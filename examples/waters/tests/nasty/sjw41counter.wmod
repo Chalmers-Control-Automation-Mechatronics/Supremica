@@ -1,0 +1,790 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="sjw41counter" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>A test for modular controllability checkers.
+This tests whether the nondeterministic trace expander can handle cases where a counterexample is cut off by a nonacceptig spec outside of the subsystem the counterexample was calculated for.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="CONTROLLABLE" Name="close_in"/>
+        <EventDecl Kind="CONTROLLABLE" Name="close_out"/>
+        <EventDecl Kind="CONTROLLABLE" Name="open_in"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="open_out"/>
+        <EventDecl Kind="CONTROLLABLE" Name="s1_off"/>
+        <EventDecl Kind="CONTROLLABLE" Name="s1_on"/>
+        <EventDecl Kind="CONTROLLABLE" Name="stirrer_off"/>
+        <EventDecl Kind="CONTROLLABLE" Name="stirrer_on"/>
+        <EventDecl Kind="CONTROLLABLE" Observable="false" Name="tau"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="SPEC" Name="Flow">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="Both_Closed">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="In_Open"/>
+                    <SimpleNode Name="Out_Open"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="Both_Closed" Target="In_Open">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="Both_Closed" Target="Out_Open">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_out"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="In_Open" Target="Both_Closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="Out_Open" Target="Both_Closed">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_out"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="Gelatinize">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="s0"/>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s10"/>
+                    <SimpleNode Name="s11">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s2"/>
+                    <SimpleNode Name="s3"/>
+                    <SimpleNode Name="s4"/>
+                    <SimpleNode Name="s5"/>
+                    <SimpleNode Name="s6"/>
+                    <SimpleNode Initial="true" Name="s7"/>
+                    <SimpleNode Name="s8"/>
+                    <SimpleNode Name="s9"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s0" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_in"/>
+                            <SimpleIdentifier Name="open_out"/>
+                            <SimpleIdentifier Name="s1_off"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s0" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="s1_on"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s0" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s0" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_out"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s1" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="s1_off"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s1" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="s1_on"/>
+                            <SimpleIdentifier Name="stirrer_off"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s1" Target="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_out"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s1" Target="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s10" Target="s10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_in"/>
+                            <SimpleIdentifier Name="close_out"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s10" Target="s11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="s1_on"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s10" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_out"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s10" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s10" Target="s6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stirrer_off"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s11" Target="s10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="s1_off"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s11" Target="s11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_in"/>
+                            <SimpleIdentifier Name="close_out"/>
+                            <SimpleIdentifier Name="s1_on"/>
+                            <SimpleIdentifier Name="stirrer_on"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s11" Target="s8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s11" Target="s9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_out"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s2" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s2" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_in"/>
+                            <SimpleIdentifier Name="stirrer_off"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s2" Target="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="s1_on"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s2" Target="s6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_out"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s3" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_out"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s3" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_out"/>
+                            <SimpleIdentifier Name="stirrer_off"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s3" Target="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="s1_on"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s3" Target="s6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s4" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_out"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s4" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="s1_off"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s4" Target="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_out"/>
+                            <SimpleIdentifier Name="s1_on"/>
+                            <SimpleIdentifier Name="stirrer_off"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s4" Target="s8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stirrer_on"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s5" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s5" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="s1_off"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s5" Target="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_in"/>
+                            <SimpleIdentifier Name="s1_on"/>
+                            <SimpleIdentifier Name="stirrer_off"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s5" Target="s9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stirrer_on"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s6" Target="s10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stirrer_on"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s6" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_out"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s6" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s6" Target="s6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_in"/>
+                            <SimpleIdentifier Name="close_out"/>
+                            <SimpleIdentifier Name="stirrer_off"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s7" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_out"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s7" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s8" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_out"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s8" Target="s11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s8" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="s1_off"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s8" Target="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stirrer_off"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s8" Target="s8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_out"/>
+                            <SimpleIdentifier Name="s1_on"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s9" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s9" Target="s11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_out"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s9" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="s1_off"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s9" Target="s5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stirrer_off"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s9" Target="s9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_in"/>
+                            <SimpleIdentifier Name="s1_on"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="stirrer">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="S:0"/>
+                    <SimpleNode Name="S:1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="S:0" Target="S:1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stirrer_on"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:1" Target="S:0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stirrer_off"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="valve_out_FullDose_sensors_valve">
+            <Graph Deterministic="false">
+                <NodeList>
+                    <SimpleNode Name="S:0"/>
+                    <SimpleNode Initial="true" Name="S:1"/>
+                    <SimpleNode Name="S:2"/>
+                    <SimpleNode Name="S:3"/>
+                    <SimpleNode Name="S:4"/>
+                    <SimpleNode Name="S:5">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="S:6"/>
+                    <SimpleNode Name="S:7"/>
+                    <SimpleNode Name="S:8"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="S:0" Target="S:3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_out"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:0" Target="S:6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:0" Target="S:7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="s1_off"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:1" Target="S:2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:2" Target="S:1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:2" Target="S:3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="s1_on"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:3" Target="S:0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_out"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:3" Target="S:4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:3" Target="S:5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:4" Target="S:3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:5" Target="S:6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_out"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:6" Target="S:0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:6" Target="S:4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_out"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:6" Target="S:5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_out"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:6" Target="S:8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="s1_off"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:7" Target="S:0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="s1_on"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:7" Target="S:2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_out"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:7" Target="S:8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:8" Target="S:1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_out"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:8" Target="S:7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_in"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Discharge_Stop_Request_Discharge_requests">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="S:0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="197" Y="239"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S:1">
+                        <PointGeometry>
+                            <Point X="108" Y="269"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S:2">
+                        <PointGeometry>
+                            <Point X="120" Y="373"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S:3">
+                        <PointGeometry>
+                            <Point X="104" Y="190"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S:4">
+                        <PointGeometry>
+                            <Point X="150" Y="304"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S:5">
+                        <PointGeometry>
+                            <Point X="210" Y="385"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S:6">
+                        <PointGeometry>
+                            <Point X="167" Y="128"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S:7">
+                        <PointGeometry>
+                            <Point X="285" Y="325"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="S:0" Target="S:0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_out"/>
+                            <SimpleIdentifier Name="s1_off"/>
+                            <SimpleIdentifier Name="s1_on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="242" Y="207"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S:0" Target="S:1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="159" Y="256"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S:1" Target="S:0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="142" Y="243"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S:1" Target="S:1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="s1_on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="50" Y="269"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S:1" Target="S:2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="open_out"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="102" Y="326"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S:1" Target="S:3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="s1_off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="96" Y="226"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S:2" Target="S:4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:2" Target="S:5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="s1_off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="163" Y="391"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S:3" Target="S:3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="s1_off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="63" Y="152"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S:3" Target="S:4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="128" Y="243"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S:3" Target="S:6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_out"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="132" Y="150"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S:4" Target="S:0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_out"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="178" Y="271"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S:4" Target="S:1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="124" Y="289"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S:4" Target="S:4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="s1_off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="162" Y="351"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S:5" Target="S:4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="182" Y="352"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S:5" Target="S:5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="s1_off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="231" Y="438"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S:5" Target="S:7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_out"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="255" Y="362"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S:6" Target="S:0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="188" Y="176"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S:6" Target="S:6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_out"/>
+                            <SimpleIdentifier Name="s1_off"/>
+                            <SimpleIdentifier Name="s1_on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="174" Y="73"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S:7" Target="S:0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="250" Y="279"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S:7" Target="S:7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="close_out"/>
+                            <SimpleIdentifier Name="s1_off"/>
+                            <SimpleIdentifier Name="s1_on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="339" Y="336"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

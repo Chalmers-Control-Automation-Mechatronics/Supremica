@@ -9,9 +9,8 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import java.util.List;
-
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 
 
@@ -129,7 +128,7 @@ public class AlphaDeterminisationTRSimplifier
     if (!modified) {
       return false;
     }
-    List<int[]> partition = mBisimulator.getResultPartition();
+    TRPartition partition = mBisimulator.getResultPartition();
     mBisimulator.reset();
     rel.reverse();
     rel.reconfigure(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
@@ -149,7 +148,7 @@ public class AlphaDeterminisationTRSimplifier
     mBisimulator.refinePartitionBasedOnInitialStates();
     modified = mBisimulator.run();
     partition = mBisimulator.getResultPartition();
-    setResultPartitionList(partition);
+    setResultPartition(partition);
     mBisimulator.setEquivalence(ObservationEquivalenceTRSimplifier.
                                 Equivalence.WEAK_OBSERVATION_EQUIVALENCE);
     applyResultPartitionAutomatically();

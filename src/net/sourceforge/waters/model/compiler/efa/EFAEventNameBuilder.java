@@ -24,10 +24,10 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
-import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.expr.ExpressionComparator;
-import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
+import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleHashCodeVisitor;
@@ -45,8 +45,6 @@ import net.sourceforge.waters.model.printer.ModuleProxyPrinter;
  * constraints, and by removing constraints that are not needed to distinguish
  * an event name suffix from others.
  *
- * @see EFAEvent
- * @see EFAEventDecl
  * @author Robi Malik
  */
 
@@ -184,6 +182,7 @@ class EFAEventNameBuilder {
 
     //#######################################################################
     //# Hashing and Comparing
+    @Override
     public int compareTo(final CountedLiteral counted)
     {
       final int oresult = mOccurrences - counted.mOccurrences;
@@ -208,6 +207,7 @@ class EFAEventNameBuilder {
       return mComparator.compare(mLiteral, counted.mLiteral);
     }
 
+    @Override
     public boolean equals(final Object other)
     {
       if (other != null && getClass() == other.getClass()) {
@@ -218,6 +218,7 @@ class EFAEventNameBuilder {
       }
     }
 
+    @Override
     public int hashCode()
     {
       return mHashCodeVisitor.hashCode(mLiteral);
@@ -374,6 +375,7 @@ class EFAEventNameBuilder {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Boolean visitIdentifierProxy(final IdentifierProxy ident)
     {
       if (mContext.getVariableRange(ident) != null) {
@@ -392,6 +394,7 @@ class EFAEventNameBuilder {
       return true;
     }
 
+    @Override
     public Boolean visitBinaryExpressionProxy(final BinaryExpressionProxy expr)
       throws VisitorException
     {
@@ -404,11 +407,13 @@ class EFAEventNameBuilder {
       return false;
     }
 
+    @Override
     public Boolean visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
     {
       return false;
     }
 
+    @Override
     public Boolean visitUnaryExpressionProxy(final UnaryExpressionProxy expr)
       throws VisitorException
     {

@@ -9,19 +9,18 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.set.hash.THashSet;
-
-import java.util.ArrayDeque;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
-import java.util.Set;
 
+import net.sourceforge.waters.analysis.tr.BFSSearchSpace;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
@@ -42,7 +41,7 @@ public class ConflictEquivalenceTraceExpander extends TRTraceExpander
      final AutomatonProxy resultAut,
      final StateEncoding resultStateEnc,
      final AutomatonProxy originalAut,
-     final List<int[]> partition)
+     final TRPartition partition)
     throws AnalysisException
   {
     super(verifier, tau, resultAut, resultStateEnc, originalAut, partition);
@@ -56,7 +55,7 @@ public class ConflictEquivalenceTraceExpander extends TRTraceExpander
      final StateEncoding resultStateEnc,
      final AutomatonProxy originalAut,
      final StateEncoding originalStateEnc,
-     final List<int[]> partition,
+     final TRPartition partition,
      final boolean preconditionMarkingReduced)
     throws AnalysisException
   {
@@ -71,6 +70,7 @@ public class ConflictEquivalenceTraceExpander extends TRTraceExpander
   @Override
   public List<TraceStepProxy> convertTraceSteps
     (final List<TraceStepProxy> traceSteps)
+    throws AnalysisAbortException, OverflowException
   {
     final List<SearchRecord> crucialSteps = getCrucialSteps(traceSteps);
     final List<SearchRecord> convertedSteps =
@@ -84,6 +84,7 @@ public class ConflictEquivalenceTraceExpander extends TRTraceExpander
   //# Auxiliary Methods
   private List<SearchRecord> convertCrucialSteps
     (final List<SearchRecord> crucialSteps)
+    throws AnalysisAbortException, OverflowException
   {
     int len = crucialSteps.size();
     SearchRecord last = crucialSteps.get(len - 1);
@@ -112,11 +113,12 @@ public class ConflictEquivalenceTraceExpander extends TRTraceExpander
   }
 
   private SearchRecord convertCrucialSteps(final SearchRecord[] crucialSteps)
+    throws AnalysisAbortException, OverflowException
   {
     final int tau = EventEncoding.TAU;
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    final Set<SearchRecord> visited = new THashSet<SearchRecord>();
-    final Queue<SearchRecord> open = new ArrayDeque<SearchRecord>();
+    final BFSSearchSpace<SearchRecord> searchSpace =
+      new BFSSearchSpace<SearchRecord>();
     final boolean firstEnd =
       crucialSteps.length == 1 && crucialSteps[0].getEvent() == tau;
     // The dummy record ensures that the first
@@ -124,6 +126,7 @@ public class ConflictEquivalenceTraceExpander extends TRTraceExpander
     final SearchRecord dummy = new SearchRecord(-1);
     final int numStates = rel.getNumberOfStates();
     for (int state = 0; state < numStates; state++) {
+      checkAbort();
       if (rel.isInitial(state)) {
         final SearchRecord record;
         if (!firstEnd) {
@@ -136,49 +139,62 @@ public class ConflictEquivalenceTraceExpander extends TRTraceExpander
             return record;
           }
         }
-        visited.add(record);
-        open.add(record);
+        searchSpace.add(record);
       }
     }
     final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
-    while (true) {
-      final SearchRecord current = open.remove();
+    final int defaultMarkingID = getDefaultMarkingID();
+    SearchRecord deadlock = null;
+    while (!searchSpace.isEmpty()) {
+      checkAbort();
+      final SearchRecord current = searchSpace.remove();
       final int source = current.getState();
-      final int depth = current.getDepth();
-      iter.reset(source, tau);
-      while (iter.advance()) {
-        final int target = iter.getCurrentTargetState();
-        int nextDepth = depth;
-        if (nextDepth == crucialSteps.length && isTargetState(target)) {
-          nextDepth++;
+      if (rel.isDeadlockState(source, defaultMarkingID)) {
+        // If a deadlock state is encountered, remember it.
+        // If we find nothing else, we will later use it as the result.
+        if (deadlock == null) {
+          deadlock = current;
         }
-        final SearchRecord record =
-          new SearchRecord(target, nextDepth, tau, current);
-        if (nextDepth > crucialSteps.length && isTraceEndState(target)) {
-          return record;
-        } else if (visited.add(record)) {
-          open.add(record);
-        }
-      }
-      if (depth < crucialSteps.length) {
-        final int event = crucialSteps[depth].getEvent();
-        iter.reset(source, event);
+      } else {
+        final int depth = current.getDepth();
+        iter.reset(source, tau);
         while (iter.advance()) {
           final int target = iter.getCurrentTargetState();
-          int nextDepth = depth + 1;
+          int nextDepth = depth;
           if (nextDepth == crucialSteps.length && isTargetState(target)) {
             nextDepth++;
           }
           final SearchRecord record =
-            new SearchRecord(target, nextDepth, event, current);
+            new SearchRecord(target, nextDepth, tau, current);
           if (nextDepth > crucialSteps.length && isTraceEndState(target)) {
             return record;
-          } else if (visited.add(record)) {
-            open.add(record);
+          } else {
+            searchSpace.add(record);
+          }
+        }
+        if (depth < crucialSteps.length) {
+          final int event = crucialSteps[depth].getEvent();
+          iter.reset(source, event);
+          while (iter.advance()) {
+            final int target = iter.getCurrentTargetState();
+            int nextDepth = depth + 1;
+            if (nextDepth == crucialSteps.length && isTargetState(target)) {
+              nextDepth++;
+            }
+            final SearchRecord record =
+              new SearchRecord(target, nextDepth, event, current);
+            if (nextDepth > crucialSteps.length && isTraceEndState(target)) {
+              return record;
+            } else {
+              searchSpace.add(record);
+            }
           }
         }
       }
     }
+    assert deadlock != null :
+      "Trace expansion search exhausted, but no deadlock state found!";
+    return deadlock;
   }
 
 }

@@ -60,7 +60,7 @@ abstract public class WatersObjectHash<T>
   protected transient Object[] _set;
 
   /** the strategy used to hash objects in this collection. */
-  protected HashingStrategy<T> _hashingStrategy;
+  protected HashingStrategy<? super T> _hashingStrategy;
 
   protected static final Object REMOVED = new Object(), FREE = new Object();
 
@@ -81,7 +81,7 @@ abstract public class WatersObjectHash<T>
    * @param strategy
    *          used to compute hash codes and to compare objects.
    */
-  public WatersObjectHash(final HashingStrategy<T> strategy)
+  public WatersObjectHash(final HashingStrategy<? super T> strategy)
   {
     this._hashingStrategy = strategy;
   }
@@ -110,7 +110,8 @@ abstract public class WatersObjectHash<T>
    * @param strategy
    *          used to compute hash codes and to compare objects.
    */
-  public WatersObjectHash(final int initialCapacity, final HashingStrategy<T> strategy)
+  public WatersObjectHash(final int initialCapacity,
+                          final HashingStrategy<? super T> strategy)
   {
     super(initialCapacity);
     this._hashingStrategy = strategy;
@@ -231,6 +232,12 @@ abstract public class WatersObjectHash<T>
     return index((T) obj) >= 0;
   }
 
+  public T getExisting(final T obj)
+  {
+    final int index = index(obj);
+    return (T) (index >= 0 ? _set[index] : null);
+  }
+
   /**
    * Locates the index of <tt>obj</tt>.
    *
@@ -240,7 +247,7 @@ abstract public class WatersObjectHash<T>
    */
   protected int index(final T obj)
   {
-    final HashingStrategy<T> hashing_strategy = _hashingStrategy;
+    final HashingStrategy<? super T> hashing_strategy = _hashingStrategy;
 
     final Object[] set = _set;
     final int length = set.length;
@@ -282,7 +289,7 @@ abstract public class WatersObjectHash<T>
    */
   protected int insertionIndex(final T obj)
   {
-    final HashingStrategy<T> hashing_strategy = _hashingStrategy;
+    final HashingStrategy<? super T> hashing_strategy = _hashingStrategy;
 
     final Object[] set = _set;
     final int length = set.length;

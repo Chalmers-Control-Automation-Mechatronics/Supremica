@@ -40,6 +40,7 @@ import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
@@ -404,13 +405,13 @@ public class OPVerifierExperiment
     }
 
     final int numStates = stateEnc.getNumberOfStates();
-    final List<int[]> partition = mOEQSimplifier.getResultPartition();
+    final TRPartition partition = mOEQSimplifier.getResultPartition();
     if (partition == null) {
       return null;
     }
     final int[] stateToClass = new int[numStates];
     int c = 0;
-    for (final int[] clazz : partition) {
+    for (final int[] clazz : partition.getClasses()) {
       for (final int s : clazz) {
         stateToClass[s] = c;
       }
@@ -426,7 +427,7 @@ public class OPVerifierExperiment
     for (int e = 0; e < numEvents; e++) {
       final int limit = e == EventEncoding.TAU ? 1 : 2;
       int sourceClass = 0;
-      for (final int[] clazz : partition) {
+      for (final int[] clazz : partition.getClasses()) {
         for (final int s : clazz) {
           iter.reset(s, e);
           while (iter.advance()) {

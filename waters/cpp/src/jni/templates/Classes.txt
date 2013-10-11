@@ -207,8 +207,8 @@ glue class KindTranslator {
   glue EventKind getEventKind(glue EventProxy event);
 }
 
-glue class AbortException extends Exception {
-  AbortException();
+glue class AnalysisAbortException extends Exception {
+  AnalysisAbortException();
 }
 
 enum class OverflowKind {STATE, TRANSITION, NODE, MEMORY}
@@ -268,4 +268,5 @@ glue class NativeConflictChecker extends NativeModelVerifier {
   glue EventProxy getUsedDefaultMarking();
   glue EventProxy getConfiguredPreconditionMarking();
   glue KindTranslator getKindTranslator();
+  boolean isDumpStateAware();
 }

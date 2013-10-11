@@ -16,11 +16,10 @@ import gnu.trove.set.hash.TLongHashSet;
 import gnu.trove.stack.TIntStack;
 import gnu.trove.stack.array.TIntArrayStack;
 
-import java.util.List;
-
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.PreTransitionBuffer;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -37,7 +36,7 @@ public class WeakObservationEquivalencePartitioning
   //#########################################################################
   //# Constructor
   WeakObservationEquivalencePartitioning(final ListBufferTransitionRelation rel,
-                                         final List<int[]> partition,
+                                         final TRPartition partition,
                                          final long propositionMask,
                                          final int limit)
   {
@@ -74,10 +73,10 @@ public class WeakObservationEquivalencePartitioning
   private void establishClassMap()
   {
     final int numStates = mTransitionRelation.getNumberOfStates();
-    final int numClasses = mPartition.size();
+    final int numClasses = mPartition.getNumberOfClasses();
     mClassMap = new int[numStates];
     for (int c = 0; c < numClasses; c++) {
-      final int[] clazz = mPartition.get(c);
+      final int[] clazz = mPartition.getStates(c);
       for (final int state : clazz) {
         mClassMap[state] = c;
       }
@@ -91,7 +90,7 @@ public class WeakObservationEquivalencePartitioning
    */
   private void collectTauVictims()
   {
-    final int numClasses = mPartition.size();
+    final int numClasses = mPartition.getNumberOfClasses();
     mTauVictims = new TLongHashSet();
     mTauClosure =
       mTransitionRelation.createSuccessorsTauClosure(mTransitionLimit);
@@ -99,7 +98,7 @@ public class WeakObservationEquivalencePartitioning
     final TIntIntHashMap succCounts = new TIntIntHashMap();
     final TIntHashSet visitedClasses = new TIntHashSet();
     for (int c = 0; c < numClasses; c++) {
-      final int[] clazz = mPartition.get(c);
+      final int[] clazz = mPartition.getStates(c);
       final int csize = clazz.length;
       if (csize > 1) {
         visitedClasses.add(c);
@@ -157,9 +156,9 @@ public class WeakObservationEquivalencePartitioning
     final TransitionIterator tauStarIter = mTauClosure.createIterator();
     final TransitionIterator closureIter =
       mTauClosure.createFullEventClosureIterator(-1);
-    final int numClasses = mPartition.size();
+    final int numClasses = mPartition.getNumberOfClasses();
     for (int c = 0; c < numClasses; c++) {
-      final int[] clazz = mPartition.get(c);
+      final int[] clazz = mPartition.getStates(c);
       long markings = 0;
       for (final int root : clazz) {
         tauSuccessors.add(root);
@@ -262,11 +261,11 @@ public class WeakObservationEquivalencePartitioning
   private void deleteTauVictims()
   {
     final int tau = EventEncoding.TAU;
-    final int numClasses = mPartition.size();
+    final int numClasses = mPartition.getNumberOfClasses();
     final TransitionIterator iter =
       mTransitionRelation.createSuccessorsModifyingIterator();
     for (int c = 0; c < numClasses; c++) {
-      final int[] clazz = mPartition.get(c);
+      final int[] clazz = mPartition.getStates(c);
       if (clazz.length > 1) {
         iter.reset(c, tau);
         while (iter.advance()) {
@@ -298,7 +297,7 @@ public class WeakObservationEquivalencePartitioning
   //#########################################################################
   //# Data Members
   private final ListBufferTransitionRelation mTransitionRelation;
-  private final List<int[]> mPartition;
+  private final TRPartition mPartition;
   private final long mPropositionMask;
   private final int mTransitionLimit;
 

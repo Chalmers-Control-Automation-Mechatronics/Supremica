@@ -178,7 +178,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     mPreselectingMethod = MustL;
     mSelectingMethod = MinS;
     mSubsumptionEnabled = false;
-    mUsingSpecialEvents = false;
+    mUsingSpecialEvents = true;
     mLowerInternalStateLimit = mUpperInternalStateLimit =
       super.getNodeLimit();
     mInternalTransitionLimit = super.getTransitionLimit();
@@ -349,7 +349,7 @@ public abstract class AbstractCompositionalModelAnalyzer
 
   /**
    * Returns whether special events are considered in abstraction.
-   * @see #setUsesSpecialEvents(boolean)
+   * @see #setUsingSpecialEvents(boolean)
    */
   public boolean isUsingSpecialEvents()
   {
@@ -595,7 +595,21 @@ public abstract class AbstractCompositionalModelAnalyzer
     if (mAbstractionProcedure != null) {
       mAbstractionProcedure.requestAbort();
     }
-    mSynchronousProductBuilder.requestAbort();
+    if (mSynchronousProductBuilder != null) {
+      mSynchronousProductBuilder.requestAbort();
+    }
+  }
+
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    if (mAbstractionProcedure != null) {
+      mAbstractionProcedure.resetAbort();
+    }
+    if (mSynchronousProductBuilder != null) {
+      mSynchronousProductBuilder.resetAbort();
+    }
   }
 
 
@@ -686,76 +700,74 @@ public abstract class AbstractCompositionalModelAnalyzer
   protected void runCompositionalMinimisation()
     throws AnalysisException
   {
-    simplify();
-    boolean cancheck = true;
-    OverflowException lastOverflow = null;
     final CompositionalAnalysisResult result = getAnalysisResult();
-    Collection<Candidate> candidates;
-    Candidate candidate = null;
-    outer:
-    do {
-      subsystem:
+    // If simplify() returns true, the global system has been trivially
+    // verified, and there is nothing left to do.
+    if (!simplify()) {
+      outer:
       do {
-        if (isSubsystemTrivial(mCurrentAutomata)) {
-          if (result.isFinished()) {
-            break outer;
-          } else {
-            continue outer;
+        boolean cancheck = true;
+        OverflowException lastOverflow = null;
+        do {
+          Collection<Candidate> candidates =
+            mPreselectingHeuristic.findCandidates();
+          while (true) {
+            checkAbort();
+            final Candidate candidate = selectCandidate(candidates);
+            if (candidate == null) {
+              break;
+            }
+            try {
+              mMayBeSplit = false;
+              applyCandidate(candidate);
+              cancheck = true;
+            } catch (final OverflowException overflow) {
+              recordUnsuccessfulComposition();
+              final List<AutomatonProxy> automata = candidate.getAutomata();
+              mOverflowCandidates.add(automata);
+              candidates.remove(candidate);
+              continue;
+            }
+            if (simplify()) {
+              if (result.isFinished()) {
+                break outer;
+              } else {
+                continue outer;
+              }
+            }
+            candidates = mPreselectingHeuristic.findCandidates();
           }
-        }
-        candidates = mPreselectingHeuristic.findCandidates();
-        candidate = selectCandidate(candidates);
-        while (candidate != null) {
           try {
-            mMayBeSplit = false;
-            applyCandidate(candidate);
-            simplify();
-            cancheck = true;
-            continue subsystem;
+            if (cancheck && !result.isFinished()) {
+              doMonolithicAnalysis(mCurrentAutomata);
+              lastOverflow = null;
+            }
           } catch (final OutOfMemoryError error) {
             getLogger().debug("<out of memory>");
-            // caught - go on ...
+            lastOverflow = new OverflowException(error);
+            cancheck = false;
           } catch (final OverflowException overflow) {
-            // caught - go on ...
+            lastOverflow = overflow;
+            cancheck = false;
           }
-          recordUnsuccessfulComposition();
-          final List<AutomatonProxy> automata = candidate.getAutomata();
-          mOverflowCandidates.add(automata);
-          candidates.remove(candidate);
-          candidate = selectCandidate(candidates);
-        }
-      } while (candidate != null);
-      try {
-        if (cancheck) {
-          doMonolithicAnalysis(mCurrentAutomata);
-          lastOverflow = null;
-        }
-      } catch (final OutOfMemoryError error) {
-        getLogger().debug("<out of memory>");
-        lastOverflow = new OverflowException(error);
-        cancheck = false;
-      } catch (final OverflowException overflow) {
-        lastOverflow = overflow;
-        cancheck = false;
-      }
-      if (lastOverflow != null) {
-        if (mCurrentInternalStateLimit < mUpperInternalStateLimit) {
-          mCurrentInternalStateLimit =
-            Math.min(2 * mCurrentInternalStateLimit, mUpperInternalStateLimit);
-          mOverflowCandidates.clear();
-          final Logger logger = getLogger();
-          if (logger.isDebugEnabled()) {
-            final String msg =
-              "State limit increased to " + mCurrentInternalStateLimit + ".";
-            logger.debug(msg);
+          if (lastOverflow != null) {
+            if (mCurrentInternalStateLimit < mUpperInternalStateLimit) {
+              mCurrentInternalStateLimit =
+                Math.min(2 * mCurrentInternalStateLimit, mUpperInternalStateLimit);
+              mOverflowCandidates.clear();
+              final Logger logger = getLogger();
+              if (logger.isDebugEnabled()) {
+                final String msg =
+                  "State limit increased to " + mCurrentInternalStateLimit + ".";
+                logger.debug(msg);
+              }
+            } else {
+              throw lastOverflow;
+            }
           }
-        } else {
-          throw lastOverflow;
-        }
-      }
-    } while (lastOverflow != null ||
-             !result.isFinished() && popEventDisjointSubsystem());
-
+        } while (lastOverflow != null);
+      } while (!result.isFinished() && popEventDisjointSubsystem());
+    }
     if (!result.isFinished()) {
       final List<AutomatonProxy> empty = Collections.emptyList();
       doMonolithicAnalysis(empty);
@@ -819,7 +831,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   /**
    * Creates an abstraction step representing a synchronous product operation.
    * This hook is called after two or more automata have been composed to
-   * prepare an abstraction step, which may later be files by a call to
+   * prepare an abstraction step, which may later be filed by a call to
    * {@link #recordAbstractionStep(AbstractionStep) recordAbstractionStep()}.
    * @param  automata     The automata that have been composed.
    * @param  sync         The synchronous product automaton that was created.
@@ -847,7 +859,7 @@ public abstract class AbstractCompositionalModelAnalyzer
    * @see #removeRedundantEvents()
    */
   protected AbstractionStep removeEvents(final Set<EventProxy> removed)
-    throws OverflowException
+    throws AnalysisException
   {
     if (removed.isEmpty()) {
       return null;
@@ -887,7 +899,9 @@ public abstract class AbstractCompositionalModelAnalyzer
 
   protected AutomatonProxy removeEvents(final AutomatonProxy aut,
                                         final Set<EventProxy> removed)
+    throws AnalysisException
   {
+    checkAbort();
     mHasRemovedProperTransition = false;
     final Collection<EventProxy> events = aut.getEvents();
     boolean found = false;
@@ -1014,7 +1028,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     }
     mRedundantEvents = new LinkedList<EventProxy>();
     for (final EventInfo info : mEventInfoMap.values()) {
-      if (info.isRemovable()) {
+      if (info.isRemovable(mUsingSpecialEvents)) {
         final EventProxy event = info.getEvent();
         mRedundantEvents.add(event);
       }
@@ -1040,6 +1054,14 @@ public abstract class AbstractCompositionalModelAnalyzer
     mCurrentAutomata.add(autToAdd);
     addEventsToAutomata(autToAdd);
     removeEventsToAutomata(autToRemove);
+  }
+
+  protected void replaceDirtyAutomaton(final AutomatonProxy newAut,
+                                       final AutomatonProxy oldAut)
+  {
+    if (mDirtyAutomata.remove(oldAut)) {
+      mDirtyAutomata.add(newAut);
+    }
   }
 
   /**
@@ -1109,7 +1131,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       info.removeAutomata(victims);
       if (info.isEmpty()) {
         iter.remove();
-      } else if (info.isRemovable()) {
+      } else if (info.isRemovable(mUsingSpecialEvents)) {
         final EventProxy event = entry.getKey();
         mRedundantEvents.add(event);
       }
@@ -1136,7 +1158,9 @@ public abstract class AbstractCompositionalModelAnalyzer
     if (logger.isDebugEnabled()) {
       final StringBuffer buffer = new StringBuffer();
       String sep = "Removing events: ";
-      for (final EventProxy event : events) {
+      final List<EventProxy> ordered = new ArrayList<EventProxy>(events);
+      Collections.sort(ordered);
+      for (final EventProxy event : ordered) {
         buffer.append(sep);
         buffer.append(event.getName());
         sep = ", ";
@@ -1226,6 +1250,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       for (int i = 0; i < subsystemAutomata.size(); i++) {
         aut = subsystemAutomata.get(i);
         for (final EventProxy event : aut.getEvents()) {
+          checkAbort();
           if (translator.getEventKind(event) != EventKind.PROPOSITION &&
               subsystemEvents.add(event) && !remainingAutomata.isEmpty()) {
             final EventInfo info = mEventInfoMap.get(event);
@@ -1359,20 +1384,33 @@ public abstract class AbstractCompositionalModelAnalyzer
    *                        been changed prior to the call, so the test for
    *                        event-disjoint subsystems is performed even if
    *                        no further simplification is possible.
+   * @return <CODE>true</CODE> if the subsystem has been found to be
+   *         trivially blocking or nonblocking. If <CODE>true</CODE>
+   *         is returned and the result for the global property is known,
+   *         the verification result is updated to contain the correct result
+   *         and a counterexample for the abstracted model if appropriate.
+   * @see #isSubsystemTrivial(Collection) isSubsystemTrivial()
    * @see #simplifyDirtyAutomata()
    * @see #removeRedundantEvents()
    * @see #findEventDisjointSubsystems()
    */
-  private void simplify()
+  private boolean simplify()
     throws AnalysisException
   {
+    if (isSubsystemTrivial(mCurrentAutomata)) {
+      return true;
+    }
     final boolean change1 = simplifyDirtyAutomata();
     final boolean change2 = removeRedundantEvents();
     boolean change = change1 || change2;
     while (change) {
+      if (isSubsystemTrivial(mCurrentAutomata)) {
+        return true;
+      }
       change = simplifyDirtyAutomata() && removeRedundantEvents();
     }
     findEventDisjointSubsystems();
+    return false;
   }
 
   /**
@@ -1421,55 +1459,64 @@ public abstract class AbstractCompositionalModelAnalyzer
   private boolean applyCandidate(final Candidate candidate)
     throws AnalysisException
   {
+    // assert mCurrentAutomata.containsAll(candidate.getAutomata());
     final List<AbstractionStep> steps = new LinkedList<AbstractionStep>();
-    final HidingStep syncStep = composeSynchronousProduct(candidate);
-    final Collection<EventProxy> local = candidate.getLocalEvents();
-    final int numLocal = local.size();
-    // Local events not replaced by tau, for synthesis abstraction.
-    final Collection<EventProxy> notReallyHidden =
-      new ArrayList<EventProxy>(numLocal);
-    for (final EventProxy event : local) {
-      final EventInfo info = mEventInfoMap.get(event);
-      if (info.canBeLocal() && !info.canBeTau()) {
-        notReallyHidden.add(event);
-      }
-    }
     AutomatonProxy aut;
-    final EventProxy tau;
-    if (syncStep == null) {
-      aut = candidate.getAutomata().iterator().next();
-      tau = null;
-    } else {
-      steps.add(syncStep);
-      aut = syncStep.getResultAutomaton();
-      tau = syncStep.getTauEvent();
-      if (tau != null) {
-        notReallyHidden.add(tau);
-      }
-    }
-    recordStatistics(aut);
-    final boolean simplified =
-      mAbstractionProcedure.run(aut, notReallyHidden, steps, candidate);
-    if (simplified) {
-      final Collection<EventProxy> oldEvents = aut.getEvents();
-      final int end = steps.size();
-      final AbstractionStep last = steps.listIterator(end).previous();
-      aut = last.getResultAutomaton();
-      final KindTranslator translator = getKindTranslator();
-      final Collection<EventProxy> newEvents =
-        new THashSet<EventProxy>(aut.getEvents());
-      for (final EventProxy event : oldEvents) {
-        if (event != tau &&
-            translator.getEventKind(event) != EventKind.PROPOSITION &&
-            !local.contains(event) && !newEvents.contains(event)) {
-          mMayBeSplit = true;
-          break;
+    try {
+      final HidingStep syncStep = composeSynchronousProduct(candidate);
+      final Collection<EventProxy> local = candidate.getLocalEvents();
+      final int numLocal = local.size();
+      // Local events not replaced by tau, for synthesis abstraction.
+      final Collection<EventProxy> notReallyHidden =
+        new ArrayList<EventProxy>(numLocal);
+      for (final EventProxy event : local) {
+        final EventInfo info = mEventInfoMap.get(event);
+        if (info.canBeLocal() && !info.canBeTau()) {
+          notReallyHidden.add(event);
         }
       }
+      final EventProxy tau;
+      if (syncStep == null) {
+        aut = candidate.getAutomata().iterator().next();
+        tau = null;
+      } else {
+        steps.add(syncStep);
+        aut = syncStep.getResultAutomaton();
+        tau = syncStep.getTauEvent();
+        if (tau != null) {
+          notReallyHidden.add(tau);
+        }
+      }
+      recordStatistics(aut);
+      final boolean simplified =
+        mAbstractionProcedure.run(aut, notReallyHidden, steps, candidate);
+      if (simplified) {
+        final Collection<EventProxy> oldEvents = aut.getEvents();
+        final int end = steps.size();
+        final AbstractionStep last = steps.listIterator(end).previous();
+        aut = last.getResultAutomaton();
+        final KindTranslator translator = getKindTranslator();
+        final Collection<EventProxy> newEvents =
+          new THashSet<EventProxy>(aut.getEvents());
+        for (final EventProxy event : oldEvents) {
+          if (event != tau &&
+              translator.getEventKind(event) != EventKind.PROPOSITION &&
+              !local.contains(event) && !newEvents.contains(event)) {
+            mMayBeSplit = true;
+            break;
+          }
+        }
+      }
+    } catch (final OutOfMemoryError error) {
+      System.gc();
+      getLogger().debug("<out of memory>");
+      throw new OverflowException(error);
     }
     if (steps.isEmpty()) {
       return false;
     } else {
+      // Beware of out-of-memory during updateEventsToAutomata() or
+      // recordAbstractionStep() --- it is not recoverable ...
       updateEventsToAutomata(aut, candidate.getAutomata());
       for (final AbstractionStep step : steps) {
         // Must be done after updateEventsToAutomata() ...
@@ -1537,7 +1584,7 @@ public abstract class AbstractCompositionalModelAnalyzer
        ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final boolean change1 = rel.checkReachability();
     final boolean change2 = rel.removeTauSelfLoops();
-    final boolean change3 = rel.removeProperSelfLoopEvents();
+    final boolean change3 = removeProperSelfLoopEvents(eventEnc, rel);
     final boolean change4 = rel.removeRedundantPropositions();
     final EventProxy trueTau = change2 ? null : tau;
     mMayBeSplit |= change3;
@@ -1589,6 +1636,27 @@ public abstract class AbstractCompositionalModelAnalyzer
         mSynchronousProductBuilder.getAnalysisResult();
       stats.addSynchronousProductAnalysisResult(result);
       mSynchronousProductBuilder.clearMask();
+    }
+  }
+
+  /**
+   * Removes events that are only selfloops from a transition relation,
+   * possibly taking into account deadlock states.
+   */
+  private boolean removeProperSelfLoopEvents(final EventEncoding enc,
+                                             final ListBufferTransitionRelation rel)
+  {
+    final EventProxy defaultMarking = getUsedDefaultMarking();
+    if (defaultMarking == null) {
+      return rel.removeProperSelfLoopEvents();
+    } else if (getConfiguredPreconditionMarking() != null) {
+      return rel.removeProperSelfLoopEvents();
+    }
+    final int defaultMarkingID = enc.getEventCode(defaultMarking);
+    if (defaultMarkingID < 0) {
+      return rel.removeProperSelfLoopEvents();
+    } else {
+      return rel.removeProperSelfLoopEvents(defaultMarkingID);
     }
   }
 
@@ -2131,7 +2199,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     protected EventInfo(final EventProxy event)
     {
       mEvent = event;
-      mAutomataMap = new TObjectByteHashMap<AutomatonProxy>();
+      mAutomataMap = new TObjectByteHashMap<AutomatonProxy>(0, 0.5f, (byte) -1);
       mSortedAutomataList = null;
       mNumNonSelfloopAutomata = 0;
       mIsBlocked = false;
@@ -2253,18 +2321,18 @@ public abstract class AbstractCompositionalModelAnalyzer
       return mAutomataMap.isEmpty();
     }
 
-    private boolean isRemovable()
+    private boolean isRemovable(final boolean special)
     {
       if (mIsBlocked) {
         return true;
-      } else if (mNumNonSelfloopAutomata == 0) {
+      } else if (special && mNumNonSelfloopAutomata == 0) {
         return isSubjectToSelfloopRemoval();
       } else {
         return false;
       }
     }
 
-     void removeAutomata(final Collection<AutomatonProxy> victims)
+    void removeAutomata(final Collection<AutomatonProxy> victims)
     {
       for (final AutomatonProxy aut : victims) {
         final byte code = mAutomataMap.remove(aut);
@@ -2299,12 +2367,14 @@ public abstract class AbstractCompositionalModelAnalyzer
      */
     boolean isOnlyNonSelfLoopCandidate(final Candidate candidate)
     {
-      int remaining = mNumNonSelfloopAutomata;
-      if (remaining == 0) {
+      if (!isSubjectToSelfloopRemoval()) {
+        return false;
+      } else if (mNumNonSelfloopAutomata == 0) {
         return true;
-      } else if (remaining > candidate.getNumberOfAutomata()) {
+      } else if (mNumNonSelfloopAutomata > candidate.getNumberOfAutomata()) {
         return false;
       } else {
+        int remaining = mNumNonSelfloopAutomata;
         for (final AutomatonProxy aut : candidate.getAutomata()) {
           if (mAutomataMap.get(aut) == NOT_ONLY_SELFLOOP) {
             remaining--;

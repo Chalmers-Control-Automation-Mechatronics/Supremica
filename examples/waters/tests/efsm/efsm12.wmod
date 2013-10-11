@@ -13,7 +13,7 @@
                             <Point X="128" Y="144"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="0" Y="10"/>
+                            <Point X="11" Y="-8"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
@@ -24,7 +24,7 @@
                             <Point X="128" Y="224"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="0" Y="10"/>
+                            <Point X="11" Y="-7"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -32,6 +32,9 @@
                     <Edge Source="S0" Target="S1">
                         <LabelBlock>
                             <SimpleIdentifier Name="a"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="9" Y="-16"/>
+                            </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
                             <Point X="144" Y="184"/>
@@ -40,6 +43,9 @@
                     <Edge Source="S1" Target="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="a"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-17" Y="-18"/>
+                            </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
                             <Point X="112" Y="184"/>
@@ -57,7 +63,7 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point X="0" Y="20"/>
+                                <Point X="-57" Y="-2"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>

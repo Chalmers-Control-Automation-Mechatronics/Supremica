@@ -225,7 +225,7 @@ public class ExpressionParser {
   {
     try {
       mScanner.setInputStream(reader);
-      final ParseResult result = parseResult(Token.END, null);
+      final ParseResult result = parseResult(Token.Type.END, null);
       checkType(result, mask, null);
       final SimpleExpressionProxy expr = result.createProxy(mFactory);
       if (input == null || expr.toString().equals(input)) {
@@ -357,7 +357,7 @@ public class ExpressionParser {
 
   //#########################################################################
   //# Auxiliary Methods for Parsing
-  private ParseResult parseResult(final int limit,
+  private ParseResult parseResult(final Token.Type limit,
                                   final Token opening)
     throws IOException, ParseException
   {
@@ -366,17 +366,19 @@ public class ExpressionParser {
     final Token after = mScanner.peek();
     if (after.getType() != limit) {
       switch (limit) {
-      case Token.END:
+      case END:
         throw createUnexpectedTokenException(after);
-      case Token.CLOSEBR:
+      case COMMA:
+        if (after.getType() == Token.Type.CLOSEBR) {
+          break;
+        }
+      case CLOSEBR:
         throw createParseException("Matching ')' not found!", opening);
-      case Token.CLOSESQ:
+      case CLOSESQ:
         throw createParseException("Matching ']' not found!", opening);
       default:
         throw new IllegalStateException("Bad limit type " + limit + "!");
       }
-    } else if (limit != Token.END) {
-      mScanner.next();
     }
     return result;
   }
@@ -386,21 +388,22 @@ public class ExpressionParser {
   {
     final Token token = mScanner.peek();
     switch (token.getType()) {
-    case Token.END:
+    case END:
       throw createUnexpectedTokenException(token);
-    case Token.OPENBR:
+    case OPENBR:
       mScanner.next();
-      final ParseResult lhs = parseResult(Token.CLOSEBR, token);
+      final ParseResult lhs = parseResult(Token.Type.CLOSEBR, token);
+      mScanner.next();
       return parseResult(lhs, token, outerpri, outerassoc);
-    case Token.OPENSQ:
+    case OPENSQ:
       mScanner.next();
       final ParseResult enumset = parseEnumSetResult();
       return parseResult(enumset, token, outerpri, outerassoc);
-    case Token.CLOSEBR:
-    case Token.CLOSESQ:
-    case Token.COMMA:
+    case CLOSEBR:
+    case CLOSESQ:
+    case COMMA:
       throw createUnexpectedTokenException(token);
-    case Token.OPERATOR:
+    case OPERATOR:
       final UnaryOperator op = token.getUnaryOperator();
       if (op != null) {
         mScanner.next();
@@ -422,7 +425,7 @@ public class ExpressionParser {
       } else {
         throw createUnexpectedTokenException(token);
       }
-    case Token.NUMBER:
+    case NUMBER:
       int value;
       mScanner.next();
       try {
@@ -432,11 +435,16 @@ public class ExpressionParser {
       }
       final ParseResult result = new IntConstantResult(value);
       return parseResult(result, token, outerpri, outerassoc);
-    case Token.SYMBOL:
+    case SYMBOL:
       mScanner.next();
       final String name = token.getText();
       final ParseResult ident = parseIdentifierResult(name);
       return parseResult(ident, token, outerpri, outerassoc);
+    case FUNCTION:
+      mScanner.next();
+      final BuiltInFunction function = token.getBuiltInFunction();
+      final ParseResult funcall = parseFunctionCallResult(function);
+      return parseResult(funcall, token, outerpri, outerassoc);
     default:
       throw new IllegalStateException
         ("Bad token type " + token.getType() + "!");
@@ -450,7 +458,7 @@ public class ExpressionParser {
     throws IOException, ParseException
   {
     final Token token = mScanner.peek(false);
-    if (token.getType() != Token.OPERATOR) {
+    if (token.getType() != Token.Type.OPERATOR) {
       return lhs;
     }
     final Operator op = token.getPostfixOperator();
@@ -507,15 +515,49 @@ public class ExpressionParser {
   {
     final List<ParseResult> indexes = new LinkedList<ParseResult>();
     Token token = mScanner.peek(false);
-    while (token.getType() == Token.OPENSQ) {
+    while (token.getType() == Token.Type.OPENSQ) {
       mScanner.next();
       final Token indexToken = mScanner.peek();
-      final ParseResult index = parseResult(Token.CLOSESQ, token);
+      final ParseResult index = parseResult(Token.Type.CLOSESQ, token);
       checkType(index, Operator.TYPE_INDEX, indexToken);
       indexes.add(index);
-      token = mScanner.peek();
+      mScanner.next();
+      token = mScanner.peek(false);
     }
     return new IdentifierResult(name, indexes);
+  }
+
+  private ParseResult parseFunctionCallResult(final BuiltInFunction function)
+    throws IOException, ParseException
+  {
+    Token token = mScanner.next();
+    if (token.getType() != Token.Type.OPENBR) {
+      throw createUnexpectedTokenException(token);
+    }
+    final List<ParseResult> args = new LinkedList<ParseResult>();
+    int argno = 0;
+    final int max = function.getMaximumNumberOfArguments();
+    do {
+      final Token argToken = mScanner.peek();
+      final ParseResult arg = parseResult(Token.Type.COMMA, token);
+      if (argno >= max) {
+        throw createParseException
+          ("Attempting to pass more than " + max +
+           " arguments to function " + function.getName(), token);
+      }
+      checkType(arg, function.getArgumentTypes(argno), argToken);
+      args.add(arg);
+      argno++;
+      token = mScanner.next();
+    } while (token.getType() == Token.Type.COMMA);
+    final int min = function.getMinimumNumberOfArguments();
+    if (argno < min) {
+      throw createParseException
+        ("Attempting to pass only " + argno +
+         " arguments to function " + function.getName() +
+         ", but " + min + " are required", token);
+    }
+    return new FunctionCallResult(function, args);
   }
 
   private ParseResult parseEnumSetResult()
@@ -524,9 +566,9 @@ public class ExpressionParser {
     final List<SimpleIdentifierProxy> items =
       new LinkedList<SimpleIdentifierProxy>();
     Token token = mScanner.next();
-    if (token.getType() != Token.CLOSESQ) {
+    if (token.getType() != Token.Type.CLOSESQ) {
       while (true) {
-        if (token.getType() != Token.SYMBOL) {
+        if (token.getType() != Token.Type.SYMBOL) {
           throw createUnexpectedTokenException(token);
         }
         final String name = token.getText();
@@ -534,9 +576,9 @@ public class ExpressionParser {
           mFactory.createSimpleIdentifierProxy(name);
         items.add(ident);
         token = mScanner.next();
-        if (token.getType() == Token.CLOSESQ) {
+        if (token.getType() == Token.Type.CLOSESQ) {
           break;
-        } else if (token.getType() != Token.COMMA) {
+        } else if (token.getType() != Token.Type.COMMA) {
           throw createUnexpectedTokenException(token);
         }
         token = mScanner.next();
@@ -568,7 +610,7 @@ public class ExpressionParser {
 
   private ParseException createUnexpectedTokenException(final Token token)
   {
-    if (token.getType() == Token.END) {
+    if (token.getType() == Token.Type.END) {
       return createParseException("Unexpected end of input!", token);
     } else {
       return createParseException
@@ -630,7 +672,7 @@ public class ExpressionParser {
       if (first) {
         first = false;
       } else {
-	buffer.append(" or ");
+        buffer.append(" or ");
       }
       buffer.append(TYPENAME_NAME);
     }

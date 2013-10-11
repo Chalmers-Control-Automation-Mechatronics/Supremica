@@ -9,23 +9,25 @@
 
 package net.sourceforge.waters.model.compiler.efa;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.IdentityHashMap;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.compiler.AbortableCompiler;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
-import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.OccursChecker;
+import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SingleBindingContext;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
@@ -45,7 +47,7 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
  * @author Robi Malik
  */
 
-class EFATransitionRelationBuilder
+class EFATransitionRelationBuilder extends AbortableCompiler
 {
 
   //#########################################################################
@@ -97,6 +99,7 @@ class EFATransitionRelationBuilder
         new LinkedList<EFAVariableTransitionRelation>();
       for (final Map.Entry<EFAVariableTransitionRelation,EventRecord> entry :
              mEventRecords.entrySet()) {
+        checkAbort();
         final EFAVariableTransitionRelation rel2 = entry.getKey();
         final EventRecord record2 = entry.getValue();
         final Collection<Proxy> locations2 = record2.getSourceLocations();
@@ -162,6 +165,7 @@ class EFATransitionRelationBuilder
         result = new EFAVariableTransitionRelation(numRecords);
         result.provideFormula(constraints);
         for (final VariableRecord record : mVariableRecords.values()) {
+          checkAbort();
           final EFAVariableTransitionRelationPart part =
             record.createTransitionRelationPart();
           if (part != null) {
@@ -175,6 +179,7 @@ class EFATransitionRelationBuilder
         }
         for (final EFAVariable var : edecl.getVariables()) {
           if (!mVariableRecords.containsKey(var)) {
+            checkAbort();
             final EFAVariable primedvar = getPrimedVariable(var);
             final VariableRecord record =
               new ModifyingVariableRecord(var, primedvar);
@@ -241,8 +246,8 @@ class EFATransitionRelationBuilder
   private VariableRecord collectRecord(final EFAEventDecl edecl,
                                        final SimpleExpressionProxy literal)
   {
-    final Collection<EFAVariable> unprimedSet = new HashSet<EFAVariable>(1);
-    final Collection<EFAVariable> primedSet = new HashSet<EFAVariable>(1);
+    final Collection<EFAVariable> unprimedSet = new THashSet<EFAVariable>(1);
+    final Collection<EFAVariable> primedSet = new THashSet<EFAVariable>(1);
     mCollector.collectAllVariables(literal, unprimedSet, primedSet);
     // Note: 'primed' is the unprimed version of the primed variable!
     assert unprimedSet.size() <= 1;
@@ -345,7 +350,7 @@ class EFATransitionRelationBuilder
                         final Collection<Proxy> locations)
     {
       mTransitionRelation = rel;
-      mSourceLocations = new HashSet<Proxy>(locations);
+      mSourceLocations = new THashSet<Proxy>(locations);
     }
 
     //#######################################################################
@@ -367,6 +372,7 @@ class EFATransitionRelationBuilder
 
     //#######################################################################
     //# Interface java.lang.Comparable
+    @Override
     public int compareTo(final EventRecord record)
     {
       return mTransitionRelation.compareTo(record.mTransitionRelation);
@@ -493,6 +499,7 @@ class EFATransitionRelationBuilder
 
     //#######################################################################
     //# Overrides
+    @Override
     EFAVariableTransitionRelationPart createTransitionRelationPart()
       throws EvalException
     {
@@ -546,6 +553,7 @@ class EFATransitionRelationBuilder
 
     //#######################################################################
     //# Overrides
+    @Override
     EFAVariableTransitionRelationPart createTransitionRelationPart()
       throws EvalException
     {
@@ -578,13 +586,15 @@ class EFATransitionRelationBuilder
             new SingleBindingContext(outervar, outervalue, mContext);
           final SimpleExpressionProxy innervalue =
             mSimpleExpressionCompiler.eval(expr, outercontext);
-          final BindingContext innercontext =
-            new SingleBindingContext(innervar, innervalue, outercontext);
-          if (evalOtherLiterals(innercontext)) {
-            if (forward) {
-              result.addTransition(outervalue, innervalue);
-            } else {
-              result.addTransition(innervalue, outervalue);
+          if (range.contains(innervalue)) {
+            final BindingContext innercontext =
+              new SingleBindingContext(innervar, innervalue, outercontext);
+            if (evalOtherLiterals(innercontext)) {
+              if (forward) {
+                result.addTransition(outervalue, innervalue);
+              } else {
+                result.addTransition(innervalue, outervalue);
+              }
             }
           }
         }
@@ -615,6 +625,7 @@ class EFATransitionRelationBuilder
 
     //#######################################################################
     //# Overrides for Base Class java.lang.Object
+    @Override
     public boolean equals(final Object other)
     {
       if (other != null && getClass() == other.getClass()) {
@@ -625,6 +636,7 @@ class EFATransitionRelationBuilder
       }
     }
 
+    @Override
     public int hashCode()
     {
       return mRelation1.objectHashCode() + 5 * mRelation2.objectHashCode();

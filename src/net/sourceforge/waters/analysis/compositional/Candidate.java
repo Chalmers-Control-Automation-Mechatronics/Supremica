@@ -138,6 +138,7 @@ public class Candidate implements Comparable<Candidate>
    * smaller. If the number of automata is equal, the lists are compared
    * lexicographically by automaton names.
    */
+  @Override
   public int compareTo(final Candidate candidate)
   {
     final List<AutomatonProxy> automata1 = mAutomata;
@@ -163,6 +164,7 @@ public class Candidate implements Comparable<Candidate>
 
   //#########################################################################
   //# Overrides for java.lang.Object
+  @Override
   public String toString()
   {
     return getCompositionName(mAutomata).replaceAll(":", "-");
@@ -286,7 +288,7 @@ public class Candidate implements Comparable<Candidate>
    *         given automata, with appropriate separators between them.
    */
   public static String getCompositionName(final String prefix,
-                                          final List<AutomatonProxy> automata)
+                                          final List<? extends AutomatonProxy> automata)
   {
     final StringBuffer buffer = new StringBuffer(prefix);
     buffer.append('{');
@@ -308,7 +310,7 @@ public class Candidate implements Comparable<Candidate>
    * including propositions.
    */
   public static Set<EventProxy> getAllEvents
-    (final Collection<AutomatonProxy> automata)
+    (final Collection<? extends AutomatonProxy> automata)
   {
     final Set<EventProxy> set = new THashSet<EventProxy>();
     for (final AutomatonProxy aut : automata) {
@@ -322,7 +324,7 @@ public class Candidate implements Comparable<Candidate>
    * including propositions.
    */
   public static List<EventProxy> getOrderedEvents
-    (final Collection<AutomatonProxy> automata)
+    (final Collection<? extends AutomatonProxy> automata)
   {
     final Set<EventProxy> set = getAllEvents(automata);
     final List<EventProxy> list = new ArrayList<EventProxy>(set);

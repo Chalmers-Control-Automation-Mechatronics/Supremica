@@ -10,6 +10,8 @@
 package net.sourceforge.waters.model.analysis.des;
 
 import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.TraceProxy;
 
 
@@ -84,10 +86,27 @@ public interface ModelVerifier extends ModelAnalyzer
    *         model checking has completed, i.e., before {@link
    *         ModelAnalyzer#run() run()} has been called, or model checking has
    *         found that the property is satisfied and there is no
-   *         counterexample.
+   *         counterexample, or counterexamples are disabled.
    */
   public TraceProxy getCounterExample();
 
+  /**
+   * Sets whether counterexample computation is enabled.
+   * If set to <CODE>true</CODE> (the default), the model verifier should
+   * compute a counterexample in all cases where it determines that a
+   * property is not satisfied. If disabled, the model verifier does not
+   * need to provide for a counterexample, which may enable it to run
+   * faster.
+   */
+  public void setCounterExampleEnabled(boolean enable);
+
+  /**
+   * Returns whether counterexample computation is enabled.
+   * @see #setCounterExampleEnabled(boolean) setCounterExampleEnabled()
+   */
+  public boolean isCounterExampleEnabled();
+
+  @Override
   public VerificationResult getAnalysisResult();
 
 }

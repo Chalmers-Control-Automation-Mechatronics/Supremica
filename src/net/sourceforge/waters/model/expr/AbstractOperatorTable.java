@@ -32,11 +32,14 @@ public abstract class AbstractOperatorTable implements OperatorTable {
     mOperatorTable = new HashMap<String,Entry>(size);
     mOperatorOrdering = new HashMap<Operator,Integer>(size);
     mOperatorChar = new boolean[maxchar - minchar];
+    mFunctionTable = new HashMap<String,BuiltInFunction>(size);
+    mFunctionKeyCharacter = 0;
   }
 
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.expr.OperatorTable
+  @Override
   public UnaryOperator getUnaryOperator(final String name)
   {
     final Entry entry = getOperatorEntry(name);
@@ -47,6 +50,7 @@ public abstract class AbstractOperatorTable implements OperatorTable {
     }
   }
 
+  @Override
   public BinaryOperator getBinaryOperator(final String name)
   {
     final Entry entry = getOperatorEntry(name);
@@ -57,32 +61,77 @@ public abstract class AbstractOperatorTable implements OperatorTable {
     }
   }
 
-  public boolean contains(final String name)
+  @Override
+  public BuiltInFunction getBuiltInFunction(final String name)
+  {
+    return mFunctionTable.get(name);
+  }
+
+  @Override
+  public boolean containsOperator(final String name)
   {
     return mOperatorTable.containsKey(name);
   }
 
+  @Override
   public boolean isOperatorCharacter(final char ch)
   {
     return
       ch >= mMinOpChar && ch < mMaxOpChar && mOperatorChar[ch - mMinOpChar];
   }
 
+  @Override
   public int getOperatorValue(final Operator op)
   {
     return mOperatorOrdering.get(op);
   }
 
+  @Override
+  public char getFunctionKeyCharacter()
+  {
+    return mFunctionKeyCharacter;
+  }
+
 
   //#########################################################################
   //# Initialisation
-  protected void store(final Operator op, final int orderindex)
+  protected void store(final BinaryOperator op, final int orderindex)
   {
-    store(op);
+    storeOperator(op);
     mOperatorOrdering.put(op, orderindex);
   }
 
-  protected void store(final Operator op)
+  protected void store(final UnaryOperator op, final int orderindex)
+  {
+    storeOperator(op);
+    mOperatorOrdering.put(op, orderindex);
+  }
+
+  protected void store(final BinaryOperator op)
+  {
+    storeOperator(op);
+  }
+
+  protected void store(final UnaryOperator op)
+  {
+    storeOperator(op);
+  }
+
+  protected void store(final BuiltInFunction function)
+  {
+    final String name = function.getName();
+    mFunctionTable.put(name, function);
+    if (mFunctionKeyCharacter == 0) {
+      mFunctionKeyCharacter = name.charAt(0);
+    } else {
+      assert mFunctionKeyCharacter == name.charAt(0);
+    }
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private void storeOperator(final Operator op)
   {
     final String name = op.getName();
     final Entry entry = mOperatorTable.get(name);
@@ -95,9 +144,6 @@ public abstract class AbstractOperatorTable implements OperatorTable {
     storeChars(name);
   }
 
-
-  //#########################################################################
-  //# Auxiliary Methods
   private Entry getOperatorEntry(final String name)
   {
     return mOperatorTable.get(name);
@@ -163,5 +209,7 @@ public abstract class AbstractOperatorTable implements OperatorTable {
   private final boolean mOperatorChar[];
   private final int mMinOpChar;
   private final int mMaxOpChar;
+  private final Map<String,BuiltInFunction> mFunctionTable;
+  private char mFunctionKeyCharacter;
 
 }

@@ -19,7 +19,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import net.sf.javabdd.BDDFactory;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -63,6 +65,7 @@ class AutomatonPartitioning
   //# Algorithm
   @Override
   void merge(final AutomatonBDD[] automatonBDDs)
+    throws AnalysisAbortException
   {
     final int numEvents = mEventMap.size();
     final int threshold = (int) Math.ceil(THRESHOLD * numEvents);
@@ -87,6 +90,7 @@ class AutomatonPartitioning
       for (EventInfo min = min0;
            min.getAutomata().isEmpty();
            min = Collections.min(events)) {
+        checkAbort();
         TransitionPartitionBDD part = min.getPartitionBDD();
         final BitSet automata = part.getAutomata();
         final TransitionPartitionBDD lostPart = lostMap.get(automata);
@@ -104,6 +108,7 @@ class AutomatonPartitioning
     }
 
     while (!mEventMap.isEmpty()) {
+      checkAbort();
       final EventInfo min = Collections.min(events);
       final Collection<AutomatonInfo> minAutomata = min.getAutomata();
       AutomatonInfo aut = null;
@@ -128,6 +133,7 @@ class AutomatonPartitioning
       }
       TransitionPartitionBDD part = null;
       for (final EventInfo event : aut.getEvents()) {
+        checkAbort();
         final TransitionPartitionBDD epart = event.getPartitionBDD();
         if (part == null) {
           part = epart;
@@ -226,6 +232,7 @@ class AutomatonPartitioning
 
     //#######################################################################
     //# Interface java.util.Comparable<EventInfo>
+    @Override
     public int compareTo(final EventInfo info)
     {
       final int count1 = mAutomata.size();
@@ -281,6 +288,7 @@ class AutomatonPartitioning
 
     //#######################################################################
     //# Interface java.util.Comparable<AutomatonInfo>
+    @Override
     public int compareTo(final AutomatonInfo info)
     {
       final int size1 = getCloudSize();

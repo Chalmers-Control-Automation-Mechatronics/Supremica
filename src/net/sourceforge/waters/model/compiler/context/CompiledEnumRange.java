@@ -156,7 +156,18 @@ public class CompiledEnumRange implements CompiledRange
       final CompiledEnumRange enumrange = (CompiledEnumRange) range;
       return intersection(enumrange);
     } else {
-      return this;
+      return this;  // TODO BUG? Should this not be empty?
+    }
+  }
+
+  @Override
+  public CompiledEnumRange union(final CompiledRange range)
+  {
+    if (range instanceof CompiledEnumRange) {
+      final CompiledEnumRange enumrange = (CompiledEnumRange) range;
+      return union(enumrange);
+    } else {
+      return null;  // TODO BUG? Should this not be an error?
     }
   }
 
@@ -201,25 +212,58 @@ public class CompiledEnumRange implements CompiledRange
 
   public CompiledEnumRange intersection(final CompiledEnumRange range)
   {
-    boolean change = false;
-    for (final IdentifierProxy atom : mAtoms) {
-      if (!range.contains(atom)) {
-        change = true;
-        break;
-      }
-    }
-    if (change) {
-      final int newsize = size() - 1;
-      final List<SimpleIdentifierProxy> newlist =
-        new ArrayList<SimpleIdentifierProxy>(newsize);
-      for (final SimpleIdentifierProxy atom : mAtoms) {
-        if (range.contains(atom)) {
-          newlist.add(atom);
+    if (size() > range.size()) {
+      return range.intersection(this);
+    } else {
+      boolean change = false;
+      for (final IdentifierProxy atom : mAtoms) {
+        if (!range.contains(atom)) {
+          change = true;
+          break;
         }
       }
-      return new CompiledEnumRange(newlist);
+      if (change) {
+        final int newSize = size() - 1;
+        final List<SimpleIdentifierProxy> newList =
+          new ArrayList<SimpleIdentifierProxy>(newSize);
+        for (final SimpleIdentifierProxy atom : mAtoms) {
+          if (range.contains(atom)) {
+            newList.add(atom);
+          }
+        }
+        return new CompiledEnumRange(newList);
+      } else {
+        return this;
+      }
+    }
+  }
+
+  public CompiledEnumRange union(final CompiledEnumRange range)
+  {
+    if (size() > range.size()) {
+      return range.intersection(this);
     } else {
-      return this;
+      boolean change = false;
+      for (final IdentifierProxy atom : mAtoms) {
+        if (!range.contains(atom)) {
+          change = true;
+          break;
+        }
+      }
+      if (change) {
+        final int newSize = size() + range.size();
+        final List<SimpleIdentifierProxy> newList =
+          new ArrayList<SimpleIdentifierProxy>(newSize);
+        newList.addAll(range.getValues());
+        for (final SimpleIdentifierProxy atom : mAtoms) {
+          if (!range.contains(atom)) {
+            newList.add(atom);
+          }
+        }
+        return new CompiledEnumRange(newList);
+      } else {
+        return range;
+      }
     }
   }
 

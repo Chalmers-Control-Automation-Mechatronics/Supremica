@@ -43,19 +43,16 @@ public final class VariableComponentElement
    * Creates a new variable.
    * @param identifier The identifier defining the name of the new variable.
    * @param type The range of the new variable.
-   * @param deterministic The deterministic of the new variable.
    * @param initialStatePredicate The initial state predicate of the new variable.
    * @param variableMarkings The list of markings of the new variable, or <CODE>null</CODE> if empty.
    */
   public VariableComponentElement(final IdentifierProxy identifier,
                                   final SimpleExpressionProxy type,
-                                  final boolean deterministic,
                                   final SimpleExpressionProxy initialStatePredicate,
                                   final Collection<? extends VariableMarkingProxy> variableMarkings)
   {
     super(identifier);
     mType = type;
-    mIsDeterministic = deterministic;
     mInitialStatePredicate = initialStatePredicate;
     if (variableMarkings == null) {
       mVariableMarkings = Collections.emptyList();
@@ -73,17 +70,14 @@ public final class VariableComponentElement
    * an empty list of markings.
    * @param identifier The identifier defining the name of the new variable.
    * @param type The range of the new variable.
-   * @param deterministic The deterministic of the new variable.
    * @param initialStatePredicate The initial state predicate of the new variable.
    */
   public VariableComponentElement(final IdentifierProxy identifier,
                                   final SimpleExpressionProxy type,
-                                  final boolean deterministic,
                                   final SimpleExpressionProxy initialStatePredicate)
   {
     this(identifier,
          type,
-         deterministic,
          initialStatePredicate,
          null);
   }
@@ -123,11 +117,6 @@ public final class VariableComponentElement
     return mType;
   }
 
-  public boolean isDeterministic()
-  {
-    return mIsDeterministic;
-  }
-
   public SimpleExpressionProxy getInitialStatePredicate()
   {
     return mInitialStatePredicate;
@@ -142,13 +131,12 @@ public final class VariableComponentElement
   //#########################################################################
   //# Data Members
   private final SimpleExpressionProxy mType;
-  private final boolean mIsDeterministic;
   private final SimpleExpressionProxy mInitialStatePredicate;
   private final List<VariableMarkingProxy> mVariableMarkings;
 
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 3062243688693388120L;
+  private static final long serialVersionUID = -8530615356850480454L;
 
 }

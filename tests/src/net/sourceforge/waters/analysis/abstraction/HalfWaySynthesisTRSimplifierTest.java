@@ -9,11 +9,6 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.set.hash.TIntHashSet;
-
-import java.util.ArrayList;
-import java.util.Collection;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -65,56 +60,28 @@ public class HalfWaySynthesisTRSimplifierTest
   protected EventEncoding createEventEncoding(final ProductDESProxy des,
                                               final AutomatonProxy aut)
   {
-    final Collection<EventProxy> events = aut.getEvents();
-    final int numEvents = events.size();
-    final Collection<EventProxy> localUncontrollable =
-      new ArrayList<EventProxy>(numEvents);
-    final Collection<EventProxy> localControllable =
-      new ArrayList<EventProxy>(numEvents);
-    final Collection<EventProxy> sharedUncontrollable =
-      new ArrayList<EventProxy>(numEvents);
-    final Collection<EventProxy> sharedControllable =
-      new ArrayList<EventProxy>(numEvents);
-    EventProxy marking = null;
-    mLastSharedControllable = 0;
-    for (final EventProxy event : events) {
-      switch (event.getKind()) {
-      case UNCONTROLLABLE:
-        if (event.isObservable()) {
-          sharedUncontrollable.add(event);
-        } else {
-          localUncontrollable.add(event);
-        }
-        mLastSharedControllable++;
-        break;
-      case CONTROLLABLE:
-        if (event.isObservable()) {
-          sharedControllable.add(event);
-        } else {
-          localControllable.add(event);
-        }
-        mLastSharedControllable++;
-        break;
-      case PROPOSITION:
-        sharedControllable.add(event);
-        if (event.getName().equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
-          marking = event;
-        }
-        break;
-      default:
+    final KindTranslator translator = IdenticalKindTranslator.getInstance();
+    final EventEncoding encoding = new EventEncoding(aut, translator);
+    final int numEvents = encoding.getNumberOfProperEvents();
+    for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+      final EventProxy event = encoding.getProperEvent(e);
+      if (!event.isObservable()) {
+        final byte status = encoding.getProperEventStatus(e);
+        encoding.setProperEventStatus
+          (e, status | EventEncoding.STATUS_LOCAL);
+      }
+    }
+    mDefaultMarkingID = -1;
+    for (int p = 0; p < encoding.getNumberOfPropositions(); p++) {
+      final EventProxy prop = encoding.getProposition(p);
+      final String name = prop.getName();
+      if (name.equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
+        mDefaultMarkingID = p;
         break;
       }
     }
-    final Collection<EventProxy> all = localUncontrollable;
-    mLastLocalUncontrollable = all.size();
-    all.addAll(localControllable);
-    mLastLocalControllable = all.size();
-    all.addAll(sharedUncontrollable);
-    mLastSharedUncontrollable = all.size();
-    all.addAll(sharedControllable);
-    final KindTranslator translator = IdenticalKindTranslator.getInstance();
-    final EventEncoding encoding = new EventEncoding(all, translator);
-    mDefaultMarkingID = encoding.getEventCode(marking);
+    encoding.sortProperEvents((byte) ~EventEncoding.STATUS_LOCAL,
+                              EventEncoding.STATUS_CONTROLLABLE);
     return encoding;
   }
 
@@ -125,18 +92,6 @@ public class HalfWaySynthesisTRSimplifierTest
     final HalfWaySynthesisTRSimplifier simplifier =
       getTransitionRelationSimplifier();
     simplifier.setDefaultMarkingID(mDefaultMarkingID);
-    simplifier.setLastLocalUncontrollableEvent(mLastLocalUncontrollable);
-    simplifier.setLastLocalControllableEvent(mLastLocalControllable);
-    simplifier.setLastSharedUncontrollableEvent(mLastSharedUncontrollable);
-    if (mSettingRenamed) {
-      final int numRenamed = mLastSharedControllable - mLastSharedUncontrollable;
-      final TIntHashSet renamed = new TIntHashSet(numRenamed);
-      for (int e = mLastSharedUncontrollable + 1;
-           e <= mLastSharedControllable; e++) {
-        renamed.add(e);
-      }
-      simplifier.setRenamedEvents(renamed);
-    }
   }
 
 
@@ -263,6 +218,14 @@ public class HalfWaySynthesisTRSimplifierTest
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
+  public void test_HalfwaySynthesis_13() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "HalfwaySynthesis_13.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
   @Override
   public void test_basic_7() throws Exception
   {
@@ -292,11 +255,7 @@ public class HalfWaySynthesisTRSimplifierTest
 
   //#########################################################################
   //# Data Members
-  private int mLastLocalUncontrollable;
-  private int mLastLocalControllable;
-  private int mLastSharedUncontrollable;
-  private int mLastSharedControllable;
   private int mDefaultMarkingID;
-  private final boolean mSettingRenamed = true;
+
 }
 

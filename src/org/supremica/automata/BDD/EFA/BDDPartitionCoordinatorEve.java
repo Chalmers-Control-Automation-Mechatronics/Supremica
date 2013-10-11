@@ -3,6 +3,8 @@ package org.supremica.automata.BDD.EFA;
 import gnu.trove.set.hash.TIntHashSet;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.procedure.TIntObjectProcedure;
+import net.sf.javabdd.BDD;
 
 
 /**
@@ -154,7 +156,16 @@ public final class BDDPartitionCoordinatorEve extends BDDPartitionCoordinator{
         candidateEventIndexSet.clear();
 
         activeEventIndexSet.clear();
-        activeEventIndexSet.addAll(partitions.getCompIndexToCompBDDMap().keys());
+        
+        partitions.getCompIndexToCompBDDMap().forEachEntry(new TIntObjectProcedure<BDD>() {
+
+            @Override
+            public boolean execute(int eventIndex, BDD eventPartition) {
+                if (!eventPartition.isZero())
+                    activeEventIndexSet.add(eventIndex);
+                return true;
+            }
+        });        
     }
 
 

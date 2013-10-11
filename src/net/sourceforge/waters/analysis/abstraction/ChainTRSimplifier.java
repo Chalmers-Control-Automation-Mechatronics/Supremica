@@ -9,13 +9,11 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.list.array.TIntArrayList;
-
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 
 
@@ -179,6 +177,15 @@ public class ChainTRSimplifier
     }
   }
 
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    for (final TransitionRelationSimplifier step : mSteps) {
+      step.resetAbort();
+    }
+  }
+
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.abstraction.
@@ -208,44 +215,16 @@ public class ChainTRSimplifier
         for (int prop = 0; prop < numProps; prop++) {
           mReducedMarkings[prop] |= step.isReducedMarking(prop);
         }
-        if (isPartitioning()) {
-          final List<int[]> currentPartition = getResultPartition();
-          final List<int[]> newPartition = step.getResultPartition();
-          final List<int[]> combinedPartition =
-            mergePartitions(currentPartition, newPartition);
-          setResultPartitionList(combinedPartition);
-        }
+      }
+      if (isPartitioning()) {
+        final TRPartition currentPartition = getResultPartition();
+        final TRPartition newPartition = step.getResultPartition();
+        final TRPartition combinedPartition =
+          TRPartition.combine(currentPartition, newPartition);
+        setResultPartition(combinedPartition);
       }
     }
     return result;
-  }
-
-
-  //#########################################################################
-  //# Merging Partitions
-  public static List<int[]> mergePartitions(final List<int[]> part1,
-                                     final List<int[]> part2)
-  {
-    if (part1 == null) {
-      return part2;
-    } else if (part2 == null) {
-      return part1;
-    } else {
-      final int size2 = part2.size();
-      final List<int[]> result = new ArrayList<int[]>(size2);
-      final TIntArrayList clazz = new TIntArrayList();
-      for (final int[] clazz2 : part2) {
-        for (final int state2 : clazz2) {
-          final int[] clazz1 = part1.get(state2);
-          for (final int state1 : clazz1) {
-            clazz.add(state1);
-          }
-        }
-        result.add(clazz.toArray());
-        clazz.clear();
-      }
-      return result;
-    }
   }
 
 

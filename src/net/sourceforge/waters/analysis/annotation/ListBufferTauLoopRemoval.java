@@ -9,6 +9,7 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 
 
@@ -92,7 +93,8 @@ public class ListBufferTauLoopRemoval
         tarjan(s);
       }
     }
-    mTransitionRelation.merge(mToBeMerged);
+    final TRPartition partition = new TRPartition(mToBeMerged, mTarjan.length);
+    mTransitionRelation.merge(partition);
     mTransitionRelation.removeTauSelfLoops();
     TIME += System.currentTimeMillis();
   }

@@ -330,6 +330,21 @@ public class ModuleProxyCloner
   }
 
   @Override
+  public FunctionCallExpressionProxy visitFunctionCallExpressionProxy
+    (final FunctionCallExpressionProxy proxy)
+    throws VisitorException
+  {
+    final String plainText = proxy.getPlainText();
+    final String functionName = proxy.getFunctionName();
+    final Collection<SimpleExpressionProxy> arguments0 = proxy.getArguments();
+    final Collection<SimpleExpressionProxy> arguments =
+      cloneProxyCollection(arguments0);
+    return mFactory.createFunctionCallExpressionProxy(plainText,
+                                                      functionName,
+                                                      arguments);
+  }
+
+  @Override
   public GraphProxy visitGraphProxy
     (final GraphProxy proxy)
     throws VisitorException
@@ -696,7 +711,6 @@ public class ModuleProxyCloner
     final IdentifierProxy identifier = visitIdentifierProxy(identifier0);
     final SimpleExpressionProxy type0 = proxy.getType();
     final SimpleExpressionProxy type = visitSimpleExpressionProxy(type0);
-    final boolean deterministic = proxy.isDeterministic();
     final SimpleExpressionProxy initialStatePredicate0 =
       proxy.getInitialStatePredicate();
     final SimpleExpressionProxy initialStatePredicate =
@@ -707,7 +721,6 @@ public class ModuleProxyCloner
       cloneProxyCollection(variableMarkings0);
     return mFactory.createVariableComponentProxy(identifier,
                                                  type,
-                                                 deterministic,
                                                  initialStatePredicate,
                                                  variableMarkings);
   }
@@ -779,4 +792,3 @@ public class ModuleProxyCloner
   private Map<String,NodeProxy> mNodeMap;
 
 }
-

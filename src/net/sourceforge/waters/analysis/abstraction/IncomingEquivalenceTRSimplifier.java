@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.abstraction
-//# CLASS:   ActiveEventsTRSimplifier
+//# CLASS:   IncomingEquivalenceTRSimplifier
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -23,6 +23,7 @@ import java.util.List;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.analysis.tr.WatersIntHashingStrategy;
@@ -88,11 +89,22 @@ public class IncomingEquivalenceTRSimplifier
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
+  //# Interface
+  //# net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
   @Override
   public int getPreferredInputConfiguration()
   {
     return ListBufferTransitionRelation.CONFIG_ALL;
+  }
+
+
+  //#########################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.analysis.abstraction.AbstractMarkingTRSimplifier
+  @Override
+  public boolean isDumpStateAware()
+  {
+    return true;
   }
 
 
@@ -174,10 +186,10 @@ public class IncomingEquivalenceTRSimplifier
     } while (change);
 
     if (trivial) {
-      setResultPartitionList(null);
+      setResultPartition(null);
       return false;
     } else {
-      final List<int[]> partition = new ArrayList<int[]>();
+      final List<int[]> classes = new ArrayList<>();
       final int[] codes = new int[numStates];
       final int[] offsets = new int[numStates];
       for (int state = 0; state < numStates; state++) {
@@ -188,18 +200,19 @@ public class IncomingEquivalenceTRSimplifier
             final int size = info.size();
             final int[] clazz = new int[size];
             clazz[0] = root;
-            codes[root] = partition.size();
+            codes[root] = classes.size();
             offsets[root] = 1;
-            partition.add(clazz);
+            classes.add(clazz);
           } else {
             final int code = codes[root];
-            final int[] clazz = partition.get(code);
+            final int[] clazz = classes.get(code);
             final int offset = offsets[root]++;
             clazz[offset] = state;
           }
         }
       }
-      setResultPartitionList(partition);
+      final TRPartition partition = new TRPartition(classes, numStates);
+      setResultPartition(partition);
       applyResultPartitionAutomatically();
       return true;
     }
@@ -230,7 +243,7 @@ public class IncomingEquivalenceTRSimplifier
     super.applyResultPartition();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     rel.removeTauSelfLoops();
-    rel.removeProperSelfLoopEvents();
+    removeProperSelfLoopEvents();
   }
 
 
@@ -338,7 +351,7 @@ public class IncomingEquivalenceTRSimplifier
      * Returns whether at least one state in this class has an outgoing
      * tau-transition to a class other than this class. If this is true,
      * the merged class has an outgoing tau-transition and can be merged
-     * into incoming equivalent class that also have an outgoing
+     * into incoming equivalent class that also has an outgoing
      * tau-transition.
      */
     private boolean hasOutgoingTau()
@@ -380,7 +393,7 @@ public class IncomingEquivalenceTRSimplifier
         int result = 0;
         mPredecessorsTauClosureIterator.resetState(root);
         mPredecessorsPreEventClosureIterator.resetEvents(EventEncoding.NONTAU,
-                                                          Integer.MAX_VALUE);
+                                                         Integer.MAX_VALUE);
         while (mPredecessorsTauClosureIterator.advance()) {
           final int taupred =
             mPredecessorsTauClosureIterator.getCurrentSourceState();
@@ -493,7 +506,7 @@ public class IncomingEquivalenceTRSimplifier
         return false;
       }
       mPredecessorsPreEventClosureIterator.resetEvents(EventEncoding.NONTAU,
-                                                        Integer.MAX_VALUE);
+                                                       Integer.MAX_VALUE);
       final ListBufferTransitionRelation rel = getTransitionRelation();
       final TIntHashSet keys0 = new TIntHashSet();
       boolean init0 = false;

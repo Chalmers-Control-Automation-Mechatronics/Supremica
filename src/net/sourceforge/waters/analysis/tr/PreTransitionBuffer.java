@@ -186,7 +186,7 @@ public class PreTransitionBuffer
       int offset = BLOCK_SIZE;
       int pos = 0;
       WritePos wpos = WritePos.NEW_LIST;
-      while (pos < size) {
+      while (++pos < size) {
         if (offset >= BLOCK_SIZE) {
           block = mBlocks.get(blockno++);
           offset = 0;
@@ -217,8 +217,7 @@ public class PreTransitionBuffer
           printer.print(event);
           printer.print("-> ");
           printer.print(state & ~TAG_END);
-          pos++;
-        } while (pos < size && (state & TAG_END) == 0);
+        } while (++pos < size && (state & TAG_END) == 0);
         wpos = WritePos.NEW_LINE;
       }
     }

@@ -24,11 +24,13 @@ import java.util.TreeSet;
 
 import net.sourceforge.waters.analysis.hisc.HISCAttributeFactory;
 import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
+import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
 import net.sourceforge.waters.model.base.ProxyAccessorSet;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.EvalAbortException;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
@@ -101,7 +103,9 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
  * @author Robi Malik
  */
 
-public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
+public class ModuleInstanceCompiler
+  extends DefaultModuleProxyVisitor
+  implements Abortable
 {
 
   //#########################################################################
@@ -123,6 +127,27 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     mIndexAdder = new IndexAdder();
     mNameSpaceVariablesContext = new NameSpaceVariablesContext();
     mInputModule = module;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
+  public void requestAbort()
+  {
+    mIsAborting = true;
+  }
+
+  @Override
+  public boolean isAborting()
+  {
+    return mIsAborting;
+  }
+
+  @Override
+  public void resetAbort()
+  {
+    mIsAborting = false;
   }
 
 
@@ -220,6 +245,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     throws VisitorException
   {
     try {
+      checkAbort();
       final IdentifierProxy ident = alias.getIdentifier();
       final ScopeKind scope = alias.getScope();
       final CompiledParameterBinding binding =
@@ -319,6 +345,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     throws VisitorException
   {
     try {
+      checkAbort();
       final IdentifierProxy ident = decl.getIdentifier();
       final ScopeKind scope = decl.getScope();
       final CompiledParameterBinding binding =
@@ -517,6 +544,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       final List<SimpleExpressionProxy> newguards =
         new ArrayList<SimpleExpressionProxy>(numguards);
       for (final SimpleExpressionProxy oldguard : oldguards) {
+        checkAbort();
         if (mPrimeSearcher.containsPrime(oldguard)) {
           // Don't simplify guards with primes ---
           // they are needed to determine the variable alphabet!
@@ -545,6 +573,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       final List<BinaryExpressionProxy> newactions =
         new ArrayList<BinaryExpressionProxy>(numactions);
       for (final BinaryExpressionProxy oldaction : oldactions) {
+        checkAbort();
         final SimpleExpressionProxy newaction =
           mSimpleExpressionCompiler.simplify
           (oldaction, mNameSpaceVariablesContext);
@@ -567,6 +596,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     throws VisitorException
   {
     try {
+      checkAbort();
       // First evaluate all indexes ...
       final IdentifierProxy newident = mNameCompiler.compileName(ident, false);
       // Second do a lookup ... Where? Depends on context ...
@@ -605,6 +635,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
   public Object visitInstanceProxy(final InstanceProxy inst)
     throws VisitorException
   {
+    checkAbort();
     final BindingContext oldContext = mContext;
     final CompiledNameSpace oldNameSpace = mNameSpace;
     switch (mHISCCompileMode) {
@@ -783,6 +814,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
   public SimpleNodeProxy visitSimpleNodeProxy(final SimpleNodeProxy node)
     throws VisitorException
   {
+    checkAbort();
     final String name = node.getName();
     final boolean initial = node.isInitial();
     final PlainEventListProxy props0 = node.getPropositions();
@@ -806,6 +838,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     throws VisitorException
   {
     try {
+      checkAbort();
       if (mHISCCompileMode == HISCCompileMode.HISC_LOW) {
         return null;
       }
@@ -819,7 +852,6 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       final SimpleExpressionProxy value =
         mSimpleExpressionCompiler.eval(expr, mContext);
       mSimpleExpressionCompiler.getRangeValue(value);
-      final boolean deterministic = var.isDeterministic();
       final SimpleExpressionProxy oldinit = var.getInitialStatePredicate();
       final SimpleExpressionProxy newinit =
         mSimpleExpressionCompiler.simplify(oldinit, context);
@@ -851,8 +883,8 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
         }
       }
       final VariableComponentProxy newvar =
-        mFactory.createVariableComponentProxy
-        (fullname, value, deterministic, newinit, newmarkings);
+        mFactory.createVariableComponentProxy(fullname, value,
+                                              newinit, newmarkings);
       mNameSpace.addComponent(suffix, newvar);
       mCompiledComponents.add(newvar);
       addSourceInfo(newvar, var);
@@ -860,6 +892,18 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     } catch (final EvalException exception) {
       exception.provideLocation(var); // ???
       throw wrap(exception);
+    }
+  }
+
+
+  //#########################################################################
+  //# Aborting
+  private void checkAbort()
+    throws VisitorException
+  {
+    if (mIsAborting) {
+      final EvalAbortException exception = new EvalAbortException();
+      throw new VisitorException(exception);
     }
   }
 
@@ -1353,5 +1397,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
 
   private EdgeProxy mCurrentEdge;
   private CompiledEventList mCurrentEventList;
+
+  private boolean mIsAborting;
 
 }

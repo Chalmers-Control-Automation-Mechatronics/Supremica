@@ -21,6 +21,7 @@ import java.util.Map;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
@@ -249,12 +250,20 @@ public abstract class AbstractCompositionalModelVerifier
       } else {
         final AbstractionProcedure proc = getAbstractionProcedure();
         proc.resetStatistics();
-        TraceProxy trace = result.getCounterExample();
-        trace = expandTrace(trace);
-        return setFailedResult(trace);
+        if (mCounterExampleEnabled) {
+          TraceProxy trace = result.getCounterExample();
+          trace = expandTrace(trace);
+          return setFailedResult(trace);
+        } else {
+          return setFailedResult(null);
+        }
       }
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
+    } catch (final OutOfMemoryError error) {
+      System.gc();
+      final OverflowException overflow = new OverflowException(error);
+      throw setExceptionResult(overflow);
     } finally {
       tearDown();
     }
@@ -269,6 +278,15 @@ public abstract class AbstractCompositionalModelVerifier
     super.requestAbort();
     if (mCurrentMonolithicVerifier != null) {
       mCurrentMonolithicVerifier.requestAbort();
+    }
+  }
+
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    if (mCurrentMonolithicVerifier != null) {
+      mCurrentMonolithicVerifier.resetAbort();
     }
   }
 
@@ -301,6 +319,18 @@ public abstract class AbstractCompositionalModelVerifier
   public CompositionalVerificationResult getAnalysisResult()
   {
     return (CompositionalVerificationResult) super.getAnalysisResult();
+  }
+
+  @Override
+  public void setCounterExampleEnabled(final boolean enable)
+  {
+    mCounterExampleEnabled = enable;
+  }
+
+  @Override
+  public boolean isCounterExampleEnabled()
+  {
+    return mCounterExampleEnabled;
   }
 
   @Override
@@ -448,6 +478,7 @@ public abstract class AbstractCompositionalModelVerifier
   private TraceProxy expandTrace(final TraceProxy trace)
     throws AnalysisException
   {
+    getLogger().debug("Property NOT satisfied --- expanding trace ...");
     final List<TraceStepProxy> unsat = trace.getTraceSteps();
     final Collection<AutomatonProxy> currentAutomata = getAllTraceAutomata();
     List<TraceStepProxy> traceSteps =
@@ -581,6 +612,7 @@ public abstract class AbstractCompositionalModelVerifier
 
   //#########################################################################
   //# Data Members
+  private boolean mCounterExampleEnabled = true;
   private boolean mTraceCheckingEnabled = false;
 
   private ModelVerifier mMonolithicVerifier;

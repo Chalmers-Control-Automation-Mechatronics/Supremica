@@ -67,57 +67,36 @@ public class EnabledEventsLimitedCertainConflictsTRSimplifierTest
     final Collection<EventProxy> events = new ArrayList<EventProxy>();
     final EnabledEventsLimitedCertainConflictsTRSimplifier simplifier = getTransitionRelationSimplifier();
     int uncontrollableCount = 0;
-    //go through automaton
-    for(final EventProxy event : aut.getEvents())
-    {
-    //find events
-
-
-    //see if controllable
-    if(event.getKind() == EventKind.UNCONTROLLABLE)
-    {
-    //put in the order you want to encode
-    //don't need to worry about tau because of the construtor I'm using
-      events.add(event);
-    //Collection<EventProxy> create list of events in right order
-
-      if(event != tau)
-      uncontrollableCount++;
+    for (final EventProxy event : aut.getEvents()) {
+      // Uncontrollable events are always enabled ...
+      if (event.getKind() == EventKind.UNCONTROLLABLE) {
+        // put in the order you want to encode
+        // don't need to worry about tau because of the constructor I'm using
+        events.add(event);
+        if (event != tau) {
+          uncontrollableCount++;
+        }
+      }
     }
-
-
-    }
-    for(final EventProxy event : aut.getEvents())
-      {
-      switch(event.getKind()){
-    //find events
-      case CONTROLLABLE :
+    for (final EventProxy event : aut.getEvents()) {
+      switch (event.getKind()) {
+      //find events
+      case CONTROLLABLE:
         events.add(event);
         break;
-      case PROPOSITION :
-        if(event.getName().equals(OMEGA))
-        {
+      case PROPOSITION:
+        if (event.getName().equals(OMEGA)) {
           events.add(event);
           simplifier.setDefaultMarkingID(0);
-         }
-        /*
-        if(event.getName().equals(ALPHA))
-        {
-          //don't just use the number 0
-
         }
-        */
         break;
-      default :
+      default:
         break;
-    }
       }
+    }
     //returns a list where all uncontrollable events are first
-
     simplifier.setNumberOfEnabledEvents(uncontrollableCount);
-
     return new EventEncoding(events, translator, tau);
-
   }
 
   @Override
@@ -340,6 +319,15 @@ public class EnabledEventsLimitedCertainConflictsTRSimplifierTest
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "certainconflicts_17.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_certainconflicts_18()
+  throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "certainconflicts_18.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 

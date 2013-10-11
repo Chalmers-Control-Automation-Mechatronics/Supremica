@@ -126,6 +126,13 @@ public class DefaultModuleProxyVisitor
   }
 
   @Override
+  public Object visitFunctionCallExpressionProxy(final FunctionCallExpressionProxy proxy)
+    throws VisitorException
+  {
+    return visitSimpleExpressionProxy(proxy);
+  }
+
+  @Override
   public Object visitGraphProxy(final GraphProxy proxy)
     throws VisitorException
   {

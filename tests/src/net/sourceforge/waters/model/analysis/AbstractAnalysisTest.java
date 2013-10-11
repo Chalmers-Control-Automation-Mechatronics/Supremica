@@ -11,6 +11,7 @@ package net.sourceforge.waters.model.analysis;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -20,6 +21,7 @@ import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.NameNotFoundException;
 import net.sourceforge.waters.model.base.ProxyTools;
+import net.sourceforge.waters.model.base.WatersException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -76,52 +78,50 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
 
   //#########################################################################
   //# Compiling
-  protected ProductDESProxy getCompiledDES(final String group,
-                                           final String name)
+  protected ModuleProxy loadModule(final String... path)
+    throws IOException, WatersException
+  {
+    File dir = getWatersInputRoot();
+    final int numDirs = path.length - 1;
+    for (int i = 0; i < numDirs; i++) {
+      final String name = path[i];
+      dir = new File(dir, name);
+    }
+    String extname = path[numDirs];
+    if (extname.indexOf('.') < 0) {
+      extname += mModuleMarshaller.getDefaultExtension();
+    }
+    final File filename = new File(dir, extname);
+    final URI uri = filename.toURI();
+    return mModuleMarshaller.unmarshal(uri);
+  }
+
+
+  protected ProductDESProxy getCompiledDES(final String... path)
     throws Exception
   {
-    return getCompiledDES(group, name, (List<ParameterBindingProxy>) null);
+    return getCompiledDESRaw(null, path);
   }
 
   protected ProductDESProxy getCompiledDES
-    (final String group,
-     final String name,
-     final List<ParameterBindingProxy> bindings)
+    (final List<ParameterBindingProxy> bindings,
+     final String... names)
     throws Exception
   {
-    final File rootdir = getWatersInputRoot();
-    final File groupdir = new File(rootdir, group);
-    return getCompiledDES(groupdir, name, bindings);
+    return getCompiledDESRaw(bindings, names);
   }
 
-  protected ProductDESProxy getCompiledDES(final String group,
-                                           final String subdir,
-                                           final String name)
+  protected ProductDESProxy getCompiledDESRaw
+    (final List<ParameterBindingProxy> bindings, final String[] names)
     throws Exception
   {
-    return getCompiledDES(group, subdir, name, null);
-  }
-
-  protected ProductDESProxy getCompiledDES
-    (final String group,
-     final String subdir,
-     final String name,
-     final List<ParameterBindingProxy> bindings)
-    throws Exception
-  {
-    final File rootdir = getWatersInputRoot();
-    final File groupdir = new File(rootdir, group);
-    return getCompiledDES(groupdir, subdir, name, bindings);
-  }
-
-  protected ProductDESProxy getCompiledDES
-    (final File groupdir,
-     final String subdir,
-     final String name,
-     final List<ParameterBindingProxy> bindings)
-    throws Exception
-  {
-    final File dir = new File(groupdir, subdir);
+    File dir = getWatersInputRoot();
+    final int numDirs = names.length - 1;
+    for (int i = 0; i < numDirs; i++) {
+      final String name = names[i];
+      dir = new File(dir, name);
+    }
+    final String name = names[numDirs];
     return getCompiledDES(dir, name, bindings);
   }
 
@@ -163,14 +163,12 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
       return des;
     } else if (doc instanceof ModuleProxy) {
       final ModuleProxy module = (ModuleProxy) doc;
-      final DeterministicModuleChecker checker =
-        DeterministicModuleChecker.getInstance();
-      mProductDESIsDeterministic =
-        checker.isDeterministic(module, mDocumentManager);
       final ModuleCompiler compiler =
         new ModuleCompiler(mDocumentManager, mProductDESProxyFactory, module);
       configure(compiler);
-      return compiler.compile(bindings);
+      final ProductDESProxy des = compiler.compile(bindings);
+      mProductDESIsDeterministic = AutomatonTools.isDeterministic(des);
+      return des;
     } else {
       fail("Unknown document type " + doc.getClass().getName() + "!");
       return null;
@@ -189,6 +187,11 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
 
   //#########################################################################
   //# Utilities
+  protected ModuleProxyFactory getModuleProxyFactory()
+  {
+    return mModuleProxyFactory;
+  }
+
   protected ProductDESProxyFactory getProductDESProxyFactory()
   {
     return mProductDESProxyFactory;
@@ -317,6 +320,21 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
     final String modname = basename + modext;
     final File modfilename = new File(dir, modname);
     mDocumentManager.saveAs(module, modfilename);
+  }
+
+  protected void saveModule(final ModuleProxy module, final String basename)
+    throws WatersMarshalException, IOException, ParseException
+  {
+    assertNotNull(module);
+    final String ext = mModuleMarshaller.getDefaultExtension();
+    final String filename = basename + ext;
+    assertTrue("File name '" + filename + "' contains colon, " +
+               "which does not work on all platforms!",
+               filename.indexOf(':') < 0);
+    final File dir = getOutputDirectory();
+    final File fullname = new File(dir, filename);
+    ensureParentDirectoryExists(fullname);
+    mDocumentManager.saveAs(module, fullname);
   }
 
   protected boolean isProductDESDeterministic()

@@ -24,6 +24,7 @@ import java.lang.reflect.Method;
 public enum ModelVerifierFactoryLoader
 {
   BDD("net.sourceforge.waters.analysis.bdd.BDDModelVerifierFactory"),
+  EnabledEvents("net.sourceforge.waters.analysis.compositional.EnabledEventsCompositionalModelVerifierFactory"),
   Compositional("net.sourceforge.waters.analysis.compositional.CompositionalModelVerifierFactory"),
   Modular("net.sourceforge.waters.analysis.modular.ModularModelVerifierFactory"),
   Monolithic("net.sourceforge.waters.analysis.monolithic.MonolithicModelVerifierFactory"),

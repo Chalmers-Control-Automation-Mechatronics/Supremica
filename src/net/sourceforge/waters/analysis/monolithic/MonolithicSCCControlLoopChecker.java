@@ -11,15 +11,15 @@ package net.sourceforge.waters.analysis.monolithic;
 
 import gnu.trove.set.hash.THashSet;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 
-import net.sourceforge.waters.model.analysis.AbortException;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -29,13 +29,12 @@ import net.sourceforge.waters.model.analysis.des.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.des.ControlLoopChecker;
 import net.sourceforge.waters.model.base.Pair;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.des.LoopTraceProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.LoopTraceProxy;
-
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -97,6 +96,7 @@ public class MonolithicSCCControlLoopChecker
    *         net.sourceforge.waters.model.analysis.des.ModelVerifier#isSatisfied()
    *         isSatisfied()} method.
    */
+  @Override
   public boolean run()
     throws AnalysisException
   {
@@ -141,6 +141,7 @@ public class MonolithicSCCControlLoopChecker
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @Override
   public boolean supportsNondeterminism()
   {
     return false;
@@ -168,11 +169,13 @@ public class MonolithicSCCControlLoopChecker
    *         has been called, or model checking has found that the
    *         property is satisfied and there is no counterexample.
    */
+  @Override
   public LoopTraceProxy getCounterExample()
   {
     return (LoopTraceProxy) super.getCounterExample();
   }
 
+  @Override
   public Collection<EventProxy> getNonLoopEvents()
   {
     final HashSet<EventProxy> output = new HashSet<EventProxy>();
@@ -206,6 +209,7 @@ public class MonolithicSCCControlLoopChecker
 
   //#########################################################################
   //# Algorithm
+  @Override
   protected void setUp()
     throws AnalysisException
   {
@@ -544,50 +548,50 @@ public class MonolithicSCCControlLoopChecker
   }
 
   private LoopTraceProxy computeCounterExample()
-  throws AbortException
-{
-  final ProductDESProxyFactory factory = getFactory();
-  final ProductDESProxy des = getModel();
-  final String desname = des.getName();
-  final String tracename = desname + "-loop";
-  List<EventProxy> tracelist = new LinkedList<EventProxy>();
+    throws AnalysisAbortException, OverflowException
+  {
+    final ProductDESProxyFactory factory = getFactory();
+    final ProductDESProxy des = getModel();
+    final String desname = des.getName();
+    final String tracename = desname + "-loop";
+    List<EventProxy> tracelist = new LinkedList<EventProxy>();
 
-  /* FIND COUNTEREXAMPLE TRACE HERE */
-  /* Counterexample = The shortest path from mInitialStateTuple to
-   *                  mRootStateTuple
-   *                  +
-   *                  The shortest path from mRootStateTuple
-   *                  to mRootStateTuple
-   */
+    /* FIND COUNTEREXAMPLE TRACE HERE */
+    /* Counterexample = The shortest path from mInitialStateTuple to
+     *                  mRootStateTuple
+     *                  +
+     *                  The shortest path from mRootStateTuple
+     *                  to mRootStateTuple
+     */
 
-  Set<TransitionProperty> loopStates =
-    new THashSet<TransitionProperty>();
-  List<EncodedStateTuple> list = new ArrayList<EncodedStateTuple>();
-  ArrayList<Integer> indexList = new ArrayList<Integer>();
+    Set<TransitionProperty> loopStates =
+      new THashSet<TransitionProperty>();
+    List<EncodedStateTuple> list = new ArrayList<EncodedStateTuple>();
+    ArrayList<Integer> indexList = new ArrayList<Integer>();
 
-  // find a shortest path from mInitialStateTuple to mRootStateTuple:
-  // for both controllable events and uncontrollable events
-  // if mInitialStateTuple != mRootStateTuple
+    // find a shortest path from mInitialStateTuple to mRootStateTuple:
+    // for both controllable events and uncontrollable events
+    // if mInitialStateTuple != mRootStateTuple
 
-  Pair<ArrayList<EncodedStateTuple>, ArrayList<Integer>> temp = findLoop();
-  list = temp.getFirst();
-  indexList = temp.getSecond();
+    Pair<ArrayList<EncodedStateTuple>, ArrayList<Integer>> temp = findLoop();
+    list = temp.getFirst();
+    indexList = temp.getSecond();
 
-  // Add to tracelist here
-  tracelist = addPathToLoop(list, indexList);
+    // Add to tracelist here
+    tracelist = addPathToLoop(list, indexList);
 
-  //find a shortest path from mRootStateTuple to mRootStateTuple:
-  // only for controllable events
-  temp = findCycle();
-  loopStates = getTransitionProxies(temp.getFirst(), temp.getSecond());
-  final int loopIndex = tracelist.size();
-  tracelist = getSecondTraceList(tracelist, loopStates);
-  final LoopTraceProxy trace =
-    factory.createLoopTraceProxy(tracename, des, tracelist, loopIndex);
-  return trace;
-}
+    //find a shortest path from mRootStateTuple to mRootStateTuple:
+    // only for controllable events
+    temp = findCycle();
+    loopStates = getTransitionProxies(temp.getFirst(), temp.getSecond());
+    final int loopIndex = tracelist.size();
+    tracelist = getSecondTraceList(tracelist, loopStates);
+    final LoopTraceProxy trace =
+      factory.createLoopTraceProxy(tracename, des, tracelist, loopIndex);
+    return trace;
+  }
 
-  private Pair<ArrayList<EncodedStateTuple>, ArrayList<Integer>> findLoop() throws AbortException
+  private Pair<ArrayList<EncodedStateTuple>, ArrayList<Integer>> findLoop() throws AnalysisAbortException
   {
     EncodedStateTuple encodedCurrTuple = new EncodedStateTuple(mNumInts);
     final ArrayList<EncodedStateTuple> layeredList = new ArrayList<EncodedStateTuple>();
@@ -625,7 +629,7 @@ public class MonolithicSCCControlLoopChecker
         if (layeredList.size() != (indexList.get(indexSize-1)+1)) {
           indexList.add(layeredList.size()-1);
         } else {
-          throw new AbortException("ERROR: Could not find any new states to explore" + stringDump(layeredList, indexList));
+          throw new AnalysisAbortException("ERROR: Could not find any new states to explore" + stringDump(layeredList, indexList));
         }
       }
     final Pair<ArrayList<EncodedStateTuple>, ArrayList<Integer>> output
@@ -667,7 +671,8 @@ public class MonolithicSCCControlLoopChecker
     return output;
   }
 
-  private Pair<ArrayList<EncodedStateTuple>,ArrayList<Integer>> findCycle() throws AbortException
+  private Pair<ArrayList<EncodedStateTuple>,ArrayList<Integer>> findCycle()
+    throws AnalysisAbortException, OverflowException
   {
     final ArrayList<EncodedStateTuple> layeredList = new ArrayList<EncodedStateTuple>();
     final THashSet<EncodedStateTuple> set = new THashSet<EncodedStateTuple>();
@@ -708,7 +713,7 @@ public class MonolithicSCCControlLoopChecker
       if (layeredList.size() != (indexList.get(indexSize-1)+1)) {
         indexList.add(layeredList.size()-1);
       } else {
-        throw new AbortException("ERROR: Could not find any new states to explore" + stringDump(layeredList, indexList));
+        throw new AnalysisAbortException("ERROR: Could not find any new states to explore" + stringDump(layeredList, indexList));
       }
     }
     final Pair<ArrayList<EncodedStateTuple>, ArrayList<Integer>> output
@@ -732,7 +737,10 @@ public class MonolithicSCCControlLoopChecker
     return output;
   }
 
-  private Set<TransitionProperty> getTransitionProxies(final ArrayList<EncodedStateTuple>layeredList, final ArrayList<Integer> indexList) throws AbortException
+  private Set<TransitionProperty> getTransitionProxies
+    (final List<EncodedStateTuple>layeredList,
+     final List<Integer> indexList)
+    throws AnalysisAbortException, OverflowException
   {
     final Set<TransitionProperty> output = new THashSet<TransitionProperty>();
     if (indexList.size() == 1) { // single cycle loop

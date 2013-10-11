@@ -406,6 +406,29 @@ public class ModuleEqualityVisitor
     }
   }
 
+  public Boolean visitFunctionCallExpressionProxy
+    (final FunctionCallExpressionProxy proxy)
+    throws VisitorException
+  {
+    if (visitSimpleExpressionProxy(proxy)) {
+      final FunctionCallExpressionProxy expected =
+        (FunctionCallExpressionProxy) getSecondProxy();
+      final String functionName1 = proxy.getFunctionName();
+      final String functionName2 = expected.getFunctionName();
+      if (!compareObjects(functionName1, functionName2)) {
+        return reportAttributeMismatch("function name", functionName1, functionName2);
+      }
+      final List<SimpleExpressionProxy> arguments1 = proxy.getArguments();
+      final List<SimpleExpressionProxy> arguments2 = expected.getArguments();
+      if (!compareExpressionLists(arguments1, arguments2)) {
+        return false;
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   public Boolean visitGraphProxy
     (final GraphProxy proxy)
     throws VisitorException
@@ -927,11 +950,6 @@ public class ModuleEqualityVisitor
       final SimpleExpressionProxy type2 = expected.getType();
       if (!mNonReportingEqualityVisitor.equals(type1, type2)) {
         return reportAttributeMismatch("range", type1, type2);
-      }
-      final boolean deterministic1 = proxy.isDeterministic();
-      final boolean deterministic2 = expected.isDeterministic();
-      if (deterministic1 != deterministic2) {
-        return reportAttributeMismatch("deterministic", deterministic1, deterministic2);
       }
       final SimpleExpressionProxy initialStatePredicate1 =
         proxy.getInitialStatePredicate();

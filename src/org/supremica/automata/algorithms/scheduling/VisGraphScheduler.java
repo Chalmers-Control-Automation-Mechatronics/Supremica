@@ -1,8 +1,16 @@
 package org.supremica.automata.algorithms.scheduling;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
-import org.supremica.automata.*;
+import org.supremica.automata.Arc;
+import org.supremica.automata.Automata;
+import org.supremica.automata.AutomataIndexMap;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.State;
 import org.supremica.gui.VisGraphDrawer;
 import org.supremica.util.ActionTimer;
 
@@ -105,13 +113,15 @@ public class VisGraphScheduler
         this.isRelaxationProvider = isRelaxationProvider;
     }
 
-	public void startSearchThread()
+	@Override
+  public void startSearchThread()
 	{
         vgThread = new Thread(this);
         isRunning = true;
         vgThread.start();
 	}
 
+    @Override
     public void run()
     {
         try
@@ -144,6 +154,7 @@ public class VisGraphScheduler
         }
     }
 
+    @Override
     public void schedule()
     throws Exception
     {
@@ -328,12 +339,14 @@ public class VisGraphScheduler
         return minCostToGoal;
     }
 
+    @Override
     public void buildScheduleAutomaton()
     throws Exception
     {
     }
 
     //TODO: make it useful
+    @Override
     public Automaton getSchedule()
     {
 	return null;
@@ -405,7 +418,7 @@ public class VisGraphScheduler
 
                     currTime += currState.getCost();
 
-                    final Arc currArc = (Arc) currState.outgoingArcsIterator().next();
+                    final Arc currArc = currState.outgoingArcsIterator().next();
                     final LabeledEvent currEvent = currArc.getEvent();
 
                     for (int j=0; j<zones.size(); j++)
@@ -586,14 +599,21 @@ public class VisGraphScheduler
         isInitialized = true;
     }
 
-    public void requestStop()
+    @Override
+    public void requestAbort()
     {
         requestStop(false);
     }
 
-    public boolean isStopped()
+    @Override
+    public boolean isAborting()
     {
         return !isRunning;
+    }
+
+    @Override
+    public void resetAbort(){
+      isRunning = true;
     }
 
     public void requestStop(final boolean disposeGui)
@@ -694,6 +714,7 @@ public class VisGraphScheduler
         return s;
     }
 
+    @Override
     public String getMessages(final int msgType)
     {
         switch (msgType)
@@ -710,11 +731,13 @@ public class VisGraphScheduler
         }
     }
 
+    @Override
     public Object[] getDebugMessages()
     {
         return debugMsgs.toArray();
     }
 
+    @Override
     public void addToMessages(final String additionStr, final int messageType)
     {
         switch (messageType)

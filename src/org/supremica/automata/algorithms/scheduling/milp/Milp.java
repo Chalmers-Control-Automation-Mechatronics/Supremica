@@ -1,10 +1,35 @@
 package org.supremica.automata.algorithms.scheduling.milp;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.TreeMap;
 
-import org.supremica.automata.*;
-import org.supremica.automata.algorithms.*;
-import org.supremica.automata.algorithms.scheduling.*;
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.AlphabetHelpers;
+import org.supremica.automata.Arc;
+import org.supremica.automata.Automata;
+import org.supremica.automata.AutomataIndexMap;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonType;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.MultiArc;
+import org.supremica.automata.State;
+import org.supremica.automata.algorithms.AutomataSynthesizer;
+import org.supremica.automata.algorithms.SynchronizationOptions;
+import org.supremica.automata.algorithms.SynthesisAlgorithm;
+import org.supremica.automata.algorithms.SynthesisType;
+import org.supremica.automata.algorithms.SynthesizerOptions;
+import org.supremica.automata.algorithms.scheduling.ConnectedComponentEdge;
+import org.supremica.automata.algorithms.scheduling.ConnectedComponentVertice;
+import org.supremica.automata.algorithms.scheduling.ConnectedComponentsGraph;
+import org.supremica.automata.algorithms.scheduling.Scheduler;
+import org.supremica.automata.algorithms.scheduling.SchedulingConstants;
+import org.supremica.automata.algorithms.scheduling.SchedulingHelper;
+import org.supremica.automata.algorithms.scheduling.SynchronizationStepper;
+import org.supremica.automata.algorithms.scheduling.VelocityBalancer;
 import org.supremica.util.ActionTimer;
 
 //TODO (always): Structure the code. Comment better.
@@ -258,6 +283,7 @@ public class Milp
         }
     }
 
+    @Override
     public void startSearchThread()
     {
         milpThread = new Thread(this);
@@ -265,6 +291,7 @@ public class Milp
         milpThread.start();
     }
 
+    @Override
     public void run()
     {
         try
@@ -300,6 +327,7 @@ public class Milp
      * This method converts the selected automata to a MILP-representation, calls the MILP-solver,
      * processes and stores the resulting information.
      */
+    @Override
     public void schedule()
     throws Exception
     {
@@ -378,6 +406,7 @@ public class Milp
      * Does not return anything? The automaton representing the optimal schedule, as given
      * by the MILP-solver can be accessed by the getSchedule-method
      */
+    @Override
     public void buildScheduleAutomaton()
     throws Exception
     {
@@ -1576,7 +1605,7 @@ public class Milp
                 currCheckedPlantStates.add(currPlantState);
                 for (int j = 0; j < currAllPlantStates.size(); j++)
                 {
-                    final int[] followingPlantState = (int[]) currAllPlantStates.get(j).get(0);
+                    final int[] followingPlantState = currAllPlantStates.get(j).get(0);
                     if (!currCheckedPlantStates.contains(followingPlantState))
                     {
                         if (internalPrecVarsTable.get(new IntKey(currPlantState, followingPlantState)) != null)
@@ -1867,14 +1896,14 @@ public class Milp
         final int nrPPlantStates = allPPlantStates.size();
         for (int i = 0; i < nrPPlantStates - 2; i++)
         {
-            final int[] firstPlantState = ((ArrayList<int[]>)allPPlantStates.get(i)).get(0);
+            final int[] firstPlantState = allPPlantStates.get(i).get(0);
             for (int j = i+1; j < nrPPlantStates - 1; j++)
             {
-                final int[] secondPlantState = ((ArrayList<int[]>)allPPlantStates.get(j)).get(0);
+                final int[] secondPlantState = allPPlantStates.get(j).get(0);
                 final String firstAlpha = internalPrecVarsTable.get(new IntKey(firstPlantState, secondPlantState)).getName();
                 for (int k = j+1; k < nrPPlantStates; k++)
                 {
-                    final int[] thirdPlantState = ((ArrayList<int[]>)allPPlantStates.get(k)).get(0);
+                    final int[] thirdPlantState = allPPlantStates.get(k).get(0);
                     final String secondAlpha = internalPrecVarsTable.get(new IntKey(firstPlantState, thirdPlantState)).getName();
                     final String thirdAlpha = internalPrecVarsTable.get(new IntKey(secondPlantState, thirdPlantState)).getName();
 
@@ -1891,14 +1920,14 @@ public class Milp
         final int nrFPlantStates = allFPlantStates.size();
         for (int i = 0; i < nrFPlantStates - 2; i++)
         {
-            final int[] firstPlantState = ((ArrayList<int[]>)allFPlantStates.get(i)).get(0);
+            final int[] firstPlantState = allFPlantStates.get(i).get(0);
             for (int j = i+1; j < nrFPlantStates - 1; j++)
             {
-                final int[] secondPlantState = ((ArrayList<int[]>)allFPlantStates.get(j)).get(0);
+                final int[] secondPlantState = allFPlantStates.get(j).get(0);
                 final String firstAlpha = internalPrecVarsTable.get(new IntKey(firstPlantState, secondPlantState)).getName();
                 for (int k = j+1; k < nrFPlantStates; k++)
                 {
-                    final int[] thirdPlantState = ((ArrayList<int[]>)allFPlantStates.get(k)).get(0);
+                    final int[] thirdPlantState = allFPlantStates.get(k).get(0);
                     final String secondAlpha = internalPrecVarsTable.get(new IntKey(firstPlantState, thirdPlantState)).getName();
                     final String thirdAlpha = internalPrecVarsTable.get(new IntKey(secondPlantState, thirdPlantState)).getName();
 
@@ -3070,7 +3099,8 @@ public class Milp
         }
     }
 
-    public void requestStop()
+    @Override
+    public void requestAbort()
     {
         requestStop(false);
     }
@@ -3082,9 +3112,15 @@ public class Milp
         milpSolver.cleanUp();
     }
 
-    public boolean isStopped()
+    @Override
+    public boolean isAborting()
     {
         return !isRunning;
+    }
+
+    @Override
+    public void resetAbort(){
+      isRunning = true;
     }
 
     private State makeScheduleState(final int[] stateIndices, final boolean isInitial)
@@ -3157,6 +3193,7 @@ public class Milp
     /**
      * Returns an automaton describing the optimised schedule.
      */
+    @Override
     public Automaton getSchedule()
     {
         return schedule;
@@ -3372,10 +3409,10 @@ public class Milp
         //test
         for (int i = 0; i < allPPlantStates.size(); i++)
         {
-            final int[] plantStateInOrder1 = (int[]) allPPlantStates.get(i).get(0);
+            final int[] plantStateInOrder1 = allPPlantStates.get(i).get(0);
             for (int j = 0; j < allFPlantStates.size(); j++)
             {
-                final int[] plantStateInOrder2 = (int[]) allFPlantStates.get(j).get(0);
+                final int[] plantStateInOrder2 = allFPlantStates.get(j).get(0);
                 if ((plantStateInOrder1[0] == plantStateInOrder2[0]) && (plantStateInOrder1[1] == plantStateInOrder2[1]))
                 {
                     final ArrayList<ArrayList<int[]>> newToOrder1 = new ArrayList<ArrayList<int[]>>(allPPlantStates);
@@ -3546,6 +3583,7 @@ public class Milp
         return upstreamsAltPathVars[plantStateEvent[0]][plantStateEvent[1]];
     }
 
+    @Override
     public String getMessages(final int msgType)
     {
         switch (msgType)
@@ -3562,11 +3600,13 @@ public class Milp
         }
     }
 
+    @Override
     public Object[] getDebugMessages()
     {
         return debugMsgs.toArray();
     }
 
+    @Override
     public void addToMessages(final String newMessage, final int msgType)
     {
         addToMessages(newMessage, msgType, false);
@@ -3583,13 +3623,13 @@ public class Milp
         switch (msgType)
         {
             case(SchedulingConstants.MESSAGE_TYPE_INFO):
-                infoMsgs += (String) newMessage + lineBreakStr;
+                infoMsgs += newMessage + lineBreakStr;
                 break;
             case(SchedulingConstants.MESSAGE_TYPE_WARN):
-                warnMsgs += (String) newMessage + lineBreakStr;
+                warnMsgs += newMessage + lineBreakStr;
                 break;
             case(SchedulingConstants.MESSAGE_TYPE_ERROR):
-                errorMsgs += (String) newMessage + lineBreakStr;
+                errorMsgs += newMessage + lineBreakStr;
                 break;
             default:
                 errorMsgs += "Wrong message type supplied to Milp.addToMessages() (messageStr = " + newMessage + ")";

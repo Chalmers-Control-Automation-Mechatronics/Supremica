@@ -22,17 +22,17 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
+import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.compiler.EvalAbortException;
+import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierException;
 import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
-import net.sourceforge.waters.model.compiler.context.
-  DuplicateIdentifierException;
-import net.sourceforge.waters.model.compiler.context.
-  UndefinedIdentifierException;
+import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -58,7 +58,9 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
-public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
+public class ModuleGraphCompiler
+  extends DefaultModuleProxyVisitor
+  implements Abortable
 {
 
   //##########################################################################
@@ -70,6 +72,27 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
     mFactory = factory;
     mSourceInfoBuilder = builder;
     mInputModule = module;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
+  public void requestAbort()
+  {
+    mIsAborting = true;
+  }
+
+  @Override
+  public boolean isAborting()
+  {
+    return mIsAborting;
+  }
+
+  @Override
+  public void resetAbort()
+  {
+    mIsAborting = false;
   }
 
 
@@ -104,8 +127,21 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
   }
 
 
+  //#########################################################################
+  //# Aborting
+  private void checkAbort()
+    throws VisitorException
+  {
+    if (mIsAborting) {
+      final EvalAbortException exception = new EvalAbortException();
+      throw new VisitorException(exception);
+    }
+  }
+
+
   //##########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+  @Override
   public Object visitEdgeProxy(final EdgeProxy edge)
   {
     // Edges must be processed in the proper order:
@@ -132,9 +168,11 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public EventProxy visitEventDeclProxy(final EventDeclProxy decl)
     throws VisitorException
   {
+    checkAbort();
     final IdentifierProxy ident = decl.getIdentifier();
     final String name = ident.toString();
     final EventKind kind = decl.getKind();
@@ -147,6 +185,7 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
     return event;
   }
 
+  @Override
   public Object visitEventListExpressionProxy
     (final EventListExpressionProxy elist)
     throws VisitorException
@@ -156,10 +195,12 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
     return null;
   }
 
+  @Override
   public CompiledNode visitGroupNodeProxy(final GroupNodeProxy group)
     throws VisitorException
   {
     try {
+      checkAbort();
       final CompiledGroupNode cgroup = new CompiledGroupNode(group);
       mPrecompiledNodesMap.put(group, cgroup);
       for (final NodeProxy child : group.getImmediateChildNodes()) {
@@ -175,10 +216,12 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public EventProxy visitIdentifierProxy(final IdentifierProxy ident)
     throws VisitorException
   {
     try {
+      checkAbort();
       final EventProxy event = findGlobalEvent(ident);
       addLocalEvent(event);
       if (mCurrentSource == null) {
@@ -199,6 +242,7 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public ProductDESProxy visitModuleProxy(final ModuleProxy module)
     throws VisitorException
   {
@@ -228,6 +272,7 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public AutomatonProxy visitSimpleComponentProxy
     (final SimpleComponentProxy comp)
     throws VisitorException
@@ -275,6 +320,7 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
               for (final List<CompiledTransition> list :
                    current.getOutgoingTransitions()) {
                 for (final CompiledTransition trans : list) {
+                  checkAbort();
                   trans.setReachable();
                   final CompiledNode target = trans.getTarget();
                   if (target.setReachable()) {
@@ -297,6 +343,7 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
       final List<StateProxy> states =
         new ArrayList<StateProxy>(mNumReachableStates);
       for (final NodeProxy node : nodes) {
+        checkAbort();
         final CompiledNode cnode = mPrecompiledNodesMap.get(node);
         final StateProxy state = cnode.createStateProxy();
         if (state != null) {
@@ -306,6 +353,7 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
       final List<TransitionProxy> transitions =
         new ArrayList<TransitionProxy>(mNumReachableTransitions);
       for (final CompiledTransition ctrans : mLocalTransitionsList) {
+        checkAbort();
         final TransitionProxy trans = ctrans.createTransitionProxy();
         if (trans != null) {
           transitions.add(trans);
@@ -335,10 +383,12 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
     }
   }
 
+  @Override
   public CompiledNode visitSimpleNodeProxy(final SimpleNodeProxy node)
     throws VisitorException
   {
     try {
+      checkAbort();
       final String name = node.getName();
       if (!mLocalStateNames.add(name)) {
         throw new DuplicateIdentifierException(name, "state", node);
@@ -539,16 +589,19 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
 
     //#######################################################################
     //# Simple Access
+    @Override
     SimpleNodeProxy getNode()
     {
       return (SimpleNodeProxy) super.getNode();
     }
 
+    @Override
     boolean isInitial()
     {
       return getNode().isInitial();
     }
 
+    @Override
     boolean isReachable()
     {
       return mIsReachable;
@@ -563,6 +616,7 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
 
     //#######################################################################
     //# Algorithms
+    @Override
     void addProposition(final EventProxy event)
     {
       if (mPropositions == null) {
@@ -573,6 +627,7 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
       }
     }
 
+    @Override
     void addTransitionFrom(final CompiledNode source,
                            final EventProxy event,
                            final CompiledNode cause,
@@ -582,6 +637,7 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
       source.addTransitionTo(this, event, cause, loc);
     }
 
+    @Override
     void addTransitionTo(final CompiledSimpleNode target,
                          final EventProxy event,
                          final CompiledNode cause,
@@ -613,11 +669,13 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
       mLocalTransitionsList.add(trans);
     }
 
+    @Override
     boolean hasProperChildNode(final CompiledNode node)
     {
       return false;
     }
 
+    @Override
     boolean setReachable()
     {
       if (!mIsReachable) {
@@ -635,6 +693,7 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
       }
     }
 
+    @Override
     Collection<List<CompiledTransition>> getOutgoingTransitions()
     {
       return mOutgoingTransitions.values();
@@ -642,6 +701,7 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
 
     //#######################################################################
     //# Specific Algorithms
+    @Override
     StateProxy createStateProxy()
     {
       if (mState == null) {
@@ -682,16 +742,19 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
 
     //#######################################################################
     //# Simple Access
+    @Override
     GroupNodeProxy getNode()
     {
       return (GroupNodeProxy) super.getNode();
     }
 
+    @Override
     boolean isInitial()
     {
       return false;
     }
 
+    @Override
     boolean isReachable()
     {
       return false;
@@ -706,6 +769,7 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
 
     //#######################################################################
     //# Algorithms
+    @Override
     void addProposition(final EventProxy event)
     {
       for (final CompiledNode child : mImmediateChildNodes) {
@@ -713,6 +777,7 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
       }
     }
 
+    @Override
     void addTransitionFrom(final CompiledNode source,
                            final EventProxy event,
                            final CompiledNode cause,
@@ -724,6 +789,7 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
       }
     }
 
+    @Override
     void addTransitionTo(final CompiledSimpleNode target,
                          final EventProxy event,
                          final CompiledNode cause,
@@ -735,6 +801,7 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
       }
     }
 
+    @Override
     boolean hasProperChildNode(final CompiledNode node)
     {
       for (final CompiledNode child : mImmediateChildNodes) {
@@ -745,16 +812,19 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
       return false;
     }
 
+    @Override
     boolean setReachable()
     {
       return false;
     }
 
+    @Override
     Collection<List<CompiledTransition>> getOutgoingTransitions()
     {
       return Collections.emptyList();
     }
 
+    @Override
     StateProxy createStateProxy()
     {
       return null;
@@ -900,5 +970,7 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
 
   private CompiledNode mCurrentSource;
   private CompiledNode mCurrentTarget;
+
+  private boolean mIsAborting;
 
 }

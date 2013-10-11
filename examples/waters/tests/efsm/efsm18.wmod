@@ -2,11 +2,8 @@
 <Module Name="efsm18" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="a"/>
-        <EventDecl Kind="CONTROLLABLE" Name="b"/>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
-        <EventDecl Kind="CONTROLLABLE" Name="c"/>
         <EventDecl Kind="CONTROLLABLE" Name="d"/>
-        <EventDecl Kind="CONTROLLABLE" Name="e"/>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="PLANT" Name="G">

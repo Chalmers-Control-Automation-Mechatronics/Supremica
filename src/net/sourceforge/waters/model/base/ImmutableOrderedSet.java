@@ -12,7 +12,6 @@ package net.sourceforge.waters.model.base;
 import gnu.trove.set.hash.THashSet;
 
 import java.io.Serializable;
-
 import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,7 +53,7 @@ public class ImmutableOrderedSet<P extends NamedProxy>
   }
 
   /**
-   * Creates and initialises a ordered set.
+   * Creates and initialises an ordered set.
    * @param  input       A collection of objects that constitute the initial
    *                     contents of the new set.
    * @throws DuplicateNameException to indicate that the input collection
@@ -83,6 +82,7 @@ public class ImmutableOrderedSet<P extends NamedProxy>
 
   //#########################################################################
   //# Cloning
+  @Override
   public ImmutableOrderedSet<P> clone()
   {
     try {
@@ -100,11 +100,13 @@ public class ImmutableOrderedSet<P extends NamedProxy>
 
   //#########################################################################
   //# Interface java.util.Set
+  @Override
   public Iterator<P> iterator()
   {
     return mProxyList.iterator();
   }
 
+  @Override
   public int size()
   {
     return mProxyList.size();

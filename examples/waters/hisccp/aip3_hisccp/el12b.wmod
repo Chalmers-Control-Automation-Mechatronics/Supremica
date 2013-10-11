@@ -1,0 +1,2697 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="el12b" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Model of an automated manufacturing system 'Atelier Inter-établissement de Productique' (AIP) based on 'Symbolic Synthesis and Verification of Hierarchical Interface-based Supervisory Control' by Raoguang Song, MSc Thesis, McMaster University, Hamilton, ON, Canada.
+This model has been modified from the original version to use HISC-CP interfaces and reduced polling.
+This subsystem represents the identical external loops 1 and 2.
+The blocking version lacks the OFProtELpre supervisor.
+It is controllable and blocking, and does not satisfies the HISC-CP interface consistency properties.
+The number of reachable states is 420762, and the diameter is 404.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Scope="OPTIONAL_PARAMETER" Name=":accepting"/>
+        <EventDecl Kind="CONTROLLABLE" Scope="OPTIONAL_PARAMETER" Name="ASDwn">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="DoRpr">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="IsPalletCL">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="LOWDATA"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="IsPalletEL"/>
+        <EventDecl Kind="CONTROLLABLE" Name="LibPallet">
+            <RangeList>
+                <EnumSetExpression Text="[of,err]">
+                    <SimpleIdentifier Name="of"/>
+                    <SimpleIdentifier Name="err"/>
+                </EnumSetExpression>
+            </RangeList>
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="NoPallet"/>
+        <EventDecl Kind="CONTROLLABLE" Name="NoTrnsfEL">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="ProcCpl">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="ProcErr">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="ProcPallet">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Scope="OPTIONAL_PARAMETER" Name="QPallet">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="QStnUp"/>
+        <EventDecl Kind="CONTROLLABLE" Scope="OPTIONAL_PARAMETER" Name="RobUp">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="StnDwn"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="StnUp"/>
+        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="TrnsfCplToCL">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="TrnsfCplToEL">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="TrnsfELToCL">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="TrnsfToEL">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="tau_t"/>
+        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="PalletRlsd">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="tau_m"/>
+        <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="tau_r"/>
+        <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="tau_d"/>
+        <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="tau_e"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PROPERTY" Name="iface_main">
+            <Graph Deterministic="false">
+                <NodeList>
+                    <SimpleNode Initial="true" Name="idle">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="192" Y="80"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point X="0" Y="-16"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-31" Y="-13"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="c1">
+                        <PointGeometry>
+                            <Point X="80" Y="176"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-6" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="r1">
+                        <PointGeometry>
+                            <Point X="384" Y="176"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-1" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="i1">
+                        <PointGeometry>
+                            <Point X="288" Y="176"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-7" Y="8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="t1">
+                        <PointGeometry>
+                            <Point X="288" Y="96"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="7" Y="-3"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S0">
+                        <PointGeometry>
+                            <Point X="192" Y="176"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="i1" Target="r1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_r"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-19" Y="1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point X="240" Y="224"/>
+                        </StartPointGeometry>
+                    </Edge>
+                    <Edge Source="c1" Target="idle">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-66" Y="-22"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="126" Y="116"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S0" Target="c1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_e"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-31" Y="1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point X="192" Y="176"/>
+                        </StartPointGeometry>
+                    </Edge>
+                    <Edge Source="r1" Target="idle">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletRlsd"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-53" Y="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="339" Y="90"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="t1" Target="idle">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-45" Y="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point X="288" Y="96"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point X="241" Y="81"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point X="192" Y="80"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Source="S0" Target="i1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-31" Y="1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point X="192" Y="176"/>
+                        </StartPointGeometry>
+                    </Edge>
+                    <Edge Source="i1" Target="t1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_t"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="1" Y="-11"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="idle" Target="S0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPallet"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="-12"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="205" Y="129"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S0" Target="idle">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_r"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-36" Y="-1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="177" Y="126"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:Interface"/>
+            </ns2:AttributeMap>
+        </SimpleComponent>
+        <SimpleComponent Kind="PROPERTY" Name="iface_ASDwn_count">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="u0p0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="128" Y="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="8" Y="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="u1p0">
+                        <PointGeometry>
+                            <Point X="128" Y="224"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-39" Y="-16"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="u2p0">
+                        <PointGeometry>
+                            <Point X="128" Y="384"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-41" Y="-10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="u3p0">
+                        <PointGeometry>
+                            <Point X="128" Y="544"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-43" Y="-11"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="u0p1">
+                        <PointGeometry>
+                            <Point X="288" Y="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="8" Y="-1"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="u1p1">
+                        <PointGeometry>
+                            <Point X="288" Y="224"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-17" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="u2p1">
+                        <PointGeometry>
+                            <Point X="288" Y="384"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-39" Y="-13"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="u3p1">
+                        <PointGeometry>
+                            <Point X="288" Y="544"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-35" Y="-16"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="u3p2">
+                        <PointGeometry>
+                            <Point X="448" Y="544"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-40" Y="-14"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="u3p3">
+                        <PointGeometry>
+                            <Point X="608" Y="544"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="4" Y="-14"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="u0p2">
+                        <PointGeometry>
+                            <Point X="448" Y="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="9" Y="-2"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="u1p2">
+                        <PointGeometry>
+                            <Point X="448" Y="224"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-37" Y="1"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="u2p2">
+                        <PointGeometry>
+                            <Point X="448" Y="384"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-40" Y="-15"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="u2p3">
+                        <PointGeometry>
+                            <Point X="608" Y="384"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="6" Y="-18"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="u0p3">
+                        <PointGeometry>
+                            <Point X="608" Y="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-1" Y="4"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="u1p3">
+                        <PointGeometry>
+                            <Point X="608" Y="224"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="6" Y="-17"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="u0p1d">
+                        <PointGeometry>
+                            <Point X="208" Y="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-42" Y="-15"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="u0p0d">
+                        <PointGeometry>
+                            <Point X="48" Y="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-48" Y="-6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="u1p1d">
+                        <PointGeometry>
+                            <Point X="208" Y="304"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-43" Y="-15"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="u0p2d">
+                        <PointGeometry>
+                            <Point X="368" Y="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-42" Y="-15"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="u1p0d">
+                        <PointGeometry>
+                            <Point X="48" Y="304"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-48" Y="-4"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="u2p0d">
+                        <PointGeometry>
+                            <Point X="48" Y="464"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-47" Y="-9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="u2p1d">
+                        <PointGeometry>
+                            <Point X="208" Y="464"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="9" Y="-14"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="u2p2d">
+                        <PointGeometry>
+                            <Point X="368" Y="464"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="7" Y="-13"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="u1p2d">
+                        <PointGeometry>
+                            <Point X="368" Y="304"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="7" Y="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="u0p3d">
+                        <PointGeometry>
+                            <Point X="528" Y="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="9" Y="-6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="u1p3d">
+                        <PointGeometry>
+                            <Point X="528" Y="304"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="10" Y="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="u2p3d">
+                        <PointGeometry>
+                            <Point X="528" Y="464"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="11" Y="-15"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="u3p1d">
+                        <PointGeometry>
+                            <Point X="208" Y="624"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-50" Y="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="u3p2d">
+                        <PointGeometry>
+                            <Point X="368" Y="624"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-49" Y="-3"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="u3p3d">
+                        <PointGeometry>
+                            <Point X="528" Y="624"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-48" Y="-4"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="u3p0d">
+                        <PointGeometry>
+                            <Point X="48" Y="624"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-49" Y="-3"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="u0p0" Target="u1p0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-44" Y="-30"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="123" Y="144"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u1p0" Target="u2p0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-49" Y="-27"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="123" Y="304"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u2p0" Target="u3p0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-50" Y="-30"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="123" Y="464"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u1p0" Target="u0p1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_m"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-16" Y="-29"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="184" Y="118"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u2p0" Target="u1p1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_m"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-30" Y="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="181" Y="277"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u3p0" Target="u2p1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_m"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-29" Y="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="187" Y="441"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u0p1" Target="u0p0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-6" Y="-20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u1p1" Target="u1p0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-33" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u2p1" Target="u2p0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-54" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u3p1" Target="u3p0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-58" Y="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u3p2" Target="u3p1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-42" Y="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <EndPointGeometry>
+                            <Point X="288" Y="544"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Source="u3p3" Target="u3p2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-21" Y="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <EndPointGeometry>
+                            <Point X="448" Y="544"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Source="u0p1" Target="u1p1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-36" Y="-32"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="284" Y="143"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u1p1" Target="u2p1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-42" Y="-35"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="284" Y="303"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u2p1" Target="u3p1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-45" Y="-34"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="284" Y="463"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u0p1" Target="u0p1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_e"/>
+                            <SimpleIdentifier Name="tau_t"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-25" Y="-12"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="318" Y="37"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u1p1" Target="u1p1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_e"/>
+                            <SimpleIdentifier Name="tau_d"/>
+                            <SimpleIdentifier Name="tau_t"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-23" Y="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="316" Y="253"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u2p1" Target="u2p1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_e"/>
+                            <SimpleIdentifier Name="tau_d"/>
+                            <SimpleIdentifier Name="tau_t"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-18" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="316" Y="408"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u3p1" Target="u3p1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_e"/>
+                            <SimpleIdentifier Name="tau_d"/>
+                            <SimpleIdentifier Name="tau_t"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-40" Y="-10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="316" Y="572"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u3p2" Target="u3p2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_e"/>
+                            <SimpleIdentifier Name="tau_d"/>
+                            <SimpleIdentifier Name="tau_t"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-40" Y="-16"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="478" Y="570"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u1p1" Target="u0p2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_m"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-25" Y="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="349" Y="120"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u2p1" Target="u1p2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_m"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-12" Y="-15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="341" Y="275"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u3p1" Target="u2p2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_m"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-16" Y="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="344" Y="441"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u3p2" Target="u2p3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_m"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-27" Y="-16"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="507" Y="440"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u0p2" Target="u0p1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-18" Y="-31"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u1p2" Target="u1p1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-48" Y="-15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u2p2" Target="u2p1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-41" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u2p3" Target="u2p2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-42" Y="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <EndPointGeometry>
+                            <Point X="448" Y="384"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Source="u0p2" Target="u1p2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-36" Y="-42"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="444" Y="143"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u1p2" Target="u2p2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-44" Y="-35"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="444" Y="303"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u2p2" Target="u3p2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-40" Y="-24"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="444" Y="463"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u2p3" Target="u3p3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="2" Y="-1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u0p2" Target="u0p2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_e"/>
+                            <SimpleIdentifier Name="tau_t"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-29" Y="-8"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="480" Y="35"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u1p2" Target="u1p2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_e"/>
+                            <SimpleIdentifier Name="tau_d"/>
+                            <SimpleIdentifier Name="tau_t"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-18" Y="-25"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="477" Y="250"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u2p2" Target="u2p2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_e"/>
+                            <SimpleIdentifier Name="tau_d"/>
+                            <SimpleIdentifier Name="tau_t"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-26" Y="-21"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="480" Y="412"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u1p2" Target="u0p3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_m"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-15" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="510" Y="123"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u2p2" Target="u1p3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_m"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-10" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="505" Y="278"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u0p3" Target="u0p2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-20" Y="-32"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u0p3" Target="u1p3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="1" Y="-14"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u1p3" Target="u2p3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="4" Y="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u1p3" Target="u1p2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-24" Y="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u0p3" Target="u0p3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_e"/>
+                            <SimpleIdentifier Name="tau_t"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-31" Y="-6"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="642" Y="35"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u1p3" Target="u1p3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_e"/>
+                            <SimpleIdentifier Name="tau_t"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-20" Y="-21"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="639" Y="251"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u2p3" Target="u2p3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_e"/>
+                            <SimpleIdentifier Name="tau_t"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-18" Y="-12"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="639" Y="408"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u3p3" Target="u3p3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_e"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-16" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="642" Y="577"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u1p0" Target="u0p1d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ASDwn"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-11" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u0p1d" Target="u0p1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobUp"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-27" Y="-7"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u0p1d" Target="u0p0d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-92" Y="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u0p0d" Target="u0p0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobUp"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-36" Y="-22"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u0p1d" Target="u0p1d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_e"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-12" Y="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="235" Y="173"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u2p0" Target="u1p1d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ASDwn"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-15" Y="-5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u1p1d" Target="u1p1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobUp"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-20" Y="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u1p1" Target="u0p2d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ASDwn"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-10" Y="-7"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u0p2d" Target="u0p2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobUp"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-12" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u1p1d" Target="u1p0d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-95" Y="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u1p0d" Target="u1p0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobUp"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-35" Y="-16"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u0p2d" Target="u0p1d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-49" Y="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u1p1d" Target="u1p1d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_e"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-16" Y="-25"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="234" Y="333"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u0p2d" Target="u0p2d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_e"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-12" Y="-21"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="396" Y="173"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u2p0d" Target="u2p0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobUp"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-45" Y="-14"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u3p0" Target="u2p1d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ASDwn"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-10" Y="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u2p1d" Target="u2p1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobUp"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-30" Y="-6"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u2p1" Target="u1p2d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ASDwn"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-17" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u1p2d" Target="u1p2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobUp"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-26" Y="-20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u1p2" Target="u0p3d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ASDwn"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-8" Y="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u0p3d" Target="u0p3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobUp"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-9" Y="-3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u3p1" Target="u2p2d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ASDwn"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-20" Y="-9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u2p2d" Target="u2p2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobUp"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-25" Y="-11"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u2p2" Target="u1p3d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ASDwn"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-12" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u1p3d" Target="u1p3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobUp"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-14" Y="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u3p2" Target="u2p3d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ASDwn"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-8" Y="-14"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u2p3d" Target="u2p3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobUp"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-20" Y="3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u2p3d" Target="u2p2d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-29" Y="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u2p2d" Target="u2p1d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-33" Y="-2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u1p3d" Target="u1p2d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-29" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u2p1d" Target="u2p0d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-93" Y="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u2p1d" Target="u2p1d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_e"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-17" Y="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="235" Y="492"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u1p2d" Target="u1p2d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_e"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-20" Y="-15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="395" Y="333"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u0p3d" Target="u0p3d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_e"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-14" Y="-16"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="556" Y="169"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u1p3d" Target="u1p3d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_e"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-16" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="556" Y="331"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u2p2d" Target="u2p2d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_e"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-15" Y="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="396" Y="493"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u2p3d" Target="u2p3d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_e"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-17" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="557" Y="492"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u1p2d" Target="u1p1d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-55" Y="-16"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u0p3d" Target="u0p2d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-37" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u2p0" Target="u2p0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_d"/>
+                            <SimpleIdentifier Name="tau_t"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-17" Y="-2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="94" Y="357"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u1p0" Target="u1p0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_d"/>
+                            <SimpleIdentifier Name="tau_t"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-25" Y="-6"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="94" Y="198"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u3p0" Target="u3p0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_d"/>
+                            <SimpleIdentifier Name="tau_t"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-21" Y="-1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="96" Y="519"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u0p1d" Target="u1p1d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-23" Y="-40"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="202" Y="222"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u1p1d" Target="u2p1d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-49" Y="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="202" Y="382"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u0p2d" Target="u1p2d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-32" Y="-33"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="362" Y="222"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u1p2d" Target="u2p2d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-27" Y="-41"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="362" Y="382"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u0p3d" Target="u1p3d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-33" Y="-36"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="522" Y="222"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u1p3d" Target="u2p3d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-26" Y="-43"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="522" Y="382"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u2p1d" Target="u3p1d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-57" Y="20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="202" Y="542"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u2p2d" Target="u3p2d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-35" Y="7"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="362" Y="542"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u2p3d" Target="u3p3d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-27" Y="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="522" Y="545"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u3p1d" Target="u3p1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobUp"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-31" Y="-4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u3p2d" Target="u3p2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobUp"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-21" Y="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u3p3d" Target="u3p3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobUp"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-22" Y="-15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u3p3d" Target="u3p2d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-50" Y="-1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u3p2d" Target="u3p1d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-54" Y="1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u3p1d" Target="u3p1d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_e"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-44" Y="-21"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="208" Y="669"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u3p2d" Target="u3p2d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_e"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-42" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="371" Y="667"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u3p3d" Target="u3p3d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_e"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-33" Y="-25"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="530" Y="665"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="u3p1d" Target="u3p0d">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-58" Y="1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u3p0d" Target="u3p0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobUp"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-48" Y="-9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="u0p0" Target="u0p0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_t"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-14" Y="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="161" Y="29"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:Interface"/>
+            </ns2:AttributeMap>
+        </SimpleComponent>
+        <SimpleComponent Kind="PROPERTY" Name="iface_ASDwn_prio">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="S0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="96" Y="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-27" Y="-4"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S1">
+                        <PointGeometry>
+                            <Point X="96" Y="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-26" Y="-5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="S0" Target="S1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_d"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="1" Y="-3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="110" Y="112"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S1" Target="S0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ASDwn"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-53" Y="-6"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="81" Y="112"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S0" Target="S0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_m"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-1" Y="-13"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="142" Y="65"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:Interface"/>
+            </ns2:AttributeMap>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="ManageTU">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="304" Y="144"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point X="-1" Y="112"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-11" Y="-22"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s1">
+                        <PointGeometry>
+                            <Point X="432" Y="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s2">
+                        <PointGeometry>
+                            <Point X="432" Y="48"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s3">
+                        <PointGeometry>
+                            <Point X="432" Y="240"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s4">
+                        <PointGeometry>
+                            <Point X="163" Y="146"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-26" Y="-6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s0" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPallet"/>
+                            <SimpleIdentifier Name="NoPallet"/>
+                            <SimpleIdentifier Name="StnUp"/>
+                            <SimpleIdentifier Name="StnDwn"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-43" Y="-55"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="304" Y="97"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s0" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s0" Target="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-40" Y="3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="234" Y="158"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s1" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUp"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s1" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnDwn"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="-10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s2" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPallet"/>
+                            <SimpleIdentifier Name="TrnsfToEL"/>
+                            <SimpleIdentifier Name="StnUp"/>
+                            <SimpleIdentifier Name="StnDwn"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="1" Y="-38"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="477" Y="48"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s2" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoTrnsfEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="6" Y="-6"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="488" Y="145"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s2" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToEL"/>
+                            <SimpleIdentifier Name="PalletRlsd"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-46" Y="-35"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s3" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPallet"/>
+                            <SimpleIdentifier Name="StnUp"/>
+                            <SimpleIdentifier Name="StnDwn"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="1" Y="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="481" Y="240"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s3" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="PalletRlsd"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-50" Y="12"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s4" Target="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfELToCL"/>
+                            <SimpleIdentifier Name="StnUp"/>
+                            <SimpleIdentifier Name="StnDwn"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-73" Y="-47"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="108" Y="147"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s4" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-59" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="233" Y="130"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="LockoutELpre">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="96" Y="144"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point X="-67" Y="2"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s01">
+                        <PointGeometry>
+                            <Point X="224" Y="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="1" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s02">
+                        <PointGeometry>
+                            <Point X="96" Y="272"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s0" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUp"/>
+                            <SimpleIdentifier Name="StnDwn"/>
+                            <SimpleIdentifier Name="TrnsfToEL"/>
+                            <SimpleIdentifier Name="TrnsfCplToEL"/>
+                            <IndexedIdentifier Name="LibPallet">
+                                <SimpleIdentifier Name="of"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-47" Y="-76"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="96" Y="96"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s0" Target="s01">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="NoTrnsfEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-32" Y="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s0" Target="s02">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-1" Y="-14"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s01" Target="s01">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUp"/>
+                            <SimpleIdentifier Name="StnDwn"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-27" Y="-32"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="225" Y="95"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s01" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LibPallet"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-28" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="159" Y="118"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s02" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUp"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-28" Y="7"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="69" Y="207"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s02" Target="s01">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnDwn"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-26" Y="13"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="172" Y="218"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="OFProtELpost">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="96" Y="96"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point X="-54" Y="0"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s1">
+                        <PointGeometry>
+                            <Point X="224" Y="96"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s2">
+                        <PointGeometry>
+                            <Point X="352" Y="96"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s3">
+                        <PointGeometry>
+                            <Point X="480" Y="96"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s0" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPallet"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-36" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="96" Y="49"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s0" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCpl"/>
+                            <SimpleIdentifier Name="ProcErr"/>
+                            <SimpleIdentifier Name="ASDwn"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-26" Y="-46"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="160" Y="80"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s1" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-36" Y="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="160" Y="112"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s1" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPallet"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-28" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="224" Y="48"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s1" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCpl"/>
+                            <SimpleIdentifier Name="ProcErr"/>
+                            <SimpleIdentifier Name="ASDwn"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-24" Y="-45"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="288" Y="82"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s2" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-35" Y="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="288" Y="111"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s2" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPallet"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-34" Y="-20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="352" Y="49"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s2" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCpl"/>
+                            <SimpleIdentifier Name="ProcErr"/>
+                            <SimpleIdentifier Name="ASDwn"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-24" Y="-45"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="416" Y="81"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s3" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-36" Y="1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="416" Y="112"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="QueryPalletAtTU">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="144" Y="112"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="9" Y="-9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s2">
+                        <PointGeometry>
+                            <Point X="144" Y="192"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="9" Y="-11"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s0" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QPallet"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-53" Y="-11"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="135" Y="153"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s2" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletCL"/>
+                            <SimpleIdentifier Name="IsPalletEL"/>
+                            <SimpleIdentifier Name="NoPallet"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="5" Y="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="155" Y="152"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="ASStoreUpState">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="112" Y="96"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s1">
+                        <PointGeometry>
+                            <Point X="112" Y="208"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s2">
+                        <PointGeometry>
+                            <Point X="224" Y="96"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s3">
+                        <PointGeometry>
+                            <Point X="224" Y="208"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s0" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QStnUp"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s0" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ASDwn"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-23" Y="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s0" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPallet"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-50" Y="-20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="76" Y="53"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s1" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ASDwn"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-28" Y="-2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="168" Y="233"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s1" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnUp"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-44" Y="-21"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="87" Y="152"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s1" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPallet"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-47" Y="6"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="69" Y="244"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s2" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="QStnUp"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-1" Y="-8"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="249" Y="152"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s2" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobUp"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-20" Y="-22"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="168" Y="71"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s2" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DoRpr"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-36" Y="-26"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="266" Y="59"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s3" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="RobUp"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-30" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s3" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="StnDwn"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-53" Y="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s3" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="DoRpr"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-32" Y="3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="261" Y="251"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="CapELpost">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="32" Y="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s1">
+                        <PointGeometry>
+                            <Point X="160" Y="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s2">
+                        <PointGeometry>
+                            <Point X="288" Y="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s3">
+                        <PointGeometry>
+                            <Point X="416" Y="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s4">
+                        <PointGeometry>
+                            <Point X="544" Y="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s0" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCpl"/>
+                            <SimpleIdentifier Name="ProcErr"/>
+                            <SimpleIdentifier Name="ASDwn"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-25" Y="-46"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="96" Y="64"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s1" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCpl"/>
+                            <SimpleIdentifier Name="ProcErr"/>
+                            <SimpleIdentifier Name="ASDwn"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-24" Y="-46"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="224" Y="64"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s1" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-33" Y="-21"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="160" Y="32"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s1" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-36" Y="-1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="96" Y="96"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s2" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCpl"/>
+                            <SimpleIdentifier Name="ProcErr"/>
+                            <SimpleIdentifier Name="ASDwn"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-26" Y="-46"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="354" Y="67"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s2" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-28" Y="-21"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="288" Y="32"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s2" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-37" Y="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="224" Y="95"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s3" Target="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcCpl"/>
+                            <SimpleIdentifier Name="ProcErr"/>
+                            <SimpleIdentifier Name="ASDwn"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-22" Y="-48"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="480" Y="64"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s3" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-37" Y="-20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="416" Y="32"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s3" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-41" Y="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="353" Y="93"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s4" Target="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="IsPalletEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-28" Y="-21"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="544" Y="31"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s4" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToCL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-40" Y="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="480" Y="95"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="CapELpre">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="48" Y="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s1">
+                        <PointGeometry>
+                            <Point X="160" Y="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s2">
+                        <PointGeometry>
+                            <Point X="272" Y="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s3">
+                        <PointGeometry>
+                            <Point X="384" Y="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s4">
+                        <PointGeometry>
+                            <Point X="496" Y="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s0" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-35" Y="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="104" Y="48"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s1" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPallet"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-29" Y="1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="104" Y="79"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s1" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-39" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="216" Y="48"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s2" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPallet"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-32" Y="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="216" Y="79"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s2" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-37" Y="-20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="328" Y="49"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s3" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPallet"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-27" Y="1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="328" Y="79"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s3" Target="s4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="TrnsfCplToEL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-37" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="440" Y="49"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="s4" Target="s3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ProcPallet"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-28" Y="1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="440" Y="79"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <Instance ModuleName="as" Name="as">
+            <ParameterBinding Name=":accepting">
+                <SimpleIdentifier Name=":accepting"/>
+            </ParameterBinding>
+            <ParameterBinding Name="ASDwn">
+                <SimpleIdentifier Name="ASDwn"/>
+            </ParameterBinding>
+            <ParameterBinding Name="DoRpr">
+                <SimpleIdentifier Name="DoRpr"/>
+            </ParameterBinding>
+            <ParameterBinding Name="ProcCpl">
+                <SimpleIdentifier Name="ProcCpl"/>
+            </ParameterBinding>
+            <ParameterBinding Name="ProcErr">
+                <SimpleIdentifier Name="ProcErr"/>
+            </ParameterBinding>
+            <ParameterBinding Name="ProcPallet">
+                <SimpleIdentifier Name="ProcPallet"/>
+            </ParameterBinding>
+            <ParameterBinding Name="RobUp">
+                <SimpleIdentifier Name="RobUp"/>
+            </ParameterBinding>
+        </Instance>
+        <Instance ModuleName="tu" Name="tu">
+            <ParameterBinding Name=":accepting">
+                <SimpleIdentifier Name=":accepting"/>
+            </ParameterBinding>
+            <ParameterBinding Name="LibPallet">
+                <SimpleIdentifier Name="LibPallet"/>
+            </ParameterBinding>
+            <ParameterBinding Name="NoTrnsfEL">
+                <SimpleIdentifier Name="NoTrnsfEL"/>
+            </ParameterBinding>
+            <ParameterBinding Name="PalletRlsd">
+                <SimpleIdentifier Name="PalletRlsd"/>
+            </ParameterBinding>
+            <ParameterBinding Name="TrnsfCplToCL">
+                <SimpleIdentifier Name="TrnsfCplToCL"/>
+            </ParameterBinding>
+            <ParameterBinding Name="TrnsfCplToEL">
+                <SimpleIdentifier Name="TrnsfCplToEL"/>
+            </ParameterBinding>
+            <ParameterBinding Name="TrnsfELToCL">
+                <SimpleIdentifier Name="TrnsfELToCL"/>
+            </ParameterBinding>
+            <ParameterBinding Name="TrnsfToEL">
+                <SimpleIdentifier Name="TrnsfToEL"/>
+            </ParameterBinding>
+        </Instance>
+    </ComponentList>
+</Module>

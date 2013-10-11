@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 
 import net.sourceforge.waters.analysis.tr.IntArrayHashingStrategy;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -47,6 +48,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.printer.ProxyPrinter;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -154,6 +156,26 @@ public class MonolithicSynchronousProductBuilder
   }
 
   /**
+   * Sets whether redundant selfloops are to be removed.
+   * If enabled, events that appear as selfloops on all states except dump
+   * states and nowhere else are removed from the output, and markings
+   * that appear on all states are also removed.
+   */
+  public void setRemovingSelfloops(final boolean removing)
+  {
+    mRemovingSelfloops = removing;
+  }
+
+  /**
+   * Returns whether selfloops are removed.
+   * @see #setRemovingSelfloops(boolean) setRemovingSelfloops()
+   */
+  public boolean getRemovingSelfloops()
+  {
+    return mRemovingSelfloops;
+  }
+
+  /**
    * Sets whether deadlock states are pruned. If enabled, the synchronous
    * product builder checks for deadlock states in the input automata, i.e.,
    * for states that are not marked by any of the configured propositions,
@@ -182,13 +204,13 @@ public class MonolithicSynchronousProductBuilder
   @Override
   public Collection<EventProxy> getPropositions()
   {
-    return mUsedPropositions;
+    return mConfiguredPropositions;
   }
 
   @Override
   public void setPropositions(final Collection<EventProxy> props)
   {
-    mUsedPropositions = props;
+    mConfiguredPropositions = props;
   }
 
   @Override
@@ -291,11 +313,11 @@ public class MonolithicSynchronousProductBuilder
     mNumAutomata = automata.size();
 
     TObjectIntHashMap<EventProxy> eventToIndex =
-      new TObjectIntHashMap<EventProxy>(mNumInputEvents);
-    if (mUsedPropositions == null) {
+      new TObjectIntHashMap<EventProxy>(mNumInputEvents, 0.5f, -1);
+    if (mConfiguredPropositions == null) {
       mCurrentPropositions = new ArrayList<EventProxy>();
     } else {
-      mCurrentPropositions = mUsedPropositions;
+      mCurrentPropositions = new ArrayList<EventProxy>(mConfiguredPropositions);
     }
     final Collection<EventProxy> forbidden = new THashSet<EventProxy>();
     if (mMaskingPairs != null) {
@@ -311,7 +333,7 @@ public class MonolithicSynchronousProductBuilder
     final KindTranslator translator = getKindTranslator();
     for (final EventProxy event : events) {
       if (translator.getEventKind(event) == EventKind.PROPOSITION) {
-        if (mUsedPropositions == null) {
+        if (mConfiguredPropositions == null) {
           mCurrentPropositions.add(event);
         }
       } else if (forbidden.contains(event)) {
@@ -325,8 +347,8 @@ public class MonolithicSynchronousProductBuilder
     final boolean pruning;
     if (!mPruningDeadlocks) {
       pruning = false;
-    } else if (mUsedPropositions != null) {
-      pruning = mUsedPropositions.containsAll(mCurrentPropositions);
+    } else if (mConfiguredPropositions != null) {
+      pruning = mConfiguredPropositions.containsAll(mCurrentPropositions);
     } else {
       pruning = !mCurrentPropositions.isEmpty();
     }
@@ -337,9 +359,10 @@ public class MonolithicSynchronousProductBuilder
       }
       for (final MaskingPair pair : mMaskingPairs) {
         final EventProxy replacement = pair.getReplacement();
+        final int r = eventToIndex.get(replacement);
         final int e;
-        if (eventToIndex.containsKey(replacement)) {
-          e = eventToIndex.get(replacement);
+        if (r >= 0) {
+          e = r;
         } else {
           e = nextNormal++;
           eventToIndex.put(replacement, e);
@@ -365,6 +388,9 @@ public class MonolithicSynchronousProductBuilder
       final int e = iter.value();
       mEvents[e] = event;
     }
+    if (mRemovingSelfloops) {
+      mSelfloops = new int[mNumEvents];
+    }
 
     final int numProps = mCurrentPropositions.size();
     mOriginalStates = new StateProxy[mNumAutomata][];
@@ -381,6 +407,7 @@ public class MonolithicSynchronousProductBuilder
 
     int a = 0;
     for (final AutomatonProxy aut : automata) {
+      checkAbort();
       final Collection<EventProxy> localEvents = aut.getEvents();
       final List<EventProxy> nonLocalProps =
         new ArrayList<EventProxy>(numProps);
@@ -520,6 +547,7 @@ public class MonolithicSynchronousProductBuilder
     mStateTuples = null;
     mUnvisited = null;
     mTransitionBuffer = null;
+    mSelfloops = null;
     mNDTuple = null;
     mTargetTuple = null;
     mCurrentSuccessors = null;
@@ -530,8 +558,9 @@ public class MonolithicSynchronousProductBuilder
   //#########################################################################
   //# Auxiliary Methods
   private void explore(final int[] sourceTuple)
-    throws OverflowException
+    throws AnalysisException
   {
+    checkAbort();
     final int source = mStates.get(sourceTuple);
     if (mCurrentSuccessors != null) {
       for (int e = 0; e < mNumEvents; e++) {
@@ -607,10 +636,10 @@ public class MonolithicSynchronousProductBuilder
       }
       target = mDeadlockState;
     } else {
-      target = getNewState();
-      if (mStateCallback != null) {
-        mStateCallback.countState(mTargetTuple);
+      if (mStateCallback != null && !mStateCallback.newState(mTargetTuple)) {
+        return;
       }
+      target = getNewState();
       final int[] newTuple = Arrays.copyOf(mTargetTuple, mNumAutomata);
       mStates.put(newTuple, target);
       mUnvisited.offer(newTuple);
@@ -649,7 +678,9 @@ public class MonolithicSynchronousProductBuilder
                              final int target)
   throws OverflowException
   {
+    final int masked;
     if (mProjectionMask == null) {
+      masked = event;
       if (target == mDeadlockState) {
         if (mCurrentDeadlock[event]) {
           return;
@@ -657,37 +688,37 @@ public class MonolithicSynchronousProductBuilder
           mCurrentDeadlock[event] = true;
         }
       }
-      if (mTransitionBuffer.size() >= mTransitionBufferLimit) {
-        throw new OverflowException(OverflowKind.TRANSITION,
-                                    getTransitionLimit());
-      }
-      mTransitionBuffer.add(source);
-      mTransitionBuffer.add(event);
-      mTransitionBuffer.add(target);
     } else {
-      final int masked = mProjectionMask[event];
-      if (mCurrentSuccessors[masked].add(target)) {
-        if (mTransitionBuffer.size() >= mTransitionBufferLimit) {
-          throw new OverflowException(OverflowKind.TRANSITION,
-                                      getTransitionLimit());
-        }
-        mTransitionBuffer.add(source);
-        mTransitionBuffer.add(masked);
-        mTransitionBuffer.add(target);
+      masked = mProjectionMask[event];
+      if (!mCurrentSuccessors[masked].add(target)) {
+        return;
+      }
+    }
+    if (mTransitionBuffer.size() >= mTransitionBufferLimit) {
+      throw new OverflowException(OverflowKind.TRANSITION,
+                                  getTransitionLimit());
+    }
+    mTransitionBuffer.add(source);
+    mTransitionBuffer.add(masked);
+    mTransitionBuffer.add(target);
+    if (mSelfloops != null) {
+      if (source != target) {
+        mSelfloops[masked] = -1;
+      } else if (mSelfloops[masked] >= 0) {
+        mSelfloops[masked]++;
       }
     }
   }
 
   private AutomatonProxy createAutomaton()
+    throws AnalysisException
   {
-    final int numEvents = mNumEvents + mCurrentPropositions.size();
-    final Collection<EventProxy> events = new ArrayList<EventProxy>(numEvents);
+    final int numSelfloopStates = mNumStates - (mDeadlockState >= 0 ? 1 : 0);
+    final Set<EventProxy> skip;
     if (mMaskingPairs == null) {
-      for (final EventProxy event : mEvents) {
-        events.add(event);
-      }
+      skip = Collections.emptySet();
     } else {
-      final THashSet<EventProxy> skip = new THashSet<EventProxy>(mNumEvents);
+      skip = new THashSet<EventProxy>(mNumEvents);
       for (final MaskingPair pair : mMaskingPairs) {
         final Collection<EventProxy> hidden = pair.getHiddenEvents();
         skip.addAll(hidden);
@@ -696,23 +727,52 @@ public class MonolithicSynchronousProductBuilder
         final EventProxy replacement = pair.getReplacement();
         skip.remove(replacement);
       }
-      for (final EventProxy event : mEvents) {
-        if (skip.add(event)) {
-          events.add(event);
-        }
+    }
+    final int numEvents = mNumEvents + mCurrentPropositions.size() - skip.size();
+    final Collection<EventProxy> events = new ArrayList<EventProxy>(numEvents);
+    for (int e = 0; e < mNumEvents; e++) {
+      final EventProxy event = mEvents[e];
+      if (skip.contains(event) ||
+          mSelfloops != null && mSelfloops[e] == numSelfloopStates) {
+        mEvents[e] = null;
+      } else {
+        events.add(event);
       }
-      for (final MaskingPair pair : mMaskingPairs) {
-        final EventProxy replacement = pair.getReplacement();
-        if (skip.add(replacement)) {
-          events.add(replacement);
+    }
+
+    // Delete propositions that appear in all states ...
+    int numProps = mCurrentPropositions.size();
+    if (mRemovingSelfloops) {
+      final Set<EventProxy> allProps =
+        new THashSet<EventProxy>(mCurrentPropositions);
+      final Set<EventProxy> localProps = new THashSet<EventProxy>(numProps);
+      for (int code = 0; code < mNumStates; code++) {
+        checkAbort();
+        final int[] tuple = mStateTuples.get(code);
+        localProps.addAll(mCurrentPropositions);
+        for (int a = 0; a < mNumAutomata; a++) {
+          final List<EventProxy> stateMarking = getStateMarking(a, tuple[a]);
+          localProps.retainAll(stateMarking);
+          if (localProps.isEmpty()) {
+            break;
+          }
         }
+        allProps.retainAll(localProps);
+        if (allProps.isEmpty()) {
+          break;
+        }
+        localProps.clear();
+      }
+      if (!allProps.isEmpty()) {
+        mCurrentPropositions.removeAll(allProps);
+        numProps = mCurrentPropositions.size();
       }
     }
     events.addAll(mCurrentPropositions);
 
-    final int numProps = mCurrentPropositions.size();
     final List<StateProxy> states = new ArrayList<StateProxy>(mNumStates);
     for (int code = 0; code < mNumStates; code++) {
+      checkAbort();
       final boolean initial = code < mNumInitialStates;
       final int[] tuple = mStateTuples.get(code);
       final List<EventProxy> marking = new ArrayList<EventProxy>(numProps);
@@ -736,15 +796,18 @@ public class MonolithicSynchronousProductBuilder
     final int bufferSize = mTransitionBuffer.size();
     final ArrayList<TransitionProxy> transitions =
       new ArrayList<TransitionProxy>(bufferSize / 3);
-    int t = 0;
-    while (t < bufferSize) {
-      int code = mTransitionBuffer.get(t++);
-      final StateProxy source = states.get(code);
-      code = mTransitionBuffer.get(t++);
-      final EventProxy event = mEvents[code];
-      code = mTransitionBuffer.get(t++);
-      final StateProxy target = states.get(code);
-      transitions.add(factory.createTransitionProxy(source, event, target));
+    int i = 0;
+    while (i < bufferSize) {
+      final int s = mTransitionBuffer.get(i++);
+      final int e = mTransitionBuffer.get(i++);
+      final int t = mTransitionBuffer.get(i++);
+      final EventProxy event = mEvents[e];
+      if (event != null) {
+        checkAbort();
+        final StateProxy source = states.get(s);
+        final StateProxy target = states.get(t);
+        transitions.add(factory.createTransitionProxy(source, event, target));
+      }
     }
 
     final String name = computeOutputName();
@@ -779,8 +842,11 @@ public class MonolithicSynchronousProductBuilder
      * before adding a new state to the synchronous product state space.
      * @param  tuple    Integer array representing state codes of a new
      *                  state tuple.
+     * @return <CODE>true</CODE> if the state should be included in the
+     *         synchronous product, <CODE>false</CODE> if it should be
+     *         suppressed.
      */
-    public void countState(int[] tuple) throws OverflowException;
+    public boolean newState(int[] tuple) throws OverflowException;
 
     /**
      * This method is called by the {@link MonolithicSynchronousProductBuilder}
@@ -996,10 +1062,12 @@ public class MonolithicSynchronousProductBuilder
       return n.getName().compareTo(getName());
     }
 
+    //#######################################################################
+    //# Debugging
     @Override
     public String toString()
     {
-      return getName();
+      return ProxyPrinter.getPrintString(this);
     }
 
     //#######################################################################
@@ -1040,9 +1108,10 @@ public class MonolithicSynchronousProductBuilder
 
   //#########################################################################
   //# Data Members
-  private Collection<EventProxy> mUsedPropositions;
+  private Collection<EventProxy> mConfiguredPropositions;
   private StateCallback mStateCallback;
   private Collection<MaskingPair> mMaskingPairs;
+  private boolean mRemovingSelfloops;
   private boolean mPruningDeadlocks;
 
   private int mNumAutomata;
@@ -1066,6 +1135,7 @@ public class MonolithicSynchronousProductBuilder
   private Queue<int[]> mUnvisited;
   private TIntArrayList mTransitionBuffer;
   private int mTransitionBufferLimit;
+  private int[] mSelfloops;
 
   private int[][] mNDTuple;
   private int[] mTargetTuple;

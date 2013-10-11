@@ -2562,7 +2562,7 @@ proc Java_CollectGlobalImports {importMapName} {
   set importMap(List) "java.util"
   set importMap(Map) "java.util"
   set importMap(Set) "java.util"
-  set importMap(THashSet) "gnu.trove"
+  set importMap(THashSet) "gnu.trove.set.hash"
   set importMap(TreeMap) "java.util"
 
   set packprefix "net.sourceforge.waters"

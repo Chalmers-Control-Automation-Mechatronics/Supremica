@@ -49,15 +49,16 @@
  */
 package org.supremica.automata.algorithms.minimization;
 
-import org.supremica.properties.Config;
-import org.supremica.log.*;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.algorithms.EquivalenceRelation;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
+import org.supremica.properties.Config;
 
 public final class MinimizationOptions
 {
     private static Logger logger = LoggerFactory.createLogger(MinimizationOptions.class);
-    
+
     private boolean dialogOK = false;
     /**
      * The equivalence relation that the minimization should be performed with respect to.
@@ -84,7 +85,7 @@ public final class MinimizationOptions
      * only the nonblocking status of the end result.
      */
     private boolean skipLast;
-    /** 
+    /**
      * In the compositional minimisation, the procedure will stop when it comes across
      * components of this size or greater.
      */
@@ -107,7 +108,7 @@ public final class MinimizationOptions
      * final result.
      */
     private Alphabet targetAlphabet;
-    
+
     /** Use conflict equivalence rule A? */
     private boolean useRuleSC = true;
     /** Use conflict equivalence rule AA? */
@@ -116,83 +117,83 @@ public final class MinimizationOptions
     private boolean useRuleAE = true;
     /** Use conflict equivalence rule F? */
     private boolean useRuleOSO = true;
-    
+
     /**
      * This constructor returns the options previously chosen by the user as per the
      * current state of SupremicaProperties.
      */
     public MinimizationOptions()
     {
-        equivalenceRelation = (EquivalenceRelation) Config.MINIMIZATION_EQUIVALENCE_RELATION.get();
+        equivalenceRelation = Config.MINIMIZATION_EQUIVALENCE_RELATION.get();
         alsoTransitions = Config.MINIMIZATION_ALSO_MINIMIZE_TRANSITIONS.get();
         keepOriginal = Config.MINIMIZATION_KEEP_ORIGINAL.get();
         ignoreMarking = Config.MINIMIZATION_IGNORE_MARKING.get();
-        minimizationStrategy = (MinimizationStrategy) Config.MINIMIZATION_STRATEGY.get();
-        minimizationHeuristic = (MinimizationHeuristic) Config.MINIMIZATION_HEURISTIC.get();
+        minimizationStrategy = Config.MINIMIZATION_STRATEGY.get();
+        minimizationHeuristic = Config.MINIMIZATION_HEURISTIC.get();
         componentSizeLimit = Integer.MAX_VALUE;
     }
-    
+
     public boolean isValid()
     {
-        String errorMessage = validOptions();
+        final String errorMessage = validOptions();
         if (errorMessage != null)
         {
             logger.error(errorMessage);
             return false;
         }
-        
+
         return true;
     }
-    
+
     public String validOptions()
     {
         if (equivalenceRelation == EquivalenceRelation.CONFLICTEQUIVALENCE)
         {
             if (ignoreMarking)
             {
-                String message = "Invalid minimization options chosen. Conflict equivalence " +
+                final String message = "Invalid minimization options chosen. Conflict equivalence " +
                     "implies that the marking must not be ignored.";
                 return message;
             }
         }
-        
+
         if (equivalenceRelation == EquivalenceRelation.SUPERVISIONEQUIVALENCE)
         {
             if (skipLast)
             {
-                String message = "Invalid minimization options chosen. Supervision equivalence " +
+                final String message = "Invalid minimization options chosen. Supervision equivalence " +
                     "implies that the last step can not be skipped.";
                 return message;
             }
         }
-        
+
         if (compositionalMinimization)
         {
             if (targetAlphabet == null)
             {
-                String message = "Null target alphabet selected for compositional minimization.";
+                final String message = "Null target alphabet selected for compositional minimization.";
                 return message;
             }
         }
-        
+
         if (targetAlphabet != null && targetAlphabet.nbrOfUnobservableEvents() != 0)
         {
-            String message = "There should not be epsilon events in the target alphabet.";  // (But it's not dangerous or anything...)
+            final String message = "There should not be epsilon events in the target alphabet.";  // (But it's not dangerous or anything...)
             return message;
         }
-        
+
         if (minimizationStrategy != MinimizationStrategy.AtLeastOneLocal &&
             (minimizationHeuristic == MinimizationHeuristic.FewestAutomata ||
             minimizationHeuristic == MinimizationHeuristic.MostAutomata))
         {
-            String message = "Inapropriate choice of minimization heuristic.";
+            final String message = "Inapropriate choice of minimization heuristic.";
             return message;
         }
-        
+
         return null;
     }
-    
-    public void setDialogOK(boolean bool)
+
+    public void setDialogOK(final boolean bool)
     {
         dialogOK = bool;
     }
@@ -200,8 +201,8 @@ public final class MinimizationOptions
     {
         return dialogOK;
     }
-    
-    public void setMinimizationType(EquivalenceRelation rel)
+
+    public void setMinimizationType(final EquivalenceRelation rel)
     {
         equivalenceRelation = rel;
     }
@@ -209,8 +210,8 @@ public final class MinimizationOptions
     {
         return equivalenceRelation;
     }
-    
-    public void setAlsoTransitions(boolean bool)
+
+    public void setAlsoTransitions(final boolean bool)
     {
         alsoTransitions = bool;
     }
@@ -218,8 +219,8 @@ public final class MinimizationOptions
     {
         return alsoTransitions;
     }
-    
-    public void setKeepOriginal(boolean bool)
+
+    public void setKeepOriginal(final boolean bool)
     {
         keepOriginal = bool;
     }
@@ -227,8 +228,8 @@ public final class MinimizationOptions
     {
         return keepOriginal;
     }
-    
-    public void setIgnoreMarking(boolean bool)
+
+    public void setIgnoreMarking(final boolean bool)
     {
         ignoreMarking = bool;
     }
@@ -236,8 +237,8 @@ public final class MinimizationOptions
     {
         return ignoreMarking;
     }
-    
-    public void setCompositionalMinimization(boolean bool)
+
+    public void setCompositionalMinimization(final boolean bool)
     {
         compositionalMinimization = bool;
     }
@@ -245,8 +246,8 @@ public final class MinimizationOptions
     {
         return compositionalMinimization;
     }
-    
-    public void setMinimizationStrategy(MinimizationStrategy strategy)
+
+    public void setMinimizationStrategy(final MinimizationStrategy strategy)
     {
         minimizationStrategy = strategy;
     }
@@ -254,8 +255,8 @@ public final class MinimizationOptions
     {
         return minimizationStrategy;
     }
-    
-    public void setMinimizationHeuristic(MinimizationHeuristic heuristic)
+
+    public void setMinimizationHeuristic(final MinimizationHeuristic heuristic)
     {
         minimizationHeuristic = heuristic;
     }
@@ -263,8 +264,8 @@ public final class MinimizationOptions
     {
         return minimizationHeuristic;
     }
-    
-    public void setSkipLast(boolean bool)
+
+    public void setSkipLast(final boolean bool)
     {
         skipLast = bool;
     }
@@ -272,8 +273,8 @@ public final class MinimizationOptions
     {
         return skipLast;
     }
-    
-    public void setComponentSizeLimit(int value)
+
+    public void setComponentSizeLimit(final int value)
     {
         componentSizeLimit = value;
     }
@@ -281,8 +282,8 @@ public final class MinimizationOptions
     {
         return componentSizeLimit;
     }
-    
-    public void setTargetAlphabet(Alphabet alpha)
+
+    public void setTargetAlphabet(final Alphabet alpha)
     {
         targetAlphabet = alpha;
     }
@@ -290,8 +291,8 @@ public final class MinimizationOptions
     {
         return targetAlphabet;
     }
-    
-    public void setUseRuleSC(boolean bool)
+
+    public void setUseRuleSC(final boolean bool)
     {
         useRuleSC = bool;
     }
@@ -299,7 +300,7 @@ public final class MinimizationOptions
     {
         return useRuleSC;
     }
-    public void setUseRuleOSI(boolean bool)
+    public void setUseRuleOSI(final boolean bool)
     {
         useRuleOSI = bool;
     }
@@ -307,7 +308,7 @@ public final class MinimizationOptions
     {
         return useRuleOSI;
     }
-    public void setUseRuleAE(boolean bool)
+    public void setUseRuleAE(final boolean bool)
     {
         useRuleAE = bool;
     }
@@ -315,7 +316,7 @@ public final class MinimizationOptions
     {
         return useRuleAE;
     }
-    public void setUseRuleOSO(boolean bool)
+    public void setUseRuleOSO(final boolean bool)
     {
         useRuleOSO = bool;
     }
@@ -323,41 +324,41 @@ public final class MinimizationOptions
     {
         return useRuleOSO;
     }
-    
+
     /**
      * Stores the current set of options in SupremicaProperties.
      */
     public void saveOptions()
     {
-        Config.MINIMIZATION_EQUIVALENCE_RELATION.set(equivalenceRelation);
+        Config.MINIMIZATION_EQUIVALENCE_RELATION.setValue(equivalenceRelation);
         Config.MINIMIZATION_ALSO_MINIMIZE_TRANSITIONS.set(alsoTransitions);
         Config.MINIMIZATION_KEEP_ORIGINAL.set(keepOriginal);
         Config.MINIMIZATION_IGNORE_MARKING.set(ignoreMarking);
-        Config.MINIMIZATION_STRATEGY.set(minimizationStrategy);
-        Config.MINIMIZATION_HEURISTIC.set(minimizationHeuristic);
+        Config.MINIMIZATION_STRATEGY.setValue(minimizationStrategy);
+        Config.MINIMIZATION_HEURISTIC.setValue(minimizationHeuristic);
     }
-    
+
     /**
      * Returns the default options for minimization - this is with
      * respect to observation equivalence.
      */
     public static MinimizationOptions getDefaultMinimizationOptions()
     {
-        MinimizationOptions options = new MinimizationOptions();
+        final MinimizationOptions options = new MinimizationOptions();
         options.setMinimizationType(EquivalenceRelation.LANGUAGEEQUIVALENCE);
         options.setAlsoTransitions(true);
         options.setKeepOriginal(true);
         options.setIgnoreMarking(false);
         return options;
     }
-    
+
     /**
      * Returns the default options for nonblocking verification - this
      * is with respect to conflict equivalence.
      */
     public static MinimizationOptions getDefaultNonblockingOptions()
     {
-        MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
+        final MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
         options.setMinimizationType(EquivalenceRelation.CONFLICTEQUIVALENCE);
         options.setMinimizationStrategy(MinimizationStrategy.FewestTransitionsFirst);
         options.setMinimizationHeuristic(MinimizationHeuristic.MostLocal);
@@ -368,7 +369,7 @@ public final class MinimizationOptions
         options.setTargetAlphabet(new Alphabet());
         return options;
     }
-    
+
     /**
      * Returns the default options for verification, presumably nonblocking?
      */
@@ -376,14 +377,14 @@ public final class MinimizationOptions
     {
         return getDefaultNonblockingOptions();
     }
-    
+
     /**
      * Returns the default options for nonblocking verification - this
      * is with respect to conflict equivalence.
      */
      public static MinimizationOptions getDefaultSynthesisOptions()
     {
-        MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
+        final MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
         options.setMinimizationType(EquivalenceRelation.SUPERVISIONEQUIVALENCE);
         options.setMinimizationStrategy(MinimizationStrategy.FewestTransitionsFirst);
         options.setMinimizationHeuristic(MinimizationHeuristic.MostLocal);
@@ -398,7 +399,7 @@ public final class MinimizationOptions
     public static MinimizationOptions getDefaultSynthesisOptionsSynthesisA()
     {
 
-        MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
+        final MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
         options.setMinimizationType(EquivalenceRelation.SYNTHESISABSTRACTION);
         options.setMinimizationStrategy(MinimizationStrategy.FewestStatesFirst);
         options.setMinimizationHeuristic(MinimizationHeuristic.MostLocal);

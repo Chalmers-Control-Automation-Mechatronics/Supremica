@@ -1,0 +1,906 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="dynamic_prime_sieve" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Distributed prime number sieve, dymanic version.
+
+Source generates numbers from 2 to N and sends them to the first sieve process sieve[1].
+There are S sieve processes for the first S prime numbers.
+The first number received by a sieve is recorded and printed as a prime.
+Afterwards, upon receiving a new number x, tests whether x is divisible by the prime received first.
+If it is, x is discarded, otherwise x is sent to the next sieve process.
+Any numbers passing through all sieves are primes, and sent to the sink for printing.
+
+The model is parametrised by the number S of sieve processes and the maximum number N tested.
+The largest working value for N is p(S)^2-1 where p(S) is the Nth prime.
+
+source :
+
+x0 = 2
+do
+  await c[0]==0
+  c[0] = x0
+  if x0 == N then end
+  x0 = x0+1
+loop
+
+sieve[k] for k=1..S :
+
+await c[k-1] &gt; 0
+p[k] = c[k-1]
+c[k-1] = 0
+print p[k]
+do
+  await c[k-1] &gt; 0
+  x[k] = c[k-1]
+  c[k-1] = 0
+  if x[k] % p[k] != 0 then
+    await c[k] == 0
+    c[k] = x[k]
+  endif
+loop
+
+sink:
+
+do
+  await c[S] &gt; 0
+  xs = c[S]
+  c[S] = 0
+  print xs
+loop
+
+Here are the numbers of reachable states for some parameter values:
+
+S=2, N=24: 13704 reachable states
+S=3, N=48: 234890 reachable states
+S=4, N=120: 5680392 reachable states
+S=5, N=168: 67891570 reachable states</ns2:Comment>
+    <ConstantAliasList>
+        <ConstantAlias Scope="OPTIONAL_PARAMETER" Name="N">
+            <ConstantAliasExpression>
+                <IntConstant Value="24"/>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+        <ConstantAlias Scope="OPTIONAL_PARAMETER" Name="S">
+            <ConstantAliasExpression>
+                <IntConstant Value="2"/>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+    </ConstantAliasList>
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="CONTROLLABLE" Name="print">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <BinaryExpression Operator="+">
+                        <SimpleIdentifier Name="S"/>
+                        <IntConstant Value="1"/>
+                    </BinaryExpression>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="read">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <BinaryExpression Operator="+">
+                        <SimpleIdentifier Name="S"/>
+                        <IntConstant Value="1"/>
+                    </BinaryExpression>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="clear">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <BinaryExpression Operator="+">
+                        <SimpleIdentifier Name="S"/>
+                        <IntConstant Value="1"/>
+                    </BinaryExpression>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="send">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <SimpleIdentifier Name="S"/>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="setx">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <BinaryExpression Operator="+">
+                        <SimpleIdentifier Name="S"/>
+                        <IntConstant Value="1"/>
+                    </BinaryExpression>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="setp">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <SimpleIdentifier Name="S"/>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="source">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="s2">
+                        <PointGeometry>
+                            <Point X="160" Y="208"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="9" Y="-11"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="s0">
+                        <PointGeometry>
+                            <Point X="160" Y="48"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="8" Y="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s1">
+                        <PointGeometry>
+                            <Point X="160" Y="128"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="9" Y="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s3">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="160" Y="288"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="8" Y="-3"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s2" Target="s0">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="setx">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-64" Y="-20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="115" Y="128"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="+=">
+                                    <SimpleIdentifier Name="x0"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-65" Y="-1"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="s1" Target="s2">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="send">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="5" Y="-20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point X="160" Y="128"/>
+                        </StartPointGeometry>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <IndexedIdentifier Name="c">
+                                        <IntConstant Value="0"/>
+                                    </IndexedIdentifier>
+                                    <SimpleIdentifier Name="x0"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="8" Y="-3"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="s0" Target="s1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="read">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="5" Y="-20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==">
+                                    <IndexedIdentifier Name="c">
+                                        <IntConstant Value="0"/>
+                                    </IndexedIdentifier>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="5" Y="-3"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="s2" Target="s3">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="read">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="3" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==">
+                                    <SimpleIdentifier Name="x0"/>
+                                    <SimpleIdentifier Name="N"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="4" Y="-4"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <VariableComponent Name="x0">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="2"/>
+                    <SimpleIdentifier Name="N"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="x0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <ForeachComponent Name="k">
+            <BinaryExpression Operator="..">
+                <IntConstant Value="0"/>
+                <SimpleIdentifier Name="S"/>
+            </BinaryExpression>
+            <ComponentList>
+                <VariableComponent>
+                    <IndexedIdentifier Name="c">
+                        <SimpleIdentifier Name="k"/>
+                    </IndexedIdentifier>
+                    <VariableRange>
+                        <BinaryExpression Operator="..">
+                            <IntConstant Value="0"/>
+                            <SimpleIdentifier Name="N"/>
+                        </BinaryExpression>
+                    </VariableRange>
+                    <VariableInitial>
+                        <BinaryExpression Operator="==">
+                            <IndexedIdentifier Name="c">
+                                <SimpleIdentifier Name="k"/>
+                            </IndexedIdentifier>
+                            <IntConstant Value="0"/>
+                        </BinaryExpression>
+                    </VariableInitial>
+                </VariableComponent>
+            </ComponentList>
+        </ForeachComponent>
+        <ForeachComponent Name="k">
+            <BinaryExpression Operator="..">
+                <IntConstant Value="1"/>
+                <SimpleIdentifier Name="S"/>
+            </BinaryExpression>
+            <ComponentList>
+                <SimpleComponent Kind="PLANT">
+                    <IndexedIdentifier Name="sieve">
+                        <SimpleIdentifier Name="k"/>
+                    </IndexedIdentifier>
+                    <Graph>
+                        <NodeList>
+                            <SimpleNode Initial="true" Name="p0">
+                                <EventList>
+                                    <SimpleIdentifier Name=":accepting"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point X="160" Y="32"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point X="7" Y="-8"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="p1">
+                                <PointGeometry>
+                                    <Point X="160" Y="96"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point X="8" Y="-7"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="p2">
+                                <PointGeometry>
+                                    <Point X="160" Y="160"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point X="7" Y="-8"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="p5">
+                                <PointGeometry>
+                                    <Point X="160" Y="352"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point X="7" Y="-8"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="p6">
+                                <PointGeometry>
+                                    <Point X="160" Y="416"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point X="7" Y="-8"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="p7">
+                                <PointGeometry>
+                                    <Point X="160" Y="480"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point X="7" Y="-8"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="p4">
+                                <EventList>
+                                    <SimpleIdentifier Name=":accepting"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point X="160" Y="288"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point X="9" Y="-9"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="p8">
+                                <PointGeometry>
+                                    <Point X="160" Y="544"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point X="7" Y="-7"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="p9">
+                                <PointGeometry>
+                                    <Point X="160" Y="608"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point X="7" Y="-9"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="p3">
+                                <PointGeometry>
+                                    <Point X="160" Y="224"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point X="7" Y="-5"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                        </NodeList>
+                        <EdgeList>
+                            <Edge Source="p0" Target="p1">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="read">
+                                        <SimpleIdentifier Name="k"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="1" Y="-18"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <GuardActionBlock>
+                                    <Guards>
+                                        <BinaryExpression Operator="&gt;">
+                                            <IndexedIdentifier Name="c">
+                                                <BinaryExpression Operator="-">
+                                                    <SimpleIdentifier Name="k"/>
+                                                    <IntConstant Value="1"/>
+                                                </BinaryExpression>
+                                            </IndexedIdentifier>
+                                            <IntConstant Value="0"/>
+                                        </BinaryExpression>
+                                    </Guards>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="2" Y="-2"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                            <Edge Source="p1" Target="p2">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="setp">
+                                        <SimpleIdentifier Name="k"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="1" Y="-18"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="=">
+                                            <IndexedIdentifier Name="p">
+                                                <SimpleIdentifier Name="k"/>
+                                            </IndexedIdentifier>
+                                            <IndexedIdentifier Name="c">
+                                                <BinaryExpression Operator="-">
+                                                    <SimpleIdentifier Name="k"/>
+                                                    <IntConstant Value="1"/>
+                                                </BinaryExpression>
+                                            </IndexedIdentifier>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="2" Y="1"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                            <Edge Source="p3" Target="p4">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="print">
+                                        <SimpleIdentifier Name="k"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="5" Y="-8"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <StartPointGeometry>
+                                    <Point X="160" Y="224"/>
+                                </StartPointGeometry>
+                                <EndPointGeometry>
+                                    <Point X="160" Y="288"/>
+                                </EndPointGeometry>
+                            </Edge>
+                            <Edge Source="p5" Target="p6">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="setx">
+                                        <SimpleIdentifier Name="k"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="1" Y="-18"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="=">
+                                            <IndexedIdentifier Name="x">
+                                                <SimpleIdentifier Name="k"/>
+                                            </IndexedIdentifier>
+                                            <IndexedIdentifier Name="c">
+                                                <BinaryExpression Operator="-">
+                                                    <SimpleIdentifier Name="k"/>
+                                                    <IntConstant Value="1"/>
+                                                </BinaryExpression>
+                                            </IndexedIdentifier>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="4" Y="-4"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                            <Edge Source="p6" Target="p7">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="clear">
+                                        <SimpleIdentifier Name="k"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="1" Y="-18"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="=">
+                                            <IndexedIdentifier Name="c">
+                                                <BinaryExpression Operator="-">
+                                                    <SimpleIdentifier Name="k"/>
+                                                    <IntConstant Value="1"/>
+                                                </BinaryExpression>
+                                            </IndexedIdentifier>
+                                            <IntConstant Value="0"/>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="2" Y="-3"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                            <Edge Source="p7" Target="p4">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="read">
+                                        <SimpleIdentifier Name="k"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-50" Y="-9"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <StartPointGeometry>
+                                    <Point X="160" Y="480"/>
+                                </StartPointGeometry>
+                                <SplineGeometry>
+                                    <Point X="116" Y="382"/>
+                                </SplineGeometry>
+                                <EndPointGeometry>
+                                    <Point X="160" Y="288"/>
+                                </EndPointGeometry>
+                                <GuardActionBlock>
+                                    <Guards>
+                                        <BinaryExpression Operator="==">
+                                            <BinaryExpression Operator="%">
+                                                <IndexedIdentifier Name="x">
+                                                    <SimpleIdentifier Name="k"/>
+                                                </IndexedIdentifier>
+                                                <IndexedIdentifier Name="p">
+                                                    <SimpleIdentifier Name="k"/>
+                                                </IndexedIdentifier>
+                                            </BinaryExpression>
+                                            <IntConstant Value="0"/>
+                                        </BinaryExpression>
+                                    </Guards>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-50" Y="4"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                            <Edge Source="p7" Target="p8">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="read">
+                                        <SimpleIdentifier Name="k"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="5" Y="-10"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <EndPointGeometry>
+                                    <Point X="160" Y="544"/>
+                                </EndPointGeometry>
+                                <GuardActionBlock>
+                                    <Guards>
+                                        <BinaryExpression Operator="!=">
+                                            <BinaryExpression Operator="%">
+                                                <IndexedIdentifier Name="x">
+                                                    <SimpleIdentifier Name="k"/>
+                                                </IndexedIdentifier>
+                                                <IndexedIdentifier Name="p">
+                                                    <SimpleIdentifier Name="k"/>
+                                                </IndexedIdentifier>
+                                            </BinaryExpression>
+                                            <IntConstant Value="0"/>
+                                        </BinaryExpression>
+                                    </Guards>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="6" Y="3"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                            <Edge Source="p4" Target="p5">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="read">
+                                        <SimpleIdentifier Name="k"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="5" Y="-13"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <GuardActionBlock>
+                                    <Guards>
+                                        <BinaryExpression Operator="&gt;">
+                                            <IndexedIdentifier Name="c">
+                                                <BinaryExpression Operator="-">
+                                                    <SimpleIdentifier Name="k"/>
+                                                    <IntConstant Value="1"/>
+                                                </BinaryExpression>
+                                            </IndexedIdentifier>
+                                            <IntConstant Value="0"/>
+                                        </BinaryExpression>
+                                    </Guards>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="6" Y="2"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                            <Edge Source="p8" Target="p9">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="read">
+                                        <SimpleIdentifier Name="k"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="4" Y="-14"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <GuardActionBlock>
+                                    <Guards>
+                                        <BinaryExpression Operator="==">
+                                            <IndexedIdentifier Name="c">
+                                                <SimpleIdentifier Name="k"/>
+                                            </IndexedIdentifier>
+                                            <IntConstant Value="0"/>
+                                        </BinaryExpression>
+                                    </Guards>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="7" Y="-2"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                            <Edge Source="p9" Target="p4">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="send">
+                                        <SimpleIdentifier Name="k"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-34" Y="42"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point X="72" Y="438"/>
+                                </SplineGeometry>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="=">
+                                            <IndexedIdentifier Name="c">
+                                                <SimpleIdentifier Name="k"/>
+                                            </IndexedIdentifier>
+                                            <IndexedIdentifier Name="x">
+                                                <SimpleIdentifier Name="k"/>
+                                            </IndexedIdentifier>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-34" Y="56"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                            <Edge Source="p2" Target="p3">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="clear">
+                                        <SimpleIdentifier Name="k"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="7" Y="-11"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="=">
+                                            <IndexedIdentifier Name="c">
+                                                <BinaryExpression Operator="-">
+                                                    <SimpleIdentifier Name="k"/>
+                                                    <IntConstant Value="1"/>
+                                                </BinaryExpression>
+                                            </IndexedIdentifier>
+                                            <IntConstant Value="0"/>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="9" Y="2"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                        </EdgeList>
+                    </Graph>
+                </SimpleComponent>
+                <VariableComponent>
+                    <IndexedIdentifier Name="p">
+                        <SimpleIdentifier Name="k"/>
+                    </IndexedIdentifier>
+                    <VariableRange>
+                        <BinaryExpression Operator="..">
+                            <IntConstant Value="2"/>
+                            <SimpleIdentifier Name="N"/>
+                        </BinaryExpression>
+                    </VariableRange>
+                    <VariableInitial>
+                        <BinaryExpression Operator="==">
+                            <IndexedIdentifier Name="p">
+                                <SimpleIdentifier Name="k"/>
+                            </IndexedIdentifier>
+                            <IntConstant Value="2"/>
+                        </BinaryExpression>
+                    </VariableInitial>
+                </VariableComponent>
+                <VariableComponent>
+                    <IndexedIdentifier Name="x">
+                        <SimpleIdentifier Name="k"/>
+                    </IndexedIdentifier>
+                    <VariableRange>
+                        <BinaryExpression Operator="..">
+                            <IntConstant Value="2"/>
+                            <SimpleIdentifier Name="N"/>
+                        </BinaryExpression>
+                    </VariableRange>
+                    <VariableInitial>
+                        <BinaryExpression Operator="==">
+                            <IndexedIdentifier Name="x">
+                                <SimpleIdentifier Name="k"/>
+                            </IndexedIdentifier>
+                            <IntConstant Value="2"/>
+                        </BinaryExpression>
+                    </VariableInitial>
+                </VariableComponent>
+            </ComponentList>
+        </ForeachComponent>
+        <SimpleComponent Kind="PLANT" Name="sink">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="S0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="192" Y="96"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="9" Y="-10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S1">
+                        <PointGeometry>
+                            <Point X="192" Y="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="9" Y="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S2">
+                        <PointGeometry>
+                            <Point X="192" Y="288"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="8" Y="-6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S3">
+                        <PointGeometry>
+                            <Point X="192" Y="224"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="S0" Target="S1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="read">
+                                <BinaryExpression Operator="+">
+                                    <SimpleIdentifier Name="S"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="4" Y="-16"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&gt;">
+                                    <IndexedIdentifier Name="c">
+                                        <SimpleIdentifier Name="S"/>
+                                    </IndexedIdentifier>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="6" Y="-1"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="S2" Target="S0">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="print">
+                                <BinaryExpression Operator="+">
+                                    <SimpleIdentifier Name="S"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-48" Y="-25"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="137" Y="193"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point X="192" Y="96"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Source="S3" Target="S2">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="clear">
+                                <BinaryExpression Operator="+">
+                                    <SimpleIdentifier Name="S"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="3" Y="-11"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point X="192" Y="224"/>
+                        </StartPointGeometry>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <IndexedIdentifier Name="c">
+                                        <SimpleIdentifier Name="S"/>
+                                    </IndexedIdentifier>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="4" Y="2"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="S1" Target="S3">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="setx">
+                                <BinaryExpression Operator="+">
+                                    <SimpleIdentifier Name="S"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="3" Y="-10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="xs"/>
+                                    <IndexedIdentifier Name="c">
+                                        <SimpleIdentifier Name="S"/>
+                                    </IndexedIdentifier>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="5" Y="3"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <VariableComponent Name="xs">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="2"/>
+                    <SimpleIdentifier Name="N"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="xs"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+    </ComponentList>
+</Module>

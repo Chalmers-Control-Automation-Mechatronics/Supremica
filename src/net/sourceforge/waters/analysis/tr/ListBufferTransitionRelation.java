@@ -136,7 +136,7 @@ public class ListBufferTransitionRelation
                                       final int config)
     throws OverflowException
   {
-    this(aut, eventEnc, new StateEncoding(aut), config);
+    this(aut, eventEnc, null, config);
   }
 
   /**
@@ -150,7 +150,8 @@ public class ListBufferTransitionRelation
    *          events in the transition buffers.
    * @param stateEnc
    *          State encoding to define the assignment of integer codes to
-   *          events in the transition buffers.
+   *          events in the transition buffers, or <CODE>null</CODE> to
+   *          use a default state encoding.
    * @param config
    *          Configuration flags defining which transition buffers are to be
    *          created. Should be one of {@link #CONFIG_SUCCESSORS},
@@ -162,7 +163,7 @@ public class ListBufferTransitionRelation
    */
   public ListBufferTransitionRelation(final AutomatonProxy aut,
                                       final EventEncoding eventEnc,
-                                      final StateEncoding stateEnc,
+                                      StateEncoding stateEnc,
                                       final int config)
     throws OverflowException
   {
@@ -170,7 +171,11 @@ public class ListBufferTransitionRelation
     mName = aut.getName();
     mKind = aut.getKind();
     final Set<EventProxy> events = new THashSet<EventProxy>(aut.getEvents());
+    if (stateEnc == null) {
+      stateEnc = new StateEncoding(aut);
+    }
     mStateBuffer = new IntStateBuffer(eventEnc, stateEnc, events);
+    mStateBuffer.setMissingStatesUnreachable(aut, stateEnc);
     mExtraStates = stateEnc.getNumberOfExtraStates();
     final Collection<TransitionProxy> transitions = aut.getTransitions();
     final List<TransitionProxy> list =
@@ -186,14 +191,17 @@ public class ListBufferTransitionRelation
       }
       mEventStatus[e] = status;
     }
+    final EventEncoding.OrderingInfo orderingInfo = eventEnc.getOrderingInfo();
     if ((config & CONFIG_SUCCESSORS) != 0) {
       mSuccessorBuffer =
-        new OutgoingTransitionListBuffer(numEvents, numStates, mEventStatus, numTrans);
+        new OutgoingTransitionListBuffer(numEvents, numStates,
+                                         mEventStatus, orderingInfo, numTrans);
       mSuccessorBuffer.setUpTransitions(events, list, eventEnc, stateEnc);
     }
     if ((config & CONFIG_PREDECESSORS) != 0) {
       mPredecessorBuffer =
-        new IncomingTransitionListBuffer(numEvents, numStates, mEventStatus, numTrans);
+        new IncomingTransitionListBuffer(numEvents, numStates,
+                                         mEventStatus, orderingInfo, numTrans);
       mPredecessorBuffer.setUpTransitions(events, list, eventEnc, stateEnc);
     }
 
@@ -240,13 +248,16 @@ public class ListBufferTransitionRelation
     for (int e = 0; e < numEvents; e++) {
       mEventStatus[e] = eventEnc.getProperEventStatus(e);
     }
+    final EventEncoding.OrderingInfo orderingInfo = eventEnc.getOrderingInfo();
     if ((config & CONFIG_SUCCESSORS) != 0) {
       mSuccessorBuffer =
-        new OutgoingTransitionListBuffer(numEvents, numStates, mEventStatus, 0);
+        new OutgoingTransitionListBuffer(numEvents, numStates,
+                                         mEventStatus, orderingInfo, 0);
     }
     if ((config & CONFIG_PREDECESSORS) != 0) {
       mPredecessorBuffer =
-        new IncomingTransitionListBuffer(numEvents, numStates, mEventStatus, 0);
+        new IncomingTransitionListBuffer(numEvents, numStates,
+                                         mEventStatus, orderingInfo, 0);
     }
 
   }
@@ -289,16 +300,15 @@ public class ListBufferTransitionRelation
     mKind = kind;
     mStateBuffer = new IntStateBuffer(numStates, numPropositions);
     mEventStatus = new byte[numProperEvents];
-    mEventStatus[EventEncoding.TAU] = EventEncoding.STATUS_LOCAL;
+    mEventStatus[EventEncoding.TAU] = EventEncoding.STATUS_FULLY_LOCAL;
     if ((config & CONFIG_SUCCESSORS) != 0) {
       mSuccessorBuffer = new OutgoingTransitionListBuffer
-        (numProperEvents, numStates ,mEventStatus, 0);
+        (numProperEvents, numStates ,mEventStatus, null, 0);
     }
     if ((config & CONFIG_PREDECESSORS) != 0) {
       mPredecessorBuffer = new IncomingTransitionListBuffer
-        (numProperEvents, numStates, mEventStatus, 0);
+        (numProperEvents, numStates, mEventStatus, null, 0);
     }
-
   }
 
   /**
@@ -325,9 +335,10 @@ public class ListBufferTransitionRelation
     mEventStatus = Arrays.copyOf(rel.mEventStatus, numEvents);
     final int numStates = mStateBuffer.getNumberOfStates();
     try {
+      final EventEncoding.OrderingInfo orderingInfo = rel.getOrderingInfo();
       if ((config & CONFIG_SUCCESSORS) != 0) {
-        mSuccessorBuffer =
-          new OutgoingTransitionListBuffer(numEvents, numStates,mEventStatus, 0);
+        mSuccessorBuffer = new OutgoingTransitionListBuffer
+          (numEvents, numStates, mEventStatus, orderingInfo, 0);
         if (rel.mSuccessorBuffer != null) {
           mSuccessorBuffer.setUpTransitions(rel.mSuccessorBuffer);
         } else {
@@ -335,8 +346,8 @@ public class ListBufferTransitionRelation
         }
       }
       if ((config & CONFIG_PREDECESSORS) != 0) {
-        mPredecessorBuffer =
-          new IncomingTransitionListBuffer(numEvents, numStates, mEventStatus, 0);
+        mPredecessorBuffer = new IncomingTransitionListBuffer
+          (numEvents, numStates, mEventStatus, orderingInfo, 0);
         if (rel.mPredecessorBuffer != null) {
           mPredecessorBuffer.setUpTransitions(rel.mPredecessorBuffer);
         } else {
@@ -401,6 +412,23 @@ public class ListBufferTransitionRelation
     mKind = kind;
   }
 
+  /**
+   * Gets the ordering information associated with this transition relation.
+   * @return Ordering information, or <CODE>null</CODE> if the event
+   *         encoding is not ordered by event status.
+   */
+  public EventEncoding.OrderingInfo getOrderingInfo()
+  {
+    if (mSuccessorBuffer != null) {
+      return mSuccessorBuffer.getOrderingInfo();
+    } else if (mPredecessorBuffer != null) {
+      return mPredecessorBuffer.getOrderingInfo();
+    } else {
+      throw createNoBufferException();
+    }
+  }
+
+
   //#########################################################################
   //# Event Access
   public int getNumberOfProperEvents()
@@ -418,6 +446,7 @@ public class ListBufferTransitionRelation
   {
     return mStateBuffer.getNumberOfPropositions();
   }
+
 
   //#########################################################################
   //# State Access
@@ -447,6 +476,17 @@ public class ListBufferTransitionRelation
   public int getNumberOfReachableStates()
   {
     return mStateBuffer.getNumberOfReachableStates();
+  }
+
+  /**
+   * Gets the number of extra spare states reserved by the transition
+   * relation. Extra states are held at the end of the state encoding
+   * for special purposes, but usually are not part of the transition
+   * relation.
+   */
+  public int getNumberOfExtraStates()
+  {
+    return mExtraStates;
   }
 
   /**
@@ -517,6 +557,7 @@ public class ListBufferTransitionRelation
     }
   }
 
+
   //#########################################################################
   //# Markings Access
   /**
@@ -539,6 +580,20 @@ public class ListBufferTransitionRelation
   public long getUsedPropositions()
   {
     return mStateBuffer.getUsedPropositions();
+  }
+
+  /**
+   * Sets a new pattern of used propositions.
+   * @param markings
+   *          Pattern containing all propositions to be considered as used.
+   *          This pattern can be obtained through the methods {@link
+   *          #getAllMarkings(int) getAllMarkings()}, {@link
+   *          #createMarkings(TIntArrayList) createMarkings()}, or
+   *          {@link #mergeMarkings(long,long) mergeMarkings()}.
+   */
+  public void setUsedPropositions(final long markings)
+  {
+    mStateBuffer.setUsedPropositions(markings);
   }
 
   /**
@@ -600,7 +655,7 @@ public class ListBufferTransitionRelation
    *          ID of the state to be modified.
    * @param markings
    *          A new marking pattern for the state. This pattern can be
-   *          obtained through the method {@link #getAllMarkings(int)
+   *          obtained through the methods {@link #getAllMarkings(int)
    *          getAllMarkings()}, {@link #createMarkings(TIntArrayList)
    *          createMarkings()}, or {@link #mergeMarkings(long,long)
    *          mergeMarkings()}.
@@ -617,7 +672,7 @@ public class ListBufferTransitionRelation
    *          ID of the state to be modified.
    * @param markings
    *          A pattern of additional markings for the state. This pattern can
-   *          be obtained through the method {@link #getAllMarkings(int)
+   *          be obtained through the methods {@link #getAllMarkings(int)
    *          getAllMarkings()}, {@link #createMarkings(TIntArrayList)
    *          createMarkings()}, or {@link #mergeMarkings(long,long)
    *          mergeMarkings()}.
@@ -637,7 +692,7 @@ public class ListBufferTransitionRelation
    *          ID of the state to be modified.
    * @param markings
    *          A pattern of markings to be removed from the state. This pattern
-   *          can be obtained through the method {@link #getAllMarkings(int)
+   *          can be obtained through the methods {@link #getAllMarkings(int)
    *          getAllMarkings()}, {@link #createMarkings(TIntArrayList)
    *          createMarkings()}, or {@link #mergeMarkings(long,long)
    *          mergeMarkings()}.
@@ -702,7 +757,7 @@ public class ListBufferTransitionRelation
    *          Code of proposition to be added to pattern.
    * @return A number identifying a marking consisting of all propositions
    *         contained in the given markings, plus the the additional marking.
-   * @see #mergeMarkings(long, long)
+   * @see #mergeMarkings(long, long) mergeMarkings()
    * @see #setAllMarkings(int,long) setAllMarkings()
    */
   public long addMarking(final long markings, final int prop)
@@ -736,6 +791,7 @@ public class ListBufferTransitionRelation
   {
     return mStateBuffer.mergeMarkings(markings1, markings2);
   }
+
 
   //#########################################################################
   //# Transition Access
@@ -816,6 +872,28 @@ public class ListBufferTransitionRelation
   }
 
   /**
+   * Creates a read-only iterator for this transition relation to iterate
+   * over transitions associated with events with the given status flags.
+   * The iterator returned is not initialised and needs to be reset using
+   * the {@link TransitionIterator#resetState(int) resetState()} method.
+   * Then it will produce all outgoing transitions from a given state
+   * with events of the specified status.
+   * @param  flags  Event status flags to specify the type of events,
+   *                as passed to the {@link
+   *                EventEncoding.OrderingInfo#getFirstEventIndex(int...)
+   *                OrderingInfo.getFirstEventIndex()} method.
+   */
+  public TransitionIterator createSuccessorsReadOnlyIteratorByStatus
+    (final int...flags)
+  {
+    if (mSuccessorBuffer != null) {
+      return mSuccessorBuffer.createReadOnlyIteratorByStatus(flags);
+    } else {
+      throw createNoBufferException(CONFIG_SUCCESSORS);
+    }
+  }
+
+  /**
    * Creates a read-only iterator for this transition relation's incoming
    * transitions. The iterator returned is not initialised, so one of the
    * methods {@link TransitionIterator#resetState(int)} or
@@ -870,6 +948,28 @@ public class ListBufferTransitionRelation
   {
     if (mPredecessorBuffer != null) {
       return mPredecessorBuffer.createReadOnlyIterator(target, event);
+    } else {
+      throw createNoBufferException(CONFIG_PREDECESSORS);
+    }
+  }
+
+  /**
+   * Creates a read-only iterator for this transition relation to iterate
+   * over transitions associated with events with the given status flags.
+   * The iterator returned is not initialised and needs to be reset using
+   * the {@link TransitionIterator#resetState(int) resetState()} method.
+   * Then it will produce all incoming transitions to a given state
+   * with events of the specified status.
+   * @param  flags  Event status flags to specify the type of events,
+   *                as passed to the {@link
+   *                EventEncoding.OrderingInfo#getFirstEventIndex(int...)
+   *                OrderingInfo.getFirstEventIndex()} method.
+   */
+  public TransitionIterator createPredecessorsReadOnlyIteratorByStatus
+    (final int...flags)
+  {
+    if (mPredecessorBuffer != null) {
+      return mPredecessorBuffer.createReadOnlyIteratorByStatus(flags);
     } else {
       throw createNoBufferException(CONFIG_PREDECESSORS);
     }
@@ -936,6 +1036,30 @@ public class ListBufferTransitionRelation
   }
 
   /**
+   * Creates a read-only iterator for this transition relation to iterate
+   * over transitions associated with events with the given status flags.
+   * The iterator returned is not initialised and needs to be reset using
+   * the {@link TransitionIterator#resetState(int) resetState()} method.
+   * Then it will produce all outgoing or outgoing (whichever available)
+   * transitions of a given state with events of the specified status.
+   * @param  flags  Event status flags to specify the type of events,
+   *                as passed to the {@link
+   *                EventEncoding.OrderingInfo#getFirstEventIndex(int...)
+   *                OrderingInfo.getFirstEventIndex()} method.
+   */
+  public TransitionIterator createAnyReadOnlyIteratorByStatus
+    (final int...flags)
+  {
+    if (mSuccessorBuffer != null) {
+      return mSuccessorBuffer.createReadOnlyIteratorByStatus(flags);
+    } else if (mPredecessorBuffer != null) {
+      return mPredecessorBuffer.createReadOnlyIteratorByStatus(flags);
+    } else {
+      throw createNoBufferException(CONFIG_SUCCESSORS);
+    }
+  }
+
+  /**
    * Creates a read-only iterator over all transitions in this transition
    * relation. The iterator returned is set up to return the first transition
    * in this buffer after calling {@link TransitionIterator#advance()}. It
@@ -977,15 +1101,40 @@ public class ListBufferTransitionRelation
   }
 
   /**
-   * Creates a read/write iterator for this transition relation's outgoing
-   * transitions. The iterator returned is not initialised, so one of the
+   * Creates a read-only iterator for this transition relation to iterate
+   * over transitions associated with events with the given status flags.
+   * The iterator returned is set up to return the first transition in
+   * this buffer after calling {@link TransitionIterator#advance()}. It does
+   * not implement the methods {@link TransitionIterator#resetState(int)}
+   * or {@link TransitionIterator#reset(int,int)}, and
+   * being a read-only iterator, it also does not implement the
+   * {@link TransitionIterator#remove()} method.
+   * @param  flags  Event status flags to specify the type of events,
+   *                as passed to the {@link
+   *                EventEncoding.OrderingInfo#getFirstEventIndex(int...)
+   *                OrderingInfo.getFirstEventIndex()} method.
+   */
+  public TransitionIterator createAllTransitionsReadOnlyIteratorByStatus
+    (final int...flags)
+  {
+    if (mSuccessorBuffer != null) {
+      return mSuccessorBuffer.createAllTransitionsReadOnlyIteratorByStatus(flags);
+    } else if (mPredecessorBuffer != null) {
+      return mPredecessorBuffer.createAllTransitionsReadOnlyIteratorByStatus(flags);
+    } else {
+      throw createNoBufferException();
+    }
+  }
+
+  /**
+   * <P>Creates a read/write iterator for this transition relation's outgoing
+   * transitions.</P>
+   * <P>The iterator returned is not initialised, so one of the
    * methods {@link TransitionIterator#resetState(int)} or
-   * {@link TransitionIterator#reset(int, int)} before it can be used.
-   * <P>
-   * <STRONG>Warning.</STRONG> The transition relation should be configured to
+   * {@link TransitionIterator#reset(int, int)} before it can be used.</P>
+   * <P><STRONG>Warning.</STRONG> The transition relation should be configured to
    * use only a predecessor buffer. If both buffers are configured, the
-   * predecessor buffer will be closed!
-   * </P>
+   * predecessor buffer will be closed!</P>
    */
   public TransitionIterator createSuccessorsModifyingIterator()
   {
@@ -998,21 +1147,72 @@ public class ListBufferTransitionRelation
   }
 
   /**
-   * Creates a read/write iterator for this transition relation's incoming
-   * transitions. The iterator returned is not initialised, so one of the
-   * methods {@link TransitionIterator#resetState(int)} or
-   * {@link TransitionIterator#reset(int, int)} before it can be used.
-   * <P>
-   * <STRONG>Warning.</STRONG> The transition relation should be configured to
+   * <P>Creates a read/write iterator for this transition relation to iterate
+   * over transitions associated with events with the given status flags.</P>
+   * <P>The iterator returned is not initialised and needs to be reset using
+   * the {@link TransitionIterator#resetState(int) resetState()} method.
+   * Then it will produce all outgoing transitions from a given state
+   * with events of the specified status.</P>
+   * <P><STRONG>Warning.</STRONG> The transition relation should be configured to
    * use only a predecessor buffer. If both buffers are configured, the
-   * successor buffer will be closed!
-   * </P>
+   * predecessor buffer will be closed!</P>
+   * @param  flags  Event status flags to specify the type of events,
+   *                as passed to the {@link
+   *                EventEncoding.OrderingInfo#getFirstEventIndex(int...)
+   *                OrderingInfo.getFirstEventIndex()} method.
+   */
+  public TransitionIterator createSuccessorsModifyingIteratorByStatus
+    (final int...flags)
+  {
+    if (mSuccessorBuffer != null) {
+      mPredecessorBuffer = null;
+      return mSuccessorBuffer.createModifyingIteratorByStatus(flags);
+    } else {
+      throw createNoBufferException(CONFIG_SUCCESSORS);
+    }
+  }
+
+  /**
+   * <P>Creates a read/write iterator for this transition relation's incoming
+   * transitions.</P>
+   * <P>The iterator returned is not initialised, so one of the
+   * methods {@link TransitionIterator#resetState(int)} or
+   * {@link TransitionIterator#reset(int, int)} before it can be used.</P>
+   * <P><STRONG>Warning.</STRONG> The transition relation should be configured to
+   * use only a predecessor buffer. If both buffers are configured, the
+   * successor buffer will be closed!</P>
    */
   public TransitionIterator createPredecessorsModifyingIterator()
   {
     if (mPredecessorBuffer != null) {
       mSuccessorBuffer = null;
       return mPredecessorBuffer.createModifyingIterator();
+    } else {
+      throw createNoBufferException(CONFIG_PREDECESSORS);
+    }
+  }
+
+  /**
+   * <P>Creates a read/write iterator for this transition relation to iterate
+   * over transitions associated with events with the given status flags.</P>
+   * <P>The iterator returned is not initialised and needs to be reset using
+   * the {@link TransitionIterator#resetState(int) resetState()} method.
+   * Then it will produce all incoming transitions to a given state
+   * with events of the specified status.</P>
+   * <P><STRONG>Warning.</STRONG> The transition relation should be configured to
+   * use only a predecessor buffer. If both buffers are configured, the
+   * successor buffer will be closed!</P>
+   * @param  flags  Event status flags to specify the type of events,
+   *                as passed to the {@link
+   *                EventEncoding.OrderingInfo#getFirstEventIndex(int...)
+   *                OrderingInfo.getFirstEventIndex()} method.
+   */
+  public TransitionIterator createPredecessorsModifyingIteratorByStatus
+    (final int...flags)
+  {
+    if (mPredecessorBuffer != null) {
+      mSuccessorBuffer = null;
+      return mPredecessorBuffer.createModifyingIteratorByStatus(flags);
     } else {
       throw createNoBufferException(CONFIG_PREDECESSORS);
     }
@@ -1048,20 +1248,15 @@ public class ListBufferTransitionRelation
   }
 
   /**
-   * <P>
-   * Creates a read/write iterator over all transitions with the given event.
-   * </P>
-   * <P>
-   * The iterator returned is set up to return the first transition with the
-   * given event after calling {@link TransitionIterator#advance()}. It does
-   * not implement the methods {@link TransitionIterator#resetState(int)} or
-   * {@link TransitionIterator#reset(int,int)}.
-   * </P>
-   * <P>
-   * <STRONG>Warning.</STRONG> The transition relation should be configured to
+   * <P>Creates a read/write iterator over all transitions with the given
+   * event.</P>
+   * <P>The iterator returned is set up to return the first transition with
+   * the given event after calling {@link TransitionIterator#advance()}. It
+   * does not implement the methods {@link TransitionIterator#resetState(int)}
+   * or {@link TransitionIterator#reset(int,int)}.</P>
+   * <P><STRONG>Warning.</STRONG> The transition relation should be configured to
    * use only one transition buffer. If both buffers are configured, the
-   * predecessor buffer will be closed!
-   * </P>
+   * predecessor buffer will be closed!</P>
    */
   public TransitionIterator createAllTransitionsModifyingIterator(final int event)
   {
@@ -1076,13 +1271,41 @@ public class ListBufferTransitionRelation
   }
 
   /**
+   * <P>Creates a read/write iterator for this transition relation to iterate
+   * over transitions associated with events with the given status flags.</P>
+   * <P>The iterator returned is set up to return the first transition in
+   * this buffer after calling {@link TransitionIterator#advance()}. It does
+   * not implement the methods {@link TransitionIterator#resetState(int)}
+   * or {@link TransitionIterator#reset(int,int)}.</P>
+   * <P><STRONG>Warning.</STRONG> The transition relation should be configured to
+   * use only one transition buffer. If both buffers are configured, the
+   * predecessor buffer will be closed!</P>
+   * @param  flags  Event status flags to specify the type of events,
+   *                as passed to the {@link
+   *                EventEncoding.OrderingInfo#getFirstEventIndex(int...)
+   *                OrderingInfo.getFirstEventIndex()} method.
+   */
+  public TransitionIterator createAllTransitionsModifyingIteratorByStatus
+    (final int...flags)
+  {
+    if (mSuccessorBuffer != null) {
+      mPredecessorBuffer = null;
+      return mSuccessorBuffer.createAllTransitionsModifyingIteratorByStatus(flags);
+    } else if (mPredecessorBuffer != null) {
+      return mPredecessorBuffer.createAllTransitionsModifyingIteratorByStatus(flags);
+    } else {
+      throw createNoBufferException();
+    }
+  }
+
+  /**
    * Obtains the tau-closure of the successors of this transition relation.
    * @param limit
    *          The maximum number of transitions that can be stored. If the
    *          number of transitions already in the transition relation plus
    *          the number of computed tau transitions exceeds the limit,
    *          precomputation is aborted and transitions will be produced on
-   *          the fly by iterators. It limit of&nbsp;0 forces the tau closure
+   *          the fly by iterators. A limit of&nbsp;0 forces the tau closure
    *          always to be computed on the fly.
    * @return A {@link TauClosure} object, which can be used to obtain a
    *         {@link TransitionIterator} over the tau-closure of the successor
@@ -1111,7 +1334,7 @@ public class ListBufferTransitionRelation
    *          number of transitions already in the transition relation plus
    *          the number of computed tau transitions exceeds the limit,
    *          precomputation is aborted and transitions will be produced on
-   *          the fly by iterators. It limit of&nbsp;0 forces the tau closure
+   *          the fly by iterators. A limit of&nbsp;0 forces the tau closure
    *          always to be computed on the fly.
    * @return A {@link TauClosure} object, which can be used to obtain a
    *         {@link TransitionIterator} over the tau-closure of the
@@ -1126,6 +1349,42 @@ public class ListBufferTransitionRelation
     } else {
       throw createNoBufferException(CONFIG_SUCCESSORS);
     }
+  }
+
+  /**
+   * Obtains a local-event closure over successors of this transition
+   * relation with a specific event type.
+   * @param limit
+   *          The maximum number of transitions that can be stored. If the
+   *          number of transitions already in the transition relation plus
+   *          the number of computed tau transitions exceeds the limit,
+   *          precomputation is aborted and transitions will be produced on
+   *          the fly by iterators. It limit of&nbsp;0 forces the tau closure
+   *          always to be computed on the fly.
+   * @param flags
+   *          List of event status flags, represented by a sequence of the
+   *          bits or bit combinations
+   *          {@link EventEncoding#STATUS_CONTROLLABLE},
+   *          {@link EventEncoding#STATUS_LOCAL},
+   *          {@link EventEncoding#STATUS_OUTSIDE_ALWAYS_ENABLED},
+   *          {@link EventEncoding#STATUS_OUTSIDE_ONLY_SELFLOOP}, and
+   *          {@link EventEncoding#STATUS_UNUSED} or their complements.<BR>
+   *          The flags must appear in the correct ordering, which must
+   *          match the ordering of the {@link EventEncoding}. If a flag
+   *          is complemented, the closure is restricted to events without
+   *          that property, otherwise to events with the property.
+   * @return A {@link TauClosure} object, which can be used to obtain a
+   *         {@link TransitionIterator} over the tau-closure of the
+   *         successor transition relation.
+   */
+  public TauClosure createSuccessorsTauClosureByStatus(final int limit,
+                                                       final int... flags)
+  {
+    final EventEncoding.OrderingInfo info = getOrderingInfo();
+    assert info != null;
+    final int first = info.getFirstEventIndex(flags);
+    final int last = info.getLastEventIndex(flags);
+    return createSuccessorsTauClosure(first, last, limit);
   }
 
   /**
@@ -1181,6 +1440,70 @@ public class ListBufferTransitionRelation
     }
   }
 
+
+  /**
+   * Obtains a local-event closure over predecessors of this transition
+   * relation with a specific event type.
+   * @param limit
+   *          The maximum number of transitions that can be stored. If the
+   *          number of transitions already in the transition relation plus
+   *          the number of computed tau transitions exceeds the limit,
+   *          precomputation is aborted and transitions will be produced on
+   *          the fly by iterators. It limit of&nbsp;0 forces the tau closure
+   *          always to be computed on the fly.
+   * @param flags
+   *          List of event status flags, represented by a sequence of the
+   *          bits or bit combinations
+   *          {@link EventEncoding#STATUS_CONTROLLABLE},
+   *          {@link EventEncoding#STATUS_LOCAL},
+   *          {@link EventEncoding#STATUS_OUTSIDE_ALWAYS_ENABLED},
+   *          {@link EventEncoding#STATUS_OUTSIDE_ONLY_SELFLOOP}, and
+   *          {@link EventEncoding#STATUS_UNUSED} or their complements.<BR>
+   *          The flags must appear in the correct ordering, which must
+   *          match the ordering of the {@link EventEncoding}. If a flag
+   *          is complemented, the closure is restricted to events without
+   *          that property, otherwise to events with the property.
+   * @return A {@link TauClosure} object, which can be used to obtain a
+   *         {@link TransitionIterator} over the tau-closure of the
+   *         successor transition relation.
+   */
+  public TauClosure createPredecessorsTauClosureByStatus(final int limit,
+                                                         final int... flags)
+  {
+    final EventEncoding.OrderingInfo info = getOrderingInfo();
+    assert info != null;
+    final int first = info.getFirstEventIndex(flags);
+    final int last = info.getLastEventIndex(flags);
+    return createPredecessorsTauClosure(first, last, limit);
+  }
+
+  /**
+   * Returns whether the given state is a deadlock state.
+   * A deadlock state is a state that is not marked and has no outgoing
+   * transitions. This method uses the successor transition buffer to
+   * check for outgoing transitions and can only be called if the transition
+   * relation is configured for successors.
+   * @param state
+   *          The state to be checked.
+   * @param prop
+   *          The proposition to determine whether a state is marked.
+   *          If the transition relation does not use this proposition,
+   *          then there are no deadlock states; otherwise states marked
+   *          with this proposition cannot be deadlock states.
+   * @return <CODE>true</CODE> if the state is not marked and has no
+   *         outgoing transitions.
+   */
+  public boolean isDeadlockState(final int state, final int prop)
+  {
+    if (prop < 0 || isMarked(state, prop)) {
+      return false;
+    } else if (mSuccessorBuffer != null) {
+      return !mSuccessorBuffer.hasTransitions(state);
+    } else {
+      throw createNoBufferException(CONFIG_SUCCESSORS);
+    }
+  }
+
   /**
    * Checks whether this transition relation represents a deterministic
    * automaton. A transition relation is deterministic if it has at most
@@ -1230,6 +1553,7 @@ public class ListBufferTransitionRelation
     }
     return true;
   }
+
 
   //#########################################################################
   //# Transition Modifications
@@ -1688,9 +2012,9 @@ public class ListBufferTransitionRelation
    *                {@link EventEncoding#STATUS_OUTSIDE_ONLY_SELFLOOP}, and
    *                {@link EventEncoding#STATUS_UNUSED}.
    */
-  public void setProperEventStatus(final int event, final byte status)
+  public void setProperEventStatus(final int event, final int status)
   {
-    mEventStatus[event] = status;
+    mEventStatus[event] = (byte) status;
   }
 
   /**
@@ -1715,13 +2039,12 @@ public class ListBufferTransitionRelation
   /**
    * Determines whether the given event is selflooped in this transition
    * relation.
-   *
    * @param event
    *          The ID of the event to be tested.
    * @return <CODE>true</CODE> if the given event is selflooped in every
    *         state, and appears on no other transitions.
    */
-  public boolean isPureSelfloopEvent(final int event)
+  public boolean isProperSelfloopEvent(final int event)
   {
     final TransitionIterator iter;
     if (mSuccessorBuffer != null) {
@@ -1750,10 +2073,54 @@ public class ListBufferTransitionRelation
   }
 
   /**
+   * Determines whether the given event is selflooped in all non-deadlock
+   * states of this transition relation. A deadlock state is a state that is
+   * not marked and has no outgoing transitions. This method uses the
+   * successor transition buffer to check for outgoing transitions and can
+   * only be called if the transition relation is configured for successors.
+   * @param event
+   *          The ID of the event to be tested.
+   * @param prop
+   *          The proposition to determine whether a state is marked.
+   *          If the transition relation does not use this proposition,
+   *          then there are no deadlock states; otherwise states marked
+   *          with this proposition cannot be deadlock states.
+   * @return <CODE>true</CODE> if the given event appears on at least one
+   *         transition and is selflooped in every non-deadlock state,
+   *         and appears on no other transitions.
+   */
+  public boolean isProperSelfloopEvent(final int event, final int prop)
+  {
+    if (mSuccessorBuffer != null) {
+      final TransitionIterator iter = mSuccessorBuffer.createReadOnlyIterator();
+      final int numStates = getNumberOfStates();
+      boolean hasTransition = false;
+      for (int state = 0; state < numStates; state++) {
+        if (isReachable(state) && !isDeadlockState(state, prop)) {
+          iter.reset(state, event);
+          if (iter.advance()) {
+            do {
+              if (iter.getCurrentToState() != state) {
+                return false;
+              }
+            } while (iter.advance());
+            hasTransition = true;
+          } else {
+            return false;
+          }
+        }
+      }
+      return hasTransition;
+    } else {
+      throw createNoBufferException(CONFIG_SUCCESSORS);
+    }
+  }
+
+  /**
    * Removes the given event from this transition relation. This method
-   * removes the given event including all its transitions from the transition
-   * relation. The event is marked as unused, and all associated transitions
-   * are deleted.
+   * removes the given event including all its transitions from the
+   * transition relation. All associated transitions are deleted,
+   * and the event is marked as unused.
    *
    * @param event
    *          The ID of the event to be removed.
@@ -1762,7 +2129,7 @@ public class ListBufferTransitionRelation
   {
     final byte status = mEventStatus[event];
     if ((status & EventEncoding.STATUS_UNUSED) == 0) {
-      mEventStatus[event] = (byte) (status | EventEncoding.STATUS_UNUSED);
+        mEventStatus[event] = (byte) (status | EventEncoding.STATUS_UNUSED);
       if (mSuccessorBuffer != null) {
         mSuccessorBuffer.removeEventTransitions(event);
       }
@@ -1797,6 +2164,7 @@ public class ListBufferTransitionRelation
       mEventStatus[newID] &= ~EventEncoding.STATUS_UNUSED;
     }
   }
+
 
   //#########################################################################
   //# Buffer Maintenance
@@ -1836,8 +2204,10 @@ public class ListBufferTransitionRelation
     try {
       if (mSuccessorBuffer == null && (config & CONFIG_SUCCESSORS) != 0) {
         if (mPredecessorBuffer != null) {
-          mSuccessorBuffer =
-            new OutgoingTransitionListBuffer(numEvents, numStates, mEventStatus);
+          final EventEncoding.OrderingInfo orderingInfo =
+            mPredecessorBuffer.getOrderingInfo();
+          mSuccessorBuffer = new OutgoingTransitionListBuffer
+            (numEvents, numStates, mEventStatus, orderingInfo);
           mSuccessorBuffer.setUpTransitions(mPredecessorBuffer);
         } else {
           throw createNoBufferException(CONFIG_PREDECESSORS);
@@ -1845,8 +2215,10 @@ public class ListBufferTransitionRelation
       }
       if (mPredecessorBuffer == null && (config & CONFIG_PREDECESSORS) != 0) {
         if (mSuccessorBuffer != null) {
-          mPredecessorBuffer =
-            new IncomingTransitionListBuffer(numEvents, numStates, mEventStatus);
+          final EventEncoding.OrderingInfo orderingInfo =
+            mSuccessorBuffer.getOrderingInfo();
+          mPredecessorBuffer = new IncomingTransitionListBuffer
+            (numEvents, numStates, mEventStatus, orderingInfo);
           mPredecessorBuffer.setUpTransitions(mSuccessorBuffer);
         } else {
           throw createNoBufferException(CONFIG_SUCCESSORS);
@@ -1896,26 +2268,30 @@ public class ListBufferTransitionRelation
    *          {@link #CONFIG_PREDECESSORS}, or {@link #CONFIG_ALL}.
    * @throws OverflowException
    */
-  public void reset(final IntStateBuffer newStates, final int numTrans,
-                    final int config) throws OverflowException
+  public void reset(final IntStateBuffer newStates,
+                    final int numTrans,
+                    final int config)
+    throws OverflowException
   {
     checkConfig(config);
     final int numEvents = getNumberOfProperEvents();
     final int numStates = newStates.getNumberOfStates();
     mStateBuffer = newStates;
+    final EventEncoding.OrderingInfo orderingInfo = getOrderingInfo();
     if ((config & CONFIG_SUCCESSORS) != 0) {
-      mSuccessorBuffer =
-        new OutgoingTransitionListBuffer(numEvents, numStates, mEventStatus, numTrans);
+      mSuccessorBuffer = new OutgoingTransitionListBuffer
+        (numEvents, numStates, mEventStatus, orderingInfo, numTrans);
     } else {
       mSuccessorBuffer = null;
     }
     if ((config & CONFIG_PREDECESSORS) != 0) {
-      mPredecessorBuffer =
-        new IncomingTransitionListBuffer(numEvents, numStates, mEventStatus, numTrans);
+      mPredecessorBuffer = new IncomingTransitionListBuffer
+        (numEvents, numStates, mEventStatus, orderingInfo, numTrans);
     } else {
       mPredecessorBuffer = null;
     }
   }
+
 
   //#########################################################################
   //# Automaton Simplification
@@ -1965,10 +2341,85 @@ public class ListBufferTransitionRelation
     boolean modified = false;
     for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
       if ((mEventStatus[e] & EventEncoding.STATUS_UNUSED) == 0 &&
-          isPureSelfloopEvent(e)) {
+          isProperSelfloopEvent(e)) {
         removeEvent(e);
         modified = true;
       }
+    }
+    return modified;
+  }
+
+  /**
+   * <P>Attempts to simplify the automaton by removing redundant selfloop
+   * events while considering deadlock states.</P>
+   * <P>This method searches for any non-tau events that appear on at least
+   * one transition and appear only as selfloops and are selflooped in all
+   * non-deadlock states of the transition relation. These events are marked
+   * as unused and removed from the transition relation.</P>
+   * <P>A deadlock state is a state that is not marked and has no outgoing
+   * transitions.</P>
+   * @param prop
+   *          The proposition to determine whether a state is marked.
+   *          If the transition relation does not use this proposition,
+   *          then there are no deadlock states; otherwise states marked
+   *          with this proposition cannot be deadlock states.
+   * @return <CODE>true</CODE> if at least one event was removed,
+   *         <CODE>false</CODE> otherwise.
+   */
+  public boolean removeProperSelfLoopEvents(final int prop)
+  {
+    if (!isUsedProposition(prop)) {
+      return removeProperSelfLoopEvents();
+    }
+    final int numEvents = getNumberOfProperEvents();
+    boolean modified = false;
+    if (mSuccessorBuffer != null) {
+      for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+        if ((mEventStatus[e] & EventEncoding.STATUS_UNUSED) == 0 &&
+            isProperSelfloopEvent(e, prop)) {
+          removeEvent(e);
+          modified = true;
+        }
+      }
+    } else if (mPredecessorBuffer != null) {
+      final int numStates = getNumberOfStates();
+      final BitSet nonDeadlockStates = new BitSet(numStates);
+      final TransitionIterator iterAll =
+        mPredecessorBuffer.createAllTransitionsReadOnlyIterator();
+      while (iterAll.advance()) {
+        final int s = iterAll.getCurrentSourceState();
+        nonDeadlockStates.set(s);
+      }
+      final TransitionIterator iter =
+        mPredecessorBuffer.createReadOnlyIterator();
+      events:
+      for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+        if ((mEventStatus[e] & EventEncoding.STATUS_UNUSED) == 0) {
+          boolean hasTransition = false;
+          for (int s = 0; s < numStates; s++) {
+            if (isReachable(s) &&
+                (nonDeadlockStates.get(s) || isMarked(s, prop))) {
+              iter.reset(s, e);
+              if (iter.advance()) {
+                do {
+                  if (iter.getCurrentToState() != s) {
+                    continue events;
+                  }
+                } while (iter.advance());
+                hasTransition = true;
+              } else {
+                continue events;
+              }
+            }
+          }
+          if (hasTransition) {
+            removeEvent(e);
+            modified = true;
+          }
+        }
+      }
+    } else {
+      throw createNoBufferException();
     }
     return modified;
   }
@@ -1998,6 +2449,47 @@ public class ListBufferTransitionRelation
   }
 
   /**
+   * Removes all transitions to deadlock states.
+   * A deadlock state is a state that is not marked and has no outgoing
+   * transitions. This method uses the successor transition buffer to
+   * check for outgoing transitions and can only be called if the transition
+   * relation is configured for successors.
+   * @param prop
+   *          The proposition to determine whether a state is marked.
+   *          If the transition relation does not use this proposition,
+   *          then there are no deadlock states; otherwise states marked
+   *          with this proposition cannot be deadlock states.
+   * @return <CODE>true</CODE> if at least one transition was removed,
+   *         <CODE>false</CODE> otherwise.
+   * @see #isDeadlockState(int, int) isDeadlockState()
+   */
+  public boolean removeDeadlockStateTransitions(final int prop)
+  {
+    if (prop < 0) {
+      return false;
+    } else {
+      boolean removed = false;
+      final TransitionIterator iter = createAllTransitionsModifyingIterator();
+      while (iter.advance()) {
+        final int target = iter.getCurrentTargetState();
+        if (isDeadlockState(target, prop)) {
+          iter.remove();
+          removed = true;
+        }
+      }
+      if (removed) {
+        final int numStates = getNumberOfStates();
+        for (int s = 0; s < numStates; s++) {
+          if (isDeadlockState(s, prop)) {
+            setReachable(s, false);
+          }
+        }
+      }
+      return removed;
+    }
+  }
+
+  /**
    * Checks for each proposition whether is appears on all reachable states,
    * and if so, removes the proposition by marking it as unused.
    *
@@ -2014,20 +2506,14 @@ public class ListBufferTransitionRelation
    * implements state merging by automaton quotient. It is used to merge
    * states after a partition has been obtained through a
    * {@link TransitionRelationSimplifier}.
-   *
    * @param partition
-   *          The partitioning to be imposed, or <CODE>null</CODE>. Each array
-   *          in the list defines the state codes comprising an equivalence
-   *          class to be merged into a single state. The index position in
-   *          the list identifies the state code to be given to the new merged
-   *          state. An argument of <CODE>null</CODE> indicates a trivial
-   *          partition, and has no effect.
+   *          The partition to be imposed, or <CODE>null</CODE>.
    */
-  public void merge(final List<int[]> partition)
+  public void merge(final TRPartition partition)
   {
     if (partition != null) {
       try {
-        final int newSize = partition.size() + mExtraStates;
+        final int newSize = partition.getNumberOfClasses() + mExtraStates;
         if (mSuccessorBuffer != null) {
           mSuccessorBuffer.merge(partition, mExtraStates);
         }
@@ -2039,15 +2525,19 @@ public class ListBufferTransitionRelation
         final IntStateBuffer newStateBuffer =
           new IntStateBuffer(newSize, numProps, used);
         int c = 0;
-        for (final int[] clazz : partition) {
-          boolean init = false;
-          long markings = 0;
-          for (final int state : clazz) {
-            init |= mStateBuffer.isInitial(state);
-            markings |= mStateBuffer.getAllMarkings(state);
+        for (final int[] clazz : partition.getClasses()) {
+          if (clazz == null) {
+            newStateBuffer.setReachable(c, false);
+          } else {
+            boolean init = false;
+            long markings = 0;
+            for (final int state : clazz) {
+              init |= mStateBuffer.isInitial(state);
+              markings |= mStateBuffer.getAllMarkings(state);
+            }
+            newStateBuffer.setInitial(c, init);
+            newStateBuffer.setAllMarkings(c, markings);
           }
-          newStateBuffer.setInitial(c, init);
-          newStateBuffer.setAllMarkings(c, markings);
           c++;
         }
         for (int state = newSize - mExtraStates; state < newSize; state++) {
@@ -2058,6 +2548,29 @@ public class ListBufferTransitionRelation
         throw new WatersRuntimeException(exception);
       }
     }
+  }
+
+  /**
+   * Re-evaluates reachability. This method does a full reachability search of
+   * the transition relation, and resets the reachability status of all states
+   * according to the result. If any states are found to be unreachable,
+   * transitions attached to these states are removed.
+   * @param  config  Preferred output configuration, either {@link
+   *                 #CONFIG_SUCCESSORS}, {@link #CONFIG_PREDECESSORS},
+   *                 or {@link #CONFIG_ALL}. If the transition
+   *                 relation is not configured to use an outgoing
+   *                 transition buffer, it will be reconfigured to the
+   *                 given configuration plus an outgoing
+   *                 transition buffer.
+   * @return <CODE>true</CODE> if the reachability status of at least one
+   *         state was changed, <CODE>false</CODE> otherwise.
+   */
+  public boolean checkReachability(final int config)
+  {
+    if (mSuccessorBuffer == null) {
+      reconfigure(config | CONFIG_SUCCESSORS);
+    }
+    return checkReachability();
   }
 
   /**
@@ -2113,6 +2626,7 @@ public class ListBufferTransitionRelation
       throw createNoBufferException(CONFIG_SUCCESSORS);
     }
   }
+
 
   //#########################################################################
   //# Automaton Output
@@ -2172,6 +2686,7 @@ public class ListBufferTransitionRelation
                                         final EventEncoding eventEnc,
                                         StateEncoding stateEnc)
   {
+    assert getNumberOfProperEvents() == eventEnc.getNumberOfProperEvents();
     final int numEvents = eventEnc.getNumberOfEvents();
     final int numProps = eventEnc.getNumberOfPropositions();
     final Collection<EventProxy> events =
@@ -2191,7 +2706,7 @@ public class ListBufferTransitionRelation
       }
     }
 
-    final int numStates = getNumberOfStates();
+    final int numStates = getNumberOfStates() - mExtraStates;
     final StateProxy[] states = new StateProxy[numStates];
     final List<StateProxy> reachable = new ArrayList<StateProxy>(numStates);
     final TLongObjectHashMap<Collection<EventProxy>> markingsMap =
@@ -2250,6 +2765,7 @@ public class ListBufferTransitionRelation
     return factory.createAutomatonProxy(mName, mKind, events, reachable,
                                         transitions);
   }
+
 
   //#########################################################################
   //# Debugging
@@ -2311,8 +2827,11 @@ public class ListBufferTransitionRelation
       }
     }
     for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
-      final EventProxy event =
-        factory.createEventProxy("e" + e, EventKind.CONTROLLABLE);
+      final byte status = getProperEventStatus(e);
+      final EventKind kind = EventEncoding.isControllableEvent(status) ?
+        EventKind.CONTROLLABLE : EventKind.UNCONTROLLABLE;
+      final boolean local = EventEncoding.isLocalEvent(status);
+      final EventProxy event = factory.createEventProxy("e" + e, kind, !local);
       events.add(event);
     }
     final KindTranslator translator = IdenticalKindTranslator.getInstance();
@@ -2327,40 +2846,40 @@ public class ListBufferTransitionRelation
     MarshallingTools.saveModule(aut, filename);
   }
 
+
   //#########################################################################
   //# Errors
   private void checkConfig(final int config)
   {
     if ((config & CONFIG_ALL) == 0) {
-      throw new IllegalArgumentException(
-                                         ProxyTools.getShortClassName(this)
-                                           + " configuration error: "
-                                           + "no incoming or outgoing transition buffer specified!");
+      throw new IllegalArgumentException
+        (ProxyTools.getShortClassName(this) + " configuration error: " +
+         "no incoming or outgoing transition buffer specified!");
     }
   }
 
   private IllegalStateException createNoBufferException()
   {
-    return new IllegalStateException(
-                                     ProxyTools.getShortClassName(this)
-                                       + " configuration error: no transition buffer!");
+    return new IllegalStateException(ProxyTools.getShortClassName(this) +
+                                     " configuration error: no transition buffer!");
   }
 
   private IllegalStateException createNoBufferException(final int config)
   {
     switch (config) {
     case CONFIG_SUCCESSORS:
-      return new IllegalStateException(
-                                       ProxyTools.getShortClassName(this)
-                                         + " configuration error: successor buffer not initialised!");
+      return new IllegalStateException
+        (ProxyTools.getShortClassName(this) +
+         " configuration error: successor buffer not initialised!");
     case CONFIG_PREDECESSORS:
-      return new IllegalStateException(
-                                       ProxyTools.getShortClassName(this)
-                                         + " configuration error: predecessor buffer not initialised!");
+      return new IllegalStateException
+        (ProxyTools.getShortClassName(this) +
+         " configuration error: predecessor buffer not initialised!");
     default:
       return createNoBufferException();
     }
   }
+
 
   //#########################################################################
   //# Data Members

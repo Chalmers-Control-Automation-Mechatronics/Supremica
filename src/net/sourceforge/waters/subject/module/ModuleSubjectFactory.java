@@ -235,6 +235,24 @@ public class ModuleSubjectFactory
                               range);
   }
 
+  public FunctionCallExpressionSubject createFunctionCallExpressionProxy
+      (final String plainText,
+       final String functionName,
+       final Collection<? extends SimpleExpressionProxy> arguments)
+  {
+    return new FunctionCallExpressionSubject(plainText,
+                                             functionName,
+                                             arguments);
+  }
+
+  public FunctionCallExpressionSubject createFunctionCallExpressionProxy
+      (final String functionName,
+       final Collection<? extends SimpleExpressionProxy> arguments)
+  {
+    return new FunctionCallExpressionSubject(functionName,
+                                             arguments);
+  }
+
   public GraphSubject createGraphProxy
       (final boolean deterministic,
        final LabelBlockProxy blockedEvents,
@@ -547,13 +565,11 @@ public class ModuleSubjectFactory
   public VariableComponentSubject createVariableComponentProxy
       (final IdentifierProxy identifier,
        final SimpleExpressionProxy type,
-       final boolean deterministic,
        final SimpleExpressionProxy initialStatePredicate,
        final Collection<? extends VariableMarkingProxy> variableMarkings)
   {
     return new VariableComponentSubject(identifier,
                                         type,
-                                        deterministic,
                                         initialStatePredicate,
                                         variableMarkings);
   }
@@ -561,12 +577,10 @@ public class ModuleSubjectFactory
   public VariableComponentSubject createVariableComponentProxy
       (final IdentifierProxy identifier,
        final SimpleExpressionProxy type,
-       final boolean deterministic,
        final SimpleExpressionProxy initialStatePredicate)
   {
     return new VariableComponentSubject(identifier,
                                         type,
-                                        deterministic,
                                         initialStatePredicate);
   }
 

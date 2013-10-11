@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters C++
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
-//# CLASS:   NativeBroadStoringConflictCheckerTest
+//# CLASS:   NativeStandardBroadStoringConflictCheckerTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -12,7 +12,6 @@ package net.sourceforge.waters.cpp.analysis;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.cpp.analysis.ExplorerMode;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -39,6 +38,7 @@ public class NativeStandardBroadStoringConflictCheckerTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  @Override
   protected ConflictChecker
     createModelVerifier(final ProductDESProxyFactory factory)
   {

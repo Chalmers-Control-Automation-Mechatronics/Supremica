@@ -83,6 +83,7 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
@@ -107,7 +108,6 @@ import org.supremica.properties.BooleanProperty;
 import org.supremica.properties.Config;
 import org.supremica.properties.SupremicaPropertyChangeEvent;
 import org.supremica.properties.SupremicaPropertyChangeListener;
-import org.supremica.util.VPopupMenu;
 
 
 public class LogDisplay
@@ -461,7 +461,7 @@ public class LogDisplay
     }
 
     class LoggerPopupMenu
-        extends VPopupMenu
+        extends JPopupMenu
     {
         private static final long serialVersionUID = 1L;
         private LoggerFilter filter = null;

@@ -11,13 +11,14 @@ package net.sourceforge.waters.analysis.monolithic;
 
 import gnu.trove.set.hash.THashSet;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
-import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
-import net.sourceforge.waters.model.analysis.AbortException;
+
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -26,13 +27,12 @@ import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.des.ControlLoopChecker;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.des.LoopTraceProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.LoopTraceProxy;
-
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -93,6 +93,7 @@ public class MonolithicControlLoopChecker
    *         net.sourceforge.waters.model.analysis.des.ModelVerifier#isSatisfied()
    *         isSatisfied()} method.
    */
+  @Override
   public boolean run()
     throws AnalysisException
   {
@@ -129,6 +130,7 @@ public class MonolithicControlLoopChecker
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @Override
   public boolean supportsNondeterminism()
   {
     return false;
@@ -137,11 +139,13 @@ public class MonolithicControlLoopChecker
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ControlLoopChecker
+  @Override
   public LoopTraceProxy getCounterExample()
   {
     return (LoopTraceProxy) super.getCounterExample();
   }
 
+  @Override
   public Collection<EventProxy> getNonLoopEvents()
   {
     return Collections.emptyList();
@@ -164,6 +168,7 @@ public class MonolithicControlLoopChecker
 
   //#########################################################################
   //# Algorithm
+  @Override
   protected void setUp()
     throws AnalysisException
   {
@@ -456,7 +461,7 @@ public class MonolithicControlLoopChecker
   }
 
   private LoopTraceProxy computeCounterExample()
-    throws AbortException
+    throws AnalysisAbortException, OverflowException
   {
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = getModel();

@@ -16,8 +16,7 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
 import net.sourceforge.waters.model.expr.UnaryOperator;
-import net.sourceforge.waters.model.module.BinaryExpressionProxy;
-import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DescendingModuleProxyVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
@@ -25,11 +24,11 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 /**
  * A utility class to collect all the primed EFA variables in expressions.
  *
- * @author Robi Malik, Sahar Mohajerani
+ * @author Robi Malik
  */
 
 class PrimedVariableCollector
-  extends DefaultModuleProxyVisitor
+  extends DescendingModuleProxyVisitor
 {
 
 
@@ -91,17 +90,6 @@ class PrimedVariableCollector
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
   @Override
-  public Object visitBinaryExpressionProxy(final BinaryExpressionProxy expr)
-    throws VisitorException
-  {
-    final SimpleExpressionProxy lhs = expr.getLeft();
-    collect(lhs);
-    final SimpleExpressionProxy rhs = expr.getRight();
-    collect(rhs);
-    return null;
-  }
-
-  @Override
   public Object visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
   {
     return null;
@@ -117,7 +105,7 @@ class PrimedVariableCollector
       }
     } else {
       final SimpleExpressionProxy subterm = expr.getSubTerm();
-      collect(subterm);
+      subterm.acceptVisitor(this);
     }
     return null;
   }

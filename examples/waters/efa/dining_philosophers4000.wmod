@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="dining_philosophers4000" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>The classical dining philosophers problem, with a paramterisable number N of philosophers. This model includes no control strategy and is blocking.</ns2:Comment>
+    <ConstantAliasList>
+        <ConstantAlias Scope="OPTIONAL_PARAMETER" Name="N">
+            <ConstantAliasExpression>
+                <IntConstant Value="4000"/>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+    </ConstantAliasList>
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Name="take">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <BinaryExpression Operator="-">
+                        <SimpleIdentifier Name="N"/>
+                        <IntConstant Value="1"/>
+                    </BinaryExpression>
+                </BinaryExpression>
+                <EnumSetExpression Text="[U,L]">
+                    <SimpleIdentifier Name="U"/>
+                    <SimpleIdentifier Name="L"/>
+                </EnumSetExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="put">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <BinaryExpression Operator="-">
+                        <SimpleIdentifier Name="N"/>
+                        <IntConstant Value="1"/>
+                    </BinaryExpression>
+                </BinaryExpression>
+                <EnumSetExpression Text="[U,L]">
+                    <SimpleIdentifier Name="U"/>
+                    <SimpleIdentifier Name="L"/>
+                </EnumSetExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="eat">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <BinaryExpression Operator="-">
+                        <SimpleIdentifier Name="N"/>
+                        <IntConstant Value="1"/>
+                    </BinaryExpression>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+    </EventDeclList>
+    <ComponentList>
+        <ForeachComponent Name="I">
+            <BinaryExpression Operator="..">
+                <IntConstant Value="0"/>
+                <BinaryExpression Operator="-">
+                    <SimpleIdentifier Name="N"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </BinaryExpression>
+            <ComponentList>
+                <SimpleComponent Kind="PLANT">
+                    <IndexedIdentifier Name="philo">
+                        <SimpleIdentifier Name="I"/>
+                    </IndexedIdentifier>
+                    <Graph>
+                        <NodeList>
+                            <SimpleNode Initial="true" Name="think">
+                                <EventList>
+                                    <SimpleIdentifier Name=":accepting"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point X="384" Y="256"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point X="11" Y="-7"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="hungry">
+                                <PointGeometry>
+                                    <Point X="336" Y="336"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point X="-47" Y="6"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="putting">
+                                <PointGeometry>
+                                    <Point X="432" Y="336"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point X="0" Y="6"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="eaten">
+                                <PointGeometry>
+                                    <Point X="432" Y="416"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point X="3" Y="4"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="ready">
+                                <PointGeometry>
+                                    <Point X="336" Y="416"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point X="-40" Y="4"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="S0">
+                                <PointGeometry>
+                                    <Point X="128" Y="336"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point X="0" Y="10"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="S1">
+                                <PointGeometry>
+                                    <Point X="656" Y="336"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point X="0" Y="10"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                        </NodeList>
+                        <EdgeList>
+                            <Edge Source="think" Target="hungry">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="take">
+                                        <SimpleIdentifier Name="I"/>
+                                        <SimpleIdentifier Name="L"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-83" Y="-13"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="-=">
+                                            <IndexedIdentifier Name="fork">
+                                                <SimpleIdentifier Name="I"/>
+                                            </IndexedIdentifier>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-76" Y="9"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                            <Edge Source="putting" Target="think">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="put">
+                                        <SimpleIdentifier Name="I"/>
+                                        <SimpleIdentifier Name="L"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="6" Y="-13"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="+=">
+                                            <IndexedIdentifier Name="fork">
+                                                <SimpleIdentifier Name="I"/>
+                                            </IndexedIdentifier>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="0" Y="20"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                            <Edge Source="hungry" Target="ready">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="take">
+                                        <BinaryExpression Operator="%">
+                                            <BinaryExpression Operator="+">
+                                                <SimpleIdentifier Name="I"/>
+                                                <IntConstant Value="1"/>
+                                            </BinaryExpression>
+                                            <SimpleIdentifier Name="N"/>
+                                        </BinaryExpression>
+                                        <SimpleIdentifier Name="U"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-100" Y="-19"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <StartPointGeometry>
+                                    <Point X="336" Y="336"/>
+                                </StartPointGeometry>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="-=">
+                                            <IndexedIdentifier Name="fork">
+                                                <BinaryExpression Operator="%">
+                                                    <BinaryExpression Operator="+">
+                                                        <SimpleIdentifier Name="I"/>
+                                                        <IntConstant Value="1"/>
+                                                    </BinaryExpression>
+                                                    <SimpleIdentifier Name="N"/>
+                                                </BinaryExpression>
+                                            </IndexedIdentifier>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-87" Y="7"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                            <Edge Source="ready" Target="eaten">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="eat">
+                                        <SimpleIdentifier Name="I"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-18" Y="6"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                            </Edge>
+                            <Edge Source="eaten" Target="putting">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="put">
+                                        <BinaryExpression Operator="%">
+                                            <BinaryExpression Operator="+">
+                                                <SimpleIdentifier Name="I"/>
+                                                <IntConstant Value="1"/>
+                                            </BinaryExpression>
+                                            <SimpleIdentifier Name="N"/>
+                                        </BinaryExpression>
+                                        <SimpleIdentifier Name="U"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="9" Y="-8"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <EndPointGeometry>
+                                    <Point X="432" Y="336"/>
+                                </EndPointGeometry>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="+=">
+                                            <IndexedIdentifier Name="fork">
+                                                <BinaryExpression Operator="%">
+                                                    <BinaryExpression Operator="+">
+                                                        <SimpleIdentifier Name="I"/>
+                                                        <IntConstant Value="1"/>
+                                                    </BinaryExpression>
+                                                    <SimpleIdentifier Name="N"/>
+                                                </BinaryExpression>
+                                            </IndexedIdentifier>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="5" Y="8"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                            <Edge Source="think" Target="S0">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="take">
+                                        <BinaryExpression Operator="%">
+                                            <BinaryExpression Operator="+">
+                                                <SimpleIdentifier Name="I"/>
+                                                <IntConstant Value="1"/>
+                                            </BinaryExpression>
+                                            <SimpleIdentifier Name="N"/>
+                                        </BinaryExpression>
+                                        <SimpleIdentifier Name="U"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-122" Y="-11"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point X="226" Y="251"/>
+                                </SplineGeometry>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="-=">
+                                            <IndexedIdentifier Name="fork">
+                                                <BinaryExpression Operator="%">
+                                                    <BinaryExpression Operator="+">
+                                                        <SimpleIdentifier Name="I"/>
+                                                        <IntConstant Value="1"/>
+                                                    </BinaryExpression>
+                                                    <SimpleIdentifier Name="N"/>
+                                                </BinaryExpression>
+                                            </IndexedIdentifier>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-156" Y="13"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                            <Edge Source="S0" Target="ready">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="take">
+                                        <SimpleIdentifier Name="I"/>
+                                        <SimpleIdentifier Name="L"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-45" Y="3"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point X="212" Y="411"/>
+                                </SplineGeometry>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="-=">
+                                            <IndexedIdentifier Name="fork">
+                                                <SimpleIdentifier Name="I"/>
+                                            </IndexedIdentifier>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="0" Y="20"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                            <Edge Source="eaten" Target="S1">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="put">
+                                        <SimpleIdentifier Name="I"/>
+                                        <SimpleIdentifier Name="L"/>
+                                    </IndexedIdentifier>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point X="574" Y="400"/>
+                                </SplineGeometry>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="+=">
+                                            <IndexedIdentifier Name="fork">
+                                                <SimpleIdentifier Name="I"/>
+                                            </IndexedIdentifier>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="0" Y="20"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                            <Edge Source="S1" Target="think">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="put">
+                                        <BinaryExpression Operator="%">
+                                            <BinaryExpression Operator="+">
+                                                <SimpleIdentifier Name="I"/>
+                                                <IntConstant Value="1"/>
+                                            </BinaryExpression>
+                                            <SimpleIdentifier Name="N"/>
+                                        </BinaryExpression>
+                                        <SimpleIdentifier Name="U"/>
+                                    </IndexedIdentifier>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point X="528" Y="260"/>
+                                </SplineGeometry>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="+=">
+                                            <IndexedIdentifier Name="fork">
+                                                <BinaryExpression Operator="%">
+                                                    <BinaryExpression Operator="+">
+                                                        <SimpleIdentifier Name="I"/>
+                                                        <IntConstant Value="1"/>
+                                                    </BinaryExpression>
+                                                    <SimpleIdentifier Name="N"/>
+                                                </BinaryExpression>
+                                            </IndexedIdentifier>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="0" Y="20"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                        </EdgeList>
+                    </Graph>
+                </SimpleComponent>
+                <VariableComponent>
+                    <IndexedIdentifier Name="fork">
+                        <SimpleIdentifier Name="I"/>
+                    </IndexedIdentifier>
+                    <VariableRange>
+                        <BinaryExpression Operator="..">
+                            <IntConstant Value="0"/>
+                            <IntConstant Value="1"/>
+                        </BinaryExpression>
+                    </VariableRange>
+                    <VariableInitial>
+                        <BinaryExpression Operator="==">
+                            <IndexedIdentifier Name="fork">
+                                <SimpleIdentifier Name="I"/>
+                            </IndexedIdentifier>
+                            <IntConstant Value="1"/>
+                        </BinaryExpression>
+                    </VariableInitial>
+                </VariableComponent>
+            </ComponentList>
+        </ForeachComponent>
+    </ComponentList>
+</Module>

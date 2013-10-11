@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.tr.WatersHashSet;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 /**
@@ -111,6 +112,23 @@ public final class AutomatonTools
       }
     }
     return factory.createProductDESProxy(name, eventList, automata);
+  }
+
+  /**
+   * Creates a copy of the given automaton with another name.
+   * @param  aut      The automaton to be duplicated.
+   * @param  name     The name to be given to the copy.
+   * @param  factory  Factory to construct automaton.
+   */
+  public static AutomatonProxy renameAutomaton(final AutomatonProxy aut,
+                                               final String name,
+                                               final ProductDESProxyFactory factory)
+  {
+    final ComponentKind kind = aut.getKind();
+    final Collection<EventProxy> events = aut.getEvents();
+    final Collection<StateProxy> states = aut.getStates();
+    final Collection<TransitionProxy> transitions = aut.getTransitions();
+    return factory.createAutomatonProxy(name, kind, events, states, transitions);
   }
 
   /**

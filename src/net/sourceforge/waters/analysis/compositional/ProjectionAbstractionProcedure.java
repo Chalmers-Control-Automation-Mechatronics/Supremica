@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.compositional;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
@@ -110,7 +111,8 @@ class ProjectionAbstractionProcedure extends TRAbstractionProcedure
           break;
         }
       }
-      final EventEncoding eventEnc = createEventEncoding(aut, tau, candidate);
+      final Collection<EventProxy> taus = Collections.singletonList(tau);
+      final EventEncoding eventEnc = createEventEncoding(aut, taus, candidate);
       final StateEncoding inputStateEnc = new StateEncoding(aut);
       final int config = simplifier.getPreferredInputConfiguration();
       final ListBufferTransitionRelation rel =

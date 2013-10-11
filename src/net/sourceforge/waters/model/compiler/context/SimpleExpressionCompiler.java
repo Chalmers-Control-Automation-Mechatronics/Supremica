@@ -11,6 +11,8 @@ package net.sourceforge.waters.model.compiler.context;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -19,12 +21,14 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.DivisionByZeroException;
 import net.sourceforge.waters.model.expr.BinaryOperator;
+import net.sourceforge.waters.model.expr.BuiltInFunction;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.TypeMismatchException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
-import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
+import net.sourceforge.waters.model.module.FunctionCallExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
@@ -103,6 +107,14 @@ public class SimpleExpressionCompiler
                            new UnaryNextEvaluator());
     mUnaryEvaluatorMap.put(optable.getUnaryMinusOperator(),
                            new UnaryMinusEvaluator());
+
+    mFunctionEvaluatorMap = new HashMap<BuiltInFunction,FunctionEvaluator>(8);
+    mFunctionEvaluatorMap.put(optable.getIteFunction(),
+                              new FunctionIteEvaluator());
+    mFunctionEvaluatorMap.put(optable.getMaxFunction(),
+                              new FunctionMaxEvaluator());
+    mFunctionEvaluatorMap.put(optable.getMinFunction(),
+                              new FunctionMinEvaluator());
 
     mRangeEstimator = new RangeEstimator(optable);
     mSimplificationVisitor = new SimplificationVisitor();
@@ -309,6 +321,17 @@ public class SimpleExpressionCompiler
     }
   }
 
+  private FunctionEvaluator getEvaluator(final BuiltInFunction function)
+    throws UnsupportedOperatorException
+  {
+    final FunctionEvaluator evaluator = mFunctionEvaluatorMap.get(function);
+    if (evaluator != null) {
+      return evaluator;
+    } else {
+      throw new UnsupportedOperatorException(function);
+    }
+  }
+
   private SimpleExpressionProxy getBoundExpression
     (final SimpleExpressionProxy ident)
   {
@@ -360,6 +383,7 @@ public class SimpleExpressionCompiler
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public SimpleExpressionProxy visitBinaryExpressionProxy
       (final BinaryExpressionProxy expr)
       throws VisitorException
@@ -374,6 +398,7 @@ public class SimpleExpressionCompiler
       }
     }
 
+    @Override
     public SimpleExpressionProxy visitEnumSetExpressionProxy
       (final EnumSetExpressionProxy expr)
       throws VisitorException
@@ -403,6 +428,23 @@ public class SimpleExpressionCompiler
       return getClone(expr, false);
     }
 
+    @Override
+    public SimpleExpressionProxy visitFunctionCallExpressionProxy
+      (final FunctionCallExpressionProxy expr)
+      throws VisitorException
+    {
+      try {
+        final String functionName = expr.getFunctionName();
+        final BuiltInFunction function = mOperatorTable.getBuiltInFunction(functionName);
+        final FunctionEvaluator evaluator = getEvaluator(function);
+        return evaluator.eval(expr);
+      } catch (final EvalException exception) {
+        exception.provideLocation(expr);
+        throw wrap(exception);
+      }
+    }
+
+    @Override
     public SimpleExpressionProxy visitIndexedIdentifierProxy
       (final IndexedIdentifierProxy ident)
       throws VisitorException
@@ -440,6 +482,7 @@ public class SimpleExpressionCompiler
       }
     }
 
+    @Override
     public SimpleExpressionProxy visitQualifiedIdentifierProxy
       (final QualifiedIdentifierProxy ident)
       throws VisitorException
@@ -468,12 +511,14 @@ public class SimpleExpressionCompiler
       }
     }
 
+    @Override
     public SimpleExpressionProxy visitSimpleExpressionProxy
       (final SimpleExpressionProxy expr)
     {
       return getClone(expr, false);
     }
 
+    @Override
     public Proxy visitSimpleIdentifierProxy(final SimpleIdentifierProxy ident)
       throws VisitorException
     {
@@ -484,6 +529,7 @@ public class SimpleExpressionCompiler
       }
     }
 
+    @Override
     public SimpleExpressionProxy visitUnaryExpressionProxy
       (final UnaryExpressionProxy expr)
       throws VisitorException
@@ -509,6 +555,7 @@ public class SimpleExpressionCompiler
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Boolean visitBinaryExpressionProxy(final BinaryExpressionProxy expr)
     {
       final BinaryOperator operator = expr.getOperator();
@@ -522,6 +569,7 @@ public class SimpleExpressionCompiler
       }
     }
 
+    @Override
     public Boolean visitEnumSetExpressionProxy
       (final EnumSetExpressionProxy expr)
     {
@@ -534,16 +582,19 @@ public class SimpleExpressionCompiler
       return true;
     }
 
+    @Override
     public Boolean visitIntConstantProxy(final IntConstantProxy expr)
     {
       return true;
     }
 
+    @Override
     public Boolean visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
     {
       return false;
     }
 
+    @Override
     public Boolean visitSimpleIdentifierProxy
       (final SimpleIdentifierProxy ident)
     {
@@ -578,6 +629,7 @@ public class SimpleExpressionCompiler
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public CompiledRange visitBinaryExpressionProxy
       (final BinaryExpressionProxy expr)
       throws VisitorException
@@ -598,6 +650,7 @@ public class SimpleExpressionCompiler
       }
     }
 
+    @Override
     public CompiledRange visitEnumSetExpressionProxy
       (final EnumSetExpressionProxy expr)
     {
@@ -605,6 +658,7 @@ public class SimpleExpressionCompiler
       return new CompiledEnumRange(items);
     }
 
+    @Override
     public CompiledRange visitSimpleExpressionProxy
       (final SimpleExpressionProxy expr)
       throws VisitorException
@@ -676,13 +730,14 @@ public class SimpleExpressionCompiler
 
     //#######################################################################
     //# Evaluation
+    @Override
     SimpleExpressionProxy eval(final BinaryExpressionProxy expr)
       throws EvalException
     {
       final SimpleExpressionProxy origLHS = expr.getLeft();
       final SimpleExpressionProxy origRHS = expr.getRight();
-      if (includesEquality() && mEquality.equals(origLHS, origRHS)) {
-        return createBooleanConstantProxy(true);
+      if (mEquality.equals(origLHS, origRHS)) {
+        return createBooleanConstantProxy(includesEquality());
       }
       final SimpleExpressionProxy simpLHS = simplify(origLHS);
       final boolean atomLHS = isAtomicValue(simpLHS);
@@ -693,9 +748,8 @@ public class SimpleExpressionCompiler
       if (atomLHS && atomRHS) {
         final boolean result = eval(intLHS, intRHS);
         return createBooleanConstantProxy(result);
-      } else if (includesEquality() &&
-                 mEquality.equals(simpLHS, simpRHS)) {
-        return createBooleanConstantProxy(true);
+      } else if (mEquality.equals(simpLHS, simpRHS)) {
+        return createBooleanConstantProxy(includesEquality());
       } else if (mVariableContext != null) {
         final CompiledIntRange rangeLHS =
           mRangeEstimator.estimateIntRange(simpLHS, mVariableContext);
@@ -732,6 +786,7 @@ public class SimpleExpressionCompiler
 
     //#######################################################################
     //# Evaluation
+    @Override
     SimpleExpressionProxy eval(final BinaryExpressionProxy expr)
       throws EvalException
     {
@@ -774,6 +829,7 @@ public class SimpleExpressionCompiler
 
     //#######################################################################
     //# Evaluation
+    @Override
     SimpleExpressionProxy eval(final BinaryExpressionProxy expr)
       throws EvalException
     {
@@ -797,7 +853,11 @@ public class SimpleExpressionCompiler
           return createBooleanConstantProxy(false);
         }
       }
-      return createExpression(expr, simpLHS, simpRHS);
+      if (mEquality.equals(simpLHS, simpRHS)) {
+        return simpLHS;
+      } else {
+        return createExpression(expr, simpLHS, simpRHS);
+      }
     }
 
   }
@@ -809,6 +869,7 @@ public class SimpleExpressionCompiler
 
     //#######################################################################
     //# Evaluation
+    @Override
     SimpleExpressionProxy eval(final BinaryExpressionProxy expr)
       throws EvalException
     {
@@ -829,6 +890,7 @@ public class SimpleExpressionCompiler
 
     //#######################################################################
     //# Evaluation
+    @Override
     SimpleExpressionProxy eval(final BinaryExpressionProxy expr)
       throws EvalException
     {
@@ -865,6 +927,7 @@ public class SimpleExpressionCompiler
 
     //#######################################################################
     //# Overrides for Abstract Base Class AbstractBinaryEqualsEvaluator
+    @Override
     boolean getEqualsResult()
     {
       return true;
@@ -881,16 +944,19 @@ public class SimpleExpressionCompiler
 
     //#######################################################################
     //# Overrides for Abstract Baseclass AbstractBinaryComparisonEvaluator
+    @Override
     boolean includesEquality()
     {
       return true;
     }
 
+    @Override
     boolean eval(final int lhs, final int rhs)
     {
       return lhs >= rhs;
     }
 
+    @Override
     Boolean eval(final CompiledIntRange lhs, final CompiledIntRange rhs)
     {
       if (lhs.getLower() >= rhs.getUpper()) {
@@ -913,16 +979,19 @@ public class SimpleExpressionCompiler
 
     //#######################################################################
     //# Overrides for Abstract Baseclass AbstractBinaryComparisonEvaluator
+    @Override
     boolean includesEquality()
     {
       return false;
     }
 
+    @Override
     boolean eval(final int lhs, final int rhs)
     {
       return lhs > rhs;
     }
 
+    @Override
     Boolean eval(final CompiledIntRange lhs, final CompiledIntRange rhs)
     {
       if (lhs.getLower() > rhs.getUpper()) {
@@ -945,16 +1014,19 @@ public class SimpleExpressionCompiler
 
     //#######################################################################
     //# Overrides for Abstract Baseclass AbstractBinaryComparisonEvaluator
+    @Override
     boolean includesEquality()
     {
       return true;
     }
 
+    @Override
     boolean eval(final int lhs, final int rhs)
     {
       return lhs <= rhs;
     }
 
+    @Override
     Boolean eval(final CompiledIntRange lhs, final CompiledIntRange rhs)
     {
       if (lhs.getUpper() <= rhs.getLower()) {
@@ -977,16 +1049,19 @@ public class SimpleExpressionCompiler
 
     //#######################################################################
     //# Overrides for Abstract Baseclass AbstractBinaryComparisonEvaluator
+    @Override
     boolean includesEquality()
     {
       return false;
     }
 
+    @Override
     boolean eval(final int lhs, final int rhs)
     {
       return lhs < rhs;
     }
 
+    @Override
     Boolean eval(final CompiledIntRange lhs, final CompiledIntRange rhs)
     {
       if (lhs.getUpper() < rhs.getLower()) {
@@ -1007,6 +1082,7 @@ public class SimpleExpressionCompiler
 
     //#######################################################################
     //# Evaluation
+    @Override
     SimpleExpressionProxy eval(final BinaryExpressionProxy expr)
       throws EvalException
     {
@@ -1041,6 +1117,7 @@ public class SimpleExpressionCompiler
 
     //#######################################################################
     //# Evaluation
+    @Override
     SimpleExpressionProxy eval(final BinaryExpressionProxy expr)
       throws EvalException
     {
@@ -1079,6 +1156,7 @@ public class SimpleExpressionCompiler
 
     //#######################################################################
     //# Overrides for Abstract Base Class AbstractBinaryEqualsEvaluator
+    @Override
     boolean getEqualsResult()
     {
       return false;
@@ -1093,6 +1171,7 @@ public class SimpleExpressionCompiler
 
     //#######################################################################
     //# Evaluation
+    @Override
     SimpleExpressionProxy eval(final BinaryExpressionProxy expr)
       throws EvalException
     {
@@ -1116,7 +1195,11 @@ public class SimpleExpressionCompiler
           return createBooleanConstantProxy(true);
         }
       }
-      return createExpression(expr, simpLHS, simpRHS);
+      if (mEquality.equals(simpLHS, simpRHS)) {
+        return simpLHS;
+      } else {
+        return createExpression(expr, simpLHS, simpRHS);
+      }
     }
 
   }
@@ -1128,6 +1211,7 @@ public class SimpleExpressionCompiler
 
     //#######################################################################
     //# Evaluation
+    @Override
     SimpleExpressionProxy eval(final BinaryExpressionProxy expr)
       throws EvalException
     {
@@ -1159,6 +1243,7 @@ public class SimpleExpressionCompiler
 
     //#######################################################################
     //# Evaluation
+    @Override
     SimpleExpressionProxy eval(final BinaryExpressionProxy expr)
       throws EvalException
     {
@@ -1184,6 +1269,7 @@ public class SimpleExpressionCompiler
 
     //#######################################################################
     //# Evaluation
+    @Override
     SimpleExpressionProxy eval(final BinaryExpressionProxy expr)
       throws EvalException
     {
@@ -1241,6 +1327,7 @@ public class SimpleExpressionCompiler
 
     //#######################################################################
     //# Evaluation
+    @Override
     SimpleExpressionProxy eval(final UnaryExpressionProxy expr)
       throws EvalException
     {
@@ -1263,6 +1350,7 @@ public class SimpleExpressionCompiler
 
     //#######################################################################
     //# Evaluation
+    @Override
     SimpleExpressionProxy eval(final UnaryExpressionProxy expr)
       throws EvalException
     {
@@ -1288,6 +1376,7 @@ public class SimpleExpressionCompiler
 
     //#######################################################################
     //# Evaluation
+    @Override
     SimpleExpressionProxy eval(final UnaryExpressionProxy expr)
       throws EvalException
     {
@@ -1305,12 +1394,233 @@ public class SimpleExpressionCompiler
 
 
   //#########################################################################
+  //# Inner Class FunctionEvaluator
+  private abstract class FunctionEvaluator {
+
+    //#######################################################################
+    //# Evaluation
+    abstract SimpleExpressionProxy eval(FunctionCallExpressionProxy expr)
+      throws EvalException;
+
+    //#######################################################################
+    //# Auxiliary Methods
+    FunctionCallExpressionProxy createExpression
+      (final FunctionCallExpressionProxy expr,
+       final List<SimpleExpressionProxy> simpArgs)
+    {
+      final List<SimpleExpressionProxy> args = expr.getArguments();
+      if (args.equals(simpArgs)) {
+        return expr;
+      } else {
+        final String functionName = expr.getFunctionName();
+        return mFactory.createFunctionCallExpressionProxy(functionName, simpArgs);
+      }
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class FunctionIteEvaluator
+  private class FunctionIteEvaluator extends FunctionEvaluator {
+
+    //#######################################################################
+    //# Evaluation
+    @Override
+    SimpleExpressionProxy eval(final FunctionCallExpressionProxy expr)
+      throws EvalException
+    {
+      final List<SimpleExpressionProxy> origArgs = expr.getArguments();
+      final Iterator<SimpleExpressionProxy> iter = origArgs.iterator();
+      final SimpleExpressionProxy origCond = iter.next();
+      final SimpleExpressionProxy origThen = iter.next();
+      final SimpleExpressionProxy origElse = iter.next();
+      final SimpleExpressionProxy simpCond = simplify(origCond);
+      if (isAtomicValue(simpCond)) {
+        if (getBooleanValue(simpCond)) {
+          return simplify(origThen);
+        } else {
+          return simplify(origElse);
+        }
+      } else {
+        final SimpleExpressionProxy simpThen = simplify(origThen);
+        final SimpleExpressionProxy simpElse = simplify(origElse);
+        if (mEquality.equals(simpThen, simpElse)) {
+          return simpThen;
+        } else {
+          final List<SimpleExpressionProxy> simpArgs =
+            new ArrayList<SimpleExpressionProxy>(3);
+          simpArgs.add(simpCond);
+          simpArgs.add(simpThen);
+          simpArgs.add(simpElse);
+          return createExpression(expr, simpArgs);
+        }
+      }
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class FunctionMaxEvaluator
+  private class FunctionMaxEvaluator extends FunctionEvaluator {
+
+    //#######################################################################
+    //# Evaluation
+    @Override
+    SimpleExpressionProxy eval(final FunctionCallExpressionProxy expr)
+      throws EvalException
+    {
+      final List<SimpleExpressionProxy> simpArgs =
+        new LinkedList<SimpleExpressionProxy>();
+      SimpleExpressionProxy maxArg = null;
+      int maxValue = Integer.MIN_VALUE;
+      int minPos = -1;
+      int pos = 0;
+      for (final SimpleExpressionProxy origArg : expr.getArguments()) {
+        final SimpleExpressionProxy simpArg = simplify(origArg);
+        if (isAtomicValue(simpArg)) {
+          final int value = getIntValue(simpArg);
+          if (value > maxValue) {
+            maxValue = value;
+            maxArg = simpArg;
+          }
+          if (minPos < 0) {
+            minPos = pos;
+          }
+        } else if (!mEquality.contains(simpArgs, simpArg)) {
+          simpArgs.add(simpArg);
+        }
+        pos++;
+      }
+      if (simpArgs.isEmpty()) {
+        return maxArg;
+      } else {
+        if (minPos >= 0) {
+          simpArgs.add(minPos, maxArg);
+        }
+        final int size = simpArgs.size();
+        if (size == 1) {
+          return simpArgs.get(0);
+        }
+        if (mVariableContext != null) {
+          final CompiledIntRange[] ranges = new CompiledIntRange[size];
+          int i = 0;
+          int maxLowerLimit = Integer.MIN_VALUE;
+          for (final SimpleExpressionProxy simpArg : simpArgs) {
+            final CompiledIntRange range =
+              mRangeEstimator.estimateIntRange(simpArg, mVariableContext);
+            if (maxLowerLimit < range.getLower()) {
+              maxLowerLimit = range.getLower();
+            }
+            ranges[i++] = range;
+          }
+          final Iterator<SimpleExpressionProxy> iter = simpArgs.iterator();
+          i = 0;
+          while (iter.hasNext()) {
+            iter.next();
+            final int upper = ranges[i].getUpper();
+            if (upper < maxLowerLimit ||
+                upper == maxLowerLimit && upper > ranges[i].getLower()) {
+              iter.remove();
+            }
+            i++;
+          }
+          if (simpArgs.size() == 1) {
+            return simpArgs.get(0);
+          }
+        }
+        return createExpression(expr, simpArgs);
+      }
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class FunctionMinEvaluator
+  private class FunctionMinEvaluator extends FunctionEvaluator {
+
+    //#######################################################################
+    //# Evaluation
+    @Override
+    SimpleExpressionProxy eval(final FunctionCallExpressionProxy expr)
+      throws EvalException
+    {
+      final List<SimpleExpressionProxy> simpArgs =
+        new LinkedList<SimpleExpressionProxy>();
+      SimpleExpressionProxy minArg = null;
+      int minValue = Integer.MAX_VALUE;
+      int minPos = -1;
+      int pos = 0;
+      for (final SimpleExpressionProxy origArg : expr.getArguments()) {
+        final SimpleExpressionProxy simpArg = simplify(origArg);
+        if (isAtomicValue(simpArg)) {
+          final int value = getIntValue(simpArg);
+          if (value < minValue) {
+            minValue = value;
+            minArg = simpArg;
+          }
+          if (minPos < 0) {
+            minPos = pos;
+          }
+        } else if (!mEquality.contains(simpArgs, simpArg)) {
+          simpArgs.add(simpArg);
+        }
+        pos++;
+      }
+      if (simpArgs.isEmpty()) {
+        return minArg;
+      } else {
+        if (minPos >= 0) {
+          simpArgs.add(minPos, minArg);
+        }
+        final int size = simpArgs.size();
+        if (size == 1) {
+          return simpArgs.get(0);
+        }
+        if (mVariableContext != null) {
+          final CompiledIntRange[] ranges = new CompiledIntRange[size];
+          int i = 0;
+          int minUpperLimit = Integer.MAX_VALUE;
+          for (final SimpleExpressionProxy simpArg : simpArgs) {
+            final CompiledIntRange range =
+              mRangeEstimator.estimateIntRange(simpArg, mVariableContext);
+            if (minUpperLimit > range.getUpper()) {
+              minUpperLimit = range.getUpper();
+            }
+            ranges[i++] = range;
+          }
+          final Iterator<SimpleExpressionProxy> iter = simpArgs.iterator();
+          i = 0;
+          while (iter.hasNext()) {
+            iter.next();
+            final int lower = ranges[i].getLower();
+            if (lower > minUpperLimit ||
+                lower == minUpperLimit && lower < ranges[i].getUpper()) {
+              iter.remove();
+            }
+            i++;
+          }
+          if (simpArgs.size() == 1) {
+            return simpArgs.get(0);
+          }
+        }
+        return createExpression(expr, simpArgs);
+      }
+    }
+
+  }
+
+
+  //#########################################################################
   //# Data Members
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;
   private final boolean mIsCloning;
   private final Map<BinaryOperator,BinaryEvaluator> mBinaryEvaluatorMap;
   private final Map<UnaryOperator,UnaryEvaluator> mUnaryEvaluatorMap;
+  private final Map<BuiltInFunction,FunctionEvaluator> mFunctionEvaluatorMap;
   private final RangeEstimator mRangeEstimator;
   private final SimplificationVisitor mSimplificationVisitor;
   private final AtomicVisitor mAtomicVisitor;

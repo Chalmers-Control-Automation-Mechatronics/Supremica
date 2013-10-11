@@ -18,7 +18,7 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 
 
 /**
- * A test for the <I>certain Conflicts Rule</I>.
+ * A test for the <I>Limited Certain Conflicts Rule</I>.
  *
  * @author Robi Malik
  */
@@ -235,6 +235,15 @@ public class LimitedCertainConflictsTRSimplifierTest
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "certainconflicts_17.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_certainconflicts_18()
+  throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "certainconflicts_18.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 

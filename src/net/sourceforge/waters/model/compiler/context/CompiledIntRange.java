@@ -131,6 +131,17 @@ public class CompiledIntRange implements CompiledRange
   }
 
   @Override
+  public CompiledIntRange union(final CompiledRange range)
+  {
+    if (range instanceof CompiledIntRange) {
+      final CompiledIntRange intrange = (CompiledIntRange) range;
+      return union(intrange);
+    } else {
+      return null;  // TODO BUG? Should this not be an error?
+    }
+  }
+
+  @Override
   public CompiledIntRange remove(final SimpleExpressionProxy value)
   {
     if (value instanceof IntConstantProxy) {
@@ -181,6 +192,19 @@ public class CompiledIntRange implements CompiledRange
       return new CompiledIntRange(range.mLower, mUpper);
     } else {
       return new CompiledIntRange(mLower, range.mUpper);
+    }
+  }
+
+  public CompiledIntRange union(final CompiledIntRange range)
+  {
+    if (range.mLower <= mLower && mUpper <= range.mUpper) {
+      return range;
+    } else if (mLower <= range.mLower && range.mUpper <= mUpper) {
+      return this;
+    } else if (mLower < range.mLower) {
+      return new CompiledIntRange(mLower, range.mUpper);
+    } else {
+      return new CompiledIntRange(range.mLower, mUpper);
     }
   }
 

@@ -11,8 +11,8 @@
 <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="net.sourceforge.waters.analysis.comp552.ConflictAssess"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="suite1.txt submissions/cph4.log submissions/cph4.progress 3600 examples tests"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="/home/robi/work/teaching/comp552-13a/assignment3/suite1.txt /home/robi/work/teaching/comp552-13a/assignment3/submissions/ahc16.run /home/robi/work/teaching/comp552-13a/assignment3/submissions/ahc16.progress 10 2g  /home/robi/work/teaching/comp552-13a/assignment3/examples /home/robi/work/teaching/comp552-13a/assignment3/tests"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="waters"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx1024m&#13;&#10;-Djava.library.path=&quot;${workspace_loc:waters}/dist&quot;&#10;-ea"/>
-<stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="/home/robi/work/teaching/comp552-12a/assignment3"/>
+<stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="/home/robi/work/teaching/comp552-13a/assignment3"/>
 </launchConfiguration>

@@ -49,7 +49,7 @@ public class CompositionalModelVerifierFactory
 
   //#########################################################################
   //# Constructors
-  private CompositionalModelVerifierFactory()
+  CompositionalModelVerifierFactory()
   {
   }
 
@@ -71,7 +71,7 @@ public class CompositionalModelVerifierFactory
     addArgument(new PreselectingMethodArgument());
     addArgument(new SelectingMethodArgument());
     addArgument(new SubsumptionArgument());
-    addArgument(new SpecialEventsArgument());
+    addArgument(new NoSpecialEventsArgument());
     addArgument(new NoDeadlockPruningArgument());
     addArgument(new SecondaryFactoryArgument());
   }
@@ -447,15 +447,15 @@ public class CompositionalModelVerifierFactory
 
 
   //#########################################################################
-  //# Inner Class SpecialEventsArgument
-  private static class SpecialEventsArgument extends CommandLineArgumentFlag
+  //# Inner Class NoSpecialEventsArgument
+  private static class NoSpecialEventsArgument extends CommandLineArgumentFlag
   {
 
     //#######################################################################
     //# Constructors
-    private SpecialEventsArgument()
+    private NoSpecialEventsArgument()
     {
-      super("-se", "Use selfloop-only events");
+      super("-nse", "Disable selfloop removal");
     }
 
     //#######################################################################
@@ -466,7 +466,7 @@ public class CompositionalModelVerifierFactory
     {
       final AbstractCompositionalModelVerifier composer =
         (AbstractCompositionalModelVerifier) verifier;
-      composer.setUsingSpecialEvents(true);
+      composer.setUsingSpecialEvents(false);
     }
 
   }

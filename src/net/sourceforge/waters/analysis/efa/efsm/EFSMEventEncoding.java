@@ -1,0 +1,74 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters EFSM Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.efa.efsm
+//# CLASS:   EFSMEventEncoding
+//###########################################################################
+//# $Id$
+//###########################################################################
+
+package net.sourceforge.waters.analysis.efa.efsm;
+
+import net.sourceforge.waters.analysis.efa.base.AbstractEFATransitionLabelEncoding;
+import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
+
+
+/**
+ * @author Robi Malik, Sahar Mohajerani
+ */
+
+public class EFSMEventEncoding extends AbstractEFATransitionLabelEncoding<ConstraintList>
+{
+
+  //#########################################################################
+  //# Constructors
+  EFSMEventEncoding()
+  {
+    this(DEFAULT_SIZE);
+  }
+
+  EFSMEventEncoding(final int size)
+  {
+    super(size);
+    createEventId(ConstraintList.TRUE);
+  }
+
+  EFSMEventEncoding(final EFSMEventEncoding encoding)
+  {
+    super(encoding);
+  }
+
+  public int getEventId(final ConstraintList update)
+  {
+    return super.getTransitionLabelId(update);
+  }
+
+  public ConstraintList getUpdate(final int event)
+  {
+    return super.getTransitionLabel(event);
+  }
+
+  public int createEventId(final ConstraintList update)
+  {
+    return super.createTransitionLabelId(update);
+  }
+
+  //#########################################################################
+  //# Simple Access
+  void setSelfloops(final ListBufferTransitionRelation rel,
+                    final EFSMVariableFinder finder)
+  {
+    for (int e = EventEncoding.NONTAU; e < size(); e++) {
+      final ConstraintList update = getUpdate(e);
+      if (!finder.findPrime(update)) {
+        final byte status = rel.getProperEventStatus(e);
+        rel.setProperEventStatus
+          (e, status | EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP);
+      }
+    }
+  }
+
+}
+

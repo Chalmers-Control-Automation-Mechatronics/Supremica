@@ -11,18 +11,18 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
                         <PointGeometry>
-                            <Point X="96" Y="96"/>
+                            <Point X="80" Y="48"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="0" Y="10"/>
+                            <Point X="8" Y="-8"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
                         <PointGeometry>
-                            <Point X="96" Y="176"/>
+                            <Point X="80" Y="128"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="0" Y="10"/>
+                            <Point X="9" Y="-5"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -35,15 +35,18 @@
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="68" Y="136"/>
+                            <Point X="65" Y="88"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Source="S1" Target="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="b"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="7" Y="-5"/>
+                            </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="121" Y="134"/>
+                            <Point X="96" Y="88"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
@@ -54,24 +57,24 @@
                 <LabelBlock>
                     <SimpleIdentifier Name="a"/>
                     <LabelGeometry Anchor="NW">
-                        <Point X="17" Y="72"/>
+                        <Point X="120" Y="30"/>
                     </LabelGeometry>
                 </LabelBlock>
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
                         <PointGeometry>
-                            <Point X="96" Y="144"/>
+                            <Point X="80" Y="48"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="0" Y="10"/>
+                            <Point X="8" Y="-10"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
                         <PointGeometry>
-                            <Point X="96" Y="224"/>
+                            <Point X="80" Y="128"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="0" Y="10"/>
+                            <Point X="10" Y="-6"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -79,15 +82,24 @@
                     <Edge Source="S0" Target="S1">
                         <LabelBlock>
                             <SimpleIdentifier Name="c"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-20" Y="-11"/>
+                            </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="49" Y="179"/>
+                            <Point X="65" Y="88"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Source="S1" Target="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="c"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="9" Y="-2"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="95" Y="88"/>
+                        </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
                                 <BinaryExpression Operator="==">
@@ -101,7 +113,7 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point X="2" Y="-11"/>
+                                <Point X="5" Y="-20"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>

@@ -696,7 +696,7 @@ void ProductExplorer::
 doAbort()
   const
 {
-  throw jni::PreJavaException(jni::CLASS_AbortException);
+  throw jni::PreJavaException(jni::CLASS_AnalysisAbortException);
 }
 
 
@@ -843,6 +843,8 @@ Java_net_sourceforge_waters_cpp_analysis_NativeConflictChecker_runNativeAlgorith
       gchecker.getConfiguredPreconditionMarkingGlue(&cache);
     waters::ProductExplorer* checker =
       finalizer.createProductExplorer(translator, premarking, marking, cache);
+    bool aware = gchecker.isDumpStateAware();
+    checker->setDumpStateAware(aware);
     bool result = checker->runNonblockingCheck();
     jni::VerificationResultGlue vresult =
       gchecker.createAnalysisResultGlue(&cache);
@@ -891,4 +893,34 @@ Java_net_sourceforge_waters_cpp_analysis_NativeModelAnalyzer_requestAbort
       (waters::ProductExplorer*) env->GetDirectBufferAddress(bbuffer);
     explorer->requestAbort();
   }
+}
+
+
+JNIEXPORT void JNICALL
+Java_net_sourceforge_waters_cpp_analysis_NativeModelAnalyzer_resetAbort
+  (JNIEnv *env, jobject jchecker)
+{
+  jni::ClassCache cache(env);
+  jni::NativeModelAnalyzerGlue gchecker(jchecker, &cache);
+  jobject bbuffer = gchecker.getNativeModelAnalyzer();
+  if (bbuffer != 0) {
+    waters::ProductExplorer* explorer =
+      (waters::ProductExplorer*) env->GetDirectBufferAddress(bbuffer);
+    explorer->resetAbort();
+  }
+}
+
+
+JNIEXPORT jlong JNICALL
+Java_net_sourceforge_waters_cpp_analysis_NativeModelAnalyzer_getPeakMemoryUsage
+  (JNIEnv *env, jclass clazz)
+{
+#ifndef __MINGW32__
+  struct rusage rusage;
+  if (getrusage(RUSAGE_SELF, &rusage) == 0) {
+    jlong usage = rusage.ru_maxrss << 10;
+    return usage;
+  }
+#endif
+  return -1;
 }

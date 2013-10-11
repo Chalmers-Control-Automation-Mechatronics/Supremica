@@ -56,14 +56,22 @@ abstract class TRSimplifierAbstractionRule extends AbstractionRule
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
   public void requestAbort()
   {
     mSimplifier.requestAbort();
   }
 
+  @Override
   public boolean isAborting()
   {
     return mSimplifier.isAborting();
+  }
+
+  @Override
+  public void resetAbort()
+  {
+    mSimplifier.resetAbort();
   }
 
 

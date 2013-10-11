@@ -154,6 +154,15 @@ public class CanonizeAbstractionRule
   }
 
   @Override
+  public void cleanup()
+  {
+    return;
+  }
+
+
+  //########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
   public void requestAbort()
   {
     mIsAborting = true;
@@ -166,9 +175,9 @@ public class CanonizeAbstractionRule
   }
 
   @Override
-  public void cleanup()
+  public void resetAbort()
   {
-    return;
+    mIsAborting = false;
   }
 
 

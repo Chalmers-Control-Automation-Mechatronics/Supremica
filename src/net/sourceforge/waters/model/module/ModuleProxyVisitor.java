@@ -67,6 +67,9 @@ public interface ModuleProxyVisitor
   public Object visitForeachProxy(ForeachProxy proxy)
     throws VisitorException;
 
+  public Object visitFunctionCallExpressionProxy(FunctionCallExpressionProxy proxy)
+    throws VisitorException;
+
   public Object visitGraphProxy(GraphProxy proxy)
     throws VisitorException;
 

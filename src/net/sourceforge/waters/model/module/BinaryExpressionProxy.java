@@ -21,9 +21,6 @@ import net.sourceforge.waters.model.expr.BinaryOperator;
  * <LI><CODE>17 == 0</CODE></LI>
  * <LI><CODE>1 .. 100</CODE></LI>
  * </UL>
- * This base class provides access to the three members.
- * It is extended in several ways to cater for different XML
- * representations and to facilitate different ways of evaluation.
  *
  * @author Robi Malik
  */

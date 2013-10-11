@@ -1,11 +1,9 @@
 package org.supremica.automata.BDD.EFA;
 
 import gnu.trove.list.array.TIntArrayList;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
-
 import net.sf.javabdd.BDD;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.ExpressionParser;
@@ -18,12 +16,11 @@ import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
-
 import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions;
-import org.supremica.automata.algorithms.SynthesisType;
 import org.supremica.automata.algorithms.Guard.BDDExtendedGuardGenerator;
 import org.supremica.automata.algorithms.Guard.GeneticMinimizer.Chromosome;
+import org.supremica.automata.algorithms.SynthesisType;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.util.ActionTimer;
@@ -122,7 +119,7 @@ public class BDDExtendedSynthesizer {
 //
 //            BDD minimalDeadlocks = state1.or(state2);
             statesAfterSynthesis =  bddAutomata.getUnsafeStates();
-            nbrOfStates = bddAutomata.nbrOfUnsafeStates;
+            nbrOfStates = (long)bddAutomata.nbrOfBoundaryUnsafeStates;
             synthesisTimer.stop();
         }
 

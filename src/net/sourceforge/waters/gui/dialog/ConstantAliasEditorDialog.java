@@ -124,6 +124,7 @@ public class ConstantAliasEditorDialog
     }
     final ExpressionParser parser = mRoot.getExpressionParser();
     final ActionListener commithandler = new ActionListener() {
+        @Override
         public void actionPerformed(final ActionEvent event)
         {
           commitDialog();
@@ -153,6 +154,7 @@ public class ConstantAliasEditorDialog
     mHasParameterCheckBox.setRequestFocusEnabled(false);
     mHasParameterCheckBox.setSelected(scope != ScopeKind.LOCAL);
     mHasParameterCheckBox.addActionListener(new ActionListener() {
+        @Override
         public void actionPerformed(final ActionEvent event)
         {
           updateRequiredEnabled();
@@ -180,6 +182,7 @@ public class ConstantAliasEditorDialog
     final JButton cancelButton = new JButton("Cancel");
     cancelButton.setRequestFocusEnabled(false);
     cancelButton.addActionListener(new ActionListener() {
+        @Override
         public void actionPerformed(final ActionEvent event)
         {
           dispose();
@@ -284,7 +287,6 @@ public class ConstantAliasEditorDialog
     } else if (!mExpressionInput.shouldYieldFocus()) {
       mExpressionInput.requestFocusInWindow();
     } else {
-      final IdentifierSubject name = (IdentifierSubject)mNameInput.getValue();
       final SimpleExpressionSubject exp0 =
         (SimpleExpressionSubject) mExpressionInput.getValue();
       final SimpleExpressionSubject exp = makeUnique(exp0);
@@ -300,8 +302,10 @@ public class ConstantAliasEditorDialog
       }
 
       if (mAlias == null) {
+        final IdentifierSubject ident =
+          (IdentifierSubject) mNameInput.getValue();
         final ConstantAliasSubject template =
-          new ConstantAliasSubject(name, exp);
+          new ConstantAliasSubject(ident, exp);
         template.setScope(scope);
         final InsertInfo insert = new InsertInfo(template, mInsertPosition);
         final List<InsertInfo> list = Collections.singletonList(insert);
@@ -309,6 +313,7 @@ public class ConstantAliasEditorDialog
         mAlias = template;
         mRoot.getUndoInterface().executeCommand(command);
       } else {
+        final String name = mNameInput.getText();
         final String oldname = mAlias.getName();
         final boolean namechange = !name.equals(oldname);
         final SimpleExpressionSubject oldexp = (SimpleExpressionSubject)mAlias.getExpression();
@@ -318,7 +323,9 @@ public class ConstantAliasEditorDialog
         if (namechange || expchange) {
           final ConstantAliasSubject template = mAlias.clone();
           if (namechange) {
-            template.setIdentifier(name);
+            final IdentifierSubject ident =
+              (IdentifierSubject) mNameInput.getValue();
+            template.setIdentifier(ident);
           }
           if (expchange) {
             template.setExpression(exp);

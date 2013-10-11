@@ -126,6 +126,7 @@ public class NativeConflictChecker
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @Override
   public void setModel(final ProductDESProxy model)
   {
     super.setModel(model);
@@ -135,6 +136,7 @@ public class NativeConflictChecker
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ConflictChecker
+  @Override
   public void setConfiguredDefaultMarking(final EventProxy marking)
   {
     mMarking = marking;
@@ -142,17 +144,20 @@ public class NativeConflictChecker
     clearAnalysisResult();
   }
 
+  @Override
   public EventProxy getConfiguredDefaultMarking()
   {
     return mMarking;
   }
 
+  @Override
   public void setConfiguredPreconditionMarking(final EventProxy marking)
   {
     mPreconditionMarking = marking;
     clearAnalysisResult();
   }
 
+  @Override
   public EventProxy getConfiguredPreconditionMarking()
   {
     return mPreconditionMarking;
@@ -162,6 +167,33 @@ public class NativeConflictChecker
   public ConflictTraceProxy getCounterExample()
   {
     return (ConflictTraceProxy) super.getCounterExample();
+  }
+
+
+  //#########################################################################
+  //# Specific Configuration
+  /**
+   * Set whether this conflict checker should stop when encountering
+   * a local dump state. A local dump state is an obvious deadlock state in
+   * a single automaton of the system. If such a state is reached, the system
+   * is clearly blocking, and the conflict may stop immediately. However,
+   * it may fail to produce a full deadlock counterexample, as other
+   * components may allow further transitions before the global systems
+   * reaches a deadlock.
+   */
+  public void setDumpStateAware(final boolean aware)
+  {
+    mDumpStateAware = aware;
+  }
+
+  /**
+   * Returns whether this conflict checker stops when encountering a local
+   * dump state.
+   * @see #setDumpStateAware(boolean) setDumpStateAware()
+   */
+  public boolean isDumpStateAware()
+  {
+    return mDumpStateAware;
   }
 
 
@@ -184,8 +216,10 @@ public class NativeConflictChecker
 
   //#########################################################################
   //# Native Methods
+  @Override
   native VerificationResult runNativeAlgorithm();
 
+  @Override
   public String getTraceName()
   {
     return getModel().getName() + "-conflicting";
@@ -197,5 +231,6 @@ public class NativeConflictChecker
   private EventProxy mMarking;
   private EventProxy mUsedMarking;
   private EventProxy mPreconditionMarking;
+  private boolean mDumpStateAware;
 
 }

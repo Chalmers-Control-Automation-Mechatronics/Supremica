@@ -70,6 +70,13 @@
                     <IntConstant Value="0"/>
                 </BinaryExpression>
             </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="x"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableMarking>
         </VariableComponent>
     </ComponentList>
 </Module>

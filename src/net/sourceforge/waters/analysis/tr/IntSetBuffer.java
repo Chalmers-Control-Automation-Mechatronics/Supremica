@@ -10,8 +10,8 @@
 package net.sourceforge.waters.analysis.tr;
 
 import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.set.hash.TIntHashSet;
 import gnu.trove.procedure.TIntProcedure;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -27,7 +27,7 @@ import net.sourceforge.waters.model.des.AutomatonTools;
  *
  * <P>An <I>integer set buffer</I> maintains a collection of sets of integers.
  * Each set is identified by its <I>index</I>, an integer that is assigned
- * by the set buffer upon creation of set list and remains a unique set
+ * by the set buffer upon creation of the set and remains a unique
  * identifier throughout the set's lifetime.</P>
  *
  * <P>Each set is represented by its size followed by its ordered list of
@@ -35,7 +35,7 @@ import net.sourceforge.waters.model.des.AutomatonTools;
  * arrays to minimise memory usage and allocation.</P>
  *
  * <P>A hash table is used to identify sets already present in the buffer.
- * If the same set is added a second time, it already existing index is
+ * If the same set is added a second time, the already existing index is
  * found and used instead of adding a second copy.</P>
  *
  * <P>The integer set buffer does not support deletion or modification of
@@ -154,38 +154,37 @@ public class IntSetBuffer implements WatersIntHashingStrategy
    return mDirectory.get(mNextFreeOffset);
   }
 
-  public int[] getSet(final int index)
+  /**
+   * Gets an array containing the contents of the given set.
+   * @param  set     The unique set index identifying the set to be examined
+   *                 in this integer set buffer.
+   * @return A newly allocated array containing the numbers in the set.
+   */
+  public int[] getSetContents(final int set)
   {
-    int blockno = index >>> BLOCK_SHIFT;
-
+    int blockno = set >>> BLOCK_SHIFT;
     int[] block = mBlocks.get(blockno);
-    int offset = index & BLOCK_MASK;
-    long data = block[offset];
-    final int count = (int)data & mSizeMask;
+    int offset = set & BLOCK_MASK;
+    long data = block[offset] & 0xffffffffL;
+    final int count = (int) (data & mSizeMask);
     final int[] result = new int[count];
-    data = data >>> mSizeShift;
-    int totalShifted = mSizeShift;
-    for (int i = 0; i < count; i++)
-    {
-        if (totalShifted + mDataShift >= 32)
-        {
-          offset++;
-          if (offset >= BLOCK_SIZE) {
-            offset = 0;
-            block = mBlocks.get(++blockno);
-          }
-          final int bitsleft = 32 - totalShifted;
-
-           totalShifted = 0 - bitsleft;
-           final long newblock = block[offset] & 0xffffffffL;
-           data |= (newblock);
+    int remainingBits = 32 - mSizeShift;
+    data >>>= mSizeShift;
+    for (int i = 0; i < count; i++) {
+      if (remainingBits < mDataShift) {
+        offset++;
+        if (offset > BLOCK_MASK) {
+          offset = 0;
+          blockno++;
+          block = mBlocks.get(blockno);
         }
-        // this cast is OK as mDataMask < 32
-        result[i] = (int)data & mDataMask;
-        data = data >>> mDataShift;
-        totalShifted += mDataShift;
+        data |= ((block[offset] & 0xffffffffL) << remainingBits);
+        remainingBits += 32;
+      }
+      result[i] = (int) (data & mDataMask);
+      data >>>= mDataShift;
+      remainingBits -= mDataShift;
     }
-
     return result;
   }
 
@@ -315,6 +314,7 @@ public class IntSetBuffer implements WatersIntHashingStrategy
    * @param   set    The unique set index identifying the set to be examined
    *                 in this integer set buffer.
    */
+  @Override
   public int computeHashCode(final int set)
   {
     int blockno = set >>> BLOCK_SHIFT;
@@ -341,6 +341,7 @@ public class IntSetBuffer implements WatersIntHashingStrategy
    * @param   set2   The unique set index identifying the second set to be
    *                 compared in this integer set buffer.
    */
+  @Override
   public boolean equals(final int set1, final int set2)
   {
     int blockno1 = set1 >>> BLOCK_SHIFT;
@@ -447,11 +448,13 @@ public class IntSetBuffer implements WatersIntHashingStrategy
 
     //#######################################################################
     //# Interface net.sourceforge.waters.analysis.tr.WatersIntIterator
+    @Override
     public void reset()
     {
       mCurrentOffset = -1;
     }
 
+    @Override
     public boolean advance()
     {
       if (mCurrentOffset >= mNextFreeOffset) {
@@ -466,11 +469,13 @@ public class IntSetBuffer implements WatersIntHashingStrategy
       }
     }
 
+    @Override
     public int getCurrentData()
     {
       return mCurrentOffset;
     }
 
+    @Override
     public void remove()
     {
       throw new UnsupportedOperationException
@@ -520,6 +525,7 @@ public class IntSetBuffer implements WatersIntHashingStrategy
 
     //#######################################################################
     //# Interface net.sourceforge.waters.analysis.tr.WatersIntIterator
+    @Override
     public void reset()
     {
       mCurrentOffset = mHeadOffset;
@@ -531,6 +537,7 @@ public class IntSetBuffer implements WatersIntHashingStrategy
       mCurrentData = (data & 0xffffffffL) >>> mCurrentShift;
     }
 
+    @Override
     public boolean advance()
     {
       if (mRemainingCount == 0) {
@@ -543,6 +550,7 @@ public class IntSetBuffer implements WatersIntHashingStrategy
       }
     }
 
+    @Override
     public int getCurrentData()
     {
       if (mCurrentShift >= 32) {
@@ -568,6 +576,7 @@ public class IntSetBuffer implements WatersIntHashingStrategy
      * @throws UnsupportedOperationException because deletions are not
      *         supported by integer set buffers.
      */
+    @Override
     public void remove()
     {
       throw new UnsupportedOperationException
@@ -603,6 +612,7 @@ public class IntSetBuffer implements WatersIntHashingStrategy
 
     //#######################################################################
     //# Interface gnu.trove.TIntProcedure
+    @Override
     public boolean execute(final int value)
     {
       mCollected.add(value);

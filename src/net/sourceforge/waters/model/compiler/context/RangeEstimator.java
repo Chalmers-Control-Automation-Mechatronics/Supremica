@@ -11,17 +11,21 @@ package net.sourceforge.waters.model.compiler.context;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.BinaryOperator;
+import net.sourceforge.waters.model.expr.BuiltInFunction;
 import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.expr.TypeMismatchException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
+import net.sourceforge.waters.model.module.FunctionCallExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
@@ -33,7 +37,7 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
  * <P>An evaluation component to estimate the range of simple expressions.</P>
  *
  * <P>Given the ranges of variables in a {@link VariableContext}, the range
- * evaluator propagates these range through all operators to give an
+ * evaluator propagates these ranges through all operators to give an
  * estimate of the range of an expression. For example, if <CODE>x</CODE>
  * and&nbsp;<CODE>y</CODE> are variables with range&nbsp;<CODE>1..3</CODE>,
  * then the estimated range of <CODE>x+y</CODE>
@@ -60,6 +64,8 @@ public class RangeEstimator
   //# Constructors
   public RangeEstimator(final CompilerOperatorTable optable)
   {
+    mOperatorTable = optable;
+
     mBinaryEvaluatorMap = new HashMap<BinaryOperator,BinaryEvaluator>(32);
     mBinaryEvaluatorMap.put(optable.getAndOperator(),
                             new BinaryAndEvaluator());
@@ -95,7 +101,15 @@ public class RangeEstimator
                            new UnaryNextEvaluator());
     mUnaryEvaluatorMap.put(optable.getUnaryMinusOperator(),
                            new UnaryMinusEvaluator());
-  }
+
+    mFunctionEvaluatorMap = new HashMap<BuiltInFunction,FunctionEvaluator>(8);
+    mFunctionEvaluatorMap.put(optable.getIteFunction(),
+                              new FunctionIteEvaluator());
+    mFunctionEvaluatorMap.put(optable.getMaxFunction(),
+                              new FunctionMaxEvaluator());
+    mFunctionEvaluatorMap.put(optable.getMinFunction(),
+                              new FunctionMinEvaluator());
+}
 
 
   //#########################################################################
@@ -191,6 +205,17 @@ public class RangeEstimator
     }
   }
 
+  private FunctionEvaluator getEvaluator(final BuiltInFunction function)
+    throws UnsupportedOperatorException
+  {
+    final FunctionEvaluator evaluator = mFunctionEvaluatorMap.get(function);
+    if (evaluator != null) {
+      return evaluator;
+    } else {
+      throw new UnsupportedOperatorException(function, " in guard expressions");
+    }
+  }
+
 
   //#########################################################################
   //# Type Checking
@@ -258,6 +283,21 @@ public class RangeEstimator
     }
   }
 
+  @Override
+  public CompiledRange visitFunctionCallExpressionProxy
+    (final FunctionCallExpressionProxy expr)
+    throws VisitorException
+  {
+    try {
+      final String name = expr.getFunctionName();
+      final BuiltInFunction function = mOperatorTable.getBuiltInFunction(name);
+      final FunctionEvaluator evaluator = getEvaluator(function);
+      return evaluator.eval(expr);
+    } catch (final EvalException exception) {
+      exception.provideLocation(expr);
+      throw wrap(exception);
+    }
+  }
 
   @Override
   public CompiledRange visitIdentifierProxy(final IdentifierProxy ident)
@@ -936,9 +976,125 @@ public class RangeEstimator
 
 
   //#########################################################################
+  //# Inner Class FunctionEvaluator
+  private abstract class FunctionEvaluator {
+
+    //#######################################################################
+    //# Evaluation
+    abstract CompiledRange eval(FunctionCallExpressionProxy expr)
+      throws VisitorException;
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class FunctionIteEvaluator
+  private class FunctionIteEvaluator extends FunctionEvaluator {
+
+    //#######################################################################
+    //# Evaluation
+    @Override
+    CompiledRange eval(final FunctionCallExpressionProxy expr)
+      throws VisitorException
+    {
+      try {
+        final List<SimpleExpressionProxy> args = expr.getArguments();
+        final Iterator<SimpleExpressionProxy> iter = args.iterator();
+        final SimpleExpressionProxy condition = iter.next();
+        final SimpleExpressionProxy thenExpr = iter.next();
+        final SimpleExpressionProxy elseExpr = iter.next();
+        final CompiledRange conditionRange = process(condition);
+        final CompiledIntRange boolRange =
+          checkBooleanRange(condition, conditionRange);
+        if (boolRange.getUpper() == 0) {
+          // Condition is false
+          return process(elseExpr);
+        } else if (boolRange.getLower() == 1) {
+          // Condition is true
+          return process(thenExpr);
+        } else {
+          final CompiledRange thenRange = process(thenExpr);
+          final CompiledRange elseRange = process(elseExpr);
+          return thenRange.union(elseRange);
+        }
+      } catch (final TypeMismatchException exception) {
+        throw wrap(exception);
+      }
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class FunctionMaxEvaluator
+  private class FunctionMaxEvaluator extends FunctionEvaluator {
+
+    //#######################################################################
+    //# Evaluation
+    @Override
+    CompiledIntRange eval(final FunctionCallExpressionProxy expr)
+      throws VisitorException
+    {
+      try {
+        int min = Integer.MIN_VALUE;
+        int max = Integer.MIN_VALUE;
+        for (final SimpleExpressionProxy arg : expr.getArguments()) {
+          final CompiledRange range = process(arg);
+          final CompiledIntRange intRange = checkIntRange(arg, range);
+          if (intRange.getLower() > min) {
+            min = intRange.getLower();
+          }
+          if (intRange.getUpper() > max) {
+            max = intRange.getUpper();
+          }
+        }
+        return new CompiledIntRange(min, max);
+      } catch (final TypeMismatchException exception) {
+        throw wrap(exception);
+      }
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class FunctionMinEvaluator
+  private class FunctionMinEvaluator extends FunctionEvaluator {
+
+    //#######################################################################
+    //# Evaluation
+    @Override
+    CompiledIntRange eval(final FunctionCallExpressionProxy expr)
+      throws VisitorException
+    {
+      try {
+        int min = Integer.MAX_VALUE;
+        int max = Integer.MAX_VALUE;
+        for (final SimpleExpressionProxy arg : expr.getArguments()) {
+          final CompiledRange range = process(arg);
+          final CompiledIntRange intRange = checkIntRange(arg, range);
+          if (intRange.getLower() < min) {
+            min = intRange.getLower();
+          }
+          if (intRange.getUpper() < max) {
+            max = intRange.getUpper();
+          }
+        }
+        return new CompiledIntRange(min, max);
+      } catch (final TypeMismatchException exception) {
+        throw wrap(exception);
+      }
+    }
+
+  }
+
+
+  //#########################################################################
   //# Data Members
+  private final OperatorTable mOperatorTable;
   private final Map<BinaryOperator,BinaryEvaluator> mBinaryEvaluatorMap;
   private final Map<UnaryOperator,UnaryEvaluator> mUnaryEvaluatorMap;
+  private final Map<BuiltInFunction,FunctionEvaluator> mFunctionEvaluatorMap;
 
   private VariableContext mContext;
 

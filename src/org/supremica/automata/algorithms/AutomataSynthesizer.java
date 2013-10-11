@@ -50,12 +50,15 @@
 package org.supremica.automata.algorithms;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
 
 import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer;
-import net.sourceforge.waters.analysis.compositional.CompositionalSynthesizer;
-import net.sourceforge.waters.analysis.compositional.SynthesisAbstractionProcedureFactory;
+import net.sourceforge.waters.analysis.compositional.CompositionalAutomataSynthesizer;
+import net.sourceforge.waters.analysis.compositional.AutomataSynthesisAbstractionProcedureFactory;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
+import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -67,24 +70,36 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.EventKind;
 
-import org.supremica.log.*;
-import org.supremica.gui.*;
-import org.supremica.automata.*;
-import org.supremica.automata.algorithms.minimization.*;
-import org.supremica.properties.Config;
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.AlphabetHelpers;
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonType;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.ModularSupervisor;
+import org.supremica.automata.Supervisor;
 import org.supremica.automata.BDD.BDDSynthesizer;
 import org.supremica.automata.IO.AutomataToWaters;
 import org.supremica.automata.IO.ProjectBuildFromWaters;
+import org.supremica.automata.algorithms.minimization.AutomataMinimizer;
+import org.supremica.automata.algorithms.minimization.AutomatonMinimizer;
+import org.supremica.automata.algorithms.minimization.MinimizationHelper;
+import org.supremica.automata.algorithms.minimization.MinimizationOptions;
+import org.supremica.gui.ExecutionDialog;
+import org.supremica.gui.ExecutionDialogMode;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
+import org.supremica.properties.Config;
 import org.supremica.util.ActionTimer;
-import org.supremica.util.BDD.OnlineBDDSupervisor;
 import org.supremica.util.BDD.BDDAutomata;
+import org.supremica.util.BDD.OnlineBDDSupervisor;
 
 /**
  * Does synthesis in automata-scale, modularily,
  * uses AutomatonSynthesizer for monolithic problems
  */
 public class AutomataSynthesizer
-    implements Stoppable
+    implements Abortable
 {
     private static Logger logger = LoggerFactory.createLogger(AutomataSynthesizer.class);
     private Automata theAutomata;
@@ -95,8 +110,8 @@ public class AutomataSynthesizer
     private ExecutionDialog executionDialog = null;
 
     // For the stopping
-    private boolean stopRequested = false;
-    private Stoppable threadToStop = null;
+    private boolean mAbortRequested = false;
+    private Abortable mThreadToAbort = null;
 
     private ActionTimer timer = new ActionTimer();
     // Statistics
@@ -142,11 +157,11 @@ public class AutomataSynthesizer
         {
             // MONOLITHIC synthesis, just whack the entire stuff into the monolithic algo
             final MonolithicAutomataSynthesizer synthesizer = new MonolithicAutomataSynthesizer();
-			threadToStop = synthesizer;
+			mThreadToAbort = synthesizer;
 			final MonolithicReturnValue retval = synthesizer.synthesizeSupervisor(
 					theAutomata, synthesizerOptions, synchronizationOptions,
 					executionDialog, helperStatistics, false);
-			if (stopRequested) return new Automata();
+			if (mAbortRequested) return new Automata();
 			result.addAutomaton(retval.automaton);
         }
 
@@ -155,7 +170,7 @@ public class AutomataSynthesizer
             // MODULAR (controllability) synthesis
             final Automata newSupervisors = doModular(theAutomata);
 
-            if (stopRequested || newSupervisors == null) return new Automata();
+            if (mAbortRequested || newSupervisors == null) return new Automata();
             logger.info(helperStatistics);
             result.addAutomata(newSupervisors);
         }
@@ -315,10 +330,10 @@ public class AutomataSynthesizer
 //
             // Applying monolithic synthesis on the abstract automaton.
             final MonolithicAutomataSynthesizer synthesizer = new MonolithicAutomataSynthesizer();
-            threadToStop = synthesizer;
+            mThreadToAbort = synthesizer;
             final MonolithicReturnValue retval = synthesizer.synthesizeSupervisor(min, synthesizerOptions, synchronizationOptions, executionDialog, helperStatistics, false);
 
-            if (stopRequested)
+            if (mAbortRequested)
                 return new Automata();
             retval.automaton.setName("sup(Untitled)");
             result.addAutomaton(retval.automaton);
@@ -367,11 +382,12 @@ public class AutomataSynthesizer
 
            final MonolithicSynthesizer synthesizer =
              new MonolithicSynthesizer(des, factory, translator);
+           mThreadToAbort = synthesizer;
            synthesizer.setConfiguredDefaultMarking(marking);
            final boolean supervisorReduction =
              synthesizerOptions.getReduceSupervisors();
            synthesizer.setSupervisorReductionEnabled(supervisorReduction);
-           final boolean supervisorLocalization = 
+           final boolean supervisorLocalization =
              synthesizerOptions.getLocalizeSupervisors();
            synthesizer.setSupervisorLocalizationEnabled(supervisorLocalization);
            // set options & marking
@@ -430,15 +446,18 @@ public class AutomataSynthesizer
           final AutomataToWaters exporter = new AutomataToWaters(factory);
           final ProductDESProxy des = exporter.convertAutomata(theAutomata);
 
-          final CompositionalSynthesizer synthesizer =
-            new CompositionalSynthesizer(des, factory, translator,
-                                         SynthesisAbstractionProcedureFactory.WSOE);
+          final CompositionalAutomataSynthesizer synthesizer =
+            new CompositionalAutomataSynthesizer(des, factory, translator,
+                                         AutomataSynthesisAbstractionProcedureFactory.WSOE);
           synthesizer.setConfiguredDefaultMarking(marking);
+          final boolean supervisorReduction =
+            synthesizerOptions.getReduceSupervisors();
+          synthesizer.setSupervisorReductionEnabled(supervisorReduction);
           synthesizer.setInternalStateLimit(5000);
            synthesizer.setPreselectingMethod
              (AbstractCompositionalModelAnalyzer.MustL);
            synthesizer.setSelectingMethod
-             (AbstractCompositionalModelAnalyzer.MinS);
+             (AbstractCompositionalModelAnalyzer.MinSync);
           synthesizer.run();
           final ProductDESResult watersResult =
             synthesizer.getAnalysisResult();
@@ -678,6 +697,7 @@ public class AutomataSynthesizer
         // Initialize execution dialog
         java.awt.EventQueue.invokeLater(new Runnable()
         {
+            @Override
             public void run()
             {
                 if (executionDialog != null)
@@ -691,7 +711,7 @@ public class AutomataSynthesizer
         // Loop over specs/sups AND their corresponding plants (dealt with by the selector)
         for (Automata automata = selector.next(); automata.size() > 0; automata = selector.next())
         {
-            if (stopRequested)
+            if (mAbortRequested)
             {
                 return new Automata();
             }
@@ -736,12 +756,12 @@ public class AutomataSynthesizer
 
             // Do monolithic synthesis on this subsystem
             final MonolithicAutomataSynthesizer synthesizer = new MonolithicAutomataSynthesizer();
-			threadToStop = synthesizer;
+			mThreadToAbort = synthesizer;
 			MonolithicReturnValue retval = synthesizer.synthesizeSupervisor(
 					automata, synthesizerOptions, synchronizationOptions,
 					executionDialog, helperStatistics, false);
 
-            if (stopRequested)
+            if (mAbortRequested)
             {
                 return new Automata();
             }
@@ -773,7 +793,7 @@ public class AutomataSynthesizer
 								synthesizerOptions, synchronizationOptions,
 								executionDialog, helperStatistics, false);
 
-                        if (stopRequested)
+                        if (mAbortRequested)
                         {
                             return new Automata();
                         }
@@ -926,7 +946,7 @@ public class AutomataSynthesizer
             final AutomataVerifier verifier = new AutomataVerifier(currAutomata, verificationOptions,
                 synchronizationOptions, null);
 
-            if (stopRequested)
+            if (mAbortRequested)
             {
                 return;
             }
@@ -934,7 +954,7 @@ public class AutomataSynthesizer
             // Will the supervisor affect the system at all?
             logger.verbose("Examining whether the supervisor candidate " +
                 currSupervisor + " is needed.");
-            threadToStop = verifier;
+            mThreadToAbort = verifier;
             // if (AutomataVerifier.verifyModularInclusion(currAutomata, new Automata(currSupervisor)))
             if (verifier.verify())
             {
@@ -947,7 +967,7 @@ public class AutomataSynthesizer
                 // This one was important! Don't remove it and put it back!!
                 currAutomata.addAutomaton(currSupervisor); // Not for LanguageInclusion
             }
-            threadToStop = null;
+            mThreadToAbort = null;
 
             if (executionDialog != null)
             {
@@ -966,22 +986,29 @@ public class AutomataSynthesizer
      *
      * @see  ExecutionDialog
      */
-    public void requestStop()
+    @Override
+    public void requestAbort()
     {
-        stopRequested = true;
+        mAbortRequested = true;
 
         logger.debug("AutomataSynthesizer requested to stop.");
 
         // Stop currently executing thread!
-        if (threadToStop != null)
+        if (mThreadToAbort != null)
         {
-            threadToStop.requestStop();
+            mThreadToAbort.requestAbort();
         }
     }
 
-    public boolean isStopped()
+    @Override
+    public boolean isAborting()
     {
-        return stopRequested;
+        return mAbortRequested;
+    }
+
+    @Override
+    public void resetAbort(){
+      mAbortRequested = false;
     }
 
     /**

@@ -96,7 +96,7 @@ public abstract class AbstractConflictChecker
                                    final ProductDESProxyFactory factory)
     {
       super(model, factory, ConflictKindTranslator.getInstance());
-      mMarking = marking;
+      mConfiguredMarking = marking;
       mPreconditionMarking = preMarking;
       mUsedMarking = null;
   }
@@ -104,6 +104,7 @@ public abstract class AbstractConflictChecker
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @Override
   public void setModel(final ProductDESProxy model)
   {
     super.setModel(model);
@@ -113,25 +114,30 @@ public abstract class AbstractConflictChecker
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ConflictChecker
+  @Override
   public void setConfiguredDefaultMarking(final EventProxy marking)
   {
-    mMarking = marking;
+    mConfiguredMarking = marking;
     mUsedMarking = null;
   }
 
+  @Override
   public EventProxy getConfiguredDefaultMarking()
   {
-    return mMarking;
+    return mConfiguredMarking;
   }
 
+  @Override
   public void setConfiguredPreconditionMarking(final EventProxy marking){
     mPreconditionMarking = marking;
   }
 
+  @Override
   public EventProxy getConfiguredPreconditionMarking(){
     return mPreconditionMarking;
   }
 
+  @Override
   public ConflictTraceProxy getCounterExample()
   {
     return (ConflictTraceProxy) super.getCounterExample();
@@ -153,9 +159,9 @@ public abstract class AbstractConflictChecker
   /**
    * Gets the marking proposition to be used.
    * This method returns the marking proposition specified by the {@link
-   * #setConfiguredDefaultMarking(EventProxy) setMarkingProposition()} method, if
-   * non-null, or the default marking proposition of the input model.
-   * @throws IllegalArgumentException to indicate that the a
+   * #setConfiguredDefaultMarking(EventProxy) setMarkingProposition()} method,
+   * if non-null, or the default marking proposition of the input model.
+   * @throws EventNotFoundException to indicate that the a
    *         <CODE>null</CODE> marking was specified, but input model does
    *         not contain any proposition with the default marking name.
    */
@@ -163,11 +169,11 @@ public abstract class AbstractConflictChecker
     throws EventNotFoundException
   {
     if (mUsedMarking == null) {
-      if (mMarking == null) {
+      if (mConfiguredMarking == null) {
         final ProductDESProxy model = getModel();
         mUsedMarking = getMarkingProposition(model);
       } else {
-        mUsedMarking = mMarking;
+        mUsedMarking = mConfiguredMarking;
       }
     }
     return mUsedMarking;
@@ -175,7 +181,8 @@ public abstract class AbstractConflictChecker
 
   /**
    * Searches the given model for a proposition event with the default
-   * marking name and returns this event.
+   * marking name {@link EventDeclProxy#DEFAULT_MARKING_NAME} and returns
+   * this event.
    * @throws EventNotFoundException to indicate that the given model
    *         does not contain any proposition with the default marking
    *         name.
@@ -228,7 +235,7 @@ public abstract class AbstractConflictChecker
 
   //#########################################################################
   //# Data Members
-  private EventProxy mMarking;
+  private EventProxy mConfiguredMarking;
   private EventProxy mUsedMarking;
   private EventProxy mPreconditionMarking;
 }

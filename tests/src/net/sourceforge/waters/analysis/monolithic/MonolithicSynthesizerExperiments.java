@@ -29,7 +29,7 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
 /**
- * This class runs experiments using the {@link CompositionalSynthesizer} with
+ * This class runs experiments using the {@link CompositionalAutomataSynthesizer} with
  * a variety of configurations. The heuristics for choosing candidates can
  * be varied, as well as the abstraction rules applied and their order.
  *

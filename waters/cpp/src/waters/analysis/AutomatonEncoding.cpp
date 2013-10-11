@@ -96,7 +96,8 @@ AutomatonRecord(const jni::AutomatonGlue& aut,
     mIsPlant(plant),
     mWordIndex(0),
     mShift(0),
-    mBitMask(0)
+    mBitMask(0),
+    mDumpStates(0)
 {
   const jni::SetGlue states = aut.getStatesGlue(cache);
   mNumStates = states.size();
@@ -131,6 +132,7 @@ AutomatonRecord::
     mJavaStates[code].jni::StateGlue::~StateGlue();
   }
   free(mJavaStates);
+  delete [] mDumpStates;
 }
 
 
@@ -412,6 +414,31 @@ getCategory(const jni::StateGlue& state,
   const int hasalpha = props.contains(&alpha) ? 3 : 0;
   const int lowers = init ^ hasalpha;
   return props.contains(&omega) ? 7 - lowers : lowers;
+}
+
+uint32_t AutomatonRecord::
+setupDumpStates(const bool* dumpStatus)
+{
+  delete [] mDumpStates;
+  uint32_t count = 0;
+  for (uint32_t s = 0; s < mNumStates; s++) {
+    if (dumpStatus[s]) {
+      count++;
+    }
+  }
+  if (count == 0) {
+    mDumpStates = 0;
+  } else {
+    mDumpStates = new uint32_t[count + 1];
+    mDumpStates[0] = count;
+    int d = 1;
+    for (uint32_t s = 0; s < mNumStates; s++) {
+      if (dumpStatus[s]) {
+        mDumpStates[d++] = s;
+      }
+    }
+  }
+  return count;
 }
 
 

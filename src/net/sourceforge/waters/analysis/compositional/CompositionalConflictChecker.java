@@ -343,7 +343,11 @@ public class CompositionalConflictChecker
       final ConflictChecker current;
       if (configured == null) {
         final ProductDESProxyFactory factory = getFactory();
-        current = new NativeConflictChecker(factory);
+        final NativeConflictChecker nativeChecker =
+          new NativeConflictChecker(factory);
+        final boolean aware = getConfiguredPreconditionMarking() == null;
+        nativeChecker.setDumpStateAware(aware);
+        current = nativeChecker;
       } else {
         current = configured;
       }
@@ -424,6 +428,15 @@ public class CompositionalConflictChecker
     super.requestAbort();
     if (mCurrentCompositionalSafetyVerifier != null) {
       mCurrentCompositionalSafetyVerifier.requestAbort();
+    }
+  }
+
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    if (mCurrentCompositionalSafetyVerifier != null) {
+      mCurrentCompositionalSafetyVerifier.resetAbort();
     }
   }
 
@@ -1132,7 +1145,7 @@ public class CompositionalConflictChecker
     //# Interface net.sourceforge.waters.analysis.monolithic.
     //# MonolithicSynchronousProductBuilder.StateCounter
     @Override
-    public void countState(final int[] tuple)
+    public boolean newState(final int[] tuple)
       throws OverflowException
     {
       final MonolithicSynchronousProductBuilder builder =
@@ -1154,6 +1167,7 @@ public class CompositionalConflictChecker
       if (mCount >= mCurrentMinimum) {
         throw new OverflowException(OverflowKind.NODE, mCurrentMinimum);
       }
+      return true;
     }
 
     @Override

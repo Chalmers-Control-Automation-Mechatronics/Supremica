@@ -49,18 +49,23 @@
  */
 package org.supremica.gui;
 
-import org.supremica.automata.algorithms.*;
-import javax.swing.*;
-import java.util.*;
+import java.util.ArrayList;
+
+import javax.swing.JOptionPane;
+
+import net.sourceforge.waters.model.analysis.Abortable;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
+import org.supremica.automata.algorithms.AutomataSynchronizer;
+import org.supremica.automata.algorithms.SynchronizationOptions;
 import org.supremica.gui.ide.actions.IDEActionInterface;
 import org.supremica.properties.Config;
 import org.supremica.util.ActionTimer;
 
 public class AutomataSynchronizerWorker
     extends Thread
-    implements Stoppable
+    implements Abortable
 {
     private IDEActionInterface ide = null;
     private Automata theAutomata = null;
@@ -68,59 +73,60 @@ public class AutomataSynchronizerWorker
     private final static int MODE_UPDATE = 2;
     private int mode = MODE_SYNC;
     private Automaton theAutomaton = null;
-    private SynchronizationOptions syncOptions;
-    private boolean stopRequested = false;
-    
-    public AutomataSynchronizerWorker(IDEActionInterface workbench, Automata theAutomata, String newAutomatonName, SynchronizationOptions syncOptions)
+    private final SynchronizationOptions syncOptions;
+    private boolean abortRequested = false;
+
+    public AutomataSynchronizerWorker(final IDEActionInterface workbench, final Automata theAutomata, final String newAutomatonName, final SynchronizationOptions syncOptions)
     {
         this.ide = workbench;
         this.theAutomata = theAutomata;
         this.syncOptions = syncOptions;
-        
+
         // Order this thread to begin execution; the Jvm calls the run method of this thread.
         this.start();
     }
-    
+
+    @Override
     public void run()
     {
         if (mode == MODE_SYNC)
         {
-            ActionTimer timer = new ActionTimer();
+            final ActionTimer timer = new ActionTimer();
             timer.start();
-            
+
             AutomataSynchronizer theSynchronizer;
-            
+
             try
             {
                 theSynchronizer = new AutomataSynchronizer(theAutomata, syncOptions, Config.SYNTHESIS_SUP_AS_PLANT.get());
             }
-            catch (Exception e)
+            catch (final Exception e)
             {
                 timer.stop();
-                
+
                 // -- MF -- should really put up a message box here? Why not let the Gui manage that?
                 JOptionPane.showMessageDialog(ide.getFrame(), e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                
+
                 // logger.error(e.getMessage());
                 ide.error(e.getMessage());
-                
+
                 return;
             }
-            
+
             // Initialize execution dialog
-            ArrayList<Stoppable> threadsToStop = new ArrayList<Stoppable>();
+            final ArrayList<Abortable> threadsToStop = new ArrayList<Abortable>();
             threadsToStop.add(theSynchronizer);
             threadsToStop.add(this);
-            ExecutionDialog executionDialog = new ExecutionDialog(ide.getFrame(), "Synchronizing", threadsToStop);
+            final ExecutionDialog executionDialog = new ExecutionDialog(ide.getFrame(), "Synchronizing", threadsToStop);
             theSynchronizer.getHelper().setExecutionDialog(executionDialog);
             executionDialog.setMode(ExecutionDialogMode.SYNCHRONIZING);
-            
+
             // Synchronize automaton
             try
             {
                 theSynchronizer.execute();
             }
-            catch (Exception ex)
+            catch (final Exception ex)
             {
                 timer.stop();
                 ide.error("Exception while executing AutomataSynchronizer", ex);
@@ -128,37 +134,37 @@ public class AutomataSynchronizerWorker
                 // logger.debug(ex.getStackTrace());
                 return;
             }
-            
+
             // Build automaton
-            if (!stopRequested && syncOptions.buildAutomaton())
+            if (!abortRequested && syncOptions.buildAutomaton())
             {
                 try
                 {
                     theAutomaton = theSynchronizer.getAutomaton();
                 }
-                catch (Exception ex)
+                catch (final Exception ex)
                 {
                     timer.stop();
-                    
+
                     // -- MF -- logger.error("Exception in AutomatonSynchronizer while getting the automaton" + ex);
                     ide.error("Exception in AutomatonSynchronizer while getting the automaton" + ex);
                     ex.printStackTrace();
-                    
+
                     // logger.debug(ex.getStackTrace());
                     return;
                 }
             }
-            
+
             // Present result
-            if (!stopRequested)
+            if (!abortRequested)
             {
                 mode = MODE_UPDATE;
-                
+
                 java.awt.EventQueue.invokeLater(this);
-                
+
                 // Date endDate = new Date();
                 timer.stop();
-                
+
                 // logger.info("Execution completed after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds.");
                 // workbench.info("Execution completed after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds.");
                 ide.info("Execution completed after " + timer.toString());
@@ -167,12 +173,12 @@ public class AutomataSynchronizerWorker
             {
                 // Date endDate = new Date();
                 timer.stop();
-                
+
                 // logger.info("Execution stopped after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds!");
                 // workbench.info("Execution stopped after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds!");
                 ide.info("Execution stopped after " + timer.toString());
             }
-            
+
             theSynchronizer.displayInfo();
             executionDialog.setMode(ExecutionDialogMode.HIDE);
         }
@@ -188,24 +194,31 @@ public class AutomataSynchronizerWorker
                     ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(theAutomaton);
                 }
             }
-            catch (Exception ex)
+            catch (final Exception ex)
             {
                 // logger.error("Could not add the new automaton after synchronization");
                 // logger.debug(ex.getStackTrace());
                 ide.error("Could not add the new automaton after synchronization");
-                
+
                 return;
             }
         }
     }
-    
-    public void requestStop()
+
+    @Override
+    public void requestAbort()
     {
-        stopRequested = true;
+        abortRequested = true;
     }
-    
-    public boolean isStopped()
+
+    @Override
+    public boolean isAborting()
     {
-        return stopRequested;
+        return abortRequested;
+    }
+
+    @Override
+    public void resetAbort(){
+      abortRequested = false;
     }
 }

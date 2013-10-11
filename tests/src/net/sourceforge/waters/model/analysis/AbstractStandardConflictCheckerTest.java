@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -94,52 +95,52 @@ public abstract class AbstractStandardConflictCheckerTest
   //# Test Cases --- nondeterministic
   public void testNondeterministicCombinations() throws Exception
   {
-    final String group = "tests";
-    final String dir = "nondeterministic";
-    final String name = "NondeterministicCombinations.wmod";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nondeterministic",
+                     "NondeterministicCombinations.wmod");
+    runModelVerifier(des, true);
   }
 
   public void testNondeterministicConflicting() throws Exception
   {
-    final String group = "tests";
-    final String dir = "nondeterministic";
-    final String name = "NondeterministicConflicting.wmod";
-    runModelVerifier(group, dir, name, false);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nondeterministic",
+                     "NondeterministicConflicting.wmod");
+    runModelVerifier(des, false);
   }
 
   public void testNondeterministicNonconflicting() throws Exception
   {
-    final String group = "tests";
-    final String dir = "nondeterministic";
-    final String name = "NondeterministicNonconflicting.wmod";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nondeterministic",
+                     "NondeterministicNonconflicting.wmod");
+    runModelVerifier(des, true);
   }
 
   public void testMultiNondeterministicConflicting() throws Exception
   {
-    final String group = "tests";
-    final String dir = "nondeterministic";
-    final String name = "multiNondeterministicConflicting.wmod";
-    runModelVerifier(group, dir, name, false);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nondeterministic",
+                     "multiNondeterministicConflicting.wmod");
+    runModelVerifier(des, false);
   }
 
   public void testMultiNondeterministicNonconflicting() throws Exception
   {
-    final String group = "tests";
-    final String dir = "nondeterministic";
-    final String name = "multiNondeterministicNonconflicting.wmod";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nondeterministic",
+                     "multiNondeterministicNonconflicting.wmod");
+    runModelVerifier(des, true);
   }
 
   public void testMultiNondeterministicSepPlacesConflicting() throws Exception
   {
     // The two deterministic automata don't have nondeterminism at the same
     // time.
-    final String group = "tests";
-    final String dir = "nondeterministic";
-    final String name = "multiNondeterministicSepPlacesConflicting.wmod";
-    runModelVerifier(group, dir, name, false);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nondeterministic",
+                     "multiNondeterministicSepPlacesConflicting.wmod");
+    runModelVerifier(des, false);
   }
 
 
@@ -147,44 +148,44 @@ public abstract class AbstractStandardConflictCheckerTest
   //# Test Cases --- handwritten
   public void testCell() throws Exception
   {
-    final String group = "handwritten";
-    final String name = "cell.wmod";
-    runModelVerifier(group, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("handwritten", "cell.wmod");
+    runModelVerifier(des, true);
   }
 
   public void testCellBlock() throws Exception
   {
-    final String group = "handwritten";
-    final String name = "cell_block.wmod";
-    runModelVerifier(group, name, false);
+    final ProductDESProxy des =
+      getCompiledDES("handwritten", "cell_block.wmod");
+    runModelVerifier(des, false);
   }
 
   public void testDosingTankWithJellyEFA1() throws Exception
   {
-    final String group = "handwritten";
-    final String name = "DosingTankWithJellyEFA1.wmod";
-    runModelVerifier(group, name, false);
+    final ProductDESProxy des =
+      getCompiledDES("handwritten", "DosingTankWithJellyEFA1.wmod");
+    runModelVerifier(des, false);
   }
 
   public void testElevatorSafety() throws Exception
   {
-    final String group = "handwritten";
-    final String name = "elevator_safety.wmod";
-    runModelVerifier(group, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("handwritten", "elevator_safety.wmod");
+    runModelVerifier(des, true);
   }
 
   public void testSmallFactory2() throws Exception
   {
-    final String group = "handwritten";
-    final String name = "small_factory_2.wdes";
-    runModelVerifier(group, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("handwritten", "small_factory_2.wdes");
+    runModelVerifier(des, true);
   }
 
   public void testTictactoe() throws Exception
   {
-    final String group = "handwritten";
-    final String name = "tictactoe.wdes";
-    runModelVerifier(group, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("handwritten", "tictactoe.wdes");
+    runModelVerifier(des, true);
   }
 
 
@@ -192,26 +193,23 @@ public abstract class AbstractStandardConflictCheckerTest
   //# Test Cases --- hisc
   public void testHISCRhoneSubsystem1Patch0() throws Exception
   {
-    final String group = "tests";
-    final String dir = "hisc";
-    final String name = "rhone_subsystem1_patch0.wmod";
-    runModelVerifier(group, dir, name, false);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "hisc", "rhone_subsystem1_patch0.wmod");
+    runModelVerifier(des, false);
   }
 
   public void testHISCRhoneSubsystem1Patch1() throws Exception
   {
-    final String group = "tests";
-    final String dir = "hisc";
-    final String name = "rhone_subsystem1_patch1.wmod";
-    runModelVerifier(group, dir, name, false);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "hisc", "rhone_subsystem1_patch1.wmod");
+    runModelVerifier(des, false);
   }
 
   public void testHISCRhoneSubsystem1Patch2() throws Exception
   {
-    final String group = "tests";
-    final String dir = "hisc";
-    final String name = "rhone_subsystem1_patch2.wmod";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "hisc", "rhone_subsystem1_patch2.wmod");
+    runModelVerifier(des, true);
   }
 
 
@@ -219,154 +217,149 @@ public abstract class AbstractStandardConflictCheckerTest
   //# Test Cases --- nasty
   public void testAgvbPart1() throws Exception
   {
-    final String group = "tests";
-    final String dir = "nasty";
-    final String name = "agvb_part1.wmod";
-    runModelVerifier(group, dir, name, false);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "agvb_part1.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testAmpleStutterTest() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "ample_stutter_test.wmod");
+    runModelVerifier(des, false);
   }
 
   public void testCertainConf1() throws Exception
   {
-    final String group = "tests";
-    final String dir = "nasty";
-    final String name = "certainconf1.wmod";
-    runModelVerifier(group, dir, name, false);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "certainconf1.wmod");
+    runModelVerifier(des, false);
   }
 
   public void testCertainConf2() throws Exception
   {
-    final String group = "tests";
-    final String dir = "nasty";
-    final String name = "certainconf2.wmod";
-    runModelVerifier(group, dir, name, false);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "certainconf2.wmod");
+    runModelVerifier(des, false);
   }
 
   public void testCertainConf3() throws Exception
   {
-    final String group = "tests";
-    final String dir = "nasty";
-    final String name = "certainconf3.wmod";
-    runModelVerifier(group, dir, name, false);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "certainconf3.wmod");
+    runModelVerifier(des, false);
   }
 
   public void testDisjoint1() throws Exception
   {
-    final String group = "tests";
-    final String dir = "nasty";
-    final String name = "disjoint1.wmod";
-    runModelVerifier(group, dir, name, false);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "disjoint1.wmod");
+    runModelVerifier(des, false);
   }
 
   public void testEmptySpec() throws Exception
   {
-    final String group = "tests";
-    final String dir = "nasty";
-    final String name = "empty_spec.wmod";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "empty_spec.wmod");
+    runModelVerifier(des, true);
   }
 
   public void testFTechnikConflict() throws Exception
   {
-    final String group = "tests";
-    final String dir = "nasty";
-    final String name = "ftechnik_conflict.wmod";
-    runModelVerifier(group, dir, name, false);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "ftechnik_conflict.wmod");
+    runModelVerifier(des, false);
   }
 
   public void testJpt10Counter() throws Exception
   {
-    final String group = "tests";
-    final String dir = "nasty";
-    final String name = "jpt10counter.wmod";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "jpt10counter.wmod");
+    runModelVerifier(des, true);
+  }
+
+  public void testJustProperty() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "just_property.wdes");
+    runModelVerifier(des, true);
   }
 
   public void testNeverMarked() throws Exception
   {
-    final String group = "tests";
-    final String dir = "nasty";
-    final String name = "never_marked.wmod";
-    runModelVerifier(group, dir, name, false);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "never_marked.wmod");
+    runModelVerifier(des, false);
   }
 
   public void testOneState() throws Exception
   {
-    final String group = "tests";
-    final String dir = "nasty";
-    final String name = "onestate.wmod";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "onestate.wmod");
+    runModelVerifier(des, true);
   }
 
   public void test_onlySelfLoop01() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "nasty";
-    final String name = "onlySelfLoop01.wmod";
-    runModelVerifier(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "onlySelfLoop01.wmod");
+    runModelVerifier(des, true);
   }
 
   public void test_onlySelfLoop02() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "nasty";
-    final String name = "onlySelfLoop02.wmod";
-    runModelVerifier(group, subdir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "onlySelfLoop02.wmod");
+    runModelVerifier(des, true);
   }
 
   public void testOrphanEvents() throws Exception
   {
-    final String group = "tests";
-    final String dir = "nasty";
-    final String name = "orphan_events.wmod";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "orphan_events.wmod");
+    runModelVerifier(des, true);
   }
 
   public void testPrimeSieve2b() throws Exception
   {
-    final String group = "tests";
-    final String dir = "nasty";
-    final String name = "prime_sieve2b.wmod";
-    runModelVerifier(group, dir, name, false);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "prime_sieve2b.wmod");
+    runModelVerifier(des, false);
   }
 
   public void testRhoneTU34() throws Exception
   {
-    final String group = "tests";
-    final String dir = "nasty";
-    final String name = "rhone_tu34.wmod";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "rhone_tu34.wmod");
+    runModelVerifier(des, true);
   }
 
   public void testSilentContinuation() throws Exception
   {
-    final String group = "tests";
-    final String dir = "nasty";
-    final String name = "silent_continuation.wmod";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "silent_continuation.wmod");
+    runModelVerifier(des, true);
   }
 
   public void testTwoInit() throws Exception
   {
-    final String group = "tests";
-    final String dir = "nasty";
-    final String name = "twoinit.wmod";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "twoinit.wmod");
+    runModelVerifier(des, true);
   }
 
   public void testTwoInitBlock() throws Exception
   {
-    final String group = "tests";
-    final String dir = "nasty";
-    final String name = "twoinit_block.wmod";
-    runModelVerifier(group, dir, name, false);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "twoinit_block.wmod");
+    runModelVerifier(des, false);
   }
 
   public void testVerriegel4Counter2() throws Exception
   {
-    final String group = "tests";
-    final String dir = "nasty";
-    final String name = "verriegel4counter2.wmod";
-    runModelVerifier(group, dir, name, false);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "verriegel4counter2.wmod");
+    runModelVerifier(des, false);
   }
 
   public void testWickedCounting() throws Exception
@@ -376,13 +369,29 @@ public abstract class AbstractStandardConflictCheckerTest
 
   protected void checkWickedCounting(final int digits) throws Exception
   {
-    final String group = "tests";
-    final String dir = "nasty";
-    final String name = "wicked_counting.wmod";
     final ParameterBindingProxy binding = createBinding("DIGITS", digits);
     final List<ParameterBindingProxy> bindings =
       Collections.singletonList(binding);
-    runModelVerifier(group, dir, name, bindings, true);
+    final ProductDESProxy des =
+      getCompiledDES(bindings, "tests", "nasty", "wicked_counting.wmod");
+    runModelVerifier(des, bindings, true);
+  }
+
+
+  //#########################################################################
+  //# Test Cases --- efa
+  public void test_CaseStudyNonblocking() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("efa", "caseStudy-nonblocking.wmod");
+    runModelVerifier(des, true);
+  }
+
+  public void test_CaseStudyOriginal() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("efa", "caseStudy-original.wmod");
+    runModelVerifier(des, false);
   }
 
 
@@ -390,472 +399,409 @@ public abstract class AbstractStandardConflictCheckerTest
   //# Test Cases --- tests
   public void test_BallTimer() throws Exception
   {
-    final String group = "tests";
-    final String dir = "ball_sorter";
-    final String name = "ball_timer.wmod";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "ball_sorter", "ball_timer.wmod");
+    runModelVerifier(des, true);
   }
 
   public void test_BallTimerUncont() throws Exception
   {
-    final String group = "tests";
-    final String dir = "ball_sorter";
-    final String name = "ball_timer_uncont.wmod";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "ball_sorter", "ball_timer_uncont.wmod");
+    runModelVerifier(des, true);
   }
 
   public void test_BallTSorter1() throws Exception
   {
-    final String group = "tests";
-    final String dir = "ball_sorter";
-    final String name = "robis_ball_sorter_attempt1.wmod";
-    runModelVerifier(group, dir, name, false);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "ball_sorter", "robis_ball_sorter_attempt1.wmod");
+    runModelVerifier(des, false);
   }
 
   public void test_Batchtank2005_amk14() throws Exception
   {
-    final String group = "tests";
-    final String dir = "batchtank2005";
-    final String name = "amk14.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "batchtank2005", "amk14.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_Batchtank2005_cjn5() throws Exception
   {
-    final String group = "tests";
-    final String dir = "batchtank2005";
-    final String name = "cjn5.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "batchtank2005", "cjn5.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_Batchtank2005_cs37() throws Exception
   {
-    final String group = "tests";
-    final String dir = "batchtank2005";
-    final String name = "cs37.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "batchtank2005", "cs37.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_Batchtank2005_ez1() throws Exception
   {
-    final String group = "tests";
-    final String dir = "batchtank2005";
-    final String name = "ez1.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "batchtank2005", "ez1.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_Batchtank2005_gb20() throws Exception
   {
-    final String group = "tests";
-    final String dir = "batchtank2005";
-    final String name = "gb20.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "batchtank2005", "gb20.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_Batchtank2005_gb21() throws Exception
   {
-    final String group = "tests";
-    final String dir = "batchtank2005";
-    final String name = "gb21.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "batchtank2005", "gb21.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_Batchtank2005_gjr5() throws Exception
   {
-    final String group = "tests";
-    final String dir = "batchtank2005";
-    final String name = "gjr5.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "batchtank2005", "gjr5.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_Batchtank2005_grj3() throws Exception
   {
-    final String group = "tests";
-    final String dir = "batchtank2005";
-    final String name = "grj3.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "batchtank2005", "grj3.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_Batchtank2005_imr1() throws Exception
   {
-    final String group = "tests";
-    final String dir = "batchtank2005";
-    final String name = "imr1.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "batchtank2005", "imr1.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_Batchtank2005_jbr2() throws Exception
   {
-    final String group = "tests";
-    final String dir = "batchtank2005";
-    final String name = "jbr2.wdes";
-    runModelVerifier(group, dir, name, false);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "batchtank2005", "jbr2.wdes");
+    runModelVerifier(des, false);
   }
 
   public void test_Batchtank2005_jmr30() throws Exception
   {
-    final String group = "tests";
-    final String dir = "batchtank2005";
-    final String name = "jmr30.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "batchtank2005", "jmr30.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_Batchtank2005_jpt10() throws Exception
   {
-    final String group = "tests";
-    final String dir = "batchtank2005";
-    final String name = "jpt10.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "batchtank2005", "jpt10.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_Batchtank2005_kah18() throws Exception
   {
-    final String group = "tests";
-    final String dir = "batchtank2005";
-    final String name = "kah18.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "batchtank2005", "kah18.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_Batchtank2005_lsr1_1() throws Exception
   {
-    final String group = "tests";
-    final String dir = "batchtank2005";
-    final String name = "lsr1_1.wdes";
-    runModelVerifier(group, dir, name, false);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "batchtank2005", "lsr1_1.wdes");
+    runModelVerifier(des, false);
   }
 
   public void test_Batchtank2005_lsr1_2() throws Exception
   {
-    final String group = "tests";
-    final String dir = "batchtank2005";
-    final String name = "lsr1_2.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "batchtank2005", "lsr1_2.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_Batchtank2005_lz136_1() throws Exception
   {
-    final String group = "tests";
-    final String dir = "batchtank2005";
-    final String name = "lz136_1.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "batchtank2005", "lz136_1.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_Batchtank2005_lz136_2() throws Exception
   {
-    final String group = "tests";
-    final String dir = "batchtank2005";
-    final String name = "lz136_2.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "batchtank2005", "lz136_2.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_Batchtank2005_rch11() throws Exception
   {
-    final String group = "tests";
-    final String dir = "batchtank2005";
-    final String name = "rch11.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "batchtank2005", "rch11.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_Batchtank2005_ry27() throws Exception
   {
-    final String group = "tests";
-    final String dir = "batchtank2005";
-    final String name = "ry27.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "batchtank2005", "ry27.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_Batchtank2005_scs10() throws Exception
   {
-    final String group = "tests";
-    final String dir = "batchtank2005";
-    final String name = "scs10.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "batchtank2005", "scs10.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_Batchtank2005_sjw41() throws Exception
   {
-    final String group = "tests";
-    final String dir = "batchtank2005";
-    final String name = "sjw41.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "batchtank2005", "sjw41.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_Batchtank2005_smr26() throws Exception
   {
-    final String group = "tests";
-    final String dir = "batchtank2005";
-    final String name = "smr26.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "batchtank2005", "smr26.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_Batchtank2005_tk27() throws Exception
   {
-    final String group = "tests";
-    final String dir = "batchtank2005";
-    final String name = "tk27.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "batchtank2005", "tk27.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_Batchtank2005_tp20() throws Exception
   {
-    final String group = "tests";
-    final String dir = "batchtank2005";
-    final String name = "tp20.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "batchtank2005", "tp20.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_Batchtank2005_vl6() throws Exception
   {
-    final String group = "tests";
-    final String dir = "batchtank2005";
-    final String name = "vl6.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "batchtank2005", "vl6.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_IMS_ims() throws Exception
   {
-    final String group = "tests";
-    final String dir = "ims";
-    final String name = "ims.wmod";
-    runModelVerifier(group, dir, name, true);
-  }
-
-  public void test_Nasty_JustProperty() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "nasty";
-    final String name = "just_property.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "ims", "ims.wmod");
+    runModelVerifier(des, true);
   }
 
   public void testProfisafeI3HostEFABlock() throws Exception
   {
-    final String group = "tests";
-    final String dir = "profisafe";
-    final String name = "profisafe_ihost_efa_block.wmod";
     final ParameterBindingProxy binding = createBinding("MAXSEQNO", 3);
     final List<ParameterBindingProxy> bindings =
         Collections.singletonList(binding);
-    runModelVerifier(group, dir, name, bindings, false);
+    final ProductDESProxy des =
+      getCompiledDES(bindings, "tests", "profisafe",
+                     "profisafe_ihost_efa_block.wmod");
+    runModelVerifier(des, bindings, false);
   }
 
   public void testProfisafeI4Slave() throws Exception
   {
-    final String group = "tests";
-    final String dir = "profisafe";
-    final String name = "profisafe_i4_slave.wmod";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "profisafe", "profisafe_i4_slave.wmod");
+    runModelVerifier(des, true);
   }
 
   public void testProfisafeI4SlaveEFA() throws Exception
   {
-    final String group = "tests";
-    final String dir = "profisafe";
-    final String name = "profisafe_islave_efa.wmod";
     final ParameterBindingProxy binding = createBinding("MAXSEQNO", 4);
     final List<ParameterBindingProxy> bindings =
         Collections.singletonList(binding);
-    runModelVerifier(group, dir, name, bindings, true);
+    final ProductDESProxy des =
+      getCompiledDES(bindings, "tests", "profisafe",
+                     "profisafe_islave_efa.wmod");
+    runModelVerifier(des, bindings, true);
   }
 
   public void test_TrafficLights2006_plants() throws Exception
   {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "plants.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "plants.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_TrafficLights2006_ac61() throws Exception
   {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "ac61.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "ac61.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_TrafficLights2006_al29() throws Exception
   {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "al29.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "al29.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_TrafficLights2006_asjc1() throws Exception
   {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "asjc1.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "asjc1.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_TrafficLights2006_dal9() throws Exception
   {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "dal9.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "dal9.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_TrafficLights2006_dmt10() throws Exception
   {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "dmt10.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "dmt10.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_TrafficLights2006_ejtrw1() throws Exception
   {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "ejtrw1.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "ejtrw1.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_TrafficLights2006_ekb2() throws Exception
   {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "ekb2.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "ekb2.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_TrafficLights2006_gat7() throws Exception
   {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "gat7.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "gat7.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_TrafficLights2006_jdm18() throws Exception
   {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "jdm18.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "jdm18.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_TrafficLights2006_jlm39() throws Exception
   {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "jlm39.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "jlm39.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_TrafficLights2006_jpg7() throws Exception
   {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "jpg7.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "jpg7.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_TrafficLights2006_jpm22() throws Exception
   {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "jpm22.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "jpm22.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_TrafficLights2006_jrv2() throws Exception
   {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "jrv2.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "jrv2.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_TrafficLights2006_js173() throws Exception
   {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "js173.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "js173.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_TrafficLights2006_lz173() throws Exception
   {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "lz173.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "lz173.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_TrafficLights2006_meb16() throws Exception
   {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "meb16.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "meb16.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_TrafficLights2006_mjd29() throws Exception
   {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "mjd29.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "mjd29.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_TrafficLights2006_ncj3() throws Exception
   {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "ncj3.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "ncj3.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_TrafficLights2006_rjo6() throws Exception
   {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "rjo6.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "rjo6.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_TrafficLights2006_rms33() throws Exception
   {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "rms33.wdes";
-    runModelVerifier(group, dir, name, false);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "rms33.wdes");
+    runModelVerifier(des, false);
   }
 
   public void test_TrafficLights2006_sdh7() throws Exception
   {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "sdh7.wdes";
-    runModelVerifier(group, dir, name, false);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "sdh7.wdes");
+    runModelVerifier(des, false);
   }
 
   public void test_TrafficLights2006_sgc9_1() throws Exception
   {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "sgc9_1.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "sgc9_1.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_TrafficLights2006_sgc9_2() throws Exception
   {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "sgc9_2.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "sgc9_2.wdes");
+    runModelVerifier(des, true);
   }
 
   public void test_TrafficLights2006_yip1() throws Exception
   {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "yip1.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "yip1.wdes");
+    runModelVerifier(des, true);
   }
 
 
@@ -863,114 +809,100 @@ public abstract class AbstractStandardConflictCheckerTest
   //# Test Cases --- valid
   public void testBigFactory() throws Exception
   {
-    final String group = "valid";
-    final String dir = "big_factory";
-    final String name = "bfactory.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("valid", "big_factory", "bfactory.wdes");
+    runModelVerifier(des, true);
   }
 
   public void testBmw_fh() throws Exception
   {
-    final String group = "valid";
-    final String dir = "bmw_fh";
-    final String name = "bmw_fh.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("valid", "bmw_fh", "bmw_fh.wdes");
+    runModelVerifier(des, true);
   }
 
   public void testDebounce() throws Exception
   {
-    final String group = "valid";
-    final String dir = "debounce";
-    final String name = "debounce.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("valid", "debounce", "debounce.wdes");
+    runModelVerifier(des, true);
   }
 
   public void testFalko() throws Exception
   {
-    final String group = "valid";
-    final String dir = "falko";
-    final String name = "falko.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("valid", "falko", "falko.wdes");
+    runModelVerifier(des, true);
   }
 
   public void testFtuer() throws Exception
   {
-    final String group = "valid";
-    final String dir = "central_locking";
-    final String name = "ftuer.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("valid", "central_locking", "ftuer.wdes");
+    runModelVerifier(des, true);
   }
 
   public void testKoordwsp() throws Exception
   {
-    final String group = "valid";
-    final String dir = "central_locking";
-    final String name = "koordwsp.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("valid", "central_locking", "koordwsp.wdes");
+    runModelVerifier(des, true);
   }
 
   public void testKoordwspBlock() throws Exception
   {
-    final String group = "valid";
-    final String dir = "central_locking";
-    final String name = "koordwsp_block.wdes";
-    runModelVerifier(group, dir, name, false);
+    final ProductDESProxy des =
+      getCompiledDES("valid", "central_locking", "koordwsp_block.wdes");
+    runModelVerifier(des, false);
   }
 
   public void testWspTimer() throws Exception
   {
-    final String group = "valid";
-    final String dir = "central_locking";
-    final String name = "wsp_timer.wmod";
-    runModelVerifier(group, dir, name, false);
+    final ProductDESProxy des =
+      getCompiledDES("valid", "central_locking", "wsp_timer.wmod");
+    runModelVerifier(des, false);
   }
 
   public void testWspTimerNoreset() throws Exception
   {
-    final String group = "valid";
-    final String dir = "central_locking";
-    final String name = "wsp_timer_noreset.wmod";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("valid", "central_locking", "wsp_timer_noreset.wmod");
+    runModelVerifier(des, true);
   }
 
   public void testSafetydisplay() throws Exception
   {
-    final String group = "valid";
-    final String dir = "safetydisplay";
-    final String name = "safetydisplay.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("valid", "safetydisplay", "safetydisplay.wdes");
+    runModelVerifier(des, true);
   }
 
   public void testSmallFactory() throws Exception
   {
-    final String group = "valid";
-    final String dir = "small";
-    final String name = "small.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("valid", "small", "small.wdes");
+    runModelVerifier(des, true);
   }
 
   public void testSmallFactoryUncont() throws Exception
   {
-    final String group = "valid";
-    final String dir = "small";
-    final String name = "small_uncont.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("valid", "small", "small_uncont.wdes");
+    runModelVerifier(des, true);
   }
 
   public void testSmd() throws Exception
   {
-    final String group = "valid";
-    final String dir = "smd";
-    final String name = "smdreset.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("valid", "smd", "smdreset.wdes");
+    runModelVerifier(des, true);
   }
 
   public void testWeiche() throws Exception
   {
-    final String group = "valid";
-    final String dir = "vt";
-    final String name = "weiche.wdes";
-    runModelVerifier(group, dir, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("valid", "vt", "weiche.wdes");
+    runModelVerifier(des, true);
   }
 
 
@@ -1046,39 +978,59 @@ public abstract class AbstractStandardConflictCheckerTest
     checkTransferline(4);
   }
 
+  public void testDynamicSieve__2() throws Exception
+  {
+    checkDynamicSieve("dynamic_prime_sieve.wmod", 2, 24, true);
+  }
+
+
+  protected void checkDynamicSieve(final String name,
+                                   final int s,
+                                   final int n,
+                                   final boolean result)
+  throws Exception
+  {
+    final ParameterBindingProxy bindingS = createBinding("S", s);
+    final ParameterBindingProxy bindingN = createBinding("N", n);
+    final List<ParameterBindingProxy> bindings = new ArrayList<>(2);
+    bindings.add(bindingS);
+    bindings.add(bindingN);
+    final ProductDESProxy des = getCompiledDES(bindings, "efa", name);
+    runModelVerifier(des, bindings, result);
+  }
 
   protected void checkPhilosophers(final String name,
                                    final int n,
                                    final boolean result)
   throws Exception
   {
-    final String group = "handwritten";
     final ParameterBindingProxy binding = createBinding("N", n);
     final List<ParameterBindingProxy> bindings =
       Collections.singletonList(binding);
-    runModelVerifier(group, name, bindings, result);
+    final ProductDESProxy des = getCompiledDES(bindings, "handwritten", name);
+    runModelVerifier(des, bindings, result);
   }
 
   protected void checkRoundRobin(final int n)
   throws Exception
   {
-    final String group = "efa";
-    final String name = "round_robin_efa.wmod";
     final ParameterBindingProxy binding = createBinding("N", n);
     final List<ParameterBindingProxy> bindings =
       Collections.singletonList(binding);
-    runModelVerifier(group, name, bindings, false);
+    final ProductDESProxy des =
+      getCompiledDES(bindings, "efa", "round_robin_efa.wmod");
+    runModelVerifier(des, bindings, false);
   }
 
   protected void checkTransferline(final int n)
   throws Exception
   {
-    final String group = "handwritten";
-    final String name = "transferline.wmod";
     final ParameterBindingProxy binding = createBinding("N", n);
     final List<ParameterBindingProxy> bindings =
       Collections.singletonList(binding);
-    runModelVerifier(group, name, bindings, true);
+    final ProductDESProxy des =
+      getCompiledDES(bindings, "handwritten", "transferline.wmod");
+    runModelVerifier(des, bindings, true);
   }
 
 }

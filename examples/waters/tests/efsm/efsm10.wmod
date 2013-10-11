@@ -2,7 +2,6 @@
 <Module Name="efsm10" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="a"/>
-        <EventDecl Kind="CONTROLLABLE" Name="b"/>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="PLANT" Name="G">
@@ -13,7 +12,7 @@
                             <Point X="96" Y="96"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="0" Y="10"/>
+                            <Point X="10" Y="-6"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
@@ -21,7 +20,7 @@
                             <Point X="96" Y="176"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="0" Y="10"/>
+                            <Point X="10" Y="-6"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -30,11 +29,11 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="a"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-18" Y="-9"/>
+                                <Point X="-60" Y="-23"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="68" Y="136"/>
+                            <Point X="83" Y="136"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -49,16 +48,19 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-46" Y="9"/>
+                                <Point X="-62" Y="-6"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
                     <Edge Source="S1" Target="S0">
                         <LabelBlock>
-                            <SimpleIdentifier Name="b"/>
+                            <SimpleIdentifier Name="a"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="7" Y="-21"/>
+                            </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="121" Y="134"/>
+                            <Point X="113" Y="136"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -70,7 +72,7 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point X="3" Y="-22"/>
+                                <Point X="8" Y="-5"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>

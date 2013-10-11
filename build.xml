@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 
 <project name="Supremica" default="build" basedir=".">
-
+    
     <property name="arch.properties" location="arch.properties"/>
 
     <property file="build.properties"/>
@@ -83,7 +83,23 @@
         <include name="**/*.class"/>
     </patternset>
 
+    <taskdef resource="net/sf/antcontrib/antlib.xml">
+        <classpath>
+            <pathelement location="${lib}/ant-contrib-1.0b3.jar"/>
+        </classpath>
+    </taskdef>
+    
+    <!-- test if abtlib works -->
+    <!--<target name="test-ant-contrib"> 
+    
+        <echo message="Testing ant-contrib is working by looping through a list of letters."/>
+        <for list="a,b,c,d,e" param="letter">
+            <sequential>
+                <echo>Letter @{letter}</echo>
+            </sequential>
+        </for>
 
+    </target>-->
     <!-- 
 *       Build this target after checking out the sources for the
 *       first time. 
@@ -273,7 +289,8 @@
                verbose="false"
                nowarn="true"
                excludes="${supremica_basedir}/net/sourceforge/waters/external/promela/parser/**"
-               source="1.5"
+               source="1.7"
+	       encoding="ISO-8859-15"
                fork="true"
                includeantruntime="false"
                memoryMaximumSize="512M">
@@ -293,7 +310,8 @@
                deprecation="false"
                verbose="false"
                nowarn="true"
-               source="1.5"
+               source="1.7"
+	       encoding="ISO-8859-15"
                fork="true"
                includeantruntime="false"
                memoryMaximumSize="256M">
@@ -318,7 +336,8 @@
             verbose="false"
             nowarn="true"
             includes="${supremica_basedir}/manufacturingTables/xsd/**"          
-            source="1.5"
+            source="1.7"
+            encoding="ISO-8859-15"
             includeantruntime="false"
         />
     </target>
@@ -333,7 +352,8 @@
             verbose="false"
             nowarn="true"
             includes="${supremica_basedir}/external/genericPLCProgramDescription/xsd/**"                
-            source="1.5"
+            source="1.7"
+            encoding="ISO-8859-15"
             includeantruntime="false"
         />
     </target>
@@ -355,7 +375,8 @@
             verbose="false"
             nowarn="true"
             includes="${supremica_basedir}/automata/algorithms/scheduling/**"           
-            source="1.5"
+            source="1.7"
+            encoding="ISO-8859-15"
             includeantruntime="false"
         />
     </target>
@@ -373,6 +394,7 @@
                deprecation="false"
                verbose="false"
                includeantruntime="false"
+               encoding="ISO-8859-15"
         >
             <classpath> 
                 <pathelement location="${build}"/>
@@ -417,6 +439,7 @@
             includeJavaRuntime="yes"
             deprecation="false"
             verbose="false"
+            encoding="ISO-8859-15"
             includeantruntime="false">
         </javac>
         
@@ -488,9 +511,6 @@ Class-Path: ${manifest.pathlist}</echo>
         </jar>
     </target>
     
-    <target name="nb_tests" depends="-jar_supremica_tests"/>
-
-
     <target name="-jar_waters_jaxb">
         <ant dir="${waters.dir}" target="jaxb-jar" inheritAll="false"/>
     </target>
@@ -654,8 +674,11 @@ Class-Path: ${manifest.pathlist}</echo>
         <copy file="${templates}/SupremicaBDD.cmd" todir="${dist}"/>    
         <chmod file="${dist}/SupremicaBDD.cmd" perm="644"/>
 -->
-        <copy file="${templates}/RelationExtraction.cmd" todir="${dist}"/>      
+        <copy file="${templates}/RelationExtraction.cmd" todir="${dist}"/>
         <chmod file="${dist}/RelationExtraction.cmd" perm="644"/>
+        <copy file="${templates}/waters.bat" todir="${dist}"/>
+        <chmod file="${dist}/waters.bat" perm="644"/>
+        <copy file="${templates}/waters.vbs" todir="${dist}"/>
     </target>
 
     <target name="-startfiles_supremica"
@@ -955,7 +978,7 @@ Class-Path: ${manifest.pathlist}</echo>
             version="true"
             use="true"
             private="true"
-            source="1.5"
+            source="1.7"
             maxmemory="512m"
             windowtitle="Supremica API"
             bottom="Copyright &#169; 2001 - 2011 Supremica and Knut Åkesson, Martin Fabian, Hugo Flordal, Robi Malik, Arash Vahidi. All Rights Reserved.">
@@ -1134,6 +1157,68 @@ Class-Path: ${manifest.pathlist}</echo>
             <to address="ka@s2.chalmers.se"/>
             <message>The daily build has completed</message>
         </mail>
+    </target>
+    
+    <!-- Run the BDD algorithms for cpmputing RAS unsafe states-->
+    <target name="benchmark-ras" 
+                depends="-run-all-ras-algo-classic,-run-all-ras-algo-alternative"/>
+    
+    <target name="-run-all-ras-algo-classic">
+        <foreach param="ras-path" target="-execute-ras-classic">
+            <path> 
+                <fileset dir="${examples}/ras-examples" casesensitive="no"/>
+            </path>
+        </foreach>
+    </target>
+      
+    <target name="-execute-ras-classic">
+        <echo message="executing the classic algo on ${ras-path}"/>
+        <java classname="${supremica_basepackage}.automata.BDD.EFA.RASAlgorithmsRunner" 
+                      fork="yes" 
+                      output="ras_algo1_log.txt" append="true"> 
+            <arg value="${ras-path}"/> 
+            <arg value="MINIMALITY_C"/>
+            <arg value="5000000"/>
+            <arg value="500000"/>
+            <arg value="10"/>
+            <classpath>
+                <pathelement location="build" />
+                <pathelement location="lib/unjared" />
+                <pathelement path="${java.class.path}" />
+            </classpath>            
+            <jvmarg value="-Xms128M"/>
+            <jvmarg value="-Xmx4096M" />
+            <jvmarg value="-Djava.library.path=${dist}"/>
+        </java>
+    </target>
+    
+    <target name="-run-all-ras-algo-alternative">
+        <foreach param="ras-path" target="-execute-ras-alternative">
+            <path> 
+                <fileset dir="${examples}/ras-examples" casesensitive="no"/>
+            </path>
+        </foreach>
+    </target>
+    
+    <target name="-execute-ras-alternative">
+        <echo message="executing the alternative algo on ${ras-path}"/>
+        <java classname="${supremica_basepackage}.automata.BDD.EFA.RASAlgorithmsRunner" 
+                      fork="yes" 
+                      output="ras_algo2_log.txt" append="true"> 
+            <arg value="${ras-path}"/> 
+            <arg value="MINIMALITY_M"/>
+            <arg value="5000000"/>
+            <arg value="500000"/>
+            <arg value="10"/>
+            <classpath>
+                <pathelement location="build" />
+                <pathelement location="lib/unjared" />
+                <pathelement path="${java.class.path}" />
+            </classpath>            
+            <jvmarg value="-Xms128M"/>
+            <jvmarg value="-Xmx4096M" />
+            <jvmarg value="-Djava.library.path=${dist}"/>
+        </java>
     </target>
     
 </project>

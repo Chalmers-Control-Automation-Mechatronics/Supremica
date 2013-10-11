@@ -23,9 +23,10 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.MemStateProxy;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
-import net.sourceforge.waters.model.analysis.AbortException;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
@@ -83,7 +84,8 @@ public class EnabledEventsLimitedCertainConflictsTRSimplifier
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
+  //# Interface
+  //# net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
   @Override
   public int getPreferredInputConfiguration()
   {
@@ -108,6 +110,16 @@ public class EnabledEventsLimitedCertainConflictsTRSimplifier
   {
     mStateInfo = null;
     super.reset();
+  }
+
+
+  //#########################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.analysis.abstraction.AbstractMarkingTRSimplifier
+  @Override
+  public boolean isDumpStateAware()
+  {
+    return true;
   }
 
 
@@ -357,19 +369,19 @@ public class EnabledEventsLimitedCertainConflictsTRSimplifier
     } else if (numCoreachable == 0) {
       // No coreachable states. Merge all reachable states into a single
       // blocking state, and be sure to remove all transitions.
-  if (numReachable > 1) {
+      if (numReachable > 1) {
         result = true;
-        final int[] clazz = new int[numReachable];
-        int index = 0;
-        for (int state = 0; state < numStates; state++) {
-          if (rel.isReachable(state)) {
-            clazz[index++] = state;
-            rel.removeOutgoingTransitions(state);
+        final int[] stateToClass = new int[numStates];
+        for (int s = 0; s < numStates; s++) {
+          if (rel.isReachable(s)) {
+            stateToClass[s] = 0;
+            rel.removeOutgoingTransitions(s);
+          } else {
+            stateToClass[s] = -1;
           }
         }
-        final int[][] partition = new int[1][];
-        partition[0] = clazz;
-        setResultPartitionArray(partition);
+        final TRPartition partition = new TRPartition(stateToClass, 1);
+        setResultPartition(partition);
         applyResultPartitionAutomatically();
       } else {
         result = mHasRemovedTransitions;
@@ -403,22 +415,22 @@ public class EnabledEventsLimitedCertainConflictsTRSimplifier
       // Create a partition that can be applied separately.
       result = true;
       final int numClasses = numCoreachable + 1;
-      final int[][] partition = new int[numClasses][];
+      final List<int[]> classes = new ArrayList<>(numClasses);
       final int numBlocking = numReachable - numCoreachable;
       final int[] bclazz = new int[numBlocking];
       int bindex = 0;
-      int cindex = 0;
       for (int state = 0; state < numStates; state++) {
         if (mStateInfo[state] == COREACHABLE) {
           final int[] clazz = new int[1];
           clazz[0] = state;
-          partition[cindex++] = clazz;
+          classes.add(clazz);
         } else if (rel.isReachable(state)) {
           bclazz[bindex++] = state;
         }
       }
-      partition[cindex] = bclazz;
-      setResultPartitionArray(partition);
+      classes.add(bclazz);
+      final TRPartition partition = new TRPartition(classes, numStates);
+      setResultPartition(partition);
       applyResultPartitionAutomatically();
     }
     return result;
@@ -438,9 +450,9 @@ public class EnabledEventsLimitedCertainConflictsTRSimplifier
   {
     // 1. Remove all transitions originating from certain conflicts states.
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    final List<int[]> partition = getResultPartition();
-    final int end = partition.size();
-    final int[] bclass = partition.listIterator(end).previous();
+    final TRPartition partition = getResultPartition();
+    final int end = partition.getNumberOfClasses();
+    final int[] bclass = partition.getClasses().listIterator(end).previous();
     for (final int state : bclass) {
       rel.removeOutgoingTransitions(state);
     }
@@ -456,7 +468,7 @@ public class EnabledEventsLimitedCertainConflictsTRSimplifier
           rel.addTransition(bstate, event, bstate);
         }
       }
-      rel.removeProperSelfLoopEvents();
+      removeProperSelfLoopEvents();
     }
     rel.removeOutgoingTransitions(bstate);
   }
@@ -595,7 +607,7 @@ public class EnabledEventsLimitedCertainConflictsTRSimplifier
   //#########################################################################
   //# Auxiliary Methods
   private int findCoreachableStates(final int level)
-  throws AbortException
+  throws AnalysisAbortException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();

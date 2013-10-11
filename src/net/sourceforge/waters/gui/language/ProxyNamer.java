@@ -22,9 +22,9 @@ import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
-import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
+import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
@@ -151,8 +151,9 @@ public class ProxyNamer {
                 SimpleNodeProxy.class, true);
     createEntry(LabelBlockProxy.class, "Labels", "Labels",
                 EdgeProxy.class, true);
-    createEntry(NodeProxy.class, "Node",  Proxy.class, false);
-    createEntry(ParameterBindingProxy.class, "Binding");
+    createEntry(NodeProxy.class, "Node", Proxy.class, false);
+    createEntry(ParameterBindingProxy.class, "Binding",
+                InstanceProxy.class, true);
     createEntry(PointGeometryProxy.class, "Node Label",
                 SimpleNodeProxy.class, false);
     createEntry(Proxy.class, "Item");
@@ -265,28 +266,27 @@ public class ProxyNamer {
           removedForeach = true;
         }
       }
-      // Otherwise find most general supertype and use it name ...
+      // Otherwise find most general supertype and use its name ...
       int count = 0;
       Class<? extends Proxy> iface = null;
       for (final Map.Entry<Class<? extends Proxy>,Integer> entry :
-             map.entrySet()) {
+           map.entrySet()) {
         final Class<? extends Proxy> key = entry.getKey();
-        iface = getLeastCommonAncestor(iface, key);
-        if (isConstituentOf(key, iface)) {
-          // leave count unchanged
-
-        } else {
+        final Class<? extends Proxy> ancestor =
+          getLeastCommonAncestor(iface, key);
+        if (!isConstituentOf(key, ancestor)) {
           count += entry.getValue();
+        } else if (iface != ancestor) {
+          count = 1;
         }
+        iface = ancestor;
       }
       final NameEntry entry = getEntry(iface);
-      if(removedForeach){
+      if (removedForeach) {
         return entry.getPlural();
-      }
-      else if(count == 1){
+      } else if (count == 1) {
         return entry.getSingular();
-      }
-      else{
+      } else {
         return entry.getPlural();
       }
     }

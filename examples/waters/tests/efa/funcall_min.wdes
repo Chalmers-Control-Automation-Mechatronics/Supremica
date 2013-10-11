@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:ProductDES Name="funcall_min" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
+<Comment>An EFA compiler test involving a call to the built-in function \min.</Comment>
+<ns2:EventList>
+<ns2:Event Kind="CONTROLLABLE" Name="e"/>
+</ns2:EventList>
+<ns2:AutomataList>
+<ns2:Automaton Kind="PLANT" Name="x">
+<ns2:EventRefList>
+<ns2:EventRef Name="e"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="0"/>
+<ns2:State Name="1"/>
+<ns2:State Name="2"/>
+<ns2:State Name="3"/>
+<ns2:State Name="4"/>
+<ns2:State Name="5"/>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Event="e" Source="0" Target="1"/>
+<ns2:Transition Event="e" Source="1" Target="2"/>
+<ns2:Transition Event="e" Source="2" Target="3"/>
+<ns2:Transition Event="e" Source="3" Target="4"/>
+<ns2:Transition Event="e" Source="4" Target="5"/>
+<ns2:Transition Event="e" Source="5" Target="5"/>
+</ns2:TransitionList>
+</ns2:Automaton>
+</ns2:AutomataList>
+</ns2:ProductDES>

@@ -55,6 +55,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
@@ -78,7 +79,7 @@ import org.supremica.log.LoggerFactory;
 import org.supremica.util.SupremicaException;
 
 public class AutomataSynchronizer
-    implements Stoppable
+    implements Abortable
 {
 
     private static Logger logger = LoggerFactory.createLogger(AutomataSynchronizer.class);
@@ -90,7 +91,7 @@ public class AutomataSynchronizer
     private AutomataIndexMap indexMap;
 
     // For stopping execution
-    private boolean stopRequested = false;
+    private boolean abortRequested = false;
 
 
     private HashMap<Arc,EdgeSubject> arc2edgeTable[];
@@ -267,9 +268,9 @@ public class AutomataSynchronizer
     }
 
     @Override
-    public void requestStop()
+    public void requestAbort()
     {
-        stopRequested = true;
+        abortRequested = true;
 
         for (int i = 0; i < synchronizationExecuters.size(); i++)
         {
@@ -278,9 +279,14 @@ public class AutomataSynchronizer
     }
 
     @Override
-    public boolean isStopped()
+    public boolean isAborting()
     {
-        return stopRequested;
+        return abortRequested;
+    }
+
+    @Override
+    public void resetAbort(){
+      abortRequested = false;
     }
 
     /**

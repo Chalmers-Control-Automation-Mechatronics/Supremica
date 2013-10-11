@@ -645,7 +645,13 @@ public class Automaton
 
         final State oldinit = getInitialState();
         final State newinit = getStateWithName(state.getName());
-
+        
+        // Return if the input state is already the initial state 
+        if (oldinit != null && oldinit.equalState(newinit))
+        {
+          return;
+        }
+        
         if (newinit == null)
         {
             throw new IllegalStateException("No such state, " + state);

@@ -30,10 +30,12 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.OneEventCachingTransitionIterator;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonTools;
 
 
@@ -169,6 +171,29 @@ public class ObservationEquivalenceTRSimplifier
   }
 
   /**
+   * Sets whether this simplifier should consider deadlock states when
+   * removing selfloops.
+   * @see #isDumpStateAware()
+   */
+  public void setDumpStateAware(final boolean aware)
+  {
+    mDumpStateAware = aware;
+  }
+
+  /**
+   * Gets whether this simplifier considers deadlock states when
+   * removing selfloops. This setting affects how the simplifier checks for
+   * pure selfloop events in the end. If the simplifier is deadlock aware,
+   * then events not enabled in deadlock states can be considered as
+   * selfloop events and removed from the automaton if selflooped in all
+   * other states.
+   */
+  public boolean isDumpStateAware()
+  {
+    return mDumpStateAware;
+  }
+
+  /**
    * Sets whether special events are to be considered in abstraction.
    * If enabled, events marked as selfloop-only in all other automata
    * will be treated specially. For such events, it is possible to assume
@@ -182,7 +207,7 @@ public class ObservationEquivalenceTRSimplifier
 
   /**
    * Returns whether special events are considered in abstraction.
-   * @see #setUsesSpecialEvents(boolean)
+   * @see #setUsingSpecialEvents(boolean)
    */
   public boolean isUsingSpecialEvents()
   {
@@ -273,6 +298,7 @@ public class ObservationEquivalenceTRSimplifier
       mask |= (1L << defaultID);
     }
     setPropositionMask(mask);
+    mDefaultMarkingID = defaultID;
   }
 
   @Override
@@ -317,11 +343,11 @@ public class ObservationEquivalenceTRSimplifier
    *          array in the collection represents a class of equivalent state
    *          codes.
    */
-  public void setUpInitialPartition(final Collection<int[]> partition)
+  public void setUpInitialPartition(final TRPartition partition)
   {
-    final int size = partition.size();
+    final int size = partition.getNumberOfClasses();
     setUpPartition(size);
-    for (final int[] clazz : partition) {
+    for (final int[] clazz : partition.getClasses()) {
       final EquivalenceClass sec =
         mEquivalence.createEquivalenceClass(this, clazz);
       sec.enqueue(true);
@@ -646,31 +672,33 @@ public class ObservationEquivalenceTRSimplifier
   {
     if (mNumClasses < mNumReachableStates) {
       final ListBufferTransitionRelation rel = getTransitionRelation();
-      final int numStates = rel.getNumberOfStates();
-      final List<int[]> partition = new ArrayList<int[]>(mNumClasses);
+      final int numStates =
+        rel.getNumberOfStates() - rel.getNumberOfExtraStates();
+      final List<int[]> classes = new ArrayList<int[]>(mNumClasses);
       for (int state = 0; state < numStates; state++) {
         if (rel.isReachable(state)) {
           final EquivalenceClass sec = mStateToClass[state];
           if (sec == null) {
             final int[] clazz = new int[1];
             clazz[0] = state;
-            partition.add(clazz);
+            classes.add(clazz);
           } else {
             final int[] clazz = sec.putResult(state);
             if (clazz != null) {
-              partition.add(clazz);
+              classes.add(clazz);
             }
           }
         }
       }
-      setResultPartitionList(partition);
+      final TRPartition partition = new TRPartition(classes, numStates);
+      setResultPartition(partition);
     } else {
-      setResultPartitionList(null);
+      setResultPartition(null);
     }
   }
 
   private void applyObservationEquivalencePartition()
-  throws AnalysisException
+    throws AnalysisException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     if (getResultPartition() != null) {
@@ -678,20 +706,20 @@ public class ObservationEquivalenceTRSimplifier
       super.applyResultPartition();
       removeRedundantTransitions(TransitionRemovalTime.AFTER_NONTRIVIAL);
       rel.removeTauSelfLoops();
-      rel.removeProperSelfLoopEvents();
+      removeProperSelfLoopEvents();
     } else {
       removeRedundantTransitions(TransitionRemovalTime.AFTER_TRIVIAL);
       if (mHasModifications) {
-        rel.removeProperSelfLoopEvents();
+        removeProperSelfLoopEvents();
       }
     }
   }
 
   private void applyWeakObservationEquivalencePartition()
-  throws AnalysisException
+    throws AnalysisException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    final List<int[]> partition = getResultPartition();
+    final TRPartition partition = getResultPartition();
     if (partition != null) {
       mTauClosure = null;
       mTauIterator = null;
@@ -703,17 +731,17 @@ public class ObservationEquivalenceTRSimplifier
       partitioner.applyPartition();
       removeRedundantTransitions(TransitionRemovalTime.AFTER_NONTRIVIAL);
       rel.removeTauSelfLoops();
-      rel.removeProperSelfLoopEvents();
+      removeProperSelfLoopEvents();
     } else {
       removeRedundantTransitions(TransitionRemovalTime.AFTER_TRIVIAL);
       if (mHasModifications) {
-        rel.removeProperSelfLoopEvents();
+        removeProperSelfLoopEvents();
       }
     }
   }
 
   private void removeRedundantTransitions(final TransitionRemovalTime time)
-  throws AnalysisException
+    throws AnalysisException
   {
     final TransitionRemoval mode = mEquivalence.getTransitionRemovalMode(this);
     final boolean doTau = mode.getDoTau(time);
@@ -731,16 +759,24 @@ public class ObservationEquivalenceTRSimplifier
       trans:
       while (iter0.advance()) {
         final int e = iter0.getCurrentEvent();
-        if ((rel.getProperEventStatus(e) & EventEncoding.STATUS_UNUSED) != 0 ||
-            e == skipped) {
+        final byte status = rel.getProperEventStatus(e);
+        if ((status & EventEncoding.STATUS_UNUSED) != 0 || e == skipped) {
           continue;
         }
         checkAbort();
+        final boolean selflooped =
+          (status & EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0 &&
+          mUsingSpecialEvents && doNonTau && e != EventEncoding.TAU;
         final int from0 = iter0.getCurrentFromState();
         final int to0 = iter0.getCurrentToState();
         iter1.resetState(from0);
         while (iter1.advance()) {
           final int p1 = iter1.getCurrentToState();
+          if (selflooped && p1 == to0) {
+            iter0.remove();
+            mHasModifications = true;
+            continue trans;
+          }
           iter2.reset(p1, e);
           while (iter2.advance()) {
             final int p2 = iter2.getCurrentToState();
@@ -766,6 +802,16 @@ public class ObservationEquivalenceTRSimplifier
           }
         }
       }
+    }
+  }
+
+  protected boolean removeProperSelfLoopEvents()
+  {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    if (mDumpStateAware && mDefaultMarkingID >= 0) {
+      return rel.removeProperSelfLoopEvents(mDefaultMarkingID);
+    } else {
+      return rel.removeProperSelfLoopEvents();
     }
   }
 
@@ -796,30 +842,34 @@ public class ObservationEquivalenceTRSimplifier
   @Override
   public String toString()
   {
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    final StringWriter writer = new StringWriter();
-    final PrintWriter printer = new PrintWriter(writer);
-    final Collection<EquivalenceClass> printed =
-      new THashSet<EquivalenceClass>(mNumClasses);
-    for (int s = 0; s < mStateToClass.length; s++) {
-      final EquivalenceClass clazz = mStateToClass[s];
-      if (clazz == null) {
-        if (rel.isReachable(s)) {
+    if (mStateToClass == null) {
+      return ProxyTools.getShortClassName(this);
+    } else {
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      final StringWriter writer = new StringWriter();
+      final PrintWriter printer = new PrintWriter(writer);
+      final Collection<EquivalenceClass> printed =
+        new THashSet<EquivalenceClass>(mNumClasses);
+      for (int s = 0; s < mStateToClass.length; s++) {
+        final EquivalenceClass clazz = mStateToClass[s];
+        if (clazz == null) {
+          if (rel.isReachable(s)) {
+            if (s > 0) {
+              printer.println();
+            }
+            printer.print('[');
+            printer.print(s);
+            printer.print(']');
+          }
+        } else if (printed.add(clazz)) {
           if (s > 0) {
             printer.println();
           }
-          printer.print('[');
-          printer.print(s);
-          printer.print(']');
+          clazz.dump(printer);
         }
-      } else if (printed.add(clazz)) {
-        if (s > 0) {
-          printer.println();
-        }
-        clazz.dump(printer);
       }
+      return writer.toString();
     }
-    return writer.toString();
   }
 
 
@@ -2205,6 +2255,8 @@ public class ObservationEquivalenceTRSimplifier
   private TransitionRemoval mTransitionRemovalMode = TransitionRemoval.NONTAU;
   private MarkingMode mMarkingMode = MarkingMode.UNCHANGED;
   private long mPropositionMask = ~0;
+  private int mDefaultMarkingID = -1;
+  private boolean mDumpStateAware = false;
   private boolean mUsingSpecialEvents = true;
   private int mTransitionLimit = Integer.MAX_VALUE;
   private int mInitialInfoSize = -1;

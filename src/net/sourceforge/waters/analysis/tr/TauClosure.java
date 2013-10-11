@@ -364,6 +364,12 @@ public class TauClosure
     }
 
     @Override
+    public void resetEventsByStatus(final int... flags)
+    {
+      throwNonTauException();
+    }
+
+    @Override
     public void resetState(final int from)
     {
       mFrom = from;
@@ -393,6 +399,14 @@ public class TauClosure
     public int getCurrentFromState()
     {
       return mFrom;
+    }
+
+    @Override
+    public void setCurrentToState(final int state)
+    {
+      throw new UnsupportedOperationException
+        (ProxyTools.getShortClassName(this) +
+         " does not support transition modification!");
     }
 
     @Override
@@ -661,6 +675,13 @@ public class TauClosure
     }
 
     @Override
+    public void resetEventsByStatus(final int... flags)
+    {
+      mEventIterator.resetEventsByStatus(flags);
+      reset();
+    }
+
+    @Override
     public void resetState(final int from)
     {
       mFromState = from;
@@ -728,6 +749,14 @@ public class TauClosure
     }
 
     @Override
+    public void setCurrentToState(final int state)
+    {
+      throw new UnsupportedOperationException
+        (ProxyTools.getShortClassName(this) +
+         " does not support transition modification!");
+    }
+
+    @Override
     public void remove()
     {
       throw new UnsupportedOperationException
@@ -789,6 +818,13 @@ public class TauClosure
     public void resetEvents(final int first, final int last)
     {
       mEventIterator.resetEvents(first, last);
+      reset();
+    }
+
+    @Override
+    public void resetEventsByStatus(final int... flags)
+    {
+      mEventIterator.resetEventsByStatus(flags);
       reset();
     }
 
@@ -860,6 +896,14 @@ public class TauClosure
     }
 
     @Override
+    public void setCurrentToState(final int state)
+    {
+      throw new UnsupportedOperationException
+        (ProxyTools.getShortClassName(this) +
+         " does not support transition modification!");
+    }
+
+    @Override
     public void remove()
     {
       throw new UnsupportedOperationException
@@ -920,6 +964,13 @@ public class TauClosure
     public void resetEvents(final int first, final int last)
     {
       mEventIterator.resetEvents(first, last);
+      reset();
+    }
+
+    @Override
+    public void resetEventsByStatus(final int... flags)
+    {
+      mEventIterator.resetEventsByStatus(flags);
       reset();
     }
 
@@ -988,6 +1039,14 @@ public class TauClosure
       } else {
         return mTauIterator2.getCurrentToState();
       }
+    }
+
+    @Override
+    public void setCurrentToState(final int state)
+    {
+      throw new UnsupportedOperationException
+        (ProxyTools.getShortClassName(this) +
+         " does not support transition modification!");
     }
 
     @Override

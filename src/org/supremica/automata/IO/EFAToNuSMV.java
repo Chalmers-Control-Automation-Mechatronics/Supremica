@@ -15,7 +15,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.xml.bind.JAXBException;
+
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.GeometryProxy;
 import net.sourceforge.waters.model.base.NamedProxy;
@@ -38,6 +40,7 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
+import net.sourceforge.waters.model.module.FunctionCallExpressionProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
@@ -67,6 +70,7 @@ import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.xsd.base.EventKind;
+
 import org.xml.sax.SAXException;
 
 /**
@@ -198,6 +202,7 @@ public class EFAToNuSMV {
 
     private Collection<String> transitionConditions(final SimpleComponentProxy sc){
         return map(new Function<EdgeProxy, String>() {
+            @Override
             public String f(final EdgeProxy edge) {
                 return transitionCondition(sc, edge.getSource(), edge.getTarget(), getEvents(edge), edge.getGuardActionBlock());
             }
@@ -205,6 +210,7 @@ public class EFAToNuSMV {
     }
     private Collection<String> stayConditions(final SimpleComponentProxy sc, final ModuleProxy m){
         final Collection<String> pred = map(new Function<SimpleNodeProxy, String>() {
+            @Override
             public String f(final SimpleNodeProxy n) {
                 return transitionCondition(sc, n, n,
                         filterType(SimpleIdentifierProxy.class, n.getPropositions().getEventIdentifierList()),
@@ -218,6 +224,7 @@ public class EFAToNuSMV {
     private Collection<SimpleNodeProxy> filterStatesWithPredicates(final Collection<SimpleNodeProxy> nodes){
         return filter(new Filter<SimpleNodeProxy>() {
 
+            @Override
             public Boolean f(final SimpleNodeProxy n) {
                 if(n.getPropositions()==null)
                     return false;
@@ -234,6 +241,7 @@ public class EFAToNuSMV {
         final Collection<SimpleIdentifierProxy> events = getEvents(sc);
         events.addAll(getPropositions(sc));
         return filter(new Filter<SimpleIdentifierProxy>() {
+            @Override
             public Boolean f(final SimpleIdentifierProxy value) {
                 return !contains(events, value);
             }
@@ -248,6 +256,7 @@ public class EFAToNuSMV {
 
     private Collection<SimpleIdentifierProxy> getEvents(final SimpleComponentProxy sc){
         return unlines(map(new Function<EdgeProxy, Collection<SimpleIdentifierProxy>>() {
+            @Override
             public Collection<SimpleIdentifierProxy> f(final EdgeProxy value) {
                 return filterType(SimpleIdentifierProxy.class, value.getLabelBlock().getEventIdentifierList());
             }
@@ -256,6 +265,7 @@ public class EFAToNuSMV {
 
     private Collection<SimpleIdentifierProxy> getEvents(final ModuleProxy m){
         return filterType(SimpleIdentifierProxy.class, map(new Function<EventDeclProxy, IdentifierProxy>() {
+            @Override
             public IdentifierProxy f(final EventDeclProxy value) {
                 return value.getIdentifier();
             }
@@ -302,6 +312,7 @@ public class EFAToNuSMV {
 
     private String disjunctionOfEvents(final Collection<SimpleIdentifierProxy> events){
         return disjunction(map(new Function<SimpleIdentifierProxy, String>() {
+                    @Override
                     public String f(final SimpleIdentifierProxy value) {
                         return exprEquals(EVENT_VAR_NAME, eventName(value));
                     }
@@ -309,6 +320,7 @@ public class EFAToNuSMV {
     }
     private String disjunctionOfEnabledEvents(final EdgeProxy edge){
         return disjunction(map(new Function<SimpleIdentifierProxy, String>() {
+                    @Override
                     public String f(final SimpleIdentifierProxy value) {
                         return exprEquals(EVENT_VAR_NAME, eventName(value));
                     }
@@ -361,6 +373,7 @@ public class EFAToNuSMV {
          * @param value value to check
          * @return      true if element is OK, false otherwise
          */
+        @Override
         public Boolean f(T value);
     }
 
@@ -398,6 +411,7 @@ public class EFAToNuSMV {
     private static Collection<SimpleNodeProxy> getInitialStates(final SimpleComponentProxy sc){
         return filter(
               new Filter<SimpleNodeProxy>() {
+                  @Override
                   public Boolean f(final SimpleNodeProxy t) { return t.isInitial(); }
               },
               getStates(sc)
@@ -434,6 +448,7 @@ public class EFAToNuSMV {
     @SuppressWarnings("unused")
 	private Collection<EventDeclProxy> filterPropositions(final Collection<EventDeclProxy> evs){
         return filter(new Filter<EventDeclProxy>() {
+            @Override
             public Boolean f(final EventDeclProxy value) {
                 return value.getKind()==EventKind.PROPOSITION;
             }
@@ -475,6 +490,7 @@ public class EFAToNuSMV {
     private <T extends NamedProxy> Collection<String> valueNames(final Collection<T> es){
         return map(
                 new Function<T, String>() {
+                    @Override
                     public String f(final T value){return valueName(value);}
                 },
                 es);
@@ -528,6 +544,7 @@ public class EFAToNuSMV {
 
     private String allGuards(final Collection<SimpleExpressionProxy> c){
         return conjunction(map(new Function<SimpleExpressionProxy, String>() {
+            @Override
             public String f(final SimpleExpressionProxy value) {
                 return watersExprToSmvExpr(value);
             }
@@ -535,6 +552,7 @@ public class EFAToNuSMV {
     }
     private String allActions(final Collection<BinaryExpressionProxy> c){
         return conjunction(map(new Function<BinaryExpressionProxy, String>() {
+            @Override
             public String f(final BinaryExpressionProxy value) {
                 return watersExprToSmvExpr(value);
             }
@@ -544,6 +562,7 @@ public class EFAToNuSMV {
 
     private static class ExpressionToSmvVisitorTransConstraint implements ModuleProxyVisitor {
 
+        @Override
         public Object visitAliasProxy(final AliasProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
@@ -571,6 +590,7 @@ public class EFAToNuSMV {
             unsupported.add("-=");
         }
 
+        @Override
         public Object visitBinaryExpressionProxy(final BinaryExpressionProxy proxy) throws VisitorException {
             final String op = proxy.getOperator().getName();
 
@@ -587,164 +607,209 @@ public class EFAToNuSMV {
             }
         }
 
+        @Override
         public Object visitBoxGeometryProxy(final BoxGeometryProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitColorGeometryProxy(final ColorGeometryProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitComponentProxy(final ComponentProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitConstantAliasProxy(final ConstantAliasProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitEdgeProxy(final EdgeProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitEnumSetExpressionProxy(final EnumSetExpressionProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitEventAliasProxy(final EventAliasProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitEventDeclProxy(final EventDeclProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitEventListExpressionProxy(final EventListExpressionProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitExpressionProxy(final ExpressionProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitForeachProxy(final ForeachProxy proxy) throws VisitorException {
-            throw new UnsupportedOperationException("Not supported yet.");
+          throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
+        public Object visitFunctionCallExpressionProxy(final FunctionCallExpressionProxy proxy) throws VisitorException {
+          throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
         public Object visitGraphProxy(final GraphProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitGroupNodeProxy(final GroupNodeProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitGuardActionBlockProxy(final GuardActionBlockProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitIdentifiedProxy(final IdentifiedProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitIdentifierProxy(final IdentifierProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitIndexedIdentifierProxy(final IndexedIdentifierProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitInstanceProxy(final InstanceProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitIntConstantProxy(final IntConstantProxy proxy) throws VisitorException {
             return Integer.toString(proxy.getValue());
         }
 
+        @Override
         public Object visitLabelBlockProxy(final LabelBlockProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitLabelGeometryProxy(final LabelGeometryProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitModuleProxy(final ModuleProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitModuleSequenceProxy(final ModuleSequenceProxy proxy)
         {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitNodeProxy(final NodeProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitParameterBindingProxy(final ParameterBindingProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitPlainEventListProxy(final PlainEventListProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitPointGeometryProxy(final PointGeometryProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitQualifiedIdentifierProxy(final QualifiedIdentifierProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitSimpleComponentProxy(final SimpleComponentProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitSimpleExpressionProxy(final SimpleExpressionProxy proxy) throws VisitorException {
             System.err.println("\n\nHello world!!\n\n");
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitSimpleIdentifierProxy(final SimpleIdentifierProxy proxy) throws VisitorException {
             return proxy.getName();
         }
 
+        @Override
         public Object visitSimpleNodeProxy(final SimpleNodeProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitSplineGeometryProxy(final SplineGeometryProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitUnaryExpressionProxy(final UnaryExpressionProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitVariableComponentProxy(final VariableComponentProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitVariableMarkingProxy(final VariableMarkingProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitProxy(final Proxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitGeometryProxy(final GeometryProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitNamedProxy(final NamedProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
 
+        @Override
         public Object visitDocumentProxy(final DocumentProxy proxy) throws VisitorException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
@@ -763,6 +828,7 @@ public class EFAToNuSMV {
         public SpecPrinterNonBlocking(){
             this(EventDeclProxy.DEFAULT_MARKING_NAME);
         }
+        @Override
         public void print(final ModuleProxy m, final PrintWriter pw) {
             pw.print("CTLSPEC AG(EF(");
             final Collection<String> parts = new ArrayList<String>();

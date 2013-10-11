@@ -11,7 +11,7 @@ package net.sourceforge.waters.model.analysis.module;
 
 import java.util.List;
 
-import net.sourceforge.waters.model.analysis.AbortException;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.DefaultAnalysisResult;
@@ -78,14 +78,14 @@ public abstract class AbstractModuleAnalyzer implements ModuleAnalyzer
     clearAnalysisResult();
   }
 
-  public List<ParameterBindingProxy> getBinding()
+  public List<ParameterBindingProxy> getBindings()
   {
-    return mBinding;
+    return mBindings;
   }
 
   public void setBindings(final List<ParameterBindingProxy> binding)
   {
-    mBinding = binding;
+    mBindings = binding;
   }
 
   public void setKindTranslator(final KindTranslator translator)
@@ -153,6 +153,12 @@ public abstract class AbstractModuleAnalyzer implements ModuleAnalyzer
     return mIsAborting;
   }
 
+  @Override
+  public void resetAbort()
+  {
+    mIsAborting = false;
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods
@@ -186,15 +192,15 @@ public abstract class AbstractModuleAnalyzer implements ModuleAnalyzer
 
   /**
    * Checks whether the model analyser has been requested to abort,
-   * and if so, performs the abort by throwing an {@link AbortException}.
+   * and if so, performs the abort by throwing an {@link AnalysisAbortException}.
    * This method should be called periodically by any model analyser that
    * supports being aborted by user request.
    */
   protected void checkAbort()
-    throws AbortException
+    throws AnalysisAbortException
   {
     if (mIsAborting) {
-      final AbortException exception = new AbortException();
+      final AnalysisAbortException exception = new AnalysisAbortException();
       setExceptionResult(exception);
       throw exception;
     }
@@ -285,6 +291,6 @@ public abstract class AbstractModuleAnalyzer implements ModuleAnalyzer
   private int mTransitionLimit;
   private long mStartTime;
   private boolean mIsAborting;
-  List<ParameterBindingProxy> mBinding;
+  List<ParameterBindingProxy> mBindings;
 
 }

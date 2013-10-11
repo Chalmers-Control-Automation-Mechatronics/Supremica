@@ -226,6 +226,28 @@ public interface ModuleProxyFactory
        SimpleExpressionProxy range);
 
   /**
+   * Creates a new function call expression.
+   * @param plainText The original text of the new function call expression, or <CODE>null</CODE>.
+   * @param functionName The function name of the new function call expression.
+   * @param arguments The arguments of the new function call expression, or <CODE>null</CODE> if empty.
+   */
+  public FunctionCallExpressionProxy createFunctionCallExpressionProxy
+      (String plainText,
+       String functionName,
+       Collection<? extends SimpleExpressionProxy> arguments);
+
+  /**
+   * Creates a new function call expression using default values.
+   * This method creates a function call expression with
+   * the original text set to <CODE>null</CODE>.
+   * @param functionName The function name of the new function call expression.
+   * @param arguments The arguments of the new function call expression, or <CODE>null</CODE> if empty.
+   */
+  public FunctionCallExpressionProxy createFunctionCallExpressionProxy
+      (String functionName,
+       Collection<? extends SimpleExpressionProxy> arguments);
+
+  /**
    * Creates a new graph.
    * @param deterministic The determinism status of the new graph.
    * @param blockedEvents The list of blocked events of the new graph, or <CODE>null</CODE>.
@@ -627,14 +649,12 @@ public interface ModuleProxyFactory
    * Creates a new variable.
    * @param identifier The identifier defining the name of the new variable.
    * @param type The range of the new variable.
-   * @param deterministic The deterministic of the new variable.
    * @param initialStatePredicate The initial state predicate of the new variable.
    * @param variableMarkings The list of markings of the new variable, or <CODE>null</CODE> if empty.
    */
   public VariableComponentProxy createVariableComponentProxy
       (IdentifierProxy identifier,
        SimpleExpressionProxy type,
-       boolean deterministic,
        SimpleExpressionProxy initialStatePredicate,
        Collection<? extends VariableMarkingProxy> variableMarkings);
 
@@ -644,13 +664,11 @@ public interface ModuleProxyFactory
    * an empty list of markings.
    * @param identifier The identifier defining the name of the new variable.
    * @param type The range of the new variable.
-   * @param deterministic The deterministic of the new variable.
    * @param initialStatePredicate The initial state predicate of the new variable.
    */
   public VariableComponentProxy createVariableComponentProxy
       (IdentifierProxy identifier,
        SimpleExpressionProxy type,
-       boolean deterministic,
        SimpleExpressionProxy initialStatePredicate);
 
   /**

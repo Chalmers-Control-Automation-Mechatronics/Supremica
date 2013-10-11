@@ -9,9 +9,9 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import net.sourceforge.waters.model.des.AutomatonTools;
-
 import gnu.trove.set.hash.TIntHashSet;
+
+import net.sourceforge.waters.model.des.AutomatonTools;
 
 
 /**
@@ -52,41 +52,55 @@ public class CachingTransitionIterator implements TransitionIterator
 
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.tr.TransitionIterator
+  @Override
   public void reset()
   {
     mInnerIterator.reset();
     clear();
   }
 
+  @Override
   public void resetEvent(final int event)
   {
     mInnerIterator.resetEvent(event);
     clear();
   }
 
+  @Override
   public void resetEvents(final int first, final int last)
   {
     mInnerIterator.resetEvents(first, last);
     clear();
   }
 
+  @Override
+  public void resetEventsByStatus(final int... flags)
+  {
+    mInnerIterator.resetEventsByStatus(flags);
+    reset();
+  }
+
+  @Override
   public void resetState(final int from)
   {
     mInnerIterator.resetState(from);
     clear();
   }
 
+  @Override
   public void reset(final int from, final int event)
   {
     mInnerIterator.reset(from, event);
     clear();
   }
 
+  @Override
   public void resume(final int from)
   {
     mInnerIterator.resetState(from);
   }
 
+  @Override
   public boolean advance()
   {
     while (mInnerIterator.advance()) {
@@ -100,31 +114,43 @@ public class CachingTransitionIterator implements TransitionIterator
     return false;
   }
 
+  @Override
   public int getCurrentEvent()
   {
     return mInnerIterator.getCurrentEvent();
   }
 
+  @Override
   public int getCurrentSourceState()
   {
     return mInnerIterator.getCurrentSourceState();
   }
 
+  @Override
   public int getCurrentToState()
   {
     return mInnerIterator.getCurrentToState();
   }
 
+  @Override
   public int getCurrentTargetState()
   {
     return mInnerIterator.getCurrentTargetState();
   }
 
+  @Override
   public int getCurrentFromState()
   {
     return mInnerIterator.getCurrentFromState();
   }
 
+  @Override
+  public void setCurrentToState(final int state)
+  {
+    mInnerIterator.setCurrentToState(state);
+  }
+
+  @Override
   public void remove()
   {
     mInnerIterator.remove();

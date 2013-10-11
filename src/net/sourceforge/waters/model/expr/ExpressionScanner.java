@@ -79,7 +79,13 @@ class ExpressionScanner {
   Token next()
     throws IOException, ParseException
   {
-    final Token token = peek();
+    return next(true);
+  }
+
+  Token next(final boolean allowNeg)
+    throws IOException, ParseException
+  {
+    final Token token = peek(allowNeg);
     mNextToken = null;
     return token;
   }
@@ -192,9 +198,18 @@ class ExpressionScanner {
    * Checks whether a character represents the escape-end character
    * <CODE>'}'</CODE>.
    */
-  boolean isEscapeEndCharachter(final int ch)
+  boolean isEscapeEndCharacter(final int ch)
   {
     return ch == '}';
+  }
+
+  /**
+   * Checks whether a character represents the function-key character
+   * <CODE>'\'</CODE>.
+   */
+  boolean isFunctionKeyCharacter(final int ch)
+  {
+    return ch == mOperatorTable.getFunctionKeyCharacter();
   }
 
   /**
@@ -212,7 +227,8 @@ class ExpressionScanner {
       isOperatorCharacter(ch) ||
       isSeparatorCharacter(ch) ||
       isEscapeStartCharachter(ch) ||
-      isEscapeEndCharachter(ch);
+      isEscapeEndCharacter(ch) ||
+      isFunctionKeyCharacter(ch);
   }
 
   /**
@@ -267,6 +283,8 @@ class ExpressionScanner {
         }
       } else if (isOperatorCharacter(ch)) {
         storeOperatorToken();
+      } else if (isFunctionKeyCharacter(ch)) {
+        storeFunctionToken();
       } else if (isSeparatorCharacter(ch)) {
         mNextToken = createSeparatorToken(ch);
       } else if (ch >= 32) {
@@ -298,8 +316,8 @@ class ExpressionScanner {
   {
     while (true) {
       if (isEscapeStartCharachter(ch)) {
-        final int tokentype = appendEscapeGroup();
-        if (tokentype == Token.END) {
+        final Token.Type tokentype = appendEscapeGroup();
+        if (tokentype == Token.Type.END) {
           return;
         }
       }
@@ -343,7 +361,33 @@ class ExpressionScanner {
     mNextToken = token;
   }
 
-  private int appendEscapeGroup()
+  private void storeFunctionToken()
+    throws IOException, ParseException
+  {
+    int ch = getNextCharacter();
+    if (isIdentifierStart(ch)) {
+      mTokenText.append((char) ch);
+      do {
+        ch = getNextCharacter();
+        mTokenText.append((char) ch);
+      } while (isIdentifierCharacter(ch));
+      final int end = mTokenText.length() - 1;
+      mTokenText.deleteCharAt(end);
+      putback(ch);
+      final Token token = createFunctionToken();
+      if (token == null) {
+        throw new ParseException
+          ("Unknown built-in function '" + mTokenText + "'!", mTokenStart);
+      }
+      mNextToken = token;
+    } else {
+      throw new ParseException
+        ("Function character '" + mTokenText +
+         "' not followed by function name!", mTokenStart);
+    }
+  }
+
+  private Token.Type appendEscapeGroup()
     throws IOException
   {
     int nesting = 1;
@@ -351,17 +395,17 @@ class ExpressionScanner {
     do {
       ch = getNextCharacter();
       if (ch < 0) {
-        mNextToken = createToken(Token.END);
-        return Token.END;
+        mNextToken = createToken(Token.Type.END);
+        return Token.Type.END;
       }
       mTokenText.append((char) ch);
       if (isEscapeStartCharachter(ch)) {
         nesting++;
-      } else if (isEscapeEndCharachter(ch)) {
+      } else if (isEscapeEndCharacter(ch)) {
         nesting--;
       }
     } while (nesting > 0);
-    return Token.SYMBOL;
+    return Token.Type.SYMBOL;
   }
 
 
@@ -404,8 +448,19 @@ class ExpressionScanner {
   private Token createOperatorToken()
   {
     final String text = mTokenText.toString();
-    if (mOperatorTable.contains(text)) {
+    if (mOperatorTable.containsOperator(text)) {
       return new OperatorToken(text, mTokenStart);
+    } else {
+      return null;
+    }
+  }
+
+  private Token createFunctionToken()
+  {
+    final String text = mTokenText.toString();
+    final BuiltInFunction function = mOperatorTable.getBuiltInFunction(text);
+    if (function != null) {
+      return new BuiltInFunctionToken(text, mTokenStart);
     } else {
       return null;
     }
@@ -413,15 +468,15 @@ class ExpressionScanner {
 
   private Token createNumberToken()
   {
-    return createToken(Token.NUMBER);
+    return createToken(Token.Type.NUMBER);
   }
 
   private Token createSymbolToken()
   {
-    return createToken(Token.SYMBOL);
+    return createToken(Token.Type.SYMBOL);
   }
 
-  private Token createToken(final int type)
+  private Token createToken(final Token.Type type)
   {
     final String text = mTokenText.toString();
     return new Token(type, text, mTokenStart);
@@ -439,19 +494,19 @@ class ExpressionScanner {
   {
     final Map<Integer,SeparatorTokenCreator> map =
       new HashMap<Integer,SeparatorTokenCreator>(16);
-    storeSeparatorTokenCreator(map, '(', Token.OPENBR);
-    storeSeparatorTokenCreator(map, ')', Token.CLOSEBR);
-    storeSeparatorTokenCreator(map, '[', Token.OPENSQ);
-    storeSeparatorTokenCreator(map, ']', Token.CLOSESQ);
-    storeSeparatorTokenCreator(map, ',', Token.COMMA);
-    storeSeparatorTokenCreator(map, -1, Token.END);
+    storeSeparatorTokenCreator(map, '(', Token.Type.OPENBR);
+    storeSeparatorTokenCreator(map, ')', Token.Type.CLOSEBR);
+    storeSeparatorTokenCreator(map, '[', Token.Type.OPENSQ);
+    storeSeparatorTokenCreator(map, ']', Token.Type.CLOSESQ);
+    storeSeparatorTokenCreator(map, ',', Token.Type.COMMA);
+    storeSeparatorTokenCreator(map, -1, Token.Type.END);
     return map;
   }
 
   private static void storeSeparatorTokenCreator
     (final Map<Integer,SeparatorTokenCreator> map,
      final int character,
-     final int type)
+     final Token.Type type)
   {
     final String name =
       character == -1 ? null : Character.toString((char) character);
@@ -469,21 +524,45 @@ class ExpressionScanner {
     //# Constructors
     private OperatorToken(final String text, final int pos)
     {
-      super(Token.OPERATOR, text, pos);
+      super(Token.Type.OPERATOR, text, pos);
     }
 
     //#######################################################################
     //# Specialised Access Methods
+    @Override
     UnaryOperator getUnaryOperator()
     {
       final String text = getText();
       return mOperatorTable.getUnaryOperator(text);
     }
 
+    @Override
     BinaryOperator getBinaryOperator()
     {
       final String text = getText();
       return mOperatorTable.getBinaryOperator(text);
+    }
+  }
+
+
+  //#########################################################################
+  //# Local Class BuiltInFunctionToken
+  private class BuiltInFunctionToken extends Token
+  {
+    //#######################################################################
+    //# Constructors
+    private BuiltInFunctionToken(final String text, final int pos)
+    {
+      super(Token.Type.FUNCTION, text, pos);
+    }
+
+    //#######################################################################
+    //# Specialised Access Methods
+    @Override
+    BuiltInFunction getBuiltInFunction()
+    {
+      final String text = getText();
+      return mOperatorTable.getBuiltInFunction(text);
     }
   }
 
@@ -494,7 +573,7 @@ class ExpressionScanner {
   {
     //#######################################################################
     //# Constructors
-    private SeparatorTokenCreator(final int type, final String name)
+    private SeparatorTokenCreator(final Token.Type type, final String name)
     {
       mType = type;
       mName = name;
@@ -509,7 +588,7 @@ class ExpressionScanner {
 
     //#######################################################################
     //# Data Members
-    private final int mType;
+    private final Token.Type mType;
     private final String mName;
   }
 

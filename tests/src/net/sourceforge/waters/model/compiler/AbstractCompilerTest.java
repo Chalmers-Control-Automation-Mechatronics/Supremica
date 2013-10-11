@@ -333,10 +333,28 @@ public abstract class AbstractCompilerTest
     compile("tests", "nasty", "forbidden");
   }
 
+  public void testCompile_funcall_max()
+    throws IOException, WatersException
+  {
+    compile("tests", "efa", "funcall_max");
+  }
+
+  public void testCompile_funcall_min()
+    throws IOException, WatersException
+  {
+    compile("tests", "efa", "funcall_min");
+  }
+
   public void testCompile_GlobalAndLocalVariables()
     throws IOException, WatersException
   {
     compile("handwritten", "GlobalAndLocalVariables");
+  }
+
+  public void testCompile_increment()
+  throws IOException, WatersException
+  {
+    compile("tests", "efa", "increment");
   }
 
   public void testCompile_io1()

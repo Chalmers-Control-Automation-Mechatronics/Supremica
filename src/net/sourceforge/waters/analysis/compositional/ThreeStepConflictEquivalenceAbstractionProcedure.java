@@ -28,6 +28,7 @@ import net.sourceforge.waters.analysis.certainconf.CertainConflictsTRSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -62,6 +63,7 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
     final ChainTRSimplifier postChain = new ChainTRSimplifier();
     final TauLoopRemovalTRSimplifier loopRemover =
       new TauLoopRemovalTRSimplifier();
+    loopRemover.setDumpStateAware(true);
     preChain.add(loopRemover);
     final MarkingRemovalTRSimplifier markingRemover =
       new MarkingRemovalTRSimplifier();
@@ -69,10 +71,12 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
     final SilentIncomingTRSimplifier silentInRemover =
       new SilentIncomingTRSimplifier();
     silentInRemover.setRestrictsToUnreachableStates(true);
+    silentInRemover.setDumpStateAware(true);
     preChain.add(silentInRemover);
     final int limit = analyzer.getInternalTransitionLimit();
     final OnlySilentOutgoingTRSimplifier silentOutRemover =
       new OnlySilentOutgoingTRSimplifier();
+    silentOutRemover.setDumpStateAware(true);
     preChain.add(silentOutRemover);
     final IncomingEquivalenceTRSimplifier incomingEquivalenceSimplifier =
       new IncomingEquivalenceTRSimplifier();
@@ -99,6 +103,7 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
     bisimulator.setMarkingMode
       (ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
     bisimulator.setTransitionLimit(limit);
+    bisimulator.setDumpStateAware(true);
     postChain.add(bisimulator);
     final MarkingSaturationTRSimplifier saturator =
       new MarkingSaturationTRSimplifier();
@@ -118,6 +123,7 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
     final ChainTRSimplifier postChain = new ChainTRSimplifier();
     final TauLoopRemovalTRSimplifier loopRemover =
       new TauLoopRemovalTRSimplifier();
+    loopRemover.setDumpStateAware(true);
     preChain.add(loopRemover);
     final MarkingRemovalTRSimplifier markingRemover =
       new MarkingRemovalTRSimplifier();
@@ -129,9 +135,11 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
     final SilentIncomingTRSimplifier silentInRemover =
       new SilentIncomingTRSimplifier();
     silentInRemover.setRestrictsToUnreachableStates(true);
+    silentInRemover.setDumpStateAware(true);
     preChain.add(silentInRemover);
     final OnlySilentOutgoingTRSimplifier silentOutRemover =
       new OnlySilentOutgoingTRSimplifier();
+    silentOutRemover.setDumpStateAware(true);
     preChain.add(silentOutRemover);
     final LimitedCertainConflictsTRSimplifier limitedCertainConflictsRemover =
       new LimitedCertainConflictsTRSimplifier();
@@ -143,12 +151,14 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
     bisimulator.setMarkingMode
       (ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
     bisimulator.setTransitionLimit(limit);
+    bisimulator.setDumpStateAware(true);
     postChain.add(bisimulator);
     final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
       new NonAlphaDeterminisationTRSimplifier();
     nonAlphaDeterminiser.setTransitionRemovalMode
       (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER_IF_CHANGED);
     nonAlphaDeterminiser.setTransitionLimit(limit);
+    nonAlphaDeterminiser.setDumpStateAware(true);
     postChain.add(nonAlphaDeterminiser);
     final IncomingEquivalenceTRSimplifier incomingEquivalenceSimplifier =
       new IncomingEquivalenceTRSimplifier();
@@ -203,7 +213,7 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
       final ProductDESProxyFactory factory = getFactory();
       final Iterator<EventProxy> iter = local.iterator();
       final EventProxy tau = iter.hasNext() ? iter.next() : null;
-      final EventEncoding eventEnc = createEventEncoding(aut, tau, candidate);
+      final EventEncoding eventEnc = createEventEncoding(aut, local, candidate);
       final StateEncoding inputStateEnc = new StateEncoding(aut);
       final int config = mPreChain.getPreferredInputConfiguration();
       ListBufferTransitionRelation rel =
@@ -216,7 +226,7 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
       final int numMarkings = rel.getNumberOfMarkings();
       AutomatonProxy lastAut = aut;
       StateEncoding lastStateEnc = inputStateEnc;
-      List<int[]> partition = null;
+      TRPartition partition = null;
       boolean oeq = true;
       boolean reduced = false;
       AbstractionStep preStep = null;
@@ -248,9 +258,9 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
               (analyzer, mLimitedCertainConflictsSimplifier, outputAut,
                lastAut, tau, lastStateEnc, outputStateEnc);
           } else {
-            final List<int[]> ccPart =
+            final TRPartition ccPart =
               mLimitedCertainConflictsSimplifier.getResultPartition();
-            partition = ChainTRSimplifier.mergePartitions(partition, ccPart);
+            partition = TRPartition.combine(partition, ccPart);
             preStep = createStep(aut, inputStateEnc,
                                  outputAut, outputStateEnc, tau,
                                  partition, oeq, false);
@@ -286,8 +296,8 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
         } else if (lccStep == null && ccStep == null) {
           lastAut = aut;
           lastStateEnc = inputStateEnc;
-          final List<int[]> postPart = mPostChain.getResultPartition();
-          partition = ChainTRSimplifier.mergePartitions(partition, postPart);
+          final TRPartition postPart = mPostChain.getResultPartition();
+          partition = TRPartition.combine(partition, postPart);
           oeq &= mPostChain.isObservationEquivalentAbstraction();
         } else {
           recordStep(steps, preStep);
@@ -343,15 +353,21 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
     return mCompleteChain.isAborting();
   }
 
+  @Override
+  public void resetAbort()
+  {
+    mCompleteChain.resetAbort();
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods
   @Override
   protected EventEncoding createEventEncoding(final AutomatonProxy aut,
-                                              final EventProxy tau,
+                                              final Collection<EventProxy> local,
                                               final Candidate candidate)
   {
-    final EventEncoding enc = super.createEventEncoding(aut, tau, candidate);
+    final EventEncoding enc = super.createEventEncoding(aut, local, candidate);
     final EventProxy defaultMarking = getUsedDefaultMarking();
     final int defaultMarkingID = enc.getEventCode(defaultMarking);
     if (defaultMarkingID < 0) {
@@ -367,7 +383,7 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
                                      final AutomatonProxy output,
                                      final StateEncoding outputStateEnc,
                                      final EventProxy tau,
-                                     final List<int[]> partition,
+                                     final TRPartition partition,
                                      final boolean oeq,
                                      final boolean reduced)
   {

@@ -74,6 +74,26 @@ public class EnabledEventsSilentIncomingTRSimplifier
   //#########################################################################
   //# Configuration
   /**
+   * Sets whether this simplifier should consider deadlock states when
+   * removing selfloops.
+   * @see AbstractMarkingTRSimplifier#isDumpStateAware()
+   */
+  public void setDumpStateAware(final boolean aware)
+  {
+    mDumpStateAware = aware;
+  }
+
+  /**
+   * Gets whether this simplifier considers deadlock states when
+   * removing selfloops.
+   */
+  @Override
+  public boolean isDumpStateAware()
+  {
+    return mDumpStateAware;
+  }
+
+  /**
    * Sets whether abstraction is applied to all states or only to states
    * that become unreachable. When this option is set to <CODE>true</CODE>
    * (the default), then the <I>Silent Incoming Rule</I> is only applied
@@ -101,17 +121,15 @@ public class EnabledEventsSilentIncomingTRSimplifier
   /**
    * Sets the number of always enabled events. Always enabled events are events
    * that are not disabled by any other current automaton.
-   * @param numEnabledEvents
    */
   public void setNumberOfEnabledEvents(final int numEnabledEvents)
   {
-
     mNumberOfEnabledEvents = numEnabledEvents;
   }
+
   public int getNumberOfEnabledEvents()
   {
     return mNumberOfEnabledEvents;
-
   }
 
 
@@ -145,7 +163,6 @@ public class EnabledEventsSilentIncomingTRSimplifier
     } else if (getPreconditionMarkingID() < 0) {        //what is the precondition marking alpha
       mTauTestIterator = rel.createSuccessorsReadOnlyIterator();
       mTauTestIterator.resetEvents(0, mNumberOfEnabledEvents);               //Definitely change this to include enabled events
-
     }
     final int numStates = rel.getNumberOfStates();
     final BitSet keep = new BitSet(numStates);  //Creates a BitSet which remembers which states will be kept
@@ -232,19 +249,25 @@ public class EnabledEventsSilentIncomingTRSimplifier
   }
 
   @Override
-  protected void applyResultPartition()     //This does not seem to be called but might be that magic just up a bit.
+  protected void applyResultPartition()
   throws AnalysisException
   {
     super.applyResultPartition();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     rel.checkReachability();
     rel.removeTauSelfLoops();
-    rel.removeProperSelfLoopEvents();
+    removeProperSelfLoopEvents();
   }
 
 
   //#########################################################################
   //# Auxiliary Methods
+  /**
+   * Returns whether the given state may be simplified by the silent
+   * continuation rule. A state is reducible if it has an outgoing
+   * tau transition or, in the case of generalised nonblocking, if it
+   * is not marked by the precondition (alpha) marking.
+   */
   private boolean isReducible(final int state)
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
@@ -261,6 +284,7 @@ public class EnabledEventsSilentIncomingTRSimplifier
   //#########################################################################
   //# Data Members
   private boolean mRestrictsToUnreachableStates = true;
+  private boolean mDumpStateAware = false;
   private int mNumberOfEnabledEvents;
 
   private TransitionIterator mTauTestIterator;

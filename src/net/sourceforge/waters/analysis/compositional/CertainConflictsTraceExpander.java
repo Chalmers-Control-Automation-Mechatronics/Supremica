@@ -9,8 +9,8 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.set.hash.THashSet;
 import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -91,7 +91,6 @@ public class CertainConflictsTraceExpander extends TRTraceExpander
   public List<TraceStepProxy> convertTraceSteps(final List<TraceStepProxy> traceSteps)
     throws AnalysisException
   {
-    ///////////////////////////////////////////
     final int config = mSimplifier.getPreferredInputConfiguration();
     final ListBufferTransitionRelation rel = getTransitionRelation();
 
@@ -147,7 +146,7 @@ public class CertainConflictsTraceExpander extends TRTraceExpander
 
     int initTest = initResult;
     if (initResult > 0 && mSimplifier.getWasOptimisationUsed()) {
-      initTest = FindTestAutomatonInit(initResult, newTraceSteps);
+      initTest = findTestAutomatonInit(initResult, newTraceSteps);
     }
 
     // Extend the trace to lowest (= most blocking) possible level ...
@@ -188,7 +187,7 @@ public class CertainConflictsTraceExpander extends TRTraceExpander
     return newTraceSteps;
   }
 
-  private int FindTestAutomatonInit(final int initResult,
+  private int findTestAutomatonInit(final int initResult,
                                     final List<TraceStepProxy> traceSteps)
   {
     // iterate trace through mTestAutomaton

@@ -49,20 +49,53 @@
  */
 package org.supremica.gui;
 
-import org.supremica.util.SupremicaException;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.TreeMap;
+
+import javax.swing.AbstractListModel;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JViewport;
+import javax.swing.ListSelectionModel;
+
+import net.sourceforge.waters.gui.util.IconLoader;
+
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Arc;
-import org.supremica.automata.Automaton;
 import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonListener;
-import org.supremica.automata.State;
 import org.supremica.automata.CompositeState;
 import org.supremica.automata.LabelTrace;
-import org.supremica.log.*;
+import org.supremica.automata.State;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
+import org.supremica.util.SupremicaException;
 
 /**
  * This class is responsible for the "exploreStates"-window.
@@ -102,6 +135,7 @@ public class AutomatonExplorer
         Utility.setupFrame(this, 400, 500);
         addWindowListener(new WindowAdapter()
         {
+            @Override
             public void windowClosing(final WindowEvent e)
             {
                 setVisible(false);
@@ -131,7 +165,8 @@ public class AutomatonExplorer
 
     public void initialize()
     {
-        setIconImage(Supremica.cornerImage);
+        final List<Image> images = IconLoader.ICONLIST_APPLICATION;
+        setIconImages(images);
         stateViewer.initialize();
     }
 
@@ -150,10 +185,10 @@ public class AutomatonExplorer
         menuFile.add(menuFileClose);
         menuFileClose.addActionListener(new ActionListener()
         {
+            @Override
             public void actionPerformed(final ActionEvent e)
             {
                 setVisible(false);
-
                 //dispose();
             }
         });
@@ -170,6 +205,7 @@ public class AutomatonExplorer
         menuView.add(menuViewEpsilonClosure);
         menuViewEpsilonClosure.addActionListener(new ActionListener()
         {
+            @Override
             public void actionPerformed(final ActionEvent e)
             {
                 stateViewer.setConsiderEpsilonClosure(!stateViewer.getConsiderEpsilonClosure());
@@ -183,6 +219,7 @@ public class AutomatonExplorer
         menuView.add(menuViewOutgoingStateNames);
         menuViewOutgoingStateNames.addActionListener(new ActionListener()
         {
+            @Override
             public void actionPerformed(final ActionEvent e)
             {
                 stateViewer.setShowOutgoingStateNames(!stateViewer.getShowOutgoingStateNames());
@@ -196,6 +233,7 @@ public class AutomatonExplorer
         menuView.add(menuViewIncomingStateNames);
         menuViewIncomingStateNames.addActionListener(new ActionListener()
         {
+            @Override
             public void actionPerformed(final ActionEvent e)
             {
                 stateViewer.setShowIncomingStateNames(!stateViewer.getShowIncomingStateNames());
@@ -209,6 +247,7 @@ public class AutomatonExplorer
         stateViewer.setCurrState(theState);
     }
 
+    @Override
     public void updated(final Object o)
     {
         if (o == theAutomaton)
@@ -217,31 +256,37 @@ public class AutomatonExplorer
         }
     }
 
+    @Override
     public void stateAdded(final Automaton aut, final State q)
     {
         updated(aut);
     }
 
+    @Override
     public void stateRemoved(final Automaton aut, final State q)
     {
         updated(aut);
     }
 
+    @Override
     public void arcAdded(final Automaton aut, final Arc a)
     {
         updated(aut);
     }
 
+    @Override
     public void arcRemoved(final Automaton aut, final Arc a)
     {
         updated(aut);
     }
 
+    @Override
     public void attributeChanged(final Automaton aut)
     {
         updated(aut);
     }
 
+    @Override
     public void automatonRenamed(final Automaton aut, final String oldName)
     {
         updated(aut);
@@ -339,7 +384,7 @@ class StateViewer
     {
         if (prevStates.size() > 0)
         {
-            final State newState = (State) prevStates.removeLast();
+            final State newState = prevStates.removeLast();
 
             nextStates.addFirst(currState);
             setCurrState(newState, true);
@@ -355,7 +400,7 @@ class StateViewer
     {
         if (nextStates.size() > 0)
         {
-            final State newState = (State) nextStates.removeFirst();
+            final State newState = nextStates.removeFirst();
 
             prevStates.addLast(currState);
             setCurrState(newState, true);
@@ -478,6 +523,7 @@ class EventList
         add(scrollPanel, BorderLayout.CENTER);
         theList.addMouseListener(new MouseAdapter()
         {
+            @Override
             public void mouseClicked(final MouseEvent e)
             {
                 if (e.getClickCount() == 2)
@@ -634,11 +680,13 @@ class EventListModel
         fireContentsChanged(this, 0, currArcs.size() - 1);
     }
 
+    @Override
     public int getSize()
     {
         return currArcs.size();
     }
 
+    @Override
     public Object getElementAt(final int index)
     {
         //Arc currArc = (Arc) currArcs.get(index);
@@ -786,6 +834,7 @@ class StateDisplayer
         isAcceptingBox.setBackground(Color.white);
         isAcceptingBox.addActionListener(new ActionListener()
         {
+            @Override
             public void actionPerformed(final ActionEvent e)
             {
                 changeStateAccepting(((JCheckBox) e.getSource()).isSelected());
@@ -796,6 +845,7 @@ class StateDisplayer
         isForbiddenBox.setBackground(Color.white);
         isForbiddenBox.addActionListener(new ActionListener()
         {
+            @Override
             public void actionPerformed(final ActionEvent e)
             {
                 changeStateForbidden(((JCheckBox) e.getSource()).isSelected());
@@ -912,6 +962,7 @@ class ExplorerController
         add(redoBox, BorderLayout.NORTH);
         undoButton.addActionListener(new ActionListener()
         {
+            @Override
             public void actionPerformed(final ActionEvent e)
             {
                 undo_actionPerformed(e);
@@ -919,6 +970,7 @@ class ExplorerController
         });
         redoButton.addActionListener(new ActionListener()
         {
+            @Override
             public void actionPerformed(final ActionEvent e)
             {
                 redo_actionPerformed(e);
@@ -926,6 +978,7 @@ class ExplorerController
         });
         resetButton.addActionListener(new ActionListener()
         {
+            @Override
             public void actionPerformed(final ActionEvent e)
             {
                 reset_actionPerformed(e);
@@ -933,6 +986,7 @@ class ExplorerController
         });
         findButton.addActionListener(new ActionListener()
         {
+            @Override
             public void actionPerformed(final ActionEvent e)
             {
                 find_actionPerformed(e);
@@ -940,6 +994,7 @@ class ExplorerController
         });
         routeButton.addActionListener(new ActionListener()
         {
+            @Override
             public void actionPerformed(final ActionEvent e)
             {
                 route_actionPerformed(e);

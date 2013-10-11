@@ -55,11 +55,12 @@ import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
+import net.sourceforge.waters.model.analysis.Abortable;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.algorithms.AutomataSynthesizer;
 import org.supremica.automata.algorithms.AutomatonSynthesizer;
-import org.supremica.automata.algorithms.Stoppable;
 import org.supremica.automata.algorithms.SynchronizationOptions;
 import org.supremica.automata.algorithms.SynthesisAlgorithm;
 import org.supremica.automata.algorithms.SynthesizerOptions;
@@ -77,7 +78,7 @@ import org.supremica.util.ActionTimer;
  */
 public class AutomataSynthesisWorker
     extends Thread
-    implements Stoppable
+    implements Abortable
 {
     private static Logger logger = LoggerFactory.createLogger(AutomataSynthesisWorker.class);
 
@@ -86,7 +87,7 @@ public class AutomataSynthesisWorker
     private final SynthesizerOptions synthOptions;
 
     private ExecutionDialog executionDialog;
-    private boolean stopRequested = false;
+    private boolean abortRequested = false;
     @SuppressWarnings("unused")
 	private final EventQueue eventQueue = new EventQueue();
     private ActionTimer timer;
@@ -101,10 +102,11 @@ public class AutomataSynthesisWorker
         this.start();
     }
 
+    @Override
     public void run()
     {
         // Initialize the ExecutionDialog
-        final ArrayList<Stoppable> threadsToStop = new ArrayList<Stoppable>();
+        final ArrayList<Abortable> threadsToStop = new ArrayList<Abortable>();
         threadsToStop.add(this);
         if(ide != null){
             executionDialog = new ExecutionDialog(ide.getFrame(), "Synthesizing", threadsToStop);
@@ -117,7 +119,7 @@ public class AutomataSynthesisWorker
         {
             if(ide != null)
                 JOptionPane.showMessageDialog(ide.getFrame(), errorMessage, "Alert", JOptionPane.ERROR_MESSAGE);
-            requestStop();
+            requestAbort();
             return;
         }
         timer = new ActionTimer();
@@ -176,6 +178,7 @@ public class AutomataSynthesisWorker
         // Hide execution dialog
         EventQueue.invokeLater(new Runnable()
         {
+            @Override
             public void run()
             {
                 if(ide != null)
@@ -189,7 +192,7 @@ public class AutomataSynthesisWorker
         });
 
         // Present result
-        if (!stopRequested)
+        if (!abortRequested)
         {
             logger.info("Synthesis completed after " + timer.toString() + ".");
 
@@ -269,9 +272,10 @@ public class AutomataSynthesisWorker
      *
      *@see  ExecutionDialog
      */
-    public void requestStop()
+    @Override
+    public void requestAbort()
     {
-        stopRequested = true;
+        abortRequested = true;
 
         logger.debug("AutomataSynthesisWorker requested to stop.");
 
@@ -281,8 +285,14 @@ public class AutomataSynthesisWorker
         }
     }
 
-    public boolean isStopped()
+    @Override
+    public boolean isAborting()
     {
-        return stopRequested;
+        return abortRequested;
+    }
+
+    @Override
+    public void resetAbort(){
+      abortRequested = false;
     }
 }

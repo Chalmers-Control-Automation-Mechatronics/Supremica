@@ -11,10 +11,12 @@ package net.sourceforge.waters.model.compiler.constraint;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Set;
 
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.BinaryOperator;
@@ -38,7 +40,7 @@ public class ConstraintList
 
   //#########################################################################
   //# Constructors
-  public ConstraintList()
+  private ConstraintList()
   {
     mConstraints = mUnmodifiableConstraints = Collections.emptyList();
   }
@@ -49,6 +51,11 @@ public class ConstraintList
     mUnmodifiableConstraints = Collections.unmodifiableList(constraints);
   }
 
+  public ConstraintList(final Set<SimpleExpressionProxy> constraints)
+  {
+    mConstraints = new ArrayList<>(constraints);
+    mUnmodifiableConstraints = Collections.unmodifiableList(mConstraints);
+  }
 
   //#########################################################################
   //# Overrides for Baseclass java.lang.Object
@@ -165,5 +172,13 @@ public class ConstraintList
   //# Data Members
   private final List<SimpleExpressionProxy> mConstraints;
   private final List<SimpleExpressionProxy> mUnmodifiableConstraints;
+
+
+  //#########################################################################
+  //# Class Constants
+  /**
+   * An empty constraint list, representing the logical formula <I>true</I>.
+   */
+  public static final ConstraintList TRUE = new ConstraintList();
 
 }

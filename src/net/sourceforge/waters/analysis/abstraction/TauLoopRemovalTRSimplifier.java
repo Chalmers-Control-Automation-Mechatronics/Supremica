@@ -20,8 +20,9 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
-import net.sourceforge.waters.model.analysis.AbortException;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 
 
@@ -42,8 +43,34 @@ public class TauLoopRemovalTRSimplifier
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.abstraction.
-  //# TransitionRelationSimplifier
+  //# Configuration
+  /**
+   * Sets whether this simplifier should consider deadlock states when
+   * removing selfloops.
+   * @see #isDumpStateAware()
+   */
+  public void setDumpStateAware(final boolean aware)
+  {
+    mDumpStateAware = aware;
+  }
+
+  /**
+   * Gets whether this simplifier considers deadlock states when
+   * removing selfloops. This setting affects how the simplifier checks for
+   * pure selfloop events in the end. If the simplifier is deadlock aware,
+   * then events not enabled in deadlock states can be considered as
+   * selfloop events and removed from the automaton if selflooped in all
+   * other states.
+   */
+  public boolean isDumpStateAware()
+  {
+    return mDumpStateAware;
+  }
+
+
+  //#########################################################################
+  //# Interface
+  //# net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
   @Override
   public boolean isPartitioning()
   {
@@ -54,6 +81,12 @@ public class TauLoopRemovalTRSimplifier
   public boolean isObservationEquivalentAbstraction()
   {
     return true;
+  }
+
+  @Override
+  public void setPropositions(final int preconditionID, final int defaultID)
+  {
+    mDefaultMarkingID = defaultID;
   }
 
   @Override
@@ -95,12 +128,12 @@ public class TauLoopRemovalTRSimplifier
     final ListBufferTransitionRelation rel = getTransitionRelation();
     if (modified || !mToBeMerged.isEmpty()) {
       final int numStates = rel.getNumberOfStates();
-      List<int[]> partition = new ArrayList<int[]>(numStates);
+      List<int[]> classes = new ArrayList<int[]>(numStates);
       final BitSet merged = new BitSet(numStates);
       for (final TIntArrayList merge : mToBeMerged) {
         checkAbort();
         final int[] array = merge.toArray();
-        partition.add(array);
+        classes.add(array);
         modified |= array.length > 1;
         for (final int s : array) {
           merged.set(s);
@@ -112,13 +145,14 @@ public class TauLoopRemovalTRSimplifier
             checkAbort();
             final int[] array = new int[1];
             array[0] = s;
-            partition.add(array);
+            classes.add(array);
           }
         }
-        setResultPartitionList(partition);
+        final TRPartition partition = new TRPartition(classes, numStates);
+        setResultPartition(partition);
         applyResultPartitionAutomatically();
       } else {
-        partition = null;
+        classes = null;
       }
     }
     return modified;
@@ -142,14 +176,18 @@ public class TauLoopRemovalTRSimplifier
     super.applyResultPartition();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     rel.removeTauSelfLoops();
-    rel.removeProperSelfLoopEvents();
+    if (mDumpStateAware && mDefaultMarkingID >= 0) {
+      rel.removeProperSelfLoopEvents(mDefaultMarkingID);
+    } else {
+      rel.removeProperSelfLoopEvents();
+    }
   }
 
 
   //#########################################################################
   //# Auxiliary Methods
   private void tarjan(final int state)
-  throws AbortException
+  throws AnalysisAbortException
   {
     checkAbort();
     final ListBufferTransitionRelation rel = getTransitionRelation();
@@ -190,6 +228,9 @@ public class TauLoopRemovalTRSimplifier
 
   //#########################################################################
   //# Data Members
+  private boolean mDumpStateAware = false;
+  private int mDefaultMarkingID = -1;
+
   private int mIndex;
   private int[] mTarjan;
   private int[] mLowLink;

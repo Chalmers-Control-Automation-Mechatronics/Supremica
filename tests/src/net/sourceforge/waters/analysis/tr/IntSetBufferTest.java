@@ -9,10 +9,11 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import java.util.Random;
-
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.set.hash.TIntHashSet;
+
+import java.util.Random;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -189,6 +190,25 @@ public class IntSetBufferTest extends AbstractWatersTest
       }
       assertFalse("Expected end of iteration not signalled!", iter.advance());
       assertEquals("Unexpected set size!", count, buffer.size(offset));
+    }
+  }
+
+  public void testBigGetSetContents()
+  {
+    final int MAXCOUNT = 100;
+    final IntSetBuffer buffer = new IntSetBuffer(MAXCOUNT + 1);
+    final TIntArrayList list = new TIntArrayList(MAXCOUNT);
+    for (int count = 0; count <= MAXCOUNT; count++) {
+      if (count > 0) {
+        list.add(count);
+      }
+      final int offset = buffer.add(list);
+      final int[] gotten = buffer.getSetContents(offset);
+      assertEquals("Unexpected array size!", count, gotten.length);
+      for (int i = 0; i < count; i++) {
+        assertEquals("Unexpected data at position " + i + " in array!",
+                     i + 1, gotten[i]);
+      }
     }
   }
 

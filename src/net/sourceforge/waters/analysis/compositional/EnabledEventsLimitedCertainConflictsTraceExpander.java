@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.compositional
-//# CLASS:   LimitedCertainConflictsTraceExpander
+//# CLASS:   EnabledEventsLimitedCertainConflictsTraceExpander
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -29,9 +29,11 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.MemStateProxy;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -164,10 +166,16 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
     mSimplifier.run();
     copy = null;
     mSimplifier.setTransitionRelation(rel);
-    final List<int[]> partition = mSimplifier.getResultPartition();
-    final int[] stateMap = createStateMap(partition);
-    final int initTest =
-      stateMap == null || initResult < 0 ? initResult : stateMap[initResult];
+    final TRPartition partition = mSimplifier.getResultPartition();
+    final int initTest;
+    if (partition == null || initResult < 0) {
+      initTest = initResult;
+    } else {
+      final int[] clazz = partition.getStates(initResult);
+      assert clazz.length == 1 :
+        "Non-certain-conflict state merged into multiple states?";
+      initTest = clazz[0];
+    }
 
     // Extend the trace to lowest (= most blocking) possible level ...
     final AbstractCompositionalModelVerifier verifier = getModelVerifier();
@@ -188,7 +196,7 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
     // Fix the initial segment of the trace ...
     final int ccState =
       foundData == null ? -1 : foundData.getTestAutomatonEndState();
-    newTraceSteps = relabelInitialTraceSteps(newTraceSteps, stateMap, ccState);
+    newTraceSteps = relabelInitialTraceSteps(newTraceSteps, partition, ccState);
 
     // Add the search results to the end of the trace ...
     if (foundData != null) {
@@ -235,21 +243,23 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
   //#########################################################################
   //# Trace Extension
   private List<TraceStepProxy> relabelInitialTraceSteps
-  (final List<TraceStepProxy> steps, final int[] stateMap, final int ccState)
+  (final List<TraceStepProxy> steps, final TRPartition partition, final int ccState)
   {
     final int numSteps = steps.size();
     final List<TraceStepProxy> newSteps =
       new ArrayList<TraceStepProxy>(numSteps);
     for (final TraceStepProxy step : steps) {
       final TraceStepProxy newStep =
-        relabelInitialTraceStep(step, stateMap, ccState);
+        relabelInitialTraceStep(step, partition, ccState);
       newSteps.add(newStep);
     }
     return newSteps;
   }
 
   private TraceStepProxy relabelInitialTraceStep
-    (final TraceStepProxy resultStep, final int[] stateMap, final int ccState)
+    (final TraceStepProxy resultStep,
+     final TRPartition partition,
+     final int ccState)
   {
     final AutomatonProxy resultAut = getResultAutomaton();
     final Map<AutomatonProxy,StateProxy> resultMap = resultStep.getStateMap();
@@ -264,12 +274,11 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
         final AutomatonProxy origAut = getOriginalAutomaton();
         final int resultCode = getResultAutomatonStateCode(state);
         final int origCode;
-        if (stateMap == null) {
+        if (partition == null) {
           origCode = resultCode;
-        } else if (stateMap[resultCode] >= 0) {
-          origCode = stateMap[resultCode];
         } else {
-          origCode = ccState;
+          final int[] clazz = partition.getStates(resultCode);
+          origCode = clazz.length == 1 ? clazz[0] : ccState;
         }
         assert origCode >= 0;
         final StateProxy origState = getOriginalAutomatonState(origCode);
@@ -305,7 +314,7 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
   }
 
   private List<TraceStepProxy> getAdditionalTauSteps
-    (final TraceStepProxy startStep, final int level)
+    (final TraceStepProxy startStep, final int level) throws OverflowException
   {
     final AutomatonProxy origAut = getOriginalAutomaton();
     final Map<AutomatonProxy,StateProxy> stepMap = startStep.getStateMap();
@@ -330,15 +339,15 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
       iter.resetEvents(0, mNumEnabledEvents);
       while (iter.advance()) {
         final int tcode = iter.getCurrentTargetState();
-                if (visited.add(tcode)) {
-                  final int tlevel = mSimplifier.getLevel(tcode);
-                  if (tlevel < 0 || tlevel > slevel) {
-                    continue;
-                  }
+        if (visited.add(tcode)) {
+          final int tlevel = mSimplifier.getLevel(tcode);
+          if (tlevel < 0 || tlevel > slevel) {
+            continue;
+          }
           final int event = iter.getCurrentEvent();
           final SearchRecord newRecord =
             new SearchRecord(tcode, 0, event, record);
-                   if (tlevel <= level) {
+          if (tlevel <= level) {
             record = newRecord;
             break search;
           }
@@ -357,6 +366,50 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
     final ProductDESProxyFactory factory = verifier.getFactory();
     final List<TraceStepProxy> additionalSteps =
       new LinkedList<TraceStepProxy>();
+
+    /*
+     * Better start differently from here ~~~ Robi
+     *
+     * Starting point is:
+     *   aut     - automaton with certain conflicts
+     *             to be un-abstracted
+     *   stepMap - contains states of all automata at the end of the
+     *             original trace, but before trace extension
+     *   trace   - list of search records containing trace extension into
+     *             certain conflicts of the un-abstracted automaton
+     *
+     * Step 1:
+     *   Go through trace, find all non-tau events---these are the always
+     *   enabled events.
+     *   Then find all automata in stepMap (other than aut) that use one of
+     *   these events---these are the ones that need special treatment.
+     *
+     * Step 2:
+     *   For each automaton identified in step 1, identify local events.
+     *   (Local events are with respect to _all_ automata, not only
+     *   those identified in step 1.)
+     *   (This step can be skipped if there a no always enabled events.)
+     *
+     * Step 3:
+     *   For each automaton identified in step 1,
+     *   make state and event encoding and transition relation.
+     *   Then track through trace.
+     *   For each step with event e:
+     *   a) If e is not in aut, keep the step.
+     *   b) If e is in aut, then it is an always enabled event.
+     *      Search from end state according to stepMap, and find a string
+     *      of events local to aut leading to state with e enabled.
+     *      Insert these transitions then e into the trace.
+     *      (Update end state of aut in case there are more steps.)
+     *   c) A special case arises if we cannot reach a state
+     *      with e enabled in b). This means aut is in a dumpstate.
+     *      Then truncate the trace so it ends with this step,
+     *      and skip forward to the next automaton.
+     *
+     * Step 4:
+     *   For each automaton not identified in step 1, update step maps.
+     */
+
     final Map<AutomatonProxy,StateProxy> workMap = //contains map of automata to state
       new HashMap<AutomatonProxy,StateProxy>(stepMap);
     for (final SearchRecord recordReverse : trace) {
@@ -371,6 +424,86 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
           if (aut.getEvents().contains(event)) {
             final StateProxy sourceState = entry.getValue();
             for (final TransitionProxy transition : aut.getTransitions()) {
+              // TODO Fix bug. If event is 'always enabled', may have to
+              // take tau (local to aut) transitions before.
+              // final EventProxy e = transition.getEvent();
+              // TODO Figure out which events are always enabled.
+              //   >>> All events here (except tau) are always enabled
+              /*
+               if(e is an always enabled event)
+
+              // Look through each T with e enabled
+              // Do it's local events until it can do e
+              // If we reach a state without local events or e it is a dump state.
+
+              //   >>> Better find local events first, not again for each
+              //   >>> automaton and each trace step. Rewrite loop from above.
+              Map<EventProxy,List<AutomatonProxy>> localEventsCounter =
+                new HashMap<EventProxy,List<AutomatonProxy>>();
+              //   >>> How about TObjectIntHashMap<EventProxy> instead ?
+              for(AutomatonProxy autLocalCounter : workMap.keySet())
+              {
+              //Find which events are local events
+                for(EventProxy eventCount : autLocalCounter.getEvents())
+                {
+                  List<AutomatonProxy> autList = localEventsCounter.get(eventCount);
+                    if(autList == null)
+                    {
+                      ArrayList<AutomatonProxy> newAutList = new ArrayList<AutomatonProxy>();
+                      newAutList.add(autLocalCounter);
+                      localEventsCounter.put(eventCount, newAutList);
+                    }
+                    else
+                    {
+                      autList.add(autLocalCounter);
+                      localEventsCounter.put(eventCount, autList);
+                    }
+                }
+              }
+              //Create a list of automata that contain local events
+              List<AutomatonProxy> AutLocalEvents = new ArrayList<AutomatonProxy>();
+              for(EventProxy localEvent : localEventsCounter.keySet())
+              {
+                if(localEventsCounter.get(localEvent).size() == 1)
+                {
+                  AutomatonProxy autLocal = localEventsCounter.get(localEvent).get(0);
+                  if(autLocal != aut)
+                  AutLocalEvents.add(autLocal);
+                }
+              }
+              //TODO: If the automata contains no always enabled events remove it from list
+
+
+
+              for(AutomatonProxy Taut : AutLocalEvents)
+                {//For each test automaton, create transition iterator
+                  EventEncoding encoding = new EventEncoding(Taut, mKindTranslator);
+                  final ListBufferTransitionRelation transrel =
+                    new ListBufferTransitionRelation(Taut, encoding,
+                                                     ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+                  final TransitionIterator normalTransIterator =
+                    transrel.createSuccessorsReadOnlyIterator();
+                  //   >>> The iterator is fine, but we must use breadth-first
+                  //   >>> search following tau events to see if we can find
+                  //   >>> a state with e enabled
+                  //Start iterating over local events at the state we'd gotten up to
+                  normalTransIterator.resetState(sourceState);
+                  normalTransIterator.resetEventsByStatus(flags);
+                  //while the current state doesn't have e enabled
+                  while(normalTransIterator)
+                  {
+                    //Advance along a local event
+                    normalTransIterator.advance();
+                    //Add these transitions to the tracesteps.
+
+                    //If there are no more local events and e has still not been found, dump state
+                  }
+
+                }
+
+              */
+              //At the end every automata must be ready to do e
+              //Or we've reached a dump state
               if (transition.getSource() == sourceState
                   && transition.getEvent() == event) {
                 entry.setValue(transition.getTarget()); //this but backwards
@@ -496,25 +629,6 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
     final StateProxy state = new MemStateProxy(0, true);
     final Collection<StateProxy> states = Collections.singletonList(state);
     return factory.createAutomatonProxy(name, kind, events, states, null);
-  }
-
-  private int[] createStateMap(final List<int[]> partition)
-  {
-    if (partition != null) {
-      final int mapSize = partition.size();
-      final int[]stateMap = new int[mapSize];
-      int c = 0;
-      for (final int[] clazz : partition) {
-        if (clazz.length == 1) {
-          stateMap[c++] = clazz[0];
-        } else {
-          stateMap[c++] = -1;
-        }
-      }
-      return stateMap;
-    } else {
-      return null;
-    }
   }
 
 

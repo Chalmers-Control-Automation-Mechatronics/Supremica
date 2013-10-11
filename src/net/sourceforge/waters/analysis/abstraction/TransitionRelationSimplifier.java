@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.abstraction;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 
@@ -120,14 +121,11 @@ public interface TransitionRelationSimplifier
 
   /**
    * Gets the partition produced by the last {@link #run()}.
-   * @return The calculated partitioning. Each array in the collection
-   *         defines the state codes comprising an equivalence class
-   *         to be merged into a single state. A partition that does not
-   *         change the automaton is indicated by a return value of
-   *         <CODE>null</CODE>.
+   * @return The calculated partition, or <CODE>null</CODE> to indicate
+   *         a partition that does not change the automaton.
    * @see #isPartitioning()
    */
-  public List<int[]> getResultPartition();
+  public TRPartition getResultPartition();
 
   /**
    * Returns whether the abstraction produced by the last {@link #run()}

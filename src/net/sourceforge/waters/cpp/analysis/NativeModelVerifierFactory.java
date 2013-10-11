@@ -53,6 +53,7 @@ public class NativeModelVerifierFactory
   {
     super.addArguments();
     addArgument(new CommandLineArgumentBroad());
+    addArgument(new CommandLineArgumentDumpStateAware());
     addArgument(new CommandLineArgumentNarrow());
   }
 
@@ -96,6 +97,27 @@ public class NativeModelVerifierFactory
     {
       final NativeModelVerifier nverifier = (NativeModelVerifier) verifier;
       nverifier.setExplorerMode(ExplorerMode.BROAD);
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class CommandLineArgumentDumpStateAware
+  private static class CommandLineArgumentDumpStateAware
+    extends CommandLineArgumentFlag
+  {
+    private CommandLineArgumentDumpStateAware()
+    {
+      super("-lds", "Conflict check stops in local deadlock state");
+    }
+
+    @Override
+    public void configure(final ModelVerifier verifier)
+    {
+      if (verifier instanceof NativeConflictChecker) {
+        final NativeConflictChecker nverifier = (NativeConflictChecker) verifier;
+        nverifier.setDumpStateAware(true);
+      }
     }
   }
 

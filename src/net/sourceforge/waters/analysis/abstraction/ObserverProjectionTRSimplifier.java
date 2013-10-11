@@ -11,10 +11,9 @@ package net.sourceforge.waters.analysis.abstraction;
 
 import gnu.trove.list.array.TIntArrayList;
 
-import java.util.List;
-
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 
@@ -166,7 +165,7 @@ public class ObserverProjectionTRSimplifier
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numTransBefore = rel.getNumberOfTransitions();
     mBisimulator.setTransitionRelation(rel);
-    List<int[]> partition;
+    TRPartition partition;
     while (true) {
       checkAbort();
       final boolean modified = mBisimulator.run();
@@ -181,7 +180,7 @@ public class ObserverProjectionTRSimplifier
       }
       mBisimulator.setUpInitialPartition(partition);
     }
-    setResultPartitionList(partition);
+    setResultPartition(partition);
     applyResultPartitionAutomatically();
     return true;
   }
@@ -201,13 +200,13 @@ public class ObserverProjectionTRSimplifier
 
   //#########################################################################
   //# Auxiliary Methods
-  private boolean makeEventsVisible(final List<int[]> partition)
+  private boolean makeEventsVisible(final TRPartition partition)
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
     final int[] pmap = new int[numStates];
     int code = 0;
-    for (final int[] array : partition) {
+    for (final int[] array : partition.getClasses()) {
       for (final int state : array) {
         pmap[state] = code;
       }

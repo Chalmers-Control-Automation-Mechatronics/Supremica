@@ -64,7 +64,8 @@ BroadProductExplorer(const jni::ProductDESProxyFactoryGlue& factory,
     mEventRecords(0),
     mReversedEventRecords(0),
     mMaxNondeterministicUpdates(0),
-    mNondeterministicTransitionIterators(0)
+    mNondeterministicTransitionIterators(0),
+    mDumpStates(0)
 {
 }
 
@@ -76,6 +77,7 @@ BroadProductExplorer::
   }
   delete [] mEventRecords;
   delete [] mNondeterministicTransitionIterators;
+  delete [] mDumpStates;
 }
 
 
@@ -139,7 +141,7 @@ teardown()
          trans = trans->getNextInSearch()) {                            \
       const AutomatonRecord* aut = trans->getAutomaton();               \
       const int a = aut->getAutomatonIndex();                           \
-      const uint32_t source = sourcetuple[a];                             \
+      const uint32_t source = sourcetuple[a];                           \
       const uint32_t target = trans->getDeterministicSuccessorShifted(source); \
       if (target == TransitionRecord::NO_TRANSITION) {                  \
         dis = aut;                                                      \
@@ -151,21 +153,21 @@ teardown()
 #define EXPAND_ENABLED_TRANSITIONS(numwords, source,                    \
                                    sourcetuple, sourcepacked, event)    \
   {                                                                     \
-    uint32_t* bufferpacked = getStateSpace().prepare();                   \
+    uint32_t* bufferpacked = getStateSpace().prepare();                 \
     if (event->isDeterministic()) {                                     \
       for (int w = 0; w < numwords; w++) {                              \
         TransitionUpdateRecord* update = event->getTransitionUpdateRecord(w); \
         if (update == 0) {                                              \
           bufferpacked[w] = sourcepacked[w];                            \
         } else {                                                        \
-          uint32_t word = (sourcepacked[w] & update->getKeptMask()) |     \
+          uint32_t word = (sourcepacked[w] & update->getKeptMask()) |   \
             update->getCommonTargets();                                 \
           for (TransitionRecord* trans = update->getTransitionRecords(); \
                trans != 0;                                              \
                trans = trans->getNextInUpdate()) {                      \
             const AutomatonRecord* aut = trans->getAutomaton();         \
             const int a = aut->getAutomatonIndex();                     \
-            const uint32_t source = sourcetuple[a];                       \
+            const uint32_t source = sourcetuple[a];                     \
             word |= trans->getDeterministicSuccessorShifted(source);    \
           }                                                             \
           bufferpacked[w] = word;                                       \
@@ -179,14 +181,14 @@ teardown()
         if (update == 0) {                                              \
           bufferpacked[w] = sourcepacked[w];                            \
         } else {                                                        \
-          uint32_t word = (sourcepacked[w] & update->getKeptMask()) |     \
+          uint32_t word = (sourcepacked[w] & update->getKeptMask()) |   \
             update->getCommonTargets();                                 \
           for (TransitionRecord* trans = update->getTransitionRecords(); \
                trans != 0;                                              \
                trans = trans->getNextInUpdate()) {                      \
             const AutomatonRecord* aut = trans->getAutomaton();         \
             const int a = aut->getAutomatonIndex();                     \
-            const uint32_t source = sourcetuple[a];                       \
+            const uint32_t source = sourcetuple[a];                     \
             uint32_t succ = trans->getDeterministicSuccessorShifted(source); \
             if (succ == TransitionRecord::MULTIPLE_TRANSITIONS) {       \
               succ = mNondeterministicTransitionIterators[ndend++].     \
@@ -254,7 +256,7 @@ expandSafetyState(const uint32_t* sourcetuple, const uint32_t* sourcepacked)
 #undef ADD_NEW_STATE
 #define ADD_NEW_STATE(source)                                           \
   {                                                                     \
-    uint32_t code = getStateSpace().add();                                \
+    uint32_t code = getStateSpace().add();                              \
     if (code != source) {                                               \
       setConflictKind(jni::ConflictKind_CONFLICT);                      \
       if (code == getNumberOfStates()) {                                \
@@ -267,7 +269,7 @@ expandSafetyState(const uint32_t* sourcetuple, const uint32_t* sourcepacked)
 #undef ADD_NEW_STATE_ALLOC
 #define ADD_NEW_STATE_ALLOC(source, bufferpacked)                       \
   {                                                                     \
-    uint32_t code = getStateSpace().add();                                \
+    uint32_t code = getStateSpace().add();                              \
     if (code != source) {                                               \
       setConflictKind(jni::ConflictKind_CONFLICT);                      \
       if (code == getNumberOfStates()) {                                \
@@ -284,6 +286,18 @@ expandNonblockingReachabilityState(uint32_t source,
 {
   const int numwords = getAutomatonEncoding().getNumberOfSignificantWords();
   setConflictKind(jni::ConflictKind_DEADLOCK);
+  // Check for local dump states ...
+  if (mDumpStates != 0) {
+    uint32_t a = mDumpStates[0];
+    int d = 1;
+    do {
+      if (sourcetuple[a] == mDumpStates[d++]) {
+        return false;
+      }
+      a = mDumpStates[d++];
+    } while (a != UINT32_MAX);
+  }
+  // Expand transitions, check for global deadlock ...
   if (getTransitionLimit() > 0) {
 #   define ADD_TRANSITION addCoreachabilityTransition
 #   define ADD_TRANSITION_ALLOC ADD_TRANSITION
@@ -623,6 +637,7 @@ setupNonblocking()
 
   // Collect transitions ...
   const int numaut = getNumberOfAutomata();
+  uint32_t numdump = 0;
   for (int a = 0; a < numaut; a++) {
     AutomatonRecord* aut = getAutomatonEncoding().getRecord(a);
     const jni::AutomatonGlue& autglue = aut->getJavaAutomaton();
@@ -648,6 +663,21 @@ setupNonblocking()
         break;
       }
     }
+    numdump += aut->getNumberOfDumpStates();
+  }
+
+  // Make dump states list ...
+  if (numdump > 0) {
+    mDumpStates = new uint32_t[2 * numdump + 1];
+    int d = 0;
+    for (int a = 0; a < numaut; a++) {
+      const AutomatonRecord* aut = getAutomatonEncoding().getRecord(a);
+      for (int i = 0; i < aut->getNumberOfDumpStates(); i++) {
+        mDumpStates[d++] = a;
+        mDumpStates[d++] = aut->getDumpState(i);
+      }
+    }
+    mDumpStates[d] = UINT32_MAX;
   }
 
   // Establish compact event list ...
@@ -694,6 +724,14 @@ setupTransitions
     aut->createStateMap();
   const jni::CollectionGlue transitions = autglue.getTransitionsGlue(cache);
   const jni::TreeSetGlue uniqtrans(&transitions, cache);
+  bool* dumpstatus = 0;
+  if (isDumpStateAware() && !aut->isAllMarked()) {
+    uint32_t numstates = aut->getNumberOfStates();
+    dumpstatus = new bool[numstates];
+    for (uint32_t s = 0; s < numstates; s++) {
+      dumpstatus[s] = !aut->isMarkedState(s);
+    }
+  }
   int maxpass = 1;
   for (int pass = 1; pass <= maxpass; pass++) {
     const jni::IteratorGlue transiter = uniqtrans.iteratorGlue(cache);
@@ -715,11 +753,18 @@ setupTransitions
         if (!det) {
           maxpass = 2;
         }
+        if (dumpstatus != 0) {
+          dumpstatus[sourcecode] = false;
+        }
       } else {
         eventrecord->addNondeterministicTransition
           (aut, sourcecode, targetcode);
       }
     }
+  }
+  if (dumpstatus != 0) {
+    aut->setupDumpStates(dumpstatus);
+    delete [] dumpstatus;
   }
   aut->deleteStateMap(statemap);
 }

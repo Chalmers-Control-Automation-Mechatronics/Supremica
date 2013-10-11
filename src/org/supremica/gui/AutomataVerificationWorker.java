@@ -49,15 +49,23 @@
  */
 package org.supremica.gui;
 
-import java.awt.*;
-import javax.swing.*;
-import java.util.*;
-import org.supremica.log.*;
-import org.supremica.automata.algorithms.*;
-import org.supremica.automata.algorithms.minimization.*;
+import java.awt.EventQueue;
+import java.util.ArrayList;
+
+import javax.swing.JOptionPane;
+
+import net.sourceforge.waters.model.analysis.Abortable;
+
 import org.supremica.automata.Automata;
-import org.supremica.util.ActionTimer;
+import org.supremica.automata.algorithms.AutomataVerifier;
+import org.supremica.automata.algorithms.SynchronizationOptions;
+import org.supremica.automata.algorithms.VerificationOptions;
+import org.supremica.automata.algorithms.VerificationType;
+import org.supremica.automata.algorithms.minimization.MinimizationOptions;
 import org.supremica.gui.ide.IDEReportInterface;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
+import org.supremica.util.ActionTimer;
 
 /**
  * Thread dealing with verification.
@@ -67,7 +75,7 @@ import org.supremica.gui.ide.IDEReportInterface;
  */
 public class AutomataVerificationWorker
     extends Thread
-    implements Stoppable
+    implements Abortable
 {
     private static Logger logger = LoggerFactory.createLogger(AutomataVerificationWorker.class);
 
@@ -81,7 +89,7 @@ public class AutomataVerificationWorker
     private final SynchronizationOptions synchronizationOptions;
     private final MinimizationOptions minimizationOptions;
     private ExecutionDialog executionDialog;
-    private boolean stopRequested = false;
+    private boolean abortRequested = false;
     @SuppressWarnings("unused")
 	private final EventQueue eventQueue = new EventQueue();
 
@@ -102,6 +110,7 @@ public class AutomataVerificationWorker
         this.start();
     }
 
+    @Override
     public void run()
     {
         final AutomataVerifier automataVerifier;
@@ -115,7 +124,7 @@ public class AutomataVerificationWorker
         {
             JOptionPane.showMessageDialog(workbench.getFrame(), errorMessage,
                 "Alert", JOptionPane.ERROR_MESSAGE);
-            requestStop();
+            requestAbort();
 
             return;
         }
@@ -156,14 +165,14 @@ public class AutomataVerificationWorker
           break;
         default:
           // Error... this can't happen!
-          requestStop();
+          requestAbort();
           logger.error("Error in AutomataVerificationWorker. Unavailable option chosen... " +
                        "this can't happen.\nPlease send bug report to bugs@supremica.org.");
           return;
         }
 
         // Did some initialization go wrong?
-        if (stopRequested)
+        if (abortRequested)
         {
             return;
         }
@@ -176,7 +185,7 @@ public class AutomataVerificationWorker
         }
         catch (final Exception ex)
         {
-            requestStop();
+            requestAbort();
             JOptionPane.showMessageDialog(workbench.getFrame(), ex.getMessage(),
                 "Error", JOptionPane.ERROR_MESSAGE);
             logger.error(ex.getMessage());
@@ -186,7 +195,7 @@ public class AutomataVerificationWorker
         }
 
         // Initialize the ExecutionDialog
-        final ArrayList<Stoppable> threadsToStop = new ArrayList<Stoppable>();
+        final ArrayList<Abortable> threadsToStop = new ArrayList<Abortable>();
         threadsToStop.add(this);
         threadsToStop.add(automataVerifier);
         executionDialog = new ExecutionDialog(workbench.getFrame(), "Verifying", threadsToStop);
@@ -204,6 +213,7 @@ public class AutomataVerificationWorker
         // Make sure(?) the ExecutionDialog is hidden!
         EventQueue.invokeLater(new Runnable()
         {
+            @Override
             public void run()
             {
                 if (executionDialog != null)
@@ -214,7 +224,7 @@ public class AutomataVerificationWorker
         });
 
         // Present the result
-        if (!stopRequested)
+        if (!abortRequested)
         {
             // Show message dialog with result
             if (verificationSuccess)
@@ -251,9 +261,10 @@ public class AutomataVerificationWorker
      *
      *@see  ExecutionDialog
      */
-    public void requestStop()
+    @Override
+    public void requestAbort()
     {
-        stopRequested = true;
+        abortRequested = true;
 
         logger.debug("AutomataVerificationWorker requested to stop.");
 
@@ -263,8 +274,14 @@ public class AutomataVerificationWorker
         }
     }
 
-    public boolean isStopped()
+    @Override
+    public boolean isAborting()
     {
-        return stopRequested;
+        return abortRequested;
+    }
+
+    @Override
+    public void resetAbort(){
+      abortRequested = false;
     }
 }

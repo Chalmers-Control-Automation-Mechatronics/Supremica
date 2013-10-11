@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: COMP452/552-12A Assignment 3
+//# PROJECT: COMP452/552-13A Assignment 3
 //# PACKAGE: net.sourceforge.waters.analysis.comp552
 //# CLASS:   BDDConflictChecker
 //###########################################################################
@@ -12,13 +12,13 @@
 //# You are welcome to edit this file as much as you like,
 //# but please DO NOT CHANGE the public interface.
 //# Do not change the signature of the two constructors,
-//# or the run() or getCounterExample() method.
+//# or of the run() or getCounterExample() methods.
 //# You should expect that several calls to run() followed by
 //# getCounterExample(), so your code needs to be reentrant and it
 //# must shut down the BDDFactory even in case of an exception.
 //###########################################################################
 //# WARNING: If you do not comply with these rules, the automatic tester
-//# may fail to run your program, resulting in 0 marks for you assignment.
+//# may fail to run your program, resulting in 0 marks for your assignment.
 //###########################################################################
 
 package net.sourceforge.waters.analysis.comp552;
@@ -100,6 +100,7 @@ public class BDDConflictChecker extends ModelChecker
    * @return <CODE>true</CODE> if the model is nonconflicting, or
    *         <CODE>false</CODE> if it is not.
    */
+  @Override
   public boolean run()
   {
     // Let us try to open a BDD factory. The "java" BDD factory is much
@@ -227,6 +228,7 @@ public class BDDConflictChecker extends ModelChecker
    *         of this conflict checker and shares its automata and
    *         event objects.
    */
+  @Override
   public ConflictTraceProxy getCounterExample()
   {
     // Just return a stored counterexample. This is the recommended way

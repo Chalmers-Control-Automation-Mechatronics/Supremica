@@ -49,8 +49,9 @@
  */
 package org.supremica.automata.algorithms;
 
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
-import org.supremica.log.*;
 
 public final class EditorSynthesizerOptions
 {
@@ -84,19 +85,19 @@ public final class EditorSynthesizerOptions
     //Guard options
     private String event;
     private int expressionType;    // 0: the guard expression will be generated from the forbidden states; 1: from allowed states; 2: Adaptive case
-        
+
     //Optimization options
     private String optVariable;
     private boolean typeOfVarOpt = true;
-        
+
 
     /**
      * The current options, based on earlier user preferences.
      */
     public EditorSynthesizerOptions()
     {
-        this((SynthesisType) Config.SYNTHESIS_SYNTHESIS_TYPE.get(),
-            (SynthesisAlgorithm) Config.SYNTHESIS_ALGORITHM_TYPE.get(),
+        this(Config.SYNTHESIS_SYNTHESIS_TYPE.get(),
+            Config.SYNTHESIS_ALGORITHM_TYPE.get(),
             Config.SYNTHESIS_PURGE.get(),
             Config.SYNTHESIS_OPTIMIZE.get(),
             Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.get(),
@@ -116,10 +117,10 @@ public final class EditorSynthesizerOptions
      * modify the necessary options one by one, starting from default! Much more readable and
      * also more practical when adding new options.
      */
-    private EditorSynthesizerOptions(SynthesisType synthesisType, SynthesisAlgorithm synthesisAlgorithm,
-    		boolean purge, boolean removeUnnecessarySupervisors, boolean maximallyPermissive,
-    		boolean maximallyPermissiveIncremental, boolean reduceSupervisors, boolean bddExtractSupervisor, 
-                boolean computePrintGuard, boolean addGuards, boolean saveInFile, boolean reachability, boolean optimization)
+    private EditorSynthesizerOptions(final SynthesisType synthesisType, final SynthesisAlgorithm synthesisAlgorithm,
+    		final boolean purge, final boolean removeUnnecessarySupervisors, final boolean maximallyPermissive,
+    		final boolean maximallyPermissiveIncremental, final boolean reduceSupervisors, final boolean bddExtractSupervisor,
+                final boolean computePrintGuard, final boolean addGuards, final boolean saveInFile, final boolean reachability, final boolean optimization)
     {
         this.synthesisType = synthesisType;
         this.synthesisAlgorithm = synthesisAlgorithm;
@@ -137,13 +138,13 @@ public final class EditorSynthesizerOptions
 
         this.event = "";
         this.expressionType = 2;
-        
+
         this.optVariable = "";
     }
 
     public boolean isValid()
     {
-        String errorMessage = validOptions();
+        final String errorMessage = validOptions();
         if (errorMessage != null)
         {
             logger.error(errorMessage);
@@ -183,7 +184,7 @@ public final class EditorSynthesizerOptions
         return null;
     }
 
-    public void setDialogOK(boolean bool)
+    public void setDialogOK(final boolean bool)
     {
         dialogOK = bool;
     }
@@ -193,7 +194,7 @@ public final class EditorSynthesizerOptions
         return dialogOK;
     }
 
-    public void setSynthesisType(SynthesisType type)
+    public void setSynthesisType(final SynthesisType type)
     {
         synthesisType = type;
     }
@@ -203,7 +204,7 @@ public final class EditorSynthesizerOptions
         return synthesisType;
     }
 
-    public void setSynthesisAlgorithm(SynthesisAlgorithm algorithm)
+    public void setSynthesisAlgorithm(final SynthesisAlgorithm algorithm)
     {
         synthesisAlgorithm = algorithm;
     }
@@ -213,7 +214,7 @@ public final class EditorSynthesizerOptions
         return synthesisAlgorithm;
     }
 
-    public void setPurge(boolean bool)
+    public void setPurge(final boolean bool)
     {
         purge = bool;
     }
@@ -223,7 +224,7 @@ public final class EditorSynthesizerOptions
         return purge;
     }
 
-    public void setRememberDisabledUncontrollableEvents(boolean remember)
+    public void setRememberDisabledUncontrollableEvents(final boolean remember)
     {
         rememberDisabledUncontrollableEvents = remember;
     }
@@ -233,7 +234,7 @@ public final class EditorSynthesizerOptions
         return rememberDisabledUncontrollableEvents;
     }
 
-    public void setRemoveUnecessarySupervisors(boolean bool)
+    public void setRemoveUnecessarySupervisors(final boolean bool)
     {
         removeUnnecessarySupervisors = bool;
     }
@@ -243,7 +244,7 @@ public final class EditorSynthesizerOptions
         return removeUnnecessarySupervisors;
     }
 
-    public void setExtractSupervisor(boolean extract)
+    public void setExtractSupervisor(final boolean extract)
     {
         bddExtractSupervisor = extract;
     }
@@ -253,7 +254,7 @@ public final class EditorSynthesizerOptions
         return bddExtractSupervisor;
     }
 
-    public void setMaximallyPermissive(boolean bool)
+    public void setMaximallyPermissive(final boolean bool)
     {
         maximallyPermissive = bool;
     }
@@ -263,7 +264,7 @@ public final class EditorSynthesizerOptions
         return maximallyPermissive;
     }
 
-    public void setMaximallyPermissiveIncremental(boolean bool)
+    public void setMaximallyPermissiveIncremental(final boolean bool)
     {
         maximallyPermissiveIncremental = bool;
     }
@@ -273,7 +274,7 @@ public final class EditorSynthesizerOptions
         return maximallyPermissiveIncremental;
     }
 
-    public void setReduceSupervisors(boolean bool)
+    public void setReduceSupervisors(final boolean bool)
     {
         reduceSupervisors = bool;
     }
@@ -288,33 +289,33 @@ public final class EditorSynthesizerOptions
         return printGuard;
     }
 
-    public void setPrintGuard(boolean bool)
+    public void setPrintGuard(final boolean bool)
     {
         printGuard = bool;
     }
-    
+
     public boolean getAddGuards()
     {
         return addGuards;
     }
 
-    public void setAddGuards(boolean bool)
+    public void setAddGuards(final boolean bool)
     {
         addGuards = bool;
     }
-    
+
     public boolean getSaveInFile()
     {
         return saveInFile;
     }
 
 
-    public void setSaveInFile(boolean bool)
+    public void setSaveInFile(final boolean bool)
     {
         saveInFile = bool;
     }
 
-    public void setSaveIDDInFile(boolean bool)
+    public void setSaveIDDInFile(final boolean bool)
     {
         saveIDDInFile = bool;
     }
@@ -324,7 +325,7 @@ public final class EditorSynthesizerOptions
         return saveIDDInFile;
     }
 
-    public void setCompHeuristic(boolean bool)
+    public void setCompHeuristic(final boolean bool)
     {
         compHeuristic = bool;
     }
@@ -334,7 +335,7 @@ public final class EditorSynthesizerOptions
         return compHeuristic;
     }
 
-    public void setIndpHeuristic(boolean bool)
+    public void setIndpHeuristic(final boolean bool)
     {
         indpHeuristic = bool;
     }
@@ -350,7 +351,7 @@ public final class EditorSynthesizerOptions
     }
 
 
-    public void setReachability(boolean bool)
+    public void setReachability(final boolean bool)
     {
         reachability = bool;
     }
@@ -360,12 +361,12 @@ public final class EditorSynthesizerOptions
         return optimization;
     }
 
-    public void setOptimization(boolean bool)
+    public void setOptimization(final boolean bool)
     {
         optimization = bool;
     }
 
-    public void setGlobalClockDomain(long domain)
+    public void setGlobalClockDomain(final long domain)
     {
         globalClockDomain = domain;
     }
@@ -380,8 +381,8 @@ public final class EditorSynthesizerOptions
      */
     public void saveOptions()
     {
-        Config.SYNTHESIS_SYNTHESIS_TYPE.set(synthesisType);
-        Config.SYNTHESIS_ALGORITHM_TYPE.set(synthesisAlgorithm);
+        Config.SYNTHESIS_SYNTHESIS_TYPE.setValue(synthesisType);
+        Config.SYNTHESIS_ALGORITHM_TYPE.setValue(synthesisAlgorithm);
 //        Config.SYNTHESIS_PURGE.set(purge);
 //        Config.SYNTHESIS_OPTIMIZE.set(removeUnnecessarySupervisors);
         Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.set(maximallyPermissive);
@@ -410,7 +411,7 @@ public final class EditorSynthesizerOptions
      */
     public static EditorSynthesizerOptions getDefaultMonolithicCNBSynthesizerOptions()
     {
-        EditorSynthesizerOptions options = getDefaultSynthesizerOptions();
+        final EditorSynthesizerOptions options = getDefaultSynthesizerOptions();
 		options.synthesisType = SynthesisType.NONBLOCKINGCONTROLLABLE;
         options.synthesisAlgorithm = SynthesisAlgorithm.BDD;
         options.removeUnnecessarySupervisors = false;
@@ -425,7 +426,7 @@ public final class EditorSynthesizerOptions
 
         options.setExpressionType(2);
 		options.setEvent("");
-        
+
         return options;
     }
 
@@ -436,7 +437,7 @@ public final class EditorSynthesizerOptions
         return expressionType;
     }
 
-    public void setExpressionType(int set)
+    public void setExpressionType(final int set)
 	{
 		expressionType = set;
 	}
@@ -446,30 +447,30 @@ public final class EditorSynthesizerOptions
         return event;
     }
 
-    public void setEvent(String set)
+    public void setEvent(final String set)
     {
 	event = set;
     }
-    
+
     public String getOptVaribale()
     {
         return optVariable;
     }
-    
-    public void setOptVariable(String var)
+
+    public void setOptVariable(final String var)
     {
         optVariable=  var;
     }
-    
+
     public boolean getTypeOfVarOpt()
     {
         return typeOfVarOpt;
     }
-    
-    public void setTypeOfVarOpt(boolean minMax)
+
+    public void setTypeOfVarOpt(final boolean minMax)
     {
         typeOfVarOpt = minMax;
-    } 
+    }
 
 
 }

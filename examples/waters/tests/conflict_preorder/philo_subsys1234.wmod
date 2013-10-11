@@ -1,0 +1,2429 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="philo_subsys1234" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Subsystem abstraction of dining philosophers model, part of conflict preorder checker benchmark.</ns2:Comment>
+    <ConstantAliasList>
+        <ConstantAlias Scope="OPTIONAL_PARAMETER" Name="N">
+            <ConstantAliasExpression>
+                <IntConstant Value="6"/>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+    </ConstantAliasList>
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Name="take">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <BinaryExpression Operator="-">
+                        <SimpleIdentifier Name="N"/>
+                        <IntConstant Value="1"/>
+                    </BinaryExpression>
+                </BinaryExpression>
+                <EnumSetExpression Text="[U,L]">
+                    <SimpleIdentifier Name="U"/>
+                    <SimpleIdentifier Name="L"/>
+                </EnumSetExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="put">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <BinaryExpression Operator="-">
+                        <SimpleIdentifier Name="N"/>
+                        <IntConstant Value="1"/>
+                    </BinaryExpression>
+                </BinaryExpression>
+                <EnumSetExpression Text="[U,L]">
+                    <SimpleIdentifier Name="U"/>
+                    <SimpleIdentifier Name="L"/>
+                </EnumSetExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="CONTROLLABLE" Name="hungry">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <BinaryExpression Operator="-">
+                        <SimpleIdentifier Name="N"/>
+                        <IntConstant Value="1"/>
+                    </BinaryExpression>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Observable="false" Name="tau"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="subsys1234">
+            <Graph Deterministic="false">
+                <NodeList>
+                    <SimpleNode Initial="true" Name="q0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q1"/>
+                    <SimpleNode Name="q10"/>
+                    <SimpleNode Name="q11"/>
+                    <SimpleNode Name="q12"/>
+                    <SimpleNode Name="q13"/>
+                    <SimpleNode Name="q14"/>
+                    <SimpleNode Name="q15"/>
+                    <SimpleNode Name="q16"/>
+                    <SimpleNode Name="q17"/>
+                    <SimpleNode Name="q18"/>
+                    <SimpleNode Name="q19"/>
+                    <SimpleNode Name="q2"/>
+                    <SimpleNode Name="q20"/>
+                    <SimpleNode Name="q21"/>
+                    <SimpleNode Name="q22"/>
+                    <SimpleNode Name="q23"/>
+                    <SimpleNode Name="q24"/>
+                    <SimpleNode Name="q25"/>
+                    <SimpleNode Name="q26"/>
+                    <SimpleNode Name="q27"/>
+                    <SimpleNode Name="q28"/>
+                    <SimpleNode Name="q29"/>
+                    <SimpleNode Name="q3"/>
+                    <SimpleNode Name="q30"/>
+                    <SimpleNode Name="q31"/>
+                    <SimpleNode Name="q32"/>
+                    <SimpleNode Name="q33"/>
+                    <SimpleNode Name="q34"/>
+                    <SimpleNode Name="q35"/>
+                    <SimpleNode Name="q36"/>
+                    <SimpleNode Name="q37"/>
+                    <SimpleNode Name="q38"/>
+                    <SimpleNode Name="q39"/>
+                    <SimpleNode Name="q4"/>
+                    <SimpleNode Name="q40"/>
+                    <SimpleNode Name="q41"/>
+                    <SimpleNode Name="q42"/>
+                    <SimpleNode Name="q43"/>
+                    <SimpleNode Name="q44"/>
+                    <SimpleNode Name="q45"/>
+                    <SimpleNode Name="q46"/>
+                    <SimpleNode Name="q47"/>
+                    <SimpleNode Name="q48"/>
+                    <SimpleNode Name="q49"/>
+                    <SimpleNode Name="q5"/>
+                    <SimpleNode Name="q50"/>
+                    <SimpleNode Name="q51"/>
+                    <SimpleNode Name="q52"/>
+                    <SimpleNode Name="q53"/>
+                    <SimpleNode Name="q54"/>
+                    <SimpleNode Name="q55"/>
+                    <SimpleNode Name="q56"/>
+                    <SimpleNode Name="q57"/>
+                    <SimpleNode Name="q58"/>
+                    <SimpleNode Name="q59"/>
+                    <SimpleNode Name="q6"/>
+                    <SimpleNode Name="q60"/>
+                    <SimpleNode Name="q61"/>
+                    <SimpleNode Name="q62"/>
+                    <SimpleNode Name="q63"/>
+                    <SimpleNode Name="q64"/>
+                    <SimpleNode Name="q65"/>
+                    <SimpleNode Name="q66"/>
+                    <SimpleNode Name="q67"/>
+                    <SimpleNode Name="q68"/>
+                    <SimpleNode Name="q69"/>
+                    <SimpleNode Name="q7"/>
+                    <SimpleNode Name="q70"/>
+                    <SimpleNode Name="q71"/>
+                    <SimpleNode Name="q72"/>
+                    <SimpleNode Name="q73"/>
+                    <SimpleNode Name="q74"/>
+                    <SimpleNode Name="q75"/>
+                    <SimpleNode Name="q76"/>
+                    <SimpleNode Name="q77"/>
+                    <SimpleNode Name="q78"/>
+                    <SimpleNode Name="q79"/>
+                    <SimpleNode Name="q8"/>
+                    <SimpleNode Name="q80"/>
+                    <SimpleNode Name="q81"/>
+                    <SimpleNode Name="q82"/>
+                    <SimpleNode Name="q83"/>
+                    <SimpleNode Name="q84"/>
+                    <SimpleNode Name="q85"/>
+                    <SimpleNode Name="q86"/>
+                    <SimpleNode Name="q87"/>
+                    <SimpleNode Name="q88"/>
+                    <SimpleNode Name="q89"/>
+                    <SimpleNode Name="q9"/>
+                    <SimpleNode Name="q90"/>
+                    <SimpleNode Name="q91"/>
+                    <SimpleNode Name="q92"/>
+                    <SimpleNode Name="q93"/>
+                    <SimpleNode Name="q94"/>
+                    <SimpleNode Name="q95"/>
+                    <SimpleNode Name="q96"/>
+                    <SimpleNode Name="q97"/>
+                    <SimpleNode Name="q98"/>
+                    <SimpleNode Name="q99"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="q0" Target="q13">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q0" Target="q24">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q0" Target="q73">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="4"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q1" Target="q20">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q1" Target="q36">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q1" Target="q83">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q10" Target="q13">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q10" Target="q29">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q10" Target="q5">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="4"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q11" Target="q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q11" Target="q31">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q11" Target="q40">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q11" Target="q91">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q12" Target="q11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q12" Target="q32">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q12" Target="q41">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q13" Target="q16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q13" Target="q48">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q13" Target="q8">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="4"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q13" Target="q99">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q14" Target="q18">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q14" Target="q41">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q15" Target="q10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q15" Target="q19">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q16" Target="q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q16" Target="q49">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q16" Target="q9">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="4"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q17" Target="q30">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q17" Target="q66">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q18" Target="q2">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q18" Target="q45">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q18" Target="q51">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q19" Target="q13">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q19" Target="q3">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q19" Target="q52">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q2" Target="q14">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q2" Target="q26">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q20" Target="q0">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q20" Target="q39">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q20" Target="q50">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q21" Target="q47">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q21" Target="q61">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q21" Target="q76">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q21" Target="q87">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q22" Target="q47">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q22" Target="q62">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q22" Target="q79">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q23" Target="q36">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q23" Target="q69">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q23" Target="q99">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q24" Target="q59">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q24" Target="q83">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q24" Target="q96">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="4"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q24" Target="q99">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q25" Target="q23">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q25" Target="q3">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q25" Target="q40">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q26" Target="q25">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q26" Target="q41">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q27" Target="q53">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q27" Target="q56">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q27" Target="q9">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q28" Target="q58">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q28" Target="q72">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q29" Target="q16">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q29" Target="q27">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="4"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q29" Target="q83">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q3" Target="q15">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q3" Target="q99">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q30" Target="q33">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q30" Target="q53">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q31" Target="q20">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q31" Target="q44">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q31" Target="q60">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q31" Target="q7">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q32" Target="q31">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q32" Target="q45">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q32" Target="q61">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q33" Target="q17">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q33" Target="q34">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q33" Target="q65">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q34" Target="q66">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q34" Target="q89">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q35" Target="q58">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q35" Target="q77">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q36" Target="q10">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q36" Target="q39">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q36" Target="q54">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q37" Target="q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q37" Target="q61">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q37" Target="q62">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q37" Target="q90">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q38" Target="q24">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q38" Target="q3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q38" Target="q63">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q38" Target="q91">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q39" Target="q13">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q39" Target="q23">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q39" Target="q42">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q39" Target="q68">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q4" Target="q28">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q4" Target="q35">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q4" Target="q51">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q40" Target="q15">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q40" Target="q36">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q40" Target="q44">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q41" Target="q40">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q41" Target="q45">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q42" Target="q16">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q42" Target="q20">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q42" Target="q69">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q43" Target="q46">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q43" Target="q65">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q43" Target="q70">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q44" Target="q19">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q44" Target="q25">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q44" Target="q39">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q44" Target="q71">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q45" Target="q26">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q45" Target="q44">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q45" Target="q72">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q46" Target="q27">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q46" Target="q66">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q46" Target="q96">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q47" Target="q85">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q47" Target="q97">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q48" Target="q43">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="4"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q48" Target="q49">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q48" Target="q74">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q49" Target="q24">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q49" Target="q29">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q49" Target="q46">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="4"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q5" Target="q27">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q5" Target="q30">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q5" Target="q8">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q50" Target="q1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q50" Target="q23">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q50" Target="q24">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q50" Target="q82">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q51" Target="q72">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q51" Target="q77">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q52" Target="q48">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q52" Target="q78">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q53" Target="q34">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q53" Target="q76">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q54" Target="q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q54" Target="q29">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q54" Target="q42">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q55" Target="q5">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q55" Target="q57">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q55" Target="q75">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q56" Target="q73">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q56" Target="q76">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q56" Target="q79">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q56" Target="q90">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q57" Target="q27">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q57" Target="q80">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q58" Target="q95">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q59" Target="q10">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q59" Target="q55">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="4"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q59" Target="q64">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q6" Target="q18">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q6" Target="q32">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q6" Target="q37">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q60" Target="q11">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q60" Target="q25">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q60" Target="q38">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q60" Target="q50">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q60" Target="q84">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q61" Target="q12">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q61" Target="q26">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q61" Target="q60">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q61" Target="q85">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q62" Target="q14">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q62" Target="q85">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q63" Target="q15">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q63" Target="q59">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q64" Target="q29">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q64" Target="q57">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="4"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q65" Target="q66">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q65" Target="q88">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q66" Target="q21">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q66" Target="q53">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q67" Target="q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q67" Target="q79">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q67" Target="q87">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q68" Target="q48">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q68" Target="q69">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q68" Target="q92">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q69" Target="q49">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q69" Target="q50">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q69" Target="q54">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q7" Target="q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q7" Target="q19">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q7" Target="q38">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q70" Target="q27">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q70" Target="q88">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q71" Target="q52">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q71" Target="q68">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q71" Target="q94">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q72" Target="q71">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q72" Target="q95">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q73" Target="q6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q73" Target="q81">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q73" Target="q89">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q73" Target="q96">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q74" Target="q29">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q74" Target="q70">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="4"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q75" Target="q30">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q75" Target="q80">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q76" Target="q12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q76" Target="q89">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q76" Target="q97">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q77" Target="q95">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q78" Target="q74">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q79" Target="q14">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q79" Target="q81">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q79" Target="q97">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q8" Target="q33">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q8" Target="q43">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q8" Target="q9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q8" Target="q93">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q80" Target="q53">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q81" Target="q18">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q81" Target="q4">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q81" Target="q67">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q81" Target="q98">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q82" Target="q36">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q82" Target="q59">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q82" Target="q86">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q83" Target="q0">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q83" Target="q10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q83" Target="q56">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="4"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q84" Target="q40">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q84" Target="q63">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q84" Target="q82">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q85" Target="q41">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q85" Target="q84">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q86" Target="q54">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q86" Target="q64">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q87" Target="q26">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q87" Target="q97">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q88" Target="q53">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q89" Target="q21">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q89" Target="q32">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q89" Target="q98">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q9" Target="q34">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q9" Target="q46">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q9" Target="q73">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q90" Target="q12">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q90" Target="q14">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q90" Target="q6">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q91" Target="q15">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q91" Target="q7">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q91" Target="q83">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q92" Target="q54">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q92" Target="q74">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q93" Target="q17">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q93" Target="q46">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q93" Target="q5">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q94" Target="q78">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q94" Target="q92">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q95" Target="q94">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q96" Target="q21">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q96" Target="q22">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q96" Target="q37">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q96" Target="q56">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q96" Target="q67">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q97" Target="q41">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q97" Target="q98">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q98" Target="q28">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q98" Target="q45">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q98" Target="q87">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q99" Target="q10">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q99" Target="q49">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q99" Target="q93">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="4"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="abs1234">
+            <Graph Deterministic="false">
+                <NodeList>
+                    <SimpleNode Initial="true" Name="idle">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="112" Y="208"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="9" Y="-9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="all_eat">
+                        <PointGeometry>
+                            <Point X="448" Y="208"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="7" Y="-5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="eUhL">
+                        <PointGeometry>
+                            <Point X="288" Y="368"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-42" Y="-19"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="eL">
+                        <PointGeometry>
+                            <Point X="192" Y="48"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-21" Y="3"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="eLhU">
+                        <PointGeometry>
+                            <Point X="288" Y="48"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-38" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="hU">
+                        <PointGeometry>
+                            <Point X="192" Y="288"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-28" Y="-9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="eU">
+                        <PointGeometry>
+                            <Point X="192" Y="368"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-24" Y="-17"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="hUL">
+                        <PointGeometry>
+                            <Point X="288" Y="288"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-32" Y="2"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="hLeU">
+                        <PointGeometry>
+                            <Point X="368" Y="128"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-37" Y="-15"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="hL">
+                        <PointGeometry>
+                            <Point X="192" Y="128"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-26" Y="-9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="edge_hungry">
+                        <PointGeometry>
+                            <Point X="320" Y="208"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="9" Y="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="hUeL">
+                        <PointGeometry>
+                            <Point X="368" Y="288"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-39" Y="2"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="hLU">
+                        <PointGeometry>
+                            <Point X="288" Y="128"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-31" Y="-17"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="idle" Target="hU">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="4"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-27" Y="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="idle" Target="hL">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-30" Y="3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="all_eat" Target="eL">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="15" Y="-2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="382" Y="27"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="all_eat" Target="eU">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="11" Y="-16"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="378" Y="376"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="eUhL" Target="all_eat">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-75" Y="24"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="398" Y="305"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="eUhL" Target="hL">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-11" Y="76"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="221" Y="249"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="eL" Target="idle">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-49" Y="-29"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="129" Y="93"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="eL" Target="eLhU">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="4"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-29" Y="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="eLhU" Target="all_eat">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-62" Y="-30"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="408" Y="99"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="eLhU" Target="hU">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="3" Y="-89"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="221" Y="163"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="hU" Target="eU">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-31" Y="-22"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="hU" Target="hUL">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-27" Y="-20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="hU" Target="edge_hungry">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-16" Y="1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="260" Y="232"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="eU" Target="idle">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="put">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-45" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="130" Y="328"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="eU" Target="eUhL">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-30" Y="3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="hUL" Target="eUhL">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-30" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="hUL" Target="hUeL">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-36" Y="-21"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="hLeU" Target="all_eat">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-47" Y="-20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="412" Y="161"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="hL" Target="eL">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-39" Y="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="hL" Target="edge_hungry">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="4"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-19" Y="-22"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="260" Y="184"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="hL" Target="hLU">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="hungry">
+                                <IntConstant Value="4"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-29" Y="1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="edge_hungry" Target="eUhL">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="7" Y="-33"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="313" Y="261"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="edge_hungry" Target="eLhU">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="9" Y="15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="316" Y="153"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="hUeL" Target="all_eat">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-51" Y="6"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="409" Y="258"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="hLU" Target="eLhU">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="1"/>
+                                <SimpleIdentifier Name="L"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="hLU" Target="hLeU">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="take">
+                                <IntConstant Value="5"/>
+                                <SimpleIdentifier Name="U"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-30" Y="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

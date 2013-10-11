@@ -11,16 +11,19 @@ package net.sourceforge.waters.model.compiler;
 
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.model.expr.AbstractOperatorTable;
 import net.sourceforge.waters.model.expr.AbstractSimpleExpressionSimplifier;
 import net.sourceforge.waters.model.expr.BinaryOperator;
+import net.sourceforge.waters.model.expr.BuiltInFunction;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.FunctionCallExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -114,6 +117,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     storeAssignment(mDecrementOperator, mMinusOperator);
     storeAssignment(mAndWithOperator, mAndOperator);
     storeAssignment(mOrWithOperator, mOrOperator);
+
+    mMaxFunction = new MaxFunction();
+    mMinFunction = new MinFunction();
+    mIteFunction = new IteFunction();
+    store(mMaxFunction);
+    store(mMinFunction);
+    store(mIteFunction);
   }
 
   private void storeComplements(final BinaryOperator op1,
@@ -137,7 +147,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
 
   //#########################################################################
-  //# Acess by Logic Semantics
+  //# Access by Logic Semantics
   public BinaryOperator getAndOperator()
   {
     return mAndOperator;
@@ -262,6 +272,42 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   public BinaryOperator getAssigningOperator(final BinaryOperator op)
   {
     return mAssigningMap.get(op);
+  }
+
+
+  public BuiltInFunction getIteFunction()
+  {
+    return mIteFunction;
+  }
+
+  public BuiltInFunction getMaxFunction()
+  {
+    return mMaxFunction;
+  }
+
+  public BuiltInFunction getMinFunction()
+  {
+    return mMinFunction;
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  /**
+   * Checks whether the given expression is a not-expression.
+   * @param   expr    The expression to be checked.
+   * @return  If the given expression is a not-expression, its subterm is
+   *          returned, otherwise <CODE>null</CODE> is returned.
+   */
+  public SimpleExpressionProxy getNegatedSubterm(final SimpleExpressionProxy expr)
+  {
+    if (expr instanceof UnaryExpressionProxy) {
+      final UnaryExpressionProxy unary = (UnaryExpressionProxy) expr;
+      if (unary.getOperator() == mNotOperator) {
+        return unary.getSubTerm();
+      }
+    }
+    return null;
   }
 
 
@@ -1886,6 +1932,180 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
 
   //#########################################################################
+  //# Inner Class AbstractBuiltInFunction
+  private abstract static class AbstractBuiltInFunction
+    implements BuiltInFunction
+  {
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.Operator
+    @Override
+    public int getPriority()
+    {
+      return PRIORITY_FUNCALL;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.BuiltInFunction
+    @Override
+    public SimpleExpressionProxy createExpression
+      (final ModuleProxyFactory factory,
+       final List<SimpleExpressionProxy> args,
+       final String text)
+    {
+      final String name = getName();
+      return factory.createFunctionCallExpressionProxy(text, name, args);
+    }
+
+    @Override
+    public SimpleExpressionProxy simplify(final FunctionCallExpressionProxy expr,
+                                          final AbstractSimpleExpressionSimplifier simplifier)
+      throws EvalException
+    {
+      // TODO Auto-generated method stub
+      return null;
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class IteFunction
+  /**
+   * The if-then-else function.
+   * Function <CODE>\ite(c,x,y)</CODE> a Boolean argument&nbsp;<CODE>c</CODE>
+   * and two arguments <CODE>x</CODE> and&nbsp;<CODE>y</CODE> of arbitrary
+   * type. If <CODE>c</CODE> is true, the function returns&nbsp;<CODE>x</CODE>,
+   * otherwise&nbsp;<CODE>y</CODE>.
+   */
+  private static class IteFunction
+    extends AbstractBuiltInFunction
+  {
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.Operator
+    @Override
+    public String getName()
+    {
+      return FUNNAME_ITE;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.BuiltInFunction
+    @Override
+    public int getMinimumNumberOfArguments()
+    {
+      return 3;
+    }
+
+    @Override
+    public int getMaximumNumberOfArguments()
+    {
+      return 3;
+    }
+
+    @Override
+    public int getArgumentTypes(final int argno)
+    {
+      if (argno == 0) {
+        return Operator.TYPE_BOOLEAN;
+      } else {
+        return Operator.TYPE_ANY;
+      }
+    }
+
+    @Override
+    public int getReturnTypes(final int[] argTypes)
+    {
+      if ((argTypes[0] & Operator.TYPE_BOOLEAN) != 0) {
+        return argTypes[1] & argTypes[2];
+      } else {
+        return 0;
+      }
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class MinFunction
+  /**
+   * Common superclass to implement minimum and maximum function.
+   * Both functions a variable number of integer arguments and returns
+   * an integer.
+   */
+  private static abstract class MinMaxFunction
+    extends AbstractBuiltInFunction
+  {
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.BuiltInFunction
+    @Override
+    public int getMinimumNumberOfArguments()
+    {
+      return 2;
+    }
+
+    @Override
+    public int getMaximumNumberOfArguments()
+    {
+      return Integer.MAX_VALUE;
+    }
+
+    @Override
+    public int getArgumentTypes(final int argno)
+    {
+      return Operator.TYPE_INT | Operator.TYPE_BOOLEAN;
+    }
+
+    @Override
+    public int getReturnTypes(final int[] argTypes)
+    {
+      int type = Operator.TYPE_INT | Operator.TYPE_BOOLEAN;
+      for (final int mask : argTypes) {
+        type &= mask;
+      }
+      return type;
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class MaxFunction
+  /**
+   * The maximum function.
+   * Take a variable number of integer arguments and returns the largest
+   * argument.
+   */
+  private static class MaxFunction
+    extends MinMaxFunction
+  {
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.Operator
+    @Override
+    public String getName()
+    {
+      return FUNNAME_MAX;
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class MinFunction
+  /**
+   * The minimum function.
+   * Take a variable number of integer arguments and returns the smallest
+   * argument.
+   */
+  private static class MinFunction
+    extends MinMaxFunction
+  {
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.Operator
+    @Override
+    public String getName()
+    {
+      return FUNNAME_MIN;
+    }
+  }
+
+
+  //#########################################################################
   //# Data Members
   private final BinaryOperator mAndOperator;
   private final BinaryOperator mOrOperator;
@@ -1912,6 +2132,10 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   private final Map<BinaryOperator,BinaryOperator> mComplementMap;
   private final Map<BinaryOperator,BinaryOperator> mSwapMap;
   private final Map<BinaryOperator,BinaryOperator> mAssigningMap;
+
+  private final BuiltInFunction mIteFunction;
+  private final BuiltInFunction mMaxFunction;
+  private final BuiltInFunction mMinFunction;
 
 
   //#########################################################################
@@ -1942,6 +2166,11 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   private static final String OPNAME_ORWITH = "|=";
   private static final String OPNAME_ASSIGNMENT = "=";
 
+  private static final String FUNNAME_ITE = "\\ite";
+  private static final String FUNNAME_MAX = "\\max";
+  private static final String FUNNAME_MIN = "\\min";
+
+  private static final int PRIORITY_FUNCALL = 200;
   private static final int PRIORITY_QUAL = 100;
   private static final int PRIORITY_NEXT = 95;
   private static final int PRIORITY_UNARY = 90;

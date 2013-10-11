@@ -1,15 +1,18 @@
 package org.supremica.gui.ide.actions;
 
-import java.util.List;
-import javax.swing.Action;
-import javax.swing.JOptionPane;
 import java.awt.event.ActionEvent;
+import java.util.List;
+
+import javax.swing.Action;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.IO.EncodingHelper;
 import org.supremica.gui.AutomataHierarchyViewer;
 import org.supremica.gui.ide.IDE;
-import org.supremica.log.*;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
 
 /**
@@ -18,14 +21,14 @@ import org.supremica.properties.Config;
 public class AnalyzerViewModularStructureAction
     extends IDEAction
 {
-    private Logger logger = LoggerFactory.createLogger(IDE.class);
+    private final Logger logger = LoggerFactory.createLogger(IDE.class);
 
     private static final long serialVersionUID = 1L;
 
     /**
      * Constructor.
      */
-    public AnalyzerViewModularStructureAction(List<IDEAction> actionList)
+    public AnalyzerViewModularStructureAction(final List<IDEAction> actionList)
     {
         super(actionList);
 
@@ -36,10 +39,11 @@ public class AnalyzerViewModularStructureAction
         putValue(Action.SHORT_DESCRIPTION, "View Modular Structure");
 //        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_A));
 //        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
-        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/modularstructure16.gif")));
+        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/supremica/modularstructure16.gif")));
     }
 
-    public void actionPerformed(ActionEvent e)
+    @Override
+    public void actionPerformed(final ActionEvent e)
     {
         doAction();
     }
@@ -47,9 +51,10 @@ public class AnalyzerViewModularStructureAction
     /**
      * The code that is run when the action is invoked.
      */
+    @Override
     public void doAction()
     {
-       Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+       final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
 
         // Sanity check
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 2, false, false, true, false))
@@ -58,7 +63,7 @@ public class AnalyzerViewModularStructureAction
         }
 
         // Warn if there are too many "states" i.e. automata
-        int maxNbrOfStates = Config.DOT_MAX_NBR_OF_STATES.get();
+        final int maxNbrOfStates = Config.DOT_MAX_NBR_OF_STATES.get();
         if (maxNbrOfStates < selectedAutomata.size())
         {
             String msg = "You have selected " + selectedAutomata.size() + " automata. It is not " +
@@ -66,8 +71,8 @@ public class AnalyzerViewModularStructureAction
                 " automata.";
             msg = EncodingHelper.linebreakAdjust(msg);
 
-            Object[] options = { "Continue", "Abort" };
-            int response = JOptionPane.showOptionDialog(ide.getFrame(), msg, "Warning",
+            final Object[] options = { "Continue", "Abort" };
+            final int response = JOptionPane.showOptionDialog(ide.getFrame(), msg, "Warning",
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.WARNING_MESSAGE,
                 null, options, options[1]);
@@ -80,13 +85,13 @@ public class AnalyzerViewModularStructureAction
         // View
         try
         {
-            AutomataHierarchyViewer viewer = new AutomataHierarchyViewer(selectedAutomata);
+            final AutomataHierarchyViewer viewer = new AutomataHierarchyViewer(selectedAutomata);
 
             viewer.setVisible(true);
 
             //viewer.setState(Frame.NORMAL);
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             logger.error("Exception in AutomataHierarchyViewer.", ex);
             logger.debug(ex.getStackTrace());

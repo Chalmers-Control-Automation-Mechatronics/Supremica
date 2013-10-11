@@ -1,17 +1,37 @@
 package org.supremica.gui.animators.scenebeans;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.io.*;
+import java.awt.Checkbox;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.Label;
+import java.awt.List;
+import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
 import java.util.Iterator;
 import java.util.TreeSet;
-import org.supremica.gui.*;
-import org.supremica.log.*;
-import uk.ac.ic.doc.scenebeans.event.*;
-import uk.ac.ic.doc.scenebeans.animation.*;
-import uk.ac.ic.doc.scenebeans.animation.parse.*;
-import uk.ac.ic.doc.scenebeans.input.*;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+import net.sourceforge.waters.gui.util.IconLoader;
+
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
+
+import uk.ac.ic.doc.scenebeans.animation.Animation;
+import uk.ac.ic.doc.scenebeans.animation.AnimationCanvas;
+import uk.ac.ic.doc.scenebeans.animation.CommandException;
+import uk.ac.ic.doc.scenebeans.animation.parse.XMLAnimationParser;
+import uk.ac.ic.doc.scenebeans.event.AnimationEvent;
+import uk.ac.ic.doc.scenebeans.event.AnimationListener;
+import uk.ac.ic.doc.scenebeans.input.MouseDispatcher;
 
 public class Animator
     extends JFrame
@@ -32,8 +52,8 @@ public class Animator
         super("Supremica Animator - " + detail);
 
         contentPane = (JPanel) getContentPane();
-
-        setIconImage(Supremica.cornerImage);
+        final java.util.List<Image> images = IconLoader.ICONLIST_APPLICATION;
+        setIconImages(images);
         contentPane.setLayout(new GridBagLayout());
 
         final GridBagConstraints pos = new GridBagConstraints();
@@ -73,6 +93,7 @@ public class Animator
 
         _paused.addItemListener(new ItemListener()
         {
+            @Override
             public void itemStateChanged(final ItemEvent ev)
             {
                 _canvas.setPaused(_paused.getState());
@@ -87,6 +108,7 @@ public class Animator
 
         _centered.addItemListener(new ItemListener()
         {
+            @Override
             public void itemStateChanged(final ItemEvent ev)
             {
                 _canvas.setAnimationCentered(_centered.getState());
@@ -101,6 +123,7 @@ public class Animator
 
         _stretched.addItemListener(new ItemListener()
         {
+            @Override
             public void itemStateChanged(final ItemEvent ev)
             {
                 _canvas.setAnimationStretched(_stretched.getState());
@@ -115,6 +138,7 @@ public class Animator
 
         _aspect.addItemListener(new ItemListener()
         {
+            @Override
             public void itemStateChanged(final ItemEvent ev)
             {
                 _canvas.setAnimationAspectFixed(_aspect.getState());
@@ -159,11 +183,13 @@ public class Animator
         _dispatcher.attachTo(_canvas);
         addWindowListener(new WindowAdapter()
         {
+            @Override
             public void windowClosing(final WindowEvent ev)
             {
                 dispose();
             }
 
+            @Override
             public void windowClosed(final WindowEvent ev)
             {}
         });
@@ -192,6 +218,7 @@ public class Animator
 
         anim.addAnimationListener(new AnimationListener()
         {
+            @Override
             public void animationEvent(final AnimationEvent ev)
             {
                 _announced.add(ev.getName());
@@ -209,6 +236,7 @@ public class Animator
         return _canvas.getAnimation();
     }
 
+    @Override
     public void actionPerformed(final ActionEvent ev)
     {
         final String command = _commands.getSelectedItem();
@@ -247,11 +275,13 @@ public class Animator
 
             view.addWindowListener(new WindowAdapter()
             {
+                @Override
                 public void windowClosing(final WindowEvent ev)
                 {
                     view.dispose();
                 }
 
+                @Override
                 public void windowClosed(final WindowEvent ev)
                 {
                     System.exit(1);

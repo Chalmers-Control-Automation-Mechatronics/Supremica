@@ -49,8 +49,8 @@
  */
 package org.supremica.automata.algorithms;
 
-import org.supremica.properties.Config;
 import org.supremica.automata.Automata;
+import org.supremica.properties.Config;
 
 public final class VerificationOptions
 {
@@ -73,12 +73,12 @@ public final class VerificationOptions
      */
     public VerificationOptions()
     {
-       this((VerificationType) Config.VERIFY_VERIFICATION_TYPE.get(), 
-           (VerificationAlgorithm) Config.VERIFY_ALGORITHM_TYPE.get(),
-           Config.VERIFY_EXCLUSION_STATE_LIMIT.get(), 
+       this(Config.VERIFY_VERIFICATION_TYPE.get(),
+           Config.VERIFY_ALGORITHM_TYPE.get(),
+           Config.VERIFY_EXCLUSION_STATE_LIMIT.get(),
            Config.VERIFY_REACHABILITY_STATE_LIMIT.get(),
-           Config.VERIFY_ONE_EVENT_AT_A_TIME.get(), 
-           Config.VERIFY_SKIP_UNCONTROLLABILITY_CHECK.get(), 
+           Config.VERIFY_ONE_EVENT_AT_A_TIME.get(),
+           Config.VERIFY_SKIP_UNCONTROLLABILITY_CHECK.get(),
            Config.VERIFY_NBR_OF_ATTEMPTS.get(),
            Config.VERIFY_SHOW_BAD_TRACE.get());
     }
@@ -91,7 +91,7 @@ public final class VerificationOptions
      * (see below)! Much more readable and also more practical when
      * adding new options.
      */
-    private VerificationOptions(VerificationType verificationType, VerificationAlgorithm algorithmType, int exclusionStateLimit, int reachabilityStateLimit, boolean oneEventAtATime, boolean skipUncontrollabilityCheck, int nbrOfAttempts, boolean showBadTrace)
+    private VerificationOptions(final VerificationType verificationType, final VerificationAlgorithm algorithmType, final int exclusionStateLimit, final int reachabilityStateLimit, final boolean oneEventAtATime, final boolean skipUncontrollabilityCheck, final int nbrOfAttempts, final boolean showBadTrace)
     {
         this.verificationType = verificationType;
         this.algorithmType = algorithmType;
@@ -103,7 +103,7 @@ public final class VerificationOptions
         this.showBadTrace = showBadTrace;
     }
 
-    public void setDialogOK(boolean bool)
+    public void setDialogOK(final boolean bool)
     {
         dialogOK = bool;
     }
@@ -113,7 +113,7 @@ public final class VerificationOptions
         return dialogOK;
     }
 
-    public void setVerificationType(VerificationType type)
+    public void setVerificationType(final VerificationType type)
     {
         verificationType = type;
     }
@@ -123,7 +123,7 @@ public final class VerificationOptions
         return verificationType;
     }
 
-    public void setAlgorithmType(VerificationAlgorithm algorithm)
+    public void setAlgorithmType(final VerificationAlgorithm algorithm)
     {
         algorithmType = algorithm;
     }
@@ -133,7 +133,7 @@ public final class VerificationOptions
         return algorithmType;
     }
 
-    public void setExclusionStateLimit(int limit)
+    public void setExclusionStateLimit(final int limit)
     {
         exclusionStateLimit = limit;
     }
@@ -143,7 +143,7 @@ public final class VerificationOptions
         return exclusionStateLimit;
     }
 
-    public void setReachabilityStateLimit(int limit)
+    public void setReachabilityStateLimit(final int limit)
     {
         reachabilityStateLimit = limit;
     }
@@ -153,7 +153,7 @@ public final class VerificationOptions
         return reachabilityStateLimit;
     }
 
-    public void setOneEventAtATime(boolean bool)
+    public void setOneEventAtATime(final boolean bool)
     {
         oneEventAtATime = bool;
     }
@@ -163,7 +163,7 @@ public final class VerificationOptions
         return oneEventAtATime;
     }
 
-    public void setSkipUncontrollabilityCheck(boolean bool)
+    public void setSkipUncontrollabilityCheck(final boolean bool)
     {
         skipUncontrollabilityCheck = bool;
     }
@@ -173,7 +173,7 @@ public final class VerificationOptions
         return skipUncontrollabilityCheck;
     }
 
-    public void setNbrOfAttempts(int nbr)
+    public void setNbrOfAttempts(final int nbr)
     {
         nbrOfAttempts = nbr;
     }
@@ -183,7 +183,7 @@ public final class VerificationOptions
         return nbrOfAttempts;
     }
 
-    public void setShowBadTrace(boolean bool)
+    public void setShowBadTrace(final boolean bool)
     {
         showBadTrace = bool;
     }
@@ -193,7 +193,7 @@ public final class VerificationOptions
         return showBadTrace;
     }
 
-    public void setInclusionAutomata(Automata aut)
+    public void setInclusionAutomata(final Automata aut)
     {
         inclusionAutomata = aut;
     }
@@ -208,8 +208,8 @@ public final class VerificationOptions
      */
     public void saveOptions()
     {
-        Config.VERIFY_VERIFICATION_TYPE.set(verificationType);
-        Config.VERIFY_ALGORITHM_TYPE.set(algorithmType);
+        Config.VERIFY_VERIFICATION_TYPE.setValue(verificationType);
+        Config.VERIFY_ALGORITHM_TYPE.setValue(algorithmType);
         Config.VERIFY_EXCLUSION_STATE_LIMIT.set(exclusionStateLimit);
         Config.VERIFY_REACHABILITY_STATE_LIMIT.set(reachabilityStateLimit);
         Config.VERIFY_ONE_EVENT_AT_A_TIME.set(oneEventAtATime);
@@ -223,7 +223,7 @@ public final class VerificationOptions
      */
     public static VerificationOptions getDefaultControllabilityOptions()
     {
-        VerificationOptions options = new VerificationOptions();
+        final VerificationOptions options = new VerificationOptions();
         options.setVerificationType(VerificationType.CONTROLLABILITY);
         options.setAlgorithmType(VerificationAlgorithm.MODULAR);
         options.setOneEventAtATime(false);
@@ -236,7 +236,7 @@ public final class VerificationOptions
      */
     public static VerificationOptions getDefaultNonblockingOptions()
     {
-        VerificationOptions options = new VerificationOptions();
+        final VerificationOptions options = new VerificationOptions();
         options.setVerificationType(VerificationType.NONBLOCKING);
         options.setAlgorithmType(VerificationAlgorithm.COMPOSITIONAL);
         return options;
@@ -247,7 +247,7 @@ public final class VerificationOptions
      */
     public static VerificationOptions getDefaultLanguageInclusionOptions()
     {
-        VerificationOptions options = getDefaultControllabilityOptions();
+        final VerificationOptions options = getDefaultControllabilityOptions();
         options.setVerificationType(VerificationType.LANGUAGEINCLUSION);
         return options;
     }

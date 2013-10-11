@@ -32,6 +32,7 @@ import java.util.Map;
 import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.analysis.bdd.BDDLanguageInclusionChecker;
+import net.sourceforge.waters.cpp.analysis.NativeModelAnalyzer;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.base.DocumentProxy;
@@ -88,6 +89,7 @@ public class ConflictAssess
   private ConflictAssess(final File reportFile,
                          final File progressFile,
                          final int minutes,
+                         final long maxBytes,
                          final TeachingSecurityManager secman)
     throws JAXBException, SAXException, IOException
   {
@@ -120,6 +122,8 @@ public class ConflictAssess
         } else if (key.equals("in")) {
           mStartIndex = Integer.parseInt(parts[1]) + 1;
           crash = true;
+        } else if (key.equals("abort")) {
+          crash = false;
         } else if (key.equals("result")) {
           mNumCorrectAnswers = Integer.parseInt(parts[1]);
           crash = false;
@@ -160,8 +164,10 @@ public class ConflictAssess
     mFormatter = new DecimalFormat("0.000");
     mStream = null;
     if (!mTerminated) {
-      final Thread terminator = new Terminator(minutes);
-      terminator.start();
+      final Thread timoutWatchdog = new TimeoutWatchdog(minutes);
+      final Thread memoryWatchdog = new MemoryWatchdog(maxBytes);
+      timoutWatchdog.start();
+      memoryWatchdog.start();
     }
   }
 
@@ -208,6 +214,28 @@ public class ConflictAssess
         }
       }
     }
+  }
+
+  private static long parseBytes(String arg)
+  {
+    int len = arg.length();
+    final long factor ;
+    if (arg.endsWith("g")) {
+      len--;
+      factor = 1L << 30;
+    } else if (arg.endsWith("m")) {
+      len--;
+      factor = 1L << 20;
+    } else if (arg.endsWith("k")) {
+      len--;
+      factor = 1L << 10;
+    } else {
+      factor = 1L;
+    }
+    if (factor > 1L) {
+      arg = arg.substring(0, len);
+    }
+    return factor * Long.parseLong(arg);
   }
 
   private List<ParameterBindingProxy> parseBindings(final String[] args,
@@ -297,7 +325,6 @@ public class ConflictAssess
       mProgressPrinter.println("result " + mNumCorrectAnswers);
     } catch (final OutOfMemoryError error) {
       checker = null;
-      System.gc();
       printException(error);
       mProgressPrinter.println("result " + mNumCorrectAnswers);
       return;
@@ -308,6 +335,7 @@ public class ConflictAssess
     } finally {
       mProgressPrinter.flush();
       mSecurityManager.setEnabled(false);
+      System.gc();  // Garbage collect all BDDs so init() can be called again.
     }
 
     synchronized (this) {
@@ -768,24 +796,25 @@ public class ConflictAssess
       if (args.length < 3) {
         System.err.println
           ("USAGE: java " + ConflictAssess.class.getName() +
-           " <input> <output> <marks> <minutes> <readable-dir> ...");
+           " <input> <output> <marks> <minutes> <maxbytes> <readable-dir> ...");
         System.exit(1);
       }
       final File inputfile = new File(args[0]);
       final File outputfile = new File(args[1]);
       final File marksfile = new File(args[2]);
       final int minutes = Integer.parseInt(args[3]);
+      final long maxBytes = parseBytes(args[4]);
       final TeachingSecurityManager secman = new TeachingSecurityManager();
       secman.addReadWriteDirectory("");
-      for (int i = 4; i < args.length; i++) {
+      for (int i = 5; i < args.length; i++) {
         secman.addReadOnlyDirectory(args[i]);
       }
       secman.addLibrary("waters");
       secman.addLibrary("buddy");
       secman.addLibrary("cudd");
-      secman.addLibrary("cal");
       secman.close();
-      assessor = new ConflictAssess(outputfile, marksfile, minutes, secman);
+      assessor =
+        new ConflictAssess(outputfile, marksfile, minutes, maxBytes, secman);
       assessor.runSuite(inputfile);
       assessor.terminate();
       System.exit(0);
@@ -804,19 +833,20 @@ public class ConflictAssess
 
 
   //#########################################################################
-  //# Local Class Terminator
-  private class Terminator extends Thread
+  //# Local Class TimeoutWatchdog
+  private class TimeoutWatchdog extends Thread
   {
 
     //#######################################################################
     //# Constructor
-    private Terminator(final int minutes)
+    private TimeoutWatchdog(final int minutes)
     {
       mMinutes = minutes;
     }
 
     //#######################################################################
     //# Interface java.lang.Runnable
+    @Override
     public void run()
     {
       try {
@@ -836,6 +866,47 @@ public class ConflictAssess
     //#######################################################################
     //# Data Members
     private final int mMinutes;
+
+  }
+
+
+  //#########################################################################
+  //# Local Class MemoryWatchdog
+  private class MemoryWatchdog extends Thread
+  {
+
+    //#######################################################################
+    //# Constructor
+    private MemoryWatchdog(final long maxBytes)
+    {
+      mLimit = maxBytes;
+    }
+
+    //#######################################################################
+    //# Interface java.lang.Runnable
+    @Override
+    public void run()
+    {
+      try {
+        do {
+          Thread.sleep(5000);
+        } while (NativeModelAnalyzer.getPeakMemoryUsage() <= mLimit);
+        synchronized (ConflictAssess.this) {
+          mReportPrinter.println("OUT OF MEMORY");
+          mProgressPrinter.println("abort");
+        }
+        close();
+      } catch (final InterruptedException exception) {
+        terminate("FATAL ERROR (InterruptedException)");
+      } finally {
+        mSecurityManager.setEnabled(false);
+        System.exit(0);
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final long mLimit;
 
   }
 

@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
+import java.util.Collection;
+
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ObserverProjectionTRSimplifier;
@@ -73,17 +75,17 @@ class ObserverProjectionAbstractionProcedure
   //# Overrides for class TRSimplifierAbstractionProcedure
   @Override
   protected EventEncoding createEventEncoding(final AutomatonProxy aut,
-                                              final EventProxy tau,
+                                              final Collection<EventProxy> local,
                                               final Candidate candidate)
   {
     final EventEncoding eventEnc =
-      super.createEventEncoding(aut, tau, candidate);
+      super.createEventEncoding(aut, local, candidate);
     final ProductDESProxyFactory factory = getFactory();
     final String name = "vtau:" + aut.getName();
     final EventProxy vtau =
       factory.createEventProxy(name, EventKind.UNCONTROLLABLE);
     final KindTranslator id = IdenticalKindTranslator.getInstance();
-    final int codeOfVTau = eventEnc.addEvent(vtau, id, (byte)0);
+    final int codeOfVTau = eventEnc.addEvent(vtau, id, 0);
     mOPSimplifier.setVisibleTau(codeOfVTau);
     return eventEnc;
   }

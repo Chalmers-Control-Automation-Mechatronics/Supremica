@@ -57,7 +57,7 @@ public abstract class AbstractModelVerifierFactory
   //# Constructors
   protected AbstractModelVerifierFactory()
   {
-    mArgumentMap = new HashMap<String,CommandLineArgument>(16);
+    mArgumentMap = new HashMap<String,CommandLineArgument>(64);
     mArgumentList = new LinkedList<CommandLineArgument>();
   }
 
@@ -71,6 +71,7 @@ public abstract class AbstractModelVerifierFactory
     addArgument(new HISCArgument());
     addArgument(new LimitArgument());
     addArgument(new MarkingArgument());
+    addArgument(new NoCounterExampleArgument());
     addArgument(new NoOptimisationArgument());
     addArgument(new PreMarkingArgument());
     addArgument(new PropertyArgument());
@@ -82,6 +83,12 @@ public abstract class AbstractModelVerifierFactory
     final String name = argument.getName();
     mArgumentMap.put(name, argument);
     mArgumentList.add(argument);
+  }
+
+  protected void removeArgument(final String name)
+  {
+    final CommandLineArgument argument = mArgumentMap.remove(name);
+    mArgumentList.remove(argument);
   }
 
 
@@ -374,6 +381,30 @@ public abstract class AbstractModelVerifierFactory
           AbstractConflictChecker.getMarkingProposition(model, markingname);
         cchecker.setConfiguredDefaultMarking(marking);
       }
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class NoCounterExampleArgument
+  private static class NoCounterExampleArgument
+    extends CommandLineArgumentFlag
+  {
+    //#######################################################################
+    //# Constructors
+    private NoCounterExampleArgument()
+    {
+      super("-nc", "Disable counter example computation");
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    @Override
+    public void configure(final ModelVerifier verifier)
+    {
+      final boolean enable = !getValue();
+      verifier.setCounterExampleEnabled(enable);
     }
   }
 

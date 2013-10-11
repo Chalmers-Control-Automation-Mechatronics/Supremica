@@ -11,10 +11,14 @@ package net.sourceforge.waters.analysis.abstraction;
 
 import gnu.trove.set.hash.TIntHashSet;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.HashFunctions;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.analysis.tr.WatersIntHashingStrategy;
@@ -78,11 +82,22 @@ public class ActiveEventsTRSimplifier
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
+  //# Interface
+  //# net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
   @Override
   public int getPreferredInputConfiguration()
   {
     return ListBufferTransitionRelation.CONFIG_ALL;
+  }
+
+
+  //#########################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.analysis.abstraction.AbstractMarkingTRSimplifier
+  @Override
+  public boolean isDumpStateAware()
+  {
+    return true;
   }
 
 
@@ -115,16 +130,16 @@ public class ActiveEventsTRSimplifier
     if (numClasses == rel.getNumberOfReachableStates()) {
       return false;
     } else {
-      final int[][] partition = new int[numClasses][];
-      int index = 0;
+      final List<int[]> classes = new ArrayList<>(numClasses);
       for (int state = 0; state < numStates; state++) {
         final int list = lists[state];
         if (list != IntListBuffer.NULL) {
           checkAbort();
-          partition[index++] = prepartition.toArray(list);
+          classes.add(prepartition.toArray(list));
         }
       }
-      setResultPartitionArray(partition);
+      final TRPartition partition = new TRPartition(classes, numStates);
+      setResultPartition(partition);
       applyResultPartitionAutomatically();
       return true;
     }
@@ -137,7 +152,7 @@ public class ActiveEventsTRSimplifier
     super.applyResultPartition();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     rel.removeTauSelfLoops();
-    rel.removeProperSelfLoopEvents();
+    removeProperSelfLoopEvents();
   }
 
 

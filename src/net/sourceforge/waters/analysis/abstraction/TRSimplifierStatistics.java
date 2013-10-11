@@ -33,15 +33,27 @@ public class TRSimplifierStatistics
   //#########################################################################
   //# Constructors
   public TRSimplifierStatistics(final Object simplifier,
-                                final boolean trans, final boolean markings)
+                                final boolean trans,
+                                final boolean markings)
+  {
+    this(simplifier, trans, trans, markings);
+  }
+
+  public TRSimplifierStatistics(final Object simplifier,
+                                final boolean states,
+                                final boolean trans,
+                                final boolean markings)
   {
     mSimplifierClass = simplifier.getClass();
     mApplicationCount = mOverflowCount = mReductionCount = 0;
-    if (trans) {
+    if (states) {
       mInputStates = mOutputStates = mUnchangedStates = 0;
-      mInputTransitions = mOutputTransitions = mUnchangedTransitions = 0;
     } else {
       mInputStates = mOutputStates = mUnchangedStates = -1;
+    }
+    if (trans) {
+      mInputTransitions = mOutputTransitions = mUnchangedTransitions = 0;
+    } else {
       mInputTransitions = mOutputTransitions = mUnchangedTransitions = -1;
     }
     if (markings) {
@@ -204,6 +216,8 @@ public class TRSimplifierStatistics
     mApplicationCount++;
     if (mInputStates >= 0) {
       mInputStates += rel.getNumberOfReachableStates();
+    }
+    if (mInputTransitions >= 0) {
       mInputTransitions += rel.getNumberOfTransitions();
     }
     if (mInputMarkings >= 0) {
@@ -216,6 +230,8 @@ public class TRSimplifierStatistics
     mApplicationCount++;
     if (mInputStates >= 0) {
       mInputStates += aut.getStates().size();
+    }
+    if (mInputTransitions >= 0) {
       mInputTransitions += aut.getTransitions().size();
     }
     if (mInputMarkings >= 0) {
@@ -232,6 +248,8 @@ public class TRSimplifierStatistics
       mReductionCount++;
       if (mOutputStates >= 0) {
         mOutputStates += rel.getNumberOfReachableStates();
+      }
+      if (mInputTransitions >= 0) {
         mOutputTransitions += rel.getNumberOfTransitions();
       }
       if (mOutputMarkings >= 0) {
@@ -240,6 +258,8 @@ public class TRSimplifierStatistics
     } else {
       if (mUnchangedStates >= 0) {
         mUnchangedStates += rel.getNumberOfReachableStates();
+      }
+      if (mUnchangedTransitions >= 0) {
         mUnchangedTransitions += rel.getNumberOfTransitions();
       }
       if (mUnchangedMarkings >= 0) {
@@ -254,6 +274,8 @@ public class TRSimplifierStatistics
       mReductionCount++;
       if (mOutputStates >= 0) {
         mOutputStates += aut.getStates().size();
+      }
+      if (mOutputTransitions >= 0) {
         mOutputTransitions += aut.getTransitions().size();
       }
       if (mOutputMarkings >= 0) {
@@ -264,6 +286,8 @@ public class TRSimplifierStatistics
     } else {
       if (mUnchangedStates >= 0) {
         mUnchangedStates += aut.getStates().size();
+      }
+      if (mUnchangedTransitions >= 0) {
         mUnchangedTransitions += aut.getTransitions().size();
       }
       if (mUnchangedMarkings >= 0) {
@@ -341,6 +365,8 @@ public class TRSimplifierStatistics
     mApplicationCount = mOverflowCount = mReductionCount = 0;
     if (mInputStates >= 0) {
       mInputStates = mOutputStates = mUnchangedStates = 0;
+    }
+    if (mInputTransitions >= 0) {
       mInputTransitions = mOutputTransitions = mUnchangedTransitions = 0;
     }
     if (mInputMarkings >= 0) {
@@ -375,6 +401,8 @@ public class TRSimplifierStatistics
       writer.println(mInputStates);
       writer.print("Number of output states: ");
       writer.println(getTotalOutputStates());
+    }
+    if (mInputTransitions >= 0) {
       writer.print("Number of input transitions: ");
       writer.println(mInputTransitions);
       writer.print("Number of output transitions: ");
@@ -401,6 +429,8 @@ public class TRSimplifierStatistics
       writer.print(",InStates");
       writer.print(",OutStatesRed");
       writer.print(",OutStatesNoRed");
+    }
+    if (mInputTransitions >= 0) {
       writer.print(",InTrans");
       writer.print(",OutTransRed");
       writer.print(",OutTransNoRed");
@@ -428,6 +458,8 @@ public class TRSimplifierStatistics
       writer.print(mOutputStates);
       writer.print(',');
       writer.print(mUnchangedStates);
+    }
+    if (mInputTransitions >= 0) {
       writer.print(',');
       writer.print(mInputTransitions);
       writer.print(',');

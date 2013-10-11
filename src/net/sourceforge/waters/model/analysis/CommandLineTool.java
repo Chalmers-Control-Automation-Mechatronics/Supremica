@@ -9,13 +9,13 @@
 
 package net.sourceforge.waters.model.analysis;
 
-import java.lang.reflect.Method;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Formatter;
@@ -37,6 +37,7 @@ import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
@@ -202,11 +203,14 @@ public class CommandLineTool
           ("SIC property check requires a conflict checker, " +
            "but none was configured.");
       }
-      final Watchdog watchdog = new Watchdog(wrapper, timeout);
       final Collection<String> empty = Collections.emptyList();
       final Iterator<String> argIter = argList.iterator();
       factory.parse(argIter);
       factory.configure(checker);
+      final Watchdog watchdog = new Watchdog(wrapper, timeout);
+      if (timeout > 0) {
+        watchdog.start();
+      }
 
       boolean first = true;
       for (final String name : argList) {
@@ -223,7 +227,9 @@ public class CommandLineTool
             compiler.setEnabledPropositionNames(empty);
           }
           factory.configure(compiler);
+          watchdog.addAbortable(compiler);
           des = compiler.compile(bindings);
+          watchdog.removeAbortable(compiler);
         }
         System.out.print(des.getName() + " ... ");
         System.out.flush();
@@ -233,7 +239,7 @@ public class CommandLineTool
         factory.postConfigure(checker);
         boolean additions = false;
         try {
-          watchdog.launch();
+          wrapper.run();
           final VerificationResult result = wrapper.getAnalysisResult();
           final long stop = System.currentTimeMillis();
           final boolean satisfied = result.isSatisfied();
@@ -242,7 +248,7 @@ public class CommandLineTool
           final int numnodes = result.getPeakNumberOfNodes();
           if (numstates < 0 && numnodes < 0) {
             formatter.format("%b (%.3f s)\n", satisfied, difftime);
-          } else if (numnodes < 0 || (int) numnodes == (int) numstates) {
+          } else if (numnodes < 0 || numnodes == (int) numstates) {
             formatter.format("%b (%.0f states, %.3f s)\n",
                              satisfied, numstates, difftime);
           } else if (numstates < 0) {
@@ -274,7 +280,7 @@ public class CommandLineTool
           final long stop = System.currentTimeMillis();
           final float difftime = 0.001f * (stop - start);
           formatter.format("OVERFLOW (%.3f s)\n", difftime);
-        } catch (final AbortException abort) {
+        } catch (final AnalysisAbortException abort) {
           final long stop = System.currentTimeMillis();
           final float difftime = 0.001f * (stop - start);
           formatter.format("TIMEOUT (%.3f s)\n", difftime);
@@ -308,6 +314,14 @@ public class CommandLineTool
         first = false;
       }
 
+    } catch (final EvalException exception) {
+      System.err.print("FATAL ERROR (");
+      System.err.print(ProxyTools.getShortClassName(exception));
+      System.err.println(")");
+      final String msg = exception.getMessage();
+      if (msg != null) {
+        System.err.println(exception.getMessage());
+      }
     } catch (final WatersUnmarshalException exception) {
       System.err.print("FATAL ERROR (");
       System.err.print(ProxyTools.getShortClassName(exception));
@@ -345,56 +359,6 @@ public class CommandLineTool
     System.err.println
       ("USAGE: java CommandLineTool <factory>  [options] <checker> <file> ...");
     System.exit(1);
-  }
-
-
-  //#########################################################################
-  //# Inner Class Watchdog
-  private static class Watchdog implements Runnable {
-
-    //#######################################################################
-    //# Constructor
-    private Watchdog(final ModelVerifier checker, final int timeout)
-    {
-      mChecker = checker;
-      mTimeoutMillis = timeout >= 0 ? 1000L * timeout : -1;
-    }
-
-    //#######################################################################
-    //# Invocation
-    private boolean launch()
-    throws AnalysisException
-    {
-      if (mTimeoutMillis >= 0) {
-        final Thread thread = new Thread(this);
-        try {
-          thread.start();
-          return mChecker.run();
-        } finally {
-          thread.interrupt();
-        }
-      } else {
-        return mChecker.run();
-      }
-    }
-
-    //#######################################################################
-    //# Interface java.lang.Runnable
-    public void run()
-    {
-      try {
-        Thread.sleep(mTimeoutMillis);
-        mChecker.requestAbort();
-      } catch (final InterruptedException exception) {
-        // No problem ...
-      }
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final ModelVerifier mChecker;
-    private final long mTimeoutMillis;
-
   }
 
 

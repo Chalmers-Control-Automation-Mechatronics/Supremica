@@ -28,7 +28,7 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
 /**
- * This class runs experiments using the {@link CompositionalSynthesizer} with
+ * This class runs experiments using the {@link CompositionalAutomataSynthesizer} with
  * a variety of configurations. The heuristics for choosing candidates can
  * be varied, as well as the abstraction rules applied and their order.
  *
@@ -73,12 +73,14 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
   {
     super.setUp();
     mPrintWriter = new PrintWriter(mOut, true);
-    final int internalStateLimit = 5000;
+    final int internalStateLimit = 100000;      //5000
     mConflictChecker.setInternalStateLimit(internalStateLimit);
-    final int internalTransitionLimit = 1000000;
+    final int internalTransitionLimit = Integer.MAX_VALUE;  //1000000
     mConflictChecker.setInternalTransitionLimit(internalTransitionLimit);
-    final int finalStateLimit = 2000000;
+    final int finalStateLimit = 50000000;   //2000000
     mConflictChecker.setMonolithicStateLimit(finalStateLimit);
+    //For the big ones
+    mConflictChecker.setMonolithicTransitionLimit(0);
     mConflictChecker.setPreselectingMethod(mPreselecting);
     mConflictChecker.setSelectingMethod(mSelecting);
     mConflictChecker.setUsingSpecialEvents(true);
@@ -220,6 +222,8 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
   //# Invocation
   void runAllTests() throws Exception
   {
+
+/*  For general testing
     testOnlySelfLoop01();
     testFailedTrafficLights();
     synthesisAGV();
@@ -234,20 +238,16 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
     synthesiseCentralLockingKoordwspBlock();
     synthesiseTbedCtct();
     synthesiseCentralLockingVerriegel3b();
-
     testBigBmw();
     testFischertechnik();
-    testFZelle();
     testProfisafeI4();
     testProfisafeO4();
-
     testTbedUncont();
     testTbedValid();
     testTbedNoderail();
     testTbedNoderailBlock();
     testVerriegel4();
     testVerriegel4B();
-
     testProfisafeI4Host();
     testProfisafeO4Host();
     testProfisafeO4Slave();
@@ -257,8 +257,39 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
     testProfisafeO6Host();
     testTip3();
     testTip3Bad();
-
-
+*/
+    //The big ones
+    testAGV();
+    testAGVB();
+    testAip0Aip();
+    testAip0Alps();
+    testAip0Tough();
+    testSongAip(3,true);
+    testSongAip(16,false);
+    testSongAip(24,false);
+    testBigBmw();
+    testFenCaiWon09();
+    testFenCaiWon09b();
+    testFtechnik();
+    testProfisafe_i4();
+    testProfisafe_i5();
+    testProfisafe_i6();
+    //testProfisafe_o4();
+    //testProfisafe_o5();
+    //testProfisafe_o6();
+    testTbed_ctct();
+    testTbed_hisc();
+    testTbed_valid();
+    testTip3();
+    testTip3_bad();
+    testVerriegel3();
+    testVerriegel3b();
+    testVerriegel4();
+    testVerriegel4b();
+    test6linka();
+    test6linki();
+    test6linkp();
+    test6linkre();
   }
 
 
@@ -290,15 +321,6 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
     final String name = "sdh7.wmod";
     runModel(group, dir, name, false);
 
-  }
-
-
-  public void testBigBmw() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "incremental_suite";
-    final String name = "big_bmw.wmod";
-    runModel(group, dir, name, true);
   }
 
 
@@ -378,14 +400,6 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
     runModel(group, dir, name, false);
   }
 
-  public void testVerriegel4() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "incremental_suite";
-    final String name = "verriegel4.wmod";
-    runModel(group, dir, name, true);
-  }
-
   public void testVerriegel4B() throws Exception
   {
     final String group = "tests";
@@ -454,108 +468,144 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
   }
 
   // #########################################################################
-  // # Test Cases -- Tip
-  public void testTip3() throws Exception
-  {
-    final String group = "tip";
-    final String dir = "acsw2006";
-    final String name = "tip3.wmod";
-    runModel(group, dir, name, true);
-  }
-
-  public void testTip3Bad() throws Exception
-  {
-    final String group = "tip";
-    final String dir = "acsw2006";
-    final String name = "tip3_bad.wmod";
-    runModel(group, dir, name, false);
-  }
-
-
 
   // Central locking
+  @SuppressWarnings("unused")
   private void synthesiseCentralLockingKoordwspBlock() throws Exception
   {
     runModel("valid", "central_locking", "koordwsp_block.wmod",false);
   }
 
-
-  private void synthesiseCentralLockingVerriegel3b() throws Exception
-  {
-    runModel("valid", "central_locking", "verriegel3b.wmod",false);
-  }
-
-
-
-  // AIP
-  private void synthesissAip0Alps() throws Exception
-  {
-    runModel("tests", "incremental_suite", "aip0alps.wmod",false);
-  }
-
   @SuppressWarnings("unused")
-  private void synthesiseAip0Aip() throws Exception
-  {
-    runModel("tests", "incremental_suite", "aip0aip.wmod",false);
-  }
-
-
-  private void synthesisFenCaiWon09Synth() throws Exception
-  {
-    runModel("tests", "fencaiwon09", "FenCaiWon09_synth.wmod",false);
-  }
-
-  // Train testbed
-
-  private void synthesiseTbedCtct() throws Exception
-  {
-    runModel("tests", "incremental_suite", "tbed_ctct.wmod",false);
-  }
-
-  //AGV
-  private void synthesisAGVB() throws Exception
-  {
-    runModel("tests", "incremental_suite", "agvb.wmod",false);
-  }
-
-  private void synthesisAGV() throws Exception
-  {
-    runModel("tests", "incremental_suite", "agv.wmod",true);
-  }
-
-  //
-  private void synthesiseIPC() throws Exception
-  {
-    runModel("tests", "synthesis", "IPC.wmod",true);
-  }
-
   private void synthesissRhoneSubPatch0() throws Exception
   {
     runModel("tests", "hisc", "rhone_subsystem1_patch0.wmod",false);
   }
-
+  @SuppressWarnings("unused")
   private void synthesissFms2003() throws Exception
   {
     runModel("tests", "fms2003", "fms2003_synth1.wmod",false);
   }
 
-  //flexible production cell
-  private void synthesiseFischertechnik() throws Exception
+
+  /////////////////////////////////////////////////////////
+  //The big ones
+  private void testAGV() throws Exception
   {
-    runModel("tests", "incremental_suite", "ftechnik.wmod",false);
+    runModel("tests", "incremental_suite", "agv.wmod",true);
   }
 
-  @SuppressWarnings("unused")
-  private void synthesisTip3Bad() throws Exception
+  private void testAGVB() throws Exception
   {
-    runModel("tip", "acsw2006", "tip3_bad.wmod",false);
+    runModel("tests", "incremental_suite", "agvb.wmod",false);
   }
-
-  private void synthesisFenCaiWon09B() throws Exception
+  private void testAip0Aip() throws Exception
+  {
+    runModel("tests", "incremental_suite", "aip0aip.wmod",true);
+  }
+  private void testAip0Alps() throws Exception
+  {
+    runModel("tests", "incremental_suite", "aip0alps.wmod",false);
+  }
+  private void testAip0Tough() throws Exception
+  {
+    runModel("tests", "incremental_suite", "aip0tough.wmod",false);
+  }
+  private void testBigBmw() throws Exception
+  {
+    runModel("tests", "incremental_suite", "big_bmw.wmod",true);
+  }
+  private void testFenCaiWon09() throws Exception
+  {
+    runModel("tests", "fencaiwon09", "FenCaiWon09.wmod",true);
+  }
+  private void testFenCaiWon09b() throws Exception
   {
     runModel("tests", "fencaiwon09", "FenCaiWon09b.wmod",false);
   }
-
+  private void testFtechnik() throws Exception
+  {
+    runModel("tests", "incremental_suite", "ftechnik.wmod",false);
+  }
+  private void testProfisafe_i4() throws Exception
+  {
+    runModel("tests", "profisafe", "profisafe_i4.wmod",true);
+  }
+  private void testProfisafe_i5() throws Exception
+  {
+    runModel("tests", "profisafe", "profisafe_i5.wmod",true);
+  }
+  private void testProfisafe_i6() throws Exception
+  {
+    runModel("tests", "profisafe", "profisafe_i6.wmod",true);
+  }
+  @SuppressWarnings("unused")
+  private void testProfisafe_o4() throws Exception
+  {
+    runModel("tests", "profisafe", "profisafe_o4.wmod",true);
+  }
+  @SuppressWarnings("unused")
+  private void testProfisafe_o5() throws Exception
+  {
+    runModel("tests", "profisafe", "profisafe_o5.wmod",true);
+  }
+  @SuppressWarnings("unused")
+  private void testProfisafe_o6() throws Exception
+  {
+    runModel("tests", "profisafe", "profisafe_o6.wmod",true);
+  }
+  private void testTbed_ctct() throws Exception
+  {
+    runModel("tests", "incremental_suite", "tbed_ctct.wmod",false);
+  }
+  private void testTbed_hisc() throws Exception
+  {
+    runModel("despot", "tbed_hisc", "tbed_hisc.wmod",true);
+  }
+  private void testTbed_valid() throws Exception
+  {
+    runModel("tests", "incremental_suite", "tbed_valid.wmod",true);
+  }
+  private void testTip3() throws Exception
+  {
+    runModel("tip", "acsw2006", "tip3.wmod",true);
+  }
+  private void testTip3_bad() throws Exception
+  {
+    runModel("tip", "acsw2006", "tip3_bad.wmod",false);
+  }
+  private void testVerriegel3() throws Exception
+  {
+    runModel("valid", "central_locking", "verriegel3.wmod",true);
+  }
+  private void testVerriegel3b() throws Exception
+  {
+    runModel("valid", "central_locking", "verriegel3b.wmod",false);
+  }
+  private void testVerriegel4() throws Exception
+  {
+    runModel("tests", "incremental_suite", "verriegel4.wmod",true);
+  }
+  private void testVerriegel4b() throws Exception
+  {
+    runModel("tests", "incremental_suite", "verriegel4b.wmod",false);
+  }
+  private void test6linka() throws Exception
+  {
+    runModel("tests", "6link", "6linka.wmod",false);
+  }
+  private void test6linki() throws Exception
+  {
+    runModel("tests", "6link", "6linki.wmod",false);
+  }
+  private void test6linkp() throws Exception
+  {
+    runModel("tests", "6link", "6linkp.wmod",false);
+  }
+  private void test6linkre() throws Exception
+  {
+    runModel("tests", "6link", "6linkre.wmod",false);
+  }
   @SuppressWarnings("unused")
   private void synthesisTransferline(final int n) throws Exception
   {
@@ -567,6 +617,23 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
       Collections.singletonList(binding);
     final long start = System.currentTimeMillis();
     runModel("handwritten", null, "transferline_uncont.wmod",false, bindings);
+    final long stop = System.currentTimeMillis();
+    @SuppressWarnings("resource")
+    final Formatter formatter = new Formatter(System.out);
+    final float difftime = 0.001f * (stop - start);
+    formatter.format("%.3f s\n", difftime);
+  }
+
+  private void testSongAip(final int n, final boolean expected) throws Exception
+  {
+    final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
+    final IntConstantProxy expr = factory.createIntConstantProxy(n);
+    final ParameterBindingProxy binding =
+      factory.createParameterBindingProxy("N", expr);
+    final List<ParameterBindingProxy> bindings =
+      Collections.singletonList(binding);
+    final long start = System.currentTimeMillis();
+    runModel("despot", "song_aip/maip3_syn", "aip1efa.wmod",expected, bindings);
     final long stop = System.currentTimeMillis();
     @SuppressWarnings("resource")
     final Formatter formatter = new Formatter(System.out);

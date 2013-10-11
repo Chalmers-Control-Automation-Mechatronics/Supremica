@@ -318,7 +318,7 @@ Two machines place workpieces into a buffer with capacity 2, from where they are
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SUPERVISOR" Name="supervisor">
+        <SimpleComponent Kind="SUPERVISOR" Name="expected_supervisor">
             <Graph>
                 <NodeList>
                     <SimpleNode Name="s2">

@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters Analysis Algorithms
+//# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.abstraction
 //# CLASS:   AbstractMarkingTRSimplifier
 //###########################################################################
@@ -11,6 +11,27 @@ package net.sourceforge.waters.analysis.abstraction;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 
+
+/**
+ * <P>A transition relation simplifier that is aware of state markings.</P>
+ *
+ * <P>This class implements support for two marking propositions:</P>
+ * <UL>
+ * <LI>The default marking (omega), which indicates termination.
+ *     It is the standard marking proposition used by nonblocking and
+ *     nonconflicting checks.</LI>
+ * <LI>The precondition marking (alpha), which is used for generalised
+ *     nonblocking.</LI>
+ * </UL>
+ * <P>Both markings are specified by their ID within the transition relation
+ * to be simplified, which means that they may have to be changed when
+ * a new transition relation is passed to the simplifier. The markings may
+ * be absent in a given transition relation, or irrelevant for a particular
+ * algorithm, in which case an ID of&nbsp;<CODE>-1</CODE> is used to specify
+ * a missing marking.</P>
+ *
+ * @author Robi Malik
+ */
 
 public abstract class AbstractMarkingTRSimplifier
   extends AbstractTRSimplifier
@@ -34,6 +55,15 @@ public abstract class AbstractMarkingTRSimplifier
 
   //#########################################################################
   //# Configuration
+  /**
+   * Sets the marking IDs used by this simplifier.
+   * @param preconditionID
+   *          ID of precondition marking proposition,
+   *          or <CODE>-1</CODE> if unused or not present.
+   * @param defaultID
+   *          ID of default marking proposition,
+   *          or <CODE>-1</CODE> if unused or not present.
+   */
   @Override
   public void setPropositions(final int preconditionID, final int defaultID)
   {
@@ -76,20 +106,62 @@ public abstract class AbstractMarkingTRSimplifier
     return mPropositions;
   }
 
+  /**
+   * Returns whether this simplifier respects deadlock states when removing
+   * selfloops.
+   * This method affects how the {@link #removeProperSelfLoopEvents()}
+   * checks for selfloops. If the simplifier is deadlock aware, then
+   * events not enabled in deadlock states can still be considered as
+   * selfloop events and removed.
+   * The default implementation returns <CODE>false</CODE> as deadlock
+   * awareness only preservers conflict equivalence and should not be
+   * used in general.
+   */
+  public boolean isDumpStateAware()
+  {
+    return false;
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.abstraction.
   //# TransitionRelationSimplifier
+  @Override
   public boolean isPartitioning()
   {
     return true;
   }
 
+  @Override
   public TRSimplifierStatistics createStatistics()
   {
     final TRSimplifierStatistics stats =
       new TRSimplifierStatistics(this, true, false);
     return setStatistics(stats);
+  }
+
+
+  //#########################################################################
+  //# Automaton Simplification
+  /**
+   * Attempts to simplify the automaton by removing redundant selfloop events.
+   * This method searches for any non-tau events that appear only as
+   * selfloops and are selflooped in all states of the transition
+   * relation, marks such events as unused, and removes the selfloops from the
+   * transition relation. Deadlock states are skipped in the search if the
+   * simplifier is configured to be deadlock aware.
+   * @return <CODE>true</CODE> if at least one event was removed,
+   *         <CODE>false</CODE> otherwise.
+   * @see #isDumpStateAware()
+   */
+  protected boolean removeProperSelfLoopEvents()
+  {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    if (isDumpStateAware() && mDefaultMarkingID >= 0) {
+      return rel.removeProperSelfLoopEvents(mDefaultMarkingID);
+    } else {
+      return rel.removeProperSelfLoopEvents();
+    }
   }
 
 

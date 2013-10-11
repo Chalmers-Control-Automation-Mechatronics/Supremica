@@ -61,6 +61,7 @@ import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
+
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.Tree;
 
@@ -116,6 +117,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     return mComponents;
   }
 
+  @Override
   public Object visitModule(final ModuleTreeNode t)
   {
     mEvents = new ArrayList<EventDeclProxy>(mVisitor.getEvents());
@@ -141,6 +143,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     return null;
   }
 
+  @Override
   public Object visitProcType(final ProctypeTreeNode t)
   {
     //Retrieve the symbol table for the current position
@@ -244,6 +247,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     return null;
   }
 
+  @Override
   public Object visitMsg(final MsgTreeNode t)
   {
     for(int i=0; i<t.getChildCount(); i++)
@@ -253,12 +257,14 @@ public class GraphCollectingVisitor implements PromelaVisitor
     return null;
   }
 
+  @Override
   public Object visitVar(final VardefTreeNode t)
   {
     //Nothing to do here, as it was done by the event collecting visitor class
     return null;
   }
 
+  @Override
   public Object visitChannel(final ChannelTreeNode t)
   {
     final String name = t.getChild(0).getText();
@@ -597,6 +603,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     }
   }
 
+  @Override
   public Object visitProcTypeStatement(final ProctypeStatementTreeNode t)
   {
     mIsInit = false;
@@ -633,11 +640,13 @@ public class GraphCollectingVisitor implements PromelaVisitor
     return result;
   }
 
+  @Override
   public Object visitChannelStatement(final ChannelStatementTreeNode t)
   {
     return null;
   }
 
+  @Override
   public Object visitSend(final SendTreeNode t)
   {
     final String chanName = t.getChild(0).getText();
@@ -1016,6 +1025,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     }
   }
 
+  @Override
   public Object visitReceive(final ReceiveTreeNode t)
   {
     runedOnce++;
@@ -1587,6 +1597,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     }
   }
 
+  @Override
   public Object visitConstant(final ConstantTreeNode t)
   {
     final int value = t.getValue();
@@ -1611,6 +1622,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     return null;
   }
 
+  @Override
   public Object visitInitial(final InitialTreeNode t)
   {
     mIsInit = true;
@@ -1638,6 +1650,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     return output;
   }
 
+  @Override
   public Object visitInitialStatement(final InitialStatementTreeNode t)
   {
     final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("initrun");
@@ -1645,6 +1658,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     return initGraph;
   }
 
+  @Override
   public Object visitRun(final RunTreeNode t)
   {
     final String name = t.getChild(0).getText();
@@ -1680,6 +1694,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
   }
 
   //return graph of init events
+  @Override
   public Object visitName(final NameTreeNode t)
   {
     if(t.getParent() instanceof RunTreeNode)
@@ -1787,6 +1802,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     return channelData;
   }
 
+  @Override
   public Object visitSemicolon(final SemicolonTreeNode t)
   {
     PromelaGraph result = null;
@@ -1799,11 +1815,13 @@ public class GraphCollectingVisitor implements PromelaVisitor
     return result;
   }
 
+  @Override
   public Object visitType(final TypeTreeNode t)
   {
     return null;
   }
 
+  @Override
   public Object visitCondition(final ConditionTreeNode t)
   {
     PromelaGraph result = null;
@@ -1816,6 +1834,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     return result;
   }
 
+  @Override
   public Object visitDoStatement(final DoConditionTreeNode t)
   {
     final boolean unwinding = mUnWinding;
@@ -1842,6 +1861,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     return result;
   }
 
+  @Override
   public Object visitBreak(final BreakStatementTreeNode t)
   {
     final ModuleProxyCloner cloner = mFactory.getCloner();
@@ -1921,6 +1941,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     }
   }
 
+  @Override
   public Object visitLabel(final LabelTreeNode t)
   {
     final PromelaGraph step = collectGraphs((PromelaTree) t.getChild(0));
@@ -1935,6 +1956,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     return result;
   }
 
+  @Override
   public Object visitGoto(final GotoTreeNode t)
   {
     if(!mUnWinding)
@@ -1979,6 +2001,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     }
   }
 
+  @Override
   public Object visitSkip(final SkipTreeNode t)
   {
     if(!mUnWinding)
@@ -2122,7 +2145,8 @@ public class GraphCollectingVisitor implements PromelaVisitor
     init = mFactory.createBinaryExpressionProxy(equals, name_2, initialValue);
 
     //Create the variable
-    final VariableComponentProxy var = mFactory.createVariableComponentProxy(name, type, true, init);
+    final VariableComponentProxy var =
+      mFactory.createVariableComponentProxy(name, type, init);
     return var;
   }
 
@@ -2225,7 +2249,8 @@ public class GraphCollectingVisitor implements PromelaVisitor
     init = mFactory.createBinaryExpressionProxy(equals, name_2, initialValue);
 
     //Create the variable
-    final VariableComponentProxy var = mFactory.createVariableComponentProxy(name, type, true, init);
+    final VariableComponentProxy var =
+      mFactory.createVariableComponentProxy(name, type, init);
     return var;
   }
 

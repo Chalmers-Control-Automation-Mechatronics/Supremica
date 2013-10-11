@@ -69,12 +69,13 @@ public class AnalyzerSendToEditorAction extends IDEAction
     //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
     putValue(Action.SMALL_ICON,
              new ImageIcon(IDE.class.getResource
-                             ("/icons/waters/toEditor16.gif")));
+                             ("/icons/supremica/toEditor16.gif")));
   }
 
 
   //#########################################################################
   //# Invocation
+  @Override
   public void actionPerformed(final ActionEvent e)
   {
     doAction();

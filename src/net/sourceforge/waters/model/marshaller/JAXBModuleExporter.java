@@ -35,9 +35,10 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
-import net.sourceforge.waters.model.module.GuardActionBlockProxy;
+import net.sourceforge.waters.model.module.FunctionCallExpressionProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
+import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifiedProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
@@ -80,6 +81,7 @@ import net.sourceforge.waters.xsd.module.EventListExpression;
 import net.sourceforge.waters.xsd.module.EventListType;
 import net.sourceforge.waters.xsd.module.ExpressionType;
 import net.sourceforge.waters.xsd.module.ForeachType;
+import net.sourceforge.waters.xsd.module.FunctionCallExpression;
 import net.sourceforge.waters.xsd.module.Graph;
 import net.sourceforge.waters.xsd.module.GroupNode;
 import net.sourceforge.waters.xsd.module.GuardActionBlock;
@@ -122,6 +124,7 @@ public class JAXBModuleExporter
 
   //#########################################################################
   //# Overrides for Abstract Base Class JAXBExporter
+  @Override
   Module exportDocument(final ModuleProxy proxy)
     throws VisitorException
   {
@@ -131,12 +134,14 @@ public class JAXBModuleExporter
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+  @Override
   public Object visitAliasProxy(final AliasProxy proxy)
     throws VisitorException
   {
     return visitIdentifiedProxy(proxy);
   }
 
+  @Override
   public BinaryExpression visitBinaryExpressionProxy
       (final BinaryExpressionProxy proxy)
     throws VisitorException
@@ -146,6 +151,7 @@ public class JAXBModuleExporter
     return element;
   }
 
+  @Override
   public BoxGeometry visitBoxGeometryProxy
       (final BoxGeometryProxy proxy)
     throws VisitorException
@@ -155,6 +161,7 @@ public class JAXBModuleExporter
     return element;
   }
 
+  @Override
   public ElementType visitConstantAliasProxy(final ConstantAliasProxy proxy)
     throws VisitorException
   {
@@ -163,6 +170,7 @@ public class JAXBModuleExporter
     return element;
   }
 
+  @Override
   public ColorGeometry visitColorGeometryProxy
       (final ColorGeometryProxy proxy)
     throws VisitorException
@@ -172,6 +180,7 @@ public class JAXBModuleExporter
     return element;
   }
 
+  @Override
   public Object visitComponentProxy
       (final ComponentProxy proxy)
     throws VisitorException
@@ -179,6 +188,7 @@ public class JAXBModuleExporter
     return visitIdentifiedProxy(proxy);
   }
 
+  @Override
   public Edge visitEdgeProxy
       (final EdgeProxy proxy)
     throws VisitorException
@@ -197,6 +207,7 @@ public class JAXBModuleExporter
     return element;
   }
 
+  @Override
   public EnumSetExpression visitEnumSetExpressionProxy
       (final EnumSetExpressionProxy proxy)
     throws VisitorException
@@ -206,6 +217,7 @@ public class JAXBModuleExporter
     return element;
   }
 
+  @Override
   public ElementType visitEventAliasProxy(final EventAliasProxy proxy)
     throws VisitorException
   {
@@ -214,6 +226,7 @@ public class JAXBModuleExporter
     return element;
   }
 
+  @Override
   public EventDecl visitEventDeclProxy
       (final EventDeclProxy proxy)
     throws VisitorException
@@ -223,6 +236,18 @@ public class JAXBModuleExporter
     return element;
   }
 
+  @Override
+  public Object visitFunctionCallExpressionProxy
+      (final FunctionCallExpressionProxy proxy)
+    throws VisitorException
+  {
+    // TODO
+    final FunctionCallExpression element = mFactory.createFunctionCallExpression();
+    copyFunctionCallExpressionProxy(proxy, element);
+    return element;
+  }
+
+  @Override
   public GuardActionBlock visitGuardActionBlockProxy
     (final GuardActionBlockProxy proxy)
     throws VisitorException
@@ -232,6 +257,7 @@ public class JAXBModuleExporter
     return element;
   }
 
+  @Override
   public Object visitEventListExpressionProxy
       (final EventListExpressionProxy proxy)
     throws VisitorException
@@ -239,6 +265,7 @@ public class JAXBModuleExporter
     return visitExpressionProxy(proxy);
   }
 
+  @Override
   public Object visitExpressionProxy
       (final ExpressionProxy proxy)
     throws VisitorException
@@ -259,6 +286,7 @@ public class JAXBModuleExporter
     return element;
   }
 
+  @Override
   public Graph visitGraphProxy
       (final GraphProxy proxy)
     throws VisitorException
@@ -268,6 +296,7 @@ public class JAXBModuleExporter
     return element;
   }
 
+  @Override
   public GroupNode visitGroupNodeProxy
       (final GroupNodeProxy proxy)
     throws VisitorException
@@ -277,6 +306,7 @@ public class JAXBModuleExporter
     return element;
   }
 
+  @Override
   public Object visitIdentifiedProxy
       (final IdentifiedProxy proxy)
     throws VisitorException
@@ -284,6 +314,7 @@ public class JAXBModuleExporter
     return visitNamedProxy(proxy);
   }
 
+  @Override
   public Object visitIdentifierProxy
       (final IdentifierProxy proxy)
     throws VisitorException
@@ -291,6 +322,7 @@ public class JAXBModuleExporter
     return visitSimpleExpressionProxy(proxy);
   }
 
+  @Override
   public IndexedIdentifier visitIndexedIdentifierProxy
       (final IndexedIdentifierProxy proxy)
     throws VisitorException
@@ -309,6 +341,7 @@ public class JAXBModuleExporter
     return element;
   }
 
+  @Override
   public Instance visitInstanceProxy
       (final InstanceProxy proxy)
     throws VisitorException
@@ -318,6 +351,7 @@ public class JAXBModuleExporter
     return element;
   }
 
+  @Override
   public IntConstant visitIntConstantProxy
       (final IntConstantProxy proxy)
     throws VisitorException
@@ -327,6 +361,7 @@ public class JAXBModuleExporter
     return element;
   }
 
+  @Override
   public LabelBlock visitLabelBlockProxy
       (final LabelBlockProxy proxy)
     throws VisitorException
@@ -340,6 +375,7 @@ public class JAXBModuleExporter
     return element;
   }
 
+  @Override
   public LabelGeometry visitLabelGeometryProxy
       (final LabelGeometryProxy proxy)
     throws VisitorException
@@ -349,6 +385,7 @@ public class JAXBModuleExporter
     return element;
   }
 
+  @Override
   public Module visitModuleProxy
       (final ModuleProxy proxy)
     throws VisitorException
@@ -358,6 +395,7 @@ public class JAXBModuleExporter
     return element;
   }
 
+  @Override
   public ModuleSequence visitModuleSequenceProxy
       (final ModuleSequenceProxy proxy)
     throws VisitorException
@@ -367,6 +405,7 @@ public class JAXBModuleExporter
     return element;
   }
 
+  @Override
   public Object visitNodeProxy
       (final NodeProxy proxy)
     throws VisitorException
@@ -374,6 +413,7 @@ public class JAXBModuleExporter
     return visitNamedProxy(proxy);
   }
 
+  @Override
   public ParameterBinding visitParameterBindingProxy
       (final ParameterBindingProxy proxy)
     throws VisitorException
@@ -383,6 +423,7 @@ public class JAXBModuleExporter
     return element;
   }
 
+  @Override
   public EventListExpression visitPlainEventListProxy
       (final PlainEventListProxy proxy)
     throws VisitorException
@@ -396,6 +437,7 @@ public class JAXBModuleExporter
     return element;
   }
 
+  @Override
   public PointGeometryType visitPointGeometryProxy
       (final PointGeometryProxy proxy)
     throws VisitorException
@@ -405,6 +447,7 @@ public class JAXBModuleExporter
     return element;
   }
 
+  @Override
   public QualifiedIdentifier visitQualifiedIdentifierProxy
       (final QualifiedIdentifierProxy proxy)
     throws VisitorException
@@ -414,6 +457,7 @@ public class JAXBModuleExporter
     return element;
   }
 
+  @Override
   public SimpleComponent visitSimpleComponentProxy
       (final SimpleComponentProxy proxy)
     throws VisitorException
@@ -423,6 +467,7 @@ public class JAXBModuleExporter
     return element;
   }
 
+  @Override
   public Object visitSimpleExpressionProxy
       (final SimpleExpressionProxy proxy)
     throws VisitorException
@@ -430,6 +475,7 @@ public class JAXBModuleExporter
     return visitExpressionProxy(proxy);
   }
 
+  @Override
   public SimpleIdentifier visitSimpleIdentifierProxy
       (final SimpleIdentifierProxy proxy)
     throws VisitorException
@@ -439,6 +485,7 @@ public class JAXBModuleExporter
     return element;
   }
 
+  @Override
   public SimpleNode visitSimpleNodeProxy
       (final SimpleNodeProxy proxy)
     throws VisitorException
@@ -448,6 +495,7 @@ public class JAXBModuleExporter
     return element;
   }
 
+  @Override
   public SplineGeometry visitSplineGeometryProxy
       (final SplineGeometryProxy proxy)
     throws VisitorException
@@ -466,6 +514,7 @@ public class JAXBModuleExporter
     return element;
   }
 
+  @Override
   public UnaryExpression visitUnaryExpressionProxy
       (final UnaryExpressionProxy proxy)
     throws VisitorException
@@ -475,6 +524,7 @@ public class JAXBModuleExporter
     return element;
   }
 
+  @Override
   public VariableComponent visitVariableComponentProxy
       (final VariableComponentProxy proxy)
     throws VisitorException
@@ -484,6 +534,7 @@ public class JAXBModuleExporter
     return element;
   }
 
+  @Override
   public VariableMarking visitVariableMarkingProxy
       (final VariableMarkingProxy proxy)
     throws VisitorException
@@ -734,6 +785,20 @@ public class JAXBModuleExporter
     throws VisitorException
   {
     copyProxy(proxy, element);
+  }
+
+  private void copyFunctionCallExpressionProxy
+      (final FunctionCallExpressionProxy proxy,
+       final FunctionCallExpression element)
+    throws VisitorException
+  {
+    copySimpleExpressionProxy(proxy, element);
+    element.setFunctionName(proxy.getFunctionName());
+    final List<SimpleExpressionProxy> argumentsProxy = proxy.getArguments();
+    final List<?> untyped = element.getArguments();
+    @SuppressWarnings("unchecked")
+    final List<ElementType> argumentsElement = (List<ElementType>) untyped;
+    copyCollection(argumentsProxy, argumentsElement);
   }
 
   private void copyForeachProxy
@@ -1103,9 +1168,6 @@ public class JAXBModuleExporter
     throws VisitorException
   {
     copyComponentProxy(proxy, element);
-    if (!proxy.isDeterministic()) {
-      element.setDeterministic(false);
-    }
     final SimpleExpressionProxy typeProxy = proxy.getType();
     final SimpleExpressionType typeElement =
       (SimpleExpressionType) typeProxy.acceptVisitor(this);

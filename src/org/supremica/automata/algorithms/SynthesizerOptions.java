@@ -49,8 +49,9 @@
  */
 package org.supremica.automata.algorithms;
 
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
-import org.supremica.log.*;
 
 public final class SynthesizerOptions
 {
@@ -67,7 +68,7 @@ public final class SynthesizerOptions
     private boolean localizeSupervisors;
     private boolean rememberDisabledUncontrollableEvents;
 	private boolean supervisorsAsPlants;
-			
+
     private boolean bddExtractSupervisor;
 
     public boolean oneEventAtATime = false;
@@ -79,8 +80,8 @@ public final class SynthesizerOptions
      */
     public SynthesizerOptions()
     {
-        this((SynthesisType) Config.SYNTHESIS_SYNTHESIS_TYPE.get(),
-            (SynthesisAlgorithm) Config.SYNTHESIS_ALGORITHM_TYPE.get(),
+        this(Config.SYNTHESIS_SYNTHESIS_TYPE.get(),
+            Config.SYNTHESIS_ALGORITHM_TYPE.get(),
             Config.SYNTHESIS_PURGE.get(),
             Config.SYNTHESIS_OPTIMIZE.get(),
             Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.get(),
@@ -99,7 +100,7 @@ public final class SynthesizerOptions
      */
     private SynthesizerOptions(final SynthesisType synthesisType, final SynthesisAlgorithm synthesisAlgorithm,
     		final boolean purge, final boolean removeUnnecessarySupervisors, final boolean maximallyPermissive,
-    		final boolean maximallyPermissiveIncremental, final boolean reduceSupervisors, 
+    		final boolean maximallyPermissiveIncremental, final boolean reduceSupervisors,
     		final boolean localizeSupervisors, final boolean supervisorsAsPlants, final boolean bddExtractSupervisor)
     {
         this.synthesisType = synthesisType;
@@ -253,7 +254,7 @@ public final class SynthesizerOptions
     {
         return reduceSupervisors;
     }
-    
+
     public void setLocalizeSupervisors(final boolean bool)
     {
         localizeSupervisors = bool;
@@ -267,15 +268,15 @@ public final class SynthesizerOptions
 
     /**
      * Stores the current set of options in SupremicaProperties.
-	 * MF -- I am not at all sure that we should do this, changing the options 
+	 * MF -- I am not at all sure that we should do this, changing the options
 	 * MF -- when synthesizing should only be temporal, or at most hold for the
-	 * MMF -- current session of Supremica. I do not think that it should change
+	 * MF -- current session of Supremica. I do not think that it should change
 	 * MF -- the global configuration. But this is now the way we have always done it, so...
      */
     public void saveOptions()
     {
-        Config.SYNTHESIS_SYNTHESIS_TYPE.set(synthesisType);
-        Config.SYNTHESIS_ALGORITHM_TYPE.set(synthesisAlgorithm);
+        Config.SYNTHESIS_SYNTHESIS_TYPE.setValue(synthesisType);
+        Config.SYNTHESIS_ALGORITHM_TYPE.setValue(synthesisAlgorithm);
         Config.SYNTHESIS_PURGE.set(purge);
         Config.SYNTHESIS_OPTIMIZE.set(removeUnnecessarySupervisors);
         Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.set(maximallyPermissive);
@@ -292,14 +293,14 @@ public final class SynthesizerOptions
      */
     public static SynthesizerOptions getDefaultSynthesizerOptions()
     {
-        return new SynthesizerOptions(SynthesisType.CONTROLLABLE, SynthesisAlgorithm.MODULAR, 
+        return new SynthesizerOptions(SynthesisType.CONTROLLABLE, SynthesisAlgorithm.MODULAR,
                                       true, true, true, true, true, true, false, false);
     }
 
     public static SynthesizerOptions getDefaultSynthesizerOptionsS()
     {
 
-        return new SynthesizerOptions(SynthesisType.NONBLOCKINGCONTROLLABLE, SynthesisAlgorithm.SYNTHESISA, 
+        return new SynthesizerOptions(SynthesisType.NONBLOCKINGCONTROLLABLE, SynthesisAlgorithm.SYNTHESISA,
                                       true, true, true, false, false, true, false, false);
     }
     /**

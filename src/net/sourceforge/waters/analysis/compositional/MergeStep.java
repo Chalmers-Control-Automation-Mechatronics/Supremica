@@ -9,9 +9,8 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import java.util.List;
-
 import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 
@@ -50,7 +49,7 @@ class MergeStep extends TRAbstractionStep
             final AutomatonProxy originalAut,
             final EventProxy tau,
             final StateEncoding originalStateEnc,
-            final List<int[]> partition,
+            final TRPartition partition,
             final boolean reduced,
             final StateEncoding resultStateEnc)
   {
@@ -68,7 +67,7 @@ class MergeStep extends TRAbstractionStep
     return mResultStateEncoding;
   }
 
-  List<int[]> getPartition()
+  TRPartition getPartition()
   {
     return mPartition;
   }
@@ -83,9 +82,8 @@ class MergeStep extends TRAbstractionStep
   //# Data Members
   /**
    * Partition applied to original automaton.
-   * Each entry lists states of the input encoding that have been merged.
    */
-  private final List<int[]> mPartition;
+  private final TRPartition mPartition;
   /**
    * A flag, indicating that the precondition markings have been reduced
    * during abstraction and need to be recovered for trace expansion.

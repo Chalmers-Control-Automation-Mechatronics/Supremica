@@ -2,6 +2,8 @@ package org.supremica.automata.algorithms;
 
 import java.util.Iterator;
 
+import net.sourceforge.waters.model.analysis.Abortable;
+
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
 import org.supremica.automata.Automata;
@@ -21,7 +23,7 @@ class MonolithicReturnValue
     public Alphabet disabledUncontrollableEvents;    // see AutomatonSynthesizer
 }
 
-public class MonolithicAutomataSynthesizer implements Stoppable {
+public class MonolithicAutomataSynthesizer implements Abortable {
 	/**
 	 * This method synchronizes the given automata, and calculates the forbidden
 	 * states. Uses the ordinary synthesis algorithm.
@@ -34,14 +36,14 @@ public class MonolithicAutomataSynthesizer implements Stoppable {
 	 * states.
 	 */
 	public MonolithicReturnValue synthesizeSupervisor(Automata automata,
-			SynthesizerOptions synthesizerOptions,
-			SynchronizationOptions synchronizationOptions,
-			ExecutionDialog executionDialog,
-			AutomataSynchronizerHelperStatistics helperStatistics,
-			boolean singleFixpoint) {
+			final SynthesizerOptions synthesizerOptions,
+			final SynchronizationOptions synchronizationOptions,
+			final ExecutionDialog executionDialog,
+			final AutomataSynchronizerHelperStatistics helperStatistics,
+			final boolean singleFixpoint) {
 		logger.verbose("Attempting monolithic synthesis for: " + automata);
 
-		MonolithicReturnValue retval = new MonolithicReturnValue();
+		final MonolithicReturnValue retval = new MonolithicReturnValue();
 
 		retval.didSomething = false;
 
@@ -56,10 +58,10 @@ public class MonolithicAutomataSynthesizer implements Stoppable {
 		// Systems, Cassandras, Lafortune for a discussion about this
 		// problem.
 		if (synthesizerOptions.getSynthesisType() == SynthesisType.NONBLOCKINGCONTROLLABLEOBSERVABLE) {
-			Alphabet unionAlphabet = AlphabetHelpers.getUnionAlphabet(automata);
-			Alphabet problemEvents = new Alphabet();
+			final Alphabet unionAlphabet = AlphabetHelpers.getUnionAlphabet(automata);
+			final Alphabet problemEvents = new Alphabet();
 
-			for (LabeledEvent currEvent : unionAlphabet) {
+			for (final LabeledEvent currEvent : unionAlphabet) {
 				if (currEvent.isControllable() && !currEvent.isObservable()) {
 					problemEvents.addEvent(currEvent);
 				}
@@ -67,20 +69,20 @@ public class MonolithicAutomataSynthesizer implements Stoppable {
 
 			if (problemEvents.size() > 0) {
 				// Make copy since we will change controllability
-				Automata newAutomata = new Automata(automata);
+				final Automata newAutomata = new Automata(automata);
 
 				// Iterate over all the automata and change
 				// controllability of the problem events
-				for (Automaton currAutomaton : newAutomata) {
-					Alphabet currAlphabet = currAutomaton.getAlphabet();
+				for (final Automaton currAutomaton : newAutomata) {
+					final Alphabet currAlphabet = currAutomaton.getAlphabet();
 
 					// Iterator over the problem events
-					for (Iterator<LabeledEvent> evIt = problemEvents.iterator(); evIt
+					for (final Iterator<LabeledEvent> evIt = problemEvents.iterator(); evIt
 							.hasNext();) {
-						LabeledEvent currEvent = evIt.next();
+						final LabeledEvent currEvent = evIt.next();
 
 						if (currAlphabet.contains(currEvent.getLabel())) {
-							LabeledEvent currAutomatonEvent = currAlphabet
+							final LabeledEvent currAutomatonEvent = currAlphabet
 									.getEvent(currEvent.getLabel());
 
 							currAutomatonEvent.setControllable(false);
@@ -88,8 +90,8 @@ public class MonolithicAutomataSynthesizer implements Stoppable {
 					}
 				}
 
-				StringBuffer sb = new StringBuffer();
-				for (LabeledEvent currEvent : problemEvents) {
+				final StringBuffer sb = new StringBuffer();
+				for (final LabeledEvent currEvent : problemEvents) {
 					sb.append(currEvent + " ");
 				}
 
@@ -105,7 +107,7 @@ public class MonolithicAutomataSynthesizer implements Stoppable {
 		}
 
 		// Remember old setting
-		boolean orgRememberDisabledEvents = synchronizationOptions
+		final boolean orgRememberDisabledEvents = synchronizationOptions
 				.rememberDisabledEvents();
 
 		// We must keep track of all events that we have disabled
@@ -114,19 +116,19 @@ public class MonolithicAutomataSynthesizer implements Stoppable {
 			synchronizationOptions.setRememberDisabledEvents(true);
 		}
 
-		if (synthesizerOptions.getSynthesisType() == SynthesisType.NONBLOCKING) 
+		if (synthesizerOptions.getSynthesisType() == SynthesisType.NONBLOCKING)
 		{
 			automata = new Automata(automata);
 			// Only nonblocking? Then everything should be considered
 			// controllable! // NOT THE RIGHT WAY TO DO THIS! No fix for it now, though // MF
-			for (Automaton automaton : automata) {
-				for (LabeledEvent event : automaton.getAlphabet()) {
+			for (final Automaton automaton : automata) {
+				for (final LabeledEvent event : automaton.getAlphabet()) {
 					event.setControllable(true);
 				}
 			}
 		}
 
-		AutomataSynchronizer syncher = new AutomataSynchronizer(automata,
+		final AutomataSynchronizer syncher = new AutomataSynchronizer(automata,
 				synchronizationOptions, Config.SYNTHESIS_SUP_AS_PLANT.get());
 		syncher.getHelper().setExecutionDialog(executionDialog);
 		threadToStop = syncher;
@@ -134,7 +136,7 @@ public class MonolithicAutomataSynthesizer implements Stoppable {
 		threadToStop = null;
 
 		// Exctract statistics, add to global statistics set in helperData.
-		AutomataSynchronizerHelper helper = syncher.getHelper();
+		final AutomataSynchronizerHelper helper = syncher.getHelper();
 		helperStatistics.setNumberOfCheckedStates(helperStatistics
 				.getNumberOfCheckedStates()
 				+ helper.getHelperData().getNumberOfCheckedStates());
@@ -164,7 +166,7 @@ public class MonolithicAutomataSynthesizer implements Stoppable {
 		// We need to synthesize even if the result above is controllable
 		// NONBLOCKING may ruin controllability
 		// ARASH: choose between triple and the single fixpoint algorithms:
-		AutomatonSynthesizer synthesizer = singleFixpoint ? 
+		final AutomatonSynthesizer synthesizer = singleFixpoint ?
 				new AutomatonSynthesizerSingleFixpoint(retval.automaton, synthesizerOptions)
 				: new AutomatonSynthesizer(retval.automaton, synthesizerOptions);
 		threadToStop = synthesizer;
@@ -189,8 +191,8 @@ public class MonolithicAutomataSynthesizer implements Stoppable {
 			assert (synthesizerOptions.doPurge());
 
 			// Add the reduced supervisor
-			Automaton supervisor = retval.automaton;
-			Automaton reducedSupervisor = AutomatonSplit.reduceAutomaton(
+			final Automaton supervisor = retval.automaton;
+			final Automaton reducedSupervisor = AutomatonSplit.reduceAutomaton(
 					supervisor, automata);
 			retval.automaton = reducedSupervisor;
 
@@ -204,16 +206,23 @@ public class MonolithicAutomataSynthesizer implements Stoppable {
 	}
 
 	private boolean stopRequested = false;
-	private Stoppable threadToStop;
+	private Abortable threadToStop;
 
-	public boolean isStopped() {
+	@Override
+	public boolean isAborting() {
 		return stopRequested;
 	}
 
-	public void requestStop() {
+	@Override
+	public void requestAbort() {
 		stopRequested = true;
 		if (threadToStop != null) {
-			threadToStop.requestStop();
+			threadToStop.requestAbort();
 		}
+	}
+
+	@Override
+	public void resetAbort(){
+	  stopRequested = false;
 	}
 }

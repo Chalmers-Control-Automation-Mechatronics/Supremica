@@ -8,10 +8,13 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
+import java.util.List;
 
+import javax.swing.ImageIcon;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.SwingUtilities;
+import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
@@ -20,6 +23,7 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.module.GraphSubject;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.supremica.gui.ide.ModuleContainer;
 
@@ -48,17 +52,20 @@ public class AutomatonInternalFrame
     pack();
     // Store the initial reference position after the window is open.
     SwingUtilities.invokeLater(new Runnable() {
+      @Override
       public void run() {
         storeReferenceFrame();
       }
     });
-    this.setFrameIcon(ModuleContext.getComponentKindIcon(aut.getKind()));
+    final ComponentKind kind = aut.getKind();
+    setFrameIcon(kind);
     container.getModule().addModelObserver(this);
   }
 
 
   //##########################################################################
   //# Overrides for javax.swing.JInternalFrame
+  @Override
   public void dispose()
   {
     mParent.removeAutomaton(this.getTitle());
@@ -118,6 +125,7 @@ public class AutomatonInternalFrame
     }
   }
 
+  @Override
   public JDesktopPane getDesktopPane()
   {
     return mParent;
@@ -153,7 +161,8 @@ public class AutomatonInternalFrame
     if (canResize())
     {
       this.pack(); // This code automatically resizes the Internal Frame to the size it was when it started
-      SwingUtilities.invokeLater(new Thread(){public void run(){AutomatonInternalFrame.this.repaint();}});
+      SwingUtilities.invokeLater(new Thread(){@Override
+      public void run(){AutomatonInternalFrame.this.repaint();}});
       storeReferenceFrame();
     }
   }
@@ -167,6 +176,7 @@ public class AutomatonInternalFrame
 
   //#########################################################################
   //# Interface ModelObserver
+  @Override
   public void modelChanged(final ModelChangeEvent event)
   {
     if (event.getKind() == ModelChangeEvent.GEOMETRY_CHANGED) {
@@ -175,9 +185,37 @@ public class AutomatonInternalFrame
     }
   }
 
+  @Override
   public int getModelObserverPriority()
   {
     return ModelObserver.RENDERING_PRIORITY;
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private void setFrameIcon(final ComponentKind kind)
+  {
+    final List<ImageIcon> icons = ModuleContext.getComponentKindIconList(kind);
+    ImageIcon icon = null;
+    if (icons.size() > 1) {
+      try {
+        final BasicInternalFrameUI ui =
+          (javax.swing.plaf.basic.BasicInternalFrameUI) getUI();
+        final int titleBarHeight = ui.getNorthPane().getPreferredSize().height;
+        for (final ImageIcon candidate : icons) {
+          if (candidate.getIconHeight() <= titleBarHeight) {
+            icon = candidate;
+          }
+        }
+      } catch (final ClassCastException exception) {
+        // Just in case the UI is a different type ...
+      }
+    }
+    if (icon == null && !icons.isEmpty()) {
+      icon = icons.get(0);
+    }
+    setFrameIcon(icon);
   }
 
 
@@ -194,6 +232,7 @@ public class AutomatonInternalFrame
      * have been completed, so we store the new location of the reference
      * frame.
      */
+    @Override
     public void mouseReleased(final MouseEvent event)
     {
       if (event.getButton() == MouseEvent.BUTTON1) {
@@ -216,6 +255,7 @@ public class AutomatonInternalFrame
      * When the window has been moved, we must update the reference frame,
      * but not if the movement happens while resizing.
      */
+    @Override
     public void componentMoved(final ComponentEvent event)
     {
       final Rectangle bounds = getBounds();
@@ -232,6 +272,7 @@ public class AutomatonInternalFrame
      * ratio of the graph, but only if a reference frame is available, and
      * the spring embedder is not running.
      */
+    @Override
     public void componentResized(final ComponentEvent event)
     {
       if (mOldBounds != null && !mDisplayPane.isEmbedderRunning()) {

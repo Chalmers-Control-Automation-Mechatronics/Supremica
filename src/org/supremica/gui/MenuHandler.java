@@ -49,19 +49,22 @@
  */
 package org.supremica.gui;
 
-import java.util.*;
-import javax.swing.*;
+import java.util.Iterator;
+import java.util.LinkedList;
 
-import org.supremica.util.VPopupMenu;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.JTable;
 
-// MF -- Small changes here to make the main popup menu usefable from other tables
+// MF -- Small changes here to make the main popup menu usable from other tables
 // MF -- Instead of hardwiring the menuhandler to a certain table, it takes a table param where appropriate
 // MF -- I also made the menuhandler accessible from org.supremica.gui.Supremica
 public class MenuHandler
 {
 	// private final JTable theTable;
-	private final JPopupMenu oneAutomataMenu = new VPopupMenu();
-	private final JPopupMenu twoAutomataMenu = new VPopupMenu();
+	private final JPopupMenu oneAutomataMenu = new JPopupMenu();
+	private final JPopupMenu twoAutomataMenu = new JPopupMenu();
 	boolean oneAutomataMenuLastSep = false;
 	boolean twoAutomataMenuLastSep = false;
 	private final LinkedList<JMenuItem> zeroAutomataItems = new LinkedList<JMenuItem>();
@@ -77,7 +80,7 @@ public class MenuHandler
 		// this.theTable = theTable;
 	}
 
-	public void add(JMenuItem theMenuItem, int minNbrOfAutomata)
+	public void add(final JMenuItem theMenuItem, final int minNbrOfAutomata)
 		throws Exception
 	{
 		if (minNbrOfAutomata == 0)
@@ -111,7 +114,7 @@ public class MenuHandler
 	 * Add a sub-menu
 	 *
 	 */
-	public void addSubMenu(JMenu theMenu, int minNbrOfAutomata)
+	public void addSubMenu(final JMenu theMenu, final int minNbrOfAutomata)
 	{
 		if (minNbrOfAutomata == 0)
 		{
@@ -148,7 +151,7 @@ public class MenuHandler
 		}
 	}
 
-	public JPopupMenu getDisabledPopupMenu(int nbrOfAutomata)
+	public JPopupMenu getDisabledPopupMenu(final int nbrOfAutomata)
 	{
 		setEnabled(twoAutomataItems, nbrOfAutomata >= 2);
 		setEnabled(oneAutomataItems, nbrOfAutomata >= 1);
@@ -158,9 +161,9 @@ public class MenuHandler
 		return twoAutomataMenu;
 	}
 
-	public JPopupMenu getTrimmedPopupMenu(JTable theTable)
+	public JPopupMenu getTrimmedPopupMenu(final JTable theTable)
 	{
-		int nbrOfAutomata = theTable.getSelectedRowCount();
+		final int nbrOfAutomata = theTable.getSelectedRowCount();
 
 		if (nbrOfAutomata >= 2)
 		{
@@ -170,13 +173,13 @@ public class MenuHandler
 		return oneAutomataMenu;
 	}
 
-	private void setEnabled(LinkedList<JMenuItem> theList, boolean enable)
+	private void setEnabled(final LinkedList<JMenuItem> theList, final boolean enable)
 	{
-		Iterator<JMenuItem> menuItemIt = theList.iterator();
+		final Iterator<JMenuItem> menuItemIt = theList.iterator();
 
 		while (menuItemIt.hasNext())
 		{
-			JMenuItem currItem = menuItemIt.next();
+			final JMenuItem currItem = menuItemIt.next();
 
 			currItem.setEnabled(enable);
 		}

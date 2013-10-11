@@ -27,8 +27,11 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.HashFunctions;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.analysis.tr.TRPartition;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -59,7 +62,7 @@ public abstract class TRTraceExpander
                             final AutomatonProxy resultAut,
                             final StateEncoding resultStateEnc,
                             final AutomatonProxy originalAut,
-                            final List<int[]> partition)
+                            final TRPartition partition)
     throws AnalysisException
   {
     this(verifier, tau, null,
@@ -73,7 +76,7 @@ public abstract class TRTraceExpander
                             final StateEncoding resultStateEnc,
                             final AutomatonProxy originalAut,
                             final StateEncoding originalStateEnc,
-                            final List<int[]> partition,
+                            final TRPartition partition,
                             final boolean preconditionMarkingReduced)
     throws AnalysisException
   {
@@ -91,7 +94,7 @@ public abstract class TRTraceExpander
                           final StateEncoding resultStateEnc,
                           final AutomatonProxy originalAut,
                           final StateEncoding originalStateEnc,
-                          final List<int[]> partition,
+                          final TRPartition partition,
                           final boolean preconditionMarkingReduced)
     throws AnalysisException
   {
@@ -215,6 +218,7 @@ public abstract class TRTraceExpander
   List<TraceStepProxy> getSaturatedTraceSteps
     (final List<TraceStepProxy> steps,
      final Collection<AutomatonProxy> automata)
+    throws AnalysisAbortException, OverflowException
   {
     final ProductDESProxyFactory factory = mModelVerifier.getFactory();
     final int numAutomata = automata.size();
@@ -242,6 +246,7 @@ public abstract class TRTraceExpander
       final Map<AutomatonProxy,StateProxy> convertedStepMap =
         new HashMap<AutomatonProxy,StateProxy>(numAutomata);
       for (final AutomatonProxy aut : automata) {
+        checkAbort();
         final StateProxy prev = previousStepMap.get(aut);
         final StateProxy state = findSuccessor(aut, event, prev, stepMap);
         convertedStepMap.put(aut, state);
@@ -310,7 +315,7 @@ public abstract class TRTraceExpander
       mTargetSet = new TIntHashSet(1);
       mTargetSet.add(targetClass);
     } else {
-      final int[] targetArray = mPartition.get(targetClass);
+      final int[] targetArray = mPartition.getStates(targetClass);
       mTargetSet = new TIntHashSet(targetArray);
     }
   }
@@ -333,8 +338,19 @@ public abstract class TRTraceExpander
     }
   }
 
+  int getDefaultMarkingID()
+  {
+    final EventProxy defaultMarking = mModelVerifier.getUsedDefaultMarking();
+    if (defaultMarking == null) {
+      return -1;
+    } else {
+      return mEventEncoding.getEventCode(defaultMarking);
+    }
+  }
+
   void mergeTraceSteps(final List<TraceStepProxy> traceSteps,
                        final List<SearchRecord> convertedSteps)
+    throws AnalysisAbortException, OverflowException
   {
     final int tau = EventEncoding.TAU;
     final ProductDESProxyFactory factory = mModelVerifier.getFactory();
@@ -356,6 +372,7 @@ public abstract class TRTraceExpander
       convertedIter.hasNext() ? convertedIter.next() : null;
     while (step != null || record != null) {
       if (step != null) {
+        checkAbort();
         final EventProxy event = step.getEvent();
         final int eventID = mEventEncoding.getEventCode(event);
         if (eventID == tau) {
@@ -373,6 +390,16 @@ public abstract class TRTraceExpander
           stepIter.set(newStep);
           step = stepIter.hasNext() ? stepIter.next() : null;
           continue;
+        } else if (record == null) {
+          // We have got a shared event, but the abstracted automaton
+          // does not accept it. This means we have entered certain conflicts
+          // in the original automaton, and the trace ends here.
+          stepIter.remove();
+          while (stepIter.hasNext()) {
+            stepIter.next();
+            stepIter.remove();
+          }
+          return;
         }
       }
       if (record != null) {
@@ -476,7 +503,7 @@ public abstract class TRTraceExpander
       chain.run();
       rel = chain.getTransitionRelation();
       final int numStates = rel.getNumberOfStates();
-      final List<int[]> partition = chain.getResultPartition();
+      final TRPartition partition = chain.getResultPartition();
       if (partition == null) {
         for (int state = 0; state < numStates; state++) {
           if (!rel.isMarked(state, mPreconditionMarkingID)) {
@@ -487,7 +514,7 @@ public abstract class TRTraceExpander
       } else {
         for (int state = 0; state < numStates; state++) {
           if (!rel.isMarked(state, mPreconditionMarkingID)) {
-            for (final int member : partition.get(state)) {
+            for (final int member : partition.getStates(state)) {
               mTransitionRelation.setMarked(member, mPreconditionMarkingID,
                                             false);
             }
@@ -495,6 +522,12 @@ public abstract class TRTraceExpander
         }
       }
     }
+  }
+
+  void checkAbort()
+    throws AnalysisAbortException, OverflowException
+  {
+    mModelVerifier.checkAbort();
   }
 
 
@@ -631,7 +664,7 @@ public abstract class TRTraceExpander
    */
   private final StateEncoding mOriginalStateEncoding;
 
-  private final List<int[]> mPartition;
+  private final TRPartition mPartition;
 
   /**
    * Transition relation that was simplified.

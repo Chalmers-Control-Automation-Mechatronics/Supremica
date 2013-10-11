@@ -17,11 +17,11 @@ import java.util.Map;
 
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
-import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
-import net.sourceforge.waters.model.analysis.des.NondeterministicDESException;
 import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -114,6 +114,7 @@ public class BDDSafetyVerifier
 
   //#########################################################################
   //# Invocation
+  @Override
   public boolean run()
     throws AnalysisException
   {
@@ -147,7 +148,29 @@ public class BDDSafetyVerifier
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
+  public void requestAbort()
+  {
+    super.requestAbort();
+    if (mConditionPartitioning != null) {
+      mConditionPartitioning.requestAbort();
+    }
+  }
+
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    if (mConditionPartitioning != null) {
+      mConditionPartitioning.resetAbort();
+    }
+  }
+
+
+  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.SafetyVerifier
+  @Override
   public SafetyDiagnostics getDiagnostics()
   {
     return mDiagnostics;
@@ -164,6 +187,7 @@ public class BDDSafetyVerifier
   //# Algorithm Implementation
   @Override
   void createAutomatonBDDs()
+    throws AnalysisAbortException, OverflowException
   {
     final ProductDESProxy model = getModel();
     final KindTranslator translator = getKindTranslator();
@@ -184,7 +208,7 @@ public class BDDSafetyVerifier
 
   @Override
   EventBDD[] createEventBDDs()
-    throws EventNotFoundException, NondeterministicDESException
+    throws AnalysisException
   {
     final ProductDESProxy model = getModel();
     final KindTranslator translator = getKindTranslator();
@@ -206,22 +230,22 @@ public class BDDSafetyVerifier
       if (!result.isFinished()) {
         final BDDFactory bddFactory = getBDDFactory();
         final int limit = getPartitioningSizeLimit();
-        final Partitioning<ConditionPartitionBDD> condPartitioning =
-          new GreedyPartitioning<ConditionPartitionBDD>
-            (bddFactory, ConditionPartitionBDD.class, limit);
+        mConditionPartitioning = new GreedyPartitioning<ConditionPartitionBDD>
+          (bddFactory, ConditionPartitionBDD.class, limit);
         int condcount0 = 0;
         for (final EventBDD eventBDD : eventBDDs) {
           final BDD cond = eventBDD.getControllabilityConditionBDD();
           if (cond != null) {
             final ConditionPartitionBDD part =
               new ConditionPartitionBDD(eventBDD);
-            condPartitioning.add(part);
+            mConditionPartitioning.add(part);
             condcount0++;
           }
         }
         final AutomatonBDD[] automatonBDDs = getAutomatonBDDs();
-          condPartitioning.merge(automatonBDDs);
-        mConditionBDDs = condPartitioning.getFullPartition();
+        mConditionPartitioning.merge(automatonBDDs);
+        mConditionBDDs = mConditionPartitioning.getFullPartition();
+        mConditionPartitioning = null;
         final int condcount1 = mConditionBDDs.size();
         if (logger.isDebugEnabled() && condcount0 > condcount1) {
           logger.debug("Merged conditions: " + condcount0 +
@@ -268,6 +292,7 @@ public class BDDSafetyVerifier
 
   @Override
   boolean containsBadState(final BDD reached)
+    throws AnalysisAbortException, OverflowException
   {
     for (final ConditionPartitionBDD part : mConditionBDDs) {
       BDD condpart = part.getBDD();
@@ -279,6 +304,7 @@ public class BDDSafetyVerifier
         Map.Entry<EventProxy,PartitionBDD> entry = iter.next();
         if (iter.hasNext()) {
           while (true) {
+            checkAbort();
             imp.free();
             condpart = entry.getValue().getBDD();
             imp = reached.imp(condpart);
@@ -298,6 +324,7 @@ public class BDDSafetyVerifier
   }
 
   private SafetyTraceProxy computeCounterExample()
+    throws AnalysisAbortException, OverflowException
   {
     for (final PartitionBDD part : mConditionBDDs) {
       part.dispose();
@@ -361,6 +388,7 @@ public class BDDSafetyVerifier
   //#########################################################################
   //# Data Members
   private final SafetyDiagnostics mDiagnostics;
+  private Partitioning<ConditionPartitionBDD> mConditionPartitioning;
   private List<ConditionPartitionBDD> mConditionBDDs;
   private BDD mBadStateBDD;
   private EventProxy mBadEvent;

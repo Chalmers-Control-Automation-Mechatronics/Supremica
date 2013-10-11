@@ -49,10 +49,24 @@
  */
 
 package org.supremica.automata.algorithms;
-import org.supremica.log.*;
-import java.util.*;
-import org.supremica.automata.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
+import net.sourceforge.waters.model.analysis.Abortable;
+
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.Arc;
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonType;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.State;
+import org.supremica.automata.StateSet;
 import org.supremica.automata.algorithms.standard.ObserverBuilder;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
 
 /**
@@ -62,7 +76,7 @@ import org.supremica.properties.Config;
  *@since November 28, 2000
  */
 public class AutomatonSynthesizer
-    implements Stoppable
+    implements Abortable
 {
     protected static Logger logger = LoggerFactory.createLogger(AutomatonSynthesizer.class);
     protected Automaton theAutomaton;
@@ -70,17 +84,17 @@ public class AutomatonSynthesizer
     protected SynthesizerOptions synthesizerOptions;
     protected Alphabet disabledUncontrollableEvents;
     protected boolean forcedPurge = false;
-    private boolean stopRequested = false;
-    
+    private boolean abortRequested = false;
+
     /**
      * theAutomaton will be changed!
      */
-    public AutomatonSynthesizer(Automaton theAutomaton, SynthesizerOptions synthesizerOptions)
+    public AutomatonSynthesizer(final Automaton theAutomaton, final SynthesizerOptions synthesizerOptions)
     {
         this.theAutomaton = theAutomaton;
         this.synthesizerOptions = synthesizerOptions;
     }
-    
+
     /**
      * Synthesize a monolithic supervisor.
      */
@@ -91,7 +105,7 @@ public class AutomatonSynthesizer
 
         // Find out which type of synthesis and do it!
         boolean didSomething = false;    // records whether we actually did anything
-        SynthesisType synthesisType = synthesizerOptions.getSynthesisType();
+        final SynthesisType synthesisType = synthesizerOptions.getSynthesisType();
         if (synthesisType == SynthesisType.CONTROLLABLE)
         {
             didSomething = synthesizeControllable();
@@ -112,19 +126,19 @@ public class AutomatonSynthesizer
         {
             throw new IllegalArgumentException("Unknown synthesis type " + synthesisType);
         }
-        
+
         // Compute which uncontrollable were disabled?
         if (synthesizerOptions.doRememberDisabledUncontrollableEvents())
         {
             computeDisabledUncontrollableEvents();
         }
-        
+
         // Purge?
         if (synthesizerOptions.doPurge() || forcedPurge)
         {
             purge();
         }
-        
+
         // Finish
         theAutomaton.invalidate();
         theAutomaton.endTransaction();
@@ -132,21 +146,21 @@ public class AutomatonSynthesizer
         theAutomaton.setName(null);
         return didSomething;
     }
-    
+
     public void initializeAcceptingStates()
     {
-        Iterator<?> stateIt = theAutomaton.stateIterator();
+        final Iterator<?> stateIt = theAutomaton.stateIterator();
         logger.debug("AutomatonSynthesizer.initializeAcceptingStates...");
         while (stateIt.hasNext())
         {
-            State currState = (State) stateIt.next();
+            final State currState = (State) stateIt.next();
             if (currState.isAccepting() && !currState.isForbidden())
             {
                 acceptingStates.add(currState);
             }
         }
     }
-    
+
     /**
      * Synthesize a controllable, nonblocking and observable supervisor.
      */
@@ -158,28 +172,28 @@ public class AutomatonSynthesizer
         int observerIteration = 1;
         while (!observable)
         {
-            boolean changed = synthesizeControllableNonblocking();
-            if (stopRequested)
+            final boolean changed = synthesizeControllableNonblocking();
+            if (abortRequested)
             {
                 return false;
             }
             didSomething = didSomething || changed;
-            ObserverBuilder observerBuilder = new ObserverBuilder(theAutomaton, true);
+            final ObserverBuilder observerBuilder = new ObserverBuilder(theAutomaton, true);
             observerBuilder.execute();
             observable = observerBuilder.isObservable();
-            Automaton currObserver = observerBuilder.getNewAutomaton();
+            final Automaton currObserver = observerBuilder.getNewAutomaton();
             currObserver.setAllStatesAccepting(true);
             currObserver.setName("Observer");
             logger.info("Number of states in observer: " + currObserver.nbrOfStates() + " nbr forb states: " + currObserver.nbrOfForbiddenStates());
-            Automata observerAndSupervisor = new Automata();
+            final Automata observerAndSupervisor = new Automata();
             observerAndSupervisor.addAutomaton(currObserver);
             observerAndSupervisor.addAutomaton(theAutomaton);
             // observerAndSupervisor.setIndicies();
-            SynchronizationOptions observerSynchOptions = new SynchronizationOptions();
+            final SynchronizationOptions observerSynchOptions = new SynchronizationOptions();
             observerSynchOptions.setSynchronizationType(SynchronizationType.FULL);
-            AutomataSynchronizer observerSynchronizer = new AutomataSynchronizer(observerAndSupervisor, observerSynchOptions, Config.SYNTHESIS_SUP_AS_PLANT.get());
+            final AutomataSynchronizer observerSynchronizer = new AutomataSynchronizer(observerAndSupervisor, observerSynchOptions, Config.SYNTHESIS_SUP_AS_PLANT.get());
             observerSynchronizer.execute();
-            Automaton newSystem = observerSynchronizer.getAutomaton();
+            final Automaton newSystem = observerSynchronizer.getAutomaton();
             logger.info("Number of states in observer||sup: " + newSystem.nbrOfStates() + " nbr forb states: " + newSystem.nbrOfForbiddenStates());
             theAutomaton = newSystem;
             logger.debug("Observer in iteration " + observerIteration + " is " + (observable
@@ -189,7 +203,7 @@ public class AutomatonSynthesizer
         }
         return true;
     }
-    
+
     /**
      * Synthesize a controllable and nonblocking supervisor.
      */
@@ -197,7 +211,7 @@ public class AutomatonSynthesizer
     {
         StateSet stateList = new StateSet();
         logger.debug("AutomatonSynthesizer.synthesizeControllableNonblocking...");
-        for (State state: theAutomaton)
+        for (final State state: theAutomaton)
         {
             if (state.isAccepting() &&!state.isForbidden())
             {
@@ -226,7 +240,7 @@ public class AutomatonSynthesizer
         doReachable();
         // Forbid the states with MAX_COST set
         boolean didSomething = false;
-        for (State state: theAutomaton)
+        for (final State state: theAutomaton)
         {
             if (state.getCost() == State.MAX_COST)
             {
@@ -237,7 +251,7 @@ public class AutomatonSynthesizer
         theAutomaton.setType(AutomatonType.SUPERVISOR);
         return didSomething;
     }
-    
+
     /**
      * Synthesize a controllable supervisor.
      */
@@ -245,11 +259,11 @@ public class AutomatonSynthesizer
     {
         logger.debug("AutomatonSynthesizer.synthesizeControllable...");
         // boolean newUnsafeStates;
-        LinkedList<State> stateList = new LinkedList<State>();
+        final LinkedList<State> stateList = new LinkedList<State>();
         Iterator<?> stateIt = theAutomaton.stateIterator();
         while (stateIt.hasNext())
         {
-            State currState = (State) stateIt.next();
+            final State currState = (State) stateIt.next();
             if (currState.isAccepting() &&!currState.isForbidden())
             {
                 acceptingStates.add(currState);
@@ -268,7 +282,7 @@ public class AutomatonSynthesizer
         stateIt = theAutomaton.stateIterator();
         while (stateIt.hasNext())
         {
-            State currState = (State) stateIt.next();
+            final State currState = (State) stateIt.next();
             if (currState.getCost() == State.MAX_COST)
             {
                 currState.setForbidden(true);
@@ -278,7 +292,7 @@ public class AutomatonSynthesizer
         theAutomaton.setType(AutomatonType.SUPERVISOR);
         return didSomething;
     }
-    
+
     protected boolean synthesizeNonblocking()
     {
         logger.debug("AutomatonSynthesizer.synthesizeNonblocking...");
@@ -294,10 +308,10 @@ public class AutomatonSynthesizer
         doReachable();
         // Forbid the states with MAX_COST set
         boolean didSomething = false;
-        Iterator<?> stateIt = theAutomaton.stateIterator();
+        final Iterator<?> stateIt = theAutomaton.stateIterator();
         while (stateIt.hasNext())
         {
-            State currState = (State) stateIt.next();
+            final State currState = (State) stateIt.next();
             if (currState.getCost() == State.MAX_COST)
             {
                 currState.setForbidden(true);
@@ -307,7 +321,7 @@ public class AutomatonSynthesizer
         theAutomaton.setType(AutomatonType.SUPERVISOR);
         return didSomething;
     }
-    
+
     /**
      * Sets the cost of all non-coreachable states to MAX_COST.
      *
@@ -324,23 +338,23 @@ public class AutomatonSynthesizer
             // Not initialized? Do it.
             initializeAcceptingStates();
         }
-        StateSet stateStack = new StateSet(acceptingStates);
+        final StateSet stateStack = new StateSet(acceptingStates);
         logger.debug(stateStack.size() + " nbr of accepting states");
         // Do propagate coreachability
         while (stateStack.size() > 0)
         {
-            if (stopRequested)
+            if (abortRequested)
             {
                 return new StateSet();
             }
             // Get and remove a state
-            State currState = stateStack.remove();
+            final State currState = stateStack.remove();
             currState.setVisited(true);
-            Iterator<?> arcIt = currState.incomingArcsIterator();
+            final Iterator<?> arcIt = currState.incomingArcsIterator();
             while (arcIt.hasNext())
             {
-                Arc currArc = (Arc) arcIt.next();
-                State fromState = currArc.getFromState();
+                final Arc currArc = (Arc) arcIt.next();
+                final State fromState = currArc.getFromState();
                 if ((fromState.getCost() != State.MAX_COST) && !fromState.isVisited())
                 {
                     fromState.setVisited(true);
@@ -352,10 +366,10 @@ public class AutomatonSynthesizer
         // Find all states that are not coreachable and
         // mark them as unsafe.
         int nbrOfNewUnsafeStates = 0;
-        Iterator<?> stateIt = theAutomaton.stateIterator();
+        final Iterator<?> stateIt = theAutomaton.stateIterator();
         while (stateIt.hasNext())
         {
-            State currState = (State) stateIt.next();
+            final State currState = (State) stateIt.next();
             if ((!currState.isVisited()) && (currState.getCost() != State.MAX_COST))
             {
                 nbrOfNewUnsafeStates++;
@@ -366,11 +380,11 @@ public class AutomatonSynthesizer
         logger.debug("found " + nbrOfNewUnsafeStates + " new blocking states");
         return stateStack;    // return the set of non-coreachable states
     }
-    
+
     /**
      * returns true if uncontrollable states found.
      */
-    protected boolean doControllable(Collection<State> stateStack)
+    protected boolean doControllable(final Collection<State> stateStack)
     {
         logger.debug("AutomatonSynthesizer.doControllable...");
         boolean newUnsafeStates = false;
@@ -378,14 +392,14 @@ public class AutomatonSynthesizer
         // Do propagate uncontrollability
         while (stateStack.size() > 0)
         {
-            if (stopRequested)
+            if (abortRequested)
             {
                 return false;
             }
             // Get and remove a state from the stack
-            State currState = stateStack.iterator().next();
+            final State currState = stateStack.iterator().next();
             stateStack.remove(currState);
-            Collection<State> newXstates = doControllable(currState);
+            final Collection<State> newXstates = doControllable(currState);
             if (newXstates.size() != 0)
             {
                 newUnsafeStates = true;
@@ -396,21 +410,21 @@ public class AutomatonSynthesizer
         logger.debug("found " + nbrOfNewUnsafeStates + " new uncontrollable states");
         return newUnsafeStates;
     }
-    
+
     /**
      * This one does for one state
      */
-    public StateSet doControllable(State currState)
+    public StateSet doControllable(final State currState)
     {
-        StateSet stateStack = new StateSet();
-        Iterator<?> arcIt = currState.incomingArcsIterator();
+        final StateSet stateStack = new StateSet();
+        final Iterator<?> arcIt = currState.incomingArcsIterator();
         while (arcIt.hasNext())
         {
-            Arc currArc = (Arc) arcIt.next();
-            LabeledEvent currEvent = currArc.getEvent();    // theAutomaton.getEvent(currArc.getEventId());
+            final Arc currArc = (Arc) arcIt.next();
+            final LabeledEvent currEvent = currArc.getEvent();    // theAutomaton.getEvent(currArc.getEventId());
             if (!currEvent.isControllable())
             {
-                State fromState = currArc.getFromState();    // backwards over this uc-event
+                final State fromState = currArc.getFromState();    // backwards over this uc-event
                 if (fromState.getCost() != State.MAX_COST)    // if not already forbidden, forbid it
                 {
                     fromState.setCost(State.MAX_COST);
@@ -424,7 +438,7 @@ public class AutomatonSynthesizer
         }
         return stateStack;
     }
-    
+
     /**
      * Sets the cost of all non reachable states to State.MAX_COST. Forbidden states
      * stop reachability "synthesis style".
@@ -433,7 +447,7 @@ public class AutomatonSynthesizer
     {
         doReachable(false);
     }
-    
+
     /**
      * Sets the cost of all non reachable states to State.MAX_COST. The treatment of
      * forbidden states as stops for reachability is selectable through the argument.
@@ -441,14 +455,14 @@ public class AutomatonSynthesizer
      * @param expandForbidden If false, states that are reachable only
      * by paths that pass through forbidden states are considered non-reachable.
      */
-    public void doReachable(boolean expandForbidden)
+    public void doReachable(final boolean expandForbidden)
     {
         logger.debug("AutomatonSynthesizer.doReachable...");
         theAutomaton.clearVisitedStates();
         // Push the initial state on the stack
         // Mark the state as visited
-        State initialState = theAutomaton.getInitialState();
-        LinkedList<State> stateStack = new LinkedList<State>();
+        final State initialState = theAutomaton.getInitialState();
+        final LinkedList<State> stateStack = new LinkedList<State>();
         //if ((initialState.getCost() != State.MAX_COST)  || expandForbidden)
         if (expandForbidden || !initialState.isForbidden())
         {
@@ -457,18 +471,18 @@ public class AutomatonSynthesizer
         // Do propagate reachability
         while (stateStack.size() > 0)
         {
-            if (stopRequested)
+            if (abortRequested)
             {
                 return;
             }
-            State currState = stateStack.removeLast();
+            final State currState = stateStack.removeLast();
             currState.setVisited(true);
             // Look at states reachable from here
-            Iterator<?> arcIt = currState.outgoingArcsIterator();
+            final Iterator<?> arcIt = currState.outgoingArcsIterator();
             while (arcIt.hasNext())
             {
-                Arc currArc = (Arc) arcIt.next();
-                State toState = currArc.getToState();
+                final Arc currArc = (Arc) arcIt.next();
+                final State toState = currArc.getToState();
                 // Expand unvisited states
                 //if (!toState.isVisited() && ((toState.getCost() != State.MAX_COST) || expandForbidden))
                 if (!toState.isVisited() && (expandForbidden || !(toState.isForbidden() || (toState.getCost() == State.MAX_COST))))
@@ -478,36 +492,36 @@ public class AutomatonSynthesizer
                 }
             }
         }
-        
+
         // Set max cost on the states that can't be reached
-        Iterator<?> stateIt = theAutomaton.stateIterator();
+        final Iterator<?> stateIt = theAutomaton.stateIterator();
         while (stateIt.hasNext())
         {
-            State currState = (State) stateIt.next();
-            
+            final State currState = (State) stateIt.next();
+
             if (!currState.isVisited())
             {
                 currState.setCost(State.MAX_COST);
             }
         }
     }
-    
+
     /**
      * Returns the set of UNCONTROLLABLE events that needed to be
      * disabled in the synthesis. If not
      * rememberDisabledUncontrollableEvents is set to true then null
-     * is returned.  This method must only be called after completed 
+     * is returned.  This method must only be called after completed
      * synthesis.
      */
     public Alphabet getDisabledUncontrollableEvents()
     {
         return disabledUncontrollableEvents;
     }
-    
+
     protected void computeDisabledUncontrollableEvents()
     {
         disabledUncontrollableEvents = new Alphabet();
-        for (State state : theAutomaton)
+        for (final State state : theAutomaton)
         {
             // Is this a forbidden state (then all incoming from
             // previous states must be disabled (unless the previous state were
@@ -515,13 +529,13 @@ public class AutomatonSynthesizer
             if (state.getCost() == State.MAX_COST)
             {
                 // Look through the incoming arcs
-                for (Iterator<Arc> evIt = state.incomingArcsIterator(); evIt.hasNext(); )
+                for (final Iterator<Arc> evIt = state.incomingArcsIterator(); evIt.hasNext(); )
                 {
-                    Arc arc = evIt.next();
+                    final Arc arc = evIt.next();
                     // Don't count selfloops!
                     if (!arc.isSelfLoop())
                     {
-                        LabeledEvent event = arc.getEvent();
+                        final LabeledEvent event = arc.getEvent();
                         if (!event.isControllable())
                         {
                             try
@@ -531,7 +545,7 @@ public class AutomatonSynthesizer
                                     disabledUncontrollableEvents.addEvent(event);
                                 }
                             }
-                            catch (Exception ex)
+                            catch (final Exception ex)
                             {
                                 logger.error("Error in AutomatonSynthesizer: " + ex.getMessage());
                                 logger.debug(ex.getStackTrace());
@@ -542,30 +556,30 @@ public class AutomatonSynthesizer
             }
         }
     }
-    
+
     public void purge()
     {
-        List<State> stateList = new LinkedList<State>();
-        
+        final List<State> stateList = new LinkedList<State>();
+
         // Find all max cost states
-        for (Iterator<State> stateIt = theAutomaton.stateIterator();
+        for (final Iterator<State> stateIt = theAutomaton.stateIterator();
         stateIt.hasNext(); )
         {
-            State currState = stateIt.next();
+            final State currState = stateIt.next();
             if (currState.getCost() == State.MAX_COST)
             {
                 stateList.add(currState);
             }
         }
         // Remove max cost states
-        for (Iterator<State> stateIt = stateList.iterator(); stateIt.hasNext(); )
+        for (final Iterator<State> stateIt = stateList.iterator(); stateIt.hasNext(); )
         {
-            State currState = stateIt.next();
+            final State currState = stateIt.next();
             theAutomaton.removeState(currState);
         }
         stateList.clear();
     }
-    
+
     /**
      * Return the previously computed result.
      */
@@ -573,20 +587,27 @@ public class AutomatonSynthesizer
     {
         return theAutomaton;
     }
-    
+
     /**
      * Method that stops the synthesizer as soon as possible.
      *
      * @see org.supremica.gui.ExecutionDialog
      */
-    public void requestStop()
+    @Override
+    public void requestAbort()
     {
-        stopRequested = true;
+        abortRequested = true;
         logger.debug("AutomatonSynthesizer requested to stop.");
     }
-            
-    public boolean isStopped()
+
+    @Override
+    public boolean isAborting()
     {
-        return stopRequested;
+        return abortRequested;
+    }
+
+    @Override
+    public void resetAbort(){
+      abortRequested = false;
     }
 }

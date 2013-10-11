@@ -30,6 +30,8 @@ public interface CompiledRange {
 
   public CompiledRange intersection(CompiledRange range);
 
+  public CompiledRange union(CompiledRange range);
+
   public CompiledRange remove(SimpleExpressionProxy value);
 
   public List<? extends SimpleExpressionProxy> getValues();

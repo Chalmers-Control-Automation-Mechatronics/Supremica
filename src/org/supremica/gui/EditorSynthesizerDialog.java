@@ -436,12 +436,9 @@ class EditorSynthesizerDialogStandardPanel
         }
         else if (typeSelector.getType() == SynthesisType.UNSAFETY)
         {
-            algorithmSelector.addItem(SynthesisAlgorithm.MINIMALITY);
-/*
-            algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHIC);
-            algorithmSelector.addItem(SynthesisAlgorithm.COMPOSITIONAL);
-            algorithmSelector.addItem(SynthesisAlgorithm.BDD);
-*/
+            algorithmSelector.addItem(SynthesisAlgorithm.MINIMALITY_C);
+            algorithmSelector.addItem(SynthesisAlgorithm.MINIMALITY_M);
+            algorithmSelector.addItem(SynthesisAlgorithm.MINIMALITY_P);
         }
 
 

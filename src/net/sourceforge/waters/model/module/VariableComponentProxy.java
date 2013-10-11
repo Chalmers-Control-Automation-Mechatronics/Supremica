@@ -48,16 +48,6 @@ public interface VariableComponentProxy extends ComponentProxy {
   public SimpleExpressionProxy getType();
 
   /**
-   * Returns whether this variable is deterministic. If a variable is set
-   * to be deterministic, the compiler should generate error messages when
-   * the automata of the model contain conflicting actions that would lead
-   * to nondeterministic state change of the variable. If the variable is not
-   * deterministic, the compiler may produce a nondeterministic automaton
-   * for it.
-   */
-  public boolean isDeterministic();
-
-  /**
    * Gets the initial state predicate for this variable.
    * The initial state predicate is an expression including an identifier
    * with the same name as the variable. A state is initial when the

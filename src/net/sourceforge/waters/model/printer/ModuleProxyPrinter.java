@@ -35,6 +35,7 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
+import net.sourceforge.waters.model.module.FunctionCallExpressionProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
@@ -61,7 +62,6 @@ import net.sourceforge.waters.model.module.SplineGeometryProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
-
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.AnchorPosition;
@@ -93,6 +93,7 @@ public class ModuleProxyPrinter
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+  @Override
   public Object visitAliasProxy
       (final AliasProxy proxy)
     throws VisitorException
@@ -105,6 +106,7 @@ public class ModuleProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitBinaryExpressionProxy
       (final BinaryExpressionProxy proxy)
     throws VisitorException
@@ -143,6 +145,7 @@ public class ModuleProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitBoxGeometryProxy(final BoxGeometryProxy geo)
     throws VisitorException
   {
@@ -151,6 +154,7 @@ public class ModuleProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitColorGeometryProxy(final ColorGeometryProxy geo)
     throws VisitorException
   {
@@ -172,12 +176,14 @@ public class ModuleProxyPrinter
     return visitGeometryProxy(geo);
   }
 
+  @Override
   public Object visitComponentProxy(final ComponentProxy proxy)
     throws VisitorException
   {
     return visitIdentifiedProxy(proxy);
   }
 
+  @Override
   public Object visitConstantAliasProxy(final ConstantAliasProxy proxy)
     throws VisitorException
   {
@@ -187,6 +193,7 @@ public class ModuleProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitEdgeProxy
       (final EdgeProxy proxy)
     throws VisitorException
@@ -206,6 +213,7 @@ public class ModuleProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitEnumSetExpressionProxy
       (final EnumSetExpressionProxy proxy)
     throws VisitorException
@@ -229,12 +237,14 @@ public class ModuleProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitEventAliasProxy(final EventAliasProxy proxy)
     throws VisitorException
   {
     return visitAliasProxy(proxy);
   }
 
+  @Override
   public Object visitEventDeclProxy
       (final EventDeclProxy proxy)
     throws VisitorException
@@ -258,6 +268,7 @@ public class ModuleProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitEventListExpressionProxy
       (final EventListExpressionProxy proxy)
     throws VisitorException
@@ -266,6 +277,7 @@ public class ModuleProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitExpressionProxy
       (final ExpressionProxy proxy)
     throws VisitorException
@@ -273,6 +285,7 @@ public class ModuleProxyPrinter
     return visitProxy(proxy);
   }
 
+  @Override
   public Object visitForeachProxy
       (final ForeachProxy proxy)
     throws VisitorException
@@ -292,6 +305,38 @@ public class ModuleProxyPrinter
     return null;
   }
 
+  @Override
+  public Object visitFunctionCallExpressionProxy
+      (final FunctionCallExpressionProxy proxy)
+    throws VisitorException
+  {
+    final String text = proxy.getPlainText();
+    if (text != null) {
+      print(text);
+    } else {
+      final int savedPriority = mPriority;
+      print(proxy.getFunctionName());
+      print('(');
+      try {
+        mPriority = OperatorTable.PRIORITY_OUTER;
+        final List<SimpleExpressionProxy> args = proxy.getArguments();
+        final Iterator<SimpleExpressionProxy> iter = args.iterator();
+        while (iter.hasNext()) {
+          final SimpleExpressionProxy arg = iter.next();
+          arg.acceptVisitor(this);
+          if (iter.hasNext()) {
+            print(", ");
+          }
+        }
+      } finally {
+        mPriority = savedPriority;
+      }
+      print(')');
+    }
+    return null;
+  }
+
+  @Override
   public Object visitGraphProxy
       (final GraphProxy proxy)
     throws VisitorException
@@ -307,6 +352,7 @@ public class ModuleProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitGroupNodeProxy
       (final GroupNodeProxy proxy)
     throws VisitorException
@@ -319,6 +365,7 @@ public class ModuleProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitGuardActionBlockProxy
     (final GuardActionBlockProxy proxy)
     throws VisitorException
@@ -332,6 +379,7 @@ public class ModuleProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitIdentifiedProxy
       (final IdentifiedProxy proxy)
     throws VisitorException
@@ -339,6 +387,7 @@ public class ModuleProxyPrinter
     return visitNamedProxy(proxy);
   }
 
+  @Override
   public Object visitIdentifierProxy
       (final IdentifierProxy proxy)
     throws VisitorException
@@ -346,6 +395,7 @@ public class ModuleProxyPrinter
     return visitSimpleExpressionProxy(proxy);
   }
 
+  @Override
   public Object visitIndexedIdentifierProxy
       (final IndexedIdentifierProxy proxy)
     throws VisitorException
@@ -375,6 +425,7 @@ public class ModuleProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitInstanceProxy
       (final InstanceProxy proxy)
     throws VisitorException
@@ -404,6 +455,7 @@ public class ModuleProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitIntConstantProxy
       (final IntConstantProxy proxy)
     throws VisitorException
@@ -417,6 +469,7 @@ public class ModuleProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitLabelBlockProxy
       (final LabelBlockProxy proxy)
     throws VisitorException
@@ -424,6 +477,7 @@ public class ModuleProxyPrinter
     return visitEventListExpressionProxy(proxy);
   }
 
+  @Override
   public Object visitLabelGeometryProxy
       (final LabelGeometryProxy geo)
     throws VisitorException
@@ -437,6 +491,7 @@ public class ModuleProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitModuleProxy
       (final ModuleProxy proxy)
     throws VisitorException
@@ -453,6 +508,7 @@ public class ModuleProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitModuleSequenceProxy(final ModuleSequenceProxy proxy)
     throws VisitorException
   {
@@ -462,6 +518,7 @@ public class ModuleProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitNodeProxy
       (final NodeProxy proxy)
     throws VisitorException
@@ -475,6 +532,7 @@ public class ModuleProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitParameterBindingProxy
       (final ParameterBindingProxy proxy)
     throws VisitorException
@@ -486,6 +544,7 @@ public class ModuleProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitPlainEventListProxy
       (final PlainEventListProxy proxy)
     throws VisitorException
@@ -493,6 +552,7 @@ public class ModuleProxyPrinter
     return visitEventListExpressionProxy(proxy);
   }
 
+  @Override
   public Object visitPointGeometryProxy
       (final PointGeometryProxy geo)
     throws VisitorException
@@ -502,6 +562,7 @@ public class ModuleProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitQualifiedIdentifierProxy
       (final QualifiedIdentifierProxy proxy)
     throws VisitorException
@@ -519,6 +580,7 @@ public class ModuleProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitSimpleComponentProxy
       (final SimpleComponentProxy proxy)
     throws VisitorException
@@ -537,6 +599,7 @@ public class ModuleProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitSimpleExpressionProxy
       (final SimpleExpressionProxy proxy)
     throws VisitorException
@@ -544,6 +607,7 @@ public class ModuleProxyPrinter
     return visitExpressionProxy(proxy);
   }
 
+  @Override
   public Object visitSimpleIdentifierProxy
       (final SimpleIdentifierProxy proxy)
     throws VisitorException
@@ -557,6 +621,7 @@ public class ModuleProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitSimpleNodeProxy
       (final SimpleNodeProxy proxy)
     throws VisitorException
@@ -570,6 +635,7 @@ public class ModuleProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitSplineGeometryProxy
       (final SplineGeometryProxy geo)
     throws VisitorException
@@ -587,6 +653,7 @@ public class ModuleProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitUnaryExpressionProxy(final UnaryExpressionProxy expr)
     throws VisitorException
   {
@@ -625,6 +692,7 @@ public class ModuleProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitVariableComponentProxy
       (final VariableComponentProxy proxy)
     throws VisitorException
@@ -650,6 +718,7 @@ public class ModuleProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitVariableMarkingProxy
       (final VariableMarkingProxy proxy)
     throws VisitorException
