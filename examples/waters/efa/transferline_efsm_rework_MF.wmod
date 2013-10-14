@@ -10,7 +10,10 @@ Reworked pieces then eventually reach testunit[1], which puts them on virtual li
 And so on... Pieces from virtual line R eventualy reach testunit[R] and then their rework status is such that they
 should not be reworked anymore, and they are discarded, event n[R], or OK and passed out of the system by event y[R]. 
 
-The variables biN keep track of the total number of workpieces in buffer bi; this should never exceed N.</ns2:Comment>
+N is the number of buffer places. R is the number of allowed reworks.
+The variables biN keep track of the total number of workpieces in buffer bi; this should never exceed N, that is
+sum_over_j(bi[j]) + biN &lt;= N
+The variables m2N, m3N, and tuN make sure that the machines and testunit capacities are 1</ns2:Comment>
     <ConstantAliasList>
         <ConstantAlias Scope="REQUIRED_PARAMETER" Name="N">
             <ConstantAliasExpression>
@@ -215,6 +218,48 @@ The variables biN keep track of the total number of workpieces in buffer bi; thi
                 </BinaryExpression>
             </VariableInitial>
         </VariableComponent>
+        <VariableComponent Name="m2N">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="m2N"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <VariableComponent Name="m3N">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="m3N"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <VariableComponent Name="tuN">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="tuN"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
         <ForeachComponent Name="i">
             <BinaryExpression Operator="..">
                 <IntConstant Value="0"/>
@@ -311,7 +356,7 @@ The variables biN keep track of the total number of workpieces in buffer bi; thi
                                         <SimpleIdentifier Name="i"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point X="-27" Y="-49"/>
+                                        <Point X="-11" Y="-21"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <SplineGeometry>
@@ -319,11 +364,17 @@ The variables biN keep track of the total number of workpieces in buffer bi; thi
                                 </SplineGeometry>
                                 <GuardActionBlock>
                                     <Guards>
-                                        <BinaryExpression Operator="&gt;">
-                                            <IndexedIdentifier Name="b1">
-                                                <SimpleIdentifier Name="i"/>
-                                            </IndexedIdentifier>
-                                            <IntConstant Value="0"/>
+                                        <BinaryExpression Operator="&amp;" Text="b1[i]&gt;0 &amp; m2N ==0">
+                                            <BinaryExpression Operator="&gt;">
+                                                <IndexedIdentifier Name="b1">
+                                                    <SimpleIdentifier Name="i"/>
+                                                </IndexedIdentifier>
+                                                <IntConstant Value="0"/>
+                                            </BinaryExpression>
+                                            <BinaryExpression Operator="==">
+                                                <SimpleIdentifier Name="m2N"/>
+                                                <IntConstant Value="0"/>
+                                            </BinaryExpression>
                                         </BinaryExpression>
                                     </Guards>
                                     <Actions>
@@ -337,9 +388,13 @@ The variables biN keep track of the total number of workpieces in buffer bi; thi
                                             <SimpleIdentifier Name="b1N"/>
                                             <IntConstant Value="1"/>
                                         </BinaryExpression>
+                                        <BinaryExpression Operator="=">
+                                            <SimpleIdentifier Name="m2N"/>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
                                     </Actions>
                                     <LabelGeometry Anchor="NW">
-                                        <Point X="-4" Y="-49"/>
+                                        <Point X="23" Y="-59"/>
                                     </LabelGeometry>
                                 </GuardActionBlock>
                             </Edge>
@@ -373,9 +428,13 @@ The variables biN keep track of the total number of workpieces in buffer bi; thi
                                             <SimpleIdentifier Name="b2N"/>
                                             <IntConstant Value="1"/>
                                         </BinaryExpression>
+                                        <BinaryExpression Operator="=" Text="m2N = 0">
+                                            <SimpleIdentifier Name="m2N"/>
+                                            <IntConstant Value="0"/>
+                                        </BinaryExpression>
                                     </Actions>
                                     <LabelGeometry Anchor="NW">
-                                        <Point X="-20" Y="16"/>
+                                        <Point X="1" Y="2"/>
                                     </LabelGeometry>
                                 </GuardActionBlock>
                             </Edge>
@@ -423,11 +482,17 @@ The variables biN keep track of the total number of workpieces in buffer bi; thi
                                 </SplineGeometry>
                                 <GuardActionBlock>
                                     <Guards>
-                                        <BinaryExpression Operator="&gt;">
-                                            <IndexedIdentifier Name="b2">
-                                                <SimpleIdentifier Name="i"/>
-                                            </IndexedIdentifier>
-                                            <IntConstant Value="0"/>
+                                        <BinaryExpression Operator="&amp;" Text="b2[i]&gt;0 &amp; m3N == 0">
+                                            <BinaryExpression Operator="&gt;">
+                                                <IndexedIdentifier Name="b2">
+                                                    <SimpleIdentifier Name="i"/>
+                                                </IndexedIdentifier>
+                                                <IntConstant Value="0"/>
+                                            </BinaryExpression>
+                                            <BinaryExpression Operator="==">
+                                                <SimpleIdentifier Name="m3N"/>
+                                                <IntConstant Value="0"/>
+                                            </BinaryExpression>
                                         </BinaryExpression>
                                     </Guards>
                                     <Actions>
@@ -441,9 +506,13 @@ The variables biN keep track of the total number of workpieces in buffer bi; thi
                                             <SimpleIdentifier Name="b2N"/>
                                             <IntConstant Value="1"/>
                                         </BinaryExpression>
+                                        <BinaryExpression Operator="=" Text="m3N = 1">
+                                            <SimpleIdentifier Name="m3N"/>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
                                     </Actions>
                                     <LabelGeometry Anchor="NW">
-                                        <Point X="2" Y="-50"/>
+                                        <Point X="2" Y="-48"/>
                                     </LabelGeometry>
                                 </GuardActionBlock>
                             </Edge>
@@ -476,6 +545,10 @@ The variables biN keep track of the total number of workpieces in buffer bi; thi
                                         <BinaryExpression Operator="-=">
                                             <SimpleIdentifier Name="b3N"/>
                                             <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                        <BinaryExpression Operator="=" Text="m3N = 0">
+                                            <SimpleIdentifier Name="m3N"/>
+                                            <IntConstant Value="0"/>
                                         </BinaryExpression>
                                     </Actions>
                                     <LabelGeometry Anchor="NW">
@@ -527,11 +600,17 @@ The variables biN keep track of the total number of workpieces in buffer bi; thi
                                 </SplineGeometry>
                                 <GuardActionBlock>
                                     <Guards>
-                                        <BinaryExpression Operator="&gt;" Text="b3[i] &gt; 0">
-                                            <IndexedIdentifier Name="b3">
-                                                <SimpleIdentifier Name="i"/>
-                                            </IndexedIdentifier>
-                                            <IntConstant Value="0"/>
+                                        <BinaryExpression Operator="&amp;" Text="b3[i] &gt; 0 &amp; tuN==0">
+                                            <BinaryExpression Operator="&gt;">
+                                                <IndexedIdentifier Name="b3">
+                                                    <SimpleIdentifier Name="i"/>
+                                                </IndexedIdentifier>
+                                                <IntConstant Value="0"/>
+                                            </BinaryExpression>
+                                            <BinaryExpression Operator="==">
+                                                <SimpleIdentifier Name="tuN"/>
+                                                <IntConstant Value="0"/>
+                                            </BinaryExpression>
                                         </BinaryExpression>
                                     </Guards>
                                     <Actions>
@@ -545,9 +624,13 @@ The variables biN keep track of the total number of workpieces in buffer bi; thi
                                             <SimpleIdentifier Name="b3N"/>
                                             <IntConstant Value="1"/>
                                         </BinaryExpression>
+                                        <BinaryExpression Operator="=" Text="tuN =1">
+                                            <SimpleIdentifier Name="tuN"/>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
                                     </Actions>
                                     <LabelGeometry Anchor="NW">
-                                        <Point X="30" Y="-31"/>
+                                        <Point X="38" Y="-50"/>
                                     </LabelGeometry>
                                 </GuardActionBlock>
                             </Edge>
@@ -590,6 +673,10 @@ The variables biN keep track of the total number of workpieces in buffer bi; thi
                                             <SimpleIdentifier Name="b1N"/>
                                             <IntConstant Value="1"/>
                                         </BinaryExpression>
+                                        <BinaryExpression Operator="=" Text="tuN = 0">
+                                            <SimpleIdentifier Name="tuN"/>
+                                            <IntConstant Value="0"/>
+                                        </BinaryExpression>
                                     </Actions>
                                     <LabelGeometry Anchor="NW">
                                         <Point X="-40" Y="8"/>
@@ -602,6 +689,17 @@ The variables biN keep track of the total number of workpieces in buffer bi; thi
                                         <SimpleIdentifier Name="i"/>
                                     </IndexedIdentifier>
                                 </LabelBlock>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="=" Text="tuN = 0">
+                                            <SimpleIdentifier Name="tuN"/>
+                                            <IntConstant Value="0"/>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="0" Y="20"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
                             </Edge>
                             <Edge Source="S1" Target="S0">
                                 <LabelBlock>
@@ -622,8 +720,14 @@ The variables biN keep track of the total number of workpieces in buffer bi; thi
                                             <SimpleIdentifier Name="R"/>
                                         </BinaryExpression>
                                     </Guards>
+                                    <Actions>
+                                        <BinaryExpression Operator="=" Text="tuN = 0">
+                                            <SimpleIdentifier Name="tuN"/>
+                                            <IntConstant Value="0"/>
+                                        </BinaryExpression>
+                                    </Actions>
                                     <LabelGeometry Anchor="NW">
-                                        <Point X="19" Y="13"/>
+                                        <Point X="24" Y="11"/>
                                     </LabelGeometry>
                                 </GuardActionBlock>
                             </Edge>
