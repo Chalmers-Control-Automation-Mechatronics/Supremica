@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.model.base.ProxyTools;
 
 /**
  * @author Robi Malik
@@ -103,6 +104,7 @@ public abstract class AbstractEFASystem<L,
 
 
   //#########################################################################
+  //# Heuristics
   public double getEstimatedStateSpace()
   {
     double size = 1;
@@ -118,6 +120,7 @@ public abstract class AbstractEFASystem<L,
 
 
   //#########################################################################
+  //# Interface java.util.Comparable<AbstractEFASystem>
   @Override
   public int compareTo(final AbstractEFASystem<?, ?, ?, ?> system)
   {
@@ -130,6 +133,41 @@ public abstract class AbstractEFASystem<L,
     } else {
       return 0;
     }
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  @Override
+  public String toString()
+  {
+    final StringBuffer buffer = new StringBuffer();
+    buffer.append(ProxyTools.getShortClassName(this));
+    buffer.append(' ');
+    buffer.append(mName);
+    buffer.append("\nTRs:");
+    boolean first = true;
+    for (final TR tr: mTransitionRelations) {
+      if (first) {
+        first = false;
+      } else {
+        buffer.append(',');
+      }
+      buffer.append(' ');
+      buffer.append(tr.getName());
+    }
+    buffer.append("\nVars:");
+    first = true;
+    for (final V var : mVariables) {
+      if (first) {
+        first = false;
+      } else {
+        buffer.append(',');
+      }
+      buffer.append(' ');
+      buffer.append(var.getName());
+    }
+    return buffer.toString();
   }
 
 

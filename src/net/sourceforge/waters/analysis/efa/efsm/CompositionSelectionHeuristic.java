@@ -1,3 +1,12 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters EFSM Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.efa.efsm
+//# CLASS:   CompositionSelectionHeuristic
+//###########################################################################
+//# $Id$
+//###########################################################################
+
 package net.sourceforge.waters.analysis.efa.efsm;
 
 import gnu.trove.set.hash.THashSet;
@@ -14,6 +23,14 @@ import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 
 
+/**
+ * The abstract superclass of all EFSM composition selection heuristics.
+ * A composition selection heuristics chooses the best candidate among
+ * different pairs of transition relations to be composed.
+ *
+ * @author Sahar Mohajerani, Robi Malik
+ */
+
 abstract class CompositionSelectionHeuristic
 {
 
@@ -22,7 +39,6 @@ abstract class CompositionSelectionHeuristic
   public CompositionSelectionHeuristic(final ModuleProxyFactory factory,
                                        final CompilerOperatorTable op)
   {
-
   }
 
   //#########################################################################
@@ -72,7 +88,7 @@ abstract class CompositionSelectionHeuristic
 
 
   //#########################################################################
-  //# Invocation
+  //# Overrides for java.lang.Object
   @Override
   public String toString()
   {

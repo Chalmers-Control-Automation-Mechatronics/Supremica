@@ -127,7 +127,6 @@ public class EFSMVariable
   }
   /**
    * Return whether this variable is local.
-   * <p/>
    * @return <CODE>true</CODE> if the variable occurs in at most one transition
    *         relation.
    */

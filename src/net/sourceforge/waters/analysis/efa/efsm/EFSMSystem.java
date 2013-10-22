@@ -48,6 +48,9 @@ class EFSMSystem
     super(name, variables, transitionRelations, context);
   }
 
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.analysis.efa.base.AbstractEFASystem
   @Override
   public List<EFSMTransitionRelation> getTransitionRelations()
   {
@@ -74,6 +77,5 @@ class EFSMSystem
       tran.removeVariable(var);
     }
   }
-
 
 }
