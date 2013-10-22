@@ -1968,6 +1968,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       register(MaxL);
       register(MaxC);
       register(MinE);
+      register(MinF);
       register(MinS);
       register(MinSync);
     }
@@ -2060,6 +2061,21 @@ public abstract class AbstractCompositionalModelAnalyzer
       (final AbstractCompositionalModelAnalyzer verifier)
     {
       return verifier.new ComparatorMinE();
+    }
+  };
+
+  /**
+   * The selecting method that chooses the candidate with the minimum
+   * frontier, i.e., the smallest number of automata that share events
+   * with the automata of this candidate.
+   */
+  public static final SelectingMethod MinF = new SelectingMethod("MinF")
+  {
+    @Override
+    Comparator<Candidate> createComparator
+      (final AbstractCompositionalModelAnalyzer verifier)
+    {
+      return verifier.new ComparatorMinF();
     }
   };
 
@@ -2752,6 +2768,38 @@ public abstract class AbstractCompositionalModelAnalyzer
         }
       }
       return (double) unionAlphabetSize / (double) largestAlphabetSize;
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class ComparatorMinF
+  private class ComparatorMinF extends SelectingComparator
+  {
+
+    //#######################################################################
+    //# Overrides for SelectingComparator
+    @Override
+    double getHeuristicValue(final Candidate candidate)
+    {
+      final Collection<AutomatonProxy> automata = candidate.getAutomata();
+      final Collection<AutomatonProxy> frontier = new THashSet<AutomatonProxy>();
+      final Collection<EventProxy> local = candidate.getLocalEvents();
+      final Collection<EventProxy> shared = new THashSet<EventProxy>();
+      for (final AutomatonProxy aut : automata) {
+        for (final EventProxy event : aut.getEvents()) {
+          final EventInfo info = getEventInfo(event);
+          if (info != null && !local.contains(event) && shared.add(event)) {
+            for (final AutomatonProxy other : info.getSortedAutomataList()) {
+              if (!automata.contains(other)) {
+                frontier.add(other);
+              }
+            }
+          }
+        }
+      }
+      return frontier.size();
     }
 
   }

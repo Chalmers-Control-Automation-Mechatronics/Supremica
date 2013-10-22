@@ -53,7 +53,7 @@ public class IntArrayBuffer implements WatersIntHashingStrategy
    */
   public IntArrayBuffer(final int arraySize)
   {
-    this(arraySize, 0);
+    this(arraySize, Integer.MAX_VALUE);
   }
 
   /**
