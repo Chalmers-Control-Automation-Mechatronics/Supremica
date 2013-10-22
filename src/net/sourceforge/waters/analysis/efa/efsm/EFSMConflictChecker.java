@@ -358,6 +358,8 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
         result.addCompositionAttempt();
         final EFSMTransitionRelation varEFSMTransitionRelation =
           varSelected.getTransitionRelation();
+        final int expectedNumVars =
+          varEFSMTransitionRelation.getVariables().size() - 1;
         final TRPartition partition =
           mVariablePartitionComputer.computePartition(varSelected,
                                                       mCurrentEFSMSystem);
@@ -386,8 +388,7 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
             break;
           }
         }
-        if (unfoldSimplified.getVariables().size() + 1 <
-            varEFSMTransitionRelation.getVariables().size()) {
+        if (unfoldSimplified.getVariables().size() < expectedNumVars) {
           splitCurrentSubsystem();
         }
       } else if (efsmTransitionRelationList.size() > 1) {
@@ -399,14 +400,14 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
         final EFSMTransitionRelation synchTR =
           mEFSMSynchronizer.synchronize(TR1, TR2);
         result.addEFSMTransitionRelation(synchTR);
+        final int expectedNumVars = synchTR.getVariables().size();
         EFSMTransitionRelation synchSimplified = simplify(synchTR);
         final boolean splitting;
         if (synchSimplified == null) {
           synchSimplified = synchTR;
           splitting = false;
         } else {
-          splitting =
-            synchTR.getVariables().size() < synchSimplified.getVariables().size();
+          splitting = synchSimplified.getVariables().size() < expectedNumVars;
         }
         efsmTransitionRelationList.remove(TR1);
         efsmTransitionRelationList.remove(TR2);
