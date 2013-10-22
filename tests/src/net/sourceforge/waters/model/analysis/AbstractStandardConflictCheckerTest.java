@@ -877,13 +877,6 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(des, true);
   }
 
-  public void testSmallFactory() throws Exception
-  {
-    final ProductDESProxy des =
-      getCompiledDES("valid", "small", "small.wdes");
-    runModelVerifier(des, true);
-  }
-
   public void testSmallFactoryUncont() throws Exception
   {
     final ProductDESProxy des =

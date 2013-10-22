@@ -13,11 +13,6 @@ import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.stack.TIntStack;
 import gnu.trove.stack.array.TIntArrayStack;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.List;
-
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
@@ -25,6 +20,22 @@ import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 
+
+/**
+ * <P>A transition relation simplifier to remove tau loops.</P>
+ *
+ * <P>This simplifier find strongly connected components of states connected
+ * by silent ({@link EventEncoding#TAU}) transitions and merges such
+ * strongly connected components into a single state. Strongly
+ * connected components are detected by an iterative implementation
+ * of Tarjan's algorithm.</P>
+ *
+ * <P><I>Reference:</I>
+ * R. Tarjan, Depth first search and linear graph algorithms. SIAM
+ * Journal of Computing, <STRONG>1</STRONG>&nbsp;(2), 146-160, June 1972.</P>
+ *
+ * @author Robi Malik
+ */
 
 public class TauLoopRemovalTRSimplifier
   extends AbstractTRSimplifier
@@ -107,65 +118,47 @@ public class TauLoopRemovalTRSimplifier
     super.setUp();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
-    mIndex = 1;
-    mTarjan = new int[numStates];
+    mNextDFSIndex = 1;
+    mDFSIndex = new int[numStates];
     mLowLink = new int[numStates];
-    mOnstack = new boolean[numStates];
-    mStack = new TIntArrayStack();
-    mToBeMerged = new ArrayList<TIntArrayList>();
+    mOnComponentStack = new boolean[numStates];
+    mControlStack = new TIntArrayList();
+    mComponentStack = new TIntArrayStack();
+    mMerging = false;
+    mNextComponentNumber = 0;
+    mComponentNumber = new int[numStates];
   }
 
   @Override
   protected boolean runSimplifier()
-  throws AnalysisException
+    throws AnalysisException
   {
-    boolean modified = false;
-    for (int s = 0; s < mTarjan.length; s++) {
-      if (mTarjan[s] == 0) {
-        tarjan(s);
-      }
-    }
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    if (modified || !mToBeMerged.isEmpty()) {
-      final int numStates = rel.getNumberOfStates();
-      List<int[]> classes = new ArrayList<int[]>(numStates);
-      final BitSet merged = new BitSet(numStates);
-      for (final TIntArrayList merge : mToBeMerged) {
-        checkAbort();
-        final int[] array = merge.toArray();
-        classes.add(array);
-        modified |= array.length > 1;
-        for (final int s : array) {
-          merged.set(s);
-        }
-      }
-      if (modified) {
-        for (int s = 0; s < numStates; s++) {
-          if (rel.isReachable(s) && !merged.get(s)) {
-            checkAbort();
-            final int[] array = new int[1];
-            array[0] = s;
-            classes.add(array);
-          }
-        }
-        final TRPartition partition = new TRPartition(classes, numStates);
-        setResultPartition(partition);
-        applyResultPartitionAutomatically();
-      } else {
-        classes = null;
+    for (int s = 0; s < mDFSIndex.length; s++) {
+      if (!rel.isReachable(s)) {
+        mComponentNumber[s] = -1;
+      } else if (mDFSIndex[s] == 0) {
+        exploreDFS(s);
       }
     }
-    return modified;
+    if (mMerging) {
+      final TRPartition partition =
+        new TRPartition(mComponentNumber, mNextComponentNumber);
+      setResultPartition(partition);
+      applyResultPartitionAutomatically();
+    }
+    return mMerging;
   }
 
   @Override
   protected void tearDown()
   {
-    mTarjan = null;
+    mDFSIndex = null;
     mLowLink = null;
-    mOnstack = null;
-    mStack = null;
-    mToBeMerged = null;
+    mOnComponentStack = null;
+    mComponentStack = null;
+    mControlStack = null;
+    mComponentNumber = null;
     super.tearDown();
   }
 
@@ -186,41 +179,60 @@ public class TauLoopRemovalTRSimplifier
 
   //#########################################################################
   //# Auxiliary Methods
-  private void tarjan(final int state)
-  throws AnalysisAbortException
+  private void exploreDFS(final int root)
+    throws AnalysisAbortException
   {
-    checkAbort();
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    mTarjan[state] = mIndex;
-    mLowLink[state] = mIndex;
-    mIndex++;
-    mOnstack[state] = true;
-    mStack.push(state);
-    final TransitionIterator iter =
-      rel.createAnyReadOnlyIterator(state, EventEncoding.TAU);
-    while (iter.advance()) {
-      final int suc = iter.getCurrentToState();
-      if(mOnstack[suc]) {
-        mLowLink[state] = mTarjan[suc] < mLowLink[state] ? mTarjan[suc]
-                                                         : mLowLink[state];
-      } else if (mTarjan[suc] == 0) {
-        tarjan(suc);
-        mLowLink[state] = mLowLink[suc] < mLowLink[state] ? mLowLink[suc]
-                                                          : mLowLink[state];
-      }
-    }
-    if (mTarjan[state] == mLowLink[state]) {
-      final TIntArrayList merge = new TIntArrayList();
-      while (true) {
-        final int pop = mStack.pop();
-        merge.add(pop);
-        mOnstack[pop] = false;
-        if (pop == state) {
-          break;
+    final TransitionIterator iter = rel.createAnyReadOnlyIterator();
+    iter.resetEvent(EventEncoding.TAU);
+    mControlStack.add(root);
+    mControlStack.add(root);
+    while (mControlStack.size() > 0) {
+      checkAbort();
+      int stackIndex = mControlStack.size() - 1;
+      int state = mControlStack.get(stackIndex);
+      if ((state & FOR_CLOSING) != 0) {
+        // Close this state ...
+        state &= ~FOR_CLOSING;
+        final int parent = mControlStack.get(--stackIndex);
+        mControlStack.remove(stackIndex, 2);
+        if (mDFSIndex[state] == mLowLink[state]) {
+          final int compNumber = mNextComponentNumber++;
+          int count = 0;
+          while (true) {
+            final int popped = mComponentStack.pop();
+            mComponentNumber[popped] = compNumber;
+            mOnComponentStack[popped] = false;
+            count++;
+            if (popped == state) {
+              break;
+            }
+          }
+          mMerging |= count > 1;
+        } else if (mLowLink[state] < mLowLink[parent]) {
+          mLowLink[parent] = mLowLink[state];
         }
-      }
-      if (merge.size() > 1) {
-        mToBeMerged.add(merge);
+      } else if (mDFSIndex[state] == 0) {
+        // Expand this state ...
+        mControlStack.set(stackIndex, state | FOR_CLOSING);
+        mDFSIndex[state] = mLowLink[state] = mNextDFSIndex++;
+        mOnComponentStack[state] = true;
+        mComponentStack.push(state);
+        iter.resetState(state);
+        while (iter.advance()) {
+          final int succ = iter.getCurrentToState();
+          if (mOnComponentStack[succ]) {
+            if (mLowLink[succ] < mLowLink[state]) {
+              mLowLink[state] = mLowLink[succ];
+            }
+          } else if (mDFSIndex[succ] == 0) {
+            mControlStack.add(state);
+            mControlStack.add(succ);
+          }
+        }
+      } else {
+        // This state has already been expanded and closed. Skip it ...
+        mControlStack.remove(--stackIndex, 2);
       }
     }
   }
@@ -231,12 +243,19 @@ public class TauLoopRemovalTRSimplifier
   private boolean mDumpStateAware = false;
   private int mDefaultMarkingID = -1;
 
-  private int mIndex;
-  private int[] mTarjan;
+  private int mNextDFSIndex;
+  private int[] mDFSIndex;
   private int[] mLowLink;
-  private boolean[] mOnstack;
-  private TIntStack mStack;
-  private Collection<TIntArrayList> mToBeMerged;
+  private boolean[] mOnComponentStack;
+  private TIntArrayList mControlStack;
+  private TIntStack mComponentStack;
+  private boolean mMerging;
+  private int mNextComponentNumber;
+  private int[] mComponentNumber;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final int FOR_CLOSING = 0x80000000;
 
 }
-
