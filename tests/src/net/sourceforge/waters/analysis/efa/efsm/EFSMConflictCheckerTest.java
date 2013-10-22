@@ -221,6 +221,18 @@ public class EFSMConflictCheckerTest
     checkTransferLine("transferline_efsm_block", 2, 2, false);
   }
 
+  public void testTransferLineRework33()
+    throws IOException, WatersException
+  {
+    checkTransferLineRework("transferline_efsm_rework", 3, 3, true);
+  }
+
+  public void testTransferLineRework33Block()
+    throws IOException, WatersException
+  {
+    checkTransferLineRework("transferline_efsm_rework_block", 3, 3, false);
+  }
+
   /*---------------------------- PROFIsafe ---------------------------------*/
 
   public void testProfisafeIHost4()
@@ -359,15 +371,12 @@ public class EFSMConflictCheckerTest
     checkConflict(module, true);
   }
 
-  /*
-   * This file is not in the repository :-(
   public void testPslWithResetTrans()
     throws IOException, WatersException
   {
     final ModuleProxy module = loadModule("tests", "psl", "pslWithResetTrans");
     checkConflict(module, false);
   }
-   */
 
 
   //#########################################################################
@@ -443,11 +452,39 @@ public class EFSMConflictCheckerTest
     checkConflict(module, bindings, expect);
   }
 
+  void checkTransferLineRework(final String name,
+                               final int r, final int n,
+                               final boolean expect)
+    throws IOException, WatersException
+  {
+    final ModuleProxyFactory factory = getModuleProxyFactory();
+    final ModuleProxy module = loadModule("efa", name);
+    final List<ParameterBindingProxy> bindings =
+      new ArrayList<ParameterBindingProxy>(2);
+    final IntConstantProxy constR = factory.createIntConstantProxy(r);
+    final ParameterBindingProxy bindingR =
+      factory.createParameterBindingProxy("R", constR);
+    bindings.add(bindingR);
+    final IntConstantProxy constN = factory.createIntConstantProxy(n);
+    final ParameterBindingProxy bindingN =
+      factory.createParameterBindingProxy("N", constN);
+    bindings.add(bindingN);
+    checkConflict(module, bindings, expect);
+  }
+
 
   //#########################################################################
   //# Customisation
   void configure(final EFSMConflictChecker checker)
   {
+    // TODO choose options here
+    /*
+    final ModuleProxyFactory factory = getModuleProxyFactory();
+    final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
+    final CompositionSelectionHeuristic heuristic =
+      new MinSharedVariablesCompositionSelectionHeuristic(factory, optable);
+    checker.setCompositionSelectionHeuristic(heuristic);
+    */
   }
 
 

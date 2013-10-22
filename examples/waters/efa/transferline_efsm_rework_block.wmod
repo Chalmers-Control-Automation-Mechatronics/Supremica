@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="transferline_efsm_rework" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="transferline_efsm_rework_block" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>Transferline model with multiple rework cycles according to Max H. de Queiroz and Jose E. R. Cury.
 This is an EFSM version of the model with a parameters R for the number of rework cycles and N for the number of serially connected cells.
-This version is nonblocking yet uncontrollable.
+This version is blocking because the last buffer is never cleared. It is also uncontrollable.
 </ns2:Comment>
     <ConstantAliasList>
         <ConstantAlias Scope="REQUIRED_PARAMETER" Name="N">
@@ -92,7 +92,6 @@ This version is nonblocking yet uncontrollable.
                 </BinaryExpression>
             </RangeList>
         </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="clear"/>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="PLANT" Name="machine1">
@@ -824,45 +823,5 @@ This version is nonblocking yet uncontrollable.
                 </BinaryExpression>
             </VariableInitial>
         </VariableComponent>
-        <SimpleComponent Kind="PLANT" Name="clear">
-            <Graph>
-                <NodeList>
-                    <SimpleNode Initial="true" Name="S0">
-                        <PointGeometry>
-                            <Point X="128" Y="80"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="0" Y="10"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
-                <EdgeList>
-                    <Edge Source="S0" Target="S0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="clear"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="1" Y="-16"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="175" Y="81"/>
-                        </SplineGeometry>
-                        <GuardActionBlock>
-                            <Actions>
-                                <BinaryExpression Operator="-=" Text="b1[N] -= 1">
-                                    <IndexedIdentifier Name="b1">
-                                        <SimpleIdentifier Name="N"/>
-                                    </IndexedIdentifier>
-                                    <IntConstant Value="1"/>
-                                </BinaryExpression>
-                            </Actions>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="2" Y="-3"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                </EdgeList>
-            </Graph>
-        </SimpleComponent>
     </ComponentList>
 </Module>
