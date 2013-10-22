@@ -479,11 +479,13 @@ public class EFSMConflictCheckerTest
   {
     // TODO choose options here
     /*
-    final ModuleProxyFactory factory = getModuleProxyFactory();
-    final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
-    final CompositionSelectionHeuristic heuristic =
-      new MinSharedVariablesCompositionSelectionHeuristic(factory, optable);
-    checker.setCompositionSelectionHeuristic(heuristic);
+    final CompositionSelectionHeuristic minV =
+      new MinSharedVariablesCompositionSelectionHeuristic();
+    final CompositionSelectionHeuristic minSynch =
+      new MinSynchCompositionSelectionHeuristic();
+    final CompositionSelectionHeuristic chain =
+      new ChainCompositionSelectionHeuristic(minV, minSynch);
+    checker.setCompositionSelectionHeuristic(chain);
     */
   }
 

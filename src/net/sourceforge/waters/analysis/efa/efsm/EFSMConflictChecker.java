@@ -224,8 +224,10 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
     }
 
     if (mCompositionSelectionHeuristic == null) {
+      final CompositionSelectionHeuristic minSynch =
+        new MinSynchCompositionSelectionHeuristic();
       mCompositionSelectionHeuristic =
-        new MinSynchCompositionSelectionHeuristic(factory, mCompilerOperatorTable);
+        new ChainCompositionSelectionHeuristic(minSynch);
     }
 
     if (mEFSMTRSimplifierFactory == null) {

@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
+//# PROJECT: Waters EFSM Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efa.efsm
-//# CLASS:   MinStatesVariableSelectionHeuristic
+//# CLASS:   MinUpdatesCompositionSelectionHeuristic
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -15,39 +15,35 @@ import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
-import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
-import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
+
 
 /**
+ * The &quot;minimum updates&quot; composition selection
+ * heuristic for EFSMs. This heuristic gives preference to composition
+ * candidates with the smallest possible number of distinct updates appearing
+ * in the EFSMs to be composed.
+ *
  * @author Robi Malik, Sahar Mohajerani
  */
-public class MinUpdatesCompositionSelectionHeuristic extends
-  CompositionSelectionHeuristic
+
+public class MinUpdatesCompositionSelectionHeuristic
+  extends CompositionSelectionHeuristic
 {
-//#########################################################################
-  //# Constructors
-  public MinUpdatesCompositionSelectionHeuristic
-    (final ModuleProxyFactory factory, final CompilerOperatorTable op)
-  {
-    super(factory, op);
-  }
 
   //#########################################################################
   //# Invocation
   @Override
   public double getHeuristicValue(final List<EFSMTransitionRelation> candidate)
-    throws AnalysisException, EvalException
   {
     final Set<ConstraintList> updates = new THashSet<ConstraintList>();
     for (final EFSMTransitionRelation efsmTR : candidate) {
       final EFSMEventEncoding efsmEncoding = efsmTR.getEventEncoding();
-      for (int up=EventEncoding.NONTAU; up < efsmEncoding.size(); up++) {
-        updates.add(efsmEncoding.getUpdate(up));
+      for (int e = EventEncoding.NONTAU; e < efsmEncoding.size(); e++) {
+        updates.add(efsmEncoding.getUpdate(e));
       }
     }
     return updates.size();
   }
+
 }

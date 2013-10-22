@@ -1107,6 +1107,10 @@ public class ObservationEquivalenceTRSimplifier
     public void dump(final PrintWriter printer)
     {
       mClassLists.dumpList(printer, mList);
+      if (mOverflowList != IntListBuffer.NULL) {
+        printer.write('+');
+        mClassLists.dumpList(printer, mOverflowList);
+      }
     }
 
     //#######################################################################

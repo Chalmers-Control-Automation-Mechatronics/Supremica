@@ -15,9 +15,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
-
 
 /**
  * The &quot;minimum shared variables&quot; composition selection
@@ -25,21 +22,13 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
  * candidates with the smallest possible number of non-local variables
  * mentioned in the EFSMs to be composed.
  *
+ * @see MinVariablesCompositionSelectionHeuristic
  * @author Robi Malik
  */
 
 public class MinSharedVariablesCompositionSelectionHeuristic
   extends CompositionSelectionHeuristic
 {
-
-  //#########################################################################
-  //# Constructors
-  public MinSharedVariablesCompositionSelectionHeuristic
-    (final ModuleProxyFactory factory, final CompilerOperatorTable op)
-  {
-    super(factory, op);
-  }
-
 
   //#########################################################################
   //# Invocation

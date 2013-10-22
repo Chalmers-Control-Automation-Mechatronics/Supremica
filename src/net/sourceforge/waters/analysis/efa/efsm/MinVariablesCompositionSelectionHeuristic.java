@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
+//# PROJECT: Waters EFSM Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efa.efsm
-//# CLASS:   MinStatesVariableSelectionHeuristic
+//# CLASS:   MinVariablesCompositionSelectionHeuristic
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -15,30 +15,25 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
 
 /**
+ * The &quot;minimum variables&quot; composition selection
+ * heuristic for EFSMs. This heuristic gives preference to composition
+ * candidates with the smallest number of variables (local or shared)
+ * mentioned in the EFSMs to be composed.
+ *
+ * @see MinSharedVariablesCompositionSelectionHeuristic
  * @author Robi Malik, Sahar Mohajerani
  */
-public class MinVariablesCompositionSelectionHeuristic extends
-  CompositionSelectionHeuristic
+
+public class MinVariablesCompositionSelectionHeuristic
+  extends CompositionSelectionHeuristic
 {
-//#########################################################################
-  //# Constructors
-  public MinVariablesCompositionSelectionHeuristic
-    (final ModuleProxyFactory factory, final CompilerOperatorTable op)
-  {
-    super(factory, op);
-  }
 
   //#########################################################################
   //# Invocation
   @Override
   public double getHeuristicValue(final List<EFSMTransitionRelation> candidate)
-    throws AnalysisException, EvalException
   {
     final Set<EFSMVariable> variables = new THashSet<EFSMVariable>();
     for (final EFSMTransitionRelation efsmTR : candidate) {
@@ -47,4 +42,5 @@ public class MinVariablesCompositionSelectionHeuristic extends
     }
     return variables.size();
   }
+
 }

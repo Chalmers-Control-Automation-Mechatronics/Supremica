@@ -13,14 +13,10 @@ import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
-import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.ProxyTools;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
 
 
 /**
@@ -32,31 +28,31 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
  */
 
 abstract class CompositionSelectionHeuristic
+  implements Comparator<List<EFSMTransitionRelation>>
 {
 
   //#########################################################################
   //# Constructors
-  public CompositionSelectionHeuristic(final ModuleProxyFactory factory,
-                                       final CompilerOperatorTable op)
+  CompositionSelectionHeuristic()
   {
+    mBestCandidate = null;
+    mBestValue = Double.POSITIVE_INFINITY;
   }
+
 
   //#########################################################################
   //# Invocation
-  public List<EFSMTransitionRelation> selectComposition(final EFSMSystem system)
-    throws AnalysisException, EvalException
+  List<EFSMTransitionRelation> selectComposition(final EFSMSystem system)
   {
     final List<EFSMVariable> variablesList = system.getVariables();
     final Collection<List<EFSMTransitionRelation>> visitedCandidates =
       new THashSet<List<EFSMTransitionRelation>>();
-    double smallestValue = Double.POSITIVE_INFINITY;
-    List<EFSMTransitionRelation> smallestCandidate = null;
+    List<EFSMTransitionRelation> bestCandidate = null;
     for (final EFSMVariable var : variablesList) {
       final Collection<EFSMTransitionRelation> efsmTRSet =
         var.getTransitionRelations();
       final List<EFSMTransitionRelation> efsmTRList =
         new ArrayList<EFSMTransitionRelation>(efsmTRSet);
-      Collections.sort(efsmTRList);
       for (int i = 0; i < efsmTRList.size(); i++) {
         for (int j = i + 1; j < efsmTRList.size(); j++) {
           final EFSMTransitionRelation efsmTR1 = efsmTRList.get(i);
@@ -71,20 +67,61 @@ abstract class CompositionSelectionHeuristic
             candidate.add(efsmTR1);
           }
           if (visitedCandidates.add(candidate)) {
-            final double candidateValue = getHeuristicValue(candidate);
-            if (candidateValue < smallestValue) {
-              smallestValue = candidateValue;
-              smallestCandidate = candidate;
+            if (bestCandidate == null ||
+                compare(candidate, bestCandidate) < 0) {
+              bestCandidate = candidate;
             }
           }
         }
       }
     }
-    return smallestCandidate;
+    reset();
+    return bestCandidate;
   }
 
-  public abstract double getHeuristicValue(List<EFSMTransitionRelation> candidate)
-    throws AnalysisException, EvalException;
+  void reset()
+  {
+    mBestCandidate = null;
+    mBestValue = Double.POSITIVE_INFINITY;
+  }
+
+  abstract double getHeuristicValue(List<EFSMTransitionRelation> candidate);
+
+
+  //#########################################################################
+  //# Interface java.util.Comparator<List>
+  @Override
+  public int compare(final List<EFSMTransitionRelation> candidate1,
+                     final List<EFSMTransitionRelation> candidate2)
+  {
+    final double value1;
+    if (candidate1 == mBestCandidate) {
+      value1 = mBestValue;
+    } else {
+      value1 = getHeuristicValue(candidate1);
+    }
+    final double value2;
+    if (candidate2 == mBestCandidate) {
+      value2 = mBestValue;
+    } else {
+      value2 = getHeuristicValue(candidate2);
+    }
+    if (value1 < value2) {
+      mBestCandidate = candidate1;
+      mBestValue = value1;
+      return -1;
+    } else if (value2 < value1) {
+      mBestCandidate = candidate2;
+      mBestValue = value2;
+      return 1;
+    } else {
+      if (mBestValue != value1) {
+        mBestCandidate = candidate1;
+        mBestValue = value1;
+      }
+      return 0;
+    }
+  }
 
 
   //#########################################################################
@@ -100,5 +137,11 @@ abstract class CompositionSelectionHeuristic
       return className;
     }
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private List<EFSMTransitionRelation> mBestCandidate;
+  private double mBestValue;
 
 }
