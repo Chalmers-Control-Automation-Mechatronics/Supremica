@@ -369,7 +369,7 @@ public class ObservationEquivalenceTRSimplifier
    * the user provides an alternative initial partition.
    */
   public void setUpInitialPartitionBasedOnMarkings()
-  throws OverflowException
+    throws OverflowException
   {
     final long mask = getPropositionMask();
     setUpInitialPartitionBasedOnMarkings(mask);
@@ -387,7 +387,7 @@ public class ObservationEquivalenceTRSimplifier
    *                for the partition.
    */
   public void setUpInitialPartitionBasedOnMarkings(final long mask)
-  throws OverflowException
+    throws OverflowException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
@@ -479,7 +479,7 @@ public class ObservationEquivalenceTRSimplifier
    * @see NonAlphaDeterminisationTRSimplifier
    */
   public void refinePartitionBasedOnInitialStates()
-  throws OverflowException
+    throws OverflowException
   {
     // Build set of initial states (includes states reachable via tau
     // transitions from an initial state) ...
@@ -531,10 +531,28 @@ public class ObservationEquivalenceTRSimplifier
   //# Overrides for net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
   @Override
   protected void setUp()
-  throws AnalysisException
+    throws AnalysisException
   {
     super.setUp();
     final ListBufferTransitionRelation rel = getTransitionRelation();
+    final int first = mEquivalence.getFirstSplitEvent();
+    if (mUsingSpecialEvents) {
+      assert mEquivalence != Equivalence.DETERMINISTIC_MINSTATE :
+        "Can't use deterministic-minstate with selfloop-only events!";
+      final int numEvents = rel.getNumberOfProperEvents();
+      mOnlySelfLoopEvents = new TIntArrayList(rel.getNumberOfProperEvents());
+      for (int e = first; e < numEvents; e++) {
+        if ((rel.getProperEventStatus(e) &
+          EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0) {
+          mOnlySelfLoopEvents.add(e);
+        }
+      }
+    } else if (first == EventEncoding.TAU) {
+      mOnlySelfLoopEvents = new TIntArrayList(1);
+      mOnlySelfLoopEvents.add(first);
+    } else {
+      mOnlySelfLoopEvents = null;
+    }
     mPlainEventIterator = rel.createPredecessorsReadOnlyIterator();
     if (mSplitters == null) {
       mHasModifications = false;
@@ -552,27 +570,11 @@ public class ObservationEquivalenceTRSimplifier
     final int numStates = rel.getNumberOfStates();
     mTempClass = new TIntArrayList(numStates);
     mMaxInfoSize = 0;
-    final int first = mEquivalence.getFirstSplitEvent();
-    if (mUsingSpecialEvents) {
-      final int numEvents = rel.getNumberOfProperEvents();
-      mOnlySelfLoopEvents = new TIntArrayList(rel.getNumberOfProperEvents());
-      for (int e = first; e < numEvents; e++) {
-        if ((rel.getProperEventStatus(e) &
-          EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0) {
-          mOnlySelfLoopEvents.add(e);
-        }
-      }
-    } else if (first == EventEncoding.TAU) {
-      mOnlySelfLoopEvents = new TIntArrayList(1);
-      mOnlySelfLoopEvents.add(first);
-    } else {
-      mOnlySelfLoopEvents = null;
-    }
   }
 
   @Override
   protected boolean runSimplifier()
-  throws AnalysisException
+    throws AnalysisException
   {
     for (Splitter splitter = mSplitters.poll();
          splitter != null && mNumClasses < mNumReachableStates;
@@ -608,7 +610,7 @@ public class ObservationEquivalenceTRSimplifier
    */
   @Override
   protected void applyResultPartition()
-  throws AnalysisException
+    throws AnalysisException
   {
     mEquivalence.applyResultPartition(this);
   }
@@ -667,6 +669,52 @@ public class ObservationEquivalenceTRSimplifier
       return mEventClosureIterator;
     }
   }
+
+  private TIntHashSet getIncomingEvents(final TIntArrayList clazz)
+  {
+    final int size = clazz.size();
+    final int hashSize = Math.min(Math.round(size * mFanout), mNumEvents);
+    // Find the set of events that can reach this class ...
+    final TIntHashSet events = new TIntHashSet(hashSize);
+    // First add all selfloop-only events (including tau) ...
+    if (mOnlySelfLoopEvents != null) {
+      for (int i = 0; i < mOnlySelfLoopEvents.size(); i++) {
+        final int e = mOnlySelfLoopEvents.get(i);
+        events.add(e);
+      }
+    }
+    final int first = mEquivalence.getFirstSplitEvent();
+    mPlainEventIterator.resetEvents(first, mNumEvents - 1);
+    // Second search for regular events that can reach the class.
+    if (mEquivalence.respectsTau()) {
+      // Considering tau as silent event ...
+      mTauIterator.reset();
+      for (int i = 0; i < size; i++) {
+        final int state = clazz.get(i);
+        mTauIterator.resume(state);
+        while (mTauIterator.advance()) {
+          final int taupred = mTauIterator.getCurrentSourceState();
+          mPlainEventIterator.resetState(taupred);
+          while (mPlainEventIterator.advance()) {
+            final int event = mPlainEventIterator.getCurrentEvent();
+            events.add(event);
+          }
+        }
+      }
+    } else {
+      // Considering tau as proper event (bisimulation) ...
+      for (int i = 0; i < size; i++) {
+        final int state = clazz.get(i);
+        mPlainEventIterator.resetState(state);
+        while (mPlainEventIterator.advance()) {
+          final int event = mPlainEventIterator.getCurrentEvent();
+          events.add(event);
+        }
+      }
+    }
+    return events;
+  }
+
 
   private void buildResultPartition()
   {
@@ -743,7 +791,8 @@ public class ObservationEquivalenceTRSimplifier
   private void removeRedundantTransitions(final TransitionRemovalTime time)
     throws AnalysisException
   {
-    final TransitionRemoval mode = mEquivalence.getTransitionRemovalMode(this);
+    final TransitionRemoval mode =
+      mEquivalence.getTransitionRemovalMode(this);
     final boolean doTau = mode.getDoTau(time);
     final boolean doNonTau = mode.getDoNonTau(time);
     if (doTau || doNonTau) {
@@ -877,7 +926,6 @@ public class ObservationEquivalenceTRSimplifier
   //# Local Interface Splitter
   private interface Splitter extends Comparable<Splitter>
   {
-
     public ComplexEquivalenceClass getParent();
 
     public void setParent(ComplexEquivalenceClass parent);
@@ -895,7 +943,6 @@ public class ObservationEquivalenceTRSimplifier
     public void enqueue(boolean force);
 
     public void dump(PrintWriter printer);
-
   }
 
 
@@ -904,7 +951,6 @@ public class ObservationEquivalenceTRSimplifier
   private abstract class EquivalenceClass
     implements Splitter
   {
-
     //#######################################################################
     //# Constructors
     EquivalenceClass()
@@ -1120,7 +1166,6 @@ public class ObservationEquivalenceTRSimplifier
     private int mOverflowList;
     private int mOverflowSize;
     private int[] mArray;
-
   }
 
 
@@ -1129,7 +1174,6 @@ public class ObservationEquivalenceTRSimplifier
   private class PlainEquivalenceClass
     extends EquivalenceClass
   {
-
     //#######################################################################
     //# Constructors
     private PlainEquivalenceClass()
@@ -1186,47 +1230,7 @@ public class ObservationEquivalenceTRSimplifier
       final int size = getSize();
       assert size == mTempClass.size();
       final ListBufferTransitionRelation rel = getTransitionRelation();
-      final int hashSize = Math.min(Math.round(size * mFanout), mNumEvents);
-      // Find the set of events that can reach this class ...
-      final TIntHashSet events = new TIntHashSet(hashSize);
-      // First add all selfloop-only events (including tau) ...
-      if (mOnlySelfLoopEvents != null) {
-        for (int i = 0; i < mOnlySelfLoopEvents.size(); i++) {
-          final int e = mOnlySelfLoopEvents.get(i);
-          events.add(e);
-        }
-      }
-      final int first = mEquivalence.getFirstSplitEvent();
-      mPlainEventIterator.resetEvents(first, mNumEvents - 1);
-      // Second search for regular events that can reach the class.
-      if (mEquivalence.respectsTau()) {
-        // Considering tau as silent event ...
-        mTauIterator.reset();
-        for (int i = 0; i < size; i++) {
-          final int state = mTempClass.get(i);
-          mTauIterator.resume(state);
-          while (mTauIterator.advance()) {
-            final int taupred = mTauIterator.getCurrentSourceState();
-            mPlainEventIterator.resetState(taupred);
-            while (mPlainEventIterator.advance()) {
-              final int event = mPlainEventIterator.getCurrentEvent();
-              events.add(event);
-            }
-          }
-        }
-      } else {
-        // Considering tau as proper event (bisimulation) ...
-        for (int i = 0; i < size; i++) {
-          final int state = mTempClass.get(i);
-          mPlainEventIterator.resetState(state);
-          while (mPlainEventIterator.advance()) {
-            final int event = mPlainEventIterator.getCurrentEvent();
-            events.add(event);
-          }
-        }
-      }
-
-      // Look for predecessors with the events found ...
+      final TIntHashSet events = getIncomingEvents(mTempClass);
       final Collection<EquivalenceClass> splitClasses =
         new THashSet<EquivalenceClass>();
       events.forEach(new TIntProcedure() {
@@ -1347,7 +1351,6 @@ public class ObservationEquivalenceTRSimplifier
     //#######################################################################
     //# Data Members
     private boolean mIsOpenSplitter;
-
   }
 
 
@@ -1355,7 +1358,6 @@ public class ObservationEquivalenceTRSimplifier
   //# Inner Class LeafEquivalenceClass
   private class LeafEquivalenceClass extends EquivalenceClass
   {
-
     //#######################################################################
     //# Constructors
     private LeafEquivalenceClass()
@@ -1420,41 +1422,66 @@ public class ObservationEquivalenceTRSimplifier
     @Override
     public void splitOn()
     {
-      final ListBufferTransitionRelation rel = getTransitionRelation();
       final InfoMap info = new InfoMap();
       setInfo(info);
       final Collection<EquivalenceClass> splitClasses =
         new THashSet<EquivalenceClass>();
-      final TIntHashSet visited = new TIntHashSet();
       collect(mTempClass);
+      final TIntHashSet events = getIncomingEvents(mTempClass);
       final int size = getSize();
-      final int first = mEquivalence.getFirstSplitEvent();
-      for (int event = first; event < mNumEvents; event++) {
-        if ((rel.getProperEventStatus(event) & EventEncoding.STATUS_UNUSED) == 0) {
+      events.forEach(new TIntProcedure() {
+        @Override
+        public boolean execute(final int event)
+        {
+          final ListBufferTransitionRelation rel = getTransitionRelation();
+          final boolean outsideOnlySelfloop = mUsingSpecialEvents &&
+            (rel.getProperEventStatus(event) &
+             EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0;
           final TransitionIterator transIter =
             getPredecessorIterator(event);
+          final TIntHashSet visitedStates = new TIntHashSet();
           for (int i = 0; i < size; i++) {
             final int state = mTempClass.get(i);
             transIter.resetState(state);
             while (transIter.advance()) {
               final int pred = transIter.getCurrentSourceState();
-              if (visited.add(pred)) {
-                final EquivalenceClass splitClass = mStateToClass[pred];
-                if (splitClass != null) {
-                  splitClass.moveToOverflowList(pred);
-                  splitClasses.add(splitClass);
+              prepareForSplit(pred, event, visitedStates, splitClasses, info);
+            }
+            if (outsideOnlySelfloop) {
+              if (!mEquivalence.respectsTau()) {
+                prepareForSplit(state, event, visitedStates, splitClasses, info);
+              } else if (event != EventEncoding.TAU) {
+                mTauIterator.resetState(state);
+                while (mTauIterator.advance()) {
+                  final int pred = mTauIterator.getCurrentSourceState();
+                  prepareForSplit(pred, event, visitedStates, splitClasses, info);
                 }
               }
-              info.increment(pred, event);
             }
           }
-          visited.clear();
           for (final EquivalenceClass splitClass : splitClasses) {
             splitClass.splitUsingOverflowList();
           }
           splitClasses.clear();
+          return true;
         }
-      }
+
+        private void prepareForSplit(final int pred,
+                                     final int event,
+                                     final TIntHashSet visitedStates,
+                                     final Collection<EquivalenceClass> splitClasses,
+                                     final InfoMap info)
+        {
+          if (visitedStates.add(pred)) {
+            final EquivalenceClass splitClass = mStateToClass[pred];
+            if (splitClass != null) {
+              splitClass.moveToOverflowList(pred);
+              splitClasses.add(splitClass);
+            }
+          }
+          info.increment(pred, event);
+        }
+      });
       mTempClass.clear();
       mMaxInfoSize = Math.max(mMaxInfoSize, info.size());
     }
@@ -1507,10 +1534,10 @@ public class ObservationEquivalenceTRSimplifier
       }
     }
 
-
     //#######################################################################
     //# Specific Methods
-    void doComplexSplit(int overflow1, int size1, int overflow2, int size2)
+    private void doComplexSplit(int overflow1, int size1,
+                                int overflow2, int size2)
     {
       if (size1 == 0 && size2 == 0) {
         return;
@@ -1597,15 +1624,13 @@ public class ObservationEquivalenceTRSimplifier
     //# Data Members
     private ComplexEquivalenceClass mParent;
     private InfoMap mInfo;
-
   }
 
 
-  // #########################################################################
-  // # Inner Class ComplexEquivalenceClass
+  //#########################################################################
+  //# Inner Class ComplexEquivalenceClass
   private class ComplexEquivalenceClass implements Splitter
   {
-
     //#######################################################################
     //# Constructors
     ComplexEquivalenceClass(final Splitter little,
@@ -1703,8 +1728,8 @@ public class ObservationEquivalenceTRSimplifier
     @Override
     public void splitOn()
     {
-      final ListBufferTransitionRelation rel = getTransitionRelation();
       mLittleChild.collect(mTempClass);
+      final TIntHashSet events = getIncomingEvents(mTempClass);
       final int tempSize = mTempClass.size();
       final InfoMap info = getInfo();
       final int infoSize = info.size();
@@ -1713,29 +1738,39 @@ public class ObservationEquivalenceTRSimplifier
       mBigChild.setInfo(info);
       final Collection<LeafEquivalenceClass> splitClasses =
         new THashSet<LeafEquivalenceClass>();
-      final TIntHashSet visited = new TIntHashSet();
-      final int first = mEquivalence.getFirstSplitEvent();
-      for (int event = first; event < mNumEvents; event++) {
-        if ((rel.getProperEventStatus(event) & EventEncoding.STATUS_UNUSED) == 0) {
+      events.forEach(new TIntProcedure() {
+        @Override
+        public boolean execute(final int event)
+        {
+          final ListBufferTransitionRelation rel = getTransitionRelation();
+          final boolean outsideOnlySelfloop = mUsingSpecialEvents &&
+            (rel.getProperEventStatus(event) &
+             EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0;
           final TransitionIterator transIter =
             getPredecessorIterator(event);
+          final TIntHashSet visitedStates = new TIntHashSet();
           for (int i = 0; i < tempSize; i++) {
             final int state = mTempClass.get(i);
             transIter.resetState(state);
             while (transIter.advance()) {
               final int pred = transIter.getCurrentSourceState();
-              if (visited.add(pred)) {
-                final EquivalenceClass splitClass = mStateToClass[pred];
-                if (splitClass != null) {
-                  final LeafEquivalenceClass leaf =
-                    (LeafEquivalenceClass) splitClass;
-                  splitClasses.add(leaf);
+              prepareForSplit(pred, event, visitedStates, splitClasses,
+                              info, littleInfo);
+            }
+            if (outsideOnlySelfloop) {
+              if (!mEquivalence.respectsTau()) {
+                prepareForSplit(state, event, visitedStates, splitClasses,
+                                info, littleInfo);
+              } else if (event != EventEncoding.TAU) {
+                mTauIterator.resetState(state);
+                while (mTauIterator.advance()) {
+                  final int pred = mTauIterator.getCurrentSourceState();
+                  prepareForSplit(pred, event, visitedStates, splitClasses,
+                                  info, littleInfo);
                 }
               }
-              info.moveTo(littleInfo, pred, event);
             }
           }
-          visited.clear();
           for (final LeafEquivalenceClass splitClass : splitClasses) {
             int size1 = 0;
             int size2 = 0;
@@ -1766,8 +1801,27 @@ public class ObservationEquivalenceTRSimplifier
             splitClass.doComplexSplit(overflow1, size1, overflow2, size2);
           }
           splitClasses.clear();
+          return true;
         }
-      }
+
+        private void prepareForSplit(final int pred,
+                                     final int event,
+                                     final TIntHashSet visitedStates,
+                                     final Collection<LeafEquivalenceClass> splitClasses,
+                                     final InfoMap info,
+                                     final InfoMap littleInfo)
+        {
+          if (visitedStates.add(pred)) {
+            final EquivalenceClass splitClass = mStateToClass[pred];
+            if (splitClass != null) {
+              final LeafEquivalenceClass leaf =
+                (LeafEquivalenceClass) splitClass;
+              splitClasses.add(leaf);
+            }
+          }
+          info.moveTo(littleInfo, pred, event);
+        }
+      });
       mTempClass.clear();
       mLittleChild.enqueue(false);
       mBigChild.enqueue(false);
@@ -1782,7 +1836,6 @@ public class ObservationEquivalenceTRSimplifier
       mSplitters.add(this);
     }
 
-
     //#######################################################################
     //# Simple Access
     void replaceChild(final EquivalenceClass oldChild,
@@ -1793,7 +1846,6 @@ public class ObservationEquivalenceTRSimplifier
       } else {
         mBigChild = newChild;
       }
-
     }
 
     //#######################################################################
@@ -1824,7 +1876,6 @@ public class ObservationEquivalenceTRSimplifier
     private InfoMap mInfo;
     private Splitter mLittleChild;
     private Splitter mBigChild;
-
   }
 
 
@@ -1833,7 +1884,6 @@ public class ObservationEquivalenceTRSimplifier
   private class InfoMap
     extends TIntIntHashMap
   {
-
     //#######################################################################
     //# Constructors
     private InfoMap()
@@ -2090,7 +2140,6 @@ public class ObservationEquivalenceTRSimplifier
    */
   public enum TransitionRemoval
   {
-
     //#######################################################################
     //# Enumeration Values
     /**
@@ -2187,7 +2236,6 @@ public class ObservationEquivalenceTRSimplifier
     //# Mode Selection
     abstract boolean getDoTau(TransitionRemovalTime time);
     abstract boolean getDoNonTau(TransitionRemovalTime time);
-
   }
 
 
@@ -2255,6 +2303,12 @@ public class ObservationEquivalenceTRSimplifier
 
   //#########################################################################
   //# Data Members
+  /**
+   * The partitioning method selected by the user.
+   * This setting allows the user to choose between bisimulation,
+   * observation equivalence, or similar relations.
+   * @see ObservationEquivalenceTRSimplifier.Equivalence
+   */
   private Equivalence mEquivalence = Equivalence.OBSERVATION_EQUIVALENCE;
   private TransitionRemoval mTransitionRemovalMode = TransitionRemoval.NONTAU;
   private MarkingMode mMarkingMode = MarkingMode.UNCHANGED;
@@ -2272,6 +2326,11 @@ public class ObservationEquivalenceTRSimplifier
   private float mFanout;
   private boolean mHasModifications;
 
+  /**
+   * List of event numbers of events that are only-selfloop in other automata
+   * (including tau), or <CODE>null</CODE> if no such events.
+   */
+  private TIntArrayList mOnlySelfLoopEvents;
   private TauClosure mTauClosure;
   private OneEventCachingTransitionIterator mTauIterator;
   private TransitionIterator mEventClosureIterator;
@@ -2283,13 +2342,7 @@ public class ObservationEquivalenceTRSimplifier
   private int[] mPredecessors;
   private Queue<Splitter> mSplitters;
   private TIntArrayList mTempClass;
-  /**
-   * List of event numbers of events that are only-selfloop in other automata
-   * (including tau), or <CODE>null</CODE> if no such events.
-   */
-  private TIntArrayList mOnlySelfLoopEvents;
 
   private int mMaxInfoSize;
-
 
 }
