@@ -55,13 +55,4 @@ public class CCAbstractionStandardConflictCheckerTest
     return checker;
   }
 
-
-  //#########################################################################
-  //# Test Cases
-  @Override
-  public void testProfisafeI3HostEFABlock() throws Exception
-  {
-    // TODO Too tough for certain conflicts (>1000s) :-(
-  }
-
 }

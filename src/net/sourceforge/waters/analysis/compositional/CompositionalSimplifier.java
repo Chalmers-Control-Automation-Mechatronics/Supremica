@@ -91,7 +91,7 @@ public class CompositionalSimplifier
   {
     super(model, factory, translator, abstractionFactory,
           new PreselectingMethodFactory(),
-          new SelectingMethodFactory());
+          new SelectionMethodFactory());
     // TODO This is specific to nonblocking and should be in a subclass.
     setPruningDeadlocks(true);
   }

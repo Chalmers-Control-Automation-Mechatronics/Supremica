@@ -16,6 +16,7 @@ import gnu.trove.set.hash.TIntHashSet;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -378,6 +379,23 @@ public class IntSetBuffer implements WatersIntHashingStrategy
 
   //#########################################################################
   //# Debugging
+  @Override
+  public String toString()
+  {
+    final StringWriter writer = new StringWriter();
+    final PrintWriter printer = new PrintWriter(writer);
+    final int[] sets = mDirectory.toArray();
+    Arrays.sort(sets);
+    for (final int set : sets) {
+      printer.print(set);
+      printer.print(" : ");
+      dump(printer, set);
+      printer.println();
+    }
+    printer.close();
+    return writer.toString();
+  }
+
   public String toString(final int set)
   {
     final StringWriter writer = new StringWriter();

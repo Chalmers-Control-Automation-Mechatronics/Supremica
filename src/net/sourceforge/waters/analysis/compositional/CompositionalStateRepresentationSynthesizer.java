@@ -124,7 +124,7 @@ public class CompositionalStateRepresentationSynthesizer extends
                                   final KindTranslator translator,
                                   final StateRepresentationSynthesisAbstractionProcedureFactory abstractionFactory,
                                   final PreselectingMethodFactory preselectingMethodFactory,
-                                  final SelectingMethodFactory selectingMethodFactory)
+                                  final SelectionMethodFactory selectingMethodFactory)
   {
     this(null, factory, translator, abstractionFactory,
          preselectingMethodFactory, selectingMethodFactory);
@@ -149,7 +149,7 @@ public class CompositionalStateRepresentationSynthesizer extends
                                   final StateRepresentationSynthesisAbstractionProcedureFactory wsoe)
   {
     this(model, factory, translator, wsoe,
-         new PreselectingMethodFactory(), new SelectingMethodFactory());
+         new PreselectingMethodFactory(), new SelectionMethodFactory());
   }
 
   /**
@@ -176,7 +176,7 @@ public class CompositionalStateRepresentationSynthesizer extends
                                   final KindTranslator translator,
                                   final StateRepresentationSynthesisAbstractionProcedureFactory wsoe,
                                   final PreselectingMethodFactory preselectingMethodFactory,
-                                  final SelectingMethodFactory selectingMethodFactory)
+                                  final SelectionMethodFactory selectingMethodFactory)
   {
     super(model, factory, translator, wsoe,
           preselectingMethodFactory, selectingMethodFactory);

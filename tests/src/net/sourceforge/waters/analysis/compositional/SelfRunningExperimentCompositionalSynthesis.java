@@ -52,12 +52,12 @@ public class SelfRunningExperimentCompositionalSynthesis
       configurations.add(configStateRepresent);
      final AbstractCompositionalModelAnalyzer.PreselectingMethodFactory
       preselectingFactory = automataSynthesizer.getPreselectingMethodFactory();
-      final AbstractCompositionalModelAnalyzer.SelectingMethodFactory
+      final AbstractCompositionalModelAnalyzer.SelectionMethodFactory
       selectingFactory = automataSynthesizer.getSelectingMethodFactory();
       int methodCount = 0;
       for (final AbstractCompositionalModelAnalyzer.PreselectingMethod
            preselectingMethod : preselectingFactory.getEnumConstants()) {
-        for (final AbstractCompositionalModelAnalyzer.SelectingMethod
+        for (final AbstractCompositionalModelAnalyzer.SelectionMethod
              selectingMethod: selectingFactory.getEnumConstants()) {
           methodCount++;
           for (final Configuration config: configurations) {

@@ -56,7 +56,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
      final AbstractCompositionalSynthesizer synthesizer,
      final AbstractionProcedureFactory method,
      final AbstractCompositionalModelAnalyzer.PreselectingMethod preselectingHeuristic,
-     final AbstractCompositionalModelAnalyzer.SelectingMethod selectingHeuristic)
+     final AbstractCompositionalModelAnalyzer.SelectionMethod selectingHeuristic)
     throws FileNotFoundException
   {
     final String outputprop = System.getProperty("waters.test.outputdir");
@@ -132,7 +132,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
    */
   void setSelectingHeuristic(final String name)
   {
-    final AbstractCompositionalModelAnalyzer.SelectingMethodFactory factory =
+    final AbstractCompositionalModelAnalyzer.SelectionMethodFactory factory =
       mSynthesizer.getSelectingMethodFactory();
     mSelecting = factory.getEnumValue(name);
   }
@@ -471,7 +471,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
   private AbstractCompositionalSynthesizer mSynthesizer;
   private final AbstractionProcedureFactory mMethod;
   private AbstractCompositionalModelAnalyzer.PreselectingMethod mPreselecting;
-  private AbstractCompositionalModelAnalyzer.SelectingMethod mSelecting;
+  private AbstractCompositionalModelAnalyzer.SelectionMethod mSelecting;
   private final Watchdog mWatchdog;
   private int mTimeout = 600;
 
