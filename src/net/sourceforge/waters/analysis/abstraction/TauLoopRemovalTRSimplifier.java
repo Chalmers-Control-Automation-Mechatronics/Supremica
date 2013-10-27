@@ -13,6 +13,8 @@ import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.stack.TIntStack;
 import gnu.trove.stack.array.TIntArrayStack;
 
+import java.util.Arrays;
+
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
@@ -110,7 +112,8 @@ public class TauLoopRemovalTRSimplifier
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
+  //# Overrides for
+  //# net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
   @Override
   protected void setUp()
     throws AnalysisException
@@ -118,32 +121,46 @@ public class TauLoopRemovalTRSimplifier
     super.setUp();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
-    mNextDFSIndex = 1;
-    mDFSIndex = new int[numStates];
-    mLowLink = new int[numStates];
-    mOnComponentStack = new boolean[numStates];
     mControlStack = new TIntArrayList();
     mComponentStack = new TIntArrayStack();
+    mOnComponentStack = new boolean[numStates];
+    mDFSIndex = new int[numStates];
+    mLowLink = new int[numStates];
+    mNextDFSIndex = 1;
     mMerging = false;
-    mNextComponentNumber = 0;
-    mComponentNumber = new int[numStates];
   }
 
   @Override
   protected boolean runSimplifier()
     throws AnalysisException
   {
+    // 1. Tarjan recursion starting from all states ...
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    for (int s = 0; s < mDFSIndex.length; s++) {
-      if (!rel.isReachable(s)) {
-        mComponentNumber[s] = -1;
-      } else if (mDFSIndex[s] == 0) {
+    final int numStates = rel.getNumberOfStates();
+    for (int s = 0; s < numStates; s++) {
+      if (rel.isReachable(s) && mDFSIndex[s] == 0) {
         exploreDFS(s);
       }
     }
+
+    // 2. Merge strongly connected components ...
     if (mMerging) {
-      final TRPartition partition =
-        new TRPartition(mComponentNumber, mNextComponentNumber);
+      // Component codes are assigned such that components are ordered
+      // by their smallest state code in the original encoding.
+      final int[] recoding = mDFSIndex;
+      Arrays.fill(recoding, -1);
+      int nextComponent = 0;
+      for (int s = 0; s < numStates; s++) {
+        final int lowLink = mLowLink[s];
+        if (lowLink == 0) {
+          mLowLink[s] = -1;
+        } else if (recoding[lowLink - 1] < 0) {
+          mLowLink[s] = recoding[lowLink - 1] = nextComponent++;
+        } else {
+          mLowLink[s] = recoding[lowLink - 1];
+        }
+      }
+      final TRPartition partition = new TRPartition(mLowLink, nextComponent);
       setResultPartition(partition);
       applyResultPartitionAutomatically();
     }
@@ -153,12 +170,11 @@ public class TauLoopRemovalTRSimplifier
   @Override
   protected void tearDown()
   {
+    mControlStack = null;
+    mComponentStack = null;
+    mOnComponentStack = null;
     mDFSIndex = null;
     mLowLink = null;
-    mOnComponentStack = null;
-    mComponentStack = null;
-    mControlStack = null;
-    mComponentNumber = null;
     super.tearDown();
   }
 
@@ -179,15 +195,15 @@ public class TauLoopRemovalTRSimplifier
 
   //#########################################################################
   //# Auxiliary Methods
-  private void exploreDFS(final int root)
+  private void exploreDFS(final int start)
     throws AnalysisAbortException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final TransitionIterator iter = rel.createAnyReadOnlyIterator();
     iter.resetEvent(EventEncoding.TAU);
-    mControlStack.add(root);
-    mControlStack.add(root);
-    while (mControlStack.size() > 0) {
+    mControlStack.add(start);
+    mControlStack.add(start);
+    do {
       checkAbort();
       int stackIndex = mControlStack.size() - 1;
       int state = mControlStack.get(stackIndex);
@@ -196,21 +212,19 @@ public class TauLoopRemovalTRSimplifier
         state &= ~FOR_CLOSING;
         final int parent = mControlStack.get(--stackIndex);
         mControlStack.remove(stackIndex, 2);
-        if (mDFSIndex[state] == mLowLink[state]) {
-          final int compNumber = mNextComponentNumber++;
-          int count = 0;
+        final int lowLink = mLowLink[state];
+        if (mDFSIndex[state] == lowLink) {
           while (true) {
             final int popped = mComponentStack.pop();
-            mComponentNumber[popped] = compNumber;
+            mLowLink[popped] = lowLink;
             mOnComponentStack[popped] = false;
-            count++;
             if (popped == state) {
               break;
             }
+            mMerging = true;
           }
-          mMerging |= count > 1;
-        } else if (mLowLink[state] < mLowLink[parent]) {
-          mLowLink[parent] = mLowLink[state];
+        } else if (lowLink < mLowLink[parent]) {
+          mLowLink[parent] = lowLink;
         }
       } else if (mDFSIndex[state] == 0) {
         // Expand this state ...
@@ -234,7 +248,7 @@ public class TauLoopRemovalTRSimplifier
         // This state has already been expanded and closed. Skip it ...
         mControlStack.remove(--stackIndex, 2);
       }
-    }
+    } while (mControlStack.size() > 0);
   }
 
 
@@ -243,15 +257,50 @@ public class TauLoopRemovalTRSimplifier
   private boolean mDumpStateAware = false;
   private int mDefaultMarkingID = -1;
 
-  private int mNextDFSIndex;
+  /**
+   * Depth-first search indexes of visited states. Unvisited states have
+   * a zero entry. Visited states receive numbers in the order in which they
+   * are encountered in depth-search order. Unreachable states retain the
+   * value&nbsp;0.
+   */
   private int[] mDFSIndex;
+  /**
+   * Depth-first search indexes of the smallest state found in the component
+   * of states. Unreachable states retain the value&nbsp;0.
+   */
   private int[] mLowLink;
-  private boolean[] mOnComponentStack;
-  private TIntArrayList mControlStack;
+  /**
+   * Stack of states currently being, which have not yet been assigned to
+   * any component.
+   */
   private TIntStack mComponentStack;
+  /**
+   * Booleans set to <CODE>true</CODE> for states currently on the
+   * component stack {@link #mComponentStack}.
+   */
+  private boolean[] mOnComponentStack;
+  /**
+   * Control stack for iterative Tarjan. Each time a recursive call is
+   * initiated, two numbers are put on the stack: first the state number of
+   * the <I>parent</I> from which a state is visited, and second the state
+   * number of the <I>state</I> to be visited. When a <I>state</I> is first
+   * visited, it is expanded, but the entry is not removed from the stack.
+   * Instead, the state is flagged with {@link #FOR_CLOSING}. When a
+   * <I>state</I> with this flag is encountered, it is checked whether a
+   * strongly connected component is completed, and subsequently both the
+   * <I>state</I> and <I>parent</I> entries are removed from the control
+   * stack.
+   */
+  private TIntArrayList mControlStack;
+  /**
+   * Next index to be put into {@link #mDFSIndex} array.
+   */
+  private int mNextDFSIndex;
+  /**
+   * Flag set to <CODE>true</CODE> when a strongly connected component
+   * consisting of more than one state is found.
+   */
   private boolean mMerging;
-  private int mNextComponentNumber;
-  private int[] mComponentNumber;
 
 
   //#########################################################################
