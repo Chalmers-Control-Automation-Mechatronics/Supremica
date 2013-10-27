@@ -9,7 +9,8 @@
 
 package net.sourceforge.waters.analysis.efa.efsm;
 
-import java.util.List;
+import net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic;
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 
 /**
  * The &quot;minimum synchronous product&quot; composition selection
@@ -23,19 +24,20 @@ import java.util.List;
  */
 
 public class MinSynchCompositionSelectionHeuristic
-  extends CompositionSelectionHeuristic
+  extends NumericSelectionHeuristic<EFSMPair>
 {
 
-  //#######################################################################
-  //# Invocation
+  //#########################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.analysis.compositional.AbstractNumericSelectionHeuristic
   @Override
-  public double getHeuristicValue(final List<EFSMTransitionRelation> candidate)
+  protected double getHeuristicValue(final EFSMPair candidate)
   {
-    double size = 1;
-    for (final EFSMTransitionRelation efsmTR : candidate) {
-      size *= efsmTR.getTransitionRelation().getNumberOfStates();
-    }
-    return size;
+    final ListBufferTransitionRelation rel1 =
+      candidate.getFirst().getTransitionRelation();
+    final ListBufferTransitionRelation rel2 =
+      candidate.getSecond().getTransitionRelation();
+    return rel1.getNumberOfStates() * rel2.getNumberOfStates();
   }
 
 }

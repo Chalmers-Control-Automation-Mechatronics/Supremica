@@ -11,17 +11,32 @@ package net.sourceforge.waters.analysis.compositional;
 
 
 /**
+ * A selection heuristic formed as a combination of several other
+ * heuristics. To decide which of two given candidates should be given
+ * preference, the chain selection heuristic uses a sequence of heuristics
+ * until one of them can make a decision. If all heuristics in the chain
+ * fail, the final resort is to compare the candidates using their
+ * {@link Comparable#compareTo(Object) compareTo()} method, which typically
+ * implements default comparison by name.
+ *
  * @author Robi Malik
+ *
+ * @see SelectionHeuristic
  */
 
 public class ChainSelectionHeuristic<T extends Comparable<? super T>>
-  extends AbstractSelectionHeuristic<T>
+  extends SelectionHeuristic<T>
 {
 
   //#########################################################################
   //# Constructor
+  /**
+   * Creates a new chain selection heuristics
+   * @param  steps   The heuristics to be invoked in the chain,
+   *                 in the order on which they are to be invoked.
+   */
   @SafeVarargs
-  public ChainSelectionHeuristic(final AbstractSelectionHeuristic<T>... steps)
+  public ChainSelectionHeuristic(final SelectionHeuristic<T>... steps)
   {
     mSteps = steps;
   }
@@ -31,13 +46,31 @@ public class ChainSelectionHeuristic<T extends Comparable<? super T>>
   @Override
   public int compare(final T candidate1, final T candidate2)
   {
-    for (final AbstractSelectionHeuristic<T> step : mSteps) {
-      final int result = step.compare(candidate1, candidate2);
+    SelectionHeuristic<T> decider = null;
+    int result = 0;
+    for (final SelectionHeuristic<T> step : mSteps) {
+      result = step.compare(candidate1, candidate2);
       if (result != 0) {
-        return result;
+        decider = step;
+        break;
       }
     }
-    return candidate1.compareTo(candidate2);
+    if (result == 0) {
+      result = candidate1.compareTo(candidate2);
+    }
+    if (result > 0) {
+      boolean before = true;
+      for (final SelectionHeuristic<T> step : mSteps) {
+        if (step == decider) {
+          before = false;
+        } else if (before) {
+          step.setBestCandidate(candidate2);
+        } else {
+          step.reset();
+        }
+      }
+    }
+    return result;
   }
 
 
@@ -45,9 +78,18 @@ public class ChainSelectionHeuristic<T extends Comparable<? super T>>
   //# Overrides for Abstract Base Class
   //# net.sourceforge.waters.analysis.compositional.AbstractHeuristic
   @Override
+  public void setContext(final Object context)
+  {
+    for (final SelectionHeuristic<? extends T> step : mSteps) {
+      step.setContext(context);
+    }
+  }
+
+  @Override
   public void reset()
   {
-    for (final AbstractSelectionHeuristic<? extends T> step : mSteps) {
+    super.reset();
+    for (final SelectionHeuristic<? extends T> step : mSteps) {
       step.reset();
     }
   }
@@ -55,6 +97,6 @@ public class ChainSelectionHeuristic<T extends Comparable<? super T>>
 
   //#########################################################################
   //# Data Members
-  private final AbstractSelectionHeuristic<T>[] mSteps;
+  private final SelectionHeuristic<T>[] mSteps;
 
 }

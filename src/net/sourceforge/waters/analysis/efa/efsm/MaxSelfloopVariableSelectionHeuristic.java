@@ -9,8 +9,7 @@
 
 package net.sourceforge.waters.analysis.efa.efsm;
 
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic;
 
 
 /**
@@ -22,23 +21,14 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
  */
 
 public class MaxSelfloopVariableSelectionHeuristic
-  extends VariableSelectionHeuristic
+  extends NumericSelectionHeuristic<EFSMVariable>
 {
 
   //#########################################################################
-  //# Constructors
-  public MaxSelfloopVariableSelectionHeuristic
-    (final ModuleProxyFactory factory, final CompilerOperatorTable op)
-  {
-    super(factory, op);
-  }
-
-
-  //#########################################################################
   //# Overrides for
-  //# net.sourceforge.waters.analysis.efa.efsm.VariableSelectionHeuristic
+  //# net.sourceforge.waters.analysis.compositional.AbstractNumericSelectionHeuristic
   @Override
-  public double getHeuristicValue(final EFSMVariable var)
+  protected double getHeuristicValue(final EFSMVariable var)
   {
     return -var.getSelfloops().size();
   }

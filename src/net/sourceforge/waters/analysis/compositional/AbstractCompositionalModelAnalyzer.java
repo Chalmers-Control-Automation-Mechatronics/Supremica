@@ -627,7 +627,8 @@ public abstract class AbstractCompositionalModelAnalyzer
       mAbstractionProcedureFactory.createAbstractionProcedure(this);
     mAbstractionProcedure.storeStatistics();
     mPreselectingHeuristic = mPreselectingMethod.createHeuristic(this);
-    mSelectingHeuristic = mSelectionMethod.createChainHeuristic(this);
+    mSelectionHeuristic = mSelectionMethod.createChainHeuristic();
+    mSelectionHeuristic.setContext(this);
     setupSynchronousProductBuilder();
     mOverflowCandidates = new THashSet<List<AutomatonProxy>>();
     mCurrentInternalStateLimit = mLowerInternalStateLimit;
@@ -642,7 +643,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     mUsedDefaultMarking = mUsedPreconditionMarking = null;
     mPropositions = null;
     mPreselectingHeuristic = null;
-    mSelectingHeuristic = null;
+    mSelectionHeuristic = null;
     mCurrentAutomata = null;
     mEventInfoMap = null;
     mDirtyAutomata = null;
@@ -1354,7 +1355,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     if (preselected.isEmpty()) {
       return null;
     } else {
-      final Candidate result = mSelectingHeuristic.select(preselected);
+      final Candidate result = mSelectionHeuristic.select(preselected);
       if (mSubsumptionEnabled) {
         final Collection<Candidate> subsumedBy = new LinkedList<Candidate>();
         for (final Candidate candidate : preselected) {
@@ -1904,7 +1905,7 @@ public abstract class AbstractCompositionalModelAnalyzer
    * AbstractCompositionalModelAnalyzer.PreselectingHeuristic
    * PreselectingHeuristic} in the first step.</P>
    *
-   * <P>Selection is implemented using a {@link AbstractSelectionHeuristic}.</P>
+   * <P>Selection is implemented using a {@link SelectionHeuristic}.</P>
    *
    * @see PreselectingMethod
    */
@@ -1936,8 +1937,7 @@ public abstract class AbstractCompositionalModelAnalyzer
      * @return A comparator, or <CODE>null</CODE> if the heuristic
      *         is not implemented by a comparator.
      */
-    abstract AbstractSelectionHeuristic<Candidate> createBaseHeuristic
-      (final AbstractCompositionalModelAnalyzer analyzer);
+    abstract SelectionHeuristic<Candidate> createBaseHeuristic();
 
     /**
      * Creates a selecting heuristic that gives preferences to this method.
@@ -1947,16 +1947,13 @@ public abstract class AbstractCompositionalModelAnalyzer
      * defined in the enumeration. If the candidates are equal under
      * all heuristics, they are compared based on their names. This
      * guarantees that no two candidates are equal.
-     * @param analyzer The model analyser requesting and using the
-     *                 heuristic.
      */
-    AbstractSelectionHeuristic<Candidate> createChainHeuristic
-      (final AbstractCompositionalModelAnalyzer analyzer)
+    SelectionHeuristic<Candidate> createChainHeuristic()
     {
       @SuppressWarnings("unchecked")
-      final AbstractSelectionHeuristic<Candidate>[] heuristics =
-        new AbstractSelectionHeuristic[1];
-      heuristics[0] = createBaseHeuristic(analyzer);
+      final SelectionHeuristic<Candidate>[] heuristics =
+        new SelectionHeuristic[1];
+      heuristics[0] = createBaseHeuristic();
       return new ChainSelectionHeuristic<>(heuristics);
     }
 
@@ -2004,16 +2001,15 @@ public abstract class AbstractCompositionalModelAnalyzer
      * @param method
      *          Primary selection method to be used first.
      */
-    static AbstractSelectionHeuristic<Candidate> createChainHeuristic
-      (final AbstractCompositionalModelAnalyzer analyzer,
-       final SelectionMethod... methods)
+    static SelectionHeuristic<Candidate> createChainHeuristic
+      (final SelectionMethod... methods)
     {
       @SuppressWarnings("unchecked")
-      final AbstractSelectionHeuristic<Candidate>[] heuristics =
-        new AbstractSelectionHeuristic[methods.length];
+      final SelectionHeuristic<Candidate>[] heuristics =
+        new SelectionHeuristic[methods.length];
       for (int i = 0; i < methods.length; i++) {
         final SelectionMethod method = methods[i];
-        heuristics[i] = method.createBaseHeuristic(analyzer);
+        heuristics[i] = method.createBaseHeuristic();
       }
       return new ChainSelectionHeuristic<>(heuristics);
     }
@@ -2030,18 +2026,16 @@ public abstract class AbstractCompositionalModelAnalyzer
   public static final SelectionMethod MaxC = new SelectionMethod("MaxC")
   {
     @Override
-    AbstractSelectionHeuristic<Candidate> createBaseHeuristic
-      (final AbstractCompositionalModelAnalyzer analyzer)
+    SelectionHeuristic<Candidate> createBaseHeuristic()
     {
-      return analyzer.new SelectionHeuristicMaxC();
+      return new SelectionHeuristicMaxC();
     }
 
     @Override
-    AbstractSelectionHeuristic<Candidate> createChainHeuristic
-      (final AbstractCompositionalModelAnalyzer analyzer)
+    SelectionHeuristic<Candidate> createChainHeuristic()
     {
       return SelectionMethodFactory.createChainHeuristic
-        (analyzer, MaxC, MaxL, MinE, MinS);
+        (MaxC, MaxL, MinE, MinS);
     }
   };
 
@@ -2052,18 +2046,16 @@ public abstract class AbstractCompositionalModelAnalyzer
   public static final SelectionMethod MaxL = new SelectionMethod("MaxL")
   {
     @Override
-    AbstractSelectionHeuristic<Candidate> createBaseHeuristic
-      (final AbstractCompositionalModelAnalyzer analyzer)
+    SelectionHeuristic<Candidate> createBaseHeuristic()
     {
-      return analyzer.new SelectionHeuristicMaxL();
+      return new SelectionHeuristicMaxL();
     }
 
     @Override
-    AbstractSelectionHeuristic<Candidate> createChainHeuristic
-      (final AbstractCompositionalModelAnalyzer analyzer)
+    SelectionHeuristic<Candidate> createChainHeuristic()
     {
       return SelectionMethodFactory.createChainHeuristic
-        (analyzer, MaxL, MaxC, MinE, MinS);
+        (MaxL, MaxC, MinE, MinS);
     }
   };
 
@@ -2076,18 +2068,16 @@ public abstract class AbstractCompositionalModelAnalyzer
   public static final SelectionMethod MinE = new SelectionMethod("MinE")
   {
     @Override
-    AbstractSelectionHeuristic<Candidate> createBaseHeuristic
-      (final AbstractCompositionalModelAnalyzer analyzer)
+    SelectionHeuristic<Candidate> createBaseHeuristic()
     {
-      return analyzer.new SelectionHeuristicMinE();
+      return new SelectionHeuristicMinE();
     }
 
     @Override
-    AbstractSelectionHeuristic<Candidate> createChainHeuristic
-      (final AbstractCompositionalModelAnalyzer analyzer)
+    SelectionHeuristic<Candidate> createChainHeuristic()
     {
       return SelectionMethodFactory.createChainHeuristic
-        (analyzer, MinE, MaxL, MaxC, MinS);
+        (MinE, MaxL, MaxC, MinS);
     }
   };
 
@@ -2099,18 +2089,16 @@ public abstract class AbstractCompositionalModelAnalyzer
   public static final SelectionMethod MinF = new SelectionMethod("MinF")
   {
     @Override
-    AbstractSelectionHeuristic<Candidate> createBaseHeuristic
-      (final AbstractCompositionalModelAnalyzer analyzer)
+    SelectionHeuristic<Candidate> createBaseHeuristic()
     {
-      return analyzer.new SelectionHeuristicMinF();
+      return new SelectionHeuristicMinF();
     }
 
     @Override
-    AbstractSelectionHeuristic<Candidate> createChainHeuristic
-      (final AbstractCompositionalModelAnalyzer analyzer)
+    SelectionHeuristic<Candidate> createChainHeuristic()
     {
       return SelectionMethodFactory.createChainHeuristic
-        (analyzer, MinF, MinSync, MaxL, MaxC, MinE);
+        (MinF, MinSync, MaxL, MaxC, MinE);
     }
   };
 
@@ -2121,18 +2109,16 @@ public abstract class AbstractCompositionalModelAnalyzer
   public static final SelectionMethod MinS = new SelectionMethod("MinS")
   {
     @Override
-    AbstractSelectionHeuristic<Candidate> createBaseHeuristic
-      (final AbstractCompositionalModelAnalyzer analyzer)
+    SelectionHeuristic<Candidate> createBaseHeuristic()
     {
-      return analyzer.new SelectionHeuristicMinS();
+      return new SelectionHeuristicMinS();
     }
 
     @Override
-    AbstractSelectionHeuristic<Candidate> createChainHeuristic
-      (final AbstractCompositionalModelAnalyzer analyzer)
+    SelectionHeuristic<Candidate> createChainHeuristic()
     {
       return SelectionMethodFactory.createChainHeuristic
-        (analyzer, MinS, MaxL, MaxC, MinE);
+        (MinS, MaxL, MaxC, MinE);
     }
   };
 
@@ -2144,18 +2130,16 @@ public abstract class AbstractCompositionalModelAnalyzer
       new SelectionMethod("MinSync")
   {
     @Override
-    AbstractSelectionHeuristic<Candidate> createBaseHeuristic
-      (final AbstractCompositionalModelAnalyzer analyzer)
+    SelectionHeuristic<Candidate> createBaseHeuristic()
     {
-      return analyzer.new SelectionHeuristicMinSync();
+      return new SelectionHeuristicMinSync();
     }
 
     @Override
-    AbstractSelectionHeuristic<Candidate> createChainHeuristic
-      (final AbstractCompositionalModelAnalyzer analyzer)
+    SelectionHeuristic<Candidate> createChainHeuristic()
     {
       return SelectionMethodFactory.createChainHeuristic
-        (analyzer, MinSync, MaxL, MaxC, MinE);
+        (MinSync, MaxL, MaxC, MinE);
     }
   };
 
@@ -2644,51 +2628,46 @@ public abstract class AbstractCompositionalModelAnalyzer
 
 
   //#########################################################################
-  //# Inner Class SelectionHeuristicMaxL
-  private class SelectionHeuristicMaxL
-    extends AbstractNumericSelectionHeuristic<Candidate>
-  {
-
-    //#######################################################################
-    //# Overrides for AbstractNumericSelectionHeuristic<Candidate>
-    @Override
-    public double getHeuristicValue(final Candidate candidate)
-    {
-      return - (double) candidate.getLocalEventCount() /
-               candidate.getNumberOfEvents();
-    }
-
-  }
-
-
-  //#########################################################################
   //# Inner Class SelectionHeuristicMaxC
-  private class SelectionHeuristicMaxC
-    extends AbstractNumericSelectionHeuristic<Candidate>
+  private static class SelectionHeuristicMaxC
+    extends NumericSelectionHeuristic<Candidate>
   {
-
     //#######################################################################
     //# Overrides for AbstractNumericSelectionHeuristic<Candidate>
     @Override
-    public double getHeuristicValue(final Candidate candidate)
+    protected double getHeuristicValue(final Candidate candidate)
     {
       return - (double) candidate.getCommonEventCount() /
                candidate.getNumberOfEvents();
     }
+  }
 
+
+  //#########################################################################
+  //# Inner Class SelectionHeuristicMaxL
+  private static class SelectionHeuristicMaxL
+    extends NumericSelectionHeuristic<Candidate>
+  {
+    //#######################################################################
+    //# Overrides for AbstractNumericSelectionHeuristic<Candidate>
+    @Override
+    protected double getHeuristicValue(final Candidate candidate)
+    {
+      return - (double) candidate.getLocalEventCount() /
+               candidate.getNumberOfEvents();
+    }
   }
 
 
   //#########################################################################
   //# Inner Class SelectionHeuristicMinE
-  private class SelectionHeuristicMinE
-    extends AbstractNumericSelectionHeuristic<Candidate>
+  private static class SelectionHeuristicMinE
+    extends NumericSelectionHeuristic<Candidate>
   {
-
     //#######################################################################
     //# Overrides for AbstractNumericSelectionHeuristic<Candidate>
     @Override
-    public double getHeuristicValue(final Candidate candidate)
+    protected double getHeuristicValue(final Candidate candidate)
     {
       final int unionAlphabetSize = candidate.getNumberOfEvents();
       int largestAlphabetSize = 0;
@@ -2700,20 +2679,24 @@ public abstract class AbstractCompositionalModelAnalyzer
       }
       return (double) unionAlphabetSize / (double) largestAlphabetSize;
     }
-
   }
 
 
   //#########################################################################
   //# Inner Class SelectionHeuristicMinF
-  private class SelectionHeuristicMinF
-    extends AbstractNumericSelectionHeuristic<Candidate>
+  private static class SelectionHeuristicMinF
+    extends NumericSelectionHeuristic<Candidate>
   {
-
     //#######################################################################
     //# Overrides for AbstractNumericSelectionHeuristic<Candidate>
     @Override
-    public double getHeuristicValue(final Candidate candidate)
+    public void setContext(final Object context)
+    {
+      mAnalyzer = (AbstractCompositionalModelAnalyzer) context;
+    }
+
+    @Override
+    protected double getHeuristicValue(final Candidate candidate)
     {
       final Collection<AutomatonProxy> automata = candidate.getAutomata();
       final Collection<AutomatonProxy> frontier = new THashSet<AutomatonProxy>();
@@ -2721,7 +2704,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       final Collection<EventProxy> shared = new THashSet<EventProxy>();
       for (final AutomatonProxy aut : automata) {
         for (final EventProxy event : aut.getEvents()) {
-          final EventInfo info = getEventInfo(event);
+          final EventInfo info = mAnalyzer.getEventInfo(event);
           if (info != null && !local.contains(event) && shared.add(event)) {
             for (final AutomatonProxy other : info.getSortedAutomataList()) {
               if (!automata.contains(other)) {
@@ -2734,19 +2717,21 @@ public abstract class AbstractCompositionalModelAnalyzer
       return frontier.size();
     }
 
+    //#######################################################################
+    //# Data Members
+    private AbstractCompositionalModelAnalyzer mAnalyzer;
   }
 
 
   //#########################################################################
   //# Inner Class SelectionHeuristicMinS
-  private class SelectionHeuristicMinS
-    extends AbstractNumericSelectionHeuristic<Candidate>
+  private static class SelectionHeuristicMinS
+    extends NumericSelectionHeuristic<Candidate>
   {
-
     //#######################################################################
     //# Overrides for AbstractNumericSelectionHeuristic<Candidate>
     @Override
-    public double getHeuristicValue(final Candidate candidate)
+    protected double getHeuristicValue(final Candidate candidate)
     {
       double product = 1.0;
       for (final AutomatonProxy aut : candidate.getAutomata()) {
@@ -2756,33 +2741,39 @@ public abstract class AbstractCompositionalModelAnalyzer
       final double localEvents = candidate.getLocalEventCount();
       return product * (totalEvents - localEvents) / totalEvents;
     }
-
   }
 
 
   //#########################################################################
   //# Inner Class SelectionHeuristicMinSync
-  private class SelectionHeuristicMinSync
-    extends AbstractNumericSelectionHeuristic<Candidate>
+  private static class SelectionHeuristicMinSync
+    extends NumericSelectionHeuristic<Candidate>
   {
-
     //#######################################################################
     //# Overrides for AbstractNumericSelectionHeuristic<Candidate>
     @Override
-    public double getHeuristicValue(final Candidate candidate)
+    public void setContext(final Object context)
     {
-      mSynchronousProductBuilder.setNodeLimit(mStateLimit);
-      mSynchronousProductBuilder.setConstructsResult(false);
-      mSynchronousProductBuilder.setStateCallback(null);
+      mAnalyzer = (AbstractCompositionalModelAnalyzer) context;
+      mStateLimit = mAnalyzer.getCurrentInternalStateLimit();
+    }
+
+    @Override
+    protected double getHeuristicValue(final Candidate candidate)
+    {
+      final MonolithicSynchronousProductBuilder syncBuilder =
+        mAnalyzer.getSynchronousProductBuilder();
+      syncBuilder.setNodeLimit(mStateLimit);
+      syncBuilder.setConstructsResult(false);
+      syncBuilder.setStateCallback(null);
       final List<EventProxy> empty = Collections.emptyList();
-      mSynchronousProductBuilder.setPropositions(empty);
+      syncBuilder.setPropositions(empty);
       final List<AutomatonProxy> automata = candidate.getAutomata();
-      final ProductDESProxy des = createProductDESProxy(automata);
-      mSynchronousProductBuilder.setModel(des);
+      final ProductDESProxy des = mAnalyzer.createProductDESProxy(automata);
+      syncBuilder.setModel(des);
       try {
-        mSynchronousProductBuilder.run();
-        final AnalysisResult result =
-          mSynchronousProductBuilder.getAnalysisResult();
+        syncBuilder.run();
+        final AnalysisResult result = syncBuilder.getAnalysisResult();
         final double dsize = result.getTotalNumberOfStates();
         final int size = (int) Math.round(dsize);
         if (size < mStateLimit) {
@@ -2790,31 +2781,31 @@ public abstract class AbstractCompositionalModelAnalyzer
         }
         return dsize;
       } catch (final OutOfMemoryError error) {
-        getLogger().debug("<out of memory>");
+        final Logger logger = mAnalyzer.getLogger();
+        logger.debug("<out of memory>");
         return Double.POSITIVE_INFINITY;
       } catch (final OverflowException overflow) {
         return Double.POSITIVE_INFINITY;
       } catch (final AnalysisException exception) {
         throw exception.getRuntimeException();
       } finally {
-        final CompositionalAnalysisResult stats = getAnalysisResult();
-        final AutomatonResult result =
-          mSynchronousProductBuilder.getAnalysisResult();
+        final CompositionalAnalysisResult stats = mAnalyzer.getAnalysisResult();
+        final AutomatonResult result = syncBuilder.getAnalysisResult();
         stats.addSynchronousProductAnalysisResult(result);
       }
     }
 
     @Override
-    public void reset()
+    protected void reset()
     {
       super.reset();
-      mStateLimit = mCurrentInternalStateLimit;
+      mStateLimit = mAnalyzer.getCurrentInternalStateLimit();
     }
 
     //#######################################################################
     //# Data Members
-    private int mStateLimit = mCurrentInternalStateLimit;
-
+    private AbstractCompositionalModelAnalyzer mAnalyzer;
+    private int mStateLimit;
   }
 
 
@@ -2984,7 +2975,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   private MonolithicSynchronousProductBuilder mSynchronousProductBuilder;
   private AbstractionProcedure mAbstractionProcedure;
   private PreselectingHeuristic mPreselectingHeuristic;
-  private AbstractSelectionHeuristic<Candidate> mSelectingHeuristic;
+  private SelectionHeuristic<Candidate> mSelectionHeuristic;
 
 
   //#########################################################################

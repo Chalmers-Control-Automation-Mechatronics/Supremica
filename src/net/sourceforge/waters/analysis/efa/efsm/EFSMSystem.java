@@ -9,7 +9,12 @@
 
 package net.sourceforge.waters.analysis.efa.efsm;
 
+import gnu.trove.set.hash.THashSet;
+
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.analysis.efa.base.AbstractEFASystem;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
@@ -76,6 +81,49 @@ class EFSMSystem
     for (final EFSMTransitionRelation tran : getTransitionRelations()) {
       tran.removeVariable(var);
     }
+  }
+
+
+  //#########################################################################
+  //# Heuristic Support
+  /**
+   * Returns a list of all local variables in this system,
+   * in the order in which they are listed.
+   */
+  List<EFSMVariable> getLocalVariables()
+  {
+    final List<EFSMVariable> all = getVariables();
+    final List<EFSMVariable> local = new ArrayList<>(all.size());
+    for (final EFSMVariable var : all) {
+      if (var.isLocal()) {
+        local.add(var);
+      }
+    }
+    return local;
+  }
+
+  /**
+   * Returns a set of all pairs of transition relations in this system
+   * that share at least one variable.
+   */
+  Set<EFSMPair> getPairs()
+  {
+    final Set<EFSMPair> pairs = new THashSet<>();
+    for (final EFSMVariable var : getVariables()) {
+      final Collection<EFSMTransitionRelation> efsmTRSet =
+        var.getTransitionRelations();
+      final List<EFSMTransitionRelation> efsmTRList =
+        new ArrayList<EFSMTransitionRelation>(efsmTRSet);
+      for (int i = 0; i < efsmTRList.size(); i++) {
+        final EFSMTransitionRelation efsmTR1 = efsmTRList.get(i);
+        for (int j = i + 1; j < efsmTRList.size(); j++) {
+          final EFSMTransitionRelation efsmTR2 = efsmTRList.get(j);
+          final EFSMPair pair = new EFSMPair(efsmTR1, efsmTR2);
+          pairs.add(pair);
+        }
+      }
+    }
+    return pairs;
   }
 
 }

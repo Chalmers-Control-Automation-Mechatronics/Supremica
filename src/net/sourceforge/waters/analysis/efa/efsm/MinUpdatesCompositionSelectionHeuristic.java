@@ -11,9 +11,9 @@ package net.sourceforge.waters.analysis.efa.efsm;
 
 import gnu.trove.set.hash.THashSet;
 
-import java.util.List;
 import java.util.Set;
 
+import net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 
@@ -28,20 +28,25 @@ import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
  */
 
 public class MinUpdatesCompositionSelectionHeuristic
-  extends CompositionSelectionHeuristic
+  extends NumericSelectionHeuristic<EFSMPair>
 {
 
   //#########################################################################
-  //# Invocation
+  //# Overrides for
+  //# net.sourceforge.waters.analysis.compositional.AbstractNumericSelectionHeuristic
   @Override
-  public double getHeuristicValue(final List<EFSMTransitionRelation> candidate)
+  protected double getHeuristicValue(final EFSMPair candidate)
   {
     final Set<ConstraintList> updates = new THashSet<ConstraintList>();
-    for (final EFSMTransitionRelation efsmTR : candidate) {
-      final EFSMEventEncoding efsmEncoding = efsmTR.getEventEncoding();
-      for (int e = EventEncoding.NONTAU; e < efsmEncoding.size(); e++) {
-        updates.add(efsmEncoding.getUpdate(e));
-      }
+    final EFSMEventEncoding encoding1 =
+      candidate.getFirst().getEventEncoding();
+    for (int e = EventEncoding.NONTAU; e < encoding1.size(); e++) {
+      updates.add(encoding1.getUpdate(e));
+    }
+    final EFSMEventEncoding encoding2 =
+      candidate.getSecond().getEventEncoding();
+    for (int e = EventEncoding.NONTAU; e < encoding2.size(); e++) {
+      updates.add(encoding2.getUpdate(e));
     }
     return updates.size();
   }

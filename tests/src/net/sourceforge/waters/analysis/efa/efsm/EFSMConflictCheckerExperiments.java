@@ -25,8 +25,7 @@ import net.sourceforge.waters.analysis.bdd.TransitionPartitioningStrategy;
 import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer;
 import net.sourceforge.waters.analysis.compositional.CompositionalConflictChecker;
 import net.sourceforge.waters.analysis.compositional.ConflictAbstractionProcedureFactory;
-import net.sourceforge.waters.analysis.efa.efsm.CompositionSelectionHeuristic;
-import net.sourceforge.waters.analysis.efa.efsm.EFSMConflictChecker;
+import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -65,7 +64,7 @@ public class EFSMConflictCheckerExperiments
 
   public EFSMConflictCheckerExperiments
     (final String statsFilename,
-     final CompositionSelectionHeuristic compositionSelectionHeuristic)
+     final SelectionHeuristic<EFSMPair> compositionSelectionHeuristic)
     throws FileNotFoundException
   {
     final String outputprop = System.getProperty("waters.test.outputdir");
@@ -542,6 +541,6 @@ public class EFSMConflictCheckerExperiments
 
   private final int mTimeout = 1200;  // 20 minutes
   private final int mInternalTransitionLimit = 1000000;
-  private final CompositionSelectionHeuristic mCompositionSelectionHeuristic;
+  private final SelectionHeuristic<EFSMPair> mCompositionSelectionHeuristic;
 
 }

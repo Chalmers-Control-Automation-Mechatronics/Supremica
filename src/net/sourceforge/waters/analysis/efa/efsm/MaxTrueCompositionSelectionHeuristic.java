@@ -9,8 +9,7 @@
 
 package net.sourceforge.waters.analysis.efa.efsm;
 
-import java.util.List;
-
+import net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -27,29 +26,34 @@ import net.sourceforge.waters.analysis.tr.TransitionIterator;
  */
 
 public class MaxTrueCompositionSelectionHeuristic
-  extends CompositionSelectionHeuristic
+  extends NumericSelectionHeuristic<EFSMPair>
 {
 
   //#########################################################################
-  //# Invocation
+  //# Overrides for
+  //# net.sourceforge.waters.analysis.compositional.AbstractNumericSelectionHeuristic
   @Override
-  public double getHeuristicValue(final List<EFSMTransitionRelation> candidate)
+  protected double getHeuristicValue(final EFSMPair candidate)
   {
-    double numStates = 1.0;
-    double trueUpdates = 0.0;
-    double numTransitions = 0.0;
-    for (final EFSMTransitionRelation efsmTR : candidate) {
-      numStates *= efsmTR.getTransitionRelation().getNumberOfStates();
+    final ListBufferTransitionRelation rel1 =
+      candidate.getFirst().getTransitionRelation();
+    final ListBufferTransitionRelation rel2 =
+      candidate.getSecond().getTransitionRelation();
+    final double numStates =
+      rel1.getNumberOfStates() * rel2.getNumberOfStates();
+    final double numTransitions =
+      rel1.getNumberOfTransitions() * numStates / rel1.getNumberOfStates() +
+      rel2.getNumberOfTransitions() * numStates / rel2.getNumberOfStates();
+    int trueUpdates = 0;
+    final TransitionIterator iter1 =
+      rel1.createAllTransitionsReadOnlyIterator(EventEncoding.TAU);
+    while (iter1.advance()) {
+      trueUpdates++;
     }
-    for (final EFSMTransitionRelation efsmTR : candidate) {
-      final ListBufferTransitionRelation rel = efsmTR.getTransitionRelation();
-      final TransitionIterator iter =
-        rel.createAllTransitionsReadOnlyIterator(EventEncoding.TAU);
-      while (iter.advance()) {
-        trueUpdates++;
-      }
-      numTransitions +=
-        rel.getNumberOfTransitions() * numStates / rel.getNumberOfStates();
+    final TransitionIterator iter2 =
+      rel1.createAllTransitionsReadOnlyIterator(EventEncoding.TAU);
+    while (iter2.advance()) {
+      trueUpdates++;
     }
     return - trueUpdates / numTransitions;
   }

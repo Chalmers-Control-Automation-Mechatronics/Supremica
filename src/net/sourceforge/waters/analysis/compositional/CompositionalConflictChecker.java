@@ -48,6 +48,8 @@ import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.des.ConflictKind;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * <P>A compositional conflict checker that can be configured to use different
@@ -835,30 +837,16 @@ public class CompositionalConflictChecker
     new SelectionMethod("MinSa")
   {
     @Override
-    AbstractSelectionHeuristic<Candidate> createBaseHeuristic
-      (final AbstractCompositionalModelAnalyzer analyzer)
+    SelectionHeuristic<Candidate> createBaseHeuristic()
     {
-      final CompositionalConflictChecker checker =
-        (CompositionalConflictChecker) analyzer;
-      if (checker.getUsedPreconditionMarking() == null) {
-        return MinS.createBaseHeuristic(analyzer);
-      } else {
-        return checker.new SelectionHeuristicMinSAlpha();
-      }
+      return new SelectionHeuristicMinSAlpha();
     }
 
     @Override
-    AbstractSelectionHeuristic<Candidate> createChainHeuristic
-      (final AbstractCompositionalModelAnalyzer analyzer)
+    SelectionHeuristic<Candidate> createChainHeuristic()
     {
-      final CompositionalConflictChecker checker =
-        (CompositionalConflictChecker) analyzer;
-      if (checker.getUsedPreconditionMarking() == null) {
-        return MinS.createChainHeuristic(analyzer);
-      } else {
-        return SelectionMethodFactory.createChainHeuristic
-          (analyzer, MinSa, MinS, MaxL, MaxC, MinE);
-      }
+      return SelectionMethodFactory.createChainHeuristic
+        (MinSa, MinS, MaxL, MaxC, MinE);
     }
   };
 
@@ -870,30 +858,16 @@ public class CompositionalConflictChecker
       new SelectionMethod("MinSyncA")
   {
     @Override
-    AbstractSelectionHeuristic<Candidate> createBaseHeuristic
-      (final AbstractCompositionalModelAnalyzer analyzer)
+    SelectionHeuristic<Candidate> createBaseHeuristic()
     {
-      final CompositionalConflictChecker checker =
-        (CompositionalConflictChecker) analyzer;
-      if (checker.getUsedPreconditionMarking() == null) {
-        return MinSync.createBaseHeuristic(analyzer);
-      } else {
-        return checker.new SelectionHeuristicMinSyncAlpha(1, 0);
-      }
+      return new SelectionHeuristicMinSyncAlpha(1, 0);
     }
 
     @Override
-    AbstractSelectionHeuristic<Candidate> createChainHeuristic
-      (final AbstractCompositionalModelAnalyzer analyzer)
+    SelectionHeuristic<Candidate> createChainHeuristic()
     {
-      final CompositionalConflictChecker checker =
-        (CompositionalConflictChecker) analyzer;
-      if (checker.getUsedPreconditionMarking() == null) {
-        return MinSync.createChainHeuristic(analyzer);
-      } else {
-        return SelectionMethodFactory.createChainHeuristic
-          (analyzer, MinSyncA, MinS, MaxL, MaxC, MinE);
-      }
+      return SelectionMethodFactory.createChainHeuristic
+        (MinSyncA, MinS, MaxL, MaxC, MinE);
     }
   };
 
@@ -1081,30 +1055,40 @@ public class CompositionalConflictChecker
 
   //#########################################################################
   //# Inner Class SelectionHeuristicMinSAlpha
-  private class SelectionHeuristicMinSAlpha
-    extends AbstractNumericSelectionHeuristic<Candidate>
+  private static class SelectionHeuristicMinSAlpha
+    extends NumericSelectionHeuristic<Candidate>
   {
     //#######################################################################
     //# Overrides for AbstractNumericSelectionHeuristic<Candidate>
+    @Override
+    public void setContext(final Object context)
+    {
+      mChecker = (CompositionalConflictChecker) context;
+    }
+
     @Override
     public double getHeuristicValue(final Candidate candidate)
     {
       double product = 1.0;
       for (final AutomatonProxy aut : candidate.getAutomata()) {
-        final AutomatonInfo info = getAutomatonInfo(aut);
+        final AutomatonInfo info = mChecker.getAutomatonInfo(aut);
         product *= info.getNumberOfPreconditionMarkedStates();
       }
       final double totalEvents = candidate.getNumberOfEvents();
       final double localEvents = candidate.getLocalEventCount();
       return product * (totalEvents - localEvents) / totalEvents;
     }
+
+    //#######################################################################
+    //# Data Members
+    private CompositionalConflictChecker mChecker;
   }
 
 
   //#########################################################################
   //# Inner Class SelectionHeuristicMinSyncAlpha
-  private class SelectionHeuristicMinSyncAlpha
-    extends AbstractNumericSelectionHeuristic<Candidate>
+  private static class SelectionHeuristicMinSyncAlpha
+    extends NumericSelectionHeuristic<Candidate>
     implements MonolithicSynchronousProductBuilder.StateCallback
   {
     //#######################################################################
@@ -1120,33 +1104,41 @@ public class CompositionalConflictChecker
     //#######################################################################
     //# Overrides for AbstractNumericSelectionHeuristic<Candidate>
     @Override
+    public void setContext(final Object context)
+    {
+      mChecker = (CompositionalConflictChecker) context;
+    }
+
+    @Override
     public double getHeuristicValue(final Candidate candidate)
     {
-      final MonolithicSynchronousProductBuilder builder =
-        getSynchronousProductBuilder();
-      final int limit = getCurrentInternalStateLimit();
-      builder.setNodeLimit(limit);
-      builder.setConstructsResult(false);
-      builder.setStateCallback(this);
+      final MonolithicSynchronousProductBuilder syncBuilder =
+        mChecker.getSynchronousProductBuilder();
+      final int limit = mChecker.getCurrentInternalStateLimit();
+      syncBuilder.setNodeLimit(limit);
+      syncBuilder.setConstructsResult(false);
+      syncBuilder.setStateCallback(this);
       final List<AutomatonProxy> automata = candidate.getAutomata();
-      final ProductDESProxy des = createProductDESProxy(automata);
-      builder.setModel(des);
+      final ProductDESProxy des = mChecker.createProductDESProxy(automata);
+      syncBuilder.setModel(des);
       try {
         mCount = 0;
-        builder.run();
+        syncBuilder.run();
         if (mCount < mCurrentMinimum) {
           mCurrentMinimum = mCount;
         }
       } catch (final OutOfMemoryError error) {
-        getLogger().debug("<out of memory>");
+        final Logger logger = mChecker.getLogger();
+        logger.debug("<out of memory>");
         return Double.POSITIVE_INFINITY;
       } catch (final OverflowException overflow) {
         return Double.POSITIVE_INFINITY;
       } catch (final AnalysisException exception) {
         throw exception.getRuntimeException();
       } finally {
-        final CompositionalVerificationResult stats = getAnalysisResult();
-        final AutomatonResult result = builder.getAnalysisResult();
+        final CompositionalVerificationResult stats =
+          mChecker.getAnalysisResult();
+        final AutomatonResult result = syncBuilder.getAnalysisResult();
         stats.addSynchronousProductAnalysisResult(result);
       }
       return mCount;
@@ -1166,12 +1158,12 @@ public class CompositionalConflictChecker
     public boolean newState(final int[] tuple)
       throws OverflowException
     {
-      final MonolithicSynchronousProductBuilder builder =
-        getSynchronousProductBuilder();
+      final MonolithicSynchronousProductBuilder syncBuilder =
+        mChecker.getSynchronousProductBuilder();
       boolean alpha = true;
       for (int a = 0; a < tuple.length; a++) {
         final List<EventProxy> props =
-          builder.getStateMarking(a, tuple[a]);
+          syncBuilder.getStateMarking(a, tuple[a]);
         if (props.isEmpty()) {
           alpha = false;
           break;
@@ -1198,6 +1190,7 @@ public class CompositionalConflictChecker
     //# Data Members
     private final int mAlphaWeight;
     private final int mNonAlphaWeight;
+    private CompositionalConflictChecker mChecker;
     private int mCount;
     private int mCurrentMinimum;
   }

@@ -11,9 +11,9 @@ package net.sourceforge.waters.analysis.efa.efsm;
 
 import gnu.trove.set.hash.THashSet;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Set;
+
+import net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic;
 
 
 /**
@@ -27,19 +27,19 @@ import java.util.Set;
  */
 
 public class MinSharedVariablesCompositionSelectionHeuristic
-  extends CompositionSelectionHeuristic
+  extends NumericSelectionHeuristic<EFSMPair>
 {
 
   //#########################################################################
-  //# Invocation
+  //# Overrides for
+  //# net.sourceforge.waters.analysis.compositional.AbstractNumericSelectionHeuristic
   @Override
-  public double getHeuristicValue(final List<EFSMTransitionRelation> candidate)
+  protected double getHeuristicValue(final EFSMPair candidate)
   {
     final Set<EFSMVariable> vars = new THashSet<EFSMVariable>();
-    for (final EFSMTransitionRelation efsmTR : candidate) {
+    for (final EFSMTransitionRelation efsmTR : candidate.asArray()) {
       for (final EFSMVariable var : efsmTR.getVariables()) {
-        final Collection<EFSMTransitionRelation> trs =
-          var.getTransitionRelations();
+        final Set<EFSMTransitionRelation> trs = var.getTransitionRelations();
         if (!candidate.containsAll(trs)) {
           vars.add(var);
         }

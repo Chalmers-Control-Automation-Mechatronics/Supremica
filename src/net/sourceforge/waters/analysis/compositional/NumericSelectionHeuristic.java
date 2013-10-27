@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.compositional
-//# CLASS:   AbstractNumericSelectionHeuristic
+//# CLASS:   NumericSelectionHeuristic
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -11,11 +11,16 @@ package net.sourceforge.waters.analysis.compositional;
 
 
 /**
+ * A selection heuristic based on the computation of a numeric heuristic
+ * value. A new heuristic is created by creating a subclass of this class
+ * and implementing the {@link #getHeuristicValue(Object) getHeuristicValue()}
+ * method.
+ *
  * @author Robi Malik
  */
 
-public abstract class AbstractNumericSelectionHeuristic<T>
-  extends AbstractSelectionHeuristic<T>
+public abstract class NumericSelectionHeuristic<T>
+  extends SelectionHeuristic<T>
 {
 
   //#########################################################################
@@ -55,16 +60,27 @@ public abstract class AbstractNumericSelectionHeuristic<T>
   //# Overrides for Abstract Base Class
   //# net.sourceforge.waters.analysis.compositional.AbstractHeuristic
   @Override
-  public void reset()
+  protected void reset()
   {
     mBestCandidate = null;
     mBestValue = Double.POSITIVE_INFINITY;
   }
 
+  @Override
+  protected void setBestCandidate(final T best)
+  {
+    mBestCandidate = best;
+  }
+
 
   //#########################################################################
   //# Abstract Methods
-  public abstract double getHeuristicValue(T candidate);
+  /**
+   * Computes the heuristic value of the given candidate.
+   * The numeric heuristic gives preference to the candidate with the
+   * smallest heuristic value.
+   */
+  protected abstract double getHeuristicValue(T candidate);
 
 
   //#########################################################################
