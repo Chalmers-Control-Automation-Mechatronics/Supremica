@@ -2,9 +2,11 @@
 <Module Name="pml3" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>Parallel manufacturing lines (PML) model.
 
-The system consists of M=3 parallel manufacturing lines, each processing workpieces of a particular type. Each line consists of N+1 machines, numbered machine[n][m] for n=0..N and m=1..M. The first machines in each line are called loaders, loader[m], and the last machines in each line are called unloaders, unloader[m]. The parallel lines share N buffers, numbered B[n] for n=1..N, of capacity C. The buffers can store workpieces of different type, but never more than C workpieces at a time. The manufacturing line is controlled such that the number of workpieces in the machines numbered n and the following buffer numbered n+1 never exceeds C, thus ensuring controllability even if machines complete their work uncontrollably. This control is faciltated by the variables Mtotal[n], for n=0..N-1, which hold the total number of workpieces processed by the machines numbered n.
+The system consists of M=3 parallel manufacturing lines, each processing workpieces of a particular type. Each line consists of N+1 machines, numbered machine[n][m] for n=0..N and m=1..M. The first machines in each line are called loaders, loader[m], and the last machines in each line are called unloaders, unloader[m].
+The parallel lines share N buffers, numbered B[n] for n=1..N, of capacity C. The buffers can store workpieces of different type, but never more than C workpieces at a time. Each buffer n is represented by m variables B[n][m] representing the number of type m workpieces in buffer n. Their sum cannot exceed the buffer capacity C.
+The manufacturing line is controlled such that the number of workpieces in the machines numbered n and the following buffer numbered n+1 never exceeds C, thus ensuring controllability even if machines complete their work uncontrollably. This control is faciltated by the variables Mtotal[n], for n=0..N-1, which hold the total number of workpieces currently processed by the machines numbered n.
 
-This parameters of this model are the number M and the capacity C of the buffers, which can be varied freely. The number M of lines is fixed at 3 in this model, as changing it also requires changing the guards in components loader[m] and machine[n][m].</ns2:Comment>
+The parameters of this model are the number N and the capacity C of the buffers, which can be varied freely. The number M of lines is fixed at 3 in this model, as changing it also requires changing the guards in components loader[m] and machine[n][m].</ns2:Comment>
     <ConstantAliasList>
         <ConstantAlias Scope="OPTIONAL_PARAMETER" Name="C">
             <ConstantAliasExpression>
