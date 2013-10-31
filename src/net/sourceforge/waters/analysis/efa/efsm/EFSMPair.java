@@ -95,6 +95,12 @@ class EFSMPair implements Comparable<EFSMPair>
     return array;
   }
 
+  boolean contains(final EFSMTransitionRelation efsmTR)
+  {
+    return mEFSMTransitionRelation1 == efsmTR ||
+           mEFSMTransitionRelation2 == efsmTR;
+  }
+
   boolean containsAll(final Set<EFSMTransitionRelation> set)
   {
     if (set.size() > 2) {
@@ -108,6 +114,16 @@ class EFSMPair implements Comparable<EFSMPair>
       }
       return true;
     }
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  @Override
+  public String toString()
+  {
+    return mEFSMTransitionRelation1.getName() + "||" +
+           mEFSMTransitionRelation2.getName();
   }
 
 
