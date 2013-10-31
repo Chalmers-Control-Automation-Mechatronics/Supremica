@@ -1,7 +1,7 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters EFSM Analysis
-//# PACKAGE: net.sourceforge.waters.analysis.efa
+//# PACKAGE: net.sourceforge.waters.analysis.efa.efsm
 //# CLASS:   EFSMConflictChecker
 //###########################################################################
 //# $Id$
@@ -23,8 +23,8 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 
-import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.ChainSelectionHeuristic;
+import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.analysis.efa.base.EFANonblockingChecker;
 import net.sourceforge.waters.analysis.tr.BFSSearchSpace;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -43,9 +43,15 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
+import org.apache.log4j.Logger;
+
+
 /**
+ * The compositional EFSM-based conflict check algorithm.
+ *
  * @author Robi Malik, Sahar Mohajerani
  */
+
 public class EFSMConflictChecker extends AbstractModuleConflictChecker
 {
 
@@ -62,7 +68,8 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
     super(model, factory);
   }
 
-  public EFSMConflictChecker(final ModuleProxy model, final IdentifierProxy marking,
+  public EFSMConflictChecker(final ModuleProxy model,
+                             final IdentifierProxy marking,
                              final ModuleProxyFactory factory)
   {
     super(model, marking, factory);
@@ -228,6 +235,16 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
     mUnfoldingCache = new EFSMUnfoldingCache(this);
     mVariableSelectionHeuristic.setContext(mUnfoldingCache);
     if (mCompositionSelectionHeuristic == null) {
+      /*
+      final SelectionHeuristic<EFSMPair> minV =
+        new MinSharedVariablesCompositionSelectionHeuristic();
+      final SelectionHeuristic<EFSMPair> minF =
+        new MinFrontierCompositionSelectionHeuristic();
+      final SelectionHeuristic<EFSMPair> minSynch =
+        new MinSynchCompositionSelectionHeuristic();
+      mCompositionSelectionHeuristic =
+        new ChainSelectionHeuristic<EFSMPair>(minV, minF, minSynch);
+      */
       final SelectionHeuristic<EFSMPair> minSynch =
         new MinSynchCompositionSelectionHeuristic();
       mCompositionSelectionHeuristic =
@@ -343,6 +360,7 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
   private boolean runCompositionalMinimization()
     throws AnalysisException, EvalException
   {
+    final Logger logger = getLogger();
     final EFSMConflictCheckerAnalysisResult result = getAnalysisResult();
     while (!mCurrentEFSMSystem.getTransitionRelations().isEmpty()) {
       if (isCurrentSubsystemTrivial()) {
@@ -362,6 +380,7 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
       final EFSMVariable varSelected =
         mVariableSelectionHeuristic.select(localVars);
       if (varSelected != null) {
+        logger.debug("UNFOLDING: " + varSelected.getName());
         result.addCompositionAttempt();
         final EFSMTransitionRelation varEFSMTransitionRelation =
           varSelected.getTransitionRelation();
@@ -403,6 +422,7 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
         final Set<EFSMPair> pairs = mCurrentEFSMSystem.getPairs();
         final EFSMPair selectedPair =
           mCompositionSelectionHeuristic.select(pairs);
+        logger.debug("COMPOSING: " + selectedPair);
         final EFSMTransitionRelation TR1 = selectedPair.getFirst();
         final EFSMTransitionRelation TR2 = selectedPair.getSecond();
         final EFSMTransitionRelation synchTR =

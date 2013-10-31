@@ -233,6 +233,19 @@ public class EFSMConflictCheckerTest
     checkTransferLineRework("transferline_efsm_rework_block", 3, 3, false);
   }
 
+  public void testPML52()
+    throws IOException, WatersException
+  {
+    checkPML("pml3", 5, 2, true);
+  }
+
+  public void testPML52block()
+    throws IOException, WatersException
+  {
+    checkPML("pml3block", 5, 2, false);
+  }
+
+
   /*---------------------------- PROFIsafe ---------------------------------*/
 
   public void testProfisafeIHost4()
@@ -465,6 +478,26 @@ public class EFSMConflictCheckerTest
     final ParameterBindingProxy bindingR =
       factory.createParameterBindingProxy("R", constR);
     bindings.add(bindingR);
+    final IntConstantProxy constN = factory.createIntConstantProxy(n);
+    final ParameterBindingProxy bindingN =
+      factory.createParameterBindingProxy("N", constN);
+    bindings.add(bindingN);
+    checkConflict(module, bindings, expect);
+  }
+
+  void checkPML(final String name,
+                final int c, final int n,
+                final boolean expect)
+    throws IOException, WatersException
+  {
+    final ModuleProxyFactory factory = getModuleProxyFactory();
+    final ModuleProxy module = loadModule("efa", name);
+    final List<ParameterBindingProxy> bindings =
+      new ArrayList<ParameterBindingProxy>(2);
+    final IntConstantProxy constC = factory.createIntConstantProxy(c);
+    final ParameterBindingProxy bindingC =
+      factory.createParameterBindingProxy("C", constC);
+    bindings.add(bindingC);
     final IntConstantProxy constN = factory.createIntConstantProxy(n);
     final ParameterBindingProxy bindingN =
       factory.createParameterBindingProxy("N", constN);

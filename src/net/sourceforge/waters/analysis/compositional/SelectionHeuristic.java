@@ -13,6 +13,8 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * <P>An abstract type to represent an arbitrary selection heuristic.
@@ -36,6 +38,8 @@ public abstract class SelectionHeuristic<T>
   implements Comparator<T>
 {
 
+  //#########################################################################
+  //# Heuristics
   /**
    * Sets the context in which the heuristic runs.
    * This method is called when a heuristic is register with a model analyser
@@ -92,6 +96,15 @@ public abstract class SelectionHeuristic<T>
    */
   protected void setBestCandidate(final T best)
   {
+  }
+
+
+  //#########################################################################
+  //# Logging
+  public Logger getLogger()
+  {
+    final Class<?> clazz = getClass();
+    return Logger.getLogger(clazz);
   }
 
 }

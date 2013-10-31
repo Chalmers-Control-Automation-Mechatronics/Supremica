@@ -261,6 +261,7 @@ class EFSMTRSimplifier extends AbstractEFSMAlgorithm
             rel.getNumberOfMarkings() == numMarkings) {
           return null;
         }
+        final int newProp = rel.isUsedProposition(0) ? 0 : -1;
         final EFSMEventEncoding eventEncoding = efsmTR.getEventEncoding();
         final int numEvents = eventEncoding.size();
         int newNumEvents = 1;
@@ -310,13 +311,14 @@ class EFSMTRSimplifier extends AbstractEFSMAlgorithm
         if (newNumReachableStates == numStates && newNumEvents == numEvents) {
           newRel = rel;
         } else {
+          final int newNumProps = newProp < 0 ? 0 : 1;
           newRel = new ListBufferTransitionRelation(rel.getName(),
                                                     rel.getKind(),
                                                     newNumEvents,
-                                                    rel.getNumberOfPropositions(),
+                                                    newNumProps,
                                                     newNumReachableStates,
                                                     rel.getConfiguration());
-          for (int s=0; s < newNumStates; s++) {
+          for (int s = 0; s < newNumStates; s++) {
             final int newCode = stateEncoding == null ? s : stateEncoding[s];
             if (newCode >= 0) {
               if (rel.isInitial(s)) {
