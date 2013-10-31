@@ -266,27 +266,27 @@ public class ProxyNamer {
           removedForeach = true;
         }
       }
-      // Otherwise find most general supertype and use it name ...
+      // Otherwise find most general supertype and use its name ...
       int count = 0;
       Class<? extends Proxy> iface = null;
       for (final Map.Entry<Class<? extends Proxy>,Integer> entry :
            map.entrySet()) {
         final Class<? extends Proxy> key = entry.getKey();
-        iface = getLeastCommonAncestor(iface, key);
-        if (isConstituentOf(key, iface)) {
-          // leave count unchanged
-        } else {
+        final Class<? extends Proxy> ancestor =
+          getLeastCommonAncestor(iface, key);
+        if (!isConstituentOf(key, ancestor)) {
           count += entry.getValue();
+        } else if (iface != ancestor) {
+          count = 1;
         }
+        iface = ancestor;
       }
       final NameEntry entry = getEntry(iface);
-      if(removedForeach){
+      if (removedForeach) {
         return entry.getPlural();
-      }
-      else if(count == 1){
+      } else if (count == 1) {
         return entry.getSingular();
-      }
-      else{
+      } else {
         return entry.getPlural();
       }
     }

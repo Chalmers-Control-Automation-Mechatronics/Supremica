@@ -1,51 +1,73 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
+//# PROJECT: Waters EFSM Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efa.efsm
-//# CLASS:   MinStatesVariableSelectionHeuristic
+//# CLASS:   MaxTrueVariableSelectionHeuristic
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.efa.efsm;
 
+import net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic;
+import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
-import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
+
 
 /**
  * @author Robi Malik, Sahar Mohajerani
  */
-public class MaxTrueVariableSelectionHeuristic extends
-  VariableSelectionHeuristic
+
+public class MaxTrueVariableSelectionHeuristic
+  extends NumericSelectionHeuristic<EFSMVariable>
 {
-//#########################################################################
-  //# Constructors
-  public MaxTrueVariableSelectionHeuristic(final ModuleProxyFactory factory,
-                                             final CompilerOperatorTable op)
-  {
-    super(factory, op);
-  }
 
   //#########################################################################
-  //# Invocation
+  //# Overrides for
+  //# net.sourceforge.waters.analysis.compositional.AbstractNumericSelectionHeuristic
   @Override
-  public double getHeuristicValue(final EFSMVariable var)
-    throws AnalysisException, EvalException
+  public void setContext(final Object context)
   {
-    final EFSMTransitionRelation unfoldTR = unfold(var);
+    mCache = (EFSMUnfoldingCache) context;
+    mCache.register(this);
+  }
+
+  @Override
+  protected double getHeuristicValue(final EFSMVariable var)
+  {
+    final EFSMTransitionRelation unfoldTR = mCache.unfold(var);
+    if (unfoldTR == null) {
+      return Double.POSITIVE_INFINITY;
+    }
     final ListBufferTransitionRelation rel = unfoldTR.getTransitionRelation();
     final double transSize = rel.getNumberOfTransitions();
     final TransitionIterator iter = rel.createAllTransitionsReadOnlyIterator();
-    double trueCount = 0;
+    int trueCount = 0;
     while (iter.advance()) {
-      if (iter.getCurrentEvent() == 0) {
-        trueCount ++;
+      if (iter.getCurrentEvent() == EventEncoding.TAU) {
+        trueCount++;
       }
     }
-    return - trueCount/transSize;
+    return - trueCount / transSize;
   }
+
+  @Override
+  protected void setBestCandidate(final EFSMVariable var)
+  {
+    mCache.reset(this, var);
+  }
+
+  @Override
+  protected void reset()
+  {
+    super.reset();
+    mCache.reset(this);
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private EFSMUnfoldingCache mCache;
+
 }

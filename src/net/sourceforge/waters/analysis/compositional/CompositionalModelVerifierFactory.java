@@ -386,9 +386,9 @@ public class CompositionalModelVerifierFactory
         final String name = getValue();
         final CompositionalConflictChecker composer =
           (CompositionalConflictChecker) verifier;
-        final EnumFactory<AbstractCompositionalModelVerifier.SelectingMethod>
+        final EnumFactory<AbstractCompositionalModelVerifier.SelectionMethod>
           factory = composer.getSelectingMethodFactory();
-        final AbstractCompositionalModelVerifier.SelectingMethod method =
+        final AbstractCompositionalModelVerifier.SelectionMethod method =
           factory.getEnumValue(name);
         if (method == null) {
           System.err.println("Bad value for " + getName() + " option!");
@@ -411,7 +411,7 @@ public class CompositionalModelVerifierFactory
         super.dump(stream, verifier);
         final CompositionalConflictChecker composer =
           (CompositionalConflictChecker) verifier;
-        final EnumFactory<AbstractCompositionalModelVerifier.SelectingMethod>
+        final EnumFactory<AbstractCompositionalModelVerifier.SelectionMethod>
           factory = composer.getSelectingMethodFactory();
         factory.dumpEnumeration(stream, INDENT);
       }

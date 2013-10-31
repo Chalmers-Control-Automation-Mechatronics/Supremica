@@ -129,7 +129,7 @@ public class CompositionalAutomataSynthesizer extends
                                   final KindTranslator translator,
                                   final AutomataSynthesisAbstractionProcedureFactory abstractionFactory,
                                   final PreselectingMethodFactory preselectingMethodFactory,
-                                  final SelectingMethodFactory selectingMethodFactory)
+                                  final SelectionMethodFactory selectingMethodFactory)
   {
     this(null, factory, translator, abstractionFactory,
          preselectingMethodFactory, selectingMethodFactory);
@@ -154,7 +154,7 @@ public class CompositionalAutomataSynthesizer extends
                                   final AutomataSynthesisAbstractionProcedureFactory abstractionFactory)
   {
     this(model, factory, translator, abstractionFactory,
-         new PreselectingMethodFactory(), new SelectingMethodFactory());
+         new PreselectingMethodFactory(), new SelectionMethodFactory());
   }
 
   /**
@@ -181,7 +181,7 @@ public class CompositionalAutomataSynthesizer extends
                                   final KindTranslator translator,
                                   final AutomataSynthesisAbstractionProcedureFactory abstractionFactory,
                                   final PreselectingMethodFactory preselectingMethodFactory,
-                                  final SelectingMethodFactory selectingMethodFactory)
+                                  final SelectionMethodFactory selectingMethodFactory)
   {
     super(model, factory, translator, abstractionFactory,
           preselectingMethodFactory, selectingMethodFactory);

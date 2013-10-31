@@ -309,6 +309,7 @@ public class SubsetConstructionTRSimplifier
             } else {
               target = mSetOffsets.binarySearch(offset);
             }
+            // TODO Suppress selfloop-only selfloop?
             mTransitionBuffer.addTransition(source, event, target);
           }
         }

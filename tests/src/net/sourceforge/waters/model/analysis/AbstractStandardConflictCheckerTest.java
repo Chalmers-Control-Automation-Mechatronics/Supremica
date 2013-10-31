@@ -379,6 +379,23 @@ public abstract class AbstractStandardConflictCheckerTest
 
 
   //#########################################################################
+  //# Test Cases --- efa
+  public void test_CaseStudyNonblocking() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("efa", "caseStudy-nonblocking.wmod");
+    runModelVerifier(des, true);
+  }
+
+  public void test_CaseStudyOriginal() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("efa", "caseStudy-original.wmod");
+    runModelVerifier(des, false);
+  }
+
+
+  //#########################################################################
   //# Test Cases --- tests
   public void test_BallTimer() throws Exception
   {
@@ -857,13 +874,6 @@ public abstract class AbstractStandardConflictCheckerTest
   {
     final ProductDESProxy des =
       getCompiledDES("valid", "safetydisplay", "safetydisplay.wdes");
-    runModelVerifier(des, true);
-  }
-
-  public void testSmallFactory() throws Exception
-  {
-    final ProductDESProxy des =
-      getCompiledDES("valid", "small", "small.wdes");
     runModelVerifier(des, true);
   }
 

@@ -99,7 +99,7 @@ public abstract class AbstractCompositionalModelVerifier
      final KindTranslator translator,
      final AbstractionProcedureFactory abstractionFactory,
      final PreselectingMethodFactory preselectingMethodFactory,
-     final SelectingMethodFactory selectingMethodFactory)
+     final SelectionMethodFactory selectingMethodFactory)
   {
     super(factory, translator, abstractionFactory,
           preselectingMethodFactory, selectingMethodFactory);
@@ -148,7 +148,7 @@ public abstract class AbstractCompositionalModelVerifier
      final KindTranslator translator,
      final AbstractionProcedureFactory abstractionFactory,
      final PreselectingMethodFactory preselectingMethodFactory,
-     final SelectingMethodFactory selectingMethodFactory)
+     final SelectionMethodFactory selectingMethodFactory)
   {
     super(model, factory, translator, abstractionFactory,
           preselectingMethodFactory, selectingMethodFactory);

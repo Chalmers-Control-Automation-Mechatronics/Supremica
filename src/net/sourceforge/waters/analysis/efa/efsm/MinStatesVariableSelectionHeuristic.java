@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
+//# PROJECT: Waters EFSM Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efa.efsm
 //# CLASS:   MinStatesVariableSelectionHeuristic
 //###########################################################################
@@ -9,33 +9,53 @@
 
 package net.sourceforge.waters.analysis.efa.efsm;
 
-import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic;
+
 
 /**
  * @author Robi Malik, Sahar Mohajerani
  */
-public class MinStatesVariableSelectionHeuristic extends
-  VariableSelectionHeuristic
+public class MinStatesVariableSelectionHeuristic
+  extends NumericSelectionHeuristic<EFSMVariable>
 {
-  //#########################################################################
-  //# Constructors
-  public MinStatesVariableSelectionHeuristic(final ModuleProxyFactory factory,
-                                             final CompilerOperatorTable op)
-  {
-    super(factory, op);
-  }
 
   //#########################################################################
-  //# Invocation
+  //# Overrides for
+  //# net.sourceforge.waters.analysis.compositional.AbstractNumericSelectionHeuristic
   @Override
-  public double getHeuristicValue(final EFSMVariable var)
-    throws AnalysisException, EvalException
+  public void setContext(final Object context)
   {
-    final EFSMTransitionRelation unfoldTR =  unfold(var);
-    return unfoldTR.getTransitionRelation().getNumberOfStates();
+    mCache = (EFSMUnfoldingCache) context;
+    mCache.register(this);
   }
+
+  @Override
+  protected double getHeuristicValue(final EFSMVariable var)
+  {
+    final EFSMTransitionRelation unfoldTR =  mCache.unfold(var);
+    if (unfoldTR == null) {
+      return Double.POSITIVE_INFINITY;
+    } else {
+      return unfoldTR.getTransitionRelation().getNumberOfStates();
+    }
+  }
+
+  @Override
+  protected void setBestCandidate(final EFSMVariable var)
+  {
+    mCache.reset(this, var);
+  }
+
+  @Override
+  protected void reset()
+  {
+    super.reset();
+    mCache.reset(this);
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private EFSMUnfoldingCache mCache;
 
 }

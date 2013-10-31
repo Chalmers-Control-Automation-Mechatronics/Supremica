@@ -12,7 +12,6 @@ package net.sourceforge.waters.analysis.compositional;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -48,6 +47,8 @@ import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.des.ConflictKind;
+
+import org.apache.log4j.Logger;
 
 
 /**
@@ -157,7 +158,7 @@ public class CompositionalConflictChecker
          factory,
          abstractionFactory,
          new PreselectingMethodFactory(),
-         new SelectingMethodFactory());
+         new SelectionMethodFactory());
   }
 
   /**
@@ -182,7 +183,7 @@ public class CompositionalConflictChecker
      final ProductDESProxyFactory factory,
      final ConflictAbstractionProcedureFactory abstractionFactory,
      final AbstractCompositionalModelAnalyzer.PreselectingMethodFactory preselectingMethodFactory,
-     final AbstractCompositionalModelAnalyzer.SelectingMethodFactory selectingMethodFactory)
+     final AbstractCompositionalModelAnalyzer.SelectionMethodFactory selectingMethodFactory)
   {
     super(model,
           factory,
@@ -234,15 +235,15 @@ public class CompositionalConflictChecker
   }
 
   @Override
-  public void setSelectingMethod(final SelectingMethod method)
+  public void setSelectingMethod(final SelectionMethod method)
   {
     super.setSelectingMethod(method);
     if (mCompositionalSafetyVerifier instanceof CompositionalSafetyVerifier) {
       final CompositionalSafetyVerifier safetyVerifier =
         (CompositionalSafetyVerifier) mCompositionalSafetyVerifier;
-      final AbstractCompositionalModelVerifier.SelectingMethodFactory
+      final AbstractCompositionalModelVerifier.SelectionMethodFactory
         factory = safetyVerifier.getSelectingMethodFactory();
-      final SelectingMethod safetyMethod = factory.getEnumValue(method);
+      final SelectionMethod safetyMethod = factory.getEnumValue(method);
       if (safetyMethod != null) {
         safetyVerifier.setSelectingMethod(safetyMethod);
       }
@@ -393,10 +394,10 @@ public class CompositionalConflictChecker
         if (ppmethod != null) {
           safetyVerifier.setPreselectingMethod(ppmethod);
         }
-        final AbstractCompositionalModelVerifier.SelectingMethodFactory
+        final AbstractCompositionalModelVerifier.SelectionMethodFactory
           sfactory = safetyVerifier.getSelectingMethodFactory();
-        final SelectingMethod smethod = getSelectingMethod();
-        final SelectingMethod ssmethod = sfactory.getEnumValue(smethod);
+        final SelectionMethod smethod = getSelectingMethod();
+        final SelectionMethod ssmethod = sfactory.getEnumValue(smethod);
         if (ssmethod != null) {
           safetyVerifier.setSelectingMethod(ssmethod);
         }
@@ -811,13 +812,13 @@ public class CompositionalConflictChecker
 
 
   //#########################################################################
-  //# Inner Class SelectingMethodFactory
-  protected static class SelectingMethodFactory
-    extends AbstractCompositionalModelVerifier.SelectingMethodFactory
+  //# Inner Class SelectionMethodFactory
+  protected static class SelectionMethodFactory
+    extends AbstractCompositionalModelVerifier.SelectionMethodFactory
   {
     //#######################################################################
     //# Constructors
-    protected SelectingMethodFactory()
+    protected SelectionMethodFactory()
     {
       register(MinSa);
       register(MinSyncA);
@@ -832,37 +833,20 @@ public class CompositionalConflictChecker
    * estimated number of precondition-marked states in the synchronous
    * product.
    */
-  public static final SelectingMethod MinSa =
-      new SelectingMethod("MinSa")
+  public static final SelectionMethod MinSa =
+    new SelectionMethod("MinSa")
   {
     @Override
-    protected SelectingMethod getCommonMethod()
+    SelectionHeuristic<Candidate> createBaseHeuristic()
     {
-      return MinS;
+      return new SelectionHeuristicMinSAlpha();
     }
+
     @Override
-    Comparator<Candidate> createComparator
-      (final AbstractCompositionalModelAnalyzer analyzer)
+    SelectionHeuristic<Candidate> createChainHeuristic()
     {
-      final CompositionalConflictChecker checker =
-        (CompositionalConflictChecker) analyzer;
-      if (checker.getUsedPreconditionMarking() == null) {
-        return null;
-      } else {
-        return checker.new ComparatorMinSAlpha();
-      }
-    }
-    @Override
-    SelectingHeuristic createHeuristic
-      (final AbstractCompositionalModelAnalyzer analyzer)
-    {
-      final CompositionalConflictChecker checker =
-        (CompositionalConflictChecker) analyzer;
-      if (checker.getUsedPreconditionMarking() == null) {
-        return MinS.createHeuristic(checker);
-      } else {
-        return super.createHeuristic(checker);
-      }
+      return SelectionMethodFactory.createChainHeuristic
+        (MinSa, MinS, MaxL, MaxC, MinE);
     }
   };
 
@@ -870,29 +854,20 @@ public class CompositionalConflictChecker
    * The selection heuristic that chooses the candidate with the minimum
    * number of precondition-marked states in the synchronous product.
    */
-  public static final SelectingMethod MinSyncA =
-      new SelectingMethod("MinSyncA")
+  public static final SelectionMethod MinSyncA =
+      new SelectionMethod("MinSyncA")
   {
     @Override
-    protected SelectingMethod getCommonMethod()
+    SelectionHeuristic<Candidate> createBaseHeuristic()
     {
-      return MinSync;
+      return new SelectionHeuristicMinSyncAlpha(1, 0);
     }
+
     @Override
-    SelectingHeuristic createHeuristic
-      (final AbstractCompositionalModelAnalyzer analyzer)
+    SelectionHeuristic<Candidate> createChainHeuristic()
     {
-      final CompositionalConflictChecker checker =
-        (CompositionalConflictChecker) analyzer;
-      if (checker.getUsedPreconditionMarking() == null) {
-        return MinSync.createHeuristic(checker);
-      } else {
-        final SelectingMethodFactory factory =
-          (SelectingMethodFactory) analyzer.getSelectingMethodFactory();
-        final Comparator<Candidate> alt =
-          factory.createComparatorChain(analyzer, MinSa);
-        return checker.new HeuristicMinSyncAlpha(1, 0, alt);
-      }
+      return SelectionMethodFactory.createChainHeuristic
+        (MinSyncA, MinS, MaxL, MaxC, MinE);
     }
   };
 
@@ -1079,66 +1054,101 @@ public class CompositionalConflictChecker
 
 
   //#########################################################################
-  //# Inner Class HeuristicMinSync
-  private class HeuristicMinSyncAlpha
-    extends SelectingHeuristic
-    implements MonolithicSynchronousProductBuilder.StateCallback
+  //# Inner Class SelectionHeuristicMinSAlpha
+  private static class SelectionHeuristicMinSAlpha
+    extends NumericSelectionHeuristic<Candidate>
   {
-
     //#######################################################################
-    //# Constructor
-    private HeuristicMinSyncAlpha(final int alphaWeight,
-                                  final int nonAlphaWeight,
-                                  final Comparator<Candidate> comparator)
+    //# Overrides for AbstractNumericSelectionHeuristic<Candidate>
+    @Override
+    public void setContext(final Object context)
     {
-      super(comparator);
-      mAlphaWeight = alphaWeight;
-      mNonAlphaWeight = nonAlphaWeight;
+      mChecker = (CompositionalConflictChecker) context;
+    }
+
+    @Override
+    public double getHeuristicValue(final Candidate candidate)
+    {
+      double product = 1.0;
+      for (final AutomatonProxy aut : candidate.getAutomata()) {
+        final AutomatonInfo info = mChecker.getAutomatonInfo(aut);
+        product *= info.getNumberOfPreconditionMarkedStates();
+      }
+      final double totalEvents = candidate.getNumberOfEvents();
+      final double localEvents = candidate.getLocalEventCount();
+      return product * (totalEvents - localEvents) / totalEvents;
     }
 
     //#######################################################################
-    //# Overrides for SelectingHeuristic
-    @Override
-    Candidate selectCandidate(final Collection<Candidate> candidates)
-    throws AnalysisException
+    //# Data Members
+    private CompositionalConflictChecker mChecker;
+  }
+
+
+  //#########################################################################
+  //# Inner Class SelectionHeuristicMinSyncAlpha
+  private static class SelectionHeuristicMinSyncAlpha
+    extends NumericSelectionHeuristic<Candidate>
+    implements MonolithicSynchronousProductBuilder.StateCallback
+  {
+    //#######################################################################
+    //# Constructor
+    private SelectionHeuristicMinSyncAlpha(final int alphaWeight,
+                                           final int nonAlphaWeight)
     {
-      final List<Candidate> list = new ArrayList<Candidate>(candidates);
-      final Comparator<Candidate> comparator = getComparator();
-      Collections.sort(list, comparator);
-      final MonolithicSynchronousProductBuilder builder =
-        getSynchronousProductBuilder();
-      final int limit = getCurrentInternalStateLimit();
-      builder.setNodeLimit(limit);
-      builder.setConstructsResult(false);
-      builder.setStateCallback(this);
+      mAlphaWeight = alphaWeight;
+      mNonAlphaWeight = nonAlphaWeight;
       mCurrentMinimum = Integer.MAX_VALUE;
-      Candidate best = null;
-      final EventProxy alpha = getUsedPreconditionMarking();
-      final List<EventProxy> props = Collections.singletonList(alpha);
-      builder.setPropositions(props);
-      for (final Candidate candidate : list) {
-        final List<AutomatonProxy> automata = candidate.getAutomata();
-        final ProductDESProxy des = createProductDESProxy(automata);
-        builder.setModel(des);
-        try {
-          mCount = 0;
-          builder.run();
-          if (mCount < mCurrentMinimum) {
-            best = candidate;
-            mCurrentMinimum = mCount;
-          }
-        } catch (final OutOfMemoryError error) {
-          getLogger().debug("<out of memory>");
-          // skip this one ...
-        } catch (final OverflowException overflow) {
-          // skip this one ...
-        } finally {
-          final CompositionalVerificationResult stats = getAnalysisResult();
-          final AutomatonResult result = builder.getAnalysisResult();
-          stats.addSynchronousProductAnalysisResult(result);
+    }
+
+    //#######################################################################
+    //# Overrides for AbstractNumericSelectionHeuristic<Candidate>
+    @Override
+    public void setContext(final Object context)
+    {
+      mChecker = (CompositionalConflictChecker) context;
+    }
+
+    @Override
+    public double getHeuristicValue(final Candidate candidate)
+    {
+      final MonolithicSynchronousProductBuilder syncBuilder =
+        mChecker.getSynchronousProductBuilder();
+      final int limit = mChecker.getCurrentInternalStateLimit();
+      syncBuilder.setNodeLimit(limit);
+      syncBuilder.setConstructsResult(false);
+      syncBuilder.setStateCallback(this);
+      final List<AutomatonProxy> automata = candidate.getAutomata();
+      final ProductDESProxy des = mChecker.createProductDESProxy(automata);
+      syncBuilder.setModel(des);
+      try {
+        mCount = 0;
+        syncBuilder.run();
+        if (mCount < mCurrentMinimum) {
+          mCurrentMinimum = mCount;
         }
+      } catch (final OutOfMemoryError error) {
+        final Logger logger = mChecker.getLogger();
+        logger.debug("<out of memory>");
+        return Double.POSITIVE_INFINITY;
+      } catch (final OverflowException overflow) {
+        return Double.POSITIVE_INFINITY;
+      } catch (final AnalysisException exception) {
+        throw exception.getRuntimeException();
+      } finally {
+        final CompositionalVerificationResult stats =
+          mChecker.getAnalysisResult();
+        final AutomatonResult result = syncBuilder.getAnalysisResult();
+        stats.addSynchronousProductAnalysisResult(result);
       }
-      return best;
+      return mCount;
+    }
+
+    @Override
+    public void reset()
+    {
+      super.reset();
+      mCurrentMinimum = Integer.MAX_VALUE;
     }
 
     //#######################################################################
@@ -1148,12 +1158,12 @@ public class CompositionalConflictChecker
     public boolean newState(final int[] tuple)
       throws OverflowException
     {
-      final MonolithicSynchronousProductBuilder builder =
-        getSynchronousProductBuilder();
+      final MonolithicSynchronousProductBuilder syncBuilder =
+        mChecker.getSynchronousProductBuilder();
       boolean alpha = true;
       for (int a = 0; a < tuple.length; a++) {
         final List<EventProxy> props =
-          builder.getStateMarking(a, tuple[a]);
+          syncBuilder.getStateMarking(a, tuple[a]);
         if (props.isEmpty()) {
           alpha = false;
           break;
@@ -1180,32 +1190,9 @@ public class CompositionalConflictChecker
     //# Data Members
     private final int mAlphaWeight;
     private final int mNonAlphaWeight;
+    private CompositionalConflictChecker mChecker;
     private int mCount;
     private int mCurrentMinimum;
-
-  }
-
-
-  //#########################################################################
-  //# Inner Class ComparatorMinSAlpha
-  private class ComparatorMinSAlpha extends SelectingComparator
-  {
-
-    //#######################################################################
-    //# Overrides for SelectingComparator
-    @Override
-    double getHeuristicValue(final Candidate candidate)
-    {
-      double product = 1.0;
-      for (final AutomatonProxy aut : candidate.getAutomata()) {
-        final AutomatonInfo info = getAutomatonInfo(aut);
-        product *= info.getNumberOfPreconditionMarkedStates();
-      }
-      final double totalEvents = candidate.getNumberOfEvents();
-      final double localEvents = candidate.getLocalEventCount();
-      return product * (totalEvents - localEvents) / totalEvents;
-    }
-
   }
 
 

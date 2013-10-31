@@ -357,6 +357,12 @@ public abstract class AbstractCompilerTest
     compile("tests", "efa", "increment");
   }
 
+  public void testCompile_instantiate_efa()
+    throws IOException, WatersException
+  {
+    compile("tests", "efa", "instantiate_efa");
+  }
+
   public void testCompile_io1()
   throws IOException, WatersException
   {

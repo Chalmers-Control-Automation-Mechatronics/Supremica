@@ -2,28 +2,31 @@
 //###########################################################################
 //# PROJECT: Waters EFSM Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efa.efsm
-//# CLASS:   MinSynchCompositionSelectionHeuristic
+//# CLASS:   MinSharedVariablesCompositionSelectionHeuristic
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.efa.efsm;
 
+import gnu.trove.set.hash.THashSet;
+
+import java.util.Set;
+
 import net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic;
-import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+
 
 /**
- * The &quot;minimum synchronous product&quot; composition selection
+ * The &quot;minimum shared variables&quot; composition selection
  * heuristic for EFSMs. This heuristic gives preference to composition
- * candidates with the smallest number of states in the synchronous
- * product. Note that the number of states in the synchronous product of
- * EFSMs is easy to calculate as there are no shared events, so it is
- * equal to the product of the state numbers of the composed EFSMs.
+ * candidates with the smallest possible number of non-local variables
+ * mentioned in the EFSMs to be composed.
  *
- * @author Robi Malik, Sahar Mohajerani
+ * @see MinVariablesCompositionSelectionHeuristic
+ * @author Robi Malik
  */
 
-public class MinSynchCompositionSelectionHeuristic
+public class MinSharedVariablesCompositionSelectionHeuristic
   extends NumericSelectionHeuristic<EFSMPair>
 {
 
@@ -33,11 +36,16 @@ public class MinSynchCompositionSelectionHeuristic
   @Override
   protected double getHeuristicValue(final EFSMPair candidate)
   {
-    final ListBufferTransitionRelation rel1 =
-      candidate.getFirst().getTransitionRelation();
-    final ListBufferTransitionRelation rel2 =
-      candidate.getSecond().getTransitionRelation();
-    return rel1.getNumberOfStates() * rel2.getNumberOfStates();
+    final Set<EFSMVariable> vars = new THashSet<EFSMVariable>();
+    for (final EFSMTransitionRelation efsmTR : candidate.asArray()) {
+      for (final EFSMVariable var : efsmTR.getVariables()) {
+        final Set<EFSMTransitionRelation> trs = var.getTransitionRelations();
+        if (!candidate.containsAll(trs)) {
+          vars.add(var);
+        }
+      }
+    }
+    return vars.size();
   }
 
 }

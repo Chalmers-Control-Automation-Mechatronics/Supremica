@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
+//# PROJECT: Waters EFSM Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efa.efsm
 //# CLASS:   EFSMSynchronizerTest
 //###########################################################################
@@ -14,12 +14,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.efa.efsm.EFSMCompiler;
-import net.sourceforge.waters.analysis.efa.efsm.EFSMSynchronizer;
-import net.sourceforge.waters.analysis.efa.efsm.EFSMSystem;
-import net.sourceforge.waters.analysis.efa.efsm.EFSMSystemImporter;
-import net.sourceforge.waters.analysis.efa.efsm.EFSMTransitionRelation;
-import net.sourceforge.waters.analysis.efa.efsm.EFSMVariableContext;
 import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -32,21 +26,12 @@ import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
+
 /**
  * @author Robi Malik, Sahar Mohajerani
  */
 public class EFSMSynchronizerTest extends AbstractWatersTest
-  {
-
-  /**
-   *
-   */
-  public EFSMSynchronizerTest()
-  {
-    // TODO Auto-generated constructor stub
-  }
-
-
+{
 
   @Override
   protected void setUp() throws Exception
@@ -73,7 +58,8 @@ public class EFSMSynchronizerTest extends AbstractWatersTest
   }
 
 
-
+  //#########################################################################
+  //# Test Cases
   public void testSynch_1() throws Exception
   {
     final String group = "tests";
@@ -120,6 +106,25 @@ public class EFSMSynchronizerTest extends AbstractWatersTest
     final String subdir = "efsm";
     final String name = "synch6.wmod";
     runSynchronizer(group, subdir, name);
+  }
+
+  public void testSynch_7() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "efsm";
+    final String name = "synch7.wmod";
+    runSynchronizer(group, subdir, name);
+  }
+
+  public void testReentrant() throws Exception
+  {
+    testSynch_1();
+    testSynch_2();
+    testSynch_3();
+    testSynch_4();
+    testSynch_5();
+    testSynch_6();
+    testSynch_7();
   }
 
 
@@ -268,7 +273,7 @@ public class EFSMSynchronizerTest extends AbstractWatersTest
       }
     }
     fail("The module '" + module.getName() + "' does not contain any simple " +
-            "component called '" + name + "'!");
+         "component called '" + name + "'!");
     return null;
   }
 

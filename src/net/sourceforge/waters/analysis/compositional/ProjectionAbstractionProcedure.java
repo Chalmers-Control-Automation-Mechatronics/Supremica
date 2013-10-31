@@ -30,8 +30,8 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 /**
  * An abstraction procedure to compute the natural projection.
  * The abstraction sequence consists of tau-loop removal, followed
- * by subset construction, a second step of tau-loop removal, and
- * finally the deterministic automata minimisation algorithm.
+ * by subset construction, and the deterministic automata minimisation
+ * algorithm.
  *
  * @author Robi Malik
  */
@@ -48,23 +48,29 @@ class ProjectionAbstractionProcedure extends TRAbstractionProcedure
     final int slimit = verifier.getInternalStateLimit();
     final int tlimit = verifier.getInternalTransitionLimit();
     final ChainTRSimplifier chain = new ChainTRSimplifier();
-    final TransitionRelationSimplifier loopRemover1 =
+    final TransitionRelationSimplifier loopRemover =
       new TauLoopRemovalTRSimplifier();
-    chain.add(loopRemover1);
+    chain.add(loopRemover);
     final SubsetConstructionTRSimplifier subset =
       new SubsetConstructionTRSimplifier();
     chain.add(subset);
     subset.setStateLimit(slimit);
     subset.setTransitionLimit(tlimit);
-    final TransitionRelationSimplifier loopRemover2 =
-      new TauLoopRemovalTRSimplifier();
-    chain.add(loopRemover2);
-    final ObservationEquivalenceTRSimplifier bisimulator =
+    final ObservationEquivalenceTRSimplifier bisimulator1 =
       new ObservationEquivalenceTRSimplifier();
-    bisimulator.setEquivalence
+    bisimulator1.setEquivalence
       (ObservationEquivalenceTRSimplifier.Equivalence.DETERMINISTIC_MINSTATE);
-    bisimulator.setTransitionLimit(tlimit);
-    chain.add(bisimulator);
+    bisimulator1.setUsingSpecialEvents(false);
+    if (verifier.isUsingSpecialEvents()) {
+      // Selfloop-only events must be handled through bisimulation.
+      final ObservationEquivalenceTRSimplifier bisimulator2 =
+        new ObservationEquivalenceTRSimplifier();
+      bisimulator2.setEquivalence
+      (ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION);
+      bisimulator2.setUsingSpecialEvents(true);
+      bisimulator2.setInfoEnabled(true);
+    }
+    chain.add(bisimulator1);
     return new ProjectionAbstractionProcedure(verifier, chain, subset);
   }
 
