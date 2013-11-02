@@ -13,6 +13,9 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 
+import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
+
 import org.apache.log4j.Logger;
 
 
@@ -60,18 +63,28 @@ public abstract class SelectionHeuristic<T>
    *         have equal preference, the first one is returned.
    */
   public T select(final Collection<? extends T> candidates)
+    throws AnalysisException
   {
     final Iterator<? extends T> iter = candidates.iterator();
     if (iter.hasNext()) {
-      T result = iter.next();
-      while (iter.hasNext()) {
-        final T next = iter.next();
-        if (compare(result, next) > 0) {
-          result = next;
+      try {
+        T result = iter.next();
+        while (iter.hasNext()) {
+          final T next = iter.next();
+          if (compare(result, next) > 0) {
+            result = next;
+          }
         }
+        return result;
+      } catch (final WatersRuntimeException exception) {
+        if (exception.getCause() instanceof AnalysisException) {
+          throw (AnalysisException) exception.getCause();
+        } else {
+          throw exception;
+        }
+      } finally {
+        reset();
       }
-      reset();
-      return result;
     } else {
       return null;
     }

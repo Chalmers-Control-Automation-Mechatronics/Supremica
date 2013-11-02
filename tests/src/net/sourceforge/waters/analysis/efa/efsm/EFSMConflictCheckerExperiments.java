@@ -139,7 +139,15 @@ public class EFSMConflictCheckerExperiments
         // next please ...
       }
     }
-
+    for (int c = 6; c <= 6; c++) {
+      try {
+        for (int n = 2; n <= 100; n += 2) {
+          checkPML("pml3", c, n, true);
+        }
+      } catch (final AnalysisException | EvalException exception) {
+        // next please ...
+      }
+    }
     try {
       testPsl();
       testPslBig();
@@ -452,12 +460,12 @@ public class EFSMConflictCheckerExperiments
       mWatchdog.addAbortable(mConflictChecker);
       // Configuration of CompositionalConflictChecker ...
       mConflictChecker.setAbstractionProcedureFactory
-        (ConflictAbstractionProcedureFactory.NB);
+        (ConflictAbstractionProcedureFactory.NBA);
       mConflictChecker.setPreselectingMethod
         (AbstractCompositionalModelAnalyzer.MustL);
       mConflictChecker.setSelectingMethod
         (AbstractCompositionalModelAnalyzer.MinF);
-      mConflictChecker.setInternalStateLimit(100000);
+      mConflictChecker.setInternalStateLimit(8000);
       mConflictChecker.setMonolithicStateLimit(50000000);
       mConflictChecker.setMonolithicTransitionLimit(0);
       mConflictChecker.setCounterExampleEnabled(false);

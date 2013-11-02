@@ -19,8 +19,8 @@ import net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic;
 /**
  * The &quot;minimum frontier&quot; composition selection
  * heuristic for EFSMs. This heuristic gives preference to composition
- * candidates with the smallest EFSMs sharing variables with the EFSMs
- * in the candidate.
+ * candidates with the smallest number of EFSMs sharing variables with the
+ * EFSMs in the candidate.
  *
  * @author Robi Malik
  */

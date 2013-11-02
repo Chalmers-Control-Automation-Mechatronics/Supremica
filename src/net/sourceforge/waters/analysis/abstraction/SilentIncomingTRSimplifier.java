@@ -200,6 +200,7 @@ public class SilentIncomingTRSimplifier
           }
         }
         if (!targets.isEmpty()) {
+          // TODO Implement transition limit!
           rel.copyOutgoingTransitions(targets, source);
           writer.reset(source, tauID);
           while (writer.advance()) {

@@ -19,7 +19,7 @@ import net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic;
 /**
  * The &quot;maximum local variables&quot; composition selection
  * heuristic for EFSMs. This heuristic gives preference to composition
- * candidates with the largest number local variables in the EFSMs to be
+ * candidates with the largest number of local variables in the EFSMs to be
  * composed.
  *
  * @see MinVariablesCompositionSelectionHeuristic
