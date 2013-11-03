@@ -72,19 +72,16 @@ public abstract class AbstractCompositionalSynthesizer extends
    * @param preselectingMethodFactory
    *          Enumeration factory that determines possible candidate
    *          preselection methods.
-   * @param selectingMethodFactory
-   *          Enumeration factory that determines possible candidate selection
-   *          methods.
    */
-  public AbstractCompositionalSynthesizer(final ProductDESProxy model,
-                                  final ProductDESProxyFactory factory,
-                                  final KindTranslator translator,
-                                  final AbstractionProcedureFactory abstractionFactory,
-                                  final PreselectingMethodFactory preselectingMethodFactory,
-                                  final SelectionMethodFactory selectingMethodFactory)
+  public AbstractCompositionalSynthesizer
+    (final ProductDESProxy model,
+     final ProductDESProxyFactory factory,
+     final KindTranslator translator,
+     final AbstractionProcedureFactory abstractionFactory,
+     final PreselectingMethodFactory preselectingMethodFactory)
   {
     super(model, factory, translator, abstractionFactory,
-          preselectingMethodFactory, selectingMethodFactory);
+          preselectingMethodFactory);
     setPruningDeadlocks(true);
   }
 

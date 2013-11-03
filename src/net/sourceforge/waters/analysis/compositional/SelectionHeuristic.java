@@ -9,11 +9,14 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 
 import org.apache.log4j.Logger;
@@ -38,7 +41,7 @@ import org.apache.log4j.Logger;
  */
 
 public abstract class SelectionHeuristic<T>
-  implements Comparator<T>
+  implements Cloneable, Comparator<T>
 {
 
   //#########################################################################
@@ -46,11 +49,11 @@ public abstract class SelectionHeuristic<T>
   /**
    * Sets the context in which the heuristic runs.
    * This method is called when a heuristic is register with a model analyser
-   * ({@link net.sourceforge.waters.model.analysis.ModelAnalyzer ModelAnalyzer}
-   * or similar object) to pass that model analyser as a context into the
-   * heuristic. The default implementation does nothing, but it can be
-   * overridden by specific heuristics that require access to their model
-   * analyser.
+   * ({@link net.sourceforge.waters.model.analysis.des.ModelAnalyzer
+   * ModelAnalyzer} or similar object) to pass that model analyser as a
+   * context into the heuristic. The default implementation does nothing,
+   * but it can be overridden by specific heuristics that require access
+   * to their model analyser.
    */
   public void setContext(final Object context)
   {
@@ -113,7 +116,45 @@ public abstract class SelectionHeuristic<T>
 
 
   //#########################################################################
-  //# Logging
+  //# Interface java.lang.Cloneable
+  @Override
+  public SelectionHeuristic<T> clone()
+  {
+    try {
+      @SuppressWarnings("unchecked")
+      final Class<? extends SelectionHeuristic<T>> clazz =
+        (Class<? extends SelectionHeuristic<T>>) getClass();
+      final Constructor<? extends SelectionHeuristic<T>> constructor =
+        clazz.getConstructor();
+      return constructor.newInstance();
+    } catch (final NoSuchMethodException | SecurityException |
+                   InstantiationException | IllegalAccessException |
+                   InvocationTargetException exception) {
+      throw new WatersRuntimeException(exception);
+    }
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  public String getName()
+  {
+    final String KEY = "SelectionHeuristic";
+    final String clazzName = getClass().getName();
+    final int pos = clazzName.lastIndexOf(KEY);
+    if (pos >= 0 && pos + KEY.length() < clazzName.length()) {
+      return clazzName.substring(pos + KEY.length());
+    } else {
+      return ProxyTools.getShortClassName(this);
+    }
+  }
+
+  @Override
+  public String toString()
+  {
+    return getName();
+  }
+
   public Logger getLogger()
   {
     final Class<?> clazz = getClass();

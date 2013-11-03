@@ -50,15 +50,15 @@ public class SelfRunningExperimentCompositionalSynthesis
         new Configuration(stateRepresentationSynthesizer,
                           StateRepresentationSynthesisAbstractionProcedureFactory.WSOE);
       configurations.add(configStateRepresent);
-     final AbstractCompositionalModelAnalyzer.PreselectingMethodFactory
+      final AbstractCompositionalModelAnalyzer.PreselectingMethodFactory
       preselectingFactory = automataSynthesizer.getPreselectingMethodFactory();
-      final AbstractCompositionalModelAnalyzer.SelectionMethodFactory
-      selectingFactory = automataSynthesizer.getSelectingMethodFactory();
+      final CompositionalSelectionHeuristicFactory selectionFactory =
+        automataSynthesizer.getSelectionHeuristicFactory();
       int methodCount = 0;
       for (final AbstractCompositionalModelAnalyzer.PreselectingMethod
            preselectingMethod : preselectingFactory.getEnumConstants()) {
-        for (final AbstractCompositionalModelAnalyzer.SelectionMethod
-             selectingMethod: selectingFactory.getEnumConstants()) {
+        for (final SelectionHeuristicCreator
+             selectingMethod: selectionFactory.getEnumConstants()) {
           methodCount++;
           for (final Configuration config: configurations) {
             final AbstractCompositionalSynthesizer synthesizer = config.getSynthesizer();
@@ -71,9 +71,9 @@ public class SelfRunningExperimentCompositionalSynthesis
                "/" + selName + " without reduction" + " ***");
             final CompositionalSynthesizerExperiments experiment =
               new CompositionalSynthesizerExperiments
-              (methodCount + "_" + config + "_" + preName + "_" +  selName +
-               "_NR.csv",
-               synthesizer, method, preselectingMethod, selectingMethod);
+                (methodCount + "_" + config + "_" + preName + "_" +  selName +
+                 "_NR.csv",
+                 synthesizer, method, preselectingMethod, selectingMethod);
             experiment.setUp();
             experiment.runAllTests();
             experiment.tearDown();

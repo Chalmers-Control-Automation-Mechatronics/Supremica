@@ -86,8 +86,9 @@ public class CompositionalAutomataSynthesizer extends
    * @param abstractionFactory
    *          Factory to define the abstraction sequence to be used.
    */
-  public CompositionalAutomataSynthesizer(final ProductDESProxyFactory factory,
-                                  final AutomataSynthesisAbstractionProcedureFactory abstractionFactory)
+  public CompositionalAutomataSynthesizer
+    (final ProductDESProxyFactory factory,
+     final AutomataSynthesisAbstractionProcedureFactory abstractionFactory)
   {
     this(factory, IdenticalKindTranslator.getInstance(), abstractionFactory);
   }
@@ -102,9 +103,10 @@ public class CompositionalAutomataSynthesizer extends
    * @param abstractionFactory
    *          Factory to define the abstraction sequence to be used.
    */
-  public CompositionalAutomataSynthesizer(final ProductDESProxyFactory factory,
-                                  final KindTranslator translator,
-                                  final AutomataSynthesisAbstractionProcedureFactory abstractionFactory)
+  public CompositionalAutomataSynthesizer
+    (final ProductDESProxyFactory factory,
+     final KindTranslator translator,
+     final AutomataSynthesisAbstractionProcedureFactory abstractionFactory)
   {
     this(null, factory, translator, abstractionFactory);
   }
@@ -121,18 +123,15 @@ public class CompositionalAutomataSynthesizer extends
    * @param preselectingMethodFactory
    *          Enumeration factory that determines possible candidate
    *          preselection methods.
-   * @param selectingMethodFactory
-   *          Enumeration factory that determines possible candidate selection
-   *          methods.
    */
-  public CompositionalAutomataSynthesizer(final ProductDESProxyFactory factory,
-                                  final KindTranslator translator,
-                                  final AutomataSynthesisAbstractionProcedureFactory abstractionFactory,
-                                  final PreselectingMethodFactory preselectingMethodFactory,
-                                  final SelectionMethodFactory selectingMethodFactory)
+  public CompositionalAutomataSynthesizer
+    (final ProductDESProxyFactory factory,
+     final KindTranslator translator,
+     final AutomataSynthesisAbstractionProcedureFactory abstractionFactory,
+     final PreselectingMethodFactory preselectingMethodFactory)
   {
     this(null, factory, translator, abstractionFactory,
-         preselectingMethodFactory, selectingMethodFactory);
+         preselectingMethodFactory);
   }
 
   /**
@@ -148,13 +147,14 @@ public class CompositionalAutomataSynthesizer extends
    * @param abstractionFactory
    *          Factory to define the abstraction sequence to be used.
    */
-  public CompositionalAutomataSynthesizer(final ProductDESProxy model,
-                                  final ProductDESProxyFactory factory,
-                                  final KindTranslator translator,
-                                  final AutomataSynthesisAbstractionProcedureFactory abstractionFactory)
+  public CompositionalAutomataSynthesizer
+    (final ProductDESProxy model,
+     final ProductDESProxyFactory factory,
+     final KindTranslator translator,
+     final AutomataSynthesisAbstractionProcedureFactory abstractionFactory)
   {
     this(model, factory, translator, abstractionFactory,
-         new PreselectingMethodFactory(), new SelectionMethodFactory());
+         new PreselectingMethodFactory());
   }
 
   /**
@@ -172,19 +172,16 @@ public class CompositionalAutomataSynthesizer extends
    * @param preselectingMethodFactory
    *          Enumeration factory that determines possible candidate
    *          preselection methods.
-   * @param selectingMethodFactory
-   *          Enumeration factory that determines possible candidate selection
-   *          methods.
    */
-  public CompositionalAutomataSynthesizer(final ProductDESProxy model,
-                                  final ProductDESProxyFactory factory,
-                                  final KindTranslator translator,
-                                  final AutomataSynthesisAbstractionProcedureFactory abstractionFactory,
-                                  final PreselectingMethodFactory preselectingMethodFactory,
-                                  final SelectionMethodFactory selectingMethodFactory)
+  public CompositionalAutomataSynthesizer
+    (final ProductDESProxy model,
+     final ProductDESProxyFactory factory,
+     final KindTranslator translator,
+     final AutomataSynthesisAbstractionProcedureFactory abstractionFactory,
+     final PreselectingMethodFactory preselectingMethodFactory)
   {
     super(model, factory, translator, abstractionFactory,
-          preselectingMethodFactory, selectingMethodFactory);
+          preselectingMethodFactory);
   }
 
   //#########################################################################

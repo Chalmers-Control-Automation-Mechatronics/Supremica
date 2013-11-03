@@ -9,6 +9,14 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import net.sourceforge.waters.model.analysis.AnalysisException;
+
+
 
 /**
  * A selection heuristic formed as a combination of several other
@@ -39,7 +47,24 @@ public class ChainSelectionHeuristic<T extends Comparable<? super T>>
   public ChainSelectionHeuristic(final SelectionHeuristic<T>... steps)
   {
     mSteps = steps;
+    mPreOrder = null;
   }
+
+
+  //#########################################################################
+  //# Simple Access
+  /**
+   * Sets the preordering method. If non-null, the list of candidates passed
+   * to the {@link #select(Collection) select()} is sorted according to this
+   * order on invocation of the method.
+   * @param  preorder  Selection heuristic defining ordering
+   *                   or <CODE>null</CODE>.
+   */
+  public void setPreOrder(final SelectionHeuristic<T> preorder)
+  {
+    mPreOrder = preorder;
+  }
+
 
   //#########################################################################
   //# Interface java.util.Comparator<T>
@@ -76,10 +101,27 @@ public class ChainSelectionHeuristic<T extends Comparable<? super T>>
 
   //#########################################################################
   //# Overrides for Abstract Base Class
-  //# net.sourceforge.waters.analysis.compositional.AbstractHeuristic
+  //# net.sourceforge.waters.analysis.compositional.SelectionHeuristic
+  @Override
+  public T select(final Collection<? extends T> candidates)
+    throws AnalysisException
+  {
+    if (mPreOrder == null) {
+      return super.select(candidates);
+    } else {
+      final List<T> list = new ArrayList<>(candidates);
+      Collections.sort(list, mPreOrder);
+      mPreOrder.reset();
+      return super.select(list);
+    }
+  }
+
   @Override
   public void setContext(final Object context)
   {
+    if (mPreOrder != null) {
+      mPreOrder.setContext(context);
+    }
     for (final SelectionHeuristic<? extends T> step : mSteps) {
       step.setContext(context);
     }
@@ -89,6 +131,9 @@ public class ChainSelectionHeuristic<T extends Comparable<? super T>>
   public void reset()
   {
     super.reset();
+    if (mPreOrder != null) {
+      mPreOrder.reset();
+    }
     for (final SelectionHeuristic<? extends T> step : mSteps) {
       step.reset();
     }
@@ -96,7 +141,35 @@ public class ChainSelectionHeuristic<T extends Comparable<? super T>>
 
 
   //#########################################################################
+  //# Interface java.lang.Cloneable
+  @Override
+  public ChainSelectionHeuristic<T> clone()
+  {
+    @SuppressWarnings("unchecked")
+    final SelectionHeuristic<T>[] clonedSteps =
+      new SelectionHeuristic[mSteps.length];
+    for (int i = 0; i < mSteps.length; i++) {
+      clonedSteps[i] = mSteps[i].clone();
+    }
+    final ChainSelectionHeuristic<T> cloned =
+      new ChainSelectionHeuristic<T>(clonedSteps);
+    cloned.setPreOrder(mPreOrder);
+    return cloned;
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  @Override
+  public String getName()
+  {
+    return mSteps[0].getName();
+  }
+
+
+  //#########################################################################
   //# Data Members
+  private SelectionHeuristic<T> mPreOrder;
   private final SelectionHeuristic<T>[] mSteps;
 
 }

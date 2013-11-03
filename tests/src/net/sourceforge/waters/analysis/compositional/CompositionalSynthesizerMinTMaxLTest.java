@@ -49,7 +49,8 @@ public class CompositionalSynthesizerMinTMaxLTest
     synthesizer.setMonolithicStateLimit(100000);
     synthesizer.setInternalTransitionLimit(500000);
     synthesizer.setPreselectingMethod(AbstractCompositionalModelAnalyzer.MinT);
-    synthesizer.setSelectingMethod(AbstractCompositionalModelAnalyzer.MaxL);
+    synthesizer.setSelectionHeuristic
+      (CompositionalSelectionHeuristicFactory.MaxL);
     return synthesizer;
   }
 

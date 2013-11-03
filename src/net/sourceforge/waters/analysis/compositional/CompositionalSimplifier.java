@@ -90,8 +90,7 @@ public class CompositionalSimplifier
      final AbstractionProcedureFactory abstractionFactory)
   {
     super(model, factory, translator, abstractionFactory,
-          new PreselectingMethodFactory(),
-          new SelectionMethodFactory());
+          new PreselectingMethodFactory());
     // TODO This is specific to nonblocking and should be in a subclass.
     setPruningDeadlocks(true);
   }

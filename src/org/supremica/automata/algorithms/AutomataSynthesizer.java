@@ -55,8 +55,9 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer;
-import net.sourceforge.waters.analysis.compositional.CompositionalAutomataSynthesizer;
 import net.sourceforge.waters.analysis.compositional.AutomataSynthesisAbstractionProcedureFactory;
+import net.sourceforge.waters.analysis.compositional.CompositionalAutomataSynthesizer;
+import net.sourceforge.waters.analysis.compositional.CompositionalSelectionHeuristicFactory;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
 import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
@@ -95,7 +96,7 @@ import org.supremica.util.BDD.BDDAutomata;
 import org.supremica.util.BDD.OnlineBDDSupervisor;
 
 /**
- * Does synthesis in automata-scale, modularily,
+ * Does synthesis in automata-scale, modularly,
  * uses AutomatonSynthesizer for monolithic problems
  */
 public class AutomataSynthesizer
@@ -447,17 +448,18 @@ public class AutomataSynthesizer
           final ProductDESProxy des = exporter.convertAutomata(theAutomata);
 
           final CompositionalAutomataSynthesizer synthesizer =
-            new CompositionalAutomataSynthesizer(des, factory, translator,
-                                         AutomataSynthesisAbstractionProcedureFactory.WSOE);
+            new CompositionalAutomataSynthesizer
+              (des, factory, translator,
+               AutomataSynthesisAbstractionProcedureFactory.WSOE);
           synthesizer.setConfiguredDefaultMarking(marking);
           final boolean supervisorReduction =
             synthesizerOptions.getReduceSupervisors();
           synthesizer.setSupervisorReductionEnabled(supervisorReduction);
           synthesizer.setInternalStateLimit(5000);
-           synthesizer.setPreselectingMethod
-             (AbstractCompositionalModelAnalyzer.MustL);
-           synthesizer.setSelectingMethod
-             (AbstractCompositionalModelAnalyzer.MinSync);
+          synthesizer.setPreselectingMethod
+            (AbstractCompositionalModelAnalyzer.MustL);
+          synthesizer.setSelectionHeuristic
+            (CompositionalSelectionHeuristicFactory.MinSync);
           synthesizer.run();
           final ProductDESResult watersResult =
             synthesizer.getAnalysisResult();

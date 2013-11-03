@@ -117,17 +117,23 @@ public class EnabledEventsCompositionalConflictChecker extends
                                                    final ConflictAbstractionProcedureFactory abstractionFactory)
   {
     super(model, marking, factory, abstractionFactory,
-          new PreselectingMethodFactory(), new SelectingMethodFactory());
+          new PreselectingMethodFactory());
   }
 
 
   //#########################################################################
   //# Configuration
+  @Override
+  public CompositionalSelectionHeuristicFactory getSelectionHeuristicFactory()
+  {
+    return EnabledEventsSelectionHeuristicFactory.getInstance();
+  }
+
   /**
    * Sets the state limit for the language inclusion check to find
    * additional always enabled events.
-   * @param  Maximum state in language check,
-   *         or <CODE>0</CODE> to disable this search.
+   * @param  limit   Maximum number of states in language inclusion check,
+   *                 or <CODE>0</CODE> to disable this search.
    */
   public void setEnabledEventSearchStateLimit(final int limit)
   {
@@ -559,21 +565,6 @@ public class EnabledEventsCompositionalConflictChecker extends
 
 
   //#########################################################################
-  //# Inner Class SelectingMethodFactory
-  protected static class SelectingMethodFactory extends
-    AbstractCompositionalModelVerifier.SelectionMethodFactory
-  {
-    //#######################################################################
-    //# Constructors
-    protected SelectingMethodFactory()
-    {
-      register(MaxLE);
-      register(MinSE);
-    }
-  }
-
-
-  //#########################################################################
   //# Inner Class HeuristicMustLE
   private class HeuristicMustLE implements PreselectingHeuristic
   {
@@ -581,9 +572,9 @@ public class EnabledEventsCompositionalConflictChecker extends
     //#######################################################################
     //# Interface PreselectingHeuristic
     @Override
-    public Collection<Candidate> findCandidates()
+    public List<Candidate> findCandidates()
     {
-      final Collection<Candidate> candidates = new LinkedList<Candidate>(); //Create collection to store candidates to return
+      final List<Candidate> candidates = new LinkedList<Candidate>(); //Create collection to store candidates to return
       final Collection<EventProxy> events = getCurrentEvents(); //Get all events and put into a collection
 
       final Collection<List<AutomatonProxy>> found = //This is the automaton combinations we have already found
@@ -613,85 +604,6 @@ public class EnabledEventsCompositionalConflictChecker extends
       }
       return candidates;
     }
-  }
-
-
-  //#########################################################################
-  //# Inner Class SelectionHeuristicMaxLE
-  private static class SelectionHeuristicMaxLE
-    extends NumericSelectionHeuristic<Candidate>
-  {
-    //#######################################################################
-    //# Overrides for AbstractNumericSelectionHeuristic<Candidate>
-    @Override
-    public void setContext(final Object context)
-    {
-      mChecker = (EnabledEventsCompositionalConflictChecker) context;
-    }
-
-    @Override
-    public double getHeuristicValue(final Candidate candidate)
-    {
-      int alwaysEnabledEvents = 0;
-      final List<AutomatonProxy> automataList = candidate.getAutomata();
-      for (final EventProxy event : candidate.getOrderedEvents()) {
-        final EnabledEventsEventInfo info = mChecker.getEventInfo(event);
-        if (info != null && // not a proposition
-            info.getDisablingAutomata() != null &&
-            automataList.containsAll(info.getDisablingAutomata())) {
-          alwaysEnabledEvents++;
-        }
-      }
-      return - (candidate.getLocalEventCount() + 0.5 * alwaysEnabledEvents) /
-               candidate.getNumberOfEvents();
-    }
-
-    //#######################################################################
-    //# Data Members
-    private EnabledEventsCompositionalConflictChecker mChecker;
-  }
-
-
-  //#########################################################################
-  //# Inner Class SelectionHeuristicMinSE
-  private static class SelectionHeuristicMinSE
-    extends NumericSelectionHeuristic<Candidate>
-  {
-    //#######################################################################
-    //# Overrides for AbstractNumericSelectionHeuristic<Candidate>
-    @Override
-    public void setContext(final Object context)
-    {
-      mChecker = (EnabledEventsCompositionalConflictChecker) context;
-    }
-
-    @Override
-    public double getHeuristicValue(final Candidate candidate)
-    {
-      double product = 1.0;
-      for (final AutomatonProxy aut : candidate.getAutomata()) {
-        product *= aut.getStates().size();
-      }
-      final double totalEvents = candidate.getNumberOfEvents();
-      final double localEvents = candidate.getLocalEventCount();
-      int alwaysEnabledEvents = 0;
-      final List<AutomatonProxy> automataList = candidate.getAutomata();
-      for (final EventProxy event : candidate.getOrderedEvents()) {
-        final EnabledEventsEventInfo info = mChecker.getEventInfo(event);
-        if (info != null && // not a proposition
-            info.getDisablingAutomata() != null &&
-            automataList.containsAll(info.getDisablingAutomata())) {
-          alwaysEnabledEvents++;
-        }
-      }
-      return product *
-             (totalEvents - localEvents - 0.5 * alwaysEnabledEvents) /
-             totalEvents;
-    }
-
-    //#######################################################################
-    //# Data Members
-    private EnabledEventsCompositionalConflictChecker mChecker;
   }
 
 
@@ -836,47 +748,6 @@ public class EnabledEventsCompositionalConflictChecker extends
       final EnabledEventsCompositionalConflictChecker everifier =
         (EnabledEventsCompositionalConflictChecker) verifier;
       return everifier.new HeuristicMustLE();
-    }
-  };
-
-  /**
-   * The selecting method that chooses the candidate with the highest
-   * proportion of local and always enabled events.
-   */
-  public static final SelectionMethod MaxLE = new SelectionMethod("MaxLE")
-  {
-    @Override
-    SelectionHeuristic<Candidate> createBaseHeuristic()
-    {
-      return new SelectionHeuristicMaxLE();
-    }
-
-    @Override
-    SelectionHeuristic<Candidate> createChainHeuristic()
-    {
-      return SelectionMethodFactory.createChainHeuristic
-        (MaxLE, MaxL, MaxC, MinE, MinS);
-    }
-  };
-
-  /**
-   * The selecting method that chooses the candidate with the minimum
-   * estimated number of states in the synchronous product, while taking
-   * into account always enabled events.
-   */
-  public static final SelectionMethod MinSE = new SelectionMethod("MinSE")
-  {
-    @Override
-    SelectionHeuristic<Candidate> createBaseHeuristic()
-    {
-      return new SelectionHeuristicMinSE();
-    }
-
-    @Override
-    SelectionHeuristic<Candidate> createChainHeuristic()
-    {
-      return SelectionMethodFactory.createChainHeuristic
-        (MinSE, MinS, MaxL, MaxC, MinE);
     }
   };
 

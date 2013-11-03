@@ -95,7 +95,7 @@ public abstract class AbstractCompositionalModelAnalyzer
      final AbstractionProcedureFactory abstractionFactory)
   {
     this(factory, translator, abstractionFactory,
-         new PreselectingMethodFactory(), new SelectionMethodFactory());
+         new PreselectingMethodFactory());
   }
 
   /**
@@ -109,19 +109,15 @@ public abstract class AbstractCompositionalModelAnalyzer
    * @param preselectingMethodFactory
    *          Enumeration factory that determines possible candidate
    *          preselection methods.
-   * @param selectingMethodFactory
-   *          Enumeration factory that determines possible candidate
-   *          selection methods.
    */
   protected AbstractCompositionalModelAnalyzer
     (final ProductDESProxyFactory factory,
      final KindTranslator translator,
      final AbstractionProcedureFactory abstractionFactory,
-     final PreselectingMethodFactory preselectingMethodFactory,
-     final SelectionMethodFactory selectingMethodFactory)
+     final PreselectingMethodFactory preselectingMethodFactory)
   {
     this(null, factory, translator, abstractionFactory,
-         preselectingMethodFactory, selectingMethodFactory);
+         preselectingMethodFactory);
   }
 
   /**
@@ -142,7 +138,7 @@ public abstract class AbstractCompositionalModelAnalyzer
      final AbstractionProcedureFactory abstractionFactory)
   {
     this(model, factory, translator, abstractionFactory,
-         new PreselectingMethodFactory(), new SelectionMethodFactory());
+         new PreselectingMethodFactory());
   }
 
   /**
@@ -158,25 +154,21 @@ public abstract class AbstractCompositionalModelAnalyzer
    * @param preselectingMethodFactory
    *          Enumeration factory that determines possible candidate
    *          preselection methods.
-   * @param selectionMethodFactory
-   *          Enumeration factory that determines possible candidate
-   *          selection methods.
    */
   protected AbstractCompositionalModelAnalyzer
     (final ProductDESProxy model,
      final ProductDESProxyFactory factory,
      final KindTranslator translator,
      final AbstractionProcedureFactory abstractionFactory,
-     final PreselectingMethodFactory preselectingMethodFactory,
-     final SelectionMethodFactory selectionMethodFactory)
+     final PreselectingMethodFactory preselectingMethodFactory)
   {
     super(model, factory, translator);
     mAbstractionProcedureFactory = abstractionFactory;
     mPreselectingMethodFactory = preselectingMethodFactory;
-    mSelectingMethodFactory = selectionMethodFactory;
     // Defaults for all model analysers---please do not change.
     mPreselectingMethod = MustL;
-    mSelectionMethod = MinS;
+    mSelectionHeuristic =
+      CompositionalSelectionHeuristicFactory.MinS.createChainHeuristic();
     mSubsumptionEnabled = false;
     mUsingSpecialEvents = true;
     mLowerInternalStateLimit = mUpperInternalStateLimit =
@@ -274,41 +266,54 @@ public abstract class AbstractCompositionalModelAnalyzer
   }
 
   /**
-   * Gets the enumeration factory that provides the possible selection
-   * methods.
-   * @see SelectionMethod
+   * Gets the selection heuristic factory for this model analyser.
+   * This method is used by user interface components to obtain all the
+   * available heuristics and link them with their names.
+   * @return A selection heuristic factory that contains selection
+   *         heuristic creators for all the heuristics supported by
+   *         this model analyser.
    */
-  public SelectionMethodFactory getSelectingMethodFactory()
+  public CompositionalSelectionHeuristicFactory getSelectionHeuristicFactory()
   {
-    return mSelectingMethodFactory;
+    return CompositionalSelectionHeuristicFactory.getInstance();
+  }
+
+  /**
+   * Sets the selecting heuristic to be used to choose candidates.
+   * Possible heuristics are available as static instances of the
+   * {@link CompositionalSelectionHeuristicFactory} class and its subclasses.
+   *
+   * @see CompositionalSelectionHeuristicFactory#MaxC
+   * @see CompositionalSelectionHeuristicFactory#MaxL
+   * @see CompositionalSelectionHeuristicFactory#MinE
+   * @see CompositionalSelectionHeuristicFactory#MinS
+   * @see CompositionalSelectionHeuristicFactory#MinSync
+   */
+  public void setSelectionHeuristic(final SelectionHeuristicCreator creator)
+  {
+    final SelectionHeuristic<Candidate> chain = creator.createChainHeuristic();
+    setSelectionHeuristic(chain);
   }
 
   /**
    * Sets the selecting heuristics to be used to choose candidates.
-   * Possible heuristics are available as static instances of the
-   * {@link AbstractCompositionalModelAnalyzer} class, or can be
-   * obtained from the verifier's {@link SelectionMethodFactory}.
+   * This is a low-level method that requires the user to construct the
+   * heuristic explicitly. A simpler is provided as an overload that
+   * accepts a selection heuristic creator.
    *
-   * @see #MaxC
-   * @see #MaxL
-   * @see #MinE
-   * @see #MinS
-   * @see #MinSync
-   * @see #getSelectingMethodFactory()
-   * @see SelectionMethod
+   * @see #setSelectionHeuristic(SelectionHeuristicCreator)
    */
-  public void setSelectingMethod(final SelectionMethod method)
+  public void setSelectionHeuristic(final SelectionHeuristic<Candidate> heuristic)
   {
-    mSelectionMethod = method;
+    mSelectionHeuristic = heuristic;
   }
 
   /**
    * Gets the selecting heuristics used to choose candidates.
-   * @see #setSelectingMethod(SelectionMethod) setSelectingMethod()
    */
-  public SelectionMethod getSelectingMethod()
+  public SelectionHeuristic<Candidate> getSelectionHeuristic()
   {
-    return mSelectionMethod;
+    return mSelectionHeuristic;
   }
 
   /**
@@ -328,7 +333,6 @@ public abstract class AbstractCompositionalModelAnalyzer
   /**
    * Returns whether subsumption is enabled in the selecting heuristic.
    * @see #setSubumptionEnabled(boolean)
-   * @see SelectionMethod
    */
   public boolean isSubsumptionEnabled()
   {
@@ -627,7 +631,6 @@ public abstract class AbstractCompositionalModelAnalyzer
       mAbstractionProcedureFactory.createAbstractionProcedure(this);
     mAbstractionProcedure.storeStatistics();
     mPreselectingHeuristic = mPreselectingMethod.createHeuristic(this);
-    mSelectionHeuristic = mSelectionMethod.createChainHeuristic();
     mSelectionHeuristic.setContext(this);
     setupSynchronousProductBuilder();
     mOverflowCandidates = new THashSet<List<AutomatonProxy>>();
@@ -643,7 +646,6 @@ public abstract class AbstractCompositionalModelAnalyzer
     mUsedDefaultMarking = mUsedPreconditionMarking = null;
     mPropositions = null;
     mPreselectingHeuristic = null;
-    mSelectionHeuristic = null;
     mCurrentAutomata = null;
     mEventInfoMap = null;
     mDirtyAutomata = null;
@@ -710,7 +712,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         boolean cancheck = true;
         OverflowException lastOverflow = null;
         do {
-          Collection<Candidate> candidates =
+          List<Candidate> candidates =
             mPreselectingHeuristic.findCandidates();
           while (true) {
             checkAbort();
@@ -1349,7 +1351,7 @@ public abstract class AbstractCompositionalModelAnalyzer
    *         into account, or <CODE>null</CODE> if no suitable candidate
    *         could be found within the state limits.
    */
-  private Candidate selectCandidate(final Collection<Candidate> preselected)
+  private Candidate selectCandidate(final List<Candidate> preselected)
     throws AnalysisException
   {
     if (preselected.isEmpty()) {
@@ -1357,7 +1359,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     } else {
       final Candidate result = mSelectionHeuristic.select(preselected);
       if (mSubsumptionEnabled) {
-        final Collection<Candidate> subsumedBy = new LinkedList<Candidate>();
+        final List<Candidate> subsumedBy = new LinkedList<Candidate>();
         for (final Candidate candidate : preselected) {
           if (candidate.subsumes(result)) {
             subsumedBy.add(candidate);
@@ -1755,8 +1757,6 @@ public abstract class AbstractCompositionalModelAnalyzer
    * represents the first step of candidate selection. It generates a list
    * of candidates, from which the best candidate is to be chosen by the
    * selecting heuristic in the second step.
-   *
-   * @see SelectionMethod
    */
   public abstract static class PreselectingMethod
   {
@@ -1889,257 +1889,6 @@ public abstract class AbstractCompositionalModelAnalyzer
       (final AbstractCompositionalModelAnalyzer analyzer)
     {
       return analyzer.new HeuristicMinT();
-    }
-  };
-
-
-  //#########################################################################
-  //# Inner Class SelectingMethod
-  /**
-   * <P>The configuration setting to determine the selection heuristic
-   * used to choose candidates during compositional verification.</P>
-   *
-   * <P>The selecting heuristic represents the second step of candidate
-   * selection. It chooses the best candidate from a list of candidates
-   * generated by the {@link
-   * AbstractCompositionalModelAnalyzer.PreselectingHeuristic
-   * PreselectingHeuristic} in the first step.</P>
-   *
-   * <P>Selection is implemented using a {@link SelectionHeuristic}.</P>
-   *
-   * @see PreselectingMethod
-   */
-  public abstract static class SelectionMethod
-  {
-    //#######################################################################
-    //# Constructors
-    protected SelectionMethod(final String name)
-    {
-      mName = name;
-    }
-
-    //#######################################################################
-    //# Override for java.lang.Object
-    @Override
-    public String toString()
-    {
-      return mName;
-    }
-
-    //#######################################################################
-    //# Heuristics
-    /**
-     * Creates a comparator to implement this selecting heuristic.
-     * This returns an implementation of only one heuristic, which
-     * may consider two candidates as equal.
-     * @param  analyzer The model analyser requesting and using the
-     *                  heuristic.
-     * @return A comparator, or <CODE>null</CODE> if the heuristic
-     *         is not implemented by a comparator.
-     */
-    abstract SelectionHeuristic<Candidate> createBaseHeuristic();
-
-    /**
-     * Creates a selecting heuristic that gives preferences to this method.
-     * The returned heuristic first compares candidates according to this
-     * selection methods. If two candidates are found equal, all other enabled
-     * selection heuristics are used, in the order in which they are
-     * defined in the enumeration. If the candidates are equal under
-     * all heuristics, they are compared based on their names. This
-     * guarantees that no two candidates are equal.
-     */
-    SelectionHeuristic<Candidate> createChainHeuristic()
-    {
-      @SuppressWarnings("unchecked")
-      final SelectionHeuristic<Candidate>[] heuristics =
-        new SelectionHeuristic[1];
-      heuristics[0] = createBaseHeuristic();
-      return new ChainSelectionHeuristic<>(heuristics);
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final String mName;
-  }
-
-
-  //#########################################################################
-  //# Inner Class SelectionMethodFactory
-  protected static class SelectionMethodFactory
-    extends ListedEnumFactory<SelectionMethod>
-  {
-    //#######################################################################
-    //# Constructors
-    protected SelectionMethodFactory()
-    {
-      register(MaxL);
-      register(MaxC);
-      register(MinE);
-      register(MinF);
-      register(MinS);
-      register(MinSync);
-    }
-
-    //#######################################################################
-    //# Migration
-    protected SelectionMethod getEnumValue(final SelectionMethod method)
-    {
-      final String name = method.toString();
-      return getEnumValue(name);
-    }
-
-    //#######################################################################
-    //# Chain Construction
-    /**
-     * Creates a comparator to implement the given selecting heuristic. The
-     * returned comparator first compares candidates according to the given
-     * selection methods. If two candidates are found equal, all other enabled
-     * selection heuristics are used, in the order in which they are registered
-     * in the enumeration. If the candidates are equal under all heuristics,
-     * they are compared based on their names. This guarantees that no two
-     * candidates are equal.
-     * @param method
-     *          Primary selection method to be used first.
-     */
-    static SelectionHeuristic<Candidate> createChainHeuristic
-      (final SelectionMethod... methods)
-    {
-      @SuppressWarnings("unchecked")
-      final SelectionHeuristic<Candidate>[] heuristics =
-        new SelectionHeuristic[methods.length];
-      for (int i = 0; i < methods.length; i++) {
-        final SelectionMethod method = methods[i];
-        heuristics[i] = method.createBaseHeuristic();
-      }
-      return new ChainSelectionHeuristic<>(heuristics);
-    }
-  }
-
-  //#########################################################################
-  //# Selection Methods
-  /**
-   * The selecting method that chooses the candidate with the highest
-   * proportion of common events.
-   * An event is considered as common if it is used by at least two
-   * automata of the candidate.
-   */
-  public static final SelectionMethod MaxC = new SelectionMethod("MaxC")
-  {
-    @Override
-    SelectionHeuristic<Candidate> createBaseHeuristic()
-    {
-      return new SelectionHeuristicMaxC();
-    }
-
-    @Override
-    SelectionHeuristic<Candidate> createChainHeuristic()
-    {
-      return SelectionMethodFactory.createChainHeuristic
-        (MaxC, MaxL, MinE, MinS);
-    }
-  };
-
-  /**
-   * The selecting method that chooses the candidate with the highest
-   * proportion of local events.
-   */
-  public static final SelectionMethod MaxL = new SelectionMethod("MaxL")
-  {
-    @Override
-    SelectionHeuristic<Candidate> createBaseHeuristic()
-    {
-      return new SelectionHeuristicMaxL();
-    }
-
-    @Override
-    SelectionHeuristic<Candidate> createChainHeuristic()
-    {
-      return SelectionMethodFactory.createChainHeuristic
-        (MaxL, MaxC, MinE, MinS);
-    }
-  };
-
-  /**
-   * The selecting method that chooses the candidate with the smallest
-   * alphabet extension. The alphabet extension is given by the quotient
-   * of the number of events of a candidate divided by the largest number of
-   * events of a single automaton of the candidate.
-   */
-  public static final SelectionMethod MinE = new SelectionMethod("MinE")
-  {
-    @Override
-    SelectionHeuristic<Candidate> createBaseHeuristic()
-    {
-      return new SelectionHeuristicMinE();
-    }
-
-    @Override
-    SelectionHeuristic<Candidate> createChainHeuristic()
-    {
-      return SelectionMethodFactory.createChainHeuristic
-        (MinE, MaxL, MaxC, MinS);
-    }
-  };
-
-  /**
-   * The selecting method that chooses the candidate with the minimum
-   * frontier, i.e., the smallest number of automata that share events
-   * with the automata of this candidate.
-   */
-  public static final SelectionMethod MinF = new SelectionMethod("MinF")
-  {
-    @Override
-    SelectionHeuristic<Candidate> createBaseHeuristic()
-    {
-      return new SelectionHeuristicMinF();
-    }
-
-    @Override
-    SelectionHeuristic<Candidate> createChainHeuristic()
-    {
-      return SelectionMethodFactory.createChainHeuristic
-        (MinF, MinSync, MaxL, MaxC, MinE);
-    }
-  };
-
-  /**
-   * The selecting method that chooses the candidate with the minimum
-   * estimated number of states in the synchronous product.
-   */
-  public static final SelectionMethod MinS = new SelectionMethod("MinS")
-  {
-    @Override
-    SelectionHeuristic<Candidate> createBaseHeuristic()
-    {
-      return new SelectionHeuristicMinS();
-    }
-
-    @Override
-    SelectionHeuristic<Candidate> createChainHeuristic()
-    {
-      return SelectionMethodFactory.createChainHeuristic
-        (MinS, MaxL, MaxC, MinE);
-    }
-  };
-
-  /**
-   * The selecting method that chooses the candidate with the minimum
-   * actual number of states in the synchronous product.
-   */
-  public static final SelectionMethod MinSync =
-      new SelectionMethod("MinSync")
-  {
-    @Override
-    SelectionHeuristic<Candidate> createBaseHeuristic()
-    {
-      return new SelectionHeuristicMinSync();
-    }
-
-    @Override
-    SelectionHeuristic<Candidate> createChainHeuristic()
-    {
-      return SelectionMethodFactory.createChainHeuristic
-        (MinSync, MaxL, MaxC, MinE);
     }
   };
 
@@ -2469,7 +2218,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   //# Local Interface PreselectingHeuristic
   protected interface PreselectingHeuristic
   {
-    public Collection<Candidate> findCandidates();
+    public List<Candidate> findCandidates();
   }
 
 
@@ -2482,7 +2231,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     //#######################################################################
     //# Interface PreselectingHeuristic
     @Override
-    public Collection<Candidate> findCandidates()
+    public List<Candidate> findCandidates()
     {
       if (mCurrentAutomata.isEmpty()) {
         return Collections.emptyList();
@@ -2495,13 +2244,13 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     //#######################################################################
     //# Auxiliary Methods
-    private Collection<Candidate> pairAutomaton
+    private List<Candidate> pairAutomaton
       (final AutomatonProxy chosenAut,
        final Collection<AutomatonProxy> automata)
     {
       final Set<EventProxy> chosenEvents =
         new THashSet<EventProxy>(chosenAut.getEvents());
-      final Collection<Candidate> candidates = new LinkedList<Candidate>();
+      final List<Candidate> candidates = new LinkedList<Candidate>();
       for (final AutomatonProxy aut : automata) {
         if (aut != chosenAut && synchronises(chosenEvents, aut.getEvents())) {
           final List<AutomatonProxy> pair = new ArrayList<AutomatonProxy>(2);
@@ -2605,9 +2354,9 @@ public abstract class AbstractCompositionalModelAnalyzer
     //#######################################################################
     //# Interface PreselectingHeuristic
     @Override
-    public Collection<Candidate> findCandidates()
+    public List<Candidate> findCandidates()
     {
-      final Collection<Candidate> candidates = new LinkedList<Candidate>();
+      final List<Candidate> candidates = new LinkedList<Candidate>();
       final int size = mEventInfoMap.size();
       final Collection<List<AutomatonProxy>> found =
         new THashSet<List<AutomatonProxy>>(size);
@@ -2624,188 +2373,6 @@ public abstract class AbstractCompositionalModelAnalyzer
       }
       return candidates;
     }
-  }
-
-
-  //#########################################################################
-  //# Inner Class SelectionHeuristicMaxC
-  private static class SelectionHeuristicMaxC
-    extends NumericSelectionHeuristic<Candidate>
-  {
-    //#######################################################################
-    //# Overrides for AbstractNumericSelectionHeuristic<Candidate>
-    @Override
-    protected double getHeuristicValue(final Candidate candidate)
-    {
-      return - (double) candidate.getCommonEventCount() /
-               candidate.getNumberOfEvents();
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class SelectionHeuristicMaxL
-  private static class SelectionHeuristicMaxL
-    extends NumericSelectionHeuristic<Candidate>
-  {
-    //#######################################################################
-    //# Overrides for AbstractNumericSelectionHeuristic<Candidate>
-    @Override
-    protected double getHeuristicValue(final Candidate candidate)
-    {
-      return - (double) candidate.getLocalEventCount() /
-               candidate.getNumberOfEvents();
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class SelectionHeuristicMinE
-  private static class SelectionHeuristicMinE
-    extends NumericSelectionHeuristic<Candidate>
-  {
-    //#######################################################################
-    //# Overrides for AbstractNumericSelectionHeuristic<Candidate>
-    @Override
-    protected double getHeuristicValue(final Candidate candidate)
-    {
-      final int unionAlphabetSize = candidate.getNumberOfEvents();
-      int largestAlphabetSize = 0;
-      for (final AutomatonProxy aut : candidate.getAutomata()) {
-        final int size = Candidate.countEvents(aut);
-        if (size > largestAlphabetSize) {
-          largestAlphabetSize = size;
-        }
-      }
-      return (double) unionAlphabetSize / (double) largestAlphabetSize;
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class SelectionHeuristicMinF
-  private static class SelectionHeuristicMinF
-    extends NumericSelectionHeuristic<Candidate>
-  {
-    //#######################################################################
-    //# Overrides for AbstractNumericSelectionHeuristic<Candidate>
-    @Override
-    public void setContext(final Object context)
-    {
-      mAnalyzer = (AbstractCompositionalModelAnalyzer) context;
-    }
-
-    @Override
-    protected double getHeuristicValue(final Candidate candidate)
-    {
-      final Collection<AutomatonProxy> automata = candidate.getAutomata();
-      final Collection<AutomatonProxy> frontier = new THashSet<AutomatonProxy>();
-      final Collection<EventProxy> local = candidate.getLocalEvents();
-      final Collection<EventProxy> shared = new THashSet<EventProxy>();
-      for (final AutomatonProxy aut : automata) {
-        for (final EventProxy event : aut.getEvents()) {
-          final EventInfo info = mAnalyzer.getEventInfo(event);
-          if (info != null && !local.contains(event) && shared.add(event)) {
-            for (final AutomatonProxy other : info.getSortedAutomataList()) {
-              if (!automata.contains(other)) {
-                frontier.add(other);
-              }
-            }
-          }
-        }
-      }
-      return frontier.size();
-    }
-
-    //#######################################################################
-    //# Data Members
-    private AbstractCompositionalModelAnalyzer mAnalyzer;
-  }
-
-
-  //#########################################################################
-  //# Inner Class SelectionHeuristicMinS
-  private static class SelectionHeuristicMinS
-    extends NumericSelectionHeuristic<Candidate>
-  {
-    //#######################################################################
-    //# Overrides for AbstractNumericSelectionHeuristic<Candidate>
-    @Override
-    protected double getHeuristicValue(final Candidate candidate)
-    {
-      double product = 1.0;
-      for (final AutomatonProxy aut : candidate.getAutomata()) {
-        product *= aut.getStates().size();
-      }
-      final double totalEvents = candidate.getNumberOfEvents();
-      final double localEvents = candidate.getLocalEventCount();
-      return product * (totalEvents - localEvents) / totalEvents;
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class SelectionHeuristicMinSync
-  private static class SelectionHeuristicMinSync
-    extends NumericSelectionHeuristic<Candidate>
-  {
-    //#######################################################################
-    //# Overrides for AbstractNumericSelectionHeuristic<Candidate>
-    @Override
-    public void setContext(final Object context)
-    {
-      mAnalyzer = (AbstractCompositionalModelAnalyzer) context;
-      mStateLimit = mAnalyzer.getCurrentInternalStateLimit();
-    }
-
-    @Override
-    protected double getHeuristicValue(final Candidate candidate)
-    {
-      final MonolithicSynchronousProductBuilder syncBuilder =
-        mAnalyzer.getSynchronousProductBuilder();
-      syncBuilder.setNodeLimit(mStateLimit);
-      syncBuilder.setConstructsResult(false);
-      syncBuilder.setStateCallback(null);
-      final List<EventProxy> empty = Collections.emptyList();
-      syncBuilder.setPropositions(empty);
-      final List<AutomatonProxy> automata = candidate.getAutomata();
-      final ProductDESProxy des = mAnalyzer.createProductDESProxy(automata);
-      syncBuilder.setModel(des);
-      try {
-        syncBuilder.run();
-        final AnalysisResult result = syncBuilder.getAnalysisResult();
-        final double dsize = result.getTotalNumberOfStates();
-        final int size = (int) Math.round(dsize);
-        if (size < mStateLimit) {
-          mStateLimit = size;
-        }
-        return dsize;
-      } catch (final OutOfMemoryError error) {
-        final Logger logger = mAnalyzer.getLogger();
-        logger.debug("<out of memory>");
-        return Double.POSITIVE_INFINITY;
-      } catch (final OverflowException overflow) {
-        return Double.POSITIVE_INFINITY;
-      } catch (final AnalysisException exception) {
-        throw exception.getRuntimeException();
-      } finally {
-        final CompositionalAnalysisResult stats = mAnalyzer.getAnalysisResult();
-        final AutomatonResult result = syncBuilder.getAnalysisResult();
-        stats.addSynchronousProductAnalysisResult(result);
-      }
-    }
-
-    @Override
-    protected void reset()
-    {
-      super.reset();
-      mStateLimit = mAnalyzer.getCurrentInternalStateLimit();
-    }
-
-    //#######################################################################
-    //# Data Members
-    private AbstractCompositionalModelAnalyzer mAnalyzer;
-    private int mStateLimit;
   }
 
 
@@ -2903,8 +2470,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   private AbstractionProcedureFactory mAbstractionProcedureFactory;
   private final PreselectingMethodFactory mPreselectingMethodFactory;
   private PreselectingMethod mPreselectingMethod;
-  private final SelectionMethodFactory mSelectingMethodFactory;
-  private SelectionMethod mSelectionMethod;
+  private SelectionHeuristic<Candidate> mSelectionHeuristic;
   private boolean mSubsumptionEnabled;
   private boolean mUsingSpecialEvents;
   private int mLowerInternalStateLimit;
@@ -2975,7 +2541,6 @@ public abstract class AbstractCompositionalModelAnalyzer
   private MonolithicSynchronousProductBuilder mSynchronousProductBuilder;
   private AbstractionProcedure mAbstractionProcedure;
   private PreselectingHeuristic mPreselectingHeuristic;
-  private SelectionHeuristic<Candidate> mSelectionHeuristic;
 
 
   //#########################################################################

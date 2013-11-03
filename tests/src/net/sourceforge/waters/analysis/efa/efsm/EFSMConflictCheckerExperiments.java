@@ -25,6 +25,7 @@ import net.sourceforge.waters.analysis.bdd.TransitionPartitioningStrategy;
 import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer;
 import net.sourceforge.waters.analysis.compositional.ChainSelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.CompositionalConflictChecker;
+import net.sourceforge.waters.analysis.compositional.CompositionalSelectionHeuristicFactory;
 import net.sourceforge.waters.analysis.compositional.ConflictAbstractionProcedureFactory;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -463,8 +464,8 @@ public class EFSMConflictCheckerExperiments
         (ConflictAbstractionProcedureFactory.NBA);
       mConflictChecker.setPreselectingMethod
         (AbstractCompositionalModelAnalyzer.MustL);
-      mConflictChecker.setSelectingMethod
-        (AbstractCompositionalModelAnalyzer.MinF);
+      mConflictChecker.setSelectionHeuristic
+        (CompositionalSelectionHeuristicFactory.MinF);
       mConflictChecker.setInternalStateLimit(8000);
       mConflictChecker.setMonolithicStateLimit(50000000);
       mConflictChecker.setMonolithicTransitionLimit(0);

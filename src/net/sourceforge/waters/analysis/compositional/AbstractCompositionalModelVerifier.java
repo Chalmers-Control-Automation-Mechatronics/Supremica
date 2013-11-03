@@ -90,19 +90,15 @@ public abstract class AbstractCompositionalModelVerifier
    * @param preselectingMethodFactory
    *          Enumeration factory that determines possible candidate
    *          preselection methods.
-   * @param selectingMethodFactory
-   *          Enumeration factory that determines possible candidate
-   *          selection methods.
    */
   protected AbstractCompositionalModelVerifier
     (final ProductDESProxyFactory factory,
      final KindTranslator translator,
      final AbstractionProcedureFactory abstractionFactory,
-     final PreselectingMethodFactory preselectingMethodFactory,
-     final SelectionMethodFactory selectingMethodFactory)
+     final PreselectingMethodFactory preselectingMethodFactory)
   {
     super(factory, translator, abstractionFactory,
-          preselectingMethodFactory, selectingMethodFactory);
+          preselectingMethodFactory);
   }
 
   /**
@@ -138,20 +134,16 @@ public abstract class AbstractCompositionalModelVerifier
    * @param preselectingMethodFactory
    *          Enumeration factory that determines possible candidate
    *          preselection methods.
-   * @param selectingMethodFactory
-   *          Enumeration factory that determines possible candidate
-   *          selection methods.
    */
   protected AbstractCompositionalModelVerifier
     (final ProductDESProxy model,
      final ProductDESProxyFactory factory,
      final KindTranslator translator,
      final AbstractionProcedureFactory abstractionFactory,
-     final PreselectingMethodFactory preselectingMethodFactory,
-     final SelectionMethodFactory selectingMethodFactory)
+     final PreselectingMethodFactory preselectingMethodFactory)
   {
     super(model, factory, translator, abstractionFactory,
-          preselectingMethodFactory, selectingMethodFactory);
+          preselectingMethodFactory);
   }
 
 
