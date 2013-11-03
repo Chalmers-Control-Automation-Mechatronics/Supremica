@@ -83,7 +83,7 @@ public abstract class AbstractEFATransitionRelation<L>
   /**
    * Returns whether the given transition label is marked as used in the
    * transition relation.
-   * @param  event  Code of transition label to be checked.
+   * @param  code   Code of transition label to be checked.
    */
   protected boolean isUsedTransitionLabel(final int code)
   {

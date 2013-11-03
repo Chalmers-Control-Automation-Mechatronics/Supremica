@@ -24,6 +24,7 @@ import net.sourceforge.waters.analysis.bdd.BDDPackage;
 import net.sourceforge.waters.analysis.bdd.TransitionPartitioningStrategy;
 import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer;
 import net.sourceforge.waters.analysis.compositional.CompositionalConflictChecker;
+import net.sourceforge.waters.analysis.compositional.CompositionalSelectionHeuristicFactory;
 import net.sourceforge.waters.analysis.compositional.ConflictAbstractionProcedureFactory;
 import net.sourceforge.waters.analysis.efa.efsm.EFSMConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -481,8 +482,8 @@ public class UnifiedEFAConflictCheckerExperiments
         (ConflictAbstractionProcedureFactory.NB);
       mConflictChecker.setPreselectingMethod
         (AbstractCompositionalModelAnalyzer.MustL);
-      mConflictChecker.setSelectingMethod
-        (AbstractCompositionalModelAnalyzer.MinS);
+      mConflictChecker.setSelectionHeuristic
+        (CompositionalSelectionHeuristicFactory.MinS);
       mConflictChecker.setInternalStateLimit(10000);
       mConflictChecker.setMonolithicStateLimit(50000000);
       mConflictChecker.setMonolithicTransitionLimit(0);

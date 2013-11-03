@@ -10,14 +10,13 @@
 package net.sourceforge.waters.analysis.efa.unified;
 
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
-import net.sourceforge.waters.analysis.efa.efsm.EFSMConflictChecker;
 
 
 /**
  * A collection of abstraction methods to be used for compositional
  * nonblocking verification. The members of this enumeration are passed to the
- * {@link EFSMConflictChecker} using its
- * {@link EFSMConflictChecker#setSimplifierFactory(UnifiedEFASimplifierFactory)
+ * {@link UnifiedEFAConflictChecker} using its
+ * {@link UnifiedEFAConflictChecker#setSimplifierFactory(UnifiedEFASimplifierFactory)
  * setSimplifierFactory()} method.
  *
  * @author Sahar Mohajerani, Robi Malik

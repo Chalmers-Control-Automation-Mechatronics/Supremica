@@ -1171,7 +1171,7 @@ public abstract class TransitionListBuffer
    * of the transition relation.
    * @param partition
    *          The partition to be imposed.
-   * @see ListBufferTransitionRelation#merge(List) ListBufferTransitionRelation.merge()
+   * @see ListBufferTransitionRelation#merge(TRPartition) ListBufferTransitionRelation.merge()
    */
   public void merge(final TRPartition partition, final int extraStates)
   {

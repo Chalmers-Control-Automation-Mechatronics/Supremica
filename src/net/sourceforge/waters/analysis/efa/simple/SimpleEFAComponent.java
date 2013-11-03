@@ -219,11 +219,6 @@ public class SimpleEFAComponent
     return edgeList;
   }
 
-  /**
-   * Constructing component proxy
-   * <p/>
-   * @return A simple component proxy {@SimpleComponentProxy}
-   */
   public SimpleComponentProxy getSimpleComponent()
   {
     final String name = getName();

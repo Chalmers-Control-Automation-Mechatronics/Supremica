@@ -114,6 +114,11 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     mUsesLocalVariable = prefer;
   }
 
+  public void setSimplifierFactory(final UnifiedEFASimplifierFactory factory)
+  {
+    mSimplifierFactory = factory;
+  }
+
   public int getInternalStateLimit()
   {
     return mInternalStateLimit;
@@ -2037,6 +2042,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
   private int mInternalStateLimit = Integer.MAX_VALUE;
   private int mInternalTransitionLimit = Integer.MAX_VALUE;
   private boolean mUsesLocalVariable;
+  private UnifiedEFASimplifierFactory mSimplifierFactory;
 
   private DocumentManager mDocumentManager;
   private UnifiedEFAVariableCollector mVariableCollector;
@@ -2044,7 +2050,6 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
   private Comparator<Candidate> mAutomataComparator;
   private UnifiedEFAVariableUnfolder mUnfolder;
   private UnifiedEFASimplifier mSimplifier;
-  private UnifiedEFASimplifierFactory mSimplifierFactory;
   private UnifiedEFAUpdateMerger mUpdateMerger;
   private UnifiedEFASynchronousProductBuilder mSynchronizer;
   private EFANonblockingChecker mNonblockingChecker;
