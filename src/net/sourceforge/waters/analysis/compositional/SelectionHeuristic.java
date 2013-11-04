@@ -54,6 +54,9 @@ public abstract class SelectionHeuristic<T>
    * context into the heuristic. The default implementation does nothing,
    * but it can be overridden by specific heuristics that require access
    * to their model analyser.
+   * @param  context  The context to be used by the selection heuristic.
+   * @throws ClassCastException to indicate that the given context is not
+   *         of a type supported by this selection heuristic.
    */
   public void setContext(final Object context)
   {

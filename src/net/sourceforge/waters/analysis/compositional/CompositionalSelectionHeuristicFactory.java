@@ -263,7 +263,7 @@ public class CompositionalSelectionHeuristicFactory
     extends NumericSelectionHeuristic<Candidate>
   {
     //#######################################################################
-    //# Overrides for AbstractNumericSelectionHeuristic<Candidate>
+    //# Overrides for NumericSelectionHeuristic<Candidate>
     @Override
     protected double getHeuristicValue(final Candidate candidate)
     {
@@ -279,7 +279,7 @@ public class CompositionalSelectionHeuristicFactory
     extends NumericSelectionHeuristic<Candidate>
   {
     //#######################################################################
-    //# Overrides for AbstractNumericSelectionHeuristic<Candidate>
+    //# Overrides for NumericSelectionHeuristic<Candidate>
     @Override
     protected double getHeuristicValue(final Candidate candidate)
     {
@@ -295,7 +295,7 @@ public class CompositionalSelectionHeuristicFactory
     extends NumericSelectionHeuristic<Candidate>
   {
     //#######################################################################
-    //# Overrides for AbstractNumericSelectionHeuristic<Candidate>
+    //# Overrides for NumericSelectionHeuristic<Candidate>
     @Override
     protected double getHeuristicValue(final Candidate candidate)
     {
@@ -318,7 +318,7 @@ public class CompositionalSelectionHeuristicFactory
     extends NumericSelectionHeuristic<Candidate>
   {
     //#######################################################################
-    //# Overrides for AbstractNumericSelectionHeuristic<Candidate>
+    //# Overrides for NumericSelectionHeuristic<Candidate>
     @Override
     public void setContext(final Object context)
     {
@@ -360,7 +360,7 @@ public class CompositionalSelectionHeuristicFactory
     extends NumericSelectionHeuristic<Candidate>
   {
     //#######################################################################
-    //# Overrides for AbstractNumericSelectionHeuristic<Candidate>
+    //# Overrides for NumericSelectionHeuristic<Candidate>
     @Override
     protected double getHeuristicValue(final Candidate candidate)
     {
@@ -381,7 +381,7 @@ public class CompositionalSelectionHeuristicFactory
     extends NumericSelectionHeuristic<Candidate>
   {
     //#######################################################################
-    //# Overrides for AbstractNumericSelectionHeuristic<Candidate>
+    //# Overrides for NumericSelectionHeuristic<Candidate>
     @Override
     public void setContext(final Object context)
     {

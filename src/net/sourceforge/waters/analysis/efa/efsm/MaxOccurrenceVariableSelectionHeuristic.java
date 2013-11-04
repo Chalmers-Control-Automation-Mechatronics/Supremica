@@ -30,7 +30,7 @@ public class MaxOccurrenceVariableSelectionHeuristic
 
   //#########################################################################
   //# Overrides for
-  //# net.sourceforge.waters.analysis.compositional.AbstractNumericSelectionHeuristic
+  //# net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic
   @Override
   protected double getHeuristicValue(final EFSMVariable var)
   {

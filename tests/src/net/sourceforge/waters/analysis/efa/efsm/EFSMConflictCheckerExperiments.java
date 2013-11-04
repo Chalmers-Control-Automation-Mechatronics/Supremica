@@ -375,14 +375,16 @@ public class EFSMConflictCheckerExperiments
           stats.printCSVHorizontalHeadings(mPrintWriter);
           mPrintWriter.println();
         }
+        mPrintWriter.print('\"');
         mPrintWriter.print(fullModuleName);
-        mPrintWriter.print(',');
+        mPrintWriter.print("\",");
         stats.printCSVHorizontal(mPrintWriter);
         mPrintWriter.println();
         return stats.isSatisfied();
       } catch (final Throwable exception) {
         System.out.println(ProxyTools.getShortClassName(exception));
-        mPrintWriter.println(fullModuleName + "," + exception.getMessage());
+        mPrintWriter.println("\"" + fullModuleName + "\"," +
+                             exception.getMessage());
         if (exception instanceof AnalysisException) {
           throw (AnalysisException) exception;
         } else if (exception instanceof EvalException) {

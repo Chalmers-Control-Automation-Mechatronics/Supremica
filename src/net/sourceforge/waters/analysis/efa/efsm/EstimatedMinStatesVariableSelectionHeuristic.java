@@ -21,7 +21,8 @@ public class EstimatedMinStatesVariableSelectionHeuristic
 {
 
   //#########################################################################
-  //# Constructors
+  //# Overrides for
+  //# net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic
   @Override
   protected double getHeuristicValue(final EFSMVariable var)
   {

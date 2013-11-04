@@ -25,7 +25,7 @@ public class MaxTrueVariableSelectionHeuristic
 
   //#########################################################################
   //# Overrides for
-  //# net.sourceforge.waters.analysis.compositional.AbstractNumericSelectionHeuristic
+  //# net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic
   @Override
   public void setContext(final Object context)
   {

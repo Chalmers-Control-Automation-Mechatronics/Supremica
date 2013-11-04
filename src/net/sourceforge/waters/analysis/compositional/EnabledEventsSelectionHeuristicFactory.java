@@ -100,7 +100,7 @@ public class EnabledEventsSelectionHeuristicFactory
     extends NumericSelectionHeuristic<Candidate>
   {
     //#######################################################################
-    //# Overrides for AbstractNumericSelectionHeuristic<Candidate>
+    //# Overrides for NumericSelectionHeuristic<Candidate>
     @Override
     public void setContext(final Object context)
     {
@@ -136,7 +136,7 @@ public class EnabledEventsSelectionHeuristicFactory
     extends NumericSelectionHeuristic<Candidate>
   {
     //#######################################################################
-    //# Overrides for AbstractNumericSelectionHeuristic<Candidate>
+    //# Overrides for NumericSelectionHeuristic<Candidate>
     @Override
     public void setContext(final Object context)
     {

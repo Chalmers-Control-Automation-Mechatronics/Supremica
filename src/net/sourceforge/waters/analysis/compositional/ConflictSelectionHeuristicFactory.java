@@ -121,7 +121,7 @@ public class ConflictSelectionHeuristicFactory
     extends NumericSelectionHeuristic<Candidate>
   {
     //#######################################################################
-    //# Overrides for AbstractNumericSelectionHeuristic<Candidate>
+    //# Overrides for NumericSelectionHeuristic<Candidate>
     @Override
     public void setContext(final Object context)
     {
@@ -173,7 +173,7 @@ public class ConflictSelectionHeuristicFactory
     }
 
     //#######################################################################
-    //# Overrides for AbstractNumericSelectionHeuristic<Candidate>
+    //# Overrides for NumericSelectionHeuristic<Candidate>
     @Override
     public void setContext(final Object context)
     {
