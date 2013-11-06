@@ -231,7 +231,10 @@ public abstract class BDDModelVerifier
       if (numNodes > mPeakNodes) {
         mPeakNodes = numNodes;
         if (numNodes > getNodeLimit()) {
-          throw new OverflowException(OverflowKind.NODE, getNodeLimit());
+          final OverflowException exception =
+            new OverflowException(OverflowKind.NODE, getNodeLimit());
+          getLogger().debug(exception.getMessage() + " - aborting ...");
+          throw exception;
         }
       }
     }
@@ -302,6 +305,11 @@ public abstract class BDDModelVerifier
   //# Debug Output
   public void silentBDDHandler(final Object dummy1, final Object dummy2)
   {
+    try {
+      checkAbort();
+    } catch (final AnalysisException exception) {
+      throw new WatersRuntimeException(exception);
+    }
   }
 
 
@@ -997,4 +1005,3 @@ public abstract class BDDModelVerifier
   private static final int START_REORDER_INDEX = 8;
 
 }
-

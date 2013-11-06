@@ -131,7 +131,7 @@ public class EFSMConflictCheckerExperiments
       new ChainSelectionHeuristic<EFSMPair>(minV, minF, minSync);
 
     checkPML("pml3", 2, 3, true); // Dummy call, result to be discarded.
-    for (int n = 2; n <= 5; n++) {
+    for (int n = 2; n <= 4; n++) {
       try {
         for (int c = 3; c <= 30; c++) {
           checkPML("pml3", c, n, true);
@@ -140,7 +140,7 @@ public class EFSMConflictCheckerExperiments
         // next please ...
       }
     }
-    for (int c = 6; c <= 6; c++) {
+    for (int c = 4; c <= 6; c += 2) {
       try {
         for (int n = 2; n <= 100; n += 2) {
           checkPML("pml3", c, n, true);
@@ -202,10 +202,12 @@ public class EFSMConflictCheckerExperiments
     try {
       testPrimeSieve4();
       testPrimeSieve4b();
-      testPrimeSieve5();
-      testPrimeSieve6();
-      testPrimeSieve7();
-      testPrimeSieve8();
+      if (!(wrapper instanceof BDDConflictCheckerWrapper)) {
+        testPrimeSieve5();
+        testPrimeSieve6();
+        testPrimeSieve7();
+        testPrimeSieve8();
+      }
     } catch (final AnalysisException | EvalException exception) {
       // next please ...
     }

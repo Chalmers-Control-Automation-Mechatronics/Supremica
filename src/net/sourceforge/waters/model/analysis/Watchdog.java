@@ -124,8 +124,11 @@ public class Watchdog extends Thread {
           mStartTime = System.currentTimeMillis();
         }
         do {
-          final long delay = mStartTime + mTimeoutMillis - System.currentTimeMillis();
-          wait(delay);
+          final long delay =
+            mStartTime + mTimeoutMillis - System.currentTimeMillis();
+          if (delay > 0) {
+            wait(delay);
+          }
         } while (System.currentTimeMillis() < mStartTime + mTimeoutMillis);
         mStartTime = -1;
         for (final Abortable abortable : mAbortables) {

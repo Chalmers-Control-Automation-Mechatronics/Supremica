@@ -22,6 +22,7 @@ import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -167,6 +168,12 @@ public class BDDConflictChecker
         final ConflictTraceProxy counterexample =
           computeCounterExample(bad, ConflictKind.LIVELOCK);
         return setFailedResult(counterexample);
+      }
+    } catch (final WatersRuntimeException exception) {
+      if (exception.getCause() instanceof AnalysisException) {
+        throw (AnalysisException) exception.getCause();
+      } else {
+        throw exception;
       }
     } finally {
       tearDown();
