@@ -18,6 +18,14 @@
                             <Point Y="8" X="-8"/>
                         </LabelGeometry>
                     </SimpleNode>
+                    <SimpleNode Name="S1">
+                        <PointGeometry>
+                            <Point Y="64" X="128"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="8" X="-6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
                     <SimpleNode Name="S2">
                         <EventList>
                             <SimpleIdentifier Name=":accepting"/>
@@ -29,15 +37,7 @@
                             <Point Y="7" X="-8"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="S1">
-                        <PointGeometry>
-                            <Point Y="64" X="128"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point Y="8" X="-6"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                </NodeList>
+                 </NodeList>
                 <EdgeList>
                     <Edge Target="S2" Source="S1">
                         <LabelBlock>
