@@ -165,6 +165,25 @@ public class TauClosure
     }
   }
 
+  /**
+   * Creates an iterator over this tau-closure that is guaranteed to
+   * support caching. This method produces an iterator like {@link
+   * #createIterator()} with the additional guarantee that it supports
+   * caching and fully implements the {@link TransitionIterator#resume()
+   * resume()} method.
+   * @see #createIterator()
+   */
+  public TransitionIterator createCachingIterator()
+  {
+    if (mStoredTransitions == null) {
+      return new OnTheFlyTauClosureIterator(mTransitionBuffer,
+                                            mFirstLocal, mLastLocal);
+    } else {
+      final TransitionIterator inner = new StoredTauClosureIterator();
+      return new OneEventCachingTransitionIterator(inner, EventEncoding.TAU);
+    }
+  }
+
 
   /**
    * Creates an iterator over the pre-event closure of the underlying transition
