@@ -33,8 +33,8 @@ import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -56,6 +56,7 @@ import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.VariableComponentSubject;
 
 import org.supremica.gui.ide.IDE;
+import org.supremica.gui.ide.ModuleContainer;
 
 
 /**
@@ -94,6 +95,7 @@ public class IDEPropertiesAction
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent event)
   {
     final Proxy proxy = getActionArgument();
@@ -103,6 +105,7 @@ public class IDEPropertiesAction
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.observer.Observer
+  @Override
   public void update(final EditorChangedEvent event)
   {
     if (event.getKind() == EditorChangedEvent.Kind.SELECTION_CHANGED) {
@@ -169,6 +172,7 @@ public class IDEPropertiesAction
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.printer.ProxyVisitor
+    @Override
     public Boolean visitProxy(final Proxy proxy)
     {
       return false;
@@ -176,6 +180,7 @@ public class IDEPropertiesAction
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
+    @Override
     public Boolean visitConstantAliasProxy(final ConstantAliasProxy decl)
     {
       if (mDoEdit) {
@@ -186,6 +191,7 @@ public class IDEPropertiesAction
       return true;
     }
 
+    @Override
     public Boolean visitEdgeProxy(final EdgeProxy edge)
     {
       if (mDoEdit) {
@@ -196,6 +202,7 @@ public class IDEPropertiesAction
       return true;
     }
 
+    @Override
     public Boolean visitEventAliasProxy(final EventAliasProxy alias)
     {
       if (mDoEdit) {
@@ -206,6 +213,7 @@ public class IDEPropertiesAction
       return true;
     }
 
+    @Override
     public Boolean visitEventDeclProxy(final EventDeclProxy decl)
     {
       if (mDoEdit) {
@@ -216,6 +224,7 @@ public class IDEPropertiesAction
       return true;
     }
 
+    @Override
     public Boolean visitForeachProxy(final ForeachProxy foreach)
     {
       if (mDoEdit) {
@@ -228,6 +237,7 @@ public class IDEPropertiesAction
       return true;
     }
 
+    @Override
     public Boolean visitInstanceProxy(final InstanceProxy instance)
     {
       if (mDoEdit) {
@@ -238,6 +248,7 @@ public class IDEPropertiesAction
       return true;
     }
 
+    @Override
     public Boolean visitParameterBindingProxy(final ParameterBindingProxy binding)
     {
       if (mDoEdit) {
@@ -248,6 +259,7 @@ public class IDEPropertiesAction
       return true;
     }
 
+    @Override
     public Boolean visitSimpleComponentProxy
       (final SimpleComponentProxy comp)
     {
@@ -259,6 +271,7 @@ public class IDEPropertiesAction
       return true;
     }
 
+    @Override
     public Boolean visitNodeProxy(final NodeProxy node)
     {
       if (mDoEdit) {
@@ -266,7 +279,7 @@ public class IDEPropertiesAction
         final SelectionOwner panel =
           ide.getFocusTracker().getWatersSelectionOwner();
         if (panel instanceof GraphEditorPanel) {
-          final ModuleWindowInterface root = getActiveModuleWindowInterface();
+          final ModuleContainer root = getActiveModuleContainer();
           final NodeSubject subject = (NodeSubject) node;
           new NodeEditorDialog(root, panel, subject);
         }
@@ -274,6 +287,7 @@ public class IDEPropertiesAction
       return true;
     }
 
+    @Override
     public Boolean visitVariableComponentProxy
       (final VariableComponentProxy var)
     {

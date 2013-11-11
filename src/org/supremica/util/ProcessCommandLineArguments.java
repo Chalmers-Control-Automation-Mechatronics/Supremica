@@ -68,6 +68,7 @@ import org.supremica.automata.IO.HISCUnmarshaller;
 import org.supremica.automata.IO.SupremicaUnmarshaller;
 import org.supremica.automata.IO.UMDESUnmarshaller;
 import org.supremica.gui.ide.DefaultAttributeFactory;
+import org.supremica.gui.ide.ModuleContainer;
 import org.supremica.properties.Config;
 import org.supremica.properties.SupremicaProperties;
 import org.w3c.dom.DOMImplementation;
@@ -288,6 +289,7 @@ public class ProcessCommandLineArguments
                 new GraphEditorPanel(
                                      (GraphSubject) component.getGraph(),
                                      (ModuleSubject) module,
+                                     (ModuleContainer) null,
                                      (EditorWindowInterface) null,
                                      (ControlledToolbar) new ControlledToolbar() {
 

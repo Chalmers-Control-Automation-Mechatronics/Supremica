@@ -17,19 +17,20 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
 import java.util.Set;
+
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.Border;
 
 import net.sourceforge.waters.gui.EditorColor;
-import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.PropositionsTree;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.PlainEventListSubject;
 
 import org.supremica.gui.ide.IDE;
+import org.supremica.gui.ide.ModuleContainer;
 
 
 /**
@@ -43,10 +44,10 @@ class PropositionsPanel extends JPanel
 
   //#########################################################################
   //# Constructors
-  PropositionsPanel(final ModuleWindowInterface rootWindow,
+  PropositionsPanel(final ModuleContainer rootWindow,
                     final NodeSubject root)
   {
-    final IDE ide = rootWindow.getRootWindow().getIDE();
+    final IDE ide = rootWindow.getIDE();
     final WatersPopupActionManager manager = ide.getPopupActionManager();
     mPropositionsTree = new PropositionsTree(rootWindow, manager, root, null);
     mPropositionsTree.setAutoscrolls(true);

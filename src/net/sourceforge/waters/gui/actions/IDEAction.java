@@ -17,8 +17,8 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 
 import net.sourceforge.waters.gui.ModuleWindowInterface;
-import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.base.Proxy;
@@ -131,6 +131,22 @@ public abstract class IDEAction
   }
 
   /**
+   * Retrieves a references to the active module container.
+   * @return  A module container of the current module,
+   *          or <CODE>null</CODE> if no module container currently active.
+   */
+  ModuleContainer getActiveModuleContainer()
+  {
+    final IDE ide = getIDE();
+    final DocumentContainer container = ide.getActiveDocumentContainer();
+    if (container == null || !(container instanceof ModuleContainer)) {
+      return null;
+    } else {
+      return (ModuleContainer) container;
+    }
+  }
+
+  /**
    * Retrieves a references to the active editor panel.
    * @return  A module window interface to access the active editor panel,
    *          or <CODE>null</CODE> if no editor panel is currently active.
@@ -184,6 +200,7 @@ public abstract class IDEAction
    * @param  event  An event object providing some details on what exactly
    *                has changed.
    */
+  @Override
   public void update(final EditorChangedEvent event)
   {
   }

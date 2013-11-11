@@ -20,6 +20,8 @@ import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
 
+import org.supremica.gui.ide.ModuleContainer;
+
 
 /**
  * The Propositions Tree used to view the propositions of a node
@@ -28,7 +30,7 @@ import net.sourceforge.waters.subject.module.NodeSubject;
  */
 public class PropositionsTree extends ModuleTree
 {
-  public PropositionsTree(final ModuleWindowInterface rootWindow,
+  public PropositionsTree(final ModuleContainer rootWindow,
                           final WatersPopupActionManager manager,
                           final NodeSubject root, final UndoInterface undo)
   {
@@ -38,22 +40,26 @@ public class PropositionsTree extends ModuleTree
     addKeyListener(new KeySpy());
   }
 
+  @Override
   ListSubject<? extends ProxySubject> getRootList()
   {
     return ((NodeSubject) getRoot())
       .getPropositions().getEventIdentifierListModifiable();
   }
 
+  @Override
   String getRootName()
   {
     return "Propositions";
   }
 
+  @Override
   DataFlavor getSupportedDataFlavor()
   {
     return WatersDataFlavor.IDENTIFIER;
   }
 
+  @Override
   PopupFactory getPopupFactory()
   {
     return mPopupFactory;
@@ -62,14 +68,17 @@ public class PropositionsTree extends ModuleTree
   private class KeySpy implements KeyListener
   {
 
+    @Override
     public void keyTyped(final KeyEvent e)
     {
     }
 
+    @Override
     public void keyPressed(final KeyEvent e)
     {
     }
 
+    @Override
     public void keyReleased(final KeyEvent e)
     {
       if(e.getKeyCode() == KeyEvent.VK_DELETE){

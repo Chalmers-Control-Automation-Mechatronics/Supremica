@@ -99,6 +99,7 @@ class ModuleTreeModel
   @Override
   public Proxy getChild(final Object parent, final int index)
   {
+    System.out.println(parent + " " + index);
     final Proxy proxy = (Proxy) parent;
     final List<? extends Proxy> children =
       mChildrenGetterVisitor.getChildren(proxy);

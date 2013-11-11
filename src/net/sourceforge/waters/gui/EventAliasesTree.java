@@ -8,6 +8,8 @@ import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
 
+import org.supremica.gui.ide.ModuleContainer;
+
 
 /**
  * The EventAliasesTree which shows under the definitions tab of the module
@@ -18,23 +20,26 @@ import net.sourceforge.waters.subject.base.ProxySubject;
 public class EventAliasesTree extends ModuleTree
 {
 
-  public EventAliasesTree(final ModuleWindowInterface root,
+  public EventAliasesTree(final ModuleContainer root,
                              final WatersPopupActionManager manager)
   {
-    super(root, manager, root.getModuleSubject(), root.getUndoInterface());
+    super(root, manager, root.getModule(), root);
     mPopupFactory = new AliasesTreePopupFactory(manager, root.getModuleContext());
   }
 
   //#########################################################################
   //# Abstract Methods
+  @Override
   ListSubject<? extends ProxySubject> getRootList(){
-    return getRootWindow().getModuleSubject().getEventAliasListModifiable();
+    return getModuleContainer().getModule().getEventAliasListModifiable();
   }
 
+  @Override
   String getRootName(){
     return "Event Aliases";
   }
 
+  @Override
   DataFlavor getSupportedDataFlavor()
   {
     return WatersDataFlavor.EVENT_ALIAS;
@@ -42,11 +47,13 @@ public class EventAliasesTree extends ModuleTree
 
   private static final long serialVersionUID = 1L;
 
+  @Override
   PopupFactory getPopupFactory()
   {
     return mPopupFactory;
   }
 
+  @Override
   boolean shouldForceCopy(final DataFlavor flavor,
                           final Transferable transferable)
   {

@@ -11,10 +11,13 @@
 package net.sourceforge.waters.gui;
 
 import java.awt.datatransfer.DataFlavor;
+
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
+
+import org.supremica.gui.ide.ModuleContainer;
 
 
 /**
@@ -28,23 +31,26 @@ public class ComponentsTree extends ModuleTree
 
   //#########################################################################
   //# Constructor
-  public ComponentsTree(final ModuleWindowInterface root,
+  public ComponentsTree(final ModuleContainer root,
                         final WatersPopupActionManager manager)
   {
-    super(root, manager, root.getModuleSubject(), root.getUndoInterface());
+    super(root, manager, root.getModule(), root);
     mPopupFactory = new ComponentsTreePopupFactory(manager, root.getModuleContext());
   }
 
+  @Override
   ListSubject<? extends ProxySubject> getRootList()
   {
-    return getRootWindow().getModuleSubject().getComponentListModifiable();
+    return getModuleContainer().getModule().getComponentListModifiable();
   }
 
+  @Override
   String getRootName()
   {
     return "Components";
   }
 
+  @Override
   DataFlavor getSupportedDataFlavor()
   {
     return WatersDataFlavor.COMPONENT;
@@ -52,6 +58,7 @@ public class ComponentsTree extends ModuleTree
 
   private static final long serialVersionUID = 1L;
 
+  @Override
   PopupFactory getPopupFactory()
   {
     return mPopupFactory;

@@ -89,6 +89,8 @@ import net.sourceforge.waters.subject.module.ParameterBindingSubject;
 import net.sourceforge.waters.subject.module.PlainEventListSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 
+import org.supremica.gui.ide.ModuleContainer;
+
 
 /**
  * The Tree used to view the constant aliases, event aliases, components and
@@ -101,15 +103,15 @@ public abstract class ModuleTree
   implements SelectionOwner, Autoscroll, TreeSelectionListener, FocusListener
 {
 
-  public ModuleTree(final ModuleWindowInterface rootWindow,
+  public ModuleTree(final ModuleContainer rootWindow,
                     final WatersPopupActionManager manager,
                     final ProxySubject root,
                     final UndoInterface undo)
   {
-    mRootWindow = rootWindow;
+    mModuleContainer = rootWindow;
     mRoot = root;
     mUndoInterface = undo;
-    mModuleContext = mRootWindow.getModuleContext();
+    mModuleContext = mModuleContainer.getModuleContext();
     mPrinter = new PrintVisitor();
     mIsPermanentFocusOwner = true;
     mModel = new ModuleTreeModel(root, getRootList());
@@ -149,9 +151,9 @@ public abstract class ModuleTree
     return (ModuleTreeModel) getModel();
   }
 
-  public ModuleWindowInterface getRootWindow()
+  public ModuleContainer getModuleContainer()
   {
-    return mRootWindow;
+    return mModuleContainer;
   }
 
   public ProxySubject getRoot()
@@ -161,7 +163,7 @@ public abstract class ModuleTree
 
   public FocusTracker getFocusTracker()
   {
-    return mRootWindow.getRootWindow().getFocusTracker();
+    return mModuleContainer.getIDE().getFocusTracker();
   }
 
   private boolean isSourceOfDrag(){
@@ -188,6 +190,7 @@ public abstract class ModuleTree
 
   //#######################################################################
   //# Interface java.awt.dnd.Autoscroll
+  @Override
   public Insets getAutoscrollInsets()
   {
     final Rectangle all = getBounds();
@@ -196,6 +199,7 @@ public abstract class ModuleTree
                                                  - visible.y + all.y + 20, 0);
   }
 
+  @Override
   public void autoscroll(final Point cursorLocn)
   {
     int realrow = getClosestRowForLocation(cursorLocn.x, cursorLocn.y);
@@ -215,6 +219,7 @@ public abstract class ModuleTree
 
   //#########################################################################
   //# Interface java.awt.event.FocusListener
+  @Override
   public void focusGained(final FocusEvent event)
   {
     if (!event.isTemporary()) {
@@ -223,6 +228,7 @@ public abstract class ModuleTree
     }
   }
 
+  @Override
   public void focusLost(final FocusEvent event)
   {
     if (!event.isTemporary()) {
@@ -234,6 +240,7 @@ public abstract class ModuleTree
 
   //#######################################################################
   //# Interface net.sourceforge.waters.gui.observer.Subject
+  @Override
   public void attach(final Observer observer)
   {
     if (mObservers == null) {
@@ -242,6 +249,7 @@ public abstract class ModuleTree
     mObservers.add(observer);
   }
 
+  @Override
   public void detach(final Observer observer)
   {
     if (mObservers != null) {
@@ -252,6 +260,7 @@ public abstract class ModuleTree
     }
   }
 
+  @Override
   public void fireEditorChangedEvent(final EditorChangedEvent event)
   {
     if (mObservers != null) {
@@ -267,16 +276,19 @@ public abstract class ModuleTree
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.transfer.SelectionOwner
+  @Override
   public UndoInterface getUndoInterface(final Action action)
   {
     return mUndoInterface;
   }
 
+  @Override
   public boolean hasNonEmptySelection()
   {
     return !isSelectionEmpty();
   }
 
+  @Override
   public boolean canSelectMore()
   {
     if (rootVisible) {
@@ -285,6 +297,7 @@ public abstract class ModuleTree
     return getSelectionCount() < getRowCount();
   }
 
+  @Override
   public boolean isSelected(final Proxy proxy)
   {
     final ModuleTreeModel model = getAliasTreeModel();
@@ -293,6 +306,7 @@ public abstract class ModuleTree
     return isPathSelected(path);
   }
 
+  @Override
   public List<Proxy> getCurrentSelection()
   {
     final int count = getSelectionCount();
@@ -309,6 +323,7 @@ public abstract class ModuleTree
     return result;
   }
 
+  @Override
   public List<Proxy> getAllSelectableItems()
   {
     final int total = getRowCount();
@@ -321,6 +336,7 @@ public abstract class ModuleTree
     return result;
   }
 
+  @Override
   public Proxy getSelectionAnchor()
   {
     final TreePath path = getAnchorSelectionPath();
@@ -331,6 +347,7 @@ public abstract class ModuleTree
     }
   }
 
+  @Override
   public Proxy getSelectableAncestor(final Proxy item)
   {
     final ModuleTreeModel model = getAliasTreeModel();
@@ -341,17 +358,20 @@ public abstract class ModuleTree
     }
   }
 
+  @Override
   public void clearSelection(final boolean propagate)
   {
     clearSelection();
   }
 
+  @Override
   public void replaceSelection(final List<? extends Proxy> items)
   {
     clearSelection();
     addToSelection(items);
   }
 
+  @Override
   public void addToSelection(final List<? extends Proxy> items)
   {
     final ModuleTreeModel model = getAliasTreeModel();
@@ -362,6 +382,7 @@ public abstract class ModuleTree
     }
   }
 
+  @Override
   public void removeFromSelection(final List<? extends Proxy> items)
   {
     final ModuleTreeModel model = getAliasTreeModel();
@@ -372,6 +393,7 @@ public abstract class ModuleTree
     }
   }
 
+  @Override
   public boolean canPaste(final Transferable transferable)
   {
     Proxy anchor = getSelectionAnchor();
@@ -391,6 +413,7 @@ public abstract class ModuleTree
     return flavor != null;
   }
 
+  @Override
   public List<InsertInfo> getInsertInfo(final Transferable transferable)
     throws IOException, UnsupportedFlavorException
   {
@@ -421,11 +444,13 @@ public abstract class ModuleTree
     return getInsertInfo(transferable, flavor, listInModule, parent, pos);
   }
 
+  @Override
   public boolean canDelete(final List<? extends Proxy> items)
   {
     return !items.isEmpty();
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public List<InsertInfo> getDeletionVictims(final List<? extends Proxy> items)
   {
@@ -453,6 +478,7 @@ public abstract class ModuleTree
     return result;
   }
 
+  @Override
   public void insertItems(final List<InsertInfo> inserts)
   {
     for (final InsertInfo insert : inserts) {
@@ -467,12 +493,13 @@ public abstract class ModuleTree
     }
   }
 
+  @Override
   public void deleteItems(final List<InsertInfo> deletes)
   {
     final int size = deletes.size();
     final ListIterator<InsertInfo> iter = deletes.listIterator(size);
     while (iter.hasPrevious()) {
-      final InsertInfo delete = (InsertInfo) iter.previous();
+      final InsertInfo delete = iter.previous();
       final ListInsertPosition inspos =
         (ListInsertPosition) delete.getInsertPosition();
       final ListSubject<? extends ProxySubject> list = inspos.getList();
@@ -481,6 +508,7 @@ public abstract class ModuleTree
     }
   }
 
+  @Override
   public void scrollToVisible(final List<? extends Proxy> list)
   {
     if (list.isEmpty()) {
@@ -512,14 +540,16 @@ public abstract class ModuleTree
       scrollRectToVisible(rect);
   }
 
+  @Override
   public void activate()
   {
     if (!isFocusOwner()) {
-      mRootWindow.showPanel(this);
+      mModuleContainer.getEditorPanel().showPanel(this);
       requestFocusInWindow();
     }
   }
 
+  @Override
   public void close()
   {
     final ModuleTreeModel model = getAliasTreeModel();
@@ -541,10 +571,12 @@ public abstract class ModuleTree
 
   //#########################################################################
   //# Interface javax.swing.event.TreeSelectionListener
+  @Override
   public void valueChanged(final TreeSelectionEvent event)
   {
     // Why can't the new selection be read immediately ???
     SwingUtilities.invokeLater(new Runnable() {
+      @Override
       public void run()
       {
         fireSelectionChanged();
@@ -606,8 +638,8 @@ public abstract class ModuleTree
   {
     final List<InsertInfo> result = new ArrayList<InsertInfo>(index);
     final List<Proxy> transferData =
-      (List<Proxy>) mListVisitor.getListOfAcceptedItems(dropTarget,
-                                                        transferable, flavor);
+      mListVisitor.getListOfAcceptedItems(dropTarget,
+                                                      transferable, flavor);
     final ModuleProxyCloner cloner =
       ModuleSubjectFactory.getCloningInstance();
     Set<String> names;
@@ -665,7 +697,7 @@ public abstract class ModuleTree
     public void mouseClicked(final MouseEvent event)
     {
       if (event.getButton() == MouseEvent.BUTTON1) {
-        final Proxy proxy = (Proxy) getClickedItem(event);
+        final Proxy proxy = getClickedItem(event);
         if (proxy == null || proxy instanceof ModuleProxy) {
           clearSelection();
         }
@@ -923,8 +955,7 @@ public abstract class ModuleTree
           try {
             final List<Proxy> result =
               (List<Proxy>) transferable.getTransferData(WatersDataFlavor.IDENTIFIER);
-            final ModuleContext context =  mRootWindow.getModuleContext();
-            if (!context.canDropOnNode(result)) {
+            if (!mModuleContext.canDropOnNode(result)) {
               return false;
             }
           } catch (final UnsupportedFlavorException exception) {
@@ -963,7 +994,7 @@ public abstract class ModuleTree
               getInsertInfo(transferable, flavor, mDropList, parentOfDropLoc,
                             mDropIndex);
             final InsertCommand allCopies =
-              new InsertCommand(inserts, ModuleTree.this, mRootWindow);
+              new InsertCommand(inserts, ModuleTree.this, mModuleContainer.getEditorPanel());
             executeCommand(allCopies);
 
           } catch (final IOException exception) {
@@ -1102,6 +1133,7 @@ public abstract class ModuleTree
       return null;
     }
 
+    @Override
     public List<Proxy> visitParameterBindingProxy(final ParameterBindingProxy binding)
     {
       final ParameterBindingSubject event = (ParameterBindingSubject) binding;
@@ -1110,6 +1142,7 @@ public abstract class ModuleTree
       return modifyList(exp.getEventIdentifierListModifiable());
     }
 
+    @Override
     public List<Proxy> visitSimpleNodeProxy(final SimpleNodeProxy node){
       final SimpleNodeSubject sub = (SimpleNodeSubject)node;
       final PlainEventListSubject list = sub.getPropositions();
@@ -1388,7 +1421,7 @@ public abstract class ModuleTree
   //#########################################################################
   //# Data Members
   private final ModuleTreeModel mModel;
-  private final ModuleWindowInterface mRootWindow;
+  private final ModuleContainer mModuleContainer;
   private final UndoInterface mUndoInterface;
   private List<Observer> mObservers;
   private final ModuleContext mModuleContext;

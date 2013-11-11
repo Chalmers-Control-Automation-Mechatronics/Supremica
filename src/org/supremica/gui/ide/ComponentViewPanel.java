@@ -18,9 +18,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
-import net.sourceforge.waters.gui.GraphEditorPanel;
-import net.sourceforge.waters.gui.ControlledToolbar;
 import net.sourceforge.waters.gui.EditorWindowInterface;
+import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.GraphEventPanel;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
@@ -76,8 +75,8 @@ public class ComponentViewPanel
 		final IDE ide = moduleContainer.getIDE();
 		final WatersPopupActionManager manager = ide.getPopupActionManager();
         surface = new GraphEditorPanel
-            (element.getGraph(), mModule, this,
-			 (ControlledToolbar) ide.getToolBar(), manager);
+            (element.getGraph(), mModule, mModuleContainer, this,
+			 ide.getToolBar(), manager);
         surface.setPreferredSize(IDEDimensions.rightAnalyzerPreferredSize);
         surface.setMinimumSize(IDEDimensions.rightAnalyzerMinimumSize);
         events = new GraphEventPanel(this, element, manager);
@@ -99,31 +98,37 @@ public class ComponentViewPanel
 
 	//########################################################################
     //# Interface net.sourceforge.waters.gui.EditorWindowInterface
+    @Override
     public SimpleComponentSubject getComponent()
     {
         return element;
     }
 
+    @Override
     public GraphEditorPanel getGraphEditorPanel()
     {
         return surface;
     }
 
+    @Override
     public GraphEventPanel getEventPanel()
     {
         return events;
     }
 
-	public ModuleWindowInterface getModuleWindowInterface()
+	@Override
+  public ModuleWindowInterface getModuleWindowInterface()
 	{
 		return mModuleContainer.getEditorPanel();
 	}
 
+    @Override
     public UndoInterface getUndoInterface()
     {
         return mModuleContainer;
     }
 
+    @Override
     @Deprecated
     public void copyAsWMFToClipboard()
     {
@@ -145,7 +150,7 @@ public class ComponentViewPanel
         // a problem with the size of wmf-data
         //width += (int)0.1*width;
         //height += (int)0.1*height;
-        Graphics theGraphics = toClipboard.getGraphics(surface.getWidth(), surface.getHeight());
+        final Graphics theGraphics = toClipboard.getGraphics(surface.getWidth(), surface.getHeight());
 
         surface.print(theGraphics);
         toClipboard.copyToClipboard();
