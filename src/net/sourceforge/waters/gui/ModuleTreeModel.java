@@ -13,26 +13,26 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
-import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.AliasProxy;
 import net.sourceforge.waters.model.module.ComponentProxy;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
-import net.sourceforge.waters.model.module.IdentifiedProxy;
-import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.subject.base.IndexedListSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
@@ -87,6 +87,7 @@ class ModuleTreeModel
 
   //#########################################################################
   //# Interface javax.swing.tree.TreeModel
+  @Override
   public void addTreeModelListener(final TreeModelListener listener)
   {
     if (mListeners == null) {
@@ -95,6 +96,7 @@ class ModuleTreeModel
     mListeners.add(listener);
   }
 
+  @Override
   public Proxy getChild(final Object parent, final int index)
   {
     final Proxy proxy = (Proxy) parent;
@@ -109,6 +111,7 @@ class ModuleTreeModel
     }
   }
 
+  @Override
   public int getChildCount(final Object parent)
   {
     final Proxy proxy = (Proxy) parent;
@@ -121,6 +124,7 @@ class ModuleTreeModel
     }
   }
 
+  @Override
   public int getIndexOfChild(final Object parent, final Object child)
   {
     final ProxySubject proxy = (ProxySubject) parent;
@@ -133,17 +137,20 @@ class ModuleTreeModel
     }
   }
 
+  @Override
   public ProxySubject getRoot()
   {
     return mRoot;
   }
 
+  @Override
   public boolean isLeaf(final Object node)
   {
     final Proxy proxy = (Proxy) node;
     return mChildrenGetterVisitor.getChildren(proxy) == null;
   }
 
+  @Override
   public void removeTreeModelListener(final TreeModelListener listener)
   {
     mListeners.remove(listener);
@@ -152,6 +159,7 @@ class ModuleTreeModel
     }
   }
 
+  @Override
   public void valueForPathChanged(final TreePath path, final Object newvalue)
   {
     throw new UnsupportedOperationException
@@ -161,6 +169,7 @@ class ModuleTreeModel
 
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.ModelObserver
+  @Override
   public void modelChanged(final ModelChangeEvent event)
   {
     if (mListeners != null) {
@@ -203,6 +212,7 @@ class ModuleTreeModel
     }
   }
 
+  @Override
   public int getModelObserverPriority()
   {
     return ModelObserver.DEFAULT_PRIORITY;
@@ -357,7 +367,7 @@ class ModuleTreeModel
   }
 
   ListSubject<? extends ProxySubject>  getChildren(final Proxy parent){
-    return (ListSubject<? extends ProxySubject>) mChildrenGetterVisitor.getChildren(parent);
+    return mChildrenGetterVisitor.getChildren(parent);
   }
 
 
@@ -380,6 +390,7 @@ class ModuleTreeModel
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.printer.ProxyVisitor
+    @Override
     public ListSubject<? extends ProxySubject> visitProxy(final Proxy proxy)
     {
       return null;
@@ -413,6 +424,7 @@ class ModuleTreeModel
       return node.getPropositions().getEventIdentifierListModifiable();
     }
 
+    @Override
     public IndexedListSubject<ParameterBindingSubject> visitInstanceProxy(final InstanceProxy inst)
     {
       final InstanceSubject instance = (InstanceSubject)inst;
@@ -431,7 +443,7 @@ class ModuleTreeModel
       final ParameterBindingSubject para = (ParameterBindingSubject)binding;
       if(para.getExpression() instanceof EventListExpressionSubject){
         final EventListExpressionSubject list = (EventListExpressionSubject) para.getExpression();
-         return (ListSubject<? extends ProxySubject>) list.getEventIdentifierListModifiable();
+         return list.getEventIdentifierListModifiable();
       }
       return null;
     }
@@ -496,25 +508,12 @@ class ModuleTreeModel
     }
 
     @Override
-    public Object visitIdentifierProxy(final IdentifierProxy ident)
-      throws VisitorException
-    {
-      final ProxySubject subject = (ProxySubject) ident;
-      if (subject.getParent() instanceof IdentifiedProxy) {
-        final IdentifiedProxy parent = (IdentifiedProxy) subject.getParent();
-        return parent.acceptVisitor(this);
-      } else {
-        final Proxy visibleAncestor = getProperAncestorInTree(subject);
-        return visibleAncestor != null ? ident : null;
-      }
-    }
-
-    @Override
     public Object visitModuleProxy(final ModuleProxy module)
     {
       return module;
     }
 
+    @Override
     public Object visitParameterBindingProxy(final ParameterBindingProxy binding)
     {
       return binding;
@@ -523,11 +522,40 @@ class ModuleTreeModel
     @Override
     public Object visitPlainEventListProxy(final PlainEventListProxy elist)
     {
-      final Subject subject = (Subject) elist;
-      final Proxy parent = SubjectTools.getProxyParent(subject);
-      return parent;
+      // Could be inside node or alias ...
+      final ProxySubject subject = (ProxySubject) elist;
+      final Proxy visibleAncestor = getProperAncestorInTree(subject);
+      return visibleAncestor != null ? visibleAncestor : null;
     }
 
+    @Override
+    public Object visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
+    {
+      // Find the non-expression parent that contains the expression ...
+      final ProxySubject subject = (ProxySubject) expr;
+      final ProxySubject parent = SubjectTools.getProxyParent(subject);
+      if (parent instanceof SimpleExpressionProxy) {
+        final SimpleExpressionProxy parentExpr = (SimpleExpressionProxy) parent;
+        return visitSimpleExpressionProxy(parentExpr);
+      }
+      final Proxy visibleAncestor = getVisibleAncestorInTree(parent);
+      if (visibleAncestor != parent) {
+        // If the non-expression parent is not visible, neither is the expression
+        return null;
+      } else if (visibleAncestor instanceof ForeachProxy) {
+        // If it is a foreach block, it depends on whether the expression
+        // is in the range/guard or in the body
+        final ForeachProxy foreach = (ForeachProxy) visibleAncestor;
+        if (expr == foreach.getRange() || expr == foreach.getGuard()) {
+          return foreach;
+        } else {
+          return expr;
+        }
+      } else {
+        // In all other cases, display the non-expression parent
+        return visibleAncestor;
+      }
+    }
   }
 
 
