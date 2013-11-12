@@ -33,9 +33,10 @@ public class PartialOrderStateTuple
     mMayNeedExpansion = false;
     mFullyExpand = false;
     mVisited = false;
-    mIncomponent = false;
     mComponentVisited = false;
     mRootChanged = false;
+    mComponentNumber = 0;
+    mMarked = false;
   }
 
   /**
@@ -115,12 +116,16 @@ public class PartialOrderStateTuple
     return mComponentVisited;
   }
 
-  public void setInComponent(final boolean value){
-    mIncomponent = value;
+  public void setComponent(final int value){
+    mComponentNumber = value;
+  }
+
+  public int getComponent(){
+    return mComponentNumber;
   }
 
   public boolean isInComponent(){
-    return mIncomponent;
+    return mComponentNumber == 0;
   }
 
   public void setRootChanged(final boolean value){
@@ -153,6 +158,14 @@ public class PartialOrderStateTuple
 
   public int getAmpleSuccessors(){
     return mAmpleSuccessors;
+  }
+
+  public void setMarked(final boolean value){
+    mMarked = value;
+  }
+
+  public boolean getMarked(){
+    return mMarked;
   }
 
   //#########################################################################
@@ -196,10 +209,11 @@ public class PartialOrderStateTuple
   private boolean mFullyExpand; //
   private boolean mVisited;
   private PartialOrderStateTuple mPred; //
-  private boolean mIncomponent;
+  private int mComponentNumber;
   private boolean mComponentVisited;
   private boolean mRootChanged;
   private boolean mFullyExpanded;
+  private boolean mMarked;
   private int mRootIndex;
   private int mTotalSuccessors; //
   private int mAmpleSuccessors; //
