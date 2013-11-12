@@ -462,7 +462,6 @@ class ModuleTreeModel
   private class TypeCheckerVisitor
     extends DefaultModuleProxyVisitor
   {
-
     //#######################################################################
     //# Invocation
     private ProxySubject getVisibleAncestorInTree(final Proxy proxy)
@@ -512,17 +511,14 @@ class ModuleTreeModel
     public Object visitIdentifierProxy(final IdentifierProxy ident)
       throws VisitorException
     {
-      Object result;
       final ProxySubject subject = (ProxySubject) ident;
       if (subject.getParent() instanceof IdentifiedProxy) {
         final IdentifiedProxy parent = (IdentifiedProxy) subject.getParent();
-        result = parent.acceptVisitor(this);
+        return parent.acceptVisitor(this);
       } else {
         final Proxy visibleAncestor = getProperAncestorInTree(subject);
-        result = visibleAncestor != null ? ident : null;
+        return visibleAncestor != null ? ident : null;
       }
-      System.err.println(ident + " -> " + result);
-      return result;
     }
 
     @Override
@@ -542,10 +538,8 @@ class ModuleTreeModel
     {
       final Subject subject = (Subject) elist;
       final Proxy parent = SubjectTools.getProxyParent(subject);
-      System.err.println(elist + " -> " + parent);
       return parent;
     }
-
   }
 
 
