@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters GUI
 //# PACKAGE: net.sourceforge.waters.gui
-//# CLASS:   ComponentsTreeModel
+//# CLASS:   ModuleTreeModel
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -28,11 +28,12 @@ import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
+import net.sourceforge.waters.model.module.IdentifiedProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
-import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.subject.base.IndexedListSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
@@ -66,7 +67,7 @@ class ModuleTreeModel
   //#########################################################################
   //# Constructor
   ModuleTreeModel(final ProxySubject root,
-                   final ListSubject<? extends ProxySubject> list)
+                  final ListSubject<? extends ProxySubject> list)
   {
     mRoot = root;
     mRootList = list;
@@ -99,7 +100,6 @@ class ModuleTreeModel
   @Override
   public Proxy getChild(final Object parent, final int index)
   {
-    System.out.println(parent + " " + index);
     final Proxy proxy = (Proxy) parent;
     final List<? extends Proxy> children =
       mChildrenGetterVisitor.getChildren(proxy);
@@ -509,6 +509,23 @@ class ModuleTreeModel
     }
 
     @Override
+    public Object visitIdentifierProxy(final IdentifierProxy ident)
+      throws VisitorException
+    {
+      Object result;
+      final ProxySubject subject = (ProxySubject) ident;
+      if (subject.getParent() instanceof IdentifiedProxy) {
+        final IdentifiedProxy parent = (IdentifiedProxy) subject.getParent();
+        result = parent.acceptVisitor(this);
+      } else {
+        final Proxy visibleAncestor = getProperAncestorInTree(subject);
+        result = visibleAncestor != null ? ident : null;
+      }
+      System.err.println(ident + " -> " + result);
+      return result;
+    }
+
+    @Override
     public Object visitModuleProxy(final ModuleProxy module)
     {
       return module;
@@ -523,40 +540,12 @@ class ModuleTreeModel
     @Override
     public Object visitPlainEventListProxy(final PlainEventListProxy elist)
     {
-      // Could be inside node or alias ...
-      final ProxySubject subject = (ProxySubject) elist;
-      final Proxy visibleAncestor = getProperAncestorInTree(subject);
-      return visibleAncestor != null ? visibleAncestor : null;
+      final Subject subject = (Subject) elist;
+      final Proxy parent = SubjectTools.getProxyParent(subject);
+      System.err.println(elist + " -> " + parent);
+      return parent;
     }
 
-    @Override
-    public Object visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
-    {
-      // Find the non-expression parent that contains the expression ...
-      final ProxySubject subject = (ProxySubject) expr;
-      final ProxySubject parent = SubjectTools.getProxyParent(subject);
-      if (parent instanceof SimpleExpressionProxy) {
-        final SimpleExpressionProxy parentExpr = (SimpleExpressionProxy) parent;
-        return visitSimpleExpressionProxy(parentExpr);
-      }
-      final Proxy visibleAncestor = getVisibleAncestorInTree(parent);
-      if (visibleAncestor != parent) {
-        // If the non-expression parent is not visible, neither is the expression
-        return null;
-      } else if (visibleAncestor instanceof ForeachProxy) {
-        // If it is a foreach block, it depends on whether the expression
-        // is in the range/guard or in the body
-        final ForeachProxy foreach = (ForeachProxy) visibleAncestor;
-        if (expr == foreach.getRange() || expr == foreach.getGuard()) {
-          return foreach;
-        } else {
-          return expr;
-        }
-      } else {
-        // In all other cases, display the non-expression parent
-        return visibleAncestor;
-      }
-    }
   }
 
 
