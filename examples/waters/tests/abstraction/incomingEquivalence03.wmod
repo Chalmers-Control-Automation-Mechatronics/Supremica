@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="incomingEquivalence_3" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="incomingEquivalence03" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>A test for the combined active events and silent continuation rule. In this test, five states can be merged in three iterations using different combinations of active events and silent continuations.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="tau"/>

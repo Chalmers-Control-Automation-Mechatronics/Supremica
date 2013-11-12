@@ -301,7 +301,7 @@ public class NewIncomingEquivalenceTRSimplifier
       final int s = mergedRoots.get(i);
       StateInfo info = mStateInfo[s];
       if (info.getFirstState() == s) {
-        mEventIterator.resetState(s);
+        mEventIterator.resume(s);
         while (mEventIterator.advance()) {
           info = mEventIterator.getCurrentTargetStateInfo();
           final int t = info.getFirstState();

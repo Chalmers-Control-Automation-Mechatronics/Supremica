@@ -191,39 +191,57 @@ public class NewIncomingEquivalenceTRSimplifierTest
 
   //#########################################################################
   //# Test Cases - Active Events and Silent Continuation Rule Combined
-  public void test_incomingEquivalence_1()
-  throws Exception
+  public void test_incomingEquivalence01()
+    throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "incomingEquivalence_1.wmod";
+    final String name = "incomingEquivalence01.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_incomingEquivalence_2()
-  throws Exception
+  public void test_incomingEquivalence02()
+    throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "incomingEquivalence_2.wmod";
+    final String name = "incomingEquivalence02.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_incomingEquivalence_3()
-  throws Exception
+  public void test_incomingEquivalence03()
+    throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "incomingEquivalence_3.wmod";
+    final String name = "incomingEquivalence03.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
-  public void test_incomingEquivalence_4()
-  throws Exception
+  public void test_incomingEquivalence04()
+    throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
-    final String name = "incomingEquivalence_4.wmod";
+    final String name = "incomingEquivalence04.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_incomingEquivalence05()
+    throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "incomingEquivalence05.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_incomingEquivalence06()
+    throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "incomingEquivalence06.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
