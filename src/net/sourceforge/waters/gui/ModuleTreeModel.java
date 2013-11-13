@@ -197,7 +197,7 @@ class ModuleTreeModel
           final TreePath path = createPath(ancestor);
           final TreeModelEvent newevent =
             new TreeModelEvent(this, path, null, null);
-          fireStructureChanged(newevent);
+          fireNodesChanged(newevent);
         }
         break;
       default:
@@ -282,6 +282,8 @@ class ModuleTreeModel
       }
       subject = subject.getParent();
     }
+    if (subject instanceof GraphProxy)
+      return null;
     return (ProxySubject) subject;
   }
 
@@ -327,7 +329,7 @@ class ModuleTreeModel
 
   private void fireNodesInserted(final TreeModelEvent event)
   {
-    if (mListeners != null) {
+    if (mListeners != null && belongsToTree(event.getTreePath())) {
       final Collection<TreeModelListener> copy =
         new ArrayList<TreeModelListener>(mListeners);
       for (final TreeModelListener listener : copy) {
@@ -338,7 +340,7 @@ class ModuleTreeModel
 
   private void fireNodesRemoved(final TreeModelEvent event)
   {
-    if (mListeners != null) {
+    if (mListeners != null && belongsToTree(event.getTreePath())) {
       final Collection<TreeModelListener> copy =
         new ArrayList<TreeModelListener>(mListeners);
       for (final TreeModelListener listener : copy) {
@@ -347,10 +349,9 @@ class ModuleTreeModel
     }
   }
 
-  @SuppressWarnings("unused")
   private void fireNodesChanged(final TreeModelEvent event)
   {
-    if (mListeners != null) {
+    if (mListeners != null && belongsToTree(event.getTreePath())) {
       final Collection<TreeModelListener> copy =
         new ArrayList<TreeModelListener>(mListeners);
       for (final TreeModelListener listener : copy) {
@@ -361,7 +362,7 @@ class ModuleTreeModel
 
   private void fireStructureChanged(final TreeModelEvent event)
   {
-    if (mListeners != null) {
+    if (mListeners != null && belongsToTree(event.getTreePath())) {
       final Collection<TreeModelListener> copy =
         new ArrayList<TreeModelListener>(mListeners);
       for (final TreeModelListener listener : copy) {
@@ -482,6 +483,11 @@ class ModuleTreeModel
       parent = SubjectTools.getProxyParent(parent);
     }
     return parent;
+  }
+
+  private boolean belongsToTree(final TreePath path)
+  {
+    return path.getPathComponent(0) == mRoot;
   }
 
   //#########################################################################
