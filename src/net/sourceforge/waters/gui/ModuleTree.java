@@ -57,9 +57,11 @@ import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.ListInsertPosition;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
+import net.sourceforge.waters.gui.util.IconLoader;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
@@ -1403,7 +1405,13 @@ public abstract class ModuleTree
       super.getTreeCellRendererComponent(tree, value, selected, expanded,
                                          leaf, row, hasFocus);
       final Proxy proxy = (Proxy) value;
-      final Icon icon = mModuleContext.getIcon(proxy);
+      final Icon icon;
+      final EvalException exception = mModuleContainer.getLastCompilationException();
+      if (exception != null && mModel.getVisibleAncestorInTree(exception.getLocation()) == proxy) {
+        icon = IconLoader.ICON_NO;
+      } else {
+        icon = mModuleContext.getIcon(proxy);
+      }
       setIcon(icon);
       final String text = mPrinter.toString(proxy, expanded);
       setText(text);

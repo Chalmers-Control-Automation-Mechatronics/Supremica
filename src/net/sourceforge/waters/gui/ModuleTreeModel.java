@@ -273,18 +273,16 @@ class ModuleTreeModel
   ProxySubject getVisibleAncestorInTree(final Proxy proxy)
   {
     Subject subject = (Subject) proxy;
-    if (subject == null) {
-      return null;
-    }
-    while (!isInTree(subject)) {
+    while (subject != null) {
       if (subject instanceof GraphProxy) {
         return null;
       }
+      if (isInTree(subject)) {
+        return (ProxySubject) subject;
+      }
       subject = subject.getParent();
     }
-    if (subject instanceof GraphProxy)
-      return null;
-    return (ProxySubject) subject;
+    return null;
   }
 
   /**
