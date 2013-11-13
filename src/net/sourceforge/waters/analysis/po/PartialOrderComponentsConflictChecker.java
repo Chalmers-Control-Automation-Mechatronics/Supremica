@@ -660,7 +660,9 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
                   }
                 }
               }
-
+              if(blocking){
+                return false;
+              }
             } else {
               int[] events;
               if ((events = enabled(prev)) == null)
