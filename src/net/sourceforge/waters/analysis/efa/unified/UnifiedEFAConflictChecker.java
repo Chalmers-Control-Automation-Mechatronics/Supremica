@@ -618,8 +618,8 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
                           final boolean unfolding)
     throws AnalysisAbortException
   {
-    getLogger().debug(tr.getName() + " is nonblocking: " +
-                      mNonblockingChecker.run(tr));
+    // getLogger().debug(tr.getName() + " is nonblocking: " +
+    //                   mNonblockingChecker.run(tr));
     for (final AbstractEFAEvent event : tr.getAllEventsExceptTau()) {
       EventInfo info = mCurrentSubSystem.getEventInfo(event);
       if (unfolding || tr.isUsedEvent(event)) {

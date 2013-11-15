@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.abstraction;
 import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.procedure.TIntProcedure;
 import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TIntHashSet;
 import gnu.trove.stack.TIntStack;
@@ -29,6 +30,7 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.analysis.tr.TransitionListBuffer;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.ProxyTools;
 
@@ -94,7 +96,7 @@ public class NewIncomingEquivalenceTRSimplifier
   @Override
   public int getPreferredInputConfiguration()
   {
-    return ListBufferTransitionRelation.CONFIG_SUCCESSORS;
+    return ListBufferTransitionRelation.CONFIG_ALL;
   }
 
 
@@ -112,7 +114,7 @@ public class NewIncomingEquivalenceTRSimplifier
   //# Overrides for net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
   @Override
   protected void setUp()
-  throws AnalysisException
+    throws AnalysisException
   {
     super.setUp();
     final ListBufferTransitionRelation rel = getTransitionRelation();
@@ -124,13 +126,18 @@ public class NewIncomingEquivalenceTRSimplifier
     mListWriteIterator = mListBuffer.createModifyingIterator();
     mSetBuffer = new IntSetBuffer(numEvents);
     mSetReadIterator = mSetBuffer.iterator();
-    mActiveEventsIterator = new ActiveEventsIterator();
-    mEventIterator = new ClassClosureIterator();
+    mTauClosureIterator = new TauClosureIterator();
+    final TransitionIterator inner1 = rel.createSuccessorsReadOnlyIterator();
+    mEventIterator = new EventIterator(inner1);
+    mPostEventIterator = new PostEventClosureIterator();
+    final TransitionListBuffer succBuf = rel.getSuccessorBuffer();
+    final TransitionIterator inner2 = rel.createSuccessorsReadOnlyIterator();
+    mForwardEventIterator = new FullEventClosureIterator(succBuf, inner2);
   }
 
   @Override
   protected boolean runSimplifier()
-  throws AnalysisException
+    throws AnalysisException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
@@ -139,21 +146,21 @@ public class NewIncomingEquivalenceTRSimplifier
     }
 
     // 1. Create StateInfo for all reachable states.
-    int numReachable = 0;
+    mNumMergedStates = 0;
     mStateInfo = new StateInfo[numStates];
     for (int s = 0; s < numStates; s++) {
       if (rel.isReachable(s)) {
-        numReachable++;
+        mNumMergedStates++;
         mStateInfo[s] = new StateInfo(s);
       }
     }
-    if (numReachable <= 1) {
+    if (mNumMergedStates <= 1) {
       return false;
     }
 
     // 2. Create equivalence classes for initial and non-initial states
-    createInitialEquivalenceClasses(numReachable);
-    if (mNumProperClasses == 0) {
+    createInitialEquivalenceClasses(mNumMergedStates);
+    if (mNumProperCandidates == 0) {
       return false;
     }
     mPredecessors = new int[numStates];
@@ -163,20 +170,25 @@ public class NewIncomingEquivalenceTRSimplifier
     final TIntArrayList mergedRoots = new TIntArrayList();
     do {
       splitOnIncomingEquivalence();
-      if (mNumProperClasses == 0) {
+      if (mNumProperCandidates == 0) {
         break;
       }
       mergeOutgoingEquivalentClasses(mergedRoots);
-      if (mergedRoots.size() == 0) {
+      if (mergedRoots.size() == 0 || mNumMergedStates == 1) {
         break;
       }
       merged = true;
       createNextEquivalenceClasses(mergedRoots);
       mergedRoots.clear();
-    } while (mNumProperClasses > 0);
+    } while (mNumProperCandidates > 0);
 
     // 4. Apply result partition.
     if (merged) {
+      int config = getPreferredOutputConfiguration();
+      if (config == 0 || config == ListBufferTransitionRelation.CONFIG_ALL) {
+        config = ListBufferTransitionRelation.CONFIG_SUCCESSORS;
+      }
+      rel.reconfigure(config);
       int classNo = 0;
       final int[] stateToClass = new int[numStates];
       for (int s = 0; s < numStates; s++) {
@@ -200,8 +212,11 @@ public class NewIncomingEquivalenceTRSimplifier
   {
     super.tearDown();
     mTauIterator = null;
-    mActiveEventsIterator = null;
+    mTauClosureIterator = null;
     mEventIterator = null;
+    mPostEventIterator = null;
+    mForwardEventIterator = null;
+    mBackwardEventIterator = null;
     mStateInfo = null;
     mListBuffer = null;
     mListReadIterator = null;
@@ -292,7 +307,14 @@ public class NewIncomingEquivalenceTRSimplifier
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numEvents = rel.getNumberOfProperEvents();
-    mEventIterator.resetEvents(EventEncoding.NONTAU, numEvents - 1);
+    mForwardEventIterator.resetEvents(EventEncoding.NONTAU, numEvents - 1);
+    if (mBackwardEventIterator == null) {
+      final TransitionListBuffer predBuf = rel.getPredecessorBuffer();
+      final TransitionIterator inner =
+        rel.createPredecessorsReadOnlyIterator();
+      mBackwardEventIterator = new FullEventClosureIterator(predBuf, inner);
+    }
+    mBackwardEventIterator.resetEvents(EventEncoding.NONTAU, numEvents - 1);
     final int init = mListBuffer.createList();
     final int nonInit = mListBuffer.createList();
     int numInit = 0;
@@ -301,9 +323,9 @@ public class NewIncomingEquivalenceTRSimplifier
       final int s = mergedRoots.get(i);
       StateInfo info = mStateInfo[s];
       if (info.getFirstState() == s) {
-        mEventIterator.resume(s);
-        while (mEventIterator.advance()) {
-          info = mEventIterator.getCurrentTargetStateInfo();
+        mForwardEventIterator.resume(s);
+        while (mForwardEventIterator.advance()) {
+          info = mForwardEventIterator.getCurrentTargetStateInfo();
           final int t = info.getFirstState();
           if (info.isInitial()) {
             mListBuffer.append(init, t);
@@ -312,10 +334,14 @@ public class NewIncomingEquivalenceTRSimplifier
             mListBuffer.append(nonInit, t);
             numNonInit++;
           }
+          mBackwardEventIterator.resume(t);
+          while (mBackwardEventIterator.advance()) {
+            // empty loop body - just collecting visited set in iterator
+          }
         }
       }
     }
-    mNumProperClasses = 0;
+    mNumProperCandidates = 0;
     if (numInit > 1 || numNonInit > 1) {
       Arrays.fill(mStateToClass, null);
       createEquivalenceClass(init, numInit);
@@ -327,7 +353,7 @@ public class NewIncomingEquivalenceTRSimplifier
   {
     if (size > 1) {
       new EquivalenceClass(list, size, false);
-      mNumProperClasses++;
+      mNumProperCandidates++;
     } else {
       mListBuffer.dispose(list);
     }
@@ -335,49 +361,71 @@ public class NewIncomingEquivalenceTRSimplifier
 
   private void splitOnIncomingEquivalence()
   {
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    final int numStates = rel.getNumberOfStates();
-    final Set<EquivalenceClass> splits = new THashSet<EquivalenceClass>();
-    for (int s = 0; s < numStates; s++) {
-      final StateInfo info = mStateInfo[s];
-      if (info != null && info.getFirstState() == s) {
-        boolean hasAlwaysEnabled = info.hasOutgoingAlwaysEnabled();
-        final int active = info.getActiveEvents();
-        mSetReadIterator.reset(active);
-        while (mSetReadIterator.advance()) {
-          final int e = mSetReadIterator.getCurrentData();
-          if (e == OMEGA) {
-            continue;
-          }
-          mEventIterator.reset(info, e);
-          while (mEventIterator.advance()) {
-            final int t = mEventIterator.getCurrentTargetState();
+    if (mBackwardEventIterator == null) {
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      final int numStates = rel.getNumberOfStates();
+      for (int s = 0; s < numStates && mNumProperCandidates > 0; s++) {
+        splitOnIncomingEquivalence(s);
+      }
+    } else {
+      final TIntHashSet splitters = mBackwardEventIterator.getVisitedStates();
+      splitters.forEach(new TIntProcedure() {
+        @Override
+        public boolean execute(final int s)
+        {
+          return splitOnIncomingEquivalence(s);
+        }
+      });
+    }
+  }
+
+  private boolean splitOnIncomingEquivalence(final int s)
+  {
+    final StateInfo info = mStateInfo[s];
+    if (info != null && info.getFirstState() == s) {
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      final Set<EquivalenceClass> splits = new THashSet<EquivalenceClass>();
+      boolean hasAlwaysEnabled = info.hasOutgoingAlwaysEnabled();
+      final int[] tauClosure = info.computeTauClosure();
+      final int active = info.computeActiveEvents(tauClosure);
+      mSetReadIterator.reset(active);
+      while (mSetReadIterator.advance()) {
+        final int e = mSetReadIterator.getCurrentData();
+        if (e == OMEGA) {
+          continue;
+        }
+        mPostEventIterator.resetEvent(e);
+        for (final int ss : tauClosure) {
+          mPostEventIterator.resume(ss);
+          while (mPostEventIterator.advance()) {
+            final int t = mPostEventIterator.getCurrentTargetState();
             final EquivalenceClass clazz = mStateToClass[t];
             if (clazz != null) {
               clazz.moveToOverflowList(t);
               splits.add(clazz);
             }
           }
-          if (!splits.isEmpty()) {
-            for (final EquivalenceClass clazz : splits) {
-              clazz.splitUsingOverflowList();
-            }
-            if (mNumProperClasses == 0) {
-              return;
-            }
-            splits.clear();
-            if (!hasAlwaysEnabled) {
-              final byte status = rel.getProperEventStatus(e);
-              hasAlwaysEnabled =
-                EventEncoding.isOutsideAlwaysEnabledEvent(status);
-            }
+        }
+        if (!splits.isEmpty()) {
+          for (final EquivalenceClass clazz : splits) {
+            clazz.splitUsingOverflowList();
+          }
+          if (mNumProperCandidates == 0) {
+            return false;
+          }
+          splits.clear();
+          if (!hasAlwaysEnabled) {
+            final byte status = rel.getProperEventStatus(e);
+            hasAlwaysEnabled =
+              EventEncoding.isOutsideAlwaysEnabledEvent(status);
           }
         }
-        if (hasAlwaysEnabled) {
-          info.setHasOutgoingAlwaysEnabled();
-        }
+      }
+      if (hasAlwaysEnabled) {
+        info.setHasOutgoingAlwaysEnabled();
       }
     }
+    return true;
   }
 
   private void mergeOutgoingEquivalentClasses(final TIntArrayList mergedRoots)
@@ -404,6 +452,7 @@ public class NewIncomingEquivalenceTRSimplifier
     final TIntHashSet activeHash = equalActive ? null : new TIntHashSet();
     int active = 0;
     int clazz = mListBuffer.createList();
+    mNumMergedStates++;
     mListReadIterator.reset(list);
     while (mListReadIterator.advance()) {
       final int s = mListReadIterator.getCurrentData();
@@ -425,6 +474,7 @@ public class NewIncomingEquivalenceTRSimplifier
       if (!equalActive) {
         mSetBuffer.collect(active, activeHash);
       }
+      mNumMergedStates--;
     }
     if (!equalActive) {
       active = mSetBuffer.add(activeHash);
@@ -468,14 +518,16 @@ public class NewIncomingEquivalenceTRSimplifier
 
   private void dump(final PrintWriter printer)
   {
-    printer.println("STATE INFO");
-    for (int s = 0; s < mStateInfo.length; s++) {
-      final StateInfo info = mStateInfo[s];
-      if (info != null) {
-        printer.print(s);
-        printer.print(" : ");
-        info.dump(printer);
-        printer.println();
+    if (mStateInfo != null) {
+      printer.println("STATE INFO");
+      for (int s = 0; s < mStateInfo.length; s++) {
+        final StateInfo info = mStateInfo[s];
+        if (info != null) {
+          printer.print(s);
+          printer.print(" : ");
+          info.dump(printer);
+          printer.println();
+        }
       }
     }
     if (mStateToClass != null) {
@@ -601,9 +653,7 @@ public class NewIncomingEquivalenceTRSimplifier
      */
     private int getActiveEvents()
     {
-      if (mActiveEvents < 0) {
-        computeActiveEvents();
-      }
+      assert mActiveEvents >= 0 : "Active events not yet initialised!";
       return mActiveEvents;
     }
 
@@ -631,18 +681,40 @@ public class NewIncomingEquivalenceTRSimplifier
 
     //#######################################################################
     //# Auxiliary Methods
-    private void computeActiveEvents()
+    private int[] computeTauClosure()
     {
-      final TIntHashSet events = new TIntHashSet();
-      mActiveEventsIterator.resetState(this);
-      while (mActiveEventsIterator.advance()) {
-        final int event = mActiveEventsIterator.getCurrentEvent();
-        events.add(event);
+      mTauClosureIterator.resetState(this);
+      while (mTauClosureIterator.advance()) {
+        // empty loop body - just collecting visited set in iterator
       }
-      if (mActiveEventsIterator.getFoundOmega()) {
-        events.add(OMEGA);
+      final TIntHashSet visited = mTauClosureIterator.getVisitedStates();
+      final int[] closure = visited.toArray();
+      mTauClosureIterator.reset();
+      return closure;
+    }
+
+    private int computeActiveEvents(final int[] tauClosure)
+    {
+      if (mActiveEvents < 0) {
+        final TIntHashSet events = new TIntHashSet();
+        final ListBufferTransitionRelation rel = getTransitionRelation();
+        final int numEvents = rel.getNumberOfProperEvents();
+        mEventIterator.resetEvents(EventEncoding.NONTAU, numEvents - 1);
+        for (final int s : tauClosure) {
+          final StateInfo info = mStateInfo[s];
+          if (info.isMarked()) {
+            events.add(OMEGA);
+          }
+          mEventIterator.resume(s);
+          while (mEventIterator.advance()) {
+            final int event = mEventIterator.getCurrentEvent();
+            events.add(event);
+          }
+        }
+        mEventIterator.reset();
+        mActiveEvents = mSetBuffer.add(events);
       }
-      mActiveEvents = mSetBuffer.add(events);
+      return mActiveEvents;
     }
 
     private void setClassNumber(final int[] stateToClass, final int classNo)
@@ -836,10 +908,10 @@ public class NewIncomingEquivalenceTRSimplifier
       mSize = newSize;
       if (mSize == 1) {
         setUpStateToClass();
-        mNumProperClasses--;
+        mNumProperCandidates--;
       }
       if (mOverflowSize > 1) {
-        mNumProperClasses++;
+        mNumProperCandidates++;
       }
     }
 
@@ -1158,11 +1230,16 @@ public class NewIncomingEquivalenceTRSimplifier
       return mCurrentTargetState;
     }
 
+    private TIntHashSet getVisitedStates()
+    {
+      return mVisited;
+    }
+
     private void clear()
     {
       if (mVisited != null) {
         final int size = mVisited.size();
-        if (size > 64) {
+        if (size > HASH_REALLOC_THRESHOLD) {
           mVisited = new TIntHashSet();
         } else if (size > 0) {
           mVisited.clear();
@@ -1332,7 +1409,11 @@ public class NewIncomingEquivalenceTRSimplifier
     //# Auxiliary Methods
     private void resetState(final StateInfo info)
     {
-      resumeClassReadIteration(info);
+      if (info == null) {
+        resetClassReadIteration();
+      } else {
+        resumeClassReadIteration(info);
+      }
       mTransitionIterator.reset();
     }
 
@@ -1414,18 +1495,196 @@ public class NewIncomingEquivalenceTRSimplifier
 
 
   //#########################################################################
-  //# Inner Class ClassClosureIterator
-  private class ClassClosureIterator
+  //# Inner Class PostEventClosureIterator
+  private class PostEventClosureIterator
     implements TransitionIterator
   {
     //#######################################################################
     //# Constructor
-    private ClassClosureIterator()
+    private PostEventClosureIterator()
     {
-      mTauIterator1 = new TauClosureIterator();
       final ListBufferTransitionRelation rel = getTransitionRelation();
       final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
       mEventIterator = new EventIterator(iter);
+      mTauIterator = new TauClosureIterator();
+      mFromState = null;
+      mLevel = -1;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.analysis.tr.TransitionIterator
+    @Override
+    public void reset()
+    {
+      mEventIterator.resetState(mFromState);
+      mTauIterator.reset();
+      resume();
+    }
+
+    @Override
+    public void resetEvent(final int event)
+    {
+      mEventIterator.resetEvent(event);
+      reset();
+    }
+
+    @Override
+    public void resetEvents(final int first, final int last)
+    {
+      mEventIterator.resetEvents(first, last);
+      reset();
+    }
+
+    @Override
+    public void resetEventsByStatus(final int... flags)
+    {
+      mEventIterator.resetEventsByStatus(flags);
+      reset();
+    }
+
+    @Override
+    public void resetState(final int from)
+    {
+      resetState(mStateInfo[from]);
+    }
+
+    @Override
+    public void reset(final int from, final int event)
+    {
+      reset(mStateInfo[from], event);
+    }
+
+    @Override
+    public void resume(final int from)
+    {
+      mFromState = mStateInfo[from];
+      resume();
+    }
+
+    @Override
+    public boolean advance()
+    {
+      int state;
+      do {
+        switch (mLevel) {
+        case 1:
+          if (!mEventIterator.advance()) {
+            break;
+          }
+          state = mEventIterator.getCurrentTargetState();
+          mTauIterator.resume(state);
+          mLevel = 2;
+          // fall through ...
+        case 2:
+          if (mTauIterator.advance()) {
+            return true;
+          }
+          break;
+        default:
+          throw new IllegalStateException
+            ("Unexpected level " + mLevel + " in " +
+             ProxyTools.getShortClassName(this) + "!");
+        }
+        mLevel--;
+      } while (mLevel > 0);
+      return false;
+    }
+
+    @Override
+    public int getCurrentEvent()
+    {
+      return mEventIterator.getCurrentEvent();
+    }
+
+    @Override
+    public int getCurrentFromState()
+    {
+      return mFromState.getFirstState();
+    }
+
+    @Override
+    public int getCurrentSourceState()
+    {
+      return getCurrentFromState();
+    }
+
+    @Override
+    public int getCurrentToState()
+    {
+      return mTauIterator.getCurrentToState();
+    }
+
+    @Override
+    public int getCurrentTargetState()
+    {
+      return getCurrentToState();
+    }
+
+    @Override
+    public void setCurrentToState(final int state)
+    {
+      throw new UnsupportedOperationException
+        (ProxyTools.getShortClassName(this) +
+         " does not support transition modification!");
+    }
+
+    @Override
+    public void remove()
+    {
+      throw new UnsupportedOperationException
+        (ProxyTools.getShortClassName(this) +
+         " does not support transition removal!");
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private void reset(final StateInfo info, final int event)
+    {
+      mFromState = info;
+      resetEvent(event);
+    }
+
+    private void resetState(final StateInfo info)
+    {
+      mFromState = info;
+      reset();
+    }
+
+    private void resume()
+    {
+      mEventIterator.resetState(mFromState);
+      mLevel = 1;
+    }
+
+    @SuppressWarnings("unused")
+    private StateInfo getCurrentTargetStateInfo()
+    {
+      return mTauIterator.getCurrentTargetStateInfo();
+    }
+
+    //#######################################################################
+    //# Data Members
+    private StateInfo mFromState;
+    private int mLevel;
+
+    private final EventIterator mEventIterator;
+    private final TauClosureIterator mTauIterator;
+  }
+
+
+  //#########################################################################
+  //# Inner Class FullEventClosureIterator
+  private class FullEventClosureIterator
+    implements TransitionIterator
+  {
+    //#######################################################################
+    //# Constructor
+    private FullEventClosureIterator(final TransitionListBuffer buffer,
+                                     final TransitionIterator inner)
+    {
+      mTransitionListBuffer = buffer;
+      mTauIterator1 = new TauClosureIterator();
+      mEventIterator = new EventIterator(inner);
       mTauIterator2 = new TauClosureIterator();
       mFromState = null;
       mLevel = -1;
@@ -1534,7 +1793,7 @@ public class NewIncomingEquivalenceTRSimplifier
     @Override
     public int getCurrentSourceState()
     {
-      return getCurrentFromState();
+      return mTransitionListBuffer.getIteratorSourceState(this);
     }
 
     @Override
@@ -1546,7 +1805,7 @@ public class NewIncomingEquivalenceTRSimplifier
     @Override
     public int getCurrentTargetState()
     {
-      return getCurrentToState();
+      return mTransitionListBuffer.getIteratorTargetState(this);
     }
 
     @Override
@@ -1585,202 +1844,25 @@ public class NewIncomingEquivalenceTRSimplifier
       mLevel = 1;
     }
 
-    public StateInfo getCurrentTargetStateInfo()
+    private StateInfo getCurrentTargetStateInfo()
     {
       return mTauIterator2.getCurrentTargetStateInfo();
     }
 
+    private TIntHashSet getVisitedStates()
+    {
+      return mTauIterator2.getVisitedStates();
+    }
+
     //#######################################################################
     //# Data Members
     private StateInfo mFromState;
     private int mLevel;
 
+    private final TransitionListBuffer mTransitionListBuffer;
     private final TauClosureIterator mTauIterator1;
     private final EventIterator mEventIterator;
     private final TauClosureIterator mTauIterator2;
-  }
-
-
-  //#########################################################################
-  //# Inner Class ActiveEventsIterator
-  private class ActiveEventsIterator
-    implements TransitionIterator
-  {
-    //#######################################################################
-    //# Constructor
-    private ActiveEventsIterator()
-    {
-      mTauIterator = new TauClosureIterator();
-      final ListBufferTransitionRelation rel = getTransitionRelation();
-      final TransitionIterator iter2 = rel.createSuccessorsReadOnlyIterator();
-      final int numEvents = rel.getNumberOfProperEvents();
-      iter2.resetEvents(EventEncoding.NONTAU, numEvents - 1);
-      mEventIterator = new EventIterator(iter2);
-      mFromState = null;
-      mLevel = -1;
-      mFoundOmega = false;
-    }
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.analysis.tr.TransitionIterator
-    @Override
-    public void reset()
-    {
-      mFoundOmega = false;
-      mTauIterator.resetState(mFromState);
-      mEventIterator.reset();
-      resume();
-    }
-
-    @Override
-    public void resetEvent(final int event)
-    {
-      mEventIterator.resetEvent(event);
-      reset();
-    }
-
-    @Override
-    public void resetEvents(final int first, final int last)
-    {
-      mEventIterator.resetEvents(first, last);
-      reset();
-    }
-
-    @Override
-    public void resetEventsByStatus(final int... flags)
-    {
-      mEventIterator.resetEventsByStatus(flags);
-      reset();
-    }
-
-    @Override
-    public void resetState(final int from)
-    {
-      resetState(mStateInfo[from]);
-    }
-
-    @Override
-    public void reset(final int from, final int event)
-    {
-      reset(mStateInfo[from], event);
-    }
-
-    @Override
-    public void resume(final int from)
-    {
-      mFromState = mStateInfo[from];
-      resume();
-    }
-
-    @Override
-    public boolean advance()
-    {
-      do {
-        switch (mLevel) {
-        case 1:
-          if (!mTauIterator.advance()) {
-            break;
-          }
-          final StateInfo info = mTauIterator.getCurrentTargetStateInfo();
-          mFoundOmega |= info.isMarked();
-          final int state = info.getFirstState();
-          mEventIterator.resume(state);
-          mLevel = 2;
-          // fall through ...
-        case 2:
-          if (mEventIterator.advance()) {
-            return true;
-          }
-          break;
-        default:
-          throw new IllegalStateException
-            ("Unexpected level " + mLevel + " in " +
-             ProxyTools.getShortClassName(this) + "!");
-        }
-        mLevel--;
-      } while (mLevel > 0);
-      return false;
-    }
-
-    @Override
-    public int getCurrentEvent()
-    {
-      return mEventIterator.getCurrentEvent();
-    }
-
-    @Override
-    public int getCurrentFromState()
-    {
-      return mFromState.getFirstState();
-    }
-
-    @Override
-    public int getCurrentSourceState()
-    {
-      return getCurrentFromState();
-    }
-
-    @Override
-    public int getCurrentToState()
-    {
-      return mEventIterator.getCurrentToState();
-    }
-
-    @Override
-    public int getCurrentTargetState()
-    {
-      return getCurrentToState();
-    }
-
-    @Override
-    public void setCurrentToState(final int state)
-    {
-      throw new UnsupportedOperationException
-        (ProxyTools.getShortClassName(this) +
-         " does not support transition modification!");
-    }
-
-    @Override
-    public void remove()
-    {
-      throw new UnsupportedOperationException
-        (ProxyTools.getShortClassName(this) +
-         " does not support transition removal!");
-    }
-
-    //#######################################################################
-    //# Auxiliary Methods
-    private void reset(final StateInfo info, final int event)
-    {
-      mFromState = info;
-      resetEvent(event);
-    }
-
-    private void resetState(final StateInfo info)
-    {
-      mFromState = info;
-      reset();
-    }
-
-    private void resume()
-    {
-      mTauIterator.resetState(mFromState);
-      mLevel = 1;
-    }
-
-    private boolean getFoundOmega()
-    {
-      return mFoundOmega;
-    }
-
-    //#######################################################################
-    //# Data Members
-    private StateInfo mFromState;
-    private int mLevel;
-    private boolean mFoundOmega;
-
-    private final TauClosureIterator mTauIterator;
-    private final EventIterator mEventIterator;
   }
 
 
@@ -1789,8 +1871,11 @@ public class NewIncomingEquivalenceTRSimplifier
   private int mTransitionLimit = Integer.MAX_VALUE;
 
   private TransitionIterator mTauIterator;
-  private ClassClosureIterator mEventIterator;
-  private ActiveEventsIterator mActiveEventsIterator;
+  private TauClosureIterator mTauClosureIterator;
+  private EventIterator mEventIterator;
+  private PostEventClosureIterator mPostEventIterator;
+  private FullEventClosureIterator mForwardEventIterator;
+  private FullEventClosureIterator mBackwardEventIterator;
 
   /**
    * State information records for all states.
@@ -1803,7 +1888,16 @@ public class NewIncomingEquivalenceTRSimplifier
   private IntListBuffer.ModifyingIterator mListWriteIterator;
   private IntSetBuffer.IntSetIterator mSetReadIterator;
   private IntSetBuffer mSetBuffer;
-  private int mNumProperClasses;
+  /**
+   * The current number of merged states.
+   * Splitting is stopped when this number reaches one.
+   */
+  private int mNumMergedStates;
+  /**
+   * The number of equivalence classes with more than one state.
+   * Splitting is stopped when this number reaches zero.
+   */
+  private int mNumProperCandidates;
   /**
    * Map of states to equivalence classes.
    * States with a non-trivial class (class containing at least two states)
@@ -1816,5 +1910,6 @@ public class NewIncomingEquivalenceTRSimplifier
   //#########################################################################
   //# Data Members
   private static final int OMEGA = EventEncoding.TAU;
+  private static final int HASH_REALLOC_THRESHOLD = 64;
 
 }
