@@ -176,11 +176,11 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
         }
       }
 
+
       mPlantTransitionMap = new ArrayList<int[][]>();
       mSpecTransitionMap = new ArrayList<int[][]>();
       mIndexList = new ArrayList<Integer>();
       mStateList = new BlockedArrayList<PartialOrderStateTuple>(PartialOrderStateTuple.class);
-      // TODO Order events so uncontrollables are first.
       mEventCodingList = new ArrayList<EventProxy>(model.getEvents());
       mPlantEventList = new ArrayList<byte[]>();
       mSpecEventList = new ArrayList<byte[]>();
@@ -204,23 +204,30 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
       mSystemState = new int[mNumAutomata];
 
       final List<AutomatonProxy>[] automataContainingEvents = new ArrayList[mNumEvents];
+      final List<EventProxy> tempEventCodingList = new ArrayList<EventProxy>();
       for (i = 0; i < mNumEvents; i++){
+        if (mEventCodingList.get(i).getKind() == EventKind.PROPOSITION)
+          tempEventCodingList.add(0,mEventCodingList.get(i));
+        else
+          tempEventCodingList.add(mEventCodingList.get(i));
         automataContainingEvents[i] = new ArrayList<AutomatonProxy>();
       }
-
+      mEventCodingList = tempEventCodingList;
       // Separate the automatons by kind
       //AutomatonProxy initUncontrollable = null;
-      mInitialMarked = false;
       for (final AutomatonProxy ap : automata) {
         // Get all states
         stateSet = ap.getStates();
         // Encoding states to binary values
         final List<StateProxy> codes = new ArrayList<StateProxy>(stateSet);
+
         // Encoding events to binary values
         final byte[] aneventCodingList = new byte[mNumEvents];
         final int[] events = new int[ap.getEvents().size()];
         i = 0;
+        //boolean propInAlphabet = false;
         for (final EventProxy evp : ap.getEvents()) {
+          //propInAlphabet |= evp==getUsedDefaultMarking();
           final int eventIndex = mEventCodingList.indexOf(evp);
           events[i] = eventIndex;
           aneventCodingList[eventIndex] = 1;
@@ -229,10 +236,14 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
         }
         // Encoding transitions to binary values
         final int stateSize = codes.size();
-        final int[][] atransition = new int[stateSize][mNumEvents];
+        final int[][] atransition = new int[stateSize+1][mNumEvents];
         for (i = 0; i < stateSize; i++) {
-          for (j = 0; j < mNumEvents; j++) {
+          if (codes.get(i).getPropositions().contains(getUsedDefaultMarking())){
+            atransition[i][0] = stateSize;
+          }
+          for (j = 1; j < mNumEvents; j++) {
             atransition[i][j] = -1;
+            atransition[stateSize][j] = stateSize;
           }
         }
         for (final TransitionProxy tp : ap.getTransitions()) {
@@ -274,7 +285,6 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
         case PLANT:
           mAutomata[ck] = ap;
           mSystemState[ck] = codes.indexOf(initialState);
-          mInitialMarked |= !codes.get(mSystemState[ck]).getPropositions().isEmpty();
           mPlantEventList.add(aneventCodingList);
           mPlantEventHash.add(events);
           mPlantTransitionMap.add(atransition);
@@ -411,11 +421,10 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
         }
       }
       mStateTupleSize = cp + 1;
-
       if (isNonConflictingReduced(mSystemState)) {
         return setSatisfiedResult();
       } else {
-        convertToBredthFirst();
+        convertToBreadthFirst();
         final ConflictTraceProxy counterexample = computePOCounterExample();
         return setFailedResult(counterexample);
       }
@@ -571,7 +580,6 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
     mInitialState = new PartialOrderStateTuple(mStateTupleSize);
 
     encode(sState, mInitialState);
-    mInitialState.setMarked(mInitialMarked);
     mStateSet.getOrAdd(mInitialState);
     mStack.add(new PartialOrderStateTuplePairing(mInitialState, null,PartialOrderParingRequest.VISIT));
     mStateTuple = new PartialOrderStateTuple(mStateTupleSize);
@@ -583,11 +591,13 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
       if (current.getReq() == PartialOrderParingRequest.VISIT && !state.getComponentVisited()){
         state.setComponentVisited(true);
         state.setRootIndex(mDepthIndex++);
-        int[] events;
-        if((events = ample(state))==null)
-          return false;
+        final int[] events = ample(state);
         if(events.length == 0){
-          state.setComponent(mComponentNumber++);
+          state.setComponent(++mComponentNumber);
+          if(!isMarked(state)){
+            setConflictResult(ConflictKind.DEADLOCK);
+            return false;
+          }
         }
         else{
           mStack.add(new PartialOrderStateTuplePairing(state, prev, PartialOrderParingRequest.CLOSE));
@@ -611,9 +621,12 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
             final int lastIndex = mComponentStack.size() - 1;
             if (lastIndex == componentRootIndex) {
               mComponentStack.remove(lastIndex);
-              prev.setComponent(mComponentNumber++);
-              if(!prev.getMarked()){
-                return false;
+              prev.setComponent(++mComponentNumber);
+              if(!isMarked(prev)){
+                if (!canReachExternalComponent(prev)){
+                  setConflictResult(ConflictKind.LIVELOCK);
+                  return false;
+                }
               }
               continue;
             }
@@ -624,47 +637,24 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
               boolean blocking = true;
               for (int i = lastIndex; i >= componentRootIndex; i--) {
                 final PartialOrderStateTuple temp = mComponentStack.remove(i);
-                temp.setComponent(mComponentNumber++);
+                temp.setComponent(++mComponentNumber);
                 if(blocking){
-                  if(temp.getMarked()){
+                  if(isMarked(temp)){
                     blocking = false;
                   }
                   else if(mComponentNumber != 1){
-                    final PartialOrderStateTuple successor = new PartialOrderStateTuple(mStateTupleSize);
-                    final int[] tempSuccessor = new int[mNumAutomata];
-                    final int[] tempState = new int[mNumAutomata];
-                    decode(temp, tempState);
-                    final int[] enabledEvents = enabled(temp);
-                    for(final int e: enabledEvents){
-                      for (i = 0; i < mNumAutomata; i++){
-                        final boolean plant = i < mNumPlants;
-                        final int si = i - mNumPlants;
-                        if ((plant ?
-                          mPlantEventList.get(i)[e]:mSpecEventList.get(si)[e]) != 1){
-                          tempSuccessor[i] = tempState[i];
-
-                        }
-                        else {
-                          tempSuccessor[i] = plant ? mPlantTransitionMap.get(i)[tempState[i]][e] :
-                            mSpecTransitionMap.get(si)[tempState[i]][e];
-                        }
-                      }
-                      encode(tempSuccessor,successor);
-                      if(mStateSet.contains(successor)){
-                        if(successor.getComponent() != mComponentNumber){
-                          blocking = false;
-                          break;
-                        }
-                      }
+                    if(canReachExternalComponent(temp)){
+                      blocking = false;
                     }
                   }
                 }
               }
-
-            } else {
-              int[] events;
-              if ((events = enabled(prev)) == null)
+              if(blocking){
+                setConflictResult(ConflictKind.LIVELOCK);
                 return false;
+              }
+            } else {
+              final int[] events = enabled(prev);
               expand(prev, events, false);
               prev.setFullyExpanded(true);
               mFullExpansions++;
@@ -676,42 +666,82 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
     return true;
   }
 
+  private boolean isMarked(final PartialOrderStateTuple current){
+    final int[] tempState = new int[mNumAutomata];;
+    decode(current, tempState);
+    boolean marked = true;
+    for (int i = 0; i < mNumAutomata; i++){
+      marked &=  mPlantTransitionMap.get(i)[tempState[i]][0] > -1 ||
+                                               mPlantEventList.get(i)[0] == 0;
+    }
+    return marked;
+  }
+
+  private boolean canReachExternalComponent(final PartialOrderStateTuple current){
+    PartialOrderStateTuple successor = new PartialOrderStateTuple(mStateTupleSize);
+    final int[] tempSuccessor = new int[mNumAutomata];
+    final int[] tempState = new int[mNumAutomata];
+    int i;
+    decode(current, tempState);
+    final int[] enabledEvents = enabled(current);
+    for(final int e: enabledEvents){
+      for (i = 0; i < mNumAutomata; i++){
+        final boolean plant = i < mNumPlants;
+        final int si = i - mNumPlants;
+        if ((plant ?
+          mPlantEventList.get(i)[e]:mSpecEventList.get(si)[e]) != 1){
+          tempSuccessor[i] = tempState[i];
+
+        }
+        else {
+          tempSuccessor[i] = plant ? mPlantTransitionMap.get(i)[tempState[i]][e] :
+            mSpecTransitionMap.get(si)[tempState[i]][e];
+        }
+      }
+      encode(tempSuccessor,successor);
+      successor = mStateSet.get(successor);
+      if(successor!=null && successor.isInComponent()){
+        if(successor.getComponent() != mComponentNumber){
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   private void expand(final PartialOrderStateTuple current,
-                       final int[] events,final boolean newState) throws AnalysisException{
+                      final int[] events,final boolean newState) throws AnalysisException{
     int i;
     if(newState){
       mComponentStack.add(current);
     }
     for (final int e : events){
-      boolean marked = false;
-      for (i = 0; i < mNumAutomata; i++){
-        final AutomatonProxy ap = mAutomata[i];
-        final List<StateProxy> codes = new ArrayList<StateProxy>(ap.getStates());
-        final boolean plant = i < mNumPlants;
-        final int si = i - mNumPlants;
-        if ((plant ?
+      if (e != 0){
+        for (i = 0; i < mNumAutomata; i++){
+          final boolean plant = i < mNumPlants;
+          final int si = i - mNumPlants;
+          if ((plant ?
             mPlantEventList.get(i)[e]:mSpecEventList.get(si)[e]) != 1){
-          mSuccessor[i] = mSystemState[i];
+            mSuccessor[i] = mSystemState[i];
 
+          }
+          else {
+            mSuccessor[i] = plant ? mPlantTransitionMap.get(i)[mSystemState[i]][e] :
+              mSpecTransitionMap.get(si)[mSystemState[i]][e];
+          }
         }
-        else {
-          mSuccessor[i] = plant ? mPlantTransitionMap.get(i)[mSystemState[i]][e] :
-            mSpecTransitionMap.get(si)[mSystemState[i]][e];
+        encode(mSuccessor, mStateTuple);
+        PartialOrderStateTuple found = mStateSet.getOrAdd(mStateTuple);
+        if (found == null) {
+          found = mStateTuple;
         }
-        marked |= !codes.get(mSuccessor[i]).getPropositions().isEmpty();
-      }
-      encode(mSuccessor, mStateTuple);
-      mStateTuple.setMarked(marked);
-      PartialOrderStateTuple found = mStateSet.getOrAdd(mStateTuple);
-      if (found == null) {
-        found = mStateTuple;
-      }
-      mStack.add(new PartialOrderStateTuplePairing(found, current, PartialOrderParingRequest.VISIT));
-      mStateTuple = new PartialOrderStateTuple(mStateTupleSize);
-      if (mStateSet.size() > getNodeLimit()) {
-        throw new OverflowException(getNodeLimit());
-      } else {
-        checkAbort();
+        mStack.add(new PartialOrderStateTuplePairing(found, current, PartialOrderParingRequest.VISIT));
+        mStateTuple = new PartialOrderStateTuple(mStateTupleSize);
+        if (mStateSet.size() > getNodeLimit()) {
+          throw new OverflowException(getNodeLimit());
+        } else {
+          checkAbort();
+        }
       }
     }
   }
@@ -902,6 +932,14 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
     return false;
   }
 
+  private void setConflictResult(final ConflictKind result){
+    mConflictResult = result;
+  }
+
+  private ConflictKind getConflictResult(){
+    return mConflictResult;
+  }
+
   @SuppressWarnings("unused")
   private void orderStutterEvents(final int[] events){
     final TIntArrayList stutter = new TIntArrayList();
@@ -923,7 +961,7 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
     }
   }
 
-  private void convertToBredthFirst(){
+  private void convertToBreadthFirst(){
     mStateList = new ArrayList<PartialOrderStateTuple>();
     mStateList.add(mInitialState);
     mInitialState.setVisited(true);
@@ -959,7 +997,7 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
         if (tuple != null && !tuple.getVisited()){
           mStateList.add(tuple);
           tuple.setVisited(true);
-          if (tuple == mErrorState){
+          if (isErrorState(tuple)){
             return;
           }
         }
@@ -968,7 +1006,10 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
         mIndexList.add(mStateList.size());
       }
     }
-    //assert false;
+  }
+
+  private boolean isErrorState(final PartialOrderStateTuple current){
+    return current.getComponent() == mErrorComponent;
   }
 
   private ConflictTraceProxy computePOCounterExample() throws AnalysisAbortException
@@ -1031,7 +1072,7 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
     final List<AutomatonProxy> automata = Arrays.asList(mAutomata);
     final ConflictTraceProxy trace =
       factory.createConflictTraceProxy(tracename, null, null, des, automata,
-                                     steps,ConflictKind.DEADLOCK);
+                                     steps,getConflictResult());
     return trace;
   }
 
@@ -1126,6 +1167,9 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
 
   //#########################################################################
   //# Data Members
+  // Conflict information
+  private ConflictKind mConflictResult;
+
   // Ample conditions
   private PartialOrderEventDependencyTuple[][] mReducedEventDependencyMap;
 
@@ -1159,7 +1203,6 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
   private PartialOrderStateTuple mStateTuple;
   private List<int[]> mPlantEventHash;
   private List<int[]> mSpecEventHash;
-  private boolean mInitialMarked;
 
   // Size
   private int mNumAutomata;
@@ -1173,7 +1216,7 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
   private int[] mSuccessor;
   private PartialOrderStateTuple mErrorState;
   private int mErrorEvent;
-  //private int mErrorAutomaton;
+  private int mErrorComponent;
 
   //Statistics
   @SuppressWarnings("unused")
