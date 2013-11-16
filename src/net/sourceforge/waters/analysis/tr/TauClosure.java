@@ -169,7 +169,7 @@ public class TauClosure
    * Creates an iterator over this tau-closure that is guaranteed to
    * support caching. This method produces an iterator like {@link
    * #createIterator()} with the additional guarantee that it supports
-   * caching and fully implements the {@link TransitionIterator#resume()
+   * caching and fully implements the {@link TransitionIterator#resume(int)
    * resume()} method.
    * @see #createIterator()
    */

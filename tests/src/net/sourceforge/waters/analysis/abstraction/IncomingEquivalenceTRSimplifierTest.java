@@ -192,7 +192,7 @@ public class IncomingEquivalenceTRSimplifierTest
   //#########################################################################
   //# Test Cases - Active Events and Silent Continuation Rule Combined
   public void test_incomingEquivalence01()
-  throws Exception
+    throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
@@ -201,7 +201,7 @@ public class IncomingEquivalenceTRSimplifierTest
   }
 
   public void test_incomingEquivalence02()
-  throws Exception
+    throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
@@ -210,7 +210,7 @@ public class IncomingEquivalenceTRSimplifierTest
   }
 
   public void test_incomingEquivalence03()
-  throws Exception
+    throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
@@ -219,11 +219,29 @@ public class IncomingEquivalenceTRSimplifierTest
   }
 
   public void test_incomingEquivalence04()
-  throws Exception
+    throws Exception
   {
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "incomingEquivalence04.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_incomingEquivalence05()
+    throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "incomingEquivalence05.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_incomingEquivalence06()
+    throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "incomingEquivalence06.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
