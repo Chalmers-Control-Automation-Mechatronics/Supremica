@@ -1972,7 +1972,7 @@ public class IncomingEquivalenceTRSimplifier
    * Array of predecessors indexes in {@link #mListBuffer}.
    * This array maps each state that appears in the list of an equivalence
    * class candidate to its predecessor in that list, to facilitate moving
-   * states to split list when classes are split.
+   * states to a split list when classes are split.
    */
   private int[] mPredecessors;
 
@@ -1991,7 +1991,7 @@ public class IncomingEquivalenceTRSimplifier
 
 
   //#########################################################################
-  //# Data Members
+  //# Class Constants
   private static final int OMEGA = EventEncoding.TAU;
   private static final int HASH_REALLOC_THRESHOLD = 64;
 
