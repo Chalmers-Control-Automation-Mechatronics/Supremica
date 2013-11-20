@@ -46,7 +46,7 @@ public class GraphSaveEPSAction
     putValue(Action.SHORT_DESCRIPTION,
              "Save the currently viewed automaton in an " +
              "Encapsulated Postscript (EPS) file");
-    putValue(Action.SMALL_ICON, IconLoader.ICON_TOOL_PRINT);
+    putValue(Action.SMALL_ICON, IconLoader.ICON_TOOL_PRINT_EPS);
   }
 
 
