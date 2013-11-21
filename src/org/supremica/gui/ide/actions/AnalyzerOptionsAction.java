@@ -1,37 +1,63 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters/Supremica IDE
+//# PACKAGE: org.supremica.gui.ide.actions
+//# CLASS:   AnalyzerOptionsAction
+//###########################################################################
+//# $Id$
+//###########################################################################
+
+
 package org.supremica.gui.ide.actions;
 
-import javax.swing.Action;
 import java.awt.event.ActionEvent;
-import org.supremica.gui.PropertiesDialog;
 import java.util.List;
-import javax.swing.ImageIcon;
-import org.supremica.gui.ide.IDE;
 
-public class AnalyzerOptionsAction
-    extends IDEAction
+import javax.swing.Action;
+
+import net.sourceforge.waters.gui.util.IconLoader;
+
+import org.supremica.gui.PropertiesDialog;
+
+
+/**
+ * The action that displays the options dialog.
+ */
+public class AnalyzerOptionsAction extends IDEAction
 {
-    private static final long serialVersionUID = 1L;
 
-    /**
-     * Displays dialog with all kinds of options (not only analyzer options...).
-     */
-    public AnalyzerOptionsAction(List<IDEAction> actionList)
-    {
-        super(actionList);
+  //#########################################################################
+  //# Constructors
+  public AnalyzerOptionsAction(final List<IDEAction> actionList)
+  {
+    super(actionList);
+    putValue(Action.NAME, "Options...");
+    putValue(Action.SHORT_DESCRIPTION, "Options");
+    putValue(Action.SMALL_ICON, IconLoader.ICON_TOOL_OPTIONS);
+  }
 
-        putValue(Action.NAME, "Options...");
-        putValue(Action.SHORT_DESCRIPTION, "Options");
-        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Preferences16.gif")));
-    }
 
-    public void actionPerformed(ActionEvent e)
-    {
-        doAction();
-    }
+  //#########################################################################
+  //# Interface java.awt.event.ActionListener
+  @Override
+  public void actionPerformed(final ActionEvent event)
+  {
+    doAction();
+  }
 
-    public void doAction()
-    {
-        PropertiesDialog dialog = new PropertiesDialog(ide.getFrame());
-        dialog.setVisible(true);
-    }
+
+  //#########################################################################
+  //# Interface org.supremica.gui.ide.actions.IDEAction
+  @Override
+  public void doAction()
+  {
+    final PropertiesDialog dialog = new PropertiesDialog(ide.getFrame());
+    dialog.setVisible(true);
+  }
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
+
 }
