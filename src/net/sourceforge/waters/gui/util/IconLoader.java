@@ -145,6 +145,7 @@ public class IconLoader
   private static final String NAME_TOOL_NEW = "new";
   private static final String NAME_TOOL_NODE = "node";
   private static final String NAME_TOOL_OPEN = "open";
+  private static final String NAME_TOOL_OPTIONS = "options";
   private static final String NAME_TOOL_PASTE = "paste";
   private static final String NAME_TOOL_PRINT = "print";
   private static final String NAME_TOOL_PRINT_EPS = "print_eps";
@@ -205,6 +206,7 @@ public class IconLoader
   public static final ImageIcon ICON_TOOL_NEW = getWatersIcon(NAME_TOOL_NEW);
   public static final ImageIcon ICON_TOOL_NODE = getWatersIcon(NAME_TOOL_NODE);
   public static final ImageIcon ICON_TOOL_OPEN = getWatersIcon(NAME_TOOL_OPEN);
+  public static final ImageIcon ICON_TOOL_OPTIONS = getWatersIcon(NAME_TOOL_OPTIONS);
   public static final ImageIcon ICON_TOOL_PASTE = getWatersIcon(NAME_TOOL_PASTE);
   public static final ImageIcon ICON_TOOL_PRINT = getWatersIcon(NAME_TOOL_PRINT);
   public static final ImageIcon ICON_TOOL_PRINT_EPS =
