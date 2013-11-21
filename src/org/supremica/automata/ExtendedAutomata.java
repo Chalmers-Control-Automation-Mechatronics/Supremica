@@ -526,21 +526,29 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         }
     }
 
-    public Set<VariableComponentProxy> extractVariablesFromExpr(final SimpleExpressionProxy expr)
-    {
-        final Set<VariableComponentProxy> vars = new HashSet<VariableComponentProxy>();
-        for(final Proxy proxy:module.getComponentList())
-        {
-            if(proxy instanceof VariableComponentProxy)
-            {
-                final VariableComponentProxy var = (VariableComponentProxy)proxy;
-                if(expr.toString().contains(var.getName())) {
-                    vars.add(var);
-                }
-            }
-        }
-        return vars;
-    }
+	public Set<VariableComponentProxy> extractVariablesFromExpr(final SimpleExpressionProxy expr) {
+
+		final Set<VariableComponentProxy> vars = new HashSet<VariableComponentProxy>();
+
+		if (module != null) {
+			for (final Proxy proxy : module.getComponentList()) {
+				if (proxy instanceof VariableComponentProxy) {
+					final VariableComponentProxy var = (VariableComponentProxy) proxy;
+					if (expr.toString().contains(var.getName())) {
+						vars.add(var);
+					}
+				}
+			}
+		} else {
+			for (final VariableComponentProxy var : getVars()) {
+				if (expr.toString().contains(var.getName())) {
+					vars.add(var);
+				}
+			}
+		}
+		return vars;
+	}
+
     /**
      * Add the automaton to the list of automata. All events will be added to the union alphabet set.
      * @param exAutomaton The EFA

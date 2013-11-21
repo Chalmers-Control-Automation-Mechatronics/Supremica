@@ -685,12 +685,11 @@ public class BDDPartitionSetEve extends BDDPartitionSet {
             }
 
             /* Find which EFA variables are in this edge. */
-            @SuppressWarnings("deprecation")
             private HashSet<String> extractVariablesFromTheEdge(final SimpleExpressionProxy guard) {
 
                 final HashSet<String> extractedVariables = new HashSet<String>();
 
-                for (final VariableComponentProxy var : anAutomaton.extractVariablesFromExpr(guard)) {
+                for (final VariableComponentProxy var : bddExAutomata.orgExAutomata.extractVariablesFromExpr(guard)) {
                     extractedVariables.add(var.getName());
                 }
 
