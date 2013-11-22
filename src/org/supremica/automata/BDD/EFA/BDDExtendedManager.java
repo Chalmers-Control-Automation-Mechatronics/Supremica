@@ -1452,20 +1452,6 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
                 currLocalUnsafeStates[i] = transToUnsafeStates.exist(bddExAutomata.getDestVariablesVarSet());
 
-                final BDD currLocalUnStatesToSourceStates = currLocalUnsafeStates[i]
-                  .replace(bddExAutomata.sourceToTempVariablePairing).and(partitionSourceStates[i]);
-
-                if (currLocalUnStatesToSourceStates.nodeCount() > maxBDDSizePartitioning)
-                  maxBDDSizePartitioning = currLocalUnStatesToSourceStates.nodeCount();
-
-                final BDD localLargerStates = currLocalUnStatesToSourceStates
-                  .relprod(globalLargerBDD, bddExAutomata.tempVariablesVarSet);
-
-                currLocalUnsafeStates[i].orWith(localLargerStates.and(feasibleSourceStates));
-
-                localLargerStates.free();
-                currLocalUnStatesToSourceStates.free();
-
                 accuLocalUnsafeStatesBDDs[i] = accuLocalUnsafeStatesBDDs[i].or(currLocalUnsafeStates[i]);
 
                 if (accuLocalUnsafeStatesBDDs[i].nodeCount() > maxBDDSizePartitioning)
@@ -1512,10 +1498,6 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
               notUnsafeStates[j].free();
             }
-
-            newFoundUnsafeStates.andWith(unsafeStates.not());
-            if (newFoundUnsafeStates.nodeCount() > maxBDDSizePartitioning)
-                    maxBDDSizePartitioning = newFoundUnsafeStates.nodeCount();
 
             unsafeStates = unsafeStates.or(newFoundUnsafeStates);
             if (unsafeStates.nodeCount() > maxBDDSizePartitioning)
