@@ -494,13 +494,11 @@ public class CompositionalSpecialTransitionsChecker
   //Create the synchronous product of the system.
   final MonolithicSynchronousProductBuilder builder = getSynchronousProductBuilder();
   builder.setModel(getModel());
-  try {
-    builder.run();
-    final AutomatonProxy sync =
-      builder.getComputedAutomaton();
-  } finally {}
-
-  final SynchronousProductStateMap synchronousAutomataMap = builder.getStateMap();
+  builder.run();
+  @SuppressWarnings("unused")
+  final AutomatonProxy sync = builder.getComputedAutomaton();
+  final SynchronousProductStateMap synchronousAutomataMap =
+    builder.getStateMap();
 
   for(final AutomatonProxy originalAut : synchronousAutomataMap.getInputAutomata())
   {
