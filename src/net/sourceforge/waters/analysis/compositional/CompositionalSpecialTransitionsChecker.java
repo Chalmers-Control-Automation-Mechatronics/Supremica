@@ -9,6 +9,9 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
+import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
+import gnu.trove.strategy.HashingStrategy;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -34,9 +37,11 @@ import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.analysis.des.TraceChecker;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESEqualityVisitor;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
@@ -481,8 +486,14 @@ public class CompositionalSpecialTransitionsChecker
   private void analyseSystemTransitions()
   throws AnalysisException
 {
-  //For every automaton in the system being tested, add every transition to transInfo
-  final HashMap<TransitionProxy, Integer> transInfo = new HashMap<>();
+  //Creates a hashmap transInfo that can store transitions.
+    final ProductDESEqualityVisitor eq =
+      ProductDESEqualityVisitor.getInstance();
+    final HashingStrategy<Proxy> strategy = eq.getTObjectHashingStrategy();
+    final TObjectIntCustomHashMap<TransitionProxy> transInfo =
+      new TObjectIntCustomHashMap<>(strategy, 0);
+
+      //Fill the hashmap with all the transitions in the original automata.
   for(final AutomatonProxy aut : getModel().getAutomata())
   {
     for(final TransitionProxy trans : aut.getTransitions())
@@ -495,30 +506,43 @@ public class CompositionalSpecialTransitionsChecker
   final MonolithicSynchronousProductBuilder builder = getSynchronousProductBuilder();
   builder.setModel(getModel());
   builder.run();
-  @SuppressWarnings("unused")
   final AutomatonProxy sync = builder.getComputedAutomaton();
-  final SynchronousProductStateMap synchronousAutomataMap =
+  final SynchronousProductStateMap synchronousStateMap =
     builder.getStateMap();
 
-  for(final AutomatonProxy originalAut : synchronousAutomataMap.getInputAutomata())
+  //For each transition of the synchronous product
+  for(final TransitionProxy trans : sync.getTransitions())
   {
-      for(final TransitionProxy trans : originalAut.getTransitions())
-      {
-        //Counts the number of times a transition is seen in the synchronous product.
-        final int numTimesSeen = transInfo.get(trans);
-        transInfo.put(trans, numTimesSeen+1);
-      }
-  }
+ // which has the form X -e-> Y
+    // where X = (x1,...,xn) and Y = (y1,...,yn) are state tuples
+    // of the synchronous product
+    final EventProxy e = trans.getEvent();
+    for(final AutomatonProxy inputAut : synchronousStateMap.getInputAutomata())
+    {
+      //find the states xi and yi corresponding to Ai in X and Y
+      final StateProxy originalSource = synchronousStateMap.getOriginalState(trans.getSource(), inputAut);
+      final StateProxy originalTarget = synchronousStateMap.getOriginalState(trans.getTarget(), inputAut);
+      //Build the original transition xi -e-> yi
+      final TransitionProxy originalTransition = getFactory().createTransitionProxy(originalSource, e, originalTarget);
 
+    //Counts the number of times a transition is seen in the synchronous product.
+      final int numTimesSeen = transInfo.get(originalTransition);
+      transInfo.put(originalTransition, numTimesSeen+1);
+    }
+  }
+  int alwaysDisabledTransCounter = 0;
   for(final TransitionProxy trans : transInfo.keySet())
   {
   //if numTimesSeen is still 0 it is always disabled transition.
+
     if(transInfo.get(trans) == 0)
     {
-      System.out.println("Found always disabled transition from" +
-    trans.getSource() + " with " + trans.getEvent() + " to " + trans.getTarget());
+      alwaysDisabledTransCounter++;
+      System.out.println("Found always disabled transition: " +
+    trans.getSource().getName() + " -" + trans.getEvent().getName() + "-> " + trans.getTarget().getName());
     }
   }
+  System.out.println("Found " + alwaysDisabledTransCounter + " always disabled transitions in this model.");
   //if the transition is always seen then it is always enabled.
 }
 
