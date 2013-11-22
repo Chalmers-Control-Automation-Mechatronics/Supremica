@@ -50,7 +50,7 @@ public class NBAbstractionStandardSpecialTransitionsCheckerTest
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);
-    checker.setTraceCheckingEnabled(true);
+    checker.setTraceCheckingEnabled(false);
     return checker;
   }
 

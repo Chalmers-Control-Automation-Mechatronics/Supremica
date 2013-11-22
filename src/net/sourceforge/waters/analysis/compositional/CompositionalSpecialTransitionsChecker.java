@@ -468,10 +468,6 @@ public class CompositionalSpecialTransitionsChecker
     setPropositionsForMarkings(defaultMarking, preconditionMarking);
     super.setUp();
     setupSafetyVerifiers();
-
-
-    analyseSystemTransitions();
-
   }
 
   @Override
@@ -483,6 +479,18 @@ public class CompositionalSpecialTransitionsChecker
     mAutomatonInfoMap = null;
   }
 
+  @Override
+  public boolean run()
+  {
+    try {
+      setUp();
+    analyseSystemTransitions();
+    tearDown();
+    } catch (final Exception e) {
+      e.printStackTrace();
+    }
+    return true;
+  }
   private void analyseSystemTransitions()
   throws AnalysisException
 {
