@@ -538,6 +538,53 @@ public class CompositionalSpecialTransitionsChecker
       transInfo.put(originalTransition, numTimesSeen+1);
     }
   }
+
+
+  int alwaysEnabledTransCounter = 0;
+  //For each automaton
+  for(final AutomatonProxy inputAut : synchronousStateMap.getInputAutomata())
+  {
+    final TObjectIntCustomHashMap<StateProxy> stateCounter =
+      new TObjectIntCustomHashMap<>(strategy, 0);
+      for(final StateProxy state : inputAut.getStates())
+      {
+
+        //Add all states to the hashmap
+        stateCounter.put(state, 0);
+      }
+
+      //Loop through the states in the synchronous product
+  for(final StateProxy syncState : sync.getStates())
+    {
+      final StateProxy originalState = synchronousStateMap.getOriginalState(syncState, inputAut);
+      //Count how many times each state appears in the synchronous product
+      final int numTimesSeen = stateCounter.get(originalState);
+      stateCounter.put(originalState, numTimesSeen+1);
+    }
+
+  //If a transition with source state s1 has seen x times in sync
+  //And s1 was in sync in x places
+  //Then the transition must be always enabled.
+  for(final TransitionProxy trans : inputAut.getTransitions())
+  {
+    final StateProxy s1 = trans.getSource();
+    final int transCount = transInfo.get(trans);
+    final int stateCount = stateCounter.get(s1);
+    if(transCount == stateCount)
+    {
+      //Found always enabled transition.
+      alwaysEnabledTransCounter++;
+      System.out.println("Found always enabled transition: " +
+        trans.getSource().getName() + " -" + trans.getEvent().getName() + "-> " + trans.getTarget().getName());
+    }
+    if(transCount > stateCount)
+    {
+      System.err.println("Too many transitions found " + transCount + " trans vs " + stateCount + " states");
+    }
+  }
+  }
+
+
   int alwaysDisabledTransCounter = 0;
   for(final TransitionProxy trans : transInfo.keySet())
   {
@@ -551,7 +598,8 @@ public class CompositionalSpecialTransitionsChecker
     }
   }
   System.out.println("Found " + alwaysDisabledTransCounter + " always disabled transitions in this model.");
-  //if the transition is always seen then it is always enabled.
+  System.out.println("Found " + alwaysEnabledTransCounter + " always enabled transitions in this model.");
+
 }
 
 
