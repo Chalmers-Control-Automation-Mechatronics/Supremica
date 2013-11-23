@@ -37,7 +37,6 @@ import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.analysis.des.TraceChecker;
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -491,214 +490,198 @@ public class CompositionalSpecialTransitionsChecker
     }
     return true;
   }
-  private void analyseSystemTransitions()
-  throws AnalysisException
-{
-  //Creates a hashmap transInfo that can store transitions.
-    final ProductDESEqualityVisitor eq =
-      ProductDESEqualityVisitor.getInstance();
-    final HashingStrategy<Proxy> strategy = eq.getTObjectHashingStrategy();
+
+  private void analyseSystemTransitions() throws AnalysisException
+  {
+    //Creates a hashmap transInfo that can store transitions.
+    final HashingStrategy<TransitionProxy> strategy =
+      ProductDESEqualityVisitor.getNonDeterminsiticTransitionHashingStrategy();
     final TObjectIntCustomHashMap<TransitionProxy> transInfo =
       new TObjectIntCustomHashMap<>(strategy, 0);
 
-      //Because the automata can be nondeterministic, keep track of if we've already
-      //seen an event in a state.
-      final HashMap<StateProxy, ArrayList<EventProxy>> visitedStates = new HashMap<>();
+    //Because the automata can be nondeterministic, keep track of if we've already
+    //seen an event in a state.
+    final HashMap<StateProxy,ArrayList<EventProxy>> visitedStates =
+      new HashMap<>();
 
-      //Fill the hashmap with all the transitions in the original automata.
-  for(final AutomatonProxy aut : getModel().getAutomata())
-  {
-    for(final TransitionProxy trans : aut.getTransitions())
-    {
-      transInfo.put(trans, 0);
-    }
-  }
-
-  //Create the synchronous product of the system.
-  final MonolithicSynchronousProductBuilder builder = getSynchronousProductBuilder();
-  builder.setModel(getModel());
-  builder.run();
-  final AutomatonProxy sync = builder.getComputedAutomaton();
-  final SynchronousProductStateMap synchronousStateMap =
-    builder.getStateMap();
-
-  //For each transition of the synchronous product
-  for(final TransitionProxy trans : sync.getTransitions())
-  {
- // which has the form X -e-> Y
-    final EventProxy e = trans.getEvent();
-    // where X = (x1,...,xn) and Y = (y1,...,yn) are state tuples
-    // of the synchronous product
-
-    //We do not want to double count the nondeterministic trans in sync
-    final ArrayList<EventProxy> eventsSeen = visitedStates.get(trans.getSource());
-    if(eventsSeen != null)
-      {
-       if(eventsSeen.contains(e))
-       {
-       //Then we have already seen this event on this state and can stop
-         continue;
-       }
-       else
-       {
-         //Otherwise add this event to the events we have seen
-         eventsSeen.add(e);
-         visitedStates.put(trans.getSource(), eventsSeen);
-       }
+    //Fill the hashmap with all the transitions in the original automata.
+    for (final AutomatonProxy aut : getModel().getAutomata()) {
+      for (final TransitionProxy trans : aut.getTransitions()) {
+        transInfo.put(trans, 0);
       }
-    else
-    {
-      //If we have never seen this state before create a List with the new event
-      //and add it to visited states.
-      final ArrayList<EventProxy> newStateFound = new ArrayList<>();
-      newStateFound.add(e);
-      visitedStates.put(trans.getSource(), newStateFound);
     }
 
+    //Create the synchronous product of the system.
+    final MonolithicSynchronousProductBuilder builder =
+      getSynchronousProductBuilder();
+    builder.setModel(getModel());
+    builder.run();
+    final AutomatonProxy sync = builder.getComputedAutomaton();
+    final SynchronousProductStateMap synchronousStateMap =
+      builder.getStateMap();
 
+    //For each transition of the synchronous product
+    for (final TransitionProxy trans : sync.getTransitions()) {
+      // which has the form X -e-> Y
+      final EventProxy e = trans.getEvent();
+      // where X = (x1,...,xn) and Y = (y1,...,yn) are state tuples
+      // of the synchronous product
+
+      //We do not want to double count the nondeterministic trans in sync
+      final ArrayList<EventProxy> eventsSeen =
+        visitedStates.get(trans.getSource());
+      if (eventsSeen != null) {
+        if (eventsSeen.contains(e)) {
+          //Then we have already seen this event on this state and can stop
+          continue;
+        } else {
+          //Otherwise add this event to the events we have seen
+          eventsSeen.add(e);
+          visitedStates.put(trans.getSource(), eventsSeen);
+        }
+      } else {
+        //If we have never seen this state before create a List with the new event
+        //and add it to visited states.
+        final ArrayList<EventProxy> newStateFound = new ArrayList<>();
+        newStateFound.add(e);
+        visitedStates.put(trans.getSource(), newStateFound);
+      }
+
+      for (final AutomatonProxy inputAut : synchronousStateMap
+        .getInputAutomata()) {
+        //find the states xi and yi corresponding to Ai in X and Y
+        final StateProxy originalSource =
+          synchronousStateMap.getOriginalState(trans.getSource(), inputAut);
+        final StateProxy originalTarget =
+          synchronousStateMap.getOriginalState(trans.getTarget(), inputAut);
+        //Build the original transition xi -e-> yi
+        final TransitionProxy originalTransition =
+          getFactory().createTransitionProxy(originalSource, e,
+                                             originalTarget);
+
+        //Counts the number of times a transition is seen in the synchronous product.
+        final int numTimesSeen = transInfo.get(originalTransition);
+        transInfo.put(originalTransition, numTimesSeen + 1);
+      }
+    }
+
+    /*
     for(final AutomatonProxy inputAut : synchronousStateMap.getInputAutomata())
     {
-      //find the states xi and yi corresponding to Ai in X and Y
-      final StateProxy originalSource = synchronousStateMap.getOriginalState(trans.getSource(), inputAut);
-      final StateProxy originalTarget = synchronousStateMap.getOriginalState(trans.getTarget(), inputAut);
-      //Build the original transition xi -e-> yi
-      final TransitionProxy originalTransition = getFactory().createTransitionProxy(originalSource, e, originalTarget);
-
-    //Counts the number of times a transition is seen in the synchronous product.
-      final int numTimesSeen = transInfo.get(originalTransition);
-      transInfo.put(originalTransition, numTimesSeen+1);
-    }
-  }
-
-
-  /*
-  for(final AutomatonProxy inputAut : synchronousStateMap.getInputAutomata())
-  {
-    for(final TransitionProxy originalTrans : inputAut.getTransitions())
-    {
-      //For each of the transitions in the original automaton
-      boolean alwaysEnabled = true;
-
+      for(final TransitionProxy originalTrans : inputAut.getTransitions())
+      {
+        //For each of the transitions in the original automaton
+        boolean alwaysEnabled = true;
         for(final StateProxy stateTuple : sync.getStates())
         {
-              final StateProxy originalState = synchronousStateMap.getOriginalState(stateTuple, inputAut);
-              final StateProxy transSource = originalTrans.getSource();
-              //We see if it is enabled in sync
-              if(transSource == originalState)
-              {
-                //Is originalTrans enabled on originalState?
-                //If it is not then it is not always enabled.
-                alwaysEnabled = false;
-                break;
-              }
+          final StateProxy originalState = synchronousStateMap.getOriginalState(stateTuple, inputAut);
+          final StateProxy transSource = originalTrans.getSource();
+          //We see if it is enabled in sync
+          if(transSource == originalState)
+          {
+            //Is originalTrans enabled on originalState?
+            //If it is not then it is not always enabled.
+            alwaysEnabled = false;
+            break;
+          }
         }
         if(alwaysEnabled)
         {
           alwaysEnabledTransCounter++;
           System.out.println("Found always enabled transition: " +
-            originalTrans.getSource().getName() + " -" + originalTrans.getEvent().getName() + "-> " + originalTrans.getTarget().getName());
-
+                             originalTrans.getSource().getName() + " -" + originalTrans.getEvent().getName() + "-> " + originalTrans.getTarget().getName());
         }
+      }
     }
-  }
-*/
+    */
 
-
-  int alwaysEnabledTransCounter = 0;
-  //For each automaton
-  for(final AutomatonProxy inputAut : synchronousStateMap.getInputAutomata())
-  {
-   final HashMap<StateProxy, Integer> stateCounter = new HashMap<>();
-      for(final StateProxy state : inputAut.getStates())
-      {
+    int alwaysEnabledTransCounter = 0;
+    //For each automaton
+    for (final AutomatonProxy inputAut : synchronousStateMap
+      .getInputAutomata()) {
+      final HashMap<StateProxy,Integer> stateCounter = new HashMap<>();
+      for (final StateProxy state : inputAut.getStates()) {
 
         //Add all states to the hashmap
         stateCounter.put(state, 0);
       }
 
       //Loop through the states in the synchronous product
-  for(final StateProxy syncState : sync.getStates())
-    {
-      final StateProxy originalState = synchronousStateMap.getOriginalState(syncState, inputAut);
-      //Count how many times each state appears in the synchronous product
-      final int numTimesSeen = stateCounter.get(originalState);
-      stateCounter.put(originalState, numTimesSeen+1);
+      for (final StateProxy syncState : sync.getStates()) {
+        final StateProxy originalState =
+          synchronousStateMap.getOriginalState(syncState, inputAut);
+        //Count how many times each state appears in the synchronous product
+        final int numTimesSeen = stateCounter.get(originalState);
+        stateCounter.put(originalState, numTimesSeen + 1);
+      }
+
+      //If a transition with source state s1 has seen x times in sync
+      //And s1 was in sync in x places
+      //Then the transition must be always enabled.
+      for (final TransitionProxy trans : inputAut.getTransitions()) {
+        final StateProxy s1 = trans.getSource();
+        final int transCount = transInfo.get(trans);
+        final int stateCount = stateCounter.get(s1);
+        if (transCount == stateCount) {
+          //Found always enabled transition.
+          alwaysEnabledTransCounter++;
+          System.out.println("Found always enabled transition: "
+                             + trans.getSource().getName() + " -"
+                             + trans.getEvent().getName() + "-> "
+                             + trans.getTarget().getName());
+        }
+        if (transCount > stateCount) {
+          System.err.println("Too many transitions found " + transCount
+                             + " trans vs " + stateCount + " states");
+        }
+      }
     }
 
-
-  //If a transition with source state s1 has seen x times in sync
-  //And s1 was in sync in x places
-  //Then the transition must be always enabled.
-  for(final TransitionProxy trans : inputAut.getTransitions())
-  {
-    final StateProxy s1 = trans.getSource();
-    final int transCount = transInfo.get(trans);
-    final int stateCount = stateCounter.get(s1);
-    if(transCount == stateCount)
+    /*
+    // Which would be a transition xj -e-> yj in automaton Aj
+    // such that, whenever the synchronous product is in state xj,
+    // then event e is enabled?
+    ListBufferTransitionRelation transitionRelation = new ListBufferTransitionRelation(sync, null , ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    for(StateProxy stateTuple : sync.getStates())
     {
-      //Found always enabled transition.
-      alwaysEnabledTransCounter++;
-      System.out.println("Found always enabled transition: " +
-        trans.getSource().getName() + " -" + trans.getEvent().getName() + "-> " + trans.getTarget().getName());
-    }
-    if(transCount > stateCount)
-    {
-      System.err.println("Too many transitions found " + transCount + " trans vs " + stateCount + " states");
-    }
-  }
-  }
-
-
-  /*
- // Which would be a transition xj -e-> yj in automaton Aj
- // such that, whenever the synchronous product is in state xj,
- // then event e is enabled?
-  ListBufferTransitionRelation transitionRelation = new ListBufferTransitionRelation(sync, null , ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-  for(StateProxy stateTuple : sync.getStates())
-  {
-    for(AutomatonProxy Aj : synchronousStateMap.getInputAutomata()) //Aj
-    {
-
-      final StateProxy AjState = synchronousStateMap.getOriginalState(stateTuple, Aj);
-
-      //for each transition xj -e-> yj in Aj
-      for(TransitionProxy trans : Aj.getTransitions())
+      for(AutomatonProxy Aj : synchronousStateMap.getInputAutomata()) //Aj
       {
-        //If it still unknown if trans is always enabled
-
-        for(AutomatonProxy Ai : synchronousStateMap.getInputAutomata())//Ai
+        final StateProxy AjState = synchronousStateMap.getOriginalState(stateTuple, Aj);
+        //for each transition xj -e-> yj in Aj
+        for(TransitionProxy trans : Aj.getTransitions())
         {
-          if(Aj != Ai)
+          //If it still unknown if trans is always enabled
+          for(AutomatonProxy Ai : synchronousStateMap.getInputAutomata())//Ai
           {
-            final StateProxy AiState = synchronousStateMap.getOriginalState(stateTuple, Ai);
-
-            //if there exists Ai (i!=j) such that xi -e-> is not defined then
-            //mark the transition xj -e-> yj as not always enabled
+            if(Aj != Ai)
+            {
+              final StateProxy AiState = synchronousStateMap.getOriginalState(stateTuple, Ai);
+              //if there exists Ai (i!=j) such that xi -e-> is not defined then
+              //mark the transition xj -e-> yj as not always enabled
+            }
           }
         }
       }
-
     }
-  }
-  */
+    */
 
-  int alwaysDisabledTransCounter = 0;
-  for(final TransitionProxy trans : transInfo.keySet())
-  {
-  //if numTimesSeen is still 0 it is always disabled transition.
+    int alwaysDisabledTransCounter = 0;
+    for (final TransitionProxy trans : transInfo.keySet()) {
+      //if numTimesSeen is still 0 it is always disabled transition.
 
-    if(transInfo.get(trans) == 0)
-    {
-      alwaysDisabledTransCounter++;
-      System.out.println("Found always disabled transition: " +
-    trans.getSource().getName() + " -" + trans.getEvent().getName() + "-> " + trans.getTarget().getName());
+      if (transInfo.get(trans) == 0) {
+        alwaysDisabledTransCounter++;
+        System.out.println("Found always disabled transition: "
+                           + trans.getSource().getName() + " -"
+                           + trans.getEvent().getName() + "-> "
+                           + trans.getTarget().getName());
+      }
     }
+    System.out.println("Found " + alwaysDisabledTransCounter
+                       + " always disabled transitions in this model.");
+    System.out.println("Found " + alwaysEnabledTransCounter
+                       + " always enabled transitions in this model.");
   }
-  System.out.println("Found " + alwaysDisabledTransCounter + " always disabled transitions in this model.");
-  System.out.println("Found " + alwaysEnabledTransCounter + " always enabled transitions in this model.");
-
-}
-
 
   //#########################################################################
   //# Hooks

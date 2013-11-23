@@ -48,6 +48,7 @@ import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESEqualityVisitor;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
@@ -219,8 +220,10 @@ public class OPVerifierExperiment
     final int numEvents = events.size();
     final TObjectIntHashMap<EventProxy> eventFanOut =
       new TObjectIntHashMap<EventProxy>(numEvents);
+    final HashingStrategy<TransitionProxy> strategy =
+      ProductDESEqualityVisitor.getDeterminsiticTransitionHashingStrategy();
     final TObjectIntCustomHashMap<TransitionProxy> transitionFanOut =
-      new TObjectIntCustomHashMap<TransitionProxy>(TransitionHashingStrategy.INSTANCE);
+      new TObjectIntCustomHashMap<TransitionProxy>(strategy);
     boolean det = true;
     final Collection<TransitionProxy> transitions = aut.getTransitions();
     for (final TransitionProxy trans : transitions) {
@@ -598,37 +601,6 @@ public class OPVerifierExperiment
       mLogWriter.println();
       mLogWriter.flush();
     }
-  }
-
-
-  //#########################################################################
-  //# Inner Class TransitionHashingStrategy
-  private static class TransitionHashingStrategy
-    implements HashingStrategy<TransitionProxy>
-  {
-    //#######################################################################
-    //# Interface gnu.trove.TObjectHashingStrategy
-    @Override
-    public int computeHashCode(final TransitionProxy trans)
-    {
-      return trans.getSource().hashCode() + 5 * trans.getEvent().hashCode();
-    }
-
-
-    @Override
-    public boolean equals(final TransitionProxy trans1,
-                          final TransitionProxy trans2)
-    {
-      return
-        trans1.getSource() == trans2.getSource() &&
-        trans1.getEvent() == trans2.getEvent();
-    }
-
-    //#######################################################################
-    //# Class Constants
-    private static final HashingStrategy<TransitionProxy> INSTANCE =
-      new TransitionHashingStrategy();
-    private static final long serialVersionUID = 1L;
   }
 
 
