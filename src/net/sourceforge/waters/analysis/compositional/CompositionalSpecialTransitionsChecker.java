@@ -501,6 +501,10 @@ public class CompositionalSpecialTransitionsChecker
     final TObjectIntCustomHashMap<TransitionProxy> transInfo =
       new TObjectIntCustomHashMap<>(strategy, 0);
 
+      //Because the automata can be nondeterministic, keep track of if we've already
+      //seen an event in a state.
+      final HashMap<StateProxy, ArrayList<EventProxy>> visitedStates = new HashMap<>();
+
       //Fill the hashmap with all the transitions in the original automata.
   for(final AutomatonProxy aut : getModel().getAutomata())
   {
@@ -522,9 +526,36 @@ public class CompositionalSpecialTransitionsChecker
   for(final TransitionProxy trans : sync.getTransitions())
   {
  // which has the form X -e-> Y
+    final EventProxy e = trans.getEvent();
     // where X = (x1,...,xn) and Y = (y1,...,yn) are state tuples
     // of the synchronous product
-    final EventProxy e = trans.getEvent();
+
+    //We do not want to double count the nondeterministic trans in sync
+    final ArrayList<EventProxy> eventsSeen = visitedStates.get(trans.getSource());
+    if(eventsSeen != null)
+      {
+       if(eventsSeen.contains(e))
+       {
+       //Then we have already seen this event on this state and can stop
+         continue;
+       }
+       else
+       {
+         //Otherwise add this event to the events we have seen
+         eventsSeen.add(e);
+         visitedStates.put(trans.getSource(), eventsSeen);
+       }
+      }
+    else
+    {
+      //If we have never seen this state before create a List with the new event
+      //and add it to visited states.
+      final ArrayList<EventProxy> newStateFound = new ArrayList<>();
+      newStateFound.add(e);
+      visitedStates.put(trans.getSource(), newStateFound);
+    }
+
+
     for(final AutomatonProxy inputAut : synchronousStateMap.getInputAutomata())
     {
       //find the states xi and yi corresponding to Ai in X and Y
@@ -540,12 +571,44 @@ public class CompositionalSpecialTransitionsChecker
   }
 
 
+  /*
+  for(final AutomatonProxy inputAut : synchronousStateMap.getInputAutomata())
+  {
+    for(final TransitionProxy originalTrans : inputAut.getTransitions())
+    {
+      //For each of the transitions in the original automaton
+      boolean alwaysEnabled = true;
+
+        for(final StateProxy stateTuple : sync.getStates())
+        {
+              final StateProxy originalState = synchronousStateMap.getOriginalState(stateTuple, inputAut);
+              final StateProxy transSource = originalTrans.getSource();
+              //We see if it is enabled in sync
+              if(transSource == originalState)
+              {
+                //Is originalTrans enabled on originalState?
+                //If it is not then it is not always enabled.
+                alwaysEnabled = false;
+                break;
+              }
+        }
+        if(alwaysEnabled)
+        {
+          alwaysEnabledTransCounter++;
+          System.out.println("Found always enabled transition: " +
+            originalTrans.getSource().getName() + " -" + originalTrans.getEvent().getName() + "-> " + originalTrans.getTarget().getName());
+
+        }
+    }
+  }
+*/
+
+
   int alwaysEnabledTransCounter = 0;
   //For each automaton
   for(final AutomatonProxy inputAut : synchronousStateMap.getInputAutomata())
   {
-    final TObjectIntCustomHashMap<StateProxy> stateCounter =
-      new TObjectIntCustomHashMap<>(strategy, 0);
+   final HashMap<StateProxy, Integer> stateCounter = new HashMap<>();
       for(final StateProxy state : inputAut.getStates())
       {
 
@@ -561,6 +624,7 @@ public class CompositionalSpecialTransitionsChecker
       final int numTimesSeen = stateCounter.get(originalState);
       stateCounter.put(originalState, numTimesSeen+1);
     }
+
 
   //If a transition with source state s1 has seen x times in sync
   //And s1 was in sync in x places
@@ -584,6 +648,39 @@ public class CompositionalSpecialTransitionsChecker
   }
   }
 
+
+  /*
+ // Which would be a transition xj -e-> yj in automaton Aj
+ // such that, whenever the synchronous product is in state xj,
+ // then event e is enabled?
+  ListBufferTransitionRelation transitionRelation = new ListBufferTransitionRelation(sync, null , ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+  for(StateProxy stateTuple : sync.getStates())
+  {
+    for(AutomatonProxy Aj : synchronousStateMap.getInputAutomata()) //Aj
+    {
+
+      final StateProxy AjState = synchronousStateMap.getOriginalState(stateTuple, Aj);
+
+      //for each transition xj -e-> yj in Aj
+      for(TransitionProxy trans : Aj.getTransitions())
+      {
+        //If it still unknown if trans is always enabled
+
+        for(AutomatonProxy Ai : synchronousStateMap.getInputAutomata())//Ai
+        {
+          if(Aj != Ai)
+          {
+            final StateProxy AiState = synchronousStateMap.getOriginalState(stateTuple, Ai);
+
+            //if there exists Ai (i!=j) such that xi -e-> is not defined then
+            //mark the transition xj -e-> yj as not always enabled
+          }
+        }
+      }
+
+    }
+  }
+  */
 
   int alwaysDisabledTransCounter = 0;
   for(final TransitionProxy trans : transInfo.keySet())
