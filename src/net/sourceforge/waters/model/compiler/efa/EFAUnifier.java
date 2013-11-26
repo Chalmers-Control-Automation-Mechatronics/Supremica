@@ -111,7 +111,8 @@ public class EFAUnifier extends AbortableCompiler
     mComparator = new EFAIdentifierComparator(comparator);
     mSourceInfoBuilder = builder;
     mSimpleExpressionCompiler =
-      new SimpleExpressionCompiler(mFactory, mOperatorTable);
+      new SimpleExpressionCompiler(mFactory, mSourceInfoBuilder,
+                                   mOperatorTable);
     mInputModule = module;
   }
 
@@ -943,7 +944,8 @@ public class EFAUnifier extends AbortableCompiler
       final EventKind ekind = mEventDecl.getKind();
       if (ekind != EventKind.PROPOSITION && !isBlocked()) {
         final ConstraintPropagator propagator =
-          new ConstraintPropagator(mFactory, mOperatorTable, mRootContext);
+          new ConstraintPropagator(mFactory, mSourceInfoBuilder,
+                                   mOperatorTable, mRootContext);
         for (final Entry<SimpleComponentProxy,EFAUpdateInfo> entry :
              mMap.entrySet()) {
           final SimpleComponentProxy comp = entry.getKey();
@@ -970,7 +972,8 @@ public class EFAUnifier extends AbortableCompiler
       if (!isBlocked()) {
         Collections.sort(mList);
         final ConstraintPropagator propagator =
-          new ConstraintPropagator(mFactory, mOperatorTable, mRootContext);
+          new ConstraintPropagator(mFactory, mSourceInfoBuilder,
+                                   mOperatorTable, mRootContext);
         combineUpdates(propagator, 0);
       }
     }

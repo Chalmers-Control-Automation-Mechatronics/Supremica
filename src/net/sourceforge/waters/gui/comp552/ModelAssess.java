@@ -164,7 +164,7 @@ public class ModelAssess
     mDocumentManager.registerMarshaller(marshaller);
     mDocumentManager.registerUnmarshaller(marshaller);
     mSimpleExpressionCompiler =
-      new SimpleExpressionCompiler(factory, optable, false);
+      new SimpleExpressionCompiler(factory, null, optable, false);
     mIsomorphismChecker = new IsomorphismChecker(mProductDESFactory, true, true);
     loadConfiguration(config);
     loadClassList(classlist);

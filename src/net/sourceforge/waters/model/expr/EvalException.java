@@ -94,6 +94,11 @@ public class EvalException extends WatersException
     return mLocation;
   }
 
+  public void replaceLocation(final Proxy location)
+  {
+    mLocation = location;
+  }
+
   public void provideLocation(final Proxy location)
   {
     if (mLocation == null) {
@@ -106,7 +111,7 @@ public class EvalException extends WatersException
   //# Data Members
   private Proxy mLocation;
 
-  
+
   //#########################################################################
   //# Static Class Variables
   public static final long serialVersionUID = 1;

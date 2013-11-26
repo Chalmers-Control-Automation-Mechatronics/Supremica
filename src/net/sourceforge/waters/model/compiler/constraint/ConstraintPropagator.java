@@ -30,6 +30,7 @@ import net.sourceforge.waters.model.compiler.context.CompiledIntRange;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
+import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
@@ -91,6 +92,22 @@ public class ConstraintPropagator
      final CompilerOperatorTable optable,
      final VariableContext root)
   {
+    this(factory, null, optable, root);
+  }
+
+  /**
+   * Creates a new constraint propagator.
+   * @param factory  Factory used to create expressions.
+   * @param optable  Operator table to provide operators.
+   * @param root     Context providing values of bound symbols and
+   *                 ranges of EFA variables.
+   */
+  public ConstraintPropagator
+    (final ModuleProxyFactory factory,
+     final SourceInfoBuilder builder,
+     final CompilerOperatorTable optable,
+     final VariableContext root)
+  {
     mFactory = factory;
     mOperatorTable = optable;
     mContext = new ConstraintContext(root);
@@ -98,7 +115,7 @@ public class ConstraintPropagator
     mEquationComparator =
       new RelationNormalizationComparator(optable, mContext);
     mSimpleExpressionCompiler =
-      new SimpleExpressionCompiler(factory, optable, false);
+      new SimpleExpressionCompiler(factory, builder, optable, false);
     mPrimedVariableCollector = new PrimedVariableCollector(optable, root);
     mNormalizer = RelationNormalizationRule.createNormalRule(factory, optable);
     mNegator = RelationNormalizationRule.createNegatingRule(factory, optable);

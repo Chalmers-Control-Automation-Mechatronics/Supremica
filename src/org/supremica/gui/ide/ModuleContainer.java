@@ -523,9 +523,15 @@ public class ModuleContainer
   public void setLastCompilationException(final EvalException exception)
   {
     final EvalException previousException = mLastCompilationException;
-    mLastCompilationException = exception;
+    if (exception != null
+        && !(exception.getLocation() instanceof net.sourceforge.waters.subject.base.Subject)) {
+      // location is invalid, so ignore it
+      mLastCompilationException = null;
+    } else {
+      mLastCompilationException = exception;
+    }
     fireCompilationExceptionEvent(previousException);
-    fireCompilationExceptionEvent(exception);
+    fireCompilationExceptionEvent(mLastCompilationException);
   }
 
   private void fireCompilationExceptionEvent(final EvalException exception)

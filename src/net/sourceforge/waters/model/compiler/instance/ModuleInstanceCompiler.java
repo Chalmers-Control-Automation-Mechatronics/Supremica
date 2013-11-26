@@ -121,7 +121,8 @@ public class ModuleInstanceCompiler
     mOperatorTable = CompilerOperatorTable.getInstance();
     mEquality = ModuleEqualityVisitor.getInstance(false);
     mSimpleExpressionCompiler =
-      new SimpleExpressionCompiler(mFactory, mOperatorTable);
+      new SimpleExpressionCompiler(mFactory, mSourceInfoBuilder,
+                                   mOperatorTable);
     mPrimeSearcher = new PrimeSearcher();
     mNameCompiler = new NameCompiler();
     mIndexAdder = new IndexAdder();
@@ -310,6 +311,7 @@ public class ModuleInstanceCompiler
       final LabelBlockProxy labels1 = createLabelBlock(events);
       final EdgeProxy compiled = mFactory.createEdgeProxy
         (source1, target1, labels1, ga1, null, null, null);
+      addSourceInfo(compiled, edge);
       mCurrentEdges.add(compiled);
       return compiled;
     } catch (final EvalException exception) {
@@ -496,8 +498,10 @@ public class ModuleInstanceCompiler
       final LabelBlockProxy blocked1 =
         mCurrentBlockedEvents == null ? null :
         createLabelBlock(mCurrentBlockedEvents);
-      return mFactory.createGraphProxy
+      final GraphProxy compiled = mFactory.createGraphProxy
         (deterministic, blocked1, mCurrentNodes, mCurrentEdges);
+      addSourceInfo(compiled, graph);
+      return compiled;
     } finally {
       mCurrentNodes = null;
       mNodeMap = null;
@@ -551,6 +555,7 @@ public class ModuleInstanceCompiler
           final ModuleProxyCloner cloner = mFactory.getCloner();
           final SimpleExpressionProxy newguard =
             (SimpleExpressionProxy) cloner.getClone(oldguard);
+          addSourceInfo(newguard, oldguard);
           newguards.add(newguard);
         } else {
           final SimpleExpressionProxy newguard =
@@ -585,7 +590,10 @@ public class ModuleInstanceCompiler
           throw new TypeMismatchException(oldaction, "ACTION");
         }
       }
-      return mFactory.createGuardActionBlockProxy(newguards, newactions, null);
+      final GuardActionBlockProxy newga =
+        mFactory.createGuardActionBlockProxy(newguards, newactions, null);
+      addSourceInfo(newga, ga);
+      return newga;
     } catch (final EvalException exception) {
       throw wrap(exception);
     }
@@ -888,6 +896,7 @@ public class ModuleInstanceCompiler
       mNameSpace.addComponent(suffix, newvar);
       mCompiledComponents.add(newvar);
       addSourceInfo(newvar, var);
+      addSourceInfo(fullname, ident);
       return newvar;
     } catch (final EvalException exception) {
       exception.provideLocation(var); // ???
@@ -997,6 +1006,7 @@ public class ModuleInstanceCompiler
       (ident, kind, observable, ScopeKind.LOCAL, null, null, attribs);
     mCompiledEvents.add(decl);
     addSourceInfo(decl, edecl);
+    addSourceInfo(ident, base);
     event.setIdentifier(ident);
     return decl;
   }
