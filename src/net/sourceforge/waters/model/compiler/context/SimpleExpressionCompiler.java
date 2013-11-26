@@ -73,6 +73,8 @@ public class SimpleExpressionCompiler
     mOperatorTable = optable;
     mIsCloning = cloning;
 
+    mCloner = new SourceInfoCloner(factory, builder);
+
     final BinaryEvaluator assigner = new BinaryAssignmentEvaluator();
     mBinaryEvaluatorMap = new HashMap<BinaryOperator,BinaryEvaluator>(32);
     mBinaryEvaluatorMap.put(optable.getAndOperator(),
@@ -301,9 +303,8 @@ public class SimpleExpressionCompiler
                                          final boolean alreadyCloned)
   {
     if (mIsCloning && !alreadyCloned) {
-      final ModuleProxyCloner cloner = mFactory.getCloner();
       final SimpleExpressionProxy clone =
-        (SimpleExpressionProxy) cloner.getClone(expr);
+        (SimpleExpressionProxy) mCloner.getClone(expr);
       addSourceInfo(clone, expr);
       return clone;
     } else {
@@ -1654,6 +1655,7 @@ public class SimpleExpressionCompiler
   //# Data Members
   private final ModuleProxyFactory mFactory;
   private final SourceInfoBuilder mSourceInfoBuilder;
+  private final ModuleProxyCloner mCloner;
   private final CompilerOperatorTable mOperatorTable;
   private final boolean mIsCloning;
   private final Map<BinaryOperator,BinaryEvaluator> mBinaryEvaluatorMap;

@@ -38,6 +38,7 @@ import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SingleBindingContext;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
+import net.sourceforge.waters.model.compiler.context.SourceInfoCloner;
 import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.TypeMismatchException;
@@ -118,6 +119,7 @@ public class ModuleInstanceCompiler
     mDocumentManager = manager;
     mFactory = factory;
     mSourceInfoBuilder = builder;
+    mCloner = new SourceInfoCloner(factory, builder);
     mOperatorTable = CompilerOperatorTable.getInstance();
     mEquality = ModuleEqualityVisitor.getInstance(false);
     mSimpleExpressionCompiler =
@@ -552,9 +554,8 @@ public class ModuleInstanceCompiler
         if (mPrimeSearcher.containsPrime(oldguard)) {
           // Don't simplify guards with primes ---
           // they are needed to determine the variable alphabet!
-          final ModuleProxyCloner cloner = mFactory.getCloner();
           final SimpleExpressionProxy newguard =
-            (SimpleExpressionProxy) cloner.getClone(oldguard);
+            (SimpleExpressionProxy) mCloner.getClone(oldguard);
           addSourceInfo(newguard, oldguard);
           newguards.add(newguard);
         } else {
@@ -660,6 +661,7 @@ public class ModuleInstanceCompiler
       final IdentifierProxy suffix = mNameCompiler.compileName(ident);
       final IdentifierProxy fullname =
         mNameSpace.getPrefixedIdentifier(suffix, mFactory);
+      addSourceInfo(fullname, ident);
       final List<ParameterBindingProxy> bindings = inst.getBindingList();
       mParameterMap = new TreeMap<String,CompiledParameterBinding>();
       visitCollection(bindings);
@@ -855,6 +857,7 @@ public class ModuleInstanceCompiler
       final IdentifierProxy suffix = mNameCompiler.compileName(ident);
       final IdentifierProxy fullname =
         mNameSpace.getPrefixedIdentifier(suffix, mFactory);
+      addSourceInfo(fullname, ident);
       final BindingContext context = new SinglePrefixingContext(suffix);
       final SimpleExpressionProxy expr = var.getType();
       final SimpleExpressionProxy value =
@@ -896,7 +899,6 @@ public class ModuleInstanceCompiler
       mNameSpace.addComponent(suffix, newvar);
       mCompiledComponents.add(newvar);
       addSourceInfo(newvar, var);
-      addSourceInfo(fullname, ident);
       return newvar;
     } catch (final EvalException exception) {
       exception.provideLocation(var); // ???
@@ -992,6 +994,7 @@ public class ModuleInstanceCompiler
     final CompiledNameSpace namespace = cdecl.getNameSpace();
     final IdentifierProxy ident =
       namespace.getPrefixedIdentifier(suffix, mFactory);
+    addSourceInfo(ident, base);
     final EventKind kind = edecl.getKind();
     final boolean observable = edecl.isObservable();
     Map<String,String> attribs = edecl.getAttributes();
@@ -1006,7 +1009,6 @@ public class ModuleInstanceCompiler
       (ident, kind, observable, ScopeKind.LOCAL, null, null, attribs);
     mCompiledEvents.add(decl);
     addSourceInfo(decl, edecl);
-    addSourceInfo(ident, base);
     event.setIdentifier(ident);
     return decl;
   }
@@ -1173,7 +1175,10 @@ public class ModuleInstanceCompiler
           cloning |= !mEquality.equals(index, value);
         }
         if (cloning) {
-          return mFactory.createIndexedIdentifierProxy(name, values);
+          final IndexedIdentifierProxy copy =
+            mFactory.createIndexedIdentifierProxy(name, values);
+          addSourceInfo(copy, ident);
+          return copy;
         } else {
           return ident;
         }
@@ -1197,7 +1202,10 @@ public class ModuleInstanceCompiler
       if (mIsCloning ||
           !mEquality.equals(base0, base1) ||
           !mEquality.equals(comp0, comp1)) {
-        return mFactory.createQualifiedIdentifierProxy(base1, comp1);
+        final QualifiedIdentifierProxy copy =
+          mFactory.createQualifiedIdentifierProxy(base1, comp1);
+        addSourceInfo(copy, ident);
+        return copy;
       } else {
         return ident;
       }
@@ -1208,8 +1216,7 @@ public class ModuleInstanceCompiler
       (final SimpleIdentifierProxy ident)
     {
       if (mIsCloning) {
-        final ModuleProxyCloner cloner = mFactory.getCloner();
-        return (SimpleIdentifierProxy) cloner.getClone(ident);
+        return (SimpleIdentifierProxy) mCloner.getClone(ident);
       } else {
         return ident;
       }
@@ -1376,6 +1383,7 @@ public class ModuleInstanceCompiler
   private final DocumentManager mDocumentManager;
   private final ModuleProxyFactory mFactory;
   private final SourceInfoBuilder mSourceInfoBuilder;
+  private final ModuleProxyCloner mCloner;
   private final CompilerOperatorTable mOperatorTable;
   private final ModuleEqualityVisitor mEquality;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;

@@ -38,6 +38,7 @@ import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierExceptio
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
+import net.sourceforge.waters.model.compiler.context.SourceInfoCloner;
 import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
 import net.sourceforge.waters.model.expr.EvalException;
@@ -799,7 +800,7 @@ public class EFACompiler extends AbortableCompiler
     //# Constructor
     private Pass4Visitor()
     {
-      mCloner = mFactory.getCloner();
+      mCloner = new SourceInfoCloner(mFactory, mSourceInfoBuilder);
     }
 
     //#######################################################################

@@ -41,6 +41,7 @@ import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierException;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
+import net.sourceforge.waters.model.compiler.context.SourceInfoCloner;
 import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionComparator;
@@ -537,7 +538,7 @@ public class EFAUnifier extends AbortableCompiler
     //# Constructor
     private Pass4Visitor()
     {
-      mCloner = mFactory.getCloner();
+      mCloner = new SourceInfoCloner(mFactory, mSourceInfoBuilder);
     }
 
     //#######################################################################

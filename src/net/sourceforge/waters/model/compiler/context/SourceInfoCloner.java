@@ -46,7 +46,9 @@ public class SourceInfoCloner extends ModuleProxyCloner
       return null;
     } else {
       final Proxy result = super.cloneProxy(orig);
-      mSourceInfoBuilder.add(result, orig);
+      if (mSourceInfoBuilder != null) {
+        mSourceInfoBuilder.add(result, orig);
+      }
       return result;
     }
   }
