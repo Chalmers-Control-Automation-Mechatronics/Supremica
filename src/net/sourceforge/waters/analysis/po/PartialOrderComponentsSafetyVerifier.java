@@ -609,7 +609,7 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
         if((events = ample3(state))==null)
           return false;
         if(events.length == 0){
-          state.setComponent(mComponentCount++);
+          state.setComponent(++mComponentCount);
         }
         else{
           mStack.add(new PartialOrderStateTuplePairing(state, prev, PartialOrderParingRequest.CLOSE));
@@ -633,7 +633,7 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
             final int lastIndex = mComponentStack.size() - 1;
             if (lastIndex == componentRootIndex) {
               mComponentStack.remove(lastIndex);
-              prev.setComponent(mComponentCount++);
+              prev.setComponent(++mComponentCount);
               continue;
             }
             for (int i = lastIndex; i >= componentRootIndex && !fullyExpanded; i--) {
@@ -641,10 +641,10 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
             }
             if (fullyExpanded) {
               for (int i = lastIndex; i >= componentRootIndex; i--) {
+                mComponentCount++;
                 final PartialOrderStateTuple temp = mComponentStack.remove(i);
-                temp.setComponent(mComponentCount++);
+                temp.setComponent(mComponentCount);
               }
-              ;
             } else {
               int[] events;
               if ((events = enabled(prev)) == null)
