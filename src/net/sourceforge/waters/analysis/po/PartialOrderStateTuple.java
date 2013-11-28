@@ -124,7 +124,7 @@ public class PartialOrderStateTuple
   }
 
   public boolean isInComponent(){
-    return mComponentNumber == 0;
+    return mComponentNumber != 0;
   }
 
   public void setRootChanged(final boolean value){

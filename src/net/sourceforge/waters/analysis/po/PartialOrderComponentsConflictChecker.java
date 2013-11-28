@@ -236,14 +236,15 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
         }
         // Encoding transitions to binary values
         final int stateSize = codes.size();
-        final int[][] atransition = new int[stateSize+1][mNumEvents];
+        final int[][] atransition = stateSize > 0 ? new int[stateSize+1][mNumEvents]:
+                                                    new int[stateSize][mNumEvents];
         for (i = 0; i < stateSize; i++) {
-          if (codes.get(i).getPropositions().contains(getUsedDefaultMarking())){
-            atransition[i][0] = stateSize;
-          }
-          for (j = 1; j < mNumEvents; j++) {
+          for (j = 0; j < mNumEvents; j++) {
             atransition[i][j] = -1;
             atransition[stateSize][j] = stateSize;
+          }
+          if (codes.get(i).getPropositions().contains(getUsedDefaultMarking())){
+            atransition[i][0] = stateSize;
           }
         }
         for (final TransitionProxy tp : ap.getTransitions()) {
@@ -637,7 +638,8 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
               boolean blocking = true;
               for (int i = lastIndex; i >= componentRootIndex; i--) {
                 final PartialOrderStateTuple temp = mComponentStack.remove(i);
-                temp.setComponent(++mComponentNumber);
+                mComponentNumber++;
+                temp.setComponent(mComponentNumber);
                 if(blocking){
                   if(isMarked(temp)){
                     blocking = false;
@@ -678,7 +680,7 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
   }
 
   private boolean canReachExternalComponent(final PartialOrderStateTuple current){
-    PartialOrderStateTuple successor = new PartialOrderStateTuple(mStateTupleSize);
+
     final int[] tempSuccessor = new int[mNumAutomata];
     final int[] tempState = new int[mNumAutomata];
     int i;
@@ -698,6 +700,7 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
             mSpecTransitionMap.get(si)[tempState[i]][e];
         }
       }
+      PartialOrderStateTuple successor = new PartialOrderStateTuple(mStateTupleSize);
       encode(tempSuccessor,successor);
       successor = mStateSet.get(successor);
       if(successor!=null && successor.isInComponent()){
@@ -768,9 +771,6 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
         final int targetState = transitionMap[sourceState][i];
         if (targetState == -1){
           if (kind == EventKind.UNCONTROLLABLE && !plant){
-            /*mErrorEvent = i;
-            mErrorAutomaton = j;
-            mErrorState = current;*/
             return null;
           }
           else{
@@ -964,6 +964,7 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
   private void convertToBreadthFirst(){
     mStateList = new ArrayList<PartialOrderStateTuple>();
     mStateList.add(mInitialState);
+    mErrorState = mInitialState;
     mInitialState.setVisited(true);
     int open = 0;
     mIndexList.add(open);
@@ -977,7 +978,7 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
       open++;
       decode(current,mSystemState);
       events:
-      for (i = 0; i < mNumEvents; i++){
+      for (i = 1; i < mNumEvents; i++){
         for (j = 0; j < mNumAutomata; j++){
           final boolean plant = j < mNumPlants;
           final int si = j - mNumPlants;
@@ -998,6 +999,8 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
           mStateList.add(tuple);
           tuple.setVisited(true);
           if (isErrorState(tuple)){
+            mErrorState = tuple;
+            mErrorEvent = i;
             return;
           }
         }
@@ -1009,7 +1012,7 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
   }
 
   private boolean isErrorState(final PartialOrderStateTuple current){
-    return current.getComponent() == mErrorComponent;
+    return current.getComponent() == mComponentNumber;
   }
 
   private ConflictTraceProxy computePOCounterExample() throws AnalysisAbortException
@@ -1017,14 +1020,14 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = getModel();
     final List<TraceStepProxy> steps = new LinkedList<TraceStepProxy>();
-    final EventProxy errorEvent = mEventCodingList.get(mErrorEvent);
-    /*final AutomatonProxy errorAut = mAutomata[mErrorAutomaton];
+    /*final EventProxy errorEvent = mEventCodingList.get(mErrorEvent);
+    final AutomatonProxy errorAut = mAutomata[mErrorAutomaton];
     final List<StateProxy> states =
       new ArrayList<StateProxy>(errorAut.getStates());
     final int errorStateIndex = mSystemState[mErrorAutomaton];
-    final StateProxy errorState = states.get(errorStateIndex);*/
+    final StateProxy errorState = states.get(errorStateIndex);
     final TraceStepProxy errorStep = factory.createTraceStepProxy(errorEvent);
-    steps.add(0, errorStep);
+    steps.add(0, errorStep);*/
 
     PartialOrderStateTuple error = mErrorState;
 
@@ -1037,7 +1040,7 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
       for (i = mIndexList.get(currentLevel - 1); i < mIndexList.get(currentLevel); i++){
         decode(mStateList.get(i),mSystemState);
         events:
-        for (j = 0; j < mNumEvents; j++){
+        for (j = 1; j < mNumEvents; j++){
           for (k = 0; k < mNumAutomata; k++){
             final boolean plant = k < mNumPlants;
             final int si = k - mNumPlants;
