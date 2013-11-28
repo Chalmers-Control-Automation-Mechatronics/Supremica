@@ -192,6 +192,7 @@ class ModuleTreeModel
         // fall through ...
       case ModelChangeEvent.NAME_CHANGED:
       case ModelChangeEvent.STATE_CHANGED:
+      case ModelChangeEvent.GEOMETRY_CHANGED:
         final ProxySubject ancestor = getVisibleAncestorInTree(source);
         if (ancestor != null) {
           final TreePath path = createPath(ancestor);
