@@ -36,7 +36,6 @@ public class PartialOrderStateTuple
     mComponentVisited = false;
     mRootChanged = false;
     mComponentNumber = 0;
-    mMarked = false;
   }
 
   /**
@@ -160,13 +159,7 @@ public class PartialOrderStateTuple
     return mAmpleSuccessors;
   }
 
-  public void setMarked(final boolean value){
-    mMarked = value;
-  }
 
-  public boolean getMarked(){
-    return mMarked;
-  }
 
   //#########################################################################
   //# Overrides for Baseclass java.lang.Object
@@ -204,17 +197,16 @@ public class PartialOrderStateTuple
 
   //#########################################################################
   //# Data Members
-  private final int mStateCodes[];
-  private boolean mMayNeedExpansion; //
-  private boolean mFullyExpand; //
-  private boolean mVisited;
-  private PartialOrderStateTuple mPred; //
-  private int mComponentNumber;
-  private boolean mComponentVisited;
-  private boolean mRootChanged;
-  private boolean mFullyExpanded;
-  private boolean mMarked;
-  private int mRootIndex;
-  private int mTotalSuccessors; //
-  private int mAmpleSuccessors; //
+  protected final int mStateCodes[];
+  protected boolean mMayNeedExpansion; //
+  protected boolean mFullyExpand; //
+  protected boolean mVisited;
+  protected PartialOrderStateTuple mPred; //
+  protected int mComponentNumber;
+  protected boolean mComponentVisited;
+  protected boolean mRootChanged;
+  protected boolean mFullyExpanded;
+  protected int mRootIndex;
+  protected int mTotalSuccessors; //
+  protected int mAmpleSuccessors; //
 }

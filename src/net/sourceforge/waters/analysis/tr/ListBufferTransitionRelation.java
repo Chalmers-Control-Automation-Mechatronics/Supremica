@@ -1556,6 +1556,27 @@ public class ListBufferTransitionRelation
 
 
   //#########################################################################
+  //# Direct Access to Transition Buffers
+  /**
+   * Gets the successor transition buffer of this transition relation,
+   * or <CODE>null</CODE> if not configured.
+   */
+  public OutgoingTransitionListBuffer getSuccessorBuffer()
+  {
+    return mSuccessorBuffer;
+  }
+
+  /**
+   * Gets the predecessor transition buffer of this transition relation,
+   * or <CODE>null</CODE> if not configured.
+   */
+  public IncomingTransitionListBuffer getPredecessorBuffer()
+  {
+    return mPredecessorBuffer;
+  }
+
+
+  //#########################################################################
   //# Transition Modifications
   /**
    * Adds a transition to this transition relation. The new transition is

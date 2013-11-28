@@ -1159,23 +1159,21 @@ Class-Path: ${manifest.pathlist}</echo>
         </mail>
     </target>
     
-    <!-- Run the BDD algorithms for cpmputing RAS unsafe states-->
-    <target name="benchmark-ras" 
-                depends="-run-all-ras-algo-classic,-run-all-ras-algo-alternative"/>
+    <!-- Run the different BDD algorithms for cpmputing RAS unsafe states-->
     
-    <target name="-run-all-ras-algo-classic">
-        <foreach param="ras-path" target="-execute-ras-classic">
+    <target name="benchmark-ras-classic">
+        <foreach param="ras-path" target="-execute-one-ras-classic">
             <path> 
                 <fileset dir="${examples}/ras-examples" casesensitive="no"/>
             </path>
         </foreach>
     </target>
       
-    <target name="-execute-ras-classic">
+    <target name="-execute-one-ras-classic">
         <echo message="executing the classic algo on ${ras-path}"/>
         <java classname="${supremica_basepackage}.automata.BDD.EFA.RASAlgorithmsRunner" 
                       fork="yes" 
-                      output="ras_algo1_log.txt" append="true"> 
+                      output="ras_classic_log.txt" append="true"> 
             <arg value="${ras-path}"/> 
             <arg value="MINIMALITY_C"/>
             <arg value="5000000"/>
@@ -1192,21 +1190,50 @@ Class-Path: ${manifest.pathlist}</echo>
         </java>
     </target>
     
-    <target name="-run-all-ras-algo-alternative">
-        <foreach param="ras-path" target="-execute-ras-alternative">
+    <target name="benchmark-ras-alternative">
+        <foreach param="ras-path" target="-execute-one-ras-alternative">
             <path> 
                 <fileset dir="${examples}/ras-examples" casesensitive="no"/>
             </path>
         </foreach>
     </target>
     
-    <target name="-execute-ras-alternative">
+    <target name="-execute-one-ras-alternative">
         <echo message="executing the alternative algo on ${ras-path}"/>
         <java classname="${supremica_basepackage}.automata.BDD.EFA.RASAlgorithmsRunner" 
                       fork="yes" 
-                      output="ras_algo2_log.txt" append="true"> 
+                      output="ras_alternative_log.txt" append="true"> 
             <arg value="${ras-path}"/> 
             <arg value="MINIMALITY_M"/>
+            <arg value="5000000"/>
+            <arg value="500000"/>
+            <arg value="10"/>
+            <classpath>
+                <pathelement location="build" />
+                <pathelement location="lib/unjared" />
+                <pathelement path="${java.class.path}" />
+            </classpath>            
+            <jvmarg value="-Xms128M"/>
+            <jvmarg value="-Xmx4096M" />
+            <jvmarg value="-Djava.library.path=${dist}"/>
+        </java>
+    </target>
+	
+	<target name="benchmark-ras-partition">
+		<foreach param="ras-path" target="-execute-one-ras-partition">
+            <path> 
+                <fileset dir="${examples}/ras-examples" casesensitive="no"/>
+            </path>
+		</foreach>
+	</target>
+	
+    <target name="-execute-one-ras-partition">
+        <echo message="executing the partitioned algo on ${ras-path}"/>
+        <java classname="${supremica_basepackage}.automata.BDD.EFA.RASAlgorithmsRunner" 
+                      fork="yes" 
+  					  output="ras_partition_log.txt" append="true"> 
+            <arg value="${ras-path}"/> 
+            <arg value="MINIMALITY_P"/>
             <arg value="5000000"/>
             <arg value="500000"/>
             <arg value="10"/>

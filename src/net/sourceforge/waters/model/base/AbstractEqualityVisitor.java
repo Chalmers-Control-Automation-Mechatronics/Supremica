@@ -202,6 +202,10 @@ public abstract class AbstractEqualityVisitor
   /**
    * Returns a hashing strategy for use with GNU Trove,
    * using the equality defined by this visitor.
+   * This equality generally is intended for content-based comparison
+   * of structures and avoids object identity when comparing references.
+   * @see net.sourceforge.waters.model.des.DeterministicTransitionHashingStrategy DeterministicTransitionHashingStrategy
+   * @see net.sourceforge.waters.model.des.NonDeterministicTransitionHashingStrategy NonDeterministicTransitionHashingStrategy
    */
   public <P extends Proxy> HashingStrategy<P> getTObjectHashingStrategy()
   {

@@ -80,7 +80,6 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
     preChain.add(silentOutRemover);
     final IncomingEquivalenceTRSimplifier incomingEquivalenceSimplifier =
       new IncomingEquivalenceTRSimplifier();
-    incomingEquivalenceSimplifier.setTransitionLimit(limit);
     preChain.add(incomingEquivalenceSimplifier);
     final LimitedCertainConflictsTRSimplifier limitedCertainConflictsRemover;
     if (useLimitedCertainConflicts) {
@@ -162,7 +161,6 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
     postChain.add(nonAlphaDeterminiser);
     final IncomingEquivalenceTRSimplifier incomingEquivalenceSimplifier =
       new IncomingEquivalenceTRSimplifier();
-    incomingEquivalenceSimplifier.setTransitionLimit(limit);
     postChain.add(incomingEquivalenceSimplifier);
     final MarkingSaturationTRSimplifier saturator =
       new MarkingSaturationTRSimplifier();

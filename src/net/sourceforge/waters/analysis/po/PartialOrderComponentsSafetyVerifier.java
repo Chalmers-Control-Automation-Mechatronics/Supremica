@@ -148,7 +148,6 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
       mSpecTransitionMap = new ArrayList<int[][]>();
       mIndexList = new ArrayList<Integer>();
       mStateList = new BlockedArrayList<PartialOrderStateTuple>(PartialOrderStateTuple.class);
-      // TODO Order events so uncontrollables are first.
       mEventCodingList = new ArrayList<EventProxy>(model.getEvents());
       mPlantEventList = new ArrayList<byte[]>();
       mSpecEventList = new ArrayList<byte[]>();
@@ -172,9 +171,15 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
       mSystemState = new int[mNumAutomata];
 
       final List<AutomatonProxy>[] automataContainingEvents = new ArrayList[mNumEvents];
+      final List<EventProxy> tempEventCodingList = new ArrayList<EventProxy>();
       for (i = 0; i < mNumEvents; i++){
+        if (mEventCodingList.get(i).getKind() == EventKind.UNCONTROLLABLE)
+          tempEventCodingList.add(0,mEventCodingList.get(i));
+        else
+          tempEventCodingList.add(mEventCodingList.get(i));
         automataContainingEvents[i] = new ArrayList<AutomatonProxy>();
       }
+      mEventCodingList = tempEventCodingList;
 
       // Separate the automatons by kind
       AutomatonProxy initUncontrollable = null;
@@ -432,7 +437,7 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
       if (isControllableReduced(mSystemState)) {
         return setSatisfiedResult();
       } else {
-        convertToBredthFirst();
+        convertToBreadthFirst();
         final SafetyTraceProxy counterexample = computePOCounterExample();
         return setFailedResult(counterexample);
       }
@@ -975,7 +980,7 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
     }
   }
 
-  private void convertToBredthFirst(){
+  private void convertToBreadthFirst(){
     mStateList = new ArrayList<PartialOrderStateTuple>();
     mStateList.add(mInitialState);
     mInitialState.setVisited(true);
@@ -1011,7 +1016,7 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
         if (tuple != null && !tuple.getVisited()){
           mStateList.add(tuple);
           tuple.setVisited(true);
-          if (tuple == mErrorState){
+          if (isErrorState(tuple)){
             return;
           }
         }
@@ -1020,7 +1025,10 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
         mIndexList.add(mStateList.size());
       }
     }
-    //assert false;
+  }
+
+  private boolean isErrorState(final PartialOrderStateTuple current){
+    return current == mErrorState;
   }
 
   private SafetyTraceProxy computePOCounterExample() throws AnalysisAbortException

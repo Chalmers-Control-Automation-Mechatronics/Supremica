@@ -54,6 +54,8 @@ public class RASAlgorithmsRunner {
                 boundaryUnsafeStates = manager.computeBoundaryUnsafeStatesClassic();
             else if (options.getSynthesisAlgorithm() == SynthesisAlgorithm.MINIMALITY_M)
                 boundaryUnsafeStates = manager.computeBoundaryUnsafeStatesAlternative();
+            else if (options.getSynthesisAlgorithm() == SynthesisAlgorithm.MINIMALITY_P)
+                boundaryUnsafeStates = manager.computeBoundaryUnsafeStatesEventPartitioning();
 
             timer.stop();
             System.out.println("Time for computing the boundary unsafe states is: "
