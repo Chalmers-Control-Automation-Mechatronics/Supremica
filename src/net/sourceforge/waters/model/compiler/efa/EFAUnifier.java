@@ -41,6 +41,7 @@ import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierException;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
+import net.sourceforge.waters.model.compiler.context.SourceInfoCloner;
 import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionComparator;
@@ -111,7 +112,8 @@ public class EFAUnifier extends AbortableCompiler
     mComparator = new EFAIdentifierComparator(comparator);
     mSourceInfoBuilder = builder;
     mSimpleExpressionCompiler =
-      new SimpleExpressionCompiler(mFactory, mOperatorTable);
+      new SimpleExpressionCompiler(mFactory, mSourceInfoBuilder,
+                                   mOperatorTable);
     mInputModule = module;
   }
 
@@ -536,7 +538,7 @@ public class EFAUnifier extends AbortableCompiler
     //# Constructor
     private Pass4Visitor()
     {
-      mCloner = mFactory.getCloner();
+      mCloner = new SourceInfoCloner(mFactory, mSourceInfoBuilder);
     }
 
     //#######################################################################
@@ -943,7 +945,8 @@ public class EFAUnifier extends AbortableCompiler
       final EventKind ekind = mEventDecl.getKind();
       if (ekind != EventKind.PROPOSITION && !isBlocked()) {
         final ConstraintPropagator propagator =
-          new ConstraintPropagator(mFactory, mOperatorTable, mRootContext);
+          new ConstraintPropagator(mFactory, mSourceInfoBuilder,
+                                   mOperatorTable, mRootContext);
         for (final Entry<SimpleComponentProxy,EFAUpdateInfo> entry :
              mMap.entrySet()) {
           final SimpleComponentProxy comp = entry.getKey();
@@ -970,7 +973,8 @@ public class EFAUnifier extends AbortableCompiler
       if (!isBlocked()) {
         Collections.sort(mList);
         final ConstraintPropagator propagator =
-          new ConstraintPropagator(mFactory, mOperatorTable, mRootContext);
+          new ConstraintPropagator(mFactory, mSourceInfoBuilder,
+                                   mOperatorTable, mRootContext);
         combineUpdates(propagator, 0);
       }
     }

@@ -36,7 +36,9 @@ import net.sourceforge.waters.model.compiler.context.CompiledEnumRange;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierException;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
+import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
+import net.sourceforge.waters.model.compiler.context.SourceInfoCloner;
 import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
 import net.sourceforge.waters.model.expr.EvalException;
@@ -122,7 +124,8 @@ public class EFACompiler extends AbortableCompiler
     mSourceInfoBuilder = builder;
     mOperatorTable = CompilerOperatorTable.getInstance();
     mSimpleExpressionCompiler =
-      new SimpleExpressionCompiler(mFactory, mOperatorTable);
+      new SimpleExpressionCompiler(mFactory, mSourceInfoBuilder,
+                                   mOperatorTable);
     mInputModule = module;
   }
 
@@ -182,10 +185,15 @@ public class EFACompiler extends AbortableCompiler
       // Pass 4 ...
       final Pass4Visitor pass4 = new Pass4Visitor();
       return pass4.visitModuleProxy(mInputModule);
+    } catch (final EvalException exception) {
+      adjustLocation(exception);
+      throw exception;
     } catch (final VisitorException exception) {
       final Throwable cause = exception.getCause();
       if (cause instanceof EvalException) {
-        throw (EvalException) cause;
+        final EvalException evalException = (EvalException) cause;
+        adjustLocation(evalException);
+        throw evalException;
       } else {
         throw exception.getRuntimeException();
       }
@@ -213,7 +221,8 @@ public class EFACompiler extends AbortableCompiler
     throws EvalException
   {
     final ConstraintPropagator propagator =
-      new ConstraintPropagator(mFactory, mOperatorTable, mRootContext);
+      new ConstraintPropagator(mFactory, mSourceInfoBuilder, mOperatorTable,
+                               mRootContext);
     final EFAEventNameBuilder namer =
       new EFAEventNameBuilder(mFactory, mOperatorTable, mRootContext);
     mEFAEventMap = new HashMap<Proxy,Collection<EFAEvent>>();
@@ -399,6 +408,19 @@ public class EFACompiler extends AbortableCompiler
     }
   }
 
+  private void adjustLocation(final EvalException e)
+  {
+    if (mSourceInfoBuilder != null) {
+      final Proxy location = e.getLocation();
+      final SourceInfo info = mSourceInfoBuilder.getSourceInfo(location);
+      if (info != null) {
+        e.replaceLocation(info.getSourceObject());
+      } else {
+        e.replaceLocation(null);
+      }
+    }
+  }
+
 
   //#########################################################################
   //# Inner Class Pass1Visitor
@@ -469,6 +491,7 @@ public class EFACompiler extends AbortableCompiler
         final String name = node.getName();
         final SimpleIdentifierProxy ident =
           mFactory.createSimpleIdentifierProxy(name);
+        addSourceInfo(ident, node);
         mRootContext.insertEnumAtom(ident);
         mCurrentRange.add(ident);
         return ident;
@@ -704,7 +727,8 @@ public class EFACompiler extends AbortableCompiler
       final Collection<EFAAutomatonTransition> result =
         new LinkedList<EFAAutomatonTransition>();
       final ConstraintPropagator propagator =
-        new ConstraintPropagator(mFactory, mOperatorTable, mRootContext);
+        new ConstraintPropagator(mFactory, mSourceInfoBuilder,
+                                 mOperatorTable, mRootContext);
       final SimpleComponentProxy comp =
         catchAll ? group.getSimpleComponent() : null;
       makeDisjoint(iter, selected, result, propagator, comp);
@@ -776,7 +800,7 @@ public class EFACompiler extends AbortableCompiler
     //# Constructor
     private Pass4Visitor()
     {
-      mCloner = mFactory.getCloner();
+      mCloner = new SourceInfoCloner(mFactory, mSourceInfoBuilder);
     }
 
     //#######################################################################

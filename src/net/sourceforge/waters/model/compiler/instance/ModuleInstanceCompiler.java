@@ -38,6 +38,7 @@ import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SingleBindingContext;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
+import net.sourceforge.waters.model.compiler.context.SourceInfoCloner;
 import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.TypeMismatchException;
@@ -118,10 +119,12 @@ public class ModuleInstanceCompiler
     mDocumentManager = manager;
     mFactory = factory;
     mSourceInfoBuilder = builder;
+    mCloner = new SourceInfoCloner(factory, builder);
     mOperatorTable = CompilerOperatorTable.getInstance();
     mEquality = ModuleEqualityVisitor.getInstance(false);
     mSimpleExpressionCompiler =
-      new SimpleExpressionCompiler(mFactory, mOperatorTable);
+      new SimpleExpressionCompiler(mFactory, mSourceInfoBuilder,
+                                   mOperatorTable);
     mPrimeSearcher = new PrimeSearcher();
     mNameCompiler = new NameCompiler();
     mIndexAdder = new IndexAdder();
@@ -310,6 +313,7 @@ public class ModuleInstanceCompiler
       final LabelBlockProxy labels1 = createLabelBlock(events);
       final EdgeProxy compiled = mFactory.createEdgeProxy
         (source1, target1, labels1, ga1, null, null, null);
+      addSourceInfo(compiled, edge);
       mCurrentEdges.add(compiled);
       return compiled;
     } catch (final EvalException exception) {
@@ -496,8 +500,10 @@ public class ModuleInstanceCompiler
       final LabelBlockProxy blocked1 =
         mCurrentBlockedEvents == null ? null :
         createLabelBlock(mCurrentBlockedEvents);
-      return mFactory.createGraphProxy
+      final GraphProxy compiled = mFactory.createGraphProxy
         (deterministic, blocked1, mCurrentNodes, mCurrentEdges);
+      addSourceInfo(compiled, graph);
+      return compiled;
     } finally {
       mCurrentNodes = null;
       mNodeMap = null;
@@ -548,9 +554,9 @@ public class ModuleInstanceCompiler
         if (mPrimeSearcher.containsPrime(oldguard)) {
           // Don't simplify guards with primes ---
           // they are needed to determine the variable alphabet!
-          final ModuleProxyCloner cloner = mFactory.getCloner();
           final SimpleExpressionProxy newguard =
-            (SimpleExpressionProxy) cloner.getClone(oldguard);
+            (SimpleExpressionProxy) mCloner.getClone(oldguard);
+          addSourceInfo(newguard, oldguard);
           newguards.add(newguard);
         } else {
           final SimpleExpressionProxy newguard =
@@ -585,7 +591,10 @@ public class ModuleInstanceCompiler
           throw new TypeMismatchException(oldaction, "ACTION");
         }
       }
-      return mFactory.createGuardActionBlockProxy(newguards, newactions, null);
+      final GuardActionBlockProxy newga =
+        mFactory.createGuardActionBlockProxy(newguards, newactions, null);
+      addSourceInfo(newga, ga);
+      return newga;
     } catch (final EvalException exception) {
       throw wrap(exception);
     }
@@ -652,6 +661,7 @@ public class ModuleInstanceCompiler
       final IdentifierProxy suffix = mNameCompiler.compileName(ident);
       final IdentifierProxy fullname =
         mNameSpace.getPrefixedIdentifier(suffix, mFactory);
+      addSourceInfo(fullname, ident);
       final List<ParameterBindingProxy> bindings = inst.getBindingList();
       mParameterMap = new TreeMap<String,CompiledParameterBinding>();
       visitCollection(bindings);
@@ -847,6 +857,7 @@ public class ModuleInstanceCompiler
       final IdentifierProxy suffix = mNameCompiler.compileName(ident);
       final IdentifierProxy fullname =
         mNameSpace.getPrefixedIdentifier(suffix, mFactory);
+      addSourceInfo(fullname, ident);
       final BindingContext context = new SinglePrefixingContext(suffix);
       final SimpleExpressionProxy expr = var.getType();
       final SimpleExpressionProxy value =
@@ -983,6 +994,7 @@ public class ModuleInstanceCompiler
     final CompiledNameSpace namespace = cdecl.getNameSpace();
     final IdentifierProxy ident =
       namespace.getPrefixedIdentifier(suffix, mFactory);
+    addSourceInfo(ident, base);
     final EventKind kind = edecl.getKind();
     final boolean observable = edecl.isObservable();
     Map<String,String> attribs = edecl.getAttributes();
@@ -1163,7 +1175,10 @@ public class ModuleInstanceCompiler
           cloning |= !mEquality.equals(index, value);
         }
         if (cloning) {
-          return mFactory.createIndexedIdentifierProxy(name, values);
+          final IndexedIdentifierProxy copy =
+            mFactory.createIndexedIdentifierProxy(name, values);
+          addSourceInfo(copy, ident);
+          return copy;
         } else {
           return ident;
         }
@@ -1187,7 +1202,10 @@ public class ModuleInstanceCompiler
       if (mIsCloning ||
           !mEquality.equals(base0, base1) ||
           !mEquality.equals(comp0, comp1)) {
-        return mFactory.createQualifiedIdentifierProxy(base1, comp1);
+        final QualifiedIdentifierProxy copy =
+          mFactory.createQualifiedIdentifierProxy(base1, comp1);
+        addSourceInfo(copy, ident);
+        return copy;
       } else {
         return ident;
       }
@@ -1198,8 +1216,7 @@ public class ModuleInstanceCompiler
       (final SimpleIdentifierProxy ident)
     {
       if (mIsCloning) {
-        final ModuleProxyCloner cloner = mFactory.getCloner();
-        return (SimpleIdentifierProxy) cloner.getClone(ident);
+        return (SimpleIdentifierProxy) mCloner.getClone(ident);
       } else {
         return ident;
       }
@@ -1366,6 +1383,7 @@ public class ModuleInstanceCompiler
   private final DocumentManager mDocumentManager;
   private final ModuleProxyFactory mFactory;
   private final SourceInfoBuilder mSourceInfoBuilder;
+  private final ModuleProxyCloner mCloner;
   private final CompilerOperatorTable mOperatorTable;
   private final ModuleEqualityVisitor mEquality;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;

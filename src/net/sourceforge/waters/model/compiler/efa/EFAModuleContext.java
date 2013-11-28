@@ -16,6 +16,7 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierException;
 import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
+import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
 import net.sourceforge.waters.model.module.ComponentProxy;
@@ -47,16 +48,23 @@ import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
  * @author Robi Malik
  */
 
-class EFAModuleContext
+public class EFAModuleContext
   extends ModuleBindingContext
   implements VariableContext
 {
 
   //#########################################################################
   //# Constructors
-  EFAModuleContext(final ModuleProxy module)
+  public EFAModuleContext(final ModuleProxy module)
   {
-    super(module);
+    this(module, null, null);
+  }
+
+  public EFAModuleContext(final ModuleProxy module,
+                          final IdentifierProxy prefix,
+                          final SourceInfo info)
+  {
+    super(module, prefix, info);
     final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
     final int size = 2 * module.getComponentList().size();
     mMap =
@@ -102,10 +110,15 @@ class EFAModuleContext
     }
   }
 
-  void createVariables(final ComponentProxy comp,
-                       final CompiledRange range,
-                       final ModuleProxyFactory factory,
-                       final CompilerOperatorTable optable)
+  /**
+   * Creates current and next-state variables for the given component.
+   * @param  comp   Component (variable or automaton) to create variables for.
+   * @param  range  Computed range of the variables.
+   */
+  public void createVariables(final ComponentProxy comp,
+                              final CompiledRange range,
+                              final ModuleProxyFactory factory,
+                              final CompilerOperatorTable optable)
     throws DuplicateIdentifierException
   {
     final IdentifierProxy ident = comp.getIdentifier();

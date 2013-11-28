@@ -14,12 +14,13 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Collection;
+
 import net.sourceforge.waters.model.base.DefaultProxyVisitor;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 
 
 public class ProxyPrinter
@@ -243,24 +244,16 @@ public class ProxyPrinter
     throws VisitorException
   {
     if (msg.length() > 0) {
-      try {
-        indent();
-        mWriter.write(msg);
-      } catch (final IOException exception) {
-        throw wrap(exception);
-      }
+      indent();
+      rawPrint(msg);
     }
   }
 
   public void print(final char msg)
     throws VisitorException
   {
-    try {
-      indent();
-      mWriter.write(msg);
-    } catch (final IOException exception) {
-      throw wrap(exception);
-    }
+    indent();
+    rawPrint(msg);
   }
 
   public void print(final double msg)
@@ -278,17 +271,13 @@ public class ProxyPrinter
   public void println()
     throws VisitorException
   {
-    try {
-      if (mWriter instanceof PrintWriter) {
-        final PrintWriter pwriter = (PrintWriter) mWriter;
-        pwriter.println();
-      } else {
-        mWriter.write('\n');
-      }
-      mAtLineStart = true;
-    } catch (final IOException exception) {
-      throw wrap(exception);
+    if (mWriter instanceof PrintWriter) {
+      final PrintWriter pwriter = (PrintWriter) mWriter;
+      pwriter.println();
+    } else {
+      rawPrint('\n');
     }
+    mAtLineStart = true;
   }
 
   public void println(final String msg)
@@ -356,14 +345,39 @@ public class ProxyPrinter
     throws VisitorException
   {
     if (mAtLineStart) {
-      try {
-        for (int i = mIndent * mIndentWidth; i > 0; i--) {
-          mWriter.write(' ');
-        }
-        mAtLineStart = false;
-      } catch (final IOException exception) {
-        throw wrap(exception);
+      for (int i = mIndent * mIndentWidth; i > 0; i--) {
+        indentOneCharacter();
       }
+      mAtLineStart = false;
+    }
+  }
+
+  protected void indentOneCharacter()
+    throws VisitorException
+  {
+    rawPrint(' ');
+  }
+
+
+  //#########################################################################
+  //# Raw Printing
+  protected void rawPrint(final String msg)
+    throws VisitorException
+  {
+    try {
+      mWriter.write(msg);
+    } catch (final IOException exception) {
+      throw wrap(exception);
+    }
+  }
+
+  protected void rawPrint(final char msg)
+    throws VisitorException
+  {
+    try {
+      mWriter.write(msg);
+    } catch (final IOException exception) {
+      throw wrap(exception);
     }
   }
 
