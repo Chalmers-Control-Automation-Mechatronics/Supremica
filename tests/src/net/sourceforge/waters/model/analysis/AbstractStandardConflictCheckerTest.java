@@ -257,6 +257,13 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(des, false);
   }
 
+  public void testDisjoint2() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "disjoint2.wmod");
+    runModelVerifier(des, false);
+  }
+
   public void testEmptySpec() throws Exception
   {
     final ProductDESProxy des =

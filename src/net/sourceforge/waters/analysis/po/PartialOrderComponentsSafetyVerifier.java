@@ -606,7 +606,7 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
         state.setComponentVisited(true);
         state.setRootIndex(mDepthIndex++);
         int[] events;
-        if((events = ample3(state))==null)
+        if((events = ample(state))==null)
           return false;
         if(events.length == 0){
           state.setComponent(++mComponentCount);
@@ -640,8 +640,8 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
               fullyExpanded |= mComponentStack.get(i).getFullyExpanded();
             }
             if (fullyExpanded) {
+              mComponentCount++;
               for (int i = lastIndex; i >= componentRootIndex; i--) {
-                mComponentCount++;
                 final PartialOrderStateTuple temp = mComponentStack.remove(i);
                 temp.setComponent(mComponentCount);
               }
@@ -736,8 +736,7 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
     return temp.toArray();
   }
 
-  @SuppressWarnings("unused")
-  private int[] ample(final PartialOrderStateTuple current){
+  /*private int[] ample(final PartialOrderStateTuple current){
     final int[] enabled = enabled(current);
     if (enabled == null){
       return null;
@@ -813,14 +812,15 @@ public class PartialOrderComponentsSafetyVerifier extends AbstractSafetyVerifier
       break;
     }
     return ample.toArray();
-  }
+  }*/
 
-  private int[] ample3(final PartialOrderStateTuple current){
+  private int[] ample(final PartialOrderStateTuple current){
     final int[] enabled = enabled(current);
     if (enabled == null){
       return null;
     }
     if (enabled.length == 1){
+      current.setFullyExpanded(true);
       return enabled;
     }
     final TIntHashSet enabledSet = new TIntHashSet(enabled);

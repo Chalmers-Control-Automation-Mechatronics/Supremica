@@ -273,19 +273,16 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
           }
         }
         final ComponentKind kind = translator.getComponentKind(ap);
-        /*if (initialState == null) {
-          if (kind == ComponentKind.PLANT
-              || translator.getEventKind(KindTranslator.INIT) == EventKind.CONTROLLABLE) {
-            return setSatisfiedResult();
-          } else {
-            initUncontrollable = ap;
-          }
-        }*/
         // Store all the information by automaton type
         switch (kind) {
         case PLANT:
           mAutomata[ck] = ap;
-          mSystemState[ck] = codes.indexOf(initialState);
+          if (initialState != null && mSystemState != null){
+            mSystemState[ck] = codes.indexOf(initialState);
+          }
+          else{
+            mSystemState = null;
+          }
           mPlantEventList.add(aneventCodingList);
           mPlantEventHash.add(events);
           mPlantTransitionMap.add(atransition);
@@ -579,12 +576,12 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
 
     mComponentStack = new ArrayList<PartialOrderStateTuple>();
     mInitialState = new PartialOrderStateTuple(mStateTupleSize);
-
-    encode(sState, mInitialState);
-    mStateSet.getOrAdd(mInitialState);
-    mStack.add(new PartialOrderStateTuplePairing(mInitialState, null,PartialOrderParingRequest.VISIT));
-    mStateTuple = new PartialOrderStateTuple(mStateTupleSize);
-
+    if(sState != null){
+      encode(sState, mInitialState);
+      mStateSet.getOrAdd(mInitialState);
+      mStack.add(new PartialOrderStateTuplePairing(mInitialState, null,PartialOrderParingRequest.VISIT));
+      mStateTuple = new PartialOrderStateTuple(mStateTupleSize);
+    }
     while(!mStack.isEmpty()){
       final PartialOrderStateTuplePairing current = mStack.remove(mStack.size() - 1);
       final PartialOrderStateTuple state = current.getState();
@@ -636,9 +633,10 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
             }
             if (fullyExpanded) {
               boolean blocking = true;
+              mComponentNumber++;
               for (int i = lastIndex; i >= componentRootIndex; i--) {
                 final PartialOrderStateTuple temp = mComponentStack.remove(i);
-                mComponentNumber++;
+
                 temp.setComponent(mComponentNumber);
                 if(blocking){
                   if(isMarked(temp)){
@@ -794,6 +792,7 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
       return null;
     }
     if (enabled.length == 1){
+      current.setFullyExpanded(true);
       return enabled;
     }
     final TIntHashSet enabledSet = new TIntHashSet(enabled);
