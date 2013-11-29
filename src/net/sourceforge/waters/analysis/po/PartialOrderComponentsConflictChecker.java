@@ -1217,7 +1217,9 @@ public class PartialOrderComponentsConflictChecker extends AbstractConflictCheck
   private int[] mSystemState;
   private int[] mSuccessor;
   private PartialOrderStateTuple mErrorState;
+  @SuppressWarnings("unused")
   private int mErrorEvent;
+  @SuppressWarnings("unused")
   private int mErrorComponent;
 
   //Statistics
