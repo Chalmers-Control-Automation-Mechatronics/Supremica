@@ -5270,18 +5270,13 @@ public class GraphEditorPanel
       if (block != null) {
         change |= addToSet(block);
         if (subject instanceof IdentifierSubject) {
-            if (!block.getEventIdentifierList().isEmpty()) {
-              change |= addToSet(subject);
-            }
+          change |= addToSet(subject);
         } else if (subject instanceof ForeachSubject) {
           final ForeachSubject foreach = (ForeachSubject) subject;
-            if (block.getEventIdentifierListModifiable().size() > 1
-                || foreach.getBodyModifiable().size() > 0) {
-              change |= addToSet(subject);
-            }
-            if(addChildren){
-              change |= addChildren(foreach);
-            }
+          change |= addToSet(subject);
+          if (addChildren) {
+            change |= addChildren(foreach);
+          }
         }
       }
       else{
