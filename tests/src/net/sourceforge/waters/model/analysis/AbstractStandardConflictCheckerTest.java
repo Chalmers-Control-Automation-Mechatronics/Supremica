@@ -58,8 +58,8 @@ public abstract class AbstractStandardConflictCheckerTest
   public void testReentrant1()
   throws Exception
   {
-    //testEmpty();
-    //testSmallFactory2();
+    testEmpty();
+    testSmallFactory2();
     testWspTimer();
     testTransferline__1();
     testEmpty();

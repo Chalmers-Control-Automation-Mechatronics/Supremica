@@ -849,11 +849,11 @@ This version is nonblocking yet uncontrollable.
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="-=" Text="b1[N] -= 1">
+                                <BinaryExpression Operator="=" Text="b1[N] = 0">
                                     <IndexedIdentifier Name="b1">
                                         <SimpleIdentifier Name="N"/>
                                     </IndexedIdentifier>
-                                    <IntConstant Value="1"/>
+                                    <IntConstant Value="0"/>
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">

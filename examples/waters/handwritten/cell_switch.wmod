@@ -12,14 +12,7 @@ This is model is not controllable and blocking, intended for synthesis. However,
                 </BinaryExpression>
             </RangeList>
         </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="start">
-            <RangeList>
-                <BinaryExpression Operator="..">
-                    <IntConstant Value="1"/>
-                    <IntConstant Value="2"/>
-                </BinaryExpression>
-            </RangeList>
-        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="start"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="advance_i"/>
         <EventDecl Kind="CONTROLLABLE" Name="unload_i"/>
         <EventDecl Kind="CONTROLLABLE" Name="load_i"/>
@@ -63,10 +56,10 @@ This is model is not controllable and blocking, intended for synthesis. However,
                 <NodeList>
                     <SimpleNode Name="F">
                         <PointGeometry>
-                            <Point X="208" Y="80"/>
+                            <Point X="144" Y="160"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point X="-17" Y="-8"/>
+                            <Point X="9" Y="-5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Initial="true" Name="E">
@@ -76,11 +69,8 @@ This is model is not controllable and blocking, intended for synthesis. However,
                         <PointGeometry>
                             <Point X="144" Y="80"/>
                         </PointGeometry>
-                        <InitialArrowGeometry>
-                            <Point X="0" Y="-14"/>
-                        </InitialArrowGeometry>
                         <LabelGeometry>
-                            <Point X="7" Y="-7"/>
+                            <Point X="13" Y="-7"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -89,22 +79,22 @@ This is model is not controllable and blocking, intended for synthesis. However,
                         <LabelBlock>
                             <SimpleIdentifier Name="unload_i"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-26" Y="-18"/>
+                                <Point X="4" Y="-11"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="176" Y="66"/>
+                            <Point X="161" Y="120"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Source="F" Target="E">
                         <LabelBlock>
                             <SimpleIdentifier Name="start"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-18" Y="-1"/>
+                                <Point X="-38" Y="-7"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="176" Y="95"/>
+                            <Point X="129" Y="119"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
@@ -113,50 +103,47 @@ This is model is not controllable and blocking, intended for synthesis. However,
         <SimpleComponent Kind="PLANT" Name="incon">
             <Graph>
                 <NodeList>
-                    <SimpleNode Initial="true" Name="E">
+                    <SimpleNode Initial="true" Name="empty">
                         <EventList>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
                             <Point X="128" Y="64"/>
                         </PointGeometry>
-                        <InitialArrowGeometry>
-                            <Point X="0" Y="-13"/>
-                        </InitialArrowGeometry>
                         <LabelGeometry>
-                            <Point X="7" Y="-7"/>
+                            <Point X="14" Y="-8"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="F">
+                    <SimpleNode Name="full">
                         <PointGeometry>
-                            <Point X="192" Y="64"/>
+                            <Point X="128" Y="128"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point X="-18" Y="-7"/>
+                            <Point X="10" Y="-6"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Source="E" Target="F">
+                    <Edge Source="empty" Target="full">
                         <LabelBlock>
                             <SimpleIdentifier Name="advance_i"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-32" Y="-18"/>
+                                <Point X="3" Y="-8"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="161" Y="50"/>
+                            <Point X="142" Y="97"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Source="F" Target="E">
+                    <Edge Source="full" Target="empty">
                         <LabelBlock>
                             <SimpleIdentifier Name="load_i"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-18" Y="-2"/>
+                                <Point X="-48" Y="-7"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="159" Y="78"/>
+                            <Point X="114" Y="95"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
@@ -165,88 +152,47 @@ This is model is not controllable and blocking, intended for synthesis. However,
         <SimpleComponent Kind="PLANT" Name="machine">
             <Graph>
                 <NodeList>
-                    <SimpleNode Name="W1">
-                        <PointGeometry>
-                            <Point X="80" Y="48"/>
-                        </PointGeometry>
-                        <LabelGeometry>
-                            <Point X="-7" Y="5"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Initial="true" Name="I">
+                    <SimpleNode Initial="true" Name="idle">
                         <EventList>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point X="144" Y="48"/>
+                            <Point X="96" Y="48"/>
                         </PointGeometry>
-                        <InitialArrowGeometry>
-                            <Point X="0" Y="-11"/>
-                        </InitialArrowGeometry>
                         <LabelGeometry>
-                            <Point X="-4" Y="6"/>
+                            <Point X="12" Y="-9"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="W2">
+                    <SimpleNode Name="working">
                         <PointGeometry>
-                            <Point X="208" Y="48"/>
+                            <Point X="96" Y="112"/>
                         </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="-14" Y="5"/>
+                        <LabelGeometry>
+                            <Point X="12" Y="-9"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Source="W1" Target="I">
+                    <Edge Source="working" Target="idle">
                         <LabelBlock>
-                            <IndexedIdentifier Name="finish">
-                                <IntConstant Value="1"/>
-                            </IndexedIdentifier>
+                            <SimpleIdentifier Name="finish"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-26" Y="0"/>
+                                <Point X="-44" Y="-8"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="112" Y="63"/>
+                            <Point X="85" Y="80"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Source="I" Target="W1">
+                    <Edge Source="idle" Target="working">
                         <LabelBlock>
-                            <IndexedIdentifier Name="start">
-                                <IntConstant Value="1"/>
-                            </IndexedIdentifier>
+                            <SimpleIdentifier Name="start"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-21" Y="-18"/>
+                                <Point X="7" Y="-12"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="112" Y="35"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="I" Target="W2">
-                        <LabelBlock>
-                            <IndexedIdentifier Name="start">
-                                <IntConstant Value="2"/>
-                            </IndexedIdentifier>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-21" Y="-18"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="176" Y="34"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="W2" Target="I">
-                        <LabelBlock>
-                            <IndexedIdentifier Name="finish">
-                                <IntConstant Value="2"/>
-                            </IndexedIdentifier>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-23" Y="0"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="176" Y="63"/>
+                            <Point X="109" Y="81"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
@@ -257,10 +203,10 @@ This is model is not controllable and blocking, intended for synthesis. However,
                 <NodeList>
                     <SimpleNode Name="F1">
                         <PointGeometry>
-                            <Point X="96" Y="80"/>
+                            <Point X="80" Y="80"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point X="-7" Y="7"/>
+                            <Point X="-9" Y="8"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Initial="true" Name="E">
@@ -279,10 +225,10 @@ This is model is not controllable and blocking, intended for synthesis. However,
                     </SimpleNode>
                     <SimpleNode Name="F2">
                         <PointGeometry>
-                            <Point X="224" Y="80"/>
+                            <Point X="240" Y="80"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="-9" Y="6"/>
+                            <Point X="-6" Y="8"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -293,11 +239,11 @@ This is model is not controllable and blocking, intended for synthesis. However,
                                 <IntConstant Value="1"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-31" Y="1"/>
+                                <Point X="-31" Y="2"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="128" Y="95"/>
+                            <Point X="121" Y="94"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Source="E" Target="F1">
@@ -306,11 +252,11 @@ This is model is not controllable and blocking, intended for synthesis. However,
                                 <IntConstant Value="1"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-31" Y="-19"/>
+                                <Point X="-31" Y="-22"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="128" Y="66"/>
+                            <Point X="119" Y="68"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Source="E" Target="F2">
@@ -319,11 +265,11 @@ This is model is not controllable and blocking, intended for synthesis. However,
                                 <IntConstant Value="2"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-25" Y="-19"/>
+                                <Point X="-28" Y="-19"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="192" Y="66"/>
+                            <Point X="203" Y="66"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Source="F2" Target="E">
@@ -336,7 +282,7 @@ This is model is not controllable and blocking, intended for synthesis. However,
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="192" Y="96"/>
+                            <Point X="200" Y="96"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
@@ -346,17 +292,17 @@ This is model is not controllable and blocking, intended for synthesis. However,
             <Graph>
                 <NodeList>
                     <SimpleNode Name="F1">
-                        <PointGeometry>
-                            <Point X="80" Y="48"/>
-                        </PointGeometry>
-                        <LabelGeometry>
-                            <Point X="-21" Y="-6"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Initial="true" Name="E">
                         <EventList>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
+                        <PointGeometry>
+                            <Point X="64" Y="48"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="-8" Y="8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="E">
                         <PointGeometry>
                             <Point X="144" Y="48"/>
                         </PointGeometry>
@@ -364,15 +310,18 @@ This is model is not controllable and blocking, intended for synthesis. However,
                             <Point X="0" Y="-11"/>
                         </InitialArrowGeometry>
                         <LabelGeometry>
-                            <Point X="-5" Y="6"/>
+                            <Point X="-5" Y="7"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="F2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
                         <PointGeometry>
-                            <Point X="208" Y="48"/>
+                            <Point X="224" Y="48"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="-10" Y="6"/>
+                            <Point X="0" Y="10"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -383,11 +332,11 @@ This is model is not controllable and blocking, intended for synthesis. However,
                                 <IntConstant Value="1"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-46" Y="0"/>
+                                <Point X="-46" Y="2"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="112" Y="63"/>
+                            <Point X="104" Y="65"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Source="E" Target="F1">
@@ -396,11 +345,11 @@ This is model is not controllable and blocking, intended for synthesis. However,
                                 <IntConstant Value="1"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-46" Y="-19"/>
+                                <Point X="-40" Y="-20"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="112" Y="35"/>
+                            <Point X="103" Y="36"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Source="E" Target="F2">
@@ -409,11 +358,11 @@ This is model is not controllable and blocking, intended for synthesis. However,
                                 <IntConstant Value="2"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-28" Y="-17"/>
+                                <Point X="-27" Y="-22"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="176" Y="34"/>
+                            <Point X="185" Y="34"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Source="F2" Target="E">
@@ -422,11 +371,11 @@ This is model is not controllable and blocking, intended for synthesis. However,
                                 <IntConstant Value="2"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-34" Y="1"/>
+                                <Point X="-33" Y="2"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="176" Y="63"/>
+                            <Point X="184" Y="64"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
@@ -435,7 +384,7 @@ This is model is not controllable and blocking, intended for synthesis. However,
         <SimpleComponent Kind="PLANT" Name="robot">
             <Graph>
                 <NodeList>
-                    <SimpleNode Initial="true" Name="I">
+                    <SimpleNode Initial="true" Name="idle">
                         <EventList>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
@@ -446,132 +395,185 @@ This is model is not controllable and blocking, intended for synthesis. However,
                             <Point X="0" Y="-12"/>
                         </InitialArrowGeometry>
                         <LabelGeometry>
-                            <Point X="-15" Y="-6"/>
+                            <Point X="-34" Y="-6"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="O1">
+                    <SimpleNode Name="loading_o1">
                         <PointGeometry>
-                            <Point X="96" Y="96"/>
+                            <Point X="80" Y="96"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point X="-26" Y="-6"/>
+                            <Point X="-74" Y="-8"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="LI">
+                    <SimpleNode Name="loading_i">
                         <PointGeometry>
-                            <Point X="160" Y="160"/>
+                            <Point X="160" Y="176"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point X="7" Y="-7"/>
+                            <Point X="8" Y="-6"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="O2">
+                    <SimpleNode Name="loading_o2">
                         <PointGeometry>
-                            <Point X="224" Y="96"/>
+                            <Point X="240" Y="96"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="-26" Y="-7"/>
+                            <Point X="7" Y="-8"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Source="LI" Target="I">
+                    <Edge Source="loading_i" Target="idle">
                         <LabelBlock>
                             <SimpleIdentifier Name="unload_i"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-50" Y="4"/>
+                                <Point X="-55" Y="3"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="150" Y="127"/>
+                            <Point X="147" Y="135"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Source="I" Target="LI">
+                    <Edge Source="idle" Target="loading_i">
                         <LabelBlock>
                             <SimpleIdentifier Name="load_i"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-2" Y="3"/>
+                                <Point X="-1" Y="1"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="170" Y="129"/>
+                            <Point X="173" Y="137"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Source="I" Target="O1">
+                    <Edge Source="idle" Target="loading_o1">
                         <LabelBlock>
                             <IndexedIdentifier Name="load_o">
                                 <IntConstant Value="1"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-35" Y="-19"/>
+                                <Point X="-34" Y="-19"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="128" Y="82"/>
+                            <Point X="119" Y="83"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Source="O1" Target="I">
+                    <Edge Source="loading_o1" Target="idle">
                         <LabelBlock>
                             <IndexedIdentifier Name="unload_o">
                                 <IntConstant Value="1"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-47" Y="-2"/>
+                                <Point X="-54" Y="0"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="128" Y="111"/>
+                            <Point X="123" Y="111"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Source="I" Target="O2">
+                    <Edge Source="idle" Target="loading_o2">
                         <LabelBlock>
                             <IndexedIdentifier Name="load_o">
                                 <IntConstant Value="2"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-24" Y="-20"/>
+                                <Point X="-19" Y="-21"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="192" Y="83"/>
+                            <Point X="203" Y="86"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Source="O2" Target="I">
+                    <Edge Source="loading_o2" Target="idle">
                         <LabelBlock>
                             <IndexedIdentifier Name="unload_o">
                                 <IntConstant Value="2"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-20" Y="0"/>
+                                <Point X="-9" Y="3"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="192" Y="110"/>
+                            <Point X="199" Y="109"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC" Name="switch">
+        <SimpleComponent Kind="PLANT" Name="switch">
             <Graph>
                 <NodeList>
-                    <SimpleNode Name="O1">
+                    <SimpleNode Name="S2">
                         <PointGeometry>
-                            <Point X="96" Y="160"/>
+                            <Point X="144" Y="160"/>
                         </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="-26" Y="-7"/>
+                        <LabelGeometry>
+                            <Point X="9" Y="-5"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="O2">
+                    <SimpleNode Initial="true" Name="S1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
                         <PointGeometry>
-                            <Point X="176" Y="160"/>
+                            <Point X="144" Y="80"/>
                         </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="-7"/>
+                        <LabelGeometry>
+                            <Point X="13" Y="-7"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Initial="true" Name="W1">
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="S1" Target="S2">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="select">
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="4" Y="-11"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="161" Y="120"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S2" Target="S1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="select">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-59" Y="-9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="129" Y="119"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="switch_spec">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="sel1">
+                        <PointGeometry>
+                            <Point X="96" Y="176"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-33" Y="-6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="sel2">
+                        <PointGeometry>
+                            <Point X="208" Y="176"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="9" Y="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="prod1">
                         <EventList>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
@@ -582,136 +584,238 @@ This is model is not controllable and blocking, intended for synthesis. However,
                             <Point X="-18" Y="0"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="-24" Y="4"/>
+                            <Point X="-39" Y="6"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="W2">
+                    <SimpleNode Name="prod2">
                         <EventList>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point X="176" Y="80"/>
+                            <Point X="208" Y="80"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="3" Y="3"/>
+                            <Point X="4" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Source="W2" Target="O1">
-                        <LabelBlock>
-                            <IndexedIdentifier Name="select">
-                                <IntConstant Value="1"/>
-                            </IndexedIdentifier>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="1" Y="-32"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="124" Y="119"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="W1" Target="O2">
+                    <Edge Source="sel1" Target="prod2">
                         <LabelBlock>
                             <IndexedIdentifier Name="select">
                                 <IntConstant Value="2"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-50" Y="-46"/>
+                                <Point X="-34" Y="-2"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="148" Y="120"/>
+                            <Point X="178" Y="128"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Source="O1" Target="O2">
-                        <LabelBlock>
-                            <IndexedIdentifier Name="select">
-                                <IntConstant Value="2"/>
-                            </IndexedIdentifier>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-26" Y="0"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="96" Y="160"/>
-                        </StartPointGeometry>
-                        <SplineGeometry>
-                            <Point X="136" Y="149"/>
-                        </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="176" Y="160"/>
-                        </EndPointGeometry>
-                    </Edge>
-                    <Edge Source="O2" Target="O1">
+                    <Edge Source="sel2" Target="prod1">
                         <LabelBlock>
                             <IndexedIdentifier Name="select">
                                 <IntConstant Value="1"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-25" Y="-1"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="176" Y="160"/>
-                        </StartPointGeometry>
-                        <SplineGeometry>
-                            <Point X="136" Y="171"/>
-                        </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="96" Y="160"/>
-                        </EndPointGeometry>
-                    </Edge>
-                    <Edge Source="O1" Target="W1">
-                        <LabelBlock>
-                            <IndexedIdentifier Name="unload_o">
-                                <IntConstant Value="1"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="unload_o">
-                                <IntConstant Value="2"/>
-                            </IndexedIdentifier>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-43" Y="-16"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="O2" Target="W2">
-                        <LabelBlock>
-                            <IndexedIdentifier Name="unload_o">
-                                <IntConstant Value="1"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="unload_o">
-                                <IntConstant Value="2"/>
-                            </IndexedIdentifier>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-22" Y="-15"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="W1" Target="W1">
-                        <LabelBlock>
-                            <IndexedIdentifier Name="unload_o">
-                                <IntConstant Value="1"/>
-                            </IndexedIdentifier>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-37" Y="6"/>
+                                <Point X="-24" Y="-18"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="96" Y="40"/>
+                            <Point X="131" Y="129"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Source="W2" Target="W2">
+                    <Edge Source="prod1" Target="prod2">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="select">
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-28" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="154" Y="65"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="prod2" Target="prod1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="select">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-24" Y="-2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="152" Y="95"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="sel1" Target="prod1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="unload_o"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-58" Y="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="sel2" Target="prod2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="unload_o"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="-1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="prod1" Target="prod1">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="unload_o">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-38" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="97" Y="40"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="prod2" Target="prod2">
                         <LabelBlock>
                             <IndexedIdentifier Name="unload_o">
                                 <IntConstant Value="2"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-42" Y="7"/>
+                                <Point X="-35" Y="-19"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="177" Y="39"/>
+                            <Point X="209" Y="39"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="supervisor">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="S:0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="96" Y="112"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point X="0" Y="-23"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-11" Y="7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S:1">
+                        <PointGeometry>
+                            <Point X="192" Y="112"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-10" Y="8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S:2">
+                        <PointGeometry>
+                            <Point X="144" Y="176"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-22" Y="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="S:0" Target="S:0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="load_i"/>
+                            <SimpleIdentifier Name="unload_i"/>
+                            <IndexedIdentifier Name="unload_o">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="unload_o">
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-31" Y="-63"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="49" Y="112"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S:0" Target="S:1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-19" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="145" Y="92"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S:1" Target="S:0">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="load_o">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="load_o">
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-28" Y="1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:1" Target="S:1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="load_i"/>
+                            <IndexedIdentifier Name="unload_o">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="unload_o">
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-40" Y="-51"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="235" Y="112"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S:1" Target="S:2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="unload_i"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-12" Y="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="173" Y="149"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S:2" Target="S:0">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="load_o">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="load_o">
+                                <IntConstant Value="2"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-60" Y="-8"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="114" Y="149"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
