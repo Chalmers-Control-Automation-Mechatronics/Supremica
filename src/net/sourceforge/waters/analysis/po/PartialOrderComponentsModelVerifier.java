@@ -705,7 +705,8 @@ public abstract class PartialOrderComponentsModelVerifier extends AbstractModelV
     mIndexList.add(open);
     mIndexList.add(mStateList.size());
     mStateTuple = new PartialOrderStateTuple(mStateTupleSize);
-    mErrorState = mInitialState;
+    if (this instanceof PartialOrderComponentsConflictChecker)
+      mErrorState = mInitialState;
 
     int i,j,temp;
 
