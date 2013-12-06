@@ -124,14 +124,16 @@ extends PartialOrderComponentsModelVerifier implements SafetyVerifier
     encode(sState, mInitialState);
 
     mStateSet.getOrAdd(mInitialState);
-    mStack.add(new PartialOrderStateTuplePairing(mInitialState, null,PartialOrderParingRequest.VISIT));
+    mStack.add(new PartialOrderStateTuplePairing(mInitialState, null,
+                                            PartialOrderParingRequest.VISIT));
     mStateTuple = new PartialOrderStateTuple(mStateTupleSize);
 
     while(!mStack.isEmpty()){
       final PartialOrderStateTuplePairing current = mStack.remove(mStack.size() - 1);
       final PartialOrderStateTuple state = current.getState();
       final PartialOrderStateTuple prev = current.getPrev();
-      if (current.getReq() == PartialOrderParingRequest.VISIT && !state.getComponentVisited()){
+      if (current.getReq() == PartialOrderParingRequest.VISIT &&
+                                                !state.getComponentVisited()){
         state.setComponentVisited(true);
         state.setRootIndex(mDepthIndex++);
         int[] events;
@@ -141,7 +143,8 @@ extends PartialOrderComponentsModelVerifier implements SafetyVerifier
           state.setComponent(++mComponentCount);
         }
         else{
-          mStack.add(new PartialOrderStateTuplePairing(state, prev, PartialOrderParingRequest.CLOSE));
+          mStack.add(new PartialOrderStateTuplePairing(state, prev,
+                                            PartialOrderParingRequest.CLOSE));
           expand(state,events,true);
         }
       }
@@ -175,10 +178,9 @@ extends PartialOrderComponentsModelVerifier implements SafetyVerifier
                 temp.setComponent(mComponentCount);
               }
             } else {
-              int[] events;
-              if ((events = enabled(prev)) == null)
+              if (enabled(prev) == null)
                 return false;
-              expand(prev, events, false);
+              expand(prev, mEnabledHash.toArray(), false);
               prev.setFullyExpanded(true);
               mFullExpansions++;
             }
@@ -196,8 +198,8 @@ extends PartialOrderComponentsModelVerifier implements SafetyVerifier
 
   @Override
   protected TraceProxy noInitialCounterexample(final AutomatonProxy ap,
-                                               final ProductDESProxy model,
-                                               final Collection<AutomatonProxy> automata)
+                                    final ProductDESProxy model,
+                                    final Collection<AutomatonProxy> automata)
   {
     final ProductDESProxyFactory factory = getFactory();
     final String tracename = getTraceName();
@@ -232,7 +234,8 @@ extends PartialOrderComponentsModelVerifier implements SafetyVerifier
     int currentLevel = mIndexList.size() - 1;
     outer:
     while (!error.equals(mInitialState)){
-      for (i = mIndexList.get(currentLevel - 1); i < mIndexList.get(currentLevel); i++){
+      for (i = mIndexList.get(currentLevel - 1);
+                i < mIndexList.get(currentLevel); i++){
         decode(mStateList.get(i),mSystemState);
         events:
         for (j = 0; j < mNumEvents; j++){

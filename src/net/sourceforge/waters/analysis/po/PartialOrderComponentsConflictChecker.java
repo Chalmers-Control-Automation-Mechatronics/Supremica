@@ -171,14 +171,17 @@ extends PartialOrderComponentsModelVerifier implements ConflictChecker
 
     encode(sState, mInitialState);
     mStateSet.getOrAdd(mInitialState);
-    mStack.add(new PartialOrderStateTuplePairing(mInitialState, null,PartialOrderParingRequest.VISIT));
+    mStack.add(new PartialOrderStateTuplePairing(mInitialState, null,
+                                             PartialOrderParingRequest.VISIT));
     mStateTuple = new PartialOrderStateTuple(mStateTupleSize);
 
     while(!mStack.isEmpty()){
-      final PartialOrderStateTuplePairing current = mStack.remove(mStack.size() - 1);
+      final PartialOrderStateTuplePairing current =
+        mStack.remove(mStack.size() - 1);
       final PartialOrderStateTuple state = current.getState();
       final PartialOrderStateTuple prev = current.getPrev();
-      if (current.getReq() == PartialOrderParingRequest.VISIT && !state.getComponentVisited()){
+      if (current.getReq() == PartialOrderParingRequest.VISIT &&
+                                                !state.getComponentVisited()){
         state.setComponentVisited(true);
         state.setRootIndex(mDepthIndex++);
         final int[] events = ample(state);
@@ -190,7 +193,8 @@ extends PartialOrderComponentsModelVerifier implements ConflictChecker
           }
         }
         else{
-          mStack.add(new PartialOrderStateTuplePairing(state, prev, PartialOrderParingRequest.CLOSE));
+          mStack.add(new PartialOrderStateTuplePairing(state, prev,
+                                            PartialOrderParingRequest.CLOSE));
           expand(state,events,true);
         }
       }
@@ -246,8 +250,8 @@ extends PartialOrderComponentsModelVerifier implements ConflictChecker
                 return false;
               }
             } else {
-              final int[] events = enabled(prev);
-              expand(prev, events, false);
+              enabled(prev);
+              expand(prev, mEnabledHash.toArray(), false);
               prev.setFullyExpanded(true);
               mFullExpansions++;
             }
@@ -275,7 +279,8 @@ extends PartialOrderComponentsModelVerifier implements ConflictChecker
     final int[] tempState = new int[mNumAutomata];
     int i;
     decode(current, tempState);
-    final int[] enabledEvents = enabled(current);
+    enabled(current);
+    final int[] enabledEvents = mEnabledHash.toArray();
     for(final int e: enabledEvents){
       for (i = 0; i < mNumAutomata; i++){
         final boolean plant = i < mNumPlants;
@@ -334,7 +339,8 @@ extends PartialOrderComponentsModelVerifier implements ConflictChecker
     int currentLevel = mIndexList.size() - 1;
     outer:
     while (!error.equals(mInitialState)){
-      for (i = mIndexList.get(currentLevel - 1); i < mIndexList.get(currentLevel); i++){
+      for (i = mIndexList.get(currentLevel - 1);
+            i < mIndexList.get(currentLevel); i++){
         decode(mStateList.get(i),mSystemState);
         events:
         for (j = 1; j < mNumEvents; j++){
@@ -377,8 +383,8 @@ extends PartialOrderComponentsModelVerifier implements ConflictChecker
 
   @Override
   protected TraceProxy noInitialCounterexample(final AutomatonProxy ap,
-                                               final ProductDESProxy model,
-                                               final Collection<AutomatonProxy> automata)
+                                    final ProductDESProxy model,
+                                    final Collection<AutomatonProxy> automata)
   {
     return null;
   }
