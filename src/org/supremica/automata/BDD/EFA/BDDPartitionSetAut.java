@@ -1,11 +1,14 @@
 package org.supremica.automata.BDD.EFA;
 
-import gnu.trove.set.hash.TIntHashSet;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.TIntHashSet;
+
 import java.util.Iterator;
+
 import net.sf.javabdd.BDD;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+
 import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
@@ -62,11 +65,19 @@ public class BDDPartitionSetAut extends BDDPartitionSet {
      */
     private BDD uncontrollableBDD;
 
+    /**
+     In order to generate the guards by using Sajed's algorithm, the BDD representing automata-based partial transition
+     must embed the encoding for the events. This is the only usage for the following BDD map to exist.
+     It is not desired, but solves the problem.
+     */
+    public TIntObjectHashMap<BDD> automatonToCompleteTransitionBDDWithEvents;
+
     public BDDPartitionSetAut(final BDDExtendedAutomata bddExAutomata) {
         super(bddExAutomata);
 
         this.size = orgAutomata.size();
         this.automatonToCompleteTransitionBDD = new TIntObjectHashMap<BDD>(size);
+        this.automatonToCompleteTransitionBDDWithEvents = new TIntObjectHashMap<BDD>(size);
         this.dependencyMap = new TIntObjectHashMap<TIntHashSet>(size);
         this.initialComponentCandidates = new TIntHashSet();
         this.markedComponentCandidates = new TIntHashSet();
@@ -84,6 +95,8 @@ public class BDDPartitionSetAut extends BDDPartitionSet {
             final BDDExtendedAutomaton bddAutomaton = bddExAutomata.getBDDExAutomaton(automaton);
             final int autIndex = theIndexMap.getExAutomatonIndex(automaton.getName());
             automatonToCompleteTransitionBDD.put(autIndex, new AutomatonDisjParDepSet(autIndex, bddAutomaton).automatonForwardTransitionBDD);
+            automatonToCompleteTransitionBDDWithEvents
+              .put(autIndex, new AutomatonDisjParDepSet(autIndex, bddAutomaton).automatonForwardTransitionBDDWithEvents);
         }
 
         final int[] autIndexArray = automatonToCompleteTransitionBDD.keys();
@@ -110,6 +123,7 @@ public class BDDPartitionSetAut extends BDDPartitionSet {
         private final int automatonIndex;
         private final BDDExtendedAutomaton bddAutomaton;
         private BDD automatonForwardTransitionBDD;
+        private BDD automatonForwardTransitionBDDWithEvents;
 
         private AutomatonDisjParDepSet (final int automatonIndex, final BDDExtendedAutomaton bddAutomaton) {
             this.automatonIndex = automatonIndex;
@@ -167,6 +181,7 @@ public class BDDPartitionSetAut extends BDDPartitionSet {
                     uncontrollableEventIndex2BDDMap.remove(anUnconEvent);
                 }
             }
+            automatonForwardTransitionBDDWithEvents = automatonForwardTransitionBDD.id();
             // Exist the event variables from the automaton forward transition BDD
             automatonForwardTransitionBDD = automatonForwardTransitionBDD.exist(bddExAutomata.getEventVarSet());
         }

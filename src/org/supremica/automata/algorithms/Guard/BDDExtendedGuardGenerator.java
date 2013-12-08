@@ -31,6 +31,7 @@ import org.supremica.automata.BDD.EFA.BDDMonolithicEdges;
 import org.supremica.automata.BDD.EFA.BDDPartitionAlgoWorker;
 import org.supremica.automata.BDD.EFA.BDDPartitionAlgoWorkerAut;
 import org.supremica.automata.BDD.EFA.BDDPartitionAlgoWorkerEve;
+import org.supremica.automata.BDD.EFA.BDDPartitionSetAut;
 import org.supremica.automata.BDD.EFA.IDD;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions;
 import org.supremica.automata.algorithms.SynthesisAlgorithm;
@@ -474,7 +475,7 @@ public final class BDDExtendedGuardGenerator {
                     } else {
                         localNbrOfTerms += 1;
                     }
-                    
+
                     set = new ArrayList<String>(setTemp);
                     if (firstTime) {
                         expr = inEq;
@@ -779,13 +780,17 @@ public final class BDDExtendedGuardGenerator {
                 final ExtendedAutomaton aut = autItr.next();
                 final int autIndex = automataBDD.getIndexMap().getExAutomatonIndex(aut.getName());
                 if (automataBDD.getBDDExAutomaton(aut).getCaredEventsIndex().contains(eventIndex)) {
-                    tmp = tmp.or(safeStatesWithEvent.and(parAlgoWorker.getCompBDD(autIndex))
+
+                    final BDDPartitionSetAut autPartitions = (BDDPartitionSetAut)parAlgoWorker.getPartitions();
+
+                    tmp = tmp.or(safeStatesWithEvent.and(autPartitions.automatonToCompleteTransitionBDDWithEvents.get(autIndex))
                             .exist(automataBDD.getDestStatesVarSet())
                             .exist(automataBDD.getEventVarSet()));
                 }
             }
 
         }
+
         mustAllowedStatesBDD = tmp.and(safeStatesBDD);
         safeStatesWithEvent.free();
         tmp.free();
@@ -813,7 +818,9 @@ public final class BDDExtendedGuardGenerator {
                 final ExtendedAutomaton aut = autItr.next();
                 final int autIndex = automataBDD.getIndexMap().getExAutomatonIndex(aut.getName());
                 if (automataBDD.getBDDExAutomaton(aut).getCaredEventsIndex().contains(eventIndex)) {
-                    tmp = tmp.or(reachableStatesWithEvent.and(parAlgoWorker.getCompBDD(autIndex))
+
+                    final BDDPartitionSetAut autPartitions = (BDDPartitionSetAut)parAlgoWorker.getPartitions();
+                    tmp = tmp.or(reachableStatesWithEvent.and(autPartitions.automatonToCompleteTransitionBDDWithEvents.get(autIndex))
                             .exist(automataBDD.getDestStatesVarSet()).exist(automataBDD.getEventVarSet()));
                 }
             }
