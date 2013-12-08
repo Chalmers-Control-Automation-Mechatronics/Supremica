@@ -67,7 +67,7 @@ public class ModuleProxyCloner
       return null;
     } else {
       try {
-        return (Proxy) proxy.acceptVisitor(this);
+        return cloneProxy(proxy);
       } catch (final VisitorException exception) {
         throw exception.getRuntimeException();
       }
@@ -78,7 +78,7 @@ public class ModuleProxyCloner
   List<P> getClonedList(final Collection<? extends P> collection)
   {
     final int size = collection.size();
-    final List<Proxy> result = new ArrayList<Proxy>(size);
+    final List<Proxy> result = new ArrayList<>(size);
     for (final P proxy : collection) {
       final Proxy cloned = getClone(proxy);
       result.add(cloned);
@@ -93,7 +93,7 @@ public class ModuleProxyCloner
   Set<P> getClonedSet(final Collection<? extends P> collection)
   {
     final int size = collection.size();
-    final Set<Proxy> result = new THashSet<Proxy>(size);
+    final Set<Proxy> result = new THashSet<>(size);
     for (final P proxy : collection) {
       final Proxy cloned = getClone(proxy);
       result.add(cloned);
@@ -117,12 +117,12 @@ public class ModuleProxyCloner
                                    final ModuleProxyFactory factory)
   {
     final int size = proxy.getNodes().size();
-    mNodeMap = new HashMap<String,NodeProxy>(size);
+    mNodeMap = new HashMap<>(size);
     try {
       final boolean deterministic = proxy.isDeterministic();
       final LabelBlockProxy blockedEvents0 = proxy.getBlockedEvents();
       final LabelBlockProxy blockedEvents =
-        blockedEvents0 == null ? null : visitLabelBlockProxy(blockedEvents0);
+        (LabelBlockProxy) cloneProxy(blockedEvents0);
       final Collection<NodeProxy> nodes0 = proxy.getNodes();
       final Collection<NodeProxy> nodes = lookupNodeProxyCollection(nodes0);
       final Collection<EdgeProxy> edges0 = proxy.getEdges();
@@ -142,14 +142,6 @@ public class ModuleProxyCloner
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
   @Override
-  public AliasProxy visitAliasProxy
-    (final AliasProxy proxy)
-    throws VisitorException
-  {
-    return (AliasProxy) proxy.acceptVisitor(this);
-  }
-
-  @Override
   public BinaryExpressionProxy visitBinaryExpressionProxy
     (final BinaryExpressionProxy proxy)
     throws VisitorException
@@ -157,9 +149,11 @@ public class ModuleProxyCloner
     final String plainText = proxy.getPlainText();
     final BinaryOperator operator = proxy.getOperator();
     final SimpleExpressionProxy left0 = proxy.getLeft();
-    final SimpleExpressionProxy left = visitSimpleExpressionProxy(left0);
+    final SimpleExpressionProxy left =
+      (SimpleExpressionProxy) cloneProxy(left0);
     final SimpleExpressionProxy right0 = proxy.getRight();
-    final SimpleExpressionProxy right = visitSimpleExpressionProxy(right0);
+    final SimpleExpressionProxy right =
+      (SimpleExpressionProxy) cloneProxy(right0);
     return mFactory.createBinaryExpressionProxy(plainText,
                                                 operator,
                                                 left,
@@ -185,22 +179,16 @@ public class ModuleProxyCloner
   }
 
   @Override
-  public ComponentProxy visitComponentProxy
-    (final ComponentProxy proxy)
-    throws VisitorException
-  {
-    return (ComponentProxy) proxy.acceptVisitor(this);
-  }
-
-  @Override
   public ConstantAliasProxy visitConstantAliasProxy
     (final ConstantAliasProxy proxy)
     throws VisitorException
   {
     final IdentifierProxy identifier0 = proxy.getIdentifier();
-    final IdentifierProxy identifier = visitIdentifierProxy(identifier0);
+    final IdentifierProxy identifier =
+      (IdentifierProxy) cloneProxy(identifier0);
     final ExpressionProxy expression0 = proxy.getExpression();
-    final ExpressionProxy expression = visitExpressionProxy(expression0);
+    final ExpressionProxy expression =
+      (ExpressionProxy) cloneProxy(expression0);
     final ScopeKind scope = proxy.getScope();
     return mFactory.createConstantAliasProxy(identifier,
                                              expression,
@@ -213,26 +201,25 @@ public class ModuleProxyCloner
     throws VisitorException
   {
     final NodeProxy source0 = proxy.getSource();
-    final NodeProxy source =
-      source0 == null ? null : lookupNodeProxy(source0);
+    final NodeProxy source = lookupNodeProxy(source0);
     final NodeProxy target0 = proxy.getTarget();
-    final NodeProxy target =
-      target0 == null ? null : lookupNodeProxy(target0);
+    final NodeProxy target = lookupNodeProxy(target0);
     final LabelBlockProxy labelBlock0 = proxy.getLabelBlock();
-    final LabelBlockProxy labelBlock = visitLabelBlockProxy(labelBlock0);
+    final LabelBlockProxy labelBlock =
+      (LabelBlockProxy) cloneProxy(labelBlock0);
     final GuardActionBlockProxy guardActionBlock0 =
       proxy.getGuardActionBlock();
     final GuardActionBlockProxy guardActionBlock =
-      guardActionBlock0 == null ? null : visitGuardActionBlockProxy(guardActionBlock0);
+      (GuardActionBlockProxy) cloneProxy(guardActionBlock0);
     final SplineGeometryProxy geometry0 = proxy.getGeometry();
     final SplineGeometryProxy geometry =
-      geometry0 == null ? null : visitSplineGeometryProxy(geometry0);
+      (SplineGeometryProxy) cloneProxy(geometry0);
     final PointGeometryProxy startPoint0 = proxy.getStartPoint();
     final PointGeometryProxy startPoint =
-      startPoint0 == null ? null : visitPointGeometryProxy(startPoint0);
+      (PointGeometryProxy) cloneProxy(startPoint0);
     final PointGeometryProxy endPoint0 = proxy.getEndPoint();
     final PointGeometryProxy endPoint =
-      endPoint0 == null ? null : visitPointGeometryProxy(endPoint0);
+      (PointGeometryProxy) cloneProxy(endPoint0);
     return mFactory.createEdgeProxy(source,
                                     target,
                                     labelBlock,
@@ -261,9 +248,11 @@ public class ModuleProxyCloner
     throws VisitorException
   {
     final IdentifierProxy identifier0 = proxy.getIdentifier();
-    final IdentifierProxy identifier = visitIdentifierProxy(identifier0);
+    final IdentifierProxy identifier =
+      (IdentifierProxy) cloneProxy(identifier0);
     final ExpressionProxy expression0 = proxy.getExpression();
-    final ExpressionProxy expression = visitExpressionProxy(expression0);
+    final ExpressionProxy expression =
+      (ExpressionProxy) cloneProxy(expression0);
     return mFactory.createEventAliasProxy(identifier,
                                           expression);
   }
@@ -274,7 +263,8 @@ public class ModuleProxyCloner
     throws VisitorException
   {
     final IdentifierProxy identifier0 = proxy.getIdentifier();
-    final IdentifierProxy identifier = visitIdentifierProxy(identifier0);
+    final IdentifierProxy identifier =
+      (IdentifierProxy) cloneProxy(identifier0);
     final EventKind kind = proxy.getKind();
     final boolean observable = proxy.isObservable();
     final ScopeKind scope = proxy.getScope();
@@ -283,7 +273,7 @@ public class ModuleProxyCloner
       cloneProxyCollection(ranges0);
     final ColorGeometryProxy colorGeometry0 = proxy.getColorGeometry();
     final ColorGeometryProxy colorGeometry =
-      colorGeometry0 == null ? null : visitColorGeometryProxy(colorGeometry0);
+      (ColorGeometryProxy) cloneProxy(colorGeometry0);
     final Map<String,String> attributes = proxy.getAttributes();
     return mFactory.createEventDeclProxy(identifier,
                                          kind,
@@ -295,32 +285,17 @@ public class ModuleProxyCloner
   }
 
   @Override
-  public EventListExpressionProxy visitEventListExpressionProxy
-    (final EventListExpressionProxy proxy)
-    throws VisitorException
-  {
-    return (EventListExpressionProxy) proxy.acceptVisitor(this);
-  }
-
-  @Override
-  public ExpressionProxy visitExpressionProxy
-    (final ExpressionProxy proxy)
-    throws VisitorException
-  {
-    return (ExpressionProxy) proxy.acceptVisitor(this);
-  }
-
-  @Override
   public ForeachProxy visitForeachProxy
     (final ForeachProxy proxy)
     throws VisitorException
   {
     final String name = proxy.getName();
     final SimpleExpressionProxy range0 = proxy.getRange();
-    final SimpleExpressionProxy range = visitSimpleExpressionProxy(range0);
+    final SimpleExpressionProxy range =
+      (SimpleExpressionProxy) cloneProxy(range0);
     final SimpleExpressionProxy guard0 = proxy.getGuard();
     final SimpleExpressionProxy guard =
-      guard0 == null ? null : visitSimpleExpressionProxy(guard0);
+      (SimpleExpressionProxy) cloneProxy(guard0);
     final Collection<Proxy> body0 = proxy.getBody();
     final Collection<Proxy> body = cloneProxyCollection(body0);
     return mFactory.createForeachProxy(name,
@@ -350,12 +325,12 @@ public class ModuleProxyCloner
     throws VisitorException
   {
     final int size = proxy.getNodes().size();
-    mNodeMap = new HashMap<String,NodeProxy>(size);
+    mNodeMap = new HashMap<>(size);
     try {
       final boolean deterministic = proxy.isDeterministic();
       final LabelBlockProxy blockedEvents0 = proxy.getBlockedEvents();
       final LabelBlockProxy blockedEvents =
-        blockedEvents0 == null ? null : visitLabelBlockProxy(blockedEvents0);
+        (LabelBlockProxy) cloneProxy(blockedEvents0);
       final Collection<NodeProxy> nodes0 = proxy.getNodes();
       final Collection<NodeProxy> nodes = lookupNodeProxyCollection(nodes0);
       final Collection<EdgeProxy> edges0 = proxy.getEdges();
@@ -377,7 +352,7 @@ public class ModuleProxyCloner
     final String name = proxy.getName();
     final PlainEventListProxy propositions0 = proxy.getPropositions();
     final PlainEventListProxy propositions =
-      visitPlainEventListProxy(propositions0);
+      (PlainEventListProxy) cloneProxy(propositions0);
     final Map<String,String> attributes = proxy.getAttributes();
     final Collection<NodeProxy> immediateChildNodes0 =
       proxy.getImmediateChildNodes();
@@ -385,7 +360,7 @@ public class ModuleProxyCloner
       lookupNodeProxyCollection(immediateChildNodes0);
     final BoxGeometryProxy geometry0 = proxy.getGeometry();
     final BoxGeometryProxy geometry =
-      geometry0 == null ? null : visitBoxGeometryProxy(geometry0);
+      (BoxGeometryProxy) cloneProxy(geometry0);
     return mFactory.createGroupNodeProxy(name,
                                          propositions,
                                          attributes,
@@ -406,26 +381,10 @@ public class ModuleProxyCloner
       cloneProxyCollection(actions0);
     final LabelGeometryProxy geometry0 = proxy.getGeometry();
     final LabelGeometryProxy geometry =
-      geometry0 == null ? null : visitLabelGeometryProxy(geometry0);
+      (LabelGeometryProxy) cloneProxy(geometry0);
     return mFactory.createGuardActionBlockProxy(guards,
                                                 actions,
                                                 geometry);
-  }
-
-  @Override
-  public IdentifiedProxy visitIdentifiedProxy
-    (final IdentifiedProxy proxy)
-    throws VisitorException
-  {
-    return (IdentifiedProxy) proxy.acceptVisitor(this);
-  }
-
-  @Override
-  public IdentifierProxy visitIdentifierProxy
-    (final IdentifierProxy proxy)
-    throws VisitorException
-  {
-    return (IdentifierProxy) proxy.acceptVisitor(this);
   }
 
   @Override
@@ -449,7 +408,8 @@ public class ModuleProxyCloner
     throws VisitorException
   {
     final IdentifierProxy identifier0 = proxy.getIdentifier();
-    final IdentifierProxy identifier = visitIdentifierProxy(identifier0);
+    final IdentifierProxy identifier =
+      (IdentifierProxy) cloneProxy(identifier0);
     final String moduleName = proxy.getModuleName();
     final Collection<ParameterBindingProxy> bindingList0 =
       proxy.getBindingList();
@@ -482,7 +442,7 @@ public class ModuleProxyCloner
       cloneProxyCollection(eventIdentifierList0);
     final LabelGeometryProxy geometry0 = proxy.getGeometry();
     final LabelGeometryProxy geometry =
-      geometry0 == null ? null : visitLabelGeometryProxy(geometry0);
+      (LabelGeometryProxy) cloneProxy(geometry0);
     return mFactory.createLabelBlockProxy(eventIdentifierList,
                                           geometry);
   }
@@ -544,21 +504,14 @@ public class ModuleProxyCloner
   }
 
   @Override
-  public NodeProxy visitNodeProxy
-    (final NodeProxy proxy)
-    throws VisitorException
-  {
-    return (NodeProxy) proxy.acceptVisitor(this);
-  }
-
-  @Override
   public ParameterBindingProxy visitParameterBindingProxy
     (final ParameterBindingProxy proxy)
     throws VisitorException
   {
     final String name = proxy.getName();
     final ExpressionProxy expression0 = proxy.getExpression();
-    final ExpressionProxy expression = visitExpressionProxy(expression0);
+    final ExpressionProxy expression =
+      (ExpressionProxy) cloneProxy(expression0);
     return mFactory.createParameterBindingProxy(name,
                                                 expression);
   }
@@ -585,14 +538,6 @@ public class ModuleProxyCloner
   }
 
   @Override
-  public Proxy visitProxy
-    (final Proxy proxy)
-    throws VisitorException
-  {
-    return (Proxy) proxy.acceptVisitor(this);
-  }
-
-  @Override
   public QualifiedIdentifierProxy visitQualifiedIdentifierProxy
     (final QualifiedIdentifierProxy proxy)
     throws VisitorException
@@ -600,11 +545,11 @@ public class ModuleProxyCloner
     final String plainText = proxy.getPlainText();
     final IdentifierProxy baseIdentifier0 = proxy.getBaseIdentifier();
     final IdentifierProxy baseIdentifier =
-      visitIdentifierProxy(baseIdentifier0);
+      (IdentifierProxy) cloneProxy(baseIdentifier0);
     final IdentifierProxy componentIdentifier0 =
       proxy.getComponentIdentifier();
     final IdentifierProxy componentIdentifier =
-      visitIdentifierProxy(componentIdentifier0);
+      (IdentifierProxy) cloneProxy(componentIdentifier0);
     return mFactory.createQualifiedIdentifierProxy(plainText,
                                                    baseIdentifier,
                                                    componentIdentifier);
@@ -616,23 +561,16 @@ public class ModuleProxyCloner
     throws VisitorException
   {
     final IdentifierProxy identifier0 = proxy.getIdentifier();
-    final IdentifierProxy identifier = visitIdentifierProxy(identifier0);
+    final IdentifierProxy identifier =
+      (IdentifierProxy) cloneProxy(identifier0);
     final ComponentKind kind = proxy.getKind();
     final GraphProxy graph0 = proxy.getGraph();
-    final GraphProxy graph = visitGraphProxy(graph0);
+    final GraphProxy graph = (GraphProxy) cloneProxy(graph0);
     final Map<String,String> attributes = proxy.getAttributes();
     return mFactory.createSimpleComponentProxy(identifier,
                                                kind,
                                                graph,
                                                attributes);
-  }
-
-  @Override
-  public SimpleExpressionProxy visitSimpleExpressionProxy
-    (final SimpleExpressionProxy proxy)
-    throws VisitorException
-  {
-    return (SimpleExpressionProxy) proxy.acceptVisitor(this);
   }
 
   @Override
@@ -654,19 +592,19 @@ public class ModuleProxyCloner
     final String name = proxy.getName();
     final PlainEventListProxy propositions0 = proxy.getPropositions();
     final PlainEventListProxy propositions =
-      visitPlainEventListProxy(propositions0);
+      (PlainEventListProxy) cloneProxy(propositions0);
     final Map<String,String> attributes = proxy.getAttributes();
     final boolean initial = proxy.isInitial();
     final PointGeometryProxy pointGeometry0 = proxy.getPointGeometry();
     final PointGeometryProxy pointGeometry =
-      pointGeometry0 == null ? null : visitPointGeometryProxy(pointGeometry0);
+      (PointGeometryProxy) cloneProxy(pointGeometry0);
     final PointGeometryProxy initialArrowGeometry0 =
       proxy.getInitialArrowGeometry();
     final PointGeometryProxy initialArrowGeometry =
-      initialArrowGeometry0 == null ? null : visitPointGeometryProxy(initialArrowGeometry0);
+      (PointGeometryProxy) cloneProxy(initialArrowGeometry0);
     final LabelGeometryProxy labelGeometry0 = proxy.getLabelGeometry();
     final LabelGeometryProxy labelGeometry =
-      labelGeometry0 == null ? null : visitLabelGeometryProxy(labelGeometry0);
+      (LabelGeometryProxy) cloneProxy(labelGeometry0);
     return mFactory.createSimpleNodeProxy(name,
                                           propositions,
                                           attributes,
@@ -696,7 +634,7 @@ public class ModuleProxyCloner
     final UnaryOperator operator = proxy.getOperator();
     final SimpleExpressionProxy subTerm0 = proxy.getSubTerm();
     final SimpleExpressionProxy subTerm =
-      visitSimpleExpressionProxy(subTerm0);
+      (SimpleExpressionProxy) cloneProxy(subTerm0);
     return mFactory.createUnaryExpressionProxy(plainText,
                                                operator,
                                                subTerm);
@@ -708,13 +646,15 @@ public class ModuleProxyCloner
     throws VisitorException
   {
     final IdentifierProxy identifier0 = proxy.getIdentifier();
-    final IdentifierProxy identifier = visitIdentifierProxy(identifier0);
+    final IdentifierProxy identifier =
+      (IdentifierProxy) cloneProxy(identifier0);
     final SimpleExpressionProxy type0 = proxy.getType();
-    final SimpleExpressionProxy type = visitSimpleExpressionProxy(type0);
+    final SimpleExpressionProxy type =
+      (SimpleExpressionProxy) cloneProxy(type0);
     final SimpleExpressionProxy initialStatePredicate0 =
       proxy.getInitialStatePredicate();
     final SimpleExpressionProxy initialStatePredicate =
-      visitSimpleExpressionProxy(initialStatePredicate0);
+      (SimpleExpressionProxy) cloneProxy(initialStatePredicate0);
     final Collection<VariableMarkingProxy> variableMarkings0 =
       proxy.getVariableMarkings();
     final Collection<VariableMarkingProxy> variableMarkings =
@@ -731,12 +671,26 @@ public class ModuleProxyCloner
     throws VisitorException
   {
     final IdentifierProxy proposition0 = proxy.getProposition();
-    final IdentifierProxy proposition = visitIdentifierProxy(proposition0);
+    final IdentifierProxy proposition =
+      (IdentifierProxy) cloneProxy(proposition0);
     final SimpleExpressionProxy predicate0 = proxy.getPredicate();
     final SimpleExpressionProxy predicate =
-      visitSimpleExpressionProxy(predicate0);
+      (SimpleExpressionProxy) cloneProxy(predicate0);
     return mFactory.createVariableMarkingProxy(proposition,
                                                predicate);
+  }
+
+
+  //#########################################################################
+  //# Hooks
+  protected Proxy cloneProxy(final Proxy orig)
+    throws VisitorException
+  {
+    if (orig == null) {
+      return orig;
+    } else {
+      return (Proxy) orig.acceptVisitor(this);
+    }
   }
 
 
@@ -751,7 +705,7 @@ public class ModuleProxyCloner
       final String name = orig.getName();
       NodeProxy node = mNodeMap.get(name);
       if (node == null) {
-        node = visitNodeProxy(orig);
+        node = (NodeProxy) cloneProxy(orig);
         mNodeMap.put(name, node);
       }
       return node;
@@ -762,7 +716,7 @@ public class ModuleProxyCloner
     (final Collection<? extends NodeProxy> orig)
     throws VisitorException
   {
-    final Collection<NodeProxy> result = new LinkedList<NodeProxy>();
+    final Collection<NodeProxy> result = new LinkedList<>();
     for (final NodeProxy orignode : orig) {
       final NodeProxy resnode = lookupNodeProxy(orignode);
       result.add(resnode);
@@ -774,9 +728,9 @@ public class ModuleProxyCloner
   Collection<P> cloneProxyCollection(final Collection<P> orig)
     throws VisitorException
   {
-    final Collection<Proxy> result = new LinkedList<Proxy>();
+    final Collection<Proxy> result = new LinkedList<>();
     for (final Proxy origelem : orig) {
-      final Proxy reselem = (Proxy) origelem.acceptVisitor(this);
+      final Proxy reselem = cloneProxy(origelem);
       result.add(reselem);
     }
     final Collection<?> precast = result;

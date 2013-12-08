@@ -10,8 +10,8 @@
 package net.sourceforge.waters.gui;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.util.List;
 
 import net.sourceforge.waters.model.base.Proxy;
@@ -64,13 +64,14 @@ public class HTMLPrinter
 
   //#########################################################################
   //# Invocation
+  @Override
   public void pprint(final Proxy proxy)
     throws IOException
   {
     try {
-      print("<HTML>");
+      printHTML("<HTML>");
       printProxy(proxy);
-      print("</HTML>");
+      printHTML("</HTML>");
     } catch (final VisitorException exception) {
       unwrap(exception);
     }
@@ -78,8 +79,51 @@ public class HTMLPrinter
 
 
   //#########################################################################
+  //# Overrides for net.sourceforge.waters.model.printer.ProxyPrinter
+  @Override
+  public void print(final String msg)
+    throws VisitorException
+  {
+    for (int i = 0; i < msg.length(); i++) {
+      print(msg.charAt(i));
+    }
+  }
+
+  @Override
+  public void print(final char msg)
+    throws VisitorException
+  {
+    if (msg == '&' || msg == '<' || msg == '>' || msg == '"' || msg == '\'') {
+      printHTML("&#");
+      print((int) msg);
+      printHTML(";");
+    } else if (msg == ' ') {
+      printHTML("&nbsp;");
+    } else {
+      super.print(msg);
+    }
+  }
+
+  @Override
+  public void println()
+    throws VisitorException
+  {
+    printHTML("<BR />");
+    super.println();
+  }
+
+  @Override
+  protected void indentOneCharacter()
+    throws VisitorException
+  {
+    rawPrint("&nbsp;");
+  }
+
+
+  //#########################################################################
   //# Overrides for Base Class
   //# net.sourceforge.waters.model.printer.ModuleProxyVisitor
+  @Override
   public Object visitEventDeclProxy
       (final EventDeclProxy proxy)
     throws VisitorException
@@ -94,55 +138,60 @@ public class HTMLPrinter
     return null;
   }
 
+  @Override
   public Object visitForeachProxy
       (final ForeachProxy proxy)
     throws VisitorException
   {
-    print("<B>FOR</B> ");
+    printHTML("<B>FOR</B> ");
     print(proxy.getName());
-    print(" <B>IN</B> ");
+    printHTML(" <B>IN</B> ");
     final SimpleExpressionProxy range = proxy.getRange();
     range.acceptVisitor(this);
     final SimpleExpressionProxy guard = proxy.getGuard();
     if (guard != null) {
-      print(" <B>WHERE</B> ");
+      printHTML(" <B>WHERE</B> ");
       guard.acceptVisitor(this);
     }
     return null;
   }
 
+  @Override
   public Object visitInstanceProxy
       (final InstanceProxy proxy)
     throws VisitorException
   {
-    print("<I>");
+    printHTML("<I>");
     final IdentifierProxy identifier = proxy.getIdentifier();
     identifier.acceptVisitor(this);
-    print("</I> = ");
+    printHTML("</I> = ");
     print(proxy.getModuleName());
     return null;
   }
 
+  @Override
   public Object visitModuleProxy(final ModuleProxy module)
     throws VisitorException
   {
-    print("<B>MODULE</B> ");
+    printHTML("<B>MODULE</B> ");
     print(module.getName());
     return null;
   }
 
+  @Override
   public Object visitParameterBindingProxy
       (final ParameterBindingProxy proxy)
     throws VisitorException
   {
-    print("<I>");
+    printHTML("<I>");
     print(proxy.getName());
-    print("</I> = ");
+    printHTML("</I> = ");
     final ExpressionProxy expression = proxy.getExpression();
     expression.acceptVisitor(this);
     return null;
   }
 
+  @Override
   public Object visitSimpleComponentProxy(final SimpleComponentProxy comp)
     throws VisitorException
   {
@@ -151,6 +200,7 @@ public class HTMLPrinter
     return null;
   }
 
+  @Override
   public Object visitVariableComponentProxy(final VariableComponentProxy var)
     throws VisitorException
   {
@@ -160,6 +210,15 @@ public class HTMLPrinter
     final SimpleExpressionProxy type = var.getType();
     type.acceptVisitor(this);
     return null;
+  }
+
+
+  //#########################################################################
+  // Unescaped Printing
+  public void printHTML(final String msg)
+    throws VisitorException
+  {
+    super.print(msg);
   }
 
 }

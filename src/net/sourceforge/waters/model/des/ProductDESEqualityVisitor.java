@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.model.des;
 
+import gnu.trove.strategy.HashingStrategy;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +18,6 @@ import java.util.Set;
 
 import net.sourceforge.waters.model.base.AbstractEqualityVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
-
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.des.ConflictKind;
@@ -54,12 +55,43 @@ public class ProductDESEqualityVisitor
 
 
   //#########################################################################
+  //# Specific Access
+  /**
+   * Gets a GNU Trove hashing strategy for transitions in deterministic
+   * automata. Unlike the standard {@link #getTObjectHashingStrategy()},
+   * this method returns a strategy that considers transitions as equal if
+   * they have the same source states and events, where states and events
+   * are compared by object identity.
+   */
+  public static HashingStrategy<TransitionProxy>
+    getDeterminsiticTransitionHashingStrategy()
+  {
+    return DeterministicTransitionHashingStrategy.getInstance();
+  }
+
+  /**
+   * Gets a GNU Trove hashing strategy for transitions in nondeterministic
+   * automata. Unlike the standard {@link #getTObjectHashingStrategy()},
+   * this method returns a strategy that considers transitions as equal if
+   * they have the same source and target states and events, where states
+   * and events are compared by object identity.
+   */
+  public static HashingStrategy<TransitionProxy>
+    getNonDeterminsiticTransitionHashingStrategy()
+  {
+    return NonDeterministicTransitionHashingStrategy.getInstance();
+  }
+
+
+  //#########################################################################
   //# Overrides for net.sourceforge.waters.model.base.AbstractEqualityVisitor
+  @Override
   public ProductDESHashCodeVisitor getHashCodeVisitor()
   {
     return ProductDESHashCodeVisitor.getInstance();
   }
 
+  @Override
   public ProductDESEqualityVisitor getNonReportingEqualityVisitor()
   {
     return getInstance();
@@ -68,6 +100,7 @@ public class ProductDESEqualityVisitor
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.des.ProductDESProxyVisitor
+  @Override
   public Boolean visitConflictTraceProxy(final ConflictTraceProxy trace)
       throws VisitorException
   {
@@ -84,6 +117,7 @@ public class ProductDESEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitAutomatonProxy(final AutomatonProxy aut)
       throws VisitorException
   {
@@ -120,6 +154,7 @@ public class ProductDESEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitEventProxy(final EventProxy event)
       throws VisitorException
   {
@@ -146,6 +181,7 @@ public class ProductDESEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitLoopTraceProxy(final LoopTraceProxy trace)
       throws VisitorException
   {
@@ -162,6 +198,7 @@ public class ProductDESEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitProductDESProxy(final ProductDESProxy des)
       throws VisitorException
   {
@@ -183,12 +220,14 @@ public class ProductDESEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitSafetyTraceProxy(final SafetyTraceProxy trace)
       throws VisitorException
   {
     return visitTraceProxy(trace);
   }
 
+  @Override
   public Boolean visitStateProxy(final StateProxy state)
       throws VisitorException
   {
@@ -210,6 +249,7 @@ public class ProductDESEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitTraceProxy(final TraceProxy trace)
       throws VisitorException
   {
@@ -238,6 +278,7 @@ public class ProductDESEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitTraceStepProxy(final TraceStepProxy step)
       throws VisitorException
   {
@@ -259,6 +300,7 @@ public class ProductDESEqualityVisitor
     }
   }
 
+  @Override
   public Boolean visitTransitionProxy(final TransitionProxy trans)
       throws VisitorException
   {

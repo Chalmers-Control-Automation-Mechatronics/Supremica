@@ -37,7 +37,7 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
  * <P>An evaluation component to estimate the range of simple expressions.</P>
  *
  * <P>Given the ranges of variables in a {@link VariableContext}, the range
- * evaluator propagates these ranges through all operators to give an
+ * estimator propagates these ranges through all operators to give an
  * estimate of the range of an expression. For example, if <CODE>x</CODE>
  * and&nbsp;<CODE>y</CODE> are variables with range&nbsp;<CODE>1..3</CODE>,
  * then the estimated range of <CODE>x+y</CODE>
@@ -301,13 +301,15 @@ public class RangeEstimator
 
   @Override
   public CompiledRange visitIdentifierProxy(final IdentifierProxy ident)
+    throws VisitorException
   {
-    if (mContext.isEnumAtom(ident)) {
-      final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) ident;
-      final List<SimpleIdentifierProxy> list = Collections.singletonList(simple);
-      return new CompiledEnumRange(list);
+    final CompiledRange range = mContext.getVariableRange(ident);
+    if (range != null) {
+      return range;
     } else {
-      return mContext.getVariableRange(ident);
+      final UndefinedIdentifierException exception =
+        new UndefinedIdentifierException(ident);
+      throw wrap(exception);
     }
   }
 
@@ -317,6 +319,19 @@ public class RangeEstimator
   {
     final int value = intconst.getValue();
     return new CompiledIntRange(value, value);
+  }
+
+  @Override
+  public CompiledRange visitSimpleIdentifierProxy
+    (final SimpleIdentifierProxy ident)
+    throws VisitorException
+  {
+    if (mContext.isEnumAtom(ident)) {
+      final List<SimpleIdentifierProxy> list = Collections.singletonList(ident);
+      return new CompiledEnumRange(list);
+    } else {
+      return visitIdentifierProxy(ident);
+    }
   }
 
   @Override

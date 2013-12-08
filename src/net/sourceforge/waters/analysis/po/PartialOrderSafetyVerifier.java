@@ -577,6 +577,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
   //# Auxiliary Methods
 
   private boolean isControllableReduced(final int[] sState) throws AnalysisException{
+    mNumReducedSets = 0;
     mStack = new ArrayList<PartialOrderStateTuple>();
     mStateSet = new StateHashSet<PartialOrderStateTuple>(PartialOrderStateTuple.class);
     mLocalSet = new TIntHashSet();
@@ -875,6 +876,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
           continue ample;
         }
       }
+      mNumReducedSets += ample.size() < enabled.length ? 1 : 0;
       return ample.toArray();
     }
     return enabled;
@@ -1185,5 +1187,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
   private int mLoopCount;
   @SuppressWarnings("unused")
   private int mNumIndependentPairings;
+  @SuppressWarnings("unused")
+  private int mNumReducedSets;
 }
 

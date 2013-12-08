@@ -1348,9 +1348,9 @@ public abstract class ModuleTree
     public Object visitModuleProxy(final ModuleProxy module)
       throws VisitorException
     {
-      print("<B>");
+      printHTML("<B>");
       print(getRootName());
-      print("</B>");
+      printHTML("</B>");
       return null;
     }
 
