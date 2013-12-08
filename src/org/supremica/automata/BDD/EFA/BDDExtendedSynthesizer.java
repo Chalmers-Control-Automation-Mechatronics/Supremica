@@ -282,7 +282,7 @@ public class BDDExtendedSynthesizer {
                         catch(final ParseException pe)
                         {
                             System.err.println(pe);
-                            logger.error("Some of the guards could not be parsed and attached to the automata: It is likely that there exists some 'strange' characters in some variables or values!");
+                            logger.error("Some of the guards could not be parsed and attached to the automata: It is likely that there exist some 'strange' characters in some variables or values!");
                             break;
                         }
                         if(!ep.getGuardActionBlock().getGuardsModifiable().isEmpty())

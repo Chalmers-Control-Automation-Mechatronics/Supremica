@@ -46,7 +46,8 @@ public class EditorReadSpecAction
     private final Logger logger = LoggerFactory.createLogger(IDE.class);
     HashMap<String,HashSet<String>> event2guard;
 
-
+	private static final String TRUE_GUARD = "1";
+	
     public EditorReadSpecAction(final List<IDEAction> actionList)
     {
         super(actionList);
@@ -120,7 +121,8 @@ public class EditorReadSpecAction
 
     public void addGuardsToAutomata(final ModuleSubject module)
     {
-        //Add the guard to the automata
+        logger.debug("Add the guard to the automata");
+		
         final ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
         final ExpressionParser parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
 
@@ -129,6 +131,10 @@ public class EditorReadSpecAction
             {
                 if(simSubj instanceof SimpleComponentSubject)
                 {
+					StringBuilder guardB = new StringBuilder();
+					StringBuilder currGuardB = new StringBuilder();
+					StringBuilder finalGuardB = new StringBuilder();
+					
                     for(final EdgeSubject ep:((SimpleComponentSubject)simSubj).getGraph().getEdgesModifiable())
                     {
 //                        for(String currEvent:event2guard.keySet())
@@ -136,9 +142,9 @@ public class EditorReadSpecAction
                         SimpleExpressionSubject ses = null;
                         SimpleExpressionSubject ses1 = null;
                         @SuppressWarnings("unused")
-                        SimpleExpressionSubject ses2 = null;
+                        // SimpleExpressionSubject ses2 = null;
                         //&& simSubj.getKind().name().equals("SPEC")
-                        String guard = "";
+                        // String guard = "";
 
 
                         final String currEvent = ep.getLabelBlock().getEventIdentifierList().iterator().next().toString();
@@ -148,34 +154,46 @@ public class EditorReadSpecAction
                         else
                             currGuards = new HashSet<String>();
 
-                        String currGuard="";
+                       // String currGuard = "";
                         try
                         {
                             for(final String g:currGuards)
                             {
-                                guard += (g+"&");
+                                // guard += (g + "&");
+								guardB.append(g).append('&'); //MF
                             }
-                            currGuard="";
+                            // currGuard = "";
                             if(!ep.getGuardActionBlock().getGuardsModifiable().isEmpty())
                             {
                                 ses1 = ep.getGuardActionBlock().getGuardsModifiable().iterator().next().clone();
-                                currGuard = ses1.toString();
+                                // currGuard = ses1.toString();
+								currGuardB.append(ses1.toString()); //MF
                             }
-                            if(currGuard.length() == 0 && guard.length() >0)
-                                guard = guard.substring(0, guard.length()-1);
-                            String finalGuard = guard+currGuard;
-                            if(finalGuard.length() == 0)
-                                finalGuard = "1";
-                            if(guard.length() == 0)
-                                guard = "1";
+							
+                            // if(currGuard.length() == 0 && guard.length() > 0) 
+							//	guard = guard.substring(0, guard.length()-1);
+							if(currGuardB.length() == 0 && guardB.length() > 0)
+								guardB.setLength(guardB.length()-1); //MF
+							
+                            // String finalGuard = guard + currGuard;
+							finalGuardB.append(guardB).append(currGuardB); //MF
+							
+                            // if(finalGuard.length() == 0)
+                            //     finalGuard = "1";
+							if(finalGuardB.length() == 0) finalGuardB.append(TRUE_GUARD); //MF
+                            // if(guard.length() == 0)
+                            //    guard = "1";
+							if(guardB.length() == 0) guardB.append(TRUE_GUARD); //MF
 //                            System.out.println("final:"+finalGuard);
 
-                            ses = (SimpleExpressionSubject)(parser.parse(finalGuard,Operator.TYPE_BOOLEAN));
+                            ses = (SimpleExpressionSubject)(parser.parse(finalGuardB.toString(), Operator.TYPE_BOOLEAN));
                             //The following line cocerns the new guards that will be attached to the automata with a DIFFERENT COLOR!
 
-                            if(guard.endsWith("&"))
-                                guard = guard.substring(0, guard.length()-1);
-                            ses2 = (SimpleExpressionSubject)(parser.parse(guard,Operator.TYPE_BOOLEAN));
+                            // if(guard.endsWith("&")) // then remove that last "&"
+                            //    guard = guard.substring(0, guard.length()-1);
+							if(guardB.charAt(guardB.length()-1) == '&') guardB.setLength(guardB.length()-1); //MF
+							
+                            // ses2 = (SimpleExpressionSubject)(parser.parse(guardB.toString(), Operator.TYPE_BOOLEAN));
                         }
                         catch(final ParseException pe)
                         {
@@ -201,6 +219,11 @@ public class EditorReadSpecAction
 //                            if(!ses2.toString().equals("1"))
 //                                ep.getGuardActionBlock().getGuardsModifiable().add(ses2);
                         }
+						
+						// Clear the striong builders for next iteration
+						guardB.setLength(0);
+						currGuardB.setLength(0);
+						finalGuardB.setLength(0);
                     }
                 }
             }
