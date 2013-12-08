@@ -82,7 +82,8 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
   {
     super.setUp();
     mSimpleExpressionCompiler =
-      new SimpleExpressionCompiler(mFactory, mOperatorTable);
+      new SimpleExpressionCompiler(mFactory, mSourceInfoBuilder,
+                                   mOperatorTable);
     final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
     final int numEvents = mInputModule.getEventDeclList().size();
     mIdentifierMap = new ProxyAccessorHashMap<>(eq,numEvents);

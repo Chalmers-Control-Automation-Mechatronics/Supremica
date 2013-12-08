@@ -34,8 +34,8 @@ import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
@@ -183,6 +183,7 @@ public class ProxyShapeProducer
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+  @Override
   public EdgeProxyShape visitEdgeProxy(final EdgeProxy edge)
   {
     final EdgeProxyShape shape = createEdgeProxyShape(edge);
@@ -194,6 +195,7 @@ public class ProxyShapeProducer
     return shape;
   }
 
+  @Override
   public Object visitGeometryProxy(final GeometryProxy proxy)
     throws VisitorException
   {
@@ -202,17 +204,20 @@ public class ProxyShapeProducer
     return parent.acceptVisitor(this);
   }
 
+  @Override
   public Object visitLabelGeometryProxy(final LabelGeometryProxy proxy)
     throws VisitorException
   {
     return visitProxy(proxy);
   }
 
+  @Override
   public LabelBlockProxyShape visitLabelBlockProxy(final LabelBlockProxy block)
   {
     return createLabelBlockShape(block, null);
   }
 
+  @Override
   public GroupNodeProxyShape visitGroupNodeProxy(final GroupNodeProxy group)
   {
     GroupNodeProxyShape shape = (GroupNodeProxyShape) lookup(group);
@@ -223,6 +228,7 @@ public class ProxyShapeProducer
     return shape;
   }
 
+  @Override
   public SimpleNodeProxyShape visitSimpleNodeProxy(final SimpleNodeProxy simple)
   {
     final SimpleNodeProxyShape shape = createSimpleNodeProxyShape(simple);
@@ -231,6 +237,7 @@ public class ProxyShapeProducer
     return shape;
   }
 
+  @Override
   public ProxyShape visitProxy(final Proxy proxy)
     throws VisitorException
   {
@@ -430,34 +437,30 @@ public class ProxyShapeProducer
 
       //Create a rectangle for only those guards that will be displayed ultimately.
       final List<SimpleExpressionProxy> guards = block.getGuards();
-      if(guards.size() == 3)
-      {
-          for (int i = 1;i<guards.size();i++)
-          {
-            final SimpleExpressionProxy guard = guards.get(i);
-            final int ly = (int) Math.round(y + height);
-            final LabelShape lshape =
-              new LabelShape(guard, lx, ly, EditorColor.DEFAULT_FONT);
-            mMap.put(guard, lshape);
-            final RoundRectangle2D lrect = lshape.getShape();
-            height += lrect.getHeight();
-            if (width < lrect.getWidth()) {
-              width = lrect.getWidth();
-            }
+      if (guards.size() == 3) {
+        for (int i = 1; i < guards.size(); i++) {
+          final SimpleExpressionProxy guard = guards.get(i);
+          final int ly = (int) Math.round(y + height);
+          final LabelShape lshape =
+            createEdgeLabelShape(guard, lx, ly, EditorColor.DEFAULT_FONT);
+          mMap.put(guard, lshape);
+          final RoundRectangle2D lrect = lshape.getShape();
+          height += lrect.getHeight();
+          if (width < lrect.getWidth()) {
+            width = lrect.getWidth();
           }
-      }
-      else if(guards.size() == 1 || guards.size() == 2)
-      {
-            final SimpleExpressionProxy guard = guards.get(0);
-            final int ly = (int) Math.round(y + height);
-            final LabelShape lshape =
-              new LabelShape(guard, lx, ly, EditorColor.DEFAULT_FONT);
-            mMap.put(guard, lshape);
-            final RoundRectangle2D lrect = lshape.getShape();
-            height += lrect.getHeight();
-            if (width < lrect.getWidth()) {
-              width = lrect.getWidth();
-            }
+        }
+      } else if (guards.size() == 1 || guards.size() == 2) {
+        final SimpleExpressionProxy guard = guards.get(0);
+        final int ly = (int) Math.round(y + height);
+        final LabelShape lshape =
+          createEdgeLabelShape(guard, lx, ly, EditorColor.DEFAULT_FONT);
+        mMap.put(guard, lshape);
+        final RoundRectangle2D lrect = lshape.getShape();
+        height += lrect.getHeight();
+        if (width < lrect.getWidth()) {
+          width = lrect.getWidth();
+        }
       }
       if (!guards.isEmpty()) {
         height += 2;

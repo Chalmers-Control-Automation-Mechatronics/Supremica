@@ -1,0 +1,537 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="pml3block" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Parallel manufacturing lines (PML) model.
+
+The system consists of M=3 parallel manufacturing lines, each processing workpieces of a particular type. Each line consists of N+1 machines, numbered machine[n][m] for n=0..N and m=1..M. The first machines in each line are called loaders, loader[m], and the last machines in each line are called unloaders, unloader[m].
+The parallel lines share N buffers, numbered B[n] for n=1..N, of capacity C. The buffers can store workpieces of different type, but never more than C workpieces at a time. Each buffer n is represented by m variables B[n][m] representing the number of type m workpieces in buffer n. Their sum cannot exceed the buffer capacity C.
+The manufacturing line is controlled such that the number of workpieces in the machines numbered n and the following buffer numbered n+1 never exceeds C, thus ensuring controllability even if machines complete their work uncontrollably. This control is faciltated by the variables Mtotal[n], for n=0..N-1, which hold the total number of workpieces currently processed by the machines numbered n.
+This version has been made blocking by the addition of the break13 automaton, which allows the system to enter deadlock if all the machines in the last step of the M manufacturing lines are working simultaneously.
+
+The parameters of this model are the number N and the capacity C of the buffers, which can be varied freely. The number M of lines is fixed at 3 in this model, as changing it also requires changing the guards in components loader[m] and machine[n][m].</ns2:Comment>
+    <ConstantAliasList>
+        <ConstantAlias Scope="OPTIONAL_PARAMETER" Name="C">
+            <ConstantAliasExpression>
+                <IntConstant Value="3"/>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+        <ConstantAlias Scope="OPTIONAL_PARAMETER" Name="N">
+            <ConstantAliasExpression>
+                <IntConstant Value="1"/>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+        <ConstantAlias Scope="OPTIONAL_PARAMETER" Name="M">
+            <ConstantAliasExpression>
+                <IntConstant Value="3"/>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+    </ConstantAliasList>
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Name="start">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <SimpleIdentifier Name="N"/>
+                </BinaryExpression>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <SimpleIdentifier Name="M"/>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="finish">
+            <RangeList>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <SimpleIdentifier Name="N"/>
+                </BinaryExpression>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="1"/>
+                    <SimpleIdentifier Name="M"/>
+                </BinaryExpression>
+            </RangeList>
+        </EventDecl>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="break"/>
+    </EventDeclList>
+    <ComponentList>
+        <ForeachComponent Name="n">
+            <BinaryExpression Operator="..">
+                <IntConstant Value="0"/>
+                <BinaryExpression Operator="-">
+                    <SimpleIdentifier Name="N"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </BinaryExpression>
+            <ComponentList>
+                <VariableComponent>
+                    <IndexedIdentifier Name="Mtotal">
+                        <SimpleIdentifier Name="n"/>
+                    </IndexedIdentifier>
+                    <VariableRange>
+                        <BinaryExpression Operator="..">
+                            <IntConstant Value="0"/>
+                            <SimpleIdentifier Name="M"/>
+                        </BinaryExpression>
+                    </VariableRange>
+                    <VariableInitial>
+                        <BinaryExpression Operator="==" Text="Mtotal[n] == 0">
+                            <IndexedIdentifier Name="Mtotal">
+                                <SimpleIdentifier Name="n"/>
+                            </IndexedIdentifier>
+                            <IntConstant Value="0"/>
+                        </BinaryExpression>
+                    </VariableInitial>
+                </VariableComponent>
+            </ComponentList>
+        </ForeachComponent>
+        <ForeachComponent Name="n">
+            <BinaryExpression Operator="..">
+                <IntConstant Value="1"/>
+                <SimpleIdentifier Name="N"/>
+            </BinaryExpression>
+            <ComponentList>
+                <ForeachComponent Name="m">
+                    <BinaryExpression Operator="..">
+                        <IntConstant Value="1"/>
+                        <SimpleIdentifier Name="M"/>
+                    </BinaryExpression>
+                    <ComponentList>
+                        <VariableComponent>
+                            <IndexedIdentifier Name="B">
+                                <SimpleIdentifier Name="n"/>
+                                <SimpleIdentifier Name="m"/>
+                            </IndexedIdentifier>
+                            <VariableRange>
+                                <BinaryExpression Operator="..">
+                                    <IntConstant Value="0"/>
+                                    <SimpleIdentifier Name="C"/>
+                                </BinaryExpression>
+                            </VariableRange>
+                            <VariableInitial>
+                                <BinaryExpression Operator="==" Text="B[n][m] == 0">
+                                    <IndexedIdentifier Name="B">
+                                        <SimpleIdentifier Name="n"/>
+                                        <SimpleIdentifier Name="m"/>
+                                    </IndexedIdentifier>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </VariableInitial>
+                        </VariableComponent>
+                    </ComponentList>
+                </ForeachComponent>
+            </ComponentList>
+        </ForeachComponent>
+        <ForeachComponent Name="m">
+            <BinaryExpression Operator="..">
+                <IntConstant Value="1"/>
+                <SimpleIdentifier Name="M"/>
+            </BinaryExpression>
+            <ComponentList>
+                <SimpleComponent Kind="PLANT">
+                    <IndexedIdentifier Name="loader">
+                        <SimpleIdentifier Name="m"/>
+                    </IndexedIdentifier>
+                    <Graph>
+                        <NodeList>
+                            <SimpleNode Initial="true" Name="idle">
+                                <EventList>
+                                    <SimpleIdentifier Name=":accepting"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point X="128" Y="64"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point X="10" Y="-7"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="working">
+                                <PointGeometry>
+                                    <Point X="128" Y="144"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point X="10" Y="-7"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                        </NodeList>
+                        <EdgeList>
+                            <Edge Source="idle" Target="working">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="start">
+                                        <IntConstant Value="0"/>
+                                        <SimpleIdentifier Name="m"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="6" Y="-29"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point X="144" Y="104"/>
+                                </SplineGeometry>
+                                <GuardActionBlock>
+                                    <Guards>
+                                        <BinaryExpression Operator="&lt;" Text="Mtotal[0] + B[1][1] + B[1][2] + B[1][3] &lt; C">
+                                            <BinaryExpression Operator="+">
+                                                <BinaryExpression Operator="+">
+                                                    <BinaryExpression Operator="+">
+                                                        <IndexedIdentifier Name="Mtotal">
+                                                            <IntConstant Value="0"/>
+                                                        </IndexedIdentifier>
+                                                        <IndexedIdentifier Name="B">
+                                                            <IntConstant Value="1"/>
+                                                            <IntConstant Value="1"/>
+                                                        </IndexedIdentifier>
+                                                    </BinaryExpression>
+                                                    <IndexedIdentifier Name="B">
+                                                        <IntConstant Value="1"/>
+                                                        <IntConstant Value="2"/>
+                                                    </IndexedIdentifier>
+                                                </BinaryExpression>
+                                                <IndexedIdentifier Name="B">
+                                                    <IntConstant Value="1"/>
+                                                    <IntConstant Value="3"/>
+                                                </IndexedIdentifier>
+                                            </BinaryExpression>
+                                            <SimpleIdentifier Name="C"/>
+                                        </BinaryExpression>
+                                    </Guards>
+                                    <Actions>
+                                        <BinaryExpression Operator="+=" Text="Mtotal[0] += 1">
+                                            <IndexedIdentifier Name="Mtotal">
+                                                <IntConstant Value="0"/>
+                                            </IndexedIdentifier>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="10" Y="-14"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                            <Edge Source="working" Target="idle">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="finish">
+                                        <IntConstant Value="0"/>
+                                        <SimpleIdentifier Name="m"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-85" Y="-29"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point X="112" Y="104"/>
+                                </SplineGeometry>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="-=" Text="Mtotal[0] -= 1">
+                                            <IndexedIdentifier Name="Mtotal">
+                                                <IntConstant Value="0"/>
+                                            </IndexedIdentifier>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                        <BinaryExpression Operator="+=" Text="B[1][m] += 1">
+                                            <IndexedIdentifier Name="B">
+                                                <IntConstant Value="1"/>
+                                                <SimpleIdentifier Name="m"/>
+                                            </IndexedIdentifier>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-95" Y="-13"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                        </EdgeList>
+                    </Graph>
+                </SimpleComponent>
+            </ComponentList>
+        </ForeachComponent>
+        <ForeachComponent Name="n">
+            <BinaryExpression Operator="..">
+                <IntConstant Value="1"/>
+                <BinaryExpression Operator="-">
+                    <SimpleIdentifier Name="N"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </BinaryExpression>
+            <ComponentList>
+                <ForeachComponent Name="m">
+                    <BinaryExpression Operator="..">
+                        <IntConstant Value="1"/>
+                        <SimpleIdentifier Name="M"/>
+                    </BinaryExpression>
+                    <ComponentList>
+                        <SimpleComponent Kind="PLANT">
+                            <IndexedIdentifier Name="machine">
+                                <SimpleIdentifier Name="n"/>
+                                <SimpleIdentifier Name="m"/>
+                            </IndexedIdentifier>
+                            <Graph>
+                                <NodeList>
+                                    <SimpleNode Initial="true" Name="idle">
+                                        <EventList>
+                                            <SimpleIdentifier Name=":accepting"/>
+                                        </EventList>
+                                        <PointGeometry>
+                                            <Point X="128" Y="64"/>
+                                        </PointGeometry>
+                                        <LabelGeometry Anchor="NW">
+                                            <Point X="10" Y="-7"/>
+                                        </LabelGeometry>
+                                    </SimpleNode>
+                                    <SimpleNode Name="working">
+                                        <PointGeometry>
+                                            <Point X="128" Y="144"/>
+                                        </PointGeometry>
+                                        <LabelGeometry Anchor="NW">
+                                            <Point X="10" Y="-7"/>
+                                        </LabelGeometry>
+                                    </SimpleNode>
+                                </NodeList>
+                                <EdgeList>
+                                    <Edge Source="idle" Target="working">
+                                        <LabelBlock>
+                                            <IndexedIdentifier Name="start">
+                                                <SimpleIdentifier Name="n"/>
+                                                <SimpleIdentifier Name="m"/>
+                                            </IndexedIdentifier>
+                                            <LabelGeometry Anchor="NW">
+                                                <Point X="2" Y="-36"/>
+                                            </LabelGeometry>
+                                        </LabelBlock>
+                                        <SplineGeometry>
+                                            <Point X="144" Y="104"/>
+                                        </SplineGeometry>
+                                        <GuardActionBlock>
+                                            <Guards>
+                                                <BinaryExpression Operator="&lt;" Text="Mtotal[n] + B[n+1][1] + B[n+1][2] + B[n+1][3] &lt; C">
+                                                    <BinaryExpression Operator="+">
+                                                        <BinaryExpression Operator="+">
+                                                            <BinaryExpression Operator="+">
+                                                                <IndexedIdentifier Name="Mtotal">
+                                                                    <SimpleIdentifier Name="n"/>
+                                                                </IndexedIdentifier>
+                                                                <IndexedIdentifier Name="B">
+                                                                    <BinaryExpression Operator="+">
+                                                                        <SimpleIdentifier Name="n"/>
+                                                                        <IntConstant Value="1"/>
+                                                                    </BinaryExpression>
+                                                                    <IntConstant Value="1"/>
+                                                                </IndexedIdentifier>
+                                                            </BinaryExpression>
+                                                            <IndexedIdentifier Name="B">
+                                                                <BinaryExpression Operator="+">
+                                                                    <SimpleIdentifier Name="n"/>
+                                                                    <IntConstant Value="1"/>
+                                                                </BinaryExpression>
+                                                                <IntConstant Value="2"/>
+                                                            </IndexedIdentifier>
+                                                        </BinaryExpression>
+                                                        <IndexedIdentifier Name="B">
+                                                            <BinaryExpression Operator="+">
+                                                                <SimpleIdentifier Name="n"/>
+                                                                <IntConstant Value="1"/>
+                                                            </BinaryExpression>
+                                                            <IntConstant Value="3"/>
+                                                        </IndexedIdentifier>
+                                                    </BinaryExpression>
+                                                    <SimpleIdentifier Name="C"/>
+                                                </BinaryExpression>
+                                            </Guards>
+                                            <Actions>
+                                                <BinaryExpression Operator="-=" Text="B[n][m] -= 1">
+                                                    <IndexedIdentifier Name="B">
+                                                        <SimpleIdentifier Name="n"/>
+                                                        <SimpleIdentifier Name="m"/>
+                                                    </IndexedIdentifier>
+                                                    <IntConstant Value="1"/>
+                                                </BinaryExpression>
+                                                <BinaryExpression Operator="+=" Text="Mtotal[n] += 1">
+                                                    <IndexedIdentifier Name="Mtotal">
+                                                        <SimpleIdentifier Name="n"/>
+                                                    </IndexedIdentifier>
+                                                    <IntConstant Value="1"/>
+                                                </BinaryExpression>
+                                            </Actions>
+                                            <LabelGeometry Anchor="NW">
+                                                <Point X="6" Y="-19"/>
+                                            </LabelGeometry>
+                                        </GuardActionBlock>
+                                    </Edge>
+                                    <Edge Source="working" Target="idle">
+                                        <LabelBlock>
+                                            <IndexedIdentifier Name="finish">
+                                                <SimpleIdentifier Name="n"/>
+                                                <SimpleIdentifier Name="m"/>
+                                            </IndexedIdentifier>
+                                            <LabelGeometry Anchor="NW">
+                                                <Point X="-82" Y="-27"/>
+                                            </LabelGeometry>
+                                        </LabelBlock>
+                                        <SplineGeometry>
+                                            <Point X="112" Y="104"/>
+                                        </SplineGeometry>
+                                        <GuardActionBlock>
+                                            <Actions>
+                                                <BinaryExpression Operator="-=" Text="Mtotal[n] -= 1">
+                                                    <IndexedIdentifier Name="Mtotal">
+                                                        <SimpleIdentifier Name="n"/>
+                                                    </IndexedIdentifier>
+                                                    <IntConstant Value="1"/>
+                                                </BinaryExpression>
+                                                <BinaryExpression Operator="+=" Text="B[n+1][m] += 1">
+                                                    <IndexedIdentifier Name="B">
+                                                        <BinaryExpression Operator="+">
+                                                            <SimpleIdentifier Name="n"/>
+                                                            <IntConstant Value="1"/>
+                                                        </BinaryExpression>
+                                                        <SimpleIdentifier Name="m"/>
+                                                    </IndexedIdentifier>
+                                                    <IntConstant Value="1"/>
+                                                </BinaryExpression>
+                                            </Actions>
+                                            <LabelGeometry Anchor="NW">
+                                                <Point X="-107" Y="-12"/>
+                                            </LabelGeometry>
+                                        </GuardActionBlock>
+                                    </Edge>
+                                </EdgeList>
+                            </Graph>
+                        </SimpleComponent>
+                    </ComponentList>
+                </ForeachComponent>
+            </ComponentList>
+        </ForeachComponent>
+        <ForeachComponent Name="m">
+            <BinaryExpression Operator="..">
+                <IntConstant Value="1"/>
+                <SimpleIdentifier Name="M"/>
+            </BinaryExpression>
+            <ComponentList>
+                <SimpleComponent Kind="PLANT">
+                    <IndexedIdentifier Name="unloader">
+                        <SimpleIdentifier Name="m"/>
+                    </IndexedIdentifier>
+                    <Graph>
+                        <NodeList>
+                            <SimpleNode Initial="true" Name="idle">
+                                <EventList>
+                                    <SimpleIdentifier Name=":accepting"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point X="128" Y="64"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point X="10" Y="-7"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="working">
+                                <PointGeometry>
+                                    <Point X="128" Y="144"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point X="10" Y="-7"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                        </NodeList>
+                        <EdgeList>
+                            <Edge Source="idle" Target="working">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="start">
+                                        <SimpleIdentifier Name="N"/>
+                                        <SimpleIdentifier Name="m"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="11" Y="-17"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point X="144" Y="104"/>
+                                </SplineGeometry>
+                                <GuardActionBlock>
+                                    <Actions>
+                                        <BinaryExpression Operator="-=" Text="B[N][m] -= 1">
+                                            <IndexedIdentifier Name="B">
+                                                <SimpleIdentifier Name="N"/>
+                                                <SimpleIdentifier Name="m"/>
+                                            </IndexedIdentifier>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </Actions>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="9" Y="1"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                            <Edge Source="working" Target="idle">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="finish">
+                                        <SimpleIdentifier Name="N"/>
+                                        <SimpleIdentifier Name="m"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-80" Y="-9"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry>
+                                    <Point X="112" Y="104"/>
+                                </SplineGeometry>
+                            </Edge>
+                        </EdgeList>
+                    </Graph>
+                </SimpleComponent>
+            </ComponentList>
+        </ForeachComponent>
+        <SimpleComponent Kind="PLANT" Name="break13">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="ok">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="144" Y="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="9" Y="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="broken">
+                        <PointGeometry>
+                            <Point X="144" Y="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="8" Y="-6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="ok" Target="broken">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="break"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="2" Y="-14"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==">
+                                    <IndexedIdentifier Name="Mtotal">
+                                        <BinaryExpression Operator="-">
+                                            <SimpleIdentifier Name="N"/>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                    </IndexedIdentifier>
+                                    <SimpleIdentifier Name="M"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="5" Y="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

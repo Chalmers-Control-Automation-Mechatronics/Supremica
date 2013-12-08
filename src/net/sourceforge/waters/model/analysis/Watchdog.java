@@ -18,7 +18,7 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 /**
  * <P>A utility class to enforce timeouts.</P>
  *
- * <P>A watchdog is a {@link Thread} linked to a {@link ModelAnalyser} or
+ * <P>A watchdog is a {@link Thread} linked to a {@link ModelAnalyzer} or
  * other object implementing the {@link Abortable} interface. Once initialised
  * and started, it waits for the set timeout period before requesting its
  * controlled object to abort. It is possible to restart the timer by calling
@@ -124,8 +124,11 @@ public class Watchdog extends Thread {
           mStartTime = System.currentTimeMillis();
         }
         do {
-          final long delay = mStartTime + mTimeoutMillis - System.currentTimeMillis();
-          wait(delay);
+          final long delay =
+            mStartTime + mTimeoutMillis - System.currentTimeMillis();
+          if (delay > 0) {
+            wait(delay);
+          }
         } while (System.currentTimeMillis() < mStartTime + mTimeoutMillis);
         mStartTime = -1;
         for (final Abortable abortable : mAbortables) {

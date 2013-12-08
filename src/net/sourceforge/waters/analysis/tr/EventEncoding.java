@@ -136,7 +136,7 @@ public class EventEncoding
    * Creates an empty encoding.
    * This method creates an event encoding without any events or
    * propositions. Events can be added using {@link
-   * #addEvent(EventProxy,KindTranslator,byte) addEvent()} or {@link
+   * #addEvent(EventProxy,KindTranslator,int) addEvent()} or {@link
    * #addSilentEvent(EventProxy) addSilentEvent()}.
    */
   public EventEncoding()
@@ -1120,10 +1120,10 @@ public class EventEncoding
 
   /**
    * Status flags indicating a local event.
-   * This is a combination of the bits {@link STATUS_LOCAL},
+   * This is a combination of the bits {@link #STATUS_LOCAL},
    * {@link #STATUS_OUTSIDE_ALWAYS_ENABLED}, and
    * {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}.
-   * Although {@link STATUS_LOCAL} usually implies the other two flags,
+   * Although {@link #STATUS_LOCAL} usually implies the other two flags,
    * it is separated from the other two for synthesis and other applications,
    * where the automatic suppression of local selfloops is not desired.
    */

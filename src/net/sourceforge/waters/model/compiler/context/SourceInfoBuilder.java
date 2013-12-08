@@ -72,20 +72,19 @@ public class SourceInfoBuilder
                         final Proxy source,
                         final BindingContext context)
   {
-    if (mParentMap == null) {
-      final SourceInfo info = new SourceInfo(source, context);
-      return add(target, info);
+    SourceInfo info = getSourceInfo(source);
+    if (info == null) {
+      if (mParentMap == null) {
+        info = new SourceInfo(source, context);
+        return add(target, info);
+      } else {
+        return null;
+      }
     }
-    final SourceInfo pinfo = mParentMap.get(source);
-    if (pinfo == null) {
-      return null;
-    } else if (context == null) {
-      return add(target, pinfo);
-    } else {
-      final Proxy psource = pinfo.getSourceObject();
-      final SourceInfo info = new SourceInfo(psource, context);
-      return add(target, info);
+    if (context != null) {
+      info = new SourceInfo(info.getSourceObject(), context);
     }
+    return add(target, info);
   }
 
   public SourceInfo add(final Object target, final SourceInfo info)
@@ -97,6 +96,15 @@ public class SourceInfoBuilder
   public Map<Object,SourceInfo> getResultMap()
   {
     return mResultMap;
+  }
+
+  public SourceInfo getSourceInfo(final Object target)
+  {
+    SourceInfo info = mResultMap.get(target);
+    if (info == null && mParentMap != null) {
+      info = mParentMap.get(target);
+    }
+    return info;
   }
 
 

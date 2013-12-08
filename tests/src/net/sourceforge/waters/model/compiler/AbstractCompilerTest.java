@@ -357,6 +357,12 @@ public abstract class AbstractCompilerTest
     compile("tests", "efa", "increment");
   }
 
+  public void testCompile_instantiate_efa()
+    throws IOException, WatersException
+  {
+    compile("tests", "efa", "instantiate_efa");
+  }
+
   public void testCompile_io1()
   throws IOException, WatersException
   {
@@ -570,10 +576,17 @@ public abstract class AbstractCompilerTest
                  NondeterministicModuleException.class, "'comp'");
   }
 
-  public void testCompile_undefvar()
+  public void testCompile_undefvar_01()
     throws IOException, WatersException
   {
-    compileError("handwritten", "undefvar", null,
+    compileError("handwritten", "undefvar_01", null,
+                 UndefinedIdentifierException.class, "'undefvar'");
+  }
+
+  public void testCompile_undefvar_02()
+    throws IOException, WatersException
+  {
+    compileError("handwritten", "undefvar_02", null,
                  UndefinedIdentifierException.class, "'undefvar'");
   }
 

@@ -23,10 +23,11 @@ import net.sourceforge.waters.analysis.bdd.BDDConflictChecker;
 import net.sourceforge.waters.analysis.bdd.BDDPackage;
 import net.sourceforge.waters.analysis.bdd.TransitionPartitioningStrategy;
 import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer;
+import net.sourceforge.waters.analysis.compositional.ChainSelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.CompositionalConflictChecker;
+import net.sourceforge.waters.analysis.compositional.CompositionalSelectionHeuristicFactory;
 import net.sourceforge.waters.analysis.compositional.ConflictAbstractionProcedureFactory;
-import net.sourceforge.waters.analysis.efa.efsm.CompositionSelectionHeuristic;
-import net.sourceforge.waters.analysis.efa.efsm.EFSMConflictChecker;
+import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -65,7 +66,7 @@ public class EFSMConflictCheckerExperiments
 
   public EFSMConflictCheckerExperiments
     (final String statsFilename,
-     final CompositionSelectionHeuristic compositionSelectionHeuristic)
+     final SelectionHeuristic<EFSMPair> compositionSelectionHeuristic)
     throws FileNotFoundException
   {
     final String outputprop = System.getProperty("waters.test.outputdir");
@@ -108,8 +109,8 @@ public class EFSMConflictCheckerExperiments
   private void runAllTests() throws Exception
   {
     runAllTests(new EFSMConflictCheckerWrapper());
-    runAllTests(new CompositionalConflictCheckerWrapper());
     runAllTests(new BDDConflictCheckerWrapper());
+    runAllTests(new CompositionalConflictCheckerWrapper());
   }
 
   private void runAllTests(final ConflictCheckerWrapper wrapper)
@@ -119,29 +120,53 @@ public class EFSMConflictCheckerExperiments
     mPrintWriter.println(wrapper.getName());
     mHasBeenPrinted = false;
     mConflictCheckerWrapper = wrapper;
+
+    final SelectionHeuristic<EFSMPair> minV =
+      new MinSharedVariablesCompositionSelectionHeuristic();
+    final SelectionHeuristic<EFSMPair> minF =
+      new MinFrontierCompositionSelectionHeuristic();
+    final SelectionHeuristic<EFSMPair> minSync =
+      new MinSynchCompositionSelectionHeuristic();
+    mCompositionSelectionHeuristic =
+      new ChainSelectionHeuristic<EFSMPair>(minV, minF, minSync);
+
+    checkPML("pml3", 2, 3, true); // Dummy call, result to be discarded.
+    for (int n = 2; n <= 4; n++) {
+      try {
+        for (int c = 3; c <= 30; c++) {
+          checkPML("pml3", c, n, true);
+        }
+      } catch (final AnalysisException | EvalException exception) {
+        // next please ...
+      }
+    }
+    for (int c = 4; c <= 6; c += 2) {
+      try {
+        for (int n = 2; n <= 100; n += 2) {
+          checkPML("pml3", c, n, true);
+        }
+      } catch (final AnalysisException | EvalException exception) {
+        // next please ...
+      }
+    }
     try {
       testPsl();
       testPslBig();
       testPslBigWithManyRestartTrans();
-    } catch (final AnalysisException exception) {
-      // next please ...
-    } catch (final EvalException exception) {
+    } catch (final AnalysisException | EvalException exception) {
       // next please ...
     }
     try {
       testPslBigBlocking();
-    } catch (final AnalysisException exception) {
-      // next please ...
-    } catch (final EvalException exception) {
+    } catch (final AnalysisException | EvalException exception) {
       // next please ...
     }
     try {
       testPslBigNonblocking();
-    } catch (final AnalysisException exception) {
-      // next please ...
-    } catch (final EvalException exception) {
+    } catch (final AnalysisException | EvalException exception) {
       // next please ...
     }
+    /*
     if (!(wrapper instanceof BDDConflictCheckerWrapper)) {
       for (int m = 2; m <= 10; m += 2) {
         try {
@@ -173,16 +198,17 @@ public class EFSMConflictCheckerExperiments
         // next please ...
       }
     }
+    */
     try {
       testPrimeSieve4();
       testPrimeSieve4b();
-      testPrimeSieve5();
-      testPrimeSieve6();
-      testPrimeSieve7();
-      testPrimeSieve8();
-    } catch (final AnalysisException exception) {
-      // next please ...
-    } catch (final EvalException exception) {
+      if (!(wrapper instanceof BDDConflictCheckerWrapper)) {
+        testPrimeSieve5();
+        testPrimeSieve6();
+        testPrimeSieve7();
+        testPrimeSieve8();
+      }
+    } catch (final AnalysisException | EvalException exception) {
       // next please ...
     }
     try {
@@ -191,27 +217,21 @@ public class EFSMConflictCheckerExperiments
         final int maxval = primes[s] * primes[s] - 1;
         checkPrimeSieve("dynamic_prime_sieve", s, maxval, true);
       }
-    } catch (final AnalysisException exception) {
-      // next please ...
-    } catch (final EvalException exception) {
+    } catch (final AnalysisException | EvalException exception) {
       // next please ...
     }
     try {
       for (int maxseqno = 31; maxseqno <= 255; maxseqno += 32) {
         checkProfisafe("profisafe_islave_efsm", maxseqno, true);
       }
-    } catch (final AnalysisException exception) {
-      // next please ...
-    } catch (final EvalException exception) {
+    } catch (final AnalysisException | EvalException exception) {
       // next please ...
     }
     try {
       for (int maxseqno = 31; maxseqno <= 255; maxseqno += 32) {
         checkProfisafe("profisafe_ihost_efsm", maxseqno, true);
       }
-    } catch (final AnalysisException exception) {
-      // next please ...
-    } catch (final EvalException exception) {
+    } catch (final AnalysisException | EvalException exception) {
       // next please ...
     }
   }
@@ -357,14 +377,16 @@ public class EFSMConflictCheckerExperiments
           stats.printCSVHorizontalHeadings(mPrintWriter);
           mPrintWriter.println();
         }
+        mPrintWriter.print('\"');
         mPrintWriter.print(fullModuleName);
-        mPrintWriter.print(',');
+        mPrintWriter.print("\",");
         stats.printCSVHorizontal(mPrintWriter);
         mPrintWriter.println();
         return stats.isSatisfied();
       } catch (final Throwable exception) {
         System.out.println(ProxyTools.getShortClassName(exception));
-        mPrintWriter.println(fullModuleName + "," + exception.getMessage());
+        mPrintWriter.println("\"" + fullModuleName + "\"," +
+                             exception.getMessage());
         if (exception instanceof AnalysisException) {
           throw (AnalysisException) exception;
         } else if (exception instanceof EvalException) {
@@ -443,12 +465,12 @@ public class EFSMConflictCheckerExperiments
       mWatchdog.addAbortable(mConflictChecker);
       // Configuration of CompositionalConflictChecker ...
       mConflictChecker.setAbstractionProcedureFactory
-        (ConflictAbstractionProcedureFactory.NB);
+        (ConflictAbstractionProcedureFactory.NBA);
       mConflictChecker.setPreselectingMethod
         (AbstractCompositionalModelAnalyzer.MustL);
-      mConflictChecker.setSelectingMethod
-        (AbstractCompositionalModelAnalyzer.MinS);
-      mConflictChecker.setInternalStateLimit(10000);
+      mConflictChecker.setSelectionHeuristic
+        (CompositionalSelectionHeuristicFactory.MinF);
+      mConflictChecker.setInternalStateLimit(8000);
       mConflictChecker.setMonolithicStateLimit(50000000);
       mConflictChecker.setMonolithicTransitionLimit(0);
       mConflictChecker.setCounterExampleEnabled(false);
@@ -542,6 +564,6 @@ public class EFSMConflictCheckerExperiments
 
   private final int mTimeout = 1200;  // 20 minutes
   private final int mInternalTransitionLimit = 1000000;
-  private final CompositionSelectionHeuristic mCompositionSelectionHeuristic;
+  private SelectionHeuristic<EFSMPair> mCompositionSelectionHeuristic;
 
 }

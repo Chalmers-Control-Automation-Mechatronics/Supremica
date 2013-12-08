@@ -52,7 +52,7 @@ public class PartialOrderModelVerifierFactory
   public ConflictChecker createConflictChecker
     (final ProductDESProxyFactory factory)
   {
-    return null;
+    return new PartialOrderComponentsConflictChecker(factory);
   }
 
   @Override

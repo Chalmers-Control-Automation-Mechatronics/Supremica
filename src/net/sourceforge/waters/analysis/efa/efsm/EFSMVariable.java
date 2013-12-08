@@ -14,6 +14,7 @@ import gnu.trove.set.hash.THashSet;
 
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.Set;
 
 import net.sourceforge.waters.analysis.efa.base.AbstractEFAVariable;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -95,7 +96,7 @@ public class EFSMVariable
    * Returns a collection containing all transition relations (EFAs) using this
    * variable.
    */
-  protected Collection<EFSMTransitionRelation> getTransitionRelations()
+  protected Set<EFSMTransitionRelation> getTransitionRelations()
   {
     return mTransitionRelations;
   }
@@ -127,7 +128,6 @@ public class EFSMVariable
   }
   /**
    * Return whether this variable is local.
-   * <p/>
    * @return <CODE>true</CODE> if the variable occurs in at most one transition
    *         relation.
    */
@@ -139,7 +139,7 @@ public class EFSMVariable
 
   //#########################################################################
   //# Data Members
-  private final Collection<EFSMTransitionRelation> mTransitionRelations;
+  private final Set<EFSMTransitionRelation> mTransitionRelations;
   /**
    * Event encoding representing selfloops involving this variable.
    * @see #getSelfloops()

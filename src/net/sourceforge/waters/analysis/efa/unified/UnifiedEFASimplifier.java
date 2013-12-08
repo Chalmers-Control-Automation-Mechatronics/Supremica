@@ -154,7 +154,6 @@ class UnifiedEFASimplifier extends AbstractEFAAlgorithm
     chain.add(silentOutRemover);
     final IncomingEquivalenceTRSimplifier incomingEquivalenceSimplifier =
       new IncomingEquivalenceTRSimplifier();
-    incomingEquivalenceSimplifier.setTransitionLimit(limit);
     chain.add(incomingEquivalenceSimplifier);
     final LimitedCertainConflictsTRSimplifier certainConflictsRemover =
       new LimitedCertainConflictsTRSimplifier();

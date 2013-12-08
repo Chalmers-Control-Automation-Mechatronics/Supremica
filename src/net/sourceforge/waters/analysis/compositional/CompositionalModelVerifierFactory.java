@@ -382,37 +382,52 @@ public class CompositionalModelVerifierFactory
     @Override
     public void configure(final ModelVerifier verifier)
     {
-      if (verifier instanceof CompositionalConflictChecker) {
-        final String name = getValue();
-        final CompositionalConflictChecker composer =
-          (CompositionalConflictChecker) verifier;
-        final EnumFactory<AbstractCompositionalModelVerifier.SelectingMethod>
-          factory = composer.getSelectingMethodFactory();
-        final AbstractCompositionalModelVerifier.SelectingMethod method =
+      final AbstractCompositionalModelAnalyzer composer =
+        (AbstractCompositionalModelAnalyzer) verifier;
+      final EnumFactory<SelectionHeuristicCreator> factory =
+        composer.getSelectionHeuristicFactory();
+      final String name = getValue();
+      final String[] parts = name.split(",");
+      final SelectionHeuristic<Candidate> heuristic;
+      if (parts.length == 1) {
+        final SelectionHeuristicCreator creator =
           factory.getEnumValue(name);
-        if (method == null) {
+        if (creator == null) {
           System.err.println("Bad value for " + getName() + " option!");
           factory.dumpEnumeration(System.err, 0);
           System.exit(1);
         }
-        composer.setSelectingMethod(method);
+        heuristic = creator.createChainHeuristic();
       } else {
-        fail(getName() + " option only supported for conflict check!");
+        @SuppressWarnings("unchecked")
+        final SelectionHeuristic<Candidate>[] heuristics =
+          new SelectionHeuristic[parts.length];
+        for (int i = 0; i < parts.length; i++) {
+          final SelectionHeuristicCreator creator =
+            factory.getEnumValue(parts[i]);
+          if (creator == null) {
+            System.err.println("Bad value for " + getName() + " option!");
+            factory.dumpEnumeration(System.err, 0);
+            System.exit(1);
+          }
+          heuristics[i] = creator.createBaseHeuristic();
+        }
+        heuristic = new ChainSelectionHeuristic<Candidate>(heuristics);
       }
+      composer.setSelectionHeuristic(heuristic);
     }
 
     //#######################################################################
     //# Printing
     @Override
-    public void dump(final PrintStream stream,
-                        final ModelVerifier verifier)
+    public void dump(final PrintStream stream, final ModelVerifier verifier)
     {
       if (verifier instanceof CompositionalConflictChecker) {
         super.dump(stream, verifier);
         final CompositionalConflictChecker composer =
           (CompositionalConflictChecker) verifier;
-        final EnumFactory<AbstractCompositionalModelVerifier.SelectingMethod>
-          factory = composer.getSelectingMethodFactory();
+        final EnumFactory<SelectionHeuristicCreator> factory =
+          composer.getSelectionHeuristicFactory();
         factory.dumpEnumeration(stream, INDENT);
       }
     }

@@ -10,12 +10,12 @@
 package net.sourceforge.waters.analysis.tr;
 
 import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.procedure.TIntProcedure;
 import gnu.trove.set.hash.TIntHashSet;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -119,6 +119,39 @@ public class IntSetBuffer implements WatersIntHashingStrategy
       mNextFreeOffset += words;
     }
     return result;
+  }
+
+  /**
+   * Adds the contents of the given set in this buffer to the given hash set.
+   * @param  set     The unique set index identifying the set to be examined
+   *                 in this integer set buffer.
+   * @param  output  Hash set to which data is to be added.
+   */
+  public void collect(final int set, final TIntHashSet output)
+  {
+    int blockno = set >>> BLOCK_SHIFT;
+    int[] block = mBlocks.get(blockno);
+    int offset = set & BLOCK_MASK;
+    long data = block[offset] & 0xffffffffL;
+    final int count = (int) (data & mSizeMask);
+    int remainingBits = 32 - mSizeShift;
+    data >>>= mSizeShift;
+    for (int i = 0; i < count; i++) {
+      if (remainingBits < mDataShift) {
+        offset++;
+        if (offset > BLOCK_MASK) {
+          offset = 0;
+          blockno++;
+          block = mBlocks.get(blockno);
+        }
+        data |= ((block[offset] & 0xffffffffL) << remainingBits);
+        remainingBits += 32;
+      }
+      final int value = (int) (data & mDataMask);
+      output.add(value);
+      data >>>= mDataShift;
+      remainingBits -= mDataShift;
+    }
   }
 
   public int get(final int[] data) {
@@ -244,11 +277,9 @@ public class IntSetBuffer implements WatersIntHashingStrategy
    */
   public int add(final TIntHashSet data)
   {
-    final Collector collector = getCollector();
-    data.forEach(collector);
-    final TIntArrayList collected = collector.getCollected();
-    collected.sort();
-    return add(collected);
+    final int[] array = data.toArray();
+    Arrays.sort(array);
+    return add(array);
   }
 
   /**
@@ -378,6 +409,23 @@ public class IntSetBuffer implements WatersIntHashingStrategy
 
   //#########################################################################
   //# Debugging
+  @Override
+  public String toString()
+  {
+    final StringWriter writer = new StringWriter();
+    final PrintWriter printer = new PrintWriter(writer);
+    final int[] sets = mDirectory.toArray();
+    Arrays.sort(sets);
+    for (final int set : sets) {
+      printer.print(set);
+      printer.print(" : ");
+      dump(printer, set);
+      printer.println();
+    }
+    printer.close();
+    return writer.toString();
+  }
+
   public String toString(final int set)
   {
     final StringWriter writer = new StringWriter();
@@ -422,16 +470,6 @@ public class IntSetBuffer implements WatersIntHashingStrategy
       mBlocks.add(block);
       capacity += BLOCK_SIZE;
     }
-  }
-
-  private Collector getCollector()
-  {
-    if (mCollector == null) {
-      mCollector = new Collector();
-    } else {
-      mCollector.reset();
-    }
-    return mCollector;
   }
 
 
@@ -595,37 +633,6 @@ public class IntSetBuffer implements WatersIntHashingStrategy
 
 
   //#########################################################################
-  //# Inner Class Collector
-  private static final class Collector implements TIntProcedure
-  {
-    //#######################################################################
-    //# Simple Access
-    private void reset()
-    {
-      mCollected.clear();
-    }
-
-    private TIntArrayList getCollected()
-    {
-      return mCollected;
-    }
-
-    //#######################################################################
-    //# Interface gnu.trove.TIntProcedure
-    @Override
-    public boolean execute(final int value)
-    {
-      mCollected.add(value);
-      return true;
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final TIntArrayList mCollected = new TIntArrayList();
-  }
-
-
-  //#########################################################################
   //# Data Members
   private final int mSizeShift;
   private final int mSizeMask;
@@ -636,7 +643,6 @@ public class IntSetBuffer implements WatersIntHashingStrategy
 
   private int mSize;
   private int mNextFreeOffset;
-  private Collector mCollector;
 
 
   //#########################################################################

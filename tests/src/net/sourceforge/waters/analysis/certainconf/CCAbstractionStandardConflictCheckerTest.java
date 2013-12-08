@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.analysis.abstraction
-//# CLASS:   GNBAbstractionStandardConflictCheckerTest
+//# PROJECT: Waters Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.certainconf
+//# CLASS:   CCAbstractionStandardConflictCheckerTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -19,8 +19,8 @@ import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class CCAbstractionStandardConflictCheckerTest extends
-    AbstractStandardConflictCheckerTest
+public class CCAbstractionStandardConflictCheckerTest
+  extends AbstractStandardConflictCheckerTest
 {
 
   //#########################################################################

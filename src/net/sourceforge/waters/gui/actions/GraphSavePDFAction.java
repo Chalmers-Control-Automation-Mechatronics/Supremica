@@ -50,7 +50,7 @@ public class GraphSavePDFAction
     putValue(Action.NAME, "Save as PDF ...");
     putValue(Action.SHORT_DESCRIPTION,
              "Save the currently viewed automaton in a PDF file");
-    putValue(Action.SMALL_ICON, IconLoader.ICON_TOOL_PRINT);
+    putValue(Action.SMALL_ICON, IconLoader.ICON_TOOL_PRINT_PDF);
   }
 
 

@@ -24,6 +24,7 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -139,6 +140,12 @@ public class BDDSafetyVerifier
         computeCounterExample();
       }
       return isSatisfied();
+    } catch (final WatersRuntimeException exception) {
+      if (exception.getCause() instanceof AnalysisException) {
+        throw (AnalysisException) exception.getCause();
+      } else {
+        throw exception;
+      }
     } finally {
       tearDown();
       getLogger().debug("BDDSafetyVerifier.run(): " +

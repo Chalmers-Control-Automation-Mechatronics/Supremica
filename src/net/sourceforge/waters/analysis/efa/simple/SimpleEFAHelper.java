@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.analysis.efa.simple;
 
+import static net.sourceforge.waters.analysis.efa.simple.SimpleEFAComponent.DEFAULT_FORBIDDEN_ID;
+import static net.sourceforge.waters.analysis.efa.simple.SimpleEFAComponent.DEFAULT_MARKING_ID;
 import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
@@ -17,9 +19,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static net.sourceforge.waters.analysis.efa.simple.SimpleEFAComponent.DEFAULT_FORBIDDEN_ID;
-import static net.sourceforge.waters.analysis.efa.simple.SimpleEFAComponent.DEFAULT_MARKING_ID;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -43,14 +42,19 @@ import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
 
+
 /**
- *
  * @author Mohammad Reza Shoaei
  */
+
 public class SimpleEFAHelper {
 
+  /**
+   * Creates an EFA helper instance based on the given factory and
+   * operator table.
+   */
   public SimpleEFAHelper(final ModuleProxyFactory factory,
-                   final CompilerOperatorTable optable)
+                         final CompilerOperatorTable optable)
   {
     mFactory = factory;
     mOperatorTable = optable;
@@ -58,10 +62,8 @@ public class SimpleEFAHelper {
   }
 
   /**
-   * Using operation table {(
-   * <p/>
-   * @CompilerOperatorTable)} instances
-   * @param factory Factory to be used for components construction
+   * Creates an EFA helper instance based on the given factory and
+   * the standard {@link CompilerOperatorTable}.
    */
   public SimpleEFAHelper(final ModuleProxyFactory factory)
   {
@@ -69,10 +71,8 @@ public class SimpleEFAHelper {
   }
 
   /**
-   * Using subject factory {(
-   * <p/>
-   * @ModuleSubjectFactory)} and operation table {(
-   * @CompilerOperatorTable)} instances
+   * Creates an EFA helper instance based on the standard
+   * {@link ModuleSubjectFactory} and {@link CompilerOperatorTable}.
    */
   public SimpleEFAHelper()
   {
@@ -261,7 +261,7 @@ public class SimpleEFAHelper {
     for (final String s : str) {
       try {
         exps.add(parser.parse(s));
-      } catch (ParseException ignored) {
+      } catch (final ParseException ignored) {
       }
     }
     return exps;

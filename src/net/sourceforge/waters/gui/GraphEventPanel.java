@@ -1431,9 +1431,12 @@ public class GraphEventPanel
       }
       final DataFlavor flavor = WatersDataFlavor.IDENTIFIER;
       if (support.getTransferable().isDataFlavorSupported(flavor)) {
-        support.setDropAction(COPY);
-        support.setShowDropLocation(false);
-        return true;
+        final Transferable transferable = support.getTransferable();
+        if (canPaste(transferable)) {
+          support.setDropAction(COPY);
+          support.setShowDropLocation(false);
+          return true;
+        }
       }
       return false;
     }

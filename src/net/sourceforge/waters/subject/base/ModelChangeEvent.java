@@ -39,6 +39,7 @@ import net.sourceforge.waters.model.base.ProxyTools;
  * <LI>{@link #NAME_CHANGED}</LI>
  * <LI>{@link #STATE_CHANGED}</LI>
  * <LI>{@link #GEOMETRY_CHANGED}</LI>
+ * <LI>{@link #GENERAL_NOTIFICATION}</LI>
  * </UL>
  * <P>In addition, each event has its <EMPH>source</EMPH> that identifies
  * the item that was affected by the change, and may have an additional
@@ -156,6 +157,20 @@ public class ModelChangeEvent extends EventObject
     } else {
       return new ModelChangeEvent(item, GEOMETRY_CHANGED, geo);
     }
+  }
+
+  /**
+   * Creates a general notification.
+   * @param  item         The item that has been modified.
+   * @param  info         Additional information passed as the value of the
+   *                      event.
+   * @return A model change event that has the item as source
+   *         and given info value.
+   */
+  public static ModelChangeEvent createGeneralNotification
+    (final Subject item, final Object info)
+  {
+    return new ModelChangeEvent(item, GENERAL_NOTIFICATION, info);
   }
 
 
@@ -340,6 +355,7 @@ public class ModelChangeEvent extends EventObject
   {
     //#######################################################################
     //# Interface java.util.Comparator
+    @Override
     public int compare(final ModelObserver obs1, final ModelObserver obs2)
     {
       return obs1.getModelObserverPriority() - obs2.getModelObserverPriority();
@@ -412,6 +428,14 @@ public class ModelChangeEvent extends EventObject
    * the introduction of a new geometry object.
    */
   public static final int GEOMETRY_CHANGED = 0x10;
+  /**
+   * The constant identifying a general notification.  This
+   * notification is sent to indicate a change of attributes or other
+   * information not directly stored on the event source. The event
+   * source is the item affected by the change, and the value may
+   * contain additional information to identify the kind of change.
+   */
+  public static final int GENERAL_NOTIFICATION = 0x20;
 
 
   //#########################################################################

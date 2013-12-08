@@ -145,8 +145,11 @@ public class IconLoader
   private static final String NAME_TOOL_NEW = "new";
   private static final String NAME_TOOL_NODE = "node";
   private static final String NAME_TOOL_OPEN = "open";
+  private static final String NAME_TOOL_OPTIONS = "options";
   private static final String NAME_TOOL_PASTE = "paste";
   private static final String NAME_TOOL_PRINT = "print";
+  private static final String NAME_TOOL_PRINT_EPS = "print_eps";
+  private static final String NAME_TOOL_PRINT_PDF = "print_pdf";
   private static final String NAME_TOOL_REDO = "redo";
   private static final String NAME_TOOL_SAVE = "save";
   private static final String NAME_TOOL_SAVE_AS = "save_as";
@@ -203,8 +206,13 @@ public class IconLoader
   public static final ImageIcon ICON_TOOL_NEW = getWatersIcon(NAME_TOOL_NEW);
   public static final ImageIcon ICON_TOOL_NODE = getWatersIcon(NAME_TOOL_NODE);
   public static final ImageIcon ICON_TOOL_OPEN = getWatersIcon(NAME_TOOL_OPEN);
+  public static final ImageIcon ICON_TOOL_OPTIONS = getWatersIcon(NAME_TOOL_OPTIONS);
   public static final ImageIcon ICON_TOOL_PASTE = getWatersIcon(NAME_TOOL_PASTE);
   public static final ImageIcon ICON_TOOL_PRINT = getWatersIcon(NAME_TOOL_PRINT);
+  public static final ImageIcon ICON_TOOL_PRINT_EPS =
+    getWatersIcon(NAME_TOOL_PRINT_EPS);
+  public static final ImageIcon ICON_TOOL_PRINT_PDF =
+    getWatersIcon(NAME_TOOL_PRINT_PDF);
   public static final ImageIcon ICON_TOOL_REDO = getWatersIcon(NAME_TOOL_REDO);
   public static final ImageIcon ICON_TOOL_SAVE = getWatersIcon(NAME_TOOL_SAVE);
   public static final ImageIcon ICON_TOOL_SAVE_AS = getWatersIcon(NAME_TOOL_SAVE_AS);

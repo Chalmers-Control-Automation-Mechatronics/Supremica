@@ -56,7 +56,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
      final AbstractCompositionalSynthesizer synthesizer,
      final AbstractionProcedureFactory method,
      final AbstractCompositionalModelAnalyzer.PreselectingMethod preselectingHeuristic,
-     final AbstractCompositionalModelAnalyzer.SelectingMethod selectingHeuristic)
+     final SelectionHeuristicCreator selectionHeuristic)
     throws FileNotFoundException
   {
     final String outputprop = System.getProperty("waters.test.outputdir");
@@ -68,9 +68,10 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     mSynthesizer = synthesizer;
     mMethod = method;
     mPreselecting = preselectingHeuristic;
-    mSelecting = selectingHeuristic;
+    mSelecting = selectionHeuristic;
     mWatchdog = new Watchdog(mSynthesizer, mTimeout);
   }
+
 
   //#########################################################################
   //# Overrides for junit.framework.TestCase
@@ -88,7 +89,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     final int finalTransitionLimit = 5000000;
     mSynthesizer.setMonolithicTransitionLimit(finalTransitionLimit);
     mSynthesizer.setPreselectingMethod(mPreselecting);
-    mSynthesizer.setSelectingMethod(mSelecting);
+    mSynthesizer.setSelectionHeuristic(mSelecting);
     mPrintWriter.println("InternalStateLimit," + internalStateLimit
                          + ",InternalTransitionLimit,"
                          + internalTransitionLimit + ",FinalStateLimit,"
@@ -132,8 +133,8 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
    */
   void setSelectingHeuristic(final String name)
   {
-    final AbstractCompositionalModelAnalyzer.SelectingMethodFactory factory =
-      mSynthesizer.getSelectingMethodFactory();
+    final CompositionalSelectionHeuristicFactory factory =
+      mSynthesizer.getSelectionHeuristicFactory();
     mSelecting = factory.getEnumValue(name);
   }
 
@@ -471,7 +472,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
   private AbstractCompositionalSynthesizer mSynthesizer;
   private final AbstractionProcedureFactory mMethod;
   private AbstractCompositionalModelAnalyzer.PreselectingMethod mPreselecting;
-  private AbstractCompositionalModelAnalyzer.SelectingMethod mSelecting;
+  private SelectionHeuristicCreator mSelecting;
   private final Watchdog mWatchdog;
   private int mTimeout = 600;
 

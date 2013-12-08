@@ -497,6 +497,7 @@ public class ModuleContainer
       final String msg = exception.getMessage();
       final IDE ide = getIDE();
       ide.error(msg);
+      setLastCompilationException(exception);
       mTabPanel.setSelectedComponent(mEditorPanel);
     }
   }
@@ -509,8 +510,39 @@ public class ModuleContainer
   {
     if (mCompiledDES == null) {
       mCompiledDES = mCompiler.compile();
+      setLastCompilationException(null);
     }
     return mCompiledDES;
+  }
+
+  public EvalException getLastCompilationException()
+  {
+    return mLastCompilationException;
+  }
+
+  public void setLastCompilationException(final EvalException exception)
+  {
+    final EvalException previousException = mLastCompilationException;
+    if (exception != null
+        && !(exception.getLocation() instanceof net.sourceforge.waters.subject.base.Subject)) {
+      // location is invalid, so ignore it
+      mLastCompilationException = null;
+    } else {
+      mLastCompilationException = exception;
+    }
+    fireCompilationExceptionEvent(previousException);
+    fireCompilationExceptionEvent(mLastCompilationException);
+  }
+
+  private void fireCompilationExceptionEvent(final EvalException exception)
+  {
+    if (exception != null) {
+      net.sourceforge.waters.subject.base.Subject location;
+      ModelChangeEvent event;
+      location = (net.sourceforge.waters.subject.base.Subject) exception.getLocation();
+      event = ModelChangeEvent.createStateChanged(location);
+      event.fire();
+    }
   }
 
 
@@ -637,6 +669,7 @@ public class ModuleContainer
   private final UpdateGraphPanelVisitor mUpdateGraphPanelVisitor =
     new UpdateGraphPanelVisitor();
   private ProductDESProxy mCompiledDES;
+  private EvalException mLastCompilationException;
 
   private final CompilerPropertyChangeListener
     mCompilerPropertyChangeListener;

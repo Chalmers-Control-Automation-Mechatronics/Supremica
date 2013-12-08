@@ -78,7 +78,7 @@ public class EditorPanel
         final WatersPopupActionManager manager = ide.getPopupActionManager();
 
         final AliasesPanel aliasesPanel =
-          new AliasesPanel(this, manager);
+          new AliasesPanel(mModuleContainer, manager);
         mAliasesTab = new Tab("Definitions", aliasesPanel);
         if (Config.INCLUDE_INSTANTION.get()) {
           mAliasesTab.addToTabbedPane();
@@ -90,7 +90,7 @@ public class EditorPanel
         mEventsTab = new Tab("Events", eventsPanel);
         mEventsTab.addToTabbedPane();
         mTabMap.put(eventsPanel, mEventsTab);
-        final ComponentsTree compPanel = new ComponentsTree(this, manager);
+        final ComponentsTree compPanel = new ComponentsTree(mModuleContainer, manager);
         mComponentsTab = new Tab("Components", compPanel);
         mComponentsTab.addToTabbedPane();
         mComponentsTab.activate();
@@ -114,69 +114,82 @@ public class EditorPanel
 
     //######################################################################
     //# Interface net.sourceforge.waters.gui.ModuleWindowInterface
+    @Override
     public UndoInterface getUndoInterface()
     {
         return mModuleContainer;
     }
 
+    @Override
     public ModuleSubject getModuleSubject()
     {
         return mModuleContainer.getModule();
     }
 
+    @Override
     public ModuleContext getModuleContext()
     {
         return mModuleContainer.getModuleContext();
     }
 
+    @Override
     public ExpressionParser getExpressionParser()
     {
         return mModuleContainer.getExpressionParser();
     }
 
+    @Override
     public IDE getRootWindow()
     {
         return (IDE) getTopLevelAncestor();
     }
 
+    @Override
     public SelectionOwner getComponentsPanel()
     {
         return (SelectionOwner) mComponentsTab.getPanel();
     }
 
+    @Override
     public SelectionOwner getEventsPanel()
     {
         return (SelectionOwner) mEventsTab.getPanel();
     }
 
+    @Override
     public SelectionOwner getConstantAliasesPanel()
     {
       final AliasesPanel panel = (AliasesPanel) mAliasesTab.getPanel();
       return panel.getConstantAliasesPanel();
     }
 
+    @Override
     public SelectionOwner getEventAliasesPanel()
     {
       final AliasesPanel panel = (AliasesPanel) mAliasesTab.getPanel();
       return panel.getEventAliasesPanel();
     }
 
+    @Override
     public SelectionOwner getInstancePanel()
     {
       // TODO Auto-generated method stub
       return (SelectionOwner) mComponentsTab.getPanel();
     }
 
+    @Override
     public void showComponents()
     {
         mComponentsTab.activate();
     }
 
+    @Override
     public void showEvents()
     {
         mEventsTab.activate();
     }
 
+    @Override
     public EditorWindowInterface showEditor(final SimpleComponentSubject comp)
     throws GeometryAbsentException
     {
@@ -186,12 +199,14 @@ public class EditorPanel
       return panel;
     }
 
+    @Override
     public EditorWindowInterface getEditorWindowInterface
         (final SimpleComponentSubject comp)
     {
         return mModuleContainer.getComponentEditorPanel(comp);
     }
 
+    @Override
     public ComponentEditorPanel getActiveEditorWindowInterface()
     {
         if (getRightComponent() instanceof EditorWindowInterface) {
@@ -201,11 +216,13 @@ public class EditorPanel
         }
     }
 
+    @Override
     public void showComment()
     {
         setRightComponent(mCommentPanel);
     }
 
+    @Override
     public void showPanel(final SelectionOwner panel)
     {
         final Tab tab = mTabMap.get(panel);
@@ -217,6 +234,7 @@ public class EditorPanel
 
     //#######################################################################
     //# Interface javax.swing.event.ChangeListener
+    @Override
     public void stateChanged(final ChangeEvent event)
     {
         // Why is the focus not transfered automatically when clicking tabs?
@@ -229,16 +247,19 @@ public class EditorPanel
 
     //#######################################################################
     //# Interface net.sourceforge.waters.gui.observer.Subject
+    @Override
     public void attach(final Observer o)
     {
         mObservers.add(o);
     }
 
+    @Override
     public void detach(final Observer o)
     {
         mObservers.remove(o);
     }
 
+    @Override
     public void fireEditorChangedEvent(final EditorChangedEvent event)
     {
         // Just in case they try to register or deregister observers
@@ -251,6 +272,7 @@ public class EditorPanel
     }
 
 
+    @Override
     public void propertyChanged(final SupremicaPropertyChangeEvent event)
     {
       if (Config.INCLUDE_INSTANTION.get()) {
@@ -263,6 +285,7 @@ public class EditorPanel
 
     //######################################################################
     //#
+    @Override
     protected boolean setRightComponent(final JComponent newComponent)
     {
         if (super.setRightComponent(newComponent)) {

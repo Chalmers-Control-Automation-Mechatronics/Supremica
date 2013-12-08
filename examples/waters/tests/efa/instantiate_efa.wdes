@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="instantiate_efa" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/des">
+    <ns2:Comment>An EFA compiler test involving variable substitution in guards and actions</ns2:Comment>
+    <EventList>
+        <Event Kind="CONTROLLABLE" Name="a[0]"/>
+        <Event Kind="CONTROLLABLE" Name="a[1]"/>
+        <Event Kind="CONTROLLABLE" Name="a[2]"/>
+        <Event Kind="CONTROLLABLE" Name="b[0]"/>
+        <Event Kind="CONTROLLABLE" Name="b[1]"/>
+        <Event Kind="CONTROLLABLE" Name="b[2]"/>
+    </EventList>
+    <AutomataList>
+        <Automaton Kind="PLANT" Name="x">
+            <EventRefList>
+                <EventRef Name="a[0]"/>
+                <EventRef Name="a[1]"/>
+                <EventRef Name="a[2]"/>
+                <EventRef Name="b[0]"/>
+                <EventRef Name="b[1]"/>
+                <EventRef Name="b[2]"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="0"/>
+                <State Name="1"/>
+                <State Name="2"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="a[0]" Source="0" Target="0"/>
+                <Transition Event="b[0]" Source="0" Target="0"/>
+                <Transition Event="b[1]" Source="0" Target="1"/>
+                <Transition Event="b[2]" Source="0" Target="2"/>
+                <Transition Event="a[1]" Source="1" Target="1"/>
+                <Transition Event="b[0]" Source="1" Target="0"/>
+                <Transition Event="b[1]" Source="1" Target="1"/>
+                <Transition Event="b[2]" Source="1" Target="2"/>
+                <Transition Event="a[2]" Source="2" Target="2"/>
+                <Transition Event="b[0]" Source="2" Target="0"/>
+                <Transition Event="b[1]" Source="2" Target="1"/>
+                <Transition Event="b[2]" Source="2" Target="2"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="PLANT" Name="aut[0]">
+            <EventRefList>
+                <EventRef Name="a[0]"/>
+                <EventRef Name="b[0]"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="S0"/>
+                <State Name="S1"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="a[0]" Source="S0" Target="S1"/>
+                <Transition Event="b[0]" Source="S1" Target="S0"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="PLANT" Name="aut[1]">
+            <EventRefList>
+                <EventRef Name="a[1]"/>
+                <EventRef Name="b[1]"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="S0"/>
+                <State Name="S1"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="a[1]" Source="S0" Target="S1"/>
+                <Transition Event="b[1]" Source="S1" Target="S0"/>
+            </TransitionList>
+        </Automaton>
+        <Automaton Kind="PLANT" Name="aut[2]">
+            <EventRefList>
+                <EventRef Name="a[2]"/>
+                <EventRef Name="b[2]"/>
+            </EventRefList>
+            <StateList>
+                <State Initial="true" Name="S0"/>
+                <State Name="S1"/>
+            </StateList>
+            <TransitionList>
+                <Transition Event="a[2]" Source="S0" Target="S1"/>
+                <Transition Event="b[2]" Source="S1" Target="S0"/>
+            </TransitionList>
+        </Automaton>
+    </AutomataList>
+</ProductDES>

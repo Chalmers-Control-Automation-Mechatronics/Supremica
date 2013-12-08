@@ -49,7 +49,8 @@ public class CompositionalSynthesizerMustLMinSUnSupTest
     synthesizer.setMonolithicStateLimit(100000);
     synthesizer.setInternalTransitionLimit(500000);
     synthesizer.setPreselectingMethod(AbstractCompositionalModelAnalyzer.MustL);
-    synthesizer.setSelectingMethod(AbstractCompositionalModelAnalyzer.MinS);
+    synthesizer.setSelectionHeuristic
+      (CompositionalSelectionHeuristicFactory.MinS);
     return synthesizer;
   }
 

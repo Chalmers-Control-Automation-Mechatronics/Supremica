@@ -16,6 +16,8 @@ import javax.swing.JPanel;
 
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 
+import org.supremica.gui.ide.ModuleContainer;
+
 
 /**
  * The aliases panel inside the definitions tab of the module editor.
@@ -33,7 +35,7 @@ public class AliasesPanel extends JPanel
 
   //#########################################################################
   //# Constructors
-  public AliasesPanel(final ModuleWindowInterface root,
+  public AliasesPanel(final ModuleContainer root,
                       final WatersPopupActionManager manager)
   {
     mConstantAliasesPanel = new ConstantAliasesTree(root, manager);

@@ -141,6 +141,7 @@ import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.xsd.module.SplineKind;
 
 import org.supremica.gui.ide.IDE;
+import org.supremica.gui.ide.ModuleContainer;
 import org.supremica.properties.Config;
 
 
@@ -161,6 +162,7 @@ public class GraphEditorPanel
   //# Constructors
   public GraphEditorPanel(final GraphSubject graph,
                           final ModuleSubject module,
+                          final ModuleContainer moduleContainer,
                           final EditorWindowInterface root,
                           final ControlledToolbar toolbar,
                           final WatersPopupActionManager manager)
@@ -168,6 +170,7 @@ public class GraphEditorPanel
   {
     super(graph, module, root.getModuleWindowInterface().getModuleContext());
     mRoot = root;
+    mModuleContainer = moduleContainer;
     mRenderingContext = new EditorRenderingContext();
     final ProxyShapeProducer producer =
       new SubjectShapeProducer(graph, module, mRenderingContext);
@@ -204,7 +207,7 @@ public class GraphEditorPanel
                            final ModuleSubject module)
     throws GeometryAbsentException
   {
-    this(graph, module, null, null, null);
+    this(graph, module, null, null, null, null);
   }
 
 
@@ -2103,7 +2106,7 @@ public class GraphEditorPanel
         }
         else if (mFocusedObject instanceof NodeSubject) {
           final NodeSubject node = (NodeSubject) mFocusedObject;
-          NodeEditorDialog.showDialog(GraphEditorPanel.this, node);
+          NodeEditorDialog.showDialog(mModuleContainer, GraphEditorPanel.this, node);
         }
       }
     }
@@ -2245,7 +2248,7 @@ public class GraphEditorPanel
             editStateName(node);
           } else if (mFocusedObject instanceof SimpleNodeSubject) {
             final SimpleNodeSubject node = (SimpleNodeSubject)mFocusedObject;
-            NodeEditorDialog.showDialog(GraphEditorPanel.this, node);
+            NodeEditorDialog.showDialog(mModuleContainer, GraphEditorPanel.this, node);
           }
         } else {
           mLastNodeCommand = null;
@@ -2317,7 +2320,7 @@ public class GraphEditorPanel
           mFocusedObject != null &&
           mFocusedObject instanceof GroupNodeSubject) {
         final GroupNodeSubject node = (GroupNodeSubject) mFocusedObject;
-        NodeEditorDialog.showDialog(GraphEditorPanel.this, node);
+        NodeEditorDialog.showDialog(mModuleContainer, GraphEditorPanel.this, node);
       }
     }
 
@@ -5361,6 +5364,7 @@ public class GraphEditorPanel
   //#########################################################################
   //# Data Members
   private final EditorWindowInterface mRoot;
+  private final ModuleContainer mModuleContainer;
   private final ControlledToolbar mToolbar;
 
   /**

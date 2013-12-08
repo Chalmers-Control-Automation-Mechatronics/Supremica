@@ -49,7 +49,8 @@ public class CompositionalSynthesizerMustLMinSyncTest
     synthesizer.setMonolithicStateLimit(100000);
     synthesizer.setInternalTransitionLimit(500000);
     synthesizer.setPreselectingMethod(AbstractCompositionalModelAnalyzer.MustL);
-    synthesizer.setSelectingMethod(AbstractCompositionalModelAnalyzer.MinSync);
+    synthesizer.setSelectionHeuristic
+      (CompositionalSelectionHeuristicFactory.MinSync);
     return synthesizer;
   }
 

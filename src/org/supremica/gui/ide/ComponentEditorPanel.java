@@ -33,9 +33,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
-import net.sourceforge.waters.gui.GraphEditorPanel;
-import net.sourceforge.waters.gui.ControlledToolbar;
 import net.sourceforge.waters.gui.EditorWindowInterface;
+import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.GraphEventPanel;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
@@ -91,8 +90,8 @@ public class ComponentEditorPanel
 		final IDE ide = moduleContainer.getIDE();
 		final WatersPopupActionManager manager = ide.getPopupActionManager();
         mSurface = new GraphEditorPanel
-            (component.getGraph(), mModule, this,
-			 (ControlledToolbar) ide.getToolBar(), manager);
+            (component.getGraph(), mModule, mModuleContainer, this,
+			 ide.getToolBar(), manager);
         mSurface.setPreferredSize(IDEDimensions.rightEditorPreferredSize);
         mSurface.setMinimumSize(IDEDimensions.rightEditorMinimumSize);
         mEventsPane = new GraphEventPanel(this, component, manager);
@@ -114,31 +113,37 @@ public class ComponentEditorPanel
 
     //########################################################################
     //# Interface net.sourceforge.waters.gui.EditorWindowInterface
+    @Override
     public SimpleComponentSubject getComponent()
     {
         return mComponent;
     }
 
+    @Override
     public ModuleWindowInterface getModuleWindowInterface()
     {
         return mModuleContainer.getEditorPanel();
     }
 
+    @Override
     public GraphEditorPanel getGraphEditorPanel()
     {
         return mSurface;
     }
 
+    @Override
     public GraphEventPanel getEventPanel()
     {
         return mEventsPane;
     }
 
+    @Override
     public UndoInterface getUndoInterface()
     {
         return mModuleContainer;
     }
 
+    @Override
     @Deprecated
     public void copyAsWMFToClipboard()
     {
@@ -191,7 +196,7 @@ public class ComponentEditorPanel
 
         // Ask the test to render into the SVG Graphics2D implementation.
         //Graphics2D
-        mSurface.paint((java.awt.Graphics2D)svgGenerator);
+        mSurface.paint(svgGenerator);
 
         // Finally, stream out SVG to the standard output using
         // UTF-8 encoding.
@@ -252,7 +257,8 @@ public class ComponentEditorPanel
 
 	//#######################################################################
 	//# Interface org.supremica.properties.SupremicaPropertyChangeListener
-	public void propertyChanged(final SupremicaPropertyChangeEvent event)
+	@Override
+  public void propertyChanged(final SupremicaPropertyChangeEvent event)
 	{
 		mSurface.propertyChanged(event);
 	}

@@ -46,6 +46,7 @@ public class NBAbstractionStandardConflictCheckerTest
     final CompositionalConflictChecker checker =
       new CompositionalConflictChecker(factory,
                                        ConflictAbstractionProcedureFactory.NB);
+    // checker.setSelectingMethod(AbstractCompositionalModelAnalyzer.MinF);
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);

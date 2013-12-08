@@ -50,7 +50,7 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
   public EnabledEventsCompositionalConflictCheckerExperiments
     (final String statsFilename,
      final AbstractCompositionalModelAnalyzer.PreselectingMethod preselectingHeuristic,
-     final AbstractCompositionalModelAnalyzer.SelectingMethod selectingHeuristic)
+     final SelectionHeuristicCreator selectingHeuristic)
     throws FileNotFoundException
   {
     final String outputprop = System.getProperty("waters.test.outputdir");
@@ -82,7 +82,7 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
     //For the big ones
     mConflictChecker.setMonolithicTransitionLimit(0);
     mConflictChecker.setPreselectingMethod(mPreselecting);
-    mConflictChecker.setSelectingMethod(mSelecting);
+    mConflictChecker.setSelectionHeuristic(mSelecting);
     mConflictChecker.setUsingSpecialEvents(true);
     mPrintWriter.println("InternalStateLimit," + internalStateLimit +
                          ",InternalTransitionLimit," +
@@ -127,8 +127,8 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
    */
   void setSelectingHeuristic(final String name)
   {
-    final AbstractCompositionalModelAnalyzer.SelectingMethodFactory factory =
-      mConflictChecker.getSelectingMethodFactory();
+    final CompositionalSelectionHeuristicFactory factory =
+      mConflictChecker.getSelectionHeuristicFactory();
     mSelecting = factory.getEnumValue(name);
   }
 
@@ -660,5 +660,5 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
 
   private AbstractCompositionalModelAnalyzer.PreselectingMethod
     mPreselecting;
-  private AbstractCompositionalModelAnalyzer.SelectingMethod mSelecting;
+  private SelectionHeuristicCreator mSelecting;
 }

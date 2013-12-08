@@ -14,7 +14,6 @@ import gnu.trove.set.hash.THashSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -118,17 +117,23 @@ public class EnabledEventsCompositionalConflictChecker extends
                                                    final ConflictAbstractionProcedureFactory abstractionFactory)
   {
     super(model, marking, factory, abstractionFactory,
-          new PreselectingMethodFactory(), new SelectingMethodFactory());
+          new PreselectingMethodFactory());
   }
 
 
   //#########################################################################
   //# Configuration
+  @Override
+  public CompositionalSelectionHeuristicFactory getSelectionHeuristicFactory()
+  {
+    return EnabledEventsSelectionHeuristicFactory.getInstance();
+  }
+
   /**
    * Sets the state limit for the language inclusion check to find
    * additional always enabled events.
-   * @param  Maximum state in language check,
-   *         or <CODE>0</CODE> to disable this search.
+   * @param  limit   Maximum number of states in language inclusion check,
+   *                 or <CODE>0</CODE> to disable this search.
    */
   public void setEnabledEventSearchStateLimit(final int limit)
   {
@@ -560,21 +565,6 @@ public class EnabledEventsCompositionalConflictChecker extends
 
 
   //#########################################################################
-  //# Inner Class SelectingMethodFactory
-  protected static class SelectingMethodFactory extends
-    AbstractCompositionalModelVerifier.SelectingMethodFactory
-  {
-    //#######################################################################
-    //# Constructors
-    protected SelectingMethodFactory()
-    {
-      register(MaxLE);
-      register(MinSE);
-    }
-  }
-
-
-  //#########################################################################
   //# Inner Class HeuristicMustLE
   private class HeuristicMustLE implements PreselectingHeuristic
   {
@@ -582,9 +572,9 @@ public class EnabledEventsCompositionalConflictChecker extends
     //#######################################################################
     //# Interface PreselectingHeuristic
     @Override
-    public Collection<Candidate> findCandidates()
+    public List<Candidate> findCandidates()
     {
-      final Collection<Candidate> candidates = new LinkedList<Candidate>(); //Create collection to store candidates to return
+      final List<Candidate> candidates = new LinkedList<Candidate>(); //Create collection to store candidates to return
       final Collection<EventProxy> events = getCurrentEvents(); //Get all events and put into a collection
 
       final Collection<List<AutomatonProxy>> found = //This is the automaton combinations we have already found
@@ -614,78 +604,6 @@ public class EnabledEventsCompositionalConflictChecker extends
       }
       return candidates;
     }
-  }
-
-
-  //#########################################################################
-  //# Inner Class ComparatorMaxLE
-  private class ComparatorMaxLE extends SelectingComparator
-  {
-
-    //#######################################################################
-    //# Overrides for SelectingComparator
-    @Override
-    double getHeuristicValue(final Candidate candidate)
-    {
-      int alwaysEnabledEvents = 0;
-
-      final List<AutomatonProxy> automataList = candidate.getAutomata();
-
-      for (final EventProxy event : candidate.getOrderedEvents()) //For each event in the candidate
-      {
-        final EnabledEventsEventInfo info = getEventInfo(event);
-
-        if (info != null) //when would info be null? Right at start?
-          if (info.getDisablingAutomata() != null)
-            if (automataList.containsAll(info.getDisablingAutomata()))
-              alwaysEnabledEvents++;
-      }
-
-      return -(candidate.getLocalEventCount() + 0.5 * alwaysEnabledEvents)
-             / candidate.getNumberOfEvents();
-    }
-
-  }
-
-
-  //#########################################################################
-  //# Inner Class ComparatorMinSE
-  private class ComparatorMinSE extends SelectingComparator
-  {
-
-    //#######################################################################
-    //# Overrides for SelectingComparator
-    @Override
-    double getHeuristicValue(final Candidate candidate)
-    {
-      double product = 1.0;
-      for (final AutomatonProxy aut : candidate.getAutomata()) { //for all automata in the candidate
-        product *= aut.getStates().size(); //multiply the number of each of states together.
-      }
-      final double totalEvents = candidate.getNumberOfEvents();
-      final double localEvents = candidate.getLocalEventCount();
-      int alwaysEnabledEvents = 0;
-
-      final List<AutomatonProxy> automataList = candidate.getAutomata();
-
-      for (final EventProxy event : candidate.getOrderedEvents()) //For each event in the candidate
-      {
-        final EnabledEventsEventInfo info = getEventInfo(event);
-
-        if (info != null) //propositions
-          if (info.getDisablingAutomata() != null)
-            if (automataList.containsAll(info.getDisablingAutomata())) {
-              alwaysEnabledEvents++;
-
-            }
-
-      }
-
-      return product
-             * (totalEvents - localEvents - 0.5 * alwaysEnabledEvents)
-             / totalEvents;
-    }
-
   }
 
 
@@ -822,8 +740,8 @@ public class EnabledEventsCompositionalConflictChecker extends
    * The preselecting method that considers every set of automata with at
    * least one local event as a candidate.
    */
-  public static final PreselectingMethod MustLE = new PreselectingMethod(
-    "MustLE") {
+  public static final PreselectingMethod MustLE = new PreselectingMethod("MustLE")
+  {
     @Override
     PreselectingHeuristic createHeuristic(final AbstractCompositionalModelAnalyzer verifier)
     {
@@ -832,34 +750,5 @@ public class EnabledEventsCompositionalConflictChecker extends
       return everifier.new HeuristicMustLE();
     }
   };
-
-  /**
-   * The selecting method that chooses the candidate with the highest
-   * proportion of local events.
-   */
-  public static final SelectingMethod MaxLE = new SelectingMethod("MaxLE") {
-    @Override
-    Comparator<Candidate> createComparator(final AbstractCompositionalModelAnalyzer verifier)
-    {
-      final EnabledEventsCompositionalConflictChecker everifier =
-        (EnabledEventsCompositionalConflictChecker) verifier;
-      return everifier.new ComparatorMaxLE();
-    }
-  };
-
-  /**
-   * The selecting method that chooses the candidate with the minimum
-   * estimated number of states in the synchronous product.
-   */
-  public static final SelectingMethod MinSE = new SelectingMethod("MinSE") {
-    @Override
-    Comparator<Candidate> createComparator(final AbstractCompositionalModelAnalyzer verifier)
-    {
-      final EnabledEventsCompositionalConflictChecker everifier =
-        (EnabledEventsCompositionalConflictChecker) verifier;
-      return everifier.new ComparatorMinSE();
-    }
-  };
-
 
 }

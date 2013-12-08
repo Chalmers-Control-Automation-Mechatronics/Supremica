@@ -147,11 +147,13 @@ class EditorGraph
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.GraphProxy
+  @Override
   public Class<GraphProxy> getProxyInterface()
   {
     return GraphProxy.class;
   }
 
+  @Override
   public Object acceptVisitor(final ProxyVisitor visitor)
     throws VisitorException
   {
@@ -159,11 +161,13 @@ class EditorGraph
     return mvisitor.visitGraphProxy(this);
   }
 
+  @Override
   public LabelBlockProxy getBlockedEvents()
   {
     return mBlockedEvents;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public Set<NodeProxy> getNodes()
   {
@@ -172,6 +176,7 @@ class EditorGraph
     return Collections.unmodifiableSet(downcast);
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public List<EdgeProxy> getEdges()
   {
@@ -190,6 +195,7 @@ class EditorGraph
     return mEdges;
   }
 
+  @Override
   public boolean isDeterministic()
   {
     return mGraph.isDeterministic();
@@ -750,6 +756,7 @@ class EditorGraph
 
     //#######################################################################
     //# Interface net.sourceforge.waters.subject.base.ModelObserver
+    @Override
     public void modelChanged(final ModelChangeEvent event)
     {
       final Subject esource = event.getSource();
@@ -841,6 +848,7 @@ class EditorGraph
       }
     }
 
+    @Override
     public int getModelObserverPriority()
     {
       return ModelObserver.RENDERING_PRIORITY;
@@ -864,6 +872,7 @@ class EditorGraph
 
     //#######################################################################
     //# Interface net.sourceforge.waters.subject.base.ModelObserver
+    @Override
     public void modelChanged(final ModelChangeEvent event)
     {
       if (event.getSource() instanceof EdgeSubject) {
@@ -875,6 +884,7 @@ class EditorGraph
       }
     }
 
+    @Override
     public int getModelObserverPriority()
     {
       return ModelObserver.CLEANUP_PRIORITY_1;
@@ -997,6 +1007,7 @@ class EditorGraph
 
     //#######################################################################
     //# Simple Access
+    @Override
     public SimpleNodeSubject getNodeSubject()
     {
       return (SimpleNodeSubject) super.getNodeSubject();
@@ -1004,6 +1015,7 @@ class EditorGraph
 
     //#######################################################################
     //# Editing
+    @Override
     public void update()
     {
       final Point2D newpos = getNodeSubject().getPointGeometry().getPoint();
@@ -1036,6 +1048,7 @@ class EditorGraph
 
     //#######################################################################
     //# Simple Access
+    @Override
     public GroupNodeSubject getNodeSubject()
     {
       return (GroupNodeSubject) super.getNodeSubject();
@@ -1043,6 +1056,7 @@ class EditorGraph
 
     //#######################################################################
     //# Editing
+    @Override
     public void update()
     {
       final GroupNodeSubject node = getNodeSubject();
@@ -1274,11 +1288,13 @@ class EditorGraph
 
     //#######################################################################
     //# Simple Access
+    @Override
     SimpleNodeSubject getOriginal()
     {
       return (SimpleNodeSubject) super.getOriginal();
     }
 
+    @Override
     SimpleNodeSubject getFake()
     {
       return (SimpleNodeSubject) super.getFake();
@@ -1286,6 +1302,7 @@ class EditorGraph
 
     //#######################################################################
     //# Updating
+    @Override
     SimpleNodeSubject createOriginal()
     {
       final SimpleNodeSubject original = getOriginal();
@@ -1300,6 +1317,7 @@ class EditorGraph
       }
     }
 
+    @Override
     AbstractEditCommand createMoveCommand(final GraphEditorPanel surface)
     {
       final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(true);
@@ -1351,11 +1369,13 @@ class EditorGraph
 
     //#######################################################################
     //# Simple Access
+    @Override
     GroupNodeSubject getOriginal()
     {
       return (GroupNodeSubject) super.getOriginal();
     }
 
+    @Override
     GroupNodeSubject getFake()
     {
       return (GroupNodeSubject) super.getFake();
@@ -1363,6 +1383,7 @@ class EditorGraph
 
     //#######################################################################
     //# Updating
+    @Override
     GroupNodeSubject createOriginal()
     {
       final GroupNodeSubject original = getOriginal();
@@ -1377,13 +1398,18 @@ class EditorGraph
       }
     }
 
+    @Override
     AbstractEditCommand createMoveCommand(final GraphEditorPanel surface)
     {
+      final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(true);
       final GroupNodeSubject original = getOriginal();
       final BoxGeometrySubject oldgeo = original.getGeometry();
-      final Rectangle2D oldrect = oldgeo.getRectangle();
       final GroupNodeSubject fake = getFake();
       final BoxGeometrySubject newgeo = fake.getGeometry();
+      if (eq.equals(oldgeo, newgeo)) {
+        return null;
+      }
+      final Rectangle2D oldrect = oldgeo.getRectangle();
       final Rectangle2D newrect = newgeo.getRectangle();
       final String name =
         oldrect.getWidth() == newrect.getWidth() &&
@@ -1429,16 +1455,19 @@ class EditorGraph
 
     //#######################################################################
     //# Simple Access
+    @Override
     EdgeSubject getOriginal()
     {
       return (EdgeSubject) super.getOriginal();
     }
 
+    @Override
     EdgeSubject getFake()
     {
       return (EdgeSubject) super.getFake();
     }
 
+    @Override
     boolean hasImplicitChanges()
     {
       if (getChangeKind() == ModelChangeEvent.NO_CHANGE) {
@@ -1460,6 +1489,7 @@ class EditorGraph
 
     //#######################################################################
     //# Updating
+    @Override
     int getPass()
     {
       if (getChangeKind() == ModelChangeEvent.ITEM_REMOVED) {
@@ -1469,6 +1499,7 @@ class EditorGraph
       }
     }
 
+    @Override
     int getMinPass()
     {
       if (getChangeKind() == ModelChangeEvent.STATE_CHANGED) {
@@ -1489,6 +1520,7 @@ class EditorGraph
       }
     }
 
+    @Override
     EdgeSubject createOriginal()
     {
       final EdgeSubject original = getOriginal();
@@ -1518,6 +1550,7 @@ class EditorGraph
       }
     }
 
+    @Override
     AbstractEditCommand createMoveCommand(final GraphEditorPanel surface)
     {
       final EdgeSubject original = getOriginal();
@@ -1554,6 +1587,7 @@ class EditorGraph
         }
       }
     }
+    @Override
     AbstractEditCommand getUpdateCommand(final GraphEditorPanel surface,
                                          final int pass)
     {
@@ -1645,11 +1679,13 @@ class EditorGraph
 
     //#######################################################################
     //# Simple Access
+    @Override
     LabelGeometrySubject getOriginal()
     {
       return (LabelGeometrySubject) super.getOriginal();
     }
 
+    @Override
     LabelGeometrySubject getFake()
     {
       return (LabelGeometrySubject) super.getFake();
@@ -1657,6 +1693,7 @@ class EditorGraph
 
     //#######################################################################
     //# Updating
+    @Override
     AbstractEditCommand createMoveCommand(final GraphEditorPanel surface)
     {
       return
@@ -1687,11 +1724,13 @@ class EditorGraph
 
     //#######################################################################
     //# Simple Access
+    @Override
     LabelBlockSubject getOriginal()
     {
       return (LabelBlockSubject) super.getOriginal();
     }
 
+    @Override
     LabelBlockSubject getFake()
     {
       return (LabelBlockSubject) super.getFake();
@@ -1699,6 +1738,7 @@ class EditorGraph
 
     //#######################################################################
     //# Updating
+    @Override
     AbstractEditCommand createMoveCommand(final GraphEditorPanel surface)
     {
       final LabelBlockSubject original = getOriginal();
@@ -1736,11 +1776,13 @@ class EditorGraph
 
     //#######################################################################
     //# Simple Access
+    @Override
     GuardActionBlockSubject getOriginal()
     {
       return (GuardActionBlockSubject) super.getOriginal();
     }
 
+    @Override
     GuardActionBlockSubject getFake()
     {
       return (GuardActionBlockSubject) super.getFake();
@@ -1748,6 +1790,7 @@ class EditorGraph
 
     //#######################################################################
     //# Updating
+    @Override
     AbstractEditCommand createMoveCommand(final GraphEditorPanel surface)
     {
       final GuardActionBlockSubject original = getOriginal();
@@ -1787,11 +1830,13 @@ class EditorGraph
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Object visitProxy(final Proxy proxy)
     {
       return null;
     }
 
+    @Override
     public ProxySubject visitLabelBlockProxy(final LabelBlockProxy original)
     {
       final LabelBlockSubject osubject = (LabelBlockSubject) original;
@@ -1806,6 +1851,7 @@ class EditorGraph
       }
     }
 
+    @Override
     public GuardActionBlockSubject visitGuardActionBlockProxy
       (final GuardActionBlockProxy original)
     {
@@ -1816,6 +1862,7 @@ class EditorGraph
       return fedge.getGuardActionBlock();
     }
 
+    @Override
     public LabelGeometrySubject visitLabelGeometryProxy
       (final LabelGeometryProxy original)
     {
@@ -1852,11 +1899,13 @@ class EditorGraph
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Object visitProxy(final Proxy proxy)
     {
       return null;
     }
 
+    @Override
     public ProxySubject visitLabelBlockProxy(final LabelBlockProxy fake)
     {
       final LabelBlockSubject fsubject = (LabelBlockSubject) fake;
@@ -1870,6 +1919,7 @@ class EditorGraph
       }
     }
 
+    @Override
     public GuardActionBlockSubject visitGuardActionBlockProxy
       (final GuardActionBlockProxy fake)
     {
@@ -1880,6 +1930,7 @@ class EditorGraph
       return oedge == null ? null : oedge.getGuardActionBlock();
     }
 
+    @Override
     public LabelGeometrySubject visitLabelGeometryProxy
       (final LabelGeometryProxy fake)
     {

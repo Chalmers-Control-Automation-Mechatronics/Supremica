@@ -9,11 +9,10 @@
 
 package net.sourceforge.waters.analysis.efa.efsm;
 
+import net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.context.OccursChecker;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
@@ -26,23 +25,14 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
  */
 
 public class MaxOccurrenceVariableSelectionHeuristic
-  extends VariableSelectionHeuristic
+  extends NumericSelectionHeuristic<EFSMVariable>
 {
 
   //#########################################################################
-  //# Constructors
-  public MaxOccurrenceVariableSelectionHeuristic
-    (final ModuleProxyFactory factory, final CompilerOperatorTable op)
-  {
-    super(factory, op);
-  }
-
-
-  //#########################################################################
   //# Overrides for
-  //# net.sourceforge.waters.analysis.efa.efsm.VariableSelectionHeuristic
+  //# net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic
   @Override
-  public double getHeuristicValue(final EFSMVariable var)
+  protected double getHeuristicValue(final EFSMVariable var)
   {
     final EFSMTransitionRelation efsmTR = var.getTransitionRelation();
     if (efsmTR == null) {

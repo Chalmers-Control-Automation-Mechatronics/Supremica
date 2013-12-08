@@ -1,10 +1,11 @@
 package org.supremica.automata.BDD.EFA;
 
-import gnu.trove.set.hash.TIntHashSet;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.procedure.TIntObjectProcedure;
 import gnu.trove.procedure.TIntProcedure;
+import gnu.trove.set.hash.TIntHashSet;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,6 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDDomain;
 import net.sourceforge.waters.model.base.Proxy;
@@ -22,6 +24,7 @@ import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
+
 import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
@@ -248,8 +251,8 @@ public class BDDPartitionSetEve extends BDDPartitionSet {
                         final int jEventIndex = eventIndexArray[j];
                         final Set<String> tmpGuardVars = new HashSet<String>(eventIndex2GuardVariables.get(jEventIndex));
                         tmpGuardVars.retainAll(updatedVars);
-                        		
-                        if (!tmpGuardVars.isEmpty() || eventIndex2GuardVariables.get(jEventIndex).isEmpty() 
+
+                        if (!tmpGuardVars.isEmpty() || eventIndex2GuardVariables.get(jEventIndex).isEmpty()
                                 || !eventIndex2UpdatedVariables.get(jEventIndex).isEmpty()) {
                             if (!forwardVarDependencyMap.contains(iEventIndex)) {
                                 forwardVarDependencyMap.put(iEventIndex, new TIntHashSet());
@@ -478,7 +481,7 @@ public class BDDPartitionSetEve extends BDDPartitionSet {
                 /* Update eventIsQualifiedForInitialComponent and eventIsQualifiedForMarkedComponent */
                 eventIsQualifiedForInitialComponent = eventIsQualifiedForInitialComponent && currAutIncTrans.qualifiedForInitialComponent;
                 eventIsQualifiedForMarkedComponent = eventIsQualifiedForMarkedComponent && currAutIncTrans.qualifiedForMarkedComponent;
-                
+
                 if(allVarPossiblyUpdated) {
                     allVarPossiblyUpdated = allVarPossiblyUpdated && currAutIncTrans.allVarPossiblyUpdated;
                 }
@@ -528,7 +531,7 @@ public class BDDPartitionSetEve extends BDDPartitionSet {
             if (eventIsQualifiedForMarkedComponent) {
                 markedComponentCandidates.add(eventIndex);
             }
-            
+
             if (allVarPossiblyUpdated) {
                 eventIndex2GuardVariables.remove(eventIndex);
                 eventIndex2GuardVariables.put(eventIndex, new HashSet<String>());
@@ -554,6 +557,7 @@ public class BDDPartitionSetEve extends BDDPartitionSet {
         class AutIncludingTransLabeledByEvent {
 
             private final ArrayList<EdgeProxy> includedEdges;
+            @SuppressWarnings("unused")
             private final ExtendedAutomaton anAutomaton;
             private final int eventIndex;
             private final BDD transitionBDDWithoutActions;
@@ -576,7 +580,7 @@ public class BDDPartitionSetEve extends BDDPartitionSet {
                 // Create these two BDD arrays
                 this.transitionBDDCorrespondingToUpdatedVariablesWithoutActions = new BDD[orgAutomata.getVars().size()];
                 this.transitionBDDCorrespondingToUpdatedVariables = new BDD[orgAutomata.getVars().size()];
-                
+
                 allVarPossiblyUpdated = false;
 
                 /* First initialize the BDD and two BDD arrays*/
@@ -667,30 +671,29 @@ public class BDDPartitionSetEve extends BDDPartitionSet {
                 }
 
                 /*
-                 * We still need to track another thing.  
-                 * First of all, let's see an example: assuming that EFA E_1 has two edges labeled by e. One edge has guards and one doesn't. 
-                 * What should be included in the guard variables if we only consider this EFA? Apprently, all, right? since one edge doesn't 
-                 * have any guard. Now, let's consider another EFA E_2 which also has two edges labeled by e. But at this time both edges have 
-                 * guards. What should be included in the guard variables if they are synchronized? The union of all variables in these guards. 
-                 * The non-guard edge in E_1 is synchronized with either edge in E_2 which does have guard. 
+                 * We still need to track another thing.
+                 * First of all, let's see an example: assuming that EFA E_1 has two edges labeled by e. One edge has guards and one doesn't.
+                 * What should be included in the guard variables if we only consider this EFA? Apprently, all, right? since one edge doesn't
+                 * have any guard. Now, let's consider another EFA E_2 which also has two edges labeled by e. But at this time both edges have
+                 * guards. What should be included in the guard variables if they are synchronized? The union of all variables in these guards.
+                 * The non-guard edge in E_1 is synchronized with either edge in E_2 which does have guard.
                  * What if one edge in E_2 deosn't have guard. OK, here is the point: the guard variables should be all!
                  */
                 if (guards == null || (guards != null && guards.isEmpty())) {
                     allVarPossiblyUpdated = true;
                 }
-                
+
                 sourceBDD.andWith(destBDD);
                 sourceBDD.andWith(guardBDD);
                 return sourceBDD;
             }
 
             /* Find which EFA variables are in this edge. */
-            @SuppressWarnings("deprecation")
             private HashSet<String> extractVariablesFromTheEdge(final SimpleExpressionProxy guard) {
 
                 final HashSet<String> extractedVariables = new HashSet<String>();
 
-                for (final VariableComponentProxy var : anAutomaton.extractVariablesFromExpr(guard)) {
+                for (final VariableComponentProxy var : bddExAutomata.orgExAutomata.extractVariablesFromExpr(guard)) {
                     extractedVariables.add(var.getName());
                 }
 

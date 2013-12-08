@@ -210,6 +210,7 @@ public abstract class AbstractModelAnalyzer implements ModelAnalyzer
     throws AnalysisAbortException, OverflowException
   {
     if (mIsAborting) {
+      getLogger().debug("Abort request received - aborting ...");
       final AnalysisAbortException exception = new AnalysisAbortException();
       setExceptionResult(exception);
       throw exception;

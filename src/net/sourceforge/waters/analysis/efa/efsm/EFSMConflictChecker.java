@@ -1,7 +1,7 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters EFSM Analysis
-//# PACKAGE: net.sourceforge.waters.analysis.efa
+//# PACKAGE: net.sourceforge.waters.analysis.efa.efsm
 //# CLASS:   EFSMConflictChecker
 //###########################################################################
 //# $Id$
@@ -21,7 +21,10 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Set;
 
+import net.sourceforge.waters.analysis.compositional.ChainSelectionHeuristic;
+import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.analysis.efa.base.EFANonblockingChecker;
 import net.sourceforge.waters.analysis.tr.BFSSearchSpace;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -40,9 +43,15 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
+import org.apache.log4j.Logger;
+
+
 /**
+ * The compositional EFSM-based conflict check algorithm.
+ *
  * @author Robi Malik, Sahar Mohajerani
  */
+
 public class EFSMConflictChecker extends AbstractModuleConflictChecker
 {
 
@@ -59,7 +68,8 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
     super(model, factory);
   }
 
-  public EFSMConflictChecker(final ModuleProxy model, final IdentifierProxy marking,
+  public EFSMConflictChecker(final ModuleProxy model,
+                             final IdentifierProxy marking,
                              final ModuleProxyFactory factory)
   {
     super(model, marking, factory);
@@ -98,22 +108,24 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
     mEFSMTRSimplifierFactory = factory;
   }
 
-  public ChainVariableSelectionHeuristic getChainVariableSelectionHeuristic()
+  public SelectionHeuristic<EFSMVariable> getVariableSelectionHeuristic()
   {
-    return mChainVariableSelectionHeuristic;
+    return mVariableSelectionHeuristic;
   }
 
-  public void setChainVariableSelectionHeuristic(final ChainVariableSelectionHeuristic chain)
+  public void setVariableSelectionHeuristic
+    (final SelectionHeuristic<EFSMVariable> chain)
   {
-    mChainVariableSelectionHeuristic = chain;
+    mVariableSelectionHeuristic = chain;
   }
 
-  public CompositionSelectionHeuristic getCompositionSelectionHeuristic()
+  public SelectionHeuristic<EFSMPair> getCompositionSelectionHeuristic()
   {
     return mCompositionSelectionHeuristic;
   }
 
-  public void setCompositionSelectionHeuristic(final CompositionSelectionHeuristic heuristic)
+  public void setCompositionSelectionHeuristic
+    (final SelectionHeuristic<EFSMPair> heuristic)
   {
     mCompositionSelectionHeuristic = heuristic;
   }
@@ -138,6 +150,12 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
   public CompilerOperatorTable getOperatorTable()
   {
     return mCompilerOperatorTable;
+  }
+
+
+  EFSMSystem getCurrentEFSMSystem()
+  {
+    return mCurrentEFSMSystem;
   }
 
 
@@ -200,32 +218,37 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
     if (mDocumentManager == null) {
       mDocumentManager = new DocumentManager();
     }
-    if (mChainVariableSelectionHeuristic == null) {
-      final List <VariableSelectionHeuristic> defaultVariableSelectionHeuristicList =
-        new ArrayList<VariableSelectionHeuristic>();
-//      final VariableSelectionHeuristic maxT =
-//        new MaxTrueVariableSelectionHeuristic(factory, mCompilerOperatorTable);
-//      defaultVariableSelectionHeuristicList.add(maxT);
-//      final VariableSelectionHeuristic minS =
-//        new MinStatesVariableSelectionHeuristic(factory, mCompilerOperatorTable);
-//      defaultVariableSelectionHeuristicList.add(minS);
-      final VariableSelectionHeuristic maxOc =
-        new MaxOccurrenceVariableSelectionHeuristic(factory, mCompilerOperatorTable);
-      defaultVariableSelectionHeuristicList.add(maxOc);
-      final VariableSelectionHeuristic maxSelfloop =
-        new MaxSelfloopVariableSelectionHeuristic(factory, mCompilerOperatorTable);
-      defaultVariableSelectionHeuristicList.add(maxSelfloop);
-      final VariableSelectionHeuristic minES =
-        new EstimatedMinStatesVariableSelectionHeuristic(factory, mCompilerOperatorTable);
-      defaultVariableSelectionHeuristicList.add(minES);
-      mChainVariableSelectionHeuristic=
-        new ChainVariableSelectionHeuristic
-        (factory, mCompilerOperatorTable, defaultVariableSelectionHeuristicList);
+    if (mVariableSelectionHeuristic == null) {
+//      final AbstractSelectionHeuristic<EFSMVariable> maxT =
+//        new MaxTrueVariableSelectionHeuristic();
+//      final AbstractSelectionHeuristic<EFSMVariable> minS =
+//        new MinStatesVariableSelectionHeuristic();
+      final SelectionHeuristic<EFSMVariable> maxOc =
+        new MaxOccurrenceVariableSelectionHeuristic();
+      final SelectionHeuristic<EFSMVariable> maxSelfloop =
+        new MaxSelfloopVariableSelectionHeuristic();
+      final SelectionHeuristic<EFSMVariable> minES =
+        new EstimatedMinStatesVariableSelectionHeuristic();
+      mVariableSelectionHeuristic =
+        new ChainSelectionHeuristic<EFSMVariable>(maxOc, maxSelfloop, minES);
     }
-
+    mUnfoldingCache = new EFSMUnfoldingCache(this);
+    mVariableSelectionHeuristic.setContext(mUnfoldingCache);
     if (mCompositionSelectionHeuristic == null) {
+      /*
+      final SelectionHeuristic<EFSMPair> minV =
+        new MinSharedVariablesCompositionSelectionHeuristic();
+      final SelectionHeuristic<EFSMPair> minF =
+        new MinFrontierCompositionSelectionHeuristic();
+      final SelectionHeuristic<EFSMPair> minSynch =
+        new MinSynchCompositionSelectionHeuristic();
       mCompositionSelectionHeuristic =
-        new MinSynchCompositionSelectionHeuristic(factory, mCompilerOperatorTable);
+        new ChainSelectionHeuristic<EFSMPair>(minV, minF, minSynch);
+      */
+      final SelectionHeuristic<EFSMPair> minSynch =
+        new MinSynchCompositionSelectionHeuristic();
+      mCompositionSelectionHeuristic =
+        new ChainSelectionHeuristic<EFSMPair>(minSynch);
     }
 
     if (mEFSMTRSimplifierFactory == null) {
@@ -251,12 +274,11 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
   {
     mCompilerOperatorTable = null;
     mDocumentManager = null;
-    mChainVariableSelectionHeuristic = null;
-    mCompositionSelectionHeuristic = null;
     mEFSMTRSimplifierFactory = null;
     mSimplifier = null;
     mVariablePartitionComputer = null;
     mPartialUnfolder = null;
+    mUnfoldingCache = null;
     mEFSMSynchronizer = null;
     mNonblockingChecker = null;
     mEFSMVariableCollector = null;
@@ -338,6 +360,7 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
   private boolean runCompositionalMinimization()
     throws AnalysisException, EvalException
   {
+    final Logger logger = getLogger();
     final EFSMConflictCheckerAnalysisResult result = getAnalysisResult();
     while (!mCurrentEFSMSystem.getTransitionRelations().isEmpty()) {
       if (isCurrentSubsystemTrivial()) {
@@ -352,12 +375,17 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
       }
       final List<EFSMTransitionRelation> efsmTransitionRelationList =
         mCurrentEFSMSystem.getTransitionRelations();
+      final List<EFSMVariable> localVars =
+        mCurrentEFSMSystem.getLocalVariables();
       final EFSMVariable varSelected =
-        mChainVariableSelectionHeuristic.selectVariable(mCurrentEFSMSystem);
+        mVariableSelectionHeuristic.select(localVars);
       if (varSelected != null) {
+        logger.debug("UNFOLDING: " + varSelected.getName());
         result.addCompositionAttempt();
         final EFSMTransitionRelation varEFSMTransitionRelation =
           varSelected.getTransitionRelation();
+        final int expectedNumVars =
+          varEFSMTransitionRelation.getVariables().size() - 1;
         final TRPartition partition =
           mVariablePartitionComputer.computePartition(varSelected,
                                                       mCurrentEFSMSystem);
@@ -386,27 +414,28 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
             break;
           }
         }
-        if (unfoldSimplified.getVariables().size() + 1 <
-            varEFSMTransitionRelation.getVariables().size()) {
+        if (unfoldSimplified.getVariables().size() < expectedNumVars) {
           splitCurrentSubsystem();
         }
       } else if (efsmTransitionRelationList.size() > 1) {
         result.addCompositionAttempt();
-        final List<EFSMTransitionRelation> selectedTR =
-          mCompositionSelectionHeuristic.selectComposition(mCurrentEFSMSystem);
-        final EFSMTransitionRelation TR1 = selectedTR.get(0);
-        final EFSMTransitionRelation TR2 = selectedTR.get(1);
+        final Set<EFSMPair> pairs = mCurrentEFSMSystem.getPairs();
+        final EFSMPair selectedPair =
+          mCompositionSelectionHeuristic.select(pairs);
+        logger.debug("COMPOSING: " + selectedPair);
+        final EFSMTransitionRelation TR1 = selectedPair.getFirst();
+        final EFSMTransitionRelation TR2 = selectedPair.getSecond();
         final EFSMTransitionRelation synchTR =
           mEFSMSynchronizer.synchronize(TR1, TR2);
         result.addEFSMTransitionRelation(synchTR);
+        final int expectedNumVars = synchTR.getVariables().size();
         EFSMTransitionRelation synchSimplified = simplify(synchTR);
         final boolean splitting;
         if (synchSimplified == null) {
           synchSimplified = synchTR;
           splitting = false;
         } else {
-          splitting =
-            synchTR.getVariables().size() < synchSimplified.getVariables().size();
+          splitting = synchSimplified.getVariables().size() < expectedNumVars;
         }
         efsmTransitionRelationList.remove(TR1);
         efsmTransitionRelationList.remove(TR2);
@@ -633,14 +662,15 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
   //# Data Members
   private CompilerOperatorTable mCompilerOperatorTable;
   private EFSMTRSimplifierFactory mEFSMTRSimplifierFactory;
-  private ChainVariableSelectionHeuristic mChainVariableSelectionHeuristic;
+  private SelectionHeuristic<EFSMVariable> mVariableSelectionHeuristic;
+  private SelectionHeuristic<EFSMPair> mCompositionSelectionHeuristic;
   private int mInternalTransitionLimit = Integer.MAX_VALUE;
 
   private DocumentManager mDocumentManager;
   private EFSMTRSimplifier mSimplifier;
   private EFSMVariablePartitionComputer mVariablePartitionComputer;
   private EFSMPartialUnfolder mPartialUnfolder;
-  private CompositionSelectionHeuristic mCompositionSelectionHeuristic;
+  private EFSMUnfoldingCache mUnfoldingCache;
   private EFSMSynchronizer mEFSMSynchronizer;
   private EFANonblockingChecker mNonblockingChecker;
   private EFSMVariableCollector mEFSMVariableCollector;

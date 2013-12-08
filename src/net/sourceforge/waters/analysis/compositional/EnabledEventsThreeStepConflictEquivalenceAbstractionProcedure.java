@@ -133,7 +133,6 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
 
     final IncomingEquivalenceTRSimplifier incomingEquivalenceSimplifier =
       new IncomingEquivalenceTRSimplifier();
-    incomingEquivalenceSimplifier.setTransitionLimit(limit);
     postChain.add(incomingEquivalenceSimplifier);
 
     final EnabledEventsSilentContinuationTRSimplifier silentContinuationSimplifier =

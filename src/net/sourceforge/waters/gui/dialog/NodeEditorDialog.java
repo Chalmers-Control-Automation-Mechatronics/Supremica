@@ -29,7 +29,6 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 
 import net.sourceforge.waters.gui.GraphEditorPanel;
-import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.language.ProxyNamer;
@@ -54,6 +53,8 @@ import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 
+import org.supremica.gui.ide.ModuleContainer;
+
 
 /**
  * @author Carly Hona
@@ -65,19 +66,19 @@ public class NodeEditorDialog
 
   //#########################################################################
   //# Constructors
-  public NodeEditorDialog(final ModuleWindowInterface root,
+  public NodeEditorDialog(final ModuleContainer root,
                           final SelectionOwner panel,
                           final NodeSubject node)
   {
-    super(root.getRootWindow());
+    super(root.getIDE());
     setTitle("Editing " + ProxyNamer.getItemClassName(node) + " '" +
              node.getName() + "'");
-    mRoot = root;
+    mModuleContainer = root;
     mPanel = panel;
     mNode = node;
     createComponents();
     layoutComponents();
-    setLocationRelativeTo(mRoot.getRootWindow());
+    setLocationRelativeTo(mModuleContainer.getIDE());
     mNameInput.requestFocusInWindow();
     setVisible(true);
     setMinimumSize(getSize());
@@ -85,12 +86,11 @@ public class NodeEditorDialog
 
   //#########################################################################
   //# Static Invocation
-  public static void showDialog(final GraphEditorPanel panel,
+  public static void showDialog(final ModuleContainer moduleContainer,
+                                final GraphEditorPanel panel,
                                 final NodeSubject node)
   {
-    final ModuleWindowInterface root =
-      panel.getEditorInterface().getModuleWindowInterface();
-    new NodeEditorDialog(root, panel, node);
+    new NodeEditorDialog(moduleContainer, panel, node);
   }
 
 
@@ -115,6 +115,7 @@ public class NodeEditorDialog
   {
     final NodeSubject template = mNode;
     final ActionListener commithandler = new ActionListener() {
+        @Override
         public void actionPerformed(final ActionEvent event)
         {
           commitDialog();
@@ -132,7 +133,7 @@ public class NodeEditorDialog
     mNameInput.setToolTipText("Enter node name, eg. \"IDLE\" or \"WORKING\"");
 
     final ModuleProxyCloner cloner = ModuleSubjectFactory.getCloningInstance();
-    mPropostionsPanel = new PropositionsPanel(mRoot, (NodeSubject) cloner.getClone(mNode));
+    mPropostionsPanel = new PropositionsPanel(mModuleContainer, (NodeSubject) cloner.getClone(mNode));
 
     // Attributes panel ...
     mAttributesPanel =
@@ -302,7 +303,7 @@ public class NodeEditorDialog
       final UndoInfo info = mNode.createUndoInfo(template, boundary);
       if (info != null) {
         final Command command = new EditCommand(mNode, info, mPanel, null);
-        mRoot.getUndoInterface().executeCommand(command);
+        mModuleContainer.executeCommand(command);
       }
       dispose();
     }
@@ -348,6 +349,7 @@ public class NodeEditorDialog
 
     //#######################################################################
     //# Overrides for net.sourceforge.waters.gui.AttributesPanel
+    @Override
     boolean isInputLocked()
     {
       return NodeEditorDialog.this.isInputLocked();
@@ -368,17 +370,18 @@ public class NodeEditorDialog
     //# Constructor
     private NodeNameInputParser(final SimpleIdentifierProxy oldident)
     {
-      super(oldident, mRoot.getExpressionParser());
+      super(oldident, mModuleContainer.getExpressionParser());
     }
 
     //#######################################################################
     //# Interface net.sourceforge.waters.gui.FormattedInputParser
+    @Override
     public SimpleIdentifierProxy parse(final String text) throws net.sourceforge.waters.model.expr.ParseException
     {
       final SimpleIdentifierProxy ident = super.parse(text);
       final String oldname = getOldName();
       if (!text.equals(oldname)) {
-        final GraphSubject graph = mRoot.getActiveEditorWindowInterface().getGraphEditorPanel().getGraph();
+        final GraphSubject graph = mModuleContainer.getActiveEditorWindowInterface().getGraphEditorPanel().getGraph();
         if (graph.getNodesModifiable().containsName(text)) {
           throw new ParseException
           ("Node name '" + text + "' is already taken!", 0);
@@ -392,7 +395,7 @@ public class NodeEditorDialog
   //#########################################################################
   //# Data Members
   // Environment
-  private final ModuleWindowInterface mRoot;
+  private final ModuleContainer mModuleContainer;
   private final SelectionOwner mPanel;
 
   // Swing components

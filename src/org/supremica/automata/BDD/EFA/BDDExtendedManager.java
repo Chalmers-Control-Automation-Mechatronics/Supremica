@@ -37,11 +37,9 @@ import org.supremica.properties.Config;
 
 public class BDDExtendedManager extends BDDAbstractManager {
 
-    //Variabes used for RAS models
     BDD globalLargerBDD = null;
-    //The BDD representing the forward transition relation, where the dest variables are removed.
+    //The BDD representing the forward transition relation, where the destination variables are removed.
     BDD frwdTrans = null;
-//    BDD completeFrwdTrans = null;
     //The BDD representing the backward transition relation
     BDD bckwdTransEvents = null;
     BDD frwdLoadingTrans = null;
@@ -50,8 +48,8 @@ public class BDDExtendedManager extends BDDAbstractManager {
     BDD unreachableStates = null;
     TIntObjectHashMap<BDD> event2ParitionBDD = null;
     BDD[] partitionBDDs = null;
-    BDD[] possUnsafeStatesBDDs = null;
-    BDD[] unsafeStatesTargetTrans = null;
+    BDD[] accuLocalUnsafeStatesBDDs = null;
+    BDD[] accuTransToGlobalUnsafeStates = null;
     int componentSize;
     BDD minimalBoundaryUnsafeStates = null;
     TIntArrayList stageVarIndexList = null;
@@ -1233,7 +1231,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
       return globalLargerBDD;
     }
 
-    // Build the BDD of feasible states from the resource invariants (module comments)
+    // Build the BDD of feasible states from the resource invariants
     private BDD getFeasibleSourceStatesBDD() {
 
         if (feasibleSourceStates == null) {
@@ -1317,7 +1315,13 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
         System.out.println("The number of boundary unsafe states is " + nbrOfBoundUnsafeStates);
 
-        return boundaryUnsafeStates.exist(bddExAutomata.getSourceResourceVarSet());
+        final BDD boundaryUnStatesWithoutResourceVar = boundaryUnsafeStates
+          .exist(bddExAutomata.getSourceResourceVarSet());
+
+        // clean up
+        boundaryUnsafeStates.free();
+
+        return boundaryUnStatesWithoutResourceVar;
     }
 
     // Get the event partial transition relation BDD
@@ -1361,15 +1365,16 @@ public class BDDExtendedManager extends BDDAbstractManager {
             }
         });
 
-        possUnsafeStatesBDDs = new BDD[componentSize];
-        unsafeStatesTargetTrans = new BDD[componentSize];
+        accuLocalUnsafeStatesBDDs = new BDD[componentSize];
+        accuTransToGlobalUnsafeStates = new BDD[componentSize];
 
         for (int i = 0; i < componentSize; i++) {
-            possUnsafeStatesBDDs[i] = getZeroBDD();
-            unsafeStatesTargetTrans[i] = getZeroBDD();
+            accuLocalUnsafeStatesBDDs[i] = getZeroBDD();
+            accuTransToGlobalUnsafeStates[i] = getZeroBDD();
         }
 
         feasibleSourceStates = getFeasibleSourceStatesBDD();
+        getGlobalStrictLargerBDD();
     }
 
     // Compute all deadlock states using partitioning techniques
@@ -1400,7 +1405,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
                     .andWith(nonDeadlocks.not()));
         }
 
-        deadlocks.andWith(feasibleSourceStates).andWith(initv.not());
+        deadlocks.andWith(feasibleSourceStates.id()).andWith(initv.not());
 
         // cleanup
         nonDeadlocks.free();
@@ -1429,7 +1434,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
         final BDD[] partitionSourceStates = new BDD[componentSize];
         final BDD[] notUnsafeStates = new BDD[componentSize];
-        final BDD[] possiableUnsafeStates = new BDD[componentSize];
+        final BDD[] currLocalUnsafeStates = new BDD[componentSize];
 
         for (int i = 0; i < componentSize; i++)
             partitionSourceStates[i] = partitionBDDs[i].exist(bddExAutomata.getDestVariablesVarSet());
@@ -1445,17 +1450,23 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
                 final BDD transToUnsafeStates = newFoundUnsafeTargetStates.and(partition);
 
-                possiableUnsafeStates[i] = transToUnsafeStates.exist(bddExAutomata.getDestVariablesVarSet());
+                currLocalUnsafeStates[i] = transToUnsafeStates.exist(bddExAutomata.getDestVariablesVarSet());
 
-                possUnsafeStatesBDDs[i] = possUnsafeStatesBDDs[i].or(possiableUnsafeStates[i]);
+                accuLocalUnsafeStatesBDDs[i] = accuLocalUnsafeStatesBDDs[i].or(currLocalUnsafeStates[i]);
 
-                final BDD notPartitionUnsafeStates = possUnsafeStatesBDDs[i].not();
+                if (accuLocalUnsafeStatesBDDs[i].nodeCount() > maxBDDSizePartitioning)
+                  maxBDDSizePartitioning = accuLocalUnsafeStatesBDDs[i].nodeCount();
+
+                final BDD notPartitionUnsafeStates = accuLocalUnsafeStatesBDDs[i].not();
 
                 notUnsafeStates[i] = partitionSourceStates[i].and(notPartitionUnsafeStates);
 
                 notPartitionUnsafeStates.free();
 
-                unsafeStatesTargetTrans[i].orWith(transToUnsafeStates);
+                accuTransToGlobalUnsafeStates[i].orWith(transToUnsafeStates);
+
+                if (accuTransToGlobalUnsafeStates[i].nodeCount() > maxBDDSizePartitioning)
+                  maxBDDSizePartitioning = accuTransToGlobalUnsafeStates[i].nodeCount();
             }
 
             newFoundUnsafeTargetStates.free();
@@ -1464,33 +1475,29 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
             for (int j1 = 0; j1 < componentSize; j1++) {
 
-                final BDD localNewUnStates = possiableUnsafeStates[j1];
+                final BDD currLocalUnStates = currLocalUnsafeStates[j1];
 
                 for (int j2 = 0; j2 < componentSize; j2++) {
                     if (j1 != j2) {
-                        localNewUnStates.andWith(notUnsafeStates[j2].not());
+                        currLocalUnStates.andWith(notUnsafeStates[j2].not());
                     }
                 }
 
-                newFoundUnsafeStates.orWith(localNewUnStates);
+                newFoundUnsafeStates.orWith(currLocalUnStates);
                 if (newFoundUnsafeStates.nodeCount() > maxBDDSizePartitioning)
                     maxBDDSizePartitioning = newFoundUnsafeStates.nodeCount();
             }
 
             for (int j = 0; j < componentSize; j++) {
 
-              unsafeStatesTargetTrans[j].andWith(newFoundUnsafeStates.not());
+              accuTransToGlobalUnsafeStates[j].andWith(newFoundUnsafeStates.not());
 
-              if (unsafeStatesTargetTrans[j].nodeCount() > maxBDDSizePartitioning) {
-                  maxBDDSizePartitioning = unsafeStatesTargetTrans[j].nodeCount();
+              if (accuTransToGlobalUnsafeStates[j].nodeCount() > maxBDDSizePartitioning) {
+                  maxBDDSizePartitioning = accuTransToGlobalUnsafeStates[j].nodeCount();
               }
 
               notUnsafeStates[j].free();
             }
-
-            newFoundUnsafeStates.andWith(unsafeStates.not());
-            if (newFoundUnsafeStates.nodeCount() > maxBDDSizePartitioning)
-                    maxBDDSizePartitioning = newFoundUnsafeStates.nodeCount();
 
             unsafeStates = unsafeStates.or(newFoundUnsafeStates);
             if (unsafeStates.nodeCount() > maxBDDSizePartitioning)
@@ -1520,16 +1527,18 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
           partitionSourceStates[i].free();
           partitionBDDs[i].free();
-          possUnsafeStatesBDDs[i].free();
+          accuLocalUnsafeStatesBDDs[i].free();
 
-          final BDD partitionBoundaryUnsafeStates = unsafeStatesTargetTrans[i]
+          final BDD partitionBoundaryUnsafeStates = accuTransToGlobalUnsafeStates[i]
             .exist(bddExAutomata.getSourceVariablesVarSet());
 
-          unsafeStatesTargetTrans[i].free();
+          accuTransToGlobalUnsafeStates[i].free();
 
           boundaryUnsafeStates.orWith(partitionBoundaryUnsafeStates
                                          .replaceWith(bddExAutomata.getDestToSourceVariablePairing()));
 
+          if (boundaryUnsafeStates.nodeCount() > maxBDDSizePartitioning)
+            maxBDDSizePartitioning = boundaryUnsafeStates.nodeCount();
         }
 
         if (boundaryUnsafeStates.nodeCount() > maxBDDSizePartitioning)

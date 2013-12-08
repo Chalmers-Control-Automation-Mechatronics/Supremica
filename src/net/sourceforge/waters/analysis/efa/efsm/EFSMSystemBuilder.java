@@ -80,7 +80,8 @@ public class EFSMSystemBuilder extends AbstractEFSMAlgorithm
     mSourceInfoBuilder = builder;
     mOperatorTable = CompilerOperatorTable.getInstance();
     mSimpleExpressionCompiler =
-      new SimpleExpressionCompiler(mFactory, mOperatorTable);
+      new SimpleExpressionCompiler(mFactory, mSourceInfoBuilder,
+                                   mOperatorTable);
     mEFSMVariableFinder = new EFSMVariableFinder(mOperatorTable);
     mInputModule = module;
     final String moduleName = module.getName();
@@ -372,7 +373,8 @@ public class EFSMSystemBuilder extends AbstractEFSMAlgorithm
     {
       mGuardCompiler = new EFAGuardCompiler(mFactory, mOperatorTable);
       mConstraintPropagator =
-        new ConstraintPropagator(mFactory, mOperatorTable, mVariableContext);
+        new ConstraintPropagator(mFactory, mSourceInfoBuilder,
+                                 mOperatorTable, mVariableContext);
       mEFSMVariableCollector = new EFSMVariableCollector(mOperatorTable, mVariableContext);
     }
 

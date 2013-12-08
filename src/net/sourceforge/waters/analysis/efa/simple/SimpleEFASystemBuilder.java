@@ -77,7 +77,8 @@ public class SimpleEFASystemBuilder implements Abortable
     mSourceInfoBuilder = builder;
     mOperatorTable = CompilerOperatorTable.getInstance();
     mSimpleExpressionCompiler =
-     new SimpleExpressionCompiler(mFactory, mOperatorTable);
+      new SimpleExpressionCompiler(mFactory, mSourceInfoBuilder,
+                                   mOperatorTable);
 //    mEFAVariableFinder = new SimpleEFAVariableFinder(mOperatorTable);
     mInputModule = module;
     final String moduleName = module.getName();
@@ -355,7 +356,8 @@ public class SimpleEFASystemBuilder implements Abortable
     {
       mGuardCompiler = new EFAGuardCompiler(mFactory, mOperatorTable);
       mConstraintPropagator =
-       new ConstraintPropagator(mFactory, mOperatorTable, mVariableContext);
+        new ConstraintPropagator(mFactory, mSourceInfoBuilder,
+                                 mOperatorTable, mVariableContext);
       mEFAVariableCollector = new SimpleEFAVariableCollector(mOperatorTable,
                                                              mVariableContext);
     }

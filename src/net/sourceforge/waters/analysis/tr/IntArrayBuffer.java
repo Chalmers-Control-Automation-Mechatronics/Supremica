@@ -53,7 +53,7 @@ public class IntArrayBuffer implements WatersIntHashingStrategy
    */
   public IntArrayBuffer(final int arraySize)
   {
-    this(arraySize, 0);
+    this(arraySize, Integer.MAX_VALUE);
   }
 
   /**
@@ -174,10 +174,11 @@ public class IntArrayBuffer implements WatersIntHashingStrategy
   }
 
   /**
-   * Gets an array containing the contents of the given set.
-   * @param  set     The unique set index identifying the set to be examined
-   *                 in this integer set buffer.
-   * @return A newly allocated array containing the numbers in the set.
+   * Retrieves the contents of the given array.
+   * @param  array   The unique set index identifying the array to be examined
+   *                 in this integer array buffer.
+   * @param  data    Array to receive data. Must be allocated to the size of
+   *                 the arrays in this buffer.
    */
   public void getContents(final int array, final int[] data)
   {

@@ -1,63 +1,61 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
+//# PROJECT: Waters EFSM Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efa.efsm
-//# CLASS:   MinStatesVariableSelectionHeuristic
+//# CLASS:   MaxTrueCompositionSelectionHeuristic
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.efa.efsm;
 
-import java.util.List;
-
+import net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
-import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
+
 
 /**
+ * The &quot;maximum true&quot; composition selection
+ * heuristic for EFSMs. This heuristic gives preference to composition
+ * candidates with the maximum ratio of true updates (tau transitions)
+ * over the total number of transitions in the synchronous product of
+ * the EFSMs in the candidate.
+ *
  * @author Robi Malik, Sahar Mohajerani
  */
-public class MaxTrueCompositionSelectionHeuristic extends
-  CompositionSelectionHeuristic
+
+public class MaxTrueCompositionSelectionHeuristic
+  extends NumericSelectionHeuristic<EFSMPair>
 {
-//#########################################################################
-  //# Constructors
-  public MaxTrueCompositionSelectionHeuristic(final ModuleProxyFactory factory,
-                                             final CompilerOperatorTable op)
-  {
-    super(factory, op);
-  }
 
   //#########################################################################
-  //# Invocation
-
+  //# Overrides for
+  //# net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic
   @Override
-  public double getHeuristicValue(final List<EFSMTransitionRelation> candidate)
-    throws AnalysisException, EvalException
+  protected double getHeuristicValue(final EFSMPair candidate)
   {
-    double numStates = 1;
-    double trueUpdates = 0;
-    double numTransitions = 0;
-    for (final EFSMTransitionRelation efsmTR : candidate) {
-      numStates = numStates * efsmTR.getTransitionRelation().getNumberOfStates();
+    final ListBufferTransitionRelation rel1 =
+      candidate.getFirst().getTransitionRelation();
+    final ListBufferTransitionRelation rel2 =
+      candidate.getSecond().getTransitionRelation();
+    final double numStates =
+      rel1.getNumberOfStates() * rel2.getNumberOfStates();
+    final double numTransitions =
+      rel1.getNumberOfTransitions() * numStates / rel1.getNumberOfStates() +
+      rel2.getNumberOfTransitions() * numStates / rel2.getNumberOfStates();
+    int trueUpdates = 0;
+    final TransitionIterator iter1 =
+      rel1.createAllTransitionsReadOnlyIterator(EventEncoding.TAU);
+    while (iter1.advance()) {
+      trueUpdates++;
     }
-
-    for (final EFSMTransitionRelation efsmTR : candidate) {
-      final ListBufferTransitionRelation rel = efsmTR.getTransitionRelation();
-      final TransitionIterator iter =
-        rel.createAllTransitionsReadOnlyIterator(EventEncoding.TAU);
-      while (iter.advance()) {
-        trueUpdates ++;
-      }
-      numTransitions = numTransitions +
-        rel.getNumberOfTransitions() * numStates/rel.getNumberOfStates();
-
+    final TransitionIterator iter2 =
+      rel1.createAllTransitionsReadOnlyIterator(EventEncoding.TAU);
+    while (iter2.advance()) {
+      trueUpdates++;
     }
-    return - trueUpdates/numTransitions;
+    return - trueUpdates / numTransitions;
   }
+
 }

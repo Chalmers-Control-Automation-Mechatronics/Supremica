@@ -116,18 +116,15 @@ public class CompositionalStateRepresentationSynthesizer extends
    * @param preselectingMethodFactory
    *          Enumeration factory that determines possible candidate
    *          preselection methods.
-   * @param selectingMethodFactory
-   *          Enumeration factory that determines possible candidate selection
-   *          methods.
    */
-  public CompositionalStateRepresentationSynthesizer(final ProductDESProxyFactory factory,
-                                  final KindTranslator translator,
-                                  final StateRepresentationSynthesisAbstractionProcedureFactory abstractionFactory,
-                                  final PreselectingMethodFactory preselectingMethodFactory,
-                                  final SelectingMethodFactory selectingMethodFactory)
+  public CompositionalStateRepresentationSynthesizer
+    (final ProductDESProxyFactory factory,
+     final KindTranslator translator,
+     final StateRepresentationSynthesisAbstractionProcedureFactory abstractionFactory,
+     final PreselectingMethodFactory preselectingMethodFactory)
   {
     this(null, factory, translator, abstractionFactory,
-         preselectingMethodFactory, selectingMethodFactory);
+         preselectingMethodFactory);
   }
 
   /**
@@ -143,13 +140,13 @@ public class CompositionalStateRepresentationSynthesizer extends
    * @param wsoe
    *          Factory to define the abstraction sequence to be used.
    */
-  public CompositionalStateRepresentationSynthesizer(final ProductDESProxy model,
-                                  final ProductDESProxyFactory factory,
-                                  final KindTranslator translator,
-                                  final StateRepresentationSynthesisAbstractionProcedureFactory wsoe)
+  public CompositionalStateRepresentationSynthesizer
+    (final ProductDESProxy model,
+     final ProductDESProxyFactory factory,
+     final KindTranslator translator,
+     final StateRepresentationSynthesisAbstractionProcedureFactory wsoe)
   {
-    this(model, factory, translator, wsoe,
-         new PreselectingMethodFactory(), new SelectingMethodFactory());
+    this(model, factory, translator, wsoe, new PreselectingMethodFactory());
   }
 
   /**
@@ -167,19 +164,15 @@ public class CompositionalStateRepresentationSynthesizer extends
    * @param preselectingMethodFactory
    *          Enumeration factory that determines possible candidate
    *          preselection methods.
-   * @param selectingMethodFactory
-   *          Enumeration factory that determines possible candidate selection
-   *          methods.
    */
-  public CompositionalStateRepresentationSynthesizer(final ProductDESProxy model,
-                                  final ProductDESProxyFactory factory,
-                                  final KindTranslator translator,
-                                  final StateRepresentationSynthesisAbstractionProcedureFactory wsoe,
-                                  final PreselectingMethodFactory preselectingMethodFactory,
-                                  final SelectingMethodFactory selectingMethodFactory)
+  public CompositionalStateRepresentationSynthesizer
+    (final ProductDESProxy model,
+     final ProductDESProxyFactory factory,
+     final KindTranslator translator,
+     final StateRepresentationSynthesisAbstractionProcedureFactory wsoe,
+     final PreselectingMethodFactory preselectingMethodFactory)
   {
-    super(model, factory, translator, wsoe,
-          preselectingMethodFactory, selectingMethodFactory);
+    super(model, factory, translator, wsoe, preselectingMethodFactory);
   }
 
   //#########################################################################
