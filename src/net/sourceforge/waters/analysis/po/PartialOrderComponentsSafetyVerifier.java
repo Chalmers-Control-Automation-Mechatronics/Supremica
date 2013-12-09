@@ -330,8 +330,6 @@ extends PartialOrderComponentsModelVerifier implements SafetyVerifier
   //Statistics
   @SuppressWarnings("unused")
   private int mNumIndependentPairings;
-  @SuppressWarnings("unused")
-  private int mFullExpansions;
   private final SafetyDiagnostics mDiagnostics;
 }
 

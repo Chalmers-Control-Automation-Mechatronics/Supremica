@@ -562,15 +562,12 @@ public abstract class PartialOrderComponentsModelVerifier
 
   protected WatersIntHeap enabled(final PartialOrderStateTuple current)
   {
-    //final KindTranslator translator = getKindTranslator();
     mEnabledHash = new TIntHashSet();
     final WatersIntHeap heap = new WatersIntHeap(mComparator);
     decode(current,mSystemState);
     events:
     for (int i = 0; i < mNumEvents; i++){
       boolean selfLoop = true;
-      //final EventProxy event = mEventCodingList.get(i);
-      //final EventKind kind = translator.getEventKind(event);
       for (int j = 0; j < mNumAutomata; j++){
         final boolean plant = j < mNumPlants;
         final int si = j - mNumPlants;
@@ -581,17 +578,6 @@ public abstract class PartialOrderComponentsModelVerifier
           mSpecTransitionMap.get(si);
         final int sourceState = mSystemState[j];
         final int targetState = transitionMap[sourceState][i];
-        /*if (targetState == -1){
-          if (kind == EventKind.UNCONTROLLABLE && !plant){
-            mErrorEvent = i;
-            mErrorAutomaton = j;
-            mErrorState = current;
-            return null;
-          }
-          else{
-            continue events;
-          }
-        }*/
         if(targetState == -1){
           continue events;
         }
@@ -648,7 +634,7 @@ public abstract class PartialOrderComponentsModelVerifier
             mReducedEventDependencyMap[ampleEvent]) {
             final int dependentCandidate = t.getCoupling();
             if(!ampleSet.contains(dependentCandidate)){
-              if (mEnabledHash.contains(dependentCandidate)/*&&!ampleSet.contains(dependentCandidate)*/) {
+              if (mEnabledHash.contains(dependentCandidate)) {
                 ample.add(dependentCandidate);
                 if(ample.size() == mEnabledHash.size()){
                   current.setFullyExpanded(ample.size() == mEnabledHash.size());
@@ -665,47 +651,6 @@ public abstract class PartialOrderComponentsModelVerifier
           considered.add(ampleEvent);
         }
       }
-      /*for (i = 0; i < mEventCodingList.size(); i++){
-        if (!ampleSet.contains(i)){
-          final BitSet ampleDependencies = new BitSet(mNumEvents);
-          for (final PartialOrderEventDependencyTuple t :
-            mReducedEventDependencyMap[i]){
-            ampleDependencies.set(t.getCoupling());
-          }
-          for (j = 0;j < ample.size(); j++){
-            if (ampleDependencies.get(ample.get(j))){
-              if (mEnabledHash.contains(i)){
-                ample.add(i);
-                ampleSet.add(i);
-                considered.add(i);
-                i = -1;
-              }
-              else{
-                dependentNonEnabled.add(i);
-              }
-              break;
-            }
-          }
-        }
-      }*/
-
-      /*final TIntHashSet unionSet =
-        new TIntHashSet(ample.size() + dependentNonEnabled.size());
-      for (i = 0; i < dependentNonEnabled.size(); i++){
-        unionSet.add(dependentNonEnabled.get(i));
-      }
-      for (i = 0; i < ample.size(); i++){
-        unionSet.add(ample.get(i));
-      }
-      if (unionSet.size() == mEventCodingList.size()){
-        return ample.toArray();
-      }
-      final TIntHashSet eventsSetMinusUnion = new TIntHashSet();
-      for (i = 0; i < mEventCodingList.size(); i++){
-        if (!unionSet.contains(i)){
-          eventsSetMinusUnion.add(i);
-        }
-      }*/
       boolean danger = false;
       for (j = 0; j < dependentNonEnabled.size(); j++){
         final int dependent = dependentNonEnabled.get(j);
@@ -938,7 +883,6 @@ public abstract class PartialOrderComponentsModelVerifier
   private int[] mDependencyWeightings;
   private PartialOrderDependencyComparator mComparator;
   protected TIntHashSet mEnabledHash;
-  protected int MAXDEPTH;
 
   // Transition map
   protected List<int[][]> mPlantTransitionMap;
@@ -987,8 +931,7 @@ public abstract class PartialOrderComponentsModelVerifier
   @SuppressWarnings("unused")
   private int mNumIndependentPairings;
   protected int mComponentCount;
-  @SuppressWarnings("unused")
-  private int mFullExpansions;
+  protected int mFullExpansions;
   @SuppressWarnings("unused")
   private int mNumReducedSets;
 }

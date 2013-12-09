@@ -476,9 +476,6 @@ extends PartialOrderComponentsModelVerifier implements ConflictChecker
   private ConflictKind mConflictResult;
   // Component information
   private int mComponentNumber;
-  //Statistics
-  @SuppressWarnings("unused")
-  private int mFullExpansions;
   //Marking information
   private EventProxy mUsedMarking;
   private EventProxy mConfiguredMarking;
