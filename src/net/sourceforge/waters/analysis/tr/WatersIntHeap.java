@@ -172,6 +172,14 @@ public class WatersIntHeap
     return minItem;
   }
 
+  public int[] toArray(){
+    final int[] temp = new int[mCurrentSize];
+    for(int i = 0; i < mCurrentSize; i++){
+      temp[i] = mData[i+1];
+    }
+    return temp;
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods
