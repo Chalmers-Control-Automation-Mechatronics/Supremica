@@ -253,8 +253,7 @@ extends PartialOrderComponentsModelVerifier implements ConflictChecker
                 return false;
               }
             } else {
-              enabled(prev);
-              expand(prev, mEnabledHash.toArray(), false);
+              expand(prev, enabled(prev).toArray(), false);
               prev.setFullyExpanded(true);
               mFullExpansions++;
             }
@@ -282,8 +281,7 @@ extends PartialOrderComponentsModelVerifier implements ConflictChecker
     final int[] tempState = new int[mNumAutomata];
     int i;
     decode(current, tempState);
-    enabled(current);
-    final int[] enabledEvents = mEnabledHash.toArray();
+    final int[] enabledEvents =  enabled(current).toArray();
     for(final int e: enabledEvents){
       for (i = 0; i < mNumAutomata; i++){
         final boolean plant = i < mNumPlants;

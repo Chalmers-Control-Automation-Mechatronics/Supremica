@@ -562,7 +562,6 @@ public abstract class PartialOrderComponentsModelVerifier
 
   protected WatersIntHeap enabled(final PartialOrderStateTuple current)
   {
-    mEnabledHash = new TIntHashSet();
     final WatersIntHeap heap = new WatersIntHeap(mComparator);
     decode(current,mSystemState);
     events:
@@ -594,7 +593,6 @@ public abstract class PartialOrderComponentsModelVerifier
       if (selfLoop){
         continue events;
       }
-      mEnabledHash.add(i);
       heap.add(i);
     }
     current.setTotalSuccessors(heap.size());
@@ -608,12 +606,13 @@ public abstract class PartialOrderComponentsModelVerifier
     }
     if (enabled.size() == 1){
       current.setFullyExpanded(true);
-      return mEnabledHash.toArray();
+      return enabled.toArray();
     }
 
     final TIntArrayList ample = new TIntArrayList();
     final TIntHashSet ampleSet = new TIntHashSet();
     final TIntHashSet considered = new TIntHashSet();
+    final TIntHashSet enabledSet = new TIntHashSet(enabled.toArray());
     int i,j;
 
     ample:
@@ -634,10 +633,10 @@ public abstract class PartialOrderComponentsModelVerifier
             mReducedEventDependencyMap[ampleEvent]) {
             final int dependentCandidate = t.getCoupling();
             if(!ampleSet.contains(dependentCandidate)){
-              if (mEnabledHash.contains(dependentCandidate)) {
+              if (enabledSet.contains(dependentCandidate)) {
                 ample.add(dependentCandidate);
-                if(ample.size() == mEnabledHash.size()){
-                  current.setFullyExpanded(ample.size() == mEnabledHash.size());
+                if(ample.size() == enabledSet.size()){
+                  current.setFullyExpanded(ample.size() == enabledSet.size());
                   return ample.toArray();
                 }
                 ampleSet.add(dependentCandidate);
@@ -645,11 +644,15 @@ public abstract class PartialOrderComponentsModelVerifier
               else {
                 dependentNonEnabled.add(dependentCandidate);
               }
+
               independents.set(dependentCandidate);
             }
           }
           considered.add(ampleEvent);
         }
+      }
+      if(ample.size()+dependentNonEnabled.size()==mNumEvents){
+        return ample.toArray();
       }
       boolean danger = false;
       for (j = 0; j < dependentNonEnabled.size(); j++){
@@ -671,12 +674,12 @@ public abstract class PartialOrderComponentsModelVerifier
           continue ample;
         }
       }
-      current.setFullyExpanded(ample.size() == mEnabledHash.size());
-      mNumReducedSets += ample.size() < mEnabledHash.size() ? 1 : 0;
+      current.setFullyExpanded(ample.size() == enabledSet.size());
+      mNumReducedSets += ample.size() < enabledSet.size() ? 1 : 0;
       return ample.toArray();
     }
     current.setFullyExpanded(true);
-    return mEnabledHash.toArray();
+    return enabledSet.toArray();
   }
 
   private boolean canBecomeEnabled(final PartialOrderStateTuple current,
@@ -882,7 +885,6 @@ public abstract class PartialOrderComponentsModelVerifier
   private PartialOrderEventDependencyTuple[][] mReducedEventDependencyMap;
   private int[] mDependencyWeightings;
   private PartialOrderDependencyComparator mComparator;
-  protected TIntHashSet mEnabledHash;
 
   // Transition map
   protected List<int[][]> mPlantTransitionMap;

@@ -185,9 +185,10 @@ extends PartialOrderComponentsModelVerifier implements SafetyVerifier
                 temp.setComponent(mComponentCount);
               }
             } else {
-              if (enabled(prev) == null)
+              int[] enabled;
+              if ((enabled = enabled(prev).toArray()) == null)
                 return false;
-              expand(prev, mEnabledHash.toArray(), false);
+              expand(prev, enabled, false);
               prev.setFullyExpanded(true);
               mFullExpansions++;
             }
