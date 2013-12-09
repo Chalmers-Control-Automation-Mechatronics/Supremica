@@ -30,6 +30,7 @@ import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 /**
  * <P>
@@ -98,12 +99,18 @@ extends PartialOrderComponentsModelVerifier implements SafetyVerifier
   //#########################################################################
   //# Auxiliary Methods
   @Override
-  protected int[][] setupTransitions(final List<StateProxy> codes, final int stateSize)
+  protected int[][] setupTransitions(final List<StateProxy> codes,
+                                     final ComponentKind kind)
   {
-    final int[][] atransition = new int[stateSize][mNumEvents];
+    final int stateSize = codes.size();
+    final int[][] atransition = kind == ComponentKind.SPEC ?
+      new int[stateSize+1][mNumEvents]:new int[stateSize][mNumEvents];
     for (int i = 0; i < stateSize; i++) {
       for (int j = 0; j < mNumEvents; j++) {
         atransition[i][j] = -1;
+        if(kind == ComponentKind.SPEC){
+          atransition[stateSize][j] = stateSize;
+        }
       }
     }
     return atransition;
@@ -323,8 +330,6 @@ extends PartialOrderComponentsModelVerifier implements SafetyVerifier
   //Statistics
   @SuppressWarnings("unused")
   private int mNumIndependentPairings;
-  @SuppressWarnings("unused")
-  private int mFullExpansions;
   private final SafetyDiagnostics mDiagnostics;
 }
 

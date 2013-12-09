@@ -30,6 +30,7 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.des.ConflictKind;
 
@@ -137,8 +138,10 @@ extends PartialOrderComponentsModelVerifier implements ConflictChecker
   //#########################################################################
   //# Auxiliary Methods
   @Override
-  protected int[][] setupTransitions(final List<StateProxy> codes,final int stateSize)
+  protected int[][] setupTransitions(final List<StateProxy> codes,
+                                     final ComponentKind kind)
   {
+    final int stateSize = codes.size();
     final int[][] atransition = stateSize > 0 ? new int[stateSize+1][mNumEvents]:
       new int[stateSize][mNumEvents];
     for (int i = 0; i < stateSize; i++) {
@@ -473,9 +476,6 @@ extends PartialOrderComponentsModelVerifier implements ConflictChecker
   private ConflictKind mConflictResult;
   // Component information
   private int mComponentNumber;
-  //Statistics
-  @SuppressWarnings("unused")
-  private int mFullExpansions;
   //Marking information
   private EventProxy mUsedMarking;
   private EventProxy mConfiguredMarking;

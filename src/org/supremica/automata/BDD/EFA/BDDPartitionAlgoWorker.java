@@ -79,6 +79,10 @@ public abstract class BDDPartitionAlgoWorker {
         coordinator.reset();
     }
 
+    public BDDPartitionSet getPartitions(){
+      return partitions;
+    }
+
     /**
      * Regarding the forward reachability, records changes based on the chosen component.
      *
