@@ -198,6 +198,13 @@ public abstract class AbstractSupervisorSynthesizerTest
     runSynthesizer(des, true);
   }
 
+  public void testCellSwitch() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "cell_switch.wmod");
+    runSynthesizer(des, true);
+  }
+
   public void testCertainUnsup() throws Exception
   {
     final ProductDESProxy des =

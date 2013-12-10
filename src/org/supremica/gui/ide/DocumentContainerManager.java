@@ -610,7 +610,7 @@ public class DocumentContainerManager
   {
     final JFrame frame = mIDE.getFrame();
     final String msg = exception.getMessage();
-    final String text = "Error accessing file:\n" + wrapExceptionMessage(msg);
+    final String text = wrapExceptionMessageInHTML("Error accessing file", msg);
     final String title = "I/O Error";
     if (maycancel) {
       final int choice = JOptionPane.showConfirmDialog
@@ -696,9 +696,39 @@ public class DocumentContainerManager
     return buffer.toString();
   }
 
-  private String wrapExceptionMessage(final String msg)
+  private static String wrapExceptionMessageInHTML(final String title,
+                                                   final String msg)
   {
-    return msg.replaceAll(": +", ":\n");
+    final StringBuffer buffer = new StringBuffer();
+    buffer.append("<html><body style='width: 320px; padding: 0px;'>");
+    buffer.append("<h2>");
+    buffer.append(title);
+    buffer.append("</h2>");
+    for (int i = 0; i < msg.length(); i++) {
+      final char ch = msg.charAt(i);
+      switch (ch) {
+      case ':':
+        buffer.append(":<br>");
+        break;
+      case '<':
+        buffer.append("&lt;");
+        break;
+      case '>':
+        buffer.append("&gt;");
+        break;
+      case '"':
+        buffer.append("&quot;");
+        break;
+      case '\n':
+        buffer.append("<br>");
+        break;
+      default:
+        buffer.append(ch);
+        break;
+      }
+    }
+    buffer.append("</html>");
+    return buffer.toString();
   }
 
 
