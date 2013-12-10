@@ -154,7 +154,7 @@ abstract class AbstractionStep
   @Override
   public String toString()
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     buffer.append(ProxyTools.getShortClassName(this));
     buffer.append("\nOriginal: ");
     boolean first = true;

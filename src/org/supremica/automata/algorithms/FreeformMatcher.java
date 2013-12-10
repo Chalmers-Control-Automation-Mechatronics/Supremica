@@ -72,7 +72,7 @@ public class FreeformMatcher
 	{
 
 		// Make up a global name
-		StringBuffer stateName = new StringBuffer();
+		StringBuilder stateName = new StringBuilder();
 
 		while (it.hasNext())
 		{

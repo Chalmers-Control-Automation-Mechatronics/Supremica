@@ -133,7 +133,7 @@ public class Place
 
 	public String toString()
 	{
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 
 		sb.append("Place: " + identity + "\n");
 		sb.append("\tPrevious transitions:\n");

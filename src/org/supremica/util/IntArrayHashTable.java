@@ -333,7 +333,7 @@ public final class IntArrayHashTable
 
 	public String toString()
 	{
-		StringBuffer theString = new StringBuffer();
+		StringBuilder theString = new StringBuilder();
 		int[][] table = theTable;
 
 		theString.append("size: " + size + "\n");

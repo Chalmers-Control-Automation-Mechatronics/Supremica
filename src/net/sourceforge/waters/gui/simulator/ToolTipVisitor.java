@@ -64,7 +64,7 @@ class ToolTipVisitor extends DefaultProductDESProxyVisitor
   //# Interface net.sourceforge.waters.model.des.ProductDESProxyVisitor
   public String visitAutomatonProxy(final AutomatonProxy aut)
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     final ComponentKind kind = aut.getKind();
     buffer.append(ModuleContext.getComponentKindToolTip(kind));
     buffer.append(' ');
@@ -82,7 +82,7 @@ class ToolTipVisitor extends DefaultProductDESProxyVisitor
 
   public String visitEventProxy(final EventProxy event)
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     final EventKind kind = event.getKind();
     buffer.append(ModuleContext.getEventKindToolTip(kind, false));
     buffer.append(' ');
@@ -103,7 +103,7 @@ class ToolTipVisitor extends DefaultProductDESProxyVisitor
 
   public String visitStateProxy(final StateProxy state)
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     if (state.isInitial()) {
       buffer.append("Initial state ");
     } else {

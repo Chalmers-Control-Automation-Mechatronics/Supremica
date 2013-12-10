@@ -236,7 +236,7 @@ public class SearchStates
     {
         final AutomataSynchronizerHelper helper = syncher.getHelper();
         final org.supremica.automata.State[][] states = helper.getIndexFormStateTable();
-        final StringBuffer str = new StringBuffer();
+        final StringBuilder str = new StringBuilder();
 
         for (int i = 0; i < states.length; ++i)
         {

@@ -1159,7 +1159,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   {
     final Logger logger = getLogger();
     if (logger.isDebugEnabled()) {
-      final StringBuffer buffer = new StringBuffer();
+      final StringBuilder buffer = new StringBuilder();
       String sep = "Removing events: ";
       final List<EventProxy> ordered = new ArrayList<EventProxy>(events);
       Collections.sort(ordered);
@@ -2189,7 +2189,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     @Override
     public String toString()
     {
-      final StringBuffer buffer = new StringBuffer("[");
+      final StringBuilder buffer = new StringBuilder("[");
       boolean first = true;
       for (final AutomatonProxy aut : getSortedAutomataList()) {
         if (first) {

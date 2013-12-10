@@ -372,7 +372,7 @@ public class IndexedHashSetSubject<P extends NamedSubject>
   {
     if (parent != null && mParent != null) {
       final Class<?> clazz = getClass();
-      final StringBuffer buffer = new StringBuffer();
+      final StringBuilder buffer = new StringBuilder();
       buffer.append("Trying to redefine parent of ");
       buffer.append(getShortClassName(clazz));
       buffer.append('!');
@@ -407,7 +407,7 @@ public class IndexedHashSetSubject<P extends NamedSubject>
   //# Error Messages
   protected ItemNotFoundException createItemNotFound(final String name)
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     appendContainerName(buffer);
     buffer.append(" does not contain the ");
     appendItemKindName(buffer);
@@ -419,7 +419,7 @@ public class IndexedHashSetSubject<P extends NamedSubject>
 
   protected NameNotFoundException createNameNotFound(final String name)
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     appendContainerName(buffer);
     buffer.append(" does not contain any ");
     appendItemKindName(buffer);
@@ -431,7 +431,7 @@ public class IndexedHashSetSubject<P extends NamedSubject>
 
   protected DuplicateNameException createDuplicateName(final String name)
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     appendContainerName(buffer);
     buffer.append(" contains more than one ");
     appendItemKindName(buffer);
@@ -441,14 +441,14 @@ public class IndexedHashSetSubject<P extends NamedSubject>
     return new DuplicateNameException(buffer.toString());
   }
 
-  protected void appendContainerName(final StringBuffer buffer)
+  protected void appendContainerName(final StringBuilder buffer)
   {
     final Class<?> clazz = getClass();
     final String name = getShortClassName(clazz);
     buffer.append(name);
   }
 
-  protected void appendItemKindName(final StringBuffer buffer)
+  protected void appendItemKindName(final StringBuilder buffer)
   {
     buffer.append("item");
   }

@@ -352,7 +352,7 @@ class NodeSetSubject
   {
     if (parent != null && mParent != null) {
       final Class<?> clazz = getClass();
-      final StringBuffer buffer = new StringBuffer();
+      final StringBuilder buffer = new StringBuilder();
       buffer.append("Trying to redefine parent of ");
       buffer.append(getShortClassName(clazz));
       buffer.append('!');
@@ -482,7 +482,7 @@ class NodeSetSubject
   //# Exceptions
   private ItemNotFoundException createItemNotFound(final String name)
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     appendContainerName(buffer);
     buffer.append(" does not contain the node '");
     buffer.append(name);
@@ -492,7 +492,7 @@ class NodeSetSubject
 
   private NameNotFoundException createNameNotFound(final String name)
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     appendContainerName(buffer);
     buffer.append(" does not contain any node named '");
     buffer.append(name);
@@ -502,7 +502,7 @@ class NodeSetSubject
 
   private DuplicateNameException createDuplicateName(final String name)
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     appendContainerName(buffer);
     buffer.append(" contains more than one node named '");
     buffer.append(name);
@@ -512,7 +512,7 @@ class NodeSetSubject
 
   private ClassCastException createBadType(final NodeProxy node)
   {
-    final StringBuffer buffer = new StringBuffer("Unsupported node class ");
+    final StringBuilder buffer = new StringBuilder("Unsupported node class ");
     final Class<?> clazz = node.getClass();
     final String name = getShortClassName(clazz);
     buffer.append(name);
@@ -523,7 +523,7 @@ class NodeSetSubject
   @SuppressWarnings("unused")
   private ClassCastException createBadType(final Object item)
   {
-    final StringBuffer buffer = new StringBuffer("Can't add object of class ");
+    final StringBuilder buffer = new StringBuilder("Can't add object of class ");
     final Class<?> clazz = item.getClass();
     final String name = getShortClassName(clazz);
     buffer.append(name);
@@ -531,7 +531,7 @@ class NodeSetSubject
     return new ClassCastException(buffer.toString());
   }
 
-  private void appendContainerName(final StringBuffer buffer)
+  private void appendContainerName(final StringBuilder buffer)
   {
     final Subject parent = getParent();
     final ComponentProxy comp =

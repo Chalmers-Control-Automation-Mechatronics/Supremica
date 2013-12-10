@@ -184,7 +184,7 @@ public class Arc
      */
     public String toString()
     {
-        final StringBuffer sbuf = new StringBuffer();
+        final StringBuilder sbuf = new StringBuilder();
 
         sbuf.append("<");
         sbuf.append(getFromState());

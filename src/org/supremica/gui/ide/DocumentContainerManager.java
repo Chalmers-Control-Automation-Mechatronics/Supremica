@@ -688,7 +688,7 @@ public class DocumentContainerManager
 
   private String getWarningText(final File file, final String msg)
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     buffer.append("File '");
     buffer.append(file);
     buffer.append("'\n");
@@ -699,7 +699,7 @@ public class DocumentContainerManager
   private static String wrapExceptionMessageInHTML(final String title,
                                                    final String msg)
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     buffer.append("<html><body style='width: 400px;'>");
     buffer.append("<h2>");
     buffer.append(title);

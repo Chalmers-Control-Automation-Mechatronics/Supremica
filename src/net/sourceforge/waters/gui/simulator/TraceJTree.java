@@ -279,7 +279,7 @@ public class TraceJTree
           mEventPanel.setBackground(EditorColor.BACKGROUNDCOLOR);
         final TraceStepTreeNode node = (TraceStepTreeNode) value;
         final int time = node.getTime();
-        final StringBuffer buffer = new StringBuffer();
+        final StringBuilder buffer = new StringBuilder();
         buffer.append(time);
         buffer.append(". ");
         buffer.append(node.getText());

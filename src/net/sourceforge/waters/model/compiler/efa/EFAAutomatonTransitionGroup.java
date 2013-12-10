@@ -102,7 +102,7 @@ class EFAAutomatonTransitionGroup
   //# Overrides for java.lang.Object
   public String toString()
   {
-    final StringBuffer buffer = new StringBuffer("{");
+    final StringBuilder buffer = new StringBuilder("{");
     final Iterator<ConstraintList> iter =
       mPartialTransitions.keySet().iterator();
     while (iter.hasNext()) {

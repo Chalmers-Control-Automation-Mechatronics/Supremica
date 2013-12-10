@@ -457,14 +457,14 @@ public class ProjectBuildFromWaters
     //# Error Handling
     private boolean warnAboutUnsupportedPropositions(final ProductDESProxy des)
     {
-      StringBuffer warning = null;
+      StringBuilder warning = null;
       for (final EventProxy event : des.getEvents()) {
         if (event.getKind() == EventKind.PROPOSITION) {
           final String name = event.getName();
           if(!name.equals(EventDeclProxy.DEFAULT_MARKING_NAME) &&
               !name.equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
             if (warning == null) {
-              warning = new StringBuffer
+              warning = new StringBuilder
                 ("Multiple propositions are not supported by the analyser. " +
                  "Ignoring ");
             } else {

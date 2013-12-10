@@ -201,7 +201,7 @@ public final class AttributeMapSubject
   public void checkSetParent(final Subject parent)
   {
     if (parent != null && mParent != null) {
-      final StringBuffer buffer = new StringBuffer();
+      final StringBuilder buffer = new StringBuilder();
       buffer.append("Trying to redefine parent of ");
       final String clsname = ProxyTools.getShortClassName(this);
       buffer.append(clsname);

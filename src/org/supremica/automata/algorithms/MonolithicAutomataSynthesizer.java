@@ -90,7 +90,7 @@ public class MonolithicAutomataSynthesizer implements Abortable {
 					}
 				}
 
-				final StringBuffer sb = new StringBuffer();
+				final StringBuilder sb = new StringBuilder();
 				for (final LabeledEvent currEvent : problemEvents) {
 					sb.append(currEvent + " ");
 				}

@@ -688,7 +688,7 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
                                   final String separator,
                                   final String closing)
   {
-    final StringBuffer result = new StringBuffer();
+    final StringBuilder result = new StringBuilder();
     if (constraints.getConstraints().isEmpty()) {
       return "";
     }

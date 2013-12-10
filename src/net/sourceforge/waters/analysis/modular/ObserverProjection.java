@@ -273,7 +273,7 @@ public class ObserverProjection
       }
     }
     ev.removeAll(removed);
-    final StringBuffer name = new StringBuffer();
+    final StringBuilder name = new StringBuilder();
     for (final AutomatonProxy a : mModel.getAutomata()) {
       name.append(a.getName());
     }

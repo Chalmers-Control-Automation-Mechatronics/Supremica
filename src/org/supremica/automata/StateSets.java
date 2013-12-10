@@ -19,7 +19,7 @@ public class StateSets
 
 	public String toString()
 	{
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append("(");
 		for (StateSet set : this)
 		{

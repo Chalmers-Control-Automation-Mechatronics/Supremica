@@ -332,7 +332,7 @@ public class UnifiedEFASynchronousProductBuilder
   private String getOutputName()
   {
     final int numTR = mInputTransitionRelations.size();
-    final StringBuffer buffer = new StringBuffer("{");
+    final StringBuilder buffer = new StringBuilder("{");
     boolean first = true;
     for (int trIndex = 0; trIndex < numTR; trIndex++) {
       if (first) {

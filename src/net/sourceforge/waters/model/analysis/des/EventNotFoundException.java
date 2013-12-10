@@ -70,7 +70,7 @@ public class EventNotFoundException extends AnalysisException
   //# Overrides for java.lang.Throwable
   public String getMessage()
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     buffer.append("The ");
     buffer.append(getContainerClassName());
     buffer.append(" '");

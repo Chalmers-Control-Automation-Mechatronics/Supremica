@@ -250,7 +250,7 @@ public class ModuleIdentifierChecker
       try {
         mParser.parseSimpleIdentifier(name);
       } catch (final ParseException exception) {
-        final StringBuffer buffer = new StringBuffer();
+        final StringBuilder buffer = new StringBuilder();
         buffer.append("The name '");
         buffer.append(name);
         buffer.append("'");

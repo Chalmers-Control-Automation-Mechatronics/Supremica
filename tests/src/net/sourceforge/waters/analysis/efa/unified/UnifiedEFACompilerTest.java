@@ -286,7 +286,7 @@ public class UnifiedEFACompilerTest
   {
     final UnifiedEFASystem system = compile(module, bindings);
     final String name = system.getName();
-    final StringBuffer buffer = new StringBuffer(name);
+    final StringBuilder buffer = new StringBuilder(name);
     if (bindings != null) {
       for (final ParameterBindingProxy binding : bindings) {
         buffer.append('-');

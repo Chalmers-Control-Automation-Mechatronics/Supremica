@@ -124,7 +124,7 @@ class ChildNodeSetSubject
         return true;
       } catch (final CyclicGroupNodeException exception) {
         mProxySet.remove(node);
-        final StringBuffer buffer = new StringBuffer();
+        final StringBuilder buffer = new StringBuilder();
         buffer.append("Adding child '");
         buffer.append(node.getName());
         if (group != null) {
@@ -240,7 +240,7 @@ class ChildNodeSetSubject
   public void checkSetParent(final Subject parent)
   {
     if (parent != null && mParent != null) {
-      final StringBuffer buffer = new StringBuffer();
+      final StringBuilder buffer = new StringBuilder();
       buffer.append("Trying to redefine parent of ");
       buffer.append(getShortClassName());
       buffer.append('!');

@@ -760,7 +760,7 @@ public class VariableEditorDialog
     {
       final String text = mNameInput.getText();
       final String name = text.length() == 0 ? "x" : text;
-      final StringBuffer buffer = new StringBuffer(160);
+      final StringBuilder buffer = new StringBuilder(160);
       buffer.append("Enter initial state predicate, e.g., ");
       buffer.append(name);
       buffer.append(" == 0 | ");
@@ -861,7 +861,7 @@ public class VariableEditorDialog
         (table, value, isSelected, row, column);
       final String text = mNameInput.getText();
       final String name = text.length() == 0 ? "x" : text;
-      final StringBuffer buffer = new StringBuffer(160);
+      final StringBuilder buffer = new StringBuilder(160);
       buffer.append("Enter marking condition, e.g., ");
       buffer.append(name);
       buffer.append(" == 0 | ");

@@ -120,7 +120,7 @@ public class EncodingHelper
 				}
 				return s.toString();
 */
-		StringBuffer str = new StringBuffer();
+		StringBuilder str = new StringBuilder();
 		int len = (s != null)
 				  ? s.length()
 				  : 0;

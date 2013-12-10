@@ -272,7 +272,7 @@ public final class IntArrayList
 
 	public String toString()
 	{
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 
 		for (Iterator<?> it = iterator(); it.hasNext(); )
 		{
@@ -287,7 +287,7 @@ public final class IntArrayList
 
 	public String blocksToString()
 	{
-		StringBuffer sb = new StringBuffer("blocks: \n");
+		StringBuilder sb = new StringBuilder("blocks: \n");
 
 		for (Iterator<int[][]> it = blocks.iterator(); it.hasNext(); )
 		{
@@ -301,7 +301,7 @@ public final class IntArrayList
 
 	private static String toString(int[][] theArray)
 	{
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 
 		if (theArray == null)
 		{
@@ -324,7 +324,7 @@ public final class IntArrayList
 
 	public static String toString(int[] theArray)
 	{
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 
 		if (theArray == null)
 		{

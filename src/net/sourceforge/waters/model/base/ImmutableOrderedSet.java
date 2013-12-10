@@ -117,7 +117,7 @@ public class ImmutableOrderedSet<P extends NamedProxy>
   //# Error Messages
   protected DuplicateNameException createDuplicateName(final String name)
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     appendContainerName(buffer);
     buffer.append(" contains more than one ");
     appendItemKindName(buffer);
@@ -127,13 +127,13 @@ public class ImmutableOrderedSet<P extends NamedProxy>
     return new DuplicateNameException(buffer.toString());
   }
 
-  protected void appendContainerName(final StringBuffer buffer)
+  protected void appendContainerName(final StringBuilder buffer)
   {
     final String name = ProxyTools.getShortClassName(this);
     buffer.append(name);
   }
 
-  protected void appendItemKindName(final StringBuffer buffer)
+  protected void appendItemKindName(final StringBuilder buffer)
   {
     buffer.append("item");
   }

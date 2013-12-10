@@ -77,7 +77,7 @@ public class CompiledEnumRange implements CompiledRange
   @Override
   public String toString()
   {
-    final StringBuffer result = new StringBuffer("{");
+    final StringBuilder result = new StringBuilder("{");
     final Iterator<SimpleIdentifierProxy> iter = mAtoms.iterator();
     while (iter.hasNext()) {
       final IdentifierProxy atom = iter.next();

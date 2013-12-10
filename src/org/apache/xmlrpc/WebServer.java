@@ -271,7 +271,7 @@ public class WebServer
 
 		if (XmlRpc.debug)
 		{
-			StringBuffer msg = new StringBuffer();
+			StringBuilder msg = new StringBuilder();
 
 			msg.append("Opened XML-RPC server socket for ");
 			msg.append((address != null)

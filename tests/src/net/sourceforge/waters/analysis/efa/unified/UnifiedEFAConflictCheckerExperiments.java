@@ -342,7 +342,7 @@ public class UnifiedEFAConflictCheckerExperiments
   private String getFullModuleName(final String moduleName,
                                    final List<ParameterBindingProxy> bindings)
   {
-    final StringBuffer buffer = new StringBuffer(moduleName);
+    final StringBuilder buffer = new StringBuilder(moduleName);
     if (bindings != null) {
       buffer.append('<');
       final Iterator<ParameterBindingProxy> iter = bindings.iterator();

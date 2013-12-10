@@ -34,7 +34,7 @@ public class InstantiationException extends EvalException {
   private static String createMessage(final Exception cause,
 				      final InstanceProxy inst)
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     buffer.append("Can't load module '");
     buffer.append(inst.getName());
     buffer.append("' for instantiation");

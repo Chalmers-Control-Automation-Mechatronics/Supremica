@@ -351,7 +351,7 @@ public class EventDeclDeleteVisitor
   private void showDialog(final String name)
     throws VisitorException
   {
-    final StringBuffer buffer = new StringBuffer(256);
+    final StringBuilder buffer = new StringBuilder(256);
     buffer.append("The event '");
     buffer.append(name);
     buffer.append("' is still used in ");

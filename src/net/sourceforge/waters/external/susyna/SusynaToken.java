@@ -33,7 +33,7 @@ class SusynaToken
     mText = text;
   }
 
-  SusynaToken(final Type type, final StringBuffer buffer)
+  SusynaToken(final Type type, final StringBuilder buffer)
   {
     this(type, buffer.toString());
   }

@@ -77,7 +77,7 @@ public class Server
     public static String escape(String was)
     {
         int len = was.length();
-        StringBuffer sb = new StringBuffer(len);
+        StringBuilder sb = new StringBuilder(len);
         
         for (int i = 0; i < len; i++)
         {

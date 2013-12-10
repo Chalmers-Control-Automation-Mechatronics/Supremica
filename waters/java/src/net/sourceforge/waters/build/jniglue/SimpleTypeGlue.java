@@ -121,7 +121,7 @@ class SimpleTypeGlue extends TypeGlue {
     return getCppTypeName();
   }
 
-  void appendTypeSignature(final StringBuffer buffer)
+  void appendTypeSignature(final StringBuilder buffer)
   {
     buffer.append(mSignature);
   }

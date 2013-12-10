@@ -1193,7 +1193,7 @@ public class EventDeclEditorDialog
         } else {
           final ExpressionParser parser = getExpressionParser();
           final int len = text.length();
-          final StringBuffer buffer = new StringBuffer(len);
+          final StringBuilder buffer = new StringBuilder(len);
           for (int i = 0; i < len; i++) {
             final char ch = text.charAt(i);
             if (parser.isIdentifierCharacter(ch)) {

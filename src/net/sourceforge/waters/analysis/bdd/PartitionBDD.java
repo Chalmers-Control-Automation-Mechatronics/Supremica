@@ -215,7 +215,7 @@ abstract class PartitionBDD
     final List<EventProxy> events =
       new ArrayList<EventProxy>(mComponents.keySet());
     Collections.sort(events);
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     buffer.append(ProxyTools.getShortClassName(this));
     buffer.append('{');
     boolean first = true;

@@ -881,7 +881,7 @@ public class CompositionalAutomataSynthesizer extends
     @Override
     public String toString()
     {
-      final StringBuffer buffer = new StringBuffer();
+      final StringBuilder buffer = new StringBuilder();
       buffer.append(mDistinguisher.getName());
       for (final DistinguisherReplacement pair : mReplacements) {
         buffer.append("\n  [");

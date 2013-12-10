@@ -57,7 +57,7 @@ public class LanguageInclusionDiagnostics
                                 final AutomatonProxy aut,
                                 final StateProxy state)
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     buffer.append("The model '");
     buffer.append(des.getName());
     buffer.append("' does not satisfy the language inclusion property '");

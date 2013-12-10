@@ -276,7 +276,7 @@ public final class AutomataIndexFormHelper
             return "[null]";
         }
         
-        StringBuffer sb = new StringBuffer("[");
+        StringBuilder sb = new StringBuilder("[");
         
         for (int i = 0; i < state.length; i++)
         {
@@ -298,7 +298,7 @@ public final class AutomataIndexFormHelper
      */
     public static String dumpVerboseState(int[] state, AutomataIndexForm theForm)
     {
-        StringBuffer sb = new StringBuffer("[\n");
+        StringBuilder sb = new StringBuilder("[\n");
         //State[][] stateTable = theForm.getStateTable();
         
         for (int i = 0; i < state.length - STATE_EXTRA_DATA; i++)

@@ -30,7 +30,7 @@ abstract public class DefaultProxyVisitor implements ProxyVisitor {
   public Object visitProxy(final Proxy proxy)
     throws VisitorException
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     buffer.append("Visitor class ");
     buffer.append(getClass().getName());
     buffer.append(" cannot handle objects of type ");

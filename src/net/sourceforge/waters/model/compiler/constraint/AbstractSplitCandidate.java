@@ -21,7 +21,7 @@ abstract class AbstractSplitCandidate
   @Override
   public String toString()
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     buffer.append(getSplitExpression().toString());
     buffer.append(": occ=");
     buffer.append(getNumberOfOccurrences());

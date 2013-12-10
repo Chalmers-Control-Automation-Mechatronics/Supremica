@@ -90,7 +90,7 @@ public final class SupremicaProperties
 
     public static String getProperties()
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (final Property property : Property.getAllProperties()) {
             sb.append("# " + property.getComment() + "\n");
             sb.append(property.toString() + "\n\n");

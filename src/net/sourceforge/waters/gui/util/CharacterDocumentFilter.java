@@ -68,7 +68,7 @@ public abstract class CharacterDocumentFilter
       return null;
     } else {
       final int len = text.length();
-      final StringBuffer buffer = new StringBuffer(len);
+      final StringBuilder buffer = new StringBuilder(len);
       for (int i = 0; i < len; i++) {
         final char ch = text.charAt(i);
         if (isAllowedCharacter(ch)) {

@@ -985,7 +985,7 @@ public class ConstraintPropagator
     @Override
     public String toString()
     {
-      final StringBuffer buffer = new StringBuffer();
+      final StringBuilder buffer = new StringBuilder();
       buffer.append(mVariableName.toString());
       buffer.append("=");
       if (mBoundExpression == null) {

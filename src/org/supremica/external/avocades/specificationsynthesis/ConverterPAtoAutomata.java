@@ -445,9 +445,9 @@ System.out.println("convPA2");
 		int[] indices;
 
 		PermutationGenerator x = new PermutationGenerator (elements.length);
-		StringBuffer permutation;
+		StringBuilder permutation;
 		while (x.hasMore ()) {
-			permutation = new StringBuffer ();
+			permutation = new StringBuilder ();
 			indices = x.getNext ();
 			for (int i = 0; i < indices.length; i++) {
 				permutation.append (elements[indices[i]]);
@@ -541,9 +541,9 @@ System.out.println("convPA2");
 		int[] indices;
 
 		PermutationGenerator x = new PermutationGenerator (elements.length);
-		StringBuffer permutation;
+		StringBuilder permutation;
 		while (x.hasMore ()) {
-			permutation = new StringBuffer ();
+			permutation = new StringBuilder ();
 			indices = x.getNext ();
 			for (int i = 0; i < indices.length; i++) {
 				permutation.append (elements[indices[i]]);

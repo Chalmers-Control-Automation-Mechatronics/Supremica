@@ -49,7 +49,7 @@ class CheckedImportList<P extends NamedProxy>
 
   //#########################################################################
   //# Error Messages
-  protected void appendContainerName(final StringBuffer buffer)
+  protected void appendContainerName(final StringBuilder buffer)
   {
     final String clazzname = ProxyTools.getShortClassName(mContainerClazz);
     buffer.append(clazzname);
@@ -60,7 +60,7 @@ class CheckedImportList<P extends NamedProxy>
     }
   }
 
-  protected void appendItemKindName(final StringBuffer buffer)
+  protected void appendItemKindName(final StringBuilder buffer)
   {
     buffer.append(mItemKindName);
   }

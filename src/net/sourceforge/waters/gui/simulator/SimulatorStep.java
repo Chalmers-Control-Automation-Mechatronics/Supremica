@@ -66,7 +66,7 @@ public class SimulatorStep
     if (mNonDeterministicAutomata == null) {
       return name;
     } else {
-      final StringBuffer buffer = new StringBuffer(name);
+      final StringBuilder buffer = new StringBuilder(name);
       buffer.append(" {");
       boolean first = true;
       for (final AutomatonProxy aut : mNonDeterministicAutomata) {

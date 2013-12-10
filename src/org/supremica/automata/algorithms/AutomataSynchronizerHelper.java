@@ -697,7 +697,7 @@ public class AutomataSynchronizerHelper
     executer.initialize();
 
     // This version does not remove shortcuts, add this later. FIXA!
-    final StringBuffer trace = new StringBuffer();
+    final StringBuilder trace = new StringBuilder();
     int[] prevState = null;
 
     for (final Iterator<?> traceIt = stateTrace.iterator(); traceIt.hasNext();) {
@@ -863,7 +863,7 @@ public class AutomataSynchronizerHelper
       problemEvent = stateHolder.getProblemEvent();
       problemAutomaton = indexMap.getAutomatonAt(problemPlant);
 
-      final StringBuffer state = new StringBuffer();
+      final StringBuilder state = new StringBuilder();
       boolean firstEntry = true;
 
       for (int i = 0; i < currState.length; i++) {

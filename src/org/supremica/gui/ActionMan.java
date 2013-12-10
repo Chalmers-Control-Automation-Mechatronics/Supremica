@@ -1588,7 +1588,7 @@ public class ActionMan
         for (Iterator<?> autIt = selectedAutomata.iterator(); autIt.hasNext(); )
         {
             Automaton currAutomaton = (Automaton) autIt.next();
-            StringBuffer statusStr = new StringBuffer();
+            StringBuilder statusStr = new StringBuilder();
 
             statusStr.append("Status for automaton: " + currAutomaton.getName());
 

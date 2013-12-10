@@ -50,7 +50,7 @@ public class RelationGenerator {
     String allwMaxTerm = "";
     String frbMinTerm = "";
     String frbMaxTerm = "";
-    StringBuffer DCs = new StringBuffer();
+    StringBuilder DCs = new StringBuilder();
     
     String variables = "";
     
@@ -184,7 +184,7 @@ public class RelationGenerator {
     public String generateMinimizerInput(Set<Integer> input)
     {
         Iterator<Integer> it = input.iterator();
-        StringBuffer output = new StringBuffer();
+        StringBuilder output = new StringBuilder();
         boolean needSeparator = false;
         while(it.hasNext())
         {

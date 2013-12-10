@@ -142,7 +142,7 @@ public class AutomataToSattLineSFCForBallProcess
 
 	protected String computeGenerationCondition(Project theProject, Alphabet theExtConfAlphabet, LabeledEvent theEvent)
 	{
-		StringBuffer theCondition = new StringBuffer();
+		StringBuilder theCondition = new StringBuilder();
 		boolean firstAutomaton = true;
 		boolean nextAutomaton = false;
 		int lineLength = 0;
@@ -276,7 +276,7 @@ public class AutomataToSattLineSFCForBallProcess
 		 its precondition. Even so, it may not be useable since
 		 the step timer variable retains its value until the step
 		 is reactivated. Maybe we should just ignore it. */
-		StringBuffer theCondition = new StringBuffer("");
+		StringBuilder theCondition = new StringBuilder("");
 
 		/* QUICK AND DIRTY HACK preventing locking behaviour: !event AND NOT !event.
 		   This is safe assuming that the event monitors remain last in execution order. */
@@ -318,7 +318,7 @@ public class AutomataToSattLineSFCForBallProcess
 
 	protected String computeCeaseCondition(Project theProject, LabeledEvent theEvent)
 	{
-		StringBuffer theCondition = new StringBuffer();
+		StringBuilder theCondition = new StringBuilder();
 		boolean firstAutomaton = true;
 		boolean nextAutomaton = false;
 		int lineLength = 31;

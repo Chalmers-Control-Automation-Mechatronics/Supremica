@@ -111,7 +111,7 @@ class FieldGlue implements Comparable<FieldGlue>, WritableGlue {
       throw new IllegalStateException("Second call to collectSignatures()!");
     }
 
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     mType.appendTypeSignature(buffer);
     final String signame = buffer.toString();
     final TypeSignature foundsig = (TypeSignature) signatures.get(signame);

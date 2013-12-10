@@ -619,7 +619,7 @@ public class AutomataVerifier
         }
 
         // The name of the "synchronized" automata
-        StringBuffer automataNames = new StringBuffer();
+        StringBuilder automataNames = new StringBuilder();
 
         if (Config.VERBOSE_MODE.isTrue())
         {

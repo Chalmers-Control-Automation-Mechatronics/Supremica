@@ -81,7 +81,7 @@ class TemplateFileParser extends ErrorReporter {
   private void parseFile()
     throws IOException
   {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     int code = getNextCharacter();
     while (code != -1) {
       if (code == '$') {
@@ -96,7 +96,7 @@ class TemplateFileParser extends ErrorReporter {
           putback(secondcode);
           parseDollarVar(numhats);
           skipWhiteSpace();
-          buffer = new StringBuffer();
+          buffer = new StringBuilder();
         } else {
           if (numhats > 0) {
             final ParseException exception = createParseException
@@ -202,7 +202,7 @@ class TemplateFileParser extends ErrorReporter {
   private String parseUpperCaseName(final String prefix)
     throws IOException, ParseException
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     while (true) {
       final int code = getNextCharacter();
       if (code >= 'A' && code <= 'Z') {
@@ -225,7 +225,7 @@ class TemplateFileParser extends ErrorReporter {
 
   //#########################################################################
   //# Storing Results
-  private void storeTextFragment(final StringBuffer buffer)
+  private void storeTextFragment(final StringBuilder buffer)
   {
     final String text = buffer.toString();
     final TemplateFragment fragment =

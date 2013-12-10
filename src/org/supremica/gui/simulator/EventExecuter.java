@@ -160,7 +160,7 @@ class EventExecuter
                                 int nbrOfEvents = eventModel.getSize();
                                 logger.debug("2.a ----------------------------");
                                 eventModel.enterLock();
-                                StringBuffer dum = new StringBuffer();
+                                StringBuilder dum = new StringBuilder();
                                 dum.append("Enabled events are: " );
                                 for (int i = 0; i < nbrOfEvents; i++) dum.append(" " + eventModel.getEventAt(i).getLabel());
                                 logger.debug(dum.toString() );

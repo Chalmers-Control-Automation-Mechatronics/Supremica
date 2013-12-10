@@ -90,7 +90,7 @@ public class SizeWatch
 				add = 0;
 			}
 
-			StringBuffer dumb = new StringBuffer(add + 2);
+			StringBuilder dumb = new StringBuilder(add + 2);
 
 			for (int i = 0; i < add; i++)
 			{
@@ -110,7 +110,7 @@ public class SizeWatch
 		if (me != null)
 		{
 
-			StringBuffer buf = new StringBuffer();
+			StringBuilder buf = new StringBuilder();
 
 			long size = manager.nodeCount(bdd);
 			buf.append(size);
