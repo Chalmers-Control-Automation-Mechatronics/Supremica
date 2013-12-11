@@ -1,6 +1,6 @@
 //# -*-  indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters GUI
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventTableModel
 //###########################################################################
@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.Icon;
+import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 
 import net.sourceforge.waters.model.base.Proxy;
@@ -30,12 +31,14 @@ import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleHashCodeVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
@@ -78,6 +81,7 @@ public class EventTableModel
     mEventDeclListModelObserver = new EventDeclListModelObserver();
     mGraphModelObserver = new GraphModelObserver();
     mIdentifierCollectVisitor = new IdentifierCollectVisitor();
+    mIdentifierRenameVisitor = new IdentifierRenameVisitor();
     mGraphSearchVisitor = new GraphSearchVisitor();
     events.addModelObserver(mEventDeclListModelObserver);
     graph.addModelObserver(mGraphModelObserver);
@@ -98,16 +102,19 @@ public class EventTableModel
 
   //#########################################################################
   //# Interface javax.swing.TableModel
+  @Override
   public int getRowCount()
   {
     return mEvents.size();
   }
 
+  @Override
   public int getColumnCount()
   {
     return 2;
   }
 
+  @Override
   public Class<?> getColumnClass(final int column)
   {
     switch (column) {
@@ -121,9 +128,10 @@ public class EventTableModel
     }
   }
 
+  @Override
   public Object getValueAt(final int row, final int column)
   {
-    final EventEntry entry = (EventEntry) mEvents.get(row);
+    final EventEntry entry = mEvents.get(row);
     switch (column) {
     case 0:
       final ModuleContext context = mRoot.getModuleContext();
@@ -137,11 +145,13 @@ public class EventTableModel
     }
   }
 
+  @Override
   public boolean isCellEditable(final int row, final int column)
   {
     return column == 1;
   }
 
+  @Override
   public void setValueAt(final Object value,
                          final int row,
                          final int column)
@@ -374,11 +384,10 @@ public class EventTableModel
     }
   }
 
-  private EventDeclProxy guessEventDecl(final int row)
+  private EventDeclProxy getEventDecl(final int row)
   {
-    final ModuleContext context = mRoot.getModuleContext();
-    final IdentifierSubject ident = getIdentifier(row);
-    return context.guessEventDecl(ident);
+    final EventEntry entry = mEvents.get(row);
+    return entry.getEventDecl();
   }
 
   private void removeIdentifierRange(final int row0, final int row1)
@@ -402,6 +411,7 @@ public class EventTableModel
 
     //#######################################################################
     //# Interface net.sourceforge.waters.subject.base.ModelObserver
+    @Override
     public void modelChanged(final ModelChangeEvent event)
     {
       switch (event.getKind()) {
@@ -428,6 +438,7 @@ public class EventTableModel
       }
     }
 
+    @Override
     public int getModelObserverPriority()
     {
       return ModelObserver.RENDERING_PRIORITY;
@@ -444,6 +455,7 @@ public class EventTableModel
 
     //#######################################################################
     //# Interface net.sourceforge.waters.subject.base.ModelObserver
+    @Override
     public void modelChanged(final ModelChangeEvent event)
     {
       final Subject source = event.getSource();
@@ -468,13 +480,18 @@ public class EventTableModel
       int row0, row1;
       switch (kind) {
       case ModelChangeEvent.ITEM_ADDED:
+        for (final EventEntry entry : mEvents) {
+          if (entry.getEventDecl() == null) {
+            entry.updateEventDecl();
+          }
+        }
         if (isDisplayed()) {
           mIdentifierCollectVisitor.addClonedIdentifiers(decl);
         }
         // fall through ...
       case ModelChangeEvent.GEOMETRY_CHANGED:
         row0 = row1 = getFirstRow(decl);
-        while (row1 < rowcount && guessEventDecl(row1) == decl) {
+        while (row1 < rowcount && getEventDecl(row1) == decl) {
           row1++;
         }
         if (row0 < row1) {
@@ -485,19 +502,11 @@ public class EventTableModel
         boolean deleting = false;
         row0 = -1;
         for (row1 = getFirstRow(decl);
-             row1 < getRowCount() && guessEventDecl(row1) == decl;
+             row1 < getRowCount() && getEventDecl(row1) == decl;
              row1++) {
-          final IdentifierProxy ident = getIdentifier(row1);
+          final EventEntry entry = mEvents.get(row1);
+          final IdentifierProxy ident = entry.getName();
           if (mGraphSearchVisitor.isEventInGraph(ident)) {
-            if (row0 < 0) {
-              row0 = row1;
-              deleting = true;
-            } else if (!deleting) {
-              fireTableRowsUpdated(row0, row1 - 1);
-              row0 = row1;
-              deleting = true;
-            }
-          } else {
             if (row0 < 0) {
               row0 = row1;
               deleting = false;
@@ -505,6 +514,16 @@ public class EventTableModel
               removeIdentifierRange(row0, row1 - 1);
               row1 = row0;
               deleting = false;
+            }
+            entry.updateEventDecl();
+          } else {
+            if (row0 < 0) {
+              row0 = row1;
+              deleting = true;
+            } else if (!deleting) {
+              fireTableRowsUpdated(row0, row1 - 1);
+              row0 = row1;
+              deleting = true;
             }
           }
         }
@@ -516,14 +535,46 @@ public class EventTableModel
           }
         }
         break;
+      case ModelChangeEvent.NAME_CHANGED:
+      case ModelChangeEvent.STATE_CHANGED:
+        final ModuleContext context = mRoot.getModuleContext();
+        for (int row = 0; row < getRowCount(); row++) {
+          final EventEntry entry = mEvents.get(row);
+          if (entry.getEventDecl() == decl) {
+            final IdentifierSubject ident = entry.getName();
+            if (context.guessEventDecl(ident) == decl) {
+              // The event declaration has not been renamed.
+              fireTableRowsUpdated(row, row);
+            } else {
+              // The event declaration has not been renamed!
+              // Wait until the graph has been updated ...
+              SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run()
+                {
+                  final int row = getRow(ident);
+                  if (mGraphSearchVisitor.isEventInGraph(ident)) {
+                    // If the old name is still in the graph, keep it.
+                    fireTableRowsUpdated(row, row);
+                  } else {
+                    // Otherwise rename the event in the pane.
+                    removeIdentifierRange(row, row);
+                    final String name = decl.getName();
+                    mIdentifierRenameVisitor.rename(ident, name);
+                    addIdentifier(ident);
+                  }
+                }
+              });
+            }
+          }
+        }
+        break;
       default:
-        // NAME_CHANGED
-        // STATE_CHANGED - may really be name change by change of identifier
-        fireTableDataChanged();
         break;
       }
     }
 
+    @Override
     public int getModelObserverPriority()
     {
       return ModelObserver.RENDERING_PRIORITY;
@@ -534,6 +585,13 @@ public class EventTableModel
 
   //#########################################################################
   //# Inner Class EventEntry
+  /**
+   * A representative for an entry in the event table.
+   * This class is a wrapper around the actual event identifier to
+   * implement equality, hash code, and comparison. It also remembers
+   * the event declaration to update the name in response to the
+   * renaming of an event declaration.
+   */
   private class EventEntry implements Comparable<EventEntry>
   {
 
@@ -542,21 +600,24 @@ public class EventTableModel
     private EventEntry()
     {
       mName = null;
+      mEventDecl = null;
     }
 
     private EventEntry(final IdentifierSubject name)
     {
       mName = name;
+      updateEventDecl();
     }
-
 
     //#######################################################################
     //# Overrides for baseclass java.lang.Object
+    @Override
     public String toString()
     {
       return mName == null ? "" : mName.toString();
     }
 
+    @Override
     public boolean equals(final Object partner)
     {
       if (partner != null && partner.getClass() == getClass()) {
@@ -569,6 +630,7 @@ public class EventTableModel
       }
     }
 
+    @Override
     public int hashCode()
     {
       final ModuleHashCodeVisitor hash =
@@ -576,9 +638,9 @@ public class EventTableModel
       return hash.hashCode(mName);
     }
 
-
     //#######################################################################
     //# Interface java.lang.Comparable
+    @Override
     public int compareTo(final EventEntry entry)
     {
       if (mName == null) {
@@ -592,7 +654,6 @@ public class EventTableModel
       }
     }
 
-
     //#######################################################################
     //# Simple Access
     private IdentifierSubject getName()
@@ -600,11 +661,28 @@ public class EventTableModel
       return mName;
     }
 
+    private EventDeclProxy getEventDecl()
+    {
+      return mEventDecl;
+    }
+
+    private void updateEventDecl()
+    {
+      final ModuleContext context = mRoot.getModuleContext();
+      mEventDecl = context.guessEventDecl(mName);
+    }
 
     //#######################################################################
     //# Data Members
+    /**
+     * A copy of the event identifier represented by this table entry.
+     */
     private final IdentifierSubject mName;
-
+    /**
+     * The last seen event declaration in the module matching this table
+     * entry, or <CODE>null</CODE>.
+     */
+    private EventDeclProxy mEventDecl;
   }
 
 
@@ -627,6 +705,7 @@ public class EventTableModel
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.base.ProxyVisitor
+    @Override
     public Object visitProxy(final Proxy proxy)
     {
       return null;
@@ -634,6 +713,7 @@ public class EventTableModel
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Object visitEdgeProxy(final EdgeProxy edge)
       throws VisitorException
     {
@@ -644,6 +724,7 @@ public class EventTableModel
       return null;
     }
 
+    @Override
     public Object visitEventDeclProxy(final EventDeclProxy decl)
       throws VisitorException
     {
@@ -651,6 +732,7 @@ public class EventTableModel
       return ident.acceptVisitor(this);
     }
 
+    @Override
     public Object visitForeachProxy(final ForeachProxy foreach)
       throws VisitorException
     {
@@ -659,6 +741,7 @@ public class EventTableModel
       return null;
     }
 
+    @Override
     public Object visitGraphProxy(final GraphProxy graph)
       throws VisitorException
     {
@@ -673,6 +756,7 @@ public class EventTableModel
       return null;
     }
 
+    @Override
     public Object visitIdentifierProxy(final IdentifierProxy ident)
     {
       final ModuleProxyCloner cloner =
@@ -683,6 +767,7 @@ public class EventTableModel
       return null;
     }
 
+    @Override
     public Object visitEventListExpressionProxy
       (final EventListExpressionProxy expr)
       throws VisitorException
@@ -692,13 +777,67 @@ public class EventTableModel
       return null;
     }
 
+    @Override
     public Object visitNodeProxy(final NodeProxy node)
       throws VisitorException
     {
       final PlainEventListProxy props = node.getPropositions();
       return visitPlainEventListProxy(props);
     }
+  }
 
+
+  //#########################################################################
+  //# Inner Class IdentifierRenameVisitor
+  /**
+   * A visitor to rename an identifier (simple or indexed) to a given
+   * new name.
+   */
+  private static class IdentifierRenameVisitor
+    extends DefaultModuleProxyVisitor
+  {
+
+    //#######################################################################
+    //# Invocation
+    private void rename(final IdentifierProxy ident, final String name)
+    {
+      try {
+        mNewName = name;
+        ident.acceptVisitor(this);
+      } catch (final VisitorException exception) {
+        throw exception.getRuntimeException();
+      }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.base.ProxyVisitor
+    @Override
+    public Object visitProxy(final Proxy proxy)
+    {
+      return null;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
+    public Object visitIndexedIdentifierProxy(final IndexedIdentifierProxy ident)
+    {
+      final IndexedIdentifierSubject subject = (IndexedIdentifierSubject) ident;
+      subject.setName(mNewName);
+      return null;
+    }
+
+    @Override
+    public Object visitSimpleIdentifierProxy(final SimpleIdentifierProxy ident)
+    {
+      final SimpleIdentifierSubject subject = (SimpleIdentifierSubject) ident;
+      subject.setName(mNewName);
+      return null;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private String mNewName;
   }
 
 
@@ -722,6 +861,7 @@ public class EventTableModel
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.base.ProxyVisitor
+    @Override
     public Boolean visitProxy(final Proxy proxy)
     {
       return false;
@@ -729,6 +869,7 @@ public class EventTableModel
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Boolean visitEdgeProxy(final EdgeProxy edge)
       throws VisitorException
     {
@@ -740,6 +881,7 @@ public class EventTableModel
       }
     }
 
+    @Override
     public Boolean visitForeachProxy(final ForeachProxy foreach)
       throws VisitorException
     {
@@ -747,6 +889,7 @@ public class EventTableModel
       return processList(body);
     }
 
+    @Override
     public Boolean visitGraphProxy(final GraphProxy graph)
       throws VisitorException
     {
@@ -759,6 +902,7 @@ public class EventTableModel
         processList(graph.getEdges());
     }
 
+    @Override
     public Boolean visitIdentifierProxy(final IdentifierProxy ident)
     {
       final ModuleEqualityVisitor eq =
@@ -766,6 +910,7 @@ public class EventTableModel
       return eq.equals(mIdentifier, ident);
     }
 
+    @Override
     public Boolean visitEventListExpressionProxy
       (final EventListExpressionProxy expr)
       throws VisitorException
@@ -774,6 +919,7 @@ public class EventTableModel
       return processList(eventlist);
     }
 
+    @Override
     public Boolean visitNodeProxy(final NodeProxy node)
       throws VisitorException
     {
@@ -811,6 +957,7 @@ public class EventTableModel
   private final EventDeclListModelObserver mEventDeclListModelObserver;
   private final GraphModelObserver mGraphModelObserver;
   private final IdentifierCollectVisitor mIdentifierCollectVisitor;
+  private final IdentifierRenameVisitor mIdentifierRenameVisitor;
   private final GraphSearchVisitor mGraphSearchVisitor;
 
 
