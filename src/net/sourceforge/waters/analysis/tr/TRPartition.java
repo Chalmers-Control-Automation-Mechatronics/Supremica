@@ -407,7 +407,7 @@ public class TRPartition
   @Override
   public String toString()
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     if (mClasses != null) {
       for (int c = 0; c < mNumberOfClasses; c++) {
         final int[] clazz = mClasses.get(c);

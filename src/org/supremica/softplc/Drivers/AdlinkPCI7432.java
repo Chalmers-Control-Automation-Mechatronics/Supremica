@@ -209,7 +209,7 @@ public class AdlinkPCI7432
 
 	public static final String toString(final boolean[] values)
 	{
-		final StringBuffer sb = new StringBuffer();
+		final StringBuilder sb = new StringBuilder();
 
 		for (int i = 0; i < values.length; i++)
 		{

@@ -1073,7 +1073,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     public String toString()
     {
       String sep = "";
-      final StringBuffer buffer = new StringBuffer("{");
+      final StringBuilder buffer = new StringBuilder("{");
       for (final UnifiedEFATransitionRelation tr : mTransitionRelations) {
         buffer.append(sep);
         buffer.append(tr.getName());
@@ -1365,7 +1365,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     @Override
     public String toString()
     {
-      final StringBuffer buffer = new StringBuffer("<");
+      final StringBuilder buffer = new StringBuilder("<");
       buffer.append(mEvent.toString());
       buffer.append(" ");
       buffer.append(mTransitionRelations.isEmpty() ? "-" : "T");
@@ -1899,7 +1899,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     @Override
     public String toString()
     {
-      final StringBuffer buffer = new StringBuffer("Transition relations");
+      final StringBuilder buffer = new StringBuilder("Transition relations");
       char sep = ':';
       for (final UnifiedEFATransitionRelation tr : mTransitionRelations) {
         buffer.append(sep);

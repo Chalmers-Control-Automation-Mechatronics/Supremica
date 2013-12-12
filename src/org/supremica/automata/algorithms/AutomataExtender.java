@@ -158,7 +158,7 @@ public class AutomataExtender
             
             for (int i = 0; i < nbrOfStateCopies; i++)
             {
-                StringBuffer labelExt = new StringBuffer("");
+                StringBuilder labelExt = new StringBuilder("");
                 for (int j = 0; j < i; j++)
                 {
                     // labelExt.append("'");

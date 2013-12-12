@@ -982,7 +982,7 @@ public final class AutomataSynchronizerExecuter
                 else
                 {
                     final org.supremica.automata.State[][] stateTable = indexForm.getStateTable();
-                    final StringBuffer sb = new StringBuffer();
+                    final StringBuilder sb = new StringBuilder();
 
                     for (int j = 0; j < currState.length - AutomataIndexFormHelper.STATE_EXTRA_DATA; j++)
                     {
@@ -1344,7 +1344,7 @@ public final class AutomataSynchronizerExecuter
     @SuppressWarnings("unused")
 	private String printTypeIsPlantTable()
     {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
 
         sb.append("[");
 

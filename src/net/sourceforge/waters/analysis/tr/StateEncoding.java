@@ -98,7 +98,7 @@ public class StateEncoding
   //# Overrides for java.lang.Object
   public String toString()
   {
-    final StringBuffer buffer = new StringBuffer("{");
+    final StringBuilder buffer = new StringBuilder("{");
     if (mStates != null) {
       int code = 0;
       for (final StateProxy state : mStates) {

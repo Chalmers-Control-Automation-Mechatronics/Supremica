@@ -290,7 +290,7 @@ public class Candidate implements Comparable<Candidate>
   public static String getCompositionName(final String prefix,
                                           final List<? extends AutomatonProxy> automata)
   {
-    final StringBuffer buffer = new StringBuffer(prefix);
+    final StringBuilder buffer = new StringBuilder(prefix);
     buffer.append('{');
     boolean first = true;
     for (final AutomatonProxy aut : automata) {

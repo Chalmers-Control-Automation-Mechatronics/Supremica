@@ -313,7 +313,7 @@ public class Cluster
 		}
 
 		// otherwise create a composite name
-		StringBuffer buf = new StringBuffer("(");
+		StringBuilder buf = new StringBuilder("(");
 
 		for (; e.hasNext(); )
 		{

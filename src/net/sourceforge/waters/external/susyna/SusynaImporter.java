@@ -325,7 +325,7 @@ public class SusynaImporter
     } else if (ch == '=') {
       return SusynaToken.getToken(SusynaToken.Type.EQUALS);
     } else if (ch == '[') {
-      final StringBuffer buffer = new StringBuffer();
+      final StringBuilder buffer = new StringBuilder();
       while (true) {
         ch = reader.read();
         if (ch < 0) {
@@ -340,7 +340,7 @@ public class SusynaImporter
       }
       return new SusynaToken(SusynaToken.Type.HEADER, buffer);
     } else if (Character.isDigit(ch)) {
-      final StringBuffer buffer = new StringBuffer();
+      final StringBuilder buffer = new StringBuilder();
       buffer.append((char) ch);
       while (true) {
         reader.mark(2);
@@ -356,7 +356,7 @@ public class SusynaImporter
       }
       return new SusynaToken(SusynaToken.Type.INTCONST, buffer);
     } else if (Character.isJavaIdentifierStart(ch)) {
-      final StringBuffer buffer = new StringBuffer();
+      final StringBuilder buffer = new StringBuilder();
       buffer.append((char) ch);
       while (true) {
         reader.mark(2);

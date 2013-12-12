@@ -15,7 +15,7 @@ import org.supremica.automata.Automaton;
 public class EnumerateStates
 {
     Automata automata = null;
-    StringBuffer prefix = null;
+    StringBuilder prefix = null;
     int prefixlen = 0;
     
     /**
@@ -24,7 +24,7 @@ public class EnumerateStates
     public EnumerateStates(Automata automata, String prefix)
     {
         this.automata = automata;
-        this.prefix = new StringBuffer(prefix);
+        this.prefix = new StringBuilder(prefix);
         this.prefixlen = prefix.length();
     }
     

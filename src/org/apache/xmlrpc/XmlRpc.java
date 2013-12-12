@@ -149,7 +149,7 @@ static
 	 * Used to collect character data (<code>CDATA</code>) of
 	 * parameter values.
 	 */
-	StringBuffer cdata;
+	StringBuilder cdata;
 	boolean readCdata;
 
 	// XML RPC parameter types used for dataMode
@@ -382,7 +382,7 @@ catch (ClassNotFoundException x)
 
 		if (cdata == null)
 		{
-			cdata = new StringBuffer(128);
+			cdata = new StringBuilder(128);
 		}
 		else
 		{

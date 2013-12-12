@@ -496,17 +496,17 @@ public class BDDAutomata
 //        for (BDD.AllSatIterator stateIt = reachableAndCoreachableStatesBDD.allsat(); stateIt.hasNext(); )
 //        {
 //            byte[] currState = stateIt.nextSat();
-//            StringBuffer stringBuffer = new StringBuffer("[");
+//            StringBuilder StringBuilder = new StringBuilder("[");
 //            for (int i = 0; i < currState.length; i++)
 //            {
-//                stringBuffer.append(currState[i]);
+//                StringBuilder.append(currState[i]);
 //                if (i < currState.length - 1)
 //                {
-//                    stringBuffer.append(" ");
+//                    StringBuilder.append(" ");
 //                }
 //            }
-//            stringBuffer.append("]");
-//            logger.info("state: " + stringBuffer.toString());
+//            StringBuilder.append("]");
+//            logger.info("state: " + StringBuilder.toString());
 //        }
         return supervisorAutomaton;
     }

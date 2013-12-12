@@ -1088,7 +1088,7 @@ public class Automata
         }
 
         final Alphabet alpha = getUnionAlphabet();
-        final StringBuffer buf = new StringBuffer(prefix);
+        final StringBuilder buf = new StringBuilder(prefix);
         int num = 1; // number to append to prefix
         while(alpha.contains(buf.toString()))
         {
@@ -1240,7 +1240,7 @@ public class Automata
     // Useful for debugging (among other things)
     public String toDebugString()
     {
-        final StringBuffer sbuf = new StringBuffer();
+        final StringBuilder sbuf = new StringBuilder();
 
         for (final Iterator<Automaton> it = iterator(); it.hasNext(); )
         {
@@ -1255,7 +1255,7 @@ public class Automata
 
     public String toString()
     {
-        final StringBuffer sbuf = new StringBuffer("{");
+        final StringBuilder sbuf = new StringBuilder("{");
 
         if (size() > 0)
         {
@@ -1275,7 +1275,7 @@ public class Automata
     // Useful for debugging (among other things) - writes Java code
     public String toCode()
     {
-        final StringBuffer sbuf = new StringBuffer();
+        final StringBuilder sbuf = new StringBuilder();
 
         // Examine each automata
         for (final Automaton automaton : this)
@@ -1298,7 +1298,7 @@ public class Automata
 
     public String stateToString(final int[] arrstate)
     {
-        final StringBuffer sbuf = new StringBuffer();
+        final StringBuilder sbuf = new StringBuilder();
         int i = 0;
 
         // Examine each automata

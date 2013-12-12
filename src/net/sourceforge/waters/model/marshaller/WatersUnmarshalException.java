@@ -120,7 +120,7 @@ public class WatersUnmarshalException extends WatersException {
     } else if (cause instanceof SAXParseException) {
       final String msg = cause.getMessage();
       if (msg != null) {
-        final StringBuffer buffer = new StringBuffer();
+        final StringBuilder buffer = new StringBuilder();
         final SAXParseException saxCause = (SAXParseException) cause;
         final String sysid = saxCause.getSystemId();
         if (sysid != null) {

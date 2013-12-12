@@ -167,7 +167,7 @@ public class CompositionalSafetyVerifier
 
   String getPropertyEventsDump()
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     final TObjectByteIterator<EventProxy> iter = mPropertyEventsMap.iterator();
     while (iter.hasNext()) {
       iter.advance();

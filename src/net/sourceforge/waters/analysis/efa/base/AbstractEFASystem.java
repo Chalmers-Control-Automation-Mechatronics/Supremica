@@ -141,7 +141,7 @@ public abstract class AbstractEFASystem<L,
   @Override
   public String toString()
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     buffer.append(ProxyTools.getShortClassName(this));
     buffer.append(' ');
     buffer.append(mName);

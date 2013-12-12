@@ -189,7 +189,7 @@ public class CompiledNormalForm implements Cloneable
 
   public String toString()
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     boolean first = true;
     buffer.append('{');
     for (final CompiledClause clause : getClauses()) {

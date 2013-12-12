@@ -125,7 +125,7 @@ public class RecipeResourcePetriNetBuilder
 
 	public String buildComments()
 	{
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		int nbr_of_product_places = thePetriNet.nbrOfPlaces() - nbr_of_resource_places;
 
 		sb.append("nbr_of_products: " + theRecipes.nbrOfRecipes() + "\n");

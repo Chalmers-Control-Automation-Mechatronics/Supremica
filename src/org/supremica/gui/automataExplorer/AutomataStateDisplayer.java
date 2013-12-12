@@ -120,7 +120,7 @@ public class AutomataStateDisplayer
         isAcceptingBox.setSelected(AutomataIndexFormHelper.isAccepting(currState));
         isForbiddenBox.setSelected(AutomataIndexFormHelper.isForbidden(currState));
         
-        StringBuffer stateNameBuffer = new StringBuffer();
+        StringBuilder stateNameBuffer = new StringBuilder();
         stateNameBuffer.append(helper.getIndexMap().getStateAt(0,currState[0]).getName());
         for (int i=1; i<helper.getAutomata().size(); i++)
         {

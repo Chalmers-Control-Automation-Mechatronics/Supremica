@@ -153,7 +153,7 @@ abstract class MethodGlue implements Comparable<MethodGlue>, WritableGlue {
 
   String getFullMethodName()
   {
-    final StringBuffer buffer = new StringBuffer(getCppMethodName());
+    final StringBuilder buffer = new StringBuilder(getCppMethodName());
     if (mMethodCodeSuffix >= 0) {
       buffer.append('_');
       buffer.append(mMethodCodeSuffix);
@@ -171,7 +171,7 @@ abstract class MethodGlue implements Comparable<MethodGlue>, WritableGlue {
       throw new IllegalStateException("Second call to collectSignatures()!");
     }
 
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     buffer.append('(');
     for (final ParameterGlue param : mParameterList) {
       param.appendTypeSignature(buffer);

@@ -610,7 +610,7 @@ public class DocumentContainerManager
   {
     final JFrame frame = mIDE.getFrame();
     final String msg = exception.getMessage();
-    final String text = "Error accessing file:\n" + wrapExceptionMessage(msg);
+    final String text = wrapExceptionMessageInHTML("Error accessing file", msg);
     final String title = "I/O Error";
     if (maycancel) {
       final int choice = JOptionPane.showConfirmDialog
@@ -688,7 +688,7 @@ public class DocumentContainerManager
 
   private String getWarningText(final File file, final String msg)
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     buffer.append("File '");
     buffer.append(file);
     buffer.append("'\n");
@@ -696,9 +696,60 @@ public class DocumentContainerManager
     return buffer.toString();
   }
 
-  private String wrapExceptionMessage(final String msg)
+  private static String wrapExceptionMessageInHTML(final String title,
+                                                   final String msg)
   {
-    return msg.replaceAll(": +", ":\n");
+    final StringBuilder buffer = new StringBuilder();
+    buffer.append("<html><body style='width: 400px;'>");
+    buffer.append("<h2>");
+    buffer.append(title);
+    buffer.append("</h2>");
+    boolean gobble = true;
+    for (int i = 0; i < msg.length(); i++) {
+      final char ch = msg.charAt(i);
+      switch (ch) {
+      case ' ':
+      case '\t':
+        if (!gobble) {
+          buffer.append(' ');
+        }
+        gobble = true;
+        break;
+      case ':':
+        buffer.append(':');
+        if (i + 1 >= msg.length() || msg.charAt(i + 1) != ' ') {
+          gobble = false;
+          break;
+        }
+        // fall through ...
+      case '\n':
+        buffer.append("<br>");
+        gobble = true;
+        break;
+      case '&':
+        buffer.append("&amp;");
+        gobble = false;
+        break;
+      case '<':
+        buffer.append("&lt;");
+        gobble = false;
+        break;
+      case '>':
+        buffer.append("&gt;");
+        gobble = false;
+        break;
+      case '"':
+        buffer.append("&quot;");
+        gobble = false;
+        break;
+      default:
+        buffer.append(ch);
+        gobble = false;
+        break;
+      }
+    }
+    buffer.append("</body></html>");
+    return buffer.toString();
   }
 
 

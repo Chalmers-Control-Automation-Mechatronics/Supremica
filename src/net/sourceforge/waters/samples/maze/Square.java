@@ -75,7 +75,7 @@ abstract class Square
   //# Names
   String getName()
   {
-    final StringBuffer result = new StringBuffer("sq_");
+    final StringBuilder result = new StringBuilder("sq_");
     result.append(mPosition.x);
     result.append('_');
     result.append(mPosition.y);

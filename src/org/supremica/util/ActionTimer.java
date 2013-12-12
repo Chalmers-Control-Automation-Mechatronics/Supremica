@@ -158,7 +158,7 @@ public class ActionTimer
         int millis = (int) time;
         
         // Produce message
-        StringBuffer sbuf = new StringBuffer();
+        StringBuilder sbuf = new StringBuilder();
         if (hrs != 0)
         {
             //sbuf.append(hrs + hours + mins + minutes + secs + seconds + millis + milliseconds);
@@ -192,7 +192,7 @@ public class ActionTimer
         long time = elapsedTime();    // time is in millisecs
 
         // Produce message
-        StringBuffer sbuf = new StringBuffer();
+        StringBuilder sbuf = new StringBuilder();
         if (time >= 60 * 60 * 1000.0)
         {
             // Hours

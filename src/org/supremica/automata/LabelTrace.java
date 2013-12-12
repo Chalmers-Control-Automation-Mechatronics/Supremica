@@ -118,7 +118,7 @@ public class LabelTrace
 
 	public String toString()
 	{
-		StringBuffer traceDesc = new StringBuffer();
+		StringBuilder traceDesc = new StringBuilder();
 
 		for (Iterator<String> eIt = iterator(); eIt.hasNext(); )
 		{

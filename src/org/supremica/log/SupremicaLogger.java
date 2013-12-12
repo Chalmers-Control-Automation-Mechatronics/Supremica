@@ -58,36 +58,39 @@
 
 package org.supremica.log;
 
-import java.io.StringWriter;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 
 
 class SupremicaLogger
     implements Logger
-{    
+{
     //#######################################################################
     //# Constructor
     SupremicaLogger(final org.apache.log4j.Logger logger)
     {
         mLogger = logger;
-    }  
-    
+    }
+
 
     //#######################################################################
     //# Interface org.apache.log4j.Logger
+    @Override
     public void debug(final Object message)
     {
         mLogger.debug(message);
     }
-    
+
+    @Override
     public void debug(final Object message, final Throwable t)
     {
         mLogger.debug(message, t);
     }
-    
+
     /**
      * Print the stack trace to the registered listeners.
      */
+    @Override
     public void debug(final StackTraceElement[] trace)
     {
         for (int i = 0; i < trace.length; ++i)
@@ -95,28 +98,32 @@ class SupremicaLogger
             mLogger.debug(trace[i].toString());
         }
     }
-    
+
+    @Override
     public void error(final Object message)
     {
         mLogger.error(message);
     }
-    
-    public void error(final Object message, Throwable t)
+
+    @Override
+    public void error(final Object message, final Throwable t)
     {
         mLogger.error(message + "\n" + t.toString());
         mLogger.debug(getStackTraceAsString(t));
     }
-    
+
+    @Override
     public void error(final Throwable t)
     {
         mLogger.error(t.toString());
         //mLogger.debug(t.getStackTrace());
         mLogger.debug(getStackTraceAsString(t));
     }
-    
+
     /**
      * Print the stack trace to the registered listeners.
      */
+    @Override
     public void error(final StackTraceElement[] trace)
     {
         for (int i = 0; i < trace.length; ++i)
@@ -124,20 +131,23 @@ class SupremicaLogger
             mLogger.error(trace[i].toString());
         }
     }
-    
+
+    @Override
     public void fatal(final Object message)
     {
         mLogger.fatal(message);
     }
-    
-    public void fatal(final Object message, Throwable t)
+
+    @Override
+    public void fatal(final Object message, final Throwable t)
     {
         mLogger.fatal(message, t);
     }
-    
+
     /**
      * Print the stack trace to the registered listeners.
      */
+    @Override
     public void fatal(final StackTraceElement[] trace)
     {
         for (int i = 0; i < trace.length; ++i)
@@ -145,20 +155,23 @@ class SupremicaLogger
             mLogger.fatal(trace[i].toString());
         }
     }
-    
+
+    @Override
     public void warn(final Object message)
     {
         mLogger.warn(message);
     }
-    
-    public void warn(final Object message, Throwable t)
+
+    @Override
+    public void warn(final Object message, final Throwable t)
     {
         mLogger.warn(message, t);
     }
-    
+
     /**
      * Print the stack trace to the registered listeners.
      */
+    @Override
     public void warn(final StackTraceElement[] trace)
     {
         for (int i = 0; i < trace.length; ++i)
@@ -166,29 +179,33 @@ class SupremicaLogger
             mLogger.warn(trace[i].toString());
         }
     }
-    
+
+    @Override
     public void info(final Object message)
     {
         mLogger.info(message);
     }
-    
-    public void info(final Object message, Throwable t)
+
+    @Override
+    public void info(final Object message, final Throwable t)
     {
         mLogger.info(message, t);
     }
-    
+
     /**
      * Logs the message as an "info"-message only if Supremica is
      * currently in "verbose mode".
      */
+    @Override
     public void verbose(final Object message)
     {
         mLogger.log(SupremicaLevel.VERBOSE, message);
     }
-    
+
     /**
      * Print the stack trace to the registered listeners.
      */
+    @Override
     public void info(final StackTraceElement[] trace)
     {
         for (int i = 0; i < trace.length; ++i)
@@ -196,22 +213,22 @@ class SupremicaLogger
             mLogger.info(trace[i].toString());
         }
     }
-    
+
+    @Override
     public boolean isDebugEnabled()
     {
         return mLogger.isDebugEnabled();
     }
-    
+
     private String getStackTraceAsString(final Throwable t)
     {
-        StringWriter stringWriter = new StringWriter();
-        PrintWriter printWriter = new PrintWriter(stringWriter);
+        final StringWriter stringWriter = new StringWriter();
+        final PrintWriter printWriter = new PrintWriter(stringWriter);
         t.printStackTrace(printWriter);
-        StringBuffer error = stringWriter.getBuffer();
-        return error.toString();
+        return stringWriter.toString();
     }
 
-    
+
     //#######################################################################
     //# Data Members
     private final org.apache.log4j.Logger mLogger;

@@ -127,7 +127,7 @@ class MazeReader
 
   private String nextSquare() throws IOException
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     while (mLastChar != '.') {
       buffer.append(mLastChar);
       getNextCharacter();
@@ -246,7 +246,7 @@ class MazeReader
   private MazeSyntaxException createSyntaxError(final String msg,
 						final Throwable cause)
   {
-    final StringBuffer buffer = new StringBuffer(msg);
+    final StringBuilder buffer = new StringBuilder(msg);
     buffer.append(" in line ");
     buffer.append(mLineNo);
     if (mURL != null) {

@@ -90,7 +90,7 @@ class ClassTypeGlue extends TypeGlue {
     }
   }
 
-  void appendTypeSignature(final StringBuffer buffer)
+  void appendTypeSignature(final StringBuilder buffer)
   {
     buffer.append('L');
     buffer.append(mClass.getFullName());

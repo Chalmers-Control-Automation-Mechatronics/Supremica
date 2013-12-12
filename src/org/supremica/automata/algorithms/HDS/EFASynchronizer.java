@@ -135,7 +135,7 @@ public class EFASynchronizer
 
     // Build the initial state - and the comment
     final Iterator<Automaton> autIt = mAutomata.iterator();
-    final StringBuffer comment = new StringBuffer();
+    final StringBuilder comment = new StringBuilder();
 
     // Set an apropriate comment on the automaton
     while (autIt.hasNext()) {

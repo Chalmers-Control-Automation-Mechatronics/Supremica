@@ -102,7 +102,7 @@ public abstract class DocumentContainer
     final DocumentProxy doc = getDocument();
     final String name = doc.getName();
     final File file = getFileLocation();
-    final StringBuffer buffer = new StringBuffer(type);
+    final StringBuilder buffer = new StringBuilder(type);
     if (name != null && !name.equals(""))
     {
       buffer.append(": ");

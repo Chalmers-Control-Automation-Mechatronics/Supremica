@@ -401,10 +401,10 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       new CoreachabilityExplorer(reverseEventAutomata, reverseTransitions,
                                  ndTuple1, EventEncoding.NONTAU,
                                  mNumProperEvents - 1);
-    mSuccessorStatesExplorer =
-      new SuccessorStatesExplorer(reverseEventAutomata, reverseTransitions,
-                                  ndTuple1, EventEncoding.NONTAU,
-                                  lastUncontrollable);
+    mBackwardsUncontrollableExplorer =
+      new BackwardsUncontrollableExplorer(reverseEventAutomata, reverseTransitions,
+                                          ndTuple1, EventEncoding.NONTAU,
+                                          lastUncontrollable);
     mReachabilityExplorer =
       new ReachabilityExplorer(eventAutomata, transitions, ndTuple2,
                                EventEncoding.NONTAU, mNumProperEvents - 1);
@@ -538,7 +538,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             mUnvisited.offer(mStateTuples.get(state));
             while (!mUnvisited.isEmpty()) {
               final int[] s = mUnvisited.remove();
-              mSuccessorStatesExplorer.explore(s);
+              mBackwardsUncontrollableExplorer.explore(s);
             }
           }
         }
@@ -935,7 +935,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     {
       checkAbort();
       decode(encodedTuple, mmDecodedTuple);
-      events: for (int e = mmFirstEvent; e <= mmLastEvent; e++) {
+      events:
+      for (int e = mmFirstEvent; e <= mmLastEvent; e++) {
         Arrays.fill(mmNDTuple, null);
         for (final int a : mmEventAutomata[e]) {
           if (mmTransitions[a][e] != null) {
@@ -1100,6 +1101,16 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       super(eventAutomata, transitions, NDTuple, firstEvent, lastEvent);
     }
 
+    /*
+    @Override
+    public boolean isUsedEvent(final int e)
+    {
+      final EventProxy event = mEventEncoding.getProperEvent(e);
+      final Map<String,String> attribs = event.getAttributes();
+      return !attribs.containsKey("synthesis:exceptional");
+    }
+    */
+
     @Override
     public boolean processNewState(final int[] decodedSource,
                                    final int event, final boolean isInitial)
@@ -1119,9 +1130,9 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
 
   //#########################################################################
   //# Inner Class SuccessorStatesExplorer
-  private class SuccessorStatesExplorer extends StateExplorer
+  private class BackwardsUncontrollableExplorer extends StateExplorer
   {
-    public SuccessorStatesExplorer(final int[][] eventAutomata,
+    public BackwardsUncontrollableExplorer(final int[][] eventAutomata,
                                    final int[][][][] transitions,
                                    final int[][] NDTuple,
                                    final int firstEvent, final int lastEvent)
@@ -1307,7 +1318,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   private StateExplorer mCtrlInitialReachabilityExplorer;
   private StateExplorer mUnctrlInitialReachabilityExplorer;
   private StateExplorer mCoreachabilityExplorer;
-  private StateExplorer mSuccessorStatesExplorer;
+  private StateExplorer mBackwardsUncontrollableExplorer;
   private StateExplorer mReachabilityExplorer;
   private FinalStateExplorer mFinalStateExplorer;
   private ListBufferTransitionRelation mTransitionRelation;

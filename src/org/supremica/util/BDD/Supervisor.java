@@ -146,7 +146,7 @@ public class Supervisor
      */
     public String type()
     {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         
         sb.append(" ");
         sb.append(Config.BDD_ALGORITHM.get());

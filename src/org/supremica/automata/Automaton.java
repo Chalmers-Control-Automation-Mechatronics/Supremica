@@ -674,15 +674,15 @@ public class Automaton
      */
     public State createUniqueState(final String prefix)
     {
-        StringBuffer name = null;
+        StringBuilder name = null;
 
         if ((prefix == null) || prefix.equals(""))
         {
-            name = new StringBuffer("q");	// this was 'r', why? Above it says 'q', I changed // MF
+            name = new StringBuilder("q");	// this was 'r', why? Above it says 'q', I changed // MF
         }
         else
         {
-            name = new StringBuffer(prefix);
+            name = new StringBuilder(prefix);
         }
 
         while (containsStateWithName(name.toString()))
@@ -2411,7 +2411,7 @@ public class Automaton
     // These are useful for debugging (etc)
     public String toDebugString()
     {
-        final StringBuffer sbuf = new StringBuffer();
+        final StringBuilder sbuf = new StringBuilder();
 
         sbuf.append(getName());
         sbuf.append("::");
@@ -2434,7 +2434,7 @@ public class Automaton
     // toCode writes Java code - Note, the names are used as-is, which means there may be blanks in variabel names!
     public String toCode()
     {
-        final StringBuffer sbuf = new StringBuffer();
+        final StringBuilder sbuf = new StringBuilder();
 
         sbuf.append("Automaton " + getName() + " = new Automaton(\"" + getName() + "\");");
         sbuf.append("\t\t{\t\t\t" + getName() + ".setType(AutomatonType." + getType().toString() + ");\n");

@@ -128,7 +128,7 @@ class GlueFileParser extends ErrorReporter {
   private Token parsePackage()
     throws IOException, ParseException
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     Token token = nextTokenIdentifier();
     String name = token.getTokenText();
     buffer.append(name);
@@ -424,7 +424,7 @@ class GlueFileParser extends ErrorReporter {
   private ParseException createUnexpectedTokenException
     (final Token token, final String expected)
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     if (token.getTokenType() == TokenTable.C_EOF) {
       buffer.append("Unexpected end of file");
     } else {

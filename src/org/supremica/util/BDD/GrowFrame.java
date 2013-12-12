@@ -255,7 +255,7 @@ public class GrowFrame
 		if(!graphic) return   "ERROR: this funcion is only available when graph data is available";
 
 		int size_x = vars.getSize();
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 
 		// get header:
 		sb.append("% " + title + "\n\n");

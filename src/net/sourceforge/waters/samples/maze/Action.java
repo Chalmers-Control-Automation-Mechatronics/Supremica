@@ -50,7 +50,7 @@ class Action
   //# Naming
   String getName()
   {
-    final StringBuffer result = new StringBuffer(ACTNAME[mKind]);
+    final StringBuilder result = new StringBuilder(ACTNAME[mKind]);
     result.append('_');
     result.append(mSource.x);
     result.append('_');

@@ -55,9 +55,6 @@ This is model is not controllable and blocking, intended for synthesis. However,
                     <IntConstant Value="2"/>
                 </BinaryExpression>
             </RangeList>
-            <ns2:AttributeMap>
-                <ns2:Attribute Name="synthesis:exceptional"/>
-            </ns2:AttributeMap>
         </EventDecl>
     </EventDeclList>
     <ComponentList>

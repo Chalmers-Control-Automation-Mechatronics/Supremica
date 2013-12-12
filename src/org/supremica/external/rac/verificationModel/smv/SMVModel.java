@@ -209,7 +209,7 @@ public class SMVModel extends VerificationModel
 		{
 		    content += line + "\n";
 		    line = reader.readLine();
-		    //StringBuffer row = new StringBuffer(line);
+		    //StringBuilder row = new StringBuilder(line);
 		}
 		standardModulesNameToContentMap.put(name, content);
 		return true;

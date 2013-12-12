@@ -3616,7 +3616,7 @@ class EqClass
         if (newState == null)
         {
             // create a new state named as the concatenation of all state-names
-            StringBuffer str = new StringBuffer();
+            StringBuilder str = new StringBuilder();
             Iterator it = iterator();
 
             while (it.hasNext())
@@ -3702,7 +3702,7 @@ class EquivalenceClassHolder
     @Override
     public String toString()
     {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         final Iterator<?> equivClassIt = iterator();
 
         sb.append("(");

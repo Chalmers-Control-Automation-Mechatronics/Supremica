@@ -173,7 +173,7 @@ public class EdgeEditorDialog
     add(actionLabel);
 
     actionField = new JTextPane();
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     boolean first = true;
     for (final BinaryExpressionSubject action : actions) {
       if (first) {

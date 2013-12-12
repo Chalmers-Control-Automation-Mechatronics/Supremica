@@ -62,7 +62,7 @@ public class AnalyzerStatisticsAction
 
         for (final Automaton currAutomaton : selectedAutomata)
         {
-            final StringBuffer statusStr = new StringBuffer();
+            final StringBuilder statusStr = new StringBuilder();
 
             statusStr.append("Status for automaton: " + currAutomaton.getName());
 

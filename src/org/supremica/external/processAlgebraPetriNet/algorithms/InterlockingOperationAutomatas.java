@@ -167,10 +167,10 @@ public class InterlockingOperationAutomatas {
 
 		int[] indices;
 		PermutationGenerator x = new PermutationGenerator (triggersArray.length);
-		StringBuffer permutation;
+		StringBuilder permutation;
 		while (x.hasMore ()) {
 
-			permutation = new StringBuffer ();
+			permutation = new StringBuilder ();
 			indices = x.getNext ();
 			for (int i = 0; i < indices.length; i++) {
 				permutation.append (triggersArray[indices[i]]);

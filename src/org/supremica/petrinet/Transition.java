@@ -145,7 +145,7 @@ public class Transition
 
 	public String toString()
 	{
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 
 		sb.append("Transition: " + identity + "\n");
 		sb.append("\tPrevious places:\n");

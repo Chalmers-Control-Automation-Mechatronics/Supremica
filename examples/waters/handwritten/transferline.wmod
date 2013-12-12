@@ -56,21 +56,13 @@ Reference: W.M. Wonham, Supervisory Control of Discrete-Event Systems. [Online h
     <ComponentList>
         <SimpleComponent Kind="PLANT" Name="init">
             <Graph>
-                <LabelBlock>
-                    <IndexedIdentifier Name="tu_accept">
-                        <IntConstant Value="0"/>
-                    </IndexedIdentifier>
-                    <IndexedIdentifier Name="tu_load">
-                        <IntConstant Value="0"/>
-                    </IndexedIdentifier>
-                </LabelBlock>
                 <NodeList>
                     <SimpleNode Name="WORKING">
                         <PointGeometry>
-                            <Point Y="249" X="214"/>
+                            <Point X="214" Y="249"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="5" X="11"/>
+                            <Point X="11" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Initial="true" Name="IDLE">
@@ -78,53 +70,53 @@ Reference: W.M. Wonham, Supervisory Control of Discrete-Event Systems. [Online h
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="162" X="214"/>
+                            <Point X="214" Y="162"/>
                         </PointGeometry>
                         <InitialArrowGeometry>
-                            <Point Y="-5" X="-5"/>
+                            <Point X="-5" Y="-5"/>
                         </InitialArrowGeometry>
                         <LabelGeometry>
-                            <Point Y="5" X="11"/>
+                            <Point X="11" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="WORKING" Source="IDLE">
+                    <Edge Source="IDLE" Target="WORKING">
                         <LabelBlock>
                             <IndexedIdentifier Name="tu_load">
                                 <IntConstant Value="0"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-11" X="-68"/>
+                                <Point X="-68" Y="-11"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <StartPointGeometry>
-                            <Point Y="162" X="214"/>
+                            <Point X="214" Y="162"/>
                         </StartPointGeometry>
                         <SplineGeometry>
-                            <Point Y="207" X="192"/>
+                            <Point X="192" Y="207"/>
                         </SplineGeometry>
                         <EndPointGeometry>
-                            <Point Y="249" X="214"/>
+                            <Point X="214" Y="249"/>
                         </EndPointGeometry>
                     </Edge>
-                    <Edge Target="IDLE" Source="WORKING">
+                    <Edge Source="WORKING" Target="IDLE">
                         <LabelBlock>
                             <IndexedIdentifier Name="tu_accept">
                                 <IntConstant Value="0"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-12" X="7"/>
+                                <Point X="7" Y="-12"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <StartPointGeometry>
-                            <Point Y="249" X="214"/>
+                            <Point X="214" Y="249"/>
                         </StartPointGeometry>
                         <SplineGeometry>
-                            <Point Y="206" X="235"/>
+                            <Point X="235" Y="206"/>
                         </SplineGeometry>
                         <EndPointGeometry>
-                            <Point Y="162" X="214"/>
+                            <Point X="214" Y="162"/>
                         </EndPointGeometry>
                     </Edge>
                 </EdgeList>
@@ -138,21 +130,13 @@ Reference: W.M. Wonham, Supervisory Control of Discrete-Event Systems. [Online h
                         <SimpleIdentifier Name="G"/>
                     </IndexedIdentifier>
                     <Graph>
-                        <LabelBlock>
-                            <IndexedIdentifier Name="machine_load">
-                                <SimpleIdentifier Name="G"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="machine_unload">
-                                <SimpleIdentifier Name="G"/>
-                            </IndexedIdentifier>
-                        </LabelBlock>
                         <NodeList>
                             <SimpleNode Name="WORKING">
                                 <PointGeometry>
-                                    <Point Y="249" X="234"/>
+                                    <Point X="234" Y="249"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point Y="5" X="11"/>
+                                    <Point X="11" Y="5"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Initial="true" Name="IDLE">
@@ -160,53 +144,53 @@ Reference: W.M. Wonham, Supervisory Control of Discrete-Event Systems. [Online h
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
-                                    <Point Y="162" X="234"/>
+                                    <Point X="234" Y="162"/>
                                 </PointGeometry>
                                 <InitialArrowGeometry>
-                                    <Point Y="-5" X="-5"/>
+                                    <Point X="-5" Y="-5"/>
                                 </InitialArrowGeometry>
                                 <LabelGeometry>
-                                    <Point Y="5" X="11"/>
+                                    <Point X="11" Y="5"/>
                                 </LabelGeometry>
                             </SimpleNode>
                         </NodeList>
                         <EdgeList>
-                            <Edge Target="WORKING" Source="IDLE">
+                            <Edge Source="IDLE" Target="WORKING">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="machine_load">
                                         <SimpleIdentifier Name="G"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-10" X="-102"/>
+                                        <Point X="-102" Y="-10"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
-                                    <Point Y="162" X="234"/>
+                                    <Point X="234" Y="162"/>
                                 </StartPointGeometry>
                                 <SplineGeometry>
-                                    <Point Y="205" X="208"/>
+                                    <Point X="208" Y="205"/>
                                 </SplineGeometry>
                                 <EndPointGeometry>
-                                    <Point Y="249" X="234"/>
+                                    <Point X="234" Y="249"/>
                                 </EndPointGeometry>
                             </Edge>
-                            <Edge Target="IDLE" Source="WORKING">
+                            <Edge Source="WORKING" Target="IDLE">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="machine_unload">
                                         <SimpleIdentifier Name="G"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-12" X="7"/>
+                                        <Point X="7" Y="-12"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
-                                    <Point Y="249" X="234"/>
+                                    <Point X="234" Y="249"/>
                                 </StartPointGeometry>
                                 <SplineGeometry>
-                                    <Point Y="206" X="258"/>
+                                    <Point X="258" Y="206"/>
                                 </SplineGeometry>
                                 <EndPointGeometry>
-                                    <Point Y="162" X="234"/>
+                                    <Point X="234" Y="162"/>
                                 </EndPointGeometry>
                             </Edge>
                         </EdgeList>
@@ -217,24 +201,13 @@ Reference: W.M. Wonham, Supervisory Control of Discrete-Event Systems. [Online h
                         <SimpleIdentifier Name="G"/>
                     </IndexedIdentifier>
                     <Graph>
-                        <LabelBlock>
-                            <IndexedIdentifier Name="tu_accept">
-                                <SimpleIdentifier Name="G"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="tu_load">
-                                <SimpleIdentifier Name="G"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="tu_reject">
-                                <SimpleIdentifier Name="G"/>
-                            </IndexedIdentifier>
-                        </LabelBlock>
                         <NodeList>
                             <SimpleNode Name="WORKING">
                                 <PointGeometry>
-                                    <Point Y="249" X="198"/>
+                                    <Point X="198" Y="249"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point Y="-3" X="9"/>
+                                    <Point X="9" Y="-3"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Initial="true" Name="IDLE">
@@ -242,18 +215,18 @@ Reference: W.M. Wonham, Supervisory Control of Discrete-Event Systems. [Online h
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
-                                    <Point Y="162" X="198"/>
+                                    <Point X="198" Y="162"/>
                                 </PointGeometry>
                                 <InitialArrowGeometry>
-                                    <Point Y="-5" X="-5"/>
+                                    <Point X="-5" Y="-5"/>
                                 </InitialArrowGeometry>
                                 <LabelGeometry>
-                                    <Point Y="-5" X="13"/>
+                                    <Point X="13" Y="-5"/>
                                 </LabelGeometry>
                             </SimpleNode>
                         </NodeList>
                         <EdgeList>
-                            <Edge Target="IDLE" Source="WORKING">
+                            <Edge Source="WORKING" Target="IDLE">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="tu_reject">
                                         <SimpleIdentifier Name="G"/>
@@ -262,36 +235,36 @@ Reference: W.M. Wonham, Supervisory Control of Discrete-Event Systems. [Online h
                                         <SimpleIdentifier Name="G"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-18" X="3"/>
+                                        <Point X="3" Y="-18"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
-                                    <Point Y="249" X="198"/>
+                                    <Point X="198" Y="249"/>
                                 </StartPointGeometry>
                                 <SplineGeometry>
-                                    <Point Y="208" X="224"/>
+                                    <Point X="224" Y="208"/>
                                 </SplineGeometry>
                                 <EndPointGeometry>
-                                    <Point Y="162" X="198"/>
+                                    <Point X="198" Y="162"/>
                                 </EndPointGeometry>
                             </Edge>
-                            <Edge Target="WORKING" Source="IDLE">
+                            <Edge Source="IDLE" Target="WORKING">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="tu_load">
                                         <SimpleIdentifier Name="G"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-11" X="-71"/>
+                                        <Point X="-71" Y="-11"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
-                                    <Point Y="162" X="198"/>
+                                    <Point X="198" Y="162"/>
                                 </StartPointGeometry>
                                 <SplineGeometry>
-                                    <Point Y="207" X="171"/>
+                                    <Point X="171" Y="207"/>
                                 </SplineGeometry>
                                 <EndPointGeometry>
-                                    <Point Y="249" X="198"/>
+                                    <Point X="198" Y="249"/>
                                 </EndPointGeometry>
                             </Edge>
                         </EdgeList>
@@ -302,65 +275,48 @@ Reference: W.M. Wonham, Supervisory Control of Discrete-Event Systems. [Online h
                         <SimpleIdentifier Name="G"/>
                     </IndexedIdentifier>
                     <Graph>
-                        <LabelBlock>
-                            <IndexedIdentifier Name="tu_accept">
-                                <SimpleIdentifier Name="G"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="tu_accept">
-                                <BinaryExpression Operator="-">
-                                    <SimpleIdentifier Name="G"/>
-                                    <IntConstant Value="1"/>
-                                </BinaryExpression>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="tu_load">
-                                <BinaryExpression Operator="-">
-                                    <SimpleIdentifier Name="G"/>
-                                    <IntConstant Value="1"/>
-                                </BinaryExpression>
-                            </IndexedIdentifier>
-                        </LabelBlock>
                         <NodeList>
                             <SimpleNode Initial="true" Name="EMPTY">
                                 <EventList>
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
-                                    <Point Y="80" X="208"/>
+                                    <Point X="208" Y="80"/>
                                 </PointGeometry>
                                 <InitialArrowGeometry>
-                                    <Point Y="-5" X="-5"/>
+                                    <Point X="-5" Y="-5"/>
                                 </InitialArrowGeometry>
                                 <LabelGeometry>
-                                    <Point Y="-3" X="-51"/>
+                                    <Point X="-51" Y="-3"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="FILLED1">
                                 <PointGeometry>
-                                    <Point Y="160" X="208"/>
+                                    <Point X="208" Y="160"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point Y="0" X="-58"/>
+                                    <Point X="-58" Y="0"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="FILLED2">
                                 <PointGeometry>
-                                    <Point Y="240" X="208"/>
+                                    <Point X="208" Y="240"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point Y="0" X="-59"/>
+                                    <Point X="-59" Y="0"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="FILLED3">
                                 <PointGeometry>
-                                    <Point Y="320" X="208"/>
+                                    <Point X="208" Y="320"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point Y="-1" X="-57"/>
+                                    <Point X="-57" Y="-1"/>
                                 </LabelGeometry>
                             </SimpleNode>
                         </NodeList>
                         <EdgeList>
-                            <Edge Target="FILLED2" Source="FILLED2">
+                            <Edge Source="FILLED2" Target="FILLED2">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="tu_load">
                                         <BinaryExpression Operator="-">
@@ -369,20 +325,20 @@ Reference: W.M. Wonham, Supervisory Control of Discrete-Event Systems. [Online h
                                         </BinaryExpression>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-4" X="3"/>
+                                        <Point X="3" Y="-4"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
-                                    <Point Y="240" X="208"/>
+                                    <Point X="208" Y="240"/>
                                 </StartPointGeometry>
                                 <SplineGeometry>
-                                    <Point Y="240" X="250"/>
+                                    <Point X="250" Y="240"/>
                                 </SplineGeometry>
                                 <EndPointGeometry>
-                                    <Point Y="240" X="208"/>
+                                    <Point X="208" Y="240"/>
                                 </EndPointGeometry>
                             </Edge>
-                            <Edge Target="FILLED3" Source="FILLED2">
+                            <Edge Source="FILLED2" Target="FILLED3">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="tu_accept">
                                         <BinaryExpression Operator="-">
@@ -391,39 +347,39 @@ Reference: W.M. Wonham, Supervisory Control of Discrete-Event Systems. [Online h
                                         </BinaryExpression>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-10" X="-94"/>
+                                        <Point X="-94" Y="-10"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
-                                    <Point Y="240" X="208"/>
+                                    <Point X="208" Y="240"/>
                                 </StartPointGeometry>
                                 <SplineGeometry>
-                                    <Point Y="280" X="192"/>
+                                    <Point X="192" Y="280"/>
                                 </SplineGeometry>
                                 <EndPointGeometry>
-                                    <Point Y="320" X="208"/>
+                                    <Point X="208" Y="320"/>
                                 </EndPointGeometry>
                             </Edge>
-                            <Edge Target="FILLED1" Source="FILLED2">
+                            <Edge Source="FILLED2" Target="FILLED1">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="tu_accept">
                                         <SimpleIdentifier Name="G"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-12" X="4"/>
+                                        <Point X="4" Y="-12"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
-                                    <Point Y="240" X="208"/>
+                                    <Point X="208" Y="240"/>
                                 </StartPointGeometry>
                                 <SplineGeometry>
-                                    <Point Y="199" X="226"/>
+                                    <Point X="226" Y="199"/>
                                 </SplineGeometry>
                                 <EndPointGeometry>
-                                    <Point Y="160" X="208"/>
+                                    <Point X="208" Y="160"/>
                                 </EndPointGeometry>
                             </Edge>
-                            <Edge Target="EMPTY" Source="EMPTY">
+                            <Edge Source="EMPTY" Target="EMPTY">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="tu_accept">
                                         <SimpleIdentifier Name="G"/>
@@ -435,20 +391,20 @@ Reference: W.M. Wonham, Supervisory Control of Discrete-Event Systems. [Online h
                                         </BinaryExpression>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-19" X="5"/>
+                                        <Point X="5" Y="-19"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
-                                    <Point Y="80" X="208"/>
+                                    <Point X="208" Y="80"/>
                                 </StartPointGeometry>
                                 <SplineGeometry>
-                                    <Point Y="82" X="251"/>
+                                    <Point X="251" Y="82"/>
                                 </SplineGeometry>
                                 <EndPointGeometry>
-                                    <Point Y="80" X="208"/>
+                                    <Point X="208" Y="80"/>
                                 </EndPointGeometry>
                             </Edge>
-                            <Edge Target="FILLED1" Source="EMPTY">
+                            <Edge Source="EMPTY" Target="FILLED1">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="tu_accept">
                                         <BinaryExpression Operator="-">
@@ -457,39 +413,39 @@ Reference: W.M. Wonham, Supervisory Control of Discrete-Event Systems. [Online h
                                         </BinaryExpression>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-11" X="-98"/>
+                                        <Point X="-98" Y="-11"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
-                                    <Point Y="80" X="208"/>
+                                    <Point X="208" Y="80"/>
                                 </StartPointGeometry>
                                 <SplineGeometry>
-                                    <Point Y="120" X="190"/>
+                                    <Point X="190" Y="120"/>
                                 </SplineGeometry>
                                 <EndPointGeometry>
-                                    <Point Y="160" X="208"/>
+                                    <Point X="208" Y="160"/>
                                 </EndPointGeometry>
                             </Edge>
-                            <Edge Target="FILLED2" Source="FILLED3">
+                            <Edge Source="FILLED3" Target="FILLED2">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="tu_accept">
                                         <SimpleIdentifier Name="G"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-8" X="10"/>
+                                        <Point X="10" Y="-8"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
-                                    <Point Y="320" X="208"/>
+                                    <Point X="208" Y="320"/>
                                 </StartPointGeometry>
                                 <SplineGeometry>
-                                    <Point Y="280" X="225"/>
+                                    <Point X="225" Y="280"/>
                                 </SplineGeometry>
                                 <EndPointGeometry>
-                                    <Point Y="240" X="208"/>
+                                    <Point X="208" Y="240"/>
                                 </EndPointGeometry>
                             </Edge>
-                            <Edge Target="FILLED2" Source="FILLED1">
+                            <Edge Source="FILLED1" Target="FILLED2">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="tu_accept">
                                         <BinaryExpression Operator="-">
@@ -498,39 +454,39 @@ Reference: W.M. Wonham, Supervisory Control of Discrete-Event Systems. [Online h
                                         </BinaryExpression>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-12" X="-96"/>
+                                        <Point X="-96" Y="-12"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
-                                    <Point Y="160" X="208"/>
+                                    <Point X="208" Y="160"/>
                                 </StartPointGeometry>
                                 <SplineGeometry>
-                                    <Point Y="200" X="191"/>
+                                    <Point X="191" Y="200"/>
                                 </SplineGeometry>
                                 <EndPointGeometry>
-                                    <Point Y="240" X="208"/>
+                                    <Point X="208" Y="240"/>
                                 </EndPointGeometry>
                             </Edge>
-                            <Edge Target="EMPTY" Source="FILLED1">
+                            <Edge Source="FILLED1" Target="EMPTY">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="tu_accept">
                                         <SimpleIdentifier Name="G"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-10" X="8"/>
+                                        <Point X="8" Y="-10"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
-                                    <Point Y="160" X="208"/>
+                                    <Point X="208" Y="160"/>
                                 </StartPointGeometry>
                                 <SplineGeometry>
-                                    <Point Y="120" X="226"/>
+                                    <Point X="226" Y="120"/>
                                 </SplineGeometry>
                                 <EndPointGeometry>
-                                    <Point Y="80" X="208"/>
+                                    <Point X="208" Y="80"/>
                                 </EndPointGeometry>
                             </Edge>
-                            <Edge Target="FILLED1" Source="FILLED1">
+                            <Edge Source="FILLED1" Target="FILLED1">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="tu_load">
                                         <BinaryExpression Operator="-">
@@ -539,17 +495,17 @@ Reference: W.M. Wonham, Supervisory Control of Discrete-Event Systems. [Online h
                                         </BinaryExpression>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-5" X="6"/>
+                                        <Point X="6" Y="-5"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
-                                    <Point Y="160" X="208"/>
+                                    <Point X="208" Y="160"/>
                                 </StartPointGeometry>
                                 <SplineGeometry>
-                                    <Point Y="162" X="249"/>
+                                    <Point X="249" Y="162"/>
                                 </SplineGeometry>
                                 <EndPointGeometry>
-                                    <Point Y="160" X="208"/>
+                                    <Point X="208" Y="160"/>
                                 </EndPointGeometry>
                             </Edge>
                         </EdgeList>
@@ -560,62 +516,48 @@ Reference: W.M. Wonham, Supervisory Control of Discrete-Event Systems. [Online h
                         <SimpleIdentifier Name="G"/>
                     </IndexedIdentifier>
                     <Graph>
-                        <LabelBlock>
-                            <IndexedIdentifier Name="machine_load">
-                                <SimpleIdentifier Name="G"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="tu_accept">
-                                <BinaryExpression Operator="-">
-                                    <SimpleIdentifier Name="G"/>
-                                    <IntConstant Value="1"/>
-                                </BinaryExpression>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="tu_reject">
-                                <SimpleIdentifier Name="G"/>
-                            </IndexedIdentifier>
-                        </LabelBlock>
                         <NodeList>
                             <SimpleNode Initial="true" Name="EMPTY">
                                 <EventList>
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
-                                    <Point Y="64" X="192"/>
+                                    <Point X="192" Y="64"/>
                                 </PointGeometry>
                                 <InitialArrowGeometry>
-                                    <Point Y="-5" X="-5"/>
+                                    <Point X="-5" Y="-5"/>
                                 </InitialArrowGeometry>
                                 <LabelGeometry>
-                                    <Point Y="5" X="11"/>
+                                    <Point X="11" Y="5"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="FILLED1">
                                 <PointGeometry>
-                                    <Point Y="144" X="192"/>
+                                    <Point X="192" Y="144"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point Y="5" X="11"/>
+                                    <Point X="11" Y="5"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="FILLED2">
                                 <PointGeometry>
-                                    <Point Y="224" X="192"/>
+                                    <Point X="192" Y="224"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point Y="5" X="11"/>
+                                    <Point X="11" Y="5"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="FILLED3">
                                 <PointGeometry>
-                                    <Point Y="304" X="192"/>
+                                    <Point X="192" Y="304"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point Y="5" X="11"/>
+                                    <Point X="11" Y="5"/>
                                 </LabelGeometry>
                             </SimpleNode>
                         </NodeList>
                         <EdgeList>
-                            <Edge Target="FILLED3" Source="FILLED2">
+                            <Edge Source="FILLED2" Target="FILLED3">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="tu_accept">
                                         <BinaryExpression Operator="-">
@@ -627,58 +569,58 @@ Reference: W.M. Wonham, Supervisory Control of Discrete-Event Systems. [Online h
                                         <SimpleIdentifier Name="G"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-16" X="-94"/>
+                                        <Point X="-94" Y="-16"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
-                                    <Point Y="224" X="192"/>
+                                    <Point X="192" Y="224"/>
                                 </StartPointGeometry>
                                 <SplineGeometry>
-                                    <Point Y="264" X="174"/>
+                                    <Point X="174" Y="264"/>
                                 </SplineGeometry>
                                 <EndPointGeometry>
-                                    <Point Y="304" X="192"/>
+                                    <Point X="192" Y="304"/>
                                 </EndPointGeometry>
                             </Edge>
-                            <Edge Target="FILLED1" Source="FILLED2">
+                            <Edge Source="FILLED2" Target="FILLED1">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="machine_load">
                                         <SimpleIdentifier Name="G"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-11" X="7"/>
+                                        <Point X="7" Y="-11"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
-                                    <Point Y="224" X="192"/>
+                                    <Point X="192" Y="224"/>
                                 </StartPointGeometry>
                                 <SplineGeometry>
-                                    <Point Y="186" X="210"/>
+                                    <Point X="210" Y="186"/>
                                 </SplineGeometry>
                                 <EndPointGeometry>
-                                    <Point Y="144" X="192"/>
+                                    <Point X="192" Y="144"/>
                                 </EndPointGeometry>
                             </Edge>
-                            <Edge Target="FILLED2" Source="FILLED3">
+                            <Edge Source="FILLED3" Target="FILLED2">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="machine_load">
                                         <SimpleIdentifier Name="G"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-12" X="6"/>
+                                        <Point X="6" Y="-12"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
-                                    <Point Y="304" X="192"/>
+                                    <Point X="192" Y="304"/>
                                 </StartPointGeometry>
                                 <SplineGeometry>
-                                    <Point Y="264" X="212"/>
+                                    <Point X="212" Y="264"/>
                                 </SplineGeometry>
                                 <EndPointGeometry>
-                                    <Point Y="224" X="192"/>
+                                    <Point X="192" Y="224"/>
                                 </EndPointGeometry>
                             </Edge>
-                            <Edge Target="FILLED2" Source="FILLED1">
+                            <Edge Source="FILLED1" Target="FILLED2">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="tu_accept">
                                         <BinaryExpression Operator="-">
@@ -690,39 +632,39 @@ Reference: W.M. Wonham, Supervisory Control of Discrete-Event Systems. [Online h
                                         <SimpleIdentifier Name="G"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-18" X="-96"/>
+                                        <Point X="-96" Y="-18"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
-                                    <Point Y="144" X="192"/>
+                                    <Point X="192" Y="144"/>
                                 </StartPointGeometry>
                                 <SplineGeometry>
-                                    <Point Y="186" X="175"/>
+                                    <Point X="175" Y="186"/>
                                 </SplineGeometry>
                                 <EndPointGeometry>
-                                    <Point Y="224" X="192"/>
+                                    <Point X="192" Y="224"/>
                                 </EndPointGeometry>
                             </Edge>
-                            <Edge Target="EMPTY" Source="FILLED1">
+                            <Edge Source="FILLED1" Target="EMPTY">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="machine_load">
                                         <SimpleIdentifier Name="G"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-12" X="4"/>
+                                        <Point X="4" Y="-12"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
-                                    <Point Y="144" X="192"/>
+                                    <Point X="192" Y="144"/>
                                 </StartPointGeometry>
                                 <SplineGeometry>
-                                    <Point Y="105" X="210"/>
+                                    <Point X="210" Y="105"/>
                                 </SplineGeometry>
                                 <EndPointGeometry>
-                                    <Point Y="64" X="192"/>
+                                    <Point X="192" Y="64"/>
                                 </EndPointGeometry>
                             </Edge>
-                            <Edge Target="FILLED1" Source="EMPTY">
+                            <Edge Source="EMPTY" Target="FILLED1">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="tu_accept">
                                         <BinaryExpression Operator="-">
@@ -734,17 +676,17 @@ Reference: W.M. Wonham, Supervisory Control of Discrete-Event Systems. [Online h
                                         <SimpleIdentifier Name="G"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-20" X="-94"/>
+                                        <Point X="-94" Y="-20"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
-                                    <Point Y="64" X="192"/>
+                                    <Point X="192" Y="64"/>
                                 </StartPointGeometry>
                                 <SplineGeometry>
-                                    <Point Y="104" X="175"/>
+                                    <Point X="175" Y="104"/>
                                 </SplineGeometry>
                                 <EndPointGeometry>
-                                    <Point Y="144" X="192"/>
+                                    <Point X="192" Y="144"/>
                                 </EndPointGeometry>
                             </Edge>
                         </EdgeList>
@@ -755,97 +697,86 @@ Reference: W.M. Wonham, Supervisory Control of Discrete-Event Systems. [Online h
                         <SimpleIdentifier Name="G"/>
                     </IndexedIdentifier>
                     <Graph>
-                        <LabelBlock>
-                            <IndexedIdentifier Name="machine_load">
-                                <SimpleIdentifier Name="G"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="machine_unload">
-                                <SimpleIdentifier Name="G"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="tu_load">
-                                <SimpleIdentifier Name="G"/>
-                            </IndexedIdentifier>
-                        </LabelBlock>
                         <NodeList>
                             <SimpleNode Initial="true" Name="EMPTY">
                                 <EventList>
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
-                                    <Point Y="176" X="224"/>
+                                    <Point X="224" Y="176"/>
                                 </PointGeometry>
                                 <InitialArrowGeometry>
-                                    <Point Y="0" X="-10"/>
+                                    <Point X="-10" Y="0"/>
                                 </InitialArrowGeometry>
                                 <LabelGeometry>
-                                    <Point Y="-4" X="11"/>
+                                    <Point X="11" Y="-4"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="FULL">
                                 <PointGeometry>
-                                    <Point Y="256" X="224"/>
+                                    <Point X="224" Y="256"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point Y="-5" X="8"/>
+                                    <Point X="8" Y="-5"/>
                                 </LabelGeometry>
                             </SimpleNode>
                         </NodeList>
                         <EdgeList>
-                            <Edge Target="EMPTY" Source="FULL">
+                            <Edge Source="FULL" Target="EMPTY">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="tu_load">
                                         <SimpleIdentifier Name="G"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-11" X="4"/>
+                                        <Point X="4" Y="-11"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
-                                    <Point Y="256" X="224"/>
+                                    <Point X="224" Y="256"/>
                                 </StartPointGeometry>
                                 <SplineGeometry>
-                                    <Point Y="214" X="242"/>
+                                    <Point X="242" Y="214"/>
                                 </SplineGeometry>
                                 <EndPointGeometry>
-                                    <Point Y="176" X="224"/>
+                                    <Point X="224" Y="176"/>
                                 </EndPointGeometry>
                             </Edge>
-                            <Edge Target="FULL" Source="EMPTY">
+                            <Edge Source="EMPTY" Target="FULL">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="machine_unload">
                                         <SimpleIdentifier Name="G"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-11" X="-122"/>
+                                        <Point X="-122" Y="-11"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
-                                    <Point Y="176" X="224"/>
+                                    <Point X="224" Y="176"/>
                                 </StartPointGeometry>
                                 <SplineGeometry>
-                                    <Point Y="215" X="207"/>
+                                    <Point X="207" Y="215"/>
                                 </SplineGeometry>
                                 <EndPointGeometry>
-                                    <Point Y="256" X="224"/>
+                                    <Point X="224" Y="256"/>
                                 </EndPointGeometry>
                             </Edge>
-                            <Edge Target="EMPTY" Source="EMPTY">
+                            <Edge Source="EMPTY" Target="EMPTY">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="machine_load">
                                         <SimpleIdentifier Name="G"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="5" X="-68"/>
+                                        <Point X="-68" Y="5"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <StartPointGeometry>
-                                    <Point Y="176" X="224"/>
+                                    <Point X="224" Y="176"/>
                                 </StartPointGeometry>
                                 <SplineGeometry>
-                                    <Point Y="136" X="225"/>
+                                    <Point X="225" Y="136"/>
                                 </SplineGeometry>
                                 <EndPointGeometry>
-                                    <Point Y="176" X="224"/>
+                                    <Point X="224" Y="176"/>
                                 </EndPointGeometry>
                             </Edge>
                         </EdgeList>

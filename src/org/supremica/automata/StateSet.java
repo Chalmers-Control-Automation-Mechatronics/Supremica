@@ -189,7 +189,7 @@ public class StateSet extends AbstractSet<State> implements Cloneable
 
   public String toString()
   {
-    final StringBuffer buf = new StringBuffer();
+    final StringBuilder buf = new StringBuilder();
 
     //buf.append("StateSet[" + size() + "]: ");
     buf.append("{");
@@ -360,7 +360,7 @@ public class StateSet extends AbstractSet<State> implements Cloneable
     boolean x = false; // forbidden?
 
     // Find new name
-    final StringBuffer buf = new StringBuffer();
+    final StringBuilder buf = new StringBuilder();
     final Iterator<State> stateit = mMap.values().iterator();
     while (stateit.hasNext()) {
       final State state = stateit.next();

@@ -695,7 +695,7 @@ class EventListModel
         // String eventId = currArc.getEventId();
         final org.supremica.automata.LabeledEvent currEvent = currArc.getEvent();
 
-        final StringBuffer responseString = new StringBuffer();
+        final StringBuilder responseString = new StringBuilder();
         boolean terminateFont = false;
 
         if (nextStateAssociated(currArc))
@@ -879,7 +879,7 @@ class StateDisplayer
 
         if (currState instanceof CompositeState)
         {
-            final StringBuffer str = new StringBuffer();
+            final StringBuilder str = new StringBuilder();
             final double[] costs = ((CompositeState) currState).getCurrentCosts();
 
             for (int i = 0; i < costs.length - 1; i++)

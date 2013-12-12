@@ -335,7 +335,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     assertNotNull(counterexample);
     final String name = counterexample.getName();
     final String ext = mTraceMarshaller.getDefaultExtension();
-    final StringBuffer buffer = new StringBuffer(name);
+    final StringBuilder buffer = new StringBuilder(name);
     if (mBindings != null) {
       for (final ParameterBindingProxy binding : mBindings) {
         buffer.append('-');
