@@ -564,7 +564,7 @@ public class ConflictAssess
     if (traceevents.isEmpty()) {
       mReportPrinter.println("  <empty>");
     } else {
-      final StringBuffer buffer = new StringBuffer("  ");
+      final StringBuilder buffer = new StringBuilder("  ");
       int count = 0;
       boolean first = true;
       for (final EventProxy event : traceevents) {

@@ -74,7 +74,7 @@ public class ProxyTools
   //#########################################################################
   //# Class Names
   public static void appendContainerName(final Proxy container,
-                                         final StringBuffer buffer)
+                                         final StringBuilder buffer)
   {
     final String clsname = getShortProxyInterfaceName(container);
     buffer.append(clsname);

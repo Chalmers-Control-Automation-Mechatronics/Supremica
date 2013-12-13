@@ -247,7 +247,7 @@ public class AutomataToSMV
 
 	String getEnableCondition(final LabeledEvent currEvent, final boolean filter, final boolean selectPlant)
 	{
-		final StringBuffer buff = new StringBuffer("(");
+		final StringBuilder buff = new StringBuilder("(");
 		boolean previousCondition = false;
 
 		for (final Iterator<?> autIt = theAutomata.iterator(); autIt.hasNext(); )

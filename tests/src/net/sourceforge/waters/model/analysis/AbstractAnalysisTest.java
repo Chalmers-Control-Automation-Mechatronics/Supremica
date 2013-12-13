@@ -280,7 +280,7 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
     if (bindings == null) {
       return name;
     } else {
-      final StringBuffer buffer = new StringBuffer(name);
+      final StringBuilder buffer = new StringBuilder(name);
       for (final ParameterBindingProxy binding : bindings) {
         buffer.append('-');
         buffer.append(binding.getExpression().toString());

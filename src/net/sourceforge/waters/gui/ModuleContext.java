@@ -339,7 +339,7 @@ public class ModuleContext
       final String name = simple.getName();
       final IdentifiedProxy found = getComponent(name);
       if (found != null) {
-        final StringBuffer buffer = new StringBuffer("Name '");
+        final StringBuilder buffer = new StringBuilder("Name '");
         buffer.append(name);
         buffer.append("' is already taken by ");
         final String typename = ProxyNamer.getUnqualifiedClassName(found);
@@ -645,7 +645,7 @@ public class ModuleContext
       final Pattern pattern = getPattern();
       final Matcher matcher = pattern.matcher(name);
       final String stripped = matcher.replaceFirst("");
-      final StringBuffer buffer = new StringBuffer();
+      final StringBuilder buffer = new StringBuilder();
       String newname;
       int index = 1;
       do {

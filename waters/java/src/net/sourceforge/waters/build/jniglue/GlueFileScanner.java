@@ -50,7 +50,7 @@ class GlueFileScanner {
     }
     char ch = (char) code;
     if (Character.isJavaIdentifierStart(ch)) {
-      final StringBuffer buffer = new StringBuffer();
+      final StringBuilder buffer = new StringBuilder();
       buffer.append(ch);
       while (true) {
 	code = getNextCharacter();

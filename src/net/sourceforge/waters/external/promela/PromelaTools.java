@@ -88,7 +88,7 @@ public class PromelaTools {
   private void printTree(final CommonTree t, final int indent)
   {
     if (t != null) {
-      StringBuffer sb = new StringBuffer(indent);
+      StringBuilder sb = new StringBuilder(indent);
       // System.out.println(sb.toString() + t.toString());
       for (int i = 0; i < indent; i++) {
         sb = sb.append("   ");
@@ -239,7 +239,7 @@ public class PromelaTools {
                 errors.add(error);
             }
         });
-        final StringBuffer preprocessedText = new StringBuffer();
+        final StringBuilder preprocessedText = new StringBuilder();
         Token tok = preProcessor.token();
         do {
             preprocessedText.append(tok.getText());

@@ -409,7 +409,7 @@ public class EFSMCompilerTest
   {
     final String inextname = name + mModuleMarshaller.getDefaultExtension();
     final File infilename = new File(dir, inextname);
-    final StringBuffer buffer = new StringBuffer(name);
+    final StringBuilder buffer = new StringBuilder(name);
     if (bindings != null && appendToName) {
       for (final ParameterBindingProxy binding : bindings) {
         buffer.append('-');

@@ -21,7 +21,7 @@ abstract class TypeGlue implements Comparable<TypeGlue>, WritableGlue {
 
   abstract String getGlueTypeName();
 
-  abstract void appendTypeSignature(StringBuffer buffer);
+  abstract void appendTypeSignature(StringBuilder buffer);
 
   abstract String getJNICallPart();
 

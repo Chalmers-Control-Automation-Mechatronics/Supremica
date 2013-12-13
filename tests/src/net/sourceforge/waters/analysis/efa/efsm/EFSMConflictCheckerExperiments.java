@@ -130,20 +130,57 @@ public class EFSMConflictCheckerExperiments
     mCompositionSelectionHeuristic =
       new ChainSelectionHeuristic<EFSMPair>(minV, minF, minSync);
 
-    checkPML("pml3", 2, 3, true); // Dummy call, result to be discarded.
-    for (int n = 2; n <= 4; n++) {
+   checkPML("pml3", 2, 3, true); // Dummy call, result to be discarded.
+    checkPML("pml3", 2, 3, true);
+    for (int n = 2; n <= 10; n+=2) {
       try {
-        for (int c = 3; c <= 30; c++) {
+        for (int c = 3; c <= 6; c+=3) {
           checkPML("pml3", c, n, true);
         }
       } catch (final AnalysisException | EvalException exception) {
         // next please ...
       }
     }
-    for (int c = 4; c <= 6; c += 2) {
+    for (int c = 6; c <= 6; c += 2) {
       try {
         for (int n = 2; n <= 100; n += 2) {
           checkPML("pml3", c, n, true);
+        }
+      } catch (final AnalysisException | EvalException exception) {
+        // next please ...
+      }
+    }
+    for (int c = 6; c <= 6; c += 2) {
+      try {
+        for (int n = 2; n <= 2; n += 2) {
+          checkPML("pml7", c, n, true);
+        }
+      } catch (final AnalysisException | EvalException exception) {
+        // next please ...
+      }
+    }
+    for (int c = 6; c <= 6; c += 2) {
+      try {
+        for (int n = 2; n <= 2; n += 2) {
+          checkPML("pml8", c, n, true);
+        }
+      } catch (final AnalysisException | EvalException exception) {
+        // next please ...
+      }
+    }
+    for (int c = 6; c <= 6; c += 2) {
+      try {
+        for (int n = 2; n <= 2; n += 2) {
+          checkPML("pml9", c, n, true);
+        }
+      } catch (final AnalysisException | EvalException exception) {
+        // next please ...
+      }
+    }
+    for (int c = 6; c <= 6; c += 2) {
+      try {
+        for (int n = 2; n <= 2; n += 2) {
+          checkPML("pml10", c, n, true);
         }
       } catch (final AnalysisException | EvalException exception) {
         // next please ...
@@ -166,21 +203,26 @@ public class EFSMConflictCheckerExperiments
     } catch (final AnalysisException | EvalException exception) {
       // next please ...
     }
-    /*
-    if (!(wrapper instanceof BDDConflictCheckerWrapper)) {
-      for (int m = 2; m <= 10; m += 2) {
+
+    if (!(wrapper instanceof BDDConflictCheckerWrapper)
+         && !(wrapper instanceof EFSMConflictCheckerWrapper )) {
+      for (int m = 3; m <= 5; m += 1) {
         try {
-          for (int n = 200; n <= 2000; n+= 200) {
-            checkTransferLine("transferline_efsm", n, m, true);
+          for (int n = 1; n <= 3; n+= 2) {
+            checkTransferLineRework("transferline_efsm_rework", m, n, false);
           }
         } catch (final AnalysisException exception) {
           // next please ...
         } catch (final EvalException exception) {
           // next please ...
         }
+      }
+       }
+    if (!(wrapper instanceof BDDConflictCheckerWrapper)) {
+      for (int m = 3; m <= 5; m += 1) {
         try {
-          for (int n = 200; n <= 2000; n+= 200) {
-            checkTransferLine("transferline_efsm_block", n, m, false);
+          for (int n = 1; n <= 3; n+= 2) {
+            checkTransferLineRework("transferline_efsm_rework_block", m, n, false);
           }
         } catch (final AnalysisException exception) {
           // next please ...
@@ -198,7 +240,6 @@ public class EFSMConflictCheckerExperiments
         // next please ...
       }
     }
-    */
     try {
       testPrimeSieve4();
       testPrimeSieve4b();
@@ -306,7 +347,11 @@ public class EFSMConflictCheckerExperiments
       final List<String> none = Collections.emptyList();
       compiler.setEnabledPropertyNames(none);
       mWatchdog.addAbortable(compiler);
+      final long start = System.currentTimeMillis();
       final ProductDESProxy des = compiler.compile(bindings);
+      final long finish = System.currentTimeMillis()-start;
+      System.out.println("events:"+des.getEvents().size());
+      System.out.println("flatten time:"+ finish);
       mWatchdog.removeAbortable(compiler);
       return des;
     } catch (final OutOfMemoryError error) {
@@ -470,7 +515,13 @@ public class EFSMConflictCheckerExperiments
         (AbstractCompositionalModelAnalyzer.MustL);
       mConflictChecker.setSelectionHeuristic
         (CompositionalSelectionHeuristicFactory.MinF);
-      mConflictChecker.setInternalStateLimit(8000);
+      /*
+       * To remove zigzag from pml plot MinSync is added.
+      mConflictChecker.setSelectionHeuristic
+        (CompositionalSelectionHeuristicFactory.MinSync);
+
+       */
+      mConflictChecker.setInternalStateLimit(100000);
       mConflictChecker.setMonolithicStateLimit(50000000);
       mConflictChecker.setMonolithicTransitionLimit(0);
       mConflictChecker.setCounterExampleEnabled(false);
@@ -562,7 +613,7 @@ public class EFSMConflictCheckerExperiments
   private PrintWriter mPrintWriter;
   private boolean mHasBeenPrinted;
 
-  private final int mTimeout = 1200;  // 20 minutes
+  private final int mTimeout = 3000;  // 20 minutes
   private final int mInternalTransitionLimit = 1000000;
   private SelectionHeuristic<EFSMPair> mCompositionSelectionHeuristic;
 

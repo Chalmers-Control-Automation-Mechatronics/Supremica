@@ -244,7 +244,7 @@ public class Projection2
       final Collection<EventProxy> ev = new ArrayList<EventProxy>(model.getEvents());
       ev.removeAll(mHide);
 
-      final StringBuffer name = new StringBuffer();
+      final StringBuilder name = new StringBuilder();
       name.append("proj:");
       final ArrayList<String> names = new ArrayList<String>(model.getAutomata().size());
       for (final AutomatonProxy a : model.getAutomata()) {

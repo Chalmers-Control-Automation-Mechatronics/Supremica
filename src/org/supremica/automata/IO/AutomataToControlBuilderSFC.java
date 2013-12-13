@@ -578,7 +578,7 @@ public class AutomataToControlBuilderSFC
     
     protected String computeGenerationCondition(Project theProject, Alphabet theExtConfAlphabet, LabeledEvent theEvent)
     {
-        StringBuffer theCondition = new StringBuffer();
+        StringBuilder theCondition = new StringBuilder();
         boolean firstAutomaton = true;
         boolean nextAutomaton = false;
         
@@ -684,7 +684,7 @@ public class AutomataToControlBuilderSFC
                    is in conflict with an output event. Note in particular that
                    we cannot use all uncontrollable events in the extended conflict.
                    Nevertheless, let's not bother about this now ... */
-        StringBuffer theCondition = new StringBuffer();
+        StringBuilder theCondition = new StringBuilder();
         boolean firstUcEvent = true;
         
         theCondition.append("NOT (");
@@ -713,7 +713,7 @@ public class AutomataToControlBuilderSFC
     
     protected String computeCeaseCondition(Project theProject, LabeledEvent theEvent)
     {
-        StringBuffer theCondition = new StringBuffer();
+        StringBuilder theCondition = new StringBuilder();
         boolean firstAutomaton = true;
         boolean nextAutomaton = false;
         

@@ -120,19 +120,20 @@ class EFAVariableTransitionRelationPart
 
   //#########################################################################
   //# Overrides for Base Class java.lang.Object
+  @Override
   public String toString()
   {
     try {
       final StringWriter writer = new StringWriter();
       final ProxyPrinter printer = new ModuleProxyPrinter(writer);
       pprint(printer);
-      final StringBuffer buffer = writer.getBuffer();
-      return buffer.toString();
+      return writer.toString();
     } catch (final IOException exception) {
       throw new WatersRuntimeException(exception);
     }
   }
 
+  @Override
   public boolean equals(final Object other)
   {
     if (other != null && getClass() == other.getClass()) {
@@ -144,6 +145,7 @@ class EFAVariableTransitionRelationPart
     }
   }
 
+  @Override
   public int hashCode()
   {
     return mTransitions.hashCode();
@@ -152,6 +154,7 @@ class EFAVariableTransitionRelationPart
 
   //#########################################################################
   //# Interface java.lang.Comparable
+  @Override
   public int compareTo(final EFAVariableTransitionRelationPart part)
   {
     final Iterator<EFAVariableTransition> iter1 = mTransitions.iterator();

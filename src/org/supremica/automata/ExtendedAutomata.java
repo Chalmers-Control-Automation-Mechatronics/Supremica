@@ -115,7 +115,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
     public HashSet<EventDeclProxy> forcibleAlphabet = null;
     HashSet<EventDeclProxy> plantAlphabet = null;
 
-    final static String LOCAL_VAR_SUFFIX = ".curr";
+    final static String LOCAL_VAR_SUFFIX = "_curr";
     final static String CLOCK_PREFIX = "clock:";
     final static String GLOBAL_PREFIX = "global:";
     final static String PARAM_PREFIX = "param:";

@@ -243,7 +243,7 @@ public class fbd2smv
 		/*  Declaration of states
 		 *
 		 */
-		StringBuffer buff = new StringBuffer("\tstate : {idle, read_input, ");
+		StringBuilder buff = new StringBuilder("\tstate : {idle, read_input, ");
 
 		for (int i = 0; i < fbdElements.size(); i++)
 		{
@@ -314,7 +314,7 @@ public class fbd2smv
 
 	void printMainModule(PrintWriter pw, LinkedList programs, LinkedList varBooleans, LinkedList varIntegers, LinkedList fbdElements)
 	{
-		StringBuffer buff = new StringBuffer("");
+		StringBuilder buff = new StringBuilder("");
 
 		pw.println("MODULE main()");
 		pw.println("{");
@@ -345,7 +345,7 @@ public class fbd2smv
 		 */
 		if (varIntegers.size() > 0)
 		{
-			buff = new StringBuffer("");
+			buff = new StringBuilder("");
 
 			for (int i = 0; i < varIntegers.size(); i++)
 			{
@@ -425,7 +425,7 @@ public class fbd2smv
 				HashMap boxes = program.getBoxes();
 				String S = null;
 
-				buff = new StringBuffer("");
+				buff = new StringBuilder("");
 
 				translateBoxNames_H(boxes);
 

@@ -58,7 +58,7 @@ class ExpressionScanner {
   ExpressionScanner(final OperatorTable optable, final Reader reader)
   {
     mOperatorTable = optable;
-    mTokenText = new StringBuffer();
+    mTokenText = new StringBuilder();
     setInputStream(reader);
   }
 
@@ -596,7 +596,7 @@ class ExpressionScanner {
   //#########################################################################
   //# Data Members
   private final OperatorTable mOperatorTable;
-  private final StringBuffer mTokenText;
+  private final StringBuilder mTokenText;
 
   private Reader mInputStream;
   private Token mNextToken;

@@ -202,7 +202,7 @@ public class ParameterBindingEditorDialog extends AbstractBindingEditorDialog
           final InstanceSubject inst =
             SubjectTools.getAncestor(mExistingBindings, InstanceSubject.class);
           final String instName = inst.getName();
-          final StringBuffer buffer = new StringBuffer("Instance '");
+          final StringBuilder buffer = new StringBuilder("Instance '");
           buffer.append(instName);
           buffer.append("' already has a binding for '");
           buffer.append(name);

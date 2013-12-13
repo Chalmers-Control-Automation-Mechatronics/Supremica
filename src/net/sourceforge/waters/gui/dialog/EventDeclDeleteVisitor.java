@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
+
 import javax.swing.JOptionPane;
 
 import net.sourceforge.waters.gui.EditorWindowInterface;
@@ -106,7 +107,7 @@ public class EventDeclDeleteVisitor
       } else {
         for (final EventDeclProxy decl : decls) {
           final InsertInfo info = new InsertInfo(decl);
-          mDeletionVictims.add(info);
+          mDeletionVictims.add(0, info);
         }
         return mDeletionVictims;
       }
@@ -205,6 +206,7 @@ public class EventDeclDeleteVisitor
 
   //#######################################################################
   //# Interface net.sourceforge.waters.model.base.ProxyVisitor
+  @Override
   public Object visitProxy(final Proxy proxy)
   {
     return null;
@@ -213,6 +215,7 @@ public class EventDeclDeleteVisitor
 
   //#######################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+  @Override
   public Object visitEdgeProxy(final EdgeProxy edge)
     throws VisitorException
   {
@@ -220,6 +223,7 @@ public class EventDeclDeleteVisitor
     return block.acceptVisitor(this);
   }
 
+  @Override
   public Object visitEventAliasProxy(final EventAliasProxy alias)
     throws VisitorException
   {
@@ -229,6 +233,7 @@ public class EventDeclDeleteVisitor
     return expr.acceptVisitor(this);
   }
 
+  @Override
   public Object visitEventListExpressionProxy
     (final EventListExpressionProxy elist)
     throws VisitorException
@@ -238,6 +243,7 @@ public class EventDeclDeleteVisitor
     return visitCollection(list);
   }
 
+  @Override
   public Object visitForeachProxy(final ForeachProxy foreach)
     throws VisitorException
   {
@@ -245,6 +251,7 @@ public class EventDeclDeleteVisitor
     return visitCollection(list);
   }
 
+  @Override
   public Object visitGraphProxy(final GraphProxy graph)
     throws VisitorException
   {
@@ -259,6 +266,7 @@ public class EventDeclDeleteVisitor
     return null;
   }
 
+  @Override
   public Object visitIndexedIdentifierProxy(final IndexedIdentifierProxy ident)
     throws VisitorException
   {
@@ -267,6 +275,7 @@ public class EventDeclDeleteVisitor
     return null;
   }
 
+  @Override
   public Object visitModuleProxy(final ModuleProxy module)
     throws VisitorException
   {
@@ -277,6 +286,7 @@ public class EventDeclDeleteVisitor
     return null;
   }
 
+  @Override
   public Object visitNodeProxy(final NodeProxy node)
     throws VisitorException
   {
@@ -284,6 +294,7 @@ public class EventDeclDeleteVisitor
     return props.acceptVisitor(this);
   }
 
+  @Override
   public Object visitSimpleComponentProxy(final SimpleComponentProxy comp)
     throws VisitorException
   {
@@ -292,6 +303,7 @@ public class EventDeclDeleteVisitor
     return graph.acceptVisitor(this);
   }
 
+  @Override
   public Object visitSimpleIdentifierProxy(final SimpleIdentifierProxy ident)
     throws VisitorException
   {
@@ -300,6 +312,7 @@ public class EventDeclDeleteVisitor
     return null;
   }
 
+  @Override
   public Object visitVariableComponentProxy(final VariableComponentProxy var)
     throws VisitorException
   {
@@ -308,6 +321,7 @@ public class EventDeclDeleteVisitor
     return visitCollection(list);
   }
 
+  @Override
   public Object visitVariableMarkingProxy(final VariableMarkingProxy marking)
     throws VisitorException
   {
@@ -351,7 +365,7 @@ public class EventDeclDeleteVisitor
   private void showDialog(final String name)
     throws VisitorException
   {
-    final StringBuffer buffer = new StringBuffer(256);
+    final StringBuilder buffer = new StringBuilder(256);
     buffer.append("The event '");
     buffer.append(name);
     buffer.append("' is still used in ");

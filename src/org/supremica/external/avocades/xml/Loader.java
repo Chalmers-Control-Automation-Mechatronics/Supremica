@@ -151,7 +151,7 @@ public class Loader {
     		if(xmlStr!=null) {			
     			JAXBContext jc = JAXBContext.newInstance(PKGS);
 				Unmarshaller u = jc.createUnmarshaller();
-				StringBuffer xmlStrB = new StringBuffer(xmlStr);
+				StringBuilder xmlStrB = new StringBuilder(xmlStr);
 				Object o = u.unmarshal(new StreamSource(new StringReader(xmlStrB.toString()))); 
     			return o;
     		}else {

@@ -50,7 +50,7 @@ public enum OverflowKind {
   //# Display
   String getMessage(final int limit)
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     final String name = toString();
     final int namelen = name.length();
     buffer.append(name.charAt(0));

@@ -151,7 +151,7 @@ public class NotCloningGeometrySetSubject<E>
   public void checkSetParent(final Subject parent)
   {
     if (parent != null && mParent != null) {
-      final StringBuffer buffer = new StringBuffer();
+      final StringBuilder buffer = new StringBuilder();
       buffer.append("Trying to redefine parent of ");
       buffer.append(getShortClassName());
       buffer.append('!');

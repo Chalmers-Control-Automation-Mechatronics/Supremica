@@ -105,7 +105,7 @@ public class QMCMinimizerSupremica
     public String generateMinimizerInput(final List<?> input)
     {
         final Iterator<?> it = input.iterator();
-        final StringBuffer output = new StringBuffer();
+        final StringBuilder output = new StringBuilder();
         boolean needSeparator = false;
         while(it.hasNext())
         {

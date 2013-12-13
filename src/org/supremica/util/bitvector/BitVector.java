@@ -769,7 +769,7 @@ public int size() {
  * @return  a string representation of this bit vector.
  */
 public String toString() {
-	StringBuffer buffer = new StringBuffer(nbits);
+	StringBuilder buffer = new StringBuilder(nbits);
 	String separator = "";
 	buffer.append('{');
 

@@ -162,7 +162,7 @@ public class EFSMVariablePartitionComputerTest
 
   private String scanIdentifier(final String text, int pos)
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     while (true) {
       final char ch = text.charAt(pos);
       if (Character.isJavaIdentifierPart(ch)) {

@@ -180,7 +180,7 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
   {
     final ProxyMarshaller<D> marshaller = getProxyMarshaller();
     final String extname = name + marshaller.getDefaultExtension();
-    final StringBuffer buffer = new StringBuffer(extname);
+    final StringBuilder buffer = new StringBuilder(extname);
     File current = subdir;
     while (current != null) {
       final String currentName = current.getName();

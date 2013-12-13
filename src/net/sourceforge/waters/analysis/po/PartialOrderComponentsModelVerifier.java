@@ -863,7 +863,7 @@ public abstract class PartialOrderComponentsModelVerifier
   {
     final int[] decoded = new int[mNumAutomata];
     decode(tuple, decoded);
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     for (int a = 0; a < mNumAutomata; a++) {
       final AutomatonProxy aut = mAutomata[a];
       buffer.append(aut.getName());

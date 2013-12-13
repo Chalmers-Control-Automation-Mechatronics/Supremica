@@ -416,7 +416,7 @@ class ModuleHierarchyChecker
     final Subject subject = (Subject) object;
     final Subject foundparent = subject.getParent();
     if (foundparent != parent) {
-      final StringBuffer buffer = new StringBuffer();
+      final StringBuilder buffer = new StringBuilder();
       if (foundparent == null) {
         buffer.append("NULL");
       } else {

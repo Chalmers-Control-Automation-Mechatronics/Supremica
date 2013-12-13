@@ -57,7 +57,7 @@ public class ControllabilityDiagnostics
                                 final AutomatonProxy aut,
                                 final StateProxy state)
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     buffer.append("The model '");
     buffer.append(des.getName());
     buffer.append("' is not controllable: specification ");

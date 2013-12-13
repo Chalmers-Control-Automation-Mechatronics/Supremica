@@ -643,8 +643,8 @@ public class Simulation implements ModelObserver, Observer
   private void warnAboutMissingInitialStates(final SimulatorState state)
   {
     if (state.getNumberOfEnabledAutomata() < mOrderedAutomata.size()) {
-      final StringBuffer buffer =
-        new StringBuffer("Could not determine initial state for ");
+      final StringBuilder buffer =
+        new StringBuilder("Could not determine initial state for ");
       boolean first = true;
       for (final AutomatonProxy aut : mOrderedAutomata) {
         if (state.getStatus(aut) == AutomatonStatus.DISABLED) {
@@ -1037,18 +1037,18 @@ public class Simulation implements ModelObserver, Observer
 
     private String getStatusText()
     {
-      final StringBuffer buffer;
+      final StringBuilder buffer;
       switch (mStatus) {
       case DISABLED:
         return "currently disabled";
       case ENABLED:
         return "currently enabled";
       case WARNING:
-        buffer = new StringBuffer("causes violation of property ");
+        buffer = new StringBuilder("causes violation of property ");
         break;
       case ERROR:
         buffer =
-          new StringBuffer("violates controllability of specification ");
+          new StringBuilder("violates controllability of specification ");
         break;
       default:
         throw new IllegalStateException

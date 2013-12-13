@@ -148,7 +148,7 @@ public class ObjectProperty<T> extends Property
                                 final boolean escapeSpace)
   {
     final int len = theString.length();
-    final StringBuffer outBuffer = new StringBuffer(len * 2);
+    final StringBuilder outBuffer = new StringBuilder(len * 2);
 
     for (int x = 0; x < len; x++) {
       final char aChar = theString.charAt(x);

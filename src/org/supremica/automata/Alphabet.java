@@ -392,14 +392,14 @@ public class Alphabet
     
     public String toDebugString()
     {
-        StringBuffer tmpBuf = new StringBuffer(theEvents.toString());
+        StringBuilder tmpBuf = new StringBuilder(theEvents.toString());
         
         return tmpBuf.toString();
     }
     
     public String toString()
     {
-        StringBuffer sbuf = new StringBuffer("{");
+        StringBuilder sbuf = new StringBuilder("{");
         
         if (size() > 0)
         {

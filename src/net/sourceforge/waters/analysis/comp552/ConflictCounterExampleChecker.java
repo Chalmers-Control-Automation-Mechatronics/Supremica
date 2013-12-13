@@ -211,7 +211,7 @@ public class ConflictCounterExampleChecker
                                              final String msg,
                                              final NamedProxy item)
   {
-    mDiagnostics = new StringBuffer();
+    mDiagnostics = new StringBuilder();
     mDiagnostics.append("Conflict error trace ");
     final String name = trace.getName();
     if (name != null) {
@@ -377,6 +377,6 @@ public class ConflictCounterExampleChecker
   //#########################################################################
   //# Data Members
   private final ProductDESProxyFactory mFactory;
-  private StringBuffer mDiagnostics;
+  private StringBuilder mDiagnostics;
 
 }

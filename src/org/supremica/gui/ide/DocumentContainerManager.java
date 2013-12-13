@@ -688,7 +688,7 @@ public class DocumentContainerManager
 
   private String getWarningText(final File file, final String msg)
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     buffer.append("File '");
     buffer.append(file);
     buffer.append("'\n");
@@ -699,35 +699,56 @@ public class DocumentContainerManager
   private static String wrapExceptionMessageInHTML(final String title,
                                                    final String msg)
   {
-    final StringBuffer buffer = new StringBuffer();
-    buffer.append("<html><body style='width: 320px; padding: 0px;'>");
+    final StringBuilder buffer = new StringBuilder();
+    buffer.append("<html><body style='width: 400px;'>");
     buffer.append("<h2>");
     buffer.append(title);
     buffer.append("</h2>");
+    boolean gobble = true;
     for (int i = 0; i < msg.length(); i++) {
       final char ch = msg.charAt(i);
       switch (ch) {
+      case ' ':
+      case '\t':
+        if (!gobble) {
+          buffer.append(' ');
+        }
+        gobble = true;
+        break;
       case ':':
-        buffer.append(":<br>");
+        buffer.append(':');
+        if (i + 1 >= msg.length() || msg.charAt(i + 1) != ' ') {
+          gobble = false;
+          break;
+        }
+        // fall through ...
+      case '\n':
+        buffer.append("<br>");
+        gobble = true;
+        break;
+      case '&':
+        buffer.append("&amp;");
+        gobble = false;
         break;
       case '<':
         buffer.append("&lt;");
+        gobble = false;
         break;
       case '>':
         buffer.append("&gt;");
+        gobble = false;
         break;
       case '"':
         buffer.append("&quot;");
-        break;
-      case '\n':
-        buffer.append("<br>");
+        gobble = false;
         break;
       default:
         buffer.append(ch);
+        gobble = false;
         break;
       }
     }
-    buffer.append("</html>");
+    buffer.append("</body></html>");
     return buffer.toString();
   }
 

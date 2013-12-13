@@ -137,7 +137,7 @@ public abstract class AbstractModelBuilder<P extends Proxy>
     if (mOuptutName != null) {
       return mOuptutName;
     } else {
-      final StringBuffer buffer = new StringBuffer("{");
+      final StringBuilder buffer = new StringBuilder("{");
       final ProductDESProxy model = getModel();
       final Collection<AutomatonProxy> automata = model.getAutomata();
       boolean first = true;

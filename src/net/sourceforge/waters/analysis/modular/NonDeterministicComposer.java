@@ -177,7 +177,7 @@ public class NonDeterministicComposer
       final EventProxy event = events[tran[1]];
       trans.add(mFactory.createTransitionProxy(source, event, target));
     }
-    final StringBuffer name = new StringBuffer();
+    final StringBuilder name = new StringBuilder();
     for (final AutomatonProxy a : mModel) {
       if (name.length() != 0) {
         name.append("||");

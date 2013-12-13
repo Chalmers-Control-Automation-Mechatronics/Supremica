@@ -35,7 +35,7 @@ public class GeometryAbsentException
 
   public String getMessage(final SimpleComponentProxy comp)
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     if (mGroupNode != null) {
       buffer.append("There is no geometry information for group node ");
       buffer.append(mGroupNode.getName());
@@ -57,7 +57,7 @@ public class GeometryAbsentException
 
   //#########################################################################
   //# Auxiliary Methods
-  private void appendComponentName(final StringBuffer buffer,
+  private void appendComponentName(final StringBuilder buffer,
                                    final SimpleComponentProxy comp)
   {
     if (comp != null) {

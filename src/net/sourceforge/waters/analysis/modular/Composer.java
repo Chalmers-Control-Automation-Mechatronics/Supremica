@@ -180,7 +180,7 @@ public class Composer
       final StateProxy targ = ns[tran[2]];
       trans.add(mFactory.createTransitionProxy(source, eveo, targ));
     }
-    final StringBuffer name = new StringBuffer();
+    final StringBuilder name = new StringBuilder();
     for (final AutomatonProxy a : mModel.getAutomata()) {
       name.append(a.getName());
     }

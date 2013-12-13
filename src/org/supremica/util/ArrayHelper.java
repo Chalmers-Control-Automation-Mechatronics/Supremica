@@ -36,7 +36,7 @@ public class ArrayHelper
              }
              final int length = Array.getLength(array);
              final int lastItem = length - 1;
-             final StringBuffer sb = new StringBuffer("[");
+             final StringBuilder sb = new StringBuilder("[");
              for (int i = 0; i < length; i++)
              {
                  obj = Array.get(array, i);

@@ -638,7 +638,7 @@ public class ExpressionParser {
    */
   private static String getTypeName(final int mask)
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     boolean first = true;
     if ((mask & Operator.TYPE_INT) != 0) {
       first = false;

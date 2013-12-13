@@ -94,7 +94,7 @@ class PlainMethodGlue extends MethodGlue {
 
   String getJNICallName()
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     buffer.append("Call");
     if (isStatic()) {
       buffer.append("Static");

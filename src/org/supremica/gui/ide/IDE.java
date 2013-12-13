@@ -370,7 +370,7 @@ public class IDE
       final DocumentProxy doc = container.getDocument();
       final String name = doc.getName();
       final File file = container.getFileLocation();
-      final StringBuffer buffer = new StringBuffer(IDENAME + " - Module");
+      final StringBuilder buffer = new StringBuilder(IDENAME + " - Module");
       if (name != null && !name.equals("")) {
         buffer.append(": ");
         buffer.append(name);

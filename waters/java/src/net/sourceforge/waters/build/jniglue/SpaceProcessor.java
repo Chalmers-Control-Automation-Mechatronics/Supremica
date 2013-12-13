@@ -25,7 +25,7 @@ class SpaceProcessor implements ProcessorVariable {
   public String getText()
   {
     if (mSpace == null) {
-      final StringBuffer buffer = new StringBuffer(mLength);
+      final StringBuilder buffer = new StringBuilder(mLength);
       for (int i = 0; i < mLength; i++) {
 	buffer.append(' ');
       }

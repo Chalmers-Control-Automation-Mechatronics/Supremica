@@ -273,7 +273,7 @@ public class EventEncoding
   @Override
   public String toString()
   {
-    final StringBuffer buffer = new StringBuffer("{");
+    final StringBuilder buffer = new StringBuilder("{");
     int ecode = 0;
     EventProxy tau = null;
     if (mProperEvents != null) {
@@ -328,7 +328,7 @@ public class EventEncoding
     return buffer.toString();
   }
 
-  private void appendStatusInfo(final StringBuffer buffer, final byte status)
+  private void appendStatusInfo(final StringBuilder buffer, final byte status)
   {
     if (status != STATUS_NONE) {
       char sep = '<';

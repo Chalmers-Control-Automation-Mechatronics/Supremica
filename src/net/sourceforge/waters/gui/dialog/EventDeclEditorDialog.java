@@ -205,6 +205,7 @@ public class EventDeclEditorDialog
       final FormattedInputParser parser = new EventNameInputParser();
       mNameInput = new SimpleExpressionCell(template.getIdentifier(), parser);
       commithandler = new ActionListener() {
+          @Override
           public void actionPerformed(final ActionEvent event)
           {
             commitDialog();
@@ -241,6 +242,7 @@ public class EventDeclEditorDialog
       mMoreOptionsButton.setRequestFocusEnabled(false);
       mMoreOptionsButton.setEnabled(advanced);
       mMoreOptionsButton.addActionListener(new ActionListener() {
+          @Override
           public void actionPerformed(final ActionEvent event)
           {
             toggleMoreOptions();
@@ -285,6 +287,7 @@ public class EventDeclEditorDialog
       mParameterButton.setRequestFocusEnabled(false);
       mParameterButton.setSelected(scope != ScopeKind.LOCAL);
       mParameterButton.addActionListener(new ActionListener() {
+          @Override
           public void actionPerformed(final ActionEvent event)
           {
             updateRequiredEnabled();
@@ -298,6 +301,7 @@ public class EventDeclEditorDialog
       mColorDisplay = new JPanel();
       mColorDisplay.setBackground(mChosenColor);
       mColorDisplay.addMouseListener(new MouseAdapter() {
+          @Override
           public void mouseClicked(final MouseEvent event)
           {
             if (event.getClickCount() == 2) {
@@ -308,6 +312,7 @@ public class EventDeclEditorDialog
       mColorButton = new JButton("Color ...");
       mColorButton.setRequestFocusEnabled(false);
       mColorButton.addActionListener(new ActionListener() {
+          @Override
           public void actionPerformed(final ActionEvent event)
           {
             chooseColor();
@@ -315,6 +320,7 @@ public class EventDeclEditorDialog
         });
       // ... add listeners to enable/disable the colour button ...
       final ActionListener kindlistener = new ActionListener() {
+          @Override
           public void actionPerformed(final ActionEvent event)
           {
             updateColorEnabled();
@@ -360,12 +366,14 @@ public class EventDeclEditorDialog
       mIndexTable.setDefaultEditor(Object.class, editor);
       final ListSelectionModel selmodel = mIndexTable.getSelectionModel();
       selmodel.addListSelectionListener(new ListSelectionListener() {
+          @Override
           public void valueChanged(final ListSelectionEvent event)
           {
             updateListControlEnabled();
           }
         });
       mIndexTable.addMouseListener(new MouseAdapter() {
+          @Override
           public void mouseClicked(final MouseEvent event)
           {
             handleIndexTableClick(event);
@@ -704,6 +712,7 @@ public class EventDeclEditorDialog
       final String name = mNameInput.getText();
       final int pos = mNameInput.getCaretPosition();
       restorer = new Runnable() {
+        @Override
         public void run()
         {
           mIsFilterEnabled = false;
@@ -845,6 +854,7 @@ public class EventDeclEditorDialog
       if (editor.stopCellEditing()) {
         // Must wait for focus change events to be processed ...
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run()
             {
               addIndexRange();
@@ -906,6 +916,7 @@ public class EventDeclEditorDialog
       if (editor.stopCellEditing()) {
         // Must wait for focus change events to be processed ...
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run()
             {
               moveIndexRangesUp();
@@ -935,6 +946,7 @@ public class EventDeclEditorDialog
       if (editor.stopCellEditing()) {
         // Must wait for focus change events to be processed ...
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run()
             {
               moveIndexRangesDown();
@@ -966,6 +978,7 @@ public class EventDeclEditorDialog
       if (editor.stopCellEditing()) {
         // Must wait for focus change events to be processed ...
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run()
             {
               commitDialog();
@@ -1055,8 +1068,7 @@ public class EventDeclEditorDialog
           if(victims == null){
             return;
           }
-          final CompoundCommand compound = new CompoundCommand();
-
+          final CompoundCommand compound = new CompoundCommand("Event Renaming");
           final int size = victims.size();
           final ListIterator<InsertInfo> iter = victims.listIterator(size);
           while (iter.hasPrevious()) {
@@ -1136,6 +1148,7 @@ public class EventDeclEditorDialog
 
     //#######################################################################
     //# Interface net.sourceforge.waters.gui.FormattedInputParser
+    @Override
     public SimpleIdentifierProxy parse(final String text)
       throws ParseException
     {
@@ -1149,6 +1162,7 @@ public class EventDeclEditorDialog
       return ident;
     }
 
+    @Override
     public DocumentFilter getDocumentFilter()
     {
       return this;
@@ -1157,6 +1171,7 @@ public class EventDeclEditorDialog
 
     //#######################################################################
     //# Overrides for class javax.swing.DocumentFilter
+    @Override
     public void insertString(final DocumentFilter.FilterBypass bypass,
                              final int offset,
                              final String text,
@@ -1169,6 +1184,7 @@ public class EventDeclEditorDialog
       }
     }
 
+    @Override
     public void replace(final DocumentFilter.FilterBypass bypass,
                         final int offset,
                         final int length,
@@ -1193,7 +1209,7 @@ public class EventDeclEditorDialog
         } else {
           final ExpressionParser parser = getExpressionParser();
           final int len = text.length();
-          final StringBuffer buffer = new StringBuffer(len);
+          final StringBuilder buffer = new StringBuilder(len);
           for (int i = 0; i < len; i++) {
             final char ch = text.charAt(i);
             if (parser.isIdentifierCharacter(ch)) {
@@ -1238,6 +1254,7 @@ public class EventDeclEditorDialog
 
     //#######################################################################
     //# Interface java.awt.event.ActionListener
+    @Override
     public void actionPerformed(final ActionEvent event)
     {
       addIndexRange();
@@ -1269,6 +1286,7 @@ public class EventDeclEditorDialog
 
     //#######################################################################
     //# Interface java.awt.event.ActionListener
+    @Override
     public void actionPerformed(final ActionEvent event)
     {
       removeIndexRanges();
@@ -1301,6 +1319,7 @@ public class EventDeclEditorDialog
 
     //#######################################################################
     //# Interface java.awt.event.ActionListener
+    @Override
     public void actionPerformed(final ActionEvent event)
     {
       moveIndexRangesUp();
@@ -1333,6 +1352,7 @@ public class EventDeclEditorDialog
 
     //#######################################################################
     //# Interface java.awt.event.ActionListener
+    @Override
     public void actionPerformed(final ActionEvent event)
     {
       moveIndexRangesDown();
@@ -1359,6 +1379,7 @@ public class EventDeclEditorDialog
 
     //#######################################################################
     //# Overrides for net.sourceforge.waters.gui.AttributesPanel
+    @Override
     boolean isInputLocked()
     {
       return EventDeclEditorDialog.this.isInputLocked();

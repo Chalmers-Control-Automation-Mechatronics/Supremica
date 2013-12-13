@@ -202,7 +202,7 @@ class SimulatorState
   //# Overrides for java.lang.Object
   public String toString()
   {
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     if (mEvent == null) {
       buffer.append("(init)");
     } else {

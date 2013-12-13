@@ -875,7 +875,7 @@ public final class IDD
 
 	public String toString(Node currNode)
 	{
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 
 		sb.append(currNode);
 
@@ -899,7 +899,7 @@ public final class IDD
 
 	private String arrayToString(int[] theArray)
 	{
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 
 		sb.append("[");
 

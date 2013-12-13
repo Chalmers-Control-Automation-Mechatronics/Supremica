@@ -109,7 +109,7 @@ public class TemplateProperties
 			return stateName;
 		}
 
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 
 		if ((stateNamePrefix != null) &&!stateNamePrefix.equals(""))
 		{
@@ -133,7 +133,7 @@ public class TemplateProperties
 			return label;
 		}
 
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 
 		if ((labelPrefix != null) &&!labelPrefix.equals(""))
 		{

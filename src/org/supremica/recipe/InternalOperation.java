@@ -182,7 +182,7 @@ public class InternalOperation
 
 	public String toString()
 	{
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 
 		sb.append("InternalOperation: " + identity + " initial: " + isInitial() + " final: " + isFinal() + "\n");
 		sb.append("\tPrevious transitions:\n");

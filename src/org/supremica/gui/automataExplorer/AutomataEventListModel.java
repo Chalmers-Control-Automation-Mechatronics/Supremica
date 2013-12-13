@@ -160,7 +160,7 @@ public class AutomataEventListModel
             return null;
         }
 
-        final StringBuffer responseString = new StringBuffer();
+        final StringBuilder responseString = new StringBuilder();
 
         if (!currEvent.isControllable())
         {

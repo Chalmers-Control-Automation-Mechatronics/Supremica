@@ -112,7 +112,7 @@ public class AutomataSSPCExporter
 			len = x.length();
 		}
 
-		final StringBuffer sb = new StringBuffer(len);
+		final StringBuilder sb = new StringBuilder(len);
 
 		for (int i = 0; i < len; i++)
 		{

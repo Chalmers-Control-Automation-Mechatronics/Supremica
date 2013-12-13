@@ -820,7 +820,7 @@ public class LogDisplay
         private String readLine()
         throws IOException
         {
-            final StringBuffer buffer = new StringBuffer();
+            final StringBuilder buffer = new StringBuilder();
             char ch;
             do
             {

@@ -1143,7 +1143,7 @@ public abstract class AbstractEqualityVisitor
     //#######################################################################
     //# Overrides for net.sourceforge.water.model.base.IndexedArraySet
     @Override
-    protected void appendContainerName(final StringBuffer buffer)
+    protected void appendContainerName(final StringBuilder buffer)
     {
       final Proxy container = mDiagnosticPath.peekLast();
       ProxyTools.appendContainerName(container, buffer);

@@ -1,4 +1,10 @@
-
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters SD
+//# PACKAGE: net.sourceforge.waters.analysis.sd
+//# CLASS:   AbstractSDLanguageInclusionChecker
+//###########################################################################
+//# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.sd;
@@ -12,14 +18,14 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 /**
- * An abstract base class for model verifier to check SIC or LDIC Properties
- * of HISC models that are based on a conflict check.
+ * An abstract base class for model verifier to check sample-data (SD)
+ * properties that are based on a language inclusion check.
  *
  * The abstract base class provides the common configuration option to
- * configure the underlying conflict checker needed for different SIC
- * verification tasks.
+ * configure the underlying language inclusion checker needed for different
+ * SD verification tasks.
  *
- * @author Robi Malik
+ * @author Mahvash Baloch, Robi Malik
  */
 
 abstract public class AbstractSDLanguageInclusionChecker
@@ -34,14 +40,14 @@ abstract public class AbstractSDLanguageInclusionChecker
   }
 
   public AbstractSDLanguageInclusionChecker(final LanguageInclusionChecker checker,
-                              final ProductDESProxyFactory factory)
+                                            final ProductDESProxyFactory factory)
   {
     this(checker, null, factory);
   }
 
   public AbstractSDLanguageInclusionChecker(final LanguageInclusionChecker checker,
-                              final ProductDESProxy model,
-                              final ProductDESProxyFactory factory)
+                                            final ProductDESProxy model,
+                                            final ProductDESProxyFactory factory)
   {
     super(model,
           LanguageInclusionKindTranslator.getInstance(),

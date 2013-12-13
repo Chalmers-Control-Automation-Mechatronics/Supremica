@@ -53,7 +53,7 @@ class ParameterGlue implements WritableGlue {
     return mType;
   }
 
-  public void appendTypeSignature(final StringBuffer buffer)
+  public void appendTypeSignature(final StringBuilder buffer)
   {
     mType.appendTypeSignature(buffer);
   }
