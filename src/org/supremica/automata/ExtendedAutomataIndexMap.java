@@ -2,18 +2,25 @@ package org.supremica.automata;
 
 /**
  *
- * @author sajed
+ * @author sajed, zhennan
  */
 
-import org.supremica.log.*;
-import org.supremica.util.Args;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
+
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
+import org.supremica.util.Args;
 
 public class ExtendedAutomataIndexMap {
 
@@ -111,20 +118,27 @@ public class ExtendedAutomataIndexMap {
             final String varName = var.getName();
             final String range = var.getType().toString();
 
-            if (range.contains(CompilerOperatorTable.getInstance().getRangeOperator().getName())) {
-                for (int i = theExAutomata.getMinValueofVar(varName); i <= theExAutomata.getMaxValueofVar(varName); i++) {
-                    val2indexMap.put("" + i, i);
-                    index2valMap.put(i, "" + i);
-                    integerDomain.add(i);
-                }
+            for (int i = theExAutomata.getMinValueofVar(varName); i <= theExAutomata.getMaxValueofVar(varName); i++) {
+                val2indexMap.put("" + i, i);
+                index2valMap.put(i, "" + i);
+                integerDomain.add(i);
+            }
 
+            if (range.contains(CompilerOperatorTable.getInstance().getRangeOperator().getName())) {
                 final int initialValue = val2indexMap.get(((BinaryExpressionProxy) var.getInitialStatePredicate()).getRight().toString());
+                var2initValMap.put(varName, initialValue);
+                var2markedValMap.put(varName, var.getVariableMarkings());
+            }
+
+            if (range.contains(",")) {
+                final String initialInstance = ((BinaryExpressionProxy)var.getInitialStatePredicate()).getRight().toString();
+                final int initialValue = Integer.parseInt(theExAutomata.getNonIntVar2InstanceIntMap().get(varName).get(initialInstance));
                 var2initValMap.put(varName, initialValue);
                 var2markedValMap.put(varName, var.getVariableMarkings());
             }
         }
 
-        index = 0;
+        /*index = 0;
         for (final VariableComponentProxy var : theExAutomata.getVars()) {
             final String varName = var.getName();
             final String range = var.getType().toString();
@@ -149,7 +163,7 @@ public class ExtendedAutomataIndexMap {
                 var2initValMap.put(varName, initialValue);
                 var2markedValMap.put(varName, var.getVariableMarkings());
             }
-        }
+        }*/
         if (index > theExAutomata.getDomain()) {
             theExAutomata.extDomain(index);
         }
@@ -164,7 +178,7 @@ public class ExtendedAutomataIndexMap {
         }
     }
 
-    public int isStringEFAorVar(String name) {
+    public int isStringEFAorVar(final String name) {
         if (EFANames.contains(name)) {
             return 0;
         } else if (variableNames.contains(name)) {
@@ -199,12 +213,12 @@ public class ExtendedAutomataIndexMap {
         return indexToVariableMap.get(i);
     }
 
-    public Integer getVariableIndexByName(String name) {
+    public Integer getVariableIndexByName(final String name) {
         return variableStringToIndexMap.get(name);
     }
 
-    public VariableComponentProxy getCorrepondentVariable(ExtendedAutomaton efa) {
-        for (VariableComponentProxy var : theExAutomata.getVars()) {
+    public VariableComponentProxy getCorrepondentVariable(final ExtendedAutomaton efa) {
+        for (final VariableComponentProxy var : theExAutomata.getVars()) {
             if (var.getName().contains(efa.getName())) {
                 return var;
             }
