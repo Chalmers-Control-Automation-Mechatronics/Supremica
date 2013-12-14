@@ -52,7 +52,7 @@
  * @author Goran Cengic (cengic@chalmers.se)
  * @author Sajed Miremadi (miremads@chalmers.se)
  * @author Mohammad Reza Shoaei (shoaei@chalmers.se)
- * @author Zhennan Fei
+ * @author Zhennan Fei (zhennan@chalmers.se)
  * @version %I%, %G%
  * @since 1.0
  */
@@ -104,6 +104,9 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
     private boolean negativeValuesIncluded = false;
     public List<EventDeclProxy> unionAlphabet;
     List<VariableComponentProxy> variables;
+    Set<String> nonIntegerVariables;
+    Map<String, Map<String, String>> nonIntVar2InstanceIntMap;
+    Map<String, Map<String, String>> nonIntVar2IntInstanceMap;
     private final List<VariableComponentProxy> clocks;
     private int domain = 0;
     private int largestClockDomain = 0;
@@ -138,6 +141,9 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         theExAutomata = new ArrayList<ExtendedAutomaton>();
         unionAlphabet = new ArrayList<EventDeclProxy>();
         variables = new ArrayList<VariableComponentProxy>();
+        nonIntegerVariables = new HashSet<String>();
+        nonIntVar2InstanceIntMap = new HashMap<String, Map<String,String>>();
+        nonIntVar2IntInstanceMap = new HashMap<String, Map<String,String>>();
         parameters = new ArrayList<VariableComponentProxy>();
         stageVars = new ArrayList<VariableComponentProxy>();
         clocks = new ArrayList<VariableComponentProxy>();
@@ -217,11 +223,12 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
 
         for (final Proxy sub : components) {
             if (sub instanceof VariableComponentProxy) {
+
                 final VariableComponentProxy var = (VariableComponentProxy) sub;
+
                 var2relatedVarsMap.put(var, new ArrayList<VariableComponentProxy>());
-                if (!sub.toString().contains(LOCAL_VAR_SUFFIX)) {
-                    variables.add(((VariableComponentProxy) sub));
-                }
+
+                variables.add(var);
 
                 if (var.getName().startsWith(FlowerEFABuilder.STAGE_PREFIX)) {
                     stageVars.add(var);
@@ -243,9 +250,23 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
                 if (range.contains(CompilerOperatorTable.getInstance().getRangeOperator().getName())) {
                     lowerBound = Integer.parseInt(((BinaryExpressionProxy) var.getType()).getLeft().toString());
                     upperBound = Integer.parseInt(((BinaryExpressionProxy) var.getType()).getRight().toString());
-                } else if (range.contains(",")) {
-                    final StringTokenizer token = new StringTokenizer(range, ", { }");
+                } else if (range.contains(",")) { // non-integer variable
+                    nonIntegerVariables.add(varName);
+                    final Map<String, String> varInstanceIntMap = new HashMap<String, String>();
+                    final Map<String, String> varIntInstanceMap = new HashMap<String, String>();
+                    final StringTokenizer token = new StringTokenizer(range, ", [ ]");
+                    int mapedIntValue = 0;
                     upperBound = token.countTokens();
+                    lowerBound = mapedIntValue;
+                    while(token.hasMoreTokens()) {
+                      final String anInstance = token.nextToken();
+                      final String mapedIntValueString = String.valueOf(mapedIntValue);
+                      varInstanceIntMap.put(anInstance, mapedIntValueString);
+                      varIntInstanceMap.put(mapedIntValueString, anInstance);
+                      mapedIntValue ++;
+                    }
+                    nonIntVar2InstanceIntMap.put(varName, varInstanceIntMap);
+                    nonIntVar2IntInstanceMap.put(varName, varIntInstanceMap);
                 } else {
                     throw new IllegalArgumentException("The variable domain is not defined!");
                 }
@@ -420,6 +441,18 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
 
     public List<VariableComponentProxy> getVars() {
         return variables;
+    }
+
+    public Set<String> getNonIntegerVarNameSet() {
+        return nonIntegerVariables;
+    }
+
+    public Map<String, Map<String, String>> getNonIntVar2InstanceIntMap() {
+        return nonIntVar2InstanceIntMap;
+    }
+
+    public Map<String, Map<String, String>> getNonIntVar2IntInstanceMap() {
+        return nonIntVar2IntInstanceMap;
     }
 
     public List<EventDeclProxy> getInverseAlphabet(final ExtendedAutomaton exAut) {

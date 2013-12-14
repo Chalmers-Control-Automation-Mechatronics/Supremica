@@ -5,7 +5,6 @@ package org.supremica.automata.BDD.EFA;
  * @author Sajed Miremadi, Zhennan Fei
  */
 import java.io.BufferedWriter;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +21,7 @@ import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
+import net.sourceforge.waters.subject.module.IntConstantSubject;
 
 import org.supremica.automata.BDD.SupremicaBDDBitVector.PSupremicaBDDBitVector;
 import org.supremica.automata.BDD.SupremicaBDDBitVector.ResultOverflows;
@@ -43,7 +43,7 @@ public abstract class BDDAbstractManager {
         if (P_TC == 0) {
             return new PSupremicaBDDBitVector(getFactory(), bitnum);
         } else if (P_TC == 1) {
-            TCSupremicaBDDBitVector output = new TCSupremicaBDDBitVector(getFactory(), bitnum);
+            final TCSupremicaBDDBitVector output = new TCSupremicaBDDBitVector(getFactory(), bitnum);
             if (!negativesIncluded) {
                 output.setBit(output.length() - 1, getZeroBDD());
             }
@@ -78,7 +78,7 @@ public abstract class BDDAbstractManager {
         if (P_TC == 0) {
             return new PSupremicaBDDBitVector(getFactory(), domain);
         } else if (P_TC == 1) {
-            TCSupremicaBDDBitVector output = new TCSupremicaBDDBitVector(getFactory(), domain);
+            final TCSupremicaBDDBitVector output = new TCSupremicaBDDBitVector(getFactory(), domain);
             if (!negativesIncluded) {
                 output.setBit(output.length() - 1, factory.ithVar(domain.vars()[0]).not());
             }
@@ -115,9 +115,9 @@ public abstract class BDDAbstractManager {
         return factory.extDomain(size);
     }
 
-    public int[] partialReverseVarOrdering(int[] varOrdering) {
-        int[] reversedVarOrdering = new int[varOrdering.length];
-        int[] updatedVarOrdering = factory.getVarOrder();
+    public int[] partialReverseVarOrdering(final int[] varOrdering) {
+        final int[] reversedVarOrdering = new int[varOrdering.length];
+        final int[] updatedVarOrdering = factory.getVarOrder();
         for (int i = 0; i < varOrdering.length; i++) {
             reversedVarOrdering[i] = varOrdering[varOrdering.length - 1 - i];
             updatedVarOrdering[varOrdering[i]] = varOrdering[varOrdering.length - 1 - i];
@@ -178,9 +178,21 @@ public abstract class BDDAbstractManager {
 
     public BDD action2BDD(final BinaryExpressionProxy expr) {
         final String leftVarName = ((SimpleIdentifierProxy) expr.getLeft()).getName();
-        int varIndex = bddExAutomata.theIndexMap.getVariableIndexByName(leftVarName);
+        final int varIndex = bddExAutomata.theIndexMap.getVariableIndexByName(leftVarName);
         final SupremicaBDDBitVector leftSide = bddExAutomata.getBDDBitVecTarget(varIndex);
-        ResultOverflows rightSide = expr2BDDBitVec(expr.getRight(), false);
+        ResultOverflows rightSide = null;
+
+        if(bddExAutomata.orgExAutomata.getNonIntegerVarNameSet().contains(leftVarName)) {
+
+          final String mapedInstanceValue = bddExAutomata.orgExAutomata
+            .getNonIntVar2InstanceIntMap().get(leftVarName).get(expr.getRight().toString());
+
+          final IntConstantProxy mapedIntProxy = new IntConstantSubject(Integer.parseInt(mapedInstanceValue));
+          rightSide = expr2BDDBitVec(mapedIntProxy, false);
+
+        }else {
+          rightSide = expr2BDDBitVec(expr.getRight(), false);
+        }
 
         BDD overflow = getZeroBDD();
         final CompilerOperatorTable cot = CompilerOperatorTable.getInstance();
@@ -326,7 +338,7 @@ public abstract class BDDAbstractManager {
                 } else {
                     throw new IllegalArgumentException("Factor is not constant!");
                 }
-            }  
+            }
             else {
                 throw new IllegalArgumentException(bexpr + ":" + bexpr.getOperator() + " is not known!");
             }
@@ -334,7 +346,7 @@ public abstract class BDDAbstractManager {
             //Currently, I don't have time to do that... maybe in the future (BTW it is not too much work).
 
         } else if (expr instanceof SimpleIdentifierProxy) {
-            String varName = ((SimpleIdentifierProxy) expr).getName();
+            final String varName = ((SimpleIdentifierProxy) expr).getName();
             return new ResultOverflows(
                     bddExAutomata.getBDDBitVecSource(bddExAutomata.theIndexMap.getVariableIndexByName(varName)), getZeroBDD());
         } else if (expr instanceof IntConstantProxy) {
@@ -360,7 +372,7 @@ public abstract class BDDAbstractManager {
 //                  return new ResultOverflows(createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType,
 //                          bddExAutomata.BDDBitVectoryType+createDomain(Math.abs(index.intValue())+1).varNum(), index), getZeroBDD());
                     return new ResultOverflows(createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType,
-                            createDomain(bddExAutomata.orgExAutomata.getDomain()).varNum(), index), getZeroBDD());                 
+                            createDomain(bddExAutomata.orgExAutomata.getDomain()).varNum(), index), getZeroBDD());
                 } else {
                     logger.error(expr.toString() + " is out of the bounds. The value will be set to 0!");
                     return new ResultOverflows(createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, bddExAutomata.BDDBitVectoryType + 1, 0), getZeroBDD());
@@ -371,22 +383,22 @@ public abstract class BDDAbstractManager {
         throw new IllegalArgumentException("Type of expression not known!");
     }
 
-    public void addLocation(BDD bdd, int locationIndex, BDDDomain domain) {
+    public void addLocation(final BDD bdd, final int locationIndex, final BDDDomain domain) {
         final BDD newLocationBDD = factory.buildCube(locationIndex, domain.vars());
         bdd.orWith(newLocationBDD);
     }
 
-    public void addLocationInvariant(BDD bdd, BDD invariant, int locationIndex, BDDDomain domain) {
+    public void addLocationInvariant(final BDD bdd, final BDD invariant, final int locationIndex, final BDDDomain domain) {
         final BDD newLocationBDD = factory.buildCube(locationIndex, domain.vars());
         bdd.orWith(newLocationBDD.and(invariant));
     }
 
     // Quite big method, however, encapsulation has been considered well :)
-    public void addEdge(BDD forwardEdgesBDD, BDD forwardEdgesWithoutDestBDD,
-            BDD[] transWhereVisUpdated, BDD[] transAndNextValsForV,
-            int sourceLocationIndex, BDDDomain sourceDomain, int destLocationIndex, BDDDomain destDomain,
-            int eventIndex, BDDDomain eventDomain,
-            List<SimpleExpressionProxy> guards, List<BinaryExpressionProxy> actions) {
+    public void addEdge(final BDD forwardEdgesBDD, final BDD forwardEdgesWithoutDestBDD,
+            final BDD[] transWhereVisUpdated, final BDD[] transAndNextValsForV,
+            final int sourceLocationIndex, final BDDDomain sourceDomain, final int destLocationIndex, final BDDDomain destDomain,
+            final int eventIndex, final BDDDomain eventDomain,
+            final List<SimpleExpressionProxy> guards, final List<BinaryExpressionProxy> actions) {
         BDD sourceBDD = getOneBDD();
         BDD destBDD = getOneBDD();
 
@@ -397,10 +409,10 @@ public abstract class BDDAbstractManager {
         destBDD = factory.buildCube(destLocationIndex, destDomain.vars());
 
         // Create a BDD representing the event
-        BDD eventBDD = factory.buildCube(eventIndex, eventDomain.vars());
+        final BDD eventBDD = factory.buildCube(eventIndex, eventDomain.vars());
 
         sourceBDD = sourceBDD.and(eventBDD);
-        BDD sourceEventBDD = sourceBDD.id();
+        final BDD sourceEventBDD = sourceBDD.id();
 
         sourceBDD = sourceBDD.and(destBDD);
 
@@ -414,12 +426,12 @@ public abstract class BDDAbstractManager {
         sourceBDD = sourceBDD.and(guardBDD);
         forwardEdgesWithoutDestBDD.orWith(sourceEventBDD.and(guardBDD));
 
-        HashSet<String> updatedVars = new HashSet<String>();
+        final HashSet<String> updatedVars = new HashSet<String>();
 
         BDD actionBDD = factory.one();
         if (actions != null) {
-            for (SimpleExpressionProxy a : actions) {
-                BinaryExpressionProxy bep = (BinaryExpressionProxy) a;
+            for (final SimpleExpressionProxy a : actions) {
+                final BinaryExpressionProxy bep = (BinaryExpressionProxy) a;
                 updatedVars.add(((SimpleIdentifierProxy) bep.getLeft()).getName());
 
                 actionBDD = actionBDD.and(action2BDD(bep));
@@ -427,13 +439,13 @@ public abstract class BDDAbstractManager {
         }
 //        actionBDD.printDot();
 
-        for (String varName : updatedVars) {
-            int variableIndex = variableStringToIndexMap.get(varName);
+        for (final String varName : updatedVars) {
+            final int variableIndex = variableStringToIndexMap.get(varName);
 
 //            bddExAutomata.allForwardTransWhereVisUpdated[variableIndex] = bddExAutomata.allForwardTransWhereVisUpdated[variableIndex].or(sourceBDD);
             transWhereVisUpdated[variableIndex] = transWhereVisUpdated[variableIndex].or(sourceBDD);
             transAndNextValsForV[variableIndex] = transAndNextValsForV[variableIndex].or(sourceBDD.and(actionBDD));
-        }        
+        }
 
         // Add the transition to the set of existing transitions
         forwardEdgesBDD.orWith(sourceBDD);
@@ -543,21 +555,21 @@ public abstract class BDDAbstractManager {
         BDD nextStates = transitions.relprod(states.id(), bddExAutomata.getSourceStatesVarSet());
         if (!bddExAutomata.orgExAutomata.getClocks().isEmpty() && !clocks.isZero()) {
             nextStates = timeEvolDest(nextStates, clocks);
-        }                
+        }
         nextStates.replaceWith(bddExAutomata.getDestToSourceLocationPairing());
         nextStates.replaceWith(bddExAutomata.getDestToSourceVariablePairing());
         return nextStates;
     }
-    
+
     BDD image_preImage(final BDD states, final BDD transitions) {
-        BDD nextStates = transitions.relprod(states.id(), bddExAutomata.getSourceStatesVarSet());
+        final BDD nextStates = transitions.relprod(states.id(), bddExAutomata.getSourceStatesVarSet());
 
         nextStates.replaceWith(bddExAutomata.getDestToSourceLocationPairing());
         nextStates.replaceWith(bddExAutomata.getDestToSourceVariablePairing());
 
         return nextStates;
     }
-    
+
 
     BDD timeEvolDest(final BDD states, final BDD clocksEvol) {
         BDD output = states.id();
