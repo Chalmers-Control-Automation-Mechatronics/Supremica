@@ -149,6 +149,9 @@ protected:
   virtual void setupReverseTransitionRelations() = 0;
   virtual void expandTraceState
     (const uint32_t* targettuple, const uint32_t* targetpacked) = 0;
+  virtual const EventRecord* findEvent
+    (const uint32_t* sourcetuple, const uint32_t* sourcepacked,
+     const uint32_t* targetpacked) = 0;
   virtual void storeNondeterministicTargets
     (const uint32_t* sourcetuple, const uint32_t* targettuple,
      const jni::MapGlue& map) = 0;

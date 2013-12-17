@@ -484,7 +484,7 @@ doNonblockingCoreachabilitySearch()
 void ProductExplorer::
 computeCounterExample(const jni::ListGlue& list, uint32_t level)
 {
-  if (level > 0) {
+  if (mReverseTransitionStore == 0 && level > 0) {
     setupReverseTransitionRelations();
   }
   uint32_t* buffers = new uint32_t[2 * mNumAutomata];
@@ -497,9 +497,16 @@ computeCounterExample(const jni::ListGlue& list, uint32_t level)
     while (level > 0) {
       checkAbort();
       mTraceLimit = mDepthMap->get(level);
-      expandTraceState(targettuple, targetpacked);
+      if (mReverseTransitionStore == 0) {
+        expandTraceState(targettuple, targetpacked);
+      } else {
+        mTraceState = mReverseTransitionStore->getFirstPredecessor(mTraceState);
+      }
       uint32_t* sourcepacked = mStateSpace->get(mTraceState);
       mEncoding->decode(sourcepacked, sourcetuple);
+      if (mReverseTransitionStore != 0) {
+        mTraceEvent = findEvent(sourcepacked, sourcetuple, targetpacked);
+      }
       storeNondeterministicTargets(sourcetuple, targettuple, statemap);
       const jni::EventGlue& event = mTraceEvent->getJavaEvent();
       jni::TraceStepGlue step =

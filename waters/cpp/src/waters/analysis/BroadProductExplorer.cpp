@@ -412,6 +412,37 @@ expandTraceState(const uint32_t* targettuple, const uint32_t* targetpacked)
 }
 
 #undef ADD_NEW_STATE
+
+
+#define ADD_NEW_STATE(source)                                    \
+  if (getStateSpace().equalTuples(bufferpacked, targetpacked)) { \
+    throw SearchAbort();                                         \
+  }
+
+const EventRecord* BroadProductExplorer::
+findEvent(const uint32_t* sourcepacked,
+          const uint32_t* sourcetuple,
+          const uint32_t* targetpacked)
+{
+  const int numwords = getAutomatonEncoding().getNumberOfSignificantWords();
+  const BroadEventRecord* event;
+  try {
+    int e = -1;
+    do {
+      event = mEventRecords[++e];
+      const AutomatonRecord* dis = 0;
+      FIND_DISABLING_AUTOMATON(sourcetuple, event, dis);
+      if (dis == 0) {
+        EXPAND_ENABLED_TRANSITIONS
+          (numwords, SOURCE, sourcetuple, sourcepacked, event);
+      }
+    } while (true);
+  } catch (const SearchAbort& abort) {
+    // OK. That's what we have been waiting for.
+    return event;
+  }
+}
+
 #undef ADD_NEW_STATE_ALLOC
 #undef EXPAND
 

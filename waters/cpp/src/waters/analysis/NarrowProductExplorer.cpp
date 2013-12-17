@@ -240,10 +240,10 @@ teardown()
   {                                                                     \
     minevent = mNumEventRecords;                                        \
     uint32_t mincount = UINT32_MAX;                                     \
-    for (uint32_t a = 0; a < numaut; a++) {                               \
+    for (uint32_t a = 0; a < numaut; a++) {                             \
       const NarrowTransitionTable& table = mTransitionTables[a];        \
       mIterator[a] = table.iterator(sourcetuple[a]);                    \
-      uint32_t e = table.getEvent(mIterator[a]);                          \
+      uint32_t e = table.getEvent(mIterator[a]);                        \
       if (e < minevent) {                                               \
         minevent = e;                                                   \
         mincount = 1;                                                   \
@@ -256,10 +256,10 @@ teardown()
       if (mincount == mEventRecords[minevent]->getNumberOfAutomata()) { \
         ADD_SUCCESSORS(source, sourcetuple, mincount, numaut, TAG);     \
       }                                                                 \
-      uint32_t newminevent = mNumEventRecords;                            \
-      for (uint32_t a = 0; a < numaut; a++) {                             \
+      uint32_t newminevent = mNumEventRecords;                          \
+      for (uint32_t a = 0; a < numaut; a++) {                           \
         const NarrowTransitionTable& table = mTransitionTables[a];      \
-        uint32_t e = table.getEvent(mIterator[a]);                        \
+        uint32_t e = table.getEvent(mIterator[a]);                      \
         if (e == minevent) {                                            \
           mIterator[a] = table.next(mIterator[a]);                      \
           e = table.getEvent(mIterator[a]);                             \
@@ -491,7 +491,6 @@ setupReverseTransitionRelations()
 
 #define ADD_NEW_STATE(source) checkTraceState()
 
-
 void NarrowProductExplorer::
 expandTraceState(const uint32_t* targettuple, const uint32_t* targetpacked)
 {
@@ -507,6 +506,32 @@ expandTraceState(const uint32_t* targettuple, const uint32_t* targetpacked)
   }
 }
 
+#undef ADD_NEW_STATE
+
+
+#define ADD_NEW_STATE(source)                                         \
+  uint32_t offset = getStateSpace().size();                           \
+  const uint32_t* foundpacked = getStateSpace().get(offset);          \
+  if (getStateSpace().equalTuples(foundpacked, targetpacked)) {       \
+    throw SearchAbort();                                              \
+  }
+
+const EventRecord* NarrowProductExplorer::
+findEvent(const uint32_t* sourcepacked,
+          const uint32_t* sourcetuple,
+          const uint32_t* targetpacked)
+{
+  const uint32_t TAG = NarrowTransitionTable::TAG_END_OF_LIST;
+  const uint32_t numaut = getNumberOfAutomata();
+  uint32_t minevent = UINT32_MAX;
+  try {
+    EXPAND(SOURCE, sourcetuple, minevent, numaut, TAG);
+    return 0;
+  } catch (const SearchAbort& abort) {
+    // OK. That's what we have been waiting for.
+    return mEventRecords[minevent];
+  }
+}
 
 #undef ADD_NEW_STATE
 #undef ADD_SUCCESSORS

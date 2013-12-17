@@ -130,6 +130,13 @@ equals(int32_t key1, int32_t key2)
 {
   const uint32_t* tuple1 = get(key1);
   const uint32_t* tuple2 = get(key2);
+  return equalTuples(tuple1, tuple2);
+}
+
+bool StateSpace::
+equalTuples(const uint32_t* tuple1, const uint32_t* tuple2)
+  const
+{
   for (int i = 0; i < mNumSignificantWords; i++) {
     if (tuple1[i] != tuple2[i]) {
       return false;
@@ -166,13 +173,11 @@ hash(int32_t key)
 }
 
 bool TaggedStateSpace::
-equals(int32_t key1, int32_t key2)
+equalTuples(const uint32_t* tuple1, const uint32_t* tuple2)
   const
 {
   const int esize = getNumberOfSignificantWords();
   if (esize > 0) {
-    const uint32_t* tuple1 = get(key1);
-    const uint32_t* tuple2 = get(key2);
     if (((tuple1[0] ^ tuple2[0]) & mMask0) != 0) {
       return false;
     }

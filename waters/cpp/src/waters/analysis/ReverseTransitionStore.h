@@ -49,6 +49,7 @@ public:
   uint32_t iterator(uint32_t target) const;
   uint32_t hasNext(uint32_t iterator) const;
   uint32_t next(uint32_t& iterator) const;
+  uint32_t getFirstPredecessor(uint32_t target) const;
 
   //##########################################################################
   //# Debug Output
