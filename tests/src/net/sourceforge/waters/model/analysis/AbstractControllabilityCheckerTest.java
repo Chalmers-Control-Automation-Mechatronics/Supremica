@@ -912,38 +912,44 @@ public abstract class AbstractControllabilityCheckerTest
   //# Test Cases -- Parameterised
   public void testTransferline__1() throws Exception
   {
-    checkTransferline(1);
+    checkTransferline("transferline.wmod",1,true);
   }
 
   public void testTransferline__2() throws Exception
   {
-    checkTransferline(2);
+    checkTransferline("transferline.wmod",2,true);
   }
 
   public void testTransferline__3() throws Exception
   {
-    checkTransferline(3);
+    checkTransferline("transferline.wmod",3,true);
   }
 
   public void testTransferline__4() throws Exception
   {
-    checkTransferline(4);
+    checkTransferline("transferline.wmod",4,true);
   }
 
   public void testTransferline__5() throws Exception
   {
-    checkTransferline(5);
+    checkTransferline("transferline.wmod",5,true);
   }
 
-  public void checkTransferline(final int n) throws Exception
+  public void testTransferline__uncont() throws Exception
+  {
+    checkTransferline("transferline_uncont2.wmod",5,false);
+  }
+
+  public void checkTransferline(final String name, final int n, final boolean result)
+    throws Exception
   {
     final String group = "handwritten";
-    final String name = "transferline.wmod";
+    //final String name = "transferline.wmod";
     final List<ParameterBindingProxy> bindings =
       new LinkedList<ParameterBindingProxy>();
     final ParameterBindingProxy binding = createBinding("N", n);
     bindings.add(binding);
-    runModelVerifier(group, name, bindings, true);
+    runModelVerifier(group, name, bindings, result);
   }
 
 
