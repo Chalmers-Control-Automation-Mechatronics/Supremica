@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+
 import javax.swing.SwingUtilities;
 
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
@@ -39,7 +40,6 @@ import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.PointGeometrySubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
-
 import net.sourceforge.waters.xsd.module.SplineKind;
 
 import org.supremica.properties.Config;
@@ -92,11 +92,13 @@ public class SpringEmbedder
 
   //#########################################################################
   //# Observer Pattern
+  @Override
   public void addObserver(final EmbedderObserver observer)
   {
     mObservers.add(observer);
   }
 
+  @Override
   public void removeObserver(final EmbedderObserver observer)
   {
     mObservers.remove(observer);
@@ -105,6 +107,7 @@ public class SpringEmbedder
 
   //#########################################################################
   //# Interface java.lang.Runnable
+  @Override
   public void run()
   {
     createWrappers();
@@ -113,6 +116,7 @@ public class SpringEmbedder
     runToConvergence();
     mSpringEmbedders.remove(this);
     SwingUtilities.invokeLater(new Runnable() {
+        @Override
         public void run() {
           updateModel();
           fireStopped();
@@ -129,7 +133,7 @@ public class SpringEmbedder
    * got geometry associated with them, without making any changes to
    * the graph.
    * @return <CODE>true</CODE> if any is missing geometry.
-   *         In this case, a call to {@link #setUpNodeGeometry()} would
+   *         In this case, a call to {@link #setUpGeometry()} would
    *         change the graph.
    * @throws GeometryAbsentException if the graph has more nodes than
    *         specified by the {@link Config#DOT_MAX_NBR_OF_STATES} setting,
@@ -179,7 +183,18 @@ public class SpringEmbedder
    *         cannot be assigned geometry automatically, and therefore the
    *         graph cannot be rendered when this exception is thrown.
    */
-  public boolean setUpNodeGeometry()
+  public boolean setUpGeometry()
+    throws GeometryAbsentException
+  {
+    if (setUpNodeGeometry()) {
+      setUpEdgeGeometry();
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  private boolean setUpNodeGeometry()
     throws GeometryAbsentException
   {
     checkNumberOfStates();
@@ -199,9 +214,9 @@ public class SpringEmbedder
             spread = 500;
           }
           simple.setPointGeometry
-            (new PointGeometrySubject
-                    (new Point(base + mRandom.nextInt(spread),
-                               base + mRandom.nextInt(spread))));
+          (new PointGeometrySubject
+           (new Point(base + mRandom.nextInt(spread),
+                      base + mRandom.nextInt(spread))));
         }
         if (simple.getLabelGeometry() == null) {
           final LabelGeometrySubject geo =
@@ -213,9 +228,14 @@ public class SpringEmbedder
         checkGroupNodeGeometry(group);
       } else {
         throw new ClassCastException
-          ("Unknown node type: " + node.getClass().getName() + "!");
+        ("Unknown node type: " + node.getClass().getName() + "!");
       }
     }
+    return runEmbedder;
+  }
+
+  private void setUpEdgeGeometry()
+  {
     for (final EdgeSubject edge : mEdges) {
       // Fixing some broken models---these adjustments should not
       // be needed, but without them many old files would not be
@@ -226,8 +246,22 @@ public class SpringEmbedder
       if (edge.getTarget() instanceof SimpleNodeSubject) {
         edge.setEndPoint(null);
       }
+      if (edge.getLabelBlock().getGeometry() == null) {
+        final LabelGeometrySubject offset =
+          new LabelGeometrySubject(LabelBlockProxyShape.DEFAULT_OFFSET);
+        edge.getLabelBlock().setGeometry(offset);
+      }
+      if (edge.getGuardActionBlock() != null &&
+          edge.getGuardActionBlock().getGeometry() == null) {
+        // TODO Find better position!
+        final LabelGeometrySubject offset =
+          new LabelGeometrySubject
+               (new Point(LabelBlockProxyShape.DEFAULT_OFFSET_X,
+                          LabelBlockProxyShape.DEFAULT_OFFSET_Y + 10));
+        edge.getGuardActionBlock().setGeometry(offset);
+      }
+      edge.setGeometry(null);
     }
-    return runEmbedder;
   }
 
 
@@ -384,7 +418,6 @@ public class SpringEmbedder
   private void runToConvergence()
   {
     if (!mStop) {
-      setUpEdgeGeometry();
       int count = 0;
       double limit = CONVERGENCE_CONST;
       for (int i = 1; i < NUM_PASSES; i++) {
@@ -398,6 +431,7 @@ public class SpringEmbedder
           if (count++ >= UPDATE_CONST) {
             count = 0;
             SwingUtilities.invokeLater(new Runnable() {
+                @Override
                 public void run() {
                   updateModel();
                 }
@@ -462,27 +496,6 @@ public class SpringEmbedder
       wrapper.updatePoint();
     }
     return maxdelta;
-  }
-
-  private void setUpEdgeGeometry()
-  {
-    for (final EdgeSubject edge : mEdges) {
-      if (edge.getLabelBlock().getGeometry() == null) {
-        final LabelGeometrySubject offset =
-          new LabelGeometrySubject(LabelBlockProxyShape.DEFAULT_OFFSET);
-        edge.getLabelBlock().setGeometry(offset);
-      }
-      if (edge.getGuardActionBlock() != null &&
-          edge.getGuardActionBlock().getGeometry() == null) {
-        // TODO Find better position!
-        final LabelGeometrySubject offset =
-          new LabelGeometrySubject
-               (new Point(LabelBlockProxyShape.DEFAULT_OFFSET_X,
-                          LabelBlockProxyShape.DEFAULT_OFFSET_Y + 10));
-        edge.getGuardActionBlock().setGeometry(offset);
-      }
-      edge.setGeometry(null);
-    }
   }
 
   private Collection<? extends GeometryWrapper> calculateNewPoints()
@@ -786,6 +799,7 @@ public class SpringEmbedder
 
     //#######################################################################
     //# Layouting Methods
+    @Override
     void initializeNewPoint()
     {
       super.initializeNewPoint();
@@ -848,6 +862,7 @@ public class SpringEmbedder
       return false;
     }
 
+    @Override
     double getDelta()
     {
       double delta = 0.0;
@@ -874,6 +889,7 @@ public class SpringEmbedder
       }
     }
 
+    @Override
     void updateModel()
     {
       final Point2D point = getNewPoint();
@@ -929,6 +945,7 @@ public class SpringEmbedder
 
     //#######################################################################
     //# Layouting Methods
+    @Override
     void initializeNewPoint()
     {
       super.initializeNewPoint();
@@ -1047,6 +1064,7 @@ public class SpringEmbedder
       return repulsion(old, other.getOldPoint(), mEdgeRepulsion);
     }
 
+    @Override
     double getDelta()
     {
       if (mPass > 0) {
@@ -1058,6 +1076,7 @@ public class SpringEmbedder
       }
     }
 
+    @Override
     void updateModel()
     {
       final Point2D point = getNewPoint();
@@ -1167,11 +1186,13 @@ public class SpringEmbedder
 
     //#######################################################################
     //# Interface java.util.Collection
+    @Override
     public Iterator<GeometryWrapper> iterator()
     {
       return new WrapperSetIterator();
     }
 
+    @Override
     public int size()
     {
       return mNodeMap.size() + mEdgeMap.size();
@@ -1195,6 +1216,7 @@ public class SpringEmbedder
 
     //#######################################################################
     //# Interface java.util.Iterator
+    @Override
     public boolean hasNext()
     {
       if (mIterator.hasNext()) {
@@ -1208,6 +1230,7 @@ public class SpringEmbedder
       }
     }
 
+    @Override
     public GeometryWrapper next()
     {
       if (mInNodes && !mIterator.hasNext()) {
@@ -1217,6 +1240,7 @@ public class SpringEmbedder
       return mIterator.next();
     }
 
+    @Override
     public void remove()
     {
       throw new UnsupportedOperationException

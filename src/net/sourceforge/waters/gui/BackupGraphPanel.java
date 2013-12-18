@@ -183,7 +183,7 @@ public class BackupGraphPanel
   protected void runEmbedder()
   {
     try {
-      mEmbedder.setUpNodeGeometry();
+      mEmbedder.setUpGeometry();
       createSecondaryGraph();
       final SimpleComponentSubject comp =
         (SimpleComponentSubject) getGraph().getParent();
