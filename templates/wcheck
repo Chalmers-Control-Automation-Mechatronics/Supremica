@@ -56,9 +56,13 @@ for F in "$@"; do
     -loop)
         CHECK="ControlLoop"
         ;;
-    -sic5|-sic6)
+    -sic5)
         CHECK="Conflict"
-        ARGS="$ARGS \"$F\""
+        ARGS="$ARGS \"-wrapper\" \"net.sourceforge.waters.analysis.hisc.SICProperty5Verifier\""
+        ;;
+    -sic6)
+        CHECK="Conflict"
+        ARGS="$ARGS \"-wrapper\" \"net.sourceforge.waters.analysis.hisc.SICProperty6Verifier\""
         ;;
     -Xmx*)
         MEM="$F"
