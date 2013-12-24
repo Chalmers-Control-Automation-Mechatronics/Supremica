@@ -186,20 +186,23 @@ public class CommandLineTool
         fclazz.getMethod(createname, ProductDESProxyFactory.class);
       final ModelVerifier checker =
         (ModelVerifier) getcheck.invoke(factory, desFactory);
-      final boolean noPropositions = !(checker instanceof ConflictChecker);
       final ModelVerifier wrapper;
+      final boolean keepPropositions;
       if (wrapperName == null) {
         wrapper = checker;
+        keepPropositions = checker instanceof ConflictChecker;
       } else {
         @SuppressWarnings("unchecked")
         final Class<ModelVerifier> clazz =
           (Class<ModelVerifier>) loader.loadClass(wrapperName);
         final Package pack = CommandLineTool.class.getPackage();
-        final String ifaceName = pack.getName() + ".des." + checkName + "Checker";
+        final String ifaceName =
+          pack.getName() + ".des." + checkName + "Checker";
         final Class<?> iface = loader.loadClass(ifaceName);
         final Constructor<ModelVerifier> constructor =
           clazz.getConstructor(iface, ProductDESProxyFactory.class);
         wrapper = constructor.newInstance(checker, desFactory);
+        keepPropositions = true;
       }
       final Collection<String> empty = Collections.emptyList();
       final Iterator<String> argIter = argList.iterator();
@@ -221,7 +224,7 @@ public class CommandLineTool
           final ModuleProxy module = (ModuleProxy) doc;
           final ModuleCompiler compiler =
             new ModuleCompiler(docManager, desFactory, module);
-          if (noPropositions) {
+          if (!keepPropositions) {
             compiler.setEnabledPropositionNames(empty);
           }
           factory.configure(compiler);

@@ -2,53 +2,57 @@
 //###########################################################################
 //# PROJECT: Waters SD Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.sd
-//# CLASS:   SDCFourVerifier
+//# CLASS:   SDCTwoAVerifier
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.sd;
 
+import java.util.Collection;
+
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
 
 
 /**
- * <P>A model verifier to check SD Controllability Property IV.</P>
+ * <P>A model verifier to check SD Controllability Property II.a.</P>
  *
- * <P><STRONG>Reference.</STRONG>
- * Mahvash Baloch. A compositional approach for verifying sampled-data
- * supervisory control. M.Sc. Thesis, Dept. of Computing and Software,
- * McMaster University, March 2012.</P>
+ * <P><STRONG>Reference.</STRONG> Mahvash Baloch. A compositional approach for
+ * verifying sampled-data supervisory control. M.Sc. Thesis, Dept. of
+ * Computing and Software, McMaster University, March 2012.</P>
  *
- * @see SDPropertyBuilder
+ * @see SD_Two_PropertyBuilder
  * @see LanguageInclusionChecker
  *
- * @author Mahvash Baloch
+ * @author Mahvash Baloch , Robi Malik
  */
 
-public class SDCFourVerifier extends AbstractSDLanguageInclusionChecker
+
+//#########################################################################
+//# Constructors
+public class SDCTwoAVerifier extends AbstractSDLanguageInclusionChecker
 {
 
   //#########################################################################
   //# Constructors
-  public SDCFourVerifier(final ProductDESProxyFactory factory)
+  public SDCTwoAVerifier(final ProductDESProxyFactory factory)
   {
     super(factory);
   }
 
-  public SDCFourVerifier(final LanguageInclusionChecker checker,
+  public SDCTwoAVerifier(final LanguageInclusionChecker checker,
                          final ProductDESProxyFactory factory)
   {
     super(checker, factory);
-
   }
 
-  public SDCFourVerifier(final LanguageInclusionChecker checker,
+  public SDCTwoAVerifier(final LanguageInclusionChecker checker,
                          final ProductDESProxy model,
                          final ProductDESProxyFactory factory)
   {
@@ -64,9 +68,14 @@ public class SDCFourVerifier extends AbstractSDLanguageInclusionChecker
     setUp();
     try {
       final ProductDESProxy model = getModel();
-      final SDPropertyBuilder builder =
-        new SDPropertyBuilder(model, getFactory());
-      final ProductDESProxy convertedModel = builder.createModelSDFour();
+      final Collection<AutomatonProxy> oldAutomata = model.getAutomata();
+      final int numaut = oldAutomata.size();
+      if (numaut == 0) {
+        return setSatisfiedResult();
+      }
+      final SD_Two_PropertyBuilder builder =
+        new SD_Two_PropertyBuilder(model, getFactory());
+      final ProductDESProxy convertedModel = builder.createSDTwoModel();
       final LanguageInclusionChecker checker = getLanguageInclusionChecker();
       checker.setModel(convertedModel);
       final VerificationResult result;
@@ -77,11 +86,15 @@ public class SDCFourVerifier extends AbstractSDLanguageInclusionChecker
         setAnalysisResult(result);
       }
       if (result.isSatisfied()) {
-        return true;
+        return setSatisfiedResult();
       } else {
         final SafetyTraceProxy counterexample = checker.getCounterExample();
         return setFailedResult(counterexample);
       }
+    } catch (final AnalysisException exception) {
+      final VerificationResult result = getAnalysisResult();
+      result.setException(exception);
+      throw exception;
     } finally {
       tearDown();
     }

@@ -73,8 +73,8 @@ public class SDThreeOneVerifier extends AbstractSDLanguageInclusionChecker
         return setSatisfiedResult();
       }
       final LanguageInclusionChecker cChecker = getLanguageInclusionChecker();
-      final SDCThreeaVerifier verifier1 =
-        new SDCThreeaVerifier(cChecker, model, getFactory());
+      final SDCThree1AVerifier verifier1 =
+        new SDCThree1AVerifier(cChecker, model, getFactory());
       final VerificationResult result1;
       try {
         verifier1.run();
@@ -85,8 +85,8 @@ public class SDThreeOneVerifier extends AbstractSDLanguageInclusionChecker
         final SafetyTraceProxy counterexample = verifier1.getCounterExample();
         return setFailedResult(counterexample);
       }
-      final SDCThreebVerifier verifier2 =
-        new SDCThreebVerifier(cChecker, model, getFactory());
+      final SDCThree1BVerifier verifier2 =
+        new SDCThree1BVerifier(cChecker, model, getFactory());
       final VerificationResult result2;
       try {
         verifier2.run();

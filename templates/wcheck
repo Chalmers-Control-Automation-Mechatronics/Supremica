@@ -56,6 +56,26 @@ for F in "$@"; do
     -loop)
         CHECK="ControlLoop"
         ;;
+    -sdc2a)
+        CHECK="LanguageInclusion"
+        ARGS="$ARGS \"-wrapper\" \"net.sourceforge.waters.analysis.sd.SDCTwoAVerifier\""
+        ;;
+    -sdc31a)
+        CHECK="LanguageInclusion"
+        ARGS="$ARGS \"-wrapper\" \"net.sourceforge.waters.analysis.sd.SDCThree1AVerifier\""
+        ;;
+    -sdc31b)
+        CHECK="LanguageInclusion"
+        ARGS="$ARGS \"-wrapper\" \"net.sourceforge.waters.analysis.sd.SDCThree1BVerifier\""
+        ;;
+    -sdc4)
+        CHECK="LanguageInclusion"
+        ARGS="$ARGS \"-wrapper\" \"net.sourceforge.waters.analysis.sd.SDCFourVerifier\""
+        ;;
+    -sdspb)
+        CHECK="LanguageInclusion"
+        ARGS="$ARGS \"-wrapper\" \"net.sourceforge.waters.analysis.sd.SDSingularProhibitableBehaviorVerifier\""
+        ;;
     -sic5)
         CHECK="Conflict"
         ARGS="$ARGS \"-wrapper\" \"net.sourceforge.waters.analysis.hisc.SICProperty5Verifier\""
