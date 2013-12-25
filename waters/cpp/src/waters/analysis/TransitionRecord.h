@@ -47,7 +47,8 @@ public:
   //# Constructors & Destructors
   explicit TransitionRecord(const AutomatonRecord* aut,
 			    TransitionRecord* next = 0,
-			    TransitionRecord* fwd = 0);
+			    const TransitionRecord* fwd = 0);
+  explicit TransitionRecord(const TransitionRecord& fwd);
   ~TransitionRecord();
 
   //##########################################################################
@@ -116,6 +117,7 @@ private:
   //# Data Members
   const AutomatonRecord* mAutomaton;
   int mWeight;
+  bool mIsReversedCopy;
   bool mIsOnlySelfloops;
   uint32_t* mFlags;
   uint32_t* mDeterministicSuccessorsShifted;
@@ -126,7 +128,6 @@ private:
   TransitionRecord* mNextInSearch;
   TransitionRecord* mNextInUpdate;
   TransitionRecord* mNextInNotTaken;
-  TransitionRecord* mForwardRecord;
 
   //##########################################################################
   //# Class Constants

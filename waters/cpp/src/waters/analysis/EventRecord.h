@@ -64,6 +64,7 @@ public:
   //##########################################################################
   //# Constructors & Destructors
   explicit EventRecord(jni::EventGlue event, bool controllable);
+  explicit EventRecord(const EventRecord& record);
   virtual ~EventRecord() {}
 
   //##########################################################################

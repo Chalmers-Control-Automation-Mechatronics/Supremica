@@ -62,6 +62,7 @@ BroadProductExplorer(const jni::ProductDESProxyFactoryGlue& factory,
   : ProductExplorer(factory, des, translator, premarking, marking, cache),
     mNumEventRecords(0),
     mEventRecords(0),
+    mNumReversedEventRecords(0),
     mReversedEventRecords(0),
     mMaxNondeterministicUpdates(0),
     mNondeterministicTransitionIterators(0),
@@ -72,6 +73,10 @@ BroadProductExplorer(const jni::ProductDESProxyFactoryGlue& factory,
 BroadProductExplorer::
 ~BroadProductExplorer()
 {
+  for (int i = 0; i < mNumReversedEventRecords; i++) {
+    delete mReversedEventRecords[i];
+  }
+  delete [] mReversedEventRecords;
   for (int i = 0; i < mNumEventRecords; i++) {
     delete mEventRecords[i];
   }
@@ -105,11 +110,16 @@ setup()
 void BroadProductExplorer::
 teardown()
 {
+  for (int i = 0; i < mNumReversedEventRecords; i++) {
+    delete mReversedEventRecords[i];
+  }
+  mNumReversedEventRecords = 0;
   for (int i = 0; i < mNumEventRecords; i++) {
     delete mEventRecords[i];
   }
   mNumEventRecords = 0;
   delete [] mEventRecords;
+  delete [] mReversedEventRecords;
   mEventRecords = mReversedEventRecords = 0;
   delete [] mNondeterministicTransitionIterators;
   mNondeterministicTransitionIterators = 0;
@@ -121,10 +131,23 @@ teardown()
 // but inlining this code is 15% faster than using method calls.
 // ~~~Robi
 
-#define EXPAND(numwords, source, sourcetuple, sourcepacked)             \
+#define EXPAND_FORWARD(numwords, source, sourcetuple, sourcepacked)     \
   {                                                                     \
     for (int e = 0; e < mNumEventRecords; e++) {                        \
       BroadEventRecord* event = mEventRecords[e];                       \
+      const AutomatonRecord* dis = 0;                                   \
+      FIND_DISABLING_AUTOMATON(sourcetuple, event, dis);                \
+      if (dis == 0) {                                                   \
+        EXPAND_ENABLED_TRANSITIONS                                      \
+          (numwords, source, sourcetuple, sourcepacked, event);         \
+      }                                                                 \
+    }                                                                   \
+  }
+
+#define EXPAND_REVERSE(numwords, source, sourcetuple, sourcepacked)     \
+  {                                                                     \
+    for (int e = 0; e < mNumReversedEventRecords; e++) {                \
+      BroadEventRecord* event = mReversedEventRecords[e];               \
       const AutomatonRecord* dis = 0;                                   \
       FIND_DISABLING_AUTOMATON(sourcetuple, event, dis);                \
       if (dis == 0) {                                                   \
@@ -301,7 +324,7 @@ expandNonblockingReachabilityState(uint32_t source,
   if (getTransitionLimit() > 0) {
 #   define ADD_TRANSITION addCoreachabilityTransition
 #   define ADD_TRANSITION_ALLOC ADD_TRANSITION
-    EXPAND(numwords, source, sourcetuple, sourcepacked);
+    EXPAND_FORWARD(numwords, source, sourcetuple, sourcepacked);
 #   undef ADD_TRANSITION
 #   undef ADD_TRANSITION_ALLOC
   } else {
@@ -320,7 +343,7 @@ expandNonblockingReachabilityState(uint32_t source,
         markedoff = event;                                              \
       }                                                                 \
     }
-    EXPAND(numwords, source, sourcetuple, sourcepacked);
+    EXPAND_FORWARD(numwords, source, sourcetuple, sourcepacked);
 #   undef ADD_TRANSITION
 #   undef ADD_TRANSITION_ALLOC
   }
@@ -345,7 +368,7 @@ expandNonblockingCoreachabilityState(const uint32_t* targettuple,
                                      const uint32_t* targetpacked)
 {
   const int numwords = getAutomatonEncoding().getNumberOfSignificantWords();
-  EXPAND(numwords, TARGET, targettuple, targetpacked);
+  EXPAND_REVERSE(numwords, TARGET, targettuple, targetpacked);
 }
 
 #undef ADD_NEW_STATE
@@ -357,25 +380,33 @@ setupReverseTransitionRelations()
   if (mReversedEventRecords == 0) {
     bool removing =
       getMode() == EXPLORER_MODE_NONBLOCKING && getTransitionLimit() == 0;
-    int numreversed = 0;
     int maxupdates = 0;
-    mReversedEventRecords = new BroadEventRecord*[mNumEventRecords];
+    BroadEventRecord** reversed = new BroadEventRecord*[mNumEventRecords];
     for (int e = 0; e < mNumEventRecords; e++) {
       BroadEventRecord* event = mEventRecords[e];
       if (removing) {
         event->removeTransitionsNotTaken();
       }
       if (!event->isGloballyDisabled() && !event->isOnlySelfloops()) {
-        if (event->reverse()) {
-          mReversedEventRecords[numreversed++] = event;
-          const int numupdates = event->getNumberOfNondeterministicUpdates();
-          if (numupdates > maxupdates) {
-            maxupdates = numupdates;
-          }
+        BroadEventRecord* rev = event->createReversedRecord();
+        reversed[mNumReversedEventRecords++] = rev;
+        const int numupdates = rev->getNumberOfNondeterministicUpdates();
+        if (numupdates > maxupdates) {
+          maxupdates = numupdates;
         }
       }
     }
-    qsort(mReversedEventRecords, numreversed, sizeof(BroadEventRecord*),
+    if (mNumReversedEventRecords < mNumEventRecords) {
+      mReversedEventRecords = new BroadEventRecord*[mNumReversedEventRecords];
+      for (int e = 0; e < mNumReversedEventRecords; e++) {
+        mReversedEventRecords[e] = reversed[e];
+      }
+      delete [] reversed;
+    } else {
+      mReversedEventRecords = reversed;
+    }
+    qsort(mReversedEventRecords, mNumReversedEventRecords,
+          sizeof(BroadEventRecord*),
           BroadEventRecord::compareForBackwardSearch);
     if (maxupdates > mMaxNondeterministicUpdates) {
       mMaxNondeterministicUpdates = maxupdates;
@@ -444,7 +475,8 @@ findEvent(const uint32_t* sourcepacked,
 }
 
 #undef ADD_NEW_STATE_ALLOC
-#undef EXPAND
+#undef EXPAND_FORWARD
+#undef EXPAND_REVERSE
 
 
 void BroadProductExplorer::

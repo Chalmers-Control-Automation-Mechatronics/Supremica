@@ -98,6 +98,7 @@ private:
   //# Data Members
   int mNumEventRecords;
   BroadEventRecord** mEventRecords;
+  int mNumReversedEventRecords;
   BroadEventRecord** mReversedEventRecords;
   int mMaxNondeterministicUpdates;
   NondeterministicTransitionIterator* mNondeterministicTransitionIterators;
