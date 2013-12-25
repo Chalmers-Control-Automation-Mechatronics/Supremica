@@ -418,27 +418,77 @@ setupReverseTransitionRelations()
 }
 
 
-#define ADD_NEW_STATE(source) checkTraceState()
 
 void BroadProductExplorer::
-expandTraceState(const uint32_t* targettuple, const uint32_t* targetpacked)
+expandTraceState(const uint32_t* targettuple,
+                 const uint32_t* targetpacked,
+                 uint32_t level)
 {
   const int numwords = getAutomatonEncoding().getNumberOfSignificantWords();
-  const BroadEventRecord* event;
+  const uint32_t prevLevelStart = getFirstState(level - 1);
+  const uint32_t prevLevelEnd = getFirstState(level);
+  const int prevLevelSize = prevLevelEnd - prevLevelStart;
+  const BroadEventRecord* event = 0;
+  const BroadEventRecord** deferred =
+    new const BroadEventRecord*[mNumReversedEventRecords];
+  uint32_t* sourcetuple = new uint32_t[getNumberOfAutomata()];
   try {
-    int e = -1;
-    do {
-      event = mReversedEventRecords[++e];
+#   define ADD_NEW_STATE(source) {                    \
+      uint32_t found = getStateSpace().find();        \
+      if (found < prevLevelEnd) {                     \
+        setTraceState(found);                         \
+        throw SearchAbort();                          \
+      }                                               \
+    }
+    int numDeferred = 0;
+    for (int e = 0; e < mNumReversedEventRecords; e++) {
+      event = mReversedEventRecords[e];
       const AutomatonRecord* dis = 0;
       FIND_DISABLING_AUTOMATON(targettuple, event, dis);
       if (dis == 0) {
-        EXPAND_ENABLED_TRANSITIONS
-          (numwords, TARGET, targettuple, targetpacked, event);
+        if (event->getFanout(targettuple) <= prevLevelSize) {
+          EXPAND_ENABLED_TRANSITIONS
+            (numwords, TARGET, targettuple, targetpacked, event);
+        } else {
+          // If the event has too many transitions to this state,
+          // do not try to expand. Search later in forward direction,
+          // if really necessary ...
+          deferred[numDeferred++] = event;
+        }
       }
-    } while (true);
+    }
+#   undef ADD_NEW_STATE
+#   define ADD_NEW_STATE(source) {                                      \
+      if (getStateSpace().equalTuples(bufferpacked, targetpacked)) {    \
+        setTraceState(source);                                          \
+        throw SearchAbort();                                            \
+      }                                                                 \
+    }
+    for (uint32_t source = prevLevelStart; source < prevLevelEnd; source++) {
+      uint32_t* sourcepacked = getStateSpace().get(source);
+      getAutomatonEncoding().decode(sourcepacked, sourcetuple);
+      for (int e = 0; e < numDeferred; e++) {
+        event = deferred[e]->getForwardRecord();
+        const AutomatonRecord* dis = 0;
+        FIND_DISABLING_AUTOMATON(sourcetuple, event, dis);
+        if (dis == 0) {
+          EXPAND_ENABLED_TRANSITIONS
+            (numwords, source, sourcetuple, sourcepacked, event);
+        }                                                        
+      }
+    }
+    // We should never get here ...
+    delete [] deferred;
+    delete [] sourcetuple;
   } catch (const SearchAbort& abort) {
     // OK. That's what we have been waiting for.
     setTraceEvent(event);
+    delete [] deferred;
+    delete [] sourcetuple;
+  } catch (...) {
+    delete [] deferred;
+    delete [] sourcetuple;
+    throw;
   }
 }
 

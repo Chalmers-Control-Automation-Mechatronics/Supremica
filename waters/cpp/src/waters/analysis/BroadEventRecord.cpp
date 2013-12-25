@@ -362,6 +362,30 @@ createReversedRecord()
 //############################################################################
 //# BroadEventRecord: Trace Computation
 
+float BroadEventRecord::
+getFanout(const uint32_t* sourcetuple)
+  const
+{
+  if (mNumNondeterministicRecords == 0) {
+    return 1.0f;
+  } else {
+    float result = 1.0f;
+    for (int w = 0; w < mNumberOfWords; w++) {
+      const TransitionUpdateRecord* update = mUpdateRecords[w];
+      if (update != 0) {
+        for (TransitionRecord* trans = update->getTransitionRecords();
+             trans != 0; trans = trans->getNextInUpdate()) {
+          const AutomatonRecord* aut = trans->getAutomaton();
+          int a = aut->getAutomatonIndex();
+          uint32_t s = sourcetuple[a];
+          result *= trans->getNumberOfSuccessors(s);
+        }
+      }           
+    }
+    return result;
+  }
+}
+
 void BroadEventRecord::
 storeNondeterministicTargets(const uint32_t* sourcetuple,
                              const uint32_t* targettuple,

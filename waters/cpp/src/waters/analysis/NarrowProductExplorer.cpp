@@ -489,13 +489,21 @@ setupReverseTransitionRelations()
 }
 
 
-#define ADD_NEW_STATE(source) checkTraceState()
+#define ADD_NEW_STATE(source)                   \
+  uint32_t found = getStateSpace().find();      \
+  if (found < prevLevelEnd) {                   \
+    setTraceState(found);                       \
+    throw SearchAbort();                        \
+  }                                             \
 
 void NarrowProductExplorer::
-expandTraceState(const uint32_t* targettuple, const uint32_t* targetpacked)
+expandTraceState(const uint32_t* targettuple,
+                 const uint32_t* targetpacked,
+                 uint32_t level)
 {
   const uint32_t TAG = NarrowTransitionTable::TAG_END_OF_LIST;
   const uint32_t numaut = getNumberOfAutomata();
+  const uint32_t prevLevelEnd = getFirstState(level);
   uint32_t minevent = UINT32_MAX;
   try {
     EXPAND(TARGET, targettuple, minevent, numaut, TAG);

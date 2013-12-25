@@ -65,6 +65,8 @@ public:
     {return mUsedSearchRecords;}
   inline TransitionUpdateRecord* getTransitionUpdateRecord(int w) const
     {return mUpdateRecords[w];}
+  inline const BroadEventRecord* getForwardRecord() const
+    {return mForwardRecord;}
 
   //##########################################################################
   //# Comparing and Hashing
@@ -93,6 +95,7 @@ public:
 
   //##########################################################################
   //# Trace Computation
+  float getFanout(const uint32_t* sourcetuple) const;
   void storeNondeterministicTargets(const uint32_t* sourcetuple,
 				    const uint32_t* targettuple,
 				    const jni::MapGlue& map) const;
