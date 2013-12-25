@@ -102,9 +102,8 @@ public class SDCTwoAVerifier extends AbstractSDLanguageInclusionChecker
     final SDCTwoPropertyBuilder builder =
       new SDCTwoPropertyBuilder(model, getFactory());
     try {
+      final Collection<EventProxy> hibs = builder.getSDCTwoAEvents();
       if (mSplitting) {
-        final Collection<EventProxy> hibs =
-          SDCTwoPropertyBuilder.getProhibitableEvents(model);
         for (final EventProxy hib : hibs) {
           logHibEvent(hib, hibs);
           final ProductDESProxy convertedModel =
@@ -115,13 +114,13 @@ public class SDCTwoAVerifier extends AbstractSDLanguageInclusionChecker
           }
         }
       } else {
-        final ProductDESProxy convertedModel = builder.createSDCTwoAModel();
+        final ProductDESProxy convertedModel = builder.createSDCTwoAModel(hibs);
         return runChecker(convertedModel);
       }
     } finally {
       tearDown();
     }
-    return true;
+    return setSatisfiedResult();
   }
 
   public EventProxy getFailedProhibitable()

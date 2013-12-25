@@ -9,12 +9,16 @@
 
 package net.sourceforge.waters.analysis.sd;
 
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -29,7 +33,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 /**
  * A converter to translate models for checking SD Controllability Properties
- * II.a and II.b.
+ * II.a and&nbsp;II.b.
  *
  * @author Mahvash Baloch, Robi Malik
  */
@@ -55,6 +59,43 @@ class SDCTwoPropertyBuilder
 
   //#########################################################################
   //# Invocation II.a
+  /**
+   * <P>Computes a set of prohibitable events needed to check SD
+   * Controllability Property&nbsp;II.a.</P>
+   *
+   * <P>Property&nbsp;II.a checks whether it is possible for a prohibitable
+   * event and the <I>tick</I> event to be enabled simultaneously. Yet in many
+   * cases, it can be shown for a prohibitable event&nbsp;<I>e</I> that there
+   * exists an automaton with both <I>e</I> and&nbsp;<I>tick</I> in the
+   * alphabet but without any state that enables both events together. Then
+   * <I>e</I> and&nbsp;<I>tick</I> are exclusive events, and there is no need
+   * to check SD Controllability Property&nbsp;II.a for event&nbsp;<I>e</I>.</P>
+   *
+   * <P>This method returns a list of events that cannot be shown to be
+   * exclusive, and for which a proper check needs to be carried out.</P>
+   */
+  Collection<EventProxy> getSDCTwoAEvents()
+  {
+    createDefaultEvents();
+    final Set<EventProxy> hibSet = new THashSet<>();
+    collectProhibitableEvents(mModel, hibSet);
+    if (hibSet.isEmpty()) {
+      return Collections.emptyList();
+    }
+    for (final AutomatonProxy aut : mModel.getAutomata()) {
+      if (removeNonSDCTwoAEvents(aut, hibSet) && hibSet.isEmpty()) {
+        return Collections.emptyList();
+      }
+    }
+    if (hibSet.size() == 1) {
+      return hibSet;
+    } else {
+      final List<EventProxy> hibList = new ArrayList<>(hibSet);
+      Collections.sort(hibList);
+      return hibList;
+    }
+  }
+
   /**
    * Builds a model for checking SD Controllability Property II.a.
    * The model created by this method contains a single test automaton
@@ -83,25 +124,99 @@ class SDCTwoPropertyBuilder
   /**
    * Builds a model for checking SD Controllability Property II.a.
    * @param  hibEvents  Prohibitable events to be used in the test.
+   */
+  ProductDESProxy createSDCTwoAModel(final Collection<EventProxy> hibEvents)
+  {
+    return createSDCTwoAModel(hibEvents, null);
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods II.a
+  private boolean removeNonSDCTwoAEvents(final AutomatonProxy aut,
+                                         final Set<EventProxy> hibEvents)
+  {
+    final Collection<EventProxy> events = aut.getEvents();
+    final int numEvents = events.size();
+    final TObjectIntHashMap<EventProxy> eventMap =
+      new TObjectIntHashMap<>(numEvents, 0.5f, -1);
+    final EventProxy[] eventArray = new EventProxy[numEvents + 1];
+    boolean hasTick = false;
+    int numHibs = 0;
+    for (final EventProxy event : events) {
+      if (event == mTickEvent) {
+        hasTick = true;
+        eventMap.put(event, 0);
+      } else if (hibEvents.contains(event)) {
+        numHibs++;
+        eventMap.put(event, numHibs);
+        eventArray[numHibs] = event;
+      }
+    }
+    if (!hasTick && numHibs == 0) {
+      return false;
+    }
+    final Collection<StateProxy> states = aut.getStates();
+    final int numStates = states.size();
+    final TObjectIntHashMap<StateProxy> stateMap =
+      new TObjectIntHashMap<>(numStates);
+    int s = 0;
+    for (final StateProxy state : states) {
+      stateMap.put(state, s++);
+    }
+    final boolean[][] enabled = new boolean[numHibs + 1][numStates];
+    boolean tickEnabled = !hasTick;
+    for (final TransitionProxy trans : aut.getTransitions()) {
+      final EventProxy event = trans.getEvent();
+      final int e = eventMap.get(event);
+      if (e >= 0) {
+        final StateProxy source = trans.getSource();
+        s = stateMap.get(source);
+        enabled[e][s] = true;
+        tickEnabled |= event == mTickEvent;
+      }
+    }
+    if (!tickEnabled) {
+      hibEvents.clear();
+      return true;
+    }
+    boolean removed = false;
+    for (int e = 1; e <= numHibs; e++) {
+      boolean exclusive = true;
+      for (s = 0; s < numStates; s++) {
+        if ((!hasTick || enabled[0][s]) && enabled[e][s]) {
+          exclusive = false;
+          break;
+        }
+      }
+      if (exclusive) {
+        final EventProxy event = eventArray[e];
+        hibEvents.remove(event);
+        removed = true;
+      }
+    }
+    return removed;
+  }
+
+  /**
+   * Builds a model for checking SD Controllability Property II.a.
+   * @param  hibEvents  Prohibitable events to be used in the test.
    * @String hibName    Name of a prohibitable event added to model name,
    *                    or <CODE>null</CODE>.
    */
-  ProductDESProxy createSDCTwoAModel(final Collection<EventProxy> hibEvents,
-                                     final String hibName)
+  private ProductDESProxy createSDCTwoAModel
+    (final Collection<EventProxy> hibEvents, final String hibName)
   {
     final Collection<AutomatonProxy> oldAutomata = mModel.getAutomata();
     final int numaut = oldAutomata.size();
-    final List<AutomatonProxy> newAutomata =
-      new ArrayList<AutomatonProxy>(numaut);
+    final List<AutomatonProxy> newAutomata = new ArrayList<>(numaut);
     final Collection<EventProxy> allEvents = mModel.getEvents();
-    final Collection<EventProxy> newEvents =
-      new ArrayList<EventProxy>(allEvents);
-    getDefaultEvents();
-    createEnTickEvent();
-    newEvents.add(mEnTickEvent);
+    final Collection<EventProxy> newEvents = new ArrayList<>(allEvents);
+    createDefaultEvents();
+    createConflictEvents(hibEvents, newEvents);
     for (final AutomatonProxy oldAut : oldAutomata) {
       final AutomatonProxy newAut;
-      newAut = addEnTickTransitions(oldAut);
+      newAut = addConflictTransitions(oldAut, hibEvents);
       newAutomata.add(newAut);
     }
     final AutomatonProxy testAut = createSDCTwoATest(hibEvents);
@@ -120,102 +235,107 @@ class SDCTwoPropertyBuilder
     return newModel;
   }
 
-
-  //#########################################################################
-  //# Auxiliary Methods II.a
   /**
    * Creates the test automaton added to the model to check SD
-   * Controllability Property II.a
-   * @param  hibEvents  Prohibitable events to be used in the test.
+   * Controllability Property&nbsp;II.a. This method creates a one-state
+   * property that disables all conflict events for the given prohibitable
+   * events.
+   * @param  hibEvents  Prohibitable events to be considered in the test.
    */
   private AutomatonProxy createSDCTwoATest
     (final Collection<EventProxy> hibEvents)
   {
-    final Collection<EventProxy> allEvents = mModel.getEvents();
-    final Collection<EventProxy> newEvents = new ArrayList<EventProxy>();
-    final Collection<StateProxy> states = new ArrayList<StateProxy>(2);
-
-    // 1. Create the 2 states needed
-    // State 1
-    final StateProxy initialState =
-      mFactory.createStateProxy("S0", true, null);
-    states.add(initialState);
-    // State 2
-    final StateProxy t2State = mFactory.createStateProxy("S1", false, null);
-    states.add(t2State);
-
-    // 2. Create the transitions needed
-    final Collection<TransitionProxy> transitions =
-      new ArrayList<TransitionProxy>();
-    // Selfloop all non-prohibitable events and the given prohibitable events
-    // on the initial state
-    for (final EventProxy event : allEvents) {
-      if (!isProhibitableEvent(event) &&
-          event.getKind() != EventKind.PROPOSITION) {
-        final TransitionProxy trans =
-          mFactory.createTransitionProxy(initialState, event, initialState);
-        transitions.add(trans);
-        newEvents.add(event);
-      }
+    final int numHibs = hibEvents.size();
+    final Collection<EventProxy> events = new ArrayList<EventProxy>(numHibs);
+    for (final EventProxy hib : hibEvents) {
+      final EventProxy conf = mConflictEvents.get(hib);
+      events.add(conf);
     }
-    for (final EventProxy event : hibEvents) {
-      final TransitionProxy trans =
-        mFactory.createTransitionProxy(initialState, event, initialState);
-      transitions.add(trans);
-    }
-    newEvents.addAll(hibEvents);
-    // The transitions which accept the etick event
-    newEvents.add(mEnTickEvent);
-    final TransitionProxy etickTransition1 =
-      mFactory.createTransitionProxy(initialState, mEnTickEvent, t2State);
-    transitions.add(etickTransition1);
-    final TransitionProxy etickTransition2 =
-      mFactory.createTransitionProxy(t2State, mEnTickEvent, t2State);
-    transitions.add(etickTransition2);
-    // The transitions which accept non-prohibitable events
-    for (final EventProxy event : allEvents) {
-      if (!isProhibitableEvent(event) &&
-          event.getKind() != EventKind.PROPOSITION) {
-        final TransitionProxy trans =
-          mFactory.createTransitionProxy(t2State, event, initialState);
-        transitions.add(trans);
-      }
-    }
-
-    // 3. Create the automaton
-    final AutomatonProxy newTestAut =
-      mFactory.createAutomatonProxy("TestSD2", ComponentKind.PROPERTY,
-                                    newEvents, states, transitions);
-    return newTestAut;
+    final StateProxy state = mFactory.createStateProxy("never", true, null);
+    final Collection<StateProxy> states = Collections.singletonList(state);
+    return
+      mFactory.createAutomatonProxy(":never", ComponentKind.PROPERTY,
+                                    events, states, null);
   }
 
   /**
-   * Creates a an automaton by adding enTick-transitions to all states
-   * with the tick event enabled.
+   * Creates a an automaton by adding conflict-event selfloops to all states
+   * with <I>tick</I> and the corresponding prohibitable event enabled
+   * simultaneously.
    */
-  private AutomatonProxy addEnTickTransitions(final AutomatonProxy aut)
+  private AutomatonProxy addConflictTransitions
+    (final AutomatonProxy aut, final Collection<EventProxy> hibEvents)
   {
     final Collection<EventProxy> allEvents = aut.getEvents();
-    if (!allEvents.contains(mTickEvent)) {
-      return aut;
-    }
-    final Collection<TransitionProxy> allTransitions = aut.getTransitions();
-    final Collection<StateProxy> allStates = aut.getStates();
-    final List<EventProxy> newEvents = new ArrayList<EventProxy>(allEvents);
-    newEvents.add(mEnTickEvent);
-    final List<TransitionProxy> newTransitions =
-      new ArrayList<TransitionProxy>(allTransitions);
-    for (final TransitionProxy transition : allTransitions) {
-      final EventProxy event = transition.getEvent();
+    final int numEvents = allEvents.size();
+    final TObjectIntHashMap<EventProxy> eventMap =
+      new TObjectIntHashMap<>(numEvents, 0.5f, -1);
+    boolean hasTick = false;
+    int numHibs = 0;
+    for (final EventProxy event : allEvents) {
       if (event == mTickEvent) {
-        final StateProxy state = transition.getSource();
-        final TransitionProxy trans =
-          mFactory.createTransitionProxy(state, mEnTickEvent, state);
-        newTransitions.add(trans);
+        hasTick = true;
+        eventMap.put(event, 0);
+      } else if (hibEvents.contains(event)) {
+        numHibs++;
+        eventMap.put(event, numHibs);
       }
     }
-    return mFactory.createAutomatonProxy
-      (aut.getName(), aut.getKind(), newEvents, allStates, newTransitions);
+    if (!hasTick && numHibs == 0) {
+      return aut;
+    }
+    final Collection<StateProxy> allStates = aut.getStates();
+    final Collection<TransitionProxy> allTransitions = aut.getTransitions();
+    final int numStates = allStates.size();
+    final TObjectIntHashMap<StateProxy> stateMap =
+      new TObjectIntHashMap<>(numStates);
+    int s = 0;
+    for (final StateProxy state : allStates) {
+      stateMap.put(state, s++);
+    }
+    final boolean[][] enabled = new boolean[numHibs + 1][numStates];
+    for (final TransitionProxy trans : allTransitions) {
+      final EventProxy event = trans.getEvent();
+      final int e = eventMap.get(event);
+      if (e >= 0) {
+        final StateProxy source = trans.getSource();
+        s = stateMap.get(source);
+        enabled[e][s] = true;
+      }
+    }
+    final boolean[] disabled = new boolean[numHibs + 1];
+    for (int e = 0; e <= numHibs; e++) {
+      for (s = 0; s < numStates; s++) {
+        if (!enabled[e][s]) {
+          disabled[e] = true;
+          break;
+        }
+      }
+    }
+    final List<EventProxy> newEvents = new ArrayList<>(allEvents);
+    final List<TransitionProxy> newTransitions =
+      new ArrayList<>(allTransitions);
+    for (final EventProxy hib : hibEvents) {
+      final int e = eventMap.get(hib);
+      if ((e >= 0 && disabled[e]) || (hasTick && disabled[0])) {
+        final EventProxy conf = mConflictEvents.get(hib);
+        newEvents.add(conf);
+        for (final StateProxy state : allStates) {
+          s = stateMap.get(state);
+          if ((e < 0 || enabled[e][s]) && (!hasTick || enabled[0][s])) {
+            final TransitionProxy trans =
+              mFactory.createTransitionProxy(state, conf, state);
+            newTransitions.add(trans);
+          }
+        }
+      }
+    }
+    if (newEvents.size() == allEvents.size()) {
+      return aut;
+    } else {
+      return mFactory.createAutomatonProxy
+        (aut.getName(), aut.getKind(), newEvents, allStates, newTransitions);
+    }
   }
 
 
@@ -237,7 +357,7 @@ class SDCTwoPropertyBuilder
       new ArrayList<AutomatonProxy>(numaut);
     final Collection<EventProxy> tevents = new ArrayList<EventProxy>(); //total events
 
-    getDefaultEvents();
+    createDefaultEvents();
     mDisabledEvents.clear();
     pCounta = 0;
     for (final AutomatonProxy oldyAut : oldAutomata) {
@@ -281,6 +401,7 @@ class SDCTwoPropertyBuilder
                                           newAutomata);
   }
 
+
   //#########################################################################
   //# Auxiliary Methods
   /**
@@ -295,7 +416,7 @@ class SDCTwoPropertyBuilder
     final List<EventProxy> UpsilonEvents = new ArrayList<EventProxy>();
     final List<EventProxy> SigmaEvents = new ArrayList<EventProxy>();
     final List<EventProxy> propositions = new ArrayList<EventProxy>(1);
-    getDefaultEvents();
+    createDefaultEvents();
 
     for (final EventProxy event : allEvents) {
 
@@ -473,7 +594,7 @@ class SDCTwoPropertyBuilder
 
   //#########################################################################
   //# Event Creation
-  private void getDefaultEvents()
+  private void createDefaultEvents()
   {
     final Collection<EventProxy> allEvents = mModel.getEvents();
     mMarking = null;
@@ -502,12 +623,25 @@ class SDCTwoPropertyBuilder
     }
   }
 
-  private void createEnTickEvent()
+  /**
+   * Creates conflict events for the given prohibitable events.
+   * @param  hibEvents  Prohibitable events to create conflict events for.
+   * @param  alphabet   Created events are added to this collection.
+   * @see #mConflictEvents
+   */
+  private void createConflictEvents(final Collection<EventProxy> hibEvents,
+                                    final Collection<EventProxy> alphabet)
   {
-    final String eEventName = "e:" + TICK_NAME;
-    mEnTickEvent =
-      mFactory.createEventProxy(eEventName, EventKind.CONTROLLABLE, true);
-
+    final int numHibs = hibEvents.size();
+    mConflictEvents = new HashMap<>(numHibs);
+    for (final EventProxy hib : hibEvents) {
+      final String hibName = hib.getName();
+      final String confName = "c:" + TICK_NAME + ":" + hibName;
+      final EventProxy conf =
+        mFactory.createEventProxy(confName, EventKind.CONTROLLABLE, true);
+      mConflictEvents.put(hib, conf);
+      alphabet.add(conf);
+    }
   }
 
   private void createDEvent()
@@ -522,18 +656,28 @@ class SDCTwoPropertyBuilder
   //#########################################################################
   //# Static Methods
   /**
-   * Gets all the prohibitable events that belong to the model.
+   * Gets all the prohibitable events that belong to given model.
    */
   static Collection<EventProxy> getProhibitableEvents(final ProductDESProxy des)
   {
+    final List<EventProxy> hibs = new ArrayList<EventProxy>();
+    collectProhibitableEvents(des, hibs);
+    return hibs;
+  }
+
+  /**
+   * Collects the prohibitable events in the given model to the given
+   * collection.
+   */
+  static void collectProhibitableEvents(final ProductDESProxy des,
+                                        final Collection<EventProxy> hibs)
+  {
     final Collection<EventProxy> allEvents = des.getEvents();
-    final List<EventProxy> hibEvents = new ArrayList<EventProxy>();
     for (final EventProxy event : allEvents) {
       if (isProhibitableEvent(event)) {
-        hibEvents.add(event);
+        hibs.add(event);
       }
     }
-    return hibEvents;
   }
 
   /**
@@ -557,15 +701,11 @@ class SDCTwoPropertyBuilder
 
   //#########################################################################
   //# Data Members
+  private final ProductDESProxyFactory mFactory;
   /**
    * The model which is being changed.
    */
   private final ProductDESProxy mModel;
-
-  private final Map<StateProxy,StateProxy> mStateMap =
-    new HashMap<StateProxy,StateProxy>();
-
-  private final ProductDESProxyFactory mFactory;
   /**
    * The default marking proposition
    */
@@ -575,13 +715,17 @@ class SDCTwoPropertyBuilder
    */
   private EventProxy mTickEvent;
   /**
-   * The event used to signify that the tick event is enabled.
+   * The map to identify conflict events. Map to each prohibitable
+   * event&nbsp;<I>e</I> a conflict event <I>c:tick:e</I>, which is to signify
+   * that <I>e</I> and&nbsp;<I>tick</I> are enabled together.
    */
-  private EventProxy mEnTickEvent;
+  private Map<EventProxy,EventProxy> mConflictEvents;
 
   private EventProxy mDisTickEvent;
   private EventProxy que;
   private final List<EventProxy> mDisabledEvents = new ArrayList<EventProxy>();
+  private final Map<StateProxy,StateProxy> mStateMap =
+    new HashMap<StateProxy,StateProxy>();
   private int pCounta = 0; // Counts for naming disable events
 
 
