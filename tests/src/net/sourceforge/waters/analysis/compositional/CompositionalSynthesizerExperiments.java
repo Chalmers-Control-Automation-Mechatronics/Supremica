@@ -449,7 +449,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
       factory.createParameterBindingProxy("N", expr);
     final List<ParameterBindingProxy> bindings =
       Collections.singletonList(binding);
-    return runModel("handwritten", null, "transferline_uncont.wmod", bindings);
+    return runModel("handwritten", null, "transferline_uncont1.wmod", bindings);
   }
 
 

@@ -935,7 +935,7 @@ public abstract class AbstractControllabilityCheckerTest
     checkTransferline("transferline.wmod",5,true);
   }
 
-  public void testTransferline__uncont() throws Exception
+  public void testTransferlineUncont2__5() throws Exception
   {
     checkTransferline("transferline_uncont2.wmod",5,false);
   }
