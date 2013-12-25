@@ -25,7 +25,7 @@ import net.sourceforge.waters.model.des.SafetyTraceProxy;
  *
  * <P>The check is done by creating a test automaton and modifying plant
  * automata for each prohibitable event in the model, and passing these
- * models to a language inclusion checker</P>
+ * models to a language inclusion checker.</P>
 
  * <P><STRONG>Reference.</STRONG>
  * Mahvash Baloch. A compositional approach for verifying sampled-data
