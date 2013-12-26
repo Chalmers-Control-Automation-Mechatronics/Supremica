@@ -82,10 +82,13 @@ public class ProjectingModelVerifierFactory
   {
     final SafetyVerifier mono =
       new NativeLanguageInclusionChecker(factory);
+    final ModularLanguageInclusionChecker mod =
+      new ModularLanguageInclusionChecker(null, factory, mono);
     final SafetyProjectionBuilder projector = new Projection2(factory);
     final SafetyVerifier cont =
       new ProjectingControllabilityChecker(factory, mono, projector);
-    return new ModularLanguageInclusionChecker(null, factory, cont);
+    mod.setInnerControllabilityChecker(cont);
+    return mod;
   }
 
 

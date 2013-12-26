@@ -35,24 +35,37 @@ abstract class AbstractModularSafetyVerifier
   //#########################################################################
   //# Constructors
   public AbstractModularSafetyVerifier(final ProductDESProxy model,
-                                       final ProductDESProxyFactory factory)
+                                       final ProductDESProxyFactory factory,
+                                       final SafetyVerifier mono)
   {
-    this(model, null, null, factory);
+    this(model, null, null, factory, mono);
   }
 
   public AbstractModularSafetyVerifier(final ProductDESProxy model,
                                        final KindTranslator translator,
                                        final SafetyDiagnostics diag,
-                                       final ProductDESProxyFactory factory)
+                                       final ProductDESProxyFactory factory,
+                                       final SafetyVerifier mono)
   {
     super(model, translator, diag, factory);
+    mMonolithicVerifier = mono;
     mHeuristicMethod = ModularHeuristicFactory.Method.RelMaxCommonEvents;
     mHeuristicPreference = ModularHeuristicFactory.Preference.NOPREF;
   }
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.SafetyVerifier
+  //# Configuration
+  public SafetyVerifier getMonolithicVerifier()
+  {
+    return mMonolithicVerifier;
+  }
+
+  public void setMonolithicVerifier(final SafetyVerifier verifier)
+  {
+    mMonolithicVerifier = verifier;
+  }
+
   public ModularHeuristicFactory.Method getHeuristicMethod()
   {
     return mHeuristicMethod;
@@ -85,7 +98,17 @@ abstract class AbstractModularSafetyVerifier
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @Override
+  public boolean supportsNondeterminism()
+  {
+    return mMonolithicVerifier.supportsNondeterminism();
+  }
+
+
+  //#########################################################################
   //# Data Members
+  private SafetyVerifier mMonolithicVerifier;
   private ModularHeuristicFactory.Method mHeuristicMethod;
   private ModularHeuristicFactory.Preference mHeuristicPreference;
 

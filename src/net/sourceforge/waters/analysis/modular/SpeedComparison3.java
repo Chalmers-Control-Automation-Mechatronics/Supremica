@@ -5,11 +5,11 @@ import java.io.FilenameFilter;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
-import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
@@ -22,14 +22,13 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
-import java.util.Collections;
 
 
 public class SpeedComparison3
 {
   public static List<File> files()
   {
-    List<File> files = new ArrayList<File>();
+    final List<File> files = new ArrayList<File>();
     files.add(new File("examples/waters/tests/profisafe/profisafe_i4_slave.wmod"));
     files.add(new File("examples/waters/tests/profisafe/profisafe_i4_host.wmod"));
     files.add(new File("examples/waters/tests/profisafe/profisafe_o4_slave.wmod"));
@@ -45,10 +44,10 @@ public class SpeedComparison3
     files.add(new File("examples/waters/tests/incremental_suite/verriegel4.wmod"));
     return files;
   }
-  
+
   public static List<File> files2()
   {
-    List<File> files = new ArrayList<File>();
+    final List<File> files = new ArrayList<File>();
     files.add(new File("examples/waters/tests/incremental_suite/tbed_ctct.wmod"));
     files.add(new File("examples/waters/tests/incremental_suite/tbed_nocoll.wmod"));
     files.add(new File("examples/waters/tests/incremental_suite/tbed_noderail.wmod"));
@@ -56,23 +55,24 @@ public class SpeedComparison3
     files.add(new File("examples/waters/tests/incremental_suite/tbed_uncont.wmod"));
     return files;
   }
-  
+
   public static class WFilter
     implements FilenameFilter
   {
-    public boolean accept(File dir, String name)
+    @Override
+    public boolean accept(final File dir, final String name)
     {
       return name.endsWith(".wmod");
     }
   }
-  
-  public static void main(String[] args) throws Exception
+
+  public static void main(final String[] args) throws Exception
   {
     ProductDESProxy model = null; //getCompiledDES(new File("rhone_tough.wmod"), null);
-    ControllabilityChecker nativec = new NativeControllabilityChecker(mProductDESProxyFactory);
-    List<File> files = new ArrayList<File>();
+    final ControllabilityChecker nativec = new NativeControllabilityChecker(mProductDESProxyFactory);
+    final List<File> files = new ArrayList<File>();
     //
-    File dir = new File("/home/darius/Projects/supr/supremica/Supremica/waters/logs/results/samples/maze/NDPRMazeTest/");
+    final File dir = new File("/home/darius/Projects/supr/supremica/Supremica/waters/logs/results/samples/maze/NDPRMazeTest/");
     files.addAll(Arrays.asList(dir.listFiles(new WFilter())));
     Collections.sort(files);
     //dir = new File("examples/waters/tests/profisafe/");
@@ -366,20 +366,23 @@ public class SpeedComparison3
     }
     ps.println();
     pt.println();
-    for (File f : files) {
+    for (final File f : files) {
       model = getCompiledDES(f, null);
       ps.print(model.getName());
       ps.print(",");
       pt.print(model.getName());
       pt.print(",");
       //for (int i = 100; i <= 3200; i *= 2) {
-      int i = 6000;
+      final int i = 6000;
       System.out.println(model.getName());
-        ControllabilityChecker mo = new NDProjectingControllabilityChecker(model, mProductDESProxyFactory,
-                                                                           nativec, false, i);
-        LanguageInclusionChecker lang = new ModularLanguageInclusionChecker(model,
-                                       mProductDESProxyFactory,
-                                       mo);
+      final ControllabilityChecker mo =
+        new NDProjectingControllabilityChecker(model, mProductDESProxyFactory,
+                                               nativec, false, i);
+      final ModularLanguageInclusionChecker lang =
+        new ModularLanguageInclusionChecker(model,
+                                            mProductDESProxyFactory,
+                                            null);
+      lang.setInnerControllabilityChecker(mo);
         mo.setNodeLimit(2000000);
         lang.setNodeLimit(2000000);
         long timeb = 0;
@@ -391,7 +394,7 @@ public class SpeedComparison3
           timea = System.currentTimeMillis();
           ps.print(mo.getAnalysisResult().getTotalNumberOfStates());
           ps.print(",");
-        } catch (Throwable t) {
+        } catch (final Throwable t) {
           timea = System.currentTimeMillis();
           ps.print(",");
         }
@@ -406,7 +409,7 @@ public class SpeedComparison3
     ps.close();
     pt.close();
   }
-  
+
   private static ProductDESProxy getCompiledDES
     (final File filename,
      final List<ParameterBindingProxy> bindings)
@@ -424,18 +427,18 @@ public class SpeedComparison3
       return null;
     }
   }
-  
+
   private static DocumentManager mDocumentManager = new DocumentManager();
   private static ProductDESProxyFactory mProductDESProxyFactory = ProductDESElementFactory.getInstance();
-  
+
   static {
-    ModuleElementFactory mModuleFactory = ModuleElementFactory.getInstance();
+    final ModuleElementFactory mModuleFactory = ModuleElementFactory.getInstance();
     final OperatorTable optable = CompilerOperatorTable.getInstance();
     try {
       final JAXBModuleMarshaller modmarshaller =
         new JAXBModuleMarshaller(mModuleFactory, optable);
       mDocumentManager.registerUnmarshaller(modmarshaller);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
   }
