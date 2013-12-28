@@ -103,7 +103,7 @@ public class EncodingHelper
 		return s;
 	}
 
-	public static String normalize(String input, boolean replacedot)
+	public static String normalize(String input, boolean replacedot, boolean replacelt, boolean replacegt)
 	{
 		String s = input;
 
@@ -131,54 +131,58 @@ public class EncodingHelper
 
 			switch (ch)
 			{
-
-			case '.' :
-			{
-				if (replacedot)
+				case '.' :
 				{
-					str.append("_");
+					if (replacedot)
+					{
+						str.append("_");
+					}
+					else
+					{
+						str.append(".");	// Possible problem here! The dot was hijacked as an operator after this code was written
+					}
+
+					break;
 				}
-				else
+				case '<' :
 				{
-					str.append(".");	// Possible problem here! The dot was hijacked as an operator after this code was written
+					if(replacelt)	// Should be replaced for XML but not for DOT - need better way to adjust this
+						str.append("&lt;");
+					else
+						str.append("<");
+
+					break;
 				}
+				case '>' :
+				{
+					if(replacegt)	// Should be replaced for XML but not for DOT - need better way to adjust this
+						str.append("&gt;");
+					else
+						str.append(">");
 
-				break;
-			}
-			case '<' :
-			{
-				str.append("&lt;");
+					break;
+				}
+				case '&' :
+				{
+					str.append("&amp;");
 
-				break;
-			}
-			case '>' :
-			{
-				str.append("&gt;");
+					break;
+				}
+				case '"' :
+				{
+					str.append("&quot;");
 
-				break;
-			}
-			case '&' :
-			{
-				str.append("&amp;");
-
-				break;
-			}
-			case '"' :
-			{
-				str.append("&quot;");
-
-				break;
-			}
-			case '\r' :
-			case '\n' :
-			{
-
-				// else, default append char
-			}
-			default :
-			{
-				str.append(ch);
-			}
+					break;
+				}
+				case '\r' :
+				case '\n' :
+				{
+					// else, default append char
+				}
+				default :
+				{
+					str.append(ch);
+				}
 			}
 		}
 
@@ -187,6 +191,6 @@ public class EncodingHelper
 
 	public static String normalize(String input)
 	{
-		return EncodingHelper.normalize(input, false);
+		return EncodingHelper.normalize(input, false, true, true);
 	}
 }

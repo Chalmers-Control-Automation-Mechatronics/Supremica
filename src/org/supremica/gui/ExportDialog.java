@@ -39,9 +39,7 @@ public class ExportDialog
 		pane.setWantsInput(true);
 		pane.setSelectionValues(possibleValues);
 		pane.setInitialSelectionValue(possibleValues[0]);
-		pane.setComponentOrientation(((comp == null)
-		? JOptionPane.getRootFrame()
-		: comp).getComponentOrientation());
+		pane.setComponentOrientation(((comp == null) ? JOptionPane.getRootFrame() : comp).getComponentOrientation());
 		pane.selectInitialValue();
 
 		this.checkbox = new JCheckBox("Export to debugview");

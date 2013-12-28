@@ -522,11 +522,15 @@ public abstract class DotViewer
 
 	public void draw()
 	{
-
 		// logger.debug("Before creating panel");
 		// theGraph.printGraph(System.err);
 		viewerPanel = new GrappaPanel(theGraph);
-
+		//** MF Note that there is some bug in Grappa (I think)
+		//** MF that sometimes throws a NullPointerException here
+		//** MF GrappaPanel, line 109: this.graph = subgraph.getGraph();
+		//** MF where "subgraph" is theGraph passed from here
+		//** MF Things seem to work anyway, though...
+		
 		viewerPanel.setScaleToFit(false);
 		viewerPanel.multiplyScaleFactor(scaleFactor);
 

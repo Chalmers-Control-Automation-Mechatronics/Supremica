@@ -127,8 +127,8 @@ public class EditorReadSpecAction
         final ExpressionParser parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
 
         HashSet<String> currGuards = new HashSet<String>();
-            for(final AbstractSubject simSubj: module.getComponentListModifiable())
-            {
+        for(final AbstractSubject simSubj: module.getComponentListModifiable())
+        {
                 if(simSubj instanceof SimpleComponentSubject)
                 {
 					StringBuilder guardB = new StringBuilder();
@@ -186,6 +186,16 @@ public class EditorReadSpecAction
 							if(guardB.length() == 0) guardB.append(TRUE_GUARD); //MF
 //                            System.out.println("final:"+finalGuard);
 
+							// Replace any ".curr" by "_curr"
+							final String CURR = ".curr";	// This is problematic, "." is interpreted as a namespace delimiter
+							final String FIXX = "_curr";
+							final int SIZEOF_FIXX = FIXX.length();
+							
+							int curr_index = finalGuardB.indexOf(CURR);
+							if(curr_index != -1) finalGuardB.replace(curr_index, curr_index+SIZEOF_FIXX, FIXX);
+							curr_index = guardB.indexOf(CURR);
+							if(curr_index != -1) guardB.replace(curr_index, curr_index+SIZEOF_FIXX, FIXX);
+							
                             ses = (SimpleExpressionSubject)(parser.parse(finalGuardB.toString(), Operator.TYPE_BOOLEAN));
                             //The following line cocerns the new guards that will be attached to the automata with a DIFFERENT COLOR!
 
@@ -226,8 +236,8 @@ public class EditorReadSpecAction
 						finalGuardB.setLength(0);
                     }
                 }
-            }
         }
-//    }
+	}
+
 
 }

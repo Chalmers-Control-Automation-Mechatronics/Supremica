@@ -244,7 +244,7 @@ public class AutomatonToDot
             
             if (withLabel)
             {
-                pw.print(EncodingHelper.normalize(sourceState.getName(), false));
+                pw.print(EncodingHelper.normalize(sourceState.getName(), false, false, false));
             }
             
             pw.println("\"" + getStateColor(sourceState) + "]; ");
@@ -309,7 +309,7 @@ public class AutomatonToDot
                             is_obs = true;
                         }
                         
-                        pw.print(EncodingHelper.normalize(thisEvent.getLabel(), false));
+                        pw.print(EncodingHelper.normalize(thisEvent.getLabel(), false, false, false));
                         
                         if (arcIt.hasNext())
                         {

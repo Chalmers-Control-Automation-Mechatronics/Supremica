@@ -2,6 +2,7 @@ package org.supremica.gui;
 
 
 // This is good, enum, not integer constants!
+//** MF Not good! Should be objects of the various classes...
 public enum ExportFormat
 {
 	UNKNOWN, XML, DOT, DSX, HTML, XML_DEBUG,
