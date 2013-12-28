@@ -1,7 +1,7 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.gui,actions
+//# PROJECT: Waters GUI
+//# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   AnalyzeLanguageInclusionAction
 //###########################################################################
 //# $Id$

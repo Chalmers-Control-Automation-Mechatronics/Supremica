@@ -49,19 +49,18 @@ public class ModularControllabilityChecker
   //#########################################################################
   //# Constructors
   public ModularControllabilityChecker(final ProductDESProxyFactory factory,
-                                       final SafetyVerifier checker)
+                                       final SafetyVerifier secondary)
   {
-    this(null, factory, checker, false);
+    this(null, factory, secondary, false);
   }
 
   public ModularControllabilityChecker(final ProductDESProxy model,
                                        final ProductDESProxyFactory factory,
-                                       final SafetyVerifier checker,
+                                       final SafetyVerifier secondary,
                                        final boolean least)
   {
-    super(model, factory);
+    super(model, factory, secondary);
     setKindTranslator(ControllabilityKindTranslator.getInstance());
-    mChecker = checker;
     mStates = 0;
     mLeast = least;
   }
@@ -69,16 +68,25 @@ public class ModularControllabilityChecker
 
   //#########################################################################
   //# Invocation
+  @Override
+  protected void setUp() throws AnalysisException
+  {
+    super.setUp();
+    final SafetyVerifier mono = getMonolithicVerifier();
+    mono.setNodeLimit(getNodeLimit());
+    mStates = 0;
+  }
+
+  @Override
   public boolean run()
     throws AnalysisException
   {
     setUp();
-    mStates = 0;
-    mChecker.setNodeLimit(getNodeLimit());
     final Set<AutomatonProxy> plants = new HashSet<AutomatonProxy>();
     final Set<AutomatonProxy> specplants = new HashSet<AutomatonProxy>();
     final SortedSet<AutomatonProxy> specs =
       new TreeSet<AutomatonProxy>(new Comparator<AutomatonProxy>() {
+      @Override
       public int compare(final AutomatonProxy a1, final AutomatonProxy a2)
       {
         if (a1.getStates().size() < a2.getStates().size()) {
@@ -119,6 +127,7 @@ public class ModularControllabilityChecker
       }
     }
 
+    final SafetyVerifier mono = getMonolithicVerifier();
     while (!specs.isEmpty()) {
       final Collection<AutomatonProxy> composition = new ArrayList<AutomatonProxy>();
       final Set<EventProxy> events = new HashSet<EventProxy>();
@@ -134,14 +143,16 @@ public class ModularControllabilityChecker
       uncomposedspecs.remove(spec);
       ProductDESProxy comp =
         getFactory().createProductDESProxy("comp", events, composition);
-      mChecker.setModel(comp);
-      mChecker.setKindTranslator(new KindTranslator()
+      mono.setModel(comp);
+      mono.setKindTranslator(new KindTranslator()
       {
+        @Override
         public EventKind getEventKind(final EventProxy e)
         {
           return getKindTranslator().getEventKind(e);
         }
 
+        @Override
         public ComponentKind getComponentKind(final AutomatonProxy a)
         {
           return specs.contains(a) ? ComponentKind.SPEC
@@ -149,17 +160,17 @@ public class ModularControllabilityChecker
         }
       });
       final ModularHeuristic heuristic = getHeuristic();
-      while (!mChecker.run()) {
-        mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
+      while (!mono.run()) {
+        mStates += mono.getAnalysisResult().getTotalNumberOfStates();
         final Collection<AutomatonProxy> newComp =
           heuristic.heur(comp,
                          uncomposedplants,
                          uncomposedspecplants,
                          uncomposedspecs,
-                         mChecker.getCounterExample());
+                         mono.getCounterExample());
         if (newComp == null) {
           final ProductDESProxyFactory factory = getFactory();
-          final SafetyTraceProxy trace = mChecker.getCounterExample();
+          final SafetyTraceProxy trace = mono.getCounterExample();
           final SafetyTraceProxy extended =
             heuristic.extendTrace(factory, trace, automata);
           return setFailedResult(extended);
@@ -172,9 +183,9 @@ public class ModularControllabilityChecker
           events.addAll(automaton.getEvents());
         }
         comp = getFactory().createProductDESProxy("comp", events, composition);
-        mChecker.setModel(comp);
+        mono.setModel(comp);
       }
-      mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
+      mStates += mono.getAnalysisResult().getTotalNumberOfStates();
       for (final AutomatonProxy automaton : composition) {
         if (specs.contains(automaton)) {
           specs.remove(automaton);
@@ -184,14 +195,6 @@ public class ModularControllabilityChecker
     }
     setSatisfiedResult();
     return true;
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
-  public boolean supportsNondeterminism()
-  {
-    return mChecker.supportsNondeterminism();
   }
 
 
@@ -227,6 +230,7 @@ public class ModularControllabilityChecker
   private final static class AutomatonComparator
     implements Comparator<AutomatonProxy>
   {
+    @Override
     public int compare(final AutomatonProxy a1, final AutomatonProxy a2)
     {
       return a1.getName().compareTo(a2.getName());
@@ -236,7 +240,6 @@ public class ModularControllabilityChecker
 
   //#########################################################################
   //# Data Members
-  private final SafetyVerifier mChecker;
   private int mStates;
   private final boolean mLeast;
 

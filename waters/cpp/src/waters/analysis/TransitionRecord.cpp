@@ -44,9 +44,10 @@ const TransitionRecordAccessorForTrace TransitionRecord::theTraceAccessor;
 TransitionRecord::
 TransitionRecord(const AutomatonRecord* aut,
                  TransitionRecord* next,
-                 TransitionRecord* fwd)
+                 const TransitionRecord* fwd)
   : mAutomaton(aut),
     mWeight(0),
+    mIsReversedCopy(false),
     mIsOnlySelfloops(true),
     mNumNondeterministicSuccessors(0),
     mNondeterministicBuffer(0),
@@ -59,31 +60,39 @@ TransitionRecord(const AutomatonRecord* aut,
   const uint32_t numstates = aut->getNumberOfStates();
   mFlags = new uint32_t[numstates];
   mDeterministicSuccessorsShifted = new uint32_t[numstates];
-  if (fwd == 0) {
-    mForwardRecord = this;
-    for (uint32_t code = 0; code < numstates; code++) {
-      mFlags[code] = 0;
-      mDeterministicSuccessorsShifted[code] = NO_TRANSITION;
-    }
-  } else {
-    mForwardRecord = fwd;
-    for (uint32_t code = 0; code < numstates; code++) {
-      mFlags[code] = fwd->mFlags[code];
-      mDeterministicSuccessorsShifted[code] = NO_TRANSITION;
-    }
+  for (uint32_t code = 0; code < numstates; code++) {
+    mFlags[code] = fwd == 0 ? 0 : fwd->mFlags[code];
+    mDeterministicSuccessorsShifted[code] = NO_TRANSITION;
   }
+}
+
+TransitionRecord::
+TransitionRecord(const TransitionRecord& fwd)
+  : mAutomaton(fwd.mAutomaton),
+    mWeight(fwd.mWeight),
+    mIsReversedCopy(true),
+    mIsOnlySelfloops(fwd.mIsOnlySelfloops),
+    mFlags(fwd.mFlags),
+    mDeterministicSuccessorsShifted(fwd.mDeterministicSuccessorsShifted),
+    mNumNondeterministicSuccessors(fwd.mNumNondeterministicSuccessors),
+    mNondeterministicBuffer(fwd.mNondeterministicBuffer),
+    mNondeterministicSuccessorsShifted(fwd.mNondeterministicSuccessorsShifted),
+    mNumNotTaken(fwd.mNumNotTaken),
+    mNextInSearch(0),
+    mNextInUpdate(0),
+    mNextInNotTaken(0)
+{
 }
 
 TransitionRecord::
 ~TransitionRecord()
 {
-  delete[] mFlags;
-  delete[] mDeterministicSuccessorsShifted;
-  delete[] mNumNondeterministicSuccessors;
-  delete[] mNondeterministicBuffer;
-  delete[] mNondeterministicSuccessorsShifted;
-  if (mForwardRecord != this) {
-    delete mForwardRecord;
+  if (!mIsReversedCopy) {
+    delete[] mFlags;
+    delete[] mDeterministicSuccessorsShifted;
+    delete[] mNumNondeterministicSuccessors;
+    delete[] mNondeterministicBuffer;
+    delete[] mNondeterministicSuccessorsShifted;
   }
   delete mNextInSearch;
 }
@@ -390,18 +399,13 @@ storeNondeterministicTarget(const uint32_t* sourcetuple,
                             const jni::MapGlue& statemap)
   const
 {
-  if (mForwardRecord != this) {
-    mForwardRecord->storeNondeterministicTarget
-      (sourcetuple, targettuple, statemap);
-  } else {
-    const uint32_t index = mAutomaton->getAutomatonIndex();
-    const uint32_t source = sourcetuple[index];
-    if (mFlags[source] & FLAG_NONDET) {
-      const uint32_t target = targettuple[index];
-      const jni::StateGlue& state = mAutomaton->getJavaState(target);
-      const jni::AutomatonGlue& aut = mAutomaton->getJavaAutomaton();
-      statemap.put(&aut, &state);
-    }
+  const uint32_t index = mAutomaton->getAutomatonIndex();
+  const uint32_t source = sourcetuple[index];
+  if (mFlags[source] & FLAG_NONDET) {
+    const uint32_t target = targettuple[index];
+    const jni::StateGlue& state = mAutomaton->getJavaState(target);
+    const jni::AutomatonGlue& aut = mAutomaton->getJavaAutomaton();
+    statemap.put(&aut, &state);
   }
 }
 

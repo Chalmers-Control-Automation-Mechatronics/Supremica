@@ -30,6 +30,11 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import net.sourceforge.waters.analysis.annotation.BiSimulatorLanguage;
+import net.sourceforge.waters.analysis.annotation.CertainDeath;
+import net.sourceforge.waters.analysis.annotation.RemoveAllTau;
+import net.sourceforge.waters.analysis.annotation.TauLoopRemoval;
+import net.sourceforge.waters.analysis.annotation.TransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -46,11 +51,6 @@ import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.analysis.annotation.BiSimulatorLanguage;
-import net.sourceforge.waters.analysis.annotation.CertainDeath;
-import net.sourceforge.waters.analysis.annotation.RemoveAllTau;
-import net.sourceforge.waters.analysis.annotation.TauLoopRemoval;
-import net.sourceforge.waters.analysis.annotation.TransitionRelation;
 
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
@@ -82,7 +82,7 @@ public class NDProjectingControllabilityChecker
                                             final ControllabilityChecker checker,
                                             final boolean least, final int maxsize)
   {
-    super(model, factory);
+    super(model, factory, checker);
     setKindTranslator(ControllabilityKindTranslator.getInstance());
     setHeuristicMethod(ModularHeuristicFactory.Method.MaxCommonEvents);
     setHeuristicPreference
@@ -226,6 +226,7 @@ public class NDProjectingControllabilityChecker
   }*/
 
 
+  @Override
   public boolean run()
     throws AnalysisException
   {
@@ -296,11 +297,13 @@ public class NDProjectingControllabilityChecker
     checker.setNodeLimit(getNodeLimit());
     checker.setKindTranslator(new KindTranslator()
     {
+      @Override
       public EventKind getEventKind(final EventProxy e)
       {
         return getKindTranslator().getEventKind(e);
       }
 
+      @Override
       public ComponentKind getComponentKind(final AutomatonProxy a)
       {
         return specs.contains(a) ? ComponentKind.SPEC : ComponentKind.PLANT;
@@ -330,6 +333,7 @@ public class NDProjectingControllabilityChecker
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @Override
   public boolean supportsNondeterminism()
   {
     return false;
@@ -339,6 +343,7 @@ public class NDProjectingControllabilityChecker
   //#########################################################################
   //# Overrides for Abstract Base Class
   //# net.sourceforge.waters.model.analysis.AbstractModelVerifier
+  @Override
   public void setNodeLimit(final int limit)
   {
     super.setNodeLimit(limit);
@@ -888,11 +893,13 @@ public class NDProjectingControllabilityChecker
         return events;
       }
 
+      @Override
       public int compareTo(final Place other)
       {
         return other.mIndex - mIndex;
       }
 
+      @Override
       public int hashCode()
       {
         int hash = 7;
@@ -901,6 +908,7 @@ public class NDProjectingControllabilityChecker
         return hash;
       }
 
+      @Override
       public boolean equals(final Object o)
       {
         final Place p = (Place) o;
@@ -924,11 +932,13 @@ public class NDProjectingControllabilityChecker
         mHash = hash;
       }
 
+      @Override
       public int hashCode()
       {
         return mHash;
       }
 
+      @Override
       public boolean equals(final Object other)
       {
         if (other != null && other.getClass() == getClass()) {
@@ -952,6 +962,7 @@ public class NDProjectingControllabilityChecker
       mHidden = hidden;
     }
 
+    @Override
     public int hashCode()
     {
       int code = 31 + mAutomata.hashCode();
@@ -959,6 +970,7 @@ public class NDProjectingControllabilityChecker
       return code;
     }
 
+    @Override
     public boolean equals(final Object o)
     {
       if (o instanceof AutomataHidden) {
@@ -972,6 +984,7 @@ public class NDProjectingControllabilityChecker
   private static class AutomataComparator
     implements Comparator<SortedSet<AutomatonProxy>>
   {
+    @Override
     public int compare(final SortedSet<AutomatonProxy> s1, final SortedSet<AutomatonProxy> s2)
     {
       if (s1.size() < s2.size()) {
@@ -1005,6 +1018,7 @@ public class NDProjectingControllabilityChecker
       mSize = size;
     }
 
+    @Override
     public int compareTo(final Tuple t)
     {
       if (mSize < t.mSize) {

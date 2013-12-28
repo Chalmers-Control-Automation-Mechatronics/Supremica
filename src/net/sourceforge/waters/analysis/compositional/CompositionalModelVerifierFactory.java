@@ -19,8 +19,6 @@ import net.sourceforge.waters.model.analysis.CommandLineArgumentString;
 import net.sourceforge.waters.model.analysis.EnumFactory;
 import net.sourceforge.waters.model.analysis.des.AbstractModelVerifierFactory;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
-import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
-import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -518,7 +516,6 @@ public class CompositionalModelVerifierFactory
   private static class SecondaryFactoryArgument
     extends CommandLineArgumentChain
   {
-
     //#######################################################################
     //# Constructors
     private SecondaryFactoryArgument()
@@ -531,25 +528,17 @@ public class CompositionalModelVerifierFactory
     @Override
     public void configure(final ModelVerifier verifier)
     {
-      final ProductDESProxyFactory desFactory = verifier.getFactory();
-      final ModelVerifierFactory secondaryFactory = getSecondaryFactory();
-      final ModelVerifier secondaryVerifier;
-      if (verifier instanceof CompositionalConflictChecker) {
-        secondaryVerifier = secondaryFactory.createConflictChecker(desFactory);
-      } else if (verifier instanceof CompositionalLanguageInclusionChecker) {
-        secondaryVerifier =
-          secondaryFactory.createLanguageInclusionChecker(desFactory);
+      if (verifier instanceof CompositionalConflictChecker ||
+          verifier instanceof CompositionalLanguageInclusionChecker) {
+        final ModelVerifier secondaryVerifier =
+          createSecondaryVerifier(verifier);
+        final AbstractCompositionalModelVerifier composer =
+          (AbstractCompositionalModelVerifier) verifier;
+        composer.setMonolithicVerifier(secondaryVerifier);
       } else {
-        fail("Unsupported compositional verifier class " +
-             ProxyTools.getShortClassName(verifier) + "!");
-        return;
+        failUnsupportedVerifierClass(verifier);
       }
-      final AbstractCompositionalModelVerifier composer =
-        (AbstractCompositionalModelVerifier) verifier;
-      composer.setMonolithicVerifier(secondaryVerifier);
-      secondaryFactory.configure(secondaryVerifier);
     }
-
   }
 
 }

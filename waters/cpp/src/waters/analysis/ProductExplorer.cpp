@@ -100,7 +100,6 @@ ProductExplorer(const jni::ProductDESProxyFactoryGlue& factory,
     mTraceEvent(0),
     mTraceAutomaton(0),
     mTraceState(UINT32_MAX),
-    mTraceLimit(UINT32_MAX),
     mJavaTraceEvent(0, cache),
     mJavaTraceAutomaton(0, cache),
     mJavaTraceState(0, cache),
@@ -355,31 +354,31 @@ teardown()
 }
 
 
-#define DO_REACHABILITY                                         \
-  {                                                             \
+#define DO_REACHABILITY                                           \
+  {                                                               \
     uint32_t nextlevel = mNumStates;                              \
     uint32_t current = 0;                                         \
-    uint32_t* currenttuple = new uint32_t[mNumAutomata];            \
-    try {                                                       \
-      while (current < mNumStates) {                            \
-        checkAbort();                                           \
+    uint32_t* currenttuple = new uint32_t[mNumAutomata];          \
+    try {                                                         \
+      while (current < mNumStates) {                              \
+        checkAbort();                                             \
         uint32_t* currentpacked = mStateSpace->get(current);      \
-        mEncoding->decode(currentpacked, currenttuple);         \
-        if (!EXPAND(current, currenttuple, currentpacked)) {    \
-          mTraceState = current;                                \
-          delete [] currenttuple;                               \
-          return false;                                         \
-        } else if (++current == nextlevel) {                    \
-          nextlevel = mNumStates;                               \
-          mDepthMap->add(nextlevel);                            \
-        }                                                       \
-      }                                                         \
-      delete [] currenttuple;                                   \
-      return true;                                              \
-    } catch (...) {                                             \
-      delete [] currenttuple;                                   \
-      throw;                                                    \
-    }                                                           \
+        mEncoding->decode(currentpacked, currenttuple);           \
+        if (!EXPAND(current, currenttuple, currentpacked)) {      \
+          mTraceState = current;                                  \
+          delete [] currenttuple;                                 \
+          return false;                                           \
+        } else if (++current == nextlevel) {                      \
+          nextlevel = mNumStates;                                 \
+          mDepthMap->add(nextlevel);                              \
+        }                                                         \
+      }                                                           \
+      delete [] currenttuple;                                     \
+      return true;                                                \
+    } catch (...) {                                               \
+      delete [] currenttuple;                                     \
+      throw;                                                      \
+    }                                                             \
   }
 
 #define EXPAND(source, sourcetuple, sourcepacked) \
@@ -484,7 +483,7 @@ doNonblockingCoreachabilitySearch()
 void ProductExplorer::
 computeCounterExample(const jni::ListGlue& list, uint32_t level)
 {
-  if (level > 0) {
+  if (mReverseTransitionStore == 0 && level > 0) {
     setupReverseTransitionRelations();
   }
   uint32_t* buffers = new uint32_t[2 * mNumAutomata];
@@ -496,10 +495,16 @@ computeCounterExample(const jni::ListGlue& list, uint32_t level)
     mEncoding->decode(targetpacked, targettuple);
     while (level > 0) {
       checkAbort();
-      mTraceLimit = mDepthMap->get(level);
-      expandTraceState(targettuple, targetpacked);
+      if (mReverseTransitionStore == 0) {
+        expandTraceState(targettuple, targetpacked, level);
+      } else {
+        mTraceState = mReverseTransitionStore->getFirstPredecessor(mTraceState);
+      }
       uint32_t* sourcepacked = mStateSpace->get(mTraceState);
       mEncoding->decode(sourcepacked, sourcetuple);
+      if (mReverseTransitionStore != 0) {
+        mTraceEvent = findEvent(sourcepacked, sourcetuple, targetpacked);
+      }
       storeNondeterministicTargets(sourcetuple, targettuple, statemap);
       const jni::EventGlue& event = mTraceEvent->getJavaEvent();
       jni::TraceStepGlue step =
@@ -587,7 +592,7 @@ storeInitialStates(bool initzero, bool donondet)
   {                                                                     \
     EXPAND(target, targettuple, targetpacked);                          \
     while (mDFSStackPos > 0) {                                          \
-      uint32_t popped = mDFSStack[--mDFSStackPos];                        \
+      uint32_t popped = mDFSStack[--mDFSStackPos];                      \
       UNPACK(popped, targetpacked);                                     \
       EXPAND(popped, targettuple, targetpacked);                        \
     }                                                                   \
@@ -597,9 +602,9 @@ storeInitialStates(bool initzero, bool donondet)
 
 #define EXPAND(target, targettuple, targetpacked)                       \
   {                                                                     \
-    uint32_t iter = mReverseTransitionStore->iterator(target);            \
+    uint32_t iter = mReverseTransitionStore->iterator(target);          \
     while (mReverseTransitionStore->hasNext(iter)) {                    \
-      uint32_t source = mReverseTransitionStore->next(iter);              \
+      uint32_t source = mReverseTransitionStore->next(iter);            \
       VISIT(source);                                                    \
     }                                                                   \
   }
@@ -607,10 +612,10 @@ storeInitialStates(bool initzero, bool donondet)
 #define VISIT(source)                                                   \
   {                                                                     \
     checkAbort();                                                       \
-    uint32_t* sourcepacked = mStateSpace->get(source);                    \
+    uint32_t* sourcepacked = mStateSpace->get(source);                  \
     if (!mEncoding->hasTag(sourcepacked, TAG_COREACHABLE)) {            \
       mEncoding->setTag(sourcepacked, TAG_COREACHABLE);                 \
-      if (mNumCoreachableStates != UINT32_MAX &&                      \
+      if (mNumCoreachableStates != UINT32_MAX &&                        \
           ++mNumCoreachableStates == mNumStates) {                      \
         throw SearchAbort();                                            \
       } else if (mDFSStackPos < mDFSStackSize) {                        \
@@ -662,16 +667,6 @@ checkCoreachabilityState()
 #undef EXPAND
 #undef UNPACK
 #undef VISIT
-
-void ProductExplorer::
-checkTraceState()
-{
-  uint32_t found = mStateSpace->find();
-  if (found < mTraceLimit) {
-    mTraceState = found;
-    throw SearchAbort();
-  }
-}
 
 uint32_t ProductExplorer::
 getDepth(uint32_t state)

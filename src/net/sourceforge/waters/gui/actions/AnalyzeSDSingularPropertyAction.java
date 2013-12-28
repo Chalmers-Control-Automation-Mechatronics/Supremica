@@ -10,7 +10,7 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import net.sourceforge.waters.analysis.sd.SDSingularPropertyVerifier;
+import net.sourceforge.waters.analysis.sd.SDSingularProhibitableBehaviorVerifier;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
@@ -45,8 +45,8 @@ public class AnalyzeSDSingularPropertyAction extends WatersAnalyzeAction
         factory.createLanguageInclusionChecker(desFactory);
 
 
-        final SDSingularPropertyVerifier verifier =
-        new SDSingularPropertyVerifier(Checker,null, desFactory);
+        final SDSingularProhibitableBehaviorVerifier verifier =
+        new SDSingularProhibitableBehaviorVerifier(Checker,null, desFactory);
     return verifier;
   }
 

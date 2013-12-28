@@ -160,32 +160,32 @@ public abstract class AbstractLargeControllabilityCheckerTest
   //# Test Cases -- Parameterised
   public void testTransferline__6() throws Exception
   {
-    checkTransferline(6);
+    checkTransferline("transferline.wmod",6,true);
   }
 
   public void testTransferline__7() throws Exception
   {
-    checkTransferline(7);
+    checkTransferline("transferline.wmod",7,true);
   }
 
   public void testTransferline__8() throws Exception
   {
-    checkTransferline(8);
+    checkTransferline("transferline.wmod",8,true);
   }
 
   public void testTransferline__9() throws Exception
   {
-    checkTransferline(9);
+    checkTransferline("transferline.wmod",9,true);
   }
 
   public void testTransferline__10() throws Exception
   {
-    checkTransferline(10);
+    checkTransferline("transferline.wmod",10,true);
   }
 
   public void testTransferline__20() throws Exception
   {
-    checkTransferline(20);
+    checkTransferline("transferline.wmod",20,true);
   }
 
 }

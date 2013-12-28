@@ -76,6 +76,13 @@ EventRecord(jni::EventGlue event, bool controllable)
 {
 }
 
+EventRecord::
+EventRecord(const EventRecord& record)
+  : mJavaEvent(record.mJavaEvent),
+    mIsControllable(record.mIsControllable)
+{
+}
+
 
 //############################################################################
 //# EventRecord: Simple Access

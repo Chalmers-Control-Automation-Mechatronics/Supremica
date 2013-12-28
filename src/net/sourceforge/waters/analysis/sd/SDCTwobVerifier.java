@@ -65,8 +65,8 @@ public class SDCTwobVerifier extends AbstractSDConflictChecker
         return setSatisfiedResult();
       }
 
-      final SD_Two_PropertyBuilder builder =
-        new SD_Two_PropertyBuilder(model, getFactory());
+      final SDCTwoPropertyBuilder builder =
+        new SDCTwoPropertyBuilder(model, getFactory());
 
 
       ProductDESProxy convertedModel = null;

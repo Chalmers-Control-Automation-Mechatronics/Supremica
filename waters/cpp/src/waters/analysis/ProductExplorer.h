@@ -143,12 +143,17 @@ protected:
   virtual bool expandSafetyState
     (const uint32_t* sourcetuple, const uint32_t* sourcepacked) = 0;
   virtual bool expandNonblockingReachabilityState
-    (uint32_t source, const uint32_t* sourcetuple, const uint32_t* sourcepacked) = 0;
+    (uint32_t source, const uint32_t* sourcetuple,
+     const uint32_t* sourcepacked) = 0;
   virtual void expandNonblockingCoreachabilityState
     (const uint32_t* targettuple, const uint32_t* targetpacked) = 0;
   virtual void setupReverseTransitionRelations() = 0;
   virtual void expandTraceState
-    (const uint32_t* targettuple, const uint32_t* targetpacked) = 0;
+  (const uint32_t* targettuple, const uint32_t* targetpacked,
+   uint32_t level) = 0;
+  virtual const EventRecord* findEvent
+    (const uint32_t* sourcetuple, const uint32_t* sourcepacked,
+     const uint32_t* targetpacked) = 0;
   virtual void storeNondeterministicTargets
     (const uint32_t* sourcetuple, const uint32_t* targettuple,
      const jni::MapGlue& map) = 0;
@@ -157,7 +162,7 @@ protected:
   void exploreNonblockingCoreachabilityStateDFS
     (uint32_t* targettuple, uint32_t* targetpacked);
   void checkCoreachabilityState();
-  void checkTraceState();
+  uint32_t getFirstState(uint32_t level) const {return mDepthMap->get(level);}
   uint32_t getDepth(uint32_t state) const;
 
   inline void checkAbort() const {if (mIsAbortRequested) doAbort();}
@@ -219,7 +224,6 @@ private:
   const EventRecord* mTraceEvent;
   const AutomatonRecord* mTraceAutomaton;
   uint32_t mTraceState;
-  uint32_t mTraceLimit;
   jni::EventGlue mJavaTraceEvent;
   jni::AutomatonGlue mJavaTraceAutomaton;
   jni::StateGlue mJavaTraceState;

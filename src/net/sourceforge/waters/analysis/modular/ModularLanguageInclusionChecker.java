@@ -14,10 +14,7 @@ import gnu.trove.set.hash.THashSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -64,68 +61,115 @@ public class ModularLanguageInclusionChecker
   //#########################################################################
   //# Constructor
   public ModularLanguageInclusionChecker(final ProductDESProxyFactory factory,
-                                         final SafetyVerifier checker)
+                                         final SafetyVerifier mono)
   {
-    this(null, factory, checker);
+    this(null, factory, mono);
   }
 
   public ModularLanguageInclusionChecker(final ProductDESProxy model,
                                          final ProductDESProxyFactory factory,
-                                         final SafetyVerifier checker)
+                                         final SafetyVerifier mono)
   {
     super(model,
           LanguageInclusionKindTranslator.getInstance(),
           LanguageInclusionDiagnostics.getInstance(),
-          factory);
-    mChecker = checker;
+          factory,
+          mono);
     mStates = 0;
     setNodeLimit(10000000);
   }
 
 
   //#########################################################################
+  //# Configuration
+  SafetyVerifier getInnerControllabilityChecker()
+  {
+    return mConfiguredControllabilityChecker;
+  }
+
+  void setInnerControllabilityChecker(final SafetyVerifier inner)
+  {
+    mConfiguredControllabilityChecker = inner;
+  }
+
+
+  //#########################################################################
   //# Invocation
+  @Override
+  protected void setUp() throws AnalysisException
+  {
+    super.setUp();
+    if (mConfiguredControllabilityChecker == null) {
+      final ProductDESProxyFactory factory = getFactory();
+      final SafetyVerifier mono = getMonolithicVerifier();
+      mUsedControllabilityChecker =
+        new ModularControllabilityChecker(null, factory, mono, false);
+    } else {
+      mUsedControllabilityChecker = mConfiguredControllabilityChecker;
+    }
+    mStates = 0;
+  }
+
+  @Override
   public boolean run()
     throws AnalysisException
-  {
+    {
     setUp();
-    mStates = 0;
-    final List<AutomatonProxy> properties = new ArrayList<AutomatonProxy>();
-    final Set<AutomatonProxy> automata =
-      new HashSet<AutomatonProxy>(getModel().getAutomata().size());
-    final KindTranslator translator = getKindTranslator();
-    for (final AutomatonProxy automaton : getModel().getAutomata()) {
-      switch (translator.getComponentKind(automaton)) {
-      case PLANT:
-        automata.add(automaton);
-        break;
-      case SPEC:
-        properties.add(automaton);
-        break;
-      default:
-        break;
+    try {
+      final List<AutomatonProxy> properties = new ArrayList<>();
+      final List<AutomatonProxy> automata =
+        new ArrayList<>(getModel().getAutomata().size());
+      final KindTranslator translator = getKindTranslator();
+      for (final AutomatonProxy aut : getModel().getAutomata()) {
+        switch (translator.getComponentKind(aut)) {
+        case PLANT:
+          automata.add(aut);
+          break;
+        case SPEC:
+          properties.add(aut);
+          break;
+        default:
+          break;
+        }
       }
-    }
-    Collections.sort(properties, new AutomatonComparator());
-    for (final AutomatonProxy p : properties) {
-      automata.add(p);
-      final ProductDESProxy model =
-        getFactory().createProductDESProxy("prop", getModel().getEvents(),
-                                           automata);
-      mChecker.setModel(model);
-      final KindTranslator chain =
-        new ChainKindTranslator(translator, properties);
-      mChecker.setKindTranslator(chain);
-      mChecker.setNodeLimit(getNodeLimit() - mStates);
-      if (!mChecker.run()) {
-        mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
-        return setFailedResult(mChecker.getCounterExample(), p);
+      Collections.sort(properties);
+      final int propIndex = automata.size();
+      final ProductDESProxyFactory factory = getFactory();
+      final Collection<EventProxy> events = getModel().getEvents();
+      final String modelName = getModel().getName();
+      for (final AutomatonProxy prop : properties) {
+        automata.add(prop);
+        final String name = modelName + "-" + prop.getName();
+        final String comment = "Automatically generated to check property '" +
+          prop.getName() + "' of model '" + modelName + "'.";
+        final ProductDESProxy model =
+          factory.createProductDESProxy(name, comment, null, events, automata);
+        mUsedControllabilityChecker.setModel(model);
+        final KindTranslator chain =
+          new ChainKindTranslator(translator, properties);
+        mUsedControllabilityChecker.setKindTranslator(chain);
+        mUsedControllabilityChecker.setNodeLimit(getNodeLimit() - mStates);
+        final boolean satisfied = mUsedControllabilityChecker.run();
+        final VerificationResult result =
+          mUsedControllabilityChecker.getAnalysisResult();
+        mStates += result.getTotalNumberOfStates();
+        if (!satisfied) {
+          return setFailedResult
+            (mUsedControllabilityChecker.getCounterExample(), prop);
+        }
+        automata.remove(propIndex);
       }
-      mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
-      automata.remove(p);
+      return setSatisfiedResult();
+    } finally {
+      tearDown();
     }
-    setSatisfiedResult();
-    return true;
+  }
+
+  @Override
+  protected void tearDown()
+  {
+    mUsedControllabilityChecker = null;
+    super.tearDown();
   }
 
   @Override
@@ -134,14 +178,6 @@ public class ModularLanguageInclusionChecker
     super.addStatistics();
     final VerificationResult result = getAnalysisResult();
     result.setNumberOfStates(mStates);
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
-  public boolean supportsNondeterminism()
-  {
-    return mChecker.supportsNondeterminism();
   }
 
 
@@ -166,18 +202,6 @@ public class ModularLanguageInclusionChecker
 
 
   //#########################################################################
-  //# Inner Class AutomatonComparator
-  private final static class AutomatonComparator
-    implements Comparator<AutomatonProxy>
-  {
-    public int compare(final AutomatonProxy a1, final AutomatonProxy a2)
-    {
-      return a1.getName().compareTo(a2.getName());
-    }
-  }
-
-
-  //#########################################################################
   //# Inner Class ChainKindTranslator
   private static class ChainKindTranslator implements KindTranslator
   {
@@ -193,6 +217,7 @@ public class ModularLanguageInclusionChecker
 
     //#######################################################################
     //# Inner Class ChainKindTranslator
+    @Override
     public ComponentKind getComponentKind(final AutomatonProxy aut)
     {
       if (mProperties.contains(aut)) {
@@ -202,6 +227,7 @@ public class ModularLanguageInclusionChecker
       }
     }
 
+    @Override
     public EventKind getEventKind(final EventProxy event)
     {
       final EventKind kind = mMaster.getEventKind(event);
@@ -222,7 +248,8 @@ public class ModularLanguageInclusionChecker
 
   //#########################################################################
   //# Data Members
-  private final SafetyVerifier mChecker;
+  private SafetyVerifier mConfiguredControllabilityChecker;
+  private SafetyVerifier mUsedControllabilityChecker;
   private int mStates;
 
 }

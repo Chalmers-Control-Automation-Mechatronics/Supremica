@@ -60,7 +60,9 @@ public:
   //##########################################################################
   //# Hash Methods
   virtual uint64_t hash(int32_t key) const;
-  virtual bool equals(int32_t key1, int32_t key2) const;
+  bool equals(int32_t key1, int32_t key2) const;
+  virtual bool equalTuples(const uint32_t* tuple1,
+			   const uint32_t* tuple2) const;
   virtual int32_t getKey(int32_t value) const {return value;}
 
 private:
@@ -96,7 +98,8 @@ public:
   //##########################################################################
   //# Hash Methods
   virtual uint64_t hash(int32_t key) const;
-  virtual bool equals(int32_t key1, int32_t key2) const;
+  virtual bool equalTuples(const uint32_t* tuple1,
+			   const uint32_t* tuple2) const;
 
 private:
   //##########################################################################

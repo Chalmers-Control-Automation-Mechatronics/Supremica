@@ -70,12 +70,16 @@ protected:
   virtual bool expandSafetyState
     (const uint32_t* sourcetuple, const uint32_t* sourcepacked);
   virtual bool expandNonblockingReachabilityState
-    (uint32_t source, const uint32_t* sourcetuple, const uint32_t* sourcepacked);
+    (uint32_t source, const uint32_t* sourcetuple,
+     const uint32_t* sourcepacked);
   virtual void expandNonblockingCoreachabilityState
     (const uint32_t* targettuple, const uint32_t* targetpacked);
   virtual void setupReverseTransitionRelations();
   virtual void expandTraceState
-    (const uint32_t* targettuple,	const uint32_t* targetpacked);
+    (const uint32_t* targettuple, const uint32_t* targetpacked, uint32_t level);
+  virtual const EventRecord* findEvent
+    (const uint32_t* sourcetuple, const uint32_t* sourcepacked,
+     const uint32_t* targetpacked);
   virtual void storeNondeterministicTargets
     (const uint32_t* sourcetuple, const uint32_t* targettuple,
      const jni::MapGlue& statemap);

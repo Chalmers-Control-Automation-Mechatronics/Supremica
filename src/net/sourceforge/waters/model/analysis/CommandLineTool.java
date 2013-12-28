@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
@@ -23,9 +24,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.hisc.AbstractSICConflictChecker;
-import net.sourceforge.waters.analysis.hisc.SICProperty5Verifier;
-import net.sourceforge.waters.analysis.hisc.SICProperty6Verifier;
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
@@ -100,7 +98,7 @@ public class CommandLineTool
       final ExpressionParser parser =
         new ExpressionParser(moduleFactory, optable);
       List<ParameterBindingProxy> bindings = null;
-      ModelVerifier wrapper = null;
+      String wrapperName = null;
 
       final String factoryname = args[0];
       final List<String> argList = new LinkedList<String>();
@@ -110,10 +108,8 @@ public class CommandLineTool
           argList.add(arg);
         } else if (arg.equals("-q") || arg.equals("-quiet")) {
           verbose = false;
-        } else if (arg.equals("-sic5")) {
-          wrapper = new SICProperty5Verifier(desFactory);
-        } else if (arg.equals("-sic6")) {
-          wrapper = new SICProperty6Verifier(desFactory);
+        } else if (arg.equals("-wrapper") && i + 1 < args.length) {
+          wrapperName = args[++i];
         } else if (arg.equals("-stats")) {
           stats = true;
         } else if (arg.equals("-timeout") && i + 1 < args.length) {
@@ -178,30 +174,35 @@ public class CommandLineTool
       docManager.registerUnmarshaller(importer);
 
       final Iterator<String> iter = argList.iterator();
-      final String checkname = iter.next();
+      final String checkName = iter.next();
       iter.remove();
 
       final Class<?> fclazz = loader.loadClass(factoryname);
       final Method getinst = fclazz.getMethod("getInstance");
       final ModelVerifierFactory factory =
         (ModelVerifierFactory) getinst.invoke(null);
-      final String createname = "create" + checkname + "Checker";
+      final String createname = "create" + checkName + "Checker";
       final Method getcheck =
         fclazz.getMethod(createname, ProductDESProxyFactory.class);
       final ModelVerifier checker =
         (ModelVerifier) getcheck.invoke(factory, desFactory);
-      final boolean noPropositions = !(checker instanceof ConflictChecker);
-      if (wrapper == null) {
+      final ModelVerifier wrapper;
+      final boolean keepPropositions;
+      if (wrapperName == null) {
         wrapper = checker;
-      } else if (checker instanceof ConflictChecker) {
-        final AbstractSICConflictChecker wwrapper =
-          (AbstractSICConflictChecker) wrapper;
-        final ConflictChecker cchecker = (ConflictChecker) checker;
-        wwrapper.setConflictChecker(cchecker);
+        keepPropositions = checker instanceof ConflictChecker;
       } else {
-        CommandLineArgument.fail
-          ("SIC property check requires a conflict checker, " +
-           "but none was configured.");
+        @SuppressWarnings("unchecked")
+        final Class<ModelVerifier> clazz =
+          (Class<ModelVerifier>) loader.loadClass(wrapperName);
+        final Package pack = CommandLineTool.class.getPackage();
+        final String ifaceName =
+          pack.getName() + ".des." + checkName + "Checker";
+        final Class<?> iface = loader.loadClass(ifaceName);
+        final Constructor<ModelVerifier> constructor =
+          clazz.getConstructor(iface, ProductDESProxyFactory.class);
+        wrapper = constructor.newInstance(checker, desFactory);
+        keepPropositions = true;
       }
       final Collection<String> empty = Collections.emptyList();
       final Iterator<String> argIter = argList.iterator();
@@ -223,7 +224,7 @@ public class CommandLineTool
           final ModuleProxy module = (ModuleProxy) doc;
           final ModuleCompiler compiler =
             new ModuleCompiler(docManager, desFactory, module);
-          if (noPropositions) {
+          if (!keepPropositions) {
             compiler.setEnabledPropositionNames(empty);
           }
           factory.configure(compiler);

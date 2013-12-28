@@ -62,6 +62,7 @@ BroadProductExplorer(const jni::ProductDESProxyFactoryGlue& factory,
   : ProductExplorer(factory, des, translator, premarking, marking, cache),
     mNumEventRecords(0),
     mEventRecords(0),
+    mNumReversedEventRecords(0),
     mReversedEventRecords(0),
     mMaxNondeterministicUpdates(0),
     mNondeterministicTransitionIterators(0),
@@ -72,6 +73,10 @@ BroadProductExplorer(const jni::ProductDESProxyFactoryGlue& factory,
 BroadProductExplorer::
 ~BroadProductExplorer()
 {
+  for (int i = 0; i < mNumReversedEventRecords; i++) {
+    delete mReversedEventRecords[i];
+  }
+  delete [] mReversedEventRecords;
   for (int i = 0; i < mNumEventRecords; i++) {
     delete mEventRecords[i];
   }
@@ -105,11 +110,16 @@ setup()
 void BroadProductExplorer::
 teardown()
 {
+  for (int i = 0; i < mNumReversedEventRecords; i++) {
+    delete mReversedEventRecords[i];
+  }
+  mNumReversedEventRecords = 0;
   for (int i = 0; i < mNumEventRecords; i++) {
     delete mEventRecords[i];
   }
   mNumEventRecords = 0;
   delete [] mEventRecords;
+  delete [] mReversedEventRecords;
   mEventRecords = mReversedEventRecords = 0;
   delete [] mNondeterministicTransitionIterators;
   mNondeterministicTransitionIterators = 0;
@@ -121,10 +131,23 @@ teardown()
 // but inlining this code is 15% faster than using method calls.
 // ~~~Robi
 
-#define EXPAND(numwords, source, sourcetuple, sourcepacked)             \
+#define EXPAND_FORWARD(numwords, source, sourcetuple, sourcepacked)     \
   {                                                                     \
     for (int e = 0; e < mNumEventRecords; e++) {                        \
       BroadEventRecord* event = mEventRecords[e];                       \
+      const AutomatonRecord* dis = 0;                                   \
+      FIND_DISABLING_AUTOMATON(sourcetuple, event, dis);                \
+      if (dis == 0) {                                                   \
+        EXPAND_ENABLED_TRANSITIONS                                      \
+          (numwords, source, sourcetuple, sourcepacked, event);         \
+      }                                                                 \
+    }                                                                   \
+  }
+
+#define EXPAND_REVERSE(numwords, source, sourcetuple, sourcepacked)     \
+  {                                                                     \
+    for (int e = 0; e < mNumReversedEventRecords; e++) {                \
+      BroadEventRecord* event = mReversedEventRecords[e];               \
       const AutomatonRecord* dis = 0;                                   \
       FIND_DISABLING_AUTOMATON(sourcetuple, event, dis);                \
       if (dis == 0) {                                                   \
@@ -301,7 +324,7 @@ expandNonblockingReachabilityState(uint32_t source,
   if (getTransitionLimit() > 0) {
 #   define ADD_TRANSITION addCoreachabilityTransition
 #   define ADD_TRANSITION_ALLOC ADD_TRANSITION
-    EXPAND(numwords, source, sourcetuple, sourcepacked);
+    EXPAND_FORWARD(numwords, source, sourcetuple, sourcepacked);
 #   undef ADD_TRANSITION
 #   undef ADD_TRANSITION_ALLOC
   } else {
@@ -320,7 +343,7 @@ expandNonblockingReachabilityState(uint32_t source,
         markedoff = event;                                              \
       }                                                                 \
     }
-    EXPAND(numwords, source, sourcetuple, sourcepacked);
+    EXPAND_FORWARD(numwords, source, sourcetuple, sourcepacked);
 #   undef ADD_TRANSITION
 #   undef ADD_TRANSITION_ALLOC
   }
@@ -345,158 +368,10 @@ expandNonblockingCoreachabilityState(const uint32_t* targettuple,
                                      const uint32_t* targetpacked)
 {
   const int numwords = getAutomatonEncoding().getNumberOfSignificantWords();
-  EXPAND(numwords, TARGET, targettuple, targetpacked);
+  EXPAND_REVERSE(numwords, TARGET, targettuple, targetpacked);
 }
 
 #undef ADD_NEW_STATE
-
-
-/*
-void BroadProductExplorer::
-doIterativeTarjan(uint32_t start)
-{
-  TarjanControlStack controlStack;
-  TarjanStateStack stateStack;
-  uint32_t* currenttuple = new uint32_t[mNumAutomata];
-  uint32_t succ = UINT32_MAX;
-
-
-  storeTarjanIndex(start);
-  controlStack.push(start);
-
-  while (!controlStack.isEmpty()) {
-    TarjanStackFrame& frame = controlStack.top();
-    uint32_t current = frame.getStateCode();
-    uint32_t* currentpacked = mStateSpace->get(current);
-    getAutomatonEncoding().decode(currentpacked, currenttuple);
-    uint32_t currentindex = getTarjanIndex(current);
-    while (true) {
-      if (frame.hasNondeterministicIterators()) {
-        uint32_t first = frame.getFirstNondeterministicSuccessor();
-        uint32_t* succpacked = getStateSpace().prepare(first);
-        if (frame.advanceNondeterministicTransitionIterators(succpacked)) {
-          succ = getStateSpace().add();
-        } else {
-          continue;
-        }
-      } else {
-        int e = frame.getEventCode();
-        AutomatonRecord* dis = 0;
-        while (e < mNumEventRecords) {
-          BroadEventRecord* event = mEventRecords[e];
-          const AutomatonRecord* dis = 0;
-          FIND_DISABLING_AUTOMATON(currenttuple, event, dis);
-          if (dis != 0) {
-            break;
-          }
-          e++;
-        }
-        if (dis == 0) {
-          succ = UINT32_MAX;
-        } else {
-          uint32_t* succpacked = getStateSpace().prepare();
-          if (event->isDeterministic()) {
-            for (int w = 0; w < numwords; w++) {
-              TransitionUpdateRecord* update =
-                event->getTransitionUpdateRecord(w);
-              if (update == 0) {
-                succpacked[w] = currentpacked[w];
-              } else {
-                uint32_t word = (sourcepacked[w] & update->getKeptMask()) |
-                  update->getCommonTargets();
-                for (TransitionRecord* trans = update->getTransitionRecords();
-                     trans != 0;
-                     trans = trans->getNextInUpdate()) {
-                  const AutomatonRecord* aut = trans->getAutomaton();
-                  const int a = aut->getAutomatonIndex();
-                  const uint32_t source = sourcetuple[a];
-                  word |= trans->getDeterministicSuccessorShifted(source);
-                }
-                succpacked[w] = word;
-              }
-            }
-            succ = getStateSpace().add();
-          } else { // nondeterministic event
-            for (int w = 0; w < numwords; w++) {
-              TransitionUpdateRecord* update =
-                event->getTransitionUpdateRecord(w);
-              if (update == 0) {                                        
-                succpacked[w] = sourcepacked[w];                      
-              } else {                                                  
-                uint32_t word = (sourcepacked[w] & update->getKeptMask()) |
-                  update->getCommonTargets(); 
-                for (TransitionRecord* trans = update->getTransitionRecords();
-                     trans != 0;                                        
-                     trans = trans->getNextInUpdate()) {                
-                  const AutomatonRecord* aut = trans->getAutomaton();
-                  const int a = aut->getAutomatonIndex();
-                  const uint32_t source = sourcetuple[a];
-                  uint32_t succ =
-                    trans->getDeterministicSuccessorShifted(source); 
-                  if (succ == TransitionRecord::MULTIPLE_TRANSITIONS) {
-                    frame.createNondeterministicTransitionIterators
-                      (mMaxNondeterministicUpdates);
-                    succ = frame.setupNondeterministicTransitionIterator
-                      (trans, source);
-                  }                         
-                  word |= succ;             
-                }                           
-                succpacked[w] = word;       
-              }                             
-            }
-            succ = getStateSpace().add();
-            frame.setFirstNondeterministicSuccessor(succ);
-          }
-        }
-      }
-      if (succ == UINT32_MAX) {
-        // All successors have been processed---
-        // complete the visit() method, then return.
-        if (frame.isRoot()) {
-          setInComponent(current);
-          while (!stateStack.isEmpty()) {
-            uint32_t next = stateStack.top();
-            if (currentindex <= getTarjanIndex(next)) {
-              stateStack.pop();
-              setTarjanIndex(next, currentindex);
-              setInComponent(next);
-            } else {
-              break;
-            }
-          }
-        } else {
-          stateStack.push(current);
-        }
-        controlStack.pop();
-        if (!inComponent(current)) {
-          TarjanStackFrame& parentframe = controlStack.top();
-          uint32_t parent = parentframe.getStateCode();
-          uint32_t parentindex = getTarjanIndex(current);
-          if (currentindex < parentindex) {
-            setTarjanIndex(parent, currentindex);
-            parentframe.setRoot(false);
-          }
-        }
-        break;
-      } else if (getTarjanIndex(succ) == 0) {
-        // We have got an unvisited successor to visit recursively.
-        frame.setEventCode(e);
-        controlStack.push(succ);
-        // TODO-visit uncontrollable successors of succ
-        break;
-      } else if (!inComponent(succ)) {
-        // Skip the recursive call because the successor was visited already.
-        uint32_t succindex = getTarjanIndex(succ);
-        if (succindex < currentindex) {
-          currentindex = succindex;
-          setTarjanIndex(current, currentindex);
-          frame.setRoot(false);
-        }
-      }
-    }
-  }
-}
-*/
 
 
 void BroadProductExplorer::
@@ -505,25 +380,33 @@ setupReverseTransitionRelations()
   if (mReversedEventRecords == 0) {
     bool removing =
       getMode() == EXPLORER_MODE_NONBLOCKING && getTransitionLimit() == 0;
-    int numreversed = 0;
     int maxupdates = 0;
-    mReversedEventRecords = new BroadEventRecord*[mNumEventRecords];
+    BroadEventRecord** reversed = new BroadEventRecord*[mNumEventRecords];
     for (int e = 0; e < mNumEventRecords; e++) {
       BroadEventRecord* event = mEventRecords[e];
       if (removing) {
         event->removeTransitionsNotTaken();
       }
       if (!event->isGloballyDisabled() && !event->isOnlySelfloops()) {
-        if (event->reverse()) {
-          mReversedEventRecords[numreversed++] = event;
-          const int numupdates = event->getNumberOfNondeterministicUpdates();
-          if (numupdates > maxupdates) {
-            maxupdates = numupdates;
-          }
+        BroadEventRecord* rev = event->createReversedRecord();
+        reversed[mNumReversedEventRecords++] = rev;
+        const int numupdates = rev->getNumberOfNondeterministicUpdates();
+        if (numupdates > maxupdates) {
+          maxupdates = numupdates;
         }
       }
     }
-    qsort(mReversedEventRecords, numreversed, sizeof(BroadEventRecord*),
+    if (mNumReversedEventRecords < mNumEventRecords) {
+      mReversedEventRecords = new BroadEventRecord*[mNumReversedEventRecords];
+      for (int e = 0; e < mNumReversedEventRecords; e++) {
+        mReversedEventRecords[e] = reversed[e];
+      }
+      delete [] reversed;
+    } else {
+      mReversedEventRecords = reversed;
+    }
+    qsort(mReversedEventRecords, mNumReversedEventRecords,
+          sizeof(BroadEventRecord*),
           BroadEventRecord::compareForBackwardSearch);
     if (maxupdates > mMaxNondeterministicUpdates) {
       mMaxNondeterministicUpdates = maxupdates;
@@ -535,33 +418,115 @@ setupReverseTransitionRelations()
 }
 
 
-#define ADD_NEW_STATE(source) checkTraceState()
 
 void BroadProductExplorer::
-expandTraceState(const uint32_t* targettuple, const uint32_t* targetpacked)
+expandTraceState(const uint32_t* targettuple,
+                 const uint32_t* targetpacked,
+                 uint32_t level)
+{
+  const int numwords = getAutomatonEncoding().getNumberOfSignificantWords();
+  const uint32_t prevLevelStart = getFirstState(level - 1);
+  const uint32_t prevLevelEnd = getFirstState(level);
+  const int prevLevelSize = prevLevelEnd - prevLevelStart;
+  const BroadEventRecord* event = 0;
+  const BroadEventRecord** deferred =
+    new const BroadEventRecord*[mNumReversedEventRecords];
+  uint32_t* sourcetuple = new uint32_t[getNumberOfAutomata()];
+  try {
+#   define ADD_NEW_STATE(source) {                    \
+      uint32_t found = getStateSpace().find();        \
+      if (found < prevLevelEnd) {                     \
+        setTraceState(found);                         \
+        throw SearchAbort();                          \
+      }                                               \
+    }
+    int numDeferred = 0;
+    for (int e = 0; e < mNumReversedEventRecords; e++) {
+      event = mReversedEventRecords[e];
+      const AutomatonRecord* dis = 0;
+      FIND_DISABLING_AUTOMATON(targettuple, event, dis);
+      if (dis == 0) {
+        if (event->getFanout(targettuple) <= prevLevelSize) {
+          EXPAND_ENABLED_TRANSITIONS
+            (numwords, TARGET, targettuple, targetpacked, event);
+        } else {
+          // If the event has too many transitions to this state,
+          // do not try to expand. Search later in forward direction,
+          // if really necessary ...
+          deferred[numDeferred++] = event;
+        }
+      }
+    }
+#   undef ADD_NEW_STATE
+#   define ADD_NEW_STATE(source) {                                      \
+      if (getStateSpace().equalTuples(bufferpacked, targetpacked)) {    \
+        setTraceState(source);                                          \
+        throw SearchAbort();                                            \
+      }                                                                 \
+    }
+    for (uint32_t source = prevLevelStart; source < prevLevelEnd; source++) {
+      uint32_t* sourcepacked = getStateSpace().get(source);
+      getAutomatonEncoding().decode(sourcepacked, sourcetuple);
+      for (int e = 0; e < numDeferred; e++) {
+        event = deferred[e]->getForwardRecord();
+        const AutomatonRecord* dis = 0;
+        FIND_DISABLING_AUTOMATON(sourcetuple, event, dis);
+        if (dis == 0) {
+          EXPAND_ENABLED_TRANSITIONS
+            (numwords, source, sourcetuple, sourcepacked, event);
+        }                                                        
+      }
+    }
+    // We should never get here ...
+    delete [] deferred;
+    delete [] sourcetuple;
+  } catch (const SearchAbort& abort) {
+    // OK. That's what we have been waiting for.
+    setTraceEvent(event);
+    delete [] deferred;
+    delete [] sourcetuple;
+  } catch (...) {
+    delete [] deferred;
+    delete [] sourcetuple;
+    throw;
+  }
+}
+
+#undef ADD_NEW_STATE
+
+
+#define ADD_NEW_STATE(source)                                    \
+  if (getStateSpace().equalTuples(bufferpacked, targetpacked)) { \
+    throw SearchAbort();                                         \
+  }
+
+const EventRecord* BroadProductExplorer::
+findEvent(const uint32_t* sourcepacked,
+          const uint32_t* sourcetuple,
+          const uint32_t* targetpacked)
 {
   const int numwords = getAutomatonEncoding().getNumberOfSignificantWords();
   const BroadEventRecord* event;
   try {
     int e = -1;
     do {
-      event = mReversedEventRecords[++e];
+      event = mEventRecords[++e];
       const AutomatonRecord* dis = 0;
-      FIND_DISABLING_AUTOMATON(targettuple, event, dis);
+      FIND_DISABLING_AUTOMATON(sourcetuple, event, dis);
       if (dis == 0) {
         EXPAND_ENABLED_TRANSITIONS
-          (numwords, TARGET, targettuple, targetpacked, event);
+          (numwords, SOURCE, sourcetuple, sourcepacked, event);
       }
     } while (true);
   } catch (const SearchAbort& abort) {
     // OK. That's what we have been waiting for.
-    setTraceEvent(event);
+    return event;
   }
 }
 
-#undef ADD_NEW_STATE
 #undef ADD_NEW_STATE_ALLOC
-#undef EXPAND
+#undef EXPAND_FORWARD
+#undef EXPAND_REVERSE
 
 
 void BroadProductExplorer::

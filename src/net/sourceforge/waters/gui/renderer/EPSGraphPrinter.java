@@ -102,7 +102,7 @@ public class EPSGraphPrinter extends Renderer
     final Color color = mGraphics.getColor();
     gen.useColor(color);
     final Font font = mGraphics.getFont();
-    final String name = font.isItalic() ? "/Helvetica-Italic" : "/Helvetica";
+    final String name = font.isItalic() ? "/Helvetica-Oblique" : "/Helvetica";
     final int size = font.getSize();
     gen.useFont(name, size);
     gen.writeln("gsave");

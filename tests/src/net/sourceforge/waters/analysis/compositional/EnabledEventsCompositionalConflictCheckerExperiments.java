@@ -616,7 +616,7 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
     final List<ParameterBindingProxy> bindings =
       Collections.singletonList(binding);
     final long start = System.currentTimeMillis();
-    runModel("handwritten", null, "transferline_uncont.wmod",false, bindings);
+    runModel("handwritten", null, "transferline_uncont1.wmod",false, bindings);
     final long stop = System.currentTimeMillis();
     @SuppressWarnings("resource")
     final Formatter formatter = new Formatter(System.out);

@@ -47,6 +47,7 @@ public:
   explicit BroadEventRecord(jni::EventGlue event,
 			    bool controllable,
 			    int numwords);
+  explicit BroadEventRecord(const BroadEventRecord& fwd);
   virtual ~BroadEventRecord();
 
   //##########################################################################
@@ -64,6 +65,8 @@ public:
     {return mUsedSearchRecords;}
   inline TransitionUpdateRecord* getTransitionUpdateRecord(int w) const
     {return mUpdateRecords[w];}
+  inline const BroadEventRecord* getForwardRecord() const
+    {return mForwardRecord;}
 
   //##########################################################################
   //# Comparing and Hashing
@@ -85,13 +88,14 @@ public:
   void setupNotTakenSearchRecords();
   void markTransitionsTaken(const uint32_t* tuple);
   int removeTransitionsNotTaken();
-  bool reverse();
+  BroadEventRecord* createReversedRecord() const;
 
   inline void markTransitionsTakenFast(const uint32_t* tuple)
     {if (mNotTakenSearchRecords) markTransitionsTaken(tuple);}
 
   //##########################################################################
   //# Trace Computation
+  float getFanout(const uint32_t* sourcetuple) const;
   void storeNondeterministicTargets(const uint32_t* sourcetuple,
 				    const uint32_t* targettuple,
 				    const jni::MapGlue& map) const;
@@ -106,7 +110,7 @@ private:
   //##########################################################################
   //# Auxiliary Methods
   void relink(TransitionRecord* trans);
-  void addReversedList(TransitionRecord* trans);
+  void addReversedList(const TransitionRecord* trans);
   void enqueueSearchRecord(TransitionRecord* trans);
   void clearSearchAndUpdateRecords();
   void storeNondeterministicTargets(TransitionRecord* trans,
@@ -128,6 +132,7 @@ private:
   TransitionRecord* mNonSelfloopingRecord;
   TransitionUpdateRecord** mUpdateRecords;
   float mProbability;
+  const BroadEventRecord* mForwardRecord;
 };
 
 }   /* namespace waters */

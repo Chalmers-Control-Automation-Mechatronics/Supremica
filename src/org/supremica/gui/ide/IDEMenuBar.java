@@ -37,7 +37,6 @@ import net.sourceforge.waters.gui.actions.AnalyzeSDCThree_one_propertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDCTwoApropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDCTwoBPropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDControllabilityAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDNSLActivityLoopAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDPlantCompletenessAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDSingularPropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSICProperty5Action;
@@ -378,41 +377,38 @@ public class IDEMenuBar extends JMenuBar
             actions.getAction(AnalyzeHISCCPControllabilityAction.class);
           mVerifyMenu.add(hiscco);
         }
-	    if (Config.GUI_ANALYZER_INCLUDE_SD.isTrue()) {
-           mVerifyMenu.addSeparator();
-           final Action plantComplete =
-           actions.getAction(AnalyzeSDPlantCompletenessAction.class);
-            mVerifyMenu.add(plantComplete);
-           final Action activityLoop =
-           actions.getAction(AnalyzeSDActivityLoopAction.class);
-            mVerifyMenu.add(activityLoop);
-            final Action nslactivityLoop =
-                actions.getAction(AnalyzeSDNSLActivityLoopAction.class);
-                 mVerifyMenu.add(nslactivityLoop);
-            final Action SSingular =
-              actions.getAction(AnalyzeSDSingularPropertyAction.class);
-            mVerifyMenu.add(SSingular);
-            final Action Sdone =
-              actions.getAction(AnalyzeSDControllabilityAction.class);
-            mVerifyMenu.add(Sdone);
-            final Action Sdtwoa =
-              actions.getAction(AnalyzeSDCTwoApropertyAction.class);
-            mVerifyMenu.add(Sdtwoa);
-            final Action Sdtwob =
-              actions.getAction(AnalyzeSDCTwoBPropertyAction.class);
-            mVerifyMenu.add(Sdtwob);
-            final Action Sdthree1 =
-              actions.getAction(AnalyzeSDCThree_one_propertyAction.class);
-            mVerifyMenu.add(Sdthree1);
-                        final Action SDthree2 =
-                actions.getAction(AnalyzeNerodeEquivalentAction.class);
-              mVerifyMenu.add(SDthree2);
-            final Action Sdfour =
-              actions.getAction(AnalyzeSDCFourPropertyAction.class);
-            mVerifyMenu.add(Sdfour);
-            final Action PTimeBeh =
-              actions.getAction(AnalyzeProperTimeBehaviorPropertyAction.class);
-            mVerifyMenu.add(PTimeBeh);
+        if (Config.GUI_ANALYZER_INCLUDE_SD.isTrue()) {
+          mVerifyMenu.addSeparator();
+          final Action plantComplete =
+            actions.getAction(AnalyzeSDPlantCompletenessAction.class);
+          mVerifyMenu.add(plantComplete);
+          final Action activityLoop =
+            actions.getAction(AnalyzeSDActivityLoopAction.class);
+          mVerifyMenu.add(activityLoop);
+          final Action SSingular =
+            actions.getAction(AnalyzeSDSingularPropertyAction.class);
+          mVerifyMenu.add(SSingular);
+          final Action Sdone =
+            actions.getAction(AnalyzeSDControllabilityAction.class);
+          mVerifyMenu.add(Sdone);
+          final Action Sdtwoa =
+            actions.getAction(AnalyzeSDCTwoApropertyAction.class);
+          mVerifyMenu.add(Sdtwoa);
+          final Action Sdtwob =
+            actions.getAction(AnalyzeSDCTwoBPropertyAction.class);
+          mVerifyMenu.add(Sdtwob);
+          final Action Sdthree1 =
+            actions.getAction(AnalyzeSDCThree_one_propertyAction.class);
+          mVerifyMenu.add(Sdthree1);
+          final Action SDthree2 =
+            actions.getAction(AnalyzeNerodeEquivalentAction.class);
+          mVerifyMenu.add(SDthree2);
+          final Action Sdfour =
+            actions.getAction(AnalyzeSDCFourPropertyAction.class);
+          mVerifyMenu.add(Sdfour);
+          final Action PTimeBeh =
+            actions.getAction(AnalyzeProperTimeBehaviorPropertyAction.class);
+          mVerifyMenu.add(PTimeBeh);
         }
       }
 

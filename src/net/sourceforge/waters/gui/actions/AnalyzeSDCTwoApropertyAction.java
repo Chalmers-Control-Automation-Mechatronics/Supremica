@@ -10,7 +10,7 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import net.sourceforge.waters.analysis.sd.SDCTwoVerifier;
+import net.sourceforge.waters.analysis.sd.SDCTwoAVerifier;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
@@ -45,8 +45,8 @@ public class AnalyzeSDCTwoApropertyAction extends WatersAnalyzeAction
         factory.createLanguageInclusionChecker(desFactory);
 
 
-        final SDCTwoVerifier verifier =
-        new SDCTwoVerifier(Checker, null, desFactory);
+        final SDCTwoAVerifier verifier =
+        new SDCTwoAVerifier(Checker, null, desFactory);
     return verifier;
   }
 

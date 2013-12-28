@@ -11,7 +11,6 @@ package net.sourceforge.waters.analysis.modular;
 
 import gnu.trove.set.hash.THashSet;
 
-import java.lang.Comparable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -88,7 +87,7 @@ public class ProjectingSafetyVerifier
                                   final SafetyProjectionBuilder projector,
                                   final int projsize)
   {
-    super(model, translator, diag, factory);
+    super(model, translator, diag, factory, checker);
     setHeuristicMethod(ModularHeuristicFactory.Method.MaxCommonEvents);
     setHeuristicPreference
       (ModularHeuristicFactory.Preference.PREFER_REAL_PLANT);
@@ -101,6 +100,7 @@ public class ProjectingSafetyVerifier
 
   //#########################################################################
   //# Configuration
+  @Override
   public void setNodeLimit(final int limit)
   {
     setMaxSyncProductStates(limit);
@@ -247,6 +247,7 @@ public class ProjectingSafetyVerifier
     return true;
   }*/
 
+  @Override
   public boolean run()
     throws AnalysisException
   {
@@ -328,11 +329,13 @@ public class ProjectingSafetyVerifier
     mChecker.setNodeLimit(getNodeLimit());
     mChecker.setKindTranslator(new KindTranslator()
     {
+      @Override
       public EventKind getEventKind(final EventProxy e)
       {
         return getKindTranslator().getEventKind(e);
       }
 
+      @Override
       public ComponentKind getComponentKind(final AutomatonProxy a)
       {
         return specs.contains(a) ? ComponentKind.SPEC : ComponentKind.PLANT;
@@ -359,6 +362,7 @@ public class ProjectingSafetyVerifier
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @Override
   public boolean supportsNondeterminism()
   {
     return false;
@@ -804,11 +808,13 @@ public class ProjectingSafetyVerifier
         return events;
       }
 
+      @Override
       public int compareTo(final Place other)
       {
         return other.mIndex - mIndex;
       }
 
+      @Override
       public int hashCode()
       {
         int hash = 7;
@@ -817,6 +823,7 @@ public class ProjectingSafetyVerifier
         return hash;
       }
 
+      @Override
       public boolean equals(final Object o)
       {
         final Place p = (Place) o;
@@ -840,11 +847,13 @@ public class ProjectingSafetyVerifier
         mHash = hash;
       }
 
+      @Override
       public int hashCode()
       {
         return mHash;
       }
 
+      @Override
       public boolean equals(final Object other)
       {
         if (other != null && other.getClass() == getClass()) {
@@ -868,6 +877,7 @@ public class ProjectingSafetyVerifier
       mHidden = hidden;
     }
 
+    @Override
     public int hashCode()
     {
       int code = 31 + mAutomata.hashCode();
@@ -875,6 +885,7 @@ public class ProjectingSafetyVerifier
       return code;
     }
 
+    @Override
     public boolean equals(final Object o)
     {
       if (o instanceof AutomataHidden) {
@@ -888,6 +899,7 @@ public class ProjectingSafetyVerifier
   private static class AutomataComparator
     implements Comparator<SortedSet<AutomatonProxy>>
   {
+    @Override
     public int compare(final SortedSet<AutomatonProxy> s1, final SortedSet<AutomatonProxy> s2)
     {
       if (s1.size() < s2.size()) {
@@ -921,6 +933,7 @@ public class ProjectingSafetyVerifier
       mSize = size;
     }
 
+    @Override
     public int compareTo(final Candidate t)
     {
       if (mSize < t.mSize) {

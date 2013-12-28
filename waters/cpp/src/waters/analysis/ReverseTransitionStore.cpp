@@ -175,6 +175,18 @@ next(uint32_t& iterator)
   }
 }
 
+uint32_t ReverseTransitionStore::
+getFirstPredecessor(uint32_t target)
+  const
+{
+  uint32_t source = UINT32_MAX;
+  uint32_t iter = iterator(target);
+  while (hasNext(iter)) {
+    source = next(iter);
+  }
+  return source;
+}
+
 
 //############################################################################
 //# ReverseTransitionStore: Debug Output

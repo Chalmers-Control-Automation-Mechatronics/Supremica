@@ -56,9 +56,37 @@ for F in "$@"; do
     -loop)
         CHECK="ControlLoop"
         ;;
-    -sic5|-sic6)
+    -alf)
+        CHECK="ControlLoop"
+        ARGS="$ARGS \"-wrapper\" \"$WPACK.analysis.sd.SDActivityLoopChecker\""
+        ;;
+    -sdc2a)
+        CHECK="LanguageInclusion"
+        ARGS="$ARGS \"-wrapper\" \"$WPACK.analysis.sd.SDCTwoAVerifier\""
+        ;;
+    -sdc31a)
+        CHECK="LanguageInclusion"
+        ARGS="$ARGS \"-wrapper\" \"$WPACK.analysis.sd.SDCThree1AVerifier\""
+        ;;
+    -sdc31b)
+        CHECK="LanguageInclusion"
+        ARGS="$ARGS \"-wrapper\" \"$WPACK.analysis.sd.SDCThree1BVerifier\""
+        ;;
+    -sdc4)
+        CHECK="LanguageInclusion"
+        ARGS="$ARGS \"-wrapper\" \"$WPACK.analysis.sd.SDCFourVerifier\""
+        ;;
+    -sdspb)
+        CHECK="LanguageInclusion"
+        ARGS="$ARGS \"-wrapper\" \"$WPACK.analysis.sd.SDSingularProhibitableBehaviorVerifier\""
+        ;;
+    -sic5)
         CHECK="Conflict"
-        ARGS="$ARGS \"$F\""
+        ARGS="$ARGS \"-wrapper\" \"$WPACK.analysis.hisc.SICProperty5Verifier\""
+        ;;
+    -sic6)
+        CHECK="Conflict"
+        ARGS="$ARGS \"-wrapper\" \"$WPACK.analysis.hisc.SICProperty6Verifier\""
         ;;
     -Xmx*)
         MEM="$F"

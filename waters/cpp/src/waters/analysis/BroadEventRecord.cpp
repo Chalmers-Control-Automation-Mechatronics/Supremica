@@ -45,10 +45,32 @@ BroadEventRecord(jni::EventGlue event, bool controllable, int numwords)
     mUsedSearchRecords(0),
     mUnusedSearchRecords(0),
     mNotTakenSearchRecords(0),
-    mNonSelfloopingRecord(0)
+    mNonSelfloopingRecord(0),
+    mForwardRecord(0)
 {
   mUpdateRecords = new TransitionUpdateRecord*[numwords];
   for (int w = 0; w < numwords; w++) {
+    mUpdateRecords[w] = 0;
+  }
+}
+
+BroadEventRecord::
+BroadEventRecord(const BroadEventRecord& fwd)
+  : EventRecord(fwd),
+    mIsGloballyDisabled(fwd.mIsGloballyDisabled),
+    mIsDisabledInSpec(fwd.mIsDisabledInSpec),
+    mNumNonSelfloopingRecords(0),
+    mNumNondeterministicRecords(0),
+    mNumberOfWords(fwd.mNumberOfWords),
+    mNumberOfUpdates(0),
+    mUsedSearchRecords(0),
+    mUnusedSearchRecords(0),
+    mNotTakenSearchRecords(0),
+    mNonSelfloopingRecord(0),
+    mForwardRecord(&fwd)
+{
+  mUpdateRecords = new TransitionUpdateRecord*[mNumberOfWords];
+  for (int w = 0; w < mNumberOfWords; w++) {
     mUpdateRecords[w] = 0;
   }
 }
@@ -315,30 +337,24 @@ removeTransitionsNotTaken()
   return result;
 }
 
-bool BroadEventRecord::
-reverse()
+BroadEventRecord* BroadEventRecord::
+createReversedRecord()
+  const
 {
   if (mIsGloballyDisabled) {
-    mProbability = 0.0;
-    return false;
+    return 0;
   } else {
-    TransitionRecord* used = mUsedSearchRecords;
-    TransitionRecord* unused = mUnusedSearchRecords;
-    clearSearchAndUpdateRecords();
-    mNumNondeterministicRecords = 0;
-    mProbability = 1.0;
-    addReversedList(used);
-    addReversedList(unused);
-    if (mIsGloballyDisabled) {
-      return false;
-    } else {
-      const LinkedRecordAccessor<TransitionRecord>* accessor =
-        TransitionRecord::getTraceAccessor();
-      LinkedRecordList<TransitionRecord> list(accessor, mUsedSearchRecords);
-      list.qsort();
-      mUsedSearchRecords = list.getHead();
-      return true;
-    }
+    BroadEventRecord* reversed = new BroadEventRecord(*this);
+    reversed->mProbability = 1.0;
+    reversed->addReversedList(mUsedSearchRecords);
+    reversed->addReversedList(mUnusedSearchRecords);
+    const LinkedRecordAccessor<TransitionRecord>* accessor =
+      TransitionRecord::getTraceAccessor();
+    LinkedRecordList<TransitionRecord> list(accessor,
+                                            reversed->mUsedSearchRecords);
+    list.qsort();
+    reversed->mUsedSearchRecords = list.getHead();
+    return reversed;
   }
 }
 
@@ -346,16 +362,44 @@ reverse()
 //############################################################################
 //# BroadEventRecord: Trace Computation
 
+float BroadEventRecord::
+getFanout(const uint32_t* sourcetuple)
+  const
+{
+  if (mNumNondeterministicRecords == 0) {
+    return 1.0f;
+  } else {
+    float result = 1.0f;
+    for (int w = 0; w < mNumberOfWords; w++) {
+      const TransitionUpdateRecord* update = mUpdateRecords[w];
+      if (update != 0) {
+        for (TransitionRecord* trans = update->getTransitionRecords();
+             trans != 0; trans = trans->getNextInUpdate()) {
+          const AutomatonRecord* aut = trans->getAutomaton();
+          int a = aut->getAutomatonIndex();
+          uint32_t s = sourcetuple[a];
+          result *= trans->getNumberOfSuccessors(s);
+        }
+      }           
+    }
+    return result;
+  }
+}
+
 void BroadEventRecord::
 storeNondeterministicTargets(const uint32_t* sourcetuple,
                              const uint32_t* targettuple,
                              const jni::MapGlue& map)
   const
 {
-  storeNondeterministicTargets
-    (mUsedSearchRecords, sourcetuple, targettuple, map);
-  storeNondeterministicTargets
-    (mUnusedSearchRecords, sourcetuple, targettuple, map);
+  if (mForwardRecord == 0) {
+    storeNondeterministicTargets
+      (mUsedSearchRecords, sourcetuple, targettuple, map);
+    storeNondeterministicTargets
+      (mUnusedSearchRecords, sourcetuple, targettuple, map);
+  } else {
+    mForwardRecord->storeNondeterministicTargets(sourcetuple, targettuple, map);
+  }
 }
 
 
@@ -382,58 +426,45 @@ relink(TransitionRecord* trans)
 }
 
 void BroadEventRecord::
-addReversedList(TransitionRecord* trans)
+addReversedList(const TransitionRecord* trans)
 {
-  if (mIsGloballyDisabled) {
-    delete trans;
-  } else {
-    while (trans != 0) {
-      TransitionRecord* next = trans->getNextInSearch();
-      if (trans->isAlwaysDisabled()) {
-        mIsGloballyDisabled = true;
-        mProbability = 0.0;
-        delete trans;
-        delete mUsedSearchRecords;
-        delete mUnusedSearchRecords;
-        clearSearchAndUpdateRecords();
-        return;
-      } else if (trans->isOnlySelfloops()) {
-        enqueueSearchRecord(trans);
-      } else {
-        const AutomatonRecord* aut = trans->getAutomaton();
-        const uint32_t numstates = aut->getNumberOfStates();
-        const int shift = aut->getShift();
-        trans->setNextInSearch(0);
-        TransitionRecord* reversed = new TransitionRecord(aut, 0, trans);
-        int maxpass = 1;
-        for (int pass = 1; pass <= maxpass; pass++) {
-          for (uint32_t source = 0; source < numstates; source++) {
-            const uint32_t numsucc = trans->getNumberOfSuccessors(source);
-            for (uint32_t offset = 0; offset < numsucc; offset++) {
-              const uint32_t shiftedtarget =
-                trans->getSuccessorShifted(source, offset);
-              const uint32_t target = shiftedtarget >> shift;
-              if (pass == 1) {
-                if (!reversed->addDeterministicTransition(target, source)) {
-                  maxpass = 2;
-                }
-              } else {
-                reversed->addNondeterministicTransition(target, source);
+  while (trans != 0) {
+    if (trans->isOnlySelfloops()) {
+      TransitionRecord* reversed = new TransitionRecord(*trans);
+      enqueueSearchRecord(reversed);
+    } else {
+      const AutomatonRecord* aut = trans->getAutomaton();
+      const uint32_t numstates = aut->getNumberOfStates();
+      const int shift = aut->getShift();
+      TransitionRecord* reversed = new TransitionRecord(aut, 0, trans);
+      int maxpass = 1;
+      for (int pass = 1; pass <= maxpass; pass++) {
+        for (uint32_t source = 0; source < numstates; source++) {
+          const uint32_t numsucc = trans->getNumberOfSuccessors(source);
+          for (uint32_t offset = 0; offset < numsucc; offset++) {
+            const uint32_t shiftedtarget =
+              trans->getSuccessorShifted(source, offset);
+            const uint32_t target = shiftedtarget >> shift;
+            if (pass == 1) {
+              if (!reversed->addDeterministicTransition(target, source)) {
+                maxpass = 2;
               }
+            } else {
+              reversed->addNondeterministicTransition(target, source);
             }
           }
         }
-        reversed->normalize();
-        if (!reversed->isDeterministic()) {
-          mNumNondeterministicRecords++;
-        }
-        enqueueSearchRecord(reversed);
-        const int wordindex = aut->getWordIndex();
-        TransitionUpdateRecord* update = createUpdateRecord(wordindex);
-        update->addTransition(reversed);
       }
-      trans = next;
+      reversed->normalize();
+      if (!reversed->isDeterministic()) {
+        mNumNondeterministicRecords++;
+      }
+      enqueueSearchRecord(reversed);
+      const int wordindex = aut->getWordIndex();
+      TransitionUpdateRecord* update = createUpdateRecord(wordindex);
+      update->addTransition(reversed);
     }
+    trans = trans->getNextInSearch();
   }
 }
 
