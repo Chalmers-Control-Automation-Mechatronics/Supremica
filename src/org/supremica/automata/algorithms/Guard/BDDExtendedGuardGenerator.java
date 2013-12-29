@@ -62,7 +62,9 @@ public final class BDDExtendedGuardGenerator {
     // private final String STATE_DELIMITER = ".";
     private final String OR = " " + CompilerOperatorTable.getInstance().getOrOperator().getName() + " ";
     private final String AND = " " + CompilerOperatorTable.getInstance().getAndOperator().getName() + " ";
+    @SuppressWarnings("unused")
     private final String O_PAR = "(";
+    @SuppressWarnings("unused")
     private final String C_PAR = ")";
     String guard = "";
     public String TRUE = "1";
@@ -110,7 +112,7 @@ public final class BDDExtendedGuardGenerator {
         manager.guard2BDD(testExpr).simplify(manager.guard2BDD(careExpr).toVarSet()).printDot();
          */
 
-        switch (options.getExpressionType()) 
+        switch (options.getExpressionType())
 		{
             case 0:
                 allowedForbidden = false;
@@ -129,7 +131,7 @@ public final class BDDExtendedGuardGenerator {
         safeStatesBDD = states;
 
 
-        if (bddAutomata.getSynthAlg().equals(SynthesisAlgorithm.MONOLITHICBDD)) 
+        if (bddAutomata.getSynthAlg().equals(SynthesisAlgorithm.MONOLITHICBDD))
 		{
             final BDDEdges bddTransitions = automataBDD.getBDDEdges();
 
@@ -143,7 +145,7 @@ public final class BDDExtendedGuardGenerator {
 
             computeStatesEnablingSigma();
 
-            if (generateIDD_PS) 
+            if (generateIDD_PS)
 			{
                 String fileName = "idd_" + eventName + "_enabled";
                 bddAutomata.BDD2IDD2PS(statesEnablingSigmaBDD, statesEnablingSigmaBDD, fileName);
@@ -163,7 +165,7 @@ public final class BDDExtendedGuardGenerator {
             computeSafeStatesEnablingSigma();
 //        System.err.println("safe states enabling "+eventName+": "+bddAutomata.nbrOfStatesBDD(safeStatesEnablingSigmaBDD));
 
-            if (generateIDD_PS) 
+            if (generateIDD_PS)
 			{
                 final String fileName = "iddSafe_" + eventName + "_enabled";
                 bddAutomata.BDD2IDD2PS(safeStatesEnablingSigmaBDD, safeStatesEnablingSigmaBDD, fileName);
@@ -171,7 +173,7 @@ public final class BDDExtendedGuardGenerator {
 
             computeStatesLeading2ForbiddenStates();
 
-            if (generateIDD_PS) 
+            if (generateIDD_PS)
 			{
                 final String fileName = "idd_" + eventName + "_leadingToForbidden";
                 bddAutomata.BDD2IDD2PS(statesLeading2ForbiddenBDD, statesLeading2ForbiddenBDD, fileName);
@@ -179,7 +181,7 @@ public final class BDDExtendedGuardGenerator {
 
             computeMustAllowedSates();
 
-            if (generateIDD_PS) 
+            if (generateIDD_PS)
 			{
                 final String fileName = "idd_" + eventName + "_allowed";
                 bddAutomata.BDD2IDD2PS(mustAllowedStatesBDD, mustAllowedStatesBDD, fileName);
@@ -187,7 +189,7 @@ public final class BDDExtendedGuardGenerator {
 
             computeMustForbiddenSates();
 
-            if (generateIDD_PS) 
+            if (generateIDD_PS)
 			{
                 final String fileName = "idd_" + eventName + "_forbidden";
                 bddAutomata.BDD2IDD2PS(mustForbiddenStatesBDD, mustForbiddenStatesBDD, fileName);
@@ -202,7 +204,7 @@ public final class BDDExtendedGuardGenerator {
         applyComplementHeuristics = options.getCompHeuristic();
         applyIndependentHeuristics = options.getIndpHeuristic();
 
-        if (optimalMode) 
+        if (optimalMode)
 		{
             allowedForbidden = true;
 
@@ -213,12 +215,12 @@ public final class BDDExtendedGuardGenerator {
 
             allowedForbidden = false;
             final String forbiddenGuard = generateGuard(mustForbiddenStatesBDD);
-            if (nbrOfTerms < minNbrOfTerms) 
+            if (nbrOfTerms < minNbrOfTerms)
 			{
                 guard = forbiddenGuard;
                 bestStateSet = "FORBIDDEN";
-            } 
-			else 
+            }
+			else
 			{
                 guard = allowedGuard;
                 nbrOfTerms = minNbrOfTerms;
@@ -226,15 +228,15 @@ public final class BDDExtendedGuardGenerator {
                 this.nbrOfIndpHeurs = nbrOfIndpHeuris;
                 bestStateSet = "ALLOWED";
             }
-        } 
-		else 
+        }
+		else
 		{
-            if (allowedForbidden) 
+            if (allowedForbidden)
 			{
                 guard = generateGuard(mustAllowedStatesBDD);
                 bestStateSet = "ALLOWED";
-            } 
-			else 
+            }
+			else
 			{
                 guard = generateGuard(mustForbiddenStatesBDD);
                 bestStateSet = "FORBIDDEN";
@@ -243,7 +245,7 @@ public final class BDDExtendedGuardGenerator {
 
         //The event is blocked in the synchronization process
         if (mustAllowedStatesBDD.satCount(automataBDD.getSourceStatesVarSet()) == 0
-                && mustForbiddenStatesBDD.satCount(automataBDD.getSourceStatesVarSet()) == 0) 
+                && mustForbiddenStatesBDD.satCount(automataBDD.getSourceStatesVarSet()) == 0)
 		{
             guard = FALSE;
             isEventBlocked = true;
@@ -314,32 +316,32 @@ public final class BDDExtendedGuardGenerator {
          */
     }
 
-    public boolean isEventBlocked() 
+    public boolean isEventBlocked()
 	{
         return isEventBlocked;
     }
 
-    public String getBestStateSet() 
+    public String getBestStateSet()
 	{
         return bestStateSet;
     }
 
-    public String getGuard() 
+    public String getGuard()
 	{
         return guard;
     }
 
-    public int getBDDSize() 
+    public int getBDDSize()
 	{
         return bddSize;
     }
 
-    public int getNbrOfTerms() 
+    public int getNbrOfTerms()
 	{
         return nbrOfTerms;
     }
 
-    public int getNbrOfCompHeuris() 
+    public int getNbrOfCompHeuris()
 	{
         return nbrOfCompHeurs;
     }
@@ -350,7 +352,7 @@ public final class BDDExtendedGuardGenerator {
     }
 
     //Q^sigma
-    private void computeStatesEnablingSigma() 
+    private void computeStatesEnablingSigma()
 	{
         statesEnablingSigmaBDD = forwardMonolithicTransitionsBDD.relprod(sigmaBDD, automataBDD.getDestStatesVarSet());
         statesEnablingSigmaBDD = statesEnablingSigmaBDD.exist(automataBDD.getEventVarSet());
@@ -372,7 +374,7 @@ public final class BDDExtendedGuardGenerator {
     }
 
     //Q^sigma_sup
-    private void computeMustAllowedSates() 
+    private void computeMustAllowedSates()
 	{
         mustAllowedStatesBDD = safeStatesEnablingSigmaBDD.and(statesLeading2ForbiddenBDD.not());
 //        BDD destSafeSates = safeStatesBDD.replace(automataBDD.getSourceToDestLocationPairing());
@@ -383,7 +385,7 @@ public final class BDDExtendedGuardGenerator {
     }
 
     //Q^sigma & C(Q^sigma_a) & Q_sup
-    private void computeMustForbiddenSates() 
+    private void computeMustForbiddenSates()
 	{
         mustForbiddenStatesBDD = safeStatesEnablingSigmaBDD.and(mustAllowedStatesBDD.not());
 //        return mustForbiddenStatesBDD;
@@ -395,7 +397,7 @@ public final class BDDExtendedGuardGenerator {
     }
 
     //Q & C(mustForbiddenStatesBDD) & C(mustAllowedStatesBDD)   OR C(careStatesBDD)
-    public void computeDontCareStates() 
+    public void computeDontCareStates()
 	{
         dontCareStatesBDD = careStatesBDD.not();
 //        return dontCareStatesBDD;
@@ -406,22 +408,22 @@ public final class BDDExtendedGuardGenerator {
         safeStatesEnablingSigmaBDD = safeStatesBDD.and(statesEnablingSigmaBDD);
     }
 
-    public BDD getCareStates() 
+    public BDD getCareStates()
 	{
         return careStatesBDD;
     }
 
-    public BDD getMustAllowedStates() 
+    public BDD getMustAllowedStates()
 	{
         return mustAllowedStatesBDD;
     }
 
-    public BDD getMustForbiddenStates() 
+    public BDD getMustForbiddenStates()
 	{
         return mustForbiddenStatesBDD;
     }
 
-    public BDD getDontCareStates() 
+    public BDD getDontCareStates()
 	{
         return dontCareStatesBDD;
     }
@@ -431,21 +433,21 @@ public final class BDDExtendedGuardGenerator {
         return statesEnablingSigmaBDD;
     }
 
-    public BDD getSatesLeading2ForbiddenBDD() 
+    public BDD getSatesLeading2ForbiddenBDD()
 	{
         return statesLeading2ForbiddenBDD;
     }
 
     public boolean guardIsTrue()
 	{
-        if (guard.equals(TRUE)) 
+        if (guard.equals(TRUE))
 		{
             return true;
         }
         return false;
     }
 
-    public String generateGuard(final BDD states) 
+    public String generateGuard(final BDD states)
 	{
         nbrOfTerms = 0;
         nbrOfCompHeurs = 0;
@@ -453,28 +455,28 @@ public final class BDDExtendedGuardGenerator {
         String localGuard = "";
 
 
-        if (states.equals(careStatesBDD)) 
+        if (states.equals(careStatesBDD))
 		{
             localGuard = allowedForbidden ? TRUE : FALSE;
             nbrOfTerms++;
-        } 
-		else if (states.satCount(automataBDD.getSourceStatesVarSet()) == 0) 
+        }
+		else if (states.satCount(automataBDD.getSourceStatesVarSet()) == 0)
 		{
             localGuard = allowedForbidden ? FALSE : TRUE;
             nbrOfTerms++;
-        } 
-		else 
+        }
+		else
 		{
             BDD goodBDD = states.simplify(careStatesBDD);
 //            BDD goodBDD = states.simplify(careStatesBDD.exist(automataBDD.getTestVarSet()).toVarSet());
 //            BDD goodBDD = states.exist(automataBDD.getTestVarSet());
 
-            if (states.nodeCount() <= goodBDD.nodeCount()) 
+            if (states.nodeCount() <= goodBDD.nodeCount())
 			{
                 goodBDD = states;
             }
 
-            if (goodBDD.nodeCount() > 0) 
+            if (goodBDD.nodeCount() > 0)
 			{
                 final IDD goodIDD = automataBDD.generateIDD(goodBDD, safeStatesEnablingSigmaBDD);
 //                System.out.println(goodIDD.nbrOfNodes());
@@ -483,16 +485,16 @@ public final class BDDExtendedGuardGenerator {
 //                goodBDD.printDot();
 
                 String fileName = "idd_" + eventName;
-                if (allowedForbidden) 
+                if (allowedForbidden)
 				{
                     fileName += "_allowed";
-                } 
-				else 
+                }
+				else
 				{
                     fileName += "_forbidden";
                 }
 
-                if (generateIDD_PS) 
+                if (generateIDD_PS)
 				{
                     automataBDD.BDD2IDD2PS(goodBDD, safeStatesEnablingSigmaBDD, fileName);
                 }
@@ -504,7 +506,7 @@ public final class BDDExtendedGuardGenerator {
         return localGuard;
     }
 
-    StringIntPair generateStateSetTerm(final boolean isComp, final boolean isAutomaton, String variable, ArrayList<String> set) 
+    StringIntPair generateStateSetTerm(final boolean isComp, final boolean isAutomaton, String variable, ArrayList<String> set)
 	{
         variable = variable.replaceAll(" ", "");
         int localNbrOfTerms = 0;
@@ -515,21 +517,21 @@ public final class BDDExtendedGuardGenerator {
         ArrayList<String> incrementalSeq;
         final ArrayList<String> setTemp = new ArrayList<String>(set);
         String inEq;
-        if (!isAutomaton) 
+        if (!isAutomaton)
 		{
             boolean firstTime = true;
-            do 
+            do
 			{
                 incrementalSeq = isIncrementalSeq(setTemp);
                 setTemp.removeAll(incrementalSeq);
                 inEq = seq2inEqual(incrementalSeq, variable, theAutomata.getMinValueofVar(variable), theAutomata.getMaxValueofVar(variable), flag);
-                if (!inEq.isEmpty()) 
+                if (!inEq.isEmpty())
 				{
-                    if (inEq.contains(AND) || inEq.contains(OR)) 
+                    if (inEq.contains(AND) || inEq.contains(OR))
 					{
                         localNbrOfTerms += 2;
-                    } 
-					else 
+                    }
+					else
 					{
                         localNbrOfTerms += 1;
                     }
@@ -540,7 +542,7 @@ public final class BDDExtendedGuardGenerator {
                         expr = inEq;
                         firstTime = false;
                     }
-					else 
+					else
 					{
                         expr += ((flag ? OR : AND) + inEq);
                     }
@@ -548,20 +550,20 @@ public final class BDDExtendedGuardGenerator {
 
             } while (!inEq.isEmpty() && !setTemp.isEmpty());
 
-            if (!expr.isEmpty()) 
+            if (!expr.isEmpty())
 			{
                 expr = "(" + expr + ")";
             }
         }
 
-        if (!set.isEmpty()) 
+        if (!set.isEmpty())
 		{
             final String ex = variable + (isAutomaton ? symbol : "") + (flag ? EQUAL : NEQUAL) + set.get(0).replaceAll(" ", "");
-            if (expr.isEmpty()) 
+            if (expr.isEmpty())
 			{
                 expr = ex;
-            } 
-			else 
+            }
+			else
 			{
                 expr += ((flag ? OR : AND) + ex);
             }
@@ -576,26 +578,26 @@ public final class BDDExtendedGuardGenerator {
         return new StringIntPair(expr, localNbrOfTerms);
     }
 
-    public boolean isIndependentHeuristicApplicable(final String autVarName, final ArrayList<String> stateSet) 
+    public boolean isIndependentHeuristicApplicable(final String autVarName, final ArrayList<String> stateSet)
 	{
         final BDDExtendedAutomaton bddAut = automataBDD.getBDDExAutomaton(autVarName);
         final boolean isAutomaton = (bddAut != null) ? true : false;
         final ArrayList<String> indpStates = new ArrayList<String>();
-        for (final String stateName : stateSet) 
+        for (final String stateName : stateSet)
 		{
             BDD stateBDD = null;
-            if (isAutomaton) 
+            if (isAutomaton)
 			{
                 final ExtendedAutomaton exAut = bddAut.getExAutomaton();
                 final int stateIndex = automataBDD.getLocationIndex(exAut, exAut.getLocationWithName(stateName));
                 stateBDD = manager.getFactory().buildCube(stateIndex, automataBDD.getSourceLocationDomain(exAut.getName()).vars());
-            } 
+            }
 			else
 			{
                 stateBDD = automataBDD.getConstantBDD(autVarName, Integer.parseInt(stateName));
             }
 
-            if ((allowedForbidden ? mustForbiddenStatesBDD : mustAllowedStatesBDD).and(stateBDD).nodeCount() == 0) 
+            if ((allowedForbidden ? mustForbiddenStatesBDD : mustAllowedStatesBDD).and(stateBDD).nodeCount() == 0)
 			{
                 indpStates.add(stateName);
 //                    indpStates.add((symbol+autVarName.replaceAll(" ", "")+(allowedForbidden?EQUAL:NEQUAL)+stateName.replaceAll(" ", "")));
@@ -605,7 +607,7 @@ public final class BDDExtendedGuardGenerator {
         return indpStates.equals(stateSet);
     }
 
-    StringIntPair compelmentHeuristic(final String autVarName, final ArrayList<String> stateSet) 
+    StringIntPair compelmentHeuristic(final String autVarName, final ArrayList<String> stateSet)
 	{
         int localNbrOfTerms = 0;
         String expr = "";
@@ -617,7 +619,7 @@ public final class BDDExtendedGuardGenerator {
         complementStates = isAutomaton ? bddAut.getComplementLocationNames(stateSet) : automataBDD.getComplementValues(autVarName, stateSet);
         final boolean isComp = complementStates.size() < stateSet.size();
         StringIntPair e_n = null;
-        if (isComp) 
+        if (isComp)
 		{
             nbrOfCompHeurs++;
             inputStateSet = new ArrayList<String>(complementStates);
@@ -632,7 +634,7 @@ public final class BDDExtendedGuardGenerator {
 
     }
 
-    public String generateExpression(final IDD idd) 
+    public String generateExpression(final IDD idd)
 	{
         String output = "";
         final HashMap<String, StringIntPair> cache = new HashMap<String, StringIntPair>();
@@ -643,18 +645,18 @@ public final class BDDExtendedGuardGenerator {
         return output;
     }
 
-    StringIntPair IDD2expr(final IDD idd, final HashMap<String, StringIntPair> cache) 
+    StringIntPair IDD2expr(final IDD idd, final HashMap<String, StringIntPair> cache)
 	{
         int localNbrOfTerms = 0;
 
-        if (idd.isOneTerminal()) 
+        if (idd.isOneTerminal())
 		{
             return new StringIntPair("", 0);
         }
 
         final ArrayList<String> terms = new ArrayList<String>();
 
-        for (final IDD iddChild : idd.getChildren()) 
+        for (final IDD iddChild : idd.getChildren())
 		{
             int inForNbr = 0;
             final String autVarName = idd.getRoot().getName();
@@ -662,11 +664,11 @@ public final class BDDExtendedGuardGenerator {
             final boolean isAutomaton = (bddAut != null) ? true : false;
             StringIntPair expr_Nbr = null;
             final String idChild = iddChild.getRoot().getID();
-            if (!applyComplementHeuristics) 
+            if (!applyComplementHeuristics)
 			{
                 expr_Nbr = generateStateSetTerm(false, isAutomaton, autVarName, idd.labelOfChild(iddChild));
-            } 
-			else 
+            }
+			else
 			{
                 expr_Nbr = compelmentHeuristic(autVarName, idd.labelOfChild(iddChild));
             }
@@ -674,7 +676,7 @@ public final class BDDExtendedGuardGenerator {
             final boolean independentApplicable = applyIndependentHeuristics && isIndependentHeuristicApplicable(autVarName, idd.labelOfChild(iddChild));
 
             String stateExpr = "";
-            if (expr_Nbr.i > 0) 
+            if (expr_Nbr.i > 0)
 			{
                 stateExpr = (expr_Nbr.i == 1) ? expr_Nbr.s : ("(" + expr_Nbr.s + ")");
             }
@@ -683,34 +685,34 @@ public final class BDDExtendedGuardGenerator {
             String expr = "";
             if (cache.get(idChild) == null) //if 'iddChild' is not visisted
             {
-                if (!independentApplicable) 
+                if (!independentApplicable)
 				{
                     final StringIntPair e_n = IDD2expr(iddChild, cache);
-                    if (e_n.i >= 0) 
+                    if (e_n.i >= 0)
 					{
                         expr = e_n.s;
                         inForNbr += e_n.i;
                         cache.put(idChild, e_n);
-                    } 
-					else 
+                    }
+					else
 					{
                         if (Math.abs(e_n.i) > 0)
 						{
                             stateExpr = (Math.abs(e_n.i) == 1) ? e_n.s : ("(" + e_n.s + ")");
                         }
 
-                        if (idd.getChildren().size() > 1 || idd.getParents().isEmpty()) 
+                        if (idd.getChildren().size() > 1 || idd.getParents().isEmpty())
 						{
                             inForNbr = (-e_n.i);
-                        } 
-						else 
+                        }
+						else
 						{
                             inForNbr = e_n.i;
                         }
                     }
 
-                } 
-				else 
+                }
+				else
 				{
                     nbrOfIndpHeurs++;
                     if (idd.getChildren().size() == 1)
@@ -718,26 +720,26 @@ public final class BDDExtendedGuardGenerator {
                         inForNbr = -inForNbr; // keep track of the independet term by keeping the number of terms as a negative number
                     }
                 }
-            } 
-			else 
+            }
+			else
 			{
                 final StringIntPair e_n = cache.get(idChild);
                 expr = e_n.s;
                 inForNbr += e_n.i;
             }
 
-            if (!expr.isEmpty()) 
+            if (!expr.isEmpty())
 			{
-                if (!stateExpr.isEmpty()) 
+                if (!stateExpr.isEmpty())
 				{
                     terms.add("(" + stateExpr + (allowedForbidden ? AND : OR) + expr + ")");
-                } 
-				else 
+                }
+				else
 				{
                     terms.add("(" + expr + ")");
                 }
-            } 
-			else 
+            }
+			else
 			{
                 terms.add(stateExpr);
             }
@@ -747,11 +749,11 @@ public final class BDDExtendedGuardGenerator {
         }
 
         String expression = "";
-        if (!terms.isEmpty()) 
+        if (!terms.isEmpty())
 		{
             expression = terms.get(0);
         }
-        for (int i = 1; i < terms.size(); i++) 
+        for (int i = 1; i < terms.size(); i++)
 		{
             expression = "(" + expression + (allowedForbidden ? OR : AND) + terms.get(i) + ")";
         }
@@ -759,79 +761,79 @@ public final class BDDExtendedGuardGenerator {
         return new StringIntPair(expression, localNbrOfTerms);
     }
 
-    public String BDD2Expr(final BDD bdd) 
+    public String BDD2Expr(final BDD bdd)
 	{
 //        System.out.println(bdd.var()+": "+bdd.hashCode());
-        if (bdd.isOne() || bdd.isZero()) 
+        if (bdd.isOne() || bdd.isZero())
 		{
             return "no expression";
         }
-        if (bdd.low().isOne()) 
+        if (bdd.low().isOne())
 		{
-            if (!bdd.high().isZero()) 
+            if (!bdd.high().isZero())
 			{
                 return "!" + bdd.var() + OR + "(" + BDD2Expr(bdd.high()) + ")";
-            } 
-			else 
+            }
+			else
 			{
                 return "!" + bdd.var();
             }
-        } 
-		else if (bdd.high().isOne()) 
+        }
+		else if (bdd.high().isOne())
 		{
-            if (!bdd.low().isZero()) 
+            if (!bdd.low().isZero())
 			{
                 return "" + bdd.var() + OR + "(" + BDD2Expr(bdd.low()) + ")";
-            } 
-			else 
+            }
+			else
 			{
                 return "" + bdd.var();
             }
-        } 
-		else if (bdd.low().isZero()) 
+        }
+		else if (bdd.low().isZero())
 		{
-            if (!bdd.high().isOne()) 
+            if (!bdd.high().isOne())
 			{
                 return "" + bdd.var() + AND + BDD2Expr(bdd.high());
-            } 
-			else 
+            }
+			else
 			{
                 return "" + bdd.var();
             }
         }
 		else if (bdd.high().isZero())
 		{
-            if (!bdd.low().isOne()) 
+            if (!bdd.low().isOne())
 			{
                 return "!" + bdd.var() + AND + BDD2Expr(bdd.low());
-            } 
-			else 
+            }
+			else
 			{
                 return "!" + bdd.var();
             }
-        } 
-		else 
+        }
+		else
 		{
             return "((" + "" + bdd.var() + AND + BDD2Expr(bdd.high()) + ")" + OR + "(" + "!" + bdd.var() + AND + BDD2Expr(bdd.low()) + "))";
         }
     }
 
-    public int smallestInEq(final ArrayList<Integer> alternatives) 
+    public int smallestInEq(final ArrayList<Integer> alternatives)
 	{
         final int min = Collections.min(alternatives);
         return alternatives.indexOf(min);
     }
 
-    public String seq2inEqual(final ArrayList<String> seq, final String var, final int min, final int max, final boolean flag) 
+    public String seq2inEqual(final ArrayList<String> seq, final String var, final int min, final int max, final boolean flag)
 	{
-        if (seq.size() > 1) 
+        if (seq.size() > 1)
 		{
             final int lastIndex = seq.size() - 1;
-            if (Integer.parseInt(seq.get(0)) == min) 
+            if (Integer.parseInt(seq.get(0)) == min)
 			{
                 return (var + (flag ? "<=" : ">") + seq.get(lastIndex));
-            } 
-			else if (Integer.parseInt(seq.get(lastIndex)) == max) 
+            }
+			else if (Integer.parseInt(seq.get(lastIndex)) == max)
 			{
                 return (var + (flag ? ">=" : "<") + seq.get(0));
             }
@@ -844,7 +846,7 @@ public final class BDDExtendedGuardGenerator {
     }
 
     @SuppressWarnings("unchecked")
-    public ArrayList<String> isIncrementalSeq(final ArrayList<String> values) 
+    public ArrayList<String> isIncrementalSeq(final ArrayList<String> values)
 	{
         final ArrayList<Integer> vals = new ArrayList<Integer>();
         for (final String v : values)
@@ -854,7 +856,7 @@ public final class BDDExtendedGuardGenerator {
 
         //Bubble sort
         boolean swapped = false;
-        do 
+        do
 		{
             swapped = false;
             for (int j = 0; j < vals.size() - 1; j++)
@@ -874,12 +876,12 @@ public final class BDDExtendedGuardGenerator {
         ArrayList<Integer> seq = new ArrayList<Integer>();
         ArrayList<Integer> seqTemp = new ArrayList<Integer>();
         seq.add(vals.get(0));
-        for (int i = 1; i < vals.size(); i++) 
+        for (int i = 1; i < vals.size(); i++)
 		{
             if (((vals.get(i) - vals.get(i - 1)) == 1))
 			{
                 seq.add(vals.get(i));
-            } 
+            }
 			else
 			{
                 if (seq.size() > seqTemp.size())
@@ -891,7 +893,7 @@ public final class BDDExtendedGuardGenerator {
                 seq.add(vals.get(i));
             }
         }
-        if (seqTemp.size() > seq.size()) 
+        if (seqTemp.size() > seq.size())
 		{
             seq = (ArrayList<Integer>) seqTemp.clone();
         }
@@ -923,8 +925,8 @@ public final class BDDExtendedGuardGenerator {
             tmp = safeStatesWithEvent.and(eventTransBDD)
                     .exist(automataBDD.getDestStatesVarSet()).exist(automataBDD.getEventVarSet());
 
-        } 
-		else if (parAlgoWorker instanceof BDDPartitionAlgoWorkerAut) 
+        }
+		else if (parAlgoWorker instanceof BDDPartitionAlgoWorkerAut)
 		{
             for (final Iterator<ExtendedAutomaton> autItr = automataBDD.getExtendedAutomata().iterator(); autItr.hasNext();)
 			{
@@ -948,7 +950,7 @@ public final class BDDExtendedGuardGenerator {
         tmp.free();
     }
 
-    private void disjunctivelyComputeMustForbiddenStates() 
+    private void disjunctivelyComputeMustForbiddenStates()
 	{
 
         final BDDPartitionAlgoWorker parAlgoWorker = automataBDD.getParAlgoWorker();
@@ -966,7 +968,7 @@ public final class BDDExtendedGuardGenerator {
             tmp = reachableStatesWithEvent.and(eventTransBDD)
                     .exist(automataBDD.getDestStatesVarSet()).exist(automataBDD.getEventVarSet());
 
-        } 
+        }
 		else if (parAlgoWorker instanceof BDDPartitionAlgoWorkerAut)
 		{
             for (final Iterator<ExtendedAutomaton> autItr = automataBDD.getExtendedAutomata().iterator(); autItr.hasNext();)
@@ -988,13 +990,13 @@ public final class BDDExtendedGuardGenerator {
         reachableStatesWithEvent.free();
     }
 
-    class StringIntPair 
+    class StringIntPair
 	{
 
         private final String s;
         private final int i;
 
-        StringIntPair(final String s, final int i) 
+        StringIntPair(final String s, final int i)
 		{
             this.s = s;
             this.i = i;

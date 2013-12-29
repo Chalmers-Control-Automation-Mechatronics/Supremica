@@ -47,7 +47,7 @@ public class EditorReadSpecAction
     HashMap<String,HashSet<String>> event2guard;
 
 	private static final String TRUE_GUARD = "1";
-	
+
     public EditorReadSpecAction(final List<IDEAction> actionList)
     {
         super(actionList);
@@ -61,12 +61,14 @@ public class EditorReadSpecAction
 //        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/synthesize16.gif")));
     }
 
+    @Override
     public void actionPerformed(final ActionEvent e)
     {
         doAction();
     }
 
 
+    @Override
     public void doAction()
     {
         final ModuleSubject module = ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject();
@@ -88,7 +90,7 @@ public class EditorReadSpecAction
                    bis = new BufferedReader(fis);
                    String text = null;
                    while((text = bis.readLine()) != null)
-                   {                        
+                   {
                         final StringTokenizer st = new StringTokenizer(text, "\t");
                         final String event = st.nextToken();
                         final String guard = st.nextToken();
@@ -122,7 +124,7 @@ public class EditorReadSpecAction
     public void addGuardsToAutomata(final ModuleSubject module)
     {
         logger.debug("Add the guard to the automata");
-		
+
         final ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
         final ExpressionParser parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
 
@@ -131,22 +133,16 @@ public class EditorReadSpecAction
         {
                 if(simSubj instanceof SimpleComponentSubject)
                 {
-					StringBuilder guardB = new StringBuilder();
-					StringBuilder currGuardB = new StringBuilder();
-					StringBuilder finalGuardB = new StringBuilder();
-					
+					final StringBuilder guardB = new StringBuilder();
+					final StringBuilder currGuardB = new StringBuilder();
+					final StringBuilder finalGuardB = new StringBuilder();
+
                     for(final EdgeSubject ep:((SimpleComponentSubject)simSubj).getGraph().getEdgesModifiable())
                     {
 //                        for(String currEvent:event2guard.keySet())
 //                        {
                         SimpleExpressionSubject ses = null;
                         SimpleExpressionSubject ses1 = null;
-                        @SuppressWarnings("unused")
-                        // SimpleExpressionSubject ses2 = null;
-                        //&& simSubj.getKind().name().equals("SPEC")
-                        // String guard = "";
-
-
                         final String currEvent = ep.getLabelBlock().getEventIdentifierList().iterator().next().toString();
 
                         if(event2guard.containsKey(currEvent))
@@ -169,15 +165,15 @@ public class EditorReadSpecAction
                                 // currGuard = ses1.toString();
 								currGuardB.append(ses1.toString()); //MF
                             }
-							
-                            // if(currGuard.length() == 0 && guard.length() > 0) 
+
+                            // if(currGuard.length() == 0 && guard.length() > 0)
 							//	guard = guard.substring(0, guard.length()-1);
 							if(currGuardB.length() == 0 && guardB.length() > 0)
 								guardB.setLength(guardB.length()-1); //MF
-							
+
                             // String finalGuard = guard + currGuard;
 							finalGuardB.append(guardB).append(currGuardB); //MF
-							
+
                             // if(finalGuard.length() == 0)
                             //     finalGuard = "1";
 							if(finalGuardB.length() == 0) finalGuardB.append(TRUE_GUARD); //MF
@@ -190,19 +186,19 @@ public class EditorReadSpecAction
 							final String CURR = ".curr";	// This is problematic, "." is interpreted as a namespace delimiter
 							final String FIXX = "_curr";
 							final int SIZEOF_FIXX = FIXX.length();
-							
+
 							int curr_index = finalGuardB.indexOf(CURR);
 							if(curr_index != -1) finalGuardB.replace(curr_index, curr_index+SIZEOF_FIXX, FIXX);
 							curr_index = guardB.indexOf(CURR);
 							if(curr_index != -1) guardB.replace(curr_index, curr_index+SIZEOF_FIXX, FIXX);
-							
+
                             ses = (SimpleExpressionSubject)(parser.parse(finalGuardB.toString(), Operator.TYPE_BOOLEAN));
                             //The following line cocerns the new guards that will be attached to the automata with a DIFFERENT COLOR!
 
                             // if(guard.endsWith("&")) // then remove that last "&"
                             //    guard = guard.substring(0, guard.length()-1);
 							if(guardB.charAt(guardB.length()-1) == '&') guardB.setLength(guardB.length()-1); //MF
-							
+
                             // ses2 = (SimpleExpressionSubject)(parser.parse(guardB.toString(), Operator.TYPE_BOOLEAN));
                         }
                         catch(final ParseException pe)
@@ -229,7 +225,7 @@ public class EditorReadSpecAction
 //                            if(!ses2.toString().equals("1"))
 //                                ep.getGuardActionBlock().getGuardsModifiable().add(ses2);
                         }
-						
+
 						// Clear the striong builders for next iteration
 						guardB.setLength(0);
 						currGuardB.setLength(0);
