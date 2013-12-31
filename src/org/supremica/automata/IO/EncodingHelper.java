@@ -50,11 +50,34 @@
 package org.supremica.automata.IO;
 
 import org.supremica.log.*;
+import org.supremica.gui.ExportFormat;
 
 public class EncodingHelper
 {
 	@SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.createLogger(EncodingHelper.class);
+
+	@SuppressWarnings("unused")
+	private static final int FM_DOT = 0;
+	private static final int FM_LT = 1;
+	private static final int FM_GT = 2;
+	private static final int FM_AMP = 3;
+	private static final int FM_QUOTE = 4;
+			
+	private static final String[] DEF_FORMAT_MAP = 
+	{ ".",	// [FM_DOT] -- this is treated specially (see below), since it is not really a format issue
+	  "<",	// [FM_LT]
+	  ">",	// [FM_GT]
+	  "&",	// [FM_AMP]
+	  "\"",	// [FM_QUOTE]
+	};
+	private static final String[] XML_FORMAT_MAP =
+	{ ".",
+	  "&lt;",	// '<'
+	  "&gt;",	// '>'
+	  "&amp;",	// '&'
+	  "&quot;",	// '"'
+	};
 
 	private EncodingHelper() {}
 
@@ -103,9 +126,9 @@ public class EncodingHelper
 		return s;
 	}
 
-	public static String normalize(String input, boolean replacedot, boolean replacelt, boolean replacegt)
+	public static String normalize(final String input, final ExportFormat format, final boolean replacedot)
 	{
-		String s = input;
+		final String s = input;
 
 /*
 				try
@@ -120,18 +143,23 @@ public class EncodingHelper
 				}
 				return s.toString();
 */
-		StringBuilder str = new StringBuilder();
-		int len = (s != null)
-				  ? s.length()
-				  : 0;
+		final StringBuilder str = new StringBuilder();
+		// int len = (s != null) // unnecessarily clever
+		//		  ? s.length()
+		//		  : 0;
+		if(s == null) return str.toString();
 
+		final int len = s.length();
+		
+		final String[] format_map = getFormatMap(format);
+		
 		for (int i = 0; i < len; i++)
 		{
 			char ch = s.charAt(i);
 
 			switch (ch)
 			{
-				case '.' :
+				case '.' :	// special treatement here
 				{
 					if (replacedot)
 					{
@@ -146,32 +174,22 @@ public class EncodingHelper
 				}
 				case '<' :
 				{
-					if(replacelt)	// Should be replaced for XML but not for DOT - need better way to adjust this
-						str.append("&lt;");
-					else
-						str.append("<");
-
+					str.append(format_map[FM_LT]);
 					break;
 				}
 				case '>' :
 				{
-					if(replacegt)	// Should be replaced for XML but not for DOT - need better way to adjust this
-						str.append("&gt;");
-					else
-						str.append(">");
-
+					str.append(format_map[FM_GT]);
 					break;
 				}
 				case '&' :
 				{
-					str.append("&amp;");
-
+					str.append(format_map[FM_AMP]);
 					break;
 				}
 				case '"' :
 				{
-					str.append("&quot;");
-
+					str.append(format_map[FM_QUOTE]);
 					break;
 				}
 				case '\r' :
@@ -189,8 +207,24 @@ public class EncodingHelper
 		return str.toString();
 	}
 
-	public static String normalize(String input)
+	public static String normalize(final String input, final ExportFormat format)
 	{
-		return EncodingHelper.normalize(input, false, true, true);
+		return EncodingHelper.normalize(input, format, false);
+	}
+	
+	private static String[] getFormatMap(ExportFormat format)
+	{
+		switch(format)
+		{
+			case XML:
+			case XML_DEBUG:
+				return XML_FORMAT_MAP;
+			case HTML:
+			case HTML_DEBUG:
+				return XML_FORMAT_MAP;	// Do we need a special HTML_FORMAT_MAP?
+			default:
+				return DEF_FORMAT_MAP;
+				
+		}
 	}
 }

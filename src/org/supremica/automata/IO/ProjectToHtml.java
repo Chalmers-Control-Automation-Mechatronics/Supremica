@@ -54,6 +54,7 @@ import java.util.*;
 import org.supremica.properties.Config;
 import org.supremica.automata.*;
 import org.supremica.log.*;
+import org.supremica.gui.ExportFormat;
 
 public class ProjectToHtml
 {
@@ -112,7 +113,7 @@ public class ProjectToHtml
 		PrintWriter pw = getPrintWriter("index.html");
 
 		printHtmlBegin(pw, "Supremica Project: " + project.getName());
-		pw.println("<h1>Project: " + EncodingHelper.normalize(project.getName()) + "</h1>");
+		pw.println("<h1>Project: " + EncodingHelper.normalize(project.getName(), ExportFormat.HTML) + "</h1>");
 		pw.println("<h2>Plants:</h2>");
 		pw.println("<ul>");
 
@@ -121,7 +122,7 @@ public class ProjectToHtml
 		{
 			Automaton aut = (Automaton) projectIt.next();
 
-			pw.println("<li> <a href=\"automaton" + aut.getIndex() + ".html\">" + EncodingHelper.normalize(aut.getName()) + "</a></li>");
+			pw.println("<li> <a href=\"automaton" + aut.getIndex() + ".html\">" + EncodingHelper.normalize(aut.getName(), ExportFormat.HTML) + "</a></li>");
 		}
 
 		pw.println("</ul>");
@@ -133,7 +134,7 @@ public class ProjectToHtml
 		{
 			Automaton aut = (Automaton) projectIt.next();
 
-			pw.println("<li> <a href=\"automaton" + aut.getIndex() + ".html\">" + EncodingHelper.normalize(aut.getName()) + "</a></li>");
+			pw.println("<li> <a href=\"automaton" + aut.getIndex() + ".html\">" + EncodingHelper.normalize(aut.getName(), ExportFormat.HTML) + "</a></li>");
 		}
 
 		pw.println("</ul>");
@@ -145,7 +146,7 @@ public class ProjectToHtml
 		{
 			Automaton aut = (Automaton) projectIt.next();
 
-			pw.println("<li> <a href=\"automaton" + aut.getIndex() + ".html\">" + EncodingHelper.normalize(aut.getName()) + "</a></li>");
+			pw.println("<li> <a href=\"automaton" + aut.getIndex() + ".html\">" + EncodingHelper.normalize(aut.getName(), ExportFormat.HTML) + "</a></li>");
 		}
 
 		pw.println("</ul>");
@@ -158,7 +159,7 @@ public class ProjectToHtml
 		PrintWriter pw = getPrintWriter("automaton" + theAutomaton.getSynchIndex() + ".html");
 
 		printHtmlBegin(pw, "Supremica Automaton: " + theAutomaton.getName());
-		pw.println("<h1>Automaton: " + EncodingHelper.normalize(theAutomaton.getName()) + "</h1>");
+		pw.println("<h1>Automaton: " + EncodingHelper.normalize(theAutomaton.getName(), ExportFormat.HTML) + "</h1>");
 		pw.println("<h2>Type: " + theAutomaton.getType() + "</h2>");
 		pw.println("<h2>Alphabet:</h2>");
 		pw.println("<ul>");
@@ -168,7 +169,7 @@ public class ProjectToHtml
 		{
 			LabeledEvent event = (LabeledEvent) eventIt.next();
 
-			pw.println("<li> <a href=\"event" + event.getIndex() + ".html\">" + EncodingHelper.normalize(event.getLabel()) + "</a></li>");
+			pw.println("<li> <a href=\"event" + event.getIndex() + ".html\">" + EncodingHelper.normalize(event.getLabel(), ExportFormat.HTML) + "</a></li>");
 		}
 
 		pw.println("</ul>");
@@ -191,7 +192,7 @@ public class ProjectToHtml
 		PrintWriter pw = getPrintWriter("event" + theEvent.getIndex() + ".html");
 
 		printHtmlBegin(pw, "Supremica Event: " + theEvent.getLabel());
-		pw.println("<h1>Event: " + EncodingHelper.normalize(theEvent.getLabel()) + "</h1>");
+		pw.println("<h1>Event: " + EncodingHelper.normalize(theEvent.getLabel(), ExportFormat.HTML) + "</h1>");
 		pw.println("<ul>");
 		pw.println("<li>" + "Controllable: " + theEvent.isControllable() + "</li>");
 		pw.println("<li>" + "Immediate: " + theEvent.isImmediate() + "</li>");
@@ -206,7 +207,7 @@ public class ProjectToHtml
 		pw.println("<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML//EN\">");
 		pw.println("<html>");
 		pw.println("<head>");
-		pw.println("<title>" + EncodingHelper.normalize(title) + "</title>");
+		pw.println("<title>" + EncodingHelper.normalize(title, ExportFormat.HTML) + "</title>");
 		pw.println("</head>");
 		pw.println("<body bgcolor=\"#FFFFFF\">");
 	}

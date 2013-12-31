@@ -57,6 +57,7 @@ import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
+import org.supremica.gui.ExportFormat;
 
 public class AutomataToXML
     implements AutomataSerializer
@@ -91,7 +92,7 @@ public class AutomataToXML
         
         if (automata.getName() != null)
         {
-            pw.print(" name=\"" + EncodingHelper.normalize(automata.getName()) + "\"");
+            pw.print(" name=\"" + EncodingHelper.normalize(automata.getName(), ExportFormat.XML) + "\"");
         }
         
         // To keep track of indices
@@ -102,7 +103,7 @@ public class AutomataToXML
         
         if ((automata.getComment() != null) && !automata.getComment().equals(""))
         {
-            pw.print(" comment=\"" + EncodingHelper.normalize(automata.getComment()) + "\"");
+            pw.print(" comment=\"" + EncodingHelper.normalize(automata.getComment(), ExportFormat.XML) + "\"");
         }
         
         pw.println(">");
@@ -119,7 +120,7 @@ public class AutomataToXML
             for (LabeledEvent event : aut.getAlphabet())
             {         
                 eventIdMap.put(event, eventId);
-                pw.print("\t\t<Event id=\"" + eventId + "\" label=\"" + EncodingHelper.normalize(event.getLabel()) + "\"");
+                pw.print("\t\t<Event id=\"" + eventId + "\" label=\"" + EncodingHelper.normalize(event.getLabel(), ExportFormat.XML) + "\"");
                 
                 eventId++;
                 
@@ -181,7 +182,7 @@ public class AutomataToXML
                 //--
                 // pw.print("\t\t<State id=\"" + EncodingHelper.normalize(state.getId()) + "\"");
                 //--
-                pw.print(" name=\"" + EncodingHelper.normalize(state.getName()) + "\"");    // always print the name
+                pw.print(" name=\"" + EncodingHelper.normalize(state.getName(), ExportFormat.XML) + "\"");    // always print the name
                 
                 //--
                 // if (!state.getId().equals(state.getName()))

@@ -57,6 +57,7 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.properties.Config;
+import org.supremica.gui.ExportFormat;
 
 public class AutomatonToDot
     implements AutomataSerializer
@@ -244,7 +245,7 @@ public class AutomatonToDot
             
             if (withLabel)
             {
-                pw.print(EncodingHelper.normalize(sourceState.getName(), false, false, false));
+                pw.print(EncodingHelper.normalize(sourceState.getName(), ExportFormat.DOT, false));
             }
             
             pw.println("\"" + getStateColor(sourceState) + "]; ");
@@ -309,7 +310,7 @@ public class AutomatonToDot
                             is_obs = true;
                         }
                         
-                        pw.print(EncodingHelper.normalize(thisEvent.getLabel(), false, false, false));
+                        pw.print(EncodingHelper.normalize(thisEvent.getLabel(), ExportFormat.DOT, false));
                         
                         if (arcIt.hasNext())
                         {

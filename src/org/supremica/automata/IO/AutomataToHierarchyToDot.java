@@ -53,6 +53,7 @@ import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
+import org.supremica.gui.ExportFormat;
 
 /**
  * Generates output to dot for viewing the moular structure of an automata. I.e. Automaton-Objects
@@ -185,7 +186,7 @@ public class AutomataToHierarchyToDot
 
             if (withLabel)
             {
-                pw.print(EncodingHelper.normalize(currAutomaton.getName()));
+                pw.print(EncodingHelper.normalize(currAutomaton.getName(), ExportFormat.DOT));
             }
 
             pw.println("\"" + getColor(currAutomaton) + getShape(currAutomaton) + "]; ");
