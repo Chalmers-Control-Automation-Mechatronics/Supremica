@@ -10,8 +10,8 @@
 package org.supremica.gui.ide.actions;
 
 import java.awt.Component;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 import net.sourceforge.waters.gui.actions.WatersActionManager;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
@@ -47,6 +47,7 @@ public class Actions extends WatersActionManager
 
     //#######################################################################
     //# Interface net.sourceforge.waters.gui.observer.Observer
+    @Override
     public void update(final EditorChangedEvent event)
     {
         super.update(event);
@@ -119,7 +120,6 @@ public class Actions extends WatersActionManager
     public IDEAction editorAddBindingAction = new EditorAddBindingAction(mIDEActions);
     public IDEAction editorStopEmbedderAction = new EditorStopEmbedderAction(mIDEActions);
     public IDEAction editorSynthesizerAction = new EditorSynthesizerAction(mIDEActions);
-    public IDEAction editorReachabilityGraphAction = new EditorReachabilityGraphAction(mIDEActions);
     public IDEAction editorTransitionProjectionAction = new EditorTransitionProjectionAction(mIDEActions);
     public IDEAction editorReadSpecAction = new EditorReadSpecAction(mIDEActions);
     public IDEAction editorReadFTAction = new EditorReadFisherThompsonAction(mIDEActions);
