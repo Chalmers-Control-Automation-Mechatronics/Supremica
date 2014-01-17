@@ -228,8 +228,10 @@ public class ExtendedAutomaton {
         }
 
 
-        for (final EdgeSubject edge : component.getGraph().getEdgesModifiable()) {
-            for (final Proxy event : edge.getLabelBlock().getEventIdentifierList()) {
+        for (final EdgeSubject edge : component.getGraph().getEdgesModifiable()) 
+        {
+            for (final Proxy event : edge.getLabelBlock().getEventIdentifierList()) 
+            {
                 final String eventName = ((SimpleIdentifierSubject) event).getName();
                 final EventDeclProxy e = automata.eventIdToProxy(eventName);
                 //The variables that appear in the guards and actions will later be used in the weighted matrix of the PCG

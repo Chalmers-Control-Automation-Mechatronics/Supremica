@@ -20,11 +20,14 @@ import java.util.Vector;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
+
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.automata.ExtendedAutomata;
@@ -82,7 +85,22 @@ public class EditorSynthesizerAction
         final int nbrOfComponents = module.getComponentList().size();
         if(nbrOfComponents == 0)
             return;
-
+        
+        /*** Check that we do not have any for-each blocks that create IndexedIdentifierSubject events (see issue #56) ***/
+        for(final Proxy sub : module.getComponentList())
+        {
+            if(sub instanceof ForeachProxy)
+            {
+                // We do not handle this at the moment, fail gracefully (sort of)
+                JOptionPane.showMessageDialog(ide.getFrame(), 
+                        "Sorry, but your module contains for-each blocks\nCurrently we cannot handle this\nWorking on it...",
+                        "Unable to handle...",                       
+                        JOptionPane.WARNING_MESSAGE);
+                
+                return;
+            }
+        }
+        
         // Synchronize EFAs
 /*        SynchronizationOptions so = new SynchronizationOptions();
         AutomataSynchronizer as = new AutomataSynchronizer(module.getComponentListModifiable(),so);
@@ -121,8 +139,10 @@ public class EditorSynthesizerAction
         {
             return;
         }
-
-        final ExtendedAutomata exAutomata = options.getOptimization()?new ExtendedAutomata(module, (int)options.getGlobalClockDomain()):new ExtendedAutomata(module);
+                
+        final ExtendedAutomata exAutomata = options.getOptimization() ? 
+                                new ExtendedAutomata(module, (int)options.getGlobalClockDomain()) : 
+                                new ExtendedAutomata(module);
 
 
     //        ReduceBDDvars rBDDv = new ReduceBDDvars(exAutomata.getExtendedAutomataList().get(0));

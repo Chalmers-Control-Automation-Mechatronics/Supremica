@@ -308,8 +308,10 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
             }
         }
 
-        for (final AbstractSubject sub : module.getComponentListModifiable()) {
-            if (sub instanceof SimpleComponentSubject) {
+        for (final AbstractSubject sub : module.getComponentListModifiable()) 
+        {
+            if (sub instanceof SimpleComponentSubject) 
+            {
                 final ExtendedAutomaton exAutomaton = new ExtendedAutomaton(this, (SimpleComponentSubject) sub);
 
                 if (theoNbrOfReachableStates == 0) {
