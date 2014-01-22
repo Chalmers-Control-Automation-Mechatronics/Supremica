@@ -150,7 +150,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     BDD[][] backwardTransAndNextValsForV;
     BDD[][] transWhereVisUpdatedWithoutDestClocks;
     BDD[][] transAndNextValsForVWithoutDestClocks;
-    String locaVarSuffix;
+    private final String locaVarSuffix;
     EditorSynthesizerOptions options;
     SynthesisAlgorithm synType;
     List<ExtendedAutomaton> plants;

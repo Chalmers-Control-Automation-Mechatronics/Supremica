@@ -262,10 +262,10 @@ public abstract class BDDAbstractManager {
                 SupremicaBDDBitVector tmp = null;
                 BDD leftOverflows = getZeroBDD();
                 BDD rightOverflows = getZeroBDD();
-                if (bexpr.getLeft().toString().contains(bddExAutomata.locaVarSuffix)) {
+                if (bexpr.getLeft().toString().contains(bddExAutomata.getLocVarSuffix())) {
                     final String leftString = bexpr.getLeft().toString();
                     final String locName = bexpr.getRight().toString();
-                    final String autName = leftString.substring(0, leftString.indexOf(bddExAutomata.locaVarSuffix));
+                    final String autName = leftString.substring(0, leftString.indexOf(bddExAutomata.getLocVarSuffix()));
                     tmp = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, false, bddExAutomata.getSourceLocationDomain(autName));
                     final BDD locBDD = createBDD(bddExAutomata.getIndexMap().getLocationIndex(autName, locName),
                             bddExAutomata.getSourceLocationDomain(autName));
@@ -283,10 +283,10 @@ public abstract class BDDAbstractManager {
                 SupremicaBDDBitVector tmp = null;
                 BDD leftOverflows = getZeroBDD();
                 BDD rightOverflows = getZeroBDD();
-                if (bexpr.getLeft().toString().contains(bddExAutomata.locaVarSuffix)) {
+                if (bexpr.getLeft().toString().contains(bddExAutomata.getLocVarSuffix())) {
                     final String leftString = bexpr.getLeft().toString();
                     final String locName = bexpr.getRight().toString();
-                    final String autName = leftString.substring(0, leftString.indexOf(bddExAutomata.locaVarSuffix));
+                    final String autName = leftString.substring(0, leftString.indexOf(bddExAutomata.getLocVarSuffix()));
                     tmp = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, false, bddExAutomata.getSourceLocationDomain(autName));
                     final BDD locBDD = createBDD(bddExAutomata.getIndexMap().getLocationIndex(autName, locName),
                             bddExAutomata.getSourceLocationDomain(autName)).not();

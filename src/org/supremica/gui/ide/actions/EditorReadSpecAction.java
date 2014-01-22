@@ -182,7 +182,7 @@ public class EditorReadSpecAction
 							if(guardB.length() == 0) guardB.append(TRUE_GUARD); //MF
 //                            System.out.println("final:"+finalGuard);
 
-							// Replace any ".curr" by "_curr"
+							// Replace any ".curr" by "_curr" -- and we assuem it occurs max once per guard
 							final String CURR = ".curr";	// This is problematic, "." is interpreted as a namespace delimiter
 							final String FIXX = "_curr";
 							final int SIZEOF_FIXX = FIXX.length();
