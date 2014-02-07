@@ -260,8 +260,8 @@ public class TauLoopRemovalTRSimplifier
   /**
    * Depth-first search indexes of visited states. Unvisited states have
    * a zero entry. Visited states receive numbers in the order in which they
-   * are encountered in depth-search order. Unreachable states retain the
-   * value&nbsp;0.
+   * are encountered in depth-search order, starting with&nbsp;1.
+   * Unreachable states retain the value&nbsp;0.
    */
   private int[] mDFSIndex;
   /**
@@ -270,8 +270,8 @@ public class TauLoopRemovalTRSimplifier
    */
   private int[] mLowLink;
   /**
-   * Stack of states currently being, which have not yet been assigned to
-   * any component.
+   * Stack of states currently being processed, which have not yet been
+   * assigned to any component.
    */
   private TIntStack mComponentStack;
   /**

@@ -1,13 +1,22 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.compositional
+//# CLASS:   EnabledEventsCache
+//###########################################################################
+//# $Id$
+//###########################################################################
+
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.iterator.TIntIterator;
 import gnu.trove.map.hash.TObjectByteHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -26,172 +35,280 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
+/**
+ * A tool to remember sets of always enabled events during compositional
+ * conflict check.
+ *
+ * @author Colin Pilbrow, Robi Malik
+ */
+
 public class EnabledEventsCache
 {
 
-  AutomatonProxy mAutToAbstract;
-  List<AutomatonProxy> mAutomataToTest = new ArrayList<AutomatonProxy>();
-  ListBufferTransitionRelation[] mTransitionRelations;
-  TObjectByteHashMap<TIntHashSet> mEventSetCache;
-  EventEncoding mEncoding;
-  ProductDESProxyFactory mFactory;
-int OMEGA;
-  HashMap<EventProxy,Integer> eventsCounter = new HashMap<>();
-
+  //#########################################################################
+  //# Constructors
   public EnabledEventsCache(final AutomatonProxy autToAbstract,
                             final Collection<AutomatonProxy> allAutomata,
+                            final EventProxy omega,
                             final ProductDESProxyFactory factory,
-                            final KindTranslator translator,
-                            final int omega)
+                            final KindTranslator translator)
   {
-    OMEGA = omega;
     mFactory = factory;
-    final EventEncoding encoding =
-      new EventEncoding(autToAbstract.getEvents(), translator);
-    mAutToAbstract = autToAbstract;
-    //Collect all automata that share events with the autToAbstract.
+    mKindTranslator = translator;
+    final Collection<EventProxy> empty = Collections.emptyList();
+    mEventEncoding =
+      new EventEncoding(autToAbstract.getEvents(), translator,
+                        empty, EventEncoding.FILTER_PROPOSITIONS);
+    mOmega = mEventEncoding.addEvent(omega, translator,
+                                     EventEncoding.STATUS_NONE);
+    mTRInfo = new ArrayList<>(allAutomata.size() - 1);
+    // Collect all automata that share events with autToAbstract.
+    for (final AutomatonProxy aut : allAutomata) {
+      if (aut != autToAbstract) {
+        for (final EventProxy event : aut.getEvents()) {
+          if (translator.getEventKind(event) != EventKind.PROPOSITION &&
+              mEventEncoding.getEventCode(event) >= 0) {
+            final TRInfo info = new TRInfo(aut);
+            mTRInfo.add(info);
+            break;
+          }
+        }
+      }
+    }
+    // Find any tau events in allAutomata and add them to the encoding.
+    final TObjectIntHashMap<EventProxy> eventsCounter =
+      new TObjectIntHashMap<>();
     for (final AutomatonProxy aut : allAutomata) {
       for (final EventProxy event : aut.getEvents()) {
-        if(translator.getEventKind(event) != EventKind.PROPOSITION && encoding.getEventCode(event) >= 0)
-        {
-          mAutomataToTest.add(aut);
-          break;
-        }
+        // If we have not seen the event in previous automata, assign a count
+        // of 1, otherwise add 1 to its count.
+        eventsCounter.adjustOrPutValue(event, 1, 1);
       }
     }
-    mTransitionRelations =
-      new ListBufferTransitionRelation[mAutomataToTest.size()];
-
-    //Find any tau events in allAutomata and add them to the encoding.
-    for (final AutomatonProxy aut : allAutomata) {
-      for (final EventProxy tauEvents : aut.getEvents()) {
-        if (!eventsCounter.containsKey(tauEvents)) {
-          //If we have not seen the event in previous automata, add it to the counter
-          eventsCounter.put(tauEvents, 1);
-        } else {
-          //Increase it's count by one, and it is no longer tau.
-          eventsCounter.put(tauEvents, eventsCounter.get(tauEvents) + 1);
-        }
+    for (final EventProxy event : eventsCounter.keySet()) {
+      if (eventsCounter.get(event) == 1) {
+        mEventEncoding.addSilentEvent(event);
       }
     }
-    for (final EventProxy tauEvents : eventsCounter.keySet()) {
-      if (eventsCounter.get(tauEvents) == 1) {
-        encoding.addSilentEvent(tauEvents);
-      }
-    }
-    //The encoding has events from autToEncode, plus all tau events from any of the automata
-    mEncoding = encoding;
   }
 
-  /**
-   *
-   * Is at least one of the events in the set eventSet enabled on all states
-   * in every other automata in the system?
-   *
-   * @param eventSet
-   *          is a set of encoded events
-   * @return true if the set is always enabled.
-   * @throws OverflowException
-   */
-  public boolean IsAlwaysEnabled(final TIntHashSet eventSet) throws OverflowException
+
+  //#########################################################################
+  //# Configuration
+  public int getTransitionLimit()
   {
-    //Check the eventSet cache to see if we have already tested this set
-    final int cacheValue = mEventSetCache.get(eventSet);
-    if (cacheValue == 1)
+    return mTransitionLimit;
+  }
+
+  public void setTransitionLimit(final int limit)
+  {
+    mTransitionLimit = limit;
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  public EventEncoding getEventEncoding()
+  {
+    return mEventEncoding;
+  }
+
+
+  //#########################################################################
+  //# Cache Access
+  /**
+   * Returns whether at least one of the events in the set given event set is
+   * enabled on all states in every other automaton in the system.
+   * @param eventSet
+   *          A set of encoded events.
+   * @return <CODE>true</CODE> if the set is always enabled.
+   */
+  public boolean IsAlwaysEnabled(final TIntHashSet eventSet)
+    throws OverflowException
+  {
+    // Check the eventSet cache to see if we have already tested this set.
+    switch (mEventSetCache.get(eventSet)) {
+    case ALWAYS_ENABLED:
       return true;
-    else if (cacheValue == 2)
+    case NOT_ALWAYS_ENABLED:
       return false;
-    else if (cacheValue == 0) {
-
-      outer: for (final AutomatonProxy aut : mAutomataToTest) {
-        //If ALL events from eventSet are in the alphabet of aut
-        final TIntIterator iter = eventSet.iterator();
-        while(iter.hasNext())
-        {
-          final int e = iter.next();
-          final EventProxy event = mEncoding.getProperEvent(e);
-          if(!aut.getEvents().contains(event))
-          {
-            continue outer;
-          }
-        }
-
-        //If all the events from eventSet are in this automaton, we then get
-        //the transition relation to test if some of eventSet is enabled on every state.
-        final int relIndex = mAutomataToTest.indexOf(aut);
-        //The transition relations are cached for a single question.
-        if (mTransitionRelations[relIndex] == null) {
-          //Create a smaller version of the automaton with only relevant events
-          final Set<StateProxy> fantasy = new THashSet<>();
-          final ArrayList<TransitionProxy> newTrans = new ArrayList<>();
-          for (final TransitionProxy tr : aut.getTransitions()) {
-
-            //If the event is not tau and not in the alphabet of the autToAbstract
-            if(mEncoding.getEventCode(tr.getEvent()) < 0)
-            {
-              //Then we will mark the state as a 'fantasy' state
-              fantasy.add(tr.getSource());
-            } else //We will add this transition to the smaller automaton.
-            {
-              newTrans.add(tr);
+    case VALUE_UNKNOWN:
+      assert !eventSet.contains(EventEncoding.TAU) :
+        "EnabledEventsCache does not support sets containing TAU --- " +
+        "please check for TAU beforehand.";
+      for (final TRInfo info : mTRInfo) {
+        final AutomatonProxy aut = info.getAutomaton();
+        // Only continue if ALL events from eventSet are in the alphabet
+        // of the automaton to be tested
+        int count = 0;
+        for (final EventProxy event : aut.getEvents()) {
+          if (mKindTranslator.getEventKind(event) != EventKind.PROPOSITION) {
+            final int e = mEventEncoding.getEventCode(event);
+            if (e > EventEncoding.TAU && eventSet.contains(e)) {
+              count++;
             }
           }
-          //Create smaller automaton using eventset of autToAbstract
-          //Same state set
-          //transitions newTrans
-          final Collection<EventProxy> newEvents = mEncoding.getEvents();
-          final AutomatonProxy newAut = mFactory.createAutomatonProxy(aut.getName(), aut.getKind(), newEvents, aut.getStates(), newTrans);
-
-          //Create a State encoding.
-          final StateEncoding stateEncoding = new StateEncoding();
-
-          //Create transition relation and store it.
-          final ListBufferTransitionRelation newRel = new ListBufferTransitionRelation(newAut, mEncoding, stateEncoding, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-
-
-          //Mark each fantasy state in the rel.
-          for(final StateProxy s : fantasy)
-          {
-            newRel.setMarked(stateEncoding.getStateCode(s), OMEGA, true);
-          }
         }
-        //Test if every state has some of eventSet enabled.
-        final TauClosure closure =
-          mTransitionRelations[relIndex].createSuccessorsTauClosure(0);
-        final TransitionIterator iterator = closure.createPreEventClosureIterator();
-
-        states: for (int state = 0; state < mTransitionRelations[relIndex]
-          .getNumberOfStates(); state++) {
-          iterator.resetState(state);
-          while (iterator.advance()) {
-            if (eventSet.contains(iterator.getCurrentEvent())) {
+        if (count < eventSet.size()) {
+          continue;
+        }
+        // Create transition relation if not yet available
+        createTransitionRelation(info);
+        // Test if every state has some event in eventSet enabled.
+        final ListBufferTransitionRelation rel = info.getTransitionRelation();
+        final int numStates = rel.getNumberOfStates();
+        final TauClosure closure = info.getTauClosure();
+        final TransitionIterator iter =
+          closure.createPreEventClosureIterator();
+        states:
+        for (int s = 0; s < numStates; s++) {
+          // If this state is a dump state then ignore it
+          // (i.e., if it has no outgoing transition, and is not marked OMEGA)
+          if (rel.isDeadlockState(s, mOmega)) {
+            continue states;
+          }
+          // Otherwise check whether it enables an event from the eventSet
+          iter.resetState(s);
+          while (iter.advance()) {
+            final int e = iter.getCurrentEvent();
+            if (eventSet.contains(e)) {
               continue states;
             }
           }
-          //If this state is a dump state then ignore it
-          //If it has no outgoing transition, and is not marked OMEGA.
-         if( mTransitionRelations[relIndex].isDeadlockState(state, OMEGA))
-          {
-            continue states;
-          }
-          //If this state has no transitions from the eventSet
-          mEventSetCache.put(eventSet, (byte) 2);
+          // If this state has no transitions from the eventSet,
+          // then the eventSet is not always enabled.
+          mEventSetCache.put(eventSet, NOT_ALWAYS_ENABLED);
           return false;
         }
       }
-    //Otherwise every state in every automaton has some transitions from the eventSet
-    mEventSetCache.put(eventSet, (byte) 1);
-    return true;
-
-    } else //The cache has somehow broken
-    {
-      return false;
+      // Every state in every automaton has some transitions from the eventSet.
+      mEventSetCache.put(eventSet, ALWAYS_ENABLED);
+      return true;
+    default:
+      throw new IllegalStateException("Unexpected value in cache: " +
+                                      mEventSetCache.get(eventSet) + "!");
     }
   }
 
 
-  public EventEncoding getEventEncoding()
+  //#########################################################################
+  //# Auxiliary Methods
+  private void createTransitionRelation(final TRInfo info)
+    throws OverflowException
   {
-    return mEncoding;
+    if (info.getTransitionRelation() != null) {
+      // Create a smaller version of the automaton with only relevant events
+      final AutomatonProxy aut = info.getAutomaton();
+      final Collection<StateProxy> states = aut.getStates();
+      final boolean containsOmega = aut.getEvents().contains(mOmega);
+      final Set<StateProxy> extraMarkedStates =
+        containsOmega ? new THashSet<StateProxy>(states.size()) : null;
+      final Collection<TransitionProxy> transitions = aut.getTransitions();
+      final Collection<TransitionProxy> newTransitions =
+        new ArrayList<>(transitions.size());
+      for (final TransitionProxy trans : aut.getTransitions()) {
+        // If the event is TAU or in the alphabet of the
+        // automaton to be abstracted
+        if (mEventEncoding.getEventCode(trans.getEvent()) >= 0) {
+          // Then add this transition to the smaller automaton.
+          newTransitions.add(trans);
+        } else if (extraMarkedStates != null) {
+          // Otherwise mark the state as a 'fantasy' state
+          // to be marked OMEGA in the end
+          extraMarkedStates.add(trans.getSource());
+        }
+      }
+      // Create smaller automaton using the event set of the automaton to
+      // be abstracted, the same state set, and the reduced transitions.
+      final Collection<EventProxy> newEvents = mEventEncoding.getEvents();
+      final AutomatonProxy newAut =
+        mFactory.createAutomatonProxy(aut.getName(), aut.getKind(),
+                                      newEvents, aut.getStates(),
+                                      newTransitions);
+      // Create transition relation
+      final StateEncoding stateEncoding = new StateEncoding();
+      final ListBufferTransitionRelation newRel =
+        new ListBufferTransitionRelation(newAut,
+                                         mEventEncoding,
+                                         stateEncoding,
+                                         ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      // Mark each 'fantasy' state in the transition relation OMEGA.
+      if (extraMarkedStates != null) {
+        for (final StateProxy state : extraMarkedStates) {
+          final int s = stateEncoding.getStateCode(state);
+          newRel.setMarked(s, mOmega, true);
+        }
+      }
+      // Store the transition relation
+      info.setTransitionRelation(newRel, mTransitionLimit);
+    }
   }
+
+
+  //#########################################################################
+  //# Inner Class TRInfo
+  /**
+   * An information record that stores automata with associated transition
+   * relations and tau closures.
+   */
+  private static class TRInfo
+  {
+    //#######################################################################
+    //# Constructor
+    private TRInfo(final AutomatonProxy aut)
+    {
+      mAutomaton = aut;
+    }
+
+    //#######################################################################
+    //# Simple Access
+    private AutomatonProxy getAutomaton()
+    {
+      return mAutomaton;
+    }
+
+    private ListBufferTransitionRelation getTransitionRelation()
+    {
+      return mTransitionRelation;
+    }
+
+    private TauClosure getTauClosure()
+    {
+      return mTauClosure;
+    }
+
+    void setTransitionRelation(final ListBufferTransitionRelation rel,
+                               final int limit)
+    {
+      mTransitionRelation = rel;
+      mTauClosure = rel.createSuccessorsTauClosure(limit);
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final AutomatonProxy mAutomaton;
+    private ListBufferTransitionRelation mTransitionRelation;
+    private TauClosure mTauClosure;
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private int mTransitionLimit = Integer.MAX_VALUE;
+
+  private final ProductDESProxyFactory mFactory;
+  private final KindTranslator mKindTranslator;
+  private final EventEncoding mEventEncoding;
+  private final int mOmega;
+  private final List<TRInfo> mTRInfo;
+
+  private TObjectByteHashMap<TIntHashSet> mEventSetCache;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final byte VALUE_UNKNOWN = 0;
+  private static final byte ALWAYS_ENABLED = 1;
+  private static final byte NOT_ALWAYS_ENABLED = 2;
+
 }

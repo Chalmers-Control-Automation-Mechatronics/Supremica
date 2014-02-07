@@ -77,12 +77,12 @@ public class IntStateBuffer
       setReachable(state, false);
     }
     int tags0 = TAG_REACHABLE;
-    for (int e = 0; e < eventEnc.getNumberOfPropositions(); e++) {
-      final byte status = eventEnc.getPropositionStatus(e);
+    for (int p = 0; p < eventEnc.getNumberOfPropositions(); p++) {
+      final byte status = eventEnc.getPropositionStatus(p);
       if ((status & EventEncoding.STATUS_UNUSED) != 0) {
-        final EventProxy event = eventEnc.getProposition(e);
+        final EventProxy event = eventEnc.getProposition(p);
         if (events == null || !events.contains(event)) {
-          tags0 |= (1 << e);
+          tags0 |= (1 << p);
         }
       }
     }
