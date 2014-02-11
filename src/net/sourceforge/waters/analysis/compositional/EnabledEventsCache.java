@@ -16,7 +16,6 @@ import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -48,6 +47,7 @@ public class EnabledEventsCache
   //#########################################################################
   //# Constructors
   public EnabledEventsCache(final AutomatonProxy autToAbstract,
+                            final Collection<EventProxy> local,
                             final Collection<AutomatonProxy> allAutomata,
                             final EventProxy omega,
                             final ProductDESProxyFactory factory,
@@ -55,12 +55,27 @@ public class EnabledEventsCache
   {
     mFactory = factory;
     mKindTranslator = translator;
-    final Collection<EventProxy> empty = Collections.emptyList();
-    mEventEncoding =
-      new EventEncoding(autToAbstract.getEvents(), translator,
-                        empty, EventEncoding.FILTER_PROPOSITIONS);
-    mOmega = mEventEncoding.addEvent(omega, translator,
-                                     EventEncoding.STATUS_NONE);
+    final Set<EventProxy> events = autToAbstract.getEvents();
+    mEventEncoding = new EventEncoding();
+    for(final EventProxy event : events)
+    {
+      if(translator.getEventKind(event) != EventKind.PROPOSITION)
+      {
+        if(local.contains(event))
+        {
+          mEventEncoding.addSilentEvent(event);
+        }
+        else
+        {
+          mEventEncoding.addEvent(event, translator, EventEncoding.STATUS_NONE);
+        }
+      }
+    }
+  //    new EventEncoding(events, translator,
+  //                      empty, EventEncoding.FILTER_PROPOSITIONS);
+    final byte status = events.contains(omega) ?
+      EventEncoding.STATUS_NONE : EventEncoding.STATUS_UNUSED;
+    mOmega = mEventEncoding.addEvent(omega, translator, status);
     mTRInfo = new ArrayList<>(allAutomata.size() - 1);
     // Collect all automata that share events with autToAbstract.
     for (final AutomatonProxy aut : allAutomata) {
@@ -80,9 +95,11 @@ public class EnabledEventsCache
       new TObjectIntHashMap<>();
     for (final AutomatonProxy aut : allAutomata) {
       for (final EventProxy event : aut.getEvents()) {
-        // If we have not seen the event in previous automata, assign a count
-        // of 1, otherwise add 1 to its count.
-        eventsCounter.adjustOrPutValue(event, 1, 1);
+        if (translator.getEventKind(event) != EventKind.PROPOSITION) {
+          // If we have not seen the event in previous automata, assign a count
+          // of 1, otherwise add 1 to its count.
+          eventsCounter.adjustOrPutValue(event, 1, 1);
+        }
       }
     }
     for (final EventProxy event : eventsCounter.keySet()) {
@@ -126,6 +143,12 @@ public class EnabledEventsCache
   public boolean IsAlwaysEnabled(final TIntHashSet eventSet)
     throws OverflowException
   {
+    //if(eventSet == null)
+     // System.out.println("Null event set");
+
+   // if(mEventSetCache == null)
+    //  System.out.println("Null cache");
+
     // Check the eventSet cache to see if we have already tested this set.
     switch (mEventSetCache.get(eventSet)) {
     case ALWAYS_ENABLED:
@@ -156,6 +179,9 @@ public class EnabledEventsCache
         createTransitionRelation(info);
         // Test if every state has some event in eventSet enabled.
         final ListBufferTransitionRelation rel = info.getTransitionRelation();
+        if(rel == null)
+          System.out.println("Null transition relation");
+
         final int numStates = rel.getNumberOfStates();
         final TauClosure closure = info.getTauClosure();
         final TransitionIterator iter =
@@ -196,7 +222,8 @@ public class EnabledEventsCache
   private void createTransitionRelation(final TRInfo info)
     throws OverflowException
   {
-    if (info.getTransitionRelation() != null) {
+
+    if (info.getTransitionRelation() == null) {
       // Create a smaller version of the automaton with only relevant events
       final AutomatonProxy aut = info.getAutomaton();
       final Collection<StateProxy> states = aut.getStates();
@@ -226,7 +253,10 @@ public class EnabledEventsCache
                                       newEvents, aut.getStates(),
                                       newTransitions);
       // Create transition relation
-      final StateEncoding stateEncoding = new StateEncoding();
+      final byte status = containsOmega ?
+        EventEncoding.STATUS_NONE : EventEncoding.STATUS_UNUSED;
+      mEventEncoding.setPropositionStatus(mOmega, status);
+      final StateEncoding stateEncoding = new StateEncoding(newAut);
       final ListBufferTransitionRelation newRel =
         new ListBufferTransitionRelation(newAut,
                                          mEventEncoding,
@@ -302,7 +332,7 @@ public class EnabledEventsCache
   private final int mOmega;
   private final List<TRInfo> mTRInfo;
 
-  private TObjectByteHashMap<TIntHashSet> mEventSetCache;
+  private final TObjectByteHashMap<TIntHashSet> mEventSetCache = new TObjectByteHashMap<TIntHashSet>();
 
 
   //#########################################################################

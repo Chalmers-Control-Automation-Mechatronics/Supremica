@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
+import net.sourceforge.waters.analysis.compositional.EnabledEventsCache;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.HashFunctions;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
@@ -41,17 +42,17 @@ import net.sourceforge.waters.model.des.AutomatonTools;
  * @author Robi Malik, Colin Pilbrow
  */
 
-public class EnabledEventsSilentContinuationTRSimplifier
+public class EnabledEventsSetSilentContinuationTRSimplifier
   extends AbstractTRSimplifier
 {
 
   //#######################################################################
   //# Constructors
-  public EnabledEventsSilentContinuationTRSimplifier()
+  public EnabledEventsSetSilentContinuationTRSimplifier()
   {
   }
 
-  public EnabledEventsSilentContinuationTRSimplifier(final ListBufferTransitionRelation rel)
+  public EnabledEventsSetSilentContinuationTRSimplifier(final ListBufferTransitionRelation rel)
   {
     super(rel);
   }
@@ -81,18 +82,9 @@ public class EnabledEventsSilentContinuationTRSimplifier
     return mTransitionLimit;
   }
 
-  /**
-   * Sets the number of always enabled events. Always enabled events are events
-   * that are not disabled by any other current automaton.
-   */
-  public void setNumberOfEnabledEvents(final int numEnabledEvents)
+  public void setEnabledEventsCache(final EnabledEventsCache enabledEventsCache)
   {
-    mNumberOfEnabledEvents = numEnabledEvents;
-  }
-
-  public int getNumberOfEnabledEvents()
-  {
-    return mNumberOfEnabledEvents;
+    mEnabledEventsCache = enabledEventsCache;
   }
 
 
@@ -102,7 +94,7 @@ public class EnabledEventsSilentContinuationTRSimplifier
   @Override
   public int getPreferredInputConfiguration()
   {
-    return ListBufferTransitionRelation.CONFIG_PREDECESSORS;
+    return ListBufferTransitionRelation.CONFIG_SUCCESSORS;
   }
 
   @Override
@@ -133,26 +125,46 @@ public class EnabledEventsSilentContinuationTRSimplifier
   throws AnalysisException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    if ((rel.getProperEventStatus(EventEncoding.TAU) &
-         EventEncoding.STATUS_UNUSED) != 0 &&
-        mNumberOfEnabledEvents == 0) {
+    if (mEnabledEventsCache != null &&
+        (rel.getProperEventStatus(EventEncoding.TAU) &
+         EventEncoding.STATUS_UNUSED) != 0) {
       return false;
     }
     final int numStates = rel.getNumberOfStates();
     final BitSet candidates = new BitSet(numStates);
 
     final TransitionIterator iter =
-      rel.createAllTransitionsReadOnlyIterator();
-    iter.resetEvents(0, mNumberOfEnabledEvents);            // Iterate over transitions tau or always enabled events ...
-    while (iter.advance()) {                                //for each transition
-      final int source = iter.getCurrentSourceState();      //find source state
-      candidates.set(source);                               //candidates will have one bit for each state with outgoing transition
-    }           //great big string of 0s and 1s which say if state has an outgoing transition or not
-    final int numCandidates = candidates.cardinality();
+      rel.createSuccessorsReadOnlyIterator();
+    outer: for(int s = 0; s < numStates; s++)
+    {
+      final TIntHashSet outgoingEvents = new TIntHashSet();
+      iter.resetState(s);
+      while(iter.advance()){
+        final int e = iter.getCurrentEvent();
+        if(e == EventEncoding.TAU)
+        {
+          candidates.set(s);
+          continue outer;
+        }
+        else{
+          //Add it to a hashset of outgoing events from this state.
+          outgoingEvents.add(e);
+        }
+      }
+      //If there are no outgoing tau events
+      //Then see if the outgoing events of this state are an always enabled set.
+      if(mEnabledEventsCache.IsAlwaysEnabled(outgoingEvents))
+      {
+        candidates.set(s);
+      }
+    }
+
+   final int numCandidates = candidates.cardinality();
     if (numCandidates == 0) {                               //if there are no outgoing transitions
       return false;                                         //can't simplify
     }
 
+    rel.reconfigure(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
     final WatersIntHashingStrategy strategy = //something in hashingstrategy does the rule //group together incoming equivalence states
       new IncomingEquivalenceStateHash();
     final WatersIntIntHashMap map =
@@ -205,10 +217,6 @@ public class EnabledEventsSilentContinuationTRSimplifier
   protected void recordStart()
   {
     super.recordStart();
-    final EnabledEventsStatistics stats = getStatistics();
-    if (stats != null) {
-      stats.recordNumEnabledEvents(mNumberOfEnabledEvents);
-    }
   }
 
 
@@ -400,7 +408,7 @@ public class EnabledEventsSilentContinuationTRSimplifier
   //#######################################################################
   //# Data Members
   private int mTransitionLimit = Integer.MAX_VALUE;
-  private int mNumberOfEnabledEvents;
+  private EnabledEventsCache mEnabledEventsCache;
 
 }
 
