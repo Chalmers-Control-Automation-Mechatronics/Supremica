@@ -96,13 +96,12 @@ public class UnifiedEFAConflictCheckerAnalysisResult
 
   //#########################################################################
   //# Providing Statistics
-  public void setUnifiedSystem(final UnifiedEFAConflictChecker checker)
+
+
+   @Override
+  public void setSatisfied(final boolean sat)
   {
-    setNumberOfAutomata(checker.getNumberOfAutomata());
-    for (final UnifiedEFATransitionRelation tr :
-      checker.getTransitionRelations()) {
-      addUnifiedEFATRTransitionRelation(tr);
-    }
+     super.setSatisfied(sat);
   }
 
   public void addUnifiedEFATRTransitionRelation(final UnifiedEFATransitionRelation tr)

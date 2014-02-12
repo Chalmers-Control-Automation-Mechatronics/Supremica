@@ -235,10 +235,12 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       (mCompilerOperatorTable, context);
     final Comparator<VariableInfo> maxEvents = new ComparatorMaxEvents();
     final Comparator<VariableInfo> maxSelfloops = new ComparatorMaxSelfloops();
+    @SuppressWarnings("unused")
     final Comparator<Candidate> minStates = new ComparatorMinStates();
     mVariableComparator =
       new VariableComparator(maxEvents, maxSelfloops);
-    mAutomataComparator = new CandidateComparator(minStates);
+    final Comparator<Candidate> minF = new ComparatorMinFrontier();
+      mAutomataComparator = new CandidateComparator(minF);
     mUnfolder = new UnifiedEFAVariableUnfolder
       (getFactory(), mCompilerOperatorTable, context);
     mDummyRoot = new SilentEFAEvent("Dummy");
@@ -285,23 +287,21 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       mCurrentSubSystem = new SubSystemInfo(mMainEFASystem.getEvents().size(),
                                             mMainEFASystem.getVariables().size(),
                                             trs);
-      final UnifiedEFAConflictCheckerAnalysisResult result = getAnalysisResult();
-      result.setUnifiedSystem(this);
       mDirtyTRs = new THashSet<>(trs);
       createVariableInfo();
       createEventInfo();
       simplifyDirtyTransitionRelations();
       splitSubsystems();
+      final UnifiedEFAConflictCheckerAnalysisResult stat = new UnifiedEFAConflictCheckerAnalysisResult();
 //      int i = 0;
       while (mCurrentSubSystem != null) {
         while (mCurrentSubSystem.isReducible()) {
           // TODO Not counting correctly :-p
-          result.setUnifiedSystem(this);
-          final Candidate minCandidate = mCurrentSubSystem.selectCandidate();
+           final Candidate minCandidate = mCurrentSubSystem.selectCandidate();
           applyCandidate(minCandidate);
           simplifyDirtyTransitionRelations();
           splitSubsystems();
-          result.setUnifiedSystem(this);
+
 //          saveCurrentSystem("debug/sub" + i);
 //          getLogger().debug("wrote debug/sub" + i);
 //          i++;
@@ -316,11 +316,15 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
         final boolean nonblocking = mNonblockingChecker.run(finalTR);
         getLogger().debug("Result for final TR " + finalTR.getName() + ": " + nonblocking);
         if (!nonblocking) {
+          super.setBooleanResult(false);
+          stat.setSatisfied(false);
           return false;
         } else {
           mCurrentSubSystem = mSubSystemQueue.poll();
         }
       }
+      super.setBooleanResult(true);
+      stat.setSatisfied(true);
       return true;
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
@@ -469,6 +473,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     final List<VariableInfo> vars = candidate.getVariables();
     List<UnifiedEFATransitionRelation> trs =
       candidate.getTransitionRelations();
+    final UnifiedEFAConflictCheckerAnalysisResult result = getAnalysisResult();
     mLocalVariableTR = null;
     if (!vars.isEmpty()) {
       final VariableInfo selectedVarInfo =
@@ -481,6 +486,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       mUnfolder.run();
       final UnifiedEFATransitionRelation unfoldedTR =
         mUnfolder.getTransitionRelation();
+      result.addUnifiedEFATRTransitionRelation(unfoldedTR);
       registerTR(unfoldedTR, true);
       unregisterVariable(selectedVarInfo);
       UnifiedEFATransitionRelation simplifiedTR = simplifyTR(unfoldedTR);
@@ -500,6 +506,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       final UnifiedEFATransitionRelation syncTR =
         mSynchronizer.getSynchronousProduct();
       registerTR(syncTR, false);
+      result.addUnifiedEFATRTransitionRelation(syncTR);
       for (final UnifiedEFATransitionRelation tr : trs) {
         unregisterTR(tr);
       }
@@ -512,6 +519,8 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       }
     } else {
       final UnifiedEFATransitionRelation tr = trs.get(0);
+      result.addUnifiedEFATRTransitionRelation(tr);
+
       final UnifiedEFATransitionRelation simplifiedTR = simplifyTR(tr);
       if (simplifiedTR != null) {
         mergeUpdates(simplifiedTR);
@@ -1970,7 +1979,49 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       }
     }
   }
+  //#########################################################################
+  //# Inner Class ComparatorMinStates
 
+  private static class ComparatorMinFrontier
+    implements Comparator<Candidate>
+  {
+
+    @Override
+    public int compare(final Candidate candidate1, final Candidate candidate2)
+    {
+      final double value1 = getHeuristicValue(candidate1);
+      final double value2 = getHeuristicValue(candidate2);
+      if (value1 < value2) {
+        return -1;
+      } else if (value2 < value1) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }
+
+
+    protected double getHeuristicValue(final Candidate candidate)
+    {
+      final List<UnifiedEFATransitionRelation> trs = candidate.getTransitionRelations();
+      final Collection<UnifiedEFATransitionRelation> frontier =
+        new THashSet<UnifiedEFATransitionRelation>();
+
+      for (final VariableInfo var : candidate.getVariables()) {
+        for (final EventInfo varEvents : var.getEvents()) {
+          for (final UnifiedEFATransitionRelation tr : varEvents.getTransitionRelations())
+          {
+            if (!trs.contains(tr)) {
+              frontier.add(tr);
+            }
+          }
+        }
+      }
+      return frontier.size();
+    }
+
+
+}
 
   //#########################################################################
   //# Inner Class CandidateComparator

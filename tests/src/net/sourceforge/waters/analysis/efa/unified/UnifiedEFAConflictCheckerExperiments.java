@@ -228,7 +228,7 @@ public class UnifiedEFAConflictCheckerExperiments
       // next please ...
     }
     try {
-      for (int maxseqno = 31; maxseqno <= 255; maxseqno += 32) {
+      for (int maxseqno = 31; maxseqno <= 150; maxseqno += 32) {
         checkProfisafe("profisafe_ihost_efa_block", maxseqno, false);
       }
     } catch (final AnalysisException exception) {
@@ -237,7 +237,7 @@ public class UnifiedEFAConflictCheckerExperiments
       // next please ...
     }
     try {
-      for (int maxseqno = 31; maxseqno <= 255; maxseqno += 32) {
+      for (int maxseqno = 31; maxseqno <= 150; maxseqno += 32) {
         checkProfisafe("profisafe_ihost_efa", maxseqno, true);
       }
     } catch (final AnalysisException exception) {
@@ -246,7 +246,7 @@ public class UnifiedEFAConflictCheckerExperiments
       // next please ...
     }
     try {
-      for (int maxseqno = 31; maxseqno <= 255; maxseqno += 32) {
+      for (int maxseqno = 31; maxseqno <= 150; maxseqno += 32) {
         checkProfisafe("profisafe_islave_efa", maxseqno, true);
       }
     } catch (final AnalysisException exception) {
@@ -483,7 +483,7 @@ public class UnifiedEFAConflictCheckerExperiments
       mConflictChecker.setPreselectingMethod
         (AbstractCompositionalModelAnalyzer.MustL);
       mConflictChecker.setSelectionHeuristic
-        (CompositionalSelectionHeuristicFactory.MinS);
+        (CompositionalSelectionHeuristicFactory.MinF);
       mConflictChecker.setInternalStateLimit(10000);
       mConflictChecker.setMonolithicStateLimit(50000000);
       mConflictChecker.setMonolithicTransitionLimit(0);
@@ -576,6 +576,6 @@ public class UnifiedEFAConflictCheckerExperiments
   private PrintWriter mPrintWriter;
   private boolean mHasBeenPrinted;
 
-  private final int mTimeout = 30;  // 20 minutes
+  private final int mTimeout = 600;  // 20 minutes
 
 }
