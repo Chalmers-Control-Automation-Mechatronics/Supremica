@@ -47,7 +47,7 @@ public class EnabledEventsCache
   //#########################################################################
   //# Constructors
   public EnabledEventsCache(final AutomatonProxy autToAbstract,
-                            final Collection<EventProxy> local,
+                            final EventEncoding autEncoding,
                             final Collection<AutomatonProxy> allAutomata,
                             final EventProxy omega,
                             final ProductDESProxyFactory factory,
@@ -55,27 +55,15 @@ public class EnabledEventsCache
   {
     mFactory = factory;
     mKindTranslator = translator;
-    final Set<EventProxy> events = autToAbstract.getEvents();
     mEventEncoding = new EventEncoding();
-    for(final EventProxy event : events)
-    {
-      if(translator.getEventKind(event) != EventKind.PROPOSITION)
-      {
-        if(local.contains(event))
-        {
-          mEventEncoding.addSilentEvent(event);
-        }
-        else
-        {
-          mEventEncoding.addEvent(event, translator, EventEncoding.STATUS_NONE);
-        }
-      }
+    for (int e = EventEncoding.NONTAU;
+         e < autEncoding.getNumberOfProperEvents(); e++) {
+      final EventProxy event = autEncoding.getProperEvent(e);
+      mEventEncoding.addEvent(event, translator,
+                              EventEncoding.STATUS_NONE);
     }
-  //    new EventEncoding(events, translator,
-  //                      empty, EventEncoding.FILTER_PROPOSITIONS);
-    final byte status = events.contains(omega) ?
-      EventEncoding.STATUS_NONE : EventEncoding.STATUS_UNUSED;
-    mOmega = mEventEncoding.addEvent(omega, translator, status);
+    mOmega = mEventEncoding.addEvent(omega, translator,
+                                     EventEncoding.STATUS_NONE);
     mTRInfo = new ArrayList<>(allAutomata.size() - 1);
     // Collect all automata that share events with autToAbstract.
     for (final AutomatonProxy aut : allAutomata) {

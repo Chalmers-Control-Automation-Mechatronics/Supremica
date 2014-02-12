@@ -132,34 +132,28 @@ public class EnabledEventsSetSilentContinuationTRSimplifier
     }
     final int numStates = rel.getNumberOfStates();
     final BitSet candidates = new BitSet(numStates);
-
     final TransitionIterator iter =
       rel.createSuccessorsReadOnlyIterator();
-    outer: for(int s = 0; s < numStates; s++)
-    {
-      final TIntHashSet outgoingEvents = new TIntHashSet();
+    for (int s = 0; s < numStates; s++) {
       iter.resetState(s);
-      while(iter.advance()){
-        final int e = iter.getCurrentEvent();
-        if(e == EventEncoding.TAU)
-        {
-          candidates.set(s);
-          continue outer;
-        }
-        else{
-          //Add it to a hashset of outgoing events from this state.
-          outgoingEvents.add(e);
-        }
+      if (!iter.advance()) {
+        continue;
+      } else if (iter.getCurrentEvent() == EventEncoding.TAU) {
+        candidates.set(s);
+        continue;
       }
-      //If there are no outgoing tau events
-      //Then see if the outgoing events of this state are an always enabled set.
-      if(mEnabledEventsCache.IsAlwaysEnabled(outgoingEvents))
-      {
+      final TIntHashSet outgoingEvents = new TIntHashSet();
+      do {
+        final int e = iter.getCurrentEvent();
+        outgoingEvents.add(e);
+      } while (iter.advance());
+      // See if the outgoing events of this state are an always enabled set.
+      if (mEnabledEventsCache.IsAlwaysEnabled(outgoingEvents)) {
         candidates.set(s);
       }
     }
 
-   final int numCandidates = candidates.cardinality();
+    final int numCandidates = candidates.cardinality();
     if (numCandidates == 0) {                               //if there are no outgoing transitions
       return false;                                         //can't simplify
     }

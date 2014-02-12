@@ -268,22 +268,21 @@ public class EnabledEventsSetSilentIncomingTRSimplifier
   {
     final int alphaID = getPreconditionMarkingID();
     if (alphaID < 0) {
-
-      final TIntHashSet outgoingEvents = new TIntHashSet();
       mTauTestIterator.resetState(state);
-
-      while (mTauTestIterator.advance()) {
-        final int e = mTauTestIterator.getCurrentEvent();
-        if (e == EventEncoding.TAU) {
-          return true;
-        } else {
-          outgoingEvents.add(e);
-        }
+      if (!mTauTestIterator.advance()) {
+        return false;
+      } else if (mTauTestIterator.getCurrentEvent() == EventEncoding.TAU) {
+        return true;
       }
+      final TIntHashSet outgoingEvents = new TIntHashSet();
+      do {
+        final int e = mTauTestIterator.getCurrentEvent();
+        outgoingEvents.add(e);
+      } while (mTauTestIterator.advance());
       return mEnabledEventsCache.IsAlwaysEnabled(outgoingEvents);
     } else {
       final ListBufferTransitionRelation rel = getTransitionRelation();
-      return !rel.isMarked(state, alphaID);     //if it is marked alpha then it is not reducible otherwise it is
+      return !rel.isMarked(state, alphaID);     // if it is marked alpha then it is not reducible otherwise it is
     }
   }
 

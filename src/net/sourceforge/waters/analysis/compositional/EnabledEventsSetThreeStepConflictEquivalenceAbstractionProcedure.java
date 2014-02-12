@@ -184,29 +184,29 @@ class EnabledEventsSetThreeStepConflictEquivalenceAbstractionProcedure
       final int config = mPreChain.getPreferredInputConfiguration();
       final CompositionalConflictChecker autAnalyzer = (CompositionalConflictChecker)getAnalyzer();
 
-    //Create the EnabledEventsCache that will be used when simplifying this automaton.
-          final EnabledEventsCache enabledEventsCache = new EnabledEventsCache(aut, local, autAnalyzer.getCurrentAutomata(), getUsedDefaultMarking(), factory, getKindTranslator());
-
-      // Tell the simplifiers how many enabled events there are
+      // Create event encoding (with local events + selfloop info)
+      final EventEncoding eventEnc = createEventEncoding(aut, local, candidate);
+      // Create the EnabledEventsCache that will be used when simplifying this automaton.
+      final EnabledEventsCache enabledEventsCache =
+        new EnabledEventsCache(aut, eventEnc, autAnalyzer.getCurrentAutomata(),
+                               getUsedDefaultMarking(), factory, getKindTranslator());
       mEnabledEventsSilentContinuationSimplifier.
         setEnabledEventsCache(enabledEventsCache);
       mEnabledEventsSilentIncomingSimplifier.
-      setEnabledEventsCache(enabledEventsCache);
+        setEnabledEventsCache(enabledEventsCache);
       if (mEnabledEventsLimitedCertainConflictsSimplifier != null) {
         mEnabledEventsLimitedCertainConflictsSimplifier.
-        setEnabledEventsCache(enabledEventsCache);
+          setEnabledEventsCache(enabledEventsCache);
       }
-     //Get the event encoding from the enabledEventsCache
-      final EventEncoding eventEnc =
-        enabledEventsCache.getEventEncoding();
+      // Create transition relation
       ListBufferTransitionRelation rel =
         new ListBufferTransitionRelation(aut, eventEnc, inputStateEnc, config);
-
       final AbstractCompositionalModelAnalyzer analyzer = getAnalyzer();
       analyzer.showDebugLog(rel);
       final int numStates = rel.getNumberOfStates();
       final int numTrans = rel.getNumberOfTransitions();
       final int numMarkings = rel.getNumberOfMarkings();
+      // Simplify ...
       AutomatonProxy lastAut = aut;
       StateEncoding lastStateEnc = inputStateEnc;
       TRPartition partition = null;
