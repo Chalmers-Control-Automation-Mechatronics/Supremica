@@ -188,8 +188,10 @@ class EnabledEventsSetThreeStepConflictEquivalenceAbstractionProcedure
       final EventEncoding eventEnc = createEventEncoding(aut, local, candidate);
       // Create the EnabledEventsCache that will be used when simplifying this automaton.
       final EnabledEventsCache enabledEventsCache =
-        new EnabledEventsCache(aut, eventEnc, autAnalyzer.getCurrentAutomata(),
-                               getUsedDefaultMarking(), factory, getKindTranslator());
+        new EnabledEventsCache(candidate,aut, eventEnc,
+                               autAnalyzer.getCurrentAutomata(),
+                               getUsedDefaultMarking(), factory,
+                               getKindTranslator());
       mEnabledEventsSilentContinuationSimplifier.
         setEnabledEventsCache(enabledEventsCache);
       mEnabledEventsSilentIncomingSimplifier.

@@ -26,7 +26,8 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 
 /**
  * <P>A list buffer transition relation implementation of the
- * <I>Silent Incoming Rule</I> or the <I>Only Silent Incoming Rule</I>.</P>
+ * <I>Silent Incoming Rule</I> or the <I>Only Silent Incoming Rule</I>
+ * with enabled event sets.</P>
  *
  * <P>The <I>Silent Incoming Rule</I> removes a transition
  * when a tau event links two states <I>x</I> and&nbsp;<I>y</I> where at most
@@ -42,9 +43,9 @@ import net.sourceforge.waters.model.analysis.OverflowException;
  * <P>The implementation supports both standard and generalised nonblocking
  * variants of the abstraction. If a precondition marking is configured,
  * only transitions leading to states not marked by the precondition marking
- * can be abstracted (as described above). Without a precondition marking, only
- * transitions leading to states with an outgoing silent transition can be
- * abstracted.</P>
+ * can be abstracted (as described above). Without a precondition marking,
+ * only transitions leading to states with outgoing silent or always enabled
+ * transitions can be abstracted.</P>
  *
  * <P><I>References:</I><BR>
  * Hugo Flordal, Robi Malik. Compositional Verification
@@ -155,7 +156,6 @@ public class EnabledEventsSetSilentIncomingTRSimplifier
       return false;
     } else if (getPreconditionMarkingID() < 0) {        //what is the precondition marking alpha
       mTauTestIterator = rel.createSuccessorsReadOnlyIterator();
-      //mTauTestIterator.resetEvents(0, mNumberOfEnabledEvents);               //Definitely change this to include enabled events
     }
     final int numStates = rel.getNumberOfStates();
     final BitSet keep = new BitSet(numStates);  //Creates a BitSet which remembers which states will be kept

@@ -46,7 +46,8 @@ public class EnabledEventsCache
 
   //#########################################################################
   //# Constructors
-  public EnabledEventsCache(final AutomatonProxy autToAbstract,
+  public EnabledEventsCache(final Candidate candidate,
+                            final AutomatonProxy autToAbstract,
                             final EventEncoding autEncoding,
                             final Collection<AutomatonProxy> allAutomata,
                             final EventProxy omega,
@@ -62,12 +63,14 @@ public class EnabledEventsCache
       mEventEncoding.addEvent(event, translator,
                               EventEncoding.STATUS_NONE);
     }
-    mOmega = mEventEncoding.addEvent(omega, translator,
-                                     EventEncoding.STATUS_NONE);
+    mOmegaEvent = omega;
+    mOmegaCode = mEventEncoding.addEvent(omega, translator,
+                                         EventEncoding.STATUS_NONE);
     mTRInfo = new ArrayList<>(allAutomata.size() - 1);
     // Collect all automata that share events with autToAbstract.
+    final List<AutomatonProxy> candidateAutomata = candidate.getAutomata();
     for (final AutomatonProxy aut : allAutomata) {
-      if (aut != autToAbstract) {
+      if (!candidateAutomata.contains(aut)) {
         for (final EventProxy event : aut.getEvents()) {
           if (translator.getEventKind(event) != EventKind.PROPOSITION &&
               mEventEncoding.getEventCode(event) >= 0) {
@@ -78,10 +81,12 @@ public class EnabledEventsCache
         }
       }
     }
-    // Find any tau events in allAutomata and add them to the encoding.
+    // Determine which events are used in exactly one automaton.
+    // Those will be added as silent events to the encoding
     final TObjectIntHashMap<EventProxy> eventsCounter =
       new TObjectIntHashMap<>();
-    for (final AutomatonProxy aut : allAutomata) {
+    for (final TRInfo info : mTRInfo) {
+      final AutomatonProxy aut = info.getAutomaton();
       for (final EventProxy event : aut.getEvents()) {
         if (translator.getEventKind(event) != EventKind.PROPOSITION) {
           // If we have not seen the event in previous automata, assign a count
@@ -89,6 +94,10 @@ public class EnabledEventsCache
           eventsCounter.adjustOrPutValue(event, 1, 1);
         }
       }
+    }
+    // Events shared by the automaton to be abstracted do not need to be included
+    for (final EventProxy event : autToAbstract.getEvents()) {
+      eventsCounter.adjustOrPutValue(event, 1, 0);
     }
     for (final EventProxy event : eventsCounter.keySet()) {
       if (eventsCounter.get(event) == 1) {
@@ -167,9 +176,6 @@ public class EnabledEventsCache
         createTransitionRelation(info);
         // Test if every state has some event in eventSet enabled.
         final ListBufferTransitionRelation rel = info.getTransitionRelation();
-        if(rel == null)
-          System.out.println("Null transition relation");
-
         final int numStates = rel.getNumberOfStates();
         final TauClosure closure = info.getTauClosure();
         final TransitionIterator iter =
@@ -178,7 +184,7 @@ public class EnabledEventsCache
         for (int s = 0; s < numStates; s++) {
           // If this state is a dump state then ignore it
           // (i.e., if it has no outgoing transition, and is not marked OMEGA)
-          if (rel.isDeadlockState(s, mOmega)) {
+          if (rel.isDeadlockState(s, mOmegaCode)) {
             continue states;
           }
           // Otherwise check whether it enables an event from the eventSet
@@ -215,7 +221,7 @@ public class EnabledEventsCache
       // Create a smaller version of the automaton with only relevant events
       final AutomatonProxy aut = info.getAutomaton();
       final Collection<StateProxy> states = aut.getStates();
-      final boolean containsOmega = aut.getEvents().contains(mOmega);
+      final boolean containsOmega = aut.getEvents().contains(mOmegaEvent);
       final Set<StateProxy> extraMarkedStates =
         containsOmega ? new THashSet<StateProxy>(states.size()) : null;
       final Collection<TransitionProxy> transitions = aut.getTransitions();
@@ -243,7 +249,7 @@ public class EnabledEventsCache
       // Create transition relation
       final byte status = containsOmega ?
         EventEncoding.STATUS_NONE : EventEncoding.STATUS_UNUSED;
-      mEventEncoding.setPropositionStatus(mOmega, status);
+      mEventEncoding.setPropositionStatus(mOmegaCode, status);
       final StateEncoding stateEncoding = new StateEncoding(newAut);
       final ListBufferTransitionRelation newRel =
         new ListBufferTransitionRelation(newAut,
@@ -254,7 +260,7 @@ public class EnabledEventsCache
       if (extraMarkedStates != null) {
         for (final StateProxy state : extraMarkedStates) {
           final int s = stateEncoding.getStateCode(state);
-          newRel.setMarked(s, mOmega, true);
+          newRel.setMarked(s, mOmegaCode, true);
         }
       }
       // Store the transition relation
@@ -317,7 +323,8 @@ public class EnabledEventsCache
   private final ProductDESProxyFactory mFactory;
   private final KindTranslator mKindTranslator;
   private final EventEncoding mEventEncoding;
-  private final int mOmega;
+  private final EventProxy mOmegaEvent;
+  private final int mOmegaCode;
   private final List<TRInfo> mTRInfo;
 
   private final TObjectByteHashMap<TIntHashSet> mEventSetCache = new TObjectByteHashMap<TIntHashSet>();
