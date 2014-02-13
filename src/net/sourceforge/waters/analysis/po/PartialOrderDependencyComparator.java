@@ -8,11 +8,11 @@ public class PartialOrderDependencyComparator implements WatersIntComparator
 {
   public PartialOrderDependencyComparator(final int[] dependencyWeightings){
     mDependencyWeightings = dependencyWeightings;
-    clearBits();
+    mToVisitedState = new BitSet(mDependencyWeightings.length);
   }
 
   public void clearBits(){
-    mToVisitedState = new BitSet(mDependencyWeightings.length);
+    mToVisitedState.clear();
   }
 
   public void reachesVisitedState(final int event){
@@ -39,5 +39,5 @@ public class PartialOrderDependencyComparator implements WatersIntComparator
   }
 
   private final int[] mDependencyWeightings;
-  private BitSet mToVisitedState;
+  private final BitSet mToVisitedState;
 }
