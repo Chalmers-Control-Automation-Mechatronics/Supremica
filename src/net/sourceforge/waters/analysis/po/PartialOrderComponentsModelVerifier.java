@@ -589,13 +589,19 @@ public abstract class PartialOrderComponentsModelVerifier
           }
         }
         selfLoop &= targetState == sourceState;
+        mSuccessor[j] = targetState;
       }
       if (selfLoop){
         continue events;
       }
+      encode(mSuccessor,mStateTuple);
+      if (mStateSet.contains(mStateTuple)){
+        mComparator.reachesVisitedState(i);
+      }
       heap.add(i);
     }
     current.setTotalSuccessors(heap.size());
+    mStateTuple = new PartialOrderStateTuple(mStateTupleSize);
     return heap;
   }
 
@@ -652,6 +658,7 @@ public abstract class PartialOrderComponentsModelVerifier
         }
       }
       if(ample.size()+dependentNonEnabled.size()==mNumEvents){
+        mComparator.clearBits();
         return ample.toArray();
       }
       boolean danger = false;
@@ -676,9 +683,11 @@ public abstract class PartialOrderComponentsModelVerifier
       }
       current.setFullyExpanded(ample.size() == enabledSet.size());
       mNumReducedSets += ample.size() < enabledSet.size() ? 1 : 0;
+      mComparator.clearBits();
       return ample.toArray();
     }
     current.setFullyExpanded(true);
+    mComparator.clearBits();
     return enabledSet.toArray();
   }
 
