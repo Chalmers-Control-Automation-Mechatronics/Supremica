@@ -240,10 +240,10 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     mVariableComparator =
       new VariableComparator(maxEvents, maxSelfloops);
     final Comparator<Candidate> minF = new ComparatorMinFrontier();
-      mAutomataComparator = new CandidateComparator(minF);
+    mAutomataComparator = new CandidateComparator(minF);
     mUnfolder = new UnifiedEFAVariableUnfolder
       (getFactory(), mCompilerOperatorTable, context);
-    mDummyRoot = new SilentEFAEvent("Dummy");
+    mDummyRoot = new SilentEFAEvent(":root");
     mUpdateMerger =
       new UnifiedEFAUpdateMerger(getFactory(), mCompilerOperatorTable, context,mDummyRoot);
     mSynchronizer = new UnifiedEFASynchronousProductBuilder();
@@ -284,24 +284,22 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       setUp();
       Collection<UnifiedEFATransitionRelation> trs =
         mMainEFASystem.getTransitionRelations();
-      mCurrentSubSystem = new SubSystemInfo(mMainEFASystem.getEvents().size(),
-                                            mMainEFASystem.getVariables().size(),
-                                            trs);
+      mCurrentSubSystem =
+        new SubSystemInfo(mMainEFASystem.getEvents().size(),
+                          mMainEFASystem.getVariables().size(),
+                          trs);
       mDirtyTRs = new THashSet<>(trs);
       createVariableInfo();
       createEventInfo();
       simplifyDirtyTransitionRelations();
       splitSubsystems();
-      final UnifiedEFAConflictCheckerAnalysisResult stat = new UnifiedEFAConflictCheckerAnalysisResult();
 //      int i = 0;
       while (mCurrentSubSystem != null) {
         while (mCurrentSubSystem.isReducible()) {
-          // TODO Not counting correctly :-p
-           final Candidate minCandidate = mCurrentSubSystem.selectCandidate();
+          final Candidate minCandidate = mCurrentSubSystem.selectCandidate();
           applyCandidate(minCandidate);
           simplifyDirtyTransitionRelations();
           splitSubsystems();
-
 //          saveCurrentSystem("debug/sub" + i);
 //          getLogger().debug("wrote debug/sub" + i);
 //          i++;
@@ -314,18 +312,15 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
         final UnifiedEFATransitionRelation finalTR =
           trs.iterator().next();
         final boolean nonblocking = mNonblockingChecker.run(finalTR);
-        getLogger().debug("Result for final TR " + finalTR.getName() + ": " + nonblocking);
+        getLogger().debug("Result for final TR " + finalTR.getName() +
+                          ": " + nonblocking);
         if (!nonblocking) {
-          super.setBooleanResult(false);
-          stat.setSatisfied(false);
-          return false;
+          return setBooleanResult(false);
         } else {
           mCurrentSubSystem = mSubSystemQueue.poll();
         }
       }
-      super.setBooleanResult(true);
-      stat.setSatisfied(true);
-      return true;
+      return setSatisfiedResult();
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
     } catch (final OutOfMemoryError error) {
@@ -473,7 +468,8 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     final List<VariableInfo> vars = candidate.getVariables();
     List<UnifiedEFATransitionRelation> trs =
       candidate.getTransitionRelations();
-    final UnifiedEFAConflictCheckerAnalysisResult result = getAnalysisResult();
+    final UnifiedEFAConflictCheckerAnalysisResult result =
+      getAnalysisResult();
     mLocalVariableTR = null;
     if (!vars.isEmpty()) {
       final VariableInfo selectedVarInfo =
@@ -520,7 +516,6 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     } else {
       final UnifiedEFATransitionRelation tr = trs.get(0);
       result.addUnifiedEFATRTransitionRelation(tr);
-
       final UnifiedEFATransitionRelation simplifiedTR = simplifyTR(tr);
       if (simplifiedTR != null) {
         mergeUpdates(simplifiedTR);
@@ -1017,6 +1012,46 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       return mEstimatedNumberOfStates;
     }
 
+    /**
+     * Returns the size of the frontier (MinF heuristic value) of this
+     * candidate. The candidate's frontier consists of all transition
+     * relations and variables linked to it through some event.
+     */
+    private double getFrontierSize()
+    {
+      // Set to contain variables and transition relations of the candidate
+      // plus its frontier
+      final Set<Object> frontierCount = new THashSet<>();
+      // Set to contain events used by the candidate
+      final Set<EventInfo> events = new THashSet<>();
+      // Collect transition relations, variables, events of candidate
+      for (final UnifiedEFATransitionRelation tr : mTransitionRelations) {
+        frontierCount.add(tr);
+        for (final AbstractEFAEvent event : tr.getAllEventsExceptTau()) {
+          final EventInfo info = mCurrentSubSystem.getEventInfo(event);
+          events.add(info);
+        }
+      }
+      for (final VariableInfo var : mVariables) {
+        frontierCount.add(var);
+        for (final EventInfo info : var.getEvents()) {
+          events.add(info);
+        }
+      }
+      // Remember frontier size before addition of any neighbours
+      final int ownSize = frontierCount.size();
+      // Add variables and transition relations of events to frontier
+      for (final EventInfo event : events) {
+        final Collection<UnifiedEFATransitionRelation> trs =
+          event.getTransitionRelations();
+        frontierCount.addAll(trs);
+        final Collection<VariableInfo> vars = event.getVariables();
+        frontierCount.addAll(vars);
+      }
+      // Frontier size is number of all variables and transition relations
+      // minus number of variables and transition relations of the candidate
+      return frontierCount.size() - ownSize;
+    }
 
     private Set<AbstractEFAEvent> removeNonLeaves
       (final Collection<AbstractEFAEvent> eventSet)
@@ -1979,18 +2014,19 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       }
     }
   }
+
+
   //#########################################################################
   //# Inner Class ComparatorMinStates
-
   private static class ComparatorMinFrontier
     implements Comparator<Candidate>
   {
-
     @Override
-    public int compare(final Candidate candidate1, final Candidate candidate2)
+    public int compare(final Candidate candidate1,
+                       final Candidate candidate2)
     {
-      final double value1 = getHeuristicValue(candidate1);
-      final double value2 = getHeuristicValue(candidate2);
+      final double value1 = candidate1.getFrontierSize();
+      final double value2 = candidate2.getFrontierSize();
       if (value1 < value2) {
         return -1;
       } else if (value2 < value1) {
@@ -2000,17 +2036,17 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       }
     }
 
-
-    protected double getHeuristicValue(final Candidate candidate)
+    @SuppressWarnings("unused")
+    private double getHeuristicValue(final Candidate candidate)
     {
-      final List<UnifiedEFATransitionRelation> trs = candidate.getTransitionRelations();
+      final List<UnifiedEFATransitionRelation> trs =
+        candidate.getTransitionRelations();
       final Collection<UnifiedEFATransitionRelation> frontier =
         new THashSet<UnifiedEFATransitionRelation>();
-
       for (final VariableInfo var : candidate.getVariables()) {
         for (final EventInfo varEvents : var.getEvents()) {
-          for (final UnifiedEFATransitionRelation tr : varEvents.getTransitionRelations())
-          {
+          for (final UnifiedEFATransitionRelation tr :
+               varEvents.getTransitionRelations()) {
             if (!trs.contains(tr)) {
               frontier.add(tr);
             }
@@ -2019,9 +2055,8 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       }
       return frontier.size();
     }
+  }
 
-
-}
 
   //#########################################################################
   //# Inner Class CandidateComparator

@@ -1,7 +1,7 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters EFA Analysis
-//# PACKAGE: net.sourceforge.waters.analysis.efa.efsm
+//# PACKAGE: net.sourceforge.waters.analysis.efa.unified
 //# CLASS:   UnifiedEFAConflictCheckerTest
 //###########################################################################
 //# $Id$
@@ -343,6 +343,14 @@ public class UnifiedEFAConflictCheckerTest
   {
     checkProfisafe("profisafe_ihost_efa_block", 3 ,false);
   }
+
+  /*
+  public void testProfisafeIHostEFA191()
+    throws IOException, WatersException
+  {
+    checkProfisafe("profisafe_ihost_efa", 191 ,true);
+  }
+  */
 
   public void testProfisafeIHostEFSM4()
     throws IOException, WatersException

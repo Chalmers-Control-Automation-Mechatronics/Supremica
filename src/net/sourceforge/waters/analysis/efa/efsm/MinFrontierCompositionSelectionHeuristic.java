@@ -38,7 +38,8 @@ public class MinFrontierCompositionSelectionHeuristic
     final Set<EFSMTransitionRelation> frontier = new THashSet<>();
     for (final EFSMTransitionRelation efsmTR : candidate.asArray()) {
       for (final EFSMVariable var : efsmTR.getVariables()) {
-        for (final EFSMTransitionRelation neighbour : var.getTransitionRelations()) {
+        for (final EFSMTransitionRelation neighbour :
+             var.getTransitionRelations()) {
           if (!candidate.contains(neighbour)) {
             frontier.add(neighbour);
           }

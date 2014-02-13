@@ -1,7 +1,7 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters Analysis
-//# PACKAGE: net.sourceforge.waters.analysis.compositional
+//# PROJECT: Waters EFA Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.efa.unified
 //# CLASS:   UnifiedEFAConflictCheckerAnalysisResult
 //###########################################################################
 //# $Id$
@@ -96,15 +96,8 @@ public class UnifiedEFAConflictCheckerAnalysisResult
 
   //#########################################################################
   //# Providing Statistics
-
-
-   @Override
-  public void setSatisfied(final boolean sat)
-  {
-     super.setSatisfied(sat);
-  }
-
-  public void addUnifiedEFATRTransitionRelation(final UnifiedEFATransitionRelation tr)
+  public void addUnifiedEFATRTransitionRelation
+    (final UnifiedEFATransitionRelation tr)
   {
     final ListBufferTransitionRelation rel = tr.getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
@@ -184,6 +177,7 @@ public class UnifiedEFAConflictCheckerAnalysisResult
     mSimplifierStatistics = new LinkedList<TRSimplifierStatistics>();
     simplifier.collectStatistics(mSimplifierStatistics);
   }
+
 
   //#########################################################################
   //# Printing
