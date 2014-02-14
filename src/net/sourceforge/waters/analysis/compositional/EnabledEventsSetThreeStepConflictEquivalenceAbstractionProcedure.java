@@ -243,7 +243,7 @@ class EnabledEventsSetThreeStepConflictEquivalenceAbstractionProcedure
           if (mEnabledEventsLimitedCertainConflictsSimplifier.hasCertainConflictTransitions() || lccStep != null) {
             eelccStep = new LimitedCertainConflictsStep                       //Give this lots of info
               (analyzer, mEnabledEventsLimitedCertainConflictsSimplifier, outputAut,     //this creates the trace expander, so will get it this info
-               lastAut, tau, lastStateEnc, outputStateEnc);
+               lastAut, tau, lastStateEnc, outputStateEnc, eventEnc, 0);
 
           } else {
             final TRPartition ccPart =

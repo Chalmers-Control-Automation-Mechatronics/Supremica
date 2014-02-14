@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.compositional;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.EnabledEventsLimitedCertainConflictsTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.EnabledEventsSetLimitedCertainConflictsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.LimitedCertainConflictsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.certainconf.CertainConflictsTRSimplifier;
@@ -120,7 +121,20 @@ class LimitedCertainConflictsStep extends AbstractionStep
              originalAut, mOriginalStateEncoding,
              mEventEncoding, mNumEnabledEvents);
         return expander.convertTraceSteps(traceSteps);
-    } else if (mSimplifier instanceof CertainConflictsTRSimplifier) {
+    }
+      else if (mSimplifier instanceof EnabledEventsSetLimitedCertainConflictsTRSimplifier) {
+      final EnabledEventsSetLimitedCertainConflictsTRSimplifier simplifier =
+        (EnabledEventsSetLimitedCertainConflictsTRSimplifier) mSimplifier;
+      final AutomatonProxy resultAut = getResultAutomaton();
+      final AutomatonProxy originalAut = getOriginalAutomaton();
+      final EnabledEventsSetLimitedCertainConflictsTraceExpander expander =
+        new EnabledEventsSetLimitedCertainConflictsTraceExpander
+          (verifier, simplifier, mTau, resultAut, mResultStateEncoding,
+           originalAut, mOriginalStateEncoding,
+           mEventEncoding);
+      return expander.convertTraceSteps(traceSteps);
+  }
+    else if (mSimplifier instanceof CertainConflictsTRSimplifier) {
       final CertainConflictsTRSimplifier simplifier =
         (CertainConflictsTRSimplifier) mSimplifier;
       final AutomatonProxy resultAut = getResultAutomaton();

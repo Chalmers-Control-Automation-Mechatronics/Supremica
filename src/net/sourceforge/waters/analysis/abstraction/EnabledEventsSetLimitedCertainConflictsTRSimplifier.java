@@ -94,15 +94,15 @@ public class EnabledEventsSetLimitedCertainConflictsTRSimplifier
   }
 
   @Override
-  public EnabledEventsCertainConflictsStatistics getStatistics()
+  public CertainConflictsStatistics getStatistics()
   {
-    return (EnabledEventsCertainConflictsStatistics) super.getStatistics();      //Possibly create EnabledEventsCertainConflict Statistics
+    return (CertainConflictsStatistics) super.getStatistics();      //Possibly create EnabledEventsCertainConflict Statistics
   }
 
   @Override
   public TRSimplifierStatistics createStatistics()
   {
-    final TRSimplifierStatistics stats = new EnabledEventsCertainConflictsStatistics(this);
+    final TRSimplifierStatistics stats = new CertainConflictsStatistics(this);
     return setStatistics(stats);
   }
 
@@ -226,24 +226,66 @@ public class EnabledEventsSetLimitedCertainConflictsTRSimplifier
     do {
       int nextlevel = level + 1;
       modified = false;
+
       // check for tau-transitions to certain conflicts
-      for (int state = 0; state < numStates; state++) {                 //For each of the states
+      for (int state = 0; state < numStates; state++)
+      {                 //For each of the states
         if (mStateInfo[state] == level && rel.isReachable(state)) {     //Change rel.isReachabled to include always enabled
           checkAbort();
           mUnvisitedStates.push(state);
-          mPredecessorsIterator.resetEvents(0, mNumberOfEnabledEvents);
           while (mUnvisitedStates.size() > 0) {                         //if there are states in buffer we have not yet visited
             final int popped = mUnvisitedStates.pop();                  //get the first one
             //mPredecessorsIterator.reset(popped, tauID);                 //Change where the iterator starts TAU found!
            mPredecessorsIterator.resetState(popped);
+           //mPredecessorsIterator.resetEvents(0, mNumberOfEnabledEvents);
 
-            while (mPredecessorsIterator.advance()) {
+          outer:  while (mPredecessorsIterator.advance()) {
               final int pred = mPredecessorsIterator.getCurrentSourceState();
               if (mStateInfo[pred] == COREACHABLE) {                    //If we have not already dumped the state
-                mMaxLevel = nextlevel;                                  //Increase max level to the highest we've found
-                mStateInfo[pred] = nextlevel;                           //Set the state info to say what level it was found to be CC
-                mUnvisitedStates.push(pred);
-                victims.add(pred);
+               final int e = mPredecessorsIterator.getCurrentEvent();
+                if(e == EventEncoding.TAU)
+               {
+                 mMaxLevel = nextlevel;                                  //Increase max level to the highest we've found
+                 mStateInfo[pred] = nextlevel;                           //Set the state info to say what level it was found to be CC
+                 mUnvisitedStates.push(pred);
+                 victims.add(pred);
+               }
+               else{
+                 //Check for always enabled sets leading to blocking states.
+                 succIter.resetState(state);
+                 final TIntHashSet outgoingEvents = new TIntHashSet();
+                 while(succIter.advance())
+                   {
+               //Loop over successor transitions
+               //Pick out the events that lead to mStateInfo[targetState] == level && rel.isReachable(state)
+                   if(mStateInfo[succIter.getCurrentTargetState()] >= 0)
+                     {
+                     final int currentEvent =succIter.getCurrentEvent();
+                     //If we see tau entering a blocking state then stop
+                     if(currentEvent == 0)
+                       {
+                       mMaxLevel = nextlevel;                                  //Increase max level to the highest we've found
+                       mStateInfo[pred] = nextlevel;                           //Set the state info to say what level it was found to be CC
+                       mUnvisitedStates.push(pred);
+                       victims.add(pred);
+                       continue outer;
+                       }
+                     //Otherwise add it to set of possible always enabled events
+                     outgoingEvents.add(currentEvent);
+                     }
+                   }
+                 //After looping over all transitions check if outgoing events are always enabled
+                 if(mEnabledEventsCache.IsAlwaysEnabled(outgoingEvents))
+                 {
+                   mMaxLevel = nextlevel;                                  //Increase max level to the highest we've found
+                   mStateInfo[pred] = nextlevel;                           //Set the state info to say what level it was found to be CC
+                   mUnvisitedStates.push(pred);
+                   victims.add(pred);
+                 }
+
+               }
+
+
               }
             }
           }
@@ -263,7 +305,7 @@ public class EnabledEventsSetLimitedCertainConflictsTRSimplifier
       nextlevel++;
 
 
-      mPredecessorsIterator.resetEvents(mNumberOfEnabledEvents , numEvents);
+      mPredecessorsIterator.resetEvents(EventEncoding.NONTAU , numEvents);
 
 
       for (int state = 0; state < numStates; state++) {
@@ -472,10 +514,9 @@ public class EnabledEventsSetLimitedCertainConflictsTRSimplifier
   protected void recordFinish(final boolean success)
   {
     super.recordFinish(success);
-    final EnabledEventsCertainConflictsStatistics stats = getStatistics();   //Change stats to include enabled events
+    final CertainConflictsStatistics stats = getStatistics();   //Change stats to include enabled events
     if (stats != null) {
       stats.recordMaxCertainConflictsLevel(mMaxLevel);
-      stats.recordNumEnabledEvents(mNumberOfEnabledEvents);
     }
   }
 
@@ -659,7 +700,6 @@ public class EnabledEventsSetLimitedCertainConflictsTRSimplifier
   private TransitionIterator mPredecessorsIterator;
 
   private int mNumberOfEnabledEvents;
-  @SuppressWarnings("unused")
   private EnabledEventsCache mEnabledEventsCache;
 
 
