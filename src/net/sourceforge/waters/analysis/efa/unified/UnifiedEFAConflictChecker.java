@@ -1027,7 +1027,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       // Collect transition relations, variables, events of candidate
       for (final UnifiedEFATransitionRelation tr : mTransitionRelations) {
         frontierCount.add(tr);
-        for (final AbstractEFAEvent event : tr.getAllEventsExceptTau()) {
+        for (final AbstractEFAEvent event : tr.getUsedEventsExceptTau()) {
           final EventInfo info = mCurrentSubSystem.getEventInfo(event);
           events.add(info);
         }
