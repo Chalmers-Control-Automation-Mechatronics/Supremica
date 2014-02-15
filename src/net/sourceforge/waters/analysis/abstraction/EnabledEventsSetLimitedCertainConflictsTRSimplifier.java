@@ -109,7 +109,7 @@ public class EnabledEventsSetLimitedCertainConflictsTRSimplifier
   @Override
   public void reset()
   {
-    mStateInfo = null;
+    mLevels = null;
     super.reset();
   }
 
@@ -167,14 +167,22 @@ public class EnabledEventsSetLimitedCertainConflictsTRSimplifier
    */
   public int getLevel(final int state)
   {
-    return mStateInfo[state];
+    return mLevels[state];
+  }
+
+  /**
+   * Returns the array containing the levels of all states.
+   * @see #getLevel(int) getLevel()
+   */
+  public int[] getLevels()
+  {
+    return mLevels;
   }
 
   public void setEnabledEventsCache(final EnabledEventsCache enabledEventsCache)
   {
     mEnabledEventsCache = enabledEventsCache;
   }
-
 
 
   //#########################################################################
@@ -184,7 +192,7 @@ public class EnabledEventsSetLimitedCertainConflictsTRSimplifier
   throws AnalysisException
   {
     super.setUp();
-    mStateInfo = null;
+    mLevels = null;
     mHasRemovedTransitions = false;
     mHasCertainConflictTransitions = false;
   }
@@ -218,7 +226,7 @@ public class EnabledEventsSetLimitedCertainConflictsTRSimplifier
     final int eshift = AutomatonTools.log2(numEvents);
     final int root = 1 << (shift + eshift);
     final TauClosure closure = rel.createPredecessorsTauClosure(0);
-    final TransitionIterator closureIter = closure.createIterator();        //change to use more than tau
+    final TransitionIterator closureIter = closure.createIterator();
     final TransitionIterator succIter = rel.createSuccessorsReadOnlyIterator();
     boolean result = false;
     boolean modified;
@@ -226,99 +234,83 @@ public class EnabledEventsSetLimitedCertainConflictsTRSimplifier
     do {
       int nextlevel = level + 1;
       modified = false;
-
-      // check for tau-transitions to certain conflicts
-      for (int state = 0; state < numStates; state++)
-      {                 //For each of the states
-        if (mStateInfo[state] == level && rel.isReachable(state)) {     //Change rel.isReachabled to include always enabled
+      succIter.resetEvents(EventEncoding.TAU, numEvents);
+      // check for tau or always enabled transitions to certain conflicts
+      for (int state = 0; state < numStates; state++) {
+        if (mLevels[state] == level && rel.isReachable(state)) {
           checkAbort();
           mUnvisitedStates.push(state);
-          while (mUnvisitedStates.size() > 0) {                         //if there are states in buffer we have not yet visited
-            final int popped = mUnvisitedStates.pop();                  //get the first one
-            //mPredecessorsIterator.reset(popped, tauID);                 //Change where the iterator starts TAU found!
-           mPredecessorsIterator.resetState(popped);
-           //mPredecessorsIterator.resetEvents(0, mNumberOfEnabledEvents);
-
-          outer:  while (mPredecessorsIterator.advance()) {
+          while (mUnvisitedStates.size() > 0) {
+            final int popped = mUnvisitedStates.pop();
+            mPredecessorsIterator.resetState(popped);
+            while (mPredecessorsIterator.advance()) {
               final int pred = mPredecessorsIterator.getCurrentSourceState();
-              if (mStateInfo[pred] == COREACHABLE) {                    //If we have not already dumped the state
-               final int e = mPredecessorsIterator.getCurrentEvent();
-                if(e == EventEncoding.TAU)
-               {
-                 mMaxLevel = nextlevel;                                  //Increase max level to the highest we've found
-                 mStateInfo[pred] = nextlevel;                           //Set the state info to say what level it was found to be CC
-                 mUnvisitedStates.push(pred);
-                 victims.add(pred);
-               }
-               else{
-                 //Check for always enabled sets leading to blocking states.
-                 succIter.resetState(state);
-                 final TIntHashSet outgoingEvents = new TIntHashSet();
-                 while(succIter.advance())
-                   {
-               //Loop over successor transitions
-               //Pick out the events that lead to mStateInfo[targetState] == level && rel.isReachable(state)
-                   if(mStateInfo[succIter.getCurrentTargetState()] >= 0)
-                     {
-                     final int currentEvent =succIter.getCurrentEvent();
-                     //If we see tau entering a blocking state then stop
-                     if(currentEvent == 0)
-                       {
-                       mMaxLevel = nextlevel;                                  //Increase max level to the highest we've found
-                       mStateInfo[pred] = nextlevel;                           //Set the state info to say what level it was found to be CC
-                       mUnvisitedStates.push(pred);
-                       victims.add(pred);
-                       continue outer;
-                       }
-                     //Otherwise add it to set of possible always enabled events
-                     outgoingEvents.add(currentEvent);
-                     }
-                   }
-                 //After looping over all transitions check if outgoing events are always enabled
-                 if(mEnabledEventsCache.IsAlwaysEnabled(outgoingEvents))
-                 {
-                   mMaxLevel = nextlevel;                                  //Increase max level to the highest we've found
-                   mStateInfo[pred] = nextlevel;                           //Set the state info to say what level it was found to be CC
-                   mUnvisitedStates.push(pred);
-                   victims.add(pred);
-                 }
-
-               }
-
-
+              if (mLevels[pred] == COREACHABLE) {
+                // If we have not already dumped the state ..
+                boolean dumpingPred = false; // set to true when pred found bad
+                if (mPredecessorsIterator.getCurrentEvent() ==
+                    EventEncoding.TAU) {
+                  // tau-predecessors of certain conflict are bad
+                  dumpingPred = true;
+                } else {
+                  // for other predecessors, check their successors:
+                  // if always enabled to certain conflicts, then bad
+                  succIter.resetState(pred);
+                  while (succIter.advance() &&
+                         succIter.getCurrentEvent() == EventEncoding.TAU) {
+                    final int t = succIter.getCurrentTargetState();
+                    if (mLevels[t] >= 0) {
+                      dumpingPred = true;
+                      break;
+                    }
+                  }
+                  if (!dumpingPred) {
+                    final TIntHashSet outgoingEvents = new TIntHashSet();
+                    do {
+                      final int t = succIter.getCurrentTargetState();
+                      if (mLevels[t] >= 0) {
+                        final int e = succIter.getCurrentEvent();
+                        outgoingEvents.add(e);
+                      }
+                    } while (succIter.advance());
+                    dumpingPred =
+                      mEnabledEventsCache.IsAlwaysEnabled(outgoingEvents);
+                  }
+                }
+                if (dumpingPred) {
+                  mMaxLevel = nextlevel; // Increase max level to the highest we've found
+                  mLevels[pred] = nextlevel; // Set the state info to say what level it was found to be CC
+                  mUnvisitedStates.push(pred);
+                  victims.add(pred);
+                }
+                // TODO Change this. First tau predecessors, then recheck
+                // visited states using successors tau closure.
               }
             }
           }
           if (!victims.isEmpty()) {
-            mHasRemovedTransitions = mHasCertainConflictTransitions =   //If victims were found, note this in various places
+            mHasRemovedTransitions = mHasCertainConflictTransitions = //If victims were found, note this in various places
               modified = true;
             for (int index = 0; index < victims.size(); index++) {
-              final int victim = victims.get(index);        //For all the victims
-              rel.removeOutgoingTransitions(victim);        //Removes outgoing transition from dumped state
-              rel.setMarked(victim, defaultID, false);      //Unmarks it
+              final int victim = victims.get(index); // For all the victims
+              rel.removeOutgoingTransitions(victim); // Remove outgoing transition from dumped state
+              rel.setMarked(victim, defaultID, false); // Unmark it
             }
-            victims.clear();                                //Clear the victims list before starting on next state in buffer
+            victims.clear(); //Clear the victims list before starting on next state in buffer
           }
         }
       }
-      // check for proper event transitions to certain conflicts
+      // Check for proper event transitions to certain conflicts
       nextlevel++;
-
-
       mPredecessorsIterator.resetEvents(EventEncoding.NONTAU , numEvents);
-
-
       for (int state = 0; state < numStates; state++) {
-        if (mStateInfo[state] >= level && rel.isReachable(state)) {
+        if (mLevels[state] >= level && rel.isReachable(state)) {
           checkAbort();
-
           mPredecessorsIterator.resetState(state);
-
-
           while (mPredecessorsIterator.advance()) {
             //final int event = mPredecessorsIterator.getCurrentEvent();
             final int pred = mPredecessorsIterator.getCurrentSourceState();
-            if (mStateInfo[pred] == COREACHABLE) {
+            if (mLevels[pred] == COREACHABLE) {
               closureIter.resetState(pred);
               while (closureIter.advance()) {
                 final int ppred = closureIter.getCurrentSourceState();
@@ -344,7 +336,7 @@ public class EnabledEventsSetLimitedCertainConflictsTRSimplifier
               final int victim = victims.get(index);
               final int event = (victim & ~root) >>> shift;
               final int pred = victim & mask;
-              if (!mHasCertainConflictTransitions && mStateInfo[pred] < 0) {
+              if (!mHasCertainConflictTransitions && mLevels[pred] < 0) {
                 // We have certain conflict transitions if we are deleting a
                 // transition from a coreachable state to another coreachable
                 // state.
@@ -352,7 +344,7 @@ public class EnabledEventsSetLimitedCertainConflictsTRSimplifier
                 succIter.reset(pred, event);
                 while (succIter.advance()) {
                   final int target = succIter.getCurrentTargetState();
-                  if (mStateInfo[target] < 0) {
+                  if (mLevels[target] < 0) {
                     mHasCertainConflictTransitions = true;
                     break;
                   }
@@ -386,7 +378,7 @@ public class EnabledEventsSetLimitedCertainConflictsTRSimplifier
     if (numCoreachable < numReachable && numCoreachable > 0) {
       // Some reachable states are blocking. Is one of them initial?
       for (int state = 0; state < numStates; state++) {
-        if (mStateInfo[state] != COREACHABLE && rel.isInitial(state)) {
+        if (mLevels[state] != COREACHABLE && rel.isInitial(state)) {
           blockingInit = state;
           break;
         }
@@ -434,7 +426,7 @@ public class EnabledEventsSetLimitedCertainConflictsTRSimplifier
       // but let us try to add selfloops and remove events.
       int bstate;
       for (bstate = 0; bstate < numStates; bstate++) {
-        if (rel.isReachable(bstate) && mStateInfo[bstate] != COREACHABLE) {
+        if (rel.isReachable(bstate) && mLevels[bstate] != COREACHABLE) {
           break;
         }
       }
@@ -457,7 +449,7 @@ public class EnabledEventsSetLimitedCertainConflictsTRSimplifier
       final int[] bclazz = new int[numBlocking];
       int bindex = 0;
       for (int state = 0; state < numStates; state++) {
-        if (mStateInfo[state] == COREACHABLE) {
+        if (mLevels[state] == COREACHABLE) {
           final int[] clazz = new int[1];
           clazz[0] = state;
           classes.add(clazz);
@@ -556,7 +548,7 @@ public class EnabledEventsSetLimitedCertainConflictsTRSimplifier
     for (int state = 0; state < numStates; state++) {
       if (rel.isReachable(state)) {
         numReachable++;
-        if (mStateInfo[state] <= level) {
+        if (mLevels[state] <= level) {
           numCritical++;
         }
       }
@@ -574,7 +566,7 @@ public class EnabledEventsSetLimitedCertainConflictsTRSimplifier
         final StateProxy memstate = new MemStateProxy(code++, init);
         states[state] = memstate;
         reachable.add(memstate);
-        final int info = mStateInfo[state];
+        final int info = mLevels[state];
         if (info != COREACHABLE && info <= level) {
           final TransitionProxy trans =
             factory.createTransitionProxy(memstate, prop, memstate);
@@ -603,42 +595,6 @@ public class EnabledEventsSetLimitedCertainConflictsTRSimplifier
                                         events, reachable, transitions);
   }
 
-  public int findTauReachableState(final int state, int level)
-  {
-    level++;
-    int info = mStateInfo[state];
-    if (info < level) {
-      return state;
-    } else if (info == level) {
-      final ListBufferTransitionRelation rel = getTransitionRelation();
-      final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
-
-      final TIntArrayList queue = new TIntArrayList();
-      final TIntHashSet visited = new TIntHashSet();
-      queue.add(state);
-      visited.add(state);
-      for (int rpos = 0; rpos < queue.size(); rpos++) {
-        final int current = queue.get(rpos);
-        //iter.reset(current, tau);
-        iter.resetState(current);
-        iter.resetEvents(0, mNumberOfEnabledEvents);
-        while (iter.advance()) {
-          final int succ = iter.getCurrentTargetState();
-          info = mStateInfo[succ];
-          if (info < level) {
-            return succ;
-          } else if (info == level && visited.add(succ)) {
-            queue.add(succ);
-          }
-        }
-      }
-      assert false : "Could not found state with expected level!";
-      return -1;
-    } else {
-      return -1;
-    }
-  }
-
 
   //#########################################################################
   //# Auxiliary Methods
@@ -648,16 +604,16 @@ public class EnabledEventsSetLimitedCertainConflictsTRSimplifier
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
     final int defaultID = getDefaultMarkingID();
-    if (mStateInfo == null) {
-      mStateInfo = new int[numStates];
+    if (mLevels == null) {
+      mLevels = new int[numStates];
       mUnvisitedStates = new TIntArrayStack();
       if (level != 0) {
-        Arrays.fill(mStateInfo, level);
+        Arrays.fill(mLevels, level);
       }
     } else {
       for (int state = 0; state < numStates; state++) {
-        if (mStateInfo[state] == COREACHABLE) {
-          mStateInfo[state] = level;
+        if (mLevels[state] == COREACHABLE) {
+          mLevels[state] = level;
         }
       }
     }
@@ -666,9 +622,9 @@ public class EnabledEventsSetLimitedCertainConflictsTRSimplifier
     for (int state = 0; state < numStates; state++) {
       if (rel.isMarked(state, defaultID) &&         //Find all marked, reachable and still interested in
           rel.isReachable(state) &&
-          mStateInfo[state] == level) {
+          mLevels[state] == level) {
         checkAbort();
-        mStateInfo[state] = COREACHABLE;
+        mLevels[state] = COREACHABLE;
         mUnvisitedStates.push(state);
         coreachable++;
         while (mUnvisitedStates.size() > 0) {
@@ -676,8 +632,8 @@ public class EnabledEventsSetLimitedCertainConflictsTRSimplifier
           mPredecessorsIterator.resetState(popped);
           while (mPredecessorsIterator.advance()) {
             final int pred = mPredecessorsIterator.getCurrentSourceState();
-            if (rel.isReachable(pred) && mStateInfo[pred] == level) {
-              mStateInfo[pred] = COREACHABLE;
+            if (rel.isReachable(pred) && mLevels[pred] == level) {
+              mLevels[pred] = COREACHABLE;
               mUnvisitedStates.push(pred);
               coreachable++;
             }
@@ -691,16 +647,15 @@ public class EnabledEventsSetLimitedCertainConflictsTRSimplifier
 
   //#########################################################################
   //# Data Members
+  private EnabledEventsCache mEnabledEventsCache;
+
   private boolean mHasRemovedTransitions;
   private boolean mHasCertainConflictTransitions;
 
   private int mMaxLevel;
-  private int[] mStateInfo;
+  private int[] mLevels;
   private TIntStack mUnvisitedStates;
   private TransitionIterator mPredecessorsIterator;
-
-  private int mNumberOfEnabledEvents;
-  private EnabledEventsCache mEnabledEventsCache;
 
 
   //#########################################################################

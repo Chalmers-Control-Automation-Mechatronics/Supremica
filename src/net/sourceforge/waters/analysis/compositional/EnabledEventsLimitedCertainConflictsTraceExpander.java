@@ -10,21 +10,16 @@
 package net.sourceforge.waters.analysis.compositional;
 
 import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Queue;
 
-import net.sourceforge.waters.analysis.abstraction.EnabledEventsLimitedCertainConflictsTRSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.MemStateProxy;
@@ -33,7 +28,6 @@ import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -58,30 +52,24 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
   //# Constructors
   protected EnabledEventsLimitedCertainConflictsTraceExpander
     (final CompositionalConflictChecker verifier,
-     final EnabledEventsLimitedCertainConflictsTRSimplifier simplifier,
      final EventProxy tau,
      final AutomatonProxy resultAut,
      final StateEncoding resultStateEnc,
      final AutomatonProxy originalAut,
      final StateEncoding originalStateEnc,
-     final EventEncoding eventEncoding,
-     final int numEnabledEvents)
+     final TRPartition partition,
+     final int[] levels)
     throws AnalysisException
   {
     super(verifier, tau, null,
           resultAut, resultStateEnc, originalAut, originalStateEnc,
           null, false);
-    mSimplifier = simplifier;
-    mNumEnabledEvents = numEnabledEvents;
-    final EventEncoding eventEnc =  eventEncoding;                 //getEventEncoding();    //Change to one we passed in
-    final EventProxy marking = verifier.getUsedDefaultMarking();
-    final int markingID = eventEnc.getEventCode(marking);
-    mSimplifier.setDefaultMarkingID(markingID);
-
     final KindTranslator translator = verifier.getKindTranslator();
     mKindTranslator = new CertainConflictsKindTranslator(translator);
     mSafetyVerifier = verifier.getCurrentCompositionalSafetyVerifier();
     mSafetyVerifier.setKindTranslator(mKindTranslator);
+    mPartition = partition;
+    mLevels = levels;
   }
 
 
@@ -146,32 +134,11 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
       newTraceSteps = new ArrayList<TraceStepProxy>(traceSteps);
     }
 
-    // Rerun certain conflicts simplifier
-    // to obtain partition and level information ...
-    final int config = mSimplifier.getPreferredInputConfiguration();
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    ListBufferTransitionRelation copy =
-      new ListBufferTransitionRelation(rel, config);
-    mSimplifier.setTransitionRelation(copy);
-    mSimplifier.setAppliesPartitionAutomatically(false);
-
-    if(mSimplifier instanceof EnabledEventsLimitedCertainConflictsTRSimplifier)
-    {
-      final EnabledEventsLimitedCertainConflictsTRSimplifier simplifier =
-        mSimplifier;
-      simplifier.setNumberOfEnabledEvents(mNumEnabledEvents);
-
-    }
-
-    mSimplifier.run();
-    copy = null;
-    mSimplifier.setTransitionRelation(rel);
-    final TRPartition partition = mSimplifier.getResultPartition();
     final int initTest;
-    if (partition == null || initResult < 0) {
+    if (mPartition == null || initResult < 0) {
       initTest = initResult;
     } else {
-      final int[] clazz = partition.getStates(initResult);
+      final int[] clazz = mPartition.getStates(initResult);
       assert clazz.length == 1 :
         "Non-certain-conflict state merged into multiple states?";
       initTest = clazz[0];
@@ -182,7 +149,8 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
     final ProductDESProxyFactory factory = verifier.getFactory();
     mCheckedProposition =
       factory.createEventProxy(":certainconf", EventKind.UNCONTROLLABLE);
-    int level = mSimplifier.getMaxLevel() | 1;
+    int level = getMaxLevel() | 1;
+    int foundLevel = level;
     SafetyTraceData foundData = null;
     do {
       final SafetyTraceData newData = findNextLevel(initTest, level);
@@ -190,30 +158,24 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
         break;
       }
       foundData = newData;
-      level = (foundData.getLevel() | 1) - 2;
+      foundLevel = foundData.getLevel();
+      level = (foundLevel | 1) - 2;
     } while (level >= 0);
-
+    if ((foundLevel & 1) == 1) {
+      final SafetyTraceData newData = findNextLevel(initTest, foundLevel - 1);
+      if (newData != null) {
+        foundData = newData;
+      }
+    }
     // Fix the initial segment of the trace ...
     final int ccState =
       foundData == null ? -1 : foundData.getTestAutomatonEndState();
-    newTraceSteps = relabelInitialTraceSteps(newTraceSteps, partition, ccState);
-
+    newTraceSteps = relabelInitialTraceSteps(newTraceSteps, mPartition, ccState);
     // Add the search results to the end of the trace ...
     if (foundData != null) {
       final List<TraceStepProxy> additionalSteps =
         foundData.getAdditionalSteps();
       newTraceSteps.addAll(additionalSteps);
-      level = foundData.getLevel();
-      if ((level & 1) == 1) {
-        // Odd level indicates tau-transitions can go one level further ...
-        final int numExtendedSteps = newTraceSteps.size();
-        final ListIterator<TraceStepProxy> extendedIter =
-          newTraceSteps.listIterator(numExtendedSteps);
-        final TraceStepProxy extendedLastStep = extendedIter.previous();
-        final List<TraceStepProxy> tauSteps =
-          getAdditionalTauSteps(extendedLastStep, level - 1);
-        newTraceSteps.addAll(tauSteps);
-      }
     }
     return newTraceSteps;
   }
@@ -237,6 +199,17 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
       }
       return true;
     }
+  }
+
+  private int getMaxLevel()
+  {
+    int max = Integer.MIN_VALUE;
+    for (final int l : mLevels) {
+      if (l > max) {
+        max = l;
+      }
+    }
+    return max;
   }
 
 
@@ -300,7 +273,7 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
     final ProductDESProxyFactory factory = verifier.getFactory();
     final EventEncoding eventEnc = getEventEncoding();
     final StateEncoding testStateEnc = new StateEncoding();
-    final AutomatonProxy testAut = mSimplifier.createTestAutomaton
+    final AutomatonProxy testAut = createTestAutomaton
       (factory, eventEnc, testStateEnc,
        initTest, mCheckedProposition, level);
     final ProductDESProxy des = createLanguageInclusionModel(testAut);
@@ -313,216 +286,90 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
     }
   }
 
-  private List<TraceStepProxy> getAdditionalTauSteps
-    (final TraceStepProxy startStep, final int level) throws OverflowException
-  {
-    final AutomatonProxy origAut = getOriginalAutomaton();
-    final Map<AutomatonProxy,StateProxy> stepMap = startStep.getStateMap();
-    final StateProxy initState = stepMap.get(origAut);
-    int scode = getOriginalAutomatonStateCode(initState);
-
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
-    final int size = rel.getNumberOfStates();
-    final TIntHashSet visited = new TIntHashSet(size);
-    visited.add(scode);
-    SearchRecord record = new SearchRecord(scode);
-    final Queue<SearchRecord> queue = new ArrayDeque<SearchRecord>();
-    queue.add(record);
-    search:
-    while (true) {
-      record = queue.remove();
-      scode = record.getState();
-      final int slevel = mSimplifier.getLevel(scode);
-      //iter.reset(scode, tau);               //we want to iterate over always enabled as well
-      iter.resetState(scode);
-      iter.resetEvents(0, mNumEnabledEvents);
-      while (iter.advance()) {
-        final int tcode = iter.getCurrentTargetState();
-        if (visited.add(tcode)) {
-          final int tlevel = mSimplifier.getLevel(tcode);
-          if (tlevel < 0 || tlevel > slevel) {
-            continue;
-          }
-          final int event = iter.getCurrentEvent();
-          final SearchRecord newRecord =
-            new SearchRecord(tcode, 0, event, record);
-          if (tlevel <= level) {
-            record = newRecord;
-            break search;
-          }
-          queue.add(newRecord);
-        }
-      }
-    }
-
-    final List<SearchRecord> trace = new LinkedList<SearchRecord>();
-    do {
-      trace.add(0, record);
-      record = record.getPredecessor();
-    } while (record.getPredecessor() != null);
-
-    final AbstractCompositionalModelVerifier verifier = getModelVerifier();
-    final ProductDESProxyFactory factory = verifier.getFactory();
-    final List<TraceStepProxy> additionalSteps =
-      new LinkedList<TraceStepProxy>();
-
-    /*
-     * Better start differently from here ~~~ Robi
-     *
-     * Starting point is:
-     *   aut     - automaton with certain conflicts
-     *             to be un-abstracted
-     *   stepMap - contains states of all automata at the end of the
-     *             original trace, but before trace extension
-     *   trace   - list of search records containing trace extension into
-     *             certain conflicts of the un-abstracted automaton
-     *
-     * Step 1:
-     *   Go through trace, find all non-tau events---these are the always
-     *   enabled events.
-     *   Then find all automata in stepMap (other than aut) that use one of
-     *   these events---these are the ones that need special treatment.
-     *
-     * Step 2:
-     *   For each automaton identified in step 1, identify local events.
-     *   (Local events are with respect to _all_ automata, not only
-     *   those identified in step 1.)
-     *   (This step can be skipped if there a no always enabled events.)
-     *
-     * Step 3:
-     *   For each automaton identified in step 1,
-     *   make state and event encoding and transition relation.
-     *   Then track through trace.
-     *   For each step with event e:
-     *   a) If e is not in aut, keep the step.
-     *   b) If e is in aut, then it is an always enabled event.
-     *      Search from end state according to stepMap, and find a string
-     *      of events local to aut leading to state with e enabled.
-     *      Insert these transitions then e into the trace.
-     *      (Update end state of aut in case there are more steps.)
-     *   c) A special case arises if we cannot reach a state
-     *      with e enabled in b). This means aut is in a dumpstate.
-     *      Then truncate the trace so it ends with this step,
-     *      and skip forward to the next automaton.
-     *
-     * Step 4:
-     *   For each automaton not identified in step 1, update step maps.
-     */
-
-    final Map<AutomatonProxy,StateProxy> workMap = //contains map of automata to state
-      new HashMap<AutomatonProxy,StateProxy>(stepMap);
-    for (final SearchRecord recordReverse : trace) {
-      scode = recordReverse.getState();
-      final int eventCode = recordReverse.getEvent();
-      final EventProxy event = getEventEncoding().getProperEvent(eventCode);
-      final StateProxy state = getOriginalAutomatonState(scode);
-      workMap.put(origAut, state);
-      for (final Map.Entry<AutomatonProxy,StateProxy> entry : workMap.entrySet()) {
-        final AutomatonProxy aut = entry.getKey();
-        if (aut != origAut) {
-          if (aut.getEvents().contains(event)) {
-            final StateProxy sourceState = entry.getValue();
-            for (final TransitionProxy transition : aut.getTransitions()) {
-              // TODO Fix bug. If event is 'always enabled', may have to
-              // take tau (local to aut) transitions before.
-              // final EventProxy e = transition.getEvent();
-              // TODO Figure out which events are always enabled.
-              //   >>> All events here (except tau) are always enabled
-              /*
-               if(e is an always enabled event)
-
-              // Look through each T with e enabled
-              // Do it's local events until it can do e
-              // If we reach a state without local events or e it is a dump state.
-
-              //   >>> Better find local events first, not again for each
-              //   >>> automaton and each trace step. Rewrite loop from above.
-              Map<EventProxy,List<AutomatonProxy>> localEventsCounter =
-                new HashMap<EventProxy,List<AutomatonProxy>>();
-              //   >>> How about TObjectIntHashMap<EventProxy> instead ?
-              for(AutomatonProxy autLocalCounter : workMap.keySet())
-              {
-              //Find which events are local events
-                for(EventProxy eventCount : autLocalCounter.getEvents())
-                {
-                  List<AutomatonProxy> autList = localEventsCounter.get(eventCount);
-                    if(autList == null)
-                    {
-                      ArrayList<AutomatonProxy> newAutList = new ArrayList<AutomatonProxy>();
-                      newAutList.add(autLocalCounter);
-                      localEventsCounter.put(eventCount, newAutList);
-                    }
-                    else
-                    {
-                      autList.add(autLocalCounter);
-                      localEventsCounter.put(eventCount, autList);
-                    }
-                }
-              }
-              //Create a list of automata that contain local events
-              List<AutomatonProxy> AutLocalEvents = new ArrayList<AutomatonProxy>();
-              for(EventProxy localEvent : localEventsCounter.keySet())
-              {
-                if(localEventsCounter.get(localEvent).size() == 1)
-                {
-                  AutomatonProxy autLocal = localEventsCounter.get(localEvent).get(0);
-                  if(autLocal != aut)
-                  AutLocalEvents.add(autLocal);
-                }
-              }
-              //TODO: If the automata contains no always enabled events remove it from list
-
-
-
-              for(AutomatonProxy Taut : AutLocalEvents)
-                {//For each test automaton, create transition iterator
-                  EventEncoding encoding = new EventEncoding(Taut, mKindTranslator);
-                  final ListBufferTransitionRelation transrel =
-                    new ListBufferTransitionRelation(Taut, encoding,
-                                                     ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-                  final TransitionIterator normalTransIterator =
-                    transrel.createSuccessorsReadOnlyIterator();
-                  //   >>> The iterator is fine, but we must use breadth-first
-                  //   >>> search following tau events to see if we can find
-                  //   >>> a state with e enabled
-                  //Start iterating over local events at the state we'd gotten up to
-                  normalTransIterator.resetState(sourceState);
-                  normalTransIterator.resetEventsByStatus(flags);
-                  //while the current state doesn't have e enabled
-                  while(normalTransIterator)
-                  {
-                    //Advance along a local event
-                    normalTransIterator.advance();
-                    //Add these transitions to the tracesteps.
-
-                    //If there are no more local events and e has still not been found, dump state
-                  }
-
-                }
-
-              */
-              //At the end every automata must be ready to do e
-              //Or we've reached a dump state
-              if (transition.getSource() == sourceState
-                  && transition.getEvent() == event) {
-                entry.setValue(transition.getTarget()); //this but backwards
-                break;
-              }
-            }
-          }
-        }
-      }
-      final TraceStepProxy step =
-        factory.createTraceStepProxy(event, workMap);
-      additionalSteps.add(step);
-    }
-    return additionalSteps;
-  }
 
 
   //#########################################################################
   //# Language Inclusion Model
+  /**
+   * Creates a test automaton to check whether certain conflict states of
+   * the given or a lower level can be reached. States of certain conflicts
+   * of levels to be checked are flagged using selfloops of the given event
+   * <CODE>prop</CODE>, so their reachability can be tested using a language
+   * inclusion check.
+   */
+  private AutomatonProxy createTestAutomaton
+    (final ProductDESProxyFactory factory,
+     final EventEncoding eventEnc,
+     final StateEncoding stateEnc,
+     final int initCode,
+     final EventProxy prop,
+     final int level)
+  {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final int numEvents = eventEnc.getNumberOfEvents();
+    final Collection<EventProxy> events = new ArrayList<EventProxy>(numEvents);
+    for (int e = 0; e < eventEnc.getNumberOfProperEvents(); e++) {
+      if ((rel.getProperEventStatus(e) & EventEncoding.STATUS_UNUSED) == 0) {
+        final EventProxy event = eventEnc.getProperEvent(e);
+        if (event != null) {
+          events.add(event);
+        }
+      }
+    }
+    events.add(prop);
+    final int numStates = rel.getNumberOfStates();
+    int numReachable = 0;
+    int numCritical = 0;
+    for (int state = 0; state < numStates; state++) {
+      if (rel.isReachable(state)) {
+        numReachable++;
+        if (mLevels[state] <= level) {
+          numCritical++;
+        }
+      }
+    }
+    final StateProxy[] states = new StateProxy[numStates];
+    final List<StateProxy> reachable = new ArrayList<StateProxy>(numReachable);
+    final int numTrans = rel.getNumberOfTransitions();
+    final Collection<TransitionProxy> transitions =
+      new ArrayList<TransitionProxy>(numTrans + numCritical);
+    int code = 0;
+    for (int state = 0; state < numStates; state++) {
+      if (rel.isReachable(state)) {
+        final boolean init =
+          initCode >= 0 ? state == initCode : rel.isInitial(state);
+        final StateProxy memstate = new MemStateProxy(code++, init);
+        states[state] = memstate;
+        reachable.add(memstate);
+        final int info = mLevels[state];
+        if (info >= 0 && info <= level) {
+          final TransitionProxy trans =
+            factory.createTransitionProxy(memstate, prop, memstate);
+          transitions.add(trans);
+        }
+      }
+    }
+    stateEnc.init(states);
+    final TransitionIterator iter = rel.createAllTransitionsReadOnlyIterator();
+    while (iter.advance()) {
+      final int s = iter.getCurrentSourceState();
+      if (rel.isReachable(s)) {
+        final int t = iter.getCurrentTargetState();
+        final StateProxy source = states[s];
+        final int e = iter.getCurrentEvent();
+        final EventProxy event = eventEnc.getProperEvent(e);
+        final StateProxy target = states[t];
+        final TransitionProxy trans =
+          factory.createTransitionProxy(source, event, target);
+        transitions.add(trans);
+      }
+    }
+    final String name = rel.getName() + ":certainconf:" + level;
+    final ComponentKind kind = ComponentKind.PLANT;
+    return factory.createAutomatonProxy(name, kind,
+                                        events, reachable, transitions);
+  }
+
   private ProductDESProxy createLanguageInclusionModel
     (final AutomatonProxy testAut)
   {
@@ -647,7 +494,7 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
       mTestAutomaton = testAut;
       mTestAutomatonStateEncoding = stateEnc;
       final int state = getTestAutomatonEndState();
-      mLevel = mSimplifier.getLevel(state);
+      mLevel = mLevels[state];
       assert mLevel >= 0;
     }
 
@@ -820,12 +667,19 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
 
   //#######################################################################
   //# Data Members
-  private final EnabledEventsLimitedCertainConflictsTRSimplifier mSimplifier;
   private final KindTranslator mKindTranslator;
   private final SafetyVerifier mSafetyVerifier;
 
-  private final int mNumEnabledEvents;
-
+  /**
+   * The partition computed by the simplifier.
+   */
+  private final TRPartition mPartition;
+  /**
+   * The levels of certain conflicts computed during simplification.
+   * Indicates the level of each state or -1 for states that are not
+   * certain conflicts.
+   */
+  private final int[] mLevels;
   /**
    * The last step of the counterexample being converted, which includes
    * a state outside of certain conflicts in the abstracted automaton.

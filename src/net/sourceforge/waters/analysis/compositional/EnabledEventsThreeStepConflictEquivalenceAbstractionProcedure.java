@@ -319,14 +319,16 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
           final StateEncoding outputStateEnc = new StateEncoding();
           final AutomatonProxy outputAut =
             rel.createAutomaton(factory, eventEnc, outputStateEnc);
-          if (mEnabledEventsLimitedCertainConflictsSimplifier.hasCertainConflictTransitions() || lccStep != null) {
-            eelccStep = new LimitedCertainConflictsStep                       //Give this lots of info
-              (analyzer, mEnabledEventsLimitedCertainConflictsSimplifier, outputAut,     //this creates the trace expander, so will get it this info
-               lastAut, tau, lastStateEnc, outputStateEnc, eventEnc, numEnabledEvents);
-            //System.out.println(numEnabledEvents);
+          final TRPartition ccPart =
+            mEnabledEventsLimitedCertainConflictsSimplifier.getResultPartition();
+          if (mEnabledEventsLimitedCertainConflictsSimplifier.hasCertainConflictTransitions() ||
+              lccStep != null) {
+            final int[] levels =
+              mEnabledEventsLimitedCertainConflictsSimplifier.getLevels();
+            eelccStep = new EnabledEventsLimitedCertainConflictsStep
+              (analyzer, outputAut, lastAut, tau, lastStateEnc,
+               outputStateEnc, ccPart, levels);
           } else {
-            final TRPartition ccPart =
-              mEnabledEventsLimitedCertainConflictsSimplifier.getResultPartition();
             partition = TRPartition.combine(partition, ccPart);
             preStep = createStep(aut, inputStateEnc,
                                  outputAut, outputStateEnc, tau,
