@@ -917,12 +917,24 @@ public abstract class AbstractCompositionalModelAnalyzer
     if (!found) {
       return aut;   //If none of the events in removed are present in aut, return aut
     }
+
+    final ProductDESProxyFactory factory = getFactory();
+    StateProxy newDumpState = null;
     final int numEvents = events.size();
     final Collection<EventProxy> newEvents =
       new ArrayList<EventProxy>(numEvents - 1);
     for (final EventProxy event : events) {
       if (!removed.contains(event)) {   //If we are not removing the event
         newEvents.add(event);           //put it into newEvents list
+      }
+      else if(getEventInfo(event).isFailing())
+      {
+        newEvents.add(event);
+        if(newDumpState == null)
+        {
+          //find dump
+          newDumpState = factory.createStateProxy(":dump");
+        }
       }
     }
     final Collection<TransitionProxy> transitions = aut.getTransitions();
@@ -933,16 +945,33 @@ public abstract class AbstractCompositionalModelAnalyzer
       final EventProxy event = trans.getEvent();
       if (!removed.contains(event)) {       //If we are not removing the event
         newTransitions.add(trans);          //Add the transition to list
-      } else if (trans.getSource() != trans.getTarget()) {  //If we are removing trans that is not self loop
+      }
+      else if(getEventInfo(event).isFailing())
+      {
+        newTransitions.add(factory.createTransitionProxy(trans.getSource(), event, newDumpState));
+        mHasRemovedProperTransition = true;
+      }
+      else if (trans.getSource() != trans.getTarget()) {  //If we are removing trans that is not self loop
         mHasRemovedProperTransition = true;
       }
     }
-    final ProductDESProxyFactory factory = getFactory();
+
     final String name = aut.getName();
     final ComponentKind kind = aut.getKind();
+    final Collection<StateProxy> newStates;
+
     final Collection<StateProxy> states = aut.getStates();
+
+    if(newDumpState != null)
+    {
+      newStates = new ArrayList<>(states.size() +1);
+      newStates.addAll(states);
+      newStates.add(newDumpState);
+    }
+    else
+      newStates = states;
     final AutomatonProxy newAut = factory.createAutomatonProxy  //Create a new automaton with the new events and transitions
-      (name, kind, newEvents, states, newTransitions);
+      (name, kind, newEvents, newStates, newTransitions);
     return newAut;
   }
 
@@ -1031,7 +1060,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     }
     mRedundantEvents = new LinkedList<EventProxy>();
     for (final EventInfo info : mEventInfoMap.values()) {
-      if (info.isRemovable(mUsingSpecialEvents)) {
+      if (info.isRemovable(mUsingSpecialEvents) || info.isFailing()) {
         final EventProxy event = info.getEvent();
         mRedundantEvents.add(event);
       }
@@ -1085,15 +1114,42 @@ public abstract class AbstractCompositionalModelAnalyzer
     throws OverflowException
   {
     final Collection<EventProxy> events = aut.getEvents();
+    final EventProxy omega = getUsedDefaultMarking();
+    Set<StateProxy> nonDumpStates = null;
+    if (omega != null && isUsingSpecialEvents() && events.contains(omega)) {
+      //Find the nondump states
+      nonDumpStates = new THashSet<>();
+      for (final TransitionProxy trans : aut.getTransitions()) {
+        nonDumpStates.add(trans.getSource());
+      }
+      for (final StateProxy state : aut.getStates()) {
+        if (state.getPropositions().contains(omega)) {
+          nonDumpStates.add(state);
+        }
+      }
+    }
+
     final int numEvents = events.size();
     final TObjectByteHashMap<EventProxy> statusMap =
       new TObjectByteHashMap<EventProxy>(numEvents);
     for (final TransitionProxy trans : aut.getTransitions()) {
       final EventProxy event = trans.getEvent();
-      if (trans.getSource() != trans.getTarget()) {
+      final byte status = statusMap.get(event);
+      if (trans.getSource() == trans.getTarget()) {
+        if (status == UNKNOWN_SELFLOOP) {
+          statusMap.put(event, ONLY_SELFLOOP);
+        } else if (status == FAILING) {
+          statusMap.put(event, NOT_ONLY_SELFLOOP);
+        }
+      } else if (nonDumpStates != null
+                 && !nonDumpStates.contains(trans.getTarget())) {
+        if (status == UNKNOWN_SELFLOOP) {
+          statusMap.put(event, FAILING);
+        } else if (status == ONLY_SELFLOOP) {
+          statusMap.put(event, NOT_ONLY_SELFLOOP);
+        }
+      } else {
         statusMap.put(event, NOT_ONLY_SELFLOOP);
-      } else if (!statusMap.containsKey(event)) {
-        statusMap.put(event, ONLY_SELFLOOP);
       }
     }
     final KindTranslator translator = getKindTranslator();
@@ -1134,7 +1190,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       info.removeAutomata(victims);
       if (info.isEmpty()) {
         iter.remove();
-      } else if (info.isRemovable(mUsingSpecialEvents)) {
+      } else if (info.isRemovable(mUsingSpecialEvents) || info.isFailing()) {
         final EventProxy event = entry.getKey();
         mRedundantEvents.add(event);
       }
@@ -1210,9 +1266,13 @@ public abstract class AbstractCompositionalModelAnalyzer
     if (step != null) {
       recordAbstractionStep(step);
       for (final EventProxy event : mRedundantEvents) {
-        mEventInfoMap.remove(event);
-        // final EventInfo info = mEventInfoMap.remove(event);
-        // mMayBeSplit |= info.getNumberOfAutomata() > 1;
+        final EventInfo info = getEventInfo(event);
+        if (info.isRemovable(mUsingSpecialEvents)) {
+          mEventInfoMap.remove(event);
+          mMayBeSplit |= info.getNumberOfAutomata() > 1;
+        } else if (info.isFailing()) {
+          info.setReduced();
+        }
       }
       mRedundantEvents.clear();
       mMayBeSplit = true;
@@ -2000,6 +2060,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       mSortedAutomataList = null;
       mNumNonSelfloopAutomata = 0;
       mIsBlocked = false;
+      mFailingStatus = NOT_FAILING;
     }
 
     //#######################################################################
@@ -2084,15 +2145,22 @@ public abstract class AbstractCompositionalModelAnalyzer
     {
       final byte present = mAutomataMap.get(aut);
       if (present != status) {
+        assert status != REDUCED;  //Not Supported Presently.
         mAutomataMap.put(aut, status);
         mSortedAutomataList = null;
-        if (present == NOT_ONLY_SELFLOOP) {
+        if (present == NOT_ONLY_SELFLOOP || present == FAILING) {
           mNumNonSelfloopAutomata--;
         }
-        if (status == NOT_ONLY_SELFLOOP) {
+        if (status == NOT_ONLY_SELFLOOP || status == FAILING) {
           mNumNonSelfloopAutomata++;
         }
         mIsBlocked |= status == BLOCKED;
+        if (status == FAILING) {
+          if (mFailingStatus == NOT_FAILING) {
+            System.out.println("Found failing event " + mEvent.getName());
+          }
+          mFailingStatus |= FAILING;
+        }
       }
     }
 
@@ -2127,6 +2195,16 @@ public abstract class AbstractCompositionalModelAnalyzer
       } else {
         return false;
       }
+    }
+
+    private boolean isFailing()
+    {
+      return mFailingStatus == FAILING;
+    }
+
+    private void setReduced()
+    {
+      mFailingStatus = REDUCED;
     }
 
     void removeAutomata(final Collection<AutomatonProxy> victims)
@@ -2210,7 +2288,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     private List<AutomatonProxy> mSortedAutomataList;
     private int mNumNonSelfloopAutomata;
     private boolean mIsBlocked;
-
+    private byte mFailingStatus;
   }
 
 
@@ -2551,6 +2629,11 @@ public abstract class AbstractCompositionalModelAnalyzer
   static final byte ONLY_SELFLOOP = 1;
   static final byte NOT_ONLY_SELFLOOP = 2;
   static final byte BLOCKED = 3;
+
+
+  static final byte NOT_FAILING = 4;
+  static final byte FAILING = 5;
+  static final byte REDUCED = 6;
 
 }
 

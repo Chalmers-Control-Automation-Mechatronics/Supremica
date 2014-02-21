@@ -278,6 +278,13 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(des, true);
   }
 
+  public void testFailingEvent() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "failingEvent.wmod");
+    runModelVerifier(des, false);
+  }
+
   public void testFTechnikConflict() throws Exception
   {
     final ProductDESProxy des =

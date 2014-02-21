@@ -44,7 +44,7 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
   public EnabledEventsCompositionalConflictCheckerExperiments(final String statsFilename)
     throws FileNotFoundException
   {
-    this(statsFilename, EnabledEventsCompositionalConflictChecker.MustLE, null);
+    this(statsFilename, EnabledEventsCompositionalConflictChecker.MustL, null);
   }
 
   public EnabledEventsCompositionalConflictCheckerExperiments
@@ -73,11 +73,11 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
   {
     super.setUp();
     mPrintWriter = new PrintWriter(mOut, true);
-    final int internalStateLimit = 100000;      //5000
+    final int internalStateLimit = 5000;      //5000
     mConflictChecker.setInternalStateLimit(internalStateLimit);
-    final int internalTransitionLimit = Integer.MAX_VALUE;  //1000000
+    final int internalTransitionLimit = 1000000;  //1000000
     mConflictChecker.setInternalTransitionLimit(internalTransitionLimit);
-    final int finalStateLimit = 50000000;   //2000000
+    final int finalStateLimit = 2000000;   //2000000
     mConflictChecker.setMonolithicStateLimit(finalStateLimit);
     //For the big ones
     mConflictChecker.setMonolithicTransitionLimit(0);
@@ -164,7 +164,7 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
     final ProductDESProxy des = getCompiledDES(filename, bindings);
     mConflictChecker.setModel(des);
     mConflictChecker.setAbstractionProcedureFactory
-      (ConflictAbstractionProcedureFactory.EENB);
+      (ConflictAbstractionProcedureFactory.EESNB);
     try {
       final boolean result = mConflictChecker.run();
 
@@ -223,21 +223,21 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
   void runAllTests() throws Exception
   {
 
-/*  For general testing
+//  For general testing
     testOnlySelfLoop01();
     testFailedTrafficLights();
-    synthesisAGV();
-    synthesisAGVB();
-    synthesissAip0Alps();
+    testAGV();
+    testAGVB();
+    testAip0Alps();
     synthesissRhoneSubPatch0();
-    synthesisFenCaiWon09B();
-    synthesisFenCaiWon09Synth();
+    testFenCaiWon09();
+    testFenCaiWon09b();
     synthesissFms2003();
-    synthesiseFischertechnik();
-    synthesiseIPC();
+    testFischertechnik();
+   // synthesiseIPC();
     synthesiseCentralLockingKoordwspBlock();
-    synthesiseTbedCtct();
-    synthesiseCentralLockingVerriegel3b();
+    testTbedCTCT();
+    testVerriegel3b();
     testBigBmw();
     testFischertechnik();
     testProfisafeI4();
@@ -256,9 +256,9 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
     testProfisafeI6Host();
     testProfisafeO6Host();
     testTip3();
-    testTip3Bad();
-*/
-    //The big ones
+   // testTip3Bad();
+
+ /*   //The big ones
     testAGV();
     testAGVB();
     testAip0Aip();
@@ -289,7 +289,7 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
     test6linka();
     test6linki();
     test6linkp();
-    test6linkre();
+    test6linkre();*/
   }
 
 
