@@ -907,6 +907,11 @@ public abstract class AbstractCompositionalModelAnalyzer
     checkAbort();
     mHasRemovedProperTransition = false;
     final Collection<EventProxy> events = aut.getEvents();
+    final Collection<StateProxy> states = aut.getStates();
+    final Collection<TransitionProxy> transitions = aut.getTransitions();
+
+    Collection<StateProxy> dumpStates = null;
+    boolean createNewDumpState = false;
     boolean found = false;
     for (final EventProxy event : events) {
       if (removed.contains(event)) {
@@ -919,7 +924,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     }
 
     final ProductDESProxyFactory factory = getFactory();
-    StateProxy newDumpState = null;
+    StateProxy dumpState = null;
     final int numEvents = events.size();
     final Collection<EventProxy> newEvents =
       new ArrayList<EventProxy>(numEvents - 1);
@@ -930,14 +935,35 @@ public abstract class AbstractCompositionalModelAnalyzer
       else if(getEventInfo(event).isFailing())
       {
         newEvents.add(event);
-        if(newDumpState == null)
+        if(dumpStates == null)
         {
-          //find dump
-          newDumpState = factory.createStateProxy(":dump");
+          //find dump states
+          dumpStates = new ArrayList<>(states.size());
+          dumpStates.addAll(states);
+          for (final TransitionProxy trans : transitions)
+          {
+            dumpStates.remove(trans.getSource());
+          }
+          for(final StateProxy state : dumpStates)
+          {
+            //If the state is marked it is not a dump state
+            if(state.getPropositions().contains(getConfiguredDefaultMarking()))
+            {
+              dumpStates.remove(state);
+            }
+          }
+          if(dumpStates.isEmpty())
+          {
+            createNewDumpState = true;
+            dumpState = factory.createStateProxy(":dump");
+          }
+          else
+          {
+            dumpState = dumpStates.iterator().next();
+          }
         }
       }
     }
-    final Collection<TransitionProxy> transitions = aut.getTransitions();
     final int numTrans = transitions.size();
     final Collection<TransitionProxy> newTransitions =
       new ArrayList<TransitionProxy>(numTrans);
@@ -948,7 +974,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       }
       else if(getEventInfo(event).isFailing())
       {
-        newTransitions.add(factory.createTransitionProxy(trans.getSource(), event, newDumpState));
+        newTransitions.add(factory.createTransitionProxy(trans.getSource(), event, dumpState));
         mHasRemovedProperTransition = true;
       }
       else if (trans.getSource() != trans.getTarget()) {  //If we are removing trans that is not self loop
@@ -959,14 +985,11 @@ public abstract class AbstractCompositionalModelAnalyzer
     final String name = aut.getName();
     final ComponentKind kind = aut.getKind();
     final Collection<StateProxy> newStates;
-
-    final Collection<StateProxy> states = aut.getStates();
-
-    if(newDumpState != null)
+    if(createNewDumpState == true)
     {
       newStates = new ArrayList<>(states.size() +1);
       newStates.addAll(states);
-      newStates.add(newDumpState);
+      newStates.add(dumpState);
     }
     else
       newStates = states;
