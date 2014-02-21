@@ -467,21 +467,18 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
     runModel(group, dir, name, true);
   }
 
-  // #########################################################################
-
+  //#########################################################################
   // Central locking
-  @SuppressWarnings("unused")
   private void synthesiseCentralLockingKoordwspBlock() throws Exception
   {
     runModel("valid", "central_locking", "koordwsp_block.wmod",false);
   }
 
-  @SuppressWarnings("unused")
   private void synthesissRhoneSubPatch0() throws Exception
   {
     runModel("tests", "hisc", "rhone_subsystem1_patch0.wmod",false);
   }
-  @SuppressWarnings("unused")
+
   private void synthesissFms2003() throws Exception
   {
     runModel("tests", "fms2003", "fms2003_synth1.wmod",false);
@@ -499,51 +496,69 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
   {
     runModel("tests", "incremental_suite", "agvb.wmod",false);
   }
+
+  @SuppressWarnings("unused")
   private void testAip0Aip() throws Exception
   {
     runModel("tests", "incremental_suite", "aip0aip.wmod",true);
   }
+
   private void testAip0Alps() throws Exception
   {
     runModel("tests", "incremental_suite", "aip0alps.wmod",false);
   }
+
+  @SuppressWarnings("unused")
   private void testAip0Tough() throws Exception
   {
     runModel("tests", "incremental_suite", "aip0tough.wmod",false);
   }
+
   private void testBigBmw() throws Exception
   {
     runModel("tests", "incremental_suite", "big_bmw.wmod",true);
   }
+
   private void testFenCaiWon09() throws Exception
   {
     runModel("tests", "fencaiwon09", "FenCaiWon09.wmod",true);
   }
+
   private void testFenCaiWon09b() throws Exception
   {
     runModel("tests", "fencaiwon09", "FenCaiWon09b.wmod",false);
   }
+
+  @SuppressWarnings("unused")
   private void testFtechnik() throws Exception
   {
     runModel("tests", "incremental_suite", "ftechnik.wmod",false);
   }
+
+  @SuppressWarnings("unused")
   private void testProfisafe_i4() throws Exception
   {
     runModel("tests", "profisafe", "profisafe_i4.wmod",true);
   }
+
+  @SuppressWarnings("unused")
   private void testProfisafe_i5() throws Exception
   {
     runModel("tests", "profisafe", "profisafe_i5.wmod",true);
   }
+
+  @SuppressWarnings("unused")
   private void testProfisafe_i6() throws Exception
   {
     runModel("tests", "profisafe", "profisafe_i6.wmod",true);
   }
+
   @SuppressWarnings("unused")
   private void testProfisafe_o4() throws Exception
   {
     runModel("tests", "profisafe", "profisafe_o4.wmod",true);
   }
+
   @SuppressWarnings("unused")
   private void testProfisafe_o5() throws Exception
   {
@@ -554,58 +569,82 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
   {
     runModel("tests", "profisafe", "profisafe_o6.wmod",true);
   }
+
+  @SuppressWarnings("unused")
   private void testTbed_ctct() throws Exception
   {
     runModel("tests", "incremental_suite", "tbed_ctct.wmod",false);
   }
+
+  @SuppressWarnings("unused")
   private void testTbed_hisc() throws Exception
   {
     runModel("despot", "tbed_hisc", "tbed_hisc.wmod",true);
   }
+
+  @SuppressWarnings("unused")
   private void testTbed_valid() throws Exception
   {
     runModel("tests", "incremental_suite", "tbed_valid.wmod",true);
   }
+
   private void testTip3() throws Exception
   {
     runModel("tip", "acsw2006", "tip3.wmod",true);
   }
+
+  @SuppressWarnings("unused")
   private void testTip3_bad() throws Exception
   {
     runModel("tip", "acsw2006", "tip3_bad.wmod",false);
   }
+
+  @SuppressWarnings("unused")
   private void testVerriegel3() throws Exception
   {
     runModel("valid", "central_locking", "verriegel3.wmod",true);
   }
+
   private void testVerriegel3b() throws Exception
   {
     runModel("valid", "central_locking", "verriegel3b.wmod",false);
   }
+
   private void testVerriegel4() throws Exception
   {
     runModel("tests", "incremental_suite", "verriegel4.wmod",true);
   }
+
+  @SuppressWarnings("unused")
   private void testVerriegel4b() throws Exception
   {
     runModel("tests", "incremental_suite", "verriegel4b.wmod",false);
   }
+
+  @SuppressWarnings("unused")
   private void test6linka() throws Exception
   {
     runModel("tests", "6link", "6linka.wmod",false);
   }
+
+  @SuppressWarnings("unused")
   private void test6linki() throws Exception
   {
     runModel("tests", "6link", "6linki.wmod",false);
   }
+
+  @SuppressWarnings("unused")
   private void test6linkp() throws Exception
   {
     runModel("tests", "6link", "6linkp.wmod",false);
   }
+
+  @SuppressWarnings("unused")
   private void test6linkre() throws Exception
   {
     runModel("tests", "6link", "6linkre.wmod",false);
   }
+
   @SuppressWarnings("unused")
   private void synthesisTransferline(final int n) throws Exception
   {
@@ -624,6 +663,7 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
     formatter.format("%.3f s\n", difftime);
   }
 
+  @SuppressWarnings("unused")
   private void testSongAip(final int n, final boolean expected) throws Exception
   {
     final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
@@ -661,4 +701,5 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
   private AbstractCompositionalModelAnalyzer.PreselectingMethod
     mPreselecting;
   private SelectionHeuristicCreator mSelecting;
+
 }

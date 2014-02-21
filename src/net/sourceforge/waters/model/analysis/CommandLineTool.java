@@ -315,23 +315,8 @@ public class CommandLineTool
         first = false;
       }
 
-    } catch (final EvalException exception) {
-      System.err.print("FATAL ERROR (");
-      System.err.print(ProxyTools.getShortClassName(exception));
-      System.err.println(")");
-      final String msg = exception.getMessage();
-      if (msg != null) {
-        System.err.println(exception.getMessage());
-      }
-    } catch (final WatersUnmarshalException exception) {
-      System.err.print("FATAL ERROR (");
-      System.err.print(ProxyTools.getShortClassName(exception));
-      System.err.println(")");
-      final String msg = exception.getMessage();
-      if (msg != null) {
-        System.err.println(exception.getMessage());
-      }
-    } catch (final IOException exception) {
+    } catch (final EvalException | WatersUnmarshalException | IOException
+             exception) {
       System.err.print("FATAL ERROR (");
       System.err.print(ProxyTools.getShortClassName(exception));
       System.err.println(")");
