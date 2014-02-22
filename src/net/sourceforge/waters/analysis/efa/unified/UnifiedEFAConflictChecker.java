@@ -46,6 +46,8 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * A compositional conflict checker for EFA.
@@ -286,7 +288,6 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     mSimplifier = mSimplifierFactory.createAbstractionProcedure(this);
     result.setSimplifierStatistics(mSimplifier);
     mNonblockingChecker = new EFANonblockingChecker();
-
   }
 
   @Override
@@ -529,6 +530,8 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
         mLocalVariableTR = simplifiedTR;
       }
     } else if (trs.size() > 1) {
+      final Logger logger = getLogger();
+      logger.debug("Synchronizing: " + candidate);
       trs = addSelfloopTR(trs);
       mSynchronizer.setInputTransitionRelations(trs);
       mSynchronizer.run();
@@ -579,6 +582,8 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       if (info.isBlocked()) {
         status |= EventEncoding.STATUS_BLOCKED;
       } else if (info.isLocal(tr)) {
+        final Logger logger = getLogger();
+        logger.debug("Hiding event: " + event.getName());
         status |= EventEncoding.STATUS_LOCAL;
       }
       rel.setProperEventStatus(code, status);
@@ -1152,6 +1157,8 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     private void setBlocked()
     {
       if (!mIsBlocked) {
+        final Logger logger = getLogger();
+        logger.debug("Found blocked event: " + mEvent.getName());
         setBlockedDownwards();
         final EventInfo parent = getParent();
         if (parent != null) {

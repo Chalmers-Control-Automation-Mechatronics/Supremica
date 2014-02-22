@@ -247,7 +247,12 @@ public class UnifiedEFACompilerTest
   //# Customisation
   void configure(final UnifiedEFACompiler compiler)
   {
+    // TODO Configure compiler here
     compiler.setSourceInfoEnabled(true);
+    /*
+    final Collection<String> empty = Collections.emptyList();
+    compiler.setEnabledPropertyNames(empty);
+    */
   }
 
   String getTestSuffix()

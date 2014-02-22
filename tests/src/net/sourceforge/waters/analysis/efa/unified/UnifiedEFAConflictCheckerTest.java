@@ -649,6 +649,13 @@ public class UnifiedEFAConflictCheckerTest
     final DocumentManager manager = getDocumentManager();
     checker.setDocumentManager(manager);
     checker.setUsesLocalVariable(true);
+//    final SelectionHeuristic<UnifiedEFACandidate> minS =
+//      new MinStatesSelectionHeuristic();
+//    final SelectionHeuristic<UnifiedEFACandidate> minF =
+//      new MinFrontierSelectionHeuristic();
+//    final SelectionHeuristic<UnifiedEFACandidate> chain =
+//      new ChainSelectionHeuristic<UnifiedEFACandidate>(minF, minS);
+//    checker.setSelectionHeuristic(chain);
   }
 
 

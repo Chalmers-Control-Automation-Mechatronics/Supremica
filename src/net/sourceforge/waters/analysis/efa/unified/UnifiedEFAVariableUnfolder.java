@@ -38,6 +38,8 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * @author Robi Malik, Sahar Mohajerani
@@ -103,6 +105,8 @@ public class UnifiedEFAVariableUnfolder extends AbstractEFAAlgorithm
   public void run() throws AnalysisException, EvalException
   {
     try {
+      final Logger logger = getLogger();
+      logger.debug("Unfolding variable: " + mUnfoldedVariable.getName());
       setUp();
       createUpdateOriginalEventMap();
       expandEvents();

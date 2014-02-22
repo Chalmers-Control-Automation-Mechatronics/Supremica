@@ -17,7 +17,6 @@ import gnu.trove.strategy.HashingStrategy;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,11 +36,11 @@ import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintPropagator;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.expr.ExpressionComparator;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 
 /**
@@ -353,16 +352,19 @@ class UnifiedEFAUpdateMerger extends AbstractEFAAlgorithm
     }
     mPropagator.propagate();
     if (mPropagator.isUnsatisfiable()) {
-      final Comparator<SimpleExpressionProxy> comparator =
-        new ExpressionComparator(mOperatorTable);
-      final ConstraintList newUpdate = new ConstraintList(commonLiterals);
-      newUpdate.sort(comparator);
-      return newUpdate;
+      mPropagator.reset();
+    } else {
+      final ConstraintList update = mPropagator.getAllConstraints();
+      mPropagator.reset();
+      mPropagator.addNegation(update);
     }
-    final ConstraintList negatedUpdate = mPropagator.getAllConstraints();
-    mPropagator.reset();
-    mPropagator.addNegation(negatedUpdate);
     mPropagator.addConstraints(commonLiterals);
+    // Make sure all primed variables are included even in case
+    // of simplification. Variables simplified away change arbitrarily.
+    for (final UnifiedEFAVariable var : allPrimedVars) {
+      final UnaryExpressionProxy primed = var.getPrimedVariableName();
+      mPropagator.addPrimedVariables(primed);
+    }
     mPropagator.propagate();
     return mPropagator.getAllConstraints();
   }

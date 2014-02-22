@@ -280,8 +280,7 @@ public class ConstraintPropagator
     assert constraint != null;
     if (!mIsUnsatisfiable) {
       mUnprocessedConstraints.add(constraint);
-      mPrimedVariableCollector.collectPrimedVariables(constraint,
-                                                      mPrimedVariables);
+      addPrimedVariables(constraint);
     }
   }
 
@@ -316,6 +315,32 @@ public class ConstraintPropagator
       }
       addConstraint(expr);
     }
+  }
+
+  /**
+   * Adds all primed variables in the given expressions to this constraint
+   * propagator. This adds variables to the constraint propagator without
+   * adding constraints, in order to ensure the output mentions these
+   * variables using equalities such as x'==x'.
+   */
+  public void addPrimedVariables
+    (final Collection<SimpleExpressionProxy> constraints)
+  {
+    for (final SimpleExpressionProxy constraint : constraints) {
+      addPrimedVariables(constraint);
+    }
+  }
+
+  /**
+   * Adds all primed variables in the given expression to this constraint
+   * propagator. This adds variables to the constraint propagator without
+   * adding constraints, in order to ensure the output mentions these
+   * variables using equalities such as x'==x'.
+   */
+  public void addPrimedVariables(final SimpleExpressionProxy constraint)
+  {
+    mPrimedVariableCollector.collectPrimedVariables(constraint,
+                                                    mPrimedVariables);
   }
 
   /**
