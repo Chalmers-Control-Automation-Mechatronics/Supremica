@@ -480,6 +480,7 @@ public class CompositionalModelVerifierFactory
       final AbstractCompositionalModelVerifier composer =
         (AbstractCompositionalModelVerifier) verifier;
       composer.setUsingSpecialEvents(false);
+      composer.setUsingFailureEvents(false);
     }
 
   }

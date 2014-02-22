@@ -84,6 +84,7 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
     mConflictChecker.setPreselectingMethod(mPreselecting);
     mConflictChecker.setSelectionHeuristic(mSelecting);
     mConflictChecker.setUsingSpecialEvents(true);
+    mConflictChecker.setUsingFailureEvents(true);
     mPrintWriter.println("InternalStateLimit," + internalStateLimit +
                          ",InternalTransitionLimit," +
                          internalTransitionLimit +

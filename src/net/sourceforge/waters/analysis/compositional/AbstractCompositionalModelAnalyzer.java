@@ -171,6 +171,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       CompositionalSelectionHeuristicFactory.MinS.createChainHeuristic();
     mSubsumptionEnabled = false;
     mUsingSpecialEvents = true;
+    mUsingFailureEvents = true;
     mLowerInternalStateLimit = mUpperInternalStateLimit =
       super.getNodeLimit();
     mInternalTransitionLimit = super.getTransitionLimit();
@@ -360,6 +361,19 @@ public abstract class AbstractCompositionalModelAnalyzer
     return mUsingSpecialEvents;
   }
 
+  /**
+   * Failure Events are events that always lead to a dump state in some automaton.
+   * If enabled, this will redirect failure events in other automata
+   * to dump states.
+   */
+  public void setUsingFailureEvents(final boolean enable)
+  {
+    mUsingFailureEvents = enable;
+  }
+  public boolean isUsingFailureEvents()
+  {
+    return mUsingFailureEvents;
+  }
   /**
    * Sets whether deadlock states are pruned in synchronous products.
    * @see MonolithicSynchronousProductBuilder#setPruningDeadlocks(boolean)
@@ -932,7 +946,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       if (!removed.contains(event)) {   //If we are not removing the event
         newEvents.add(event);           //put it into newEvents list
       }
-      else if(getEventInfo(event).isFailing())
+      else if(getEventInfo(event).isFailing(mUsingFailureEvents))
       {
         newEvents.add(event);
         if(dumpStates == null)
@@ -972,7 +986,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       if (!removed.contains(event)) {       //If we are not removing the event
         newTransitions.add(trans);          //Add the transition to list
       }
-      else if(getEventInfo(event).isFailing())
+      else if(getEventInfo(event).isFailing(mUsingFailureEvents))
       {
         newTransitions.add(factory.createTransitionProxy(trans.getSource(), event, dumpState));
         mHasRemovedProperTransition = true;
@@ -1083,7 +1097,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     }
     mRedundantEvents = new LinkedList<EventProxy>();
     for (final EventInfo info : mEventInfoMap.values()) {
-      if (info.isRemovable(mUsingSpecialEvents) || info.isFailing()) {
+      if (info.isRemovable(mUsingSpecialEvents) || info.isFailing(mUsingFailureEvents)) {
         final EventProxy event = info.getEvent();
         mRedundantEvents.add(event);
       }
@@ -1139,7 +1153,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     final Collection<EventProxy> events = aut.getEvents();
     final EventProxy omega = getUsedDefaultMarking();
     Set<StateProxy> nonDumpStates = null;
-    if (omega != null && isUsingSpecialEvents() && events.contains(omega)) {
+    if (omega != null && isUsingFailureEvents() && events.contains(omega)) {
       //Find the nondump states
       nonDumpStates = new THashSet<>();
       for (final TransitionProxy trans : aut.getTransitions()) {
@@ -1213,7 +1227,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       info.removeAutomata(victims);
       if (info.isEmpty()) {
         iter.remove();
-      } else if (info.isRemovable(mUsingSpecialEvents) || info.isFailing()) {
+      } else if (info.isRemovable(mUsingSpecialEvents) || info.isFailing(mUsingFailureEvents)) {
         final EventProxy event = entry.getKey();
         mRedundantEvents.add(event);
       }
@@ -1293,7 +1307,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         if (info.isRemovable(mUsingSpecialEvents)) {
           mEventInfoMap.remove(event);
           mMayBeSplit |= info.getNumberOfAutomata() > 1;
-        } else if (info.isFailing()) {
+        } else if (info.isFailing(mUsingFailureEvents)) {
           info.setReduced();
         }
       }
@@ -2220,9 +2234,12 @@ public abstract class AbstractCompositionalModelAnalyzer
       }
     }
 
-    private boolean isFailing()
+    private boolean isFailing(final boolean failingUsed)
     {
+      if(failingUsed)
       return mFailingStatus == FAILING;
+      else
+        return false;
     }
 
     private void setReduced()
@@ -2574,6 +2591,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   private SelectionHeuristic<Candidate> mSelectionHeuristic;
   private boolean mSubsumptionEnabled;
   private boolean mUsingSpecialEvents;
+  private boolean mUsingFailureEvents;
   private int mLowerInternalStateLimit;
   private int mUpperInternalStateLimit;
   private int mInternalTransitionLimit;
