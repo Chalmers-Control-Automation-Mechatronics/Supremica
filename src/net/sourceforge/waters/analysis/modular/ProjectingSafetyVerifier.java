@@ -266,14 +266,14 @@ public class ProjectingSafetyVerifier
     for (final AutomatonProxy aut : getModel().getAutomata()) {
       switch (translator.getComponentKind(aut)) {
         case PLANT:
-          if (AutomatonTools.hasInitialState(aut)) {
+          if (AutomatonTools.getFirstInitialState(aut) != null) {
             plants.add(aut);
           } else {
             return setSatisfiedResult();
           }
           break;
         case SPEC:
-          if (AutomatonTools.hasInitialState(aut)) {
+          if (AutomatonTools.getFirstInitialState(aut) != null) {
             origspecs.add(aut);
           } else if (translator.getEventKind(KindTranslator.INIT) ==
                      EventKind.CONTROLLABLE) {

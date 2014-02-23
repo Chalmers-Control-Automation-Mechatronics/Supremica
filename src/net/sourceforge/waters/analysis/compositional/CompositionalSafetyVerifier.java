@@ -213,7 +213,7 @@ public class CompositionalSafetyVerifier
       final ListIterator<AutomatonProxy> iter = mProperties.listIterator();
       while (iter.hasNext()) {
         final AutomatonProxy aut = iter.next();
-        final AutomatonProxy newAut = removeEvents(aut, removed);
+        final AutomatonProxy newAut = removeEvents(aut, removed, null);
         if (newAut == aut) {
           continue;
         } else if (isTrivialProperty(newAut)) {

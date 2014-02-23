@@ -54,16 +54,42 @@ public final class AutomatonTools
   }
 
   /**
-   * Returns whether the given automaton has at least one initial state.
+   * Returns the first initial state of the given automaton,
+   * or <CODE> null</CODE>.
+   * This method does a sequential search and its complexity is linear in
+   * the number of states of the automaton.
    */
-  public static boolean hasInitialState(final AutomatonProxy aut)
+  public static StateProxy getFirstInitialState(final AutomatonProxy aut)
   {
     for (final StateProxy state : aut.getStates()) {
       if (state.isInitial()) {
-        return true;
+        return state;
       }
     }
-    return false;
+    return null;
+  }
+
+  /**
+   * Returns the first successor state for the given state and event.
+   * This method does a sequential search and its complexity is linear in
+   * the number of transitions of the automaton.
+   * @param  aut       The automaton to be searched.
+   * @param  source    The source state to be searched for.
+   * @param  event     The event to be searched for.
+   * @return The target state of the first transition in the given automaton
+   *         with matching source state and event, or <CODE>null</CODE> if
+   *         no such transition exists.
+   */
+  public static StateProxy getFirstSuccessorState(final AutomatonProxy aut,
+                                                  final StateProxy source,
+                                                  final EventProxy event)
+  {
+    for (final TransitionProxy trans : aut.getTransitions()) {
+      if (trans.getSource() == source && trans.getEvent() == event) {
+        return trans.getTarget();
+      }
+    }
+    return null;
   }
 
   /**
