@@ -85,17 +85,19 @@ class EventRemovalStep extends AbstractionStep
   @Override
   List<TraceStepProxy> convertTraceSteps(final List<TraceStepProxy> steps)
   {
-    final List<AutomatonProxy> results = getResultAutomata();
     final List<AutomatonProxy> originals = getOriginalAutomata();
+    final List<AutomatonProxy> results = getResultAutomata();
     final int numAutomata = results.size();
     final Map<AutomatonProxy,AutomatonProxy> autMap =
-      new HashMap<AutomatonProxy,AutomatonProxy>(numAutomata);
-    final Iterator<AutomatonProxy> resultIter = results.iterator();
+      new HashMap<>(numAutomata);
+    final Map<StateProxy,StateProxy> stateMap = new HashMap<>();
     final Iterator<AutomatonProxy> originalIter = originals.iterator();
+    final Iterator<AutomatonProxy> resultIter = results.iterator();
     while (resultIter.hasNext()) {
-      final AutomatonProxy result = resultIter.next();
       final AutomatonProxy original = originalIter.next();
+      final AutomatonProxy result = resultIter.next();
       autMap.put(result, original);
+      addToStateMap(original, result, stateMap);
     }
     final ProductDESProxyFactory factory = getFactory();
     TraceStepProxy previousStep = null;
@@ -115,6 +117,10 @@ class EventRemovalStep extends AbstractionStep
           newAut = aut;
         }
         StateProxy target = entry.getValue();
+        final StateProxy altTarget = stateMap.get(target);
+        if (altTarget != null) {
+          target = altTarget;
+        }
         if (mFailingEvents != null && event != null &&
             mFailingEvents.contains(event) && previousStep != null) {
           final StateProxy source = previousStep.getStateMap().get(newAut);
@@ -133,6 +139,29 @@ class EventRemovalStep extends AbstractionStep
 
   //#######################################################################
   //# Auxiliary Methods
+  private void addToStateMap(final AutomatonProxy original,
+                             final AutomatonProxy result,
+                             final Map<StateProxy,StateProxy> stateMap)
+  {
+    if (result != original) {
+      final Collection<StateProxy> originalStates = original.getStates();
+      final Collection<StateProxy> resultStates = result.getStates();
+      StateProxy originalState = originalStates.iterator().next();
+      StateProxy resultState = resultStates.iterator().next();
+      if (resultState != originalState) {
+        final Iterator<StateProxy> originalStatesIter =
+          originalStates.iterator();
+        final Iterator<StateProxy> resultStatesIter =
+          resultStates.iterator();
+        while (originalStatesIter.hasNext()) {
+          originalState = originalStatesIter.next();
+          resultState = resultStatesIter.next();
+          stateMap.put(resultState, originalState);
+        }
+      }
+    }
+  }
+
   private static StateProxy getAlternativeSuccessor(final AutomatonProxy aut,
                                                     final StateProxy source,
                                                     final EventProxy event,

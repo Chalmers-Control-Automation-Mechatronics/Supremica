@@ -923,94 +923,22 @@ public abstract class AbstractCompositionalModelAnalyzer
     }
   }
 
+  /**
+   * Removes events from an automaton. This method is called to remove
+   * redundant events from an automaton.
+   * @param  aut      An automaton to be simplified.
+   * @param  removed  Set of events to be removed.
+   * @param  failing  Set of failing events to be redirected to dump states.
+   * @return New automaton representing result of event removal.
+   *         May be the same as the input automaton, if no events can be
+   *         removed.
+   */
   protected AutomatonProxy removeEvents(final AutomatonProxy aut,
                                         final Set<EventProxy> removed,
                                         final Set<EventProxy> failing)
     throws AnalysisException
   {
-    checkAbort();
-    mHasRemovedProperTransition = false;
-    final Collection<EventProxy> events = aut.getEvents();
-    boolean found = false;
-    for (final EventProxy event : events) {
-      if (removed.contains(event)) {
-        found = true;
-        break;
-      }
-    }
-    if (!found) {
-      return aut; // If none of the events in removed are present in aut, return aut
-    }
-
-    final ProductDESProxyFactory factory = getFactory();
-    final int numEvents = events.size();
-    final Collection<EventProxy> newEvents =
-      new ArrayList<EventProxy>(numEvents - 1);
-    for (final EventProxy event : events) {
-      if (!removed.contains(event)) { // If we are not removing the event
-        newEvents.add(event); // ... put it into newEvents list
-      } else if (getEventInfo(event).isFailing()) {
-        newEvents.add(event); // But keep failing events
-      }
-    }
-
-    final Collection<StateProxy> states = aut.getStates();
-    final Collection<TransitionProxy> transitions = aut.getTransitions();
-    Collection<StateProxy> newStates = states;
-    StateProxy dumpState = null;
-    final int numTrans = transitions.size();
-    final Collection<TransitionProxy> newTransitions =
-      new ArrayList<TransitionProxy>(numTrans);
-    for (final TransitionProxy trans : transitions) {
-      final EventProxy event = trans.getEvent();
-      if (!removed.contains(event)) { // If we are not removing the event
-        newTransitions.add(trans); // ... add the transition to list
-      } else if (getEventInfo(event).isFailing()) {
-        if (dumpState == null) {
-          // Find or create dump state ...
-          final EventProxy defaultMarking = getUsedDefaultMarking();
-          // TODO Handle the case where omega is not in the automaton ...
-          final Set<StateProxy> nonDumpStates =
-            new THashSet<StateProxy>(states.size());
-          for (final StateProxy state : states) {
-            // If the state is marked it is not a dump state
-            if (state.getPropositions().contains(defaultMarking)) {
-              nonDumpStates.add(state);
-            }
-          }
-          for (final TransitionProxy tr : transitions) {
-            // If the state has an outgoing transition it is not a dump state
-            nonDumpStates.add(tr.getSource());
-          }
-          if (nonDumpStates.size() == states.size()) {
-            dumpState = factory.createStateProxy(":dump");
-            newStates = new ArrayList<>(states.size() +1);
-            newStates.addAll(states);
-            newStates.add(dumpState);
-          } else {
-            for (final StateProxy state : states) {
-              if (!nonDumpStates.contains(state)) {
-                dumpState = state;
-                break;
-              }
-            }
-          }
-        }
-        final TransitionProxy newTrans =
-          factory.createTransitionProxy(trans.getSource(), event, dumpState);
-        newTransitions.add(newTrans);
-        failing.add(event);
-        mHasRemovedProperTransition = true;
-      } else if (trans.getSource() != trans.getTarget()) { // If we are removing trans that is not self loop
-        mHasRemovedProperTransition = true;
-      }
-    }
-
-    final String name = aut.getName();
-    final ComponentKind kind = aut.getKind();
-    final AutomatonProxy newAut = factory.createAutomatonProxy  //Create a new automaton with the new events and transitions
-      (name, kind, newEvents, newStates, newTransitions);
-    return newAut;
+    return removeEvents(aut, removed, failing, null);
   }
 
   /**
@@ -1319,6 +1247,163 @@ public abstract class AbstractCompositionalModelAnalyzer
     } else {
       return false;
     }
+  }
+
+  /**
+   * Removes events from an automaton. This method is called to remove
+   * redundant events from an automaton.
+   * @param  aut       An automaton to be simplified.
+   * @param  removed   Set of events to be removed.
+   * @param  failing   Set of failing events to be redirected to dump states.
+   * @param  dumpState Dump state to be used for failing events,
+   *                   or <CODE>null</CODE>.
+   * @return New automaton representing result of event removal.
+   *         May be the same as the input automaton, if no events can be
+   *         removed.
+   */
+  private AutomatonProxy removeEvents(final AutomatonProxy aut,
+                                      final Set<EventProxy> removed,
+                                      final Set<EventProxy> failing,
+                                      StateProxy dumpState)
+    throws AnalysisException
+  {
+    checkAbort();
+    mHasRemovedProperTransition = false;
+    final Collection<EventProxy> events = aut.getEvents();
+    boolean found = false;
+    for (final EventProxy event : events) {
+      if (removed.contains(event)) {
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      return aut; // If none of the events in removed are present in aut, return aut
+    }
+
+    final ProductDESProxyFactory factory = getFactory();
+    final int numEvents = events.size();
+    final Collection<EventProxy> newEvents =
+      new ArrayList<EventProxy>(numEvents - 1);
+    for (final EventProxy event : events) {
+      if (!removed.contains(event)) { // If we are not removing the event
+        newEvents.add(event); // ... put it into newEvents list
+      } else if (getEventInfo(event).isFailing()) {
+        newEvents.add(event); // But keep failing events
+      }
+    }
+
+    final Collection<StateProxy> states = aut.getStates();
+    final Collection<TransitionProxy> transitions = aut.getTransitions();
+    Collection<StateProxy> newStates = states;
+    final int numTrans = transitions.size();
+    final Collection<TransitionProxy> newTransitions =
+      new ArrayList<TransitionProxy>(numTrans);
+    for (final TransitionProxy trans : transitions) {
+      final EventProxy event = trans.getEvent();
+      if (!removed.contains(event)) { // If we are not removing the event
+        newTransitions.add(trans); // ... add the transition to list
+      } else if (getEventInfo(event).isFailing()) {
+        if (dumpState == null) {
+          // Find or create dump state ...
+          final EventProxy defaultMarking = getUsedDefaultMarking();
+          if (events.contains(defaultMarking)) {
+            final Set<StateProxy> nonDumpStates =
+              new THashSet<StateProxy>(states.size());
+            for (final StateProxy state : states) {
+              // If the state is marked it is not a dump state
+              if (state.getPropositions().contains(defaultMarking)) {
+                nonDumpStates.add(state);
+              }
+            }
+            for (final TransitionProxy tr : transitions) {
+              // If the state has an outgoing transition it is not a dump state
+              nonDumpStates.add(tr.getSource());
+            }
+            if (nonDumpStates.size() == states.size()) {
+              dumpState = factory.createStateProxy(":dump");
+              newStates = new ArrayList<>(states.size() +1);
+              newStates.addAll(states);
+              newStates.add(dumpState);
+            } else {
+              for (final StateProxy state : states) {
+                if (!nonDumpStates.contains(state)) {
+                  dumpState = state;
+                  break;
+                }
+              }
+            }
+          } else {
+            // The marking proposition is not in the alphabet ...
+            dumpState = factory.createStateProxy(":dump");
+            final AutomatonProxy copy = markStatesAndAddDump(aut, dumpState);
+            return removeEvents(copy, removed, failing, dumpState);
+          }
+        }
+        final TransitionProxy newTrans =
+          factory.createTransitionProxy(trans.getSource(), event, dumpState);
+        newTransitions.add(newTrans);
+        failing.add(event);
+        mHasRemovedProperTransition = true;
+      } else if (trans.getSource() != trans.getTarget()) { // If we are removing trans that is not self loop
+        mHasRemovedProperTransition = true;
+      }
+    }
+
+    final String name = aut.getName();
+    final ComponentKind kind = aut.getKind();
+    final AutomatonProxy newAut = factory.createAutomatonProxy  //Create a new automaton with the new events and transitions
+      (name, kind, newEvents, newStates, newTransitions);
+    return newAut;
+  }
+
+  private AutomatonProxy markStatesAndAddDump(final AutomatonProxy aut,
+                                              final StateProxy dump)
+  {
+    final ProductDESProxyFactory factory = getFactory();
+    final EventProxy defaultMarking = getUsedDefaultMarking();
+    final Collection<EventProxy> events = aut.getEvents();
+    final Collection<EventProxy> newEvents = new ArrayList<>(events.size() + 1);
+    newEvents.addAll(events);
+    newEvents.add(defaultMarking);
+    final Collection<StateProxy> states = aut.getStates();
+    final Collection<StateProxy> newStates = new ArrayList<>(states.size() + 1);
+    final Map<StateProxy,StateProxy> stateMap = new HashMap<>(states.size());
+    for (final StateProxy state : states) {
+      final String name = state.getName();
+      final boolean init = state.isInitial();
+      final Collection<EventProxy> props = state.getPropositions();
+      final Collection<EventProxy> newProps;
+      if (props.isEmpty()) {
+        newProps = Collections.singletonList(defaultMarking);
+      } else {
+        newProps = new ArrayList<>(props.size() + 1);
+        newProps.addAll(props);
+        newProps.add(defaultMarking);
+      }
+      final StateProxy newState =
+        factory.createStateProxy(name, init, newProps);
+      newStates.add(newState);
+      stateMap.put(state, newState);
+    }
+    newStates.add(dump);
+    final Collection<TransitionProxy> transitions = aut.getTransitions();
+    final Collection<TransitionProxy> newTransitions =
+      new ArrayList<>(transitions.size());
+    for (final TransitionProxy trans : transitions) {
+      final StateProxy source = trans.getSource();
+      final StateProxy newSource = stateMap.get(source);
+      final EventProxy event = trans.getEvent();
+      final StateProxy target = trans.getTarget();
+      final StateProxy newTarget = stateMap.get(target);
+      final TransitionProxy newTrans =
+        factory.createTransitionProxy(newSource, event, newTarget);
+      newTransitions.add(newTrans);
+    }
+    final String name = aut.getName();
+    final ComponentKind kind = aut.getKind();
+    return factory.createAutomatonProxy
+      (name, kind, newEvents, newStates, newTransitions);
   }
 
   /**
@@ -2194,11 +2279,9 @@ public abstract class AbstractCompositionalModelAnalyzer
           mNumNonSelfloopAutomata++;
         }
         mIsBlocked |= status == BLOCKED;
-        if (status == FAILING) {
-          if (mFailingStatus == NOT_FAILING) {
-            System.out.println("Found failing event " + mEvent.getName());
-          }
-          mFailingStatus |= FAILING;
+        if (status == FAILING && mFailingStatus == NOT_FAILING) {
+          // System.out.println("Found failing event " + mEvent.getName());
+          mFailingStatus = FAILING;
         }
       }
     }
