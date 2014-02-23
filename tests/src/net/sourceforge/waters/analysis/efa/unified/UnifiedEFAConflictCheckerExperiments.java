@@ -238,7 +238,7 @@ public class UnifiedEFAConflictCheckerExperiments
     }
     try {
       for (int maxseqno = 31; maxseqno <= 150; maxseqno += 32) {
-        checkProfisafe("profisafe_ihost_efa", maxseqno, true);
+        checkProfisafe("profisafe_ihost_efa_2", maxseqno, true);
       }
     } catch (final AnalysisException exception) {
       // next please ...
