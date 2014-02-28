@@ -32,11 +32,6 @@ public class PlainTextPrinter
 
   //#########################################################################
   //# Constructors
-  public PlainTextPrinter()
-  {
-    super();
-  }
-
   public PlainTextPrinter(final Writer writer)
   {
     super(writer);
@@ -45,6 +40,7 @@ public class PlainTextPrinter
 
   //#########################################################################
   //# Invocation
+  @Override
   public void pprint(final Proxy proxy)
     throws IOException
   {
@@ -59,6 +55,7 @@ public class PlainTextPrinter
   //#########################################################################
   //# Overrides for Base Class
   //# net.sourceforge.waters.model.printer.ModuleProxyVisitor
+  @Override
   public Object visitEventDeclProxy
       (final EventDeclProxy proxy)
     throws VisitorException
@@ -73,6 +70,7 @@ public class PlainTextPrinter
     return null;
   }
 
+  @Override
   public Object visitForeachProxy
       (final ForeachProxy proxy)
     throws VisitorException
@@ -90,6 +88,7 @@ public class PlainTextPrinter
     return null;
   }
 
+  @Override
   public Object visitInstanceProxy
       (final InstanceProxy proxy)
     throws VisitorException
@@ -101,6 +100,7 @@ public class PlainTextPrinter
     return null;
   }
 
+  @Override
   public Object visitParameterBindingProxy
       (final ParameterBindingProxy proxy)
     throws VisitorException
@@ -112,6 +112,7 @@ public class PlainTextPrinter
     return null;
   }
 
+  @Override
   public Object visitSimpleComponentProxy
       (final SimpleComponentProxy proxy)
     throws VisitorException

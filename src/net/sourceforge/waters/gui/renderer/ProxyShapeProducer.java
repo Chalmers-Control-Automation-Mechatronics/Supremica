@@ -74,7 +74,6 @@ public class ProxyShapeProducer
     final int size = graph.getNodes().size() + graph.getEdges().size();
     final Map<Proxy,ProxyShape> map = new HashMap<Proxy,ProxyShape>(4 * size);
     mMap = Collections.synchronizedMap(map);
-    mPrinter = new ModuleProxyPrinter();
     mCompiler = compiler;
     mBindings = binding;
   }
@@ -501,7 +500,7 @@ public class ProxyShapeProducer
         // OK, use the original label
       }
     }
-    final String text = mPrinter.toString(shown);
+    final String text = ModuleProxyPrinter.getPrintString(shown);
     return new LabelShape(label, x, y, font, text);
   }
 
@@ -535,7 +534,6 @@ public class ProxyShapeProducer
   private final GraphProxy mGraph;
   private final RenderingContext mRenderingContext;
   private final Map<Proxy,ProxyShape> mMap;
-  private final ModuleProxyPrinter mPrinter;
   private final SimpleExpressionCompiler mCompiler;
   private final BindingContext mBindings;
   private double mHeight;

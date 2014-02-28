@@ -28,7 +28,6 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.des.ConflictKind;
@@ -41,11 +40,6 @@ public class ProductDESProxyPrinter
 
   //#########################################################################
   //# Constructors
-  public ProductDESProxyPrinter()
-  {
-    super();
-  }
-
   public ProductDESProxyPrinter(final Writer writer)
   {
     super(writer);
@@ -59,6 +53,7 @@ public class ProductDESProxyPrinter
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.des.ProductDESProxyVisitor
+  @Override
   public Object visitConflictTraceProxy(final ConflictTraceProxy trace)
     throws VisitorException
   {
@@ -74,6 +69,7 @@ public class ProductDESProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitAutomatonProxy(final AutomatonProxy aut)
     throws VisitorException
   {
@@ -93,6 +89,7 @@ public class ProductDESProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitEventProxy(final EventProxy event)
     throws VisitorException
   {
@@ -108,6 +105,7 @@ public class ProductDESProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitLoopTraceProxy(final LoopTraceProxy trace)
     throws VisitorException
   {
@@ -118,6 +116,7 @@ public class ProductDESProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitProductDESProxy(final ProductDESProxy des)
     throws VisitorException
   {
@@ -129,6 +128,7 @@ public class ProductDESProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitSafetyTraceProxy(final SafetyTraceProxy trace)
     throws VisitorException
   {
@@ -138,6 +138,7 @@ public class ProductDESProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitStateProxy(final StateProxy state)
     throws VisitorException
   {
@@ -153,6 +154,7 @@ public class ProductDESProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitTraceProxy(final TraceProxy trace)
     throws VisitorException
   {
@@ -160,6 +162,7 @@ public class ProductDESProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitTraceStepProxy(final TraceStepProxy step)
     throws VisitorException
   {
@@ -189,6 +192,7 @@ public class ProductDESProxyPrinter
     return null;
   }
 
+  @Override
   public Object visitTransitionProxy(final TransitionProxy trans)
     throws VisitorException
   {

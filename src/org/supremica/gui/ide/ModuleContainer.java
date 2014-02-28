@@ -28,7 +28,6 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import net.sourceforge.waters.gui.EditorWindowInterface;
-import net.sourceforge.waters.gui.HTMLPrinter;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.UndoInterface;
@@ -58,7 +57,6 @@ import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
-import net.sourceforge.waters.model.printer.ProxyPrinter;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
@@ -86,7 +84,6 @@ public class ModuleContainer
     final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
     final OperatorTable optable = CompilerOperatorTable.getInstance();
     mExpressionParser = new ExpressionParser(factory, optable);
-    mPrinter = new HTMLPrinter();
     final DocumentManager manager = ide.getDocumentManager();
     final ProductDESProxyFactory desfactory =
       ProductDESElementFactory.getInstance();
@@ -293,11 +290,6 @@ public class ModuleContainer
   public ExpressionParser getExpressionParser()
   {
     return mExpressionParser;
-  }
-
-  public ProxyPrinter getPrinter()
-  {
-    return mPrinter;
   }
 
   public void showComment()
@@ -665,7 +657,6 @@ public class ModuleContainer
   private final ModuleContext mModuleContext;
   private final ModuleCompiler mCompiler;
   private final ExpressionParser mExpressionParser;
-  private final ProxyPrinter mPrinter;
   private final UpdateGraphPanelVisitor mUpdateGraphPanelVisitor =
     new UpdateGraphPanelVisitor();
   private ProductDESProxy mCompiledDES;

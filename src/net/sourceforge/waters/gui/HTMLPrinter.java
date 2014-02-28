@@ -51,11 +51,6 @@ public class HTMLPrinter
 
   //#########################################################################
   //# Constructors
-  public HTMLPrinter()
-  {
-    super();
-  }
-
   public HTMLPrinter(final Writer writer)
   {
     super(writer);

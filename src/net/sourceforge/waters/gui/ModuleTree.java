@@ -23,6 +23,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -114,7 +116,6 @@ public abstract class ModuleTree
     mRoot = root;
     mUndoInterface = undo;
     mModuleContext = mModuleContainer.getModuleContext();
-    mPrinter = new PrintVisitor();
     mIsPermanentFocusOwner = true;
     mModel = new ModuleTreeModel(root, getRootList());
     setModel(mModel);
@@ -630,6 +631,18 @@ public abstract class ModuleTree
       }
     }
     return false;
+  }
+
+  private String getPrintString(final Proxy proxy, final boolean expanded)
+  {
+    try {
+      final StringWriter writer = new StringWriter();
+      final PrintVisitor printer = new PrintVisitor(writer, expanded);
+      printer.pprint(proxy);
+      return writer.toString();
+    } catch (final IOException exception) {
+      throw new WatersRuntimeException(exception);
+    }
   }
 
   public List<InsertInfo> getInsertInfo(final Transferable transferable,
@@ -1318,11 +1331,11 @@ public abstract class ModuleTree
   {
 
     //#######################################################################
-    //# Invocation
-    public String toString(final Proxy proxy, final boolean expanded)
+    //# Constructors
+    public PrintVisitor(final Writer writer, final boolean expanded)
     {
+      super(writer);
       mExpanded = expanded;
-      return toString(proxy);
     }
 
     //#######################################################################
@@ -1373,7 +1386,7 @@ public abstract class ModuleTree
 
     //#######################################################################
     //# Data Members
-    private boolean mExpanded;
+    private final boolean mExpanded;
   }
 
 
@@ -1413,7 +1426,7 @@ public abstract class ModuleTree
         icon = mModuleContext.getIcon(proxy);
       }
       setIcon(icon);
-      final String text = mPrinter.toString(proxy, expanded);
+      final String text = getPrintString(proxy, expanded);
       setText(text);
       final String tooltip = mModuleContext.getToolTipText(proxy);
       setToolTipText(tooltip);
@@ -1433,7 +1446,6 @@ public abstract class ModuleTree
   private final UndoInterface mUndoInterface;
   private List<Observer> mObservers;
   private final ModuleContext mModuleContext;
-  private final PrintVisitor mPrinter;
   private boolean mIsPermanentFocusOwner;
   private final DoubleClickVisitor mDoubleClickVisitor;
   private final AcceptTransferableVisitor mAcceptTransferableVisitor;

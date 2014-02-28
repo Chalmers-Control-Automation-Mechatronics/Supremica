@@ -12,6 +12,8 @@ package net.sourceforge.waters.model.printer;
 import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Iterator;
 import java.util.List;
@@ -19,6 +21,7 @@ import java.util.Set;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.expr.UnaryOperator;
@@ -74,12 +77,22 @@ public class ModuleProxyPrinter
 {
 
   //#########################################################################
-  //# Constructors
-  public ModuleProxyPrinter()
+  //# Static Class Methods
+  public static String getPrintString(final Proxy proxy)
   {
-    super();
+    try {
+      final StringWriter writer = new StringWriter();
+      final ModuleProxyPrinter printer = new ModuleProxyPrinter(writer);
+      printer.pprint(proxy);
+      return writer.toString();
+    } catch (final IOException exception) {
+      throw new WatersRuntimeException(exception);
+    }
   }
 
+
+  //#########################################################################
+  //# Constructors
   public ModuleProxyPrinter(final Writer writer)
   {
     super(writer);
