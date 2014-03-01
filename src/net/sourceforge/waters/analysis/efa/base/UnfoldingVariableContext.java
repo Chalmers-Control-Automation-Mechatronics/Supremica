@@ -53,8 +53,7 @@ public class UnfoldingVariableContext implements VariableContext
   @Override
   public SimpleExpressionProxy getBoundExpression(final SimpleExpressionProxy varname)
   {
-    final ModuleEqualityVisitor eq =
-      ModuleEqualityVisitor.getInstance(false);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     if (eq.equals(varname, mUnfoldedVariableName)) {
       return mCurrentValue;
     } else if (varname instanceof UnaryExpressionProxy) {

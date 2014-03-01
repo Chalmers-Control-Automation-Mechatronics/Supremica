@@ -461,7 +461,7 @@ public abstract class AbstractExpressionTest extends TestCase
     final ModuleProxyFactory factory = getFactory();
     final OperatorTable optable = CompilerOperatorTable.getInstance();
     mParser = new ExpressionParser(factory, optable);
-    mEquality = ModuleEqualityVisitor.getInstance(false);
+    mEquality = new ModuleEqualityVisitor(false);
 
     final BinaryOperator plus = optable.getBinaryOperator("+");
     final BinaryOperator minus = optable.getBinaryOperator("-");

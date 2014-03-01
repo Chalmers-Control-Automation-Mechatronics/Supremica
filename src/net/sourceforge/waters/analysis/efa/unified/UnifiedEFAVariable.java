@@ -42,7 +42,7 @@ public class UnifiedEFAVariable
   {
     super(var, range, factory, op);
     mMarkedStatePredicate = null;
-    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     for (final VariableMarkingProxy marking : var.getVariableMarkings()) {
       if (eq.equals(marking.getProposition(), defaultMarking)) {
         mMarkedStatePredicate = marking.getPredicate();

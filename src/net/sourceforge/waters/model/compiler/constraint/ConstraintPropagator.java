@@ -144,9 +144,8 @@ public class ConstraintPropagator
       RightLessEqualsRestrictionRule.createRule(factory, optable)
     };
     mUnprocessedConstraints = new LinkedList<SimpleExpressionProxy>();
-    mNormalizedConstraints =
-      new TreeSet<SimpleExpressionProxy>(mListComparator);
-    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    mNormalizedConstraints = new TreeSet<>(mListComparator);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     mPrimedVariables = new ProxyAccessorHashSet<UnaryExpressionProxy>(eq);
     mIsUnsatisfiable = false;
     mNumberOfInvocations = 0;
@@ -172,14 +171,13 @@ public class ConstraintPropagator
     mNegator = propagator.mNegator;
     mNormalizationRules = propagator.mNormalizationRules;
     mRewriteRules = propagator.mRewriteRules;
-    mUnprocessedConstraints = new LinkedList<SimpleExpressionProxy>
-      (propagator.mUnprocessedConstraints);
-    mNormalizedConstraints =
-      new TreeSet<SimpleExpressionProxy>(mListComparator);
+    mUnprocessedConstraints =
+      new LinkedList<>(propagator.mUnprocessedConstraints);
+    mNormalizedConstraints = new TreeSet<>(mListComparator);
     mNormalizedConstraints.addAll(propagator.mNormalizedConstraints);
-    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
-    mPrimedVariables = new ProxyAccessorHashSet<UnaryExpressionProxy>
-      (eq, propagator.mPrimedVariables);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
+    mPrimedVariables =
+      new ProxyAccessorHashSet<>(eq, propagator.mPrimedVariables);
     mIsUnsatisfiable = propagator.mIsUnsatisfiable;
     mNumberOfInvocations = 0;
   }
@@ -371,15 +369,14 @@ public class ConstraintPropagator
    */
   public void removeUnchangedVariables()
   {
-    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     final int numPrimed = mPrimedVariables.size();
     final ProxyAccessorSet<UnaryExpressionProxy> primedVars =
-      new ProxyAccessorHashSet<UnaryExpressionProxy>(eq, numPrimed);
+      new ProxyAccessorHashSet<>(eq, numPrimed);
     mPrimedVariableCollector.collectPrimedVariables
       (mNormalizedConstraints, primedVars);
     mContext.collectPrimedVariables(primedVars);
-    final List<UnaryExpressionProxy> victims =
-      new LinkedList<UnaryExpressionProxy>();
+    final List<UnaryExpressionProxy> victims = new LinkedList<>();
     for (final UnaryExpressionProxy primed : mPrimedVariables) {
       if (!primedVars.containsProxy(primed)) {
         final SimpleExpressionProxy varName = primed.getSubTerm();
@@ -706,9 +703,9 @@ public class ConstraintPropagator
    */
   private void addPrimedVariables(final List<SimpleExpressionProxy> list)
   {
-    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     final ProxyAccessorSet<UnaryExpressionProxy> remainingPrimed =
-      new ProxyAccessorHashSet<UnaryExpressionProxy>(eq, mPrimedVariables.size());
+      new ProxyAccessorHashSet<>(eq, mPrimedVariables.size());
     mPrimedVariableCollector.collectPrimedVariables(list, remainingPrimed);
     final ModuleProxyCloner cloner = mFactory.getCloner();
     final BinaryOperator op = mOperatorTable.getEqualsOperator();
@@ -746,11 +743,8 @@ public class ConstraintPropagator
     {
       mRootContext = context.mRootContext;
       final int size = 2 * mRootContext.getNumberOfVariables();
-      final ModuleEqualityVisitor eq =
-        ModuleEqualityVisitor.getInstance(false);
-      mBindings =
-        new ProxyAccessorHashMap<SimpleExpressionProxy,AbstractBinding>
-          (eq, size);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
+      mBindings = new ProxyAccessorHashMap<>(eq, size);
       for (final Map.Entry<ProxyAccessor<SimpleExpressionProxy>,
                            AbstractBinding> entry :
              context.mBindings.entrySet()) {
@@ -774,12 +768,9 @@ public class ConstraintPropagator
     ConstraintContext(final VariableContext root)
     {
       mRootContext = root;
-      final ModuleEqualityVisitor eq =
-        ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       final int size = 2 * root.getNumberOfVariables();
-      mBindings =
-        new ProxyAccessorHashMap<SimpleExpressionProxy,AbstractBinding>
-          (eq, size);
+      mBindings = new ProxyAccessorHashMap<>(eq, size);
     }
 
     //#######################################################################
@@ -1114,8 +1105,7 @@ public class ConstraintPropagator
     boolean restrictRange(final SimpleExpressionProxy expr)
       throws EvalException
     {
-      final ModuleEqualityVisitor eq =
-        ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       if (eq.equals(expr, mBoundExpression)) {
         return false;
       } else {

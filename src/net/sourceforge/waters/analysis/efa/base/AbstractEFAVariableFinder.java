@@ -37,7 +37,7 @@ public abstract class AbstractEFAVariableFinder<L,
   protected AbstractEFAVariableFinder(final CompilerOperatorTable optable)
   {
     mNextOperator = optable.getNextOperator();
-    mEqualityVisitor = ModuleEqualityVisitor.getInstance(false);
+    mEqualityVisitor = new ModuleEqualityVisitor(false);
   }
 
   //#########################################################################

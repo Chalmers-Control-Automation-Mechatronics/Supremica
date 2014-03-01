@@ -303,7 +303,7 @@ class NodeSetSubject
     if (boundary != null && boundary.contains(this)) {
       return null;
     }
-    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(true);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(true);
     if (eq.isEqualSet(this, newState)) {
       return null;
     } else {

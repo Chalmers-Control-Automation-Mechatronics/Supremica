@@ -30,17 +30,16 @@ public class CompiledClause implements Cloneable
   //# Constructors
   public CompiledClause(final BinaryOperator op)
   {
-    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     mOperator = op;
-    mLiterals = new ProxyAccessorHashSet<SimpleExpressionProxy>(eq);
+    mLiterals = new ProxyAccessorHashSet<>(eq);
   }
 
   public CompiledClause(final BinaryOperator op, final int size)
   {
-    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     mOperator = op;
-    mLiterals =
-      new ProxyAccessorHashSet<SimpleExpressionProxy>(eq, size);
+    mLiterals = new ProxyAccessorHashSet<>(eq, size);
   }
 
   public CompiledClause(final BinaryOperator op,
@@ -118,6 +117,7 @@ public class CompiledClause implements Cloneable
 
   //#########################################################################
   //# Overrides for Baseclass java.lang.Object
+  @Override
   public boolean equals(final Object partner)
   {
     if (partner != null && partner.getClass() == getClass()) {
@@ -130,11 +130,13 @@ public class CompiledClause implements Cloneable
     }
   }
 
+  @Override
   public int hashCode()
   {
     return mOperator.hashCode() + 5 * mLiterals.hashCodeByAccessorEquality();
   }
 
+  @Override
   public String toString()
   {
     try {
@@ -150,6 +152,7 @@ public class CompiledClause implements Cloneable
 
   //#########################################################################
   //# Interface java.lang.Cloneable
+  @Override
   public CompiledClause clone()
   {
     final CompiledClause result = new CompiledClause(mOperator);

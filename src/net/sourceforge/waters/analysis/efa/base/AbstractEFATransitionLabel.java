@@ -123,8 +123,7 @@ public abstract class AbstractEFATransitionLabel
   public boolean equals(final Object other)
   {
     if (other != null && other.getClass() == getClass()) {
-      final ModuleEqualityVisitor eq =
-       ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       final AbstractEFATransitionLabel expected =
        (AbstractEFATransitionLabel) other;
       final ArrayList<Proxy> pList = new ArrayList<>();

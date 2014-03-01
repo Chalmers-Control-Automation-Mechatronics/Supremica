@@ -122,7 +122,7 @@ public class ModuleInstanceCompiler
     mCompilationInfo = compilationInfo;
     mCloner = new SourceInfoCloner(factory, compilationInfo);
     mOperatorTable = CompilerOperatorTable.getInstance();
-    mEquality = ModuleEqualityVisitor.getInstance(false);
+    mEquality = new ModuleEqualityVisitor(false);
     mSimpleExpressionCompiler =
       new SimpleExpressionCompiler(mFactory, mCompilationInfo,
                                    mOperatorTable);
@@ -512,15 +512,14 @@ public class ModuleInstanceCompiler
       }
       final Collection<NodeProxy> nodes = graph.getNodes();
       final int numnodes = nodes.size();
-      mCurrentNodes = new ArrayList<NodeProxy>(numnodes);
-      mNodeMap = new HashMap<NodeProxy,NodeProxy>(numnodes);
+      mCurrentNodes = new ArrayList<>(numnodes);
+      mNodeMap = new HashMap<>(numnodes);
       visitCollection(nodes);
-      final ModuleEqualityVisitor eq =
-        ModuleEqualityVisitor.getInstance(false);
-      mCurrentAlphabet = new ProxyAccessorHashSet<IdentifierProxy>(eq);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
+      mCurrentAlphabet = new ProxyAccessorHashSet<>(eq);
       final Collection<EdgeProxy> edges = graph.getEdges();
       final int numedges = edges.size();
-      mCurrentEdges = new ArrayList<EdgeProxy>(numedges);
+      mCurrentEdges = new ArrayList<>(numedges);
       visitCollection(edges);
       final LabelBlockProxy blocked1 =
         mCurrentBlockedEvents == null ? null :

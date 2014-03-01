@@ -258,7 +258,7 @@ public class EdgeEditorDialog
         }
       }
       final ModuleProxyCloner cloner = ModuleSubjectFactory.getCloningInstance();
-      final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       // Store parsed results ...
       final GuardActionBlockSubject block = mEdge.getGuardActionBlock();
       Command command = null;

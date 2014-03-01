@@ -162,11 +162,10 @@ class DisjunctionNormalizationRule extends SimplificationRule
     //# Constructor
     private DisjunctionCollector()
     {
-      final ModuleEqualityVisitor eq =
-        ModuleEqualityVisitor.getInstance(false);
-      mAllLiterals = new LinkedList<SimpleExpressionProxy>();
-      mPositiveLiterals = new ProxyAccessorHashSet<SimpleExpressionProxy>(eq);
-      mNegativeLiterals = new ProxyAccessorHashSet<SimpleExpressionProxy>(eq);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
+      mAllLiterals = new LinkedList<>();
+      mPositiveLiterals = new ProxyAccessorHashSet<>(eq);
+      mNegativeLiterals = new ProxyAccessorHashSet<>(eq);
     }
 
     //#######################################################################

@@ -667,8 +667,7 @@ public class VariableEditorDialog
         ident.getParent() == null ? ident : ident.clone();
       final VariableComponentSubject template =
         new VariableComponentSubject(iclone, type, initial, markings);
-      final ModuleEqualityVisitor eq =
-        ModuleEqualityVisitor.getInstance(true);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(true);
       if (mVariable == null) {
         final SelectionOwner panel = mRoot.getComponentsPanel();
         final InsertInfo insert = new InsertInfo(template, mInsertPosition);

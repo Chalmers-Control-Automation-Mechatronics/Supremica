@@ -13,15 +13,14 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
 import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
+import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierException;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
-import net.sourceforge.waters.model.compiler.context.
-  DuplicateIdentifierException;
-import net.sourceforge.waters.model.compiler.context.
-  UndefinedIdentifierException;
+import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
@@ -36,22 +35,23 @@ class CompiledArrayAlias implements CompiledEvent
   //# Constructor
   CompiledArrayAlias(final String name)
   {
-    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     mParentInfo = new RootParentInfo(name);
-    mMap = new ProxyAccessorHashMap<SimpleExpressionProxy,CompiledEvent>(eq);
+    mMap = new ProxyAccessorHashMap<>(eq);
   }
 
   CompiledArrayAlias(final CompiledArrayAlias parent,
                      final SimpleExpressionProxy index)
   {
-    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     mParentInfo = new IndexedParentInfo(parent, index);
-    mMap = new ProxyAccessorHashMap<SimpleExpressionProxy,CompiledEvent>(eq);
+    mMap = new ProxyAccessorHashMap<>(eq);
   }
 
 
   //#########################################################################
   //# Overrides for java.lang.Object
+  @Override
   public String toString()
   {
     return getIdentifier().toString();
@@ -60,6 +60,7 @@ class CompiledArrayAlias implements CompiledEvent
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.compiler.CompiledEvent
+  @Override
   public int getKindMask()
   {
     int mask = 0;
@@ -69,6 +70,7 @@ class CompiledArrayAlias implements CompiledEvent
     return mask;
   }
 
+  @Override
   public boolean isObservable()
   {
     boolean observable = true;
@@ -78,11 +80,13 @@ class CompiledArrayAlias implements CompiledEvent
     return observable;
   }
 
+  @Override
   public List<CompiledRange> getIndexRanges()
   {
     return Collections.emptyList();
   }
 
+  @Override
   public CompiledEvent find(final SimpleExpressionProxy index)
     throws UndefinedIdentifierException
   {
@@ -95,11 +99,13 @@ class CompiledArrayAlias implements CompiledEvent
     return result;
   }
 
+  @Override
   public SourceInfo getSourceInfo()
   {
     return null;
   }
 
+  @Override
   public Iterator<CompiledEvent> getChildrenIterator()
   {
     return mMap.values().iterator();
@@ -219,11 +225,13 @@ class CompiledArrayAlias implements CompiledEvent
 
     //#######################################################################
     //# Naming
+    @Override
     IdentifierProxy getIdentifier()
     {
       return new SimpleIdentifierElement(mName);
     }
 
+    @Override
     IdentifierProxy getIdentifier(final List<SimpleExpressionProxy> indexes)
     {
       if (indexes.isEmpty()) {
@@ -254,6 +262,7 @@ class CompiledArrayAlias implements CompiledEvent
 
     //#######################################################################
     //# Naming
+    @Override
     IdentifierProxy getIdentifier(final List<SimpleExpressionProxy> indexes)
     {
       final ParentInfo info = mParent.getParentInfo();

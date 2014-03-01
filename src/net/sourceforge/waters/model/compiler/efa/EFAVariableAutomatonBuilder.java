@@ -64,7 +64,7 @@ class EFAVariableAutomatonBuilder extends AbortableCompiler
   {
     mFactory = factory;
     mSimpleExpressionCompiler = compiler;
-    mEquality = ModuleEqualityVisitor.getInstance(false);
+    mEquality = new ModuleEqualityVisitor(false);
     mHashCodeVisitor = ModuleHashCodeVisitor.getInstance(false);
     mRootContext = context;
   }
@@ -122,15 +122,13 @@ class EFAVariableAutomatonBuilder extends AbortableCompiler
       final IdentifierProxy prop = marking.getProposition();
       blocked.add(prop);
     }
-    final List<IdentifierProxy> props =
-      new ArrayList<IdentifierProxy>(nummarkings);
+    final List<IdentifierProxy> props = new ArrayList<>(nummarkings);
     final CompiledRange range = mVariable.getRange();
     final int rangesize = range.size();
     mNodeList = new ArrayList<SimpleNodeProxy>(rangesize);
-    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
-    mNodeMap = new ProxyAccessorHashMap<SimpleExpressionProxy,SimpleNodeProxy>
-      (eq, rangesize);
-    mEdgeMap = new TreeMap<EFAVariableEdge,EFAVariableEdge>();
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
+    mNodeMap = new ProxyAccessorHashMap<>(eq, rangesize);
+    mEdgeMap = new TreeMap<>();
     for (final SimpleExpressionProxy value : range.getValues()) {
       checkAbort();
       final String name = value.toString();

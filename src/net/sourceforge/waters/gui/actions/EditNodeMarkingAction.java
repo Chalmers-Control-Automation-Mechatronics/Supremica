@@ -13,6 +13,7 @@ package net.sourceforge.waters.gui.actions;
 import java.awt.event.ActionEvent;
 import java.util.Iterator;
 import java.util.List;
+
 import javax.swing.Action;
 import javax.swing.Icon;
 
@@ -76,13 +77,14 @@ public class EditNodeMarkingAction
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent event)
   {
     final ModuleProxyCloner cloner = ModuleSubjectFactory.getCloningInstance();
     final NodeSubject cloned = (NodeSubject) cloner.getClone(mNode);
     final List<AbstractSubject> props =
       cloned.getPropositions().getEventIdentifierListModifiable();
-    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     final Iterator<AbstractSubject> iter = props.iterator();
     boolean removed = false;
     while (iter.hasNext()) {

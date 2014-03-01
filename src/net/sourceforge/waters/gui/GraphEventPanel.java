@@ -1167,9 +1167,8 @@ public class GraphEventPanel
                                     final List<InsertInfo> inserts)
     {
       try {
-        final ModuleEqualityVisitor eq =
-          ModuleEqualityVisitor.getInstance(false);
-        mItems = new ProxyAccessorHashSet<Proxy>(eq, items);
+        final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
+        mItems = new ProxyAccessorHashSet<>(eq, items);
         mInserts = inserts;
         final SimpleComponentProxy comp = mRoot.getComponent();
         final GraphProxy graph = comp.getGraph();
@@ -1367,8 +1366,7 @@ public class GraphEventPanel
     private void processList(final ListSubject<? extends ProxySubject> list)
       throws VisitorException
     {
-      final ModuleEqualityVisitor eq =
-        ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       int pos = 0;
       for (final Proxy proxy : list) {
         if (proxy instanceof IdentifierProxy) {

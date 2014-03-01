@@ -48,8 +48,8 @@ public class ModuleBindingContext implements BindingContext
                               final IdentifierProxy prefix,
                               final SourceInfo info)
   {
-    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
-    mMap = new ProxyAccessorHashSet<SimpleExpressionProxy>(eq);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
+    mMap = new ProxyAccessorHashSet<>(eq);
     mModule = module;
     mPrefix = prefix;
     mInstanceSource = info;
@@ -58,6 +58,7 @@ public class ModuleBindingContext implements BindingContext
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.compiler.BindingContext
+  @Override
   public SimpleExpressionProxy getBoundExpression
     (final SimpleExpressionProxy ident)
   {
@@ -66,11 +67,11 @@ public class ModuleBindingContext implements BindingContext
     return mMap.get(key);
   }
 
+  @Override
   public boolean isEnumAtom(final IdentifierProxy ident)
   {
     if (ident instanceof SimpleIdentifierProxy) {
-      final ModuleEqualityVisitor eq =
-        ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       final SimpleExpressionProxy bound = getBoundExpression(ident);
       return eq.equals(ident, bound);
     } else {
@@ -78,6 +79,7 @@ public class ModuleBindingContext implements BindingContext
     }
   }
 
+  @Override
   public ModuleBindingContext getModuleBindingContext()
   {
     return this;
@@ -143,8 +145,7 @@ public class ModuleBindingContext implements BindingContext
     if (expr == null) {
       mMap.put(key, ident);
     } else {
-      final ModuleEqualityVisitor eq =
-        ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       if (!eq.equals(ident, expr)) {
         final String name = ident.toString();
         throw new DuplicateIdentifierException(name);

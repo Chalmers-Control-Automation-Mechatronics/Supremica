@@ -131,7 +131,7 @@ public class SimpleExpressionCompiler
     mSimplificationVisitor = new SimplificationVisitor();
     mAtomicVisitor = new AtomicVisitor();
     mRangeVisitor = new RangeVisitor();
-    mEquality = ModuleEqualityVisitor.getInstance(false);
+    mEquality = new ModuleEqualityVisitor(false);
   }
 
 

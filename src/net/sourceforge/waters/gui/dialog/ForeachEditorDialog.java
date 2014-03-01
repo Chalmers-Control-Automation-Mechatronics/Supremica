@@ -130,6 +130,7 @@ public class ForeachEditorDialog
     }
     final ExpressionParser parser = mRoot.getExpressionParser();
     final ActionListener commithandler = new ActionListener() {
+        @Override
         public void actionPerformed(final ActionEvent event)
         {
           commitDialog();
@@ -179,6 +180,7 @@ public class ForeachEditorDialog
     final JButton cancelButton = new JButton("Cancel");
     cancelButton.setRequestFocusEnabled(false);
     cancelButton.addActionListener(new ActionListener() {
+        @Override
         public void actionPerformed(final ActionEvent event)
         {
           dispose();
@@ -310,8 +312,7 @@ public class ForeachEditorDialog
         final String oldname = mForeach.getName();
         final boolean namechange = !name.equals(oldname);
         final SimpleExpressionSubject oldrange = mForeach.getRange();
-        final ModuleEqualityVisitor eq =
-          ModuleEqualityVisitor.getInstance(true);
+        final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(true);
         final boolean rangechange = !eq.equals(range, oldrange);
         final SimpleExpressionSubject oldguard = mForeach.getGuard();
         final boolean guardchange = !eq.equals(guard, oldguard);

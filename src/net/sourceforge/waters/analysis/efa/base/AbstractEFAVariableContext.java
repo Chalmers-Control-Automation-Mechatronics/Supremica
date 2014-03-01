@@ -30,11 +30,11 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
  * <p/>
  * @author Robi Malik
  */
-public abstract class AbstractEFAVariableContext<L, 
+public abstract class AbstractEFAVariableContext<L,
                                                  V extends AbstractEFAVariable<L>>
  implements VariableContext
 {
-  
+
   //#######################################################################
   //# Constructor
   public AbstractEFAVariableContext(final ModuleProxy module,
@@ -42,9 +42,8 @@ public abstract class AbstractEFAVariableContext<L,
   {
 
     mModuleContext = new ModuleBindingContext(module);
-    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
-    mGlobalVariableMap =
-     new ProxyAccessorHashMap<>(eq);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
+    mGlobalVariableMap = new ProxyAccessorHashMap<>(eq);
     mNextOperator = op.getNextOperator();
   }
 
@@ -119,9 +118,9 @@ public abstract class AbstractEFAVariableContext<L,
   }
   private final ModuleBindingContext mModuleContext;
   private final UnaryOperator mNextOperator;
-  
+
   //#######################################################################
   //# Data Members
   protected final ProxyAccessorMap<IdentifierProxy, V> mGlobalVariableMap;
-  
+
 }

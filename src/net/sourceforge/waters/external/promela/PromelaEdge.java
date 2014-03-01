@@ -84,7 +84,7 @@ public class PromelaEdge
    */
   private boolean equalGuards(final PromelaEdge other)
   {
-    final ModuleEqualityVisitor comparitor = ModuleEqualityVisitor.getInstance(false);
+    final ModuleEqualityVisitor comparitor = new ModuleEqualityVisitor(false);
 
     if(other.getGuards() == null && this.getGuards() == null)
     {
@@ -119,7 +119,7 @@ public class PromelaEdge
    */
   private boolean equalActions(final PromelaEdge other)
   {
-    final ModuleEqualityVisitor comparitor = ModuleEqualityVisitor.getInstance(false);
+    final ModuleEqualityVisitor comparitor = new ModuleEqualityVisitor(false);
 
     if(other.getActions() == null && this.getActions() == null)
     {

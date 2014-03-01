@@ -247,20 +247,18 @@ public class ModuleGraphCompiler
     throws VisitorException
   {
     try {
-      final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       final String name = mInputModule.getName();
       final String comment = mInputModule.getComment();
       final List<EventDeclProxy> decls = mInputModule.getEventDeclList();
       final int numevents = decls.size();
-      mGlobalEventsMap =
-        new ProxyAccessorHashMap<IdentifierProxy,EventProxy>(eq, numevents);
-      mGlobalEventsList = new ArrayList<EventProxy>(numevents);
+      mGlobalEventsMap = new ProxyAccessorHashMap<>(eq, numevents);
+      mGlobalEventsList = new ArrayList<>(numevents);
       visitCollection(decls);
       final List<Proxy> components = mInputModule.getComponentList();
       final int numaut = components.size();
-      mAutomataMap =
-        new ProxyAccessorHashMap<IdentifierProxy,AutomatonProxy>(eq, numaut);
-      mAutomataList = new ArrayList<AutomatonProxy>(numaut);
+      mAutomataMap = new ProxyAccessorHashMap<>(eq, numaut);
+      mAutomataList = new ArrayList<>(numaut);
       visitCollection(components);
       return mFactory.createProductDESProxy
         (name, comment, null, mGlobalEventsList, mAutomataList);

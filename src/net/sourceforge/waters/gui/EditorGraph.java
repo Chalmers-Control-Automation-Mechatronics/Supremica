@@ -1320,7 +1320,7 @@ class EditorGraph
     @Override
     AbstractEditCommand createMoveCommand(final GraphEditorPanel surface)
     {
-      final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(true);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(true);
       final SimpleNodeSubject original = getOriginal();
       final PointGeometrySubject oldgeo = original.getPointGeometry();
       final PointGeometrySubject oldinit = original.getInitialArrowGeometry();
@@ -1401,7 +1401,7 @@ class EditorGraph
     @Override
     AbstractEditCommand createMoveCommand(final GraphEditorPanel surface)
     {
-      final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(true);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(true);
       final GroupNodeSubject original = getOriginal();
       final BoxGeometrySubject oldgeo = original.getGeometry();
       final GroupNodeSubject fake = getFake();
@@ -1577,8 +1577,7 @@ class EditorGraph
       if (hasnull) {
         return createEditCommand(surface, name);
       } else {
-        final ModuleEqualityVisitor eq =
-          ModuleEqualityVisitor.getInstance(true);
+        final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(true);
         final boolean equalgeo = eq.equals(oldgeo, newgeo);
         final boolean equalstart = eq.equals(oldstart, newstart);
         final boolean equalend = eq.equals(oldend, newend);

@@ -47,17 +47,17 @@ class EFAVariableTransitionRelationPart
   //# Constructors
   EFAVariableTransitionRelationPart()
   {
-    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
-    mSourceValues = new ProxyAccessorHashSet<SimpleExpressionProxy>(eq);
-    mTransitions = new TreeSet<EFAVariableTransition>();
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
+    mSourceValues = new ProxyAccessorHashSet<>(eq);
+    mTransitions = new TreeSet<>();
     mIsAllSelfloops = true;
   }
 
   EFAVariableTransitionRelationPart(final int size)
   {
-    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
-    mSourceValues = new ProxyAccessorHashSet<SimpleExpressionProxy>(eq, size);
-    mTransitions = new TreeSet<EFAVariableTransition>();
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
+    mSourceValues = new ProxyAccessorHashSet<>(eq, size);
+    mTransitions = new TreeSet<>();
     mIsAllSelfloops = true;
   }
 
@@ -262,11 +262,11 @@ class EFAVariableTransitionRelationPart
 
   EFAVariableTransitionRelationPart complement(final CompiledRange range)
   {
-    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     final List<? extends SimpleExpressionProxy> allvalues = range.getValues();
     final int allsize = allvalues.size();
     final ProxyAccessorSet<SimpleExpressionProxy> selfloops =
-      new ProxyAccessorHashSet<SimpleExpressionProxy>(eq, allsize);
+      new ProxyAccessorHashSet<>(eq, allsize);
     for (final EFAVariableTransition trans : mTransitions) {
       if (trans.isSelfloop()) {
         final SimpleExpressionProxy source = trans.getSource();

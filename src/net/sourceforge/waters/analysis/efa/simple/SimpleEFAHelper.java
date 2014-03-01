@@ -157,16 +157,14 @@ public class SimpleEFAHelper {
 
   public boolean containsMarkingProposition(final EventListExpressionProxy list)
   {
-    final ModuleEqualityVisitor eq =
-     ModuleEqualityVisitor.getInstance(false);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     return eq.contains(list.getEventIdentifierList(), getMarkingIdentifier());
   }
 
   public boolean containsForbiddenProposition(
    final EventListExpressionProxy list)
   {
-    final ModuleEqualityVisitor eq =
-     ModuleEqualityVisitor.getInstance(false);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     return eq.contains(list.getEventIdentifierList(), getForbiddenIdentifier());
   }
 

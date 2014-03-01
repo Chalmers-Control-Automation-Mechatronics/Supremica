@@ -39,7 +39,7 @@ class EFAVariableTransition implements Comparable<EFAVariableTransition>
   EFAVariableTransition(final SimpleExpressionProxy source,
                         final SimpleExpressionProxy target)
   {
-    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     if (eq.equals(source, target)) {
       mSource = mTarget = source;
     } else {
@@ -86,7 +86,7 @@ class EFAVariableTransition implements Comparable<EFAVariableTransition>
   public boolean equals(final Object other)
   {
     if (other != null && getClass() == other.getClass()) {
-      final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       final EFAVariableTransition trans = (EFAVariableTransition) other;
       return
         eq.equals(mSource, trans.mSource) && eq.equals(mTarget, trans.mTarget);

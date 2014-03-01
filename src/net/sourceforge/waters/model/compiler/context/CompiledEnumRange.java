@@ -49,8 +49,7 @@ public class CompiledEnumRange implements CompiledRange
         }
         final IdentifierProxy atom1 = iter1.next();
         final IdentifierProxy atom2 = iter2.next();
-        final ModuleEqualityVisitor eq =
-          ModuleEqualityVisitor.getInstance(false);
+        final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
         if (!eq.equals(atom1, atom2)) {
           return false;
         }
@@ -198,8 +197,7 @@ public class CompiledEnumRange implements CompiledRange
 
   public int indexOf(final IdentifierProxy value)
   {
-    final ModuleEqualityVisitor eq =
-      ModuleEqualityVisitor.getInstance(false);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     int i = 0;
     for (final IdentifierProxy atom : mAtoms) {
       if (eq.equals(atom, value)) {
@@ -270,11 +268,9 @@ public class CompiledEnumRange implements CompiledRange
   public CompiledEnumRange remove(final IdentifierProxy value)
   {
     if (contains(value)) {
-      final ModuleEqualityVisitor eq =
-        ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       final int newsize = size() - 1;
-      final List<SimpleIdentifierProxy> newlist =
-        new ArrayList<SimpleIdentifierProxy>(newsize);
+      final List<SimpleIdentifierProxy> newlist = new ArrayList<>(newsize);
       for (final SimpleIdentifierProxy atom : mAtoms) {
         if (!eq.equals(atom, value)) {
           newlist.add(atom);

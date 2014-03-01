@@ -76,8 +76,7 @@ public class ConstraintList
   public boolean equals(final Object other)
   {
     if (other != null && other.getClass() == getClass()) {
-      final ModuleEqualityVisitor eq =
-        ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       final ConstraintList clist = (ConstraintList) other;
       return eq.isEqualList(mConstraints, clist.mConstraints);
     } else {
@@ -126,7 +125,7 @@ public class ConstraintList
    */
   public boolean contains(final SimpleExpressionProxy constraint)
   {
-    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     for (final SimpleExpressionProxy current : mConstraints) {
       if (eq.equals(current, constraint)) {
         return true;

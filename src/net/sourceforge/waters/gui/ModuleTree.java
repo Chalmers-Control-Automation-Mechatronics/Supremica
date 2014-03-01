@@ -916,8 +916,7 @@ public abstract class ModuleTree
               return;
             }
           }
-          final ModuleEqualityVisitor eq =
-            ModuleEqualityVisitor.getInstance(false);
+          final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
           for (final InsertInfo delete : deletes) {
             final Proxy proxy = delete.getProxy();
             final ListInsertPosition delpos =
@@ -1073,11 +1072,8 @@ public abstract class ModuleTree
       List<Proxy> transferData;
       final List<Proxy> result = new ArrayList<Proxy>();
       try {
-        final ModuleEqualityVisitor eq =
-          ModuleEqualityVisitor.getInstance(false);
-        transferData =
-          (List<Proxy>) mTransferable
-            .getTransferData(mFlavor);
+        final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
+        transferData = (List<Proxy>) mTransferable.getTransferData(mFlavor);
         for (final Proxy transferredProxy : transferData) {
           if (!eq.contains(parentsList, transferredProxy)) {
             result.add(transferredProxy);
@@ -1216,8 +1212,7 @@ public abstract class ModuleTree
     {
       if (mTransferable.isDataFlavorSupported(WatersDataFlavor.IDENTIFIER)) {
         try {
-          final ModuleEqualityVisitor eq =
-            ModuleEqualityVisitor.getInstance(false);
+          final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
           @SuppressWarnings("unchecked")
           final List<Proxy> transferData = (List<Proxy>)
             mTransferable.getTransferData(WatersDataFlavor.IDENTIFIER);

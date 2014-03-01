@@ -110,7 +110,7 @@ class UnifiedEFAUpdateMerger extends AbstractEFAAlgorithm
       new UnifiedEFAVariableCollector(mOperatorTable, mContext);
     mRemovedEvents = new ArrayList<>(mCandidateEvents.size());
     mAddedEvents = new ArrayList<>(mCandidateEvents.size() / 2);
-    mEqualityVisitor = ModuleEqualityVisitor.getInstance(false);
+    mEqualityVisitor = new ModuleEqualityVisitor(false);
     mPropagator = new ConstraintPropagator(mFactory, mOperatorTable, mContext);
   }
 

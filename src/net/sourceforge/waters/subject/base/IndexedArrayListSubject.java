@@ -376,7 +376,7 @@ public class IndexedArrayListSubject<P extends NamedSubject>
     if (boundary != null && boundary.contains(this)) {
       return null;
     }
-    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(true);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(true);
     if (eq.isEqualList(this, newList)) {
       return null;
     }

@@ -65,10 +65,9 @@ public class EFAModuleContext
                           final SourceInfo info)
   {
     super(module, prefix, info);
-    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     final int size = 2 * module.getComponentList().size();
-    mMap =
-      new ProxyAccessorHashMap<SimpleExpressionProxy,EFAVariable>(eq, size);
+    mMap = new ProxyAccessorHashMap<>(eq, size);
   }
 
 

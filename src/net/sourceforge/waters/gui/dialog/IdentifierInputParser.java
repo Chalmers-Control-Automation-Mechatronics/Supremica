@@ -39,7 +39,7 @@ public class IdentifierInputParser
   {
     mOldIdentifier = oldIdent;
     mOldName = oldIdent.toString();
-    mEquality = ModuleEqualityVisitor.getInstance(true);
+    mEquality = new ModuleEqualityVisitor(true);
     mExpressionParser = parser;
     mDocumentFilter = new SimpleExpressionDocumentFilter(parser);
   }

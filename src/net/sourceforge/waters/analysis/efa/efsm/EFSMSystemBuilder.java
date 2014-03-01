@@ -189,10 +189,8 @@ public class EFSMSystemBuilder extends AbstractEFSMAlgorithm
     //# Constructor
     private Pass1Visitor()
     {
-      final ModuleEqualityVisitor eq =
-        ModuleEqualityVisitor.getInstance(false);
-      mGlobalEventsMap =
-        new ProxyAccessorHashMap<IdentifierProxy,SimpleComponentProxy>(eq);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
+      mGlobalEventsMap = new ProxyAccessorHashMap<>(eq);
     }
 
     //#######################################################################
@@ -344,7 +342,7 @@ public class EFSMSystemBuilder extends AbstractEFSMAlgorithm
     public EFSMVariable visitVariableMarkingProxy
       (final VariableMarkingProxy marking)
     {
-      final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       final IdentifierProxy prop = marking.getProposition();
       if (eq.equals(prop, mDefaultMarking)) {
         final SimpleExpressionProxy pred = marking.getPredicate();
@@ -437,20 +435,17 @@ public class EFSMSystemBuilder extends AbstractEFSMAlgorithm
         mUsesMarking = containsMarkingProposition(block);
       }
       final Collection<NodeProxy> nodes = graph.getNodes();
-      mStateMap =
-        new TObjectIntHashMap<SimpleNodeProxy>(nodes.size(), 0.5f, -1);
+      mStateMap = new TObjectIntHashMap<>(nodes.size(), 0.5f, -1);
       if (mCompilationInfo.isSourceInfoEnabled()) {
-        mNodeList = new ArrayList<SimpleNodeProxy>(nodes.size());
+        mNodeList = new ArrayList<>(nodes.size());
       } else {
         mNodeList = null;
       }
       visitCollection(nodes);
-      final ModuleEqualityVisitor eq =
-        ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       final Collection<EdgeProxy> edges = graph.getEdges();
       mSimplifiedGuardActionBlockMap =
-        new ProxyAccessorHashMap<GuardActionBlockProxy,ConstraintList>
-          (eq, edges.size());
+        new ProxyAccessorHashMap<>(eq, edges.size());
       mEventEncoding = new EFSMEventEncoding(edges.size());
       return visitCollection(edges);
     }
@@ -518,8 +513,7 @@ public class EFSMSystemBuilder extends AbstractEFSMAlgorithm
     private boolean containsMarkingProposition
       (final EventListExpressionProxy list)
     {
-      final ModuleEqualityVisitor eq =
-        ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       return eq.contains(list.getEventIdentifierList(), mDefaultMarking);
     }
 

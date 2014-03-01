@@ -11,9 +11,6 @@ package net.sourceforge.waters.analysis.efa.efsm;
 
 import java.util.List;
 
-import net.sourceforge.waters.analysis.efa.efsm.EFSMSystem;
-import net.sourceforge.waters.analysis.efa.efsm.EFSMVariable;
-import net.sourceforge.waters.analysis.efa.efsm.EFSMVariablePartitionComputer;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
@@ -189,10 +186,9 @@ public class EFSMVariablePartitionComputerTest
     //# Constructor
     private EFSMVariablePartition(final EFSMVariable var)
     {
-      final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       mRange = var.getRange();
-      mStateToClass =
-        new ProxyAccessorHashMap<SimpleExpressionProxy,Integer>(eq, mRange.size());
+      mStateToClass = new ProxyAccessorHashMap<>(eq, mRange.size());
     }
 
     //#########################################################################
@@ -218,9 +214,9 @@ public class EFSMVariablePartitionComputerTest
     //# Testing
     private void verify(final TRPartition computedPartition)
     {
-      final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       final ProxyAccessorHashSet<SimpleExpressionProxy> unaccounted =
-        new ProxyAccessorHashSet<SimpleExpressionProxy>(eq, mRange.size());
+        new ProxyAccessorHashSet<>(eq, mRange.size());
       for (final ProxyAccessor<SimpleExpressionProxy> accessor :
            mStateToClass.keySet()) {
         final SimpleExpressionProxy expr = accessor.getProxy();

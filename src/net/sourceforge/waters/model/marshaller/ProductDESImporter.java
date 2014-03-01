@@ -36,8 +36,8 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -46,16 +46,15 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
-import net.sourceforge.waters.model.module.ModuleProxyCloner;
-import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
-
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
@@ -379,8 +378,8 @@ public class ProductDESImporter
     private EnumSymbolCollector()
     {
       mCloner = mFactory.getCloner();
-      final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
-      mEnumSymbols = new ProxyAccessorHashSet<SimpleIdentifierProxy>(eq);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
+      mEnumSymbols = new ProxyAccessorHashSet<>(eq);
     }
 
     //#######################################################################
@@ -422,6 +421,7 @@ public class ProductDESImporter
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Object visitIndexedIdentifierProxy
       (final IndexedIdentifierProxy ident)
       throws VisitorException
@@ -432,6 +432,7 @@ public class ProductDESImporter
       return null;
     }
 
+    @Override
     public Object visitQualifiedIdentifierProxy
       (final QualifiedIdentifierProxy ident)
       throws VisitorException
@@ -442,11 +443,13 @@ public class ProductDESImporter
       return comp.acceptVisitor(this);
     }
 
+    @Override
     public Object visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
     {
       return null;
     }
 
+    @Override
     public Object visitSimpleIdentifierProxy(final SimpleIdentifierProxy ident)
     {
       final SimpleIdentifierProxy cloned =
@@ -489,6 +492,7 @@ public class ProductDESImporter
 
     //#######################################################################
     //# Equals and Hashcode
+    @Override
     public boolean equals(final Object other)
     {
       if (other != null && other.getClass() == getClass()) {
@@ -499,6 +503,7 @@ public class ProductDESImporter
       }
     }
 
+    @Override
     public int hashCode()
     {
       return mSource.hashCode() + 5 * mTarget.hashCode();
@@ -506,6 +511,7 @@ public class ProductDESImporter
 
     //#######################################################################
     //# Interface java.util.Comparable<NodePair>
+    @Override
     public int compareTo(final NodePair pair)
     {
       final int result = mSource.compareTo(pair.mSource);
@@ -552,6 +558,7 @@ public class ProductDESImporter
 
     //#######################################################################
     //# Equals and Hashcode
+    @Override
     public boolean equals(final Object other)
     {
       if (other != null && other.getClass() == getClass()) {
@@ -562,6 +569,7 @@ public class ProductDESImporter
       }
     }
 
+    @Override
     public int hashCode()
     {
       return mState.hashCode() + 5 * mEvent.hashCode();

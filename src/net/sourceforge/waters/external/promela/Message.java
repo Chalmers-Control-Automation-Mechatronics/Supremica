@@ -59,7 +59,7 @@ public class Message implements Comparable<Message>
     if (getClass() == other.getClass()) {
       final Message msg = (Message) other;
       final ModuleEqualityVisitor eqVisitor =
-        ModuleEqualityVisitor.getInstance(false);
+        new ModuleEqualityVisitor(false);
       return eqVisitor.isEqualList(getMsg(), msg.getMsg());
     } else {
       return false;
@@ -69,8 +69,7 @@ public class Message implements Comparable<Message>
   @Override
   public int hashCode()
   {
-    final ModuleEqualityVisitor eqVisitor =
-      ModuleEqualityVisitor.getInstance(false);
+    final ModuleEqualityVisitor eqVisitor = new ModuleEqualityVisitor(false);
     final ModuleHashCodeVisitor hashVisitor = eqVisitor.getHashCodeVisitor();
     return hashVisitor.getListHashCode(this.getMsg());
   }
@@ -126,6 +125,7 @@ public class Message implements Comparable<Message>
    * Only the message content is checked in the comparison
    * @param other The message to compare this message to.
    */
+  @Override
   public int compareTo(final Message other)
   {
     final List<SimpleExpressionProxy> content = other.getMsg();

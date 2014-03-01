@@ -57,7 +57,7 @@ class EFAEventNameBuilder {
                       final VariableContext context)
   {
     mComparator = new ExpressionComparator(optable);
-    mEquality = ModuleEqualityVisitor.getInstance(false);
+    mEquality = new ModuleEqualityVisitor(false);
     mHashCodeVisitor = ModuleHashCodeVisitor.getInstance(false);
     mCollector = new VariableCollectVisitor(optable, context);
     mAllLiterals = null;

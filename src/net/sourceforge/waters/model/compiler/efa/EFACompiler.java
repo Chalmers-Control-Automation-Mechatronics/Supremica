@@ -625,12 +625,10 @@ public class EFACompiler extends AbortableCompiler
     public Object visitModuleProxy(final ModuleProxy module)
       throws VisitorException
     {
-      final ModuleEqualityVisitor eq =
-        ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       final List<EventDeclProxy> events = module.getEventDeclList();
       final int size = events.size();
-      mEFAEventDeclMap =
-        new ProxyAccessorHashMap<IdentifierProxy,EFAEventDecl>(eq, size);
+      mEFAEventDeclMap = new ProxyAccessorHashMap<>(eq, size);
       visitCollection(events);
       final List<Proxy> components = module.getComponentList();
       visitCollection(components);

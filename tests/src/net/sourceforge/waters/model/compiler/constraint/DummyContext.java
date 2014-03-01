@@ -29,10 +29,9 @@ class DummyContext implements VariableContext
   //# Constructor
   DummyContext()
   {
-    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
-    mAtoms = new ProxyAccessorHashSet<IdentifierProxy>(eq);
-    mRangeMap =
-      new ProxyAccessorHashMap<SimpleExpressionProxy,CompiledRange>(eq);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
+    mAtoms = new ProxyAccessorHashSet<>(eq);
+    mRangeMap = new ProxyAccessorHashMap<>(eq);
   }
 
 

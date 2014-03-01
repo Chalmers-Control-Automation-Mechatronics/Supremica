@@ -63,16 +63,11 @@ class EFATransitionRelationBuilder extends AbortableCompiler
     mContext = context;
     mSimpleExpressionCompiler = compiler;
     mCollector = new EFAVariableCollector(optable, context);
-    mEquality = ModuleEqualityVisitor.getInstance(false);
+    mEquality = new ModuleEqualityVisitor(false);
 
-    mUniqueTransitionRelations =
-      new HashMap<EFAVariableTransitionRelation,
-                  EFAVariableTransitionRelation>();
-    mUniqueTransitionRelationParts =
-      new HashMap<EFAVariableTransitionRelationPart,
-                  EFAVariableTransitionRelationPart>();
-    mSubsumptionCache =
-      new HashMap<SubsumptionTestPair,SubsumptionResult>(256);
+    mUniqueTransitionRelations = new HashMap<>();
+    mUniqueTransitionRelationParts = new HashMap<>();
+    mSubsumptionCache = new HashMap<>(256);
   }
 
 
@@ -80,8 +75,7 @@ class EFATransitionRelationBuilder extends AbortableCompiler
   //# Building Events
   void initEventRecords()
   {
-    mEventRecords =
-      new IdentityHashMap<EFAVariableTransitionRelation,EventRecord>();
+    mEventRecords = new IdentityHashMap<>();
   }
 
   void addEventRecord(final EFAEventDecl edecl,
@@ -95,8 +89,7 @@ class EFATransitionRelationBuilder extends AbortableCompiler
     if (found != null) {
       found.addSourceLocations(locations);
     } else {
-      final List<EFAVariableTransitionRelation> victims =
-        new LinkedList<EFAVariableTransitionRelation>();
+      final List<EFAVariableTransitionRelation> victims = new LinkedList<>();
       for (final Map.Entry<EFAVariableTransitionRelation,EventRecord> entry :
              mEventRecords.entrySet()) {
         checkAbort();

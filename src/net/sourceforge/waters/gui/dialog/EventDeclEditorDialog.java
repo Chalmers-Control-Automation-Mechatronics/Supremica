@@ -1044,7 +1044,7 @@ public class EventDeclEditorDialog
         final Set<Color> set = Collections.singleton(mChosenColor);
         geo = new ColorGeometrySubject(set);
       }
-      final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(true);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(true);
       final SelectionOwner panel = mRoot.getEventsPanel();
       final EventDeclSubject template =
         new EventDeclSubject(ident, kind, observable,

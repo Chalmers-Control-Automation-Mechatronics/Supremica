@@ -37,11 +37,10 @@ public class EFAGuardCompiler
   public EFAGuardCompiler(final ModuleProxyFactory factory,
                           final CompilerOperatorTable optable)
   {
-    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     mFactory = factory;
     mOperatorTable = optable;
-    mCache =
-      new ProxyAccessorHashMap<GuardActionBlockProxy,ConstraintList>(eq);
+    mCache = new ProxyAccessorHashMap<>(eq);
   }
 
 

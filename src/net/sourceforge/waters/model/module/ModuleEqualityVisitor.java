@@ -51,40 +51,21 @@ public class ModuleEqualityVisitor
 {
 
   //#########################################################################
-  //# Singleton Pattern
+  //# Constructor
   /**
-   * Returns an instance of an equality checker that does not provide
-   * diagnostic information. This method uses the singleton pattern
-   * to provide more efficient access to a pre-built visitor object.
+   * Creates a new equality checker without diagnostic information.
    * @param  geo  A flag, indicating whether the equality checker
    *              should consider geometry information.
-   *              If <CODE>true</CODE> objects will be considered
+   *              If <CODE>true</CODE>, objects will be considered
    *              equal if their contents and geometry are equal,
    *              otherwise any geometry information will be ignored
    *              when checking for equality.
    */
-  public static ModuleEqualityVisitor getInstance(final boolean geo)
+  public ModuleEqualityVisitor(final boolean geo)
   {
-    if (geo) {
-      return SingletonHolderWithGeometry.INSTANCE;
-    } else {
-      return SingletonHolderWithoutGeometry.INSTANCE;
-    }
+    this(false, geo);
   }
 
-  private static class SingletonHolderWithoutGeometry {
-    private static final ModuleEqualityVisitor INSTANCE =
-      new ModuleEqualityVisitor(false, false);
-  }
-
-  private static class SingletonHolderWithGeometry {
-    private static final ModuleEqualityVisitor INSTANCE =
-      new ModuleEqualityVisitor(false, true);
-  }
-
-
-  //#########################################################################
-  //# Constructor
   /**
    * Creates a new equality checker.
    * @param  diag A flag, indicating whether the equality checker
@@ -100,12 +81,13 @@ public class ModuleEqualityVisitor
    *              equal if their contents and geometry are equal,
    *              otherwise any geometry information will be ignored
    *              when checking for equality.
-*/
+   */
   public ModuleEqualityVisitor(final boolean diag, final boolean geo)
   {
     super (diag, geo);
     mHashCodeVisitor = ModuleHashCodeVisitor.getInstance(geo);
-    mNonReportingEqualityVisitor = diag ? getInstance(geo) : this;
+    mNonReportingEqualityVisitor =
+      diag ? new ModuleEqualityVisitor(geo) : this;
   }
 
 

@@ -1224,7 +1224,7 @@ public class GraphCollectingVisitor implements PromelaVisitor
     else
     {
       final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
-      final ModuleEqualityVisitor equalityVisitor = ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor equalityVisitor = new ModuleEqualityVisitor(false);
 
       final ChannelData data = iterList.get(iterIndex);
       if(data.getDataType() == ChannelDataType.SHOWN_VARIABLE)

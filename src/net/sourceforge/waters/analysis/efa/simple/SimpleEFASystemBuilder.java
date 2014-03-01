@@ -258,8 +258,7 @@ public class SimpleEFASystemBuilder implements Abortable
     public Object visitModuleProxy(final ModuleProxy module)
      throws VisitorException
     {
-      final ModuleEqualityVisitor eq =
-       ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       final List<EventDeclProxy> events = module.getEventDeclList();
       final int size = events.size();
       mEFAEventDeclMap =
@@ -301,7 +300,7 @@ public class SimpleEFASystemBuilder implements Abortable
     public SimpleEFAVariable visitVariableMarkingProxy(
      final VariableMarkingProxy marking)
     {
-      final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       final IdentifierProxy prop = marking.getProposition();
       if (eq.equals(prop, mHelper.getMarkingIdentifier())) {
         final SimpleExpressionProxy pred = marking.getPredicate();
@@ -477,8 +476,7 @@ public class SimpleEFASystemBuilder implements Abortable
       // visiting visitSimpleNodeProxy
       visitCollection(nodes);
 
-      final ModuleEqualityVisitor eq2 =
-       ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq2 = new ModuleEqualityVisitor(false);
       final Collection<EdgeProxy> edges = graph.getEdges();
       mEdgeLabelMap = new ProxyAccessorHashMap<>(eq2, edges.size());
       mEventEncoding = new SimpleEFATransitionLabelEncoding(edges.size());

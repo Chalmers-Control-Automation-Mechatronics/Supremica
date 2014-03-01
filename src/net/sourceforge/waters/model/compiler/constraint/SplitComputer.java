@@ -59,19 +59,17 @@ public class SplitComputer
                        final CompilerOperatorTable optable,
                        final VariableContext root)
   {
-    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     mFactory = factory;
     mOperatorTable = optable;
     mDisjunctionCollectVisitor = new DisjunctionCollectVisitor();
     mCollectVisitor = new CollectVisitor();
     mOneVariableFinder = new OneVariableFinder();
-    mEquality = ModuleEqualityVisitor.getInstance(false);
+    mEquality = new ModuleEqualityVisitor(false);
     mExpressionComparator = new ExpressionComparator(optable);
     mCandidateComparator = new CandidateComparator();
-    mCombinations = new THashSet<VariableCombination>();
-    mCandidateMap =
-      new ProxyAccessorHashMap<SimpleExpressionProxy,AbstractSplitCandidate>
-        (eq);
+    mCombinations = new THashSet<>();
+    mCandidateMap = new ProxyAccessorHashMap<>(eq);
   }
 
 
@@ -257,8 +255,7 @@ public class SplitComputer
       if (unary.getOperator() != mOperatorTable.getNextOperator()) {
         return false;
       }
-      final ModuleEqualityVisitor eq =
-        ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       final SimpleExpressionProxy subterm = unary.getSubTerm();
       return eq.equals(subterm, varname);
     } else {
@@ -331,13 +328,12 @@ public class SplitComputer
             disjunct.getVariables();
           return createRelevantVariableCombination(variables);
         } else {
-          final ModuleEqualityVisitor eq =
-            ModuleEqualityVisitor.getInstance(false);
+          final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
           final int size = mDisjuncts.size();
           final ProxyAccessorSet<SimpleExpressionProxy> result =
-            new ProxyAccessorHashSet<SimpleExpressionProxy>(eq, size);
+            new ProxyAccessorHashSet<>(eq, size);
           final Map<VariableCombination,List<SimpleExpressionProxy>> splitmap =
-            new HashMap<VariableCombination,List<SimpleExpressionProxy>>(size);
+            new HashMap<>(size);
           for (final Disjunct disjunct : mDisjuncts) {
             final ProxyAccessorSet<SimpleExpressionProxy> variables =
               disjunct.getVariables();
@@ -403,10 +399,9 @@ public class SplitComputer
     public Boolean visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
       throws VisitorException
     {
-      final ModuleEqualityVisitor eq =
-        ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       final ProxyAccessorSet<SimpleExpressionProxy> collection =
-        new ProxyAccessorHashSet<SimpleExpressionProxy>(eq);
+        new ProxyAccessorHashSet<>(eq);
       final boolean result = mCollectVisitor.process(expr, collection);
       if (!result) {
         final Disjunct disjunct = new Disjunct(expr, collection);

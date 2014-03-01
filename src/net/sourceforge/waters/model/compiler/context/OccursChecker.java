@@ -102,8 +102,7 @@ public class OccursChecker extends DefaultModuleProxyVisitor
   private boolean occurs(final SimpleExpressionProxy expr)
     throws VisitorException
   {
-    final ModuleEqualityVisitor eq =
-      ModuleEqualityVisitor.getInstance(false);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     if (eq.equals(expr, mVarName)) {
       return true;
     } else {

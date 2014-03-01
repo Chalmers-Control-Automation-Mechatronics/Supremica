@@ -194,8 +194,7 @@ public class SimpleEFAVariable
   {
     if (obj instanceof SimpleEFAVariable) {
       final VariableComponentProxy var = ((SimpleEFAVariable) obj).getComponent();
-      final ModuleEqualityVisitor eq =
-       ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       return eq.equals(this.mVar, var);
     }
     return false;

@@ -20,10 +20,8 @@ import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
-import net.sourceforge.waters.model.compiler.context.
-  DuplicateIdentifierException;
-import net.sourceforge.waters.model.compiler.context.
-  UndefinedIdentifierException;
+import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierException;
+import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.IdentifiedProxy;
@@ -48,17 +46,14 @@ class CompiledNameSpace
   }
 
   CompiledNameSpace(final IdentifierProxy ident,
-		    final CompiledNameSpace parent)
+                    final CompiledNameSpace parent)
   {
-    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     mIdentifier = ident;
     mParent = parent;
-    mNameSpaceMap =
-      new ProxyAccessorHashMap<IdentifierProxy,CompiledNameSpace>(eq);
-    mComponentMap =
-      new ProxyAccessorHashMap<IdentifierProxy,IdentifiedProxy>(eq);
-    mEventMap =
-      new HashMap<String,CompiledEvent>();
+    mNameSpaceMap = new ProxyAccessorHashMap<>(eq);
+    mComponentMap = new ProxyAccessorHashMap<>(eq);
+    mEventMap = new HashMap<>();
   }
 
 
@@ -122,7 +117,7 @@ class CompiledNameSpace
   }
 
   void addNameSpace(final IdentifierProxy ident,
-		    final CompiledNameSpace subspace)
+                    final CompiledNameSpace subspace)
     throws EvalException
   {
     NAMESPACE_ADD_VISITOR.addNameSpace(this, ident, subspace);
@@ -172,7 +167,7 @@ class CompiledNameSpace
   }
 
   private CompiledNameSpace lookupNameSpace(final IdentifierProxy ident,
-					    final boolean throwing)
+                                            final boolean throwing)
     throws UndefinedIdentifierException
   {
     final ProxyAccessor<IdentifierProxy> accessor =
@@ -214,7 +209,7 @@ class CompiledNameSpace
   }
 
   private Object putNameSpace(final IdentifierProxy ident,
-			      final CompiledNameSpace subspace)
+                              final CompiledNameSpace subspace)
     throws DuplicateIdentifierException
   {
     final ProxyAccessor<IdentifierProxy> accessor =
@@ -286,35 +281,36 @@ class CompiledNameSpace
     //#######################################################################
     //# Invocation
     private CompiledEvent getEvent(final CompiledNameSpace namespace,
-				   final IdentifierProxy ident,
-				   final boolean throwing)
+                                   final IdentifierProxy ident,
+                                   final boolean throwing)
       throws EvalException
     {
       try {
-	mNameSpace = namespace;
-	mThrowing = throwing;
-	return (CompiledEvent) ident.acceptVisitor(this);
+        mNameSpace = namespace;
+        mThrowing = throwing;
+        return (CompiledEvent) ident.acceptVisitor(this);
       } catch (final VisitorException exception) {
-	final Throwable cause = exception.getCause();
-	if (throwing && cause instanceof EvalException) {
-	  throw (EvalException) cause;
-	} else {
-	  throw exception.getRuntimeException();
-	}
+        final Throwable cause = exception.getCause();
+        if (throwing && cause instanceof EvalException) {
+          throw (EvalException) cause;
+        } else {
+          throw exception.getRuntimeException();
+        }
       }
     }
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public CompiledEvent visitIndexedIdentifierProxy
       (final IndexedIdentifierProxy ident)
       throws VisitorException
     {
       try {
-	final String name = ident.getName();
+        final String name = ident.getName();
         //System.err.println("name=" + name);
-	final List<SimpleExpressionProxy> indexes = ident.getIndexes();
-	CompiledEvent event = mNameSpace.lookupEvent(name, mThrowing);
+        final List<SimpleExpressionProxy> indexes = ident.getIndexes();
+        CompiledEvent event = mNameSpace.lookupEvent(name, mThrowing);
         //System.err.println("event=" + event);
         if (event != null) {
           for (final SimpleExpressionProxy index : indexes) {
@@ -323,36 +319,38 @@ class CompiledNameSpace
             //System.err.println("event=" + event);
           }
         }
-	return event;
+        return event;
       } catch (final EvalException exception) {
-	throw wrap(exception);
+        throw wrap(exception);
       }
     }
 
+    @Override
     public CompiledEvent visitQualifiedIdentifierProxy
       (final QualifiedIdentifierProxy ident)
       throws VisitorException
     {
       try {
-	final IdentifierProxy base = ident.getBaseIdentifier();
-	mNameSpace =
-	  NAMESPACE_LOOKUP_VISITOR.getNameSpace(mNameSpace, base, mThrowing);
-	final IdentifierProxy comp = ident.getComponentIdentifier();
-	return (CompiledEvent) comp.acceptVisitor(this);
+        final IdentifierProxy base = ident.getBaseIdentifier();
+        mNameSpace =
+          NAMESPACE_LOOKUP_VISITOR.getNameSpace(mNameSpace, base, mThrowing);
+        final IdentifierProxy comp = ident.getComponentIdentifier();
+        return (CompiledEvent) comp.acceptVisitor(this);
       } catch (final EvalException exception) {
-	throw wrap(exception);
+        throw wrap(exception);
       }
     }
 
+    @Override
     public CompiledEvent visitSimpleIdentifierProxy
       (final SimpleIdentifierProxy ident)
       throws VisitorException
     {
       try {
-	final String name = ident.getName();
-	return mNameSpace.lookupEvent(name, mThrowing);
+        final String name = ident.getName();
+        return mNameSpace.lookupEvent(name, mThrowing);
       } catch (final UndefinedIdentifierException exception) {
-	throw wrap(exception);
+        throw wrap(exception);
       }
     }
 
@@ -376,32 +374,34 @@ class CompiledNameSpace
       throws EvalException
     {
       try {
-	mNameSpace = namespace;
-	mThrowing = throwing;
-	return (IdentifiedProxy) ident.acceptVisitor(this);
+        mNameSpace = namespace;
+        mThrowing = throwing;
+        return (IdentifiedProxy) ident.acceptVisitor(this);
       } catch (final VisitorException exception) {
-	final Throwable cause = exception.getCause();
-	if (throwing && cause instanceof EvalException) {
-	  throw (EvalException) cause;
-	} else {
-	  throw exception.getRuntimeException();
-	}
+        final Throwable cause = exception.getCause();
+        if (throwing && cause instanceof EvalException) {
+          throw (EvalException) cause;
+        } else {
+          throw exception.getRuntimeException();
+        }
       }
     }
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public IdentifiedProxy visitIndexedIdentifierProxy
       (final IndexedIdentifierProxy ident)
       throws VisitorException
     {
       try {
-	return mNameSpace.lookupComponent(ident, mThrowing);
+        return mNameSpace.lookupComponent(ident, mThrowing);
       } catch (final UndefinedIdentifierException exception) {
-	throw wrap(exception);
+        throw wrap(exception);
       }
     }
 
+    @Override
     public IdentifiedProxy visitQualifiedIdentifierProxy
       (final QualifiedIdentifierProxy ident)
       throws VisitorException
@@ -421,14 +421,15 @@ class CompiledNameSpace
       }
     }
 
+    @Override
     public IdentifiedProxy visitSimpleIdentifierProxy
       (final SimpleIdentifierProxy ident)
       throws VisitorException
     {
       try {
-	return mNameSpace.lookupComponent(ident, mThrowing);
+        return mNameSpace.lookupComponent(ident, mThrowing);
       } catch (final UndefinedIdentifierException exception) {
-	throw wrap(exception);
+        throw wrap(exception);
       }
     }
 
@@ -447,37 +448,39 @@ class CompiledNameSpace
     //#######################################################################
     //# Invocation
     private CompiledNameSpace getNameSpace(final CompiledNameSpace namespace,
-					   final IdentifierProxy ident,
-					   final boolean throwing)
+                                           final IdentifierProxy ident,
+                                           final boolean throwing)
       throws EvalException
     {
       try {
-	mNameSpace = namespace;
-	mThrowing = throwing;
-	return (CompiledNameSpace) ident.acceptVisitor(this);
+        mNameSpace = namespace;
+        mThrowing = throwing;
+        return (CompiledNameSpace) ident.acceptVisitor(this);
       } catch (final VisitorException exception) {
-	final Throwable cause = exception.getCause();
-	if (throwing && cause instanceof EvalException) {
-	  throw (EvalException) cause;
-	} else {
-	  throw exception.getRuntimeException();
-	}
+        final Throwable cause = exception.getCause();
+        if (throwing && cause instanceof EvalException) {
+          throw (EvalException) cause;
+        } else {
+          throw exception.getRuntimeException();
+        }
       }
     }
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public CompiledNameSpace visitIndexedIdentifierProxy
       (final IndexedIdentifierProxy ident)
       throws VisitorException
     {
       try {
-	return mNameSpace.lookupNameSpace(ident, mThrowing);
+        return mNameSpace.lookupNameSpace(ident, mThrowing);
       } catch (final UndefinedIdentifierException exception) {
-	throw wrap(exception);
+        throw wrap(exception);
       }
     }
 
+    @Override
     public CompiledNameSpace visitQualifiedIdentifierProxy
       (final QualifiedIdentifierProxy ident)
       throws VisitorException
@@ -488,14 +491,15 @@ class CompiledNameSpace
       return (CompiledNameSpace) comp.acceptVisitor(this);
     }
 
+    @Override
     public CompiledNameSpace visitSimpleIdentifierProxy
       (final SimpleIdentifierProxy ident)
       throws VisitorException
     {
       try {
-	return mNameSpace.lookupNameSpace(ident, mThrowing);
+        return mNameSpace.lookupNameSpace(ident, mThrowing);
       } catch (final UndefinedIdentifierException exception) {
-	throw wrap(exception);
+        throw wrap(exception);
       }
     }
 
@@ -518,60 +522,63 @@ class CompiledNameSpace
       throws EvalException
     {
       try {
-	mNameSpace = namespace;
-	mEvent = event;
-	ident.acceptVisitor(this);
+        mNameSpace = namespace;
+        mEvent = event;
+        ident.acceptVisitor(this);
       } catch (final VisitorException exception) {
-	final Throwable cause = exception.getCause();
-	if (cause instanceof EvalException) {
-	  throw (EvalException) cause;
-	} else {
-	  throw exception.getRuntimeException();
-	}
+        final Throwable cause = exception.getCause();
+        if (cause instanceof EvalException) {
+          throw (EvalException) cause;
+        } else {
+          throw exception.getRuntimeException();
+        }
       }
     }
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Object visitIndexedIdentifierProxy
       (final IndexedIdentifierProxy ident)
       throws VisitorException
     {
       try {
         final String name = ident.getName();
-	final List<SimpleExpressionProxy> indexes = ident.getIndexes();
+        final List<SimpleExpressionProxy> indexes = ident.getIndexes();
         final CompiledArrayAlias alias = mNameSpace.createArrayAlias(name);
         alias.set(indexes, mEvent);
         return null;
       } catch (final DuplicateIdentifierException exception) {
-	throw wrap(exception);
+        throw wrap(exception);
       }
     }
 
+    @Override
     public Object visitQualifiedIdentifierProxy
       (final QualifiedIdentifierProxy ident)
       throws VisitorException
     {
       try {
-	final IdentifierProxy base = ident.getBaseIdentifier();
-	mNameSpace =
-	  NAMESPACE_LOOKUP_VISITOR.getNameSpace(mNameSpace, base, true);
-	final IdentifierProxy comp = ident.getComponentIdentifier();
-	return comp.acceptVisitor(this);
+        final IdentifierProxy base = ident.getBaseIdentifier();
+        mNameSpace =
+          NAMESPACE_LOOKUP_VISITOR.getNameSpace(mNameSpace, base, true);
+        final IdentifierProxy comp = ident.getComponentIdentifier();
+        return comp.acceptVisitor(this);
       } catch (final EvalException exception) {
-	throw wrap(exception);
+        throw wrap(exception);
       }
     }
 
+    @Override
     public Object visitSimpleIdentifierProxy
       (final SimpleIdentifierProxy ident)
       throws VisitorException
     {
       try {
         final String name = ident.getName();
-	return mNameSpace.putEvent(name, mEvent);
+        return mNameSpace.putEvent(name, mEvent);
       } catch (final DuplicateIdentifierException exception) {
-	throw wrap(exception);
+        throw wrap(exception);
       }
     }
 
@@ -589,60 +596,63 @@ class CompiledNameSpace
     //#######################################################################
     //# Invocation
     private void addComponent(final CompiledNameSpace namespace,
-			      final IdentifierProxy ident,
-			      final IdentifiedProxy comp)
+                              final IdentifierProxy ident,
+                              final IdentifiedProxy comp)
       throws EvalException
     {
       try {
-	mNameSpace = namespace;
-	mComponent = comp;
-	ident.acceptVisitor(this);
+        mNameSpace = namespace;
+        mComponent = comp;
+        ident.acceptVisitor(this);
       } catch (final VisitorException exception) {
-	final Throwable cause = exception.getCause();
-	if (cause instanceof EvalException) {
-	  throw (EvalException) cause;
-	} else {
-	  throw exception.getRuntimeException();
-	}
+        final Throwable cause = exception.getCause();
+        if (cause instanceof EvalException) {
+          throw (EvalException) cause;
+        } else {
+          throw exception.getRuntimeException();
+        }
       }
     }
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Object visitIndexedIdentifierProxy
       (final IndexedIdentifierProxy ident)
       throws VisitorException
     {
       try {
-	return mNameSpace.putComponent(ident, mComponent);
+        return mNameSpace.putComponent(ident, mComponent);
       } catch (final DuplicateIdentifierException exception) {
-	throw wrap(exception);
+        throw wrap(exception);
       }
     }
 
+    @Override
     public Object visitQualifiedIdentifierProxy
       (final QualifiedIdentifierProxy ident)
       throws VisitorException
     {
       try {
-	final IdentifierProxy base = ident.getBaseIdentifier();
-	mNameSpace =
-	  NAMESPACE_LOOKUP_VISITOR.getNameSpace(mNameSpace, base, true);
-	final IdentifierProxy comp = ident.getComponentIdentifier();
-	return comp.acceptVisitor(this);
+        final IdentifierProxy base = ident.getBaseIdentifier();
+        mNameSpace =
+          NAMESPACE_LOOKUP_VISITOR.getNameSpace(mNameSpace, base, true);
+        final IdentifierProxy comp = ident.getComponentIdentifier();
+        return comp.acceptVisitor(this);
       } catch (final EvalException exception) {
-	throw wrap(exception);
+        throw wrap(exception);
       }
     }
 
+    @Override
     public Object visitSimpleIdentifierProxy
       (final SimpleIdentifierProxy ident)
       throws VisitorException
     {
       try {
-	return mNameSpace.putComponent(ident, mComponent);
+        return mNameSpace.putComponent(ident, mComponent);
       } catch (final DuplicateIdentifierException exception) {
-	throw wrap(exception);
+        throw wrap(exception);
       }
     }
 
@@ -660,60 +670,63 @@ class CompiledNameSpace
     //#######################################################################
     //# Invocation
     private void addNameSpace(final CompiledNameSpace namespace,
-			      final IdentifierProxy ident,
-			      final CompiledNameSpace subspace)
+                              final IdentifierProxy ident,
+                              final CompiledNameSpace subspace)
       throws EvalException
     {
       try {
-	mNameSpace = namespace;
-	mSubSpace = subspace;
-	ident.acceptVisitor(this);
+        mNameSpace = namespace;
+        mSubSpace = subspace;
+        ident.acceptVisitor(this);
       } catch (final VisitorException exception) {
-	final Throwable cause = exception.getCause();
-	if (cause instanceof EvalException) {
-	  throw (EvalException) cause;
-	} else {
-	  throw exception.getRuntimeException();
-	}
+        final Throwable cause = exception.getCause();
+        if (cause instanceof EvalException) {
+          throw (EvalException) cause;
+        } else {
+          throw exception.getRuntimeException();
+        }
       }
     }
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Object visitIndexedIdentifierProxy
       (final IndexedIdentifierProxy ident)
       throws VisitorException
     {
       try {
-	return mNameSpace.putNameSpace(ident, mSubSpace);
+        return mNameSpace.putNameSpace(ident, mSubSpace);
       } catch (final DuplicateIdentifierException exception) {
-	throw wrap(exception);
+        throw wrap(exception);
       }
     }
 
+    @Override
     public Object visitQualifiedIdentifierProxy
       (final QualifiedIdentifierProxy ident)
       throws VisitorException
     {
       try {
-	final IdentifierProxy base = ident.getBaseIdentifier();
-	mNameSpace =
-	  NAMESPACE_LOOKUP_VISITOR.getNameSpace(mNameSpace, base, true);
-	final IdentifierProxy comp = ident.getComponentIdentifier();
-	return comp.acceptVisitor(this);
+        final IdentifierProxy base = ident.getBaseIdentifier();
+        mNameSpace =
+          NAMESPACE_LOOKUP_VISITOR.getNameSpace(mNameSpace, base, true);
+        final IdentifierProxy comp = ident.getComponentIdentifier();
+        return comp.acceptVisitor(this);
       } catch (final EvalException exception) {
-	throw wrap(exception);
+        throw wrap(exception);
       }
     }
 
+    @Override
     public Object visitSimpleIdentifierProxy
       (final SimpleIdentifierProxy ident)
       throws VisitorException
     {
       try {
-	return mNameSpace.putNameSpace(ident, mSubSpace);
+        return mNameSpace.putNameSpace(ident, mSubSpace);
       } catch (final DuplicateIdentifierException exception) {
-	throw wrap(exception);
+        throw wrap(exception);
       }
     }
 

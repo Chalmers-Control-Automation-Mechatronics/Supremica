@@ -317,8 +317,7 @@ public class ConstantAliasEditorDialog
         final String oldname = mAlias.getName();
         final boolean namechange = !name.equals(oldname);
         final SimpleExpressionSubject oldexp = (SimpleExpressionSubject)mAlias.getExpression();
-        final ModuleEqualityVisitor eq =
-          ModuleEqualityVisitor.getInstance(true);
+        final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(true);
         final boolean expchange = !eq.equals(exp, oldexp);
         if (namechange || expchange) {
           final ConstantAliasSubject template = mAlias.clone();

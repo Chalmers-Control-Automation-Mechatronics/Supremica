@@ -1824,7 +1824,7 @@ public class GraphEditorPanel
       final ProxySubject anchor = getSelectionAnchor();
       clearSelection();
       rangeSelection.add(anchor, false);
-      final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       final ProxyShape anchorShape = getShapeProducer().getShape(anchor);
       final int anchorPoint = (int)anchorShape.getShape().getBounds().getY();
       final ProxyShape endShape = getShapeProducer().getShape(item);
@@ -3397,8 +3397,7 @@ public class GraphEditorPanel
           }
         }
       }
-      final ModuleEqualityVisitor eq =
-        ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       for (final ProxySubject item : mDraggedList) {
         if (eq.contains(mDropList, item)) {
           for (final Proxy proxy : selected) {
@@ -3891,8 +3890,7 @@ public class GraphEditorPanel
               final PointGeometrySubject newGeo =
                 (mIsSource ?
                  mCopiedEdge.getStartPoint() : mCopiedEdge.getEndPoint());
-              final ModuleEqualityVisitor eq =
-                ModuleEqualityVisitor.getInstance(true);
+              final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(true);
               if (eq.equals(oldGeo, newGeo)) {
                 return;
               }
@@ -4118,7 +4116,7 @@ public class GraphEditorPanel
     }
 
     @SuppressWarnings("unused")
-	private void move(final ProxySubject item, final int dx, final int dy)
+    private void move(final ProxySubject item, final int dx, final int dy)
     {
       try {
         assert(getSecondaryGraph() != null);
@@ -4372,7 +4370,7 @@ public class GraphEditorPanel
         final int x = left ? -1 : right ? 1 : 0;
         final int y = up ? -1 : down ? 1 : 0;
         mMoveVisitor = new MoveVisitor();
-        final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(true);
+        final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(true);
         final ModuleProxyCloner cloner = ModuleSubjectFactory.getCloningInstance();
         final GraphSubject g0 = (GraphSubject) cloner.getClone(getGraph());
         final UndoInterface undoInterface = mRoot.getUndoInterface();
@@ -4673,7 +4671,7 @@ public class GraphEditorPanel
     implements FocusListener
   {
 
-	//#######################################################################
+    //#######################################################################
     //# Constructor
     private StateNameInputCell(final SimpleNodeSubject node,
                                final SimpleIdentifierSubject ident)
@@ -4792,7 +4790,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Class Constants
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
   }
 
 
@@ -4994,8 +4992,7 @@ public class GraphEditorPanel
       final EventListExpressionSubject elist =
         getIdentifierPasteTarget(focussed, data);
       if (elist != null) {
-        final ModuleEqualityVisitor eq =
-          ModuleEqualityVisitor.getInstance(false);
+        final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
         final ListSubject<AbstractSubject> list =
           elist.getEventIdentifierListModifiable();
         int pos = startpos < 0 ? list.size() : startpos;
@@ -5024,8 +5021,7 @@ public class GraphEditorPanel
       final List<? extends Proxy> data = getTransferData(transferable);
       final EventListExpressionSubject elist =
         getIdentifierPasteTarget(focussed, data);
-      final ModuleEqualityVisitor eq =
-        ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       if (elist != null) {
         final ListSubject<AbstractSubject> list =
           elist.getEventIdentifierListModifiable();
@@ -5079,8 +5075,7 @@ public class GraphEditorPanel
       if(data.size() == 1){
         return true;
       }
-      final ModuleEqualityVisitor eq =
-        ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       int in = -1;
       final boolean cont = true;
       boolean fromElseWhere = false;
@@ -5186,7 +5181,7 @@ public class GraphEditorPanel
     //#######################################################################
     //# Auxiliary Methods
     @SuppressWarnings("unchecked")
-	private List<? extends Proxy> getTransferData
+    private List<? extends Proxy> getTransferData
       (final Transferable transferable)
       throws IOException, UnsupportedFlavorException
     {
@@ -5194,12 +5189,11 @@ public class GraphEditorPanel
         (WatersDataFlavor.IDENTIFIER);
     }
 
-	private boolean isContainingAll(final EventListExpressionProxy elist)
+    private boolean isContainingAll(final EventListExpressionProxy elist)
     {
-      final ModuleEqualityVisitor eq =
-        ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       final List<? extends Proxy> list = elist.getEventIdentifierList();
-      final ProxyAccessorSet<Proxy> map = new ProxyAccessorHashSet<Proxy>(eq, list);
+      final ProxyAccessorSet<Proxy> map = new ProxyAccessorHashSet<>(eq, list);
       return map.containsAll(mTransferData);
     }
 

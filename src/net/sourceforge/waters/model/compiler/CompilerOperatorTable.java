@@ -597,8 +597,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       } else if (intRHS == 0) {
         return simpLHS;
       }
-      final ModuleEqualityVisitor eq =
-        ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       if (eq.equals(simpLHS, simpRHS)) {
         return simplifier.createIntConstantProxy(0);
       } else {
@@ -919,8 +918,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
        final AbstractSimpleExpressionSimplifier simplifier)
       throws EvalException
     {
-      final ModuleEqualityVisitor eq =
-        ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       final boolean eresult = getEqualsResult();
       final SimpleExpressionProxy origLHS = expr.getLeft();
       final SimpleExpressionProxy origRHS = expr.getRight();
@@ -1066,8 +1064,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
         final boolean result = eval(intLHS, intRHS);
         return simplifier.createBooleanConstantProxy(result);
       }
-      final ModuleEqualityVisitor eq =
-        ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       if (eq.equals(simpLHS, simpRHS)) {
         final boolean result = includesEquality();
         return simplifier.createBooleanConstantProxy(result);

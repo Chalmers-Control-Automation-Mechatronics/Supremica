@@ -144,11 +144,9 @@ public class EFAUnifier extends AbortableCompiler
       mInputModule.acceptVisitor(pass1);
       // Pass 2 ...
       mGuardCompiler = new EFAGuardCompiler(mFactory, mOperatorTable);
-      final ModuleEqualityVisitor eq =
-        ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       final int size = mInputModule.getEventDeclList().size();
-      mEventMap =
-        new ProxyAccessorHashMap<IdentifierProxy,EFAEventInfo>(eq,size);
+      mEventMap = new ProxyAccessorHashMap<>(eq,size);
       final Pass2Visitor pass2 = new Pass2Visitor();
       mInputModule.acceptVisitor(pass2);
       // Pass 3 ...

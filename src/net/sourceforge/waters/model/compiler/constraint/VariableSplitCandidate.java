@@ -62,8 +62,8 @@ class VariableSplitCandidate
   void addIteSplit(final SimpleExpressionProxy cond)
   {
     if (mIteSplits == null) {
-      final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
-      mIteSplits = new ProxyAccessorHashMap<SimpleExpressionProxy,Integer>(eq);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
+      mIteSplits = new ProxyAccessorHashMap<>(eq);
     }
     final ProxyAccessor<SimpleExpressionProxy> accessor =
       mIteSplits.createAccessor(cond);

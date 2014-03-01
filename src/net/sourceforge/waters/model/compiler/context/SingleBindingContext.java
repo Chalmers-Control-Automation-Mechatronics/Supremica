@@ -57,11 +57,11 @@ public class SingleBindingContext implements BindingContext
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.compiler.BindingContext
+  @Override
   public SimpleExpressionProxy getBoundExpression
     (final SimpleExpressionProxy ident)
   {
-    final ModuleEqualityVisitor eq =
-      ModuleEqualityVisitor.getInstance(false);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     if (eq.equals(mBoundVariableName, ident)) {
       return mBoundValue;
     } else {
@@ -69,17 +69,18 @@ public class SingleBindingContext implements BindingContext
     }
   }
 
+  @Override
   public boolean isEnumAtom(final IdentifierProxy ident)
   {
     if (ident instanceof SimpleIdentifierProxy &&
-        ModuleEqualityVisitor.getInstance(false).
-          equals(mBoundVariableName, ident)) {
+        new ModuleEqualityVisitor(false).equals(mBoundVariableName, ident)) {
       return false;
     } else {
       return mParent.isEnumAtom(ident);
     }
   }
 
+  @Override
   public ModuleBindingContext getModuleBindingContext()
   {
     return mParent.getModuleBindingContext();

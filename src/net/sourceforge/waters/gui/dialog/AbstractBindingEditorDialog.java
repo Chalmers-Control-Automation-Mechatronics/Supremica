@@ -138,6 +138,7 @@ public abstract class AbstractBindingEditorDialog extends JDialog
     }
     final ExpressionParser parser = mRoot.getExpressionParser();
     final ActionListener commithandler = new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent event)
       {
         commitDialog();
@@ -169,6 +170,7 @@ public abstract class AbstractBindingEditorDialog extends JDialog
     mIsSimpleExpCheckBox.setRequestFocusEnabled(false);
     mIsSimpleExpCheckBox.setSelected(exp instanceof SimpleExpressionProxy);
     mIsSimpleExpCheckBox.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent event)
       {
         updateExpressionEnabled();
@@ -191,6 +193,7 @@ public abstract class AbstractBindingEditorDialog extends JDialog
     final JButton cancelButton = new JButton("Cancel");
     cancelButton.setRequestFocusEnabled(false);
     cancelButton.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent event)
       {
         dispose();
@@ -313,8 +316,7 @@ public abstract class AbstractBindingEditorDialog extends JDialog
         setProxySubject(template);
         mRoot.getUndoInterface().executeCommand(command);
       } else {
-        final ModuleEqualityVisitor eq =
-          ModuleEqualityVisitor.getInstance(true);
+        final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(true);
         final IdentifierSubject oldIdent = getProxyIdentifier();
         final boolean namechange = !eq.equals(ident, oldIdent);
         final ExpressionSubject oldExp = getExpression();

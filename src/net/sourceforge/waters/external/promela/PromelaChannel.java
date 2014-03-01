@@ -89,13 +89,13 @@ public class PromelaChannel
     mSentItems = new ProxyAccessorHashSet[types.size()];
     for(int i = 0; i < types.size(); i++)
     {
-      mSentItems[i] = new ProxyAccessorHashSet<SimpleExpressionProxy>(ModuleEqualityVisitor.getInstance(false));
+      mSentItems[i] = new ProxyAccessorHashSet<>(new ModuleEqualityVisitor(false));
     }
 
     mReceivedItems = new ProxyAccessorHashSet[types.size()];
     for(int i = 0; i < types.size(); i++)
     {
-      mReceivedItems[i] = new ProxyAccessorHashSet<SimpleExpressionProxy>(ModuleEqualityVisitor.getInstance(false));
+      mReceivedItems[i] = new ProxyAccessorHashSet<>(new ModuleEqualityVisitor(false));
     }
 
     mProcessVariablesUsed = new HashMap<String,List<String>>();

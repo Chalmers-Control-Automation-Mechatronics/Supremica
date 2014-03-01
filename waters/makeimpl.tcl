@@ -2210,21 +2210,17 @@ proc Java_GenerateEqualityVisitor {subpack prefix destname classnames
     Java_WriteLn $stream $umap "\{"
 
   ############################################################################
-  # Write Singleton Pattern
-    Java_GenerateSeparatorComment $stream $umap "Singleton Pattern"
+  # Write Constructor
+    Java_GenerateSeparatorComment $stream $umap "Constructor"
     Java_WriteLn $stream $umap "  /**"
     Java_WriteLn $stream $umap \
-        "   * Returns an instance of an equality checker that does not provide"
-    Java_WriteLn $stream $umap \
-        "   * diagnostic information. This method uses the singleton pattern"
-    Java_WriteLn $stream $umap \
-        "   * to provide more efficient access to a pre-built visitor object."
+        "   * Creates a new equality checker without diagnostic information."
     Java_WriteLn $stream $umap \
         "   * @param  geo  A flag, indicating whether the equality checker"
     Java_WriteLn $stream $umap \
         "   *              should consider geometry information."
     Java_WriteLn $stream $umap \
-        "   *              If <CODE>true</CODE> objects will be considered"
+        "   *              If <CODE>true</CODE>, objects will be considered"
     Java_WriteLn $stream $umap \
         "   *              equal if their contents and geometry are equal,"
     Java_WriteLn $stream $umap \
@@ -2233,37 +2229,12 @@ proc Java_GenerateEqualityVisitor {subpack prefix destname classnames
         "   *              when checking for equality."
     Java_WriteLn $stream $umap "   */"
     Java_WriteLn $stream $umap \
-        "  public static $visitorname getInstance(final boolean geo)"
+        "  public ${visitorname}(final boolean geo)"
     Java_WriteLn $stream $umap "  \{"
-    Java_WriteLn $stream $umap "    if (geo) \{"
-    Java_WriteLn $stream $umap \
-        "      return SingletonHolderWithGeometry.INSTANCE;";
-    Java_WriteLn $stream $umap "    \} else \{"
-    Java_WriteLn $stream $umap \
-        "      return SingletonHolderWithoutGeometry.INSTANCE;"
-    Java_WriteLn $stream $umap "    \}"
+    Java_WriteLn $stream $umap "    this(false, geo);"
     Java_WriteLn $stream $umap "  \}"
     Java_WriteLn $stream $umap ""
-    for {set geo 0} {$geo <= 1} {incr geo} {
-      if {$geo} {
-        set gbool "true"
-        set gname "With"
-      } else {
-        set gbool "false"
-        set gname "Without"
-      }
-      Java_WriteLn $stream $umap \
-          "  private static class SingletonHolder${gname}Geometry \{"
-      Java_WriteLn $stream $umap \
-          "    private static final $visitorname INSTANCE ="
-      Java_WriteLn $stream $umap "      new ${visitorname}(false, ${gbool});"
-      Java_WriteLn $stream $umap "  \}"
-      Java_WriteLn $stream $umap ""
-    }
 
-  ############################################################################
-  # Write Constructor
-    Java_GenerateSeparatorComment $stream $umap "Constructor"
     Java_WriteLn $stream $umap "  /**"
     Java_WriteLn $stream $umap \
         "   * Creates a new equality checker."
@@ -2293,7 +2264,7 @@ proc Java_GenerateEqualityVisitor {subpack prefix destname classnames
         "   *              otherwise any geometry information will be ignored"
     Java_WriteLn $stream $umap \
         "   *              when checking for equality."
-    Java_WriteLn $stream $umap "*/"
+    Java_WriteLn $stream $umap "   */"
     Java_WriteLn $stream $umap \
         "  public ${visitorname}(final boolean diag, final boolean geo)"
     Java_WriteLn $stream $umap "  \{"
@@ -2301,7 +2272,7 @@ proc Java_GenerateEqualityVisitor {subpack prefix destname classnames
     Java_WriteLn $stream $umap \
         "    mHashCodeVisitor = ${prefix}HashCodeVisitor.getInstance(geo);"
     Java_WriteLn $stream $umap \
-        "    $nonreporter = diag ? getInstance(geo) : this;"
+        "    $nonreporter = diag ? new ModuleEqualityVisitor(geo) : this;"
     Java_WriteLn $stream $umap "  \}"
     Java_WriteLn $stream $umap ""
 

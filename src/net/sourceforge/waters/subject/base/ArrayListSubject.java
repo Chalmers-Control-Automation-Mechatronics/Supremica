@@ -161,7 +161,7 @@ public class ArrayListSubject<P extends ProxySubject>
     if (boundary != null && boundary.contains(this)) {
       return null;
     }
-    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(true);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(true);
     if (eq.isEqualList(this, newList)) {
       return null;
     }

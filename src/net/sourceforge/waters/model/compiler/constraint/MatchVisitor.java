@@ -185,8 +185,7 @@ class MatchVisitor extends DefaultModuleProxyVisitor
   public Boolean visitSimpleExpressionProxy
     (final SimpleExpressionProxy template)
   {
-    final ModuleEqualityVisitor eq =
-      ModuleEqualityVisitor.getInstance(false);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     return eq.equals(template, mCurrentExpression);
   }
 

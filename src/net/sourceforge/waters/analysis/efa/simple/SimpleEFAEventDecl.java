@@ -220,8 +220,7 @@ public class SimpleEFAEventDecl
   public boolean equals(final Object other)
   {
     if (other != null && other.getClass() == getClass()) {
-      final ModuleEqualityVisitor eq =
-       ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       final SimpleEFAEventDecl expected = (SimpleEFAEventDecl) other;
       return eq
        .isEqualList(Collections.singletonList(expected.getEventDecl()),

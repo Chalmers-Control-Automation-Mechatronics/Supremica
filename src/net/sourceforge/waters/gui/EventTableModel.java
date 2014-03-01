@@ -162,8 +162,7 @@ public class EventTableModel
       case 1:
         final ModuleProxyCloner cloner =
           ModuleSubjectFactory.getCloningInstance();
-        final ModuleEqualityVisitor eq =
-          ModuleEqualityVisitor.getInstance(true);
+        final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(true);
         final Proxy proxy = (Proxy) value;
         final IdentifierSubject neo =
           (IdentifierSubject) cloner.getClone(proxy);
@@ -214,8 +213,7 @@ public class EventTableModel
     if (index < 0) {
       return false;
     } else {
-      final ModuleEqualityVisitor eq =
-        ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       final IdentifierSubject found = getIdentifier(index);
       return eq.equals(found, ident);
     }
@@ -314,9 +312,9 @@ public class EventTableModel
   //# Auxiliary Methods
   private List<EventEntry> collectEvents()
   {
-    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     final ProxyAccessorSet<IdentifierSubject> collected =
-      new ProxyAccessorHashSet<IdentifierSubject>(eq);
+      new ProxyAccessorHashSet<>(eq);
     final EventListExpressionProxy blocked = mGraph.getBlockedEvents();
     collectEvents(collected, blocked);
     final Collection<NodeProxy> nodes = mGraph.getNodes();
@@ -621,8 +619,7 @@ public class EventTableModel
     public boolean equals(final Object partner)
     {
       if (partner != null && partner.getClass() == getClass()) {
-        final ModuleEqualityVisitor eq =
-          ModuleEqualityVisitor.getInstance(false);
+        final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
         final EventEntry entry = (EventEntry) partner;
         return eq.equals(mName, entry.mName);
       } else {
@@ -905,8 +902,7 @@ public class EventTableModel
     @Override
     public Boolean visitIdentifierProxy(final IdentifierProxy ident)
     {
-      final ModuleEqualityVisitor eq =
-        ModuleEqualityVisitor.getInstance(false);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       return eq.equals(mIdentifier, ident);
     }
 

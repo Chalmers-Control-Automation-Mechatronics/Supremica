@@ -84,7 +84,7 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
     mSimpleExpressionCompiler =
       new SimpleExpressionCompiler(mFactory, mCompilationInfo,
                                    mOperatorTable);
-    final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     final int numEvents = mInputModule.getEventDeclList().size();
     mIdentifierMap = new ProxyAccessorHashMap<>(eq,numEvents);
     final String moduleName = mInputModule.getName();
@@ -177,8 +177,7 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
   private boolean containsMarkingProposition
     (final EventListExpressionProxy list)
   {
-    final ModuleEqualityVisitor eq =
-      ModuleEqualityVisitor.getInstance(false);
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     return eq.contains(list.getEventIdentifierList(), mDefaultMarking);
   }
 
@@ -242,7 +241,7 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
       if (event != null) {
         mCollectedEvents.createEventId(event);
       } else {
-        final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
+        final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
         if (eq.equals(ident, mDefaultMarking)) {
           mFoundDefaultMarking = true;
         }
