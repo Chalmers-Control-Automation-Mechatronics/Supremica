@@ -48,12 +48,25 @@ public class HTMLPrinter
     }
   }
 
+  public static String encodeInHTML(final String text)
+  {
+    try {
+      final StringWriter writer = new StringWriter();
+      final HTMLPrinter printer = new HTMLPrinter(writer);
+      printer.pprint(text);
+      return writer.toString();
+    } catch (final IOException exception) {
+      throw new WatersRuntimeException(exception);
+    }
+  }
+
 
   //#########################################################################
   //# Constructors
   public HTMLPrinter(final Writer writer)
   {
-    super(writer);
+    super(new HTMLWriter(writer));
+    mRaw = writer;
   }
 
 
@@ -70,48 +83,6 @@ public class HTMLPrinter
     } catch (final VisitorException exception) {
       unwrap(exception);
     }
-  }
-
-
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.model.printer.ProxyPrinter
-  @Override
-  public void print(final String msg)
-    throws VisitorException
-  {
-    for (int i = 0; i < msg.length(); i++) {
-      print(msg.charAt(i));
-    }
-  }
-
-  @Override
-  public void print(final char msg)
-    throws VisitorException
-  {
-    if (msg == '&' || msg == '<' || msg == '>' || msg == '"' || msg == '\'') {
-      printHTML("&#");
-      print((int) msg);
-      printHTML(";");
-    } else if (msg == ' ') {
-      printHTML("&nbsp;");
-    } else {
-      super.print(msg);
-    }
-  }
-
-  @Override
-  public void println()
-    throws VisitorException
-  {
-    printHTML("<BR />");
-    super.println();
-  }
-
-  @Override
-  protected void indentOneCharacter()
-    throws VisitorException
-  {
-    rawPrint("&nbsp;");
   }
 
 
@@ -209,11 +180,73 @@ public class HTMLPrinter
 
 
   //#########################################################################
-  // Unescaped Printing
+  //# Unescaped Printing
   public void printHTML(final String msg)
     throws VisitorException
   {
-    super.print(msg);
+    try {
+      mRaw.write(msg);
+    } catch (final IOException e) {
+      throw wrap(e);
+    }
   }
+
+
+  //#########################################################################
+  //# Inner Class HTMLWriter
+  public static class HTMLWriter extends Writer
+  {
+
+    public HTMLWriter(final Writer out)
+    {
+      super(out);
+      mOut = out;
+    }
+
+    //#######################################################################
+    //# Overrides for base class java.io.Writer
+    @Override
+    public void write(final char[] cbuf, final int off, final int len)
+      throws IOException
+    {
+      synchronized (lock) {
+        for (int i = off; i < len; i++) {
+          switch (cbuf[i]) {
+          case '<':  mOut.write("&lt;");     break;
+          case '>':  mOut.write("&gt;");     break;
+          case '&':  mOut.write("&amp;");    break;
+          case '"':  mOut.write("&quot;");   break;
+          case '\'': mOut.write("&#39;");    break;
+          case '\n': mOut.write("<BR />\n"); break;
+          default:   mOut.write(cbuf[i]);    break;
+          }
+        }
+      }
+    }
+
+    @Override
+    public void flush()
+      throws IOException
+    {
+      mOut.flush();
+    }
+
+    @Override
+    public void close()
+      throws IOException
+    {
+      mOut.close();
+    }
+
+    //########################################################################
+    //# Data Members
+    private final Writer mOut;
+
+  }
+
+
+  //########################################################################
+  //# Data Members
+  private final Writer mRaw;
 
 }

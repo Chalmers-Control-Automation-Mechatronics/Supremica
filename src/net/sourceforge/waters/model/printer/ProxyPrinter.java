@@ -10,7 +10,6 @@
 package net.sourceforge.waters.model.printer;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Collection;
@@ -218,16 +217,24 @@ public class ProxyPrinter
     throws VisitorException
   {
     if (msg.length() > 0) {
-      indent();
-      rawPrint(msg);
+      try {
+        indent();
+        mWriter.write(msg);
+      } catch (final IOException exception) {
+        throw wrap(exception);
+      }
     }
   }
 
   public void print(final char msg)
     throws VisitorException
   {
-    indent();
-    rawPrint(msg);
+    try {
+      indent();
+      mWriter.write(msg);
+    } catch (final IOException exception) {
+      throw wrap(exception);
+    }
   }
 
   public void print(final double msg)
@@ -245,13 +252,12 @@ public class ProxyPrinter
   public void println()
     throws VisitorException
   {
-    if (mWriter instanceof PrintWriter) {
-      final PrintWriter pwriter = (PrintWriter) mWriter;
-      pwriter.println();
-    } else {
-      rawPrint('\n');
+    try {
+      mWriter.write('\n');
+      mAtLineStart = true;
+    } catch (final IOException exception) {
+      throw wrap(exception);
     }
-    mAtLineStart = true;
   }
 
   public void println(final String msg)
@@ -319,39 +325,14 @@ public class ProxyPrinter
     throws VisitorException
   {
     if (mAtLineStart) {
-      for (int i = mIndent * mIndentWidth; i > 0; i--) {
-        indentOneCharacter();
+      try {
+        for (int i = mIndent * mIndentWidth; i > 0; i--) {
+          mWriter.write(' ');
+        }
+        mAtLineStart = false;
+      } catch (final IOException exception) {
+        throw wrap(exception);
       }
-      mAtLineStart = false;
-    }
-  }
-
-  protected void indentOneCharacter()
-    throws VisitorException
-  {
-    rawPrint(' ');
-  }
-
-
-  //#########################################################################
-  //# Raw Printing
-  protected void rawPrint(final String msg)
-    throws VisitorException
-  {
-    try {
-      mWriter.write(msg);
-    } catch (final IOException exception) {
-      throw wrap(exception);
-    }
-  }
-
-  protected void rawPrint(final char msg)
-    throws VisitorException
-  {
-    try {
-      mWriter.write(msg);
-    } catch (final IOException exception) {
-      throw wrap(exception);
     }
   }
 
