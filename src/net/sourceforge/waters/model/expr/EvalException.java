@@ -106,6 +106,18 @@ public class EvalException extends WatersException
     }
   }
 
+  /**
+   * Returns all the exceptions associated with this instance. The default
+   * implementation returns a singleton array containing <CODE>this</CODE>,
+   * but a {@link MultiEvalException} may return several exceptions.
+   *
+   * @return The exceptions associated with this instance.
+   */
+  public EvalException[] getAll()
+  {
+    return new EvalException[] { this };
+  }
+
 
   //#########################################################################
   //# Data Members

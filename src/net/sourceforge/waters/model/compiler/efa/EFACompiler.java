@@ -32,12 +32,11 @@ import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintPropagator;
 import net.sourceforge.waters.model.compiler.constraint.SplitCandidate;
 import net.sourceforge.waters.model.compiler.constraint.SplitComputer;
+import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.context.CompiledEnumRange;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierException;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
-import net.sourceforge.waters.model.compiler.context.SourceInfo;
-import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
 import net.sourceforge.waters.model.compiler.context.SourceInfoCloner;
 import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
@@ -117,15 +116,14 @@ public class EFACompiler extends AbortableCompiler
   //#########################################################################
   //# Constructors
   public EFACompiler(final ModuleProxyFactory factory,
-                     final SourceInfoBuilder builder,
+                     final CompilationInfo compilationInfo,
                      final ModuleProxy module)
   {
     mFactory = factory;
-    mSourceInfoBuilder = builder;
+    mCompilationInfo = compilationInfo;
     mOperatorTable = CompilerOperatorTable.getInstance();
     mSimpleExpressionCompiler =
-      new SimpleExpressionCompiler(mFactory, mSourceInfoBuilder,
-                                   mOperatorTable);
+      new SimpleExpressionCompiler(mFactory, mCompilationInfo, mOperatorTable);
     mInputModule = module;
   }
 
@@ -185,15 +183,10 @@ public class EFACompiler extends AbortableCompiler
       // Pass 4 ...
       final Pass4Visitor pass4 = new Pass4Visitor();
       return pass4.visitModuleProxy(mInputModule);
-    } catch (final EvalException exception) {
-      adjustLocation(exception);
-      throw exception;
     } catch (final VisitorException exception) {
       final Throwable cause = exception.getCause();
       if (cause instanceof EvalException) {
-        final EvalException evalException = (EvalException) cause;
-        adjustLocation(evalException);
-        throw evalException;
+        throw (EvalException) cause;
       } else {
         throw exception.getRuntimeException();
       }
@@ -221,7 +214,7 @@ public class EFACompiler extends AbortableCompiler
     throws EvalException
   {
     final ConstraintPropagator propagator =
-      new ConstraintPropagator(mFactory, mSourceInfoBuilder, mOperatorTable,
+      new ConstraintPropagator(mFactory, mCompilationInfo, mOperatorTable,
                                mRootContext);
     final EFAEventNameBuilder namer =
       new EFAEventNameBuilder(mFactory, mOperatorTable, mRootContext);
@@ -401,26 +394,6 @@ public class EFACompiler extends AbortableCompiler
     }
   }
 
-  private void addSourceInfo(final Proxy target, final Proxy source)
-  {
-    if (mSourceInfoBuilder != null) {
-      mSourceInfoBuilder.add(target, source);
-    }
-  }
-
-  private void adjustLocation(final EvalException e)
-  {
-    if (mSourceInfoBuilder != null) {
-      final Proxy location = e.getLocation();
-      final SourceInfo info = mSourceInfoBuilder.getSourceInfo(location);
-      if (info != null) {
-        e.replaceLocation(info.getSourceObject());
-      } else {
-        e.replaceLocation(null);
-      }
-    }
-  }
-
 
   //#########################################################################
   //# Inner Class Pass1Visitor
@@ -491,7 +464,7 @@ public class EFACompiler extends AbortableCompiler
         final String name = node.getName();
         final SimpleIdentifierProxy ident =
           mFactory.createSimpleIdentifierProxy(name);
-        addSourceInfo(ident, node);
+        mCompilationInfo.add(ident, node);
         mRootContext.insertEnumAtom(ident);
         mCurrentRange.add(ident);
         return ident;
@@ -727,8 +700,8 @@ public class EFACompiler extends AbortableCompiler
       final Collection<EFAAutomatonTransition> result =
         new LinkedList<EFAAutomatonTransition>();
       final ConstraintPropagator propagator =
-        new ConstraintPropagator(mFactory, mSourceInfoBuilder,
-                                 mOperatorTable, mRootContext);
+        new ConstraintPropagator(mFactory, mCompilationInfo, mOperatorTable,
+                                 mRootContext);
       final SimpleComponentProxy comp =
         catchAll ? group.getSimpleComponent() : null;
       makeDisjoint(iter, selected, result, propagator, comp);
@@ -800,7 +773,7 @@ public class EFACompiler extends AbortableCompiler
     //# Constructor
     private Pass4Visitor()
     {
-      mCloner = new SourceInfoCloner(mFactory, mSourceInfoBuilder);
+      mCloner = new SourceInfoCloner(mFactory, mCompilationInfo);
     }
 
     //#######################################################################
@@ -821,7 +794,7 @@ public class EFACompiler extends AbortableCompiler
           final EventDeclProxy subdecl = mFactory.createEventDeclProxy
             (subident, kind, observable, ScopeKind.LOCAL, null, null, attribs);
           mEventDeclarations.add(subdecl);
-          addSourceInfo(subdecl, decl);
+          mCompilationInfo.add(subdecl, decl);
         }
         return null;
       } catch (final UndefinedIdentifierException exception) {
@@ -917,7 +890,7 @@ public class EFACompiler extends AbortableCompiler
         mFactory.createGroupNodeProxy(name, props1, attribs1, children1, null);
       mNodeList.add(result);
       mNodeMap.put(group, result);
-      addSourceInfo(result, group);
+      mCompilationInfo.add(result, group);
       return result;
     }
 
@@ -938,13 +911,13 @@ public class EFACompiler extends AbortableCompiler
           if (mEFAAlphabet.add(event)) {
             final IdentifierProxy subident = event.createIdentifier(mFactory);
             mLabelList.add(subident);
-            addSourceInfo(subident, ident);
+            mCompilationInfo.add(subident, ident);
           }
         } else {
           mEFAAlphabet.add(event);
           final IdentifierProxy subident = event.createIdentifier(mFactory);
           mLabelList.add(subident);
-          addSourceInfo(subident, ident);
+          mCompilationInfo.add(subident, ident);
         }
       }
       return null;
@@ -1003,7 +976,7 @@ public class EFACompiler extends AbortableCompiler
         final Map<String,String> attribs = comp.getAttributes();
         final SimpleComponentProxy result =
           mFactory.createSimpleComponentProxy(ident1, kind, graph1, attribs);
-        addSourceInfo(result, comp);
+        mCompilationInfo.add(result, comp);
         mComponents.add(result);
         return result;
       } finally {
@@ -1027,7 +1000,7 @@ public class EFACompiler extends AbortableCompiler
         (name, props1, attribs1, initial, null, null, null);
       mNodeList.add(result);
       mNodeMap.put(node, result);
-      addSourceInfo(result, node);
+      mCompilationInfo.add(result, node);
       return result;
     }
 
@@ -1042,7 +1015,7 @@ public class EFACompiler extends AbortableCompiler
         final EFAVariable var = mRootContext.getVariable(ident);
         final SimpleComponentProxy result =
           mVariableAutomatonBuilder.constructSimpleComponent(var);
-        addSourceInfo(result, comp);
+        mCompilationInfo.add(result, comp);
         mComponents.add(result);
         return result;
       } catch (final EvalException exception) {
@@ -1071,7 +1044,7 @@ public class EFACompiler extends AbortableCompiler
   //#########################################################################
   //# Data Members
   private final ModuleProxyFactory mFactory;
-  private final SourceInfoBuilder mSourceInfoBuilder;
+  private final CompilationInfo mCompilationInfo;
   private final CompilerOperatorTable mOperatorTable;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private final ModuleProxy mInputModule;

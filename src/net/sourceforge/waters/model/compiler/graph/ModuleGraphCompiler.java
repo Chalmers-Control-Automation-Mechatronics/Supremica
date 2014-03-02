@@ -30,8 +30,8 @@ import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.EvalAbortException;
+import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierException;
-import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
 import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -66,11 +66,11 @@ public class ModuleGraphCompiler
   //##########################################################################
   //# Constructors
   public ModuleGraphCompiler(final ProductDESProxyFactory factory,
-                             final SourceInfoBuilder builder,
+                             final CompilationInfo compilationInfo,
                              final ModuleProxy module)
   {
     mFactory = factory;
-    mSourceInfoBuilder = builder;
+    mCompilationInfo = compilationInfo;
     mInputModule = module;
   }
 
@@ -181,7 +181,7 @@ public class ModuleGraphCompiler
     final EventProxy event =
       mFactory.createEventProxy(name, kind, observable, attribs);
     addGlobalEvent(ident, event);
-    addSourceInfo(event, decl);
+    mCompilationInfo.add(event, decl);
     return event;
   }
 
@@ -369,7 +369,7 @@ public class ModuleGraphCompiler
         mFactory.createAutomatonProxy(name, kind, alphabet,
                                       states, transitions, attribs);
       addAutomaton(ident, aut);
-      addSourceInfo(aut, comp);
+      mCompilationInfo.add(aut, comp);
       return aut;
     } finally {
       mCurrentComponent = null;
@@ -496,13 +496,6 @@ public class ModuleGraphCompiler
           iter.remove();
         }
       }
-    }
-  }
-
-  private void addSourceInfo(final Proxy target, final Proxy source)
-  {
-    if (mSourceInfoBuilder != null) {
-      mSourceInfoBuilder.add(target, source);
     }
   }
 
@@ -711,7 +704,7 @@ public class ModuleGraphCompiler
           final boolean initial = node.isInitial();
           removeSelfloopedEvents(mPropositions);
           mState = mFactory.createStateProxy(name, initial, mPropositions);
-          addSourceInfo(mState, node);
+          mCompilationInfo.add(mState, node);
         }
       }
       return mState;
@@ -888,7 +881,7 @@ public class ModuleGraphCompiler
         final StateProxy targetstate = mTarget.getState();
         final TransitionProxy trans =
           mFactory.createTransitionProxy(sourcestate, mEvent, targetstate);
-        addSourceInfo(trans, mLocation);
+        mCompilationInfo.add(trans, mLocation);
         return trans;
       }
     }
@@ -948,7 +941,7 @@ public class ModuleGraphCompiler
   //#########################################################################
   //# Data Members
   private final ProductDESProxyFactory mFactory;
-  private final SourceInfoBuilder mSourceInfoBuilder;
+  private final CompilationInfo mCompilationInfo;
   private final ModuleProxy mInputModule;
 
   private boolean mIsOptimizationEnabled = true;

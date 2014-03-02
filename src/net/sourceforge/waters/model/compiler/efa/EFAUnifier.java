@@ -36,11 +36,11 @@ import net.sourceforge.waters.model.compiler.AbortableCompiler;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintPropagator;
+import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.context.CompiledEnumRange;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierException;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
-import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
 import net.sourceforge.waters.model.compiler.context.SourceInfoCloner;
 import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.expr.EvalException;
@@ -102,7 +102,7 @@ public class EFAUnifier extends AbortableCompiler
   //#########################################################################
   //# Constructors
   public EFAUnifier(final ModuleProxyFactory factory,
-                    final SourceInfoBuilder builder,
+                    final CompilationInfo compilationInfo,
                     final ModuleProxy module)
   {
     mFactory = factory;
@@ -110,10 +110,9 @@ public class EFAUnifier extends AbortableCompiler
     final ExpressionComparator comparator =
       new ExpressionComparator(mOperatorTable);
     mComparator = new EFAIdentifierComparator(comparator);
-    mSourceInfoBuilder = builder;
+    mCompilationInfo = compilationInfo;
     mSimpleExpressionCompiler =
-      new SimpleExpressionCompiler(mFactory, mSourceInfoBuilder,
-                                   mOperatorTable);
+      new SimpleExpressionCompiler(mFactory, mCompilationInfo, mOperatorTable);
     mInputModule = module;
   }
 
@@ -234,13 +233,6 @@ public class EFAUnifier extends AbortableCompiler
       throw new UndefinedIdentifierException(ident, "event");
     } else {
       return edecl;
-    }
-  }
-
-  private void addSourceInfo(final Proxy target, final Proxy source)
-  {
-    if (mSourceInfoBuilder != null) {
-      mSourceInfoBuilder.add(target, source);
     }
   }
 
@@ -538,7 +530,7 @@ public class EFAUnifier extends AbortableCompiler
     //# Constructor
     private Pass4Visitor()
     {
-      mCloner = new SourceInfoCloner(mFactory, mSourceInfoBuilder);
+      mCloner = new SourceInfoCloner(mFactory, mCompilationInfo);
     }
 
     //#######################################################################
@@ -560,7 +552,7 @@ public class EFAUnifier extends AbortableCompiler
           final EventDeclProxy subDecl = mFactory.createEventDeclProxy
             (subClone, kind, observable, ScopeKind.LOCAL, null, null, attribs);
           mEventDeclarations.add(subDecl);
-          addSourceInfo(subDecl, decl);
+          mCompilationInfo.add(subDecl, decl);
         }
         return null;
       } catch (final UndefinedIdentifierException exception) {
@@ -660,7 +652,7 @@ public class EFAUnifier extends AbortableCompiler
         mFactory.createGroupNodeProxy(name, props1, attribs1, children1, null);
       mNodeList.add(result);
       mNodeMap.put(group, result);
-      addSourceInfo(result, group);
+      mCompilationInfo.add(result, group);
       return result;
     }
 
@@ -693,7 +685,7 @@ public class EFAUnifier extends AbortableCompiler
             final IdentifierProxy subident = event.getIdentifier();
             mLabelList.add(subident);
             mCurrentIdentifiers.add(event);
-            addSourceInfo(subident, ident);
+            mCompilationInfo.add(subident, ident);
           }
         }
         return null;
@@ -759,7 +751,7 @@ public class EFAUnifier extends AbortableCompiler
         final Map<String,String> attribs = comp.getAttributes();
         final SimpleComponentProxy result =
           mFactory.createSimpleComponentProxy(ident1, kind, graph1, attribs);
-        addSourceInfo(result, comp);
+        mCompilationInfo.add(result, comp);
         mComponents.add(result);
         return result;
       } finally {
@@ -783,7 +775,7 @@ public class EFAUnifier extends AbortableCompiler
         (name, props1, attribs1, initial, null, null, null);
       mNodeList.add(result);
       mNodeMap.put(node, result);
-      addSourceInfo(result, node);
+      mCompilationInfo.add(result, node);
       return result;
     }
 
@@ -795,7 +787,7 @@ public class EFAUnifier extends AbortableCompiler
       checkAbortInVisitor();
       final VariableComponentProxy variable =
         (VariableComponentProxy) mCloner.getClone(comp);
-      addSourceInfo(variable, comp);
+      mCompilationInfo.add(variable, comp);
       mComponents.add(variable);
       return variable;
     }
@@ -945,7 +937,7 @@ public class EFAUnifier extends AbortableCompiler
       final EventKind ekind = mEventDecl.getKind();
       if (ekind != EventKind.PROPOSITION && !isBlocked()) {
         final ConstraintPropagator propagator =
-          new ConstraintPropagator(mFactory, mSourceInfoBuilder,
+          new ConstraintPropagator(mFactory, mCompilationInfo,
                                    mOperatorTable, mRootContext);
         for (final Entry<SimpleComponentProxy,EFAUpdateInfo> entry :
              mMap.entrySet()) {
@@ -973,7 +965,7 @@ public class EFAUnifier extends AbortableCompiler
       if (!isBlocked()) {
         Collections.sort(mList);
         final ConstraintPropagator propagator =
-          new ConstraintPropagator(mFactory, mSourceInfoBuilder,
+          new ConstraintPropagator(mFactory, mCompilationInfo,
                                    mOperatorTable, mRootContext);
         combineUpdates(propagator, 0);
       }
@@ -1347,7 +1339,7 @@ public class EFAUnifier extends AbortableCompiler
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;
   private final EFAIdentifierComparator mComparator;
-  private final SourceInfoBuilder mSourceInfoBuilder;
+  private final CompilationInfo mCompilationInfo;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
 
   private final ModuleProxy mInputModule;

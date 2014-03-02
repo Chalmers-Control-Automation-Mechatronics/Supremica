@@ -12,6 +12,7 @@ package net.sourceforge.waters.model.compiler;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,21 +20,23 @@ import java.util.List;
 import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersException;
 import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierException;
 import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.compiler.graph.NondeterministicModuleException;
 import net.sourceforge.waters.model.compiler.instance.EmptyLabelBlockException;
-import net.sourceforge.waters.model.compiler.instance.EventKindException;
 import net.sourceforge.waters.model.compiler.instance.InstantiationException;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.expr.MultiEvalException;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
+import net.sourceforge.waters.model.module.DescendingModuleProxyVisitor;
 import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
@@ -54,9 +57,9 @@ public abstract class AbstractCompilerTest
     throws EvalException
   {
     final String name = "empty";
-    final ModuleProxy module = mModuleFactory.createModuleProxy
+    mModule = mModuleFactory.createModuleProxy
       (name, null, null, null, null, null, null);
-    final ProductDESProxy des = compile(module);
+    final ProductDESProxy des = compile(mModule);
     assertTrue("Unexpected name!", des.getName().equals(name));
     assertTrue("Unexpected location!", des.getLocation() == null);
     assertTrue("Unexpected event!", des.getEvents().isEmpty());
@@ -73,17 +76,14 @@ public abstract class AbstractCompilerTest
         mModuleFactory.createSimpleIdentifierProxy(instname);
       final InstanceProxy instance = mModuleFactory.createInstanceProxy
         (ident, instname, null);
-      final ModuleProxy module = mModuleFactory.createModuleProxy
+      mModule = mModuleFactory.createModuleProxy
         (modname, null, null, null, null, null,
          Collections.singletonList(instance));
-      compile(module);
+      compile(mModule);
       fail("Expected InstantiationException not caught!");
-    } catch (final InstantiationException exception) {
-      final String culprit = "'" + instname + "'";
-      final String msg = exception.getMessage();
-      assertTrue("InstantiationException <" + msg +
-                 "> does not mention culprit " + culprit + "!",
-                 msg.indexOf(culprit) >= 0);
+    } catch (final WatersException exception) {
+      final String[] culprit = {"'" + instname + "'"};
+      checkExceptions(exception, InstantiationException.class, culprit);
     }
   }
 
@@ -515,37 +515,41 @@ public abstract class AbstractCompilerTest
   public void testCompile_error2_small()
     throws IOException, WatersException
   {
+    final String[] culprit1 = {"required parameter 'break'"};
+    final String[] culprit2 = {"required parameter 'repair'"};
     compileError("handwritten", "error2_small",null,
-                 UndefinedIdentifierException.class,
-                 "required parameter 'break'");
+                 InstantiationException.class,
+                 culprit1, culprit2);
   }
 
   public void testCompile_error3_small()
     throws IOException, WatersException
   {
     compileError("handwritten", "error3_small", null,
-                 UndefinedIdentifierException.class, "'finish_after'");
+                 InstantiationException.class, "'finish_after'");
   }
 
   public void testCompile_error4_small()
     throws IOException, WatersException
   {
+    final String[] culprit1 = {"'start1'"};
+    final String[] culprit2 = {"'start2'"};
     compileError("handwritten", "error4_small", null,
-                 EventKindException.class, "'start1'");
+                 InstantiationException.class, culprit1, culprit2);
   }
 
   public void testCompile_error5_small()
     throws IOException, WatersException
   {
     compileError("handwritten", "error5_small", null,
-                 UndefinedIdentifierException.class, "'finish_before'");
+                 InstantiationException.class, "'finish_before'");
   }
 
   public void testCompile_error6_small()
     throws IOException, WatersException
   {
     compileError("handwritten", "error6_small", null,
-                 EventKindException.class, "'start2'");
+                 InstantiationException.class, "'start2'");
   }
 
   public void testCompile_error7_small()
@@ -602,83 +606,22 @@ public abstract class AbstractCompilerTest
 
   //#########################################################################
   //# Utilities
-  @SuppressWarnings("unused")
-  private void compileError(final String dirname,
-                            final String name,
-                            final List<ParameterBindingProxy> bindings,
-                            final Class<? extends WatersException> exclass)
-    throws IOException, WatersException
-  {
-    final String[] culprits = {};
-    compileError(dirname, name, bindings, exclass, culprits);
-  }
-
-  @SuppressWarnings("unused")
-  private void compileError(final String dirname,
-                            final String subdirname,
-                            final String name,
-                            final List<ParameterBindingProxy> bindings,
-                            final Class<? extends WatersException> exclass)
-    throws IOException, WatersException
-  {
-    final String[] culprits = {};
-    compileError(dirname, subdirname, name, bindings, exclass, culprits);
-  }
-
   private void compileError(final String dirname,
                             final String name,
                             final List<ParameterBindingProxy> bindings,
                             final Class<? extends WatersException> exclass,
-                            final String culprit)
+                            final String... culprit)
     throws IOException, WatersException
   {
-    final String[] culprits = {culprit};
+    final String[][] culprits = {culprit};
     compileError(dirname, name, bindings, exclass, culprits);
   }
 
   private void compileError(final String dirname,
-                            final String subdirname,
                             final String name,
                             final List<ParameterBindingProxy> bindings,
                             final Class<? extends WatersException> exclass,
-                            final String culprit)
-    throws IOException, WatersException
-  {
-    final String[] culprits = {culprit};
-    compileError(dirname, subdirname, name, bindings, exclass, culprits);
-  }
-
-  private void compileError(final String dirname,
-                            final String name,
-                            final List<ParameterBindingProxy> bindings,
-                            final Class<? extends WatersException> exclass,
-                            final String culprit1,
-                            final String culprit2)
-    throws IOException, WatersException
-  {
-    final String[] culprits = {culprit1, culprit2};
-    compileError(dirname, name, bindings, exclass, culprits);
-  }
-
-  @SuppressWarnings("unused")
-  private void compileError(final String dirname,
-                            final String subdirname,
-                            final String name,
-                            final List<ParameterBindingProxy> bindings,
-                            final Class<? extends WatersException> exclass,
-                            final String culprit1,
-                            final String culprit2)
-    throws IOException, WatersException
-  {
-    final String[] culprits = {culprit1, culprit2};
-    compileError(dirname, subdirname, name, bindings, exclass, culprits);
-  }
-
-  private void compileError(final String dirname,
-                            final String name,
-                            final List<ParameterBindingProxy> bindings,
-                            final Class<? extends WatersException> exclass,
-                            final String[] culprits)
+                            final String[]... culprits)
     throws IOException, WatersException
   {
     final File root = getWatersInputRoot();
@@ -691,12 +634,13 @@ public abstract class AbstractCompilerTest
                             final String name,
                             final List<ParameterBindingProxy> bindings,
                             final Class<? extends WatersException> exclass,
-                            final String[] culprits)
+                            final String... culprit)
     throws IOException, WatersException
   {
     final File root = getWatersInputRoot();
     final File dir = new File(root, dirname);
     final File subdir = new File(dir, subdirname);
+    final String[][] culprits = {culprit};
     compileError(subdir, name, bindings, exclass, culprits);
   }
 
@@ -704,7 +648,7 @@ public abstract class AbstractCompilerTest
                             final String name,
                             final List<ParameterBindingProxy> bindings,
                             final Class<? extends WatersException> exclass,
-                            final String[] culprits)
+                            final String[][] culprits)
     throws IOException, WatersException
   {
     try {
@@ -714,29 +658,9 @@ public abstract class AbstractCompilerTest
         name + mProductDESMarshaller.getDefaultExtension();
       final File outfilename = new File(mOutputDirectory, outextname);
       compile(infilename, outfilename, bindings);
-      fail("Expected " + exclass.getName() + " not caught!");
+      fail("Expected " + exclass.getSimpleName() + " not caught!");
     } catch (final WatersException exception) {
-      if (exception.getClass() == exclass) {
-        for (int i = 0; i < culprits.length; i++) {
-          final String culprit = culprits[i];
-          final String msg = exception.getMessage();
-          assertNotNull("Caught " + exclass.getName() +
-                        " as expected, but no error message found!", msg);
-          assertTrue("Caught " + exclass.getName() +
-                     " as expected, but message '" + msg +
-                     "' does not mention culprit: " + culprit + "!",
-                     msg.indexOf(culprit) >= 0);
-        }
-        if (exception instanceof EvalException) {
-          final EvalException evalException = (EvalException) exception;
-          final Proxy location = evalException.getLocation();
-          assertNotNull("Caught " + exception.getClass().getName() + " <" +
-                        exception.getMessage() + "> provides no location!",
-                        location);
-        }
-      } else {
-        throw exception;
-      }
+      checkExceptions(exception, exclass, culprits);
     }
   }
 
@@ -801,9 +725,8 @@ public abstract class AbstractCompilerTest
     throws IOException, WatersException
   {
     final URI uri = infilename.toURI();
-    final ModuleProxy module = mModuleMarshaller.unmarshal(uri);
-    final ProductDESProxy des = compile(module, bindings);
-    ensureParentDirectoryExists(outfilename);
+    mModule = mModuleMarshaller.unmarshal(uri);
+    final ProductDESProxy des = compile(mModule, bindings);
     mProductDESMarshaller.marshal(des, outfilename);
   }
 
@@ -817,10 +740,10 @@ public abstract class AbstractCompilerTest
                                   final List<ParameterBindingProxy> bindings)
     throws EvalException
   {
-    final ModuleCompiler compiler =
+    mCompiler =
       new ModuleCompiler(mDocumentManager, mProductDESFactory, module);
-    configure(compiler);
-    return compiler.compile(bindings);
+    configure(mCompiler);
+    return mCompiler.compile(bindings);
   }
 
   private void compare(final File filename1, final File filename2)
@@ -838,6 +761,129 @@ public abstract class AbstractCompilerTest
   {
     final IntConstantProxy expr = mModuleFactory.createIntConstantProxy(value);
     return mModuleFactory.createParameterBindingProxy(name, expr);
+  }
+
+  /**
+   * Asserts that the exception mentions all the phrases in the culprit.
+   */
+  private void assertMentions(final WatersException exception,
+                              final String[] culprit)
+  {
+    final String msg = exception.getMessage();
+    for (final String phrase : culprit) {
+      assertTrue("Caught " + exception.getClass().getSimpleName() +
+                 " as expected, but message '" + msg +
+                 "' does not mention culprit: " + phrase + "!",
+                 msg.contains(phrase));
+    }
+  }
+
+  /**
+   * Checks if the exception mentions all of the phrases in the culprit.
+   */
+  private boolean mentions(final WatersException exception,
+                           final String[] culprit)
+  {
+    final String msg = exception.getMessage();
+    for (final String phrase : culprit) {
+      if (!msg.contains(phrase)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Asserts that the culprit is mentioned by at least one exception.
+   */
+  private void assertMentioned(final String[] culprit,
+                               final WatersException[] exceptions)
+  {
+    for (final WatersException exception : exceptions) {
+      if (mentions(exception, culprit)) {
+        return;
+      }
+    }
+    fail("The culprit " + Arrays.toString(culprit) +
+         " is not mentioned in any of the exception messages!");
+  }
+
+  /**
+   * Asserts that the exception mentions at least one culprit.
+   */
+  private void assertMentionsAny(final WatersException exception,
+                                 final String[][] culprits)
+  {
+    if (culprits.length == 1) {
+      assertMentions(exception, culprits[0]);
+    } else {
+      for (final String[] culprit : culprits) {
+        if (mentions(exception, culprit)) {
+          return;
+        }
+      }
+      fail("Caught " + exception.getClass().getSimpleName() +
+           " as expected, but message '" + exception.getMessage() +
+           "' does not mention any of the culprits: " +
+           Arrays.deepToString(culprits) + "!");
+    }
+  }
+
+  /**
+   * Asserts that the exception has the right type, mentions one of the
+   * culprits, and has a valid location.
+   */
+  private void checkException(final WatersException exception,
+                              final Class<? extends WatersException> exclass,
+                              final String[]... culprits)
+  {
+    assertEquals("Wrong exception type!", exclass, exception.getClass());
+    final String msg = exception.getMessage();
+    assertNotNull("Caught " + exclass.getSimpleName() +
+                  " as expected, but no error message found!", msg);
+    assertMentionsAny(exception, culprits);
+    if (exception instanceof EvalException) {
+      final EvalException evalException = (EvalException) exception;
+      final Proxy location = evalException.getLocation();
+      assertNotNull("Caught " + exclass.getSimpleName() + " <" + msg +
+                    "> provides no location!",
+                    location);
+      if (mCompiler.isSourceInfoEnabled()) {
+        assertTrue("Caught " + exception.getClass().getSimpleName() + " <" +
+                   msg + "> in " + location.getClass().getSimpleName() +
+                   " which is not in the module!",
+                   mDescendantCheckVisitor.isDescendant(location, mModule));
+      }
+    }
+  }
+
+  /**
+   * Asserts that the exception fulfills all the requirements.
+   * <CODE>MultiEvalExceptions</CODE> are handled appropriately.
+   */
+  private void checkExceptions(final WatersException exception,
+                               final Class<? extends WatersException> exclass,
+                               final String[]... culprits)
+  {
+    assertTrue("Invalid test, does not specify any culprits!",
+               culprits.length > 0);
+    final boolean multi = mCompiler.isMultiExceptionsEnabled();
+    if (multi && EvalException.class.isAssignableFrom(exclass)) {
+      assertEquals("Not a MultiEvalException!",
+                   MultiEvalException.class, exception.getClass());
+      final EvalException[] exceptions = ((EvalException) exception).getAll();
+      assertTrue("Caught MultiEvalException as expected, " +
+                 "but it does not contain any exceptions!",
+                 exceptions.length > 0);
+      for (final EvalException ex : exceptions) {
+        checkException(ex, exclass, culprits);
+      }
+      for (final String[] culprit : culprits) {
+        assertMentioned(culprit, exceptions);
+      }
+    } else {
+      checkException(exception, exclass, culprits[0]);
+    }
   }
 
 
@@ -859,6 +905,7 @@ public abstract class AbstractCompilerTest
     mDocumentManager.registerMarshaller(mProductDESMarshaller);
     mDocumentManager.registerUnmarshaller(mModuleMarshaller);
     mDocumentManager.registerUnmarshaller(mProductDESMarshaller);
+    mDescendantCheckVisitor = new DescendantCheckVisitor();
   }
 
   @Override
@@ -871,7 +918,54 @@ public abstract class AbstractCompilerTest
     mModuleMarshaller = null;
     mProductDESMarshaller = null;
     mDocumentManager = null;
+    mDescendantCheckVisitor = null;
     super.tearDown();
+  }
+
+
+  //#########################################################################
+  //# Inner Class DescendantCheckVisitor
+  private static class DescendantCheckVisitor
+    extends DescendingModuleProxyVisitor
+  {
+
+    //#######################################################################
+    //# Invocation
+    private boolean isDescendant(final Proxy child, final Proxy parent)
+    {
+      mChild = child;
+      try {
+        parent.acceptVisitor(this);
+      } catch (final VisitorException exception) {
+        if (exception == SUCCESS) {
+          return true;
+        } else {
+          throw exception.getRuntimeException();
+        }
+      }
+      return false;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
+    public Object visitProxy(final Proxy proxy)
+      throws VisitorException
+    {
+      if (proxy == mChild) {
+        throw SUCCESS;
+      }
+      return null;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private Proxy mChild;
+
+    //#######################################################################
+    //# Class Constants
+    private static final VisitorException SUCCESS = new VisitorException();
+
   }
 
 
@@ -883,5 +977,8 @@ public abstract class AbstractCompilerTest
   private JAXBModuleMarshaller mModuleMarshaller;
   private JAXBProductDESMarshaller mProductDESMarshaller;
   private DocumentManager mDocumentManager;
+  private ModuleCompiler mCompiler;
+  private ModuleProxy mModule;
+  private DescendantCheckVisitor mDescendantCheckVisitor;
 
 }

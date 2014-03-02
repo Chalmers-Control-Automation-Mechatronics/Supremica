@@ -32,15 +32,16 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.EvalAbortException;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
+import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SingleBindingContext;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
-import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
 import net.sourceforge.waters.model.compiler.context.SourceInfoCloner;
 import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.expr.MultiEvalException;
 import net.sourceforge.waters.model.expr.TypeMismatchException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
@@ -113,17 +114,17 @@ public class ModuleInstanceCompiler
   //# Constructors
   public ModuleInstanceCompiler(final DocumentManager manager,
                                 final ModuleProxyFactory factory,
-                                final SourceInfoBuilder builder,
+                                final CompilationInfo compilationInfo,
                                 final ModuleProxy module)
   {
     mDocumentManager = manager;
     mFactory = factory;
-    mSourceInfoBuilder = builder;
-    mCloner = new SourceInfoCloner(factory, builder);
+    mCompilationInfo = compilationInfo;
+    mCloner = new SourceInfoCloner(factory, compilationInfo);
     mOperatorTable = CompilerOperatorTable.getInstance();
     mEquality = ModuleEqualityVisitor.getInstance(false);
     mSimpleExpressionCompiler =
-      new SimpleExpressionCompiler(mFactory, mSourceInfoBuilder,
+      new SimpleExpressionCompiler(mFactory, mCompilationInfo,
                                    mOperatorTable);
     mPrimeSearcher = new PrimeSearcher();
     mNameCompiler = new NameCompiler();
@@ -242,6 +243,30 @@ public class ModuleInstanceCompiler
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+  @Override
+  public Object visitCollection(final Collection<? extends Proxy> collection)
+    throws VisitorException
+  {
+    boolean hasExceptions = false;
+    for (final Proxy proxy : collection) {
+      try {
+        proxy.acceptVisitor(this);
+      } catch (final VisitorException exception) {
+        final Throwable cause = exception.getCause();
+        if (cause instanceof EvalException) {
+          hasExceptions = true;
+          mCompilationInfo.raiseInVisitor((EvalException) cause);
+        } else {
+          throw exception;
+        }
+      }
+    }
+    if (hasExceptions) {
+      throw wrap(mCompilationInfo.getExceptions());
+    }
+    return null;
+  }
+
   @Override
   public SimpleExpressionProxy visitConstantAliasProxy
     (final ConstantAliasProxy alias)
@@ -529,6 +554,9 @@ public class ModuleInstanceCompiler
     final List<NodeProxy> children1 = new ArrayList<NodeProxy>(numchildren);
     for (final NodeProxy child0 : children0) {
       final NodeProxy child1 = mNodeMap.get(child0);
+      if (child1 == null) {
+        return null;
+      }
       children1.add(child1);
     }
     final GroupNodeProxy compiled =
@@ -625,8 +653,10 @@ public class ModuleInstanceCompiler
           return null;
         }
       }
-      final SourceInfo info = new SourceInfo(ident, mContext);
-      final CompiledEvent occ = new CompiledEventOccurrence(event, info);
+      final SourceInfo info = mCompilationInfo.getSourceInfo(ident);
+      final Proxy source = (info == null) ? ident : info.getSourceObject();
+      final SourceInfo einfo = new SourceInfo(source, mContext);
+      final CompiledEvent occ = new CompiledEventOccurrence(event, einfo);
       if (mCurrentEventList != null) {
         mCurrentEventList.addEvent(occ);
       }
@@ -647,6 +677,7 @@ public class ModuleInstanceCompiler
     checkAbort();
     final BindingContext oldContext = mContext;
     final CompiledNameSpace oldNameSpace = mNameSpace;
+    final MultiEvalException oldExceptions = mCompilationInfo.getExceptions();
     switch (mHISCCompileMode) {
     case HISC_LOW:
       return null;
@@ -656,15 +687,15 @@ public class ModuleInstanceCompiler
     default:
       break;
     }
+    final IdentifierProxy ident = inst.getIdentifier();
+    final IdentifierProxy suffix = mNameCompiler.compileName(ident);
+    final IdentifierProxy fullname =
+      mNameSpace.getPrefixedIdentifier(suffix, mFactory);
+    addSourceInfo(fullname, ident);
+    final List<ParameterBindingProxy> bindings = inst.getBindingList();
+    mParameterMap = new TreeMap<String,CompiledParameterBinding>();
+    visitCollection(bindings);
     try {
-      final IdentifierProxy ident = inst.getIdentifier();
-      final IdentifierProxy suffix = mNameCompiler.compileName(ident);
-      final IdentifierProxy fullname =
-        mNameSpace.getPrefixedIdentifier(suffix, mFactory);
-      addSourceInfo(fullname, ident);
-      final List<ParameterBindingProxy> bindings = inst.getBindingList();
-      mParameterMap = new TreeMap<String,CompiledParameterBinding>();
-      visitCollection(bindings);
       final ModuleBindingContext root = mContext.getModuleBindingContext();
       final URI uri = root.getModule().getLocation();
       final String filename = inst.getModuleName();
@@ -673,18 +704,31 @@ public class ModuleInstanceCompiler
       final SourceInfo info = new SourceInfo(inst, mContext);
       mContext = new ModuleBindingContext(module, fullname, info);
       mNameSpace = new CompiledNameSpace(suffix, mNameSpace);
+      mCompilationInfo.setExceptions(new MultiEvalException());
       return visitModuleProxy(module);
-    } catch (final IOException exception) {
-      final InstantiationException next =
-        new InstantiationException(exception, inst);
-      throw wrap(next);
-    } catch (final WatersUnmarshalException exception) {
+    } catch (final VisitorException exception) {
+      final Throwable cause = exception.getCause();
+      if (cause instanceof EvalException
+          && !(cause instanceof EvalAbortException)) {
+        mCompilationInfo.setExceptions(oldExceptions);
+        final EvalException evalCause = (EvalException) cause;
+        for (final EvalException ex : evalCause.getAll()) {
+          final InstantiationException next =
+            new InstantiationException(ex, inst);
+          mCompilationInfo.raiseInVisitor(next);
+        }
+        throw wrap(mCompilationInfo.getExceptions());
+      } else {
+        throw exception;
+      }
+    } catch (final IOException | WatersUnmarshalException exception) {
       final InstantiationException next =
         new InstantiationException(exception, inst);
       throw wrap(next);
     } finally {
       mContext = oldContext;
       mNameSpace = oldNameSpace;
+      mCompilationInfo.setExceptions(oldExceptions);
       mParameterMap = null;
       if (mHISCCompileMode == HISCCompileMode.HISC_LOW) {
         mHISCCompileMode = HISCCompileMode.HISC_HIGH;
@@ -980,7 +1024,7 @@ public class ModuleInstanceCompiler
       ident = event.getIdentifier();
     }
     final IdentifierProxy iclone = ident.clone();
-    addSourceInfo(iclone, output);
+    mCompilationInfo.add(iclone, output.getSourceInfo());
     return iclone;
   }
 
@@ -1022,20 +1066,9 @@ public class ModuleInstanceCompiler
     mCurrentBlockedEvents.addEvent(event);
   }
 
-  private void addSourceInfo(final IdentifierProxy target,
-                             final SingleEventOutput output)
-  {
-    if (mSourceInfoBuilder != null) {
-      final SourceInfo info = output.getSourceInfo();
-      mSourceInfoBuilder.add(target, info);
-    }
-  }
-
   private void addSourceInfo(final Proxy target, final Proxy source)
   {
-    if (mSourceInfoBuilder != null) {
-      mSourceInfoBuilder.add(target, source, mContext);
-    }
+    mCompilationInfo.add(target, source, mContext);
   }
 
   private boolean isDisabledProposition(final CompiledEvent event)
@@ -1382,7 +1415,7 @@ public class ModuleInstanceCompiler
   //# Data Members
   private final DocumentManager mDocumentManager;
   private final ModuleProxyFactory mFactory;
-  private final SourceInfoBuilder mSourceInfoBuilder;
+  private final CompilationInfo mCompilationInfo;
   private final ModuleProxyCloner mCloner;
   private final CompilerOperatorTable mOperatorTable;
   private final ModuleEqualityVisitor mEquality;

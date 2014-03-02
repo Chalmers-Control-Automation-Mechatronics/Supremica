@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.efa.base.AbstractEFACompiler;
-import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
+import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
@@ -65,19 +65,20 @@ public class SimpleEFACompiler
     final ModuleInstanceCompiler mModuleInstanceCompiler;
     try {
       final ModuleProxyFactory modfactory = ModuleElementFactory.getInstance();
-      initSourceInfo();
+      mCompilationInfo = new CompilationInfo(mIsSourceInfoEnabled,
+                                             mIsMultiExceptionsEnabled);
       mModuleInstanceCompiler = new ModuleInstanceCompiler(mDocumentManager,
                                                            modfactory,
-                                                           mSourceInfoBuilder,
+                                                           mCompilationInfo,
                                                            mInputModule);
       mModuleInstanceCompiler.setOptimizationEnabled(mIsOptimizationEnabled);
       mModuleInstanceCompiler.setEnabledPropertyNames(mEnabledPropertyNames);
       mModuleInstanceCompiler.setEnabledPropositionNames(mEnabledPropositionNames);
       checkAbort();
       final ModuleProxy intermediate = mModuleInstanceCompiler.compile(bindings);
-      shiftSourceInfo();
+      mCompilationInfo.shift();
       mEFASystemBuilder = new SimpleEFASystemBuilder(modfactory,
-                                                     mSourceInfoBuilder,
+                                                     mCompilationInfo,
                                                      intermediate);
       mEFASystemBuilder.setOptimizationEnabled(mIsOptimizationEnabled);
       mEFASystemBuilder.setMarkingVariablEFAEnable(mIsMarkingVariablEFAEnable);
@@ -123,6 +124,16 @@ public class SimpleEFACompiler
   public void setSourceInfoEnabled(final boolean enable)
   {
     mIsSourceInfoEnabled = enable;
+  }
+
+  public boolean isMultiExceptionsEnabled()
+  {
+    return mIsMultiExceptionsEnabled;
+  }
+
+  public void setMultiExceptionsEnabled(final boolean enable)
+  {
+    mIsMultiExceptionsEnabled = enable;
   }
 
   public Collection<String> getEnabledPropertyNames()
@@ -181,27 +192,17 @@ public void requestAbort()
       mEnabledPropositionNames.add(EventDeclProxy.DEFAULT_FORBIDDEN_NAME);
     }
   }
-  private void initSourceInfo()
-  {
-    if (mIsSourceInfoEnabled) {
-      mSourceInfoBuilder = new SourceInfoBuilder();
-    }
-  }
 
-    private void shiftSourceInfo()
-  {
-    if (mIsSourceInfoEnabled) {
-      mSourceInfoBuilder.shift();
-    }
-  }
+
   //#########################################################################
   //# Data Members
   private final DocumentManager mDocumentManager;
   private final ModuleProxy mInputModule;
   private SimpleEFASystemBuilder mEFASystemBuilder;
-  private SourceInfoBuilder mSourceInfoBuilder;
+  private CompilationInfo mCompilationInfo;
   private boolean mIsOptimizationEnabled = true;
   private boolean mIsSourceInfoEnabled = false;
+  private boolean mIsMultiExceptionsEnabled = false;
   private boolean mIsMarkingVariablEFAEnable = false;
   private Collection<String> mEnabledPropertyNames = null;
   private Collection<String> mEnabledPropositionNames = null;

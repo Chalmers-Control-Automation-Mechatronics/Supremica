@@ -12,14 +12,12 @@ package net.sourceforge.waters.analysis.efa.unified;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import net.sourceforge.waters.analysis.efa.base.AbstractEFAAlgorithm;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
-import net.sourceforge.waters.model.compiler.context.SourceInfo;
-import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
+import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.efa.EFAUnifier;
 import net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
@@ -111,25 +109,26 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
       }
       final Collection<String> propositionNames =
         Collections.singletonList(marking.toString());
-      initSourceInfo();
+      mCompilationInfo = new CompilationInfo(mIsSourceInfoEnabled,
+                                             mIsMultiExceptionsEnabled);
       mModuleInstanceCompiler = new ModuleInstanceCompiler
-        (mDocumentManager, modfactory, mSourceInfoBuilder, mInputModule);
+        (mDocumentManager, modfactory, mCompilationInfo, mInputModule);
       mModuleInstanceCompiler.setOptimizationEnabled(mIsOptimizationEnabled);
       mModuleInstanceCompiler.setEnabledPropertyNames(mEnabledPropertyNames);
       mModuleInstanceCompiler.setEnabledPropositionNames(propositionNames);
       final ModuleProxy instantiated =
         mModuleInstanceCompiler.compile(bindings);
       mModuleInstanceCompiler = null;
-      shiftSourceInfo();
+      mCompilationInfo.shift();
       mEFAUnifier =
-        new EFAUnifier(modfactory, mSourceInfoBuilder, instantiated);
+        new EFAUnifier(modfactory, mCompilationInfo, instantiated);
       final ModuleProxy unified = mEFAUnifier.compile();
-      shiftSourceInfo();
+      mCompilationInfo.shift();
       final ProxyAccessorMap<IdentifierProxy, ConstraintList> map =
         mEFAUnifier.getEventUpdateMap();
       mEFAUnifier = null;
       mSystemBuilder = new UnifiedEFASystemBuilder
-        (modfactory, mSourceInfoBuilder, unified, map);
+        (modfactory, mCompilationInfo, unified, map);
       mSystemBuilder.setOptimizationEnabled(mIsOptimizationEnabled);
       mSystemBuilder.setConfiguredDefaultMarking(marking);
       return mSystemBuilder.compile();
@@ -144,15 +143,6 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
   public ModuleProxy getInputModule()
   {
     return mInputModule;
-  }
-
-  public Map<Object,SourceInfo> getSourceInfoMap()
-  {
-    if (mIsSourceInfoEnabled) {
-      return mSourceInfoBuilder.getResultMap();
-    } else {
-      return null;
-    }
   }
 
 
@@ -178,6 +168,16 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
     mIsSourceInfoEnabled = enable;
   }
 
+  public boolean isMultiExceptionsEnabled()
+  {
+    return mIsMultiExceptionsEnabled;
+  }
+
+  public void setMultiExceptionsEnabled(final boolean enable)
+  {
+    mIsMultiExceptionsEnabled = enable;
+  }
+
   public Collection<String> getEnabledPropertyNames()
   {
     return mEnabledPropertyNames;
@@ -200,23 +200,6 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
 
 
   //#########################################################################
-  //# Auxiliary Methods
-  private void initSourceInfo()
-  {
-    if (mIsSourceInfoEnabled) {
-      mSourceInfoBuilder = new SourceInfoBuilder();
-    }
-  }
-
-  private void shiftSourceInfo()
-  {
-    if (mIsSourceInfoEnabled) {
-      mSourceInfoBuilder.shift();
-    }
-  }
-
-
-  //#########################################################################
   //# Data Members
   private final DocumentManager mDocumentManager;
   private final ModuleProxy mInputModule;
@@ -224,10 +207,11 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
   private ModuleInstanceCompiler mModuleInstanceCompiler;
   private EFAUnifier mEFAUnifier;
   private UnifiedEFASystemBuilder mSystemBuilder;
-  private SourceInfoBuilder mSourceInfoBuilder;
+  private CompilationInfo mCompilationInfo;
 
   private boolean mIsOptimizationEnabled = true;
   private boolean mIsSourceInfoEnabled = false;
+  private boolean mIsMultiExceptionsEnabled = false;
   private Collection<String> mEnabledPropertyNames = null;
   private IdentifierProxy mMarking;
 

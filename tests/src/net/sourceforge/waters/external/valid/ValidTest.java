@@ -12,7 +12,6 @@ package net.sourceforge.waters.external.valid;
 import java.io.File;
 import java.io.IOException;
 
-import net.sourceforge.waters.external.valid.ValidUnmarshaller;
 import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.Proxy;
@@ -240,7 +239,6 @@ public class ValidTest extends AbstractWatersTest
   {
     final ModuleProxy module =
       (ModuleProxy) mDocumentManager.load(infilename);
-    ensureParentDirectoryExists(outfilename);
     mModuleMarshaller.marshal(module, outfilename);
     return module;
   }
@@ -252,7 +250,6 @@ public class ValidTest extends AbstractWatersTest
     final ModuleCompiler compiler =
       new ModuleCompiler(mDocumentManager, mProductDESFactory, module);
     final ProductDESProxy des = compiler.compile();
-    ensureParentDirectoryExists(outfilename);
     mProductDESMarshaller.marshal(des, outfilename);
     return des;
   }
@@ -270,6 +267,7 @@ public class ValidTest extends AbstractWatersTest
 
   //#########################################################################
   //# Overrides for junit.framework.TestCase
+  @Override
   protected void setUp()
     throws Exception
   {
@@ -292,6 +290,7 @@ public class ValidTest extends AbstractWatersTest
     mDocumentManager.registerUnmarshaller(importer);
   }
 
+  @Override
   protected void tearDown()
     throws Exception
   {

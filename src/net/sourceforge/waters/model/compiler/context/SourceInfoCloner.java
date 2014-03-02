@@ -19,7 +19,7 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
  * An implementation of a {@link ModuleProxyCloner} that tracks source
  * information while cloning. Every time a {@link Proxy} is duplicated
  * by this cloner, a reference from the copy to the original is filed
- * in the cloner's {@link SourceInfoBuilder}.
+ * in the cloner's {@link CompilationInfo}.
  *
  * @author Robi Malik
  */
@@ -30,10 +30,10 @@ public class SourceInfoCloner extends ModuleProxyCloner
   //#########################################################################
   //# Constructor
   public SourceInfoCloner(final ModuleProxyFactory factory,
-                          final SourceInfoBuilder builder)
+                          final CompilationInfo compilationInfo)
   {
     super(factory);
-    mSourceInfoBuilder = builder;
+    mCompilationInfo = compilationInfo;
   }
 
 
@@ -46,9 +46,7 @@ public class SourceInfoCloner extends ModuleProxyCloner
       return null;
     } else {
       final Proxy result = super.cloneProxy(orig);
-      if (mSourceInfoBuilder != null) {
-        mSourceInfoBuilder.add(result, orig);
-      }
+      mCompilationInfo.add(result, orig);
       return result;
     }
   }
@@ -56,6 +54,6 @@ public class SourceInfoCloner extends ModuleProxyCloner
 
   //#########################################################################
   //# Data Members
-  private final SourceInfoBuilder mSourceInfoBuilder;
+  private final CompilationInfo mCompilationInfo;
 
 }

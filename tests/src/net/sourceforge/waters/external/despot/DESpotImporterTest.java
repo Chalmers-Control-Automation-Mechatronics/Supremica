@@ -19,7 +19,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sourceforge.waters.external.despot.DESpotImporter;
 import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -302,7 +301,6 @@ public class DESpotImporterTest extends AbstractWatersTest
         }
       }
     }
-    ensureParentDirectoryExists(outdirname);
   }
 
   private void parseGeneratedModules(final String testname,
@@ -355,6 +353,7 @@ public class DESpotImporterTest extends AbstractWatersTest
 
   // #########################################################################
   // # Overrides for junit.framework.TestCase
+  @Override
   protected void setUp() throws Exception
   {
     super.setUp();
@@ -375,6 +374,7 @@ public class DESpotImporterTest extends AbstractWatersTest
         ModuleIdentifierChecker.getModuleIdentifierCheckerInstance();
   }
 
+  @Override
   protected void tearDown() throws Exception
   {
     mInputDirectory = null;

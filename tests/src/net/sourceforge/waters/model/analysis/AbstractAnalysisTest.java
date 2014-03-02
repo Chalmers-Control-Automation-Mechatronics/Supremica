@@ -313,7 +313,6 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
                desname.indexOf(':') < 0);
     final File dir = getOutputDirectory();
     final File desfilename = new File(dir, desname);
-    ensureParentDirectoryExists(desfilename);
     mDocumentManager.saveAs(des, desfilename);
     final ModuleProxy module = mProductDESImporter.importModule(des);
     final String modext = mModuleMarshaller.getDefaultExtension();
@@ -333,7 +332,6 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
                filename.indexOf(':') < 0);
     final File dir = getOutputDirectory();
     final File fullname = new File(dir, filename);
-    ensureParentDirectoryExists(fullname);
     mDocumentManager.saveAs(module, fullname);
   }
 

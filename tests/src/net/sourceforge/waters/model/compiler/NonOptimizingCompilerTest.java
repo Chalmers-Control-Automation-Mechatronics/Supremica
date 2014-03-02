@@ -33,12 +33,15 @@ public class NonOptimizingCompilerTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.model.compiler.AbstractCompilerTest
+  @Override
   void configure(final ModuleCompiler compiler)
   {
     compiler.setOptimizationEnabled(false);
     compiler.setSourceInfoEnabled(true);
+    compiler.setMultiExceptionsEnabled(true);
   }
 
+  @Override
   String getTestSuffix()
   {
     return "noopt";

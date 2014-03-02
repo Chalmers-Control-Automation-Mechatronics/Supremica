@@ -31,10 +31,10 @@ import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintPropagator;
+import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierException;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
-import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
 import net.sourceforge.waters.model.compiler.efa.EFAGuardCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
@@ -73,14 +73,14 @@ public class EFSMSystemBuilder extends AbstractEFSMAlgorithm
   //#########################################################################
   //# Constructors
   public EFSMSystemBuilder(final ModuleProxyFactory factory,
-                           final SourceInfoBuilder builder,
+                           final CompilationInfo compilationInfo,
                            final ModuleProxy module)
   {
     mFactory = factory;
-    mSourceInfoBuilder = builder;
+    mCompilationInfo = compilationInfo;
     mOperatorTable = CompilerOperatorTable.getInstance();
     mSimpleExpressionCompiler =
-      new SimpleExpressionCompiler(mFactory, mSourceInfoBuilder,
+      new SimpleExpressionCompiler(mFactory, mCompilationInfo,
                                    mOperatorTable);
     mEFSMVariableFinder = new EFSMVariableFinder(mOperatorTable);
     mInputModule = module;
@@ -373,7 +373,7 @@ public class EFSMSystemBuilder extends AbstractEFSMAlgorithm
     {
       mGuardCompiler = new EFAGuardCompiler(mFactory, mOperatorTable);
       mConstraintPropagator =
-        new ConstraintPropagator(mFactory, mSourceInfoBuilder,
+        new ConstraintPropagator(mFactory, mCompilationInfo,
                                  mOperatorTable, mVariableContext);
       mEFSMVariableCollector = new EFSMVariableCollector(mOperatorTable, mVariableContext);
     }
@@ -439,7 +439,7 @@ public class EFSMSystemBuilder extends AbstractEFSMAlgorithm
       final Collection<NodeProxy> nodes = graph.getNodes();
       mStateMap =
         new TObjectIntHashMap<SimpleNodeProxy>(nodes.size(), 0.5f, -1);
-      if (mSourceInfoBuilder != null) {
+      if (mCompilationInfo.isSourceInfoEnabled()) {
         mNodeList = new ArrayList<SimpleNodeProxy>(nodes.size());
       } else {
         mNodeList = null;
@@ -719,7 +719,7 @@ public class EFSMSystemBuilder extends AbstractEFSMAlgorithm
   //#########################################################################
   //# Data Members
   private final ModuleProxyFactory mFactory;
-  private final SourceInfoBuilder mSourceInfoBuilder;
+  private final CompilationInfo mCompilationInfo;
   private final CompilerOperatorTable mOperatorTable;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private final EFSMVariableFinder mEFSMVariableFinder;

@@ -693,7 +693,6 @@ public abstract class AbstractSupervisorSynthesizerTest
     final String extname = basename + ext;
     final File dir = getOutputDirectory();
     final File filename = new File(dir, extname);
-    ensureParentDirectoryExists(filename);
     mTraceMarshaller.marshal(counterexample, filename);
     return filename;
   }

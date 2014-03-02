@@ -53,27 +53,27 @@ public class SimpleExpressionCompiler
   public SimpleExpressionCompiler(final ModuleProxyFactory factory,
                                   final CompilerOperatorTable optable)
   {
-    this(factory, null, optable, true);
+    this(factory, new CompilationInfo(false, false), optable, true);
   }
 
   public SimpleExpressionCompiler(final ModuleProxyFactory factory,
-                                  final SourceInfoBuilder builder,
+                                  final CompilationInfo compilationInfo,
                                   final CompilerOperatorTable optable)
   {
-    this(factory, builder, optable, true);
+    this(factory, compilationInfo, optable, true);
   }
 
   public SimpleExpressionCompiler(final ModuleProxyFactory factory,
-                                  final SourceInfoBuilder builder,
+                                  final CompilationInfo compilationInfo,
                                   final CompilerOperatorTable optable,
                                   final boolean cloning)
   {
     mFactory = factory;
-    mSourceInfoBuilder = builder;
+    mCompilationInfo = compilationInfo;
     mOperatorTable = optable;
     mIsCloning = cloning;
 
-    mCloner = new SourceInfoCloner(factory, builder);
+    mCloner = new SourceInfoCloner(factory, compilationInfo);
 
     final BinaryEvaluator assigner = new BinaryAssignmentEvaluator();
     mBinaryEvaluatorMap = new HashMap<BinaryOperator,BinaryEvaluator>(32);
@@ -291,7 +291,9 @@ public class SimpleExpressionCompiler
     if (mEquality.equals(expr, bound)) {
       return getClone(expr, alreadyCloned);
     } else if (bound != null) {
-      return simplify(bound);
+      final SimpleExpressionProxy simp = simplify(bound);
+      mCompilationInfo.add(simp, expr);
+      return simp;
     } else if (mIsEvaluating) {
       throw new UndefinedIdentifierException(expr);
     } else {
@@ -305,7 +307,7 @@ public class SimpleExpressionCompiler
     if (mIsCloning && !alreadyCloned) {
       final SimpleExpressionProxy clone =
         (SimpleExpressionProxy) mCloner.getClone(expr);
-      addSourceInfo(clone, expr);
+      mCompilationInfo.add(clone, expr);
       return clone;
     } else {
       return expr;
@@ -361,13 +363,6 @@ public class SimpleExpressionCompiler
       return false;
     } else {
       return mContext.isEnumAtom(ident);
-    }
-  }
-
-  private void addSourceInfo(final Proxy target, final Proxy source)
-  {
-    if (mSourceInfoBuilder != null) {
-      mSourceInfoBuilder.add(target, source);
     }
   }
 
@@ -493,7 +488,7 @@ public class SimpleExpressionCompiler
           final String name = ident.getName();
           final IndexedIdentifierProxy copy =
             mFactory.createIndexedIdentifierProxy(name, indexes);
-          addSourceInfo(copy, ident);
+          mCompilationInfo.add(copy, ident);
           return processIdentifier(copy, true);
         } else {
           return processIdentifier(ident, false);
@@ -523,7 +518,7 @@ public class SimpleExpressionCompiler
         } else {
           final QualifiedIdentifierProxy copy =
             mFactory.createQualifiedIdentifierProxy(base1, comp1);
-          addSourceInfo(copy, ident);
+          mCompilationInfo.add(copy, ident);
           return processIdentifier(copy, true);
         }
       } catch (final EvalException exception) {
@@ -714,7 +709,7 @@ public class SimpleExpressionCompiler
         final BinaryOperator op = expr.getOperator();
         final BinaryExpressionProxy copy =
           mFactory.createBinaryExpressionProxy(op, simpLHS, simpRHS);
-        addSourceInfo(copy, expr);
+        mCompilationInfo.add(copy, expr);
         return copy;
       }
     }
@@ -742,7 +737,7 @@ public class SimpleExpressionCompiler
         final UnaryOperator op = expr.getOperator();
         final UnaryExpressionProxy copy =
           mFactory.createUnaryExpressionProxy(op, simpsub);
-        addSourceInfo(copy, expr);
+        mCompilationInfo.add(copy, expr);
         return copy;
       }
     }
@@ -1128,7 +1123,7 @@ public class SimpleExpressionCompiler
         final UnaryOperator op = mOperatorTable.getUnaryMinusOperator();
         final SimpleExpressionProxy copy =
           mFactory.createUnaryExpressionProxy(op, simpRHS);
-        addSourceInfo(copy, expr);
+        mCompilationInfo.add(copy, expr);
         return copy;
       } else if (intRHS == 0) {
         return simpLHS;
@@ -1319,7 +1314,7 @@ public class SimpleExpressionCompiler
           final UnaryOperator op = mOperatorTable.getUnaryMinusOperator();
           final UnaryExpressionProxy uminus =
             mFactory.createUnaryExpressionProxy(op, origRHS);
-          addSourceInfo(uminus, expr);
+          mCompilationInfo.add(uminus, expr);
           return simplify(uminus);
         default:
           break;
@@ -1340,7 +1335,7 @@ public class SimpleExpressionCompiler
             final UnaryOperator op = mOperatorTable.getUnaryMinusOperator();
             final UnaryExpressionProxy uminus =
               mFactory.createUnaryExpressionProxy(op, simpLHS);
-            addSourceInfo(uminus, expr);
+            mCompilationInfo.add(uminus, expr);
             return uminus;
           }
         default:
@@ -1450,7 +1445,7 @@ public class SimpleExpressionCompiler
         final String functionName = expr.getFunctionName();
         final FunctionCallExpressionProxy copy =
           mFactory.createFunctionCallExpressionProxy(functionName, simpArgs);
-        addSourceInfo(copy, expr);
+        mCompilationInfo.add(copy, expr);
         return copy;
       }
     }
@@ -1654,7 +1649,7 @@ public class SimpleExpressionCompiler
   //#########################################################################
   //# Data Members
   private final ModuleProxyFactory mFactory;
-  private final SourceInfoBuilder mSourceInfoBuilder;
+  private final CompilationInfo mCompilationInfo;
   private final ModuleProxyCloner mCloner;
   private final CompilerOperatorTable mOperatorTable;
   private final boolean mIsCloning;

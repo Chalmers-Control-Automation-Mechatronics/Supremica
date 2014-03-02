@@ -12,11 +12,9 @@ package net.sourceforge.waters.analysis.efa.efsm;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.compiler.context.SourceInfo;
-import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
+import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
@@ -111,31 +109,23 @@ class EFSMCompiler extends AbstractEFSMAlgorithm
       }
       final Collection<String> propositions =
         Collections.singletonList(marking.toString());
-      initSourceInfo();
+      mCompilationInfo = new CompilationInfo(mIsSourceInfoEnabled,
+                                             mIsMultiExceptionsEnabled);
       mModuleInstanceCompiler = new ModuleInstanceCompiler
-        (mDocumentManager, modfactory, mSourceInfoBuilder, mInputModule);
+        (mDocumentManager, modfactory, mCompilationInfo, mInputModule);
       mModuleInstanceCompiler.setOptimizationEnabled(mIsOptimizationEnabled);
       mModuleInstanceCompiler.setEnabledPropertyNames(mEnabledPropertyNames);
       mModuleInstanceCompiler.setEnabledPropositionNames(propositions);
       final ModuleProxy intermediate = mModuleInstanceCompiler.compile(bindings);
       mModuleInstanceCompiler = null;
-      shiftSourceInfo();
+      mCompilationInfo.shift();
       mEFSMSystemBuilder = new EFSMSystemBuilder
-        (modfactory, mSourceInfoBuilder, intermediate);
+        (modfactory, mCompilationInfo, intermediate);
       mEFSMSystemBuilder.setOptimizationEnabled(mIsOptimizationEnabled);
       mEFSMSystemBuilder.setConfiguredDefaultMarking(marking);
       return mEFSMSystemBuilder.compile();
     } finally {
       tearDown();
-    }
-  }
-
-  public Map<Object,SourceInfo> getSourceInfoMap()
-  {
-    if (mIsSourceInfoEnabled) {
-      return mSourceInfoBuilder.getResultMap();
-    } else {
-      return null;
     }
   }
 
@@ -162,6 +152,16 @@ class EFSMCompiler extends AbstractEFSMAlgorithm
     mIsSourceInfoEnabled = enable;
   }
 
+  public boolean isMultiExceptionsEnabled()
+  {
+    return mIsMultiExceptionsEnabled;
+  }
+
+  public void setMultiExceptionsEnabled(final boolean enable)
+  {
+    mIsMultiExceptionsEnabled = enable;
+  }
+
   public Collection<String> getEnabledPropertyNames()
   {
     return mEnabledPropertyNames;
@@ -184,33 +184,17 @@ class EFSMCompiler extends AbstractEFSMAlgorithm
 
 
   //#########################################################################
-  //# Auxiliary Methods
-  private void initSourceInfo()
-  {
-    if (mIsSourceInfoEnabled) {
-      mSourceInfoBuilder = new SourceInfoBuilder();
-    }
-  }
-
-  private void shiftSourceInfo()
-  {
-    if (mIsSourceInfoEnabled) {
-      mSourceInfoBuilder.shift();
-    }
-  }
-
-
-  //#########################################################################
   //# Data Members
   private final DocumentManager mDocumentManager;
   private final ModuleProxy mInputModule;
 
   private ModuleInstanceCompiler mModuleInstanceCompiler;
   private EFSMSystemBuilder mEFSMSystemBuilder;
-  private SourceInfoBuilder mSourceInfoBuilder;
+  private CompilationInfo mCompilationInfo;
 
   private boolean mIsOptimizationEnabled = true;
   private boolean mIsSourceInfoEnabled = false;
+  private boolean mIsMultiExceptionsEnabled = false;
   private Collection<String> mEnabledPropertyNames = null;
   private IdentifierProxy mMarking;
 

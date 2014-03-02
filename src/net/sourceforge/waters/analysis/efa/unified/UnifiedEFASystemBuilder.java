@@ -26,9 +26,9 @@ import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
+import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
-import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -63,13 +63,13 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
   //# Constructors
   public UnifiedEFASystemBuilder
     (final ModuleProxyFactory factory,
-     final SourceInfoBuilder builder,
+     final CompilationInfo compilationInfo,
      final ModuleProxy module,
      final ProxyAccessorMap<IdentifierProxy,ConstraintList> map)
   {
     mFactory = factory;
     mOperatorTable = CompilerOperatorTable.getInstance();
-    mSourceInfoBuilder = builder;
+    mCompilationInfo = compilationInfo;
     mInputModule = module;
     mEventUpdateMap = map;
   }
@@ -82,7 +82,7 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
   {
     super.setUp();
     mSimpleExpressionCompiler =
-      new SimpleExpressionCompiler(mFactory, mSourceInfoBuilder,
+      new SimpleExpressionCompiler(mFactory, mCompilationInfo,
                                    mOperatorTable);
     final ModuleEqualityVisitor eq = ModuleEqualityVisitor.getInstance(false);
     final int numEvents = mInputModule.getEventDeclList().size();
@@ -351,7 +351,7 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
       final Collection<NodeProxy> nodes = graph.getNodes();
       mStateMap =
         new TObjectIntHashMap<SimpleNodeProxy>(nodes.size(), 0.5f, -1);
-      if (mSourceInfoBuilder != null) {
+      if (mCompilationInfo.isSourceInfoEnabled()) {
         mNodeList = new ArrayList<SimpleNodeProxy>(nodes.size());
       } else {
         mNodeList = null;
@@ -494,7 +494,7 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
   //# Data Members
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;
-  private final SourceInfoBuilder mSourceInfoBuilder;
+  private final CompilationInfo mCompilationInfo;
 
   private boolean mIsOptimizationEnabled;
   private IdentifierProxy mDefaultMarking;

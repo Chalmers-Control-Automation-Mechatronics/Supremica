@@ -352,7 +352,6 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
                extname.indexOf(':') < 0);
     final File dir = getOutputDirectory();
     final File filename = new File(dir, extname);
-    ensureParentDirectoryExists(filename);
     mTraceMarshaller.marshal(counterexample, filename);
     return filename;
   }

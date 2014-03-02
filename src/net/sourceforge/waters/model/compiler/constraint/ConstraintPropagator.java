@@ -25,12 +25,12 @@ import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.base.ProxyAccessorSet;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.context.CompiledEnumRange;
 import net.sourceforge.waters.model.compiler.context.CompiledIntRange;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
-import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
@@ -92,7 +92,7 @@ public class ConstraintPropagator
      final CompilerOperatorTable optable,
      final VariableContext root)
   {
-    this(factory, null, optable, root);
+    this(factory, new CompilationInfo(false, false), optable, root);
   }
 
   /**
@@ -104,7 +104,7 @@ public class ConstraintPropagator
    */
   public ConstraintPropagator
     (final ModuleProxyFactory factory,
-     final SourceInfoBuilder builder,
+     final CompilationInfo compilationInfo,
      final CompilerOperatorTable optable,
      final VariableContext root)
   {
@@ -115,7 +115,7 @@ public class ConstraintPropagator
     mEquationComparator =
       new RelationNormalizationComparator(optable, mContext);
     mSimpleExpressionCompiler =
-      new SimpleExpressionCompiler(factory, builder, optable, false);
+      new SimpleExpressionCompiler(factory, compilationInfo, optable, false);
     mPrimedVariableCollector = new PrimedVariableCollector(optable, root);
     mNormalizer = RelationNormalizationRule.createNormalRule(factory, optable);
     mNegator = RelationNormalizationRule.createNegatingRule(factory, optable);

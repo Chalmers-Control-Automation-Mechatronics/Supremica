@@ -52,6 +52,7 @@ import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
+import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -163,8 +164,8 @@ public class ModelAssess
     mDocumentManager = new DocumentManager();
     mDocumentManager.registerMarshaller(marshaller);
     mDocumentManager.registerUnmarshaller(marshaller);
-    mSimpleExpressionCompiler =
-      new SimpleExpressionCompiler(factory, null, optable, false);
+    mSimpleExpressionCompiler = new SimpleExpressionCompiler
+      (factory, new CompilationInfo(false, false), optable, false);
     mIsomorphismChecker = new IsomorphismChecker(mProductDESFactory, true, true);
     loadConfiguration(config);
     loadClassList(classlist);

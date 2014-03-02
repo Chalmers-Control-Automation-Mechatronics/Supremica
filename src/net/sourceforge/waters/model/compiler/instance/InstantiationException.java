@@ -23,16 +23,27 @@ public class InstantiationException extends EvalException {
    * being thrown when loading the module.
    */
   public InstantiationException(final Exception cause,
-				final InstanceProxy inst)
+                                final InstanceProxy inst)
   {
     super(createMessage(cause, inst), cause, inst);
+  }
+
+  /**
+   * Constructs a new exception indicating that the given instance
+   * failed to be compiled because of the indicated exception being
+   * thrown while compiling the module.
+   */
+  public InstantiationException(final EvalException cause,
+                                final InstanceProxy inst)
+  {
+    super(createEvalMessage(cause, inst), cause, inst);
   }
 
 
   //#########################################################################
   //# Message Preparation
   private static String createMessage(final Exception cause,
-				      final InstanceProxy inst)
+                                      final InstanceProxy inst)
   {
     final StringBuilder buffer = new StringBuilder();
     buffer.append("Can't load module '");
@@ -42,12 +53,30 @@ public class InstantiationException extends EvalException {
     if (msg == null) {
       buffer.append('!');
     } else {
+      buffer.append(": ");
       buffer.append(msg);
     }
     return buffer.toString();
   }
 
-  
+  private static String createEvalMessage(final EvalException cause,
+                                          final InstanceProxy inst)
+  {
+    final StringBuilder buffer = new StringBuilder();
+    buffer.append("Error while compiling module '");
+    buffer.append(inst.getName());
+    buffer.append("'");
+    final String msg = cause.getMessage();
+    if (msg == null) {
+      buffer.append('!');
+    } else {
+      buffer.append(": ");
+      buffer.append(msg);
+    }
+    return buffer.toString();
+  }
+
+
   //#########################################################################
   //# Static Class Variables
   public static final long serialVersionUID = 1;

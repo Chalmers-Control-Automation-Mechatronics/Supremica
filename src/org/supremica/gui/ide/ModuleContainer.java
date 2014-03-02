@@ -89,6 +89,7 @@ public class ModuleContainer
       ProductDESElementFactory.getInstance();
     mCompiler = new ModuleCompiler(manager, desfactory, module);
     mCompiler.setSourceInfoEnabled(true);
+    mCompiler.setMultiExceptionsEnabled(true);
     mCompiler.setOptimizationEnabled(Config.OPTIMIZING_COMPILER.isTrue());
     mCompilerPropertyChangeListener =
       new CompilerPropertyChangeListener();
@@ -486,9 +487,10 @@ public class ModuleContainer
       // This line of code fires whenever a tab is changed.
       fireEditorChangedEvent(eevent);
     } catch (final EvalException exception) {
-      final String msg = exception.getMessage();
       final IDE ide = getIDE();
-      ide.error(msg);
+      for (final EvalException e : exception.getAll()) {
+        ide.error(e.getMessage());
+      }
       setLastCompilationException(exception);
       mTabPanel.setSelectedComponent(mEditorPanel);
     }

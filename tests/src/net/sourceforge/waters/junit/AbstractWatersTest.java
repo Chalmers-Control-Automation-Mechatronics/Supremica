@@ -121,12 +121,6 @@ public abstract class AbstractWatersTest
     }
   }
 
-  protected void ensureParentDirectoryExists(final File outfile)
-  {
-    final File dirname = outfile.getParentFile();
-    ensureDirectoryExists(dirname);
-  }
-
   protected File getLogFile()
   {
     return mLogFile;

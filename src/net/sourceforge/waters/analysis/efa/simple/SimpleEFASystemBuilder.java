@@ -31,10 +31,10 @@ import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintPropagator;
+import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierException;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
-import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
 import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.compiler.efa.EFAGuardCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
@@ -70,15 +70,14 @@ public class SimpleEFASystemBuilder implements Abortable
 {
 
   public SimpleEFASystemBuilder(final ModuleProxyFactory factory,
-                                final SourceInfoBuilder builder,
+                                final CompilationInfo compilationInfo,
                                 final ModuleProxy module)
   {
     mFactory = factory;
-    mSourceInfoBuilder = builder;
+    mCompilationInfo = compilationInfo;
     mOperatorTable = CompilerOperatorTable.getInstance();
     mSimpleExpressionCompiler =
-      new SimpleExpressionCompiler(mFactory, mSourceInfoBuilder,
-                                   mOperatorTable);
+      new SimpleExpressionCompiler(mFactory, mCompilationInfo, mOperatorTable);
 //    mEFAVariableFinder = new SimpleEFAVariableFinder(mOperatorTable);
     mInputModule = module;
     final String moduleName = module.getName();
@@ -95,12 +94,12 @@ public class SimpleEFASystemBuilder implements Abortable
   public SimpleEFASystemBuilder(final ModuleProxyFactory factory,
                                 final ModuleProxy module)
   {
-    this(factory, null, module);
+    this(factory, new CompilationInfo(false, false), module);
   }
 
   public SimpleEFASystemBuilder(final ModuleProxy module)
   {
-    this(ModuleElementFactory.getInstance(), null, module);
+    this(ModuleElementFactory.getInstance(), module);
   }
 
   public SimpleEFASystem compile() throws EvalException
@@ -227,14 +226,6 @@ public class SimpleEFASystemBuilder implements Abortable
     }
   }
 
-  @SuppressWarnings("unused")
-  private void addSourceInfo(final Proxy target, final Proxy source)
-  {
-    if (mSourceInfoBuilder != null) {
-      mSourceInfoBuilder.add(target, source);
-    }
-  }
-
   void checkAbort() throws AnalysisAbortException
   {
     if (mIsAborting) {
@@ -356,8 +347,8 @@ public class SimpleEFASystemBuilder implements Abortable
     {
       mGuardCompiler = new EFAGuardCompiler(mFactory, mOperatorTable);
       mConstraintPropagator =
-        new ConstraintPropagator(mFactory, mSourceInfoBuilder,
-                                 mOperatorTable, mVariableContext);
+        new ConstraintPropagator(mFactory, mCompilationInfo, mOperatorTable,
+                                 mVariableContext);
       mEFAVariableCollector = new SimpleEFAVariableCollector(mOperatorTable,
                                                              mVariableContext);
     }
@@ -478,7 +469,7 @@ public class SimpleEFASystemBuilder implements Abortable
 
       final Collection<NodeProxy> nodes = graph.getNodes();
       mStateEncoding = new SimpleEFAStateEncoding(nodes.size());
-      if (mSourceInfoBuilder != null) {
+      if (mCompilationInfo.isSourceInfoEnabled()) {
         mNodeList = new ArrayList<>(nodes.size());
       } else {
         mNodeList = null;
@@ -879,7 +870,7 @@ public class SimpleEFASystemBuilder implements Abortable
   //#########################################################################
   //# SimpleEFASystemBuilder Data Members
   private final ModuleProxyFactory mFactory;
-  private final SourceInfoBuilder mSourceInfoBuilder;
+  private final CompilationInfo mCompilationInfo;
   private final CompilerOperatorTable mOperatorTable;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   //  private final SimpleEFAVariableFinder mEFAVariableFinder;

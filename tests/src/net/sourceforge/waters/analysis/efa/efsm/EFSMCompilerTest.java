@@ -18,10 +18,6 @@ import java.util.List;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.analysis.efa.efsm.EFSMCompiler;
-import net.sourceforge.waters.analysis.efa.efsm.EFSMSystem;
-import net.sourceforge.waters.analysis.efa.efsm.EFSMSystemImporter;
-import net.sourceforge.waters.analysis.efa.efsm.SharedEventException;
 import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.Proxy;
@@ -421,7 +417,6 @@ public class EFSMCompilerTest
     buffer.append(ext);
     final String outextname = buffer.toString();
     final File outfilename = new File(mOutputDirectory, outextname);
-    ensureParentDirectoryExists(outfilename);
     final ModuleProxy outputModule = compile(infilename, outfilename, bindings);
     final String suffix = getTestSuffix();
     buffer.setLength(pos);

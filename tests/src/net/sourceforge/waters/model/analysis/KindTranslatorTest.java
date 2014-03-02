@@ -15,6 +15,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -67,7 +68,6 @@ public class KindTranslatorTest
     assertEquals(trans0.getEventKind(event), EventKind.CONTROLLABLE);
     final File filename =
       new File(getOutputDirectory(), "KindTranslatorTest.ser");
-    ensureParentDirectoryExists(filename);
     final FileOutputStream fos =  new FileOutputStream(filename);
     final ObjectOutputStream out = new ObjectOutputStream(fos);
     out.writeObject(trans0);

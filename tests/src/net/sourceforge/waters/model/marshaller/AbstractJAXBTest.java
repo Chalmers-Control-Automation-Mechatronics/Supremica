@@ -21,9 +21,9 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
 
+import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
-import net.sourceforge.waters.junit.AbstractWatersTest;
 
 
 public abstract class AbstractJAXBTest<D extends DocumentProxy>
@@ -140,7 +140,6 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
   {
     final DocumentManager manager = getDocumentManager();
     final DocumentProxy proxy1 = manager.load(inuri);
-    ensureParentDirectoryExists(outfilename);
     manager.saveAs(proxy1, outfilename);
     final URI outuri = outfilename.toURI();
     final DocumentProxy proxy2 = manager.load(outuri);
@@ -331,7 +330,6 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
     final DocumentManager manager = getDocumentManager();
     final DocumentProxy doc1 = manager.load(inuri);
     if (doc1 instanceof Serializable) {
-      ensureParentDirectoryExists(outfilename);
       final FileOutputStream fos =  new FileOutputStream(outfilename);
       final ObjectOutputStream out = new ObjectOutputStream(fos);
       out.writeObject(doc1);
@@ -391,6 +389,7 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
 
   //#########################################################################
   //# Overrides for junit.framework.TestCase
+  @Override
   protected void tearDown()
     throws Exception
   {
@@ -405,6 +404,7 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
 
     //#######################################################################
     //# Interface java.io.FileFilter
+    @Override
     public boolean accept(final File path)
     {
       if (path.isDirectory()) {

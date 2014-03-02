@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
+import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
-import net.sourceforge.waters.model.compiler.context.SourceInfoBuilder;
 import net.sourceforge.waters.model.compiler.efa.EFACompiler;
 import net.sourceforge.waters.model.compiler.graph.ModuleGraphCompiler;
 import net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler;
@@ -100,10 +100,11 @@ public class ModuleCompiler extends AbortableCompiler
   {
     try {
       setUp();
-      initSourceInfo();
+      mCompilationInfo = new CompilationInfo(mIsSourceInfoEnabled,
+                                             mIsMultiExceptionsEnabled);
       final ModuleProxyFactory modfactory = ModuleElementFactory.getInstance();
       mInstanceCompiler = new ModuleInstanceCompiler
-        (mDocumentManager, modfactory, mSourceInfoBuilder, mInputModule);
+        (mDocumentManager, modfactory, mCompilationInfo, mInputModule);
       mInstanceCompiler.setOptimizationEnabled(mIsOptimizationEnabled);
       mInstanceCompiler.setEnabledPropertyNames(mEnabledPropertyNames);
       mInstanceCompiler.setEnabledPropositionNames(mEnabledPropositionNames);
@@ -113,21 +114,24 @@ public class ModuleCompiler extends AbortableCompiler
       final boolean efa = mInstanceCompiler.getHasEFAElements();
       mInstanceCompiler = null;
       if (efa && mIsExpandingEFATransitions) {
-        shiftSourceInfo();
+        mCompilationInfo.shift();
         mEFACompiler =
-          new EFACompiler(modfactory, mSourceInfoBuilder, intermediate);
+          new EFACompiler(modfactory, mCompilationInfo, intermediate);
         checkAbort();
         intermediate = mEFACompiler.compile();
         mEFACompiler = null;
       }
-      shiftSourceInfo();
+      mCompilationInfo.shift();
       mGraphCompiler =
-        new ModuleGraphCompiler(mFactory, mSourceInfoBuilder, intermediate);
+        new ModuleGraphCompiler(mFactory, mCompilationInfo, intermediate);
       mGraphCompiler.setOptimizationEnabled(mIsOptimizationEnabled);
       checkAbort();
       final ProductDESProxy des = mGraphCompiler.compile();
       setLocation(des);
       return des;
+    } catch (final EvalException exception) {
+      mCompilationInfo.raise(exception);
+      throw mCompilationInfo.getExceptions();
     } finally {
       tearDown();
     }
@@ -135,11 +139,7 @@ public class ModuleCompiler extends AbortableCompiler
 
   public Map<Object,SourceInfo> getSourceInfoMap()
   {
-    if (mIsSourceInfoEnabled) {
-      return mSourceInfoBuilder.getResultMap();
-    } else {
-      return null;
-    }
+    return mCompilationInfo.getResultMap();
   }
 
 
@@ -183,6 +183,16 @@ public class ModuleCompiler extends AbortableCompiler
   public void setSourceInfoEnabled(final boolean enable)
   {
     mIsSourceInfoEnabled = enable;
+  }
+
+  public boolean isMultiExceptionsEnabled()
+  {
+    return mIsMultiExceptionsEnabled;
+  }
+
+  public void setMultiExceptionsEnabled(final boolean enable)
+  {
+    mIsMultiExceptionsEnabled = enable;
   }
 
   public Collection<String> getEnabledPropertyNames()
@@ -254,20 +264,6 @@ public class ModuleCompiler extends AbortableCompiler
     }
   }
 
-  private void initSourceInfo()
-  {
-    if (mIsSourceInfoEnabled) {
-      mSourceInfoBuilder = new SourceInfoBuilder();
-    }
-  }
-
-  private void shiftSourceInfo()
-  {
-    if (mIsSourceInfoEnabled) {
-      mSourceInfoBuilder.shift();
-    }
-  }
-
 
   //#########################################################################
   //# Data Members
@@ -275,7 +271,7 @@ public class ModuleCompiler extends AbortableCompiler
   private final ProductDESProxyFactory mFactory;
   private final ModuleProxy mInputModule;
 
-  private SourceInfoBuilder mSourceInfoBuilder;
+  private CompilationInfo mCompilationInfo;
   private ModuleInstanceCompiler mInstanceCompiler;
   private EFACompiler mEFACompiler;
   private ModuleGraphCompiler mGraphCompiler;
@@ -284,6 +280,7 @@ public class ModuleCompiler extends AbortableCompiler
   private boolean mIsExpandingEFATransitions = true;
   private boolean mIsUsingEventAlphabet = true;
   private boolean mIsSourceInfoEnabled = false;
+  private boolean mIsMultiExceptionsEnabled = false;
   private Collection<String> mEnabledPropertyNames = null;
   private Collection<String> mEnabledPropositionNames = null;
   private HISCCompileMode mHISCCompileMode = HISCCompileMode.NOT_HISC;
