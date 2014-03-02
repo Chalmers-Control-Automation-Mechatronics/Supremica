@@ -59,6 +59,7 @@ import net.sourceforge.waters.gui.actions.InsertInstanceAction;
 import net.sourceforge.waters.gui.actions.InsertParameterBindingAction;
 import net.sourceforge.waters.gui.actions.InsertSimpleComponentAction;
 import net.sourceforge.waters.gui.actions.InsertVariableAction;
+import net.sourceforge.waters.gui.actions.RecompileAction;
 import net.sourceforge.waters.gui.actions.ShowGraphAction;
 import net.sourceforge.waters.gui.actions.ShowModuleCommentAction;
 import net.sourceforge.waters.gui.actions.SimulationBackToStartAction;
@@ -410,6 +411,9 @@ public class IDEMenuBar extends JMenuBar
             actions.getAction(AnalyzeProperTimeBehaviorPropertyAction.class);
           mVerifyMenu.add(PTimeBeh);
         }
+        mVerifyMenu.addSeparator();
+        final Action recompile = actions.getAction(RecompileAction.class);
+        mVerifyMenu.add(recompile);
       }
 
       // Analyze

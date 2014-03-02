@@ -78,8 +78,7 @@ public class Simulation implements ModelObserver, Observer
     final ModuleSubject module = container.getModule();
     module.addModelObserver(this);
     container.attach(this);
-    final ProductDESProxy des = container.getCompiledDES();
-    setCompiledDES(des);
+    setCompiledDES(null);
 
     /*
     mTransitionsToEvents = new TransitionEventMap(des);

@@ -17,6 +17,7 @@ import java.util.Map;
 import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
 import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
+import net.sourceforge.waters.model.compiler.context.SourceInfoCloner;
 import net.sourceforge.waters.model.compiler.efa.EFACompiler;
 import net.sourceforge.waters.model.compiler.graph.ModuleGraphCompiler;
 import net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler;
@@ -43,6 +44,7 @@ public class ModuleCompiler extends AbortableCompiler
     mDocumentManager = manager;
     mFactory = factory;
     mInputModule = module;
+    mCompilationInfoIsDirty = true;
   }
 
 
@@ -51,6 +53,24 @@ public class ModuleCompiler extends AbortableCompiler
   public ModuleProxy getInputModule()
   {
     return mInputModule;
+  }
+
+  public void setInputModule(final ModuleProxy module, final boolean clone)
+  {
+    if (clone) {
+      mCompilationInfo =
+        new CompilationInfo(mIsSourceInfoEnabled, mIsMultiExceptionsEnabled);
+      mCompilationInfoIsDirty = false;
+      final ModuleProxyFactory modfactory =
+        ModuleElementFactory.getInstance();
+      final SourceInfoCloner cloner =
+        new SourceInfoCloner(modfactory, mCompilationInfo);
+      mInputModule = (ModuleProxy) cloner.getClone(module);
+      mInputModule.setLocation(module.getLocation());
+    } else {
+      mCompilationInfoIsDirty = true;
+      mInputModule = module;
+    }
   }
 
 
@@ -100,8 +120,10 @@ public class ModuleCompiler extends AbortableCompiler
   {
     try {
       setUp();
-      mCompilationInfo = new CompilationInfo(mIsSourceInfoEnabled,
-                                             mIsMultiExceptionsEnabled);
+      if (mCompilationInfoIsDirty) {
+        mCompilationInfo = new CompilationInfo(mIsSourceInfoEnabled,
+                                               mIsMultiExceptionsEnabled);
+      }
       final ModuleProxyFactory modfactory = ModuleElementFactory.getInstance();
       mInstanceCompiler = new ModuleInstanceCompiler
         (mDocumentManager, modfactory, mCompilationInfo, mInputModule);
@@ -242,6 +264,7 @@ public class ModuleCompiler extends AbortableCompiler
 
   private void tearDown()
   {
+    mCompilationInfoIsDirty = true;
     mInstanceCompiler = null;
     mEFACompiler = null;
     mGraphCompiler = null;
@@ -269,9 +292,10 @@ public class ModuleCompiler extends AbortableCompiler
   //# Data Members
   private final DocumentManager mDocumentManager;
   private final ProductDESProxyFactory mFactory;
-  private final ModuleProxy mInputModule;
 
+  private ModuleProxy mInputModule;
   private CompilationInfo mCompilationInfo;
+  private boolean mCompilationInfoIsDirty;
   private ModuleInstanceCompiler mInstanceCompiler;
   private EFACompiler mEFACompiler;
   private ModuleGraphCompiler mGraphCompiler;

@@ -20,12 +20,12 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 
+import net.sourceforge.waters.gui.compiler.CompilationObserver;
+import net.sourceforge.waters.gui.dialog.MultilineLabel;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -35,10 +35,8 @@ import net.sourceforge.waters.model.analysis.des.ModelVerifierFactoryLoader;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.TraceProxy;
-import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
-import org.supremica.gui.ide.DocumentContainer;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 import org.supremica.properties.Config;
@@ -52,7 +50,7 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
 
 public abstract class WatersAnalyzeAction
   extends WatersAction
-  implements SupremicaPropertyChangeListener
+  implements SupremicaPropertyChangeListener, CompilationObserver
 {
 
   //#########################################################################
@@ -74,8 +72,24 @@ public abstract class WatersAnalyzeAction
   @Override
   public void actionPerformed(final ActionEvent e)
   {
+    final ModuleContainer container = getActiveModuleContainer();
+    container.compile(this);
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.gui.compiler.CompilationObserver
+  @Override
+  public void compilationSucceeded(final ProductDESProxy compiledDES)
+  {
     @SuppressWarnings("unused")
-    final AnalyzerDialog dialog = new AnalyzerDialog();
+    final AnalyzerDialog dialog = new AnalyzerDialog(compiledDES);
+  }
+
+  @Override
+  public String getVerb()
+  {
+    return "verified";
   }
 
 
@@ -139,29 +153,6 @@ public abstract class WatersAnalyzeAction
     }
   }
 
-  ProductDESProxy getCompiledDES()
-    throws EvalException
-  {
-    final IDE ide = getIDE();
-    if (ide == null) {
-      return null;
-    }
-    final DocumentContainer container = ide.getActiveDocumentContainer();
-    if (container == null || !(container instanceof ModuleContainer)) {
-      return null;
-    }
-    final ModuleContainer mContainer = (ModuleContainer) container;
-    return mContainer.recompile();
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Static Methods
-  private static String wrapInHTML(final String raw)
-  {
-    return "<html><P STYLE=\"text-align:center;word-wrap:break-word;width:100%;left:0\">" + raw + "</p></html>";
-  }
-
 
   //#########################################################################
   // # Abstract Methods
@@ -178,16 +169,16 @@ public abstract class WatersAnalyzeAction
   {
     //#######################################################################
     //# Constructor
-    public AnalyzerDialog()
+    public AnalyzerDialog(final ProductDESProxy des)
     {
+      super(getIDE());
       setLocationAndSize();
       setVisible(true);
       setTitle(getCheckName() + " Check");
       mRunner = new AnalyzerThread();
       mBottomPanel = new JPanel();
       mInformationLabel =
-        new WrapperLabel(getCheckName() + " Check is running...");
-      mInformationLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        new MultilineLabel(getCheckName() + " Check is running...");
       final Border outer = BorderFactory.createRaisedBevelBorder();
       final Border inner = BorderFactory.createEmptyBorder(4, 4, 4, 4);
       final Border border = BorderFactory.createCompoundBorder(outer, inner);
@@ -205,15 +196,8 @@ public abstract class WatersAnalyzeAction
       final Container pane = getContentPane();
       pane.add(mInformationLabel, BorderLayout.CENTER);
       pane.add(mBottomPanel, BorderLayout.SOUTH);
-      try {
-        final ProductDESProxy des = getCompiledDES();
-        mVerifier = getModelVerifier();
-        mVerifier.setModel(des);
-      } catch (final EvalException exception) {
-        getIDE().error(exception.getMessage());
-        error(exception);
-        return;
-      }
+      mVerifier = getModelVerifier();
+      mVerifier.setModel(des);
       mRunner.setPriority(Thread.MIN_PRIORITY);
       mRunner.start();
     }
@@ -367,38 +351,11 @@ public abstract class WatersAnalyzeAction
     private final JPanel mBottomPanel;
     private final JButton mExitButton;
     private JButton traceButton;
-    private final WrapperLabel mInformationLabel;
+    private final MultilineLabel mInformationLabel;
 
     //#######################################################################
     //# Class Constants
     private static final long serialVersionUID = -2478548485525996982L;
-  }
-
-
-  //#########################################################################
-  //# Inner Class WrapperLabel
-  private class WrapperLabel extends JLabel
-  {
-
-    //#######################################################################
-    //# Constructor
-    private WrapperLabel(final String e)
-    {
-      super(wrapInHTML(e));
-    }
-
-    //#######################################################################
-    //# Overrides for javax.swing.JLabel
-    @Override
-    public void setText(final String e)
-    {
-      super.setText(wrapInHTML(e));
-    }
-
-    //#######################################################################
-    //# Class Constants
-    private static final long serialVersionUID = -6693747793242415495L;
-
   }
 
 

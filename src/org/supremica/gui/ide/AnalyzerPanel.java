@@ -73,7 +73,8 @@ public class AnalyzerPanel
         {
 			private static final long serialVersionUID = 1L;
 
-			public void actionPerformed(final ActionEvent e)
+			@Override
+            public void actionPerformed(final ActionEvent e)
             {
                 automataPanel.selectAllAutomata();
             }
@@ -108,39 +109,33 @@ public class AnalyzerPanel
     /**
      * Updates the automata in the analyzer-tab.
      */
-    public boolean updateAutomata()
+    public void updateAutomata(final ProductDESProxy des)
       throws EvalException
     {
-      if (mDocumentContainer instanceof ModuleContainer) {
-        final ModuleContainer moduleContainer =
-          (ModuleContainer) mDocumentContainer;
-        final ProductDESProxy des = moduleContainer.getCompiledDES();
-        final DocumentManager manager =
-          mDocumentContainer.getIDE().getDocumentManager();
-        final ProjectBuildFromWaters builder =
-          new ProjectBuildFromWaters(manager);
-        builder.setIncludesProperties
-          (Config.GUI_ANALYZER_SEND_PROPERTIES_TO_ANALYZER.isTrue());
-        final Project supremicaProject = builder.build(des);
-        final List<String> warnings = builder.getWarnings();
-        if (!warnings.isEmpty()) {
-          final IDE ide = moduleContainer.getIDE();
-          for (final String warning : warnings) {
-            ide.warn(warning);
-          }
+      final IDE ide = mDocumentContainer.getIDE();
+      final DocumentManager manager = ide.getDocumentManager();
+      final ProjectBuildFromWaters builder =
+        new ProjectBuildFromWaters(manager);
+      builder.setIncludesProperties
+        (Config.GUI_ANALYZER_SEND_PROPERTIES_TO_ANALYZER.isTrue());
+      final Project supremicaProject = builder.build(des);
+      final List<String> warnings = builder.getWarnings();
+      if (!warnings.isEmpty()) {
+        for (final String warning : warnings) {
+          ide.warn(warning);
         }
-        addProject(supremicaProject);
-        mVisualProject.updated();
-        /*
-          if (Config.GUI_ANALYZER_AUTOMATONVIEWER_USE_CONTROLLED_SURFACE.isTrue())
-          {
-            ProductDESImporter importer = new ProductDESImporter(ModuleSubjectFactory.getInstance());
-            ModuleSubject flatModule = (ModuleSubject) importer.importModule(mVisualProject);
-            flatModuleContainer = new ModuleContainer(getIDE(), flatModule);
-          }
-        */
       }
-      return true;
+      addProject(supremicaProject);
+      mVisualProject.updated();
+      automataPanel.sortAutomataByName();
+      /*
+        if (Config.GUI_ANALYZER_AUTOMATONVIEWER_USE_CONTROLLED_SURFACE.isTrue())
+        {
+          ProductDESImporter importer = new ProductDESImporter(ModuleSubjectFactory.getInstance());
+          ModuleSubject flatModule = (ModuleSubject) importer.importModule(mVisualProject);
+          flatModuleContainer = new ModuleContainer(getIDE(), flatModule);
+        }
+      */
     }
 
     public VisualProject getVisualProject()
@@ -158,7 +153,7 @@ public class AnalyzerPanel
     {
         while (true)
         {
-            String newName = (String) JOptionPane.showInputDialog(this, msg, "Enter a new name", JOptionPane.QUESTION_MESSAGE, null, null, nameSuggestion);
+            final String newName = (String) JOptionPane.showInputDialog(this, msg, "Enter a new name", JOptionPane.QUESTION_MESSAGE, null, null, nameSuggestion);
 
             if (newName == null)	// user cancelled
             {
@@ -196,8 +191,8 @@ public class AnalyzerPanel
     {
 		return addAutomata(theAutomata, false);
 	}
-	
-	public int addAutomata(final Automata theAutomata, boolean sanityCheck)
+
+	public int addAutomata(final Automata theAutomata, final boolean sanityCheck)
 	{
         final int size = mVisualProject.nbrOfAutomata();
 		if(sanityCheck == false) // just do it the old unsafe way, this fails ungracefully if adding automata named the same as an existing one
@@ -205,16 +200,16 @@ public class AnalyzerPanel
 			mVisualProject.addAutomata(theAutomata);
 			return mVisualProject.nbrOfAutomata() - size;
 		}
-		
+
 		// Here we do it the nice and graceful way
-		for(Automaton aut : theAutomata)
+		for(final Automaton aut : theAutomata)
 		{
 			while(mVisualProject.addAutomaton(aut) == false)
 			{
 				final String name = getNewAutomatonName("Automaton exists: " + aut.getName(), aut.getComment());
 				if(name == null) // then the user cancelled
 					break;	// handle the next one
-				
+
 				aut.setName(name);
 			}
 		}
@@ -227,11 +222,6 @@ public class AnalyzerPanel
         mVisualProject.addAutomata(project);
         mVisualProject.addAttributes(project);
         return project.size();
-    }
-
-    public void sortAutomataByName()
-    {
-        automataPanel.sortAutomataByName();
     }
 
     private final VisualProject mVisualProject = new VisualProject();

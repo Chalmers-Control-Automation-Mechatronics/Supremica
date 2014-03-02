@@ -22,8 +22,6 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
@@ -34,6 +32,9 @@ import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.command.UndoableCommand;
 import net.sourceforge.waters.gui.command.WatersUndoManager;
+import net.sourceforge.waters.gui.compiler.BackgroundCompiler;
+import net.sourceforge.waters.gui.compiler.CompilationDialog;
+import net.sourceforge.waters.gui.compiler.CompilationObserver;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.MainPanelSwitchEvent;
 import net.sourceforge.waters.gui.observer.Observer;
@@ -45,20 +46,16 @@ import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.OperatorTable;
-import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
-import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.ProxySubject;
@@ -73,7 +70,7 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
 
 public class ModuleContainer
   extends DocumentContainer
-  implements UndoInterface, Subject, ChangeListener, ModelObserver
+  implements UndoInterface, Subject, ModelObserver
 {
 
   //#########################################################################
@@ -83,22 +80,12 @@ public class ModuleContainer
     super(ide, module);
 
     mModuleContext = new ModuleContext(module);
+    mBackgroundCompiler = new BackgroundCompiler(this);
     final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
     final OperatorTable optable = CompilerOperatorTable.getInstance();
     mExpressionParser = new ExpressionParser(factory, optable);
-    final DocumentManager manager = ide.getDocumentManager();
-    final ProductDESProxyFactory desfactory =
-      ProductDESElementFactory.getInstance();
-    mCompiler = new ModuleCompiler(manager, desfactory, module);
-    mCompiler.setSourceInfoEnabled(true);
-    mCompiler.setMultiExceptionsEnabled(true);
-    mCompiler.setOptimizationEnabled(Config.OPTIMIZING_COMPILER.isTrue());
-    mCompilerPropertyChangeListener =
-      new CompilerPropertyChangeListener();
-    Config.OPTIMIZING_COMPILER.addPropertyChangeListener
-      (mCompilerPropertyChangeListener);
 
-    mTabPanel = new JTabbedPane();
+    mTabPanel = new CompilingTabbedPane();
     mEditorPanel = new EditorPanel(this, "Editor");
     mSimulatorPanel = new SimulatorPanel(this, "Simulator");
     mAnalyzerPanel = new AnalyzerPanel(this, "Analyzer");
@@ -111,22 +98,9 @@ public class ModuleContainer
       mTabPanel.add(mSimulatorPanel);
     }
     mTabPanel.add(mAnalyzerPanel);
-    mTabPanel.addChangeListener(this);
     mEditorPanel.showComment();
 
     module.addModelObserver(this);
-
-    mTabPanel.addMouseListener(new java.awt.event.MouseAdapter()
-    {
-      @Override
-      public void mouseClicked(final java.awt.event.MouseEvent e)
-      {
-        if (mTabPanel.getSelectedComponent().getName().equals
-              (mAnalyzerPanel.getName())) {
-          mAnalyzerPanel.sortAutomataByName();
-        }
-      }
-    });
   }
 
 
@@ -149,10 +123,9 @@ public class ModuleContainer
   public void close()
   {
     mEditorPanel.close();
-    Config.OPTIMIZING_COMPILER.removePropertyChangeListener
-      (mCompilerPropertyChangeListener);
     Config.INCLUDE_WATERS_SIMULATOR.removePropertyChangeListener
       (mSimulatorPropertyChangeListener);
+    mBackgroundCompiler.terminate();
   }
 
   @Override
@@ -228,13 +201,6 @@ public class ModuleContainer
     case ModelChangeEvent.NAME_CHANGED:
       if (event.getSource() == getModule()) {
         setDocumentNameHasChanged(true);
-      } else {
-        mCompiledDES = null;
-      }
-      break;
-    case ModelChangeEvent.STATE_CHANGED:
-      if (event.getSource() != getModule()) {
-        mCompiledDES = null;
       }
       break;
     case ModelChangeEvent.ITEM_REMOVED:
@@ -242,12 +208,8 @@ public class ModuleContainer
       if(value instanceof Proxy){
         mUpdateGraphPanelVisitor.updateGraphPanel((Proxy) value);
       }
-      mCompiledDES = null;
-      break;
-    case ModelChangeEvent.GEOMETRY_CHANGED:
       break;
     default:
-      mCompiledDES = null;
       break;
     }
   }
@@ -278,16 +240,12 @@ public class ModuleContainer
 
   public ProductDESProxy getCompiledDES()
   {
-    return mCompiledDES;
+    return mBackgroundCompiler.getCompiledDES();
   }
 
   public Map<Object,SourceInfo> getSourceInfoMap()
   {
-    if (mCompiledDES == null) {
-      return null;
-    } else {
-      return mCompiler.getSourceInfoMap();
-    }
+    return mBackgroundCompiler.getSourceInfoMap();
   }
 
   public ExpressionParser getExpressionParser()
@@ -473,46 +431,15 @@ public class ModuleContainer
 
 
   //#######################################################################
-  //# Interface javax.swing.event.ChangeListener
-  @Override
-  public void stateChanged(final ChangeEvent event)
+  //# Compilation
+  public void compile(final CompilationObserver observer)
   {
-    final Component selected = mTabPanel.getSelectedComponent();
-    try {
-      if (selected == mSimulatorPanel) {
-        recompile();
-      } else if (selected == mAnalyzerPanel) {
-        recompile();
-        mAnalyzerPanel.updateAutomata();
-      }
-      final EditorChangedEvent eevent = new MainPanelSwitchEvent(this);
-      // This line of code fires whenever a tab is changed.
-      fireEditorChangedEvent(eevent);
-    } catch (final EvalException exception) {
-      final IDE ide = getIDE();
-      for (final EvalException e : exception.getAll()) {
-        ide.error(e.getMessage());
-      }
-      mTabPanel.setSelectedComponent(mEditorPanel);
-    }
+    mBackgroundCompiler.compile(observer);
   }
 
-
-  //#######################################################################
-  //# Compilation
-  public ProductDESProxy recompile()
-    throws EvalException
+  public void forceCompile(final CompilationObserver observer)
   {
-    if (mCompiledDES == null) {
-      try {
-        mCompiledDES = mCompiler.compile();
-        setCompilationException(null);
-      } catch (final EvalException exception) {
-        setCompilationException(exception);
-        throw exception;
-      }
-    }
-    return mCompiledDES;
+    mBackgroundCompiler.forceCompile(observer);
   }
 
   public void setCompilationException(final EvalException exception)
@@ -550,22 +477,6 @@ public class ModuleContainer
     final ModelChangeEvent event =
       ModelChangeEvent.createGeneralNotification(location, null);
     event.fire();
-  }
-
-
-  //#######################################################################
-  //# Inner Class CompilerPropertyChangeListener
-  private class CompilerPropertyChangeListener
-      implements SupremicaPropertyChangeListener
-  {
-
-    @Override
-    public void propertyChanged(final SupremicaPropertyChangeEvent event)
-    {
-      mCompiler.setOptimizationEnabled(Config.OPTIMIZING_COMPILER.isTrue());
-      mCompiledDES = null;
-    }
-
   }
 
 
@@ -645,6 +556,69 @@ public class ModuleContainer
     }
   }
 
+  //#########################################################################
+  //# Inner Class CompilingTabbedPane
+  private class CompilingTabbedPane
+    extends JTabbedPane
+    implements CompilationObserver
+  {
+    //#######################################################################
+    //# Overrides for javax.swing.JTabbedPane
+    @Override
+    public void setSelectedIndex(final int index)
+    {
+      if (index == -1) {
+        setSelectedIndexImpl(index);
+      } else {
+        mSelected = getComponent(index);
+        if (mSelected == mEditorPanel) {
+          setSelectedIndexImpl(index);
+        } else {
+          compile(this);
+        }
+      }
+    }
+
+    private void setSelectedIndexImpl(final int index)
+    {
+      super.setSelectedIndex(index);
+      final EditorChangedEvent eevent = new MainPanelSwitchEvent(this);
+      fireEditorChangedEvent(eevent);
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.gui.compiler.CompilationObserver
+    @Override
+    public void compilationSucceeded(final ProductDESProxy compiledDES)
+    {
+      try {
+        if (mSelected == mAnalyzerPanel) {
+          mAnalyzerPanel.updateAutomata(compiledDES);
+        }
+        final int index = indexOfComponent(mSelected);
+        setSelectedIndexImpl(index);
+      } catch (final EvalException exception) {
+        final IDE ide = getIDE();
+        final CompilationDialog dialog = new CompilationDialog(ide, null);
+        dialog.setEvalException(exception, getVerb());
+      }
+    }
+
+    @Override
+    public String getVerb()
+    {
+      return (mSelected == mSimulatorPanel) ? "simulated" : "analyzed";
+    }
+
+    //#######################################################################
+    //# Data Members
+    private Component mSelected;
+
+    //#######################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1L;
+  }
+
 
   //#######################################################################
   //# Data Members
@@ -661,14 +635,11 @@ public class ModuleContainer
     new HashMap<SimpleComponentSubject,ComponentViewPanel>();
 
   private final ModuleContext mModuleContext;
-  private final ModuleCompiler mCompiler;
+  private final BackgroundCompiler mBackgroundCompiler;
   private final ExpressionParser mExpressionParser;
   private final UpdateGraphPanelVisitor mUpdateGraphPanelVisitor =
     new UpdateGraphPanelVisitor();
-  private ProductDESProxy mCompiledDES;
 
-  private final CompilerPropertyChangeListener
-    mCompilerPropertyChangeListener;
   private final SupremicaPropertyChangeListener
     mSimulatorPropertyChangeListener;
   private final WatersUndoManager mUndoManager = new WatersUndoManager();

@@ -80,6 +80,6 @@ public class AbortableCompiler implements Abortable
 
   //#########################################################################
   //# Data Members
-  private boolean mIsAborting;
+  private volatile boolean mIsAborting;
 
 }
