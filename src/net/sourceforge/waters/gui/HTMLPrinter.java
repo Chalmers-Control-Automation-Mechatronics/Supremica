@@ -36,11 +36,12 @@ public class HTMLPrinter
 
   //#########################################################################
   //# Static Class Methods
-  public static String getHTMLString(final Proxy proxy)
+  public static String getHTMLString(final Proxy proxy,
+                                     final ModuleContext moduleContext)
   {
     try {
       final StringWriter writer = new StringWriter();
-      final HTMLPrinter printer = new HTMLPrinter(writer);
+      final HTMLPrinter printer = new HTMLPrinter(writer, moduleContext);
       printer.pprint(proxy);
       return writer.toString();
     } catch (final IOException exception) {
@@ -52,8 +53,8 @@ public class HTMLPrinter
   {
     try {
       final StringWriter writer = new StringWriter();
-      final HTMLPrinter printer = new HTMLPrinter(writer);
-      printer.pprint(text);
+      final HTMLWriter wrapper = new HTMLWriter(writer);
+      wrapper.write(text);
       return writer.toString();
     } catch (final IOException exception) {
       throw new WatersRuntimeException(exception);
@@ -63,10 +64,11 @@ public class HTMLPrinter
 
   //#########################################################################
   //# Constructors
-  public HTMLPrinter(final Writer writer)
+  public HTMLPrinter(final Writer writer, final ModuleContext moduleContext)
   {
     super(new HTMLWriter(writer));
     mRaw = writer;
+    mModuleContext = moduleContext;
   }
 
 
@@ -82,6 +84,24 @@ public class HTMLPrinter
       printHTML("</HTML>");
     } catch (final VisitorException exception) {
       unwrap(exception);
+    }
+  }
+
+
+  //#########################################################################
+  //# Proxy Printing
+  @Override
+  public void printProxy(final Proxy proxy)
+    throws VisitorException
+  {
+    final ModuleCompilationErrors errors =
+      mModuleContext.getCompilationErrors();
+    if (errors.isUnderlined(proxy)) {
+      printHTML("<DIV " + UNDERLINE_STYLE + ">");
+      super.printProxy(proxy);
+      printHTML("</DIV>");
+    } else {
+      super.printProxy(proxy);
     }
   }
 
@@ -105,20 +125,35 @@ public class HTMLPrinter
   }
 
   @Override
-  public Object visitForeachProxy
-      (final ForeachProxy proxy)
+  public Object visitForeachProxy(final ForeachProxy proxy)
     throws VisitorException
   {
-    printHTML("<B>FOR</B> ");
+    final ModuleCompilationErrors errors =
+      mModuleContext.getCompilationErrors();
+    printHTML("<TABLE cellspacing=0 cellpadding=0><TR>");
+    printHTML("<TD><B>FOR</B> ");
     print(proxy.getName());
-    printHTML(" <B>IN</B> ");
+    printHTML(" <B>IN</B>&nbsp;</TD>");
     final SimpleExpressionProxy range = proxy.getRange();
+    if (errors.isUnderlined(range)) {
+      printHTML("<TD " + UNDERLINE_STYLE + ">");
+    } else {
+      printHTML("<TD>");
+    }
     range.acceptVisitor(this);
+    printHTML("</TD>");
     final SimpleExpressionProxy guard = proxy.getGuard();
     if (guard != null) {
-      printHTML(" <B>WHERE</B> ");
+      printHTML("<TD>&nbsp;<B>WHERE</B>&nbsp;</TD>");
+      if (errors.isUnderlined(guard)) {
+        printHTML("<TD " + UNDERLINE_STYLE + ">");
+      } else {
+        printHTML("<TD>");
+      }
       guard.acceptVisitor(this);
+      printHTML("</TD>");
     }
+    printHTML("</TR></TABLE>");
     return null;
   }
 
@@ -248,5 +283,12 @@ public class HTMLPrinter
   //########################################################################
   //# Data Members
   private final Writer mRaw;
+  private final ModuleContext mModuleContext;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final String UNDERLINE_STYLE =
+    "style='border-bottom: 1px red dashed'";
 
 }

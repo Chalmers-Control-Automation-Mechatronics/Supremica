@@ -16,8 +16,6 @@ import java.awt.font.TextLayout;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
-import java.io.IOException;
-import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,7 +28,6 @@ import net.sourceforge.waters.gui.util.PropositionIcon;
 import net.sourceforge.waters.model.base.GeometryProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
@@ -232,7 +229,7 @@ public class ProxyShapeProducer
   {
     final SimpleNodeProxyShape shape = createSimpleNodeProxyShape(simple);
     final LabelGeometryProxy geo = simple.getLabelGeometry();
-    createNodeLabelProxyShape(geo, simple);
+    createNodeLabelShape(geo, simple);
     return shape;
   }
 
@@ -275,12 +272,12 @@ public class ProxyShapeProducer
     return shape;
   }
 
-  LabelProxyShape createNodeLabelProxyShape(final LabelGeometryProxy geo,
-                                            final SimpleNodeProxy simple)
+  LabelShape createNodeLabelShape(final LabelGeometryProxy geo,
+                                  final SimpleNodeProxy simple)
   {
-    LabelProxyShape shape = (LabelProxyShape) lookup(geo);
+    LabelShape shape = (LabelShape) lookup(geo);
     if (shape == null) {
-      shape = new LabelProxyShape(simple, EditorColor.DEFAULT_FONT);
+      shape = new LabelShape(simple, EditorColor.DEFAULT_FONT);
       mMap.put(geo, shape);
     }
     return shape;
@@ -374,7 +371,7 @@ public class ProxyShapeProducer
       final int ly = (int) Math.round(y + mHeight);
       Font font = EditorColor.DEFAULT_FONT;
       mMaxBounds = font.getMaxCharBounds(new FontRenderContext(null, true, true));
-      LabelShape lshape = null;
+      AbstractLabelShape lshape = null;
       if (proxy instanceof IdentifierProxy) {
         final IdentifierProxy ident = (IdentifierProxy) proxy;
         font = mRenderingContext.getFont(ident);
@@ -396,14 +393,13 @@ public class ProxyShapeProducer
   private Rectangle2D mMaxBounds;
   private double mMaxHeight = 0;
 
-  private void adjustRect(final LabelShape shape, final int indent)
+  private void adjustRect(final AbstractLabelShape shape, final int indent)
   {
     if(mMaxHeight < mMaxBounds.getHeight()){
       mMaxHeight = mMaxBounds.getHeight();
     }
     final RoundRectangle2D lrect = shape.getShape();
-      lrect.setRoundRect(lrect.getX(), lrect.getY(), lrect.getWidth(),
-                         mMaxHeight, lrect.getArcWidth(), lrect.getArcHeight());
+    lrect.setFrame(lrect.getX(), lrect.getY(), lrect.getWidth(), mMaxHeight);
     mHeight += mMaxHeight;
     if (mWidth < lrect.getWidth() + indent) {
       mWidth = (int) lrect.getWidth() + indent;
@@ -504,27 +500,24 @@ public class ProxyShapeProducer
     return new LabelShape(label, x, y, font, text);
   }
 
-  private LabelShape createForeachLabelShape(final ForeachProxy foreach,
-                                             final int x, final int y){
-    final Font font = EditorColor.DEFAULT_FONT;
-    final StringWriter stringWriter = new StringWriter();
-
-    final ModuleProxyPrinter proxyPrinter = new ModuleProxyPrinter(stringWriter);
-    try {
-      proxyPrinter.pprint("FOR ");
-      proxyPrinter.pprint(foreach.getName());
-      proxyPrinter.pprint(" IN ");
-      proxyPrinter.pprint(foreach.getRange());
-      if(foreach.getGuard() != null){
-        proxyPrinter.pprint(" WHERE ");
-        proxyPrinter.pprint(foreach.getGuard());
-      }
-
-    } catch (final IOException exception) {
-      throw new WatersRuntimeException(exception);
+  private AbstractLabelShape createForeachLabelShape(final ForeachProxy foreach,
+                                                     final int x, final int y)
+  {
+    final Font keyword = EditorColor.DEFAULT_FONT.deriveFont(Font.BOLD);
+    final ForeachLabelShapeBuilder builder =
+      new ForeachLabelShapeBuilder(EditorColor.DEFAULT_FONT);
+    builder.add(keyword, "FOR");
+    builder.add(" " + foreach.getName() + " ");
+    builder.add(keyword, "IN");
+    builder.add(" ");
+    builder.add(foreach.getRange());
+    if (foreach.getGuard() != null) {
+      builder.add(" ");
+      builder.add(keyword, "WHERE");
+      builder.add(" ");
+      builder.add(foreach.getGuard());
     }
-    final String text = stringWriter.toString();
-    return new LabelShape(foreach, x, y, font, text);
+    return builder.create(foreach, x, y, mMap);
   }
 
 

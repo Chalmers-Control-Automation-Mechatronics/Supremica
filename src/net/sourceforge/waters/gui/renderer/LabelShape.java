@@ -14,13 +14,16 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.module.LabelGeometryProxy;
+import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
 
-public class LabelShape extends AbstractProxyShape
+public class LabelShape extends AbstractLabelShape
 {
 
   //##########################################################################
@@ -38,23 +41,43 @@ public class LabelShape extends AbstractProxyShape
     mFont = font;
     mPoint = new Point(x + 2, y + font.getSize());
     mName = name;
-    final TextLayout layout =
-        new TextLayout(mName, mFont, new FontRenderContext(null, true, true));
-    final Rectangle2D rect = layout.getBounds();
-    rect.setRect(x, y, rect.getWidth() + 4, rect.getHeight() + 4);
-    mBounds =
-        new RoundRectangle2D.Double(rect.getX(), rect.getY(), rect.getWidth(),
-                                    rect.getHeight(), ARC_RADIUS, ARC_RADIUS);
+    final Rectangle2D rect = calculateBounds(mName, mFont);
+    mBounds = new RoundRectangle2D.Double(x, y, rect.getWidth() + 4,
+        rect.getHeight() + 4, CORNER_RADIUS, CORNER_RADIUS);
+    mUnderline = new UnderlineShape(proxy, mPoint.x + rect.getMinX(),
+        mPoint.y, rect.getWidth(), font);
+  }
+
+  public LabelShape(final SimpleNodeProxy node, final Font font)
+  {
+    super(node.getLabelGeometry());
+    mFont = font;
+    final Point2D nodepos = node.getPointGeometry().getPoint();
+    final LabelGeometryProxy geom = node.getLabelGeometry();
+    final Point2D offset = (geom == null) ? DEFAULT_OFFSET : geom.getOffset();
+    final int x = (int) Math.round(nodepos.getX() + offset.getX());
+    final int y = (int) Math.round(nodepos.getY() + offset.getY());
+    mPoint = new Point(x + 2, y + font.getSize());
+    mName = node.getName();
+    final Rectangle2D rect = calculateBounds(mName, mFont);
+    // Unfortunately there are some ac hoc constants here to get
+    // these to conform with the corresponding label blocks
+    mBounds = new RoundRectangle2D.Double(x, y - 2, rect.getWidth() + 5,
+        rect.getHeight() + 10, CORNER_RADIUS, CORNER_RADIUS);
+    mUnderline = new UnderlineShape(geom, mPoint.x + rect.getMinX(),
+        mPoint.y, rect.getWidth(), font);
   }
 
 
   //##########################################################################
   //# Interface net.sourceforge.waters.gui.renderer.ProxyShape
+  @Override
   public RoundRectangle2D getShape()
   {
     return mBounds;
   }
 
+  @Override
   public void draw(final Graphics2D graphics,final RenderingInformation status)
   {
     if (status.isFocused()) {
@@ -63,9 +86,18 @@ public class LabelShape extends AbstractProxyShape
     }
     graphics.setFont(mFont);
     graphics.setColor(status.getColor());
-    final int x = (int) Math.round(mPoint.getX());
-    final int y = (int) Math.round(mPoint.getY());
-    graphics.drawString(mName, x, y);
+    graphics.drawString(mName, mPoint.x, mPoint.y);
+    mUnderline.draw(graphics, status);
+  }
+
+
+  //##########################################################################
+  //# Auxiliary Methods
+  protected Rectangle2D calculateBounds(final String name, final Font font)
+  {
+    final FontRenderContext context = new FontRenderContext(null, true, true);
+    final TextLayout layout = new TextLayout(name, font, context);
+    return layout.getBounds();
   }
 
 
@@ -75,10 +107,14 @@ public class LabelShape extends AbstractProxyShape
   private final RoundRectangle2D mBounds;
   private final Font mFont;
   private final String mName;
+  private final UnderlineShape mUnderline;
 
 
   //##########################################################################
   //# Class Constants
-  private static double ARC_RADIUS = 5;
+  public static final int DEFAULT_OFFSET_X = 0;
+  public static final int DEFAULT_OFFSET_Y = 10;
+  public static final Point DEFAULT_OFFSET =
+      new Point(DEFAULT_OFFSET_X, DEFAULT_OFFSET_Y);
 
 }

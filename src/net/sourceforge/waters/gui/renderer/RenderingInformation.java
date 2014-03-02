@@ -9,6 +9,7 @@ public class RenderingInformation
   private final boolean mShowHandles;
   private final Color mColor;
   private final Color mShadowColor;
+  private final boolean mIsUnderlined;
   private final boolean mIsFocused;
   private final int mPriority;
 
@@ -19,11 +20,13 @@ public class RenderingInformation
 
   public RenderingInformation(final boolean isSelected,
                               final boolean showHandles,
+                              final boolean isUnderlined,
                               final boolean isFocused, final Color color,
                               final Color shadowColor, final int priority)
   {
     mIsSelected = isSelected;
     mShowHandles = showHandles;
+    mIsUnderlined = isUnderlined;
     mIsFocused = isFocused;
     mColor = color;
     mShadowColor = shadowColor;
@@ -38,6 +41,11 @@ public class RenderingInformation
   public boolean showHandles()
   {
     return mIsSelected && mShowHandles;
+  }
+
+  public boolean isUnderlined()
+  {
+    return mIsUnderlined;
   }
 
   public boolean isFocused()

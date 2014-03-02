@@ -11,6 +11,7 @@
 package net.sourceforge.waters.gui;
 
 import java.awt.Component;
+
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -35,17 +36,20 @@ class EventListCell
 
   //#########################################################################
   //# Interface javax.swing.ListCellRenderer
+  @Override
   public Component getListCellRendererComponent(final JList<? extends EventDeclSubject> list,
                                                 final EventDeclSubject value,
                                                 final int index,
                                                 final boolean isSelected,
                                                 final boolean cellHasFocus)
   {
-    final EventDeclProxy decl = (EventDeclProxy) value;
-    final String text = HTMLPrinter.getHTMLString(decl);
+    final EventDeclProxy decl = value;
+    final String text = HTMLPrinter.getHTMLString(decl, mContext);
     final Icon icon = mContext.getIcon(decl);
+    final String tooltip = mContext.getToolTipText(decl);
     setText(text);
     setIcon(icon);
+    setToolTipText(tooltip);
     if (isSelected) {
       setBackground(list.getSelectionBackground());
       setForeground(list.getSelectionForeground());

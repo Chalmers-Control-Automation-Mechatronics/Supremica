@@ -40,12 +40,12 @@ import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
-import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.subject.base.ArrayListSubject;
 import net.sourceforge.waters.subject.base.IndexedHashSetSubject;
@@ -63,11 +63,11 @@ import net.sourceforge.waters.subject.module.GeometryTools;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.GroupNodeSubject;
 import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
-import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.LabelBlockSubject;
 import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.PointGeometrySubject;
+import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.subject.module.SplineGeometrySubject;
 import net.sourceforge.waters.xsd.module.SplineKind;
@@ -1441,15 +1441,23 @@ class EditorGraph
       super(original, fake, kind);
       LabelBlockSubject originalLB = null;
       LabelBlockSubject fakeLB = null;
+      GuardActionBlockSubject originalGA = null;
+      GuardActionBlockSubject fakeGA = null;
       if (original != null) {
         originalLB = original.getLabelBlock();
+        originalGA = original.getGuardActionBlock();
       }
       if (fake != null) {
         fakeLB = fake.getLabelBlock();
+        fakeGA = fake.getGuardActionBlock();
       }
       if (originalLB != null && fakeLB != null) {
         mChangeRecordCreator.createChangeRecordsForLabelBlock(originalLB,
                                                               fakeLB);
+      }
+      if (originalGA != null && fakeGA != null) {
+        mChangeRecordCreator.createChangeRecordsForGuardActionBlock
+          (originalGA, fakeGA);
       }
     }
 
@@ -1986,6 +1994,18 @@ class EditorGraph
       }
     }
 
+    private void createChangeRecordsForGuardActionBlock
+      (final GuardActionBlockSubject orig,
+       final GuardActionBlockSubject fake)
+    {
+      try {
+        visitLists(orig.getGuardsModifiable(), fake.getGuardsModifiable());
+        visitLists(orig.getActionsModifiable(), fake.getActionsModifiable());
+      } catch (final VisitorException exception) {
+        throw exception.getRuntimeException();
+      }
+    }
+
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     @Override
@@ -2008,6 +2028,10 @@ class EditorGraph
       final ListSubject<? extends ProxySubject> fakeList =
         fforeach.getBodyModifiable();
       visitLists(originalList, fakeList);
+      visitProxies(oforeach.getRange(), fforeach.getRange());
+      if (oforeach.getGuard() != null) {
+        visitProxies(oforeach.getGuard(), fforeach.getGuard());
+      }
       return null;
     }
 
@@ -2031,14 +2055,6 @@ class EditorGraph
     }
 
     @Override
-    public ChangeRecord visitIdentifierProxy(final IdentifierProxy fake)
-    {
-      final IdentifierSubject oident = (IdentifierSubject) mOriginal;
-      final IdentifierSubject fident = (IdentifierSubject) mFake;
-      return new LabelChangeRecord(oident, fident);
-    }
-
-    @Override
     public ChangeRecord visitLabelBlockProxy(final LabelBlockProxy fake)
     {
       final LabelBlockSubject oblock = (LabelBlockSubject) mOriginal;
@@ -2052,6 +2068,17 @@ class EditorGraph
       final LabelGeometrySubject ogeo = (LabelGeometrySubject) mOriginal;
       final LabelGeometrySubject fgeo = (LabelGeometrySubject) mFake;
       return new LabelGeometryChangeRecord(ogeo, fgeo, mKind);
+    }
+
+    @Override
+    public ChangeRecord visitSimpleExpressionProxy
+      (final SimpleExpressionProxy fake)
+    {
+      final SimpleExpressionSubject oexpr =
+        (SimpleExpressionSubject) mOriginal;
+      final SimpleExpressionSubject fexpr =
+        (SimpleExpressionSubject) mFake;
+      return new LabelChangeRecord(oexpr, fexpr);
     }
 
     @Override
@@ -2072,10 +2099,16 @@ class EditorGraph
         originalList.iterator();
       final Iterator<? extends ProxySubject> fakeIter = fakeList.iterator();
       while (originalIter.hasNext()) {
-        mOriginal = originalIter.next();
-        mFake = fakeIter.next();
-        mOriginal.acceptVisitor(this);
+        visitProxies(originalIter.next(), fakeIter.next());
       }
+    }
+
+    private void visitProxies(final ProxySubject original, final ProxySubject fake)
+      throws VisitorException
+    {
+      mOriginal = original;
+      mFake = fake;
+      mOriginal.acceptVisitor(this);
     }
 
     //#######################################################################

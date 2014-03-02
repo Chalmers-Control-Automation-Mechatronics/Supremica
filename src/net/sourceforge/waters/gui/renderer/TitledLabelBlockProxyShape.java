@@ -42,6 +42,9 @@ public class TitledLabelBlockProxyShape
     super(block, bounds);
     mTitle = title;
     mFont = font;
+    final Rectangle2D titleBounds = getTitleBounds();
+    mUnderline = new UnderlineShape(block, titleBounds.getMinX(),
+        titleBounds.getMaxY(), titleBounds.getWidth(), font);
   }
 
 
@@ -52,11 +55,13 @@ public class TitledLabelBlockProxyShape
     return true;
   }
 
+  @Override
   public Rectangle2D getBounds2D()
   {
     return getTitleBounds();
   }
 
+  @Override
   public boolean isClicked(final int x, final int y)
   {
     return super.isClicked(x, y) || getTitleBounds().contains(x, y);
@@ -65,12 +70,13 @@ public class TitledLabelBlockProxyShape
 
   //#########################################################################
   //# Drawing
+  @Override
   public void draw(final Graphics2D g, final RenderingInformation status)
   {
     super.draw(g, status);
-    final Rectangle2D shapeBounds = getShape().getBounds();
-    final int x = (int) shapeBounds.getMinX();
-    final int y = (int) shapeBounds.getMinY();
+    final Rectangle2D titleBounds = getTitleBounds();
+    final int x = (int) titleBounds.getMinX();
+    final int y = (int) titleBounds.getMaxY();
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                        RenderingHints.VALUE_ANTIALIAS_ON);
     g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,
@@ -79,6 +85,7 @@ public class TitledLabelBlockProxyShape
     g.setStroke(BASICSTROKE);
     g.setColor(status.getColor());
     g.drawString(mTitle, x, y);
+    mUnderline.draw(g, status);
   }
 
 
@@ -94,7 +101,7 @@ public class TitledLabelBlockProxyShape
     final Rectangle2D titleBounds = mFont.getStringBounds(mTitle, context);
     final double width = titleBounds.getWidth();
     final double height = titleBounds.getHeight();
-    titleBounds.setRect(x, y - height, width, height);
+    titleBounds.setRect(x, y - height - 2, width, height);
     return titleBounds;
   }
 
@@ -103,5 +110,6 @@ public class TitledLabelBlockProxyShape
   //# Data Members
   private final String mTitle;
   private final Font mFont;
+  private final UnderlineShape mUnderline;
 
 }

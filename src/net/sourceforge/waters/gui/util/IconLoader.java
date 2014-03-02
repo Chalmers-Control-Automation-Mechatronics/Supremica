@@ -108,11 +108,15 @@ public class IconLoader
   private static final String NAME_CONSTANT = "constant";
   private static final String NAME_CONTROLLABLE_OBSERVABLE =
     "controllable";
+  private static final String NAME_CONTROLLABLE_OBSERVABLE_ERROR =
+    "controllable_error";
   private static final String NAME_CONTROLLABLE_UNOBSERVABLE =
     "controllable_unobservable";
   private static final String NAME_EVENT = "event";
   private static final String NAME_EVENT_ALIAS = "event_alias";
+  private static final String NAME_EVENT_ALIAS_ERROR = "event_alias_error";
   private static final String NAME_FOREACH = "foreach";
+  private static final String NAME_FOREACH_ERROR = "foreach_error";
   private static final String NAME_FORBIDDEN = "ForbiddenState16";
   private static final String NAME_INSTANCE = "instance";
   private static final String NAME_NEW_AUTOMATON = "new_automaton";
@@ -125,7 +129,9 @@ public class IconLoader
   private static final String NAME_NEW_VARIABLE = "new_variable";
   private static final String NAME_NO = "no";
   private static final String NAME_PLANT = "plant";
+  private static final String NAME_PLANT_ERROR = "plant_error";
   private static final String NAME_PROPERTY = "property";
+  private static final String NAME_PROPERTY_ERROR = "property_error";
   private static final String NAME_SIMULATOR_BACK = "simulator_back";
   private static final String NAME_SIMULATOR_REPLAY = "simulator_replay";
   private static final String NAME_SIMULATOR_RESET = "simulator_reset";
@@ -133,7 +139,9 @@ public class IconLoader
   private static final String NAME_SIMULATOR_TO_END = "simulator_to_end";
   private static final String NAME_SIMULATOR_TO_START = "simulator_to_start";
   private static final String NAME_SPEC = "specification";
+  private static final String NAME_SPEC_ERROR = "specification_error";
   private static final String NAME_SUPERVISOR = "supervisor";
+  private static final String NAME_SUPERVISOR_ERROR = "supervisor_error";
   private static final String NAME_TOOL_ABOUT = "about";
   private static final String NAME_TOOL_COPY = "copy";
   private static final String NAME_TOOL_CUT = "cut";
@@ -157,6 +165,8 @@ public class IconLoader
   private static final String NAME_TOOL_UNDO = "undo";
   private static final String NAME_UNCONTROLLABLE_OBSERVABLE =
     "uncontrollable";
+  private static final String NAME_UNCONTROLLABLE_OBSERVABLE_ERROR =
+    "uncontrollable_error";
   private static final String NAME_UNCONTROLLABLE_UNOBSERVABLE =
     "uncontrollable_unobservable";
   private static final String NAME_VARIABLE = "variable";
@@ -174,12 +184,17 @@ public class IconLoader
   public static final ImageIcon ICON_BINDING = getWatersIcon(NAME_BINDING);
   public static final ImageIcon ICON_CONTROLLABLE_OBSERVABLE =
     getWatersIcon(NAME_CONTROLLABLE_OBSERVABLE);
+  public static final ImageIcon ICON_CONTROLLABLE_OBSERVABLE_ERROR =
+    getWatersIcon(NAME_CONTROLLABLE_OBSERVABLE_ERROR);
   public static final ImageIcon ICON_CONTROLLABLE_UNOBSERVABLE =
     getWatersIcon(NAME_CONTROLLABLE_UNOBSERVABLE);
   public static final ImageIcon ICON_EVENT = getWatersIcon(NAME_EVENT);
   public static final ImageIcon ICON_EVENT_ALIAS = getWatersIcon(NAME_EVENT_ALIAS);
+  public static final ImageIcon ICON_EVENT_ALIAS_ERROR =
+    getWatersIcon(NAME_EVENT_ALIAS_ERROR);
   public static final ImageIcon ICON_FORBIDDEN = getSupremicaIcon(NAME_FORBIDDEN);
   public static final ImageIcon ICON_FOREACH = getWatersIcon(NAME_FOREACH);
+  public static final ImageIcon ICON_FOREACH_ERROR = getWatersIcon(NAME_FOREACH_ERROR);
   public static final ImageIcon ICON_INSTANCE = getWatersIcon(NAME_INSTANCE);
   public static final ImageIcon ICON_NEW_AUTOMATON =
     getWatersIcon(NAME_NEW_AUTOMATON);
@@ -192,9 +207,14 @@ public class IconLoader
   public static final ImageIcon ICON_NEW_VARIABLE = getWatersIcon(NAME_NEW_VARIABLE);
   public static final ImageIcon ICON_NO = getWatersIcon(NAME_NO);
   public static final ImageIcon ICON_PLANT = getWatersIcon(NAME_PLANT);
+  public static final ImageIcon ICON_PLANT_ERROR = getWatersIcon(NAME_PLANT_ERROR);
   public static final ImageIcon ICON_PROPERTY = getWatersIcon(NAME_PROPERTY);
+  public static final ImageIcon ICON_PROPERTY_ERROR = getWatersIcon(NAME_PROPERTY_ERROR);
   public static final ImageIcon ICON_SPEC = getWatersIcon(NAME_SPEC);
+  public static final ImageIcon ICON_SPEC_ERROR = getWatersIcon(NAME_SPEC_ERROR);
   public static final ImageIcon ICON_SUPERVISOR = getWatersIcon(NAME_SUPERVISOR);
+  public static final ImageIcon ICON_SUPERVISOR_ERROR =
+    getWatersIcon(NAME_SUPERVISOR_ERROR);
   public static final ImageIcon ICON_TOOL_ABOUT = getWatersIcon(NAME_TOOL_ABOUT);
   public static final ImageIcon ICON_TOOL_COPY = getWatersIcon(NAME_TOOL_COPY);
   public static final ImageIcon ICON_TOOL_CUT = getWatersIcon(NAME_TOOL_CUT);
@@ -220,6 +240,8 @@ public class IconLoader
   public static final ImageIcon ICON_TOOL_UNDO = getWatersIcon(NAME_TOOL_UNDO);
   public static final ImageIcon ICON_UNCONTROLLABLE_OBSERVABLE =
     getWatersIcon(NAME_UNCONTROLLABLE_OBSERVABLE);
+  public static final ImageIcon ICON_UNCONTROLLABLE_OBSERVABLE_ERROR =
+    getWatersIcon(NAME_UNCONTROLLABLE_OBSERVABLE_ERROR);
   public static final ImageIcon ICON_UNCONTROLLABLE_UNOBSERVABLE =
     getWatersIcon(NAME_UNCONTROLLABLE_UNOBSERVABLE);
   public static final ImageIcon ICON_VARIABLE = getWatersIcon(NAME_VARIABLE);

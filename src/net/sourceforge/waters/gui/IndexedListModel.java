@@ -15,13 +15,14 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+
 import javax.swing.AbstractListModel;
 import javax.swing.ListSelectionModel;
 
 import net.sourceforge.waters.subject.base.ListSubject;
-import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
+import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.module.IdentifiedSubject;
 
 
@@ -51,6 +52,7 @@ public class IndexedListModel<E extends IdentifiedSubject>
     }
   }
 
+  @Override
   protected void finalize()
   {
     dispose();
@@ -88,11 +90,13 @@ public class IndexedListModel<E extends IdentifiedSubject>
 
   //#########################################################################
   //# Interface javax.swing.ListModel
+  @Override
   public E getElementAt(final int index)
   {
     return mSortedMirror.get(index);
   }
 
+  @Override
   public int getSize()
   {
     return mSortedMirror.size();
@@ -101,6 +105,7 @@ public class IndexedListModel<E extends IdentifiedSubject>
 
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.ModelObserver
+  @Override
   public void modelChanged(final ModelChangeEvent event)
   {
     Subject source = event.getSource();
@@ -119,6 +124,7 @@ public class IndexedListModel<E extends IdentifiedSubject>
       case ModelChangeEvent.NAME_CHANGED:
       case ModelChangeEvent.STATE_CHANGED:
       case ModelChangeEvent.GEOMETRY_CHANGED:
+      case ModelChangeEvent.GENERAL_NOTIFICATION:
         break;
       default:
         throw new IllegalStateException
@@ -170,6 +176,7 @@ public class IndexedListModel<E extends IdentifiedSubject>
       }
       break;
     case ModelChangeEvent.GEOMETRY_CHANGED:
+    case ModelChangeEvent.GENERAL_NOTIFICATION:
       {
         final IdentifiedSubject isource = (IdentifiedSubject) source;
         final int index = Collections.binarySearch(mSortedMirror, isource);
@@ -186,6 +193,7 @@ public class IndexedListModel<E extends IdentifiedSubject>
     }
   }
 
+  @Override
   public int getModelObserverPriority()
   {
     return ModelObserver.RENDERING_PRIORITY;
@@ -224,6 +232,7 @@ public class IndexedListModel<E extends IdentifiedSubject>
 
     //#######################################################################
     //# Interface java.util.Iterable
+    @Override
     public Iterator<E> iterator()
     {
       return new SelectionIterator(mSelection);
@@ -250,11 +259,13 @@ public class IndexedListModel<E extends IdentifiedSubject>
 
     //#######################################################################
     //# Interface java.util.Iterator
+    @Override
     public boolean hasNext()
     {
       return mIndex >= 0;
     }
 
+    @Override
     public E next()
     {
       if (mIndex >= 0) {
@@ -275,6 +286,7 @@ public class IndexedListModel<E extends IdentifiedSubject>
       }
     }
 
+    @Override
     public void remove()
     {
       throw new UnsupportedOperationException

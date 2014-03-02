@@ -16,12 +16,13 @@ public class PrintRenderingContext extends ModuleRenderingContext
 
     //#######################################################################
     //# Interface net.sourceforge.waters.gui.renderer.RenderingContext
+    @Override
     public RenderingInformation getRenderingInformation(final Proxy proxy)
     {
       final ProxySubject item = (ProxySubject) proxy;
       final int priority = getPriority(item);
       return new RenderingInformation
-        (false, false, false,
+        (false, false, false, false,
          EditorColor.getColor(item, DragOverStatus.NOTDRAG, false,
                               false, false),
          EditorColor.getShadowColor(item, DragOverStatus.NOTDRAG, false,

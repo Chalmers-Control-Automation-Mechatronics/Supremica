@@ -59,8 +59,7 @@ public class EPSGraphPrinter extends Renderer
                          final ProxyShapeProducer producer,
                          final File file)
   {
-    mGraph = graph;
-    mProxyShapeProducer = producer;
+    super(graph, null, producer);
     mFile = file;
   }
 
@@ -77,13 +76,13 @@ public class EPSGraphPrinter extends Renderer
       mGraphics.setCustomTextHandler(this);
       mGraphics.setGraphicContext(new GraphicContext());
       final Rectangle2D bounds =
-        mProxyShapeProducer.getMinimumBoundingRectangle();
+        getProxyShapeProducer().getMinimumBoundingRectangle();
       mGraphics.translate(-bounds.getX(), -bounds.getY());
       final int width = (int) Math.ceil(bounds.getWidth());
       final int height = (int) Math.ceil(bounds.getHeight());
       mGraphics.setupDocument(stream, width, height);
       mGraphics.preparePainting();
-      renderGraph(mGraph, null, mProxyShapeProducer, mGraphics);
+      renderGraph(mGraphics);
       mGraphics.finish();
     } finally {
       close(stream);
@@ -142,8 +141,6 @@ public class EPSGraphPrinter extends Renderer
 
   //#########################################################################
   //# Data Members
-  private final GraphProxy mGraph;
-  private final ProxyShapeProducer mProxyShapeProducer;
   private final File mFile;
 
   private AbstractPSDocumentGraphics2D mGraphics;

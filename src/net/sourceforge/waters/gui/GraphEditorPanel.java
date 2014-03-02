@@ -50,6 +50,7 @@ import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
 import javax.swing.TransferHandler;
 import javax.swing.TransferHandler.TransferSupport;
 
@@ -198,6 +199,7 @@ public class GraphEditorPanel
       undoer.attach(this);
     }
     setTransferHandler(new GraphEditorPanelTransferHandler());
+    ToolTipManager.sharedInstance().registerComponent(this);
   }
 
   /**
@@ -241,6 +243,28 @@ public class GraphEditorPanel
       point = mCurrentPoint;
     }
     return findGrid(point);
+  }
+
+
+  //#########################################################################
+  //# Overrides for javax.swing.JComponent
+  @Override
+  public String getToolTipText(final MouseEvent event)
+  {
+    final ModuleCompilationErrors errors =
+      getModuleContext().getCompilationErrors();
+    final ProxySubject item = getDraggableItem(event, false);
+    if (item == null) {
+      return null;
+    } else if (item instanceof SimpleNodeProxy) {
+      return errors.getSummaryMessage(item);
+    } else if (item.getParent() instanceof SimpleNodeProxy) {
+      final SimpleNodeProxy parent = (SimpleNodeProxy) item.getParent();
+      if (item == parent.getLabelGeometry()) {
+        return errors.getSummaryMessage(parent);
+      }
+    }
+    return errors.getDetailedMessage(item);
   }
 
 
@@ -782,6 +806,7 @@ public class GraphEditorPanel
       final UndoInterface undoer = getUndoInterface();
       undoer.detach(this);
     }
+    ToolTipManager.sharedInstance().unregisterComponent(this);
   }
 
 
@@ -872,7 +897,7 @@ public class GraphEditorPanel
   protected void graphChanged(final ModelChangeEvent event)
   {
     checkGroupNodeHierarchyUpdate(event);
-    updateError();
+    updateOverlap();
     mController.updateHighlighting();
     super.graphChanged(event);
     mSizeMayHaveChanged = true;
@@ -1175,10 +1200,10 @@ public class GraphEditorPanel
     final ProxySubject original = getOriginal(item);
     if (original == null) {
       return false;
-    } else if (isSelected(original)) {
-      return true;
+    } else if (original.getParent() instanceof ForeachProxy) {
+      return isSelected((Proxy) original.getParent());
     } else {
-      return false;
+      return isSelected(original);
     }
   }
 
@@ -1264,11 +1289,11 @@ public class GraphEditorPanel
 
 
   //#########################################################################
-  //# Error Display
-  private void updateError()
+  //# Overlap Display
+  private void updateOverlap()
   {
     if (!mIsCommittingSecondaryGraph) {
-      mError.clear();
+      mOverlap.clear();
       final Collection<NodeProxy> nodes = getDrawnGraph().getNodes();
       for (final NodeProxy n1 : nodes) {
         final Shape s1 = getShapeProducer().getShape(n1).getShape();
@@ -1280,8 +1305,8 @@ public class GraphEditorPanel
             if (overlap(s1, s2)) {
               final NodeSubject node1 = (NodeSubject) n1;
               final NodeSubject node2 = (NodeSubject) n2;
-              mError.add(node1);
-              mError.add(node2);
+              mOverlap.add(node1);
+              mOverlap.add(node2);
             }
           }
         }
@@ -1289,9 +1314,9 @@ public class GraphEditorPanel
     }
   }
 
-  private boolean isError(final ProxySubject subject)
+  private boolean isOverlap(final ProxySubject subject)
   {
-    return mError.contains(subject);
+    return mOverlap.contains(subject);
   }
 
 
@@ -1456,26 +1481,40 @@ public class GraphEditorPanel
    * the item really to be selected may be a label under the cursor,
    * otherwise this method returns the item in focus.
    * @param  event  The mouse event being processed.
+   * @param  ifSelected  Flag, if set to <CODE>true</CODE> then
+   *                     only return items with a label block if
+   *                     that label block is selected.
    * @return The item to be dragged or <CODE>null</CODE>
    */
-  private ProxySubject getItemToBeSelected(final MouseEvent event)
+  private ProxySubject getDraggableItem(final MouseEvent event,
+                                        final boolean ifSelected)
   {
     final ProxySubject item = mFocusedObject;
     if (item == null) {
       return null;
-    } else if (item instanceof LabelBlockSubject && isSelected(item)) {
+    } else if (item instanceof LabelBlockSubject &&
+               (!ifSelected || isSelected(item))) {
       final LabelBlockSubject block = (LabelBlockSubject) item;
       final Point point = event.getPoint();
       final ProxySubject label =
         getLabelToBeSelected(block.getEventIdentifierListModifiable(), point);
+      return label == null ? item : label;
+    } else if (item instanceof GuardActionBlockSubject && !ifSelected) {
+      final GuardActionBlockSubject block = (GuardActionBlockSubject) item;
+      final Point point = event.getPoint();
+      ProxySubject label =
+        getLabelToBeSelected(block.getGuardsModifiable(), point);
+      if (label == null) {
+        label = getLabelToBeSelected(block.getActionsModifiable(), point);
+      }
       return label == null ? item : label;
     } else {
       return item;
     }
   }
 
-  private ProxySubject getLabelToBeSelected(final ListSubject<AbstractSubject> list,
-                                            final Point point)
+  private ProxySubject getLabelToBeSelected
+      (final ListSubject<? extends AbstractSubject> list, final Point point)
   {
     for (final ProxySubject sub : list) {
       final ProxyShape shape = getShapeProducer().getShape(sub);
@@ -1588,7 +1627,7 @@ public class GraphEditorPanel
     //# Constructor
     private EditorRenderingContext()
     {
-      super(mRoot.getModuleWindowInterface().getModuleContext());
+      super(getModuleContext());
     }
 
     //#######################################################################
@@ -1601,7 +1640,7 @@ public class GraphEditorPanel
       final boolean selected = isRenderedSelected(item);
       final boolean showHandles = getCurrentSelection().size() == 1;
         //showHandles = mController.canBeSelected(item);
-      final boolean error = isError(item);
+      final boolean overlap = isOverlap(item);
       int priority = getPriority(item);
       if (mDontDraw.contains(item)) {
         priority = -1;
@@ -1615,8 +1654,22 @@ public class GraphEditorPanel
         dragover = DragOverStatus.NOTDRAG;
       }
       final boolean focussed = isTrackedFocusOwner();
+      final ProxySubject orig = getOriginal(item);
+      final ModuleCompilationErrors errors =
+        getModuleContext().getCompilationErrors();
+      final boolean underlined = errors.isUnderlined(orig);
+      boolean nestedError = false;
+      if (orig instanceof SimpleNodeProxy) {
+        nestedError = errors.hasErrorIcon(orig);
+      } else if (orig.getParent() instanceof SimpleNodeProxy) {
+        final SimpleNodeProxy parent = (SimpleNodeProxy) orig.getParent();
+        if (orig == parent.getLabelGeometry()) {
+          nestedError = errors.hasErrorIcon(parent);
+        }
+      }
+      final boolean error = overlap || nestedError;
       return new RenderingInformation
-        (selected, showHandles, focused,
+        (selected, showHandles, underlined, focused,
          EditorColor.getColor(item, dragover, selected, error, focussed),
          EditorColor.getShadowColor(item, dragover, selected, error, focussed),
          priority);
@@ -1635,8 +1688,13 @@ public class GraphEditorPanel
     @Override
     public void modelChanged(final ModelChangeEvent event)
     {
-      if (event.getKind() == ModelChangeEvent.GEOMETRY_CHANGED) {
+      switch (event.getKind()) {
+      case ModelChangeEvent.GEOMETRY_CHANGED:
+      case ModelChangeEvent.GENERAL_NOTIFICATION:
         repaint();
+        break;
+      default:
+        break;
       }
     }
 
@@ -1817,7 +1875,7 @@ public class GraphEditorPanel
 
     private void mousePressedWhenInFocus(final MouseEvent event)
     {
-      final ProxySubject item = getItemToBeSelected(event);
+      final ProxySubject item = getDraggableItem(event, true);
       final List<ProxySubject> list = getListOfSelectedLabels();
       mItem = item;
       if (canBeSelected(item)) {
@@ -2120,7 +2178,7 @@ public class GraphEditorPanel
           mInternalDragAction = new InternalDragActionSelect
             (start, event.isShiftDown() || event.isControlDown());
         } else {
-          final ProxySubject subject = getItemToBeSelected(event);
+          final ProxySubject subject = getDraggableItem(event, true);
           if (mFocusedObject == subject || !isSelected(subject)) {
             final Handle handle = getClickedHandle(subject, start);
             if (handle == null) {
@@ -2264,7 +2322,7 @@ public class GraphEditorPanel
           mInternalDragAction =
             new InternalDragActionSelect(getStartPoint(), event.isShiftDown() || event.isControlDown());
         } else {
-          final ProxySubject subject = getItemToBeSelected(event);
+          final ProxySubject subject = getDraggableItem(event, true);
           if (mFocusedObject == subject || !isSelected(subject)) {
             final Handle handle = getClickedHandle(subject, getStartPoint());
             if (handle == null) {
@@ -2422,7 +2480,7 @@ public class GraphEditorPanel
           mInternalDragAction =
             new InternalDragActionSelect(getStartPoint(), event.isShiftDown() || event.isControlDown());
         } else {
-          final ProxySubject item = getItemToBeSelected(event);
+          final ProxySubject item = getDraggableItem(event, true);
           if (mFocusedObject == item || !isSelected(item)){
             final Handle handle = getClickedHandle(item, getStartPoint());
             if (handle == null && canBeSelected(item)){
@@ -2727,7 +2785,7 @@ public class GraphEditorPanel
       commitSecondaryGraph();
       clearSecondaryGraph();
       mIsCommittingSecondaryGraph = false;
-      updateError();
+      updateOverlap();
     }
 
     @Override
@@ -5089,8 +5147,7 @@ public class GraphEditorPanel
         // Any event can be dropped on the blocked events list.
         return isContainingAll(block) ? null : block;
       } else {
-        final ModuleContext context =
-          mRoot.getModuleWindowInterface().getModuleContext();
+        final ModuleContext context = getModuleContext();
         if(context.canDropOnEdge(mTransferData)){
           return block;
         }
@@ -5112,8 +5169,7 @@ public class GraphEditorPanel
     public EventListExpressionProxy visitPlainEventListProxy
       (final PlainEventListProxy elist)
     {
-      final ModuleContext context =
-        mRoot.getModuleWindowInterface().getModuleContext();
+      final ModuleContext context = getModuleContext();
       return
         context.canDropOnNode(mTransferData) && !isContainingAll(elist) ?
         elist : null;
@@ -5368,9 +5424,9 @@ public class GraphEditorPanel
    */
   private final Set<ProxySubject> mDontDraw = new THashSet<ProxySubject>();
   /**
-   * Set of items to be highlighted as erroneous.
+   * Set of items to be highlighted as overlapping.
    */
-  private final Set<ProxySubject> mError = new THashSet<ProxySubject>();
+  private final Set<ProxySubject> mOverlap = new THashSet<ProxySubject>();
   /**
    * The currently highlighted item (under the mouse pointer).
    */

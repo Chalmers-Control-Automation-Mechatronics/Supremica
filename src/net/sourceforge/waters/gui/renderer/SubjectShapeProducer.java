@@ -13,8 +13,8 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
-import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
@@ -92,6 +92,7 @@ public class SubjectShapeProducer
 
   //#########################################################################
   //# Clean up
+  @Override
   public void close()
   {
     if (mModule != null) {
@@ -118,6 +119,7 @@ public class SubjectShapeProducer
 
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.ModelObserver
+  @Override
   public void modelChanged(final ModelChangeEvent event)
   {
     final RenderingContext context = getRenderingContext();
@@ -166,8 +168,8 @@ public class SubjectShapeProducer
       } else if (esource instanceof IdentifierProxy) {
         final IdentifierSubject simple = (IdentifierSubject) esource;
         final Subject ancestor =
-          (Subject) SubjectTools.getAncestor(simple, SimpleNodeSubject.class,
-                                             LabelBlockSubject.class);
+          SubjectTools.getAncestor(simple, SimpleNodeSubject.class,
+                                           LabelBlockSubject.class);
         if (ancestor != null) {
           removeMapping(ancestor);
         }
@@ -205,11 +207,14 @@ public class SubjectShapeProducer
         removeMapping(esource);
       }
       break;
+    case ModelChangeEvent.GENERAL_NOTIFICATION:
+      break;
     default:
       removeMapping(esource);
     }
   }
 
+  @Override
   public int getModelObserverPriority()
   {
     return ModelObserver.CLEANUP_PRIORITY_0;
@@ -218,6 +223,7 @@ public class SubjectShapeProducer
 
   //#########################################################################
   //# Smarter Lookup Using Parents
+  @Override
   public GuardActionBlockProxyShape visitGuardActionBlockProxy
     (final GuardActionBlockProxy block)
   {
@@ -233,6 +239,7 @@ public class SubjectShapeProducer
     }
   }
 
+  @Override
   public LabelBlockProxyShape visitLabelBlockProxy(final LabelBlockProxy block)
   {
     final LabelBlockProxyShape shape = (LabelBlockProxyShape) lookup(block);
@@ -252,15 +259,16 @@ public class SubjectShapeProducer
     }
   }
 
-  public LabelProxyShape visitLabelGeometryProxy(final LabelGeometryProxy geo)
+  @Override
+  public LabelShape visitLabelGeometryProxy(final LabelGeometryProxy geo)
   {
-    final LabelProxyShape shape = (LabelProxyShape) lookup(geo);
+    final LabelShape shape = (LabelShape) lookup(geo);
     if (shape != null) {
       return shape;
     } else {
       final LabelGeometrySubject subject = (LabelGeometrySubject) geo;
       final SimpleNodeSubject node = (SimpleNodeSubject) subject.getParent();
-      return createNodeLabelProxyShape(geo, node);
+      return createNodeLabelShape(geo, node);
     }
   }
 
@@ -284,6 +292,7 @@ public class SubjectShapeProducer
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.base.ProxyVisitor
+    @Override
     public Object visitProxy(final Proxy proxy)
     {
       unmap(proxy);
@@ -292,6 +301,7 @@ public class SubjectShapeProducer
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Object visitEdgeProxy(final EdgeProxy edge)
       throws VisitorException
     {
@@ -304,6 +314,7 @@ public class SubjectShapeProducer
       return null;
     }
 
+    @Override
     public Object visitGuardActionBlockProxy(final GuardActionBlockProxy block)
       throws VisitorException
     {
@@ -317,6 +328,7 @@ public class SubjectShapeProducer
       return null;
     }
 
+    @Override
     public Object visitLabelBlockProxy(final LabelBlockProxy block)
       throws VisitorException
     {
@@ -327,6 +339,7 @@ public class SubjectShapeProducer
       return null;
     }
 
+    @Override
     public Object visitSimpleNodeProxy(final SimpleNodeProxy node)
       throws VisitorException
     {

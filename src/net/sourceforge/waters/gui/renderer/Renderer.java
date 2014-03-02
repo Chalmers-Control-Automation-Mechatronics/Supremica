@@ -29,147 +29,185 @@ import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
 public class Renderer
 {
-  public void renderGraph(final GraphProxy graph,
-                          final List<MiscShape> shapes,
-                          final ProxyShapeProducer producer,
-                          final Graphics2D graphics)
+
+  //#########################################################################
+  //# Constructor
+  public Renderer(final GraphProxy graph, final List<MiscShape> shapes,
+                  final ProxyShapeProducer producer)
   {
-    final RenderingContext context = producer.getRenderingContext();
-    final PriorityQueue<ShapeToRender> queue =
-      new PriorityQueue<ShapeToRender>();
+    mGraph = graph;
+    mShapes = shapes;
+    mProxyShapeProducer = producer;
+    mQueue = new PriorityQueue<>();
+  }
+
+
+  //#########################################################################
+  //# Invocation
+  public void renderGraph(final Graphics2D graphics)
+  {
+    mGraphics = graphics;
 
     // Blocked events
-    final LabelBlockProxy blocked = graph.getBlockedEvents();
+    final LabelBlockProxy blocked = mGraph.getBlockedEvents();
     if (blocked != null) {
-      final ProxyShape shape = producer.getShape(blocked);
-      final RenderingInformation info =
-        context.getRenderingInformation(blocked);
-      queue.offer(new ShapeToRender(shape, info));
-
-      listToRender(blocked.getEventIdentifierList(), queue, producer);
+      addToQueue(blocked);
+      listToRender(blocked.getEventIdentifierList());
     }
 
     // Nodes
-    for (final NodeProxy proxy : graph.getNodes()) {
-      queue.offer(new ShapeToRender(producer.getShape(proxy), context
-          .getRenderingInformation(proxy)));
+    for (final NodeProxy proxy : mGraph.getNodes()) {
+      addToQueue(proxy);
       if (proxy instanceof SimpleNodeProxy) {
-        queue.offer(new ShapeToRender(producer
-            .getShape(((SimpleNodeProxy) proxy).getLabelGeometry()), context
-            .getRenderingInformation(((SimpleNodeProxy) proxy)
-                .getLabelGeometry())));
+        addToQueue(((SimpleNodeProxy) proxy).getLabelGeometry());
       }
     }
 
     // Edges
-    for (final EdgeProxy edge : graph.getEdges()) {
-      queue.offer(new ShapeToRender(producer.getShape(edge), context
-          .getRenderingInformation(edge)));
-      queue.offer(new ShapeToRender(producer.getShape(edge.getLabelBlock()),
-          context.getRenderingInformation(edge.getLabelBlock())));
+    for (final EdgeProxy edge : mGraph.getEdges()) {
+      addToQueue(edge);
+      addToQueue(edge.getLabelBlock());
 
-      listToRender(edge.getLabelBlock().getEventIdentifierList(), queue, producer);
+      listToRender(edge.getLabelBlock().getEventIdentifierList());
 
       if (edge.getGuardActionBlock() != null) {
-        queue.offer(new ShapeToRender(producer.getShape(edge
-            .getGuardActionBlock()), context.getRenderingInformation(edge
-            .getGuardActionBlock())));
+        addToQueue(edge.getGuardActionBlock());
         for (final BinaryExpressionProxy action : edge.getGuardActionBlock().getActions()) {
-          queue.offer(new ShapeToRender(producer.getShape(action),
-              new RenderingInformation(false, false, false, EditorColor.ACTIONCOLOR,
-                  EditorColor.ACTIONCOLOR, 0)));
+          addToQueue(action, EditorColor.ACTIONCOLOR);
         }
         final List<SimpleExpressionProxy> guards = edge.getGuardActionBlock().getGuards();
-        // A naive solution for showing the added guards(after synthesis) with different color.
+        // A naive solution for showing the added guards (after synthesis) with different color.
         if(guards.size() == 1)
         {
-            final SimpleExpressionProxy guard = guards.get(0); //there should be only one guard.
-            queue.offer(new ShapeToRender(producer.getShape(guard),
-                new RenderingInformation(false, false, false, EditorColor.GUARDCOLOR, EditorColor.GUARDCOLOR, 0)));
+          addToQueue(guards.get(0), EditorColor.GUARDCOLOR); //there should be only one guard.
         }
         else if(guards.size() == 2)
         {
-            final SimpleExpressionProxy guard = guards.get(0);
-            queue.offer(new ShapeToRender(producer.getShape(guard),
-                new RenderingInformation(false, false, false, EditorColor.ADDEDGUARDCOLOR, EditorColor.ADDEDGUARDCOLOR, 0)));
+          addToQueue(guards.get(0), EditorColor.ADDEDGUARDCOLOR);
         }
         else if(guards.size() == 3)
         {
-            for(int i= 1;i<guards.size();i++)
-            {
-                Color guardColor = EditorColor.GUARDCOLOR;
-                if(i==2)
-                    guardColor = EditorColor.ADDEDGUARDCOLOR;
+          for(int i= 1;i<guards.size();i++)
+          {
+            Color guardColor = EditorColor.GUARDCOLOR;
+            if(i==2)
+              guardColor = EditorColor.ADDEDGUARDCOLOR;
 
-                final SimpleExpressionProxy guard = guards.get(i); //Change color
-                queue.offer(new ShapeToRender(producer.getShape(guard),
-                    new RenderingInformation(false, false, false, guardColor, guardColor, 0)));
-            }
+            addToQueue(guards.get(i), guardColor); //Change color
+          }
         }
       }
     }
 
-    graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                              RenderingHints.VALUE_ANTIALIAS_ON);
-    graphics.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,
-                              RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-    while (!queue.isEmpty()) {
-      final ShapeToRender shape = queue.poll();
-      shape.draw(graphics);
+    mGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                               RenderingHints.VALUE_ANTIALIAS_ON);
+    mGraphics.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS,
+                               RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+    while (!mQueue.isEmpty()) {
+      final ShapeToRender shapeToRender = mQueue.poll();
+      shapeToRender.draw();
     }
-    if (shapes != null) {
-      for (final MiscShape shape : shapes) {
-        shape.draw(graphics);
+    if (mShapes != null) {
+      for (final MiscShape shape : mShapes) {
+        shape.draw(mGraphics);
       }
     }
   }
 
-    protected void drawShape(final ProxyShape p, final RenderingInformation status,
-        final Graphics2D graphics)
-    {
-        p.draw(graphics, status);
-    }
 
-    /**
-     * Just a wrapper class to aid with setting up priority Queue
-     */
-    private class ShapeToRender
-        implements Comparable<ShapeToRender>
-    {
-        private final ProxyShape mShape;
-        private final RenderingInformation mStatus;
+  //#########################################################################
+  //# Simple Access
+  protected ProxyShapeProducer getProxyShapeProducer()
+  {
+    return mProxyShapeProducer;
+  }
 
-        public ShapeToRender(final ProxyShape shape, final RenderingInformation status)
-        {
-            mShape = shape;
-            mStatus = status;
-        }
 
-        public void draw(final Graphics2D g)
-        {
-            if (mStatus.getPriority() >= 0)
-            {
-                drawShape(mShape, mStatus, g);
-            }
-        }
+  //#########################################################################
+  //# Auxiliary Methods
+  protected void drawShape(final ProxyShape p, final RenderingInformation status)
+  {
+    p.draw(mGraphics, status);
+  }
 
-        public int compareTo(final ShapeToRender o)
-        {
-            return mStatus.getPriority() - o.mStatus.getPriority();
-        }
-
-    }
-
-    private void listToRender(final List<Proxy> list,
-                              final PriorityQueue<ShapeToRender> queue,
-                              final ProxyShapeProducer producer){
-      for (final Proxy proxy : list) {
-        queue.offer(new ShapeToRender(producer.getShape(proxy),
-             producer.getRenderingContext().getRenderingInformation(proxy)));
-        if(proxy instanceof ForeachProxy){
-          final ForeachProxy foreach = (ForeachProxy)proxy;
-          listToRender(foreach.getBody(), queue, producer);
+  private void listToRender(final List<Proxy> list)
+  {
+    for (final Proxy proxy : list) {
+      addToQueue(proxy);
+      if (proxy instanceof ForeachProxy){
+        final ForeachProxy foreach = (ForeachProxy) proxy;
+        listToRender(foreach.getBody());
+        addToQueue(foreach.getRange());
+        if(foreach.getGuard() != null) {
+          addToQueue(foreach.getGuard());
         }
       }
     }
+  }
+
+  protected void addToQueue(final Proxy proxy)
+  {
+    final RenderingContext context =
+      mProxyShapeProducer.getRenderingContext();
+    final RenderingInformation info = context.getRenderingInformation(proxy);
+    final ProxyShape shape = mProxyShapeProducer.getShape(proxy);
+    mQueue.offer(new ShapeToRender(shape, info));
+  }
+
+  protected void addToQueue(final Proxy proxy, final Color color)
+  {
+    final Color shadow = EditorColor.shadow(color);
+    final RenderingContext context =
+      mProxyShapeProducer.getRenderingContext();
+    final RenderingInformation info = context.getRenderingInformation(proxy);
+    final RenderingInformation fixed = new RenderingInformation(
+        info.isSelected(), info.showHandles(), info.isUnderlined(),
+        info.isFocused(), color, shadow, info.getPriority());
+    final ProxyShape shape = mProxyShapeProducer.getShape(proxy);
+    mQueue.offer(new ShapeToRender(shape, fixed));
+  }
+
+
+  //#########################################################################
+  //# Inner Class ShapeToRender
+  /**
+   * Just a wrapper class to aid with setting up priority Queue
+   */
+  private class ShapeToRender
+    implements Comparable<ShapeToRender>
+  {
+    private final ProxyShape mShape;
+    private final RenderingInformation mStatus;
+
+    public ShapeToRender(final ProxyShape shape, final RenderingInformation status)
+    {
+      mShape = shape;
+      mStatus = status;
+    }
+
+    public void draw()
+    {
+      if (mStatus.getPriority() >= 0) {
+        drawShape(mShape, mStatus);
+      }
+    }
+
+    @Override
+    public int compareTo(final ShapeToRender o)
+    {
+      return mStatus.getPriority() - o.mStatus.getPriority();
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final GraphProxy mGraph;
+  private final List<MiscShape> mShapes;
+  private final ProxyShapeProducer mProxyShapeProducer;
+  private final PriorityQueue<ShapeToRender> mQueue;
+
+  private Graphics2D mGraphics;
+
 }

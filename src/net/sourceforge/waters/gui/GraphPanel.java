@@ -28,6 +28,7 @@ import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
 import net.sourceforge.waters.gui.renderer.Renderer;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
+
 import org.supremica.properties.Config;
 import org.supremica.properties.SupremicaPropertyChangeEvent;
 import org.supremica.properties.SupremicaPropertyChangeListener;
@@ -120,6 +121,7 @@ public class GraphPanel
 
   //#########################################################################
   //# Interface org.supremica.properties.SupremicaPropertyChangeListener
+  @Override
   public void propertyChanged(final SupremicaPropertyChangeEvent event)
   {
     getShapeProducer().clear();
@@ -157,15 +159,14 @@ public class GraphPanel
   /**
    * Called when printing.
    */
+  @Override
   protected void printComponent(final Graphics g)
   {
     final ProxyShapeProducer producer = new ProxyShapeProducer(mGraph,
-                                   new PrintRenderingContext(mModuleContext));
-    final Renderer renderer = new Renderer();
-    renderer.renderGraph(getDrawnGraph(),
-                         getDrawnObjects(),
-                         producer,
-                         (Graphics2D) g);
+                             new PrintRenderingContext(mModuleContext));
+    final Renderer renderer =
+      new Renderer(getDrawnGraph(), getDrawnObjects(), producer);
+    renderer.renderGraph((Graphics2D) g);
     // Reset stroke
     AbstractRendererShape.setBasicStroke(AbstractRendererShape.SINGLESTROKE);
   }
@@ -173,14 +174,13 @@ public class GraphPanel
   /**
    * Called when painting.
    */
+  @Override
   protected void paintComponent(final Graphics g)
   {
     paintGrid(g);
-    final Renderer renderer = new Renderer();
-    renderer.renderGraph(getDrawnGraph(),
-                         getDrawnObjects(),
-                         getShapeProducer(),
-                         (Graphics2D) g);
+    final Renderer renderer =
+      new Renderer(getDrawnGraph(), getDrawnObjects(), getShapeProducer());
+    renderer.renderGraph((Graphics2D) g);
   }
 
   /**
@@ -199,6 +199,7 @@ public class GraphPanel
   /**
    * Implementation of the Printable interface.
    */
+  @Override
   public int print(final Graphics g, final PageFormat pageFormat, final int page)
   {
     //final double INCH = 72;

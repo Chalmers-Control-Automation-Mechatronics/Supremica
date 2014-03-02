@@ -39,6 +39,7 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
 import javax.swing.TransferHandler;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -59,11 +60,9 @@ import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.ListInsertPosition;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
-import net.sourceforge.waters.gui.util.IconLoader;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
-import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
@@ -145,6 +144,8 @@ public abstract class ModuleTree
 
     setCellRenderer(new ModuleTreeRenderer());
     expandAll(getRootList());
+
+    ToolTipManager.sharedInstance().registerComponent(this);
   }
 
   //#########################################################################
@@ -557,6 +558,7 @@ public abstract class ModuleTree
   {
     final ModuleTreeModel model = getAliasTreeModel();
     model.close();
+    ToolTipManager.sharedInstance().unregisterComponent(this);
   }
 
   private Proxy getClickedItem(final MouseEvent event)
@@ -569,6 +571,20 @@ public abstract class ModuleTree
   {
     final EditorChangedEvent event = new SelectionChangedEvent(this);
     fireEditorChangedEvent(event);
+  }
+
+
+  //#########################################################################
+  //# Overrides for javax.swing.JTree
+  @Override
+  public String getToolTipText(final MouseEvent event)
+  {
+    final TreePath path = getClosestPathForLocation(event.getX(), event.getY());
+    if (path == null) {
+      return null;
+    }
+    final Proxy location = (Proxy) path.getLastPathComponent();
+    return mModuleContext.getToolTipText(location);
   }
 
 
@@ -589,7 +605,7 @@ public abstract class ModuleTree
 
 
   //#########################################################################
-  //#Auxiliary Methods
+  //# Auxiliary Methods
   private void expandOrCollapseRoot()
   {
     final TreePath path = getPathForRow(0);
@@ -1334,7 +1350,7 @@ public abstract class ModuleTree
     //# Constructors
     public PrintVisitor(final Writer writer, final boolean expanded)
     {
-      super(writer);
+      super(writer, mModuleContext);
       mExpanded = expanded;
     }
 
@@ -1387,6 +1403,7 @@ public abstract class ModuleTree
     //#######################################################################
     //# Data Members
     private final boolean mExpanded;
+
   }
 
 
@@ -1418,18 +1435,11 @@ public abstract class ModuleTree
       super.getTreeCellRendererComponent(tree, value, selected, expanded,
                                          leaf, row, hasFocus);
       final Proxy proxy = (Proxy) value;
-      final Icon icon;
-      final EvalException exception = mModuleContainer.getLastCompilationException();
-      if (exception != null && mModel.getVisibleAncestorInTree(exception.getLocation()) == proxy) {
-        icon = IconLoader.ICON_NO;
-      } else {
-        icon = mModuleContext.getIcon(proxy);
-      }
+      final Icon icon = mModuleContext.getIcon(proxy);
       setIcon(icon);
       final String text = getPrintString(proxy, expanded);
       setText(text);
-      final String tooltip = mModuleContext.getToolTipText(proxy);
-      setToolTipText(tooltip);
+
       return this;
     }
 

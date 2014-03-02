@@ -193,11 +193,11 @@ class ModuleTreeModel
       case ModelChangeEvent.NAME_CHANGED:
       case ModelChangeEvent.STATE_CHANGED:
       case ModelChangeEvent.GEOMETRY_CHANGED:
+      case ModelChangeEvent.GENERAL_NOTIFICATION:
         final ProxySubject ancestor = getVisibleAncestorInTree(source);
         if (ancestor != null) {
           final TreePath path = createPath(ancestor);
-          final TreeModelEvent newevent =
-            new TreeModelEvent(this, path, null, null);
+          final TreeModelEvent newevent = new TreeModelEvent(this, path);
           fireNodesChanged(newevent);
         }
         break;
@@ -296,18 +296,6 @@ class ModuleTreeModel
   {
     final Proxy proxy = SubjectTools.getProxyParent(subject);
     return getVisibleAncestorInTree(proxy);
-  }
-
-  /**
-   * Finds the closest proper ancestor of the given node that has a direct
-   * node to be rendered in a tree.
-   * @return The closest parent displayed in trees, which is not equal to the
-   * argument, or <CODE>null</CODE> if no such parent can be found.
-   */
-  ProxySubject getProperAncestorInTree(final ProxySubject node)
-  {
-    final Proxy parent = SubjectTools.getProxyParent(node);
-    return getVisibleAncestorInTree(parent);
   }
 
 

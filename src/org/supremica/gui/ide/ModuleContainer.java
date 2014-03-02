@@ -28,6 +28,7 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import net.sourceforge.waters.gui.EditorWindowInterface;
+import net.sourceforge.waters.gui.ModuleCompilationErrors;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.UndoInterface;
@@ -60,6 +61,7 @@ import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
+import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
@@ -491,7 +493,6 @@ public class ModuleContainer
       for (final EvalException e : exception.getAll()) {
         ide.error(e.getMessage());
       }
-      setLastCompilationException(exception);
       mTabPanel.setSelectedComponent(mEditorPanel);
     }
   }
@@ -503,39 +504,35 @@ public class ModuleContainer
     throws EvalException
   {
     if (mCompiledDES == null) {
-      mCompiledDES = mCompiler.compile();
-      setLastCompilationException(null);
+      try {
+        mCompiledDES = mCompiler.compile();
+        setCompilationException(null);
+      } catch (final EvalException exception) {
+        setCompilationException(exception);
+        throw exception;
+      }
     }
     return mCompiledDES;
   }
 
-  public EvalException getLastCompilationException()
+  public void setCompilationException(final EvalException exception)
   {
-    return mLastCompilationException;
-  }
-
-  public void setLastCompilationException(final EvalException exception)
-  {
-    final EvalException previousException = mLastCompilationException;
-    if (exception != null
-        && !(exception.getLocation() instanceof net.sourceforge.waters.subject.base.Subject)) {
-      // location is invalid, so ignore it
-      mLastCompilationException = null;
+    final ModuleCompilationErrors old = mModuleContext.getCompilationErrors();
+    final ModuleCompilationErrors current;
+    if (exception == null) {
+      current = ModuleCompilationErrors.NONE;
     } else {
-      mLastCompilationException = exception;
+      current = new ModuleCompilationErrors();
+      for (final EvalException e : exception.getAll()) {
+        current.add(e);
+      }
     }
-    fireCompilationExceptionEvent(previousException);
-    fireCompilationExceptionEvent(mLastCompilationException);
-  }
-
-  private void fireCompilationExceptionEvent(final EvalException exception)
-  {
-    if (exception != null) {
-      net.sourceforge.waters.subject.base.Subject location;
-      ModelChangeEvent event;
-      location = (net.sourceforge.waters.subject.base.Subject) exception.getLocation();
-      event = ModelChangeEvent.createStateChanged(location);
-      event.fire();
+    mModuleContext.setCompilationErrors(current);
+    for (final ProxySubject location : old.getAllLocations()) {
+      fireGeneralNotification(location);
+    }
+    for (final ProxySubject location : current.getAllLocations()) {
+      fireGeneralNotification(location);
     }
   }
 
@@ -546,6 +543,13 @@ public class ModuleContainer
   {
     final EditorChangedEvent event = new UndoRedoEvent(this);
     fireEditorChangedEvent(event);
+  }
+
+  private void fireGeneralNotification(final ProxySubject location)
+  {
+    final ModelChangeEvent event =
+      ModelChangeEvent.createGeneralNotification(location, null);
+    event.fire();
   }
 
 
@@ -662,7 +666,6 @@ public class ModuleContainer
   private final UpdateGraphPanelVisitor mUpdateGraphPanelVisitor =
     new UpdateGraphPanelVisitor();
   private ProductDESProxy mCompiledDES;
-  private EvalException mLastCompilationException;
 
   private final CompilerPropertyChangeListener
     mCompilerPropertyChangeListener;

@@ -139,10 +139,18 @@ public class ModuleContext
 
   /**
    * Gets a tool tip text to describe the given module element.
+   * If the element has errors an appropriate error message is returned.
    */
   public String getToolTipText(final Proxy item)
   {
-    return mToolTipGetterVisitor.getToolTipText(item);
+    String tooltip = mCompilationErrors.getDetailedMessage(item);
+    if (tooltip == null) {
+      tooltip = mCompilationErrors.getSummaryMessage(item);
+    }
+    if (tooltip == null) {
+      tooltip = mToolTipGetterVisitor.getToolTipText(item);
+    }
+    return tooltip;
   }
 
   //#########################################################################
@@ -150,6 +158,16 @@ public class ModuleContext
   public ModuleProxy getModule()
   {
     return mModule;
+  }
+
+  public ModuleCompilationErrors getCompilationErrors()
+  {
+    return mCompilationErrors;
+  }
+
+  public void setCompilationErrors(final ModuleCompilationErrors errors)
+  {
+    mCompilationErrors = errors;
   }
 
   //#########################################################################
@@ -199,7 +217,12 @@ public class ModuleContext
   public Icon guessEventIcon(final IdentifierProxy ident)
   {
     final EventDeclProxy decl = guessEventDecl(ident);
-    return decl == null ? IconLoader.ICON_EVENT : getIcon(decl);
+    if (decl != null) {
+      final boolean error = hasErrorIcon(ident);
+      return getEventDeclIcon(decl, error);
+    } else {
+      return IconLoader.ICON_EVENT;
+    }
   }
 
   /**
@@ -216,7 +239,7 @@ public class ModuleContext
     final String name = mIdentifierNameVisitor.getIdentifierName(ident);
     final EventDeclProxy decl = getEventDecl(name);
     if (decl != null) {
-      return getIcon(decl);
+      return getEventDeclIcon(decl, false);
     } else if (ident instanceof SimpleIdentifierProxy
                && name.equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
       return IconLoader.ICON_FORBIDDEN;
@@ -248,7 +271,7 @@ public class ModuleContext
   public String guessEventToolTipText(final IdentifierProxy ident)
   {
     final EventDeclProxy decl = guessEventDecl(ident);
-    return decl == null ? "Event" : getToolTipText(decl);
+    return decl == null ? "Event" : mToolTipGetterVisitor.getToolTipText(decl);
   }
 
   /**
@@ -512,15 +535,43 @@ public class ModuleContext
    */
   public static Icon getComponentKindIcon(final ComponentKind kind)
   {
+    return getComponentKindIcon(kind, false);
+  }
+
+  /**
+   * Gets an icon to represent a component of the given kind.
+   * @param kind    The type ({@link ComponentKind#PLANT}, etc.) of the
+   *                component to be displayed.
+   * @param error   <CODE>true</CODE> to get the error icon.
+   */
+  public static Icon getComponentKindIcon(final ComponentKind kind,
+                                          final boolean error)
+  {
     switch (kind) {
     case PLANT:
-      return IconLoader.ICON_PLANT;
+      if (error) {
+        return IconLoader.ICON_PLANT_ERROR;
+      } else {
+        return IconLoader.ICON_PLANT;
+      }
     case PROPERTY:
-      return IconLoader.ICON_PROPERTY;
+      if (error) {
+        return IconLoader.ICON_PROPERTY_ERROR;
+      } else {
+        return IconLoader.ICON_PROPERTY;
+      }
     case SPEC:
-      return IconLoader.ICON_SPEC;
+      if (error) {
+        return IconLoader.ICON_SPEC_ERROR;
+      } else {
+        return IconLoader.ICON_SPEC;
+      }
     case SUPERVISOR:
-      return IconLoader.ICON_SUPERVISOR;
+      if (error) {
+        return IconLoader.ICON_SUPERVISOR_ERROR;
+      } else {
+        return IconLoader.ICON_SUPERVISOR;
+      }
     default:
       throw new IllegalArgumentException("Unknown component kind: " + kind
                                          + "!");
@@ -555,16 +606,31 @@ public class ModuleContext
   public static Icon getEventKindIcon(final EventKind event,
                                       final boolean observable)
   {
+    return getEventKindIcon(event, observable, false);
+  }
+
+  public static Icon getEventKindIcon(final EventKind event,
+                                      final boolean observable,
+                                      final boolean error)
+  {
     switch (event) {
     case CONTROLLABLE:
       if (observable) {
-        return IconLoader.ICON_CONTROLLABLE_OBSERVABLE;
+        if (error) {
+          return IconLoader.ICON_CONTROLLABLE_OBSERVABLE_ERROR;
+        } else {
+          return IconLoader.ICON_CONTROLLABLE_OBSERVABLE;
+        }
       } else {
         return IconLoader.ICON_CONTROLLABLE_UNOBSERVABLE;
       }
     case UNCONTROLLABLE:
       if (observable) {
-        return IconLoader.ICON_UNCONTROLLABLE_OBSERVABLE;
+        if (error) {
+          return IconLoader.ICON_UNCONTROLLABLE_OBSERVABLE_ERROR;
+        } else {
+          return IconLoader.ICON_UNCONTROLLABLE_OBSERVABLE;
+        }
       } else {
         return IconLoader.ICON_UNCONTROLLABLE_UNOBSERVABLE;
       }
@@ -634,6 +700,35 @@ public class ModuleContext
       status = new GraphStatus(graph);
     }
     return status.hasPropositions();
+  }
+
+  private boolean hasErrorIcon(final Proxy proxy)
+  {
+    return mCompilationErrors.hasErrorIcon(proxy);
+  }
+
+  private Icon getEventDeclIcon(final EventDeclProxy decl, final boolean error)
+  {
+    final EventKind kind = decl.getKind();
+    switch (kind) {
+    case CONTROLLABLE:
+    case UNCONTROLLABLE:
+      final boolean observable = decl.isObservable();
+      return getEventKindIcon(kind, observable, error);
+    case PROPOSITION:
+      final String name = decl.getName();
+      final ColorGeometryProxy geo = decl.getColorGeometry();
+      if (geo != null && !geo.getColorSet().isEmpty()) {
+        final Color color = geo.getColorSet().iterator().next();
+        return PropositionIcon.getIcon(color);
+      } else if (name.equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
+        return IconLoader.ICON_FORBIDDEN;
+      } else {
+        return PropositionIcon.getDefaultMarkedIcon();
+      }
+    default:
+      throw new IllegalArgumentException("Unknown event kind: " + kind + "!");
+    }
   }
 
   //#########################################################################
@@ -1102,39 +1197,28 @@ public class ModuleContext
     @Override
     public Icon visitEventAliasProxy(final EventAliasProxy var)
     {
-      return IconLoader.ICON_EVENT_ALIAS;
+      if (hasErrorIcon(var)) {
+        return IconLoader.ICON_EVENT_ALIAS_ERROR;
+      } else {
+        return IconLoader.ICON_EVENT_ALIAS;
+      }
     }
 
     @Override
     public Icon visitEventDeclProxy(final EventDeclProxy decl)
     {
-      final EventKind kind = decl.getKind();
-      switch (kind) {
-      case CONTROLLABLE:
-      case UNCONTROLLABLE:
-        final boolean observable = decl.isObservable();
-        return getEventKindIcon(kind, observable);
-      case PROPOSITION:
-        final String name = decl.getName();
-        final ColorGeometryProxy geo = decl.getColorGeometry();
-        if (geo != null && !geo.getColorSet().isEmpty()) {
-          final Color color = geo.getColorSet().iterator().next();
-          return PropositionIcon.getIcon(color);
-        } else if (name.equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
-          return IconLoader.ICON_FORBIDDEN;
-        } else {
-          return PropositionIcon.getDefaultMarkedIcon();
-        }
-      default:
-        throw new IllegalArgumentException("Unknown event kind: " + kind
-                                           + "!");
-      }
+      final boolean error = hasErrorIcon(decl);
+      return getEventDeclIcon(decl, error);
     }
 
     @Override
     public Icon visitForeachProxy(final ForeachProxy foreach)
     {
-      return IconLoader.ICON_FOREACH;
+      if (hasErrorIcon(foreach)) {
+        return IconLoader.ICON_FOREACH_ERROR;
+      } else {
+        return IconLoader.ICON_FOREACH;
+      }
     }
 
     @Override
@@ -1159,7 +1243,8 @@ public class ModuleContext
     public Icon visitSimpleComponentProxy(final SimpleComponentProxy comp)
     {
       final ComponentKind kind = comp.getKind();
-      return getComponentKindIcon(kind);
+      final boolean error = hasErrorIcon(comp);
+      return getComponentKindIcon(kind, error);
     }
 
     @Override
@@ -1494,6 +1579,9 @@ public class ModuleContext
   private final ListSubjectWrapper mConstanAliasListWrapper;
   private final ListSubjectWrapper mEventAliasListWrapper;
   private final Map<GraphProxy,GraphStatus> mGraphStatusMap;
+
+  private ModuleCompilationErrors mCompilationErrors =
+    ModuleCompilationErrors.NONE;
 
   //#########################################################################
   //# Static Class Variables

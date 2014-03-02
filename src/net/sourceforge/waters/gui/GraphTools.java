@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sourceforge.waters.gui.renderer.LabelProxyShape;
+import net.sourceforge.waters.gui.renderer.LabelShape;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
@@ -69,7 +69,7 @@ public class GraphTools {
     final boolean initial = nodes.isEmpty();
     final PointGeometrySubject geo = new PointGeometrySubject(pos);
     final LabelGeometrySubject label =
-      new LabelGeometrySubject(LabelProxyShape.DEFAULT_OFFSET);
+      new LabelGeometrySubject(LabelShape.DEFAULT_OFFSET);
     return new SimpleNodeSubject(name, null, null, initial, geo, null, label);
   }
 
@@ -315,6 +315,7 @@ public class GraphTools {
     }
     // Sort all the node groups from smallest to largest ...
     Collections.sort(groups, new Comparator<GroupNodeSubject>() {
+      @Override
       public int compare(final GroupNodeSubject g1, final GroupNodeSubject g2)
       {
         final Rectangle2D r1 = g1.getGeometry().getRectangle();

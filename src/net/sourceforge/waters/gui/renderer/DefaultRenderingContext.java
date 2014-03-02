@@ -21,6 +21,7 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
@@ -29,6 +30,7 @@ import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 
@@ -56,15 +58,17 @@ public class DefaultRenderingContext
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.renderer.RenderingContext
+  @Override
   public Font getFont(final IdentifierProxy ident)
   {
     return EditorColor.DEFAULT_FONT;
   }
 
+  @Override
   public RenderingInformation getRenderingInformation(final Proxy proxy)
   {
     return new RenderingInformation
-      (false, false, false,
+      (false, false, false, false,
        EditorColor.getColor
          (proxy, GraphPanel.DragOverStatus.NOTDRAG, false, false, true),
        EditorColor.getShadowColor
@@ -72,6 +76,7 @@ public class DefaultRenderingContext
        getPriority(proxy));
   }
 
+  @Override
   public ColorInfo getColorInfo(final GraphProxy graph,
                                 final SimpleNodeProxy node)
   {
@@ -84,6 +89,7 @@ public class DefaultRenderingContext
     }
   }
 
+  @Override
   public boolean causesPropositionStatusChange(final ModelChangeEvent event,
                                                final GraphProxy graph)
   {
@@ -105,42 +111,63 @@ public class DefaultRenderingContext
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.Module.ModuleProxyVisitor
+  @Override
   public Object visitProxy(final Proxy proxy)
   {
     return 0;
   }
 
+  @Override
   public Object visitGroupNodeProxy(final GroupNodeProxy group)
   {
     return 1;
   }
 
+  @Override
   public Object visitEdgeProxy(final EdgeProxy edge)
   {
     return 2;
   }
 
+  @Override
   public Object visitNodeProxy(final NodeProxy node)
   {
     return 3;
   }
 
+  @Override
   public Object visitLabelGeometryProxy(final LabelGeometryProxy geo)
   {
     return 4;
   }
 
+  @Override
   public Object visitLabelBlockProxy(final LabelBlockProxy block)
   {
     return 5;
   }
 
+  @Override
   public Object visitGuardActionBlockProxy(final GuardActionBlockProxy block)
   {
     return 6;
   }
 
+  @Override
+  public Object visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
+  {
+    // guards and actions
+    return 6;
+  }
+
+  @Override
   public Object visitIdentifierProxy(final IdentifierProxy ident)
+  {
+    return 7;
+  }
+
+  @Override
+  public Object visitForeachProxy(final ForeachProxy foreach)
   {
     return 7;
   }

@@ -241,6 +241,7 @@ public class ModelChangeEvent extends EventObject
    * <LI>{@link #NAME_CHANGED}</LI>
    * <LI>{@link #STATE_CHANGED}</LI>
    * <LI>{@link #GEOMETRY_CHANGED}</LI>
+   * <LI>{@link #GENERAL_NOTIFICATION}</LI>
    * </UL>
    */
   public int getKind()
@@ -324,6 +325,7 @@ public class ModelChangeEvent extends EventObject
     case NAME_CHANGED:
     case STATE_CHANGED:
     case GEOMETRY_CHANGED:
+    case GENERAL_NOTIFICATION:
       final Queue<ModelObserver> recipients =
         new PriorityQueue<ModelObserver>(7, ModelObserverComparator.INSTANCE);
       for (Subject current = getSource();
