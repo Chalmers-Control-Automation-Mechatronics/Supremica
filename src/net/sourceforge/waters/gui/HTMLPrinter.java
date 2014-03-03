@@ -53,6 +53,7 @@ public class HTMLPrinter
   {
     try {
       final StringWriter writer = new StringWriter();
+      @SuppressWarnings("resource")
       final HTMLWriter wrapper = new HTMLWriter(writer);
       wrapper.write(text);
       return writer.toString();

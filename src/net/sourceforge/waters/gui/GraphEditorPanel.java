@@ -999,12 +999,8 @@ public class GraphEditorPanel
   private void updateController(final ToolController controller)
   {
     if (mController != controller) {
-      for (final MouseListener listener : getMouseListeners()) {
-        removeMouseListener(listener);
-      }
-      for (final MouseMotionListener listener : getMouseMotionListeners()) {
-        removeMouseMotionListener(listener);
-      }
+      removeMouseListener(mController);
+      removeMouseMotionListener(mController);
       mController = controller;
       addMouseListener(mController);
       addMouseMotionListener(mController);
