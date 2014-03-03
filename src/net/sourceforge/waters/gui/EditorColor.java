@@ -46,17 +46,17 @@ public class EditorColor
       } else if (dragOver == GraphPanel.DragOverStatus.CANTDROP) {
         return CANTDROPCOLOR;
       }
-    } else if (error) {
-      if (o instanceof SimpleNodeProxy) {
-        return ERRORCOLOR_NODE;
-      } else {
-	return ERRORCOLOR;
-      }
     } else if (selected) {
       if (hasfocus) {
         return GRAPH_SELECTED_FOCUSSED;
       } else {
         return GRAPH_SELECTED_NOTFOCUSSED;
+      }
+    } else if (error) {
+      if (o instanceof SimpleNodeProxy) {
+        return ERRORCOLOR_NODE;
+      } else {
+        return ERRORCOLOR;
       }
     }
     // Defaults

@@ -1624,6 +1624,7 @@ public class GraphEditorPanel
     private EditorRenderingContext()
     {
       super(getModuleContext());
+      mErrorVisitor = new ErrorVisitor();
     }
 
     //#######################################################################
@@ -1654,15 +1655,7 @@ public class GraphEditorPanel
       final ModuleCompilationErrors errors =
         getModuleContext().getCompilationErrors();
       final boolean underlined = errors.isUnderlined(orig);
-      boolean nestedError = false;
-      if (orig instanceof SimpleNodeProxy) {
-        nestedError = errors.hasErrorIcon(orig);
-      } else if (orig.getParent() instanceof SimpleNodeProxy) {
-        final SimpleNodeProxy parent = (SimpleNodeProxy) orig.getParent();
-        if (orig == parent.getLabelGeometry()) {
-          nestedError = errors.hasErrorIcon(parent);
-        }
-      }
+      final boolean nestedError = mErrorVisitor.isRenderedError(orig);
       final boolean error = overlap || nestedError;
       return new RenderingInformation
         (selected, showHandles, underlined, focused,
@@ -1671,6 +1664,63 @@ public class GraphEditorPanel
          priority);
     }
 
+    //#########################################################################
+    //# Data Members
+    private final ErrorVisitor mErrorVisitor;
+  }
+
+
+  //#########################################################################
+  //# Inner Class ErrorVisitor
+  private class ErrorVisitor extends DefaultModuleProxyVisitor
+  {
+    //#######################################################################
+    //# Invocation
+    public boolean isRenderedError(final Proxy proxy)
+    {
+      try {
+        return (Boolean) proxy.acceptVisitor(this);
+      } catch (final VisitorException exception) {
+        throw exception.getRuntimeException();
+      }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
+    public Boolean visitProxy(final Proxy proxy)
+    {
+      return false;
+    }
+
+    @Override
+    public Boolean visitEdgeProxy(final EdgeProxy edge)
+    {
+      final LabelBlockProxy block = edge.getLabelBlock();
+      if (block != null && block.getEventIdentifierList().isEmpty()) {
+        final ModuleCompilationErrors errors =
+          getModuleContext().getCompilationErrors();
+        return errors.hasErrorIcon(edge);
+      } else {
+        return false;
+      }
+    }
+
+    @Override
+    public Boolean visitLabelGeometryProxy(final LabelGeometryProxy geo)
+    {
+      final LabelGeometrySubject subject = (LabelGeometrySubject) geo;
+      final ProxySubject parent = (ProxySubject) subject.getParent();
+      return isRenderedError(parent);
+    }
+
+    @Override
+    public Boolean visitSimpleNodeProxy(final SimpleNodeProxy node)
+    {
+      final ModuleCompilationErrors errors =
+        getModuleContext().getCompilationErrors();
+      return errors.hasErrorIcon(node);
+    }
   }
 
 

@@ -70,6 +70,8 @@ public class CompositionalModelVerifierFactory
     addArgument(new SelectingMethodArgument());
     addArgument(new SubsumptionArgument());
     addArgument(new NoSpecialEventsArgument());
+    addArgument(new NoSelfloopEventsArgument());
+    addArgument(new NoFailingEventsArgument());
     addArgument(new NoDeadlockPruningArgument());
     addArgument(new SecondaryFactoryArgument());
   }
@@ -468,7 +470,7 @@ public class CompositionalModelVerifierFactory
     //# Constructors
     private NoSpecialEventsArgument()
     {
-      super("-nse", "Disable selfloop removal");
+      super("-nse", "Disable special events");
     }
 
     //#######################################################################
@@ -480,6 +482,58 @@ public class CompositionalModelVerifierFactory
       final AbstractCompositionalModelVerifier composer =
         (AbstractCompositionalModelVerifier) verifier;
       composer.setUsingSpecialEvents(false);
+      composer.setUsingFailureEvents(false);
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class NoSelfloopEventsArgument
+  private static class NoSelfloopEventsArgument extends CommandLineArgumentFlag
+  {
+
+    //#######################################################################
+    //# Constructors
+    private NoSelfloopEventsArgument()
+    {
+      super("-nsl", "Disable selfloop removal");
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    @Override
+    public void configure(final ModelVerifier verifier)
+    {
+      final AbstractCompositionalModelVerifier composer =
+        (AbstractCompositionalModelVerifier) verifier;
+      composer.setUsingSpecialEvents(false);
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class NoFailingEventsArgument
+  private static class NoFailingEventsArgument extends CommandLineArgumentFlag
+  {
+
+    //#######################################################################
+    //# Constructors
+    private NoFailingEventsArgument()
+    {
+      super("-nfe", "Disable failing events removal");
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    @Override
+    public void configure(final ModelVerifier verifier)
+    {
+      final AbstractCompositionalModelVerifier composer =
+        (AbstractCompositionalModelVerifier) verifier;
       composer.setUsingFailureEvents(false);
     }
 

@@ -1182,16 +1182,30 @@ public abstract class AbstractCompositionalModelAnalyzer
   {
     final Logger logger = getLogger();
     if (logger.isDebugEnabled()) {
-      final StringBuilder buffer = new StringBuilder();
-      String sep = "Removing events: ";
-      final List<EventProxy> ordered = new ArrayList<EventProxy>(events);
+      final StringBuilder removing = new StringBuilder();
+      String rsep = "Removing events: ";
+      final StringBuilder failing = new StringBuilder();
+      String fsep = "Redirecting failing events: ";
+      final List<EventProxy> ordered = new ArrayList<>(events);
       Collections.sort(ordered);
       for (final EventProxy event : ordered) {
-        buffer.append(sep);
-        buffer.append(event.getName());
-        sep = ", ";
+        final EventInfo info = getEventInfo(event);
+        if (info.isFailing()) {
+          failing.append(fsep);
+          failing.append(event.getName());
+          fsep = ", ";
+        } else {
+          removing.append(rsep);
+          removing.append(event.getName());
+          rsep = ", ";
+        }
       }
-      logger.debug(buffer);
+      if (rsep.length() == 2) {
+        logger.debug(removing);
+      }
+      if (fsep.length() == 2) {
+        logger.debug(failing);
+      }
     }
   }
 
@@ -2280,7 +2294,6 @@ public abstract class AbstractCompositionalModelAnalyzer
         }
         mIsBlocked |= status == BLOCKED;
         if (status == FAILING && mFailingStatus == NOT_FAILING) {
-          // System.out.println("Found failing event " + mEvent.getName());
           mFailingStatus = FAILING;
         }
       }
