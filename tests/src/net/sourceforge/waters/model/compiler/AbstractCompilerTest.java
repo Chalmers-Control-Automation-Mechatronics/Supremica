@@ -24,6 +24,7 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersException;
 import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierException;
 import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
+import net.sourceforge.waters.model.compiler.efa.ActionSyntaxException;
 import net.sourceforge.waters.model.compiler.graph.NondeterministicModuleException;
 import net.sourceforge.waters.model.compiler.instance.EmptyLabelBlockException;
 import net.sourceforge.waters.model.compiler.instance.InstantiationException;
@@ -484,6 +485,20 @@ public abstract class AbstractCompilerTest
 
   //#########################################################################
   //# Test Cases that Expect Exceptions
+  public void testCompile_assignmentInGuard1()
+    throws IOException, WatersException
+  {
+    compileError("tests", "efa", "assignment_in_guard1", null,
+                 ActionSyntaxException.class, "Assignment operator =");
+  }
+
+  public void testCompile_assignmentInGuard2()
+    throws IOException, WatersException
+  {
+    compileError("tests", "efa", "assignment_in_guard2", null,
+                 ActionSyntaxException.class, "Assignment operator =");
+  }
+
   public void testCompile_edge0()
     throws IOException, WatersException
   {

@@ -269,6 +269,12 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     return mSwapMap.get(op);
   }
 
+  /**
+   * Retrieves the arithmetic operator for modifying assignment operators
+   * such as&nbsp;+=. For example, the assigning operator of&nbsp;+=
+   * is&nbsp;+. If the given operator is not an assignment, or the normal
+   * assignment operator&nbsp;=, then <CODE>null</CODE> is returned.
+   */
   public BinaryOperator getAssigningOperator(final BinaryOperator op)
   {
     return mAssigningMap.get(op);

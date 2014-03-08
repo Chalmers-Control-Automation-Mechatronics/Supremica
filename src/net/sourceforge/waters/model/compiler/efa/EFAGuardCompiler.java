@@ -10,17 +10,21 @@
 package net.sourceforge.waters.model.compiler.efa;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
+import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.DescendingModuleProxyVisitor;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
@@ -40,6 +44,7 @@ public class EFAGuardCompiler
     final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     mFactory = factory;
     mOperatorTable = optable;
+    mGuardChecker = new GuardChecker();
     mCache = new ProxyAccessorHashMap<>(eq);
   }
 
@@ -73,6 +78,7 @@ public class EFAGuardCompiler
       throw new ActionSyntaxException("Empty guard/action block encountered!",
                                       block);
     }
+    mGuardChecker.checkGuards(guards);
     final int size = guards.size() + actions.size();
     final List<SimpleExpressionProxy> list =
       new ArrayList<SimpleExpressionProxy>(size);
@@ -92,6 +98,7 @@ public class EFAGuardCompiler
     if (!(lhs instanceof IdentifierProxy)) {
       throw new ActionSyntaxException(action, lhs);
     }
+    mGuardChecker.checkExpression(lhs);
     final IdentifierProxy ident = (IdentifierProxy) lhs;
     final SimpleExpressionProxy expr = action.getRight();
     final BinaryOperator assignment = action.getOperator();
@@ -105,6 +112,7 @@ public class EFAGuardCompiler
     } else {
       throw new ActionSyntaxException(action);
     }
+    mGuardChecker.checkExpression(expr);
     final BinaryOperator eqop = mOperatorTable.getEqualsOperator();
     final UnaryOperator nextop = mOperatorTable.getNextOperator();
     final UnaryExpressionProxy nextident =
@@ -114,9 +122,84 @@ public class EFAGuardCompiler
 
 
   //#########################################################################
+  //# Inner Class GuardChecker
+  /**
+   * A visitor to search a guard or other expression for occurrences of
+   * assignment operators such as = or&nbsp;+=, in order to report an error
+   * in such cases.
+   */
+  private class GuardChecker extends DescendingModuleProxyVisitor
+  {
+
+    //#######################################################################
+    //# Invocation
+    void checkGuards(final Collection<SimpleExpressionProxy> guards)
+      throws EvalException
+    {
+      try {
+        mWhere = "guard";
+        for (final SimpleExpressionProxy guard : guards) {
+          guard.acceptVisitor(this);
+        }
+      } catch (final VisitorException exception) {
+        final Throwable cause = exception.getCause();
+        if (cause instanceof EvalException) {
+          throw (EvalException) cause;
+        } else {
+          throw exception.getRuntimeException();
+        }
+      }
+    }
+
+    void checkExpression(final SimpleExpressionProxy expr)
+      throws EvalException
+    {
+      try {
+        mWhere = "expression";
+        expr.acceptVisitor(this);
+      } catch (final VisitorException exception) {
+        final Throwable cause = exception.getCause();
+        if (cause instanceof EvalException) {
+          throw (EvalException) cause;
+        } else {
+          throw exception.getRuntimeException();
+        }
+      }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
+    public Object visitProxy(final Proxy proxy)
+    {
+      return null;
+    }
+
+    @Override
+    public Object visitBinaryExpressionProxy(final BinaryExpressionProxy expr)
+      throws VisitorException
+    {
+      final BinaryOperator op = expr.getOperator();
+      if (op == mOperatorTable.getAssignmentOperator() ||
+          mOperatorTable.getAssigningOperator(op) != null) {
+        final ActionSyntaxException exception =
+          new ActionSyntaxException(expr, mWhere);
+        throw wrap(exception);
+      }
+      return super.visitBinaryExpressionProxy(expr);
+    }
+
+    //#######################################################################
+    //# Data Members
+    private String mWhere;
+  }
+
+
+  //#########################################################################
   //# Data Members
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;
+  private final GuardChecker mGuardChecker;
 
   private final ProxyAccessorMap<GuardActionBlockProxy,ConstraintList> mCache;
 
