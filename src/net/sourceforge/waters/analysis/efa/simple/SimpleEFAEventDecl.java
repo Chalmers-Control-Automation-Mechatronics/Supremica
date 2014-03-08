@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.NamedProxy;
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.efa.EFACompiler;
@@ -84,6 +83,7 @@ public class SimpleEFAEventDecl
     return mEFAEventDecl;
   }
 
+  @Override
   public EventKind getKind()
   {
     return mEFAEventDecl.getKind();
@@ -99,11 +99,13 @@ public class SimpleEFAEventDecl
     return mEFAEventDecl.getRanges();
   }
 
+  @Override
   public boolean isObservable()
   {
     return mEFAEventDecl.isObservable();
   }
 
+  @Override
   public Map<String, String> getAttributes()
   {
     return mEFAEventDecl.getAttributes();
@@ -267,6 +269,7 @@ public class SimpleEFAEventDecl
         return null;
     }
 
+    @Override
     public String getName()
   {
     return mEFAEventDecl.getName();
@@ -306,8 +309,14 @@ public class SimpleEFAEventDecl
   private EventKind mKind;
   private boolean mIsObservable;
 
-    @Override
-    public int compareTo(final NamedProxy namedProxy) {
-        return 0;
-    }
+  @Override
+  public int compareTo(final NamedProxy namedProxy) {
+    return 0;
+  }
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = -3739541318333865287L;
+
 }

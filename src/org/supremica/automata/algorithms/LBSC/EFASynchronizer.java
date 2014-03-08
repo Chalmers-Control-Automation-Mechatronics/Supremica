@@ -5,14 +5,25 @@ import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.set.hash.THashSet;
 
-import net.sourceforge.waters.analysis.efa.simple.*;
-import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Stack;
 
-import java.util.*;
-
+import net.sourceforge.waters.analysis.efa.simple.SimpleEFAComponent;
+import net.sourceforge.waters.analysis.efa.simple.SimpleEFAEventDecl;
+import net.sourceforge.waters.analysis.efa.simple.SimpleEFAHelper;
+import net.sourceforge.waters.analysis.efa.simple.SimpleEFAState;
+import net.sourceforge.waters.analysis.efa.simple.SimpleEFAStateEncoding;
+import net.sourceforge.waters.analysis.efa.simple.SimpleEFATransitionLabel;
+import net.sourceforge.waters.analysis.efa.simple.SimpleEFATransitionLabelEncoding;
+import net.sourceforge.waters.analysis.efa.simple.SimpleEFAVariable;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 /**
@@ -119,7 +130,7 @@ public class EFASynchronizer
 
   private int getStateId(final TIntArrayList state)
   {
-    
+
     boolean isForbidden = false;
     boolean isMarked = true;
     boolean isInitial = true;
@@ -193,6 +204,7 @@ public class EFASynchronizer
     mName = mName.substring(0, mName.length() - 2);
   }
 
+  @SuppressWarnings("unused")
   private HashSet<SimpleEFAEventDecl> getEnabledEvents(final TIntArrayList state)
   {
     final HashSet<SimpleEFAEventDecl> events = new HashSet<>();

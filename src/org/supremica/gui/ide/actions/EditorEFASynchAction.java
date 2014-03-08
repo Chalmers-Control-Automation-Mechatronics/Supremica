@@ -50,6 +50,7 @@ import org.supremica.log.LoggerFactory;
  * @version %I%, %G%
  * @since 1.0
  */
+@SuppressWarnings("deprecation")
 public class EditorEFASynchAction
  extends IDEAction
 {
