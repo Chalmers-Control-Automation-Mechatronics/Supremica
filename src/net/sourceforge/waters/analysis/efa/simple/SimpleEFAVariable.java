@@ -13,6 +13,7 @@ import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Objects;
 
 import net.sourceforge.waters.analysis.efa.base.AbstractEFAVariable;
@@ -55,7 +56,7 @@ public class SimpleEFAVariable
    */
   public Collection<IdentifierProxy> getModifiers()
   {
-    return mModifiers;
+    return Collections.unmodifiableCollection(mModifiers);
   }
 
   /**
@@ -65,13 +66,12 @@ public class SimpleEFAVariable
    */
   public void addModifier(final SimpleEFAComponent component)
   {
-//    super.addTransitionRelation(component);
     mModifiers.add(component.getIdentifier());
   }
 
-  public void removeModifiers(final IdentifierProxy component)
+  public void removeModifier(final SimpleEFAComponent component)
   {
-    mModifiers.remove(component);
+    mModifiers.remove(component.getIdentifier());
   }
 
   /**
@@ -80,7 +80,7 @@ public class SimpleEFAVariable
    */
   public Collection<IdentifierProxy> getVisitors()
   {
-    return mVisitors;
+    return Collections.unmodifiableCollection(mVisitors);
   }
 
   /**
@@ -90,23 +90,22 @@ public class SimpleEFAVariable
    */
   public void addVisitor(final SimpleEFAComponent comopnent)
   {
-//    super.addTransitionRelation(comopnent);
     mVisitors.add(comopnent.getIdentifier());
   }
 
-  public void removeVisitor(final IdentifierProxy component)
+  public void removeVisitor(final SimpleEFAComponent component)
   {
-    mVisitors.remove(component);
+    mVisitors.remove(component.getIdentifier());
   }
 
-  public boolean isModifiedBy(final IdentifierProxy component)
+  public boolean isModifiedBy(final SimpleEFAComponent component)
   {
-    return mModifiers.contains(component);
+    return mModifiers.contains(component.getIdentifier());
   }
 
-  public boolean isVisitedBy(final IdentifierProxy component)
+  public boolean isVisitedBy(final SimpleEFAComponent component)
   {
-    return mVisitors.contains(component);
+    return mVisitors.contains(component.getIdentifier());
   }
 
   /**
@@ -122,7 +121,6 @@ public class SimpleEFAVariable
   {
     mMarkings.clear();
   }
-
   /**
    * Returns a collection containing all transition relations (EFAs) using this
    * variable.
@@ -148,14 +146,15 @@ public class SimpleEFAVariable
    * @return <CODE>true</CODE> if the variable is modifies by at most one
    *         component but may visit (appears in guards) by others.
    */
-  public boolean isLocal()
+  public boolean isLocalIn(final SimpleEFAComponent component)
   {
-    return mModifiers.size() <= 1;
+    return (isOnlyModifiedBy(component) || mModifiers.isEmpty())
+     && isVisitedBy(component);
   }
 
 
   /**
-   * Return whether this variable is local.
+   * Return whether this variable is local in given component.
    * <p/>
    * @param component
    * <p/>
@@ -163,13 +162,18 @@ public class SimpleEFAVariable
    *         component but may visit (appears in guards) by others or it does
    *         not have any modifier and only checked here.
    */
-  public boolean isLocalIn(final IdentifierProxy component)
+  public boolean isOnlyModifiedBy(final SimpleEFAComponent component)
   {
-    return (mModifiers.size() == 1 && mModifiers.contains(component))
-     || (mModifiers.isEmpty() && mVisitors.contains(component));
+    return mModifiers.size() < 2 && isModifiedBy(component);
   }
 
-  public VariableComponentProxy getVariableComponent(final ModuleProxyFactory factory)
+  public boolean isOnlyVisitedBy(final SimpleEFAComponent component)
+  {
+    return mVisitors.size() < 2 && isVisitedBy(component);
+  }
+
+  public VariableComponentProxy getVariableComponent(
+   final ModuleProxyFactory factory)
   {
     final ModuleProxyCloner cloner = factory.getCloner();
     final IdentifierProxy iden =
@@ -195,7 +199,7 @@ public class SimpleEFAVariable
     if (obj instanceof SimpleEFAVariable) {
       final VariableComponentProxy var = ((SimpleEFAVariable) obj).getComponent();
       final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
-      return eq.equals(this.mVar, var);
+      return eq.equals(mVar, var);
     }
     return false;
   }
@@ -204,7 +208,7 @@ public class SimpleEFAVariable
   public int hashCode()
   {
     int hash = 7;
-    hash = 17 * hash + Objects.hashCode(this.mVar);
+    hash = 17 * hash + Objects.hashCode(mVar);
     return hash;
   }
 

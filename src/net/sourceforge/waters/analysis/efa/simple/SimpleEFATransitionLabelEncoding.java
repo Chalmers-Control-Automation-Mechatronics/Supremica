@@ -9,8 +9,10 @@
 
 package net.sourceforge.waters.analysis.efa.simple;
 
+import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.set.hash.TIntHashSet;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.efa.base.AbstractEFATransitionLabelEncoding;
@@ -27,7 +29,7 @@ public class SimpleEFATransitionLabelEncoding
 
   public SimpleEFATransitionLabelEncoding()
   {
-    this(DEFAULT_SIZE);
+    this(AbstractEFATransitionLabelEncoding.DEFAULT_SIZE);
   }
 
   public SimpleEFATransitionLabelEncoding(final int size)
@@ -56,7 +58,25 @@ public class SimpleEFATransitionLabelEncoding
   @Override
   public List<SimpleEFATransitionLabel> getTransitionLabelsIncludingTau()
   {
-    return super.getTransitionLabelsExceptTau();
+    return super.getTransitionLabelsIncludingTau();
+  }
+
+  public List<SimpleEFAEventDecl> getSimpleEFAEventDeclsExceptTau()
+  {
+    final List<SimpleEFAEventDecl> events = new ArrayList<>();
+    for (int e = 1; e < size(); e++){
+      events.add(getTransitionLabel(e).getEvent());
+    }
+    return events;
+  }
+
+  public List<SimpleEFAEventDecl> getSimpleEFAEventDeclsIncludingTau()
+  {
+    final List<SimpleEFAEventDecl> events = new ArrayList<>();
+    for (int e = 0; e < size(); e++){
+      events.add(getTransitionLabel(e).getEvent());
+    }
+    return events;
   }
 
   public int[] getTransitionLabelIdByEvent(final SimpleEFAEventDecl e)
@@ -69,6 +89,28 @@ public class SimpleEFATransitionLabelEncoding
       }
     }
     return events.toArray();
+  }
+
+  public TIntObjectHashMap<SimpleEFAEventDecl> getTranLabelToEventMap(){
+    final TIntObjectHashMap<SimpleEFAEventDecl> map = new TIntObjectHashMap<>(size());
+    for (int id = 1; id < size(); id++){
+      map.put(id, getTransitionLabel(id).getEvent());
+    }
+    return map;
+  }
+
+  public TIntObjectHashMap<ConstraintList> getTranLabelToConstraintMap(){
+    final TIntObjectHashMap<ConstraintList> map = new TIntObjectHashMap<>(size());
+    for (int id = 1; id < size(); id++){
+      map.put(id, getTransitionLabel(id).getConstraint());
+    }
+    return map;
+  }
+
+  @Override
+  public int size()
+  {
+    return super.size();
   }
   @Override
   public String toString(){

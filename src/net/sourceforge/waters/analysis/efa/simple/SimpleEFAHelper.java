@@ -9,14 +9,9 @@
 
 package net.sourceforge.waters.analysis.efa.simple;
 
-import static net.sourceforge.waters.analysis.efa.simple.SimpleEFAComponent.DEFAULT_FORBIDDEN_ID;
-import static net.sourceforge.waters.analysis.efa.simple.SimpleEFAComponent.DEFAULT_MARKING_ID;
 import gnu.trove.set.hash.THashSet;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,8 +49,8 @@ public class SimpleEFAHelper {
    * operator table.
    */
   public SimpleEFAHelper(final ModuleProxyFactory factory,
-                         final CompilerOperatorTable optable)
-  {
+                         final CompilerOperatorTable optable) {
+    super();
     mFactory = factory;
     mOperatorTable = optable;
     mCloner = ModuleSubjectFactory.getCloningInstance();
@@ -87,15 +82,15 @@ public class SimpleEFAHelper {
      new THashSet<>(list.size());
     for (final SimpleEFAEventDecl e : list) {
       final IdentifierProxy identifier =
-       mFactory.createSimpleIdentifierProxy(e.getName());
+              mFactory.createSimpleIdentifierProxy(e.getName());
       final EventDeclProxy event =
-       mFactory.createEventDeclProxy(identifier,
-                                     e.getKind(),
-                                     e.isObservable(),
-                                     ScopeKind.LOCAL,
-                                     e.getRanges(),
-                                     null,
-                                     null);
+              mFactory.createEventDeclProxy(identifier,
+                      e.getKind(),
+                      e.isObservable(),
+                      ScopeKind.LOCAL,
+                      e.getRanges(),
+                      null,
+                      null);
       decls.add(event);
     }
     return decls;
@@ -117,7 +112,7 @@ public class SimpleEFAHelper {
           guard = subjectConstraint;
         } else {
           guard =
-           mFactory.createBinaryExpressionProxy(bop, guard, subjectConstraint);
+                  mFactory.createBinaryExpressionProxy(bop, guard, subjectConstraint);
         }
       }
       final Collection<SimpleExpressionProxy> guards =
@@ -184,22 +179,22 @@ public class SimpleEFAHelper {
   {
     final String name = "tau:";
     final SimpleIdentifierProxy iden =
-     mFactory.createSimpleIdentifierProxy(name);
+            mFactory.createSimpleIdentifierProxy(name);
     return mFactory.createEventDeclProxy(iden, EventKind.CONTROLLABLE, false,
-     ScopeKind.LOCAL, null, null, null);
+            ScopeKind.LOCAL, null, null, null);
   }
 
   public EventDeclProxy getMarkingDecl()
   {
     final SimpleIdentifierProxy iden =
-     mFactory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME);
+            mFactory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME);
     return mFactory.createEventDeclProxy(iden, EventKind.PROPOSITION);
   }
 
   public EventDeclProxy getForbiddenDecl()
   {
     final SimpleIdentifierProxy iden =
-     mFactory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_FORBIDDEN_NAME);
+            mFactory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_FORBIDDEN_NAME);
     return mFactory.createEventDeclProxy(iden, EventKind.PROPOSITION);
   }
 
@@ -265,7 +260,55 @@ public class SimpleEFAHelper {
     return exps;
   }
 
+  public static HashMap<String, String> merge(
+   final HashMap<String, String> attribute1,
+   final HashMap<String, String> attribute2,
+   final String separator)
+  {
+    if (attribute1 == null || attribute1.isEmpty()) {
+      return attribute2;
+    }
+    if (attribute2 == null || attribute2.isEmpty()) {
+      return attribute1;
+    }
+
+    final HashMap<String, String> result = new HashMap<>(attribute1);
+    for (final String att2 : attribute2.keySet()) {
+      final String val2 = attribute2.get(att2);
+      String val = result.get(att2);
+      if (val != null) {
+        val += separator + val2;
+      } else {
+        val = val2;
+      }
+      result.put(att2, val);
+    }
+    return result;
+  }
+
+  public static ConstraintList merge(final ConstraintList con1, final ConstraintList con2)
+  {
+    final List<SimpleExpressionProxy> con = new ArrayList<>(con1.getConstraints());
+    con.addAll(con2.getConstraints());
+    return new ConstraintList(con);
+  }
+
+  public ConstraintList conjunct(final ConstraintList con1, final ConstraintList con2){
+    final ConstraintList merge = SimpleEFAHelper.merge(con1, con2);
+    final SimpleExpressionProxy con = merge.createExpression(mFactory, mOperatorTable.getAndOperator());
+    return new ConstraintList(Collections.singletonList(con));
+  }
+
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;
   private final ModuleProxyCloner mCloner;
+
+  public static final String DEFAULT_STATEVALUE_STRING = "PE:";
+  public static final String DEFAULT_VALUE_OPENING = "<";
+  public static final String DEFAULT_VALUE_CLOSING = ">";
+  public static final String DEFAULT_VALUE_SEPARATOR = ",";
+
+  public static final int DEFAULT_MARKING_ID = 0;
+  public static final int DEFAULT_FORBIDDEN_ID = 1;
+
 }

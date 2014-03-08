@@ -100,14 +100,16 @@ import org.supremica.log.LoggerFactory;
 import org.supremica.util.SupremicaException;
 
 /**
- *
+ * A nasty implementation of synchronous composition for EFAs. Use
+ * {@link org.supremica.automata.algorithms.LBSC.EFASynchronizer} instead
+ * <p>
  * @author Mohammad Reza Shoaei
  */
+@Deprecated
 public class EFASynchronizer
  implements Abortable
 {
 
-  //TODO HDS: Accept ComponentProxy 
   public EFASynchronizer(final List<SimpleEFAComponent> components,
                          final SynchronizationOptions options)
    throws AnalysisException
@@ -275,7 +277,7 @@ public class EFASynchronizer
     final SimpleEFASystem system = compiler.compile();
     final SimpleEFAComponent efa = system.getComponents().iterator().next();
     efa.setBlockedEvents(null);
-    efa.setDeterministic(automaton.isDeterministic());
+    efa.setStructurallyDeterministic(automaton.isDeterministic());
     if (mStateNameAsValue) {
       readStateNames(efa.getStateEncoding());
     }
@@ -428,8 +430,9 @@ public class EFASynchronizer
     State fromState, toState;
     LabeledEvent event;
     boolean initialFlag = true;
-    if (!component.getEdges().isEmpty()) {
-      for (final EdgeProxy item : component.getEdges()) {
+    final List<EdgeProxy> trs = component.getTransitionSet(false);
+    if (!trs.isEmpty()) {
+      for (final EdgeProxy item : trs) {
         final EdgeSubject edge = (EdgeSubject) item;
         fromState = automaton.getStateWithName(edge.getSource().getName());
         if (fromState == null) {
@@ -511,13 +514,13 @@ public class EFASynchronizer
     for (final SimpleEFAState state : oStateEncoding.getSimpleStates()) {
       final String str = state.getName();
       final List<SimpleExpressionProxy> exps =
-       mHelper.parseString(str,
-                           EFAPartialEvaluator.DEFAULT_VALUE_OPENING,
-                           EFAPartialEvaluator.DEFAULT_VALUE_CLOSING);
+ mHelper.parseString(str,
+                                                                   SimpleEFAHelper.DEFAULT_VALUE_OPENING,
+                                                                   SimpleEFAHelper.DEFAULT_VALUE_CLOSING);
       for (final SimpleExpressionProxy exp : exps) {
-        state.mergeToAttribute(EFAPartialEvaluator.DEFAULT_STATEVALUE_STRING,
+        state.mergeToAttribute(SimpleEFAHelper.DEFAULT_STATEVALUE_STRING,
                                exp.toString(),
-                               EFAPartialEvaluator.DEFAULT_VALUE_SEPARATOR);
+                               SimpleEFAHelper.DEFAULT_VALUE_SEPARATOR);
       }
     }
   }

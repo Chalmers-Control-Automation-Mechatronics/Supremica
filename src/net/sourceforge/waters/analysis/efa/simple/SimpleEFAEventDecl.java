@@ -17,13 +17,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sourceforge.waters.model.base.NamedProxy;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyVisitor;
+import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.efa.EFACompiler;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleHashCodeVisitor;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.plain.base.NamedElement;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -32,12 +38,15 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * @author Mohammad Reza Shoaei
  */
 public class SimpleEFAEventDecl
+        extends NamedElement
+        implements EventProxy
 {
 
   //#########################################################################
   //# Constructors
   public SimpleEFAEventDecl(final EventDeclProxy decl)
   {
+    super(decl.getName());
     mEFAEventDecl = decl;
     mVariables = new THashSet<>();
     mPrimeVariables = new THashSet<>();
@@ -50,6 +59,7 @@ public class SimpleEFAEventDecl
   public SimpleEFAEventDecl(final IdentifierProxy identifier,
                             final EventKind kind)
   {
+    super(identifier.getPlainText());
     mEFAEventDecl = new EventDeclSubject(identifier, kind);
     mVariables = new THashSet<>();
     mPrimeVariables = new THashSet<>();
@@ -131,6 +141,11 @@ public class SimpleEFAEventDecl
     return mComponents.size() < 2;
   }
 
+  public boolean isProposition()
+  {
+    return mEFAEventDecl.getKind() == EventKind.PROPOSITION;
+  }
+
   public boolean isLocalIn(final SimpleEFAComponent component)
   {
     return isLocal() && mComponents.contains(component.getIdentifier());
@@ -199,7 +214,7 @@ public class SimpleEFAEventDecl
    */
   public void setKind(final EventKind kind)
   {
-    if (mKind.equals(kind)) {
+    if (mKind == kind) {
       return;
     }
     mKind = kind;
@@ -234,10 +249,25 @@ public class SimpleEFAEventDecl
   {
     final ModuleHashCodeVisitor hash =
      ModuleHashCodeVisitor.getInstance(false);
-    return hash.getListHashCode(Collections.singletonList(this.mEFAEventDecl));
+    return hash.getListHashCode(Collections.singletonList(mEFAEventDecl));
   }
 
-  public String getName()
+    @Override
+    public SimpleEFAEventDecl clone() {
+        return new SimpleEFAEventDecl(getIdentifier(),getKind());
+    }
+
+    @Override
+    public Class<EventProxy> getProxyInterface() {
+        return EventProxy.class;
+    }
+
+    @Override
+    public Object acceptVisitor(final ProxyVisitor visitor) throws VisitorException {
+        return null;
+    }
+
+    public String getName()
   {
     return mEFAEventDecl.getName();
   }
@@ -275,4 +305,9 @@ public class SimpleEFAEventDecl
   private boolean mIsBlocked;
   private EventKind mKind;
   private boolean mIsObservable;
+
+    @Override
+    public int compareTo(final NamedProxy namedProxy) {
+        return 0;
+    }
 }

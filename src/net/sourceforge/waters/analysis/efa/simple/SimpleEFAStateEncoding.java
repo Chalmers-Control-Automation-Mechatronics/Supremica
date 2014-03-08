@@ -32,7 +32,7 @@ public class SimpleEFAStateEncoding implements Iterable<SimpleEFAState>
 
   public SimpleEFAStateEncoding()
   {
-    this(DEFAULT_SIZE);
+    this(SimpleEFAStateEncoding.DEFAULT_SIZE);
   }
 
   public int size()

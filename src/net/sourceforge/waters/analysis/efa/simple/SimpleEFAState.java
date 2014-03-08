@@ -58,9 +58,9 @@ public class SimpleEFAState
   public SimpleEFAState(final String name,
                         final boolean isInitial, final boolean isMarked,
                         final boolean isForbidden,
-                        final Map<String, String> attributes,
-                        final ModuleProxyFactory factory)
-  {
+                        final HashMap<String, String> attributes,
+                        final ModuleProxyFactory factory) {
+    super();
     mName = name;
     mIsInitial = isInitial;
     mIsMarked = isMarked;
@@ -69,7 +69,7 @@ public class SimpleEFAState
     mHelper = new SimpleEFAHelper(mFactory);
     mPropositions = mFactory.createPlainEventListProxy();
     mAttributes = attributes != null ? attributes
-                  : new HashMap<String, String>();
+            : new HashMap<String, String>();
   }
 
   public SimpleEFAState(final String name,
@@ -77,6 +77,14 @@ public class SimpleEFAState
                         final boolean isMarked)
   {
     this(name, isInitial, isMarked, false, null, null);
+  }
+
+  public SimpleEFAState(final String name,
+                        final boolean isInitial, final boolean isMarked,
+                        final boolean isForbidden,
+                        final HashMap<String, String> attributes)
+  {
+    this(name, isInitial, isMarked, isForbidden, attributes, null);
   }
 
   public String getName()
@@ -119,12 +127,12 @@ public class SimpleEFAState
     return mIsForbidden;
   }
 
-  public Map<String, String> getAttributes()
+  public HashMap<String, String> getAttributes()
   {
     return mAttributes.isEmpty() ? null : mAttributes;
   }
 
-  public void setAttributes(final Map<String, String> attributes)
+  public void setAttributes(final HashMap<String, String> attributes)
   {
     mAttributes = attributes;
   }
@@ -145,7 +153,8 @@ public class SimpleEFAState
     if (list.isEmpty()) {
       return null;
     } else {
-      return mFactory.createPlainEventListProxy(list);
+      return mFactory.createPlainEventListProxy(mFactory.getCloner()
+              .getClonedList(list));
     }
   }
 
@@ -162,9 +171,9 @@ public class SimpleEFAState
   public SimpleNodeProxy getSimpleNode()
   {
     return mFactory.createSimpleNodeProxy(mName, getPropositions(),
-                                          getAttributes(), mIsInitial,
-                                          mPointGeometry, mInitialArrowGeometry,
-                                          mLabelGeometry);
+            getAttributes(), mIsInitial,
+            mPointGeometry, mInitialArrowGeometry,
+            mLabelGeometry);
   }
 
   public void addToAttribute(final String key, final String value)
@@ -181,9 +190,14 @@ public class SimpleEFAState
                                final String separator)
   {
     if (mAttributes != null && mAttributes.containsKey(key)) {
-      final String oValue = mAttributes.get(key);
-      final String nValue = oValue + separator + value;
-      addToAttribute(key, nValue);
+      String oValue = mAttributes.get(key);
+      final String[] values = value.split(separator);
+      for (final String v : values) {
+        if (!oValue.contains(v)) {
+          oValue += separator + v;
+        }
+      }
+      addToAttribute(key, oValue);
     } else {
       addToAttribute(key, value);
     }
@@ -198,9 +212,14 @@ public class SimpleEFAState
   @Override
   public boolean equals(final Object obj)
   {
+    final SimpleNodeProxy thisNode = getSimpleNode();
     if (obj instanceof SimpleNodeProxy) {
       final SimpleNodeProxy otherNode = (SimpleNodeProxy) obj;
-      final SimpleNodeProxy thisNode = getSimpleNode();
+      if (otherNode.compareTo(thisNode) == 0) {
+        return true;
+      }
+    } else if (obj instanceof SimpleEFAState) {
+      final SimpleNodeProxy otherNode = ((SimpleEFAState) obj).getSimpleNode();
       if (otherNode.compareTo(thisNode) == 0) {
         return true;
       }
@@ -212,19 +231,19 @@ public class SimpleEFAState
   public int hashCode()
   {
     int hash = 7;
-    hash = 97 * hash + Objects.hashCode(this.mName);
+    hash = 97 * hash + Objects.hashCode(mName);
     return hash;
   }
 
   private ModuleProxyFactory mFactory;
-  private boolean mIsInitial = false;
-  private boolean mIsMarked = false;
-  private boolean mIsForbidden = false;
-  private Map<String, String> mAttributes;
+  private boolean mIsInitial;
+  private boolean mIsMarked;
+  private boolean mIsForbidden;
+  private HashMap<String, String> mAttributes;
   private PlainEventListProxy mPropositions;
   private String mName;
   private final SimpleEFAHelper mHelper;
-  private PointGeometryProxy mInitialArrowGeometry = null;
-  private LabelGeometryProxy mLabelGeometry = null;
-  private PointGeometryProxy mPointGeometry = null;
+  private PointGeometryProxy mInitialArrowGeometry;
+  private LabelGeometryProxy mLabelGeometry;
+  private PointGeometryProxy mPointGeometry;
 }
