@@ -171,7 +171,6 @@ public abstract class AbstractCompositionalModelAnalyzer
       CompositionalSelectionHeuristicFactory.MinS.createChainHeuristic();
     mSubsumptionEnabled = false;
     mUsingSpecialEvents = true;
-    mUsingFailureEvents = true;
     mLowerInternalStateLimit = mUpperInternalStateLimit =
       super.getNodeLimit();
     mInternalTransitionLimit = super.getTransitionLimit();
@@ -362,23 +361,24 @@ public abstract class AbstractCompositionalModelAnalyzer
   }
 
   /**
-   * Sets whether special events are to be considered in abstraction.
-   * Failure Events are events that always lead to a dump state in some automaton.
-   * If enabled, this will redirect failure events in other automata
-   * to dump states.
+   * Sets whether failure events are to be considered in abstraction.
+   * @see #isFailureEventsEnabled()
    */
-  public void setUsingFailureEvents(final boolean enable)
+  public void setFailureEventsEnabled(final boolean enable)
   {
-    mUsingFailureEvents = enable;
+    mFailureEventsEnabled = enable;
   }
 
   /**
    * Returns whether failure events are considered in abstraction.
-   * @see #setUsingFailureEvents(boolean)
+   * Failure Events are events that always lead to a dump state in some
+   * automaton. If enabled, this will redirect failure events in other
+   * automata to dump states.
+   * @see #setFailureEventsEnabled(boolean) setFailureEventEnabled()
    */
-  public boolean isUsingFailureEvents()
+  public boolean isFailureEventsEnabled()
   {
-    return mUsingFailureEvents;
+    return mFailureEventsEnabled;
   }
 
   /**
@@ -874,6 +874,19 @@ public abstract class AbstractCompositionalModelAnalyzer
   }
 
   /**
+   * Returns whether failure events are considered in abstraction.
+   * Failure Events are events that always lead to a dump state in some
+   * automaton. If enabled, this will redirect failure events in other
+   * automata to dump states.
+   * @return <CODE>false</CODE>. Failure events are disabled by default
+   *         but can be enabled by subclasses overriding this method.
+   */
+  protected boolean isUsingFailureEvents()
+  {
+    return false;
+  }
+
+  /**
    * Removes the given events from the model.
    * This method is called when redundant events have been identified to
    * remove them.
@@ -890,7 +903,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     } else {
       showRemovedEvents(removed);
       final Set<EventProxy> failing =
-        mUsingFailureEvents ? new THashSet<EventProxy>() : null;
+        isUsingFailureEvents() ? new THashSet<EventProxy>() : null;
       final int numAutomata = mCurrentAutomata.size();
       final List<AutomatonProxy> originals =
         new ArrayList<AutomatonProxy>(numAutomata);
@@ -928,7 +941,8 @@ public abstract class AbstractCompositionalModelAnalyzer
    * redundant events from an automaton.
    * @param  aut      An automaton to be simplified.
    * @param  removed  Set of events to be removed.
-   * @param  failing  Set of failing events to be redirected to dump states.
+   * @param  failing  Failing events that have been redirected to dump states
+   *                  are added to this set.
    * @return New automaton representing result of event removal.
    *         May be the same as the input automaton, if no events can be
    *         removed.
@@ -1081,7 +1095,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   {
     final Collection<EventProxy> events = aut.getEvents();
     Set<StateProxy> nonDumpStates = null;
-    if (mUsingFailureEvents) {
+    if (isUsingFailureEvents()) {
       final EventProxy omega = getUsedDefaultMarking();
       if (omega != null && events.contains(omega)) {
         //Find the nondump states
@@ -1322,8 +1336,7 @@ public abstract class AbstractCompositionalModelAnalyzer
           // Find or create dump state ...
           final EventProxy defaultMarking = getUsedDefaultMarking();
           if (events.contains(defaultMarking)) {
-            final Set<StateProxy> nonDumpStates =
-              new THashSet<StateProxy>(states.size());
+            final Set<StateProxy> nonDumpStates = new THashSet<>(states.size());
             for (final StateProxy state : states) {
               // If the state is marked it is not a dump state
               if (state.getPropositions().contains(defaultMarking)) {
@@ -1354,12 +1367,20 @@ public abstract class AbstractCompositionalModelAnalyzer
             return removeEvents(copy, removed, failing, dumpState);
           }
         }
-        final TransitionProxy newTrans =
-          factory.createTransitionProxy(trans.getSource(), event, dumpState);
-        newTransitions.add(newTrans);
-        failing.add(event);
-        mHasRemovedProperTransition = true;
-      } else if (trans.getSource() != trans.getTarget()) { // If we are removing trans that is not self loop
+        if (trans.getTarget() == dumpState) {
+          // If the transition already goes to the dump state, keep it
+          newTransitions.add(trans);
+        } else {
+          // Otherwise redirect the transition to the dump state
+          final TransitionProxy newTrans =
+            factory.createTransitionProxy(trans.getSource(), event, dumpState);
+          newTransitions.add(newTrans);
+          failing.add(event);
+          // Redirecting a transition to dump can block other events
+          mHasRemovedProperTransition = true;
+        }
+      } else if (trans.getSource() != trans.getTarget()) {
+        // Removing a non-selfloop blocked event can block other events
         mHasRemovedProperTransition = true;
       }
     }
@@ -2686,7 +2707,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   private SelectionHeuristic<Candidate> mSelectionHeuristic;
   private boolean mSubsumptionEnabled;
   private boolean mUsingSpecialEvents;
-  private boolean mUsingFailureEvents;
+  private boolean mFailureEventsEnabled = false;
   private int mLowerInternalStateLimit;
   private int mUpperInternalStateLimit;
   private int mInternalTransitionLimit;

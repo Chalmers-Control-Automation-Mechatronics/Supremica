@@ -11,20 +11,19 @@ package net.sourceforge.waters.model.analysis;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.LoopTraceProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.LoopTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
-
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -363,7 +362,7 @@ public abstract class AbstractControlLoopCheckerTest
   {
     final String group = "tests";
     final String dir = "profisafe";
-    final String name = "profisafe_ihost_efa.wmod";
+    final String name = "profisafe_ihost_efa_1.wmod";
     final ParameterBindingProxy binding = createBinding("MAXSEQNO", 3);
     final List<ParameterBindingProxy> bindings =
       Collections.singletonList(binding);
@@ -587,6 +586,7 @@ public abstract class AbstractControlLoopCheckerTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractAnalysisTest
+  @Override
   protected void configure(final ModuleCompiler compiler)
   {
     final Collection<String> empty = Collections.emptyList();
@@ -598,6 +598,7 @@ public abstract class AbstractControlLoopCheckerTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  @Override
   protected void checkCounterExample(final ProductDESProxy des,
                                      final TraceProxy trace)
   {

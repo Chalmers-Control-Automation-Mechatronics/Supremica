@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.compositional
-//# CLASS:   CompositionalSynthesizer
+//# CLASS:   AbstractCompositionalSynthesizer
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -83,7 +83,9 @@ public abstract class AbstractCompositionalSynthesizer extends
     super(model, factory, translator, abstractionFactory,
           preselectingMethodFactory);
     setPruningDeadlocks(true);
+    setFailureEventsEnabled(false); // TODO change this to true
   }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelBuilder
@@ -118,6 +120,7 @@ public abstract class AbstractCompositionalSynthesizer extends
     return result.getComputedProductDES();
   }
 
+
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ProductDESBuilder
   @Override
@@ -125,6 +128,7 @@ public abstract class AbstractCompositionalSynthesizer extends
   {
     return getComputedProxy();
   }
+
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
@@ -250,6 +254,17 @@ public abstract class AbstractCompositionalSynthesizer extends
   {
     return super.isPermissibleCandidate(automata)
            && automata.size() < getCurrentAutomata().size();
+  }
+
+  /**
+   * Returns whether failure events are considered in abstraction.
+   * @return <CODE>true</CODE> if failure events have been enabled by
+   *         configuration (which they are by default).
+   */
+  @Override
+  protected boolean isUsingFailureEvents()
+  {
+    return isFailureEventsEnabled();
   }
 
 

@@ -184,6 +184,7 @@ public class CompositionalConflictChecker
           abstractionFactory,
           preselectingMethodFactory);
     setPruningDeadlocks(true);
+    setFailureEventsEnabled(true);
     setConfiguredDefaultMarking(marking);
   }
 
@@ -208,7 +209,6 @@ public class CompositionalConflictChecker
   {
     mMonolithicSafetyVerifier = checker;
   }
-
 
   @Override
   public void setPreselectingMethod(final PreselectingMethod method)
@@ -515,6 +515,19 @@ public class CompositionalConflictChecker
     } else {
       return false;
     }
+  }
+
+  /**
+   * Returns whether failure events are considered in abstraction.
+   * @return <CODE>true</CODE> if failure events have been enabled by
+   *         configuration (which they are by default), and there is
+   *         no precondition marking (failure events do not work for
+   *         generalised nonblocking).
+   */
+  @Override
+  protected boolean isUsingFailureEvents()
+  {
+    return isFailureEventsEnabled() && getUsedPreconditionMarking() == null;
   }
 
   @Override
