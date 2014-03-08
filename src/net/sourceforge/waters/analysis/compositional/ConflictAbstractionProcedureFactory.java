@@ -68,24 +68,7 @@ public enum ConflictAbstractionProcedureFactory
     }
   },
   /**
-   * <P>Minimisation finds event sets that are always-enabled or
-   * only-selfloop outside of the automaton being simplified. This is the
-   * same abstraction sequence as {@link #NB}, with special events enabled
-   * and additional steps in the chain to measure performance.</P>
-   */
-  EESNB {
-    @Override
-    public AbstractionProcedure createAbstractionProcedure
-      (final AbstractCompositionalModelAnalyzer analyzer)
-    {
-      return EnabledEventsSetThreeStepConflictEquivalenceAbstractionProcedure.
-        createThreeStepConflictEquivalenceAbstractionProcedure
-          (analyzer, ObservationEquivalenceTRSimplifier.Equivalence.
-           WEAK_OBSERVATION_EQUIVALENCE, true, true);
-    }
-  },
-  /**
-    * <P>Minimisation is performed according to a sequence of abstraction
+   * <P>Minimisation is performed according to a sequence of abstraction
    * rules for generalised nonblocking proposed, but using weak observation
    * equivalence instead of observation equivalence.</P>
    * <P><I>Reference:</I> Robi Malik, Ryan Leduc. A Compositional Approach

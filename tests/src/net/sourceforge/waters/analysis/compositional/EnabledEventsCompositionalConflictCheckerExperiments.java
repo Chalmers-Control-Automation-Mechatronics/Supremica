@@ -84,7 +84,6 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
     mConflictChecker.setPreselectingMethod(mPreselecting);
     mConflictChecker.setSelectionHeuristic(mSelecting);
     mConflictChecker.setUsingSpecialEvents(true);
-    mConflictChecker.setUsingFailureEvents(true);
     mPrintWriter.println("InternalStateLimit," + internalStateLimit +
                          ",InternalTransitionLimit," +
                          internalTransitionLimit +
@@ -165,7 +164,7 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
     final ProductDESProxy des = getCompiledDES(filename, bindings);
     mConflictChecker.setModel(des);
     mConflictChecker.setAbstractionProcedureFactory
-      (ConflictAbstractionProcedureFactory.EESNB);
+      (ConflictAbstractionProcedureFactory.EENB);
     try {
       final boolean result = mConflictChecker.run();
 
