@@ -181,7 +181,7 @@ public abstract class AbstractLanguageInclusionCheckerTest
   {
     final String group = "tests";
     final String dir = "profisafe";
-    final String name = "profisafe_ihost_efa.wmod";
+    final String name = "profisafe_ihost_efa_1.wmod";
     final ParameterBindingProxy binding = createBinding("MAXSEQNO", 3);
     final List<ParameterBindingProxy> bindings =
       Collections.singletonList(binding);

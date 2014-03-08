@@ -556,7 +556,7 @@ public abstract class AbstractControllabilityCheckerTest
   {
     final String group = "tests";
     final String dir = "profisafe";
-    final String name = "profisafe_ihost_efa.wmod";
+    final String name = "profisafe_ihost_efa_1.wmod";
     final List<ParameterBindingProxy> bindings =
       new LinkedList<ParameterBindingProxy>();
     final ParameterBindingProxy binding = createBinding("MAXSEQNO", 3);
