@@ -9,8 +9,9 @@
 
 package net.sourceforge.waters.analysis.efa.simple;
 
+import gnu.trove.map.hash.THashMap;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -42,7 +43,7 @@ public class SimpleEFAState
     }
     mName = node.getName();
     mIsInitial = node.isInitial();
-    mAttributes = new HashMap<>(node.getAttributes());
+    mAttributes = new THashMap<>(node.getAttributes());
     final PlainEventListProxy propositions = node.getPropositions();
     mPropositions = propositions != null ? propositions
                     : mFactory.createPlainEventListProxy();
@@ -52,12 +53,37 @@ public class SimpleEFAState
     mInitialArrowGeometry = node.getInitialArrowGeometry();
     mLabelGeometry = node.getLabelGeometry();
     mPointGeometry = node.getPointGeometry();
-}
+    mStateValue = "";
+  }
+
+  public SimpleEFAState(final SimpleEFAState state)
+  {
+    mFactory = ModuleSubjectFactory.getInstance();
+    mName = state.getName();
+    mIsInitial = state.isInitial();
+    final THashMap<String, String> att = state.getAttributes();
+    if (att != null) {
+      mAttributes = new THashMap<>(state.getAttributes());
+    } else {
+      mAttributes = new THashMap<>();
+    }
+
+    final PlainEventListProxy propositions = state.getPropositions();
+    mPropositions = propositions != null ? propositions
+                    : mFactory.createPlainEventListProxy();
+    mHelper = new SimpleEFAHelper(mFactory);
+    mIsMarked = mHelper.containsMarkingProposition(mPropositions);
+    mIsForbidden = mHelper.containsForbiddenProposition(mPropositions);
+    mInitialArrowGeometry = state.getSimpleNode().getInitialArrowGeometry();
+    mLabelGeometry = state.getSimpleNode().getLabelGeometry();
+    mPointGeometry = state.getSimpleNode().getPointGeometry();
+    mStateValue = state.getStateValue();
+  }
 
   public SimpleEFAState(final String name,
                         final boolean isInitial, final boolean isMarked,
                         final boolean isForbidden,
-                        final HashMap<String, String> attributes,
+                        final THashMap<String, String> attributes,
                         final ModuleProxyFactory factory) {
     super();
     mName = name;
@@ -68,8 +94,9 @@ public class SimpleEFAState
     mHelper = new SimpleEFAHelper(mFactory);
     mPropositions = mFactory.createPlainEventListProxy();
     mAttributes = attributes != null ? attributes
-            : new HashMap<String, String>();
-  }
+                  : new THashMap<String, String>();
+    mStateValue = "";
+}
 
   public SimpleEFAState(final String name,
                         final boolean isInitial,
@@ -81,7 +108,7 @@ public class SimpleEFAState
   public SimpleEFAState(final String name,
                         final boolean isInitial, final boolean isMarked,
                         final boolean isForbidden,
-                        final HashMap<String, String> attributes)
+                        final THashMap<String, String> attributes)
   {
     this(name, isInitial, isMarked, isForbidden, attributes, null);
   }
@@ -126,12 +153,12 @@ public class SimpleEFAState
     return mIsForbidden;
   }
 
-  public HashMap<String, String> getAttributes()
+  public THashMap<String, String> getAttributes()
   {
     return mAttributes.isEmpty() ? null : mAttributes;
   }
 
-  public void setAttributes(final HashMap<String, String> attributes)
+  public void setAttributes(final THashMap<String, String> attributes)
   {
     mAttributes = attributes;
   }
@@ -175,6 +202,16 @@ public class SimpleEFAState
             mLabelGeometry);
   }
 
+  public void setStateValue(final String value)
+  {
+    mStateValue = value;
+  }
+
+  public String getStateValue()
+  {
+    return mStateValue;
+  }
+
   public void addToAttribute(final String key, final String value)
   {
     mAttributes.put(key, value);
@@ -188,7 +225,7 @@ public class SimpleEFAState
   public void mergeToAttribute(final String key, final String value,
                                final String separator)
   {
-    if (mAttributes != null && mAttributes.containsKey(key)) {
+    if (mAttributes != null && !value.isEmpty() && mAttributes.containsKey(key)) {
       String oValue = mAttributes.get(key);
       final String[] values = value.split(separator);
       for (final String v : values) {
@@ -238,11 +275,12 @@ public class SimpleEFAState
   private boolean mIsInitial;
   private boolean mIsMarked;
   private boolean mIsForbidden;
-  private HashMap<String, String> mAttributes;
+  private THashMap<String, String> mAttributes;
   private PlainEventListProxy mPropositions;
   private String mName;
   private final SimpleEFAHelper mHelper;
   private PointGeometryProxy mInitialArrowGeometry;
   private LabelGeometryProxy mLabelGeometry;
   private PointGeometryProxy mPointGeometry;
+  private String mStateValue;
 }

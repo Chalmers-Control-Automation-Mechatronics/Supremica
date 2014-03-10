@@ -9,8 +9,15 @@
 
 package net.sourceforge.waters.analysis.efa.simple;
 
-import java.util.*;
 
+import gnu.trove.set.hash.THashSet;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -36,8 +43,8 @@ public class SimpleEFATransitionLabel
   {
     mConstraint = constraint;
     mEvent = event;
-    mVariables = new HashSet<>();
-    mTransitionRelations = new HashSet<>();
+    mVariables = new THashSet<>();
+    mTransitionRelations = new THashSet<>();
     mIsObservable = mEvent.isObservable();
     mKind = mEvent.getKind();
   }
@@ -111,7 +118,8 @@ public class SimpleEFATransitionLabel
   }
 
   public void addToConstraints(final ConstraintList con){
-    final List<SimpleExpressionProxy> newCons = new ArrayList<>(mConstraint.getConstraints());
+    final List<SimpleExpressionProxy> newCons = new ArrayList<>(mConstraint
+     .getConstraints());
     newCons.addAll(con.getConstraints());
 
     mConstraint = new ConstraintList(newCons);

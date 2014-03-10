@@ -9,9 +9,13 @@
 
 package net.sourceforge.waters.analysis.efa.simple;
 
+import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -116,7 +120,8 @@ public class SimpleEFAHelper {
         }
       }
       final Collection<SimpleExpressionProxy> guards =
-       Collections.singletonList(guard);
+ Collections
+       .singletonList(guard);
       return mFactory.createGuardActionBlockProxy(guards, null, null);
     }
   }
@@ -260,9 +265,52 @@ public class SimpleEFAHelper {
     return exps;
   }
 
-  public static HashMap<String, String> merge(
-   final HashMap<String, String> attribute1,
-   final HashMap<String, String> attribute2,
+  public List<SimpleExpressionProxy> parse(final String str,
+                                           final String seperator)
+  {
+    final ExpressionParser parser = new ExpressionParser(mFactory,
+                                                         mOperatorTable);
+    final List<SimpleExpressionProxy> exps = new ArrayList<>();
+    final String[] values = str.split(seperator);
+    for (final String s : values) {
+      try {
+        exps.add(parser.parse(s));
+      } catch (final ParseException ignored) {
+      }
+    }
+    return exps;
+  }
+
+  public static Collection<SimpleEFAVariable> getStateVariables(
+   final SimpleEFAState state,
+   final Collection<SimpleEFAVariable> vars)
+  {
+    final Collection<SimpleEFAVariable> list = new THashSet<>();
+    final String str = state.getStateValue();
+    for (final SimpleEFAVariable var : vars) {
+      if (str.contains(var.getName())) {
+        list.add(var);
+      }
+    }
+    return list;
+  }
+
+  public static Collection<SimpleEFAVariable> getStateVariables(
+   final String value,
+   final Collection<SimpleEFAVariable> vars)
+  {
+    final Collection<SimpleEFAVariable> list = new THashSet<>();
+    for (final SimpleEFAVariable var : vars) {
+      if (value.contains(var.getName())) {
+        list.add(var);
+      }
+    }
+    return list;
+  }
+
+  public static THashMap<String, String> merge(
+   final THashMap<String, String> attribute1,
+   final THashMap<String, String> attribute2,
    final String separator)
   {
     if (attribute1 == null || attribute1.isEmpty()) {
@@ -272,11 +320,11 @@ public class SimpleEFAHelper {
       return attribute1;
     }
 
-    final HashMap<String, String> result = new HashMap<>(attribute1);
+    final THashMap<String, String> result = new THashMap<>(attribute1);
     for (final String att2 : attribute2.keySet()) {
       final String val2 = attribute2.get(att2);
       String val = result.get(att2);
-      if (val != null) {
+      if (val != null && !val.isEmpty()) {
         val += separator + val2;
       } else {
         val = val2;
@@ -288,15 +336,16 @@ public class SimpleEFAHelper {
 
   public static ConstraintList merge(final ConstraintList con1, final ConstraintList con2)
   {
-    final List<SimpleExpressionProxy> con = new ArrayList<>(con1.getConstraints());
+    if (con1.isTrue()) {
+      return con2;
+    }
+    if (con2.isTrue()) {
+      return con1;
+    }
+    final List<SimpleExpressionProxy> con = new ArrayList<>(con1
+     .getConstraints());
     con.addAll(con2.getConstraints());
     return new ConstraintList(con);
-  }
-
-  public ConstraintList conjunct(final ConstraintList con1, final ConstraintList con2){
-    final ConstraintList merge = SimpleEFAHelper.merge(con1, con2);
-    final SimpleExpressionProxy con = merge.createExpression(mFactory, mOperatorTable.getAndOperator());
-    return new ConstraintList(Collections.singletonList(con));
   }
 
   private final ModuleProxyFactory mFactory;

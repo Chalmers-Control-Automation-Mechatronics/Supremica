@@ -14,7 +14,6 @@ import gnu.trove.set.hash.THashSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.efa.base.AbstractEFATransitionRelation;
@@ -65,7 +64,7 @@ public class SimpleEFAComponent
     mVariables = variables;
     mUnprimeVars = new ArrayList<>();
     mPrimeVars = new ArrayList<>();
-    mStateVars = new ArrayList<>();
+    mStateVariables = new ArrayList<>();
     mBlockedEvents = blockedEvents;
     mCloner = mFactory.getCloner();
     mAlphabet = initAlphabet();
@@ -112,7 +111,7 @@ public class SimpleEFAComponent
    */
   public void register() throws AnalysisException
   {
-    final HashSet<SimpleEFAVariable> vars = new HashSet<>(mUnprimeVars);
+    final THashSet<SimpleEFAVariable> vars = new THashSet<>(mUnprimeVars);
     vars.addAll(mPrimeVars);
     if (mVariables.size() != vars.size()) {
       vars.removeAll(mVariables);
@@ -130,9 +129,8 @@ public class SimpleEFAComponent
       var.addModifier(this);
     }
 
-    for (final SimpleEFAVariable var : mStateVars) {
-      var.addTransitionRelation(this);
-      var.addModifier(this);
+    for (final SimpleEFAVariable var : mStateVariables) {
+      var.addUseInState(this);
     }
 
     for (final SimpleEFAEventDecl event : mAlphabet) {
@@ -157,13 +155,20 @@ public class SimpleEFAComponent
       var.removeModifier(this);
     }
 
-    for (final SimpleEFAVariable var : mStateVars) {
-      var.removeTransitionRelation(this);
-      var.removeModifier(this);
+    for (final SimpleEFAVariable var : mStateVariables) {
+      var.removeUseInState(this);
     }
+
     for (final SimpleEFAEventDecl event : mAlphabet) {
       event.removeComponent(this);
     }
+    mVariables.clear();
+    mAlphabet.clear();
+    mUnprimeVars = null;
+    mPrimeVars = null;
+    mStateVariables = null;
+    mEdges = null;
+    mStateEncoding = null;
   }
 
   public Collection<SimpleEFAEventDecl> getAlphabet()
@@ -223,12 +228,7 @@ public class SimpleEFAComponent
 
   public SimpleEFAState getInitialState()
   {
-    for (final SimpleEFAState state : getStateSet()) {
-      if (state.isInitial()) {
-        return state;
-      }
-    }
-    return null;
+    return mStateEncoding.getInitialState();
   }
 
   public List<EdgeProxy> getTransitionSet(final boolean reset)
@@ -449,13 +449,14 @@ public class SimpleEFAComponent
 
   public void setStateVariables(final List<SimpleEFAVariable> svars)
   {
-    mStateVars = svars;
+    mStateVariables = svars;
   }
 
   public List<SimpleEFAVariable> getStateVariables()
   {
-    return mStateVars;
+    return mStateVariables;
   }
+
   private Collection<SimpleEFAEventDecl> initAlphabet()
   {
     final SimpleEFATransitionLabelEncoding labels = getTransitionLabelEncoding();
@@ -493,7 +494,7 @@ public class SimpleEFAComponent
   private List<EdgeProxy> mEdges;
   private List<SimpleEFAVariable> mUnprimeVars;
   private List<SimpleEFAVariable> mPrimeVars;
-  private List<SimpleEFAVariable> mStateVars;
+  private List<SimpleEFAVariable> mStateVariables;
   private final ModuleProxyCloner mCloner;
   private final SimpleEFAHelper mHelper;
   private final Collection<SimpleEFAEventDecl> mAlphabet;

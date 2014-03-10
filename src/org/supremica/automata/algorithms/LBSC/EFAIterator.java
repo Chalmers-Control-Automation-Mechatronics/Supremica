@@ -3,9 +3,10 @@ package org.supremica.automata.algorithms.LBSC;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
+
 import net.sourceforge.waters.analysis.efa.simple.SimpleEFAComponent;
 import net.sourceforge.waters.analysis.efa.simple.SimpleEFAEventDecl;
 import net.sourceforge.waters.analysis.efa.simple.SimpleEFAState;
@@ -230,8 +231,9 @@ public class EFAIterator implements TransitionIterator
     return mInitialState;
   }
 
-  public HashSet<SimpleEFAEventDecl> getEnabledEvents(){
-    final HashSet<SimpleEFAEventDecl> events = new HashSet<>();
+  public THashSet<SimpleEFAEventDecl> getEnabledEvents()
+  {
+    final THashSet<SimpleEFAEventDecl> events = new THashSet<>();
     for (final int[] tr : mCurrTrans){
       events.add(mLabelEventMap.get(tr[1]));
     }

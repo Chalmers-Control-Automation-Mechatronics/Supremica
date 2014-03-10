@@ -44,6 +44,7 @@ public class SimpleEFAVariable
     super(var, range, factory, op);
     mModifiers = new THashSet<>();
     mVisitors = new THashSet<>();
+    mInStates = new THashSet<>();
     mMarkings = new ArrayList<>(var.getVariableMarkings());
     mVar = var;
     mOperatorTable = op;
@@ -108,6 +109,42 @@ public class SimpleEFAVariable
     return mVisitors.contains(component.getIdentifier());
   }
 
+  public boolean hasVisitor()
+  {
+    return mVisitors.isEmpty();
+  }
+
+  public boolean hasModifier()
+  {
+    return !mModifiers.isEmpty();
+  }
+
+  public boolean hasStateUser()
+  {
+    return !mInStates.isEmpty();
+  }
+
+  public void addUseInState(final SimpleEFAComponent comopnent)
+  {
+    mInStates.add(comopnent.getIdentifier());
+  }
+
+  public void removeUseInState(final SimpleEFAComponent comopnent)
+  {
+    mInStates.remove(comopnent.getIdentifier());
+  }
+
+  public boolean isUsedInStateBy(final SimpleEFAComponent component)
+  {
+    return mInStates.contains(component.getIdentifier());
+  }
+
+  public boolean isOnlyUsedInStateBy(final SimpleEFAComponent component)
+  {
+    return (mInStates.size() == 1
+     && mInStates.contains(component.getIdentifier()));
+  }
+
   /**
    *
    * @return Marking propositions of this variable.
@@ -148,8 +185,15 @@ public class SimpleEFAVariable
    */
   public boolean isLocalIn(final SimpleEFAComponent component)
   {
-    return (isOnlyModifiedBy(component) || mModifiers.isEmpty())
-     && isVisitedBy(component);
+    final boolean OM = isOnlyModifiedBy(component);
+    final boolean HSU = hasStateUser();
+    final boolean OUS = isOnlyUsedInStateBy(component);
+    final boolean HM = hasModifier();
+    final boolean VB = isVisitedBy(component);
+    return (OM) || (!HM && (OUS || !HSU) && VB);
+//    return ((isOnlyModifiedBy(component) && (!hasStateUser() || isOnlyUsedInStateBy(component)))
+//     || (!hasModifier() && (!hasStateUser() || isOnlyUsedInStateBy(component))
+//     && isVisitedBy(component)));
   }
 
 
@@ -214,6 +258,7 @@ public class SimpleEFAVariable
 
   private final Collection<IdentifierProxy> mModifiers;
   private final Collection<IdentifierProxy> mVisitors;
+  private final THashSet<IdentifierProxy> mInStates;
   private final Collection<VariableMarkingProxy> mMarkings;
   private final CompilerOperatorTable mOperatorTable;
   private final VariableComponentProxy mVar;

@@ -412,6 +412,7 @@ public class SimpleEFASystemBuilder implements Abortable
         final Collection<SimpleEFAVariable> variables = new THashSet<>();
         variables.addAll(mAllPrimeVars);
         variables.addAll(mAllUnprimeVars);
+
         // Collecting all the variables in the colletion "variables".
         //mEFAVariableCollector.collectAllVariables(mEventEncoding, variables);
 
@@ -424,7 +425,11 @@ public class SimpleEFASystemBuilder implements Abortable
 
         efaComponent.setPrimeVariables(new ArrayList<>(mAllPrimeVars));
         efaComponent.setUnprimeVariables(new ArrayList<>(mAllUnprimeVars));
-        efaComponent.setStateVariables(new ArrayList<>(mAllStateVars));
+        // Setting state variables
+        final Collection<SimpleEFAVariable> stateVariables
+         = SimpleEFAHelper.getStateVariables(efaComponent.getInitialState().getStateValue(),
+                                             mVariableContext.getVariables());
+        efaComponent.setStateVariables(new ArrayList<>(stateVariables));
         efaComponent.setIsEFA(mIsEFA);
 
         // Registering this component to all the events and variables.
@@ -444,7 +449,6 @@ public class SimpleEFASystemBuilder implements Abortable
         mEvents = null;
         mAllPrimeVars = null;
         mAllUnprimeVars = null;
-        mAllStateVars = null;
         mCurrentPrime = null;
         mCurrentUnprime = null;
         mSimplifyConstraint = null;
@@ -485,7 +489,6 @@ public class SimpleEFASystemBuilder implements Abortable
       final int nbVariables = mVariableContext.getNumberOfVariables();
       mAllPrimeVars = new THashSet<>(nbVariables);
       mAllUnprimeVars = new THashSet<>(nbVariables);
-      mAllStateVars = new THashSet<>(nbVariables);
       mCurrentPrime = new THashSet<>(nbVariables);
       mCurrentUnprime = new THashSet<>(nbVariables);
 
@@ -506,7 +509,7 @@ public class SimpleEFASystemBuilder implements Abortable
     public Object visitSimpleNodeProxy(final SimpleNodeProxy node)
     {
       final SimpleEFAState state = new SimpleEFAState(node);
-      mStateEncoding.createSimpleNodeId(node);
+      mStateEncoding.createSimpleStateId(state);
       // Adding the node and its id
       if (mNodeList != null) {
         mNodeList.add(node);
@@ -518,16 +521,11 @@ public class SimpleEFASystemBuilder implements Abortable
       if (state.isForbidden()) {
         mUsesForbidden = true;
       }
-      if (state.isInitial()) {
-        final String values = state.getAttribute(
-         SimpleEFAHelper.DEFAULT_STATEVALUE_STRING);
-        if (values != null) {
-          for (final SimpleEFAVariable var : mVariableContext.getVariables()) {
-            if (values.contains(var.getName())) {
-              mAllStateVars.add(var);
-            }
-          }
-        }
+
+      final String sValue = state.getAttribute(
+       SimpleEFAHelper.DEFAULT_STATEVALUE_STRING);
+      if (sValue != null) {
+        state.setStateValue(sValue);
       }
       return null;
     }
@@ -674,13 +672,9 @@ public class SimpleEFASystemBuilder implements Abortable
       final int eventSize = mEventEncoding.size();
       final ComponentKind kind = comp.getKind();
       final int numProps = (mUsesMarking ? 1 : 0) + (mUsesForbidden ? 1 : 0);
-      final ListBufferTransitionRelation rel =
-       new ListBufferTransitionRelation(name,
-                                        kind,
-                                        eventSize,
-                                        numProps,
-               mStateEncoding.size(),
-                                        ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      final ListBufferTransitionRelation rel = new ListBufferTransitionRelation(
+       name, kind, eventSize, numProps, mStateEncoding.size(),
+       ListBufferTransitionRelation.CONFIG_SUCCESSORS);
       for (final SimpleEFAState state : mStateEncoding.getSimpleStates()) {
         final int code = mStateEncoding.getStateId(state);
         if (state.isInitial()) {
@@ -885,7 +879,6 @@ public class SimpleEFASystemBuilder implements Abortable
     private Collection<SimpleEFAEventDecl> mBlockedEvents;
     private THashSet<SimpleEFAVariable> mAllPrimeVars;
     private THashSet<SimpleEFAVariable> mAllUnprimeVars;
-    private THashSet<SimpleEFAVariable> mAllStateVars;
     private THashSet<SimpleEFAVariable> mCurrentPrime;
     private THashSet<SimpleEFAVariable> mCurrentUnprime;
     private boolean mIsEFA;

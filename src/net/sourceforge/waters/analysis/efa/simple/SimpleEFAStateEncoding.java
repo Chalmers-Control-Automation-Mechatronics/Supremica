@@ -28,6 +28,7 @@ public class SimpleEFAStateEncoding implements Iterable<SimpleEFAState>
   {
     mStateMap = new TObjectIntHashMap<>(size, 0.5f, -1);
     mStateList = new ArrayList<>(size);
+    mInitialStateId = -1;
   }
 
   public SimpleEFAStateEncoding()
@@ -85,6 +86,9 @@ public class SimpleEFAStateEncoding implements Iterable<SimpleEFAState>
       final int labelId = mStateMap.size();
       mStateMap.put(state, labelId);
       mStateList.add(state);
+      if (state.isInitial()) {
+        mInitialStateId = labelId;
+      }
       return labelId;
     }
   }
@@ -99,6 +103,9 @@ public class SimpleEFAStateEncoding implements Iterable<SimpleEFAState>
       final SimpleEFAState state = new SimpleEFAState(node);
       mStateMap.put(state, labelId);
       mStateList.add(state);
+      if (state.isInitial()) {
+        mInitialStateId = labelId;
+      }
       return labelId;
     }
   }
@@ -117,13 +124,36 @@ public class SimpleEFAStateEncoding implements Iterable<SimpleEFAState>
     }
   }
 
+  public void setInitialStateId(final int id)
+  {
+    mInitialStateId = id;
+  }
+
+  public int getInitialStateId()
+  {
+    if (mInitialStateId < 0) {
+      for (final SimpleEFAState state : this.getSimpleStates()) {
+        if (state.isInitial()) {
+          mInitialStateId = this.getStateId(state);
+        }
+      }
+    }
+    return mInitialStateId;
+  }
+
   @Override
   public Iterator<SimpleEFAState> iterator()
   {
     return mStateList.iterator();
   }
 
+  public SimpleEFAState getInitialState()
+  {
+    return this.getSimpleState(this.getInitialStateId());
+  }
+
   private final TObjectIntHashMap<SimpleEFAState> mStateMap;
   private final ArrayList<SimpleEFAState> mStateList;
   private static final int DEFAULT_SIZE = 16;
+  private int mInitialStateId;
 }

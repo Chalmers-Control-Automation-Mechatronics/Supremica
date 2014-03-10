@@ -100,7 +100,7 @@ import org.supremica.log.LoggerFactory;
 import org.supremica.util.SupremicaException;
 
 /**
- * A nasty implementation of synchronous composition for EFAs. Use
+ * A not efficient implementation of synchronous composition for EFAs. Use
  * {@link org.supremica.automata.algorithms.LBSC.EFASynchronizer} instead
  * <p>
  * @author Mohammad Reza Shoaei

@@ -2,13 +2,12 @@
 package org.supremica.automata.algorithms.LBSC;
 
 import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.THashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Stack;
 
@@ -45,11 +44,11 @@ public class EFASynchronizer
     mEFAIterators = new ArrayList<>(mSize);
     mInitialState = new TIntArrayList(mSize, -1);
     mSharedEvents = new THashSet<>();
-    mPrimedVars = new HashSet<>();
-    mUnprimedVars = new HashSet<>();
-    mStateVars = new HashSet<>();
-    mBlockedEvents = new HashSet<>();
-    mAlphabet = new HashSet<>();
+    mPrimedVars = new THashSet<>();
+    mUnprimedVars = new THashSet<>();
+    mStateVars = new THashSet<>();
+    mBlockedEvents = new THashSet<>();
+    mAlphabet = new THashSet<>();
     mSynchEFA = null;
   }
 
@@ -135,12 +134,15 @@ public class EFASynchronizer
     boolean isMarked = true;
     boolean isInitial = true;
     String name = "";
-    HashMap<String, String> attribute = new HashMap<>();
+    THashMap<String, String> attribute = new THashMap<>();
+    String stateValues = "";
     for (int s = 0; s < mSize; s++) {
       final EFAIterator iter = mEFAIterators.get(s);
       final SimpleEFAState simpleState = iter.getSimpleState(state.get(s));
       attribute = SimpleEFAHelper.merge(attribute, simpleState.getAttributes(),
                                         SimpleEFAHelper.DEFAULT_VALUE_SEPARATOR);
+      stateValues += SimpleEFAHelper.DEFAULT_VALUE_SEPARATOR + simpleState
+       .getStateValue();
       if (simpleState.isForbidden()) {
         isForbidden = true;
         mUsesForbidden = true;
@@ -155,9 +157,9 @@ public class EFASynchronizer
     }
     //String name = "S" + mStateSpace.size();
     name = name.substring(0, name.length() - 1);
-    final SimpleEFAState st = new SimpleEFAState(name, isInitial,
-                                           isMarked, isForbidden,
-                                           attribute);
+    final SimpleEFAState st = new SimpleEFAState(name, isInitial, isMarked,
+                                                 isForbidden, attribute);
+    st.setStateValue(stateValues.substring(1));
     return mStateEncoding.createSimpleStateId(st);
   }
 
@@ -178,11 +180,13 @@ public class EFASynchronizer
     for (final SimpleEFAComponent efa : mComponents) {
       sp *= efa.getStateSet().size();
       final EFAIterator iter = new EFAIterator(efa);
+
       iter.reset();
       mEFAIterators.add(iter);
       mInitialState.add(iter.getInitialState());
-      final HashSet<SimpleEFAEventDecl> currEvents = new HashSet<>(efa.getAlphabet());
-      final HashSet<SimpleEFAEventDecl> otherEvents = new HashSet<>();
+      final THashSet<SimpleEFAEventDecl> currEvents = new THashSet<>(efa
+       .getAlphabet());
+      final THashSet<SimpleEFAEventDecl> otherEvents = new THashSet<>();
       for (final SimpleEFAComponent other : mComponents) {
         if (!efa.equals(other)) {
           otherEvents.addAll(other.getAlphabet());
@@ -205,9 +209,10 @@ public class EFASynchronizer
   }
 
   @SuppressWarnings("unused")
-  private HashSet<SimpleEFAEventDecl> getEnabledEvents(final TIntArrayList state)
+  private THashSet<SimpleEFAEventDecl> getEnabledEvents(
+   final TIntArrayList state)
   {
-    final HashSet<SimpleEFAEventDecl> events = new HashSet<>();
+    final THashSet<SimpleEFAEventDecl> events = new THashSet<>();
     for (int i = 0; i < mSize; i++) {
       final EFAIterator iter = mEFAIterators.get(i);
       iter.resetState(state.get(i));
@@ -252,7 +257,7 @@ public class EFASynchronizer
             mStateEncoding.size());
 
     // Creating a residual EFA.
-    final HashSet<SimpleEFAVariable> vars = new HashSet<>(mPrimedVars);
+    final THashSet<SimpleEFAVariable> vars = new THashSet<>(mPrimedVars);
     vars.addAll(mUnprimedVars);
     mSynchEFA = new SimpleEFAComponent(name, vars,
                                        mStateEncoding,
