@@ -81,6 +81,58 @@ public class EFASynchronizer
     return true;
   }
 
+  /**
+   * Constructing the synchronized EFA
+   * <p>
+   * @return A synch EFA
+   * <p>
+   * @throws OverflowException
+   * @throws AnalysisException
+   */
+  public SimpleEFAComponent getSynchronizedEFA() throws OverflowException, AnalysisException
+  {
+    return getSynchronizedEFA(mName, ComponentKind.PLANT);
+  }
+
+  /**
+   * Constructing the synchronized EFA
+   * <p>
+   * @param name
+   * @param kind
+   * <p>
+   * @return
+   * <p>
+   * @throws OverflowException
+   * @throws AnalysisException
+   */
+  public SimpleEFAComponent getSynchronizedEFA(final String name, final ComponentKind kind) throws OverflowException, AnalysisException
+  {
+    final int sNumPropositions = (mUsesMarking ? 1 : 0) + (mUsesForbidden ? 1 : 0);
+    final ListBufferTransitionRelation sRel = createTransitionRelation(name,
+                                                                       kind,
+                                                                       mLabelEncoding.size(),
+                                                                       sNumPropositions,
+                                                                       mStateEncoding.size());
+    
+    // Creating a residual EFA.
+    final THashSet<SimpleEFAVariable> vars = new THashSet<>(mPrimedVars);
+    vars.addAll(mUnprimedVars);
+    mSynchEFA = new SimpleEFAComponent(name, vars,
+     mStateEncoding,
+     mLabelEncoding,
+     mBlockedEvents,
+     sRel, kind, null);
+    
+    mSynchEFA.setStructurallyDeterministic(true);
+    // Setting the visitor / modifiers of the variables
+    mSynchEFA.setPrimeVariables(new ArrayList<>(mPrimedVars));
+    mSynchEFA.setUnprimeVariables(new ArrayList<>(mUnprimedVars));
+    mSynchEFA.setStateVariables(new ArrayList<>(mStateVars));
+    mSynchEFA.setIsEFA(!vars.isEmpty());
+    mSynchEFA.register();
+    return mSynchEFA;
+  }
+
   private TIntArrayList step(final TIntArrayList source, final SimpleEFAEventDecl event)
   {
     // If the event is shared but disabled by one of the components then we stay at current state
@@ -118,10 +170,10 @@ public class EFASynchronizer
     }
 
     final int[] tr = {mStateSpace.get(source),
-            mLabelEncoding.createTransitionLabelId(
-                    new SimpleEFATransitionLabel(event, newCon)),
-                         targetId};
-
+                      mLabelEncoding.createTransitionLabelId(
+                       new SimpleEFATransitionLabel(event, newCon)),
+                      targetId};
+    
     mTR.add(tr);
 
     return isNewState ? target : null;
@@ -140,7 +192,7 @@ public class EFASynchronizer
       final EFAIterator iter = mEFAIterators.get(s);
       final SimpleEFAState simpleState = iter.getSimpleState(state.get(s));
       attribute = SimpleEFAHelper.merge(attribute, simpleState.getAttributes(),
-                                        SimpleEFAHelper.DEFAULT_VALUE_SEPARATOR);
+                                                   SimpleEFAHelper.DEFAULT_VALUE_SEPARATOR);
       stateValues += SimpleEFAHelper.DEFAULT_VALUE_SEPARATOR + simpleState
        .getStateValue();
       if (simpleState.isForbidden()) {
@@ -158,21 +210,22 @@ public class EFASynchronizer
     //String name = "S" + mStateSpace.size();
     name = name.substring(0, name.length() - 1);
     final SimpleEFAState st = new SimpleEFAState(name, isInitial, isMarked,
-                                                 isForbidden, attribute);
+     isForbidden, attribute);
     st.setStateValue(stateValues.substring(1));
     return mStateEncoding.createSimpleStateId(st);
   }
 
-  private boolean isEnabled(final TIntArrayList source, final SimpleEFAEventDecl event)
-  {
-    for (int i = 0; i < mSize; i++) {
-      final EFAIterator iter = mEFAIterators.get(i);
-      if (!iter.isEnabled(source.get(i), event)) {
-        return false;
+    private boolean isEnabled(
+     final TIntArrayList source, final SimpleEFAEventDecl event)
+    {
+      for (int i = 0; i < mSize; i++) {
+        final EFAIterator iter = mEFAIterators.get(i);
+        if (!iter.isEnabled(source.get(i), event)) {
+          return false;
+        }
       }
+      return true;
     }
-    return true;
-  }
 
   private void initialize()
   {
@@ -183,7 +236,7 @@ public class EFASynchronizer
 
       iter.reset();
       mEFAIterators.add(iter);
-      mInitialState.add(iter.getInitialState());
+      mInitialState.add(efa.getStateEncoding().getInitialStateId());
       final THashSet<SimpleEFAEventDecl> currEvents = new THashSet<>(efa
        .getAlphabet());
       final THashSet<SimpleEFAEventDecl> otherEvents = new THashSet<>();
@@ -200,79 +253,16 @@ public class EFASynchronizer
       mPrimedVars.addAll(efa.getPrimeVariables());
       mUnprimedVars.addAll(efa.getUnprimeVariables());
       mStateVars.addAll(efa.getStateVariables());
-      mBlockedEvents.addAll(efa.getBlockedEvents());
+      final Collection<SimpleEFAEventDecl> blockedEvents = efa
+       .getBlockedEvents();
+      if (blockedEvents != null) {
+        mBlockedEvents.addAll(blockedEvents);
+      }
       mAlphabet.addAll(efa.getAlphabet());
       mName += efa.getName() + "||";
     }
     mStateSpace.setUp(Math.round(sp * 0.25f));
     mName = mName.substring(0, mName.length() - 2);
-  }
-
-  @SuppressWarnings("unused")
-  private THashSet<SimpleEFAEventDecl> getEnabledEvents(
-   final TIntArrayList state)
-  {
-    final THashSet<SimpleEFAEventDecl> events = new THashSet<>();
-    for (int i = 0; i < mSize; i++) {
-      final EFAIterator iter = mEFAIterators.get(i);
-      iter.resetState(state.get(i));
-      events.addAll(iter.getEnabledEvents());
-    }
-    return events;
-  }
-
-  /**
-   * Constructing the synchronized EFA
-   * <p>
-   * @return A synch EFA
-   * <p>
-   * @throws OverflowException
-   * @throws AnalysisException
-   */
-  public SimpleEFAComponent getSynchronizedEFA()
-   throws OverflowException, AnalysisException
-  {
-    return getSynchronizedEFA(mName, ComponentKind.PLANT);
-  }
-
-  /**
-   * Constructing the synchronized EFA
-   * <p>
-   * @param name
-   * @param kind
-   * <p>
-   * @return
-   * <p>
-   * @throws OverflowException
-   * @throws AnalysisException
-   */
-  public SimpleEFAComponent getSynchronizedEFA(final String name, final ComponentKind kind)
-   throws OverflowException, AnalysisException
-  {
-    final int sNumPropositions = (mUsesMarking ? 1 : 0) + (mUsesForbidden ? 1 : 0);
-    final ListBufferTransitionRelation sRel = createTransitionRelation(name,
-                                                                 kind,
-            mLabelEncoding.size(),
-                                sNumPropositions,
-            mStateEncoding.size());
-
-    // Creating a residual EFA.
-    final THashSet<SimpleEFAVariable> vars = new THashSet<>(mPrimedVars);
-    vars.addAll(mUnprimedVars);
-    mSynchEFA = new SimpleEFAComponent(name, vars,
-                                       mStateEncoding,
-                                       mLabelEncoding,
-                                       mBlockedEvents,
-                                       sRel, kind, null);
-
-    mSynchEFA.setStructurallyDeterministic(true);
-    // Setting the visitor / modifiers of the variables
-    mSynchEFA.setPrimeVariables(new ArrayList<>(mPrimedVars));
-    mSynchEFA.setUnprimeVariables(new ArrayList<>(mUnprimedVars));
-    mSynchEFA.setStateVariables(new ArrayList<>(mStateVars));
-    mSynchEFA.setIsEFA(!vars.isEmpty());
-    mSynchEFA.register();
-    return mSynchEFA;
   }
 
   private ListBufferTransitionRelation createTransitionRelation(

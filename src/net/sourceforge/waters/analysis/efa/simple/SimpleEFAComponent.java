@@ -178,7 +178,7 @@ public class SimpleEFAComponent
 
   public Collection<SimpleEFAEventDecl> getBlockedEvents()
   {
-    return Collections.unmodifiableCollection(mBlockedEvents);
+    return (mBlockedEvents != null ? Collections.unmodifiableCollection(mBlockedEvents) : null);
   }
 
   public void setBlockedEvents(final Collection<SimpleEFAEventDecl> blocked)

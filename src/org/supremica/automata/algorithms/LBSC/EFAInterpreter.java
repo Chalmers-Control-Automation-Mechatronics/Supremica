@@ -5,30 +5,37 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sourceforge.waters.analysis.efa.simple.SimpleEFAComponent;
 import net.sourceforge.waters.analysis.efa.simple.SimpleEFAEventDecl;
 import net.sourceforge.waters.analysis.efa.simple.SimpleEFAState;
 import net.sourceforge.waters.analysis.efa.simple.SimpleEFATransitionLabelEncoding;
+import net.sourceforge.waters.analysis.efa.simple.SimpleEFAVariable;
+import net.sourceforge.waters.analysis.efa.simple.SimpleEFAVariableContext;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
+import net.sourceforge.waters.model.compiler.constraint.ConstraintPropagator;
+import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 /**
  * A transition iterator for EFAs.
  * <p>
  * @author Mohammad Reza Shoaei
  */
-public class EFAIterator implements TransitionIterator
+public class EFAInterpreter implements TransitionIterator
 {
 
-  /**
-   * Constructor of the iterator
-   * <p>
-   * @param efa An EFA to iterate on
-   */
-  public EFAIterator(final SimpleEFAComponent efa)
+  public EFAInterpreter(final SimpleEFAComponent efa,
+                        final SimpleEFAVariableContext varContext)
   {
     mEFA = efa;
     mAlphabet = new THashSet<>(efa.getAlphabet());
@@ -37,7 +44,11 @@ public class EFAIterator implements TransitionIterator
     mIterator = mRel.createSuccessorsReadOnlyIterator();
     mLabelEncoding = efa.getTransitionLabelEncoding();
     mLabelEventMap = mLabelEncoding.getTranLabelToEventMap();
+    mPropagator = new ConstraintPropagator(ModuleElementFactory.getInstance(),
+                                           CompilerOperatorTable.getInstance(),
+                                           varContext);
     mCurrState = getInitState();
+    mCurrValue = getInitialValue(efa.getVariables());
     mCurrTrans = null;
     mCurrTran = null;
     mInnerIter = null;
@@ -46,6 +57,18 @@ public class EFAIterator implements TransitionIterator
   @Override
   public void reset(){
     mIterator.resetState(mCurrState);
+    mCurrTrans = getCurrTrans();
+    mCurrValue = ConstraintList.TRUE;
+    mPropagator.reset();
+    mInnerIter = mCurrTrans.iterator();
+  }
+
+  public void reset(final ConstraintList value)
+  {
+    mIterator.resetState(mCurrState);
+    mCurrValue = value;
+    mPropagator.reset();
+    mPropagator.addConstraints(value);
     mCurrTrans = getCurrTrans();
     mInnerIter = mCurrTrans.iterator();
   }
@@ -86,9 +109,27 @@ public class EFAIterator implements TransitionIterator
     reset();
   }
 
+  public void resetState(final int from, final ConstraintList value)
+  {
+    mCurrState = from;
+    reset(value);
+  }
+
   @Override
   public void reset(final int from, final int label) {
     mCurrState = from;
+    mPropagator.reset();
+    mIterator.reset(from, label);
+    mCurrTrans = getCurrTrans();
+    mInnerIter = mCurrTrans.iterator();
+  }
+
+  public void reset(final int from, final int label, final ConstraintList value)
+  {
+    mCurrState = from;
+    mCurrValue = value;
+    mPropagator.reset();
+    mPropagator.addConstraints(value);
     mIterator.reset(from, label);
     mCurrTrans = getCurrTrans();
     mInnerIter = mCurrTrans.iterator();
@@ -108,7 +149,6 @@ public class EFAIterator implements TransitionIterator
     }
     mCurrTrans = trs;
     mInnerIter = mCurrTrans.iterator();
-
   }
 
   @Override
@@ -118,7 +158,7 @@ public class EFAIterator implements TransitionIterator
 
   @Override
   public boolean advance() {
-    if (!mCurrTrans.isEmpty() && mInnerIter.hasNext()) {
+    if (mInnerIter.hasNext()) {
       mCurrTran = mInnerIter.next();
       return true;
     }
@@ -140,13 +180,26 @@ public class EFAIterator implements TransitionIterator
     return mCurrTran[1];
   }
 
+  public ConstraintList getNextValue()
+  {
+    mPropagator.reset();
+    mPropagator.addConstraints(mCurrValue);
+    mPropagator.addConstraints(getCurrentConstraints());
+    ConstraintList result = null;
+    try {
+      mPropagator.propagate();
+      result = mPropagator.getAllConstraints();
+    } catch (final EvalException ex) {
+    }
+    return result;
+  }
+
   public SimpleEFAEventDecl getCurrentSimpleDeclEvent() {
     return mLabelEventMap.get(mCurrTran[1]);
   }
 
   public ConstraintList getCurrentConstraints() {
-    final int currLabel = getCurrentEvent();
-    return mLabelEncoding.getTransitionLabel(currLabel).getConstraint();
+    return mLabelEncoding.getTransitionLabel(getCurrentEvent()).getConstraint();
   }
 
   @Override
@@ -208,31 +261,34 @@ public class EFAIterator implements TransitionIterator
     return mEFA.getStateEncoding().getSimpleState(stateId);
   }
 
-  public int getInitialState()
-  {
-    return getInitState();
-  }
-
-  private ArrayList<int[]> getCurrTrans()
-  {
+  private ArrayList<int[]> getCurrTrans() {
     final ArrayList<int[]> trs = new ArrayList<>();
-    while (mIterator.advance()) {
+    while (mIterator.advance()){
       final int[] tr = {mIterator.getCurrentSourceState(),
-                        mIterator.getCurrentEvent(),
-                        mIterator.getCurrentTargetState()};
+              mIterator.getCurrentEvent(),
+              mIterator.getCurrentTargetState()};
       trs.add(tr);
     }
     return trs;
   }
 
-  private int getInitState()
-  {
+  private int getInitState() {
     for (int s = 0; s < mRel.getNumberOfStates(); s++) {
       if (mRel.isInitial(s)) {
         return s;
       }
     }
     return -1;
+  }
+  private ConstraintList getInitialValue(
+   final Collection<SimpleEFAVariable> vars)
+  {
+    final List<SimpleExpressionProxy> inits = new ArrayList<>(vars.size());
+    for (final SimpleEFAVariable var : vars) {
+      final SimpleExpressionProxy exp = var.getInitialStatePredicate();
+      inits.add(exp);
+    }
+    return new ConstraintList(inits);
   }
 
   private final ListBufferTransitionRelation mRel;
@@ -245,5 +301,7 @@ public class EFAIterator implements TransitionIterator
   private ArrayList<int[]> mCurrTrans;
   private int[] mCurrTran;
   private final SimpleEFAComponent mEFA;
+  private ConstraintList mCurrValue;
+  private final ConstraintPropagator mPropagator;
 
 }

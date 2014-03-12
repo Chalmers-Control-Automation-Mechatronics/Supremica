@@ -114,6 +114,17 @@ public class SimpleEFASystemBuilder implements Abortable
       final Pass2Visitor pass2 = new Pass2Visitor();
       mInputModule.acceptVisitor(pass2);
 
+      if (mIsMarkingVariablEFAEnable) {
+        final String eventName = "variable:markings";
+        final SimpleIdentifierProxy eventIdent = mFactory
+         .createSimpleIdentifierProxy(eventName);
+        if (!hasIdentifier(eventIdent)) {
+          final EventDeclProxy decl = mFactory.createEventDeclProxy(eventIdent,
+                                                                    EventKind.CONTROLLABLE);
+          final SimpleEFAEventDecl edecl = new SimpleEFAEventDecl(decl);
+          insertEventDecl(decl.getIdentifier(), edecl);
+        }
+      }
       // Add collected information
       mResultEFASystem.addEvents(mEFAEventDeclMap.values());
       mResultEFASystem.addVariables(mVariableContext.getVariables());
@@ -822,18 +833,10 @@ public class SimpleEFASystemBuilder implements Abortable
           final ConstraintList markingUpdate =
            new ConstraintList(mVariableMarkingPredicates);
 
-          final String eventName = "variable:markings";
+          final String eventName = SimpleEFAHelper.DEFAULT_MARKINGEVENT_NAME;
           final SimpleIdentifierProxy eventIdent =
                   mFactory.createSimpleIdentifierProxy(eventName);
-          final SimpleEFAEventDecl edecl;
-          if (!hasIdentifier(eventIdent)) {
-            final EventDeclProxy decl =
-                    mFactory.createEventDeclProxy(eventIdent, EventKind.CONTROLLABLE);
-            edecl = new SimpleEFAEventDecl(decl);
-            insertEventDecl(decl.getIdentifier(), edecl);
-          } else {
-            edecl = getEventDecl(eventIdent);
-          }
+          final SimpleEFAEventDecl edecl = getEventDecl(eventIdent);
           final SimpleEFATransitionLabel label =
            new SimpleEFATransitionLabel(edecl, markingUpdate);
           edecl.addAllUnPrimeVariable(mMarkedVariables);
@@ -846,16 +849,15 @@ public class SimpleEFASystemBuilder implements Abortable
           rel.setInitial(0, true);
           rel.setMarked(1, SimpleEFAHelper.DEFAULT_MARKING_ID, true);
           rel.addTransition(0, eventId, 1);
-          final SimpleEFAComponent markingEFA =
-           new SimpleEFAComponent("VariablesMarking",
-                   mMarkedVariables,
-                                  eventEncoding,
-                                  rel);
-          mResultEFASystem.addComponent(markingEFA);
+          final SimpleEFAComponent markingEFA = new SimpleEFAComponent(
+           "VariablesMarking", mMarkedVariables, eventEncoding, rel);
           for (final SimpleEFAVariable var : mMarkedVariables) {
             var.clearVariableMarkings();
           }
+          markingEFA.setUnprimeVariables(mMarkedVariables);
+          markingEFA.setIsEFA(true);
           markingEFA.register();
+          mResultEFASystem.addComponent(markingEFA);
         } catch (final OverflowException exception) {
           throw new WatersRuntimeException(exception);
         }

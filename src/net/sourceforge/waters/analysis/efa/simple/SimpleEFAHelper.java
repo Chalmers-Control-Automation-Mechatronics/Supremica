@@ -352,6 +352,8 @@ public class SimpleEFAHelper {
   private final CompilerOperatorTable mOperatorTable;
   private final ModuleProxyCloner mCloner;
 
+  public static final String DEFAULT_MARKINGEVENT_NAME = "variable:markings";
+
   public static final String DEFAULT_STATEVALUE_STRING = "PE:";
   public static final String DEFAULT_VALUE_OPENING = "<";
   public static final String DEFAULT_VALUE_CLOSING = ">";

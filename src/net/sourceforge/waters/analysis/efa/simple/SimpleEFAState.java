@@ -173,8 +173,14 @@ public class SimpleEFAState
     if (mIsForbidden && !mHelper.containsForbiddenProposition(mPropositions)) {
       list.add(mHelper.getForbiddenIdentifier());
     }
+    if (!mIsForbidden) {
+      list.remove(mHelper.getForbiddenIdentifier());
+    }
     if (mIsMarked && !mHelper.containsMarkingProposition(mPropositions)) {
       list.add(mHelper.getMarkingIdentifier());
+    }
+    if (!mIsMarked) {
+      list.remove(mHelper.getMarkingIdentifier());
     }
     if (list.isEmpty()) {
       return null;
