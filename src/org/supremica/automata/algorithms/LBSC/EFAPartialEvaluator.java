@@ -20,7 +20,17 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.efa.simple.*;
+import net.sourceforge.waters.analysis.efa.simple.SimpleEFAComponent;
+import net.sourceforge.waters.analysis.efa.simple.SimpleEFAEventDecl;
+import net.sourceforge.waters.analysis.efa.simple.SimpleEFAHelper;
+import net.sourceforge.waters.analysis.efa.simple.SimpleEFAState;
+import net.sourceforge.waters.analysis.efa.simple.SimpleEFAStateEncoding;
+import net.sourceforge.waters.analysis.efa.simple.SimpleEFATransitionLabel;
+import net.sourceforge.waters.analysis.efa.simple.SimpleEFATransitionLabelEncoding;
+import net.sourceforge.waters.analysis.efa.simple.SimpleEFAVariable;
+import net.sourceforge.waters.analysis.efa.simple.SimpleEFAVariableCollector;
+import net.sourceforge.waters.analysis.efa.simple.SimpleEFAVariableContext;
+import net.sourceforge.waters.analysis.efa.simple.SimpleEFAVariableFinder;
 import net.sourceforge.waters.analysis.tr.DFSIntSearchSpace;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -259,8 +269,7 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
       while (oIter.advance()) {
         final int currLabelId = oIter.getCurrentEvent();
         final int currTargetId = oIter.getCurrentTargetState();
-        @SuppressWarnings("unchecked") final THashSet<SimpleEFAVariable> currSourceVars
-         = new THashSet<>();
+        final THashSet<SimpleEFAVariable> currSourceVars = new THashSet<>();
         mVarCollector.collectAllVariables(currSourceValue, currSourceVars);
         final ConstraintList currTargetValue
          = (ConstraintList) oStateInfo.get(currTargetId)[0];
@@ -600,7 +609,6 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
 
   private int getStateId(final int state, final ConstraintList value)
   {
-    outter:
     for (int index = 0; index < mTupleList.size(); index++) {
       final Object[] tuple = mTupleList.get(index);
       if ((int) tuple[0] == state) {
