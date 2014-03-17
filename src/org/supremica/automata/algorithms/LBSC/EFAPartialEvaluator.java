@@ -71,8 +71,8 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
    * @param varContext
    */
   public EFAPartialEvaluator(final ModuleProxyFactory factory,
-                              final CompilerOperatorTable op,
-                              final SimpleEFAVariableContext varContext)
+                             final CompilerOperatorTable op,
+                             final SimpleEFAVariableContext varContext)
   {
     mCompVarsMap = null;
     mFactory = factory;

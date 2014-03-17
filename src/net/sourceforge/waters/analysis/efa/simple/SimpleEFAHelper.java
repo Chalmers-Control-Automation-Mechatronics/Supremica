@@ -36,6 +36,7 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
+import net.sourceforge.waters.subject.module.IntConstantSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -115,8 +116,7 @@ public class SimpleEFAHelper {
         if (guard == null) {
           guard = subjectConstraint;
         } else {
-          guard =
-                  mFactory.createBinaryExpressionProxy(bop, guard, subjectConstraint);
+          guard = mFactory.createBinaryExpressionProxy(bop, guard, subjectConstraint);
         }
       }
       final Collection<SimpleExpressionProxy> guards =
@@ -346,6 +346,12 @@ public class SimpleEFAHelper {
      .getConstraints());
     con.addAll(con2.getConstraints());
     return new ConstraintList(con);
+  }
+
+  public static ConstraintList getFalseConstraintList()
+  {
+    SimpleExpressionProxy False = new IntConstantSubject(0);
+    return new ConstraintList(Collections.singleton(False));
   }
 
   private final ModuleProxyFactory mFactory;

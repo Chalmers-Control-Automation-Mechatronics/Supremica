@@ -89,9 +89,21 @@ public class EFASynchronizer
    * @throws OverflowException
    * @throws AnalysisException
    */
-  public SimpleEFAComponent getSynchronizedEFA() throws OverflowException, AnalysisException
+  public SimpleEFAComponent getSynchronizedEFA()
+   throws OverflowException, AnalysisException
   {
     return getSynchronizedEFA(mName, ComponentKind.PLANT);
+  }
+
+  public void enableRegisterSynchronizedEFA(boolean enable)
+  {
+    mRegister = enable;
+  }
+
+  public SimpleEFAComponent getSynchronizedEFA(final ComponentKind kind)
+   throws OverflowException, AnalysisException
+  {
+    return getSynchronizedEFA(mName, kind);
   }
 
   /**
@@ -105,7 +117,9 @@ public class EFASynchronizer
    * @throws OverflowException
    * @throws AnalysisException
    */
-  public SimpleEFAComponent getSynchronizedEFA(final String name, final ComponentKind kind) throws OverflowException, AnalysisException
+  public SimpleEFAComponent getSynchronizedEFA(final String name,
+                                               final ComponentKind kind)
+   throws OverflowException, AnalysisException
   {
     final int sNumPropositions = (mUsesMarking ? 1 : 0) + (mUsesForbidden ? 1 : 0);
     final ListBufferTransitionRelation sRel = createTransitionRelation(name,
@@ -129,7 +143,9 @@ public class EFASynchronizer
     mSynchEFA.setUnprimeVariables(new ArrayList<>(mUnprimedVars));
     mSynchEFA.setStateVariables(new ArrayList<>(mStateVars));
     mSynchEFA.setIsEFA(!vars.isEmpty());
-    mSynchEFA.register();
+    if (mRegister) {
+      mSynchEFA.register();
+    }
     return mSynchEFA;
   }
 
@@ -261,6 +277,7 @@ public class EFASynchronizer
       mAlphabet.addAll(efa.getAlphabet());
       mName += efa.getName() + "||";
     }
+    System.err.println("Estimate state space: " + sp);
     mStateSpace.setUp(Math.round(sp * 0.25f));
     mName = mName.substring(0, mName.length() - 2);
   }
@@ -316,5 +333,6 @@ public class EFASynchronizer
   private final Collection<SimpleEFAEventDecl> mBlockedEvents;
   private final Collection<SimpleEFAEventDecl> mAlphabet;
   private String mName = "";
+  private boolean mRegister = true;
 
 }

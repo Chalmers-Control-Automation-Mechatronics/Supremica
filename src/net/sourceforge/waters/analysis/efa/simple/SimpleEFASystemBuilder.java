@@ -368,14 +368,10 @@ public class SimpleEFASystemBuilder implements Abortable
     //# Constructor
     private Pass3Visitor()
     {
-      mGuardCompiler = new EFAGuardCompiler(mFactory,
-              mOperatorTable);
-      mConstraintPropagator =
- new ConstraintPropagator(mFactory,
-                                                            mCompilationInfo,
-                                                            mOperatorTable, mVariableContext);
-      mEFAVariableCollector = new SimpleEFAVariableCollector(mOperatorTable,
-              mVariableContext);
+      mGuardCompiler = new EFAGuardCompiler(mFactory, mOperatorTable);
+      mConstraintPropagator = new ConstraintPropagator(mFactory, mCompilationInfo, mOperatorTable,
+                                                       mVariableContext);
+      mEFAVariableCollector = new SimpleEFAVariableCollector(mOperatorTable, mVariableContext);
     }
 
     //#######################################################################
@@ -411,6 +407,9 @@ public class SimpleEFASystemBuilder implements Abortable
     {
       try {
         final GraphProxy graph = comp.getGraph();
+        if (graph.getNodes().isEmpty()) {
+          return null;
+        }
         // visiting the graph model (node and edges)
         visitGraphProxy(graph);
         // creating a transition relation based on the information we obtained
