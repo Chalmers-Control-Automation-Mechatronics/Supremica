@@ -167,17 +167,21 @@
         <unjar src="${lib}/manufacturingTables_jaxb.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/genericPLCProgramDescription_jaxb.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/itext.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/sat4j-core-2.0.rc8.jar" dest="${lib}/${unjared}"/>       
         <unjar src="${lib}/fsa2sat-1.0.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/javailp-1.2.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/lpsolve55j.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/junit.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/glpk-java.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/org.sat4j.core.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/minisatjni1.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/cplex.jar" dest="${lib}/${unjared}"/>
+        
+        <!-- Library for handling Sat4j. -->
+        <unjar src="${lib}/org.sat4j.core.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/org.sat4j.csp.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/org.sat4j.csp.xmlparser.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/org.sat4j.pb.jar" dest="${lib}/${unjared}"/>
-
+        <unjar src="${lib}/js.jar" dest="${lib}/${unjared}"/>
+        
         <!-- svg export -->
         <unjar src="${lib}/batik-awt-util.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/batik-svggen.jar" dest="${lib}/${unjared}"/>
