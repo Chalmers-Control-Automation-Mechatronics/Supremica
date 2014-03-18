@@ -67,9 +67,16 @@ import net.sourceforge.waters.plain.module.UnaryExpressionElement;
 /**
  * A Constraint Satisfaction Problem (CSP) solver based on SAT4J CSP package. Given a set of
  * constraints over variables, CSPSolver attempts to find all variables values that satisfies the
- * given constraints. Note that SAT4J does not contain a real CSP solver, it translates CSP problems
- * given in extension into SAT problems to solve them. Hence, it might exploit on variables with
- * large domain. A sample code to use this solver is as follows.
+ * given constraints. Note that SAT4J does not contain a real CSP solver, it translates given CSP
+ * problems into SAT problems to solve them. Hence, it might get hot on variables with large domain
+ * (>5000 elements). Despite this fact, it is very efficient on solving problems with constraints
+ * over boolean variables and logical connectivities (guess why?). The solver is equipped with
+ * methods to work with sequence of conditional transition relations (such as EFAs) where a sequence
+ * of updates can be modelled by automatic renaming of variables where next-variables (primed
+ * variables) of the i-th condition in the sequence will serve the current variables (unprimed
+ * variables) of i+1-th condition, and so on.
+ * <p>
+ * A sample code to use this solver is as follows.
  * <PRE>
  * {@link CSPSolver} solver = new {@link #CSPSolver(net.sourceforge.waters.analysis.efa.simple.SimpleEFAVariableContext) (varcontext)};
  * solver.{@link #init(java.util.List)} (constraints);
@@ -135,7 +142,8 @@ public class CSPSolver
    * @param exp
    * @throws AnalysisException
    */
-  public void init(final String exp) throws AnalysisException
+  public void init(final String exp)
+   throws AnalysisException
   {
     reset();
     addExpression(exp);
@@ -148,7 +156,8 @@ public class CSPSolver
    * <p>
    * @throws AnalysisException
    */
-  public void init(final List<SimpleExpressionProxy> exps) throws AnalysisException
+  public void init(final List<SimpleExpressionProxy> exps)
+   throws AnalysisException
   {
     reset();
     addExpression(exps);
@@ -161,7 +170,8 @@ public class CSPSolver
    * <p>
    * @throws AnalysisException
    */
-  public void addExpression(final String exp) throws AnalysisException
+  public void addExpression(final String exp)
+   throws AnalysisException
   {
     addExpression(mHelper.parse(exp));
   }
@@ -173,7 +183,8 @@ public class CSPSolver
    * <p>
    * @throws AnalysisException
    */
-  public void addNegatedExpression(final String str) throws AnalysisException
+  public void addNegatedExpression(final String str)
+   throws AnalysisException
   {
     addNegatedExpression(mHelper.parse(str));
   }
@@ -185,7 +196,8 @@ public class CSPSolver
    * <p>
    * @throws AnalysisException
    */
-  public void addNegatedExpression(final List<SimpleExpressionProxy> exps) throws AnalysisException
+  public void addNegatedExpression(final List<SimpleExpressionProxy> exps)
+   throws AnalysisException
   {
     for (final SimpleExpressionProxy exp : exps) {
       addNegatedExpression(exp);
@@ -199,7 +211,8 @@ public class CSPSolver
    * <p>
    * @throws AnalysisException
    */
-  public void addExpression(final List<SimpleExpressionProxy> exps) throws AnalysisException
+  public void addExpression(final List<SimpleExpressionProxy> exps)
+   throws AnalysisException
   {
     for (final SimpleExpressionProxy exp : exps) {
       addExpression(exp);
@@ -209,7 +222,7 @@ public class CSPSolver
   /**
    * Increase the variables post fix by one. From now on, the primed variables, say x', of the
    * stored constraints will be considered as the unprimed variables of any constraint which will be
-   * added.
+   * added later.
    */
   public void step()
   {
@@ -236,8 +249,8 @@ public class CSPSolver
   }
 
   /**
-   * Stores are the information (except learned clauses) in the buffer. The stored information can
-   * be retrieved by calling {@link #resume()} method.
+   * Stores are the information (except learned clauses) in a buffer. The stored information can be
+   * retrieved at any time by calling {@link #resume()} method.
    */
   public void pause()
   {
@@ -271,8 +284,9 @@ public class CSPSolver
   }
 
   /**
-   * Solves, learns, and stores values of unprimed variables of the initial step that satisfied all
-   * constraints. Note that the {@link #solve()} method must be called before.
+   * Solves, learns, and stores values of unprimed variables of the initial step (marked by postfix
+   * 0) that satisfied all constraints. Note that the {@link #solve()} method is automatically
+   * called by the method.
    * <p>
    * @param negate If the negated of the values must be stored.
    * <p>
@@ -288,7 +302,7 @@ public class CSPSolver
 
   /**
    * Solves, learns, and stores values of unprimed variables of the particular step that satisfied
-   * all constraints.
+   * all constraints. Note that the {@link #solve()} method is automatically called by the method.
    * <p>
    * @param negate  If the negated of the values must be stored.
    * @param postfix The step, initially it is 0.
@@ -297,7 +311,8 @@ public class CSPSolver
    * <p>
    * @throws AnalysisException
    */
-  public boolean learn(final boolean negate, final int postfix) throws AnalysisException
+  public boolean learn(final boolean negate, final int postfix)
+   throws AnalysisException
   {
     boolean success = false;
     final String fn = negate ? CSPOP_NOTEQUALS : CSPOP_EQUALS;
@@ -343,14 +358,15 @@ public class CSPSolver
   }
 
   /**
-   * Returns whether there exists any solution the current constraints. {@link #solve()} must be
-   * called before hand. Also, this method must be called before retrieving any model.
+   * Returns whether there exists any solution for the current constraints. Note that
+   * {@link #solve()} must be called before hand.
    * <p>
    * @return <CODE>true</CODE> is there is any solution, <CODE>false</CODE> otherwise.
    * <p>
    * @throws AnalysisException
    */
-  public boolean isSatisfiable() throws AnalysisException
+  public boolean isSatisfiable()
+   throws AnalysisException
   {
     try {
       if (!mTrivialFalsity) {
@@ -363,7 +379,8 @@ public class CSPSolver
   }
 
   /**
-   * Returns a model that satisfies the current constraints.
+   * Returns a model that satisfies the current constraints. Note that {@link #isSatisfiable()} must
+   * be called before hand.
    * <p>
    * @return A map of variables to the values.
    */
@@ -380,7 +397,8 @@ public class CSPSolver
   }
 
   /**
-   * Returns the inner model.
+   * Returns the inner model, namely, variables with postfix. Note that {@link #isSatisfiable()}
+   * must be called before hand.
    * <p>
    * @return A map of inner variables to the values.
    */
@@ -391,7 +409,7 @@ public class CSPSolver
   }
 
   /**
-   * Attempts to solve the CSP. Must be called before retrieving the models or checking the
+   * Attempts to solve the CSP. Must be called before retrieving any model or checking the
    * satisfiability of the problem.
    * <p>
    * @throws AnalysisException
@@ -434,7 +452,8 @@ public class CSPSolver
     }
   }
 
-  private void addNegatedExpression(final SimpleExpressionProxy exp) throws AnalysisException
+  private void addNegatedExpression(final SimpleExpressionProxy exp)
+   throws AnalysisException
   {
     final Object[] p = getCSPPredicate(exp);
     if (p != null) {
@@ -444,7 +463,8 @@ public class CSPSolver
     }
   }
 
-  private void addExpression(final SimpleExpressionProxy exp) throws AnalysisException
+  private void addExpression(final SimpleExpressionProxy exp)
+   throws AnalysisException
   {
     final Object[] p = getCSPPredicate(exp);
     if (p != null) {
@@ -475,7 +495,8 @@ public class CSPSolver
     }
   }
 
-  private Domain getCSPDomain(final String name, final CompiledRange range) throws AnalysisException
+  private Domain getCSPDomain(final String name, final CompiledRange range)
+   throws AnalysisException
   {
     Domain domain = mRangeToDomain.get(range);
     if (domain == null) {
@@ -508,7 +529,8 @@ public class CSPSolver
     return value;
   }
 
-  private Object[] getCSPPredicate(final SimpleExpressionProxy exp) throws AnalysisException
+  private Object[] getCSPPredicate(final SimpleExpressionProxy exp)
+   throws AnalysisException
   {
     try {
       final CompiledNormalForm normal = mDNF.convertToCNF(exp);
@@ -531,7 +553,8 @@ public class CSPSolver
     }
   }
 
-  private String getCSPExpressionString(final List<CompiledClause> clauses, final ExpressionVisitor visitor)
+  private String getCSPExpressionString(final List<CompiledClause> clauses,
+                                        final ExpressionVisitor visitor)
    throws VisitorException
   {
     String pAndExp = "";
@@ -615,8 +638,8 @@ public class CSPSolver
 
     //#########################################################################
     @Override
-    public Object visitBinaryExpressionProxy(final BinaryExpressionProxy proxy) throws
-     VisitorException
+    public Object visitBinaryExpressionProxy(final BinaryExpressionProxy proxy)
+     throws VisitorException
     {
       if (mUnsupportedFlag) {
         return null;
@@ -659,7 +682,8 @@ public class CSPSolver
     }
 
     @Override
-    public Object visitIntConstantProxy(final IntConstantProxy proxy) throws VisitorException
+    public Object visitIntConstantProxy(final IntConstantProxy proxy)
+     throws VisitorException
     {
       if (!mUnsupportedFlag) {
         mPredicate += proxy.getValue();
@@ -669,8 +693,8 @@ public class CSPSolver
     }
 
     @Override
-    public Object visitSimpleIdentifierProxy(final SimpleIdentifierProxy proxy) throws
-     VisitorException
+    public Object visitSimpleIdentifierProxy(final SimpleIdentifierProxy proxy)
+     throws VisitorException
     {
       if (!mUnsupportedFlag) {
         final String sName = proxy.getName();
@@ -683,8 +707,8 @@ public class CSPSolver
     }
 
     @Override
-    public Object visitUnaryExpressionProxy(final UnaryExpressionProxy proxy) throws
-     VisitorException
+    public Object visitUnaryExpressionProxy(final UnaryExpressionProxy proxy)
+     throws VisitorException
     {
       if (!mUnsupportedFlag) {
         final UnaryExpressionElement exp = (UnaryExpressionElement) mCloner.getClone(proxy);
