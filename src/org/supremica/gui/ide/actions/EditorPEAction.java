@@ -40,7 +40,7 @@ import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
-import org.supremica.automata.algorithms.HDS.EFAPartialEvaluator;
+import org.supremica.automata.algorithms.LBSC.EFAPartialEvaluator;
 import org.supremica.gui.ide.IDE;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
@@ -113,15 +113,15 @@ public class EditorPEAction
         }
       }
       if (!compList.isEmpty()) {
-        SimpleEFAVariableContext context = sys.getVariableContext();
+        final SimpleEFAVariableContext context = sys.getVariableContext();
         final EFAPartialEvaluator pe = new EFAPartialEvaluator(context);
         pe.init(compList);
         pe.evaluate();
         final Collection<SimpleEFAComponent> residuals =
          pe.getResidualComponents();
-        Collection<SimpleEFAVariable> vars =
+        final Collection<SimpleEFAVariable> vars =
          pe.getEvaluatedVariables();
-        for (SimpleEFAVariable var : vars) {
+        for (final SimpleEFAVariable var : vars) {
           System.err.println("Evaluated: " + var.getName());
         }
         for (final SimpleEFAComponent res : residuals) {
