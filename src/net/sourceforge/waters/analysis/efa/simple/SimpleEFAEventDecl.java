@@ -236,12 +236,11 @@ public class SimpleEFAEventDecl
   @Override
   public boolean equals(final Object other)
   {
-    if (other != null && other.getClass() == getClass()) {
+    if ((other != null) && (other.getClass() == getClass())) {
       final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       final SimpleEFAEventDecl expected = (SimpleEFAEventDecl) other;
-      return eq
-       .isEqualList(Collections.singletonList(expected.getEventDecl()),
-                    Collections.singletonList(mEFAEventDecl));
+      return eq.isEqualList(Collections.singletonList(expected.mEFAEventDecl),
+                            Collections.singletonList(mEFAEventDecl));
     }
     return false;
   }
@@ -249,14 +248,13 @@ public class SimpleEFAEventDecl
   @Override
   public int hashCode()
   {
-    final ModuleHashCodeVisitor hash =
-     ModuleHashCodeVisitor.getInstance(false);
+    final ModuleHashCodeVisitor hash = ModuleHashCodeVisitor.getInstance(false);
     return hash.getListHashCode(Collections.singletonList(mEFAEventDecl));
   }
 
     @Override
     public SimpleEFAEventDecl clone() {
-        return new SimpleEFAEventDecl(getIdentifier(),getKind());
+      return new SimpleEFAEventDecl(getIdentifier(),getKind());
     }
 
     @Override
@@ -286,7 +284,8 @@ public class SimpleEFAEventDecl
    * The <I>event variable set</I>, consisting of all the variables whose value
    * may change when this event occurs. This set contains only the EFA variable
    * objects for the current state of the concerned variables.
-   * @see EFACompiler
+   * <p/>
+   * @see {@link net.sourceforge.waters.model.compiler.efa.EFACompiler}.
    */
   private final Set<SimpleEFAVariable> mVariables;
   private final Set<SimpleEFAVariable> mPrimeVariables;
@@ -310,7 +309,7 @@ public class SimpleEFAEventDecl
 
   @Override
   public int compareTo(final NamedProxy namedProxy) {
-    return 0;
+    return this.getName().compareTo(namedProxy.getName());
   }
 
 

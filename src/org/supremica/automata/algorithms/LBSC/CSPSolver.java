@@ -71,10 +71,9 @@ import net.sourceforge.waters.plain.module.UnaryExpressionElement;
  * problems into SAT problems to solve them. Hence, it might get hot on variables with large domain
  * (>5000 elements). Despite this fact, it is very efficient on solving problems with constraints
  * over boolean variables and logical connectivities (guess why?). The solver is equipped with
- * methods to work with sequence of conditional transition relations (such as EFAs) where a sequence
- * of updates can be modelled by automatic renaming of variables where next-variables (primed
- * variables) of the i-th condition in the sequence will serve the current variables (unprimed
- * variables) of i+1-th condition, and so on.
+ * methods to work with sequence of conditional transitions where a sequence of updates is modelled
+ * by automatic renaming of variables where next-variables (primed variables) of the i-th condition
+ * in the sequence serve the current variables (unprimed variables) of i+1-th condition, and so on.
  * <p>
  * A sample code to use this solver is as follows.
  * <PRE>
@@ -234,18 +233,29 @@ public class CSPSolver
    */
   public void reset()
   {
+    reset(true);
+  }
+
+  /**
+   * Resets and clears all the stored information.
+   * @param warm Clears only constrains, learned clauses and sets postfix value to 0.
+   */
+  public void reset(final boolean warm)
+  {
     mSolver.reset();
-    mCSPVarNameToDomain.clear();
-    mCSPVarNameToSimVar.clear();
-    mCSPVarNameToCSPVar.clear();
     mCSPPredicatesList.clear();
-    mIntToCSPEval.clear();
-    mNbCSPVars = 0;
     mVarPostfix = 0;
     mTrivialFalsity = false;
     mLearnedClauses.clear();
-    mRangeToDomain.clear();
-    mExpIntMap.clear();
+    if (!warm) {
+      mExpIntMap.clear();
+      mCSPVarNameToDomain.clear();
+      mCSPVarNameToSimVar.clear();
+      mCSPVarNameToCSPVar.clear();
+      mIntToCSPEval.clear();
+      mNbCSPVars = 0;
+      mRangeToDomain.clear();
+    }
   }
 
   /**
@@ -329,7 +339,7 @@ public class CSPSolver
         final String key = entry.getKey();
         final SimpleExpressionProxy value = entry.getValue();
         if (key.endsWith(Integer.toString(postfix))) {
-          pairs.add(fn + "(" + key + "," + value + ")");
+          pairs.add(fn + '(' + key + ',' + value + ')');
           pExpVars.add(key);
           pExpCons.add(getExpressionId(value));
         }
@@ -342,7 +352,7 @@ public class CSPSolver
       String pExpStr = "";
       for (int j = pairs.size(); j > 0; j--) {
         if (j > 1) {
-          pExpStr += CSPOP_AND + "(";
+          pExpStr += CSPOP_AND + '(';
         }
         pExpStr += pairs.get(j - 1);
         pExpStr += ",";
@@ -386,10 +396,23 @@ public class CSPSolver
    */
   public Map<String, SimpleExpressionProxy> getModel()
   {
+    return getModel(0);
+  }
+
+  /**
+   * Returns a model that satisfies the current constraints. Note that {@link #isSatisfiable()} must
+   * be called before hand.
+   * <p>
+   * @param postfix The variables value at specific step. To get next value of step i use i+1.
+   * <p>
+   * @return A map of variables to the values.
+   */
+  public Map<String, SimpleExpressionProxy> getModel(final int postfix)
+  {
     final THashMap<String, SimpleExpressionProxy> sVarToValue = new THashMap<>();
     final THashMap<String, SimpleExpressionProxy> translation = getInnerModel();
     for (final Map.Entry<String, SimpleExpressionProxy> entry : translation.entrySet()) {
-      if (entry.getKey().endsWith("0")) {
+      if (entry.getKey().endsWith(Integer.toString(postfix))) {
         sVarToValue.put(mCSPVarNameToSimVar.get(entry.getKey()), entry.getValue());
       }
     }
@@ -458,7 +481,7 @@ public class CSPSolver
     final Object[] p = getCSPPredicate(exp);
     if (p != null) {
       final String pExpStr = (String) p[0];
-      p[0] = CSPOP_NOT + "(" + pExpStr + ")";
+      p[0] = CSPOP_NOT + '(' + pExpStr + ')';
       mCSPPredicatesList.add(p);
     }
   }
@@ -498,23 +521,26 @@ public class CSPSolver
   private Domain getCSPDomain(final String name, final CompiledRange range)
    throws AnalysisException
   {
-    Domain domain = mRangeToDomain.get(range);
+    Domain domain = mCSPVarNameToDomain.get(name);
     if (domain == null) {
-      if (range instanceof CompiledIntRange) {
-        final CompiledIntRange dom = (CompiledIntRange) range;
-        domain = new RangeDomain(dom.getLower(), dom.getUpper());
-      } else if (range instanceof CompiledEnumRange) {
-        final TIntArrayList elements = new TIntArrayList();
-        for (final SimpleExpressionProxy exp : range.getValues()) {
-          elements.add(getExpressionId(exp));
+      domain = mRangeToDomain.get(range);
+      if (domain == null) {
+        if (range instanceof CompiledIntRange) {
+          final CompiledIntRange dom = (CompiledIntRange) range;
+          domain = new RangeDomain(dom.getLower(), dom.getUpper());
+        } else if (range instanceof CompiledEnumRange) {
+          final TIntArrayList elements = new TIntArrayList();
+          for (final SimpleExpressionProxy exp : range.getValues()) {
+            elements.add(getExpressionId(exp));
+          }
+          domain = new EnumeratedDomain(elements.toArray());
+        } else {
+          throw new AnalysisException("Unknown domain range!");
         }
-        domain = new EnumeratedDomain(elements.toArray());
-      } else {
-        throw new AnalysisException("Unknown domain range!");
+        mRangeToDomain.put(range, domain);
       }
-      mRangeToDomain.put(range, domain);
+      mCSPVarNameToDomain.put(name, domain);
     }
-    mCSPVarNameToDomain.put(name, domain);
     return domain;
   }
 
@@ -560,7 +586,7 @@ public class CSPSolver
     String pAndExp = "";
     for (int i = clauses.size(); i > 0; i--) {
       if (i > 1) {
-        pAndExp += CSPOP_AND + "(";
+        pAndExp += CSPOP_AND + '(';
       }
       String pOrExp = "";
       final CompiledClause clause = clauses.get(i - 1);
@@ -568,7 +594,7 @@ public class CSPSolver
       for (int j = literals.size(); j > 0; j--) {
         final SimpleExpressionProxy literal = literals.get(j - 1);
         if (j > 1) {
-          pOrExp += CSPOP_OR + "(";
+          pOrExp += CSPOP_OR + '(';
         }
         visitor.clear();
         literal.acceptVisitor(visitor);
@@ -579,7 +605,7 @@ public class CSPSolver
       for (int j = 1; j < literals.size(); j++) {
         pOrExp += ")";
       }
-      pAndExp += pOrExp + ",";
+      pAndExp += pOrExp + ',';
     }
     pAndExp = pAndExp.substring(0, pAndExp.length() - 1);
     for (int i = 1; i < clauses.size(); i++) {
@@ -587,7 +613,7 @@ public class CSPSolver
     }
     return pAndExp;
   }
-  private ModelIterator getSolver(final int mode)
+  private static ModelIterator getSolver(final int mode)
   {
     final ModelIterator solver;
     switch (mode) {
@@ -714,7 +740,7 @@ public class CSPSolver
         final UnaryExpressionElement exp = (UnaryExpressionElement) mCloner.getClone(proxy);
         final UnaryOperator op = exp.getOperator();
         if (op == mOp.getNotOperator()) {
-          mPredicate += CSPOP_NOT + "(";
+          mPredicate += CSPOP_NOT + '(';
           exp.getSubTerm().acceptVisitor(this);
           mPredicate += ")";
         } else if (op == mOp.getNextOperator()) {

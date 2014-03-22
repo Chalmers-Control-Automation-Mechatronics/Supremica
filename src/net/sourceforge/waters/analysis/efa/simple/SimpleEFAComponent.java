@@ -9,32 +9,17 @@
 
 package net.sourceforge.waters.analysis.efa.simple;
 
-import gnu.trove.set.hash.THashSet;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.efa.base.AbstractEFATransitionRelation;
-import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
-import net.sourceforge.waters.model.module.EdgeProxy;
-import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.GraphProxy;
-import net.sourceforge.waters.model.module.GuardActionBlockProxy;
-import net.sourceforge.waters.model.module.LabelBlockProxy;
-import net.sourceforge.waters.model.module.ModuleProxyCloner;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.model.module.NodeProxy;
-import net.sourceforge.waters.model.module.SimpleComponentProxy;
-import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
-import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 /**
@@ -43,43 +28,46 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
  * @author Mohammad Reza Shoaei
  */
 public class SimpleEFAComponent
- extends AbstractEFATransitionRelation<SimpleEFATransitionLabel>
+ extends AbstractEFATransitionRelation<Integer>
 {
 
   public SimpleEFAComponent(final String name,
-                            final Collection<SimpleEFAVariable> variables,
+                            final TIntArrayList variables,
+                            final SimpleEFAVariableContext varContext,
                             final SimpleEFAStateEncoding stateEncoding,
-                            final SimpleEFATransitionLabelEncoding labels,
-                            final Collection<SimpleEFAEventDecl> blockedEvents,
+                            final SimpleEFATransitionLabelEncoding labelEncoding,
                             final ListBufferTransitionRelation rel,
-                            final ComponentKind kind,
-                            final ModuleProxyFactory factory)
+                            final TIntArrayList blockedEvents,
+                            final ComponentKind kind)
   {
-    super(rel, labels, null);
+    super(rel, labelEncoding, null);
     super.setName(name);
-    mFactory = factory != null ? factory : ModuleSubjectFactory.getInstance();
-    mHelper = new SimpleEFAHelper(mFactory);
-    mStateEncoding = stateEncoding != null ? stateEncoding
-                     : mHelper.getStateEncoding(rel);
+    mIdentifier = SimpleEFAHelper.getSimpleIdentifierSubject(name);
+    mStateEncoding = stateEncoding;
     mVariables = variables;
-    mUnprimeVars = new ArrayList<>();
-    mPrimeVars = new ArrayList<>();
-    mStateVariables = new ArrayList<>();
+    mVarContext = varContext;
+    mUnprimedVars = new TIntArrayList();
+    mPrimedVars = new TIntArrayList();
+    mStateVariables = new TIntArrayList();
     mBlockedEvents = blockedEvents;
-    mCloner = mFactory.getCloner();
-    mAlphabet = initAlphabet();
-    mIdentifier = mFactory.createSimpleIdentifierProxy(name);
     mKind = kind != null ? kind : ComponentKind.PLANT;
     rel.setKind(mKind);
     mIsStructurallyDeterministic = rel.isDeterministic();
   }
 
   public SimpleEFAComponent(final String name,
-                            final Collection<SimpleEFAVariable> variables,
+                            final TIntArrayList variables,
+                            final SimpleEFAVariableContext varContext,
+                            final SimpleEFAStateEncoding stateEncoding,
                             final SimpleEFATransitionLabelEncoding labels,
                             final ListBufferTransitionRelation rel)
   {
-    this(name, variables, null, labels, null, rel, null, null);
+    this(name, variables, varContext, stateEncoding, labels, rel, null, null);
+  }
+
+  public SimpleEFAEventEncoding getEventEncoding()
+  {
+    return getTransitionLabelEncoding().getEventEncoding();
   }
 
   @Override
@@ -90,19 +78,12 @@ public class SimpleEFAComponent
 
   public void addVariable(final SimpleEFAVariable variable)
   {
-    mVariables.add(variable);
     variable.addTransitionRelation(this);
   }
 
   public void removeVariable(final SimpleEFAVariable variable)
   {
-    mVariables.remove(variable);
     variable.removeTransitionRelation(this);
-  }
-
-  public Collection<SimpleEFAVariable> getVariables()
-  {
-    return mVariables;
   }
 
   /**
@@ -111,30 +92,26 @@ public class SimpleEFAComponent
    */
   public void register() throws AnalysisException
   {
-    final THashSet<SimpleEFAVariable> vars = new THashSet<>(mUnprimeVars);
-    vars.addAll(mPrimeVars);
-    if (mVariables.size() != vars.size()) {
+    final TIntHashSet vars = new TIntHashSet(mUnprimedVars);
+    vars.addAll(mPrimedVars);
+    if (!vars.isEmpty() && (mVariables.size() != vars.size())) {
       vars.removeAll(mVariables);
-      throw new AnalysisException("Inconsistency in variable set is detected: "
-       + vars);
+      throw new AnalysisException(
+       "SimpleEFAComponent > register() > Inconsistency in variable set is detected > " + vars);
     }
 
-    for (final SimpleEFAVariable var : mUnprimeVars) {
-      var.addTransitionRelation(this);
-      var.addVisitor(this);
+    for (final int var : mUnprimedVars.toArray()) {
+      mVarContext.getVariable(var).addTransitionRelation(this);
+      mVarContext.getVariable(var).addVisitor(this);
     }
 
-    for (final SimpleEFAVariable var : mPrimeVars) {
-      var.addTransitionRelation(this);
-      var.addModifier(this);
+    for (final int var : mPrimedVars.toArray()) {
+      mVarContext.getVariable(var).addTransitionRelation(this);
+      mVarContext.getVariable(var).addModifier(this);
     }
 
-    for (final SimpleEFAVariable var : mStateVariables) {
-      var.addUseInState(this);
-    }
-
-    for (final SimpleEFAEventDecl event : mAlphabet) {
-      event.addComponent(this);
+    for (final int var : mStateVariables.toArray()) {
+      mVarContext.getVariable(var).addUseInState(this);
     }
 
   }
@@ -145,56 +122,39 @@ public class SimpleEFAComponent
    */
   public void dispose()
   {
-    for (final SimpleEFAVariable var : mUnprimeVars) {
-      var.removeTransitionRelation(this);
-      var.removeVisitor(this);
+    for (final int var : mUnprimedVars.toArray()) {
+      mVarContext.getVariable(var).removeTransitionRelation(this);
+      mVarContext.getVariable(var).removeVisitor(this);
     }
 
-    for (final SimpleEFAVariable var : mPrimeVars) {
-      var.removeTransitionRelation(this);
-      var.removeModifier(this);
+    for (final int var : mPrimedVars.toArray()) {
+      mVarContext.getVariable(var).removeTransitionRelation(this);
+      mVarContext.getVariable(var).removeModifier(this);
     }
 
-    for (final SimpleEFAVariable var : mStateVariables) {
-      var.removeUseInState(this);
+    for (final int var : mStateVariables.toArray()) {
+      mVarContext.getVariable(var).removeUseInState(this);
     }
-
-    for (final SimpleEFAEventDecl event : mAlphabet) {
-      event.removeComponent(this);
-    }
-    mVariables.clear();
-    mAlphabet.clear();
-    mUnprimeVars = null;
-    mPrimeVars = null;
+    mVariables = null;
+    mUnprimedVars = null;
+    mPrimedVars = null;
     mStateVariables = null;
-    mEdges = null;
     mStateEncoding = null;
   }
 
-  public Collection<SimpleEFAEventDecl> getAlphabet()
+  public TIntArrayList getEvents()
   {
-    return Collections.unmodifiableCollection(mAlphabet);
+    return getTransitionLabelEncoding().getEventList();
   }
 
-  public Collection<SimpleEFAEventDecl> getBlockedEvents()
+  public TIntArrayList getBlockedEvents()
   {
-    return (mBlockedEvents != null ? Collections.unmodifiableCollection(mBlockedEvents) : null);
+    return mBlockedEvents;
   }
 
-  public void setBlockedEvents(final Collection<SimpleEFAEventDecl> blocked)
+  public void setBlockedEvents(final TIntArrayList blocked)
   {
     mBlockedEvents = blocked;
-  }
-
-  public Collection<ConstraintList> getConstrainSet()
-  {
-    final Collection<ConstraintList> constraints =
-      new THashSet<>(getTransitionLabelEncoding().size());
-    for (final SimpleEFATransitionLabel label :
-         getTransitionLabelEncoding().getTransitionLabelsIncludingTau()) {
-      constraints.add(label.getConstraint());
-    }
-    return Collections.unmodifiableCollection(constraints);
   }
 
   public SimpleEFAStateEncoding getStateEncoding()
@@ -207,110 +167,9 @@ public class SimpleEFAComponent
     mStateEncoding = encoding;
   }
 
-  public List<SimpleEFAState> getStateSet()
-  {
-    return mStateEncoding.getSimpleStates();
-  }
-
-  public List<SimpleEFAState> getMarkedStates()
-  {
-    final List<SimpleEFAState> markedState = new ArrayList<>();
-    if (mHasMarking) {
-      final List<SimpleEFAState> states = getStateSet();
-      for (final SimpleEFAState state : states) {
-        if (state.isMarked()) {
-          markedState.add(state);
-        }
-      }
-    }
-    return markedState;
-  }
-
   public SimpleEFAState getInitialState()
   {
     return mStateEncoding.getInitialState();
-  }
-
-  public List<EdgeProxy> getTransitionSet(final boolean reset)
-  {
-    if (mEdges == null || reset) {
-      mEdges = computeTransitionSet();
-    }
-    return mEdges;
-  }
-
-  private List<EdgeProxy> computeTransitionSet()
-  {
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    final SimpleEFATransitionLabelEncoding efaEvent =
-     getTransitionLabelEncoding();
-    final List<EdgeProxy> edgeList =
-     new ArrayList<>(rel.getNumberOfTransitions());
-    final TransitionIterator iter =
-     rel.createAllTransitionsReadOnlyIterator();
-    while (iter.advance()) {
-      final int eventId = iter.getCurrentEvent();
-      final int source = iter.getCurrentSourceState();
-      final int target = iter.getCurrentTargetState();
-      final SimpleEFATransitionLabel label =
-       efaEvent.getTransitionLabel(eventId);
-      final ConstraintList condition = label.getConstraint();
-      final List<SimpleIdentifierProxy> identList =
-       new ArrayList<>();
-      final SimpleIdentifierProxy ident =
-              mFactory.createSimpleIdentifierProxy(label.getEvent().getName());
-      identList.add(ident);
-      final CompilerOperatorTable op = CompilerOperatorTable.getInstance();
-      final GuardActionBlockProxy guardActionBlock =
-              mHelper.createGuardActionBlock(condition, op);
-      final LabelBlockProxy block =
-              mFactory.createLabelBlockProxy(identList, null);
-      final SimpleNodeProxy sourceNode = mStateEncoding.getSimpleNode(source);
-      final SimpleNodeProxy targetNode = mStateEncoding.getSimpleNode(target);
-      final EdgeProxy edge =
-              mFactory.createEdgeProxy((NodeProxy) mCloner.getClone(sourceNode),
-                      (NodeProxy) mCloner.getClone(targetNode),
-                      block, guardActionBlock, null, null, null);
-      edgeList.add(edge);
-    }
-    return edgeList;
-  }
-
-  public SimpleComponentProxy getSimpleComponent()
-  {
-    final String name = getName();
-    final List<SimpleEFAState> stateSet = getStateSet();
-    final List<SimpleNodeProxy> nodes = new ArrayList<>(stateSet.size());
-    for (final SimpleEFAState state : stateSet) {
-      nodes.add((SimpleNodeProxy) mCloner.getClone(state.getSimpleNode()));
-    }
-    final List<EdgeProxy> edgeList = computeTransitionSet();
-    final boolean isMarkingIsUsed =
-     getTransitionRelation()
-     .isUsedProposition(SimpleEFAHelper.DEFAULT_MARKING_ID);
-    final int numOfMarkingState = getMarkedStates().size();
-    LabelBlockProxy markingBlock = null;
-    final List<SimpleIdentifierProxy> identList = new ArrayList<>();
-    final Collection<SimpleEFAEventDecl> blockedEvents = getBlockedEvents();
-    if (blockedEvents != null && !blockedEvents.isEmpty()) {
-      for (final SimpleEFAEventDecl e : blockedEvents) {
-        identList.add(mFactory.createSimpleIdentifierProxy(e.getName()));
-      }
-    }
-    if (isMarkingIsUsed && numOfMarkingState < 1) {
-      final SimpleIdentifierProxy marking =
-              mFactory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME);
-      identList.add(marking);
-    }
-    if (!identList.isEmpty()) {
-      markingBlock = mFactory.createLabelBlockProxy(identList, null);
-    }
-    final GraphProxy graph =
-            mFactory.createGraphProxy(false, markingBlock, nodes, edgeList);
-    final SimpleIdentifierProxy ident =
-            mFactory.createSimpleIdentifierProxy(name);
-
-    return mFactory.createSimpleComponentProxy(ident, getKind(), graph);
   }
 
   public void setStructurallyDeterministic(final boolean deterministic)
@@ -369,16 +228,6 @@ public class SimpleEFAComponent
     }
   }
 
-  public ModuleProxyFactory getFactory()
-  {
-    return mFactory;
-  }
-
-  public void setFactory(final ModuleProxyFactory factory)
-  {
-    mFactory = factory;
-  }
-
   public ComponentKind getKind()
   {
     return mKind;
@@ -390,7 +239,7 @@ public class SimpleEFAComponent
     getTransitionRelation().setKind(kind);
   }
 
-  public SimpleIdentifierProxy getIdentifier()
+  public IdentifierProxy getIdentifier()
   {
     return mIdentifier;
   }
@@ -398,28 +247,23 @@ public class SimpleEFAComponent
   @Override
   public String getName()
   {
-    return mIdentifier.getName();
+    return mIdentifier.toString();
   }
 
   public boolean hasMarkedState()
   {
-    return mHasMarking;
+    return mStateEncoding.hasMarkedState();
   }
 
   public boolean hasForbiddenState()
   {
-    return mHasForbidden;
+    return mStateEncoding.hasForbbidenState();
   }
 
-  public int getNumberOfAlphabet()
+  public int getNumberOfEvents()
   {
-    final int extras = (mHasMarking ? 1 : 0) + (mHasForbidden ? 1 : 0);
-    return mAlphabet.size() - extras;
-  }
-
-  public int getNumberOfTransitions()
-  {
-    return getTransitionSet(false).size();
+    final int extras = (hasMarkedState() ? 1 : 0) + (hasForbiddenState() ? 1 : 0);
+    return getTransitionLabelEncoding().getEventList().size() - extras;
   }
 
   public int getNumberOfStates()
@@ -427,81 +271,59 @@ public class SimpleEFAComponent
     return mStateEncoding.size();
   }
 
-  public void setUnprimeVariables(final List<SimpleEFAVariable> uvars)
+  public SimpleEFAVariableContext getVariableContext()
   {
-    mUnprimeVars = uvars;
+    return mVarContext;
   }
 
-  public void setPrimeVariables(final List<SimpleEFAVariable> pvars)
+  public void setUnprimeVariables(final TIntArrayList uvars)
   {
-    mPrimeVars = pvars;
+    mUnprimedVars = uvars;
   }
 
-  public List<SimpleEFAVariable> getUnprimeVariables()
+  public void setPrimeVariables(final TIntArrayList pvars)
   {
-    return mUnprimeVars;
+    mPrimedVars = pvars;
   }
 
-  public List<SimpleEFAVariable> getPrimeVariables()
+  public TIntArrayList getUnprimeVariables()
   {
-    return mPrimeVars;
+    return mUnprimedVars;
   }
 
-  public void setStateVariables(final List<SimpleEFAVariable> svars)
+  public TIntArrayList getPrimeVariables()
+  {
+    return mPrimedVars;
+  }
+
+  public TIntArrayList getVariables()
+  {
+    return mVariables;
+  }
+
+  public void setStateVariables(final TIntArrayList svars)
   {
     mStateVariables = svars;
   }
 
-  public List<SimpleEFAVariable> getStateVariables()
+  public TIntArrayList getStateVariables()
   {
     return mStateVariables;
   }
 
-  private Collection<SimpleEFAEventDecl> initAlphabet()
-  {
-    final SimpleEFATransitionLabelEncoding labels = getTransitionLabelEncoding();
-    final Collection<SimpleEFAEventDecl> blockedEvents = getBlockedEvents();
-    final Collection<SimpleEFAEventDecl> alphabet = new THashSet<>();
-    for (int i = EventEncoding.NONTAU; i < labels.size(); i++) {
-      alphabet.add(labels.getTransitionLabel(i).getEvent());
-    }
-    if (blockedEvents != null && !blockedEvents.isEmpty()) {
-      alphabet.addAll(blockedEvents);
-    }
-    final long prop = getTransitionRelation().getUsedPropositions();
-    if ((prop & 1) != 0) {
-      final SimpleEFAEventDecl marking =
-       new SimpleEFAEventDecl(mHelper.getMarkingDecl());
-      alphabet.add(marking);
-      mHasMarking = true;
-    }
-    if ((prop & 1 << SimpleEFAHelper.DEFAULT_FORBIDDEN_ID) != 0) {
-      final SimpleEFAEventDecl forbidden =
-       new SimpleEFAEventDecl(mHelper.getForbiddenDecl());
-      alphabet.add(forbidden);
-      mHasForbidden = true;
-    }
-    return alphabet;
-  }
 
   //#########################################################################
   //# Data Members
-  private ModuleProxyFactory mFactory;
   private SimpleEFAStateEncoding mStateEncoding;
-  private final Collection<SimpleEFAVariable> mVariables;
-  private Collection<SimpleEFAEventDecl> mBlockedEvents;
+  private TIntArrayList mVariables;
+  private TIntArrayList mBlockedEvents;
   private List<SimpleEFASystem> mSystems;
-  private List<EdgeProxy> mEdges;
-  private List<SimpleEFAVariable> mUnprimeVars;
-  private List<SimpleEFAVariable> mPrimeVars;
-  private List<SimpleEFAVariable> mStateVariables;
-  private final ModuleProxyCloner mCloner;
-  private final SimpleEFAHelper mHelper;
-  private final Collection<SimpleEFAEventDecl> mAlphabet;
+  private TIntArrayList mUnprimedVars;
+  private TIntArrayList mPrimedVars;
+  private TIntArrayList mStateVariables;
   private boolean mIsStructurallyDeterministic;
   private boolean mIsEFA = true;
-  private boolean mHasMarking;
-  private boolean mHasForbidden;
-  private final SimpleIdentifierProxy mIdentifier;
+  private final IdentifierProxy mIdentifier;
   private ComponentKind mKind;
+  private final SimpleEFAVariableContext mVarContext;
 }

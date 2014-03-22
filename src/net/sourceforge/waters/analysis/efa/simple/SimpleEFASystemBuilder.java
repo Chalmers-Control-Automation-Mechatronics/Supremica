@@ -9,21 +9,19 @@
 
 package net.sourceforge.waters.analysis.efa.simple;
 
+import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -35,7 +33,6 @@ import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierException;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
-import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.compiler.efa.EFAGuardCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
@@ -76,9 +73,8 @@ public class SimpleEFASystemBuilder implements Abortable
     mFactory = factory;
     mCompilationInfo = compilationInfo;
     mOperatorTable = CompilerOperatorTable.getInstance();
-    mSimpleExpressionCompiler = new SimpleExpressionCompiler(mFactory,
-                                                                  mCompilationInfo,
-                                                                  mOperatorTable);
+    mSimpleExpressionCompiler = new SimpleExpressionCompiler(mFactory, mCompilationInfo,
+                                                             mOperatorTable);
     mInputModule = module;
     final String moduleName = module.getName();
     mVariableContext =
@@ -89,6 +85,7 @@ public class SimpleEFASystemBuilder implements Abortable
     mResultEFASystem = new SimpleEFASystem(moduleName, mVariableContext, size);
     mUserPass = new THashSet<>(5, 0.8f);
     mHelper = new SimpleEFAHelper(factory, mOperatorTable);
+    mEventEncoding = null;
   }
 
   public SimpleEFASystemBuilder(final ModuleProxyFactory factory,
@@ -115,18 +112,18 @@ public class SimpleEFASystemBuilder implements Abortable
       mInputModule.acceptVisitor(pass2);
 
       if (mIsMarkingVariablEFAEnable) {
-        final String eventName = "variable:markings";
+        final String eventName = SimpleEFAHelper.DEFAULT_MARKINGEVENT_NAME;
         final SimpleIdentifierProxy eventIdent = mFactory
          .createSimpleIdentifierProxy(eventName);
-        if (!hasIdentifier(eventIdent)) {
+        if (mEventEncoding.getEventDecl(eventIdent) == null) {
           final EventDeclProxy decl = mFactory.createEventDeclProxy(eventIdent,
                                                                     EventKind.CONTROLLABLE);
           final SimpleEFAEventDecl edecl = new SimpleEFAEventDecl(decl);
-          insertEventDecl(decl.getIdentifier(), edecl);
+          mEventEncoding.createEventId(edecl);
         }
       }
       // Add collected information
-      mResultEFASystem.addEvents(mEFAEventDeclMap.values());
+      mResultEFASystem.setEventEncoding(mEventEncoding);
       mResultEFASystem.addVariables(mVariableContext.getVariables());
 
       // Pass 3 ... Cunstructing EFAs.
@@ -216,39 +213,6 @@ public class SimpleEFASystemBuilder implements Abortable
 
   //#########################################################################
   // Auxiliary methods
-  private void insertEventDecl(final IdentifierProxy ident,
-                               final SimpleEFAEventDecl edecl)
-   throws DuplicateIdentifierException
-  {
-    final ProxyAccessor<IdentifierProxy> accessor =
-            mEFAEventDeclMap.createAccessor(ident);
-    if (mEFAEventDeclMap.containsKey(accessor)) {
-      throw new DuplicateIdentifierException(ident, "event");
-    } else {
-      mEFAEventDeclMap.put(accessor, edecl);
-    }
-  }
-
-  private SimpleEFAEventDecl getEventDecl(final IdentifierProxy ident)
-  {
-    return mEFAEventDeclMap.getByProxy(ident);
-  }
-
-  private boolean hasIdentifier(final IdentifierProxy ident)
-  {
-    return getEventDecl(ident) != null;
-  }
-
-  private SimpleEFAEventDecl findEventDecl(final IdentifierProxy ident)
-   throws UndefinedIdentifierException
-  {
-    final SimpleEFAEventDecl edecl = getEventDecl(ident);
-    if (edecl == null) {
-      throw new UndefinedIdentifierException(ident, "event");
-    } else {
-      return edecl;
-    }
-  }
 
   void checkAbort() throws AnalysisAbortException
   {
@@ -282,11 +246,9 @@ public class SimpleEFASystemBuilder implements Abortable
     public Object visitModuleProxy(final ModuleProxy module)
      throws VisitorException
     {
-      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       final List<EventDeclProxy> events = module.getEventDeclList();
       final int size = events.size();
-      mEFAEventDeclMap =
-       new ProxyAccessorHashMap<>(eq, size);
+      mEventEncoding = new SimpleEFAEventEncoding(size);
       visitCollection(events);
       final List<Proxy> components = module.getComponentList();
       return visitCollection(components);
@@ -307,12 +269,9 @@ public class SimpleEFASystemBuilder implements Abortable
       try {
         checkAbortInVisitor();
         final SimpleExpressionProxy type = var.getType();
-        final SimpleExpressionProxy value =
-                mSimpleExpressionCompiler.eval(type, null);
-        final CompiledRange range =
-                mSimpleExpressionCompiler.getRangeValue(value);
-        mCurrentVariable =
-                mVariableContext.createVariables(var, range);
+        final SimpleExpressionProxy value = mSimpleExpressionCompiler.eval(type, null);
+        final CompiledRange range = mSimpleExpressionCompiler.getRangeValue(value);
+        mCurrentVariable = mVariableContext.createVariables(var, range);
         visitCollection(var.getVariableMarkings());
       } catch (final EvalException exception) {
         throw wrap(exception);
@@ -338,14 +297,9 @@ public class SimpleEFASystemBuilder implements Abortable
     public Object visitEventDeclProxy(final EventDeclProxy decl)
      throws VisitorException
     {
-      try {
-        checkAbortInVisitor();
-        final IdentifierProxy ident = decl.getIdentifier();
-        final SimpleEFAEventDecl edecl = new SimpleEFAEventDecl(decl);
-        insertEventDecl(ident, edecl);
-      } catch (final DuplicateIdentifierException exception) {
-        throw wrap(exception);
-      }
+      checkAbortInVisitor();
+      final SimpleEFAEventDecl edecl = new SimpleEFAEventDecl(decl);
+      mEventEncoding.createEventId(edecl);
       return null;
     }
 
@@ -427,19 +381,21 @@ public class SimpleEFASystemBuilder implements Abortable
         //mEFAVariableCollector.collectAllVariables(mEventEncoding, variables);
 
         // Creating a simple EFA component
-        final SimpleEFAComponent efaComponent = new SimpleEFAComponent(comp.getName(), variables,
+        final SimpleEFAComponent efaComponent = new SimpleEFAComponent(comp.getName(),
+                                                                       mVariableContext.getVariablesId(variables),
+                                                                       mVariableContext,
                                                                        mStateEncoding,
-                                                                       mEventEncoding,
-                                                                       mBlockedEvents,
-                                                                       rel, comp.getKind(), null);
+                                                                       mLabelEncoding, rel,
+                                                                       new TIntArrayList(mBlockedEvents),
+                                                                       comp.getKind());
 
-        efaComponent.setPrimeVariables(new ArrayList<>(mAllPrimeVars));
-        efaComponent.setUnprimeVariables(new ArrayList<>(mAllUnprimeVars));
+        efaComponent.setPrimeVariables(mVariableContext.getVariablesId(mAllPrimeVars));
+        efaComponent.setUnprimeVariables(mVariableContext.getVariablesId(mAllUnprimeVars));
         // Setting state variables
         final Collection<SimpleEFAVariable> stateVariables
-         = SimpleEFAHelper.getStateVariables(efaComponent.getInitialState().getStateValue(),
+         = SimpleEFAHelper.getStateVariables(mStateEncoding.getInitialState().getStateValue(),
                                              mVariableContext.getVariables());
-        efaComponent.setStateVariables(new ArrayList<>(stateVariables));
+        efaComponent.setStateVariables(mVariableContext.getVariablesId(stateVariables));
         efaComponent.setIsEFA(mIsEFA);
 
         // Registering this component to all the events and variables.
@@ -451,7 +407,7 @@ public class SimpleEFASystemBuilder implements Abortable
       } catch (final AnalysisException exception) {
         throw wrap(exception);
       } finally {
-        mEventEncoding = null;
+        mLabelEncoding = null;
         mStateEncoding = null;
         mEdgeLabelMap = null;
         mNodeList = null;
@@ -474,13 +430,13 @@ public class SimpleEFASystemBuilder implements Abortable
       mUsesMarking = false;
       mUsesForbidden = false;
       mIsEFA = false;
-      mBlockedEvents = new THashSet<>();
+      mBlockedEvents = new TIntHashSet();
       mEvents = new THashSet<>();
       final LabelBlockProxy block = graph.getBlockedEvents();
       if (block != null) {
         visitLabelBlockProxy(block);
         for (final SimpleEFAEventDecl e : mEvents){
-          mBlockedEvents.add(e);
+          mBlockedEvents.add(mEventEncoding.getEventId(e));
         }
         mUsesMarking = mHelper.containsMarkingProposition(block);
         mUsesForbidden = mHelper.containsForbiddenProposition(block);
@@ -508,7 +464,7 @@ public class SimpleEFASystemBuilder implements Abortable
       final ModuleEqualityVisitor eq2 = new ModuleEqualityVisitor(false);
       final Collection<EdgeProxy> edges = graph.getEdges();
       mEdgeLabelMap = new ProxyAccessorHashMap<>(eq2, edges.size());
-      mEventEncoding = new SimpleEFATransitionLabelEncoding(edges.size());
+      mLabelEncoding = new SimpleEFATransitionLabelEncoding(mEventEncoding, edges.size());
 
       // visiting visitEdgeProxy
       return visitCollection(edges);
@@ -545,8 +501,7 @@ public class SimpleEFASystemBuilder implements Abortable
      throws VisitorException
     {
       //TODO: Flattening the GroupNodes
-      throw new VisitorException(
-       "EFA System builder: GroupNodes are not supported.");
+      throw new VisitorException("EFA System builder: GroupNodes are not supported.");
     }
 
     // visiting edges inthe graph
@@ -575,8 +530,8 @@ public class SimpleEFASystemBuilder implements Abortable
           // keeping the track of which variables value are change (mPrimeVars)
           // or checked (mUnprimeVars) by this edge.
           mEFAVariableCollector.collectAllVariables(mSimplifyConstraint,
-                  mCurrentUnprime,
-                  mCurrentPrime);
+                                                    mCurrentUnprime,
+                                                    mCurrentPrime);
           mAllPrimeVars.addAll(mCurrentPrime);
           mAllUnprimeVars.addAll(mCurrentUnprime);
           mIsEFA = true;
@@ -586,16 +541,13 @@ public class SimpleEFASystemBuilder implements Abortable
         // see visitLabelBlockProxy
         visitLabelBlockProxy(edge.getLabelBlock());
 
-        final List<SimpleEFATransitionLabel> labels =
-         new ArrayList<>(mEvents.size());
+        final TIntArrayList labels = new TIntArrayList(mEvents.size());
         for (final SimpleEFAEventDecl edecl : mEvents) {
           edecl.addAllPrimeVariable(mCurrentPrime);
           edecl.addAllUnPrimeVariable(mCurrentUnprime);
           // creating a new label which is a pair of an event and a condition
-          final SimpleEFATransitionLabel label =
-           new SimpleEFATransitionLabel(edecl, mSimplifyConstraint);
-          labels.add(label);
-          mEventEncoding.createTransitionLabelId(label);
+          final int labelId = mLabelEncoding.createTransitionLabelId(edecl, mSimplifyConstraint);
+          labels.add(labelId);
         }
         mEdgeLabelMap.putByProxy(mEdge, labels);
       }
@@ -622,15 +574,15 @@ public class SimpleEFASystemBuilder implements Abortable
     public SimpleEFAEventDecl visitIdentifierProxy(final IdentifierProxy ident)
      throws VisitorException
     {
-      try {
         checkAbortInVisitor();
-        final SimpleEFAEventDecl edecl = findEventDecl(ident);
-        // Adding which variables value is change / check by this event
+      final SimpleEFAEventDecl edecl = mEventEncoding.getEventDecl(ident);
+      if (edecl == null) {
+        throw new VisitorException("Event '" + ident + "' cannot be found!");
+      }
+      // Adding which variables value is change / check by this event
         mEvents.add(edecl);
         return null;
-      } catch (final UndefinedIdentifierException exception) {
-        throw wrap(exception);
-      }
+        
     }
 
     // visiting the guard and action block
@@ -648,7 +600,7 @@ public class SimpleEFASystemBuilder implements Abortable
           // if it is not a contradiction (always false in the variables context)
           if (!mConstraintPropagator.isUnsatisfiable()) {
             mConstraintPropagator.removeUnchangedVariables();
-            return mConstraintPropagator.getAllConstraints();
+            return mConstraintPropagator.getAllConstraints(false);
           } else {
             return null;
           }
@@ -679,7 +631,7 @@ public class SimpleEFASystemBuilder implements Abortable
     {
       final GraphProxy graph = comp.getGraph();
       final String name = comp.getName();
-      final int eventSize = mEventEncoding.size();
+      final int eventSize = mLabelEncoding.size();
       final ComponentKind kind = comp.getKind();
       final int numProps = (mUsesMarking ? 1 : 0) + (mUsesForbidden ? 1 : 0);
       final ListBufferTransitionRelation rel = new ListBufferTransitionRelation(
@@ -701,21 +653,17 @@ public class SimpleEFASystemBuilder implements Abortable
       for (final EdgeProxy edge : edges) {
         checkAbort();
         final SimpleNodeProxy source = (SimpleNodeProxy) edge.getSource();
-        final int sourceState = mStateEncoding.getNodeId(source);
+        final int sourceState = mStateEncoding.getStateId(source);
         final SimpleNodeProxy target = (SimpleNodeProxy) edge.getTarget();
-        final int targetState = mStateEncoding.getNodeId(target);
-        if (sourceState < 0 || targetState < 0) {
+        final int targetState = mStateEncoding.getStateId(target);
+        if ((sourceState < 0) || (targetState < 0)) {
           continue;
         }
-        final List<SimpleEFATransitionLabel> labels = mEdgeLabelMap.getByProxy(edge);
-        if (labels == null) {
+        final TIntArrayList labels = mEdgeLabelMap.getByProxy(edge);
+        if (labels.isEmpty()) {
           continue;
         }
-        for (final SimpleEFATransitionLabel label : labels) {
-          final int labelId = mEventEncoding.getTransitionLabelId(label);
-          if (labelId < 0) {
-            continue;
-          }
+        for (final int labelId : labels.toArray()) {
           rel.addTransition(sourceState, labelId, targetState);
         }
       }
@@ -723,15 +671,15 @@ public class SimpleEFASystemBuilder implements Abortable
     }
 
     private boolean simplifyTransitionRelation(
-     final ListBufferTransitionRelation rel)
+     final ListBufferTransitionRelation rel) throws AnalysisException
     {
       if (mIsOptimizationEnabled) {
         // 1. Check reachability
         final boolean hasUnreachableStates = checkReachability(rel);
         // 2. Check for unused events
-        final boolean hasRemovableEvents = removeRedundantEvents(rel);
+        //final boolean hasRemovableEvents = removeRedundantEvents(rel);
 
-        return hasUnreachableStates || hasRemovableEvents;
+        return hasUnreachableStates; // || hasRemovableEvents;
       } else {
         return false;
       }
@@ -776,8 +724,9 @@ public class SimpleEFASystemBuilder implements Abortable
         return false;
       }
     }
-
-    private boolean removeRedundantEvents(final ListBufferTransitionRelation rel)
+    /*
+     private boolean removeRedundantEvents(final ListBufferTransitionRelation rel)
+     throws AnalysisException
     {
       final int oldNumEvents = rel.getNumberOfProperEvents();
       final boolean[] usedEvents = new boolean[oldNumEvents];
@@ -800,22 +749,23 @@ public class SimpleEFASystemBuilder implements Abortable
         }
       }
       if (hasRemovableEvents) {
-        final SimpleEFATransitionLabelEncoding newEncoding =
-         new SimpleEFATransitionLabelEncoding(newNumEvents);
-        for (int e = EventEncoding.NONTAU; e < oldNumEvents; e++) {
-            final SimpleEFATransitionLabel label =
-                    mEventEncoding.getTransitionLabel(e);
+        final SimpleEFATransitionLabelEncoding newEncoding = new SimpleEFATransitionLabelEncoding(
+         mEventEncoding, newNumEvents);
+        for (int e = 0; e < oldNumEvents; e++) {
+          Long label = mLabelEncoding.getTransitionLabel(e);
+          SimpleEFAEventDecl eventDecl = mLabelEncoding.getEventDecl(label);
+          ConstraintList constraint = mLabelEncoding.getConstraint(label);
           if (usedEvents[e]) {
-            newEncoding.createTransitionLabelId(label);
+            newEncoding.createTransitionLabelId(eventDecl, constraint);
           } else {
-            mBlockedEvents.add(label.getEvent());
+            mBlockedEvents.add(SimpleEFATransitionLabelEncoding.getEventId(label));
           }
         }
-        mEventEncoding = newEncoding;
+        mLabelEncoding = newEncoding;
         }
       return hasRemovableEvents;
     }
-
+*/
     // Creating a marking variable EFA. Note that, all variables'
     // marking propositions will be removed. Furthermore, this introduces
     // extra node/transition to the system hence the supervisor is larger than
@@ -827,20 +777,17 @@ public class SimpleEFASystemBuilder implements Abortable
       if (!mMarkedVariables.isEmpty()) {
         try {
           checkAbort();
-          final SimpleEFATransitionLabelEncoding eventEncoding =
-           new SimpleEFATransitionLabelEncoding(2);
+          final SimpleEFATransitionLabelEncoding eventEncoding
+           = new SimpleEFATransitionLabelEncoding(mEventEncoding);
           final ConstraintList markingUpdate =
            new ConstraintList(mVariableMarkingPredicates);
 
           final String eventName = SimpleEFAHelper.DEFAULT_MARKINGEVENT_NAME;
           final SimpleIdentifierProxy eventIdent =
                   mFactory.createSimpleIdentifierProxy(eventName);
-          final SimpleEFAEventDecl edecl = getEventDecl(eventIdent);
-          final SimpleEFATransitionLabel label =
-           new SimpleEFATransitionLabel(edecl, markingUpdate);
+          final SimpleEFAEventDecl edecl = mEventEncoding.getEventDecl(eventIdent);
           edecl.addAllUnPrimeVariable(mMarkedVariables);
-          label.addVariables(mMarkedVariables);
-          final int eventId = eventEncoding.createTransitionLabelId(label);
+          final int eventId = eventEncoding.createTransitionLabelId(edecl, markingUpdate);
           final ListBufferTransitionRelation rel =
            new ListBufferTransitionRelation(eventName, ComponentKind.PLANT,
                                             2, 1, 2,
@@ -848,12 +795,15 @@ public class SimpleEFASystemBuilder implements Abortable
           rel.setInitial(0, true);
           rel.setMarked(1, SimpleEFAHelper.DEFAULT_MARKING_ID, true);
           rel.addTransition(0, eventId, 1);
-          final SimpleEFAComponent markingEFA = new SimpleEFAComponent(
-           "VariablesMarking", mMarkedVariables, eventEncoding, rel);
+          final SimpleEFAComponent markingEFA = new SimpleEFAComponent("VariablesMarking",
+                                                                       mVariableContext.getVariablesId(mMarkedVariables),
+                                                                       mVariableContext,
+                                                                       mHelper.getStateEncoding(rel),
+                                                                       eventEncoding, rel);
           for (final SimpleEFAVariable var : mMarkedVariables) {
             var.clearVariableMarkings();
           }
-          markingEFA.setUnprimeVariables(mMarkedVariables);
+          markingEFA.setUnprimeVariables(mVariableContext.getVariablesId(mMarkedVariables));
           markingEFA.setIsEFA(true);
           markingEFA.register();
           mResultEFASystem.addComponent(markingEFA);
@@ -865,19 +815,19 @@ public class SimpleEFASystemBuilder implements Abortable
 
     //#########################################################################
   //# Pass3 Data Members
-    private SimpleEFATransitionLabelEncoding mEventEncoding;
+    private SimpleEFATransitionLabelEncoding mLabelEncoding;
     private SimpleEFAStateEncoding mStateEncoding;
     private List<SimpleNodeProxy> mNodeList;
     private boolean mUsesMarking;
     private boolean mUsesForbidden;
-    private ProxyAccessorMap<EdgeProxy, List<SimpleEFATransitionLabel>> mEdgeLabelMap;
+    private ProxyAccessorMap<EdgeProxy, TIntArrayList> mEdgeLabelMap;
     private ConstraintList mSimplifyConstraint;
     private final EFAGuardCompiler mGuardCompiler;
     private final ConstraintPropagator mConstraintPropagator;
     private final SimpleEFAVariableCollector mEFAVariableCollector;
     private EdgeProxy mEdge;
     private Collection<SimpleEFAEventDecl> mEvents;
-    private Collection<SimpleEFAEventDecl> mBlockedEvents;
+    private TIntHashSet mBlockedEvents;
     private THashSet<SimpleEFAVariable> mAllPrimeVars;
     private THashSet<SimpleEFAVariable> mAllUnprimeVars;
     private THashSet<SimpleEFAVariable> mCurrentPrime;
@@ -892,8 +842,6 @@ public class SimpleEFASystemBuilder implements Abortable
   private final CompilationInfo mCompilationInfo;
   private final CompilerOperatorTable mOperatorTable;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
-  //  private final SimpleEFAVariableFinder mEFAVariableFinder;
-  private ProxyAccessorHashMap<IdentifierProxy, SimpleEFAEventDecl> mEFAEventDeclMap;
   private boolean mIsOptimizationEnabled = true;
   private boolean mIsMarkingVariablEFAEnable;
   private final ModuleProxy mInputModule;
@@ -904,6 +852,7 @@ public class SimpleEFASystemBuilder implements Abortable
   private boolean mIsAborting;
   private final Collection<DefaultModuleProxyVisitor> mUserPass;
   private final SimpleEFAHelper mHelper;
-  private boolean mIsConstraintPropagatorEnabled = true;
+  private boolean mIsConstraintPropagatorEnabled;
+  private SimpleEFAEventEncoding mEventEncoding;
 
 }

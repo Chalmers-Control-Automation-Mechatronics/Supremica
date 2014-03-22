@@ -72,7 +72,7 @@ public class AbstractEFATransitionLabelEncoding<L>
     return mTransitionLabelList.get(labelId);
   }
 
-  public int createTransitionLabelId(final L label)
+  protected int createTransitionLabelId(final L label)
   {
     final int id = mTransitionLabelMap.get(label);
     if (id >= 0) {

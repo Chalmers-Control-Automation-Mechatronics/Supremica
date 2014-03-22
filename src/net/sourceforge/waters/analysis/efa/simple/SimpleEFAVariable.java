@@ -32,8 +32,7 @@ import net.sourceforge.waters.model.module.VariableMarkingProxy;
  * <p/>
  * @author Mohammad Reza Shoaei
  */
-public class SimpleEFAVariable
- extends AbstractEFAVariable<SimpleEFATransitionLabel>
+public class SimpleEFAVariable extends AbstractEFAVariable<Integer>
 {
 
   public SimpleEFAVariable(final VariableComponentProxy var,
@@ -141,8 +140,8 @@ public class SimpleEFAVariable
 
   public boolean isOnlyUsedInStateBy(final SimpleEFAComponent component)
   {
-    return (mInStates.size() == 1
-     && mInStates.contains(component.getIdentifier()));
+    return mInStates.size() == 1
+            && mInStates.contains(component.getIdentifier());
   }
 
   /**
@@ -190,7 +189,7 @@ public class SimpleEFAVariable
     final boolean OUS = isOnlyUsedInStateBy(component);
     final boolean HM = hasModifier();
     final boolean VB = isVisitedBy(component);
-    return (OM) || (!HM && (OUS || !HSU) && VB);
+    return OM || !HM && (OUS || !HSU) && VB;
 //    return ((isOnlyModifiedBy(component) && (!hasStateUser() || isOnlyUsedInStateBy(component)))
 //     || (!hasModifier() && (!hasStateUser() || isOnlyUsedInStateBy(component))
 //     && isVisitedBy(component)));
@@ -208,12 +207,12 @@ public class SimpleEFAVariable
    */
   public boolean isOnlyModifiedBy(final SimpleEFAComponent component)
   {
-    return mModifiers.size() < 2 && isModifiedBy(component);
+    return (mModifiers.size() < 2) && isModifiedBy(component);
   }
 
   public boolean isOnlyVisitedBy(final SimpleEFAComponent component)
   {
-    return mVisitors.size() < 2 && isVisitedBy(component);
+    return (mVisitors.size() < 2) && isVisitedBy(component);
   }
 
   public VariableComponentProxy getVariableComponent(
@@ -229,7 +228,7 @@ public class SimpleEFAVariable
     final SimpleExpressionProxy initialStatePredicate =
      (SimpleExpressionProxy) cloner.getClone(getInitialStatePredicate());
     final Collection<VariableMarkingProxy> variableMarkings =
-     cloner.getClonedList(getVariableMarkings());
+     cloner.getClonedList(mMarkings);
 
     return factory.createVariableComponentProxy(iden,
                                                 type,

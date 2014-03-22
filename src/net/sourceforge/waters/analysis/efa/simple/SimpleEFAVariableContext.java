@@ -9,16 +9,21 @@
 
 package net.sourceforge.waters.analysis.efa.simple;
 
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.TIntSet;
 import java.util.Collection;
+import java.util.HashSet;
 
 import net.sourceforge.waters.analysis.efa.base.AbstractEFAVariableContext;
 import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierException;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 
 /**
@@ -26,8 +31,7 @@ import net.sourceforge.waters.model.module.VariableComponentProxy;
  * <p/>
  * @author Mohammad Reza Shoaei
  */
-public class SimpleEFAVariableContext
- extends AbstractEFAVariableContext<SimpleEFATransitionLabel, SimpleEFAVariable>
+public class SimpleEFAVariableContext extends AbstractEFAVariableContext<Integer, SimpleEFAVariable>
 {
 
   public SimpleEFAVariableContext(final ModuleProxy module,
@@ -35,8 +39,11 @@ public class SimpleEFAVariableContext
                                   final ModuleProxyFactory factory)
   {
     super(module, op);
+    mVariableEncoding = new SimpleInfoEncoder<>();
     mFactory = factory;
     mOp = op;
+    mVarFinder = new SimpleEFAVariableFinder(op);
+    mVarCollector = new SimpleEFAVariableCollector(op, this);
   }
 
   public SimpleEFAVariable createVariables(final VariableComponentProxy comp,
@@ -55,7 +62,16 @@ public class SimpleEFAVariableContext
       throw new DuplicateIdentifierException(ident);
     }
     mGlobalVariableMap.put(key, var);
+    mVariableEncoding.encode(var);
     return var;
+  }
+
+  @Override
+  public void addVariable(final SimpleEFAVariable var)
+  {
+    final IdentifierProxy ident = var.getVariableName();
+    mGlobalVariableMap.putByProxy(ident, var);
+    mVariableEncoding.encode(var);
   }
 
   public Collection<SimpleEFAVariable> getVariables()
@@ -68,6 +84,161 @@ public class SimpleEFAVariableContext
     return mGlobalVariableMap.getByProxy(proxy);
   }
 
+  public SimpleEFAVariable getVariable(final int varId)
+  {
+    return mVariableEncoding.decode(varId);
+  }
+
+  public Collection<SimpleEFAVariable> getVariables(final TIntSet varIds)
+  {
+    final HashSet<SimpleEFAVariable> vars = new HashSet<>(varIds.size());
+    for (final int id : varIds.toArray()) {
+      vars.add(getVariable(id));
+    }
+    return vars;
+  }
+
+  public int getVariableId(final SimpleEFAVariable var)
+  {
+    return mVariableEncoding.getInfoId(var);
+  }
+
+  public TIntArrayList getVariablesId(final Collection<SimpleEFAVariable> vars)
+  {
+    final TIntArrayList list = new TIntArrayList(vars.size());
+    for (final SimpleEFAVariable var : vars) {
+      list.add(getVariableId(var));
+    }
+    return list;
+  }
+
+  public boolean findPrimeVariables(final ConstraintList constraints,
+                                    final Collection<SimpleEFAVariable> vars)
+  {
+    for (final SimpleEFAVariable var : vars) {
+      if (mVarFinder.findPrimeVariable(constraints, var)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public boolean findPrimeVariables(final SimpleExpressionProxy exp,
+                                    final Collection<SimpleEFAVariable> vars)
+  {
+    for (final SimpleEFAVariable var : vars) {
+      if (mVarFinder.findPrimeVariable(exp, var)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public boolean findPrimeVariables(final ConstraintList constraints,
+                                    final TIntSet varIds)
+  {
+    for (final int varId : varIds.toArray()) {
+      if (mVarFinder.findPrimeVariable(constraints, getVariable(varId))) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public boolean findPrimeVariables(final SimpleExpressionProxy exp,
+                                    final TIntSet varIds)
+  {
+    for (final int varId : varIds.toArray()) {
+      if (mVarFinder.findPrimeVariable(exp, getVariable(varId))) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public void collectAllVariables(final SimpleEFATransitionLabelEncoding encoding,
+                                  final Collection<SimpleEFAVariable> vars)
+  {
+    collectAllVariables(encoding, vars, vars);
+  }
+
+  public void collectAllVariables(final SimpleEFATransitionLabelEncoding encoding,
+                                  final Collection<SimpleEFAVariable> unprimed,
+                                  final Collection<SimpleEFAVariable> primed)
+  {
+    for (final int label : encoding.getTransitionLabels()) {
+      final ConstraintList constraint = encoding.getConstraint(label);
+      mVarCollector.collectAllVariables(constraint, unprimed, primed);
+    }
+  }
+
+  public void collectAllVariables(final ConstraintList constraints,
+                                  final TIntSet vars)
+  {
+    final HashSet<SimpleEFAVariable> var = new HashSet<>();
+    mVarCollector.collectAllVariables(constraints, var);
+    for (final SimpleEFAVariable v : var) {
+      vars.add(getVariableId(v));
+    }
+  }
+
+  public void collectAllVariables(final SimpleExpressionProxy exp,
+                                  final TIntSet unprimed,
+                                  final TIntSet primed)
+  {
+    final HashSet<SimpleEFAVariable> prs = new HashSet<>();
+    final HashSet<SimpleEFAVariable> unprs = new HashSet<>();
+    mVarCollector.collectAllVariables(exp, unprs, prs);
+    unprimed.addAll(getVariablesId(unprs));
+    primed.addAll(getVariablesId(prs));
+  }
+
+  public void collectAllVariables(final ConstraintList constraint,
+                                  final TIntSet unprimed,
+                                  final TIntSet primed)
+  {
+    final HashSet<SimpleEFAVariable> prs = new HashSet<>();
+    final HashSet<SimpleEFAVariable> unprs = new HashSet<>();
+    for (final SimpleExpressionProxy exp : constraint.getConstraints()) {
+      mVarCollector.collectAllVariables(exp, unprs, prs);
+    }
+    unprimed.addAll(getVariablesId(unprs));
+    primed.addAll(getVariablesId(prs));
+  }
+
+  public void collectAllVariables(final SimpleEFATransitionLabelEncoding encoding,
+                                  final TIntSet vars)
+  {
+    collectAllVariables(encoding, vars, vars);
+  }
+
+  public void collectAllVariables(final SimpleEFATransitionLabelEncoding encoding,
+                                  final TIntSet unprimed,
+                                  final TIntSet primed)
+  {
+    final HashSet<SimpleEFAVariable> prs = new HashSet<>();
+    final HashSet<SimpleEFAVariable> unprs = new HashSet<>();
+    for (final int label : encoding.getTransitionLabels()) {
+      final ConstraintList update = encoding.getConstraint(label);
+      mVarCollector.collectAllVariables(update, unprs, prs);
+    }
+    unprimed.addAll(getVariablesId(unprs));
+    primed.addAll(getVariablesId(prs));
+  }
+
+  public boolean findPrimeVariable(final SimpleExpressionProxy expr, final int varId)
+  {
+    return mVarFinder.findPrimeVariable(expr, getVariable(varId));
+  }
+
+  public boolean findPrimeVariable(final ConstraintList constraints, final int varId)
+  {
+    return mVarFinder.findPrimeVariable(constraints, getVariable(varId));
+  }
+
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOp;
+  private final SimpleInfoEncoder<SimpleEFAVariable> mVariableEncoding;
+  private final SimpleEFAVariableFinder mVarFinder;
+  private final SimpleEFAVariableCollector mVarCollector;
 }

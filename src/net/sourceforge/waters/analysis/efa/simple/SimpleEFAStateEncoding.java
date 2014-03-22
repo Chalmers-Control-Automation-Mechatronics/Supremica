@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.analysis.efa.simple;
 
+import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.ArrayList;
@@ -28,6 +29,8 @@ public class SimpleEFAStateEncoding implements Iterable<SimpleEFAState>
   {
     mStateMap = new TObjectIntHashMap<>(size, 0.5f, -1);
     mStateList = new ArrayList<>(size);
+    mMarkedStates = new TIntArrayList();
+    mForbiddenStates = new TIntArrayList();
     mInitialStateId = -1;
   }
 
@@ -51,11 +54,11 @@ public class SimpleEFAStateEncoding implements Iterable<SimpleEFAState>
     return mStateMap.get(state);
   }
 
-  public int getNodeId(final SimpleNodeProxy node)
+  public int getStateId(final SimpleNodeProxy node)
   {
-    for (final SimpleEFAState state : mStateMap.keySet()) {
+    for (final SimpleEFAState state : getSimpleStates()) {
       if (state.equals(node)) {
-        return mStateMap.get(state);
+        return getStateId(state);
       }
     }
     return -1;
@@ -64,12 +67,6 @@ public class SimpleEFAStateEncoding implements Iterable<SimpleEFAState>
   public SimpleEFAState getSimpleState(final int stateId)
   {
     return mStateList.get(stateId);
-  }
-
-  public SimpleNodeProxy getSimpleNode(final int stateId)
-  {
-    final SimpleEFAState state = mStateList.get(stateId);
-    return state.getSimpleNode();
   }
 
   public List<SimpleEFAState> getSimpleStates()
@@ -89,22 +86,11 @@ public class SimpleEFAStateEncoding implements Iterable<SimpleEFAState>
       if (state.isInitial()) {
         mInitialStateId = labelId;
       }
-      return labelId;
-    }
-  }
-
-  public int createSimpleNodeId(final SimpleNodeProxy node)
-  {
-    final int id = getNodeId(node);
-    if (id >= 0) {
-      return id;
-    } else {
-      final int labelId = mStateMap.size();
-      final SimpleEFAState state = new SimpleEFAState(node);
-      mStateMap.put(state, labelId);
-      mStateList.add(state);
-      if (state.isInitial()) {
-        mInitialStateId = labelId;
+      if (state.isMarked()) {
+        mMarkedStates.add(labelId);
+      }
+      if (state.isForbidden()) {
+        mForbiddenStates.add(labelId);
       }
       return labelId;
     }
@@ -124,21 +110,29 @@ public class SimpleEFAStateEncoding implements Iterable<SimpleEFAState>
     }
   }
 
-  public void setInitialStateId(final int id)
-  {
-    mInitialStateId = id;
-  }
-
   public int getInitialStateId()
   {
-    if (mInitialStateId < 0) {
-      for (final SimpleEFAState state : this.getSimpleStates()) {
-        if (state.isInitial()) {
-          mInitialStateId = this.getStateId(state);
-        }
-      }
-    }
     return mInitialStateId;
+  }
+
+  public TIntArrayList getMarkedStateIds()
+  {
+    return mMarkedStates;
+  }
+
+  public TIntArrayList getForbbidenStateIds()
+  {
+    return mForbiddenStates;
+  }
+
+  public boolean hasMarkedState()
+  {
+    return !mMarkedStates.isEmpty();
+  }
+
+  public boolean hasForbbidenState()
+  {
+    return !mForbiddenStates.isEmpty();
   }
 
   @Override
@@ -149,11 +143,13 @@ public class SimpleEFAStateEncoding implements Iterable<SimpleEFAState>
 
   public SimpleEFAState getInitialState()
   {
-    return this.getSimpleState(this.getInitialStateId());
+    return getSimpleState(mInitialStateId);
   }
 
   private final TObjectIntHashMap<SimpleEFAState> mStateMap;
   private final ArrayList<SimpleEFAState> mStateList;
   private static final int DEFAULT_SIZE = 16;
   private int mInitialStateId;
+  private final TIntArrayList mMarkedStates;
+  private final TIntArrayList mForbiddenStates;
 }

@@ -31,11 +31,7 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
  * @author Mohammad Reza Shoaei
  */
 public class SimpleEFACompiler
- extends AbstractEFACompiler<SimpleEFATransitionLabel,
-                             SimpleEFAVariable,
-                             SimpleEFAComponent,
-                             SimpleEFAVariableContext,
-                             SimpleEFASystem>
+ extends AbstractEFACompiler<Integer, SimpleEFAVariable, SimpleEFAComponent, SimpleEFAVariableContext, SimpleEFASystem>
 {
 
   public SimpleEFACompiler(final ModuleProxy module)
@@ -65,8 +61,8 @@ public class SimpleEFACompiler
     final ModuleInstanceCompiler mModuleInstanceCompiler;
     try {
       final ModuleProxyFactory modfactory = ModuleElementFactory.getInstance();
-      mCompilationInfo = new CompilationInfo(mIsSourceInfoEnabled,
-                                             mIsMultiExceptionsEnabled);
+      CompilationInfo mCompilationInfo = new CompilationInfo(mIsSourceInfoEnabled,
+              mIsMultiExceptionsEnabled);
       mModuleInstanceCompiler = new ModuleInstanceCompiler(mDocumentManager,
                                                            modfactory,
                                                            mCompilationInfo,
@@ -78,7 +74,7 @@ public class SimpleEFACompiler
       final ModuleProxy intermediate = mModuleInstanceCompiler.compile(bindings);
       mCompilationInfo.shift();
       mEFASystemBuilder = new SimpleEFASystemBuilder(modfactory,
-                                                     mCompilationInfo,
+              mCompilationInfo,
                                                      intermediate);
       mEFASystemBuilder.setOptimizationEnabled(mIsOptimizationEnabled);
       mEFASystemBuilder.setMarkingVariablEFAEnable(mIsMarkingVariablEFAEnable);
@@ -199,12 +195,11 @@ public void requestAbort()
   private final DocumentManager mDocumentManager;
   private final ModuleProxy mInputModule;
   private SimpleEFASystemBuilder mEFASystemBuilder;
-  private CompilationInfo mCompilationInfo;
   private boolean mIsOptimizationEnabled = true;
-  private boolean mIsSourceInfoEnabled = false;
-  private boolean mIsMultiExceptionsEnabled = false;
-  private boolean mIsMarkingVariablEFAEnable = false;
-  private Collection<String> mEnabledPropertyNames = null;
-  private Collection<String> mEnabledPropositionNames = null;
+  private boolean mIsSourceInfoEnabled;
+  private boolean mIsMultiExceptionsEnabled;
+  private boolean mIsMarkingVariablEFAEnable;
+  private Collection<String> mEnabledPropertyNames;
+  private Collection<String> mEnabledPropositionNames;
   private boolean mIsExpandingEFATransitions;
 }

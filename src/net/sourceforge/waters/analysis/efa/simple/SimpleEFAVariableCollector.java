@@ -9,11 +9,9 @@
 
 package net.sourceforge.waters.analysis.efa.simple;
 
-import java.util.Collection;
 
 import net.sourceforge.waters.analysis.efa.base.AbstractEFAVariableCollector;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 
 /**
  * An implementation of {@link AbstractEFAVariableCollector}.
@@ -21,30 +19,11 @@ import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
  * @author Mohammad Reza Shoaei
  */
 public class SimpleEFAVariableCollector
- extends AbstractEFAVariableCollector<SimpleEFATransitionLabel, SimpleEFAVariable>
+ extends AbstractEFAVariableCollector<Integer, SimpleEFAVariable>
 {
-
   public SimpleEFAVariableCollector(final CompilerOperatorTable optable,
    final SimpleEFAVariableContext context)
   {
     super(optable, context);
   }
-
-  void collectAllVariables(final SimpleEFATransitionLabelEncoding encoding,
-   final Collection<SimpleEFAVariable> vars)
-  {
-    collectAllVariables(encoding, vars, vars);
-  }
-
-  void collectAllVariables(final SimpleEFATransitionLabelEncoding encoding,
-                           final Collection<SimpleEFAVariable> unprimed,
-                           final Collection<SimpleEFAVariable> primed)
-  {
-    for (final SimpleEFATransitionLabel label :
-         encoding.getTransitionLabelsIncludingTau()) {
-      final ConstraintList update = label.getConstraint();
-      collectAllVariables(update, unprimed, primed);
-    }
-  }
-
 }

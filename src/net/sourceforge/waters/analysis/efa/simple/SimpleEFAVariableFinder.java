@@ -9,12 +9,9 @@
 
 package net.sourceforge.waters.analysis.efa.simple;
 
-import java.util.Collection;
 
 import net.sourceforge.waters.analysis.efa.base.AbstractEFAVariableFinder;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
-import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 /**
  * An implementation of {@link AbstractEFAVariableFinder}.
@@ -22,34 +19,10 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
  * @author Mohammad Reza Shoaei
  */
 public class SimpleEFAVariableFinder
- extends AbstractEFAVariableFinder<SimpleEFATransitionLabel, SimpleEFAVariable>
+ extends AbstractEFAVariableFinder<Integer, SimpleEFAVariable>
 {
-
   public SimpleEFAVariableFinder(final CompilerOperatorTable optable)
   {
     super(optable);
   }
-
-  public boolean findPrimeVariables(final ConstraintList constraints,
-                                    final Collection<SimpleEFAVariable> vars)
-  {
-    for (final SimpleEFAVariable var : vars) {
-      if (findPrimeVariable(constraints, var)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public boolean findPrimeVariables(final SimpleExpressionProxy exp,
-                                    final Collection<SimpleEFAVariable> vars)
-  {
-    for (final SimpleEFAVariable var : vars) {
-      if (findPrimeVariable(exp, var)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
 }
