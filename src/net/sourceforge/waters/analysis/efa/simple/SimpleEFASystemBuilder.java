@@ -16,6 +16,7 @@ import gnu.trove.set.hash.TIntHashSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
@@ -129,7 +130,7 @@ public class SimpleEFASystemBuilder implements Abortable
       // Pass 3 ... Cunstructing EFAs.
       final Pass3Visitor pass3 = new Pass3Visitor();
       mInputModule.acceptVisitor(pass3);
-      
+
       return mResultEFASystem;
     } catch (final VisitorException exception) {
       final Throwable cause = exception.getCause();
@@ -582,7 +583,7 @@ public class SimpleEFASystemBuilder implements Abortable
       // Adding which variables value is change / check by this event
         mEvents.add(edecl);
         return null;
-        
+
     }
 
     // visiting the guard and action block
@@ -798,7 +799,7 @@ public class SimpleEFASystemBuilder implements Abortable
           final SimpleEFAComponent markingEFA = new SimpleEFAComponent("VariablesMarking",
                                                                        mVariableContext.getVariablesId(mMarkedVariables),
                                                                        mVariableContext,
-                                                                       mHelper.getStateEncoding(rel),
+                                                                       SimpleEFAHelper.getStateEncoding(rel),
                                                                        eventEncoding, rel);
           for (final SimpleEFAVariable var : mMarkedVariables) {
             var.clearVariableMarkings();

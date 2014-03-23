@@ -138,7 +138,6 @@ public class EFASynchronizer
     return mSynchEFA;
   }
 
-  @SuppressWarnings("unchecked")
   private ListBufferTransitionRelation createTransitionRelation() throws OverflowException
   {
     final int nbrPropositions = (mUsesMarking ? 1 : 0) + (mUsesForbidden ? 1 : 0);
@@ -180,14 +179,14 @@ public class EFASynchronizer
       return;
     }
     final ListBufferTransitionRelation sRel = createTransitionRelation();
-    
+
     // Creating a residual EFA.
     final TIntHashSet vars = new TIntHashSet(mPrimedVars);
     vars.addAll(mUnprimedVars);
     mSynchEFA = new SimpleEFAComponent(mName, new TIntArrayList(vars), mVarContext, mStateEncoding,
                                        mLabelEncoding, sRel, new TIntArrayList(mBlockedEvents),
                                        ComponentKind.PLANT);
-    
+
     mSynchEFA.setStructurallyDeterministic(true);
     // Setting the visitor / modifiers of the variables
     mSynchEFA.setPrimeVariables(new TIntArrayList(mPrimedVars));
@@ -349,7 +348,7 @@ public class EFASynchronizer
       if (blockedEvents != null & !blockedEvents.isEmpty()) {
         mBlockedEvents.addAll(blockedEvents);
       }
-      
+
       mName += efa.getName() + "||";
     }
     mName = mName.substring(0, mName.length() - 2);
@@ -394,7 +393,7 @@ public class EFASynchronizer
     return !mPropagator.isUnsatisfiable();
   }
 
-  private List<SimpleEFAComponent> mComponents;
+  private final List<SimpleEFAComponent> mComponents;
   private SimpleEFAComponent mSynchEFA;
   private TObjectIntHashMap<TIntArrayList> mStateSpace;
   private TIntArrayList mInitialStates;

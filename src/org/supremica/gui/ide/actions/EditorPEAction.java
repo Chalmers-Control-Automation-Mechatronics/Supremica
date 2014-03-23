@@ -114,7 +114,7 @@ public class EditorPEAction
       }
       if (!compList.isEmpty()) {
         final SimpleEFAVariableContext context = sys.getVariableContext();
-        final EFAPartialEvaluator pe = new EFAPartialEvaluator(context);
+        final EFAPartialEvaluator pe = new EFAPartialEvaluator(context, null);
         pe.init(compList);
         pe.evaluate();
         final Collection<SimpleEFAComponent> residuals =
@@ -130,7 +130,7 @@ public class EditorPEAction
       }
 
       System.err.println("Start importing ...");
-      final ModuleSubject system = (ModuleSubject) sys.getModuleProxy(mFactory);
+      final ModuleSubject system = sys.getModuleProxy(mFactory);
       importToIDE(system, module);
       System.err.println("Finish importing ...");
     } catch (AnalysisException | EvalException | IOException |

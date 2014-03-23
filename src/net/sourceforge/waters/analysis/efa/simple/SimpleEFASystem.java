@@ -17,6 +17,8 @@ import net.sourceforge.waters.analysis.efa.base.AbstractEFASystem;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 /**
@@ -53,6 +55,12 @@ public class SimpleEFASystem
   public int getNbrComponents()
   {
     return super.getTransitionRelations().size();
+  }
+
+  public ModuleSubject getModuleProxy(final ModuleProxyFactory mFactory)
+  {
+    throw new UnsupportedOperationException
+      ("getModuleProxy() not implemented for SimpleEFASystem!");
   }
 
   public List<SimpleEFAComponent> getComponents()
@@ -149,4 +157,5 @@ public class SimpleEFASystem
   //#########################################################################
   //# Data Members
   private SimpleEFAEventEncoding mEventEncoding;
+
 }

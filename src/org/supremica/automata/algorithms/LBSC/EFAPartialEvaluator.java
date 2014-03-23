@@ -369,7 +369,7 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
     if (!pTR.isEmpty()) {
       rel.setInitial(pTR.get(0)[0], true);
       if (mHasMarkingValue) {
-        for (int[] tr : pTR) {
+        for (final int[] tr : pTR) {
           final int source = tr[0];
           final int label = tr[1];
           final int target = tr[2];
@@ -384,7 +384,7 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
           rel.addTransition(source, label, target);
         }
       } else {
-        for (int[] tr : pTR) {
+        for (final int[] tr : pTR) {
           rel.setAllMarkings(tr[0], pStatePropMap.get(tr[0]));
           rel.setAllMarkings(tr[2], pStatePropMap.get(tr[2]));
           rel.addTransition(tr[0], tr[1], tr[2]);
@@ -659,7 +659,7 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
     if (constraints.isTrue()) {
       return "";
     }
-    return mHelper.printer(constraints, opening, separator, closing);
+    return SimpleEFAHelper.printer(constraints, opening, separator, closing);
   }
 
   //#########################################################################
