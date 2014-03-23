@@ -1533,7 +1533,8 @@ public class ModelAssess
       while (name.charAt(++splitpos) == ' ') {
       }
       mFirstName = name.substring(splitpos);
-      mPattern = Pattern.compile("^[^0-9_]+_" + mStudentID + "-.*$");
+      mPattern = Pattern.compile("^" + mFirstName + " " + mLastName + "_[0-9]+.*$");
+      // mPattern = Pattern.compile("^[^0-9_]+_" + mStudentID + "_.*$");
     }
 
     //#######################################################################
