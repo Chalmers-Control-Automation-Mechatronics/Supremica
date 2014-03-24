@@ -890,20 +890,21 @@ public abstract class AbstractCompositionalModelAnalyzer
    * Removes the given events from the model.
    * This method is called when redundant events have been identified to
    * remove them.
+   * @param failing2 TODO
    * @return An abstraction step representing the event removal, or
    *         <CODE>null</CODE> to signal that no events can be removed
    *         after all.
    * @see #removeRedundantEvents()
    */
-  protected AbstractionStep removeEvents(final Set<EventProxy> removed)
+  protected AbstractionStep removeEvents(final Set<EventProxy> removed,
+                                         final Set<EventProxy> failing)
     throws AnalysisException
   {
     if (removed.isEmpty()) {
       return null;
     } else {
-      showRemovedEvents(removed);
-      final Set<EventProxy> failing =
-        isUsingFailureEvents() ? new THashSet<EventProxy>() : null;
+      showRemovedEvents("Removing events", removed);
+      showRemovedEvents("Redirecting failing events", failing);
       final int numAutomata = mCurrentAutomata.size();
       final List<AutomatonProxy> originals =
         new ArrayList<AutomatonProxy>(numAutomata);
@@ -913,7 +914,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         mCurrentAutomata.listIterator();
       while (iter.hasNext()) {
         final AutomatonProxy aut = iter.next();
-        final AutomatonProxy newAut = removeEvents(aut, removed, failing);
+        final AutomatonProxy newAut = removeEvents(aut, removed);
         if (newAut != aut) {
           originals.add(aut);
           results.add(newAut);
@@ -932,6 +933,8 @@ public abstract class AbstractCompositionalModelAnalyzer
       final CompositionalAnalysisResult stats = getAnalysisResult();
       final int numRemoved = removed.size();
       stats.addRedundantEvents(numRemoved);
+      final int numFailing = failing.size();
+      stats.addFailingEvents(numFailing);
       return new EventRemovalStep(this, results, originals, failing);
     }
   }
@@ -941,18 +944,15 @@ public abstract class AbstractCompositionalModelAnalyzer
    * redundant events from an automaton.
    * @param  aut      An automaton to be simplified.
    * @param  removed  Set of events to be removed.
-   * @param  failing  Failing events that have been redirected to dump states
-   *                  are added to this set.
    * @return New automaton representing result of event removal.
    *         May be the same as the input automaton, if no events can be
    *         removed.
    */
   protected AutomatonProxy removeEvents(final AutomatonProxy aut,
-                                        final Set<EventProxy> removed,
-                                        final Set<EventProxy> failing)
+                                        final Set<EventProxy> removed)
     throws AnalysisException
   {
-    return removeEvents(aut, removed, failing, null);
+    return removeEvents(aut, removed, null);
   }
 
   /**
@@ -1192,34 +1192,27 @@ public abstract class AbstractCompositionalModelAnalyzer
     }
   }
 
-  private void showRemovedEvents(final Collection<EventProxy> events)
+  private void showRemovedEvents(final String msg,
+                                 final Set<EventProxy> removed)
   {
     final Logger logger = getLogger();
-    if (logger.isDebugEnabled()) {
-      final StringBuilder removing = new StringBuilder();
-      String rsep = "Removing events: ";
-      final StringBuilder failing = new StringBuilder();
-      String fsep = "Redirecting failing events: ";
-      final List<EventProxy> ordered = new ArrayList<>(events);
+    if (logger.isDebugEnabled() && !removed.isEmpty()) {
+      final StringBuilder builder = new StringBuilder();
+      final List<EventProxy> ordered = new ArrayList<>(removed);
       Collections.sort(ordered);
+      boolean first = true;
       for (final EventProxy event : ordered) {
-        final EventInfo info = getEventInfo(event);
-        if (info.isFailing()) {
-          failing.append(fsep);
-          failing.append(event.getName());
-          fsep = ", ";
+        if (first) {
+          builder.append(msg);
+          builder.append(':');
+          first = false;
         } else {
-          removing.append(rsep);
-          removing.append(event.getName());
-          rsep = ", ";
+          builder.append(',');
         }
+        builder.append(' ');
+        builder.append(event.getName());
       }
-      if (rsep.length() == 2) {
-        logger.debug(removing);
-      }
-      if (fsep.length() == 2) {
-        logger.debug(failing);
-      }
+      logger.debug(builder);
     }
   }
 
@@ -1256,18 +1249,32 @@ public abstract class AbstractCompositionalModelAnalyzer
   private boolean removeRedundantEvents()
     throws AnalysisException
   {
-    final Set<EventProxy> removed = new THashSet<EventProxy>(mRedundantEvents);
-    final AbstractionStep step = removeEvents(removed);
+    final int numRedundant = mRedundantEvents.size();
+    final Set<EventProxy> removed = new THashSet<>(numRedundant);
+    final Set<EventProxy> failing;
+    if (isUsingFailureEvents()) {
+      failing = new THashSet<>(numRedundant);
+    } else {
+      failing = Collections.emptySet();
+    }
+    for (final EventProxy event : mRedundantEvents) {
+      final EventInfo info = getEventInfo(event);
+      if (info.isFailing()) {
+        failing.add(event);
+      } else {
+        removed.add(event);
+      }
+    }
+    final AbstractionStep step = removeEvents(removed, failing);
     if (step != null) {
       recordAbstractionStep(step);
-      for (final EventProxy event : mRedundantEvents) {
+      for (final EventProxy event : removed) {
+        final EventInfo info = mEventInfoMap.remove(event);
+        mMayBeSplit |= info.getNumberOfAutomata() > 1;
+      }
+      for (final EventProxy event : failing) {
         final EventInfo info = getEventInfo(event);
-        if (info.isRemovable(mUsingSpecialEvents)) {
-          mEventInfoMap.remove(event);
-          mMayBeSplit |= info.getNumberOfAutomata() > 1;
-        } else if (info.isFailing()) {
-          info.setReduced();
-        }
+        info.setReduced();
       }
       mRedundantEvents.clear();
       mMayBeSplit = true;
@@ -1282,7 +1289,6 @@ public abstract class AbstractCompositionalModelAnalyzer
    * redundant events from an automaton.
    * @param  aut       An automaton to be simplified.
    * @param  removed   Set of events to be removed.
-   * @param  failing   Set of failing events to be redirected to dump states.
    * @param  dumpState Dump state to be used for failing events,
    *                   or <CODE>null</CODE>.
    * @return New automaton representing result of event removal.
@@ -1291,7 +1297,6 @@ public abstract class AbstractCompositionalModelAnalyzer
    */
   private AutomatonProxy removeEvents(final AutomatonProxy aut,
                                       final Set<EventProxy> removed,
-                                      final Set<EventProxy> failing,
                                       StateProxy dumpState)
     throws AnalysisException
   {
@@ -1300,7 +1305,8 @@ public abstract class AbstractCompositionalModelAnalyzer
     final Collection<EventProxy> events = aut.getEvents();
     boolean found = false;
     for (final EventProxy event : events) {
-      if (removed.contains(event)) {
+      final EventInfo info = getEventInfo(event);
+      if (info != null && (removed.contains(event) || info.isFailing())) {
         found = true;
         break;
       }
@@ -1314,10 +1320,13 @@ public abstract class AbstractCompositionalModelAnalyzer
     final Collection<EventProxy> newEvents =
       new ArrayList<EventProxy>(numEvents - 1);
     for (final EventProxy event : events) {
-      if (!removed.contains(event)) { // If we are not removing the event
-        newEvents.add(event); // ... put it into newEvents list
-      } else if (getEventInfo(event).isFailing()) {
-        newEvents.add(event); // But keep failing events
+      final EventInfo info = getEventInfo(event);
+      if (info == null) {
+        newEvents.add(event); // keep propositions
+      } else if (info.isFailing()) {
+        newEvents.add(event); // keep failing events
+      } else if (!removed.contains(event)) {
+        newEvents.add(event); // but do not keep removed events
       }
     }
 
@@ -1329,9 +1338,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       new ArrayList<TransitionProxy>(numTrans);
     for (final TransitionProxy trans : transitions) {
       final EventProxy event = trans.getEvent();
-      if (!removed.contains(event)) { // If we are not removing the event
-        newTransitions.add(trans); // ... add the transition to list
-      } else if (getEventInfo(event).isFailing()) {
+      if (getEventInfo(event).isFailing()) {
         if (dumpState == null) {
           // Find or create dump state ...
           final EventProxy defaultMarking = getUsedDefaultMarking();
@@ -1364,7 +1371,7 @@ public abstract class AbstractCompositionalModelAnalyzer
             // The marking proposition is not in the alphabet ...
             dumpState = factory.createStateProxy(":dump");
             final AutomatonProxy copy = markStatesAndAddDump(aut, dumpState);
-            return removeEvents(copy, removed, failing, dumpState);
+            return removeEvents(copy, removed, dumpState);
           }
         }
         if (trans.getTarget() == dumpState) {
@@ -1375,10 +1382,11 @@ public abstract class AbstractCompositionalModelAnalyzer
           final TransitionProxy newTrans =
             factory.createTransitionProxy(trans.getSource(), event, dumpState);
           newTransitions.add(newTrans);
-          failing.add(event);
           // Redirecting a transition to dump can block other events
           mHasRemovedProperTransition = true;
         }
+      } else if (!removed.contains(event)) { // If we are not removing the event
+        newTransitions.add(trans); // ... add the transition to list
       } else if (trans.getSource() != trans.getTarget()) {
         // Removing a non-selfloop blocked event can block other events
         mHasRemovedProperTransition = true;
@@ -1998,10 +2006,10 @@ public abstract class AbstractCompositionalModelAnalyzer
     //# Heuristics
     /**
      * Gets the common method associated with this method.
-     * Not all compositional model analyzers support all preselecting
+     * Not all compositional model analysers support all preselecting
      * methods. By calling {@link #getCommonMethod()}, it should be
      * possible to obtain an alternative that is supported by all
-     * compositional model analyzers.
+     * compositional model analysers.
      */
     protected PreselectingMethod getCommonMethod()
     {
@@ -2028,7 +2036,7 @@ public abstract class AbstractCompositionalModelAnalyzer
    * obtain a list of available preselecting heuristics, or to find
    * a preselecting heuristic given its name.
    *
-   * Every compositional model analyzer has its preselecting method factory
+   * Every compositional model analyser has its preselecting method factory
    * initialised by the constructor, but different subtypes may be initialised
    * with different factories.
    *
@@ -2204,7 +2212,7 @@ public abstract class AbstractCompositionalModelAnalyzer
    * it occurs in, plus information in which automata the event only appears
    * as selfloops.
    */
-  protected static class EventInfo
+  protected static class EventInfo implements Comparable<EventInfo>
   {
 
     //#######################################################################
@@ -2220,6 +2228,14 @@ public abstract class AbstractCompositionalModelAnalyzer
       mNumNonSelfloopAutomata = 0;
       mIsBlocked = false;
       mFailingStatus = NOT_FAILING;
+    }
+
+    //#######################################################################
+    //# Interface java.util.Comparable<EventInfo>
+    @Override
+    public int compareTo(final EventInfo info)
+    {
+      return mEvent.compareTo(info.mEvent);
     }
 
     //#######################################################################

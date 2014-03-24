@@ -46,7 +46,7 @@ public class CompositionalAnalysisResult
   {
     mTotalCompositionsCount = 0;
     mUnsuccessfulCompositionsCount = 0;
-    mRedundantEventsCount = 0;
+    mRedundantEventsCount = mFailingEventsCount = 0;
     mNumberOfSplitAttempts = 0;
     mNumberOfSplits = 0;
     mSplitTime = 0;
@@ -88,6 +88,15 @@ public class CompositionalAnalysisResult
   public int getRedundantEventsCount()
   {
     return mRedundantEventsCount;
+  }
+
+  /**
+   * Gets the number of events that were found to be failing and have
+   * been redirected to dump states.
+   */
+  public int getFailingEventsCount()
+  {
+    return mFailingEventsCount;
   }
 
   /**
@@ -139,6 +148,11 @@ public class CompositionalAnalysisResult
   public void addRedundantEvents(final int count)
   {
     mRedundantEventsCount += count;
+  }
+
+  public void addFailingEvents(final int count)
+  {
+    mFailingEventsCount += count;
   }
 
   public void setSimplifierStatistics
@@ -244,6 +258,8 @@ public class CompositionalAnalysisResult
                      0.001f * mSplitTime);
     writer.print("Number of redundant events: ");
     writer.println(mRedundantEventsCount);
+    writer.print("Number of failing events: ");
+    writer.println(mFailingEventsCount);
     if (mUnsuccessfulCompositionsCount > 0) {
       final float probability =
         (float) (mTotalCompositionsCount - mUnsuccessfulCompositionsCount) /
@@ -282,6 +298,7 @@ public class CompositionalAnalysisResult
     writer.print(",Splits");
     writer.print(",SplitTime");
     writer.print(",RedundantEvents");
+    writer.print(",FailingEvents");
     if (mSimplifierStatistics != null) {
       for (final TRSimplifierStatistics ruleStats : mSimplifierStatistics) {
         ruleStats.printCSVHorizontalHeadings(writer);
@@ -313,6 +330,8 @@ public class CompositionalAnalysisResult
     writer.print(mSplitTime);
     writer.print(',');
     writer.print(mRedundantEventsCount);
+    writer.print(',');
+    writer.print(mFailingEventsCount);
     if (mSimplifierStatistics != null) {
       for (final TRSimplifierStatistics ruleStats : mSimplifierStatistics) {
         ruleStats.printCSVHorizontal(writer);
@@ -341,6 +360,7 @@ public class CompositionalAnalysisResult
   private int mNumberOfSplits;
   private long mSplitTime;
   private int mRedundantEventsCount;
+  private int mFailingEventsCount;
   private List<TRSimplifierStatistics> mSimplifierStatistics;
   private int mNumberOfSyncProducts;
   private AnalysisResult mSynchronousProductStats;

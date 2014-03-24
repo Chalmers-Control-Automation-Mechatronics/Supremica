@@ -205,15 +205,16 @@ public class CompositionalSafetyVerifier
   }
 
   @Override
-  protected AbstractionStep removeEvents(final Set<EventProxy> removed)
+  protected AbstractionStep removeEvents(final Set<EventProxy> removed,
+                                         final Set<EventProxy> failing)
     throws AnalysisException
   {
-    final AbstractionStep step = super.removeEvents(removed);
+    final AbstractionStep step = super.removeEvents(removed, failing);
     if (step != null) {
       final ListIterator<AutomatonProxy> iter = mProperties.listIterator();
       while (iter.hasNext()) {
         final AutomatonProxy aut = iter.next();
-        final AutomatonProxy newAut = removeEvents(aut, removed, null);
+        final AutomatonProxy newAut = removeEvents(aut, removed);
         if (newAut == aut) {
           continue;
         } else if (isTrivialProperty(newAut)) {
