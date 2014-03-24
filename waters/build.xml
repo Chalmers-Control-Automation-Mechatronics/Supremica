@@ -171,6 +171,7 @@
       <compilerarg value="-Xlint:deprecation"/>
       <include name="net/sourceforge/waters/**/*.java"/>
       <exclude name="net/sourceforge/waters/external/promela/parser/**/*.java"/>
+      <exclude name="net/sourceforge/waters/analysis/efa/simple/**/*.java"/>
       <exclude name="net/sourceforge/waters/gui/**/*.java"/>
       <include name="org/supremica/log/**/*.java"/>
    </javac>

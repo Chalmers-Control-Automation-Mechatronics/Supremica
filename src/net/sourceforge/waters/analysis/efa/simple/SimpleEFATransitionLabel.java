@@ -1,13 +1,13 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters EFA Analysis
-//# PACKAGE: net.sourceforge.waters.analysis.efa
-//# CLASS:   AbstractEFATransitionLabel
+//# PACKAGE: net.sourceforge.waters.analysis.efa.simple
+//# CLASS:   SimpleEFATransitionLabel
 //###########################################################################
 //# $Id$
 //###########################################################################
 
-package net.sourceforge.waters.analysis.efa.base;
+package net.sourceforge.waters.analysis.efa.simple;
 
 import gnu.trove.set.hash.THashSet;
 
@@ -17,8 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sourceforge.waters.analysis.efa.simple.SimpleEFAEventDecl;
-import net.sourceforge.waters.analysis.efa.simple.SimpleEFAVariable;
+import net.sourceforge.waters.analysis.efa.base.AbstractEFATransitionRelation;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
@@ -29,10 +28,10 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * An abstract class for EFA transition labels.
  * @author Mohammad Reza Shoaei
  */
-public abstract class AbstractEFATransitionLabel
+public abstract class SimpleEFATransitionLabel
 {
 
-  public AbstractEFATransitionLabel(final ConstraintList constraint,
+  public SimpleEFATransitionLabel(final ConstraintList constraint,
                                     final SimpleEFAEventDecl event)
   {
     mConstraint = constraint;
@@ -46,7 +45,7 @@ public abstract class AbstractEFATransitionLabel
     mProxyList.addAll(mConstraint.getConstraints());
   }
 
-  public AbstractEFATransitionLabel(final SimpleEFAEventDecl event)
+  public SimpleEFATransitionLabel(final SimpleEFAEventDecl event)
   {
     this(ConstraintList.TRUE, event);
   }
@@ -124,8 +123,8 @@ public abstract class AbstractEFATransitionLabel
   {
     if (other != null && other.getClass() == getClass()) {
       final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
-      final AbstractEFATransitionLabel expected =
-       (AbstractEFATransitionLabel) other;
+      final SimpleEFATransitionLabel expected =
+       (SimpleEFATransitionLabel) other;
       final ArrayList<Proxy> pList = new ArrayList<>();
       pList.add(expected.getEvent().getEventDecl());
       pList.addAll(expected.getConstraint().getConstraints());

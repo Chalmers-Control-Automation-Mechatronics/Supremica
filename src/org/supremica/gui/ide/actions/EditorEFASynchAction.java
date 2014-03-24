@@ -38,7 +38,7 @@ import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
 import org.supremica.automata.algorithms.SynchronizationOptions;
-import org.supremica.automata.algorithms.HDS.EFASynchronizer;
+import org.supremica.automata.algorithms.LBSC.EFASynchronizer;
 import org.supremica.gui.ide.IDE;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
@@ -50,7 +50,6 @@ import org.supremica.log.LoggerFactory;
  * @version %I%, %G%
  * @since 1.0
  */
-@SuppressWarnings("deprecation")
 public class EditorEFASynchAction
  extends IDEAction
 {
@@ -109,17 +108,18 @@ public class EditorEFASynchAction
         }
       }
       if (!compList.isEmpty()) {
+        @SuppressWarnings("unused")
         final SynchronizationOptions option = new SynchronizationOptions();
-        final EFASynchronizer synch = new EFASynchronizer(compList, option);
+        final EFASynchronizer synch = new EFASynchronizer();
+        synch.init(compList);
         System.err.println("Start synchronizing ...");
-        final SimpleEFAComponent result =
-         synch.getSynchronizedEFA("");
+        final SimpleEFAComponent result = synch.getSynchronizedEFA();
         System.err.println("Finish synchronizing ...");
         sys.addComponent(result);
       }
 
       System.err.println("Start importing ...");
-      final ModuleSubject system = (ModuleSubject) sys.getModuleProxy(mFactory);
+      final ModuleSubject system = sys.getModuleProxy(mFactory);
       importToIDE(system, module);
       System.err.println("Finish importing ...");
     } catch (EvalException | AnalysisException | IOException |
