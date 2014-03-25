@@ -9,9 +9,10 @@
 
 package net.sourceforge.waters.analysis.efa.simple;
 
+import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -46,9 +47,9 @@ public class SimpleEFAEventDecl
   {
     super(decl.getName());
     mEFAEventDecl = decl;
-    mVariables = new THashSet<>();
-    mPrimeVariables = new THashSet<>();
-    mUnPrimeVariables = new THashSet<>();
+    mVariables = new TIntHashSet();
+    mPrimeVariables = new TIntHashSet();
+    mUnPrimeVariables = new TIntHashSet();
     mComponents = new THashSet<>();
     mIsObservable = decl.isObservable();
     mKind = decl.getKind();
@@ -59,9 +60,9 @@ public class SimpleEFAEventDecl
   {
     super(identifier.getPlainText());
     mEFAEventDecl = new EventDeclSubject(identifier, kind);
-    mVariables = new THashSet<>();
-    mPrimeVariables = new THashSet<>();
-    mUnPrimeVariables = new THashSet<>();
+    mVariables = new TIntHashSet();
+    mPrimeVariables = new TIntHashSet();
+    mUnPrimeVariables = new TIntHashSet();
     mComponents = new THashSet<>();
     mIsObservable = true;
     mKind = kind;
@@ -101,7 +102,7 @@ public class SimpleEFAEventDecl
   @Override
   public boolean isObservable()
   {
-    return mEFAEventDecl.isObservable();
+    return mIsObservable;
   }
 
   @Override
@@ -132,7 +133,7 @@ public class SimpleEFAEventDecl
     mComponents.remove(component.getIdentifier());
   }
 
-  public Set<SimpleEFAVariable> getVariables()
+  public TIntSet getVariables()
   {
     return mVariables;
   }
@@ -152,35 +153,35 @@ public class SimpleEFAEventDecl
     return isLocal() && mComponents.contains(component.getIdentifier());
   }
 
-  public void addVariable(final SimpleEFAVariable var)
+  public void addVariable(final int var)
   {
     mVariables.add(var);
   }
 
-  public void addPrimeVariable(final SimpleEFAVariable var)
+  public void addPrimeVariable(final int var)
   {
     mPrimeVariables.add(var);
     mVariables.add(var);
   }
 
-  public void addUnPrimeVariable(final SimpleEFAVariable var)
+  public void addUnPrimeVariable(final int var)
   {
     mUnPrimeVariables.add(var);
     mVariables.add(var);
   }
 
-  public void addAllVariable(final Collection<SimpleEFAVariable> var)
+  public void addAllVariable(final int[] var)
   {
     mVariables.addAll(var);
   }
 
-  public void addAllPrimeVariable(final Collection<SimpleEFAVariable> var)
+  public void addAllPrimeVariable(final int[] var)
   {
     mPrimeVariables.addAll(var);
     mVariables.addAll(var);
   }
 
-  public void addAllUnPrimeVariable(final Collection<SimpleEFAVariable> var)
+  public void addAllUnPrimeVariable(final int[] var)
   {
     mUnPrimeVariables.addAll(var);
     mVariables.addAll(var);
@@ -191,12 +192,12 @@ public class SimpleEFAEventDecl
     return mComponents;
   }
 
-  public Set<SimpleEFAVariable> getPrimeVariables()
+  public TIntSet getPrimeVariables()
   {
     return mPrimeVariables;
   }
 
-  public Set<SimpleEFAVariable> getUnPrimeVariables()
+  public TIntSet getUnPrimeVariables()
   {
     return mUnPrimeVariables;
   }
@@ -226,9 +227,6 @@ public class SimpleEFAEventDecl
    */
   public void setObservable(final boolean observable)
   {
-    if (mIsObservable == observable) {
-      return;
-    }
     mIsObservable = observable;
   }
 
@@ -283,12 +281,10 @@ public class SimpleEFAEventDecl
    * The <I>event variable set</I>, consisting of all the variables whose value
    * may change when this event occurs. This set contains only the EFA variable
    * objects for the current state of the concerned variables.
-   * <p/>
-   * @see {@link net.sourceforge.waters.model.compiler.efa.EFACompiler}.
    */
-  private final Set<SimpleEFAVariable> mVariables;
-  private final Set<SimpleEFAVariable> mPrimeVariables;
-  private final Set<SimpleEFAVariable> mUnPrimeVariables;
+  private final TIntHashSet mVariables;
+  private final TIntHashSet mPrimeVariables;
+  private final TIntHashSet mUnPrimeVariables;
   /**
    * The map that assigns to each automaton ({@link SimpleComponentProxy}) the
    * collection of transitions of this event that are to be associated with it.

@@ -32,31 +32,31 @@ public class SimpleEFAComponent
 {
 
   public SimpleEFAComponent(final String name,
-                            final TIntArrayList variables,
+                            final int[] variables,
                             final SimpleEFAVariableContext varContext,
                             final SimpleEFAStateEncoding stateEncoding,
                             final SimpleEFATransitionLabelEncoding labelEncoding,
                             final ListBufferTransitionRelation rel,
-                            final TIntArrayList blockedEvents,
+                            final int[] blockedEvents,
                             final ComponentKind kind)
   {
     super(rel, labelEncoding, null);
     super.setName(name);
     mIdentifier = SimpleEFAHelper.getSimpleIdentifierSubject(name);
     mStateEncoding = stateEncoding;
-    mVariables = variables;
+    mVariables = new TIntArrayList(variables);
     mVarContext = varContext;
     mUnprimedVars = new TIntArrayList();
     mPrimedVars = new TIntArrayList();
     mStateVariables = new TIntArrayList();
-    mBlockedEvents = blockedEvents;
+    mBlockedEvents = new TIntArrayList(blockedEvents);
     mKind = kind != null ? kind : ComponentKind.PLANT;
     rel.setKind(mKind);
     mIsStructurallyDeterministic = rel.isDeterministic();
   }
 
   public SimpleEFAComponent(final String name,
-                            final TIntArrayList variables,
+                            final int[] variables,
                             final SimpleEFAVariableContext varContext,
                             final SimpleEFAStateEncoding stateEncoding,
                             final SimpleEFATransitionLabelEncoding labels,
@@ -122,24 +122,28 @@ public class SimpleEFAComponent
    */
   public void dispose()
   {
-    for (final int var : mUnprimedVars.toArray()) {
-      mVarContext.getVariable(var).removeTransitionRelation(this);
-      mVarContext.getVariable(var).removeVisitor(this);
-    }
+    try {
+      for (final int var : mUnprimedVars.toArray()) {
+        mVarContext.getVariable(var).removeTransitionRelation(this);
+        mVarContext.getVariable(var).removeVisitor(this);
+      }
 
-    for (final int var : mPrimedVars.toArray()) {
-      mVarContext.getVariable(var).removeTransitionRelation(this);
-      mVarContext.getVariable(var).removeModifier(this);
-    }
+      for (final int var : mPrimedVars.toArray()) {
+        mVarContext.getVariable(var).removeTransitionRelation(this);
+        mVarContext.getVariable(var).removeModifier(this);
+      }
 
-    for (final int var : mStateVariables.toArray()) {
-      mVarContext.getVariable(var).removeUseInState(this);
+      for (final int var : mStateVariables.toArray()) {
+        mVarContext.getVariable(var).removeUseInState(this);
+      }
+    } catch (Exception ex) {
+    } finally {
+      mVariables = null;
+      mUnprimedVars = null;
+      mPrimedVars = null;
+      mStateVariables = null;
+      mStateEncoding = null;
     }
-    mVariables = null;
-    mUnprimedVars = null;
-    mPrimedVars = null;
-    mStateVariables = null;
-    mStateEncoding = null;
   }
 
   public TIntArrayList getEvents()
@@ -276,14 +280,14 @@ public class SimpleEFAComponent
     return mVarContext;
   }
 
-  public void setUnprimeVariables(final TIntArrayList uvars)
+  public void setUnprimeVariables(final int[] uvars)
   {
-    mUnprimedVars = uvars;
+    mUnprimedVars = new TIntArrayList(uvars);
   }
 
-  public void setPrimeVariables(final TIntArrayList pvars)
+  public void setPrimeVariables(final int[] pvars)
   {
-    mPrimedVars = pvars;
+    mPrimedVars = new TIntArrayList(pvars);
   }
 
   public TIntArrayList getUnprimeVariables()

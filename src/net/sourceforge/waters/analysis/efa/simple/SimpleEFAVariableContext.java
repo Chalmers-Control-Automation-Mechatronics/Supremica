@@ -46,8 +46,7 @@ public class SimpleEFAVariableContext extends AbstractEFAVariableContext<Integer
     mVarCollector = new SimpleEFAVariableCollector(op, this);
   }
 
-  public SimpleEFAVariable createVariables(final VariableComponentProxy comp,
-                                           final CompiledRange range)
+  public int createVariables(final VariableComponentProxy comp, final CompiledRange range)
    throws DuplicateIdentifierException
   {
     final IdentifierProxy ident = comp.getIdentifier();
@@ -62,8 +61,8 @@ public class SimpleEFAVariableContext extends AbstractEFAVariableContext<Integer
       throw new DuplicateIdentifierException(ident);
     }
     mGlobalVariableMap.put(key, var);
-    mVariableEncoding.encode(var);
-    return var;
+    int varId = mVariableEncoding.encode(var);
+    return varId;
   }
 
   @Override

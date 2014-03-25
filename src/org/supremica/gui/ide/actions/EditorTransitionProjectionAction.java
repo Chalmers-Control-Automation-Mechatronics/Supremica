@@ -58,7 +58,7 @@ public class EditorTransitionProjectionAction
     public void doAction() {
         final ModuleSubject module = ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject();
         final ExtendedAutomata exAutomata = new ExtendedAutomata(module);
-        final HashSet<EventDeclProxy> uniAlphabet = new HashSet<EventDeclProxy>();
+        final HashSet<EventDeclProxy> uniAlphabet = new HashSet<>();
         for(final ExtendedAutomaton efa:exAutomata) {
             uniAlphabet.addAll(efa.getAlphabet());
         }
@@ -71,7 +71,7 @@ public class EditorTransitionProjectionAction
 
         final List<? extends Proxy> currentSelection = ide.getActiveDocumentContainer().getEditorPanel().getComponentsPanel().getCurrentSelection();
 
-        final HashSet<String> components = new HashSet<String>();
+        final HashSet<String> components = new HashSet<>();
         for(final Proxy item : currentSelection) {
             if (item instanceof SimpleComponentSubject) {
                 components.add(((SimpleComponentSubject) item).getName());
@@ -90,12 +90,12 @@ public class EditorTransitionProjectionAction
                 }
             }
 
-            final boolean auto = (dialog.getEventOption() == TPDialogOption.AUTOMATIC_SELECTED)?true:false;
+            final boolean auto = (dialog.getEventOption() == TPDialogOption.AUTOMATIC_SELECTED);
             final AutomataTransitionProjection TP = new AutomataTransitionProjection(exAutomata, auto);
-            final List<ExtendedAutomaton> prjs = new ArrayList<ExtendedAutomaton>();
+            final List<ExtendedAutomaton> prjs = new ArrayList<>();
 
             if(dialog.getEventOption() == TPDialogOption.LOCALEVENT_SELECTED){
-                final HashSet<EventDeclProxy> localEvents = new HashSet<EventDeclProxy>();
+                final HashSet<EventDeclProxy> localEvents = new HashSet<>();
                 final String locals = dialog.getLocalText();
                 if(!locals.isEmpty()){
                     final String[] events = locals.split(",");
@@ -114,7 +114,7 @@ public class EditorTransitionProjectionAction
                 }
 
             } else if(dialog.getEventOption() == TPDialogOption.SHAREDEVENT_SELECTED){
-                final HashSet<EventDeclProxy> sharedEvents = new HashSet<EventDeclProxy>();
+                final HashSet<EventDeclProxy> sharedEvents = new HashSet<>();
                 final String shared = dialog.getShareText();
                 if(!shared.isEmpty()){
                     final String[] events = shared.split(",");
@@ -140,7 +140,7 @@ public class EditorTransitionProjectionAction
                 logger.info("Transition Projection start");
             }
 
-            final HashSet<String> projectedEFAs = new HashSet<String>();
+            final HashSet<String> projectedEFAs = new HashSet<>();
             for(final String efa : components){
                 final ExtendedAutomaton oriEFA = exAutomata.getExtendedAutomaton(efa);
                 
@@ -204,12 +204,12 @@ public class EditorTransitionProjectionAction
             }
 
             if(show){
-                final HashSet<EventDeclProxy> uniPrjAlphabet = new HashSet<EventDeclProxy>();
+                final HashSet<EventDeclProxy> uniPrjAlphabet = new HashSet<>();
                 for(final ExtendedAutomaton efa : prjs) {
                     uniPrjAlphabet.addAll(efa.getAlphabet());
                 }
                 
-                final HashSet<EventDeclProxy> locEvents = new HashSet<EventDeclProxy>();
+                final HashSet<EventDeclProxy> locEvents = new HashSet<>();
                 
                 if(!(uniPrjAlphabet.isEmpty() || uniPrjAlphabet.size() == uniAlphabet.size())){
                     @SuppressWarnings("unchecked")

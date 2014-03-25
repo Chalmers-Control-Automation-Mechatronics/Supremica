@@ -336,19 +336,20 @@ public class EFAPartialEvaluator extends DefaultModuleProxyVisitor
                                 pStateEncoding.size());
     // Creating a residual EFA.
     final SimpleEFAComponent residual = new SimpleEFAComponent(pComponentName,
-                                                               new TIntArrayList(pVars),
+                                                               pVars.toArray(),
                                                                mVarContext,
                                                                pStateEncoding,
                                                                mLabelEncoding,
                                                                rel,
-                                                               component.getBlockedEvents(),
+                                                               component.getBlockedEvents()
+     .toArray(),
                                                                component.getKind());
     // Registering the remaning variables to this component.
     residual.setStructurallyDeterministic(true);
     // Setting the visitor / modifiers of the variables
     residual.setIsEFA(!pVars.isEmpty());
-    residual.setUnprimeVariables(new TIntArrayList(mUnprimed));
-    residual.setPrimeVariables(new TIntArrayList(mPrimed));
+    residual.setUnprimeVariables(mUnprimed.toArray());
+    residual.setPrimeVariables(mPrimed.toArray());
     final TIntHashSet sVars = new TIntHashSet(component.getStateVariables());
     sVars.addAll(PEVars);
     residual.setStateVariables(new TIntArrayList(sVars));

@@ -60,6 +60,17 @@ public class SimpleEFAEventEncoding extends SimpleInfoEncoder<SimpleEFAEventDecl
     return null;
   }
 
+  public int getEventId(final IdentifierProxy ident)
+  {
+    final List<SimpleEFAEventDecl> list = getEventDeclListExceptTau();
+    for (final SimpleEFAEventDecl event : list) {
+      if (event.toString().equals(ident.toString())) {
+        return getEventId(event);
+      }
+    }
+    return -1;
+  }
+
   public final int createEventId(final SimpleEFAEventDecl event)
   {
     return super.encode(event);

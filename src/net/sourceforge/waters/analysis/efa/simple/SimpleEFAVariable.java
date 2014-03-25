@@ -179,6 +179,8 @@ public class SimpleEFAVariable extends AbstractEFAVariable<Integer>
   /**
    * Return whether this variable is local.
    * <p/>
+   * @param component
+   * <p>
    * @return <CODE>true</CODE> if the variable is modifies by at most one
    *         component but may visit (appears in guards) by others.
    */
@@ -189,7 +191,7 @@ public class SimpleEFAVariable extends AbstractEFAVariable<Integer>
     final boolean OUS = isOnlyUsedInStateBy(component);
     final boolean HM = hasModifier();
     final boolean VB = isVisitedBy(component);
-    return OM || !HM && (OUS || !HSU) && VB;
+    return OM || (!HM && (OUS || !HSU) && VB);
 //    return ((isOnlyModifiedBy(component) && (!hasStateUser() || isOnlyUsedInStateBy(component)))
 //     || (!hasModifier() && (!hasStateUser() || isOnlyUsedInStateBy(component))
 //     && isVisitedBy(component)));

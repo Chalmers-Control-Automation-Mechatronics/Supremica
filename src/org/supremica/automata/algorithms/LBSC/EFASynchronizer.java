@@ -183,14 +183,14 @@ public class EFASynchronizer
     // Creating a residual EFA.
     final TIntHashSet vars = new TIntHashSet(mPrimedVars);
     vars.addAll(mUnprimedVars);
-    mSynchEFA = new SimpleEFAComponent(mName, new TIntArrayList(vars), mVarContext, mStateEncoding,
-                                       mLabelEncoding, sRel, new TIntArrayList(mBlockedEvents),
+    mSynchEFA = new SimpleEFAComponent(mName, vars.toArray(), mVarContext, mStateEncoding,
+                                       mLabelEncoding, sRel, mBlockedEvents.toArray(),
                                        ComponentKind.PLANT);
 
     mSynchEFA.setStructurallyDeterministic(true);
     // Setting the visitor / modifiers of the variables
-    mSynchEFA.setPrimeVariables(new TIntArrayList(mPrimedVars));
-    mSynchEFA.setUnprimeVariables(new TIntArrayList(mUnprimedVars));
+    mSynchEFA.setPrimeVariables(mPrimedVars.toArray());
+    mSynchEFA.setUnprimeVariables(mUnprimedVars.toArray());
     mSynchEFA.setStateVariables(new TIntArrayList(mStateVars));
     mSynchEFA.setIsEFA(!vars.isEmpty());
     if (mRegister) {
