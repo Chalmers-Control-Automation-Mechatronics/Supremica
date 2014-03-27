@@ -191,6 +191,13 @@ public abstract class AbstractSupervisorSynthesizerTest
     runSynthesizer(des, true);
   }
 
+  public void testCatMouseUnsup() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "cat_mouse_unsup.wmod");
+    runSynthesizer(des, true);
+  }
+
   public void testCell() throws Exception
   {
     final ProductDESProxy des =
