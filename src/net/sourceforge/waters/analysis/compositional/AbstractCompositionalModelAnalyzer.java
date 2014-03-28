@@ -890,7 +890,6 @@ public abstract class AbstractCompositionalModelAnalyzer
    * Removes the given events from the model.
    * This method is called when redundant events have been identified to
    * remove them.
-   * @param failing2 TODO
    * @return An abstraction step representing the event removal, or
    *         <CODE>null</CODE> to signal that no events can be removed
    *         after all.
