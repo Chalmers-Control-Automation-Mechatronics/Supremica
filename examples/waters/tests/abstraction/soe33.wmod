@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="soe33" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Example from 'Decentralized Control and Coordination of Discrete-Event Systems with Partial Observation' by F. Lin and W. M. Wonham. Two types of products are produced in a system with two machines, M1 and M2. The products require three operations, type 1 products first visit M1, then M2 and finally M1 and type 2 products first visit M2, then M1 and finally M2. The products enter into M1 and M2 respectively through two infinite buffers and move between the machines through four handlers with 2-place buffers. Each handler and buffer is dedicated to a certain product and a certain direction of movement of that product. 
+This is a modified version with a switch to suspend production by M1, and an additional specification to require that output must always be delivered in batches of three workpieces. As the output event of M1 is uncontrollable, the specification prevents the production cycle of M1 completely.
+The system is uncontrollable (buffer overflow problems) and blocking.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="output1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="res1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="sus1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="lock"/>
+        <EventDecl Kind="CONTROLLABLE" Observable="false" Name="unlock"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="before">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="q0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="112" Y="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-31" Y="-6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q5">
+                        <PointGeometry>
+                            <Point X="112" Y="256"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-29" Y="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q1">
+                        <PointGeometry>
+                            <Point X="176" Y="368"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="6" Y="2"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q2">
+                        <PointGeometry>
+                            <Point X="240" Y="256"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q4">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="112" Y="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-30" Y="-9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="q0" Target="q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="output1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="3" Y="-11"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="156" Y="79"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q0" Target="q4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="unlock"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="2" Y="-12"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q5" Target="q2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="lock"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-16" Y="-20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="176" Y="243"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q5" Target="q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="output1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-57" Y="-9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <EndPointGeometry>
+                            <Point X="176" Y="368"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Source="q2" Target="q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="output1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="6" Y="-8"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q2" Target="q5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="unlock"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-22" Y="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="178" Y="271"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q4" Target="q5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="sus1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-39" Y="-8"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="99" Y="208"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q5" Target="q4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="res1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="5" Y="-6"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="123" Y="208"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="after">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="q0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="112" Y="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-31" Y="-6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q4">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="112" Y="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-30" Y="-9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q1">
+                        <PointGeometry>
+                            <Point X="112" Y="240"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-25" Y="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="q0" Target="q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="output1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="3" Y="-11"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="156" Y="79"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q0" Target="q4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="unlock"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="2" Y="-12"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q4" Target="q4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="sus1"/>
+                            <SimpleIdentifier Name="res1"/>
+                            <SimpleIdentifier Name="lock"/>
+                            <SimpleIdentifier Name="unlock"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="2" Y="-26"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="157" Y="160"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point X="112" Y="160"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Source="q4" Target="q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="output1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="6" Y="-1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point X="112" Y="160"/>
+                        </StartPointGeometry>
+                        <EndPointGeometry>
+                            <Point X="112" Y="240"/>
+                        </EndPointGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

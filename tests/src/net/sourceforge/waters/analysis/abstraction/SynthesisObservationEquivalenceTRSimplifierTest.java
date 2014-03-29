@@ -378,6 +378,14 @@ public class SynthesisObservationEquivalenceTRSimplifierTest
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
+  public void test_synthesisAbstraction_33() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "soe33.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
   /**
    * A test to see whether a single abstraction rule object can perform
    * multiple abstractions in sequence.

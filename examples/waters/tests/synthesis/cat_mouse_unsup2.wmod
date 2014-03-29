@@ -1654,7 +1654,7 @@ The included supervisor solves the problem for a building size of 2x2. Synthesis
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SUPERVISOR" Name="supervisor">
+        <SimpleComponent Kind="SUPERVISOR" Name="monolithic_sup">
             <Graph>
                 <LabelBlock>
                     <IndexedIdentifier Name="cat">

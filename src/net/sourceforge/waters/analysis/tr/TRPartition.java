@@ -105,7 +105,7 @@ public class TRPartition
 
   /**
    * Checks whether this partition is empty.
-   * A partition is empty contains no classes. It consists of only bad states
+   * An empty partition contains no classes. It consists of only bad states
    * that are removed as a result of partitioning.
    */
   public boolean isEmpty()

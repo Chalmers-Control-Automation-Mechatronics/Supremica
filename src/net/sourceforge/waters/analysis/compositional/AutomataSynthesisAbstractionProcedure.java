@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.compositional;
 
 import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.sourceforge.waters.analysis.abstraction.CertainUnsupervisabilityTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
@@ -156,34 +158,34 @@ public class AutomataSynthesisAbstractionProcedure extends
       if (mChain.run()) {
         rel = mChain.getTransitionRelation();
         final TRPartition partition = mChain.getResultPartition();
+        final Set<TransitionProxy> removedTransitions;
         final EventEncoding originalEnc;
         // 1. Check if the abstraction is deterministic
-        boolean det = true;
+        ListBufferTransitionRelation detRel = rel;
         if (!mUsingRenaming) {
           // If there is no prior renaming, check the output directly
           if (isMergingPartition(partition)) {
             rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
             if (!rel.isDeterministic()) {
-              det = false;
+              detRel = null;
             }
           }
+          removedTransitions = collectRemovedTransitions
+            (aut, mergedEnc, inputStateEnc, rel, partition);
           originalEnc = mergedEnc;
         } else {
           // Otherwise try to build the unrenamed abstraction
+          removedTransitions = collectRemovedTransitions
+            (aut, mergedEnc, inputStateEnc, rel, partition);
           originalEnc = createEventEncoding(aut, local, false);
-          final ListBufferTransitionRelation mergedTR =
-            createMergedAbstraction(aut, originalEnc, inputStateEnc, partition);
-          if (mergedTR == null) {
-            det = false;
-          } else {
-            rel = mergedTR;
-          }
+          detRel = createMergedAbstraction
+            (aut, removedTransitions, originalEnc, inputStateEnc, partition);
         }
         final SynthesisAbstractionStep step;
-        if (det) {
+        if (detRel != null) {
           final ProductDESProxyFactory factory = getFactory();
           final AutomatonProxy convertedAut =
-            rel.createAutomaton(factory, originalEnc, null);
+            detRel.createAutomaton(factory, originalEnc, null);
           synthesizer.reportAbstractionResult(convertedAut, null);
           step = new SynthesisAbstractionStep
             (synthesizer, convertedAut, aut, originalEnc);
@@ -193,7 +195,8 @@ public class AutomataSynthesisAbstractionProcedure extends
           final int outputConfig =
             ListBufferTransitionRelation.CONFIG_SUCCESSORS;
           final ListBufferTransitionRelation before =
-            createPseudoSupervisorTR(aut, originalEnc, inputStateEnc, inputStateEnc,
+            createPseudoSupervisorTR(aut, removedTransitions,
+                                     originalEnc, inputStateEnc, inputStateEnc,
                                      partition, absMode, outputConfig);
           final Map<EventProxy,List<EventProxy>> renaming =
             findEventRenaming(before, originalEnc, partition);
@@ -215,7 +218,8 @@ public class AutomataSynthesisAbstractionProcedure extends
         final int outputConfig =
           ListBufferTransitionRelation.CONFIG_SUCCESSORS;
         final ListBufferTransitionRelation supervisor =
-          createPseudoSupervisorTR(aut, originalEnc, inputStateEnc, null,
+          createPseudoSupervisorTR(aut, removedTransitions,
+                                   originalEnc, inputStateEnc, null,
                                    partition, supMode, outputConfig);
         if (supervisor != null) {
           synthesizer.reportSupervisor("halfway synthesis", supervisor);
@@ -376,8 +380,78 @@ public class AutomataSynthesisAbstractionProcedure extends
     return dump;
   }
 
+  /**
+   * Creates a set of transitions of the input automaton states that have
+   * removed in abstraction (unsupervisable transitions). Only transitions
+   * between non-dump states are considered by this method.
+   */
+  private Set<TransitionProxy> collectRemovedTransitions
+    (final AutomatonProxy inputAut,
+     final EventEncoding inputEventEnc,
+     final StateEncoding inputStateEnc,
+     final ListBufferTransitionRelation outputRel,
+     final TRPartition outputPartition)
+  {
+    Set<TransitionProxy> result = Collections.emptySet();
+    if (!outputPartition.isEmpty()) {
+      final boolean forward =
+        (outputRel.getConfiguration() &
+         ListBufferTransitionRelation.CONFIG_SUCCESSORS) != 0;
+      final TransitionIterator iter = forward ?
+        outputRel.createSuccessorsReadOnlyIterator() :
+        outputRel.createPredecessorsReadOnlyIterator();
+      for (final TransitionProxy trans : inputAut.getTransitions()) {
+        final StateProxy source = trans.getSource();
+        final int sourceCode = inputStateEnc.getStateCode(source);
+        final int sourceClass = outputPartition.getClassCode(sourceCode);
+        if (sourceClass < 0) {
+          continue;
+        }
+        final StateProxy target = trans.getTarget();
+        final int targetCode = inputStateEnc.getStateCode(target);
+        final int targetClass = outputPartition.getClassCode(targetCode);
+        if (targetClass < 0) {
+          continue;
+        }
+        boolean found = false;
+        final EventProxy event = trans.getEvent();
+        final int e = inputEventEnc.getEventCode(event);
+        final byte status = outputRel.getProperEventStatus(e);
+        if (EventEncoding.isUsedEvent(status)) {
+          if (forward) {
+            iter.reset(sourceClass, e);
+            while (iter.advance()) {
+              if (iter.getCurrentTargetState() == targetClass) {
+                found = true;
+                break;
+              }
+            }
+          } else {
+            iter.reset(targetClass, e);
+            while (iter.advance()) {
+              if (iter.getCurrentSourceState() == sourceClass) {
+                found = true;
+                break;
+              }
+            }
+          }
+        } else {
+          found = sourceClass == targetClass;
+        }
+        if (!found) {
+          if (result.isEmpty()) {
+            result = new THashSet<>();
+          }
+          result.add(trans);
+        }
+      }
+    }
+    return result;
+  }
+
   private ListBufferTransitionRelation createMergedAbstraction
     (final AutomatonProxy aut,
+     final Set<TransitionProxy> removedTransitions,
      final EventEncoding eventEnc,
      final StateEncoding inputStateEnc,
      final TRPartition partition)
@@ -400,6 +474,9 @@ public class AutomataSynthesisAbstractionProcedure extends
         if (s < 0) {
           continue;
         }
+        if (removedTransitions.contains(trans)) {
+          continue;
+        }
         final EventProxy event = trans.getEvent();
         final int e = eventEnc.getEventCode(event);
         final StateProxy target = trans.getTarget();
@@ -413,7 +490,7 @@ public class AutomataSynthesisAbstractionProcedure extends
             return null;
           }
         } else if (t != dump ||
-          translator.getEventKind(event) == EventKind.UNCONTROLLABLE) {
+                   translator.getEventKind(event) == EventKind.UNCONTROLLABLE) {
           mergedTR.addTransition(s, e, t);
         }
       }
@@ -528,6 +605,7 @@ public class AutomataSynthesisAbstractionProcedure extends
 
   private ListBufferTransitionRelation createPseudoSupervisorTR
     (final AutomatonProxy aut,
+     final Set<TransitionProxy> removedTransitions,
      final EventEncoding eventEnc,
      final StateEncoding inputStateEnc,
      final StateEncoding outputStateEnc,
@@ -544,9 +622,9 @@ public class AutomataSynthesisAbstractionProcedure extends
          ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     }
     final AutomatonProxy supervisorAut = createPseudoSupervisorAut
-      (aut, eventEnc, inputStateEnc, partition, mode);
+      (aut, removedTransitions, eventEnc, inputStateEnc, partition, mode);
     if (supervisorAut == aut &&
-      mode != HalfWaySynthesisTRSimplifier.OutputMode.ABSTRACTION) {
+        mode != HalfWaySynthesisTRSimplifier.OutputMode.ABSTRACTION) {
       return null;
     }
     return new ListBufferTransitionRelation
@@ -555,6 +633,7 @@ public class AutomataSynthesisAbstractionProcedure extends
 
   private AutomatonProxy createPseudoSupervisorAut
     (final AutomatonProxy aut,
+     final Set<TransitionProxy> removedTransitions,
      final EventEncoding eventEnc,
      final StateEncoding stateEnc,
      final TRPartition partition,
@@ -616,7 +695,8 @@ public class AutomataSynthesisAbstractionProcedure extends
     for (final TransitionProxy trans : transitions) {
       final StateProxy source = trans.getSource();
       final int s = stateEnc.getStateCode(source);
-      if (partition.getClassCode(s) >= 0) {
+      if (partition.getClassCode(s) >= 0 &&
+          !removedTransitions.contains(trans)) {
         final EventProxy event = trans.getEvent();
         final int e = eventEnc.getEventCode(event);
         if (source != trans.getTarget()) {
@@ -653,7 +733,8 @@ public class AutomataSynthesisAbstractionProcedure extends
     for (final TransitionProxy trans : transitions) {
       final StateProxy source = trans.getSource();
       final int s = stateEnc.getStateCode(source);
-      if (partition.getClassCode(s) < 0) {
+      if (partition.getClassCode(s) < 0 ||
+          removedTransitions.contains(trans)) {
         continue;
       }
       final EventProxy event = trans.getEvent();
