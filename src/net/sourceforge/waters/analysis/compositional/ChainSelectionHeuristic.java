@@ -161,6 +161,20 @@ public class ChainSelectionHeuristic<T extends Comparable<? super T>>
   //#########################################################################
   //# Debugging
   @Override
+  public String show(final T candidate)
+  {
+    final StringBuilder builder = new StringBuilder();
+    for (final SelectionHeuristic<T> step : mSteps) {
+      if (builder.length() > 0) {
+        builder.append("; ");
+      }
+      final String text = step.show(candidate);
+      builder.append(text);
+    }
+    return builder.toString();
+  }
+
+  @Override
   public String getName()
   {
     return mSteps[0].getName();

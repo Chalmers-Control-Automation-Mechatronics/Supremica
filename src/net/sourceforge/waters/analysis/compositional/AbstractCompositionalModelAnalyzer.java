@@ -246,9 +246,10 @@ public abstract class AbstractCompositionalModelAnalyzer
    * {@link AbstractCompositionalModelAnalyzer} class, or can be
    * obtained from the verifier's {@link PreselectingMethodFactory}.
    *
-   * @see #MustL
-   * @see #MinT
    * @see #MaxS
+   * @see #MinT
+   * @see #MustL
+   * @see #Pairs
    * @see #getPreselectingMethodFactory()
    */
   public void setPreselectingMethod(final PreselectingMethod method)
@@ -286,6 +287,7 @@ public abstract class AbstractCompositionalModelAnalyzer
    * @see CompositionalSelectionHeuristicFactory#MaxC
    * @see CompositionalSelectionHeuristicFactory#MaxL
    * @see CompositionalSelectionHeuristicFactory#MinE
+   * @see CompositionalSelectionHeuristicFactory#MinF
    * @see CompositionalSelectionHeuristicFactory#MinS
    * @see CompositionalSelectionHeuristicFactory#MinSync
    */
@@ -724,6 +726,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   protected void runCompositionalMinimisation()
     throws AnalysisException
   {
+    final Logger logger = getLogger();
     final CompositionalAnalysisResult result = getAnalysisResult();
     // If simplify() returns true, the global system has been trivially
     // verified, and there is nothing left to do.
@@ -737,6 +740,14 @@ public abstract class AbstractCompositionalModelAnalyzer
             mPreselectingHeuristic.findCandidates();
           while (true) {
             checkAbort();
+            /*
+            if (logger.isDebugEnabled()) {
+              for (final Candidate candidate : candidates) {
+                final String info = mSelectionHeuristic.show(candidate);
+                logger.debug(candidate + ": " + info);
+              }
+            }
+            */
             final Candidate candidate = selectCandidate(candidates);
             if (candidate == null) {
               break;
@@ -779,7 +790,6 @@ public abstract class AbstractCompositionalModelAnalyzer
               mCurrentInternalStateLimit =
                 Math.min(2 * mCurrentInternalStateLimit, mUpperInternalStateLimit);
               mOverflowCandidates.clear();
-              final Logger logger = getLogger();
               if (logger.isDebugEnabled()) {
                 final String msg =
                   "State limit increased to " + mCurrentInternalStateLimit + ".";
@@ -2052,6 +2062,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       register(MustL);
       register(MaxS);
       register(MinT);
+      register(Pairs);
     }
 
     //#######################################################################
@@ -2072,21 +2083,6 @@ public abstract class AbstractCompositionalModelAnalyzer
 
   //#########################################################################
   //# Preselection Methods
-  /**
-   * The preselecting method that considers every set of automata with at
-   * least one local event as a candidate.
-   */
-  public static final PreselectingMethod MustL =
-      new PreselectingMethod("MustL")
-  {
-    @Override
-    PreselectingHeuristic createHeuristic
-      (final AbstractCompositionalModelAnalyzer analyzer)
-    {
-      return analyzer.new HeuristicMustL();
-    }
-  };
-
   /**
    * The preselecting method that produces candidates by pairing the
    * automaton with the most states to every other automaton in the model.
@@ -2115,6 +2111,36 @@ public abstract class AbstractCompositionalModelAnalyzer
       (final AbstractCompositionalModelAnalyzer analyzer)
     {
       return analyzer.new HeuristicMinT();
+    }
+  };
+
+  /**
+   * The preselecting method that considers every set of automata with at
+   * least one local event as a candidate.
+   */
+  public static final PreselectingMethod MustL =
+      new PreselectingMethod("MustL")
+  {
+    @Override
+    PreselectingHeuristic createHeuristic
+      (final AbstractCompositionalModelAnalyzer analyzer)
+    {
+      return analyzer.new HeuristicMustL();
+    }
+  };
+
+  /**
+   * The preselecting method that considers every pair of automata that
+   * share at least one event.
+   */
+  public static final PreselectingMethod Pairs =
+      new PreselectingMethod("Pairs")
+  {
+    @Override
+    PreselectingHeuristic createHeuristic
+      (final AbstractCompositionalModelAnalyzer analyzer)
+    {
+      return analyzer.new HeuristicPairs();
     }
   };
 
@@ -2300,6 +2326,14 @@ public abstract class AbstractCompositionalModelAnalyzer
     protected boolean isSubjectToSelfloopRemoval()
     {
       return canBeTau();
+    }
+
+    /**
+     * Returns whether the given automaton uses this event.
+     */
+    boolean containsAutomaton(final AutomatonProxy aut)
+    {
+      return mAutomataMap.containsKey(aut);
     }
 
     /**
@@ -2622,6 +2656,66 @@ public abstract class AbstractCompositionalModelAnalyzer
       }
       return candidates;
     }
+  }
+
+
+  //#########################################################################
+  //# Inner Class HeuristicPairs
+  private class HeuristicPairs
+    implements PreselectingHeuristic
+  {
+
+    //#######################################################################
+    //# Interface PreselectingHeuristic
+    @Override
+    public List<Candidate> findCandidates()
+    {
+      final List<Candidate> candidates = new LinkedList<Candidate>();
+      final List<AutomatonProxy> automata = getCurrentAutomata();
+      final int numAutomata = automata.size();
+      for (int index1 = 0; index1 < numAutomata; index1++) {
+        final AutomatonProxy aut1 = automata.get(index1);
+        final int numEvents1 = aut1.getEvents().size();
+        for (int index2 = index1 + 1; index2 < numAutomata; index2++) {
+          final AutomatonProxy aut2 = automata.get(index2);
+          final int numEvents2 = aut2.getEvents().size();
+          if (numEvents1 <= numEvents2) {
+            findCandidate(aut1, aut2, candidates);
+          } else {
+            findCandidate(aut2, aut1, candidates);
+          }
+        }
+      }
+      return candidates;
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private void findCandidate(final AutomatonProxy aut1,
+                               final AutomatonProxy aut2,
+                               final List<Candidate> candidates)
+    {
+      for (final EventProxy event : aut1.getEvents()) {
+        final EventInfo info = getEventInfo(event);
+        if (info != null && info.containsAutomaton(aut2)) {
+          final List<AutomatonProxy> automata = new ArrayList<>(2);
+          if (aut1.compareTo(aut2) <= 0) {
+            automata.add(aut1);
+            automata.add(aut2);
+          } else {
+            automata.add(aut2);
+            automata.add(aut1);
+          }
+          if (isPermissibleCandidate(automata)) {
+            final Set<EventProxy> local = identifyLocalEvents(automata);
+            final Candidate candidate = new Candidate(automata, local);
+            candidates.add(candidate);
+          }
+          return;
+        }
+      }
+    }
+
   }
 
 

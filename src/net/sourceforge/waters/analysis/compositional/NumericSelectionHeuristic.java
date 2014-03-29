@@ -84,6 +84,15 @@ public abstract class NumericSelectionHeuristic<T>
 
 
   //#########################################################################
+  //# Debugging
+  @Override
+  public String show(final T candidate)
+  {
+    return getName() + ":" + getHeuristicValue(candidate);
+  }
+
+
+  //#########################################################################
   //# Data Members
   private T mBestCandidate = null;
   private double mBestValue = Double.POSITIVE_INFINITY;

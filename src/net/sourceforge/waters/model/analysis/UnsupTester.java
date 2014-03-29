@@ -23,10 +23,12 @@ import java.util.List;
 import net.sourceforge.waters.analysis.abstraction.CertainUnsupervisabilityTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.HalfWaySynthesisTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TRSimplifierStatistics;
+import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer.PreselectingMethod;
 import net.sourceforge.waters.analysis.compositional.AutomataSynthesisAbstractionProcedureFactory;
 import net.sourceforge.waters.analysis.compositional.CompositionalAutomataSynthesisResult;
 import net.sourceforge.waters.analysis.compositional.CompositionalAutomataSynthesizer;
 import net.sourceforge.waters.analysis.compositional.CompositionalModelVerifierFactory;
+import net.sourceforge.waters.analysis.compositional.SelectionHeuristicCreator;
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
 import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
 import net.sourceforge.waters.model.base.DocumentProxy;
@@ -81,6 +83,8 @@ public class UnsupTester
     boolean verbose = true;
     boolean stats = false;
     boolean noargs = false;
+    String presel = null;
+    String sel = null;
     AutomataSynthesisAbstractionProcedureFactory proc =
       AutomataSynthesisAbstractionProcedureFactory.WSOE;
     int timeout = -1;
@@ -110,6 +114,12 @@ public class UnsupTester
           verbose = false;
         } else if (arg.equals("-unsup")) {
           proc = AutomataSynthesisAbstractionProcedureFactory.WSOE_UNSUP;
+        } else if (arg.equals("-presel") && i + 1 < args.length) {
+          i++;
+          presel = args[i];
+        } else if (arg.equals("-sel") && i + 1 < args.length) {
+          i++;
+          sel = args[i];
         } else if (arg.equals("-stats")) {
           stats = true;
         } else if (arg.equals("-timeout") && i + 1 < args.length) {
@@ -175,6 +185,22 @@ public class UnsupTester
 
       final CompositionalAutomataSynthesizer synthesizer =
         new CompositionalAutomataSynthesizer(desFactory, proc);
+      if (presel != null) {
+        final ListedEnumFactory<PreselectingMethod> factory =
+          synthesizer.getPreselectingMethodFactory();
+        final PreselectingMethod method = factory.getEnumValue(presel);
+        if (method != null) {
+          synthesizer.setPreselectingMethod(method);
+        }
+      }
+      if (sel != null) {
+        final ListedEnumFactory<SelectionHeuristicCreator> factory =
+          synthesizer.getSelectionHeuristicFactory();
+        final SelectionHeuristicCreator creator = factory.getEnumValue(sel);
+        if (creator != null) {
+          synthesizer.setSelectionHeuristic(creator);
+        }
+      }
       final Watchdog watchdog = new Watchdog(synthesizer, timeout);
       if (timeout > 0) {
         watchdog.start();

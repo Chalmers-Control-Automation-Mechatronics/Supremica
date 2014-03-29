@@ -140,6 +140,8 @@ public abstract class SelectionHeuristic<T>
 
   //#########################################################################
   //# Debugging
+  public abstract String show(T candidate);
+
   public String getName()
   {
     final String KEY = "SelectionHeuristic";
