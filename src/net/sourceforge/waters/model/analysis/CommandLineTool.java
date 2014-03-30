@@ -26,15 +26,17 @@ import java.util.List;
 
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
-import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.base.DocumentProxy;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.OperatorTable;
@@ -179,35 +181,35 @@ public class CommandLineTool
 
       final Class<?> fclazz = loader.loadClass(factoryname);
       final Method getinst = fclazz.getMethod("getInstance");
-      final ModelVerifierFactory factory =
-        (ModelVerifierFactory) getinst.invoke(null);
-      final String createname = "create" + checkName + "Checker";
+      final ModelAnalyzerFactory factory =
+        (ModelAnalyzerFactory) getinst.invoke(null);
+      final String createname = "create" + checkName;
       final Method getcheck =
         fclazz.getMethod(createname, ProductDESProxyFactory.class);
-      final ModelVerifier checker =
-        (ModelVerifier) getcheck.invoke(factory, desFactory);
-      final ModelVerifier wrapper;
+      final ModelAnalyzer analyzer =
+        (ModelAnalyzer) getcheck.invoke(factory, desFactory);
+      final ModelAnalyzer wrapper;
       final boolean keepPropositions;
       if (wrapperName == null) {
-        wrapper = checker;
-        keepPropositions = checker instanceof ConflictChecker;
+        wrapper = analyzer;
+        keepPropositions = analyzer instanceof ConflictChecker ||
+                           analyzer instanceof SupervisorSynthesizer;
       } else {
         @SuppressWarnings("unchecked")
         final Class<ModelVerifier> clazz =
           (Class<ModelVerifier>) loader.loadClass(wrapperName);
         final Package pack = CommandLineTool.class.getPackage();
-        final String ifaceName =
-          pack.getName() + ".des." + checkName + "Checker";
+        final String ifaceName = pack.getName() + ".des." + checkName;
         final Class<?> iface = loader.loadClass(ifaceName);
         final Constructor<ModelVerifier> constructor =
           clazz.getConstructor(iface, ProductDESProxyFactory.class);
-        wrapper = constructor.newInstance(checker, desFactory);
+        wrapper = constructor.newInstance(analyzer, desFactory);
         keepPropositions = true;
       }
       final Collection<String> empty = Collections.emptyList();
       final Iterator<String> argIter = argList.iterator();
       factory.parse(argIter);
-      factory.configure(checker);
+      factory.configure(analyzer);
       final Watchdog watchdog = new Watchdog(wrapper, timeout);
       if (timeout > 0) {
         watchdog.start();
@@ -237,11 +239,11 @@ public class CommandLineTool
 
         final long start = System.currentTimeMillis();
         wrapper.setModel(des);
-        factory.postConfigure(checker);
+        factory.postConfigure(analyzer);
         boolean additions = false;
         try {
           wrapper.run();
-          final VerificationResult result = wrapper.getAnalysisResult();
+          final AnalysisResult result = wrapper.getAnalysisResult();
           final long stop = System.currentTimeMillis();
           final boolean satisfied = result.isSatisfied();
           final double numstates = result.getTotalNumberOfStates();
@@ -259,12 +261,14 @@ public class CommandLineTool
             formatter.format("%b (%.0f states, %d nodes, %.3f s)\n",
                              satisfied, numstates, numnodes, difftime);
           }
-          if (verbose && !satisfied) {
-            final TraceProxy counterex = result.getCounterExample();
-            if (counterex != null) {
+          if (verbose && result instanceof ProxyResult<?>) {
+            final ProxyResult<?> proxyResult = (ProxyResult<?>) result;
+            final Proxy proxy = proxyResult.getComputedProxy();
+            if (proxy != null) {
+              final String description = proxyResult.getResultDescription();
               System.out.println(SEPARATOR);
-              System.out.println("Counterexample:");
-              System.out.print(counterex.toString());
+              System.out.println(description + ":");
+              System.out.print(proxy);
               additions = true;
             }
           }
@@ -272,7 +276,7 @@ public class CommandLineTool
           final long stop = System.currentTimeMillis();
           final float difftime = 0.001f * (stop - start);
           formatter.format("OUT OF MEMORY (%.3f s)\n", difftime);
-          final VerificationResult result = wrapper.getAnalysisResult();
+          final AnalysisResult result = wrapper.getAnalysisResult();
           if (result != null) {
             final OverflowException overflow = new OverflowException(error);
             result.setException(overflow);
@@ -286,7 +290,7 @@ public class CommandLineTool
           final float difftime = 0.001f * (stop - start);
           formatter.format("TIMEOUT (%.3f s)\n", difftime);
         }
-        final VerificationResult result = wrapper.getAnalysisResult();
+        final AnalysisResult result = wrapper.getAnalysisResult();
         if (result != null) {
           if (stats) {
             System.out.println(SEPARATOR);

@@ -19,7 +19,7 @@ import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.des.AbstractLanguageInclusionKindTranslator;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
-import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -98,7 +98,7 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
 
   @Override
   protected ModelVerifier getModelVerifier
-    (final ModelVerifierFactory vfactory,
+    (final ModelAnalyzerFactory vfactory,
      final ProductDESProxyFactory desfactory)
   {
     final LanguageInclusionChecker checker =

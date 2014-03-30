@@ -2,7 +2,7 @@ package net.sourceforge.waters.gui.actions;
 
 import net.sourceforge.waters.gui.actions.WatersAnalyzeAction;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
-import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 import org.supremica.gui.ide.IDE;
@@ -25,7 +25,7 @@ public class AnalyzeControlLoopAction extends WatersAnalyzeAction
     return "has a control loop";
   }
 
-  protected ModelVerifier getModelVerifier(final ModelVerifierFactory factory,
+  protected ModelVerifier getModelVerifier(final ModelAnalyzerFactory factory,
                                            final ProductDESProxyFactory desFactory)
   {
     return factory.createControlLoopChecker(desFactory);

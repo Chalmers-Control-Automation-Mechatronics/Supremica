@@ -10,8 +10,8 @@
 package net.sourceforge.waters.cpp.analysis;
 
 import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
-import net.sourceforge.waters.model.analysis.des.AbstractModelVerifierFactory;
-import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -22,7 +22,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  */
 
 public class NativeModelVerifierFactory
-  extends AbstractModelVerifierFactory
+  extends AbstractModelAnalyzerFactory
 {
 
   //#########################################################################
@@ -93,7 +93,7 @@ public class NativeModelVerifierFactory
     }
 
     @Override
-    public void configure(final ModelVerifier verifier)
+    public void configure(final ModelAnalyzer verifier)
     {
       final NativeModelVerifier nverifier = (NativeModelVerifier) verifier;
       nverifier.setExplorerMode(ExplorerMode.BROAD);
@@ -112,7 +112,7 @@ public class NativeModelVerifierFactory
     }
 
     @Override
-    public void configure(final ModelVerifier verifier)
+    public void configure(final ModelAnalyzer verifier)
     {
       if (verifier instanceof NativeConflictChecker) {
         final NativeConflictChecker nverifier = (NativeConflictChecker) verifier;
@@ -133,7 +133,7 @@ public class NativeModelVerifierFactory
     }
 
     @Override
-    public void configure(final ModelVerifier verifier)
+    public void configure(final ModelAnalyzer verifier)
     {
       final NativeModelVerifier nverifier = (NativeModelVerifier) verifier;
       nverifier.setExplorerMode(ExplorerMode.NARROW);

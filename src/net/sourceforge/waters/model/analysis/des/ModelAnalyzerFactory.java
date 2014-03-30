@@ -22,7 +22,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  * @author Robi Malik
  */
 
-public interface ModelVerifierFactory
+public interface ModelAnalyzerFactory
 {
 
   //#########################################################################
@@ -50,18 +50,24 @@ public interface ModelVerifierFactory
   public LanguageInclusionChecker createLanguageInclusionChecker
     (ProductDESProxyFactory factory);
 
+  /**
+   * Creates a supervisor synthesiser.
+   */
+  public SupervisorSynthesizer createSupervisorSynthesizer
+    (ProductDESProxyFactory factory);
+
 
   //#########################################################################
   //# Command Line Arguments
   public void parse(Iterator<String> iter);
 
   /**
-   * Configures the given model verifier according to any command line
+   * Configures the given model analyser according to any command line
    * arguments passed to this factory. This method is called while parsing
    * command line arguments, before loading of any models. Hence, the model
-   * verifier does not yet have its input model when this method is called.
+   * analyser does not yet have its input model when this method is called.
    */
-  public void configure(ModelVerifier verifier);
+  public void configure(ModelAnalyzer analyzer);
 
   /**
    * Configures the given compiler according to any command line arguments
@@ -70,11 +76,11 @@ public interface ModelVerifierFactory
   public void configure(ModuleCompiler compiler);
 
   /**
-   * Configures the given model verifier after command line arguments parsing
+   * Configures the given model analyser after command line arguments parsing
    * and compiling of models. This method is called just before running the
    * model verifier to provide a second pass of configuration. When it is
-   * called, the model verifier's input model is available.
+   * called, the model analyser's input model is available.
    */
-  public void postConfigure(ModelVerifier verifier) throws AnalysisException;
+  public void postConfigure(ModelAnalyzer analyzer) throws AnalysisException;
 
 }

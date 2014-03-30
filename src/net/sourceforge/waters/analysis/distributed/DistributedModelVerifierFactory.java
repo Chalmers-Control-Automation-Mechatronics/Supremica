@@ -22,8 +22,8 @@ import net.sourceforge.waters.analysis.distributed.application.Server;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentString;
-import net.sourceforge.waters.model.analysis.des.AbstractModelVerifierFactory;
-import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -35,7 +35,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  */
 
 public class DistributedModelVerifierFactory
-  extends AbstractModelVerifierFactory
+  extends AbstractModelAnalyzerFactory
 {
   //####################################################################
   // The current implementation makes a cast to
@@ -86,9 +86,9 @@ public class DistributedModelVerifierFactory
   }
 
   @Override
-  public void configure(final ModelVerifier verifier)
+  public void configure(final ModelAnalyzer analyzer)
   {
-    super.configure(verifier);
+    super.configure(analyzer);
     launchLocalServers();
   }
 
@@ -153,9 +153,9 @@ public class DistributedModelVerifierFactory
     }
 
     @Override
-    public void configure(final ModelVerifier verifier)
+    public void configure(final ModelAnalyzer analyzer)
     {
-      final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) verifier;
+      final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) analyzer;
       final String value = getValue();
       dsv.setHostname(value);
     }
@@ -171,9 +171,9 @@ public class DistributedModelVerifierFactory
     }
 
     @Override
-    public void configure(final ModelVerifier verifier)
+    public void configure(final ModelAnalyzer analyzer)
     {
-      final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier)verifier;
+      final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) analyzer;
       final String value = getValue();
       dsv.setResultsDumpFile(new File(value));
     }
@@ -195,9 +195,9 @@ public class DistributedModelVerifierFactory
     }
 
     @Override
-    public void configure(final ModelVerifier verifier)
+    public void configure(final ModelAnalyzer analyzer)
     {
-      final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) verifier;
+      final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) analyzer;
       final int value = getValue();
       dsv.setPort(value);
     }
@@ -218,9 +218,9 @@ public class DistributedModelVerifierFactory
     }
 
     @Override
-    public void configure(final ModelVerifier verifier)
+    public void configure(final ModelAnalyzer analyzer)
     {
-      final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) verifier;
+      final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) analyzer;
       final int value = getValue();
       dsv.setNodeCount(value);
     }
@@ -236,9 +236,9 @@ public class DistributedModelVerifierFactory
     }
 
     @Override
-    public void configure(final ModelVerifier verifier)
+    public void configure(final ModelAnalyzer analyzer)
     {
-      final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) verifier;
+      final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) analyzer;
       dsv.setShutdownAfter(true);
     }
   }
@@ -253,9 +253,9 @@ public class DistributedModelVerifierFactory
     }
 
     @Override
-    public void configure(final ModelVerifier verifier)
+    public void configure(final ModelAnalyzer analyzer)
     {
-      final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) verifier;
+      final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) analyzer;
       dsv.setWalltimeLimit(getValue());
     }
   }
@@ -271,9 +271,9 @@ public class DistributedModelVerifierFactory
     }
 
     @Override
-    public void configure(final ModelVerifier verifier)
+    public void configure(final ModelAnalyzer analyzer)
     {
-      final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) verifier;
+      final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) analyzer;
       dsv.setProcessingThreadCount(getValue());
     }
   }
@@ -289,9 +289,9 @@ public class DistributedModelVerifierFactory
     }
 
     @Override
-    public void configure(final ModelVerifier verifier)
+    public void configure(final ModelAnalyzer analyzer)
     {
-      final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) verifier;
+      final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) analyzer;
       dsv.setStateDistribution(getValue());
     }
   }

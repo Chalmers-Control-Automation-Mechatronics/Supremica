@@ -2,14 +2,14 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
-//# CLASS:   MonolithicModelVerifierFactory
+//# CLASS:   MonolithicModelAnalyzerFactory
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import net.sourceforge.waters.model.analysis.des.AbstractModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -19,26 +19,26 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  * @author Robi Malik
  */
 
-public class MonolithicModelVerifierFactory
-  extends AbstractModelVerifierFactory
+public class MonolithicModelAnalyzerFactory
+  extends AbstractModelAnalyzerFactory
 {
 
   //#########################################################################
   //# Singleton Pattern
-  public static MonolithicModelVerifierFactory getInstance()
+  public static MonolithicModelAnalyzerFactory getInstance()
   {
     return SingletonHolder.INSTANCE;
   }
 
   private static class SingletonHolder {
-    private static final MonolithicModelVerifierFactory INSTANCE =
-      new MonolithicModelVerifierFactory();
+    private static final MonolithicModelAnalyzerFactory INSTANCE =
+      new MonolithicModelAnalyzerFactory();
   }
 
 
   //#########################################################################
   //# Constructors
-  private MonolithicModelVerifierFactory()
+  private MonolithicModelAnalyzerFactory()
   {
   }
 
@@ -71,6 +71,13 @@ public class MonolithicModelVerifierFactory
     (final ProductDESProxyFactory factory)
   {
     return new MonolithicLanguageInclusionChecker(factory);
+  }
+
+  @Override
+  public MonolithicSynthesizer createSupervisorSynthesizer
+    (final ProductDESProxyFactory factory)
+  {
+    return new MonolithicSynthesizer(factory);
   }
 
 }

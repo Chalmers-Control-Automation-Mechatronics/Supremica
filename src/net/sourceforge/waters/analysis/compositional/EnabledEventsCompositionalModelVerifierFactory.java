@@ -10,7 +10,7 @@
 package net.sourceforge.waters.analysis.compositional;
 
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
-import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -22,7 +22,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  */
 
 public class EnabledEventsCompositionalModelVerifierFactory
-  extends CompositionalModelVerifierFactory
+  extends CompositionalModelAnalyzerFactory
 {
 
   //#########################################################################
@@ -84,10 +84,10 @@ public class EnabledEventsCompositionalModelVerifierFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelVerifier verifier)
+    public void configure(final ModelAnalyzer analyzer)
     {
       final EnabledEventsCompositionalConflictChecker checker =
-        (EnabledEventsCompositionalConflictChecker) verifier;
+        (EnabledEventsCompositionalConflictChecker) analyzer;
       final int value = getValue();
       checker.setEnabledEventSearchStateLimit(value);
     }

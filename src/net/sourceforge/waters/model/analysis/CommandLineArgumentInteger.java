@@ -11,11 +11,11 @@ package net.sourceforge.waters.model.analysis;
 
 import java.util.Iterator;
 
-import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 
 
 /**
- * An integer command line argument passed to a {@link ModelVerifierFactory}.
+ * An integer command line argument passed to a {@link ModelAnalyzerFactory}.
  * Integer command line arguments are specified on the command line by their
  * name followed by an integer value, e.g.,
  * <CODE>-limit 500000</CODE>. The parsed value is stored

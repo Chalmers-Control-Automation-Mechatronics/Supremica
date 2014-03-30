@@ -11,11 +11,11 @@ package net.sourceforge.waters.model.analysis;
 
 import java.util.Iterator;
 
-import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 
 
 /**
- * A flag command line argument passed to a {@link ModelVerifierFactory}.
+ * A flag command line argument passed to a {@link ModelAnalyzerFactory}.
  * Flags are optional arguments that can be either present or absent.
  * The status (present or absent) can be queried using the {@link
  * #getValue()} method, but note that configuration of the compiler and the

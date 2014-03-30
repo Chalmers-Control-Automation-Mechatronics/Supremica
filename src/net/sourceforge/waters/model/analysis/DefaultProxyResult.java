@@ -37,15 +37,23 @@ public class DefaultProxyResult<P extends Proxy>
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ProxyResult<P>
+  @Override
   public P getComputedProxy()
   {
     return mComputedProxy;
   }
 
+  @Override
   public void setComputedProxy(final P proxy)
   {
     setSatisfied(proxy != null);
     mComputedProxy = proxy;
+  }
+
+  @Override
+  public String getResultDescription()
+  {
+    return "supervisor";
   }
 
 

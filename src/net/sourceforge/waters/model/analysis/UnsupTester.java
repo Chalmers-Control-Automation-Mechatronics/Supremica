@@ -27,10 +27,10 @@ import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelA
 import net.sourceforge.waters.analysis.compositional.AutomataSynthesisAbstractionProcedureFactory;
 import net.sourceforge.waters.analysis.compositional.CompositionalAutomataSynthesisResult;
 import net.sourceforge.waters.analysis.compositional.CompositionalAutomataSynthesizer;
-import net.sourceforge.waters.analysis.compositional.CompositionalModelVerifierFactory;
+import net.sourceforge.waters.analysis.compositional.CompositionalModelAnalyzerFactory;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristicCreator;
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
-import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -217,8 +217,8 @@ public class UnsupTester
           final ModuleProxy module = (ModuleProxy) doc;
           final ModuleCompiler compiler =
             new ModuleCompiler(docManager, desFactory, module);
-          final ModelVerifierFactory factory =
-            CompositionalModelVerifierFactory.getInstance();
+          final ModelAnalyzerFactory factory =
+            CompositionalModelAnalyzerFactory.getInstance();
           factory.configure(compiler);
           watchdog.addAbortable(compiler);
           des = compiler.compile(bindings);

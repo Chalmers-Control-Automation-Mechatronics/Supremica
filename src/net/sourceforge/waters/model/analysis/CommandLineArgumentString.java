@@ -11,11 +11,11 @@ package net.sourceforge.waters.model.analysis;
 
 import java.util.Iterator;
 
-import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 
 
 /**
- * A string command line argument passed to a {@link ModelVerifierFactory}.
+ * A string command line argument passed to a {@link ModelAnalyzerFactory}.
  * String command line arguments are specified on the command line by their
  * name followed by a string value, e.g.,
  * <CODE>-marking &quot;:acc&quot;</CODE>. The parsed value is stored

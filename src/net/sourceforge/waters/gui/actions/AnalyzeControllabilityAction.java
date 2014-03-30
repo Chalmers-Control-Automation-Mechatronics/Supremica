@@ -1,7 +1,7 @@
 package net.sourceforge.waters.gui.actions;
 
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
-import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 import org.supremica.gui.ide.IDE;
@@ -23,7 +23,7 @@ public class AnalyzeControllabilityAction extends WatersAnalyzeAction
     return "is not controllable";
   }
 
-  protected ModelVerifier getModelVerifier(final ModelVerifierFactory factory,
+  protected ModelVerifier getModelVerifier(final ModelAnalyzerFactory factory,
                                            final ProductDESProxyFactory desFactory)
   {
     return factory.createControllabilityChecker(desFactory);

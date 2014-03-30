@@ -12,7 +12,7 @@ package net.sourceforge.waters.model.analysis;
 import net.sourceforge.waters.cpp.analysis.NativeModelVerifierFactory;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
-import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -60,11 +60,11 @@ public final class AnalysisTools
       ProductDESElementFactory.getInstance();
     ConflictChecker checker;
     try {
-      final ModelVerifierFactory vFactory =
+      final ModelAnalyzerFactory vFactory =
         NativeModelVerifierFactory.getInstance();
       checker = vFactory.createConflictChecker(desFactory);
     } catch (final UnsatisfiedLinkError error) {
-      final ModelVerifierFactory vFactory =
+      final ModelAnalyzerFactory vFactory =
         NativeModelVerifierFactory.getInstance();
       checker = vFactory.createConflictChecker(desFactory);
     }

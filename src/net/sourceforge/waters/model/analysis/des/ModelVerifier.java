@@ -38,12 +38,12 @@ import net.sourceforge.waters.model.des.TraceProxy;
  *   {@link net.sourceforge.waters.plain.des.ProductDESElementFactory}.{@link
  *   net.sourceforge.waters.plain.des.ProductDESElementFactory#getInstance()
  *   getInstance}();</CODE><BR>
- * <CODE>{@link ModelVerifierFactory} vfactory =
- *   {@link net.sourceforge.waters.analysis.monolithic.MonolithicModelVerifierFactory}.{@link
- *   net.sourceforge.waters.analysis.monolithic.MonolithicModelVerifierFactory#getInstance()
+ * <CODE>{@link ModelAnalyzerFactory} vfactory =
+ *   {@link net.sourceforge.waters.analysis.monolithic.MonolithicModelAnalyzerFactory}.{@link
+ *   net.sourceforge.waters.analysis.monolithic.MonolithicModelAnalyzerFactory#getInstance()
  *   getInstance}(); //</CODE> <I>e.g.</I></CODE><BR>
  * <CODE>ModelVerifier verifier = vfactory.{@link
- *   ModelVerifierFactory#createControllabilityChecker(ProductDESProxyFactory)
+ *   ModelAnalyzerFactory#createControllabilityChecker(ProductDESProxyFactory)
  *   createControllabilityChecker}(desfactory); //</CODE> <I>e.g.</I><BR>
  * <CODE>verifier.{@link #setModel(ProductDESProxy) setModel}(des);</CODE><BR>
  * <CODE>verifier.{@link #run() run()};</CODE><BR>

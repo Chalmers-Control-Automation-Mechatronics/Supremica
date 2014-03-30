@@ -10,7 +10,7 @@
 package net.sourceforge.waters.analysis.modular;
 
 import net.sourceforge.waters.analysis.annotation.CompNonBlockingChecker;
-import net.sourceforge.waters.model.analysis.des.AbstractModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -21,7 +21,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  */
 
 public class CompModelVerifierFactory
-  extends AbstractModelVerifierFactory
+  extends AbstractModelAnalyzerFactory
 {
 
   //#########################################################################

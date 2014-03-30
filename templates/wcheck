@@ -21,7 +21,7 @@ for F in "$@"; do
         FACTORY="$WPACK.analysis.bdd.BDDModelVerifierFactory"
         ;;
     -comp|-compositional)
-        FACTORY="$WPACK.analysis.compositional.CompositionalModelVerifierFactory"
+        FACTORY="$WPACK.analysis.compositional.CompositionalModelAnalyzerFactory"
         ;;
     -dist)
         FACTORY="$WPACK.analysis.distributed.DistributedModelVerifierFactory"
@@ -33,7 +33,7 @@ for F in "$@"; do
         FACTORY="$WPACK.analysis.modular.ModularModelVerifierFactory"
         ;;
     -mono)
-        FACTORY="$WPACK.analysis.monolithic.MonolithicModelVerifierFactory"
+        FACTORY="$WPACK.analysis.monolithic.MonolithicModelAnalyzerFactory"
         ;;
     -native)
         FACTORY="$WPACK.cpp.analysis.NativeModelVerifierFactory"
@@ -45,47 +45,50 @@ for F in "$@"; do
         FACTORY="$WPACK.analysis.modular.ProjectingModelVerifierFactory"
         ;;
     -conf)
-        CHECK="Conflict"
+        CHECK="ConflictChecker"
         ;;
     -cont)
-        CHECK="Controllability"
+        CHECK="ControllabilityChecker"
         ;;
     -lang)
-        CHECK="LanguageInclusion"
+        CHECK="LanguageInclusionChecker"
         ;;
     -loop)
-        CHECK="ControlLoop"
+        CHECK="ControlLoopChecker"
+        ;;
+    -synth)
+        CHECK="SupervisorSynthesizer"
         ;;
     -alf)
-        CHECK="ControlLoop"
+        CHECK="ControlLoopChecker"
         ARGS="$ARGS \"-wrapper\" \"$WPACK.analysis.sd.SDActivityLoopChecker\""
         ;;
     -sdc2a)
-        CHECK="LanguageInclusion"
+        CHECK="LanguageInclusionChecker"
         ARGS="$ARGS \"-wrapper\" \"$WPACK.analysis.sd.SDCTwoAVerifier\""
         ;;
     -sdc31a)
-        CHECK="LanguageInclusion"
+        CHECK="LanguageInclusionChecker"
         ARGS="$ARGS \"-wrapper\" \"$WPACK.analysis.sd.SDCThree1AVerifier\""
         ;;
     -sdc31b)
-        CHECK="LanguageInclusion"
+        CHECK="LanguageInclusionChecker"
         ARGS="$ARGS \"-wrapper\" \"$WPACK.analysis.sd.SDCThree1BVerifier\""
         ;;
     -sdc4)
-        CHECK="LanguageInclusion"
+        CHECK="LanguageInclusionChecker"
         ARGS="$ARGS \"-wrapper\" \"$WPACK.analysis.sd.SDCFourVerifier\""
         ;;
     -sdspb)
-        CHECK="LanguageInclusion"
+        CHECK="LanguageInclusionChecker"
         ARGS="$ARGS \"-wrapper\" \"$WPACK.analysis.sd.SDSingularProhibitableBehaviorVerifier\""
         ;;
     -sic5)
-        CHECK="Conflict"
+        CHECK="ConflictChecker"
         ARGS="$ARGS \"-wrapper\" \"$WPACK.analysis.hisc.SICProperty5Verifier\""
         ;;
     -sic6)
-        CHECK="Conflict"
+        CHECK="ConflictChecker"
         ARGS="$ARGS \"-wrapper\" \"$WPACK.analysis.hisc.SICProperty6Verifier\""
         ;;
     -Xmx*)
@@ -108,7 +111,7 @@ done
 OK=1
 if [ "" = "$CHECK" ]; then
     echo "No check specified!"
-    echo "Available options are: -conf -cont -lang -loop -sic5"
+    echo "Available options are: -conf -cont -lang -loop -synth"
     OK=0
 fi
 

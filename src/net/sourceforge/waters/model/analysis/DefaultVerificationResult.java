@@ -48,12 +48,35 @@ public class DefaultVerificationResult
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ProxyResult<TraceProxy>
+  @Override
+  public TraceProxy getComputedProxy()
+  {
+    return getCounterExample();
+  }
+
+  @Override
+  public void setComputedProxy(final TraceProxy counterexample)
+  {
+    setCounterExample(counterexample);
+  }
+
+  @Override
+  public String getResultDescription()
+  {
+    return "counterexample";
+  }
+
+
+  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.VerificationResult
+  @Override
   public TraceProxy getCounterExample()
   {
     return mCounterExample;
   }
 
+  @Override
   public void setCounterExample(final TraceProxy counterexample)
   {
     super.setSatisfied(false);

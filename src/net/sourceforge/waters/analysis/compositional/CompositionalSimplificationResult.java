@@ -60,6 +60,12 @@ public class CompositionalSimplificationResult
     mProductDES = des;
   }
 
+  @Override
+  public String getResultDescription()
+  {
+    return "abstraction";
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ProductDESResult

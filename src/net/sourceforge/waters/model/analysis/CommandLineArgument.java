@@ -12,13 +12,13 @@ package net.sourceforge.waters.model.analysis;
 import java.io.PrintStream;
 import java.util.Iterator;
 
-import net.sourceforge.waters.model.analysis.des.ModelVerifier;
-import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 
 
 /**
- * A command line argument passed to a {@link ModelVerifierFactory}.
+ * A command line argument passed to a {@link ModelAnalyzerFactory}.
  *
  * @author Robi Malik
  */
@@ -93,7 +93,7 @@ public abstract class CommandLineArgument
    * of its factory; if more elaborate conditions on arguments are
    * needed, they have to be implemented by the individual model verifiers.</P>
    * <P>After parsing all command line arguments, the {@link
-   * ModelVerifierFactory} checks whether all required arguments have been
+   * ModelAnalyzerFactory} checks whether all required arguments have been
    * specified, and if this is not the case, it causes configuration to
    * fail by calling the {@link #fail(String) fail()} method of the
    * unspecified required argument.</P>
@@ -118,7 +118,7 @@ public abstract class CommandLineArgument
   //# Parsing
   public abstract void parse(Iterator<String> iter);
 
-  public void configure(final ModelVerifier verifier)
+  public void configure(final ModelAnalyzer analyzer)
   {
   }
 
@@ -126,7 +126,7 @@ public abstract class CommandLineArgument
   {
   }
 
-  public void postConfigure(final ModelVerifier verifier)
+  public void postConfigure(final ModelAnalyzer analyzer)
     throws AnalysisException
   {
   }
@@ -134,7 +134,7 @@ public abstract class CommandLineArgument
 
   //#########################################################################
   //# Printing
-  public void dump(final PrintStream stream, final ModelVerifier verifier)
+  public void dump(final PrintStream stream, final ModelAnalyzer analyzer)
   {
     final String name = getName();
     final String template = getArgumentTemplate();

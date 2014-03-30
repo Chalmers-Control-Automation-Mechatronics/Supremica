@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.model.analysis
-//# CLASS:   AbstractModelVerifierFactory
+//# PACKAGE: net.sourceforge.waters.model.analysis.des
+//# CLASS:   AbstractModelAnalyzerFactory
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -42,20 +42,20 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
- * A default implementation of the {@link ModelVerifierFactory} interface.
+ * A default implementation of the {@link ModelAnalyzerFactory} interface.
  * This class is extended for different flavours of model checking
  * algorithms.
  *
  * @author Robi Malik
  */
 
-public abstract class AbstractModelVerifierFactory
-  implements ModelVerifierFactory
+public abstract class AbstractModelAnalyzerFactory
+  implements ModelAnalyzerFactory
 {
 
   //#########################################################################
   //# Constructors
-  protected AbstractModelVerifierFactory()
+  protected AbstractModelAnalyzerFactory()
   {
     mArgumentMap = new HashMap<String,CommandLineArgument>(64);
     mArgumentList = new LinkedList<CommandLineArgument>();
@@ -98,28 +98,35 @@ public abstract class AbstractModelVerifierFactory
   public ConflictChecker createConflictChecker
     (final ProductDESProxyFactory factory)
   {
-    throw createUnsupportedOperationException("conflict");
+    throw createUnsupportedOperationException("conflict check");
   }
 
   @Override
   public ControllabilityChecker createControllabilityChecker
     (final ProductDESProxyFactory factory)
   {
-    throw createUnsupportedOperationException("controllability");
+    throw createUnsupportedOperationException("controllability check");
   }
 
   @Override
   public ControlLoopChecker createControlLoopChecker
     (final ProductDESProxyFactory factory)
   {
-    throw createUnsupportedOperationException("control-loop");
+    throw createUnsupportedOperationException("control-loop check");
   }
 
   @Override
   public LanguageInclusionChecker createLanguageInclusionChecker
     (final ProductDESProxyFactory factory)
   {
-    throw createUnsupportedOperationException("language inclusion");
+    throw createUnsupportedOperationException("language inclusion check");
+  }
+
+  @Override
+  public SupervisorSynthesizer createSupervisorSynthesizer
+    (final ProductDESProxyFactory factory)
+  {
+    throw createUnsupportedOperationException("synthesis");
   }
 
 
@@ -145,11 +152,11 @@ public abstract class AbstractModelVerifierFactory
   }
 
   @Override
-  public void configure(final ModelVerifier verifier)
+  public void configure(final ModelAnalyzer analyzer)
   {
     for (final CommandLineArgument arg : mArgumentList) {
       if (arg.isUsed()) {
-        arg.configure(verifier);
+        arg.configure(analyzer);
       }
     }
   }
@@ -165,12 +172,12 @@ public abstract class AbstractModelVerifierFactory
   }
 
   @Override
-  public void postConfigure(final ModelVerifier checker)
+  public void postConfigure(final ModelAnalyzer analyzer)
   throws AnalysisException
   {
     for (final CommandLineArgument arg : mArgumentList) {
       if (arg.isUsed()) {
-        arg.postConfigure(checker);
+        arg.postConfigure(analyzer);
       }
     }
   }
@@ -179,13 +186,12 @@ public abstract class AbstractModelVerifierFactory
   //#########################################################################
   //# Auxiliary Methods
   private UnsupportedOperationException createUnsupportedOperationException
-    (final String checkname)
+    (final String opname)
   {
     final String clsname = getClass().getName();
     final int dotpos = clsname.lastIndexOf('.');
     final String msg =
-      clsname.substring(dotpos + 1) + " does not support " +
-      checkname + " check!";
+      clsname.substring(dotpos + 1) + " does not support " + opname + "!";
     return new UnsupportedOperationException(msg);
   }
 
@@ -243,18 +249,18 @@ public abstract class AbstractModelVerifierFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelVerifier verifier)
+    public void configure(final ModelAnalyzer analyzer)
     {
       if (getValue()) {
         final String name =
-          ProxyTools.getShortClassName(AbstractModelVerifierFactory.this);
+          ProxyTools.getShortClassName(AbstractModelAnalyzerFactory.this);
         System.err.println
           (name + " supports the following command line options:");
         final List<CommandLineArgument> args =
           new ArrayList<CommandLineArgument>(mArgumentMap.values());
         Collections.sort(args);
         for (final CommandLineArgument arg : args) {
-          arg.dump(System.err, verifier);
+          arg.dump(System.err, analyzer);
         }
         System.exit(0);
       }
@@ -305,7 +311,7 @@ public abstract class AbstractModelVerifierFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelVerifier verifier)
+    public void configure(final ModelAnalyzer verifier)
     {
       final int limit = getValue();
       verifier.setNodeLimit(limit);
@@ -331,7 +337,7 @@ public abstract class AbstractModelVerifierFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelVerifier verifier)
+    public void configure(final ModelAnalyzer verifier)
     {
       if (!(verifier instanceof ConflictChecker)) {
         fail("Command line option " + getName() +
@@ -370,10 +376,10 @@ public abstract class AbstractModelVerifierFactory
     }
 
     @Override
-    public void postConfigure(final ModelVerifier verifier)
+    public void postConfigure(final ModelAnalyzer analyzer)
     throws EventNotFoundException
     {
-      final ConflictChecker cchecker = (ConflictChecker) verifier;
+      final ConflictChecker cchecker = (ConflictChecker) analyzer;
       final ProductDESProxy model = cchecker.getModel();
       final String markingname = getValue();
       if (markingname != null) {
@@ -401,10 +407,16 @@ public abstract class AbstractModelVerifierFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelVerifier verifier)
+    public void configure(final ModelAnalyzer analyzer)
     {
-      final boolean enable = !getValue();
-      verifier.setCounterExampleEnabled(enable);
+      if (analyzer instanceof ModelVerifier) {
+        final ModelVerifier verifier = (ModelVerifier) analyzer;
+        final boolean enable = !getValue();
+        verifier.setCounterExampleEnabled(enable);
+      } else {
+        fail("Command line option " + getName() +
+             " is only supported for verification!");
+      }
     }
   }
 
@@ -451,7 +463,7 @@ public abstract class AbstractModelVerifierFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelVerifier verifier)
+    public void configure(final ModelAnalyzer verifier)
     {
       if (!(verifier instanceof ConflictChecker)) {
         fail("Command line option " + getName() +
@@ -478,10 +490,10 @@ public abstract class AbstractModelVerifierFactory
     }
 
     @Override
-    public void postConfigure(final ModelVerifier verifier)
+    public void postConfigure(final ModelAnalyzer analyzer)
     throws EventNotFoundException
     {
-      final ConflictChecker cchecker = (ConflictChecker) verifier;
+      final ConflictChecker cchecker = (ConflictChecker) analyzer;
       final ProductDESProxy model = cchecker.getModel();
       final String markingname = getValue();
       if (markingname != null) {
@@ -512,7 +524,7 @@ public abstract class AbstractModelVerifierFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelVerifier verifier)
+    public void configure(final ModelAnalyzer verifier)
     {
       final Collection<String> props = getValues();
       if (verifier instanceof LanguageInclusionChecker) {
@@ -546,10 +558,10 @@ public abstract class AbstractModelVerifierFactory
     //# Printing
     @Override
     public void dump(final PrintStream stream,
-                     final ModelVerifier verifier)
+                     final ModelAnalyzer analyzer)
     {
-      if (verifier instanceof LanguageInclusionChecker) {
-        super.dump(stream, verifier);
+      if (analyzer instanceof LanguageInclusionChecker) {
+        super.dump(stream, analyzer);
       }
     }
   }
@@ -572,7 +584,7 @@ public abstract class AbstractModelVerifierFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelVerifier verifier)
+    public void configure(final ModelAnalyzer verifier)
     {
       final int limit = getValue();
       verifier.setTransitionLimit(limit);

@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.analysis.po;
 
-import net.sourceforge.waters.model.analysis.des.AbstractModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ControlLoopChecker;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
@@ -23,7 +23,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  */
 
 public class PartialOrderModelVerifierFactory
-  extends AbstractModelVerifierFactory
+  extends AbstractModelAnalyzerFactory
 {
 
   //#########################################################################

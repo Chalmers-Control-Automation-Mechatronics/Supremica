@@ -11,8 +11,8 @@ package net.sourceforge.waters.analysis.gnonblocking;
 
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentString;
-import net.sourceforge.waters.model.analysis.des.AbstractModelVerifierFactory;
-import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -26,7 +26,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  * @author Jinjian Shi, Rachel Francis, Robi Malik
  */
 
-public class GNBModelVerifierFactory extends AbstractModelVerifierFactory
+public class GNBModelVerifierFactory extends AbstractModelAnalyzerFactory
 {
 
   //#########################################################################
@@ -105,12 +105,12 @@ public class GNBModelVerifierFactory extends AbstractModelVerifierFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelVerifier verifier)
+    public void configure(final ModelAnalyzer analyzer)
     {
       final int limit = getValue();
-      if (verifier instanceof CompositionalGeneralisedConflictChecker) {
+      if (analyzer instanceof CompositionalGeneralisedConflictChecker) {
         final CompositionalGeneralisedConflictChecker composer =
-            (CompositionalGeneralisedConflictChecker) verifier;
+            (CompositionalGeneralisedConflictChecker) analyzer;
         composer.setFinalStepNodeLimit(limit);
       }
     }
@@ -136,12 +136,12 @@ public class GNBModelVerifierFactory extends AbstractModelVerifierFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelVerifier verifier)
+    public void configure(final ModelAnalyzer analyzer)
     {
       final int limit = getValue();
-      if (verifier instanceof CompositionalGeneralisedConflictChecker) {
+      if (analyzer instanceof CompositionalGeneralisedConflictChecker) {
         final CompositionalGeneralisedConflictChecker composer =
-            (CompositionalGeneralisedConflictChecker) verifier;
+            (CompositionalGeneralisedConflictChecker) analyzer;
         composer.setInternalStepNodeLimit(limit);
       }
     }
@@ -167,12 +167,12 @@ public class GNBModelVerifierFactory extends AbstractModelVerifierFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelVerifier verifier)
+    public void configure(final ModelAnalyzer analyzer)
     {
       final int limit = getValue();
-      if (verifier instanceof CompositionalGeneralisedConflictChecker) {
+      if (analyzer instanceof CompositionalGeneralisedConflictChecker) {
         final CompositionalGeneralisedConflictChecker composer =
-            (CompositionalGeneralisedConflictChecker) verifier;
+            (CompositionalGeneralisedConflictChecker) analyzer;
         composer.setFinalStepTransitionLimit(limit);
       }
     }
@@ -198,12 +198,12 @@ public class GNBModelVerifierFactory extends AbstractModelVerifierFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelVerifier verifier)
+    public void configure(final ModelAnalyzer analyzer)
     {
       final int limit = getValue();
-      if (verifier instanceof CompositionalGeneralisedConflictChecker) {
+      if (analyzer instanceof CompositionalGeneralisedConflictChecker) {
         final CompositionalGeneralisedConflictChecker composer =
-            (CompositionalGeneralisedConflictChecker) verifier;
+            (CompositionalGeneralisedConflictChecker) analyzer;
         composer.setInternalStepTransitionLimit(limit);
       }
     }
@@ -227,12 +227,12 @@ public class GNBModelVerifierFactory extends AbstractModelVerifierFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelVerifier verifier)
+    public void configure(final ModelAnalyzer analyzer)
     {
       final String name = getValue();
-      if (verifier instanceof CompositionalGeneralisedConflictChecker) {
+      if (analyzer instanceof CompositionalGeneralisedConflictChecker) {
         final CompositionalGeneralisedConflictChecker composer =
-          (CompositionalGeneralisedConflictChecker) verifier;
+          (CompositionalGeneralisedConflictChecker) analyzer;
         CompositionalGeneralisedConflictChecker.PreselectingHeuristic heuristic = null;
         if (name.equalsIgnoreCase("minT")) {
           heuristic = composer.createHeuristicMinT();
@@ -268,12 +268,12 @@ public class GNBModelVerifierFactory extends AbstractModelVerifierFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelVerifier verifier)
+    public void configure(final ModelAnalyzer analyzer)
     {
       final String name = getValue();
-      if (verifier instanceof CompositionalGeneralisedConflictChecker) {
+      if (analyzer instanceof CompositionalGeneralisedConflictChecker) {
         final CompositionalGeneralisedConflictChecker composer =
-          (CompositionalGeneralisedConflictChecker) verifier;
+          (CompositionalGeneralisedConflictChecker) analyzer;
         CompositionalGeneralisedConflictChecker.SelectingHeuristic heuristic = null;
         if (name.equalsIgnoreCase("maxl")) {
           heuristic = composer.createHeuristicMaxL();

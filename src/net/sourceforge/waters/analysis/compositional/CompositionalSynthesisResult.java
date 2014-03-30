@@ -62,6 +62,15 @@ public abstract class CompositionalSynthesisResult
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ProxyResult<TraceProxy>
+  @Override
+  public String getResultDescription()
+  {
+    return "supervisor";
+  }
+
+
+  //#########################################################################
   //# Overrides for net.sourceforge.waters.model.analysis.DefaultAnalysisResult
   @Override
   public void merge(final AnalysisResult other)

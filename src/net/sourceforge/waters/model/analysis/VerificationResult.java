@@ -21,7 +21,7 @@ import net.sourceforge.waters.model.des.TraceProxy;
  * @author Robi Malik
  */
 
-public interface VerificationResult extends AnalysisResult
+public interface VerificationResult extends ProxyResult<TraceProxy>
 {
 
   //#########################################################################

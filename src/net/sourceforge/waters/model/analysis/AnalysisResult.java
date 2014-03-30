@@ -21,11 +21,11 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
  * algorithm. This includes computed data such as counterexamples or generated
  * automata as well as runtime statistics.
  *
- * This base only provides basic information, so it can be determined whether
- * the analysis operation has terminated and if an exception has occurred. It
- * also can store a Boolean result and the time taken, and it records basic
- * statistics about automata sizes. More specific result data can be added
- * by subclasses.
+ * This base class only provides basic information, so it can be determined
+ * whether the analysis operation has terminated and if an exception has
+ * occurred. It also can store a Boolean result and the time taken, and it
+ * records basic statistics about automata sizes. More specific result data
+ * can be added by subclasses.
  *
  * @author Robi Malik
  */

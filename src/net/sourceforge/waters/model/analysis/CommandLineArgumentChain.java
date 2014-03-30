@@ -17,17 +17,18 @@ import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ControlLoopChecker;
 import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
-import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 /**
- * <P>A command line argument specifying a second {@link ModelVerifierFactory}.
+ * <P>A command line argument specifying a second {@link ModelAnalyzerFactory}.
  * The <CODE>-chain</CODE> command line argument is followed by the class name
- * of a {@link ModelVerifierFactory}. It stops all command line argument
+ * of a {@link ModelAnalyzerFactory}. It stops all command line argument
  * processing by the current model verifier factory and hands over to the
  * secondary factory.</P>
  *
@@ -58,7 +59,7 @@ public abstract class CommandLineArgumentChain
     return "<factory>";
   }
 
-  protected ModelVerifierFactory getSecondaryFactory()
+  protected ModelAnalyzerFactory getSecondaryFactory()
   {
     return mSecondaryFactory;
   }
@@ -82,16 +83,16 @@ public abstract class CommandLineArgumentChain
       secondaryVerifier =
         mSecondaryFactory.createLanguageInclusionChecker(desFactory);
     } else {
-      failUnsupportedVerifierClass(verifier);
+      failUnsupportedAnalyzerClass(verifier);
       return null;
     }
     mSecondaryFactory.configure(secondaryVerifier);
     return secondaryVerifier;
   }
 
-  protected void failUnsupportedVerifierClass(final ModelVerifier verifier)
+  protected void failUnsupportedAnalyzerClass(final ModelAnalyzer analyzer)
   {
-    fail(ProxyTools.getShortClassName(verifier) +
+    fail(ProxyTools.getShortClassName(analyzer) +
          " does not support secondary verifier!");
   }
 
@@ -107,7 +108,7 @@ public abstract class CommandLineArgumentChain
         final ClassLoader loader = getClass().getClassLoader();
         final Class<?> fclazz = loader.loadClass(factoryname);
         final Method getinst = fclazz.getMethod("getInstance");
-        mSecondaryFactory = (ModelVerifierFactory) getinst.invoke(null);
+        mSecondaryFactory = (ModelAnalyzerFactory) getinst.invoke(null);
       } catch (final ClassNotFoundException exception) {
         fail("Can't find factory " + factoryname + "!");
       } catch (final SecurityException | NoSuchMethodException |
@@ -132,6 +133,6 @@ public abstract class CommandLineArgumentChain
 
   //#########################################################################
   //# Data Members
-  private ModelVerifierFactory mSecondaryFactory;
+  private ModelAnalyzerFactory mSecondaryFactory;
 
 }

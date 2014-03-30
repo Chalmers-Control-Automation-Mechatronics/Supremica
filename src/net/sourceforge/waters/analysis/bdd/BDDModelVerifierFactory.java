@@ -12,8 +12,8 @@ package net.sourceforge.waters.analysis.bdd;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
-import net.sourceforge.waters.model.analysis.des.AbstractModelVerifierFactory;
-import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -24,7 +24,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  */
 
 public class BDDModelVerifierFactory
-  extends AbstractModelVerifierFactory
+  extends AbstractModelAnalyzerFactory
 {
 
   //#########################################################################
@@ -103,9 +103,9 @@ public class BDDModelVerifierFactory
     //# Overrides for
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelVerifier verifier)
+    public void configure(final ModelAnalyzer analyzer)
     {
-      final BDDModelVerifier bddVerifier = (BDDModelVerifier) verifier;
+      final BDDModelVerifier bddVerifier = (BDDModelVerifier) analyzer;
       final BDDPackage pack = getValue();
       bddVerifier.setBDDPackage(pack);
     }
@@ -129,9 +129,9 @@ public class BDDModelVerifierFactory
     //# Overrides for
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelVerifier verifier)
+    public void configure(final ModelAnalyzer analyzer)
     {
-      final BDDModelVerifier bddVerifier = (BDDModelVerifier) verifier;
+      final BDDModelVerifier bddVerifier = (BDDModelVerifier) analyzer;
       final VariableOrdering ordering = getValue();
       bddVerifier.setVariableOrdering(ordering);
     }
@@ -154,9 +154,9 @@ public class BDDModelVerifierFactory
     //# Overrides for
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelVerifier verifier)
+    public void configure(final ModelAnalyzer analyzer)
     {
-      final BDDModelVerifier bddVerifier = (BDDModelVerifier) verifier;
+      final BDDModelVerifier bddVerifier = (BDDModelVerifier) analyzer;
       final boolean enable = getValue();
       bddVerifier.setReorderingEnabled(enable);
     }
@@ -179,9 +179,9 @@ public class BDDModelVerifierFactory
     //# Overrides for
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelVerifier verifier)
+    public void configure(final ModelAnalyzer analyzer)
     {
-      final BDDModelVerifier bddVerifier = (BDDModelVerifier) verifier;
+      final BDDModelVerifier bddVerifier = (BDDModelVerifier) analyzer;
       final int size = getValue();
       bddVerifier.setInitialSize(size);
     }
@@ -205,9 +205,9 @@ public class BDDModelVerifierFactory
     //# Overrides for
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelVerifier verifier)
+    public void configure(final ModelAnalyzer analyzer)
     {
-      final BDDModelVerifier bddVerifier = (BDDModelVerifier) verifier;
+      final BDDModelVerifier bddVerifier = (BDDModelVerifier) analyzer;
       final TransitionPartitioningStrategy strategy = getValue();
       bddVerifier.setTransitionPartitioningStrategy(strategy);
     }
@@ -230,9 +230,9 @@ public class BDDModelVerifierFactory
     //# Overrides for
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelVerifier verifier)
+    public void configure(final ModelAnalyzer analyzer)
     {
-      final BDDModelVerifier bddVerifier = (BDDModelVerifier) verifier;
+      final BDDModelVerifier bddVerifier = (BDDModelVerifier) analyzer;
       final int limit = getValue();
       bddVerifier.setPartitioningSizeLimit(limit);
     }

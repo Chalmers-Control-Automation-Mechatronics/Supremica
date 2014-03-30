@@ -14,13 +14,13 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import net.sourceforge.waters.model.analysis.des.ModelVerifier;
-import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 
 
 /**
  * An enumeration-value command line argument passed to a
- * {@link ModelVerifierFactory}.
+ * {@link ModelAnalyzerFactory}.
  * Enumeration command line arguments are specified on the command line by
  * their name followed by a string that represents one of the enumeration
  * objects to be selected. The command line argument knows the enumeration
@@ -112,9 +112,9 @@ public abstract class CommandLineArgumentEnum<E extends Enum<E>>
   //#########################################################################
   //# Printing
   @Override
-  public void dump(final PrintStream stream, final ModelVerifier verifier)
+  public void dump(final PrintStream stream, final ModelAnalyzer analyzer)
   {
-    super.dump(stream, verifier);
+    super.dump(stream, analyzer);
     mEnumFactory.dumpEnumeration(stream, INDENT);
   }
 

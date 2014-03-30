@@ -48,4 +48,10 @@ public interface ProxyResult<P extends Proxy>
    */
   public void setComputedProxy(final P proxy);
 
+  /**
+   * Returns a short string describing the computed object,
+   * e.g. &quot;counterexample&quot; or &quot;supervisor&quot;.
+   */
+  public String getResultDescription();
+
 }

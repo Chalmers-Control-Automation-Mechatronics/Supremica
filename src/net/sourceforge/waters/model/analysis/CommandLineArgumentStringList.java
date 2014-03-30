@@ -13,11 +13,11 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 
 
 /**
- * A command line argument passed to a {@link ModelVerifierFactory} to specify
+ * A command line argument passed to a {@link ModelAnalyzerFactory} to specify
  * multiple strings. String list command line arguments can be used several
  * times in the command line, each time specifying a string value. The
  * list of parsed values is stored in the

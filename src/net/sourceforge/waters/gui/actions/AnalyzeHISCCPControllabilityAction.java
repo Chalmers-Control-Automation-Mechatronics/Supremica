@@ -11,7 +11,7 @@
 package net.sourceforge.waters.gui.actions;
 
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
-import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import org.supremica.gui.ide.IDE;
 
@@ -55,7 +55,7 @@ public class AnalyzeHISCCPControllabilityAction
 
   @Override
   protected ModelVerifier getModelVerifier
-    (final ModelVerifierFactory factory,
+    (final ModelAnalyzerFactory factory,
      final ProductDESProxyFactory desFactory)
   {
     return factory.createControllabilityChecker(desFactory);

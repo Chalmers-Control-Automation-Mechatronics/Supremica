@@ -15,7 +15,7 @@ import net.sourceforge.waters.analysis.compositional.ConflictAbstractionProcedur
 import net.sourceforge.waters.analysis.hisc.HISCCPInterfaceConsistencyChecker;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
-import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 import org.supremica.gui.ide.IDE;
@@ -56,7 +56,7 @@ public class AnalyzeHISCCPInterfaceConsistencyAction
 
   @Override
   protected ModelVerifier getModelVerifier
-    (final ModelVerifierFactory factory,
+    (final ModelAnalyzerFactory factory,
      final ProductDESProxyFactory desFactory)
   {
     final ConflictChecker checker = factory.createConflictChecker(desFactory);

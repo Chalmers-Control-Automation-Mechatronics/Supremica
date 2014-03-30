@@ -11,12 +11,12 @@ package net.sourceforge.waters.model.analysis;
 
 import java.util.Iterator;
 
-import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 
 
 /**
  * A floating point number command line argument passed to a
- * {@link ModelVerifierFactory}. Double command line arguments are specified on
+ * {@link ModelAnalyzerFactory}. Double command line arguments are specified on
  * the command line by their name followed by a floating point number, e.g.,
  * <CODE>-part 2.5</CODE>. The parsed value is stored in the
  * <CODE>CommandLineArgumentDouble</CODE> object for retrieval.

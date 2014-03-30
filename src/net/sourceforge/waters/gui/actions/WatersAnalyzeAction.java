@@ -30,8 +30,8 @@ import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
-import net.sourceforge.waters.model.analysis.des.ModelVerifierFactory;
-import net.sourceforge.waters.model.analysis.des.ModelVerifierFactoryLoader;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.TraceProxy;
@@ -127,12 +127,12 @@ public abstract class WatersAnalyzeAction
 
   //#########################################################################
   //# Factory Access
-  ModelVerifierFactory getModelVerifierFactory()
+  ModelAnalyzerFactory getModelVerifierFactory()
     throws ClassNotFoundException
   {
-    final ModelVerifierFactoryLoader loader =
+    final ModelAnalyzerFactoryLoader loader =
       Config.GUI_ANALYZER_USED_FACTORY.get();
-    return loader.getModelVerifierFactory();
+    return loader.getModelAnalyzerFactory();
   }
 
   ModelVerifier getModelVerifier()
@@ -140,7 +140,7 @@ public abstract class WatersAnalyzeAction
     try {
       final ProductDESProxyFactory desfactory =
         ProductDESElementFactory.getInstance();
-      final ModelVerifierFactory vfactory = getModelVerifierFactory();
+      final ModelAnalyzerFactory vfactory = getModelVerifierFactory();
       return getModelVerifier(vfactory, desfactory);
     } catch (final NoClassDefFoundError error) {
       return null;
@@ -160,7 +160,7 @@ public abstract class WatersAnalyzeAction
   protected abstract String getFailureDescription();
   protected abstract String getSuccessDescription();
   protected abstract ModelVerifier getModelVerifier
-    (ModelVerifierFactory factory, ProductDESProxyFactory desFactory);
+    (ModelAnalyzerFactory factory, ProductDESProxyFactory desFactory);
 
 
   //#########################################################################

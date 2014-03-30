@@ -21,7 +21,7 @@ import java.lang.reflect.Method;
  * @author Robi Malik
  */
 
-public enum ModelVerifierFactoryLoader
+public enum ModelAnalyzerFactoryLoader
 {
   BDD("net.sourceforge.waters.analysis.bdd.BDDModelVerifierFactory"),
   EnabledEvents("net.sourceforge.waters.analysis.compositional.EnabledEventsCompositionalModelVerifierFactory"),
@@ -33,7 +33,7 @@ public enum ModelVerifierFactoryLoader
 
   //#########################################################################
   //# Constructor
-  private ModelVerifierFactoryLoader(final String classname)
+  private ModelAnalyzerFactoryLoader(final String classname)
   {
     mClassName = classname;
   }
@@ -41,14 +41,14 @@ public enum ModelVerifierFactoryLoader
 
   //#########################################################################
   //# Constructor
-  public ModelVerifierFactory getModelVerifierFactory()
+  public ModelAnalyzerFactory getModelAnalyzerFactory()
     throws ClassNotFoundException
   {
     try {
       final ClassLoader loader = getClass().getClassLoader();
       final Class<?> clazz = loader.loadClass(mClassName);
       final Method method = clazz.getMethod("getInstance");
-      return (ModelVerifierFactory) method.invoke(null);
+      return (ModelAnalyzerFactory) method.invoke(null);
     } catch (final SecurityException exception) {
       throw wrap(exception);
     } catch (final NoSuchMethodException exception) {

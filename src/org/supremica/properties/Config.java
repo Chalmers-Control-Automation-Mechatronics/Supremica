@@ -59,7 +59,7 @@ package org.supremica.properties;
 
 import java.awt.Color;
 
-import net.sourceforge.waters.model.analysis.des.ModelVerifierFactoryLoader;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 
 import org.supremica.automata.BDD.BDDLibraryType;
 import org.supremica.automata.BDD.BDDPartitioningType;
@@ -228,11 +228,11 @@ public final class Config
                           10000, "Maximum layout time", false, 0);
 
     // GUI_ANALYZER
-    public static final ObjectProperty<ModelVerifierFactoryLoader> GUI_ANALYZER_USED_FACTORY =
-      new ObjectProperty<ModelVerifierFactoryLoader>(PropertyType.GUI_ANALYZER, "guiAnalyzerUsedFactory",
-                         ModelVerifierFactoryLoader.Monolithic,
+    public static final ObjectProperty<ModelAnalyzerFactoryLoader> GUI_ANALYZER_USED_FACTORY =
+      new ObjectProperty<ModelAnalyzerFactoryLoader>(PropertyType.GUI_ANALYZER, "guiAnalyzerUsedFactory",
+                         ModelAnalyzerFactoryLoader.Monolithic,
                          "Model verifier factory used by Editor's Verify menu",
-                         ModelVerifierFactoryLoader.values());
+                         ModelAnalyzerFactoryLoader.values());
     public static final BooleanProperty GUI_ANALYZER_INCLUDE_SEAMLESS_SYNTHESIS =
       new BooleanProperty(PropertyType.GUI_ANALYZER, "includeSeamlessSynthesis",
                           true, "Include Seamless Synthesis");
