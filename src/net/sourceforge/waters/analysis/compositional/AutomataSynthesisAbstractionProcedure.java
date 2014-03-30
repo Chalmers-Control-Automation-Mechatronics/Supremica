@@ -42,6 +42,8 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * @author Robi Malik
@@ -146,6 +148,7 @@ public class AutomataSynthesisAbstractionProcedure extends
     throws AnalysisException
   {
     try {
+      reportAutomaton("input", aut);
       final EventEncoding mergedEnc = createEventEncoding(aut, local, true);
       final StateEncoding inputStateEnc = createStateEncoding(aut);
       final int inputConfig = mChain.getPreferredInputConfiguration();
@@ -182,13 +185,13 @@ public class AutomataSynthesisAbstractionProcedure extends
             (aut, removedTransitions, originalEnc, inputStateEnc, partition);
         }
         final SynthesisAbstractionStep step;
+        final AutomatonProxy abstractedAut;
         if (detRel != null) {
           final ProductDESProxyFactory factory = getFactory();
-          final AutomatonProxy convertedAut =
-            detRel.createAutomaton(factory, originalEnc, null);
-          synthesizer.reportAbstractionResult(convertedAut, null);
+          abstractedAut = detRel.createAutomaton(factory, originalEnc, null);
+          synthesizer.reportAbstractionResult(abstractedAut, null);
           step = new SynthesisAbstractionStep
-            (synthesizer, convertedAut, aut, originalEnc);
+            (synthesizer, abstractedAut, aut, originalEnc);
         } else {
           final HalfWaySynthesisTRSimplifier.OutputMode absMode =
             HalfWaySynthesisTRSimplifier.OutputMode.ABSTRACTION;
@@ -202,17 +205,17 @@ public class AutomataSynthesisAbstractionProcedure extends
             findEventRenaming(before, originalEnc, partition);
           final EventEncoding renamedEnc =
             createRenamedEventEncoding(originalEnc, renaming);
-          final AutomatonProxy abstraction =
-            createRenamedAbstraction(before, originalEnc, renamedEnc, renaming,
-                                     partition);
+          abstractedAut = createRenamedAbstraction
+            (before, originalEnc, renamedEnc, renaming, partition);
           step = new SynthesisAbstractionStep
-            (synthesizer, abstraction, aut, renaming, originalEnc);
+            (synthesizer, abstractedAut, aut, renaming, originalEnc);
           final AutomatonProxy distinguisher =
             createDistinguisher(before, originalEnc, renaming,
                                 inputStateEnc, partition);
           synthesizer.recordDistinuisherInfo(renaming, distinguisher);
-          synthesizer.reportAbstractionResult(abstraction, distinguisher);
+          synthesizer.reportAbstractionResult(abstractedAut, distinguisher);
         }
+        reportAutomaton("abstraction", abstractedAut);
         final HalfWaySynthesisTRSimplifier.OutputMode supMode =
           HalfWaySynthesisTRSimplifier.OutputMode.PSEUDO_SUPERVISOR;
         final int outputConfig =
@@ -248,6 +251,7 @@ public class AutomataSynthesisAbstractionProcedure extends
     mChain.createStatistics();
   }
 
+
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
@@ -268,6 +272,7 @@ public class AutomataSynthesisAbstractionProcedure extends
     mChain.resetAbort();
   }
 
+
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.compositional.
   //# AbstractAbstractionProcedure
@@ -282,6 +287,7 @@ public class AutomataSynthesisAbstractionProcedure extends
   {
     return (CompositionalAutomataSynthesisResult) super.getAnalysisResult();
   }
+
 
   //#########################################################################
   //# Auxiliary Methods
@@ -960,6 +966,21 @@ public class AutomataSynthesisAbstractionProcedure extends
       }
     }
     return events;
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  private void reportAutomaton(final String label,
+                               final AutomatonProxy aut)
+  {
+    final Logger logger = getLogger();
+    if (logger.isDebugEnabled()) {
+      final String msg =
+        "Unrenamed " + label + " has " + aut.getStates().size() +
+        " states and " + aut.getTransitions().size() + " transitions.";
+      logger.debug(msg);
+    }
   }
 
 

@@ -13,6 +13,7 @@ import java.io.PrintWriter;
 
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 
 
 /**
@@ -36,20 +37,27 @@ public abstract class CompositionalSynthesisResult
    */
   public CompositionalSynthesisResult()
   {
-    mSynchSize = -1;
+    mSynchStates = -1;
+    mSynchTransitions = -1;
   }
 
 
   //#########################################################################
   //# Specific Access
-  void addSynchSize(final int size)
+  void addSynchSize(final AutomatonProxy aut)
   {
-    mSynchSize = mergeAdd(mSynchSize, size);
+    mSynchStates = mergeAdd(mSynchStates, aut.getStates().size());
+    mSynchTransitions = mergeAdd(mSynchStates, aut.getTransitions().size());
   }
 
-  int getSynchSize()
+  int getSynchStates()
   {
-    return mSynchSize;
+    return mSynchStates;
+  }
+
+  int getSynchTransitions()
+  {
+    return mSynchTransitions;
   }
 
 
@@ -61,8 +69,8 @@ public abstract class CompositionalSynthesisResult
     super.merge(other);
     final CompositionalSynthesisResult result =
       (CompositionalSynthesisResult) other;
-    mSynchSize = mergeAdd(mSynchSize, result.mSynchSize);
-
+    mSynchStates = mergeAdd(mSynchStates, result.mSynchStates);
+    mSynchTransitions = mergeAdd(mSynchTransitions, result.mSynchTransitions);
   }
 
   @Override
@@ -70,7 +78,9 @@ public abstract class CompositionalSynthesisResult
   {
     super.print(writer);
     writer.print("Final number of states: ");
-    writer.println(mSynchSize);
+    writer.println(mSynchStates);
+    writer.print("Final number of transitions: ");
+    writer.println(mSynchTransitions);
   }
 
   @Override
@@ -78,7 +88,9 @@ public abstract class CompositionalSynthesisResult
   {
     super.printCSVHorizontalHeadings(writer);
     writer.print(',');
-    writer.print("SynchSize");
+    writer.print("SynchStates");
+    writer.print(',');
+    writer.print("SynchTransitions");
   }
 
   @Override
@@ -86,12 +98,15 @@ public abstract class CompositionalSynthesisResult
   {
     super.printCSVHorizontal(writer);
     writer.print(",");
-    writer.print(getSynchSize());
+    writer.print(getSynchStates());
+    writer.print(",");
+    writer.print(getSynchTransitions());
   }
 
 
   //#########################################################################
   //# Data Members
-  private int mSynchSize;
+  private int mSynchStates;
+  private int mSynchTransitions;
 
 }

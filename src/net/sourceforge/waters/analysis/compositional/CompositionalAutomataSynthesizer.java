@@ -400,15 +400,13 @@ public class CompositionalAutomataSynthesizer extends
       automaton = syncBuilder.getComputedAutomaton();
       break;
     }
-    final int numberOfStates = automaton.getStates().size();
     final CompositionalAutomataSynthesisResult result = getAnalysisResult();
-    result.addSynchSize(numberOfStates);
+    result.addSynchSize(automaton);
     mTempEventEncoding = createSynthesisEventEncoding(automaton);
     final ListBufferTransitionRelation supervisor =
       synthesise(automaton, mTempEventEncoding);
     if (supervisor != null) {
       reportSupervisor("monolithic", supervisor);
-      result.addSynchSize(automaton.getStates().size());
       if (supervisor.getNumberOfReachableStates() == 0) {
         result.setSatisfied(false);
         return false;
@@ -788,8 +786,9 @@ public class CompositionalAutomataSynthesizer extends
     final Logger logger = getLogger();
     if (logger.isDebugEnabled() && sup != null) {
       final String msg =
-        "Got " + kind + " supervisor '" + sup.getName() + "' with "
-          + sup.getNumberOfReachableStates() + " states.";
+        "Got " + kind + " supervisor '" + sup.getName() + "' with " +
+        sup.getNumberOfReachableStates() + " states and " +
+        sup.getNumberOfTransitions() + " transitions.";
       logger.debug(msg);
     }
   }

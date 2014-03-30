@@ -1406,6 +1406,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     final ComponentKind kind = aut.getKind();
     final AutomatonProxy newAut = factory.createAutomatonProxy  //Create a new automaton with the new events and transitions
       (name, kind, newEvents, newStates, newTransitions);
+    reportEventRemoval(newAut);
     return newAut;
   }
 
@@ -1980,6 +1981,17 @@ public abstract class AbstractCompositionalModelAnalyzer
       }
     }
     return null;
+  }
+
+  private void reportEventRemoval(final AutomatonProxy aut)
+  {
+    final Logger logger = getLogger();
+    if (logger.isDebugEnabled()) {
+      final String msg =
+        aut.getName() + " reduced to " + aut.getStates().size() +
+        " states and " + aut.getTransitions().size() + " transitions.";
+      logger.debug(msg);
+    }
   }
 
 
