@@ -43,13 +43,18 @@ public abstract class EnumFactory<E>
     return null;
   }
 
+  /**
+   * Prints a list of the possible values of the underlying enumeration
+   * to the given stream so as to provide a listing of possible values
+   * for an error message.
+   */
   public void dumpEnumeration(final PrintStream stream, final int indent)
   {
     CommandLineArgument.doIndent(stream, indent);
     stream.println("Possible values are:");
     int column = 0;
     boolean first = true;
-    for (final E item : getEnumConstants()) {
+    for (final Object item : getEnumConstants()) {
       final String label = item.toString();
       final int len = label.length();
       if (first) {

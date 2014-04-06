@@ -28,6 +28,7 @@ import net.sourceforge.waters.external.valid.ValidUnmarshaller;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.base.DocumentProxy;
@@ -102,7 +103,7 @@ public class CommandLineTool
       List<ParameterBindingProxy> bindings = null;
       String wrapperName = null;
 
-      final String factoryname = args[0];
+      final String factoryName = args[0];
       final List<String> argList = new LinkedList<String>();
       for (int i = 1; i < args.length; i++) {
         final String arg = args[i];
@@ -179,10 +180,12 @@ public class CommandLineTool
       final String checkName = iter.next();
       iter.remove();
 
-      final Class<?> fclazz = loader.loadClass(factoryname);
-      final Method getinst = fclazz.getMethod("getInstance");
+      final ModelAnalyzerFactoryLoader factoryLoader =
+        CommandLineArgumentEnum.parse(ModelAnalyzerFactoryLoader.class,
+                                      "model analyser factory", factoryName);
       final ModelAnalyzerFactory factory =
-        (ModelAnalyzerFactory) getinst.invoke(null);
+        factoryLoader.getModelAnalyzerFactory();
+      final Class<? extends ModelAnalyzerFactory> fclazz = factory.getClass();
       final String createname = "create" + checkName;
       final Method getcheck =
         fclazz.getMethod(createname, ProductDESProxyFactory.class);

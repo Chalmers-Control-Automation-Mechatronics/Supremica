@@ -94,17 +94,23 @@ public abstract class CommandLineArgumentEnum<E extends Enum<E>>
   public void parse(final Iterator<String> iter)
   {
     if (iter.hasNext()) {
-      final String name = iter.next();
-      mValue = mEnumFactory.getEnumValue(name);
-      if (mValue == null) {
-        System.err.println("Bad value for " + getName() + " option!");
-        mEnumFactory.dumpEnumeration(System.err, 0);
-        System.exit(1);
-      }
+      final String arg = iter.next();
+      parse(arg);
       iter.remove();
       setUsed(true);
     } else {
       failMissingValue();
+    }
+  }
+
+  public void parse(final String arg)
+  {
+    mValue = mEnumFactory.getEnumValue(arg);
+    if (mValue == null) {
+      final String msg = getErrorMessage();
+      System.err.println(msg);
+      mEnumFactory.dumpEnumeration(System.err, 0);
+      System.exit(1);
     }
   }
 
@@ -116,6 +122,30 @@ public abstract class CommandLineArgumentEnum<E extends Enum<E>>
   {
     super.dump(stream, analyzer);
     mEnumFactory.dumpEnumeration(stream, INDENT);
+  }
+
+  protected String getErrorMessage()
+  {
+    return "Bad value for " + getName() + " option!";
+  }
+
+
+  //#########################################################################
+  //# Static Enum Parsing
+  public static <E extends Enum<E>> E parse(final Class<E> eclass,
+                                            final String name,
+                                            final String value)
+  {
+    final CommandLineArgumentEnum<E> parser =
+      new CommandLineArgumentEnum<E>(name, name, eclass) {
+      @Override
+      protected String getErrorMessage()
+      {
+        return "Bad value for " + name + "!";
+      }
+    };
+    parser.parse(value);
+    return parser.getValue();
   }
 
 

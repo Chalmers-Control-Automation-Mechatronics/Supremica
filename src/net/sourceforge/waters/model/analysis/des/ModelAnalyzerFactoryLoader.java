@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
-//# PACKAGE: net.sourceforge.waters.model.analysis
-//# CLASS:   ModelVerifierFactoryLoader
+//# PROJECT: Waters Analysis
+//# PACKAGE: net.sourceforge.waters.model.analysis.des
+//# CLASS:   ModelAnalyzerFactoryLoader
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -16,7 +16,8 @@ import java.lang.reflect.Method;
 /**
  * An enumeration of available model verifier factories.
  * This is used in combination with Supremica properties to enable users
- * to choose a model verifier factory through the IDE configuration.
+ * to choose a model verifier factory through the IDE configuration dialog
+ * as well as the command line tool.
  *
  * @author Robi Malik
  */
@@ -24,11 +25,14 @@ import java.lang.reflect.Method;
 public enum ModelAnalyzerFactoryLoader
 {
   BDD("net.sourceforge.waters.analysis.bdd.BDDModelVerifierFactory"),
+  Compositional("net.sourceforge.waters.analysis.compositional.CompositionalModelAnalyzerFactory"),
   EnabledEvents("net.sourceforge.waters.analysis.compositional.EnabledEventsCompositionalModelVerifierFactory"),
-  Compositional("net.sourceforge.waters.analysis.compositional.CompositionalModelVerifierFactory"),
+  GNB("net.sourceforge.waters.analysis.gnonblocking.GNBModelVerifierFactory"),
   Modular("net.sourceforge.waters.analysis.modular.ModularModelVerifierFactory"),
-  Monolithic("net.sourceforge.waters.analysis.monolithic.MonolithicModelVerifierFactory"),
-  Native("net.sourceforge.waters.cpp.analysis.NativeModelVerifierFactory");
+  Monolithic("net.sourceforge.waters.analysis.monolithic.MonolithicModelAnalyzerFactory"),
+  Native("net.sourceforge.waters.cpp.analysis.NativeModelVerifierFactory"),
+  PartialOrder("net.sourceforge.waters.analysis.po.PartialOrderModelVerifierFactory"),
+  Projecting("net.sourceforge.waters.analysis.modular.ProjectingModelVerifierFactory");
 
 
   //#########################################################################
