@@ -363,12 +363,12 @@ public abstract class AbstractCompositionalModelAnalyzer
   }
 
   /**
-   * Sets whether failure events are to be considered in abstraction.
-   * @see #isFailureEventsEnabled()
+   * Sets whether failing events are to be considered in abstraction.
+   * @see #isFailingEventsEnabled()
    */
-  public void setFailureEventsEnabled(final boolean enable)
+  public void setFailingEventsEnabled(final boolean enable)
   {
-    mFailureEventsEnabled = enable;
+    mFailingEventsEnabled = enable;
   }
 
   /**
@@ -376,11 +376,11 @@ public abstract class AbstractCompositionalModelAnalyzer
    * Failure Events are events that always lead to a dump state in some
    * automaton. If enabled, this will redirect failure events in other
    * automata to dump states.
-   * @see #setFailureEventsEnabled(boolean) setFailureEventEnabled()
+   * @see #setFailingEventsEnabled(boolean) setFailingEventsEnabled()
    */
-  public boolean isFailureEventsEnabled()
+  public boolean isFailingEventsEnabled()
   {
-    return mFailureEventsEnabled;
+    return mFailingEventsEnabled;
   }
 
   /**
@@ -891,7 +891,7 @@ public abstract class AbstractCompositionalModelAnalyzer
    * @return <CODE>false</CODE>. Failure events are disabled by default
    *         but can be enabled by subclasses overriding this method.
    */
-  protected boolean isUsingFailureEvents()
+  protected boolean isUsingFailingEvents()
   {
     return false;
   }
@@ -1019,10 +1019,10 @@ public abstract class AbstractCompositionalModelAnalyzer
     final Collection<AutomatonProxy> automata = model.getAutomata();
     final int numAutomata = automata.size();
     final KindTranslator translator = getKindTranslator();
-    mCurrentAutomata = new ArrayList<AutomatonProxy>(numAutomata);
+    mCurrentAutomata = new ArrayList<>(numAutomata);
     final int numEvents = model.getEvents().size();
-    mEventInfoMap = new HashMap<EventProxy,EventInfo>(numEvents);
-    mDirtyAutomata = new LinkedList<AutomatonProxy>();
+    mEventInfoMap = new HashMap<>(numEvents);
+    mDirtyAutomata = new LinkedList<>();
     for (AutomatonProxy aut : automata) {
       switch (translator.getComponentKind(aut)) {
       case SPEC:
@@ -1066,6 +1066,26 @@ public abstract class AbstractCompositionalModelAnalyzer
     }
   }
 
+  /**
+   * Updates events and automata data structure after successful application
+   * of a candidate.
+   * @param candidate  The candidate that has been applied.
+   * @param steps      The abstraction steps used to simplify the candidate.
+   * @param aut        The simplified automaton replacing the automata
+   *                   in the candidate.
+   */
+  protected void recordCandidateApplication(final Candidate candidate,
+                                            final List<AbstractionStep> steps,
+                                            final AutomatonProxy aut)
+    throws AnalysisException
+  {
+    updateEventsToAutomata(aut, candidate.getAutomata());
+    for (final AbstractionStep step : steps) {
+      // Must be done after updateEventsToAutomata() ...
+      recordAbstractionStep(step);
+    }
+  }
+
   protected void updateEventsToAutomata
     (final AutomatonProxy autToAdd,
      final List<AutomatonProxy> autToRemove)
@@ -1099,12 +1119,17 @@ public abstract class AbstractCompositionalModelAnalyzer
     return mEventInfoMap.get(event);
   }
 
+  protected void putEventInfo(final EventProxy event, final EventInfo info)
+  {
+    mEventInfoMap.put(event, info);
+  }
+
   protected void addEventsToAutomata(final AutomatonProxy aut)
     throws OverflowException
   {
     final Collection<EventProxy> events = aut.getEvents();
     Set<StateProxy> nonDumpStates = null;
-    if (isUsingFailureEvents()) {
+    if (isUsingFailingEvents()) {
       final EventProxy omega = getUsedDefaultMarking();
       if (omega != null && events.contains(omega)) {
         //Find the nondump states
@@ -1261,7 +1286,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     final int numRedundant = mRedundantEvents.size();
     final Set<EventProxy> removed = new THashSet<>(numRedundant);
     final Set<EventProxy> failing;
-    if (isUsingFailureEvents()) {
+    if (isUsingFailingEvents()) {
       failing = new THashSet<>(numRedundant);
     } else {
       failing = Collections.emptySet();
@@ -1757,39 +1782,10 @@ public abstract class AbstractCompositionalModelAnalyzer
     } else {
       // Beware of out-of-memory during updateEventsToAutomata() or
       // recordAbstractionStep() --- it is not recoverable ...
-      updateEventsToAutomata(aut, candidate.getAutomata());
-      for (final AbstractionStep step : steps) {
-        // Must be done after updateEventsToAutomata() ...
-        recordAbstractionStep(step);
-      }
+      recordCandidateApplication(candidate, steps, aut);
       return true;
     }
   }
-
-  /*
-  private void attemptMonolithicSynthesis()
-  {
-    try {
-      final String name = "TEST";
-      final Collection<AutomatonProxy> automata = getCurrentAutomata();
-      final ProductDESProxyFactory factory = getFactory();
-      final ProductDESProxy inputDES =
-        AutomatonTools.createProductDESProxy(name, automata, factory);
-      final MonolithicSynthesizer synthesizer =
-        new MonolithicSynthesizer(inputDES, factory);
-      synthesizer.run();
-      final ProductDESProxy outputDES = synthesizer.getComputedProductDES();
-      final Collection<AutomatonProxy> supervisors = outputDES.getAutomata();
-      assert supervisors.size() == 1;
-      final AutomatonProxy supervisor = supervisors.iterator().next();
-      final int states = supervisor.getStates().size();
-      getLogger().debug("Monolithic supervisor has " + states + " states.");
-    } catch (final AnalysisException exception) {
-      throw exception.getRuntimeException();
-    }
-  }
-  */
-
 
   /**
    * Builds the synchronous product for a given candidate.
@@ -2341,6 +2337,17 @@ public abstract class AbstractCompositionalModelAnalyzer
     }
 
     /**
+     * Returns whether this event has been marked as failing.
+     * In a nonblocking check, an event is failing if the model contains
+     * an automaton such that every transition with this event has a
+     * blocking target state.
+     */
+    protected boolean isFailing()
+    {
+      return mFailingStatus == FAILING;
+    }
+
+   /**
      * Returns whether the given automaton uses this event.
      */
     boolean containsAutomaton(final AutomatonProxy aut)
@@ -2361,7 +2368,7 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     //#######################################################################
     //# Simple Access
-    private void addAutomaton(final AutomatonProxy aut, final byte status)
+    void addAutomaton(final AutomatonProxy aut, final byte status)
     {
       final byte present = mAutomataMap.get(aut);
       if (present != status) {
@@ -2398,7 +2405,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       return mSortedAutomataList;
     }
 
-    private boolean isEmpty()
+    boolean isEmpty()
     {
       return mAutomataMap.isEmpty();
     }
@@ -2412,11 +2419,6 @@ public abstract class AbstractCompositionalModelAnalyzer
       } else {
         return false;
       }
-    }
-
-    private boolean isFailing()
-    {
-      return mFailingStatus == FAILING;
     }
 
     private void setReduced()
@@ -2828,7 +2830,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   private SelectionHeuristic<Candidate> mSelectionHeuristic;
   private boolean mSubsumptionEnabled;
   private boolean mUsingSpecialEvents;
-  private boolean mFailureEventsEnabled = false;
+  private boolean mFailingEventsEnabled = false;
   private int mLowerInternalStateLimit;
   private int mUpperInternalStateLimit;
   private int mInternalTransitionLimit;

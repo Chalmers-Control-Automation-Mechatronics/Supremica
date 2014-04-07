@@ -184,7 +184,7 @@ public class CompositionalConflictChecker
           abstractionFactory,
           preselectingMethodFactory);
     setPruningDeadlocks(true);
-    setFailureEventsEnabled(true);
+    setFailingEventsEnabled(true);
     setConfiguredDefaultMarking(marking);
   }
 
@@ -525,9 +525,9 @@ public class CompositionalConflictChecker
    *         generalised nonblocking).
    */
   @Override
-  protected boolean isUsingFailureEvents()
+  protected boolean isUsingFailingEvents()
   {
-    return isFailureEventsEnabled() && getUsedPreconditionMarking() == null;
+    return isFailingEventsEnabled() && getUsedPreconditionMarking() == null;
   }
 
   @Override

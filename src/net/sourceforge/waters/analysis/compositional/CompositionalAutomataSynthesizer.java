@@ -279,25 +279,50 @@ public class CompositionalAutomataSynthesizer extends
     mHalfwaySimplifier = null;
   }
 
+
   //#########################################################################
   //# Hooks
+  @Override
+  protected SynthesisEventInfo createEventInfo(final EventProxy event)
+  {
+    if (isUsingFailingEvents()) {
+      return new RenamedEventInfo(event);
+    } else {
+      return new SynthesisEventInfo(event);
+    }
+  }
+
+  @Override
+  protected void recordCandidateApplication(final Candidate candidate,
+                                            final List<AbstractionStep> steps,
+                                            final AutomatonProxy aut)
+    throws AnalysisException
+  {
+    if (isUsingFailingEvents()) {
+      for (final AbstractionStep step : steps) {
+        createRenamedEventInfo(step);
+      }
+    }
+    super.recordCandidateApplication(candidate, steps, aut);
+  }
+
   @Override
   protected void recordAbstractionStep(final AbstractionStep step)
     throws AnalysisException
   {
-    final CompositionalAutomataSynthesisResult result = getAnalysisResult();
-    final ProductDESProxyFactory factory = getFactory();
     if (step instanceof SynthesisAbstractionStep) {
-      final SynthesisAbstractionStep synStep =
+      final CompositionalAutomataSynthesisResult result = getAnalysisResult();
+      final ProductDESProxyFactory factory = getFactory();
+      final SynthesisAbstractionStep synthStep =
         (SynthesisAbstractionStep) step;
-      mTempEventEncoding = synStep.getEventEncoding();
-      final ListBufferTransitionRelation supervisor = synStep.getSupervisor();
+      mTempEventEncoding = synthStep.getEventEncoding();
+      final ListBufferTransitionRelation supervisor = synthStep.getSupervisor();
       if (supervisor != null) {
         if (supervisor.isEmpty()) {
           result.setSatisfied(false);
           return;
         } else {
-          final EventEncoding enc = synStep.getEventEncoding();
+          final EventEncoding enc = synthStep.getEventEncoding();
           final int defaultMarking = enc.getEventCode(getUsedDefaultMarking());
           result.addUnrenamedSupervisor(supervisor, defaultMarking);
           if (isDetailedOutputEnabled()) {
@@ -308,9 +333,9 @@ public class CompositionalAutomataSynthesizer extends
       }
 
       // Apply inverse renaming to other automata
-      final Map<EventProxy,List<EventProxy>> renaming = synStep.getRenaming();
+      final Map<EventProxy,List<EventProxy>> renaming = synthStep.getRenaming();
       if (renaming != null) {
-        final AutomatonProxy originalAut = synStep.getOriginalAutomaton();
+        final AutomatonProxy originalAut = synthStep.getOriginalAutomaton();
         final Set<AutomatonProxy> affectedAutomata =
           new THashSet<AutomatonProxy>();
         for (final EventProxy event : renaming.keySet()) {
@@ -463,6 +488,28 @@ public class CompositionalAutomataSynthesizer extends
       }
     }
     mDistinguisherInfoList.add(info);
+  }
+
+  private void createRenamedEventInfo(final AbstractionStep step)
+  {
+    if (step instanceof SynthesisAbstractionStep) {
+      final SynthesisAbstractionStep synthStep =
+        (SynthesisAbstractionStep) step;
+      final Map<EventProxy,List<EventProxy>> renaming = synthStep.getRenaming();
+      if (renaming != null) {
+        for (final Map.Entry<EventProxy,List<EventProxy>> entry :
+             renaming.entrySet()) {
+          final EventProxy originalEvent = entry.getKey();
+          final RenamedEventInfo originalInfo =
+            (RenamedEventInfo) getEventInfo(originalEvent);
+          for (final EventProxy replacementEvent : entry.getValue()) {
+            final RenamedEventInfo replacementInfo =
+              new RenamedEventInfo(replacementEvent, originalInfo);
+            putEventInfo(replacementEvent, replacementInfo);
+          }
+        }
+      }
+    }
   }
 
   private EventEncoding createSynthesisEventEncoding(final AutomatonProxy aut)
@@ -988,6 +1035,77 @@ public class CompositionalAutomataSynthesizer extends
 
 
   //#########################################################################
+  //# Inner Class SynthesisEventInfo
+  /**
+   * An event information record for compositional synthesis with renaming.
+   * This is presently only used to implement failing events correctly,
+   * so that an event is only considered failing if all its renamed instances
+   * are failing. The renamed event information records the original event
+   * an event is renamed to, and for the original event, maintains the
+   * number of non-failing events it has been replaced by.
+   */
+  private final class RenamedEventInfo extends SynthesisEventInfo
+  {
+    //#######################################################################
+    //# Constructor
+    private RenamedEventInfo(final EventProxy event)
+    {
+      super(event);
+      mOriginal = this;
+      mNumNonFailingInstances = 1;
+    }
+
+    private RenamedEventInfo(final EventProxy event,
+                             final RenamedEventInfo original)
+    {
+      super(event);
+      mOriginal = original.mOriginal;
+      mOriginal.mNumNonFailingInstances++;
+    }
+
+    //#######################################################################
+    //# Event Status
+    @Override
+    protected boolean isFailing()
+    {
+      return super.isFailing() && mOriginal.mNumNonFailingInstances == 0;
+    }
+
+    @Override
+    void addAutomaton(final AutomatonProxy aut, final byte status)
+    {
+      final boolean wasFailing = super.isFailing();
+      super.addAutomaton(aut, status);
+      if (!wasFailing && isFailing()) {
+        mOriginal.mNumNonFailingInstances--;
+      }
+    }
+
+    @Override
+    void removeAutomata(final Collection<AutomatonProxy> victims)
+    {
+      super.removeAutomata(victims);
+      if (isEmpty() && !isFailing()) {
+        mOriginal.mNumNonFailingInstances--;
+      }
+    }
+
+    //#######################################################################
+    //# Instance Variable
+    /**
+     * The original (un-renamed) event this event maps back to.
+     */
+    private final RenamedEventInfo mOriginal;
+    /**
+     * The number of non-failing events replacing this event.
+     * An event is considered as failing if its status has been set to
+     * failing, and its original has no non-failing instances recorded.
+     */
+    private int mNumNonFailingInstances;
+  }
+
+
+  //#########################################################################
   //# Data Members
   private boolean mSupervisorReductionEnabled = false;
   private final boolean mReduceIncrementally = false;
@@ -1004,4 +1122,5 @@ public class CompositionalAutomataSynthesizer extends
    * A temporary event encoding for supervisor back-renaming.
    */
   private EventEncoding mTempEventEncoding;
+
 }

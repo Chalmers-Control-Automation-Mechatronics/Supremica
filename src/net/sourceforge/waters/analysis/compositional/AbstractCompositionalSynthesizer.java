@@ -83,7 +83,7 @@ public abstract class AbstractCompositionalSynthesizer extends
     super(model, factory, translator, abstractionFactory,
           preselectingMethodFactory);
     setPruningDeadlocks(true);
-    setFailureEventsEnabled(false); // TODO change this to true
+    setFailingEventsEnabled(true);
   }
 
 
@@ -250,9 +250,9 @@ public abstract class AbstractCompositionalSynthesizer extends
    *         configuration (which they are by default).
    */
   @Override
-  protected boolean isUsingFailureEvents()
+  protected boolean isUsingFailingEvents()
   {
-    return isFailureEventsEnabled();
+    return isFailingEventsEnabled();
   }
 
 
@@ -295,9 +295,10 @@ public abstract class AbstractCompositionalSynthesizer extends
   /**
    * An event information record for compositional synthesis. In compositional
    * synthesis, there are no tau events, yet all events are subject to
-   * selfloop removal.
+   * selfloop removal. Also, only uncontrollable events are considered
+   * as failing.
    */
-  private final class SynthesisEventInfo extends EventInfo
+  protected class SynthesisEventInfo extends EventInfo
   {
     //#######################################################################
     //# Constructor
@@ -318,6 +319,18 @@ public abstract class AbstractCompositionalSynthesizer extends
     protected boolean isSubjectToSelfloopRemoval()
     {
       return true;
+    }
+
+    @Override
+    protected boolean isFailing()
+    {
+      if (super.isFailing()) {
+        final KindTranslator translator = getKindTranslator();
+        final EventProxy event = getEvent();
+        return translator.getEventKind(event) == EventKind.UNCONTROLLABLE;
+      } else {
+        return false;
+      }
     }
   }
 
