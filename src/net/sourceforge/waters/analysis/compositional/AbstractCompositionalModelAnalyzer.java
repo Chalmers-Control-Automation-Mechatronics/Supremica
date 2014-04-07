@@ -1882,7 +1882,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       mSynchronousProductBuilder.addMask(hidden, tau);
       expectedNumberOfEvents++;
     }
-    mSynchronousProductBuilder.setConstructsResult(true);
+    mSynchronousProductBuilder.setDetailedOutputEnabled(true);
     mSynchronousProductBuilder.setNodeLimit(mCurrentInternalStateLimit);
     mSynchronousProductBuilder.setTransitionLimit(mInternalTransitionLimit);
     mSynchronousProductBuilder.setStateCallback(null);

@@ -242,7 +242,7 @@ public abstract class AbstractCompositionalModelVerifier
       } else {
         final AbstractionProcedure proc = getAbstractionProcedure();
         proc.resetStatistics();
-        if (mCounterExampleEnabled) {
+        if (isCounterExampleEnabled()) {
           TraceProxy trace = result.getCounterExample();
           trace = expandTrace(trace);
           return setFailedResult(trace);
@@ -316,13 +316,13 @@ public abstract class AbstractCompositionalModelVerifier
   @Override
   public void setCounterExampleEnabled(final boolean enable)
   {
-    mCounterExampleEnabled = enable;
+    setDetailedOutputEnabled(enable);
   }
 
   @Override
   public boolean isCounterExampleEnabled()
   {
-    return mCounterExampleEnabled;
+    return isDetailedOutputEnabled();
   }
 
   @Override
@@ -604,7 +604,6 @@ public abstract class AbstractCompositionalModelVerifier
 
   //#########################################################################
   //# Data Members
-  private boolean mCounterExampleEnabled = true;
   private boolean mTraceCheckingEnabled = false;
 
   private ModelVerifier mMonolithicVerifier;

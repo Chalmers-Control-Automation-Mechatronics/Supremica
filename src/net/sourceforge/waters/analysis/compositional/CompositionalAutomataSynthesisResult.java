@@ -43,7 +43,8 @@ public class CompositionalAutomataSynthesisResult
    */
   public CompositionalAutomataSynthesisResult()
   {
-    mSupervisors = new ArrayList<AutomatonProxy>();
+    mNumberOfSupervisors = 0;
+    mSupervisors = new ArrayList<>();
     mMaxUnrenamedSupervisorStates = -1;
     mMaxUnrenamedSupervisorStates = -1;
     mTotalUnrenamedSupervisorStates = -1;
@@ -101,6 +102,7 @@ public class CompositionalAutomataSynthesisResult
   void addUnrenamedSupervisor(final ListBufferTransitionRelation sup,
                               final int defaultMarking)
   {
+    mNumberOfSupervisors++;
     final int numberOfStates =
       getNumberOfSupervisorStates(sup, defaultMarking);
     mMaxUnrenamedSupervisorStates =
@@ -163,19 +165,19 @@ public class CompositionalAutomataSynthesisResult
     mMaxUnrenamedSupervisorStates = Math.max(mMaxUnrenamedSupervisorStates,
                                              result.mMaxUnrenamedSupervisorStates);
     mTotalUnrenamedSupervisorStates = mergeAdd(mTotalUnrenamedSupervisorStates,
-                                             result.mTotalUnrenamedSupervisorStates);
+                                               result.mTotalUnrenamedSupervisorStates);
     mMaxUnrenamedSupervisorTransitions = Math.max(mMaxUnrenamedSupervisorTransitions,
-                                             result.mMaxUnrenamedSupervisorTransitions);
+                                                  result.mMaxUnrenamedSupervisorTransitions);
     mTotalUnrenamedSupervisorTransitions = mergeAdd(mTotalUnrenamedSupervisorTransitions,
-                                             result.mTotalUnrenamedSupervisorTransitions);
+                                                    result.mTotalUnrenamedSupervisorTransitions);
     mMaxRenamedSupervisorStates = Math.max(mMaxRenamedSupervisorStates,
-                                             result.mMaxRenamedSupervisorStates);
+                                           result.mMaxRenamedSupervisorStates);
     mTotalRenamedSupervisorStates = mergeAdd(mTotalRenamedSupervisorStates,
                                              result.mTotalRenamedSupervisorStates);
     mMaxRenamedSupervisorTransitions = Math.max(mMaxRenamedSupervisorTransitions,
-                                             result.mMaxRenamedSupervisorTransitions);
+                                                result.mMaxRenamedSupervisorTransitions);
     mTotalRenamedSupervisorTransitions = mergeAdd(mTotalRenamedSupervisorTransitions,
-                                             result.mTotalRenamedSupervisorTransitions);
+                                                  result.mTotalRenamedSupervisorTransitions);
   }
 
   @Override
@@ -185,31 +187,35 @@ public class CompositionalAutomataSynthesisResult
     writer.print("Number of renamings: ");
     writer.println(mNumberOfRenamings);
     writer.print("Number of supervisors: ");
-    writer.println(mSupervisors.size());
-    writer.print("Maximum number of unrenamed supervisor states: ");
-    writer.println(mMaxUnrenamedSupervisorStates);
-    writer.print("Total number of unrenamed supervisor states: ");
-    writer.println(mTotalUnrenamedSupervisorStates);
-    writer.print("Maximum number of unrenamed supervisor transitions: ");
-    writer.println(mMaxUnrenamedSupervisorTransitions);
-    writer.print("Total number of unrenamed supervisor transitions: ");
-    writer.println(mTotalUnrenamedSupervisorTransitions);
-    writer.print("Memory estimate for unrenamed supervisor: ");
-    writer.print(getMemoryEstimate(mTotalUnrenamedSupervisorStates,
-                                   mTotalUnrenamedSupervisorTransitions));
-    writer.println(" bytes");
-    writer.print("Maximum number of renamed supervisor states: ");
-    writer.println(mMaxRenamedSupervisorStates);
-    writer.print("Total number of renamed supervisor states: ");
-    writer.println(mTotalRenamedSupervisorStates);
-    writer.print("Maximum number of renamed supervisor transitions: ");
-    writer.println(mMaxRenamedSupervisorTransitions);
-    writer.print("Total number of renamed supervisor transitions: ");
-    writer.println(mTotalRenamedSupervisorTransitions);
-    writer.print("Memory estimate for renamed supervisor: ");
-    writer.print(getMemoryEstimate(mTotalRenamedSupervisorStates,
-                                   mTotalRenamedSupervisorTransitions));
-    writer.println(" bytes");
+    writer.println(mNumberOfSupervisors);
+    if (mMaxUnrenamedSupervisorStates >= 0) {
+      writer.print("Maximum number of unrenamed supervisor states: ");
+      writer.println(mMaxUnrenamedSupervisorStates);
+      writer.print("Total number of unrenamed supervisor states: ");
+      writer.println(mTotalUnrenamedSupervisorStates);
+      writer.print("Maximum number of unrenamed supervisor transitions: ");
+      writer.println(mMaxUnrenamedSupervisorTransitions);
+      writer.print("Total number of unrenamed supervisor transitions: ");
+      writer.println(mTotalUnrenamedSupervisorTransitions);
+      writer.print("Memory estimate for unrenamed supervisor: ");
+      writer.print(getMemoryEstimate(mTotalUnrenamedSupervisorStates,
+                                     mTotalUnrenamedSupervisorTransitions));
+      writer.println(" bytes");
+    }
+    if (mMaxRenamedSupervisorStates >= 0) {
+      writer.print("Maximum number of renamed supervisor states: ");
+      writer.println(mMaxRenamedSupervisorStates);
+      writer.print("Total number of renamed supervisor states: ");
+      writer.println(mTotalRenamedSupervisorStates);
+      writer.print("Maximum number of renamed supervisor transitions: ");
+      writer.println(mMaxRenamedSupervisorTransitions);
+      writer.print("Total number of renamed supervisor transitions: ");
+      writer.println(mTotalRenamedSupervisorTransitions);
+      writer.print("Memory estimate for renamed supervisor: ");
+      writer.print(getMemoryEstimate(mTotalRenamedSupervisorStates,
+                                     mTotalRenamedSupervisorTransitions));
+      writer.println(" bytes");
+    }
   }
 
   @Override
@@ -249,7 +255,7 @@ public class CompositionalAutomataSynthesisResult
     writer.print(",");
     writer.print(getNumberOfRenamings());
     writer.print(",");
-    writer.print(mSupervisors.size());
+    writer.print(mNumberOfSupervisors);
     writer.print(",");
     writer.print(mMaxUnrenamedSupervisorStates);
     writer.print(",");
@@ -342,6 +348,7 @@ public class CompositionalAutomataSynthesisResult
   //#########################################################################
   //# Data Members
   private ProductDESProxy mProductDES;
+  private int mNumberOfSupervisors;
   private final List<AutomatonProxy> mSupervisors;
   private int mNumberOfRenamings;
   private int mMaxUnrenamedSupervisorStates;

@@ -97,6 +97,21 @@ public interface ModelAnalyzer
   //#########################################################################
   //# Parameters
   /**
+   * Sets whether computation of full output is enabled.
+   * If set to <CODE>true</CODE> (the default), the model analyser should
+   * compute detailed results (e.g., counterexamples or supervisors) in
+   * all cases where it is applicable. If disabled, the model analyser only
+   * needs to return a Boolean result, which may enable it to run faster.
+   */
+  public void setDetailedOutputEnabled(boolean enable);
+
+  /**
+   * Returns whether computation of full output is enabled.
+   * @see #setDetailedOutputEnabled(boolean) setDetailedOutputEnabled()
+   */
+  public boolean isDetailedOutputEnabled();
+
+  /**
    * Returns whether or not this model analyser supports nondeterministic
    * automata. Only model analysers that return <CODE>true</CODE> on this
    * call are guaranteed to give correct results when presented an input

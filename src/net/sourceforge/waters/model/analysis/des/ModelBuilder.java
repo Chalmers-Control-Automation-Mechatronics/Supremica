@@ -55,19 +55,6 @@ public interface ModelBuilder<P extends Proxy> extends ModelAnalyzer
    */
   public String getOutputName();
 
-  /**
-   * Sets whether this builder actually constructs a result object.
-   * This option is set to <CODE>true</CODE> by default, but it can turned off
-   * to run an automaton builder that only produces statistics.
-   */
-  public void setConstructsResult(boolean construct);
-
-  /**
-   * Gets whether an result is actually constructed by this builder.
-   * @see #setConstructsResult(boolean) setConstructsResult()
-   */
-  public boolean getConstructsResult();
-
 
   //#########################################################################
   //# More Specific Access to the Results
@@ -81,6 +68,7 @@ public interface ModelBuilder<P extends Proxy> extends ModelAnalyzer
    */
   public P getComputedProxy();
 
+  @Override
   public ProxyResult<P> getAnalysisResult();
 
 }

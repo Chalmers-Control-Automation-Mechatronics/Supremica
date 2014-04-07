@@ -259,7 +259,7 @@ public class MonolithicSynchronousProductBuilder
         final int[] tuple = mUnvisited.remove();
         explore(tuple);
       }
-      if (getConstructsResult()) {
+      if (isDetailedOutputEnabled()) {
         final AutomatonProxy aut = createAutomaton();
         return setAutomatonResult(aut);
       } else {

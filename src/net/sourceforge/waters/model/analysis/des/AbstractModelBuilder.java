@@ -15,9 +15,9 @@ import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.ProxyResult;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.AutomatonProxy;
 
 
 /**
@@ -42,27 +42,27 @@ public abstract class AbstractModelBuilder<P extends Proxy>
   }
 
   public AbstractModelBuilder(final ProductDESProxy model,
-                                  final ProductDESProxyFactory factory)
+                              final ProductDESProxyFactory factory)
   {
     super(model, factory, IdenticalKindTranslator.getInstance());
   }
 
   public AbstractModelBuilder(final ProductDESProxy model,
-                                  final ProductDESProxyFactory factory,
-                                  final KindTranslator translator)
+                              final ProductDESProxyFactory factory,
+                              final KindTranslator translator)
   {
     super(model, factory, translator);
   }
 
   public AbstractModelBuilder(final AutomatonProxy aut,
-                                  final ProductDESProxyFactory factory)
+                              final ProductDESProxyFactory factory)
   {
     super(aut, factory, IdenticalKindTranslator.getInstance());
   }
 
   public AbstractModelBuilder(final AutomatonProxy aut,
-                                  final ProductDESProxyFactory factory,
-                                  final KindTranslator translator)
+                              final ProductDESProxyFactory factory,
+                              final KindTranslator translator)
   {
     super(aut, factory, translator);
   }
@@ -70,26 +70,19 @@ public abstract class AbstractModelBuilder<P extends Proxy>
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelBuilder
+  @Override
   public void setOutputName(final String name)
   {
     mOuptutName = name;
   }
 
+  @Override
   public String getOutputName()
   {
     return mOuptutName;
   }
 
-  public void setConstructsResult(final boolean construct)
-  {
-    mConstructsResult = construct;
-  }
-
-  public boolean getConstructsResult()
-  {
-    return mConstructsResult;
-  }
-
+  @Override
   public P getComputedProxy()
   {
     final ProxyResult<P> result = getAnalysisResult();
@@ -158,7 +151,6 @@ public abstract class AbstractModelBuilder<P extends Proxy>
   //#########################################################################
   //# Data Members
   private String mOuptutName;
-  private boolean mConstructsResult = true;
 
 }
 

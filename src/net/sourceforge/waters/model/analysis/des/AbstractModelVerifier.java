@@ -45,7 +45,6 @@ public abstract class AbstractModelVerifier
                                final KindTranslator translator)
   {
     super(model, factory, translator);
-    mCounterExampleEnabled = true;
   }
 
 
@@ -82,13 +81,13 @@ public abstract class AbstractModelVerifier
   @Override
   public void setCounterExampleEnabled(final boolean enable)
   {
-    mCounterExampleEnabled = enable;
+    setDetailedOutputEnabled(enable);
   }
 
   @Override
   public boolean isCounterExampleEnabled()
   {
-    return mCounterExampleEnabled;
+    return isDetailedOutputEnabled();
   }
 
 
@@ -125,10 +124,5 @@ public abstract class AbstractModelVerifier
     result.setCounterExample(counterexample);
     return setBooleanResult(false);
   }
-
-
-  //#########################################################################
-  //# Data Members
-  private boolean mCounterExampleEnabled;
 
 }

@@ -54,6 +54,7 @@ public abstract class AbstractModelAnalyzer implements ModelAnalyzer
   {
     mFactory = factory;
     mKindTranslator = translator;
+    mDetailedOutputEnabled = true;
     mModel = model;
     mNodeLimit = Integer.MAX_VALUE;
     mTransitionLimit = Integer.MAX_VALUE;
@@ -111,6 +112,18 @@ public abstract class AbstractModelAnalyzer implements ModelAnalyzer
   public KindTranslator getKindTranslator()
   {
     return mKindTranslator;
+  }
+
+  @Override
+  public void setDetailedOutputEnabled(final boolean enable)
+  {
+    mDetailedOutputEnabled = enable;
+  }
+
+  @Override
+  public boolean isDetailedOutputEnabled()
+  {
+    return mDetailedOutputEnabled;
   }
 
   @Override
@@ -334,6 +347,7 @@ public abstract class AbstractModelAnalyzer implements ModelAnalyzer
   private AnalysisResult mAnalysisResult;
   private KindTranslator mKindTranslator;
 
+  private boolean mDetailedOutputEnabled;
   private int mNodeLimit;
   private int mTransitionLimit;
   private long mStartTime;

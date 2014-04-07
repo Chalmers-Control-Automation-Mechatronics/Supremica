@@ -350,7 +350,7 @@ public class BDDConflictChecker
                                                    final ConflictKind kind)
     throws AnalysisAbortException, OverflowException
   {
-    if (isCounterExampleEnabled()) {
+    if (isDetailedOutputEnabled()) {
       final List<TraceStepProxy> trace = computeTrace(bad, index);
       return createCounterExample(trace, kind);
     } else {
@@ -362,7 +362,7 @@ public class BDDConflictChecker
                                                    final ConflictKind kind)
     throws AnalysisAbortException, OverflowException
   {
-    if (isCounterExampleEnabled()) {
+    if (isDetailedOutputEnabled()) {
       final List<TraceStepProxy> trace = computeTrace(bad);
       return createCounterExample(trace, kind);
     } else {

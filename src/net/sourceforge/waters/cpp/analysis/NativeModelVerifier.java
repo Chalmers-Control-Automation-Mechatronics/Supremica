@@ -43,7 +43,6 @@ public abstract class NativeModelVerifier
   {
     super(model, factory, translator);
     mExplorerMode = ExplorerMode.BEST_GUESS;
-    mCounterExampleEnabled = true;
   }
 
 
@@ -58,13 +57,13 @@ public abstract class NativeModelVerifier
   @Override
   public void setCounterExampleEnabled(final boolean enable)
   {
-    mCounterExampleEnabled = enable;
+    setDetailedOutputEnabled(enable);
   }
 
   @Override
   public boolean isCounterExampleEnabled()
   {
-    return mCounterExampleEnabled;
+    return isDetailedOutputEnabled();
   }
 
 
@@ -150,6 +149,5 @@ public abstract class NativeModelVerifier
   //#########################################################################
   //# Data Members
   private ExplorerMode mExplorerMode;
-  private boolean mCounterExampleEnabled;
 
 }

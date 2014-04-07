@@ -71,8 +71,8 @@ public abstract class AbstractModelAnalyzerFactory
     addArgument(new HISCArgument());
     addArgument(new LimitArgument());
     addArgument(new MarkingArgument());
-    addArgument(new NoCounterExampleArgument());
     addArgument(new NoOptimisationArgument());
+    addArgument(new NoOutputArgument());
     addArgument(new PreMarkingArgument());
     addArgument(new PropertyArgument());
     addArgument(new TransitionLimitArgument());
@@ -392,36 +392,6 @@ public abstract class AbstractModelAnalyzerFactory
 
 
   //#########################################################################
-  //# Inner Class NoCounterExampleArgument
-  private static class NoCounterExampleArgument
-    extends CommandLineArgumentFlag
-  {
-    //#######################################################################
-    //# Constructors
-    private NoCounterExampleArgument()
-    {
-      super("-nc", "Disable counter example computation");
-    }
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    @Override
-    public void configure(final ModelAnalyzer analyzer)
-    {
-      if (analyzer instanceof ModelVerifier) {
-        final ModelVerifier verifier = (ModelVerifier) analyzer;
-        final boolean enable = !getValue();
-        verifier.setCounterExampleEnabled(enable);
-      } else {
-        fail("Command line option " + getName() +
-             " is only supported for verification!");
-      }
-    }
-  }
-
-
-  //#########################################################################
   //# Inner Class NoOptimisationArgument
   private static class NoOptimisationArgument
     extends CommandLineArgumentFlag
@@ -441,6 +411,30 @@ public abstract class AbstractModelAnalyzerFactory
     {
       final boolean opt = !getValue();
       compiler.setOptimizationEnabled(opt);
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class NoOutputArgument
+  private static class NoOutputArgument
+    extends CommandLineArgumentFlag
+  {
+    //#######################################################################
+    //# Constructors
+    private NoOutputArgument()
+    {
+      super("-noout", "Disable counter example/supervisor computation");
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    @Override
+    public void configure(final ModelAnalyzer analyzer)
+    {
+      final boolean enable = !getValue();
+      analyzer.setDetailedOutputEnabled(enable);
     }
   }
 

@@ -223,7 +223,7 @@ public class CompositionalAutomataSynthesizer extends
       }
       if (!result.isFinished()) {
         result.setSatisfied(true);
-        if (getConstructsResult()) {
+        if (isDetailedOutputEnabled()) {
           final ProductDESProxyFactory factory = getFactory();
           result.close(factory, getOutputName());
         }
@@ -300,8 +300,10 @@ public class CompositionalAutomataSynthesizer extends
           final EventEncoding enc = synStep.getEventEncoding();
           final int defaultMarking = enc.getEventCode(getUsedDefaultMarking());
           result.addUnrenamedSupervisor(supervisor, defaultMarking);
-          final AutomatonProxy newSupervisor = createSupervisor(supervisor);
-          result.addBackRenamedSupervisor(newSupervisor);
+          if (isDetailedOutputEnabled()) {
+            final AutomatonProxy newSupervisor = createSupervisor(supervisor);
+            result.addBackRenamedSupervisor(newSupervisor);
+          }
         }
       }
 
@@ -396,7 +398,7 @@ public class CompositionalAutomataSynthesizer extends
       syncBuilder.setNodeLimit(slimit);
       final int tlimit = getMonolithicTransitionLimit();
       syncBuilder.setTransitionLimit(tlimit);
-      syncBuilder.setConstructsResult(true);
+      syncBuilder.setDetailedOutputEnabled(true);
       syncBuilder.setPropositions(getPropositions());
       syncBuilder.run();
       automaton = syncBuilder.getComputedAutomaton();
@@ -416,8 +418,10 @@ public class CompositionalAutomataSynthesizer extends
         final int defaultMarking =
           mTempEventEncoding.getEventCode(getUsedDefaultMarking());
         result.addUnrenamedSupervisor(supervisor, defaultMarking);
-        final AutomatonProxy renamedSup = createSupervisor(supervisor);
-        result.addBackRenamedSupervisor(renamedSup);
+        if (isDetailedOutputEnabled()) {
+          final AutomatonProxy renamedSup = createSupervisor(supervisor);
+          result.addBackRenamedSupervisor(renamedSup);
+        }
         return true;
       }
     } else {
@@ -710,7 +714,7 @@ public class CompositionalAutomataSynthesizer extends
       getSynchronousProductBuilder();
     builder.setNodeLimit(getMonolithicStateLimit());
     builder.setTransitionLimit(getMonolithicTransitionLimit());
-    builder.setConstructsResult(true);
+    builder.setDetailedOutputEnabled(true);
     builder.setPropositions(getPropositions());
     builder.setModel(model);
     for (final DistinguisherReplacement pair : info.getReplacements()) {

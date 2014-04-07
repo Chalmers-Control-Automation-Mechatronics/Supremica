@@ -187,7 +187,7 @@ public class ConflictSelectionHeuristicFactory
         mChecker.getSynchronousProductBuilder();
       final int limit = mChecker.getCurrentInternalStateLimit();
       syncBuilder.setNodeLimit(limit);
-      syncBuilder.setConstructsResult(false);
+      syncBuilder.setDetailedOutputEnabled(false);
       syncBuilder.setStateCallback(this);
       final List<AutomatonProxy> automata = candidate.getAutomata();
       final ProductDESProxy des = mChecker.createProductDESProxy(automata);

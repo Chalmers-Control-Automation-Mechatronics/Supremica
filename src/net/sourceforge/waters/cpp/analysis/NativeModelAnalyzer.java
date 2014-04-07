@@ -48,11 +48,24 @@ public abstract class NativeModelAnalyzer
   {
     super(model, factory, translator);
     mNativeModelAnalyzer = null;
+    mDetailedOutputEnabled = true;
   }
 
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @Override
+  public void setDetailedOutputEnabled(final boolean enable)
+  {
+    mDetailedOutputEnabled = enable;
+  }
+
+  @Override
+  public boolean isDetailedOutputEnabled()
+  {
+    return mDetailedOutputEnabled;
+  }
+
   @Override
   public boolean supportsNondeterminism()
   {
@@ -87,5 +100,6 @@ public abstract class NativeModelAnalyzer
   //#########################################################################
   //# Data Members
   private ByteBuffer mNativeModelAnalyzer;
+  private boolean mDetailedOutputEnabled;
 
 }

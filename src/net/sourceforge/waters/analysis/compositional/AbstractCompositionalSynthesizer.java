@@ -102,18 +102,6 @@ public abstract class AbstractCompositionalSynthesizer extends
   }
 
   @Override
-  public void setConstructsResult(final boolean construct)
-  {
-    mConstructsResult = construct;
-  }
-
-  @Override
-  public boolean getConstructsResult()
-  {
-    return mConstructsResult;
-  }
-
-  @Override
   public ProductDESProxy getComputedProxy()
   {
     final ProductDESResult result = getAnalysisResult();
@@ -295,24 +283,10 @@ public abstract class AbstractCompositionalSynthesizer extends
     final Logger logger = getLogger();
     if (logger.isDebugEnabled() && sup != null) {
       final String msg =
-        "Got " + kind + " supervisor '" + sup.getName() + "' with "
-          + sup.getNumberOfReachableStates() + " states.";
+        "Got " + kind + " supervisor '" + sup.getName() + "' with " +
+        sup.getNumberOfReachableStates() + " states.";
       logger.debug(msg);
     }
-  }
-
-  @SuppressWarnings("unused")
-  private int getNumberOfDumpStates(final ListBufferTransitionRelation rel)
-  {
-    int numBadState = 0;
-    for (int s = 0; s < rel.getNumberOfStates(); s++) {
-      final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
-      iter.resetState(s);
-      if (!iter.advance() & rel.isReachable(s) & rel.getAllMarkings(s) == 0) {
-        numBadState++;
-      }
-    }
-    return numBadState;
   }
 
 
@@ -347,8 +321,9 @@ public abstract class AbstractCompositionalSynthesizer extends
     }
   }
 
+
   //#########################################################################
   //# Data Members
   private String mOutputName;
-  private boolean mConstructsResult = true;
+
 }

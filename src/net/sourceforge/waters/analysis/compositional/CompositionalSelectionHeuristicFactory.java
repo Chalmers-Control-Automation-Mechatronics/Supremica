@@ -395,7 +395,7 @@ public class CompositionalSelectionHeuristicFactory
       final MonolithicSynchronousProductBuilder syncBuilder =
         mAnalyzer.getSynchronousProductBuilder();
       syncBuilder.setNodeLimit(mStateLimit);
-      syncBuilder.setConstructsResult(false);
+      syncBuilder.setDetailedOutputEnabled(false);
       syncBuilder.setStateCallback(null);
       final List<EventProxy> empty = Collections.emptyList();
       syncBuilder.setPropositions(empty);

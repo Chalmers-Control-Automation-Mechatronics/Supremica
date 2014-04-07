@@ -608,7 +608,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       mSafeStates = null;
       mReachableStates = null;
 
-      if (getConstructsResult()) {
+      if (isDetailedOutputEnabled()) {
         final int marking = getUsedDefaultMarkingID();
         ProductDESProxy des = null;
         if (mSupervisorReductionEnabled) {

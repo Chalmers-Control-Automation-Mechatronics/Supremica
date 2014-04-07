@@ -524,7 +524,7 @@ public class EFSMConflictCheckerExperiments
       mConflictChecker.setInternalStateLimit(100000);
       mConflictChecker.setMonolithicStateLimit(50000000);
       mConflictChecker.setMonolithicTransitionLimit(0);
-      mConflictChecker.setCounterExampleEnabled(false);
+      mConflictChecker.setDetailedOutputEnabled(false);
       // Configuration end
     }
 
@@ -574,7 +574,7 @@ public class EFSMConflictCheckerExperiments
         (TransitionPartitioningStrategy.AUTOMATA);
       mConflictChecker.setPartitioningSizeLimit(5000);
       mConflictChecker.setNodeLimit(25000000);
-      mConflictChecker.setCounterExampleEnabled(false);
+      mConflictChecker.setDetailedOutputEnabled(false);
       // Configuration end
     }
 

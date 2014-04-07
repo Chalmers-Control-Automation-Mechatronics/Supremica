@@ -200,7 +200,7 @@ public class CompositionalStateRepresentationSynthesizer extends
       if (!result.isFinished()) {
         result.setSatisfied(true);
       }
-      if (result.isSatisfied() && getConstructsResult()) {
+      if (result.isSatisfied() && isDetailedOutputEnabled()) {
         result.addSynthesisStateSpace(mSynthesisStateSpace);
         final ProductDESProxyFactory factory = getFactory();
         final Collection<EventProxy> events = getModel().getEvents();
@@ -421,7 +421,7 @@ public class CompositionalStateRepresentationSynthesizer extends
       syncBuilder.setNodeLimit(slimit);
       final int tlimit = getMonolithicTransitionLimit();
       syncBuilder.setTransitionLimit(tlimit);
-      syncBuilder.setConstructsResult(true);
+      syncBuilder.setDetailedOutputEnabled(true);
       syncBuilder.setPropositions(getPropositions());
       syncBuilder.run();
       automaton = syncBuilder.getComputedAutomaton();
