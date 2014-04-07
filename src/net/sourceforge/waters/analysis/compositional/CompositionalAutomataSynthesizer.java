@@ -297,7 +297,9 @@ public class CompositionalAutomataSynthesizer extends
           result.setSatisfied(false);
           return;
         } else {
-          result.addUnrenamedSupervisor(supervisor);
+          final EventEncoding enc = synStep.getEventEncoding();
+          final int defaultMarking = enc.getEventCode(getUsedDefaultMarking());
+          result.addUnrenamedSupervisor(supervisor, defaultMarking);
           final AutomatonProxy newSupervisor = createSupervisor(supervisor);
           result.addBackRenamedSupervisor(newSupervisor);
         }
@@ -411,7 +413,9 @@ public class CompositionalAutomataSynthesizer extends
         result.setSatisfied(false);
         return false;
       } else {
-        result.addUnrenamedSupervisor(supervisor);
+        final int defaultMarking =
+          mTempEventEncoding.getEventCode(getUsedDefaultMarking());
+        result.addUnrenamedSupervisor(supervisor, defaultMarking);
         final AutomatonProxy renamedSup = createSupervisor(supervisor);
         result.addBackRenamedSupervisor(renamedSup);
         return true;

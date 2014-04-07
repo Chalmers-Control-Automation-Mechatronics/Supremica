@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -97,14 +98,17 @@ public class CompositionalAutomataSynthesisResult
   /**
    * Adds the given automaton to the list of synthesised supervisors.
    */
-  void addUnrenamedSupervisor(final ListBufferTransitionRelation sup)
+  void addUnrenamedSupervisor(final ListBufferTransitionRelation sup,
+                              final int defaultMarking)
   {
-    final int numberOfStates = sup.getNumberOfReachableStates();
+    final int numberOfStates =
+      getNumberOfSupervisorStates(sup, defaultMarking);
     mMaxUnrenamedSupervisorStates =
       Math.max(mMaxUnrenamedSupervisorStates, numberOfStates);
     mTotalUnrenamedSupervisorStates =
       mergeAdd(mTotalUnrenamedSupervisorStates, numberOfStates);
-    final int numberOfTrans = sup.getNumberOfTransitions();
+    final int numberOfTrans =
+      getNumberOfSupervisorTransitions(sup, defaultMarking);
     mMaxUnrenamedSupervisorTransitions =
       Math.max(mMaxUnrenamedSupervisorTransitions, numberOfTrans);
     mTotalUnrenamedSupervisorTransitions =
@@ -295,7 +299,41 @@ public class CompositionalAutomataSynthesisResult
 
   //#########################################################################
   //# Auxiliary Methods
-  private int getMemoryEstimate(final int states, final int transitions)
+  private static int getNumberOfSupervisorStates
+    (final ListBufferTransitionRelation sup, final int defaultMarking)
+  {
+    if (defaultMarking < 0 || !sup.isUsedProposition(defaultMarking)) {
+      return sup.getNumberOfReachableStates();
+    } else {
+      int numStates = 0;
+      for (int s = 0; s < sup.getNumberOfStates(); s++) {
+        if (sup.isReachable(s) && !sup.isDeadlockState(s, defaultMarking)) {
+          numStates++;
+        }
+      }
+      return numStates;
+    }
+  }
+
+  private static int getNumberOfSupervisorTransitions
+    (final ListBufferTransitionRelation sup, final int defaultMarking)
+  {
+    if (defaultMarking < 0 || !sup.isUsedProposition(defaultMarking)) {
+      return sup.getNumberOfTransitions();
+    } else {
+      int numTrans = 0;
+      final TransitionIterator iter = sup.createAllTransitionsReadOnlyIterator();
+      while (iter.advance()) {
+        final int t = iter.getCurrentTargetState();
+        if (!sup.isDeadlockState(t, defaultMarking)) {
+          numTrans++;
+        }
+      }
+      return numTrans;
+    }
+  }
+
+  private static int getMemoryEstimate(final int states, final int transitions)
   {
     return 4*states + 8*transitions;
   }
