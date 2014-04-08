@@ -81,14 +81,14 @@ public class CompositionalConflictChecker
    * Creates a new conflict checker without a model or marking proposition.
    * @param factory
    *          Factory used for trace construction.
-   * @param abstractionFactory
+   * @param abstractionCreator
    *          Factory to define the abstraction sequence to be used.
    */
   public CompositionalConflictChecker
     (final ProductDESProxyFactory factory,
-     final ConflictAbstractionProcedureFactory abstractionFactory)
+     final AbstractionProcedureCreator abstractionCreator)
   {
-    this(null, null, factory, abstractionFactory);
+    this(null, null, factory, abstractionCreator);
   }
 
   /**
@@ -139,19 +139,19 @@ public class CompositionalConflictChecker
    *          propositions must contain this event (exactly the same object).
    * @param factory
    *          Factory used for trace construction.
-   * @param abstractionFactory
+   * @param abstractionCreator
    *          Factory to define the abstraction sequence to be used.
    */
   public CompositionalConflictChecker
     (final ProductDESProxy model,
      final EventProxy marking,
      final ProductDESProxyFactory factory,
-     final ConflictAbstractionProcedureFactory abstractionFactory)
+     final AbstractionProcedureCreator abstractionCreator)
   {
     this(model,
          marking,
          factory,
-         abstractionFactory,
+         abstractionCreator,
          new PreselectingMethodFactory());
   }
 
@@ -168,20 +168,20 @@ public class CompositionalConflictChecker
    *          propositions must contain this event (exactly the same object).
    * @param factory
    *          Factory used for trace construction.
-   * @param abstractionFactory
+   * @param abstractionCreator
    *          Factory to define the abstraction sequence to be used.
    */
   public CompositionalConflictChecker
     (final ProductDESProxy model,
      final EventProxy marking,
      final ProductDESProxyFactory factory,
-     final ConflictAbstractionProcedureFactory abstractionFactory,
+     final AbstractionProcedureCreator abstractionCreator,
      final AbstractCompositionalModelAnalyzer.PreselectingMethodFactory preselectingMethodFactory)
   {
     super(model,
           factory,
           ConflictKindTranslator.getInstance(),
-          abstractionFactory,
+          abstractionCreator,
           preselectingMethodFactory);
     setPruningDeadlocks(true);
     setFailingEventsEnabled(true);
@@ -224,6 +224,12 @@ public class CompositionalConflictChecker
         safetyVerifier.setPreselectingMethod(safetyMethod);
       }
     }
+  }
+
+  @Override
+  public ConflictAbstractionProcedureFactory getAbstractionProcedureFactory()
+  {
+    return ConflictAbstractionProcedureFactory.getInstance();
   }
 
   @Override
@@ -336,12 +342,12 @@ public class CompositionalConflictChecker
   //#########################################################################
   //# Specific Access
   @Override
-  protected void setupMonolithicVerifier()
+  protected void setupMonolithicAnalyzer()
     throws EventNotFoundException
   {
-    if (getCurrentMonolithicVerifier() == null) {
+    if (getCurrentMonolithicAnalyzer() == null) {
       final ConflictChecker configured =
-        (ConflictChecker) getMonolithicVerifier();
+        (ConflictChecker) getMonolithicAnalyzer();
       final ConflictChecker current;
       if (configured == null) {
         final ProductDESProxyFactory factory = getFactory();
@@ -357,8 +363,8 @@ public class CompositionalConflictChecker
       current.setConfiguredDefaultMarking(defaultMarking);
       final EventProxy preconditionMarking = getUsedPreconditionMarking();
       current.setConfiguredPreconditionMarking(preconditionMarking);
-      setCurrentMonolithicVerifier(current);
-      super.setupMonolithicVerifier();
+      setCurrentMonolithicAnalyzer(current);
+      super.setupMonolithicAnalyzer();
     }
   }
 
@@ -456,8 +462,8 @@ public class CompositionalConflictChecker
     throws AnalysisException
   {
     final EventProxy defaultMarking = createDefaultMarking();
-    final AbstractionProcedureFactory abstraction =
-      getAbstractionProcedureFactory();
+    final AbstractionProcedureCreator abstraction =
+      getAbstractionProcedureCreator();
     final EventProxy preconditionMarking;
     if (abstraction.expectsAllMarkings()) {
       preconditionMarking = createPreconditionMarking();

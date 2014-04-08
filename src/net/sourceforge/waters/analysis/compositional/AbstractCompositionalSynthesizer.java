@@ -77,7 +77,7 @@ public abstract class AbstractCompositionalSynthesizer extends
     (final ProductDESProxy model,
      final ProductDESProxyFactory factory,
      final KindTranslator translator,
-     final AbstractionProcedureFactory abstractionFactory,
+     final AbstractionProcedureCreator abstractionFactory,
      final PreselectingMethodFactory preselectingMethodFactory)
   {
     super(model, factory, translator, abstractionFactory,

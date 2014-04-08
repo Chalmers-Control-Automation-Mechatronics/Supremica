@@ -10,22 +10,54 @@
 package net.sourceforge.waters.analysis.compositional;
 
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
+import net.sourceforge.waters.model.analysis.ListedEnumFactory;
 
 
 /**
  * A collection of abstraction methods to be used for compositional
  * nonblocking verification. The members of this enumeration are passed to the
  * {@link CompositionalConflictChecker} using its
- * {@link AbstractCompositionalModelAnalyzer#setAbstractionProcedureFactory(AbstractionProcedureFactory)
+ * {@link AbstractCompositionalModelAnalyzer#setAbstractionProcedureCreator(AbstractionProcedureCreator)
  * setAbstractionProcedureFactory()} method.
  *
  * @see AbstractionProcedure
  * @author Robi Malik
  */
 
-public enum ConflictAbstractionProcedureFactory
-  implements AbstractionProcedureFactory
+public class ConflictAbstractionProcedureFactory
+  extends ListedEnumFactory<AbstractionProcedureCreator>
 {
+
+  //#########################################################################
+  //# Singleton Pattern
+  public static ConflictAbstractionProcedureFactory getInstance()
+  {
+    return SingletonHolder.INSTANCE;
+  }
+
+  private static class SingletonHolder
+  {
+    private static ConflictAbstractionProcedureFactory INSTANCE =
+      new ConflictAbstractionProcedureFactory();
+  }
+
+
+  //#########################################################################
+  //# Constructors
+  protected ConflictAbstractionProcedureFactory()
+  {
+    register(CC);
+    register(EENB);
+    register(GNB);
+    register(NB);
+    register(NBA);
+    register(NBC);
+    register(OEQ);
+    register(OP);
+    register(OPVERIFIER);
+    register(WOEQ);
+  }
+
 
   //#########################################################################
   //# Enumeration
@@ -39,7 +71,9 @@ public enum ConflictAbstractionProcedureFactory
    * Verification in Supervisory Control. SIAM Journal of Control and
    * Optimization, 48(3), 1914-1938, 2009.</P>
    */
-  CC {
+  public static final AbstractionProcedureCreator CC =
+    new AbstractionProcedureCreator("CC")
+  {
     @Override
     public AbstractionProcedure createAbstractionProcedure
       (final AbstractCompositionalModelAnalyzer analyzer)
@@ -49,14 +83,17 @@ public enum ConflictAbstractionProcedureFactory
           (analyzer, ObservationEquivalenceTRSimplifier.Equivalence.
            OBSERVATION_EQUIVALENCE, false, true);
     }
-  },
+  };
+
   /**
    * <P>Minimisation considers events that are known to be always-enabled or
    * only-selfloop outside of the automaton being simplified. This is the
    * same abstraction sequence as {@link #NB}, with special events enabled
    * and additional steps in the chain to measure performance.</P>
    */
-  EENB {
+  public static final AbstractionProcedureCreator EENB =
+    new AbstractionProcedureCreator("EENB")
+  {
     @Override
     public AbstractionProcedure createAbstractionProcedure
       (final AbstractCompositionalModelAnalyzer analyzer)
@@ -66,7 +103,8 @@ public enum ConflictAbstractionProcedureFactory
           (analyzer, ObservationEquivalenceTRSimplifier.Equivalence.
            WEAK_OBSERVATION_EQUIVALENCE, true, false, true);
     }
-  },
+  };
+
   /**
    * <P>Minimisation is performed according to a sequence of abstraction
    * rules for generalised nonblocking proposed, but using weak observation
@@ -76,7 +114,9 @@ public enum ConflictAbstractionProcedureFactory
    * Conference on Control and Automation, ICCA'09, 448-453, Christchurch,
    * New Zealand, 2009.</P>
    */
-  GNB {
+  public static final AbstractionProcedureCreator GNB =
+    new AbstractionProcedureCreator("GNB")
+  {
     @Override
     public AbstractionProcedure createAbstractionProcedure
       (final AbstractCompositionalModelAnalyzer analyzer)
@@ -92,7 +132,8 @@ public enum ConflictAbstractionProcedureFactory
     {
       return true;
     }
-  },
+  };
+
   /**
    * <P>Minimisation is performed according to a sequence of abstraction rules
    * for standard nonblocking, but using weak observation
@@ -101,7 +142,9 @@ public enum ConflictAbstractionProcedureFactory
    * Verification in Supervisory Control. SIAM Journal of Control and
    * Optimization, 48(3), 1914-1938, 2009.</P>
    */
-  NB {
+  public static final AbstractionProcedureCreator NB =
+    new AbstractionProcedureCreator("NB")
+  {
     @Override
     public AbstractionProcedure createAbstractionProcedure
       (final AbstractCompositionalModelAnalyzer analyzer)
@@ -111,7 +154,8 @@ public enum ConflictAbstractionProcedureFactory
           (analyzer, ObservationEquivalenceTRSimplifier.Equivalence.
            WEAK_OBSERVATION_EQUIVALENCE, true, false);
     }
-  },
+  };
+
   /**
    * <P>Minimisation is performed according to a sequence of abstraction rules
    * for standard nonblocking, but using weak observation equivalence instead
@@ -121,7 +165,9 @@ public enum ConflictAbstractionProcedureFactory
    * Verification in Supervisory Control. SIAM Journal of Control and
    * Optimization, 48(3), 1914-1938, 2009.</P>
    */
-  NBA {
+  public static final AbstractionProcedureCreator NBA =
+    new AbstractionProcedureCreator("NBA")
+  {
     @Override
     public AbstractionProcedure createAbstractionProcedure
       (final AbstractCompositionalModelAnalyzer analyzer)
@@ -131,7 +177,8 @@ public enum ConflictAbstractionProcedureFactory
           (analyzer, ObservationEquivalenceTRSimplifier.Equivalence.
            WEAK_OBSERVATION_EQUIVALENCE);
     }
-  },
+  };
+
   /**
    * <P>Minimisation is performed according to a sequence of abstraction rules
    * for standard nonblocking, but using weak observation
@@ -142,7 +189,9 @@ public enum ConflictAbstractionProcedureFactory
    * Verification in Supervisory Control. SIAM Journal of Control and
    * Optimization, 48(3), 1914-1938, 2009.</P>
    */
-  NBC {
+  public static final AbstractionProcedureCreator NBC =
+    new AbstractionProcedureCreator("NBC")
+  {
     @Override
     public AbstractionProcedure createAbstractionProcedure
       (final AbstractCompositionalModelAnalyzer analyzer)
@@ -152,11 +201,14 @@ public enum ConflictAbstractionProcedureFactory
           (analyzer, ObservationEquivalenceTRSimplifier.Equivalence.
            WEAK_OBSERVATION_EQUIVALENCE, true, true);
     }
-  },
+  };
+
   /**
    * Automata are minimised according to <I>observation equivalence</I>.
    */
-  OEQ {
+  public static final AbstractionProcedureCreator OEQ =
+    new AbstractionProcedureCreator("OEQ")
+  {
     @Override
     public AbstractionProcedure createAbstractionProcedure
       (final AbstractCompositionalModelAnalyzer analyzer)
@@ -166,14 +218,17 @@ public enum ConflictAbstractionProcedureFactory
           (analyzer, ObservationEquivalenceTRSimplifier.Equivalence.
            OBSERVATION_EQUIVALENCE);
     }
-  },
+  };
+
   /**
    * Automata are minimised using <I>observer projection</I>.
    * The present implementation determines a coarsest causal reporter
    * map satisfying the observer property. Nondeterminism in the projected
    * automata is not resolved, nondeterministic abstractions are used instead.
    */
-  OP {
+  public static final AbstractionProcedureCreator OP =
+    new AbstractionProcedureCreator("OP")
+  {
     @Override
     public AbstractionProcedure createAbstractionProcedure
       (final AbstractCompositionalModelAnalyzer analyzer)
@@ -181,13 +236,16 @@ public enum ConflictAbstractionProcedureFactory
       return ObserverProjectionAbstractionProcedure.
         createObserverProjectionProcedure(analyzer);
     }
-  },
+  };
+
   /**
    * <P>An experimental abstraction procedure that works like weak
    * observation equivalence, but in addition runs the OP-verifier
    * algorithm on each automaton to gather performance statistics.</P>
    */
-  OPVERIFIER {
+  public static final AbstractionProcedureCreator OPVERIFIER =
+    new AbstractionProcedureCreator("OPVERIFIER")
+  {
     @Override
     public AbstractionProcedure createAbstractionProcedure
       (final AbstractCompositionalModelAnalyzer analyzer)
@@ -196,7 +254,8 @@ public enum ConflictAbstractionProcedureFactory
         (analyzer, ObservationEquivalenceTRSimplifier.Equivalence.
          WEAK_OBSERVATION_EQUIVALENCE);
     }
-  },
+  };
+
   /**
    * <P>Automata are minimised according to <I>weak observation
    * equivalence</I>. Initial states and markings are not saturated, silent
@@ -208,7 +267,9 @@ public enum ConflictAbstractionProcedureFactory
    * abstractions based on weak observation equivalence. Automatica,
    * <STRONG>46</STRONG>(6), 968-978, 2010.</P>
    */
-  WOEQ {
+  public static final AbstractionProcedureCreator WOEQ =
+    new AbstractionProcedureCreator("WOEQ")
+  {
     @Override
     public AbstractionProcedure createAbstractionProcedure
       (final AbstractCompositionalModelAnalyzer analyzer)
@@ -219,21 +280,5 @@ public enum ConflictAbstractionProcedureFactory
            WEAK_OBSERVATION_EQUIVALENCE);
     }
   };
-
-
-  //#########################################################################
-  //# Interface
-  //# net.sourceforge.waters.analysis.compositional.AbstractionProcedureFactory
-  @Override
-  public boolean supportsNondeterminism()
-  {
-    return true;
-  }
-
-  @Override
-  public boolean expectsAllMarkings()
-  {
-    return false;
-  }
 
 }

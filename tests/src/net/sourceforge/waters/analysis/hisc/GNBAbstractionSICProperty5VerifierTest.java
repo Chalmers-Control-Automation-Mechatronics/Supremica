@@ -14,7 +14,6 @@ import junit.framework.TestSuite;
 
 import net.sourceforge.waters.analysis.compositional.CompositionalConflictChecker;
 import net.sourceforge.waters.analysis.compositional.ConflictAbstractionProcedureFactory;
-import net.sourceforge.waters.analysis.hisc.SICProperty5Verifier;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -41,6 +40,7 @@ public class GNBAbstractionSICProperty5VerifierTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  @Override
   protected ModelVerifier createModelVerifier
     (final ProductDESProxyFactory factory)
   {

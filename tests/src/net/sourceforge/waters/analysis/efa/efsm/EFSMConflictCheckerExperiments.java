@@ -509,7 +509,7 @@ public class EFSMConflictCheckerExperiments
       mConflictChecker =  new CompositionalConflictChecker(factory);
       mWatchdog.addAbortable(mConflictChecker);
       // Configuration of CompositionalConflictChecker ...
-      mConflictChecker.setAbstractionProcedureFactory
+      mConflictChecker.setAbstractionProcedureCreator
         (ConflictAbstractionProcedureFactory.NBA);
       mConflictChecker.setPreselectingMethod
         (AbstractCompositionalModelAnalyzer.MustL);

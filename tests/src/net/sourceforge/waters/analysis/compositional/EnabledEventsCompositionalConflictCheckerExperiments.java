@@ -163,7 +163,7 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
     final File filename = new File(dir, name);
     final ProductDESProxy des = getCompiledDES(filename, bindings);
     mConflictChecker.setModel(des);
-    mConflictChecker.setAbstractionProcedureFactory
+    mConflictChecker.setAbstractionProcedureCreator
       (ConflictAbstractionProcedureFactory.EENB);
     try {
       final boolean result = mConflictChecker.run();

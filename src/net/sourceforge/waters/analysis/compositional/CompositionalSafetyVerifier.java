@@ -99,7 +99,7 @@ public class CompositionalSafetyVerifier
                                      final SafetyDiagnostics diag)
   {
     super(model, factory, translator,
-          ProjectionAbstractionProcedureFactory.INSTANCE);
+          ProjectionAbstractionProcedureFactory.PROJ);
     mDiagnostics = diag;
   }
 
@@ -116,6 +116,15 @@ public class CompositionalSafetyVerifier
   public SafetyDiagnostics getDiagnostics()
   {
     return mDiagnostics;
+  }
+
+
+  //#########################################################################
+  //# Configuration
+  @Override
+  public ProjectionAbstractionProcedureFactory getAbstractionProcedureFactory()
+  {
+    return ProjectionAbstractionProcedureFactory.getInstance();
   }
 
 
@@ -256,12 +265,12 @@ public class CompositionalSafetyVerifier
   }
 
   @Override
-  protected void setupMonolithicVerifier()
+  protected void setupMonolithicAnalyzer()
     throws EventNotFoundException
   {
-    if (getCurrentMonolithicVerifier() == null) {
+    if (getCurrentMonolithicAnalyzer() == null) {
       final SafetyVerifier configured =
-        (SafetyVerifier) getMonolithicVerifier();
+        (SafetyVerifier) getMonolithicAnalyzer();
       final SafetyVerifier current;
       if (configured == null) {
         final KindTranslator translator = getKindTranslator();
@@ -270,8 +279,8 @@ public class CompositionalSafetyVerifier
       } else {
         current = configured;
       }
-      setCurrentMonolithicVerifier(current);
-      super.setupMonolithicVerifier();
+      setCurrentMonolithicAnalyzer(current);
+      super.setupMonolithicAnalyzer();
     }
   }
 
@@ -384,44 +393,6 @@ public class CompositionalSafetyVerifier
     {
       return canBeTau();
     }
-  }
-
-
-  //#########################################################################
-  //# Inner Class ProjectionAbstractionProcedureFactory
-  private static class ProjectionAbstractionProcedureFactory
-    implements AbstractionProcedureFactory
-  {
-    //#######################################################################
-    //# Interface
-    //# net.sourceforge.waters.model.analysis.compositional.
-    //# AbstractionProcedureFactory
-    @Override
-    public AbstractionProcedure createAbstractionProcedure
-      (final AbstractCompositionalModelAnalyzer analyzer)
-    {
-      final CompositionalSafetyVerifier verifier =
-        (CompositionalSafetyVerifier) analyzer;
-      return ProjectionAbstractionProcedure.
-        createProjectionAbstractionProcedure(verifier);
-    }
-
-    @Override
-    public boolean supportsNondeterminism()
-    {
-      return true;
-    }
-
-    @Override
-    public boolean expectsAllMarkings()
-    {
-      return false;
-    }
-
-    //#######################################################################
-    //# Class Constants
-    private static final ProjectionAbstractionProcedureFactory INSTANCE =
-      new ProjectionAbstractionProcedureFactory();
   }
 
 

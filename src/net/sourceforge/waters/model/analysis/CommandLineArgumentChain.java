@@ -66,28 +66,28 @@ public abstract class CommandLineArgumentChain
 
   //#######################################################################
   //# Configuring the Secondary Verifier
-  protected ModelVerifier createSecondaryVerifier(final ModelVerifier verifier)
+  protected ModelAnalyzer createSecondaryAnalyzer(final ModelAnalyzer analyzer)
   {
-    final ProductDESProxyFactory desFactory = verifier.getFactory();
-    final ModelVerifier secondaryVerifier;
-    if (verifier instanceof ConflictChecker) {
-      secondaryVerifier =
+    final ProductDESProxyFactory desFactory = analyzer.getFactory();
+    final ModelVerifier secondaryAnalyzer;
+    if (analyzer instanceof ConflictChecker) {
+      secondaryAnalyzer =
         mSecondaryFactory.createConflictChecker(desFactory);
-    } else if (verifier instanceof ControllabilityChecker) {
-      secondaryVerifier =
+    } else if (analyzer instanceof ControllabilityChecker) {
+      secondaryAnalyzer =
         mSecondaryFactory.createControllabilityChecker(desFactory);
-    } else if (verifier instanceof ControlLoopChecker) {
-      secondaryVerifier =
+    } else if (analyzer instanceof ControlLoopChecker) {
+      secondaryAnalyzer =
         mSecondaryFactory.createControlLoopChecker(desFactory);
-    } else if (verifier instanceof LanguageInclusionChecker) {
-      secondaryVerifier =
+    } else if (analyzer instanceof LanguageInclusionChecker) {
+      secondaryAnalyzer =
         mSecondaryFactory.createLanguageInclusionChecker(desFactory);
     } else {
-      failUnsupportedAnalyzerClass(verifier);
+      failUnsupportedAnalyzerClass(analyzer);
       return null;
     }
-    mSecondaryFactory.configure(secondaryVerifier);
-    return secondaryVerifier;
+    mSecondaryFactory.configure(secondaryAnalyzer);
+    return secondaryAnalyzer;
   }
 
   protected void failUnsupportedAnalyzerClass(final ModelAnalyzer analyzer)

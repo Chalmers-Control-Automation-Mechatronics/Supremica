@@ -24,6 +24,7 @@ import net.sourceforge.waters.analysis.abstraction.CertainUnsupervisabilityTRSim
 import net.sourceforge.waters.analysis.abstraction.HalfWaySynthesisTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TRSimplifierStatistics;
 import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer.PreselectingMethod;
+import net.sourceforge.waters.analysis.compositional.AbstractionProcedureCreator;
 import net.sourceforge.waters.analysis.compositional.AutomataSynthesisAbstractionProcedureFactory;
 import net.sourceforge.waters.analysis.compositional.CompositionalAutomataSynthesisResult;
 import net.sourceforge.waters.analysis.compositional.CompositionalAutomataSynthesizer;
@@ -85,7 +86,7 @@ public class UnsupTester
     boolean noargs = false;
     String presel = null;
     String sel = null;
-    AutomataSynthesisAbstractionProcedureFactory proc =
+    AbstractionProcedureCreator proc =
       AutomataSynthesisAbstractionProcedureFactory.WSOE;
     int timeout = -1;
     PrintWriter csv = null;

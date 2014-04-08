@@ -12,14 +12,12 @@ package net.sourceforge.waters.analysis.compositional;
 import java.io.PrintStream;
 
 import net.sourceforge.waters.model.analysis.CommandLineArgumentChain;
-import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentString;
 import net.sourceforge.waters.model.analysis.EnumFactory;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
-import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -55,7 +53,7 @@ public class CompositionalModelAnalyzerFactory
 
   //#########################################################################
   //# Overrides for
-  //# net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory
+  //# net.sourceforge.waters.model.analysis.AbstractModelAnalyzerFactory
   @Override
   protected void addArguments()
   {
@@ -79,7 +77,7 @@ public class CompositionalModelAnalyzerFactory
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelVerifierFactory
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzerFactory
   @Override
   public CompositionalConflictChecker createConflictChecker
     (final ProductDESProxyFactory factory)
@@ -124,8 +122,8 @@ public class CompositionalModelAnalyzerFactory
     public void configure(final ModelAnalyzer analyzer)
     {
       final int limit = getValue();
-      final AbstractCompositionalModelVerifier composer =
-        (AbstractCompositionalModelVerifier) analyzer;
+      final AbstractCompositionalModelAnalyzer composer =
+        (AbstractCompositionalModelAnalyzer) analyzer;
       composer.setMonolithicStateLimit(limit);
     }
 
@@ -153,8 +151,8 @@ public class CompositionalModelAnalyzerFactory
     public void configure(final ModelAnalyzer analyzer)
     {
       final int limit = getValue();
-      final AbstractCompositionalModelVerifier composer =
-        (AbstractCompositionalModelVerifier) analyzer;
+      final AbstractCompositionalModelAnalyzer composer =
+        (AbstractCompositionalModelAnalyzer) analyzer;
       composer.setInternalStateLimit(limit);
     }
 
@@ -182,8 +180,8 @@ public class CompositionalModelAnalyzerFactory
     public void configure(final ModelAnalyzer analyzer)
     {
       final int limit = getValue();
-      final AbstractCompositionalModelVerifier composer =
-        (AbstractCompositionalModelVerifier) analyzer;
+      final AbstractCompositionalModelAnalyzer composer =
+        (AbstractCompositionalModelAnalyzer) analyzer;
       composer.setLowerInternalStateLimit(limit);
     }
 
@@ -211,8 +209,8 @@ public class CompositionalModelAnalyzerFactory
     public void configure(final ModelAnalyzer analyzer)
     {
       final int limit = getValue();
-      final AbstractCompositionalModelVerifier composer =
-        (AbstractCompositionalModelVerifier) analyzer;
+      final AbstractCompositionalModelAnalyzer composer =
+        (AbstractCompositionalModelAnalyzer) analyzer;
       composer.setUpperInternalStateLimit(limit);
     }
 
@@ -241,8 +239,8 @@ public class CompositionalModelAnalyzerFactory
     public void configure(final ModelAnalyzer analyzer)
     {
       final int limit = getValue();
-      final AbstractCompositionalModelVerifier composer =
-        (AbstractCompositionalModelVerifier) analyzer;
+      final AbstractCompositionalModelAnalyzer composer =
+        (AbstractCompositionalModelAnalyzer) analyzer;
       composer.setMonolithicTransitionLimit(limit);
     }
 
@@ -271,8 +269,8 @@ public class CompositionalModelAnalyzerFactory
     public void configure(final ModelAnalyzer analyzer)
     {
       final int limit = getValue();
-      final AbstractCompositionalModelVerifier composer =
-        (AbstractCompositionalModelVerifier) analyzer;
+      final AbstractCompositionalModelAnalyzer composer =
+        (AbstractCompositionalModelAnalyzer) analyzer;
       composer.setInternalTransitionLimit(limit);
     }
 
@@ -282,15 +280,14 @@ public class CompositionalModelAnalyzerFactory
   //#########################################################################
   //# Inner Class AbstractionMethodArgument
   private static class AbstractionMethodArgument
-    extends CommandLineArgumentEnum<ConflictAbstractionProcedureFactory>
+    extends CommandLineArgumentString
   {
 
     //#######################################################################
     //# Constructors
     private AbstractionMethodArgument()
     {
-      super("-method", "Abstraction method used for conflict check",
-            ConflictAbstractionProcedureFactory.class);
+      super("-method", "Abstraction sequence for compositional analysis");
     }
 
     //#######################################################################
@@ -299,16 +296,19 @@ public class CompositionalModelAnalyzerFactory
     @Override
     public void configure(final ModelAnalyzer analyzer)
     {
-      final ConflictAbstractionProcedureFactory method = getValue();
-      if (analyzer instanceof CompositionalConflictChecker) {
-        final CompositionalConflictChecker composer =
-          (CompositionalConflictChecker) analyzer;
-        composer.setAbstractionProcedureFactory(method);
-      } else {
-        fail(getName() + " option only supported for conflict check!");
+      final String name = getValue();
+      final AbstractCompositionalModelAnalyzer composer =
+        (AbstractCompositionalModelAnalyzer) analyzer;
+      final EnumFactory<AbstractionProcedureCreator>
+        factory = composer.getAbstractionProcedureFactory();
+      final AbstractionProcedureCreator creator = factory.getEnumValue(name);
+      if (creator == null) {
+        System.err.println("Bad value for " + getName() + " option!");
+        factory.dumpEnumeration(System.err, 0);
+        System.exit(1);
       }
+      composer.setAbstractionProcedureCreator(creator);
     }
-
   }
 
 
@@ -331,24 +331,19 @@ public class CompositionalModelAnalyzerFactory
     @Override
     public void configure(final ModelAnalyzer analyzer)
     {
-      if (analyzer instanceof CompositionalConflictChecker) {
-        final String name = getValue();
-        final CompositionalConflictChecker composer =
-          (CompositionalConflictChecker) analyzer;
-        final EnumFactory<AbstractCompositionalModelVerifier.
-                          PreselectingMethod>
-          factory = composer.getPreselectingMethodFactory();
-        final AbstractCompositionalModelVerifier.PreselectingMethod method =
-          factory.getEnumValue(name);
-        if (method == null) {
-          System.err.println("Bad value for " + getName() + " option!");
-          factory.dumpEnumeration(System.err, 0);
-          System.exit(1);
-        }
-        composer.setPreselectingMethod(method);
-      } else {
-        fail(getName() + " option only supported for conflict check!");
+      final String name = getValue();
+      final AbstractCompositionalModelAnalyzer composer =
+        (AbstractCompositionalModelAnalyzer) analyzer;
+      final EnumFactory<AbstractCompositionalModelAnalyzer.PreselectingMethod>
+        factory = composer.getPreselectingMethodFactory();
+      final AbstractCompositionalModelAnalyzer.PreselectingMethod method =
+        factory.getEnumValue(name);
+      if (method == null) {
+        System.err.println("Bad value for " + getName() + " option!");
+        factory.dumpEnumeration(System.err, 0);
+        System.exit(1);
       }
+      composer.setPreselectingMethod(method);
     }
 
     //#######################################################################
@@ -357,15 +352,12 @@ public class CompositionalModelAnalyzerFactory
     public void dump(final PrintStream stream,
                      final ModelAnalyzer analyzer)
     {
-      if (analyzer instanceof CompositionalConflictChecker) {
-        super.dump(stream, analyzer);
-        final CompositionalConflictChecker composer =
-          (CompositionalConflictChecker) analyzer;
-        final EnumFactory<AbstractCompositionalModelVerifier.
-                          PreselectingMethod>
-          factory = composer.getPreselectingMethodFactory();
-        factory.dumpEnumeration(stream, INDENT);
-      }
+      super.dump(stream, analyzer);
+      final AbstractCompositionalModelAnalyzer composer =
+        (AbstractCompositionalModelAnalyzer) analyzer;
+      final EnumFactory<AbstractCompositionalModelAnalyzer.PreselectingMethod>
+        factory = composer.getPreselectingMethodFactory();
+      factory.dumpEnumeration(stream, INDENT);
     }
 
   }
@@ -374,7 +366,7 @@ public class CompositionalModelAnalyzerFactory
   //#########################################################################
   //# Inner Class SelectingMethodArgument
   private static class SelectingMethodArgument
-  extends CommandLineArgumentString
+    extends CommandLineArgumentString
   {
 
     //#######################################################################
@@ -461,8 +453,8 @@ public class CompositionalModelAnalyzerFactory
     @Override
     public void configure(final ModelAnalyzer analyzer)
     {
-      final AbstractCompositionalModelVerifier composer =
-        (AbstractCompositionalModelVerifier) analyzer;
+      final AbstractCompositionalModelAnalyzer composer =
+        (AbstractCompositionalModelAnalyzer) analyzer;
       composer.setSubumptionEnabled(true);
     }
 
@@ -487,8 +479,8 @@ public class CompositionalModelAnalyzerFactory
     @Override
     public void configure(final ModelAnalyzer analyzer)
     {
-      final AbstractCompositionalModelVerifier composer =
-        (AbstractCompositionalModelVerifier) analyzer;
+      final AbstractCompositionalModelAnalyzer composer =
+        (AbstractCompositionalModelAnalyzer) analyzer;
       composer.setUsingSpecialEvents(false);
       composer.setFailingEventsEnabled(false);
     }
@@ -514,8 +506,8 @@ public class CompositionalModelAnalyzerFactory
     @Override
     public void configure(final ModelAnalyzer analyzer)
     {
-      final AbstractCompositionalModelVerifier composer =
-        (AbstractCompositionalModelVerifier) analyzer;
+      final AbstractCompositionalModelAnalyzer composer =
+        (AbstractCompositionalModelAnalyzer) analyzer;
       composer.setUsingSpecialEvents(false);
     }
 
@@ -540,8 +532,8 @@ public class CompositionalModelAnalyzerFactory
     @Override
     public void configure(final ModelAnalyzer analyzer)
     {
-      final AbstractCompositionalModelVerifier composer =
-        (AbstractCompositionalModelVerifier) analyzer;
+      final AbstractCompositionalModelAnalyzer composer =
+        (AbstractCompositionalModelAnalyzer) analyzer;
       composer.setFailingEventsEnabled(false);
     }
 
@@ -557,7 +549,7 @@ public class CompositionalModelAnalyzerFactory
     //# Constructors
     private NoDeadlockPruningArgument()
     {
-      super("-ndp", "Disable deadlock pruning in synchronous products");
+      super("-ndp", "Disable deadlock pruning in synchronous composition");
     }
 
     //#######################################################################
@@ -566,8 +558,8 @@ public class CompositionalModelAnalyzerFactory
     @Override
     public void configure(final ModelAnalyzer verifier)
     {
-      final AbstractCompositionalModelVerifier composer =
-        (AbstractCompositionalModelVerifier) verifier;
+      final AbstractCompositionalModelAnalyzer composer =
+        (AbstractCompositionalModelAnalyzer) verifier;
       composer.setPruningDeadlocks(false);
     }
 
@@ -591,17 +583,11 @@ public class CompositionalModelAnalyzerFactory
     @Override
     public void configure(final ModelAnalyzer analyzer)
     {
-      if (analyzer instanceof CompositionalConflictChecker ||
-          analyzer instanceof CompositionalLanguageInclusionChecker) {
-        final ModelVerifier verifier = (ModelVerifier) analyzer;
-        final ModelVerifier secondaryVerifier =
-          createSecondaryVerifier(verifier);
-        final AbstractCompositionalModelVerifier composer =
-          (AbstractCompositionalModelVerifier) verifier;
-        composer.setMonolithicVerifier(secondaryVerifier);
-      } else {
-        failUnsupportedAnalyzerClass(analyzer);
-      }
+      final ModelAnalyzer secondaryAnalyzer =
+        createSecondaryAnalyzer(analyzer);
+      final AbstractCompositionalModelAnalyzer composer =
+        (AbstractCompositionalModelAnalyzer) analyzer;
+      composer.setMonolithicAnalyzer(secondaryAnalyzer);
     }
   }
 

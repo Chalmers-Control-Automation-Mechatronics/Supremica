@@ -62,7 +62,7 @@ public class SelfRunningExperimentCompositionalSynthesis
           methodCount++;
           for (final Configuration config: configurations) {
             final AbstractCompositionalSynthesizer synthesizer = config.getSynthesizer();
-            final AbstractionProcedureFactory method = config.getMethod();
+            final AbstractionProcedureCreator method = config.getMethod();
             final String preName = preselectingMethod.toString();
             final String selName = selectingMethod.toString();
             // without supervisor reduction:
@@ -101,7 +101,7 @@ public class SelfRunningExperimentCompositionalSynthesis
   private static class Configuration
   {
     private Configuration(final AbstractCompositionalSynthesizer synthesizer,
-                  final AbstractionProcedureFactory factory)
+                  final AbstractionProcedureCreator factory)
     {
       mSynthesizer = synthesizer;
       mFactory = factory;
@@ -112,7 +112,7 @@ public class SelfRunningExperimentCompositionalSynthesis
       return mSynthesizer;
     }
 
-    private AbstractionProcedureFactory getMethod()
+    private AbstractionProcedureCreator getMethod()
     {
       return mFactory;
     }
@@ -134,7 +134,7 @@ public class SelfRunningExperimentCompositionalSynthesis
     //#######################################################################
     //# Data members
     private final AbstractCompositionalSynthesizer mSynthesizer;
-    private final AbstractionProcedureFactory mFactory;
+    private final AbstractionProcedureCreator mFactory;
   }
 
 }

@@ -44,7 +44,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
   //# Constructor
   public CompositionalSynthesizerExperiments
     (final AbstractCompositionalSynthesizer synthesizer,
-     final AbstractionProcedureFactory method,
+     final AbstractionProcedureCreator method,
      final String statsFilename)
     throws FileNotFoundException
   {
@@ -54,7 +54,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
   public CompositionalSynthesizerExperiments
     (final String statsFilename,
      final AbstractCompositionalSynthesizer synthesizer,
-     final AbstractionProcedureFactory method,
+     final AbstractionProcedureCreator method,
      final AbstractCompositionalModelAnalyzer.PreselectingMethod preselectingHeuristic,
      final SelectionHeuristicCreator selectionHeuristic)
     throws FileNotFoundException
@@ -211,7 +211,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
         final ProductDESProxyFactory factory =
           ProductDESElementFactory.getInstance();
         final AbstractCompositionalSynthesizer synthesizer;
-        final AbstractionProcedureFactory method;
+        final AbstractionProcedureCreator method;
         final String filename = args[0];
         final String preselectingHeuristic = args[2];
         final String selectingHeuristic = args[3];
@@ -470,7 +470,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
   //#########################################################################
   //# Data Members
   private AbstractCompositionalSynthesizer mSynthesizer;
-  private final AbstractionProcedureFactory mMethod;
+  private final AbstractionProcedureCreator mMethod;
   private AbstractCompositionalModelAnalyzer.PreselectingMethod mPreselecting;
   private SelectionHeuristicCreator mSelecting;
   private final Watchdog mWatchdog;

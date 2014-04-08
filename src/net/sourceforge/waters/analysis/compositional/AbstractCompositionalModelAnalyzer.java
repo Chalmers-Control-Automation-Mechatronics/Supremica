@@ -34,6 +34,7 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
+import net.sourceforge.waters.model.analysis.EnumFactory;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.ListedEnumFactory;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -41,6 +42,7 @@ import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.AutomatonResult;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -92,7 +94,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   protected AbstractCompositionalModelAnalyzer
     (final ProductDESProxyFactory factory,
      final KindTranslator translator,
-     final AbstractionProcedureFactory abstractionFactory)
+     final AbstractionProcedureCreator abstractionFactory)
   {
     this(factory, translator, abstractionFactory,
          new PreselectingMethodFactory());
@@ -113,7 +115,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   protected AbstractCompositionalModelAnalyzer
     (final ProductDESProxyFactory factory,
      final KindTranslator translator,
-     final AbstractionProcedureFactory abstractionFactory,
+     final AbstractionProcedureCreator abstractionFactory,
      final PreselectingMethodFactory preselectingMethodFactory)
   {
     this(null, factory, translator, abstractionFactory,
@@ -135,7 +137,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     (final ProductDESProxy model,
      final ProductDESProxyFactory factory,
      final KindTranslator translator,
-     final AbstractionProcedureFactory abstractionFactory)
+     final AbstractionProcedureCreator abstractionFactory)
   {
     this(model, factory, translator, abstractionFactory,
          new PreselectingMethodFactory());
@@ -159,11 +161,11 @@ public abstract class AbstractCompositionalModelAnalyzer
     (final ProductDESProxy model,
      final ProductDESProxyFactory factory,
      final KindTranslator translator,
-     final AbstractionProcedureFactory abstractionFactory,
+     final AbstractionProcedureCreator abstractionFactory,
      final PreselectingMethodFactory preselectingMethodFactory)
   {
     super(model, factory, translator);
-    mAbstractionProcedureFactory = abstractionFactory;
+    mAbstractionProcedureCreator = abstractionFactory;
     mPreselectingMethodFactory = preselectingMethodFactory;
     // Defaults for all model analysers---please do not change.
     mPreselectingMethod = MustL;
@@ -219,15 +221,18 @@ public abstract class AbstractCompositionalModelAnalyzer
     mConfiguredPreconditionMarking = event;
   }
 
-  public void setAbstractionProcedureFactory
-    (final AbstractionProcedureFactory factory)
+  public abstract EnumFactory<AbstractionProcedureCreator>
+    getAbstractionProcedureFactory();
+
+  public void setAbstractionProcedureCreator
+    (final AbstractionProcedureCreator creator)
   {
-    mAbstractionProcedureFactory = factory;
+    mAbstractionProcedureCreator = creator;
   }
 
-  public AbstractionProcedureFactory getAbstractionProcedureFactory()
+  public AbstractionProcedureCreator getAbstractionProcedureCreator()
   {
-    return mAbstractionProcedureFactory;
+    return mAbstractionProcedureCreator;
   }
 
   /**
@@ -493,7 +498,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   @Override
   public boolean supportsNondeterminism()
   {
-    return mAbstractionProcedureFactory.supportsNondeterminism();
+    return mAbstractionProcedureCreator.supportsNondeterminism();
   }
 
   @Override
@@ -509,6 +514,16 @@ public abstract class AbstractCompositionalModelAnalyzer
   {
     setInternalStateLimit(limit);
     setMonolithicStateLimit(limit);
+  }
+
+  public void setMonolithicAnalyzer(final ModelAnalyzer analyzer)
+  {
+    mMonolithicAnalyzer = analyzer;
+  }
+
+  public ModelAnalyzer getMonolithicAnalyzer()
+  {
+    return mMonolithicAnalyzer;
   }
 
 
@@ -612,6 +627,29 @@ public abstract class AbstractCompositionalModelAnalyzer
     mSynchronousProductBuilder.setTransitionLimit(tlimit);
   }
 
+  protected void setCurrentMonolithicAnalyzer(final ModelAnalyzer analyzer)
+  {
+    mCurrentMonolithicAnalyzer = analyzer;
+  }
+
+  protected ModelAnalyzer getCurrentMonolithicAnalyzer()
+  {
+    return mCurrentMonolithicAnalyzer;
+  }
+
+  protected void setupMonolithicAnalyzer()
+    throws EventNotFoundException
+  {
+    if (mCurrentMonolithicAnalyzer != null) {
+      final int nlimit = getMonolithicStateLimit();
+      mCurrentMonolithicAnalyzer.setNodeLimit(nlimit);
+      final int tlimit = getMonolithicTransitionLimit();
+      mCurrentMonolithicAnalyzer.setTransitionLimit(tlimit);
+      final KindTranslator translator = getKindTranslator();
+      mCurrentMonolithicAnalyzer.setKindTranslator(translator);
+    }
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
@@ -625,6 +663,9 @@ public abstract class AbstractCompositionalModelAnalyzer
     if (mSynchronousProductBuilder != null) {
       mSynchronousProductBuilder.requestAbort();
     }
+    if (mCurrentMonolithicAnalyzer != null) {
+      mCurrentMonolithicAnalyzer.requestAbort();
+    }
   }
 
   @Override
@@ -637,6 +678,9 @@ public abstract class AbstractCompositionalModelAnalyzer
     if (mSynchronousProductBuilder != null) {
       mSynchronousProductBuilder.resetAbort();
     }
+    if (mCurrentMonolithicAnalyzer != null) {
+      mCurrentMonolithicAnalyzer.resetAbort();
+    }
   }
 
 
@@ -647,11 +691,12 @@ public abstract class AbstractCompositionalModelAnalyzer
     throws AnalysisException
   {
     super.setUp();
+    setupMonolithicAnalyzer();
     final CompositionalAnalysisResult result = getAnalysisResult();
     result.setNumberOfStates(0.0);
     result.setNumberOfTransitions(0.0);
     mAbstractionProcedure =
-      mAbstractionProcedureFactory.createAbstractionProcedure(this);
+      mAbstractionProcedureCreator.createAbstractionProcedure(this);
     mAbstractionProcedure.storeStatistics();
     mPreselectingHeuristic = mPreselectingMethod.createHeuristic(this);
     mSelectionHeuristic.setContext(this);
@@ -677,6 +722,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     mProcessedSubsystems = null;
     mUsedEventNames = null;
     mOverflowCandidates = null;
+    mCurrentMonolithicAnalyzer = null;
   }
 
   @Override
@@ -2889,7 +2935,7 @@ public abstract class AbstractCompositionalModelAnalyzer
    */
   private Collection<EventProxy> mPropositions;
 
-  private AbstractionProcedureFactory mAbstractionProcedureFactory;
+  private AbstractionProcedureCreator mAbstractionProcedureCreator;
   private final PreselectingMethodFactory mPreselectingMethodFactory;
   private PreselectingMethod mPreselectingMethod;
   private SelectionHeuristic<Candidate> mSelectionHeuristic;
@@ -2899,6 +2945,8 @@ public abstract class AbstractCompositionalModelAnalyzer
   private int mLowerInternalStateLimit;
   private int mUpperInternalStateLimit;
   private int mInternalTransitionLimit;
+  private ModelAnalyzer mMonolithicAnalyzer;
+  private ModelAnalyzer mCurrentMonolithicAnalyzer;
 
   /**
    * The automata currently being analysed. This list is updated after each

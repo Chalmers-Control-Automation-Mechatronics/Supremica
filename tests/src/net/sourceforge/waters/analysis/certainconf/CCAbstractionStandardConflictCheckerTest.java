@@ -47,7 +47,7 @@ public class CCAbstractionStandardConflictCheckerTest
   {
     final CompositionalConflictChecker checker =
       new CompositionalConflictChecker(factory);
-    checker.setAbstractionProcedureFactory(ConflictAbstractionProcedureFactory.CC);
+    checker.setAbstractionProcedureCreator(ConflictAbstractionProcedureFactory.CC);
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);

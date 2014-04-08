@@ -117,7 +117,7 @@ public class ModularModelVerifierFactory
         final AbstractModularSafetyVerifier modular =
           (AbstractModularSafetyVerifier) verifier;
         final SafetyVerifier secondaryVerifier =
-          (SafetyVerifier) createSecondaryVerifier(verifier);
+          (SafetyVerifier) createSecondaryAnalyzer(verifier);
         modular.setMonolithicVerifier(secondaryVerifier);
       } else {
         failUnsupportedAnalyzerClass(analyzer);

@@ -478,7 +478,7 @@ public class UnifiedEFAConflictCheckerExperiments
       mConflictChecker =  new CompositionalConflictChecker(factory);
       mWatchdog.addAbortable(mConflictChecker);
       // Configuration of CompositionalConflictChecker ...
-      mConflictChecker.setAbstractionProcedureFactory
+      mConflictChecker.setAbstractionProcedureCreator
         (ConflictAbstractionProcedureFactory.NB);
       mConflictChecker.setPreselectingMethod
         (AbstractCompositionalModelAnalyzer.MustL);

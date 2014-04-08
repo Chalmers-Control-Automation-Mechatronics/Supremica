@@ -23,7 +23,6 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
-import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
@@ -74,7 +73,7 @@ public abstract class AbstractCompositionalModelVerifier
   protected AbstractCompositionalModelVerifier
     (final ProductDESProxyFactory factory,
      final KindTranslator translator,
-     final AbstractionProcedureFactory abstractionFactory)
+     final AbstractionProcedureCreator abstractionFactory)
   {
     super(factory, translator, abstractionFactory);
   }
@@ -94,7 +93,7 @@ public abstract class AbstractCompositionalModelVerifier
   protected AbstractCompositionalModelVerifier
     (final ProductDESProxyFactory factory,
      final KindTranslator translator,
-     final AbstractionProcedureFactory abstractionFactory,
+     final AbstractionProcedureCreator abstractionFactory,
      final PreselectingMethodFactory preselectingMethodFactory)
   {
     super(factory, translator, abstractionFactory,
@@ -116,7 +115,7 @@ public abstract class AbstractCompositionalModelVerifier
     (final ProductDESProxy model,
      final ProductDESProxyFactory factory,
      final KindTranslator translator,
-     final AbstractionProcedureFactory abstractionFactory)
+     final AbstractionProcedureCreator abstractionFactory)
   {
     super(model, factory, translator, abstractionFactory);
   }
@@ -139,7 +138,7 @@ public abstract class AbstractCompositionalModelVerifier
     (final ProductDESProxy model,
      final ProductDESProxyFactory factory,
      final KindTranslator translator,
-     final AbstractionProcedureFactory abstractionFactory,
+     final AbstractionProcedureCreator abstractionFactory,
      final PreselectingMethodFactory preselectingMethodFactory)
   {
     super(model, factory, translator, abstractionFactory,
@@ -168,37 +167,6 @@ public abstract class AbstractCompositionalModelVerifier
   public boolean isTraceCheckingEnabled()
   {
     return mTraceCheckingEnabled;
-  }
-
-  protected void setMonolithicVerifier(final ModelVerifier verifier)
-  {
-    mMonolithicVerifier = verifier;
-  }
-
-  protected ModelVerifier getMonolithicVerifier()
-  {
-    return mMonolithicVerifier;
-  }
-
-  protected void setCurrentMonolithicVerifier(final ModelVerifier verifier)
-  {
-    mCurrentMonolithicVerifier = verifier;
-  }
-
-  protected ModelVerifier getCurrentMonolithicVerifier()
-  {
-    return mCurrentMonolithicVerifier;
-  }
-
-  protected void setupMonolithicVerifier()
-    throws EventNotFoundException
-  {
-    final int nlimit = getMonolithicStateLimit();
-    mCurrentMonolithicVerifier.setNodeLimit(nlimit);
-    final int tlimit = getMonolithicTransitionLimit();
-    mCurrentMonolithicVerifier.setTransitionLimit(tlimit);
-    final KindTranslator translator = getKindTranslator();
-    mCurrentMonolithicVerifier.setKindTranslator(translator);
   }
 
 
@@ -263,27 +231,6 @@ public abstract class AbstractCompositionalModelVerifier
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.Abortable
-  @Override
-  public void requestAbort()
-  {
-    super.requestAbort();
-    if (mCurrentMonolithicVerifier != null) {
-      mCurrentMonolithicVerifier.requestAbort();
-    }
-  }
-
-  @Override
-  public void resetAbort()
-  {
-    super.resetAbort();
-    if (mCurrentMonolithicVerifier != null) {
-      mCurrentMonolithicVerifier.resetAbort();
-    }
-  }
-
-
-  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelVerifier
   @Override
   public boolean isSatisfied()
@@ -338,7 +285,6 @@ public abstract class AbstractCompositionalModelVerifier
   protected void setUp()
     throws AnalysisException
   {
-    setupMonolithicVerifier();
     mAbstractionSteps = new ArrayList<AbstractionStep>();
     super.setUp();
   }
@@ -347,7 +293,6 @@ public abstract class AbstractCompositionalModelVerifier
   protected void tearDown()
   {
     super.tearDown();
-    mCurrentMonolithicVerifier = null;
     mAbstractionSteps = null;
   }
 
@@ -399,19 +344,20 @@ public abstract class AbstractCompositionalModelVerifier
         logger.debug("Monolithically composing " + automata1.size() +
                      " automata, estimated " + estimate + " states.");
       }
-      mCurrentMonolithicVerifier.setModel(des);
-      mCurrentMonolithicVerifier.run();
+      final ModelVerifier monolithicVerifier =
+        (ModelVerifier) getCurrentMonolithicAnalyzer();
+      monolithicVerifier.setModel(des);
+      monolithicVerifier.run();
       // Do not clean up before run, keep data just in case of overflow ...
       removeEventsToAutomata(automata);
       final VerificationResult subresult =
-        mCurrentMonolithicVerifier.getAnalysisResult();
+        monolithicVerifier.getAnalysisResult();
       recordStatistics(subresult);
       if (subresult.isSatisfied()) {
         return true;
       } else {
         final CompositionalVerificationResult result = getAnalysisResult();
-        final TraceProxy trace =
-          mCurrentMonolithicVerifier.getCounterExample();
+        final TraceProxy trace = monolithicVerifier.getCounterExample();
         result.setCounterExample(trace);
         final boolean confirmed = confirmMonolithicCounterExample();
         return !confirmed;
@@ -606,8 +552,6 @@ public abstract class AbstractCompositionalModelVerifier
   //# Data Members
   private boolean mTraceCheckingEnabled = false;
 
-  private ModelVerifier mMonolithicVerifier;
-  private ModelVerifier mCurrentMonolithicVerifier;
   private List<AbstractionStep> mAbstractionSteps;
 
 }

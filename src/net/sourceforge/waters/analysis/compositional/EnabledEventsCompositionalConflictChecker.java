@@ -108,15 +108,15 @@ public class EnabledEventsCompositionalConflictChecker extends
    *          propositions must contain this event (exactly the same object).
    * @param factory
    *          Factory used for trace construction.
-   * @param abstractionFactory
+   * @param abstractionCreator
    *          Factory to define the abstraction sequence to be used.
    */
   public EnabledEventsCompositionalConflictChecker(final ProductDESProxy model,
                                                    final EventProxy marking,
                                                    final ProductDESProxyFactory factory,
-                                                   final ConflictAbstractionProcedureFactory abstractionFactory)
+                                                   final AbstractionProcedureCreator abstractionCreator)
   {
-    super(model, marking, factory, abstractionFactory,
+    super(model, marking, factory, abstractionCreator,
           new PreselectingMethodFactory());
   }
 

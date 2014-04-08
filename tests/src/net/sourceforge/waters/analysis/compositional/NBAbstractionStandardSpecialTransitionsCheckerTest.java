@@ -44,8 +44,8 @@ public class NBAbstractionStandardSpecialTransitionsCheckerTest
     (final ProductDESProxyFactory factory)
   {
     final CompositionalSpecialTransitionsChecker checker =
-      new CompositionalSpecialTransitionsChecker(factory,
-                                       ConflictAbstractionProcedureFactory.NB);
+      new CompositionalSpecialTransitionsChecker
+        (factory, ConflictAbstractionProcedureFactory.NB);
     // checker.setSelectingMethod(AbstractCompositionalModelAnalyzer.MinF);
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);

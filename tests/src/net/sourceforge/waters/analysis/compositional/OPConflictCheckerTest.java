@@ -38,6 +38,7 @@ public class OPConflictCheckerTest extends
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  @Override
   protected ConflictChecker createModelVerifier
     (final ProductDESProxyFactory factory)
   {

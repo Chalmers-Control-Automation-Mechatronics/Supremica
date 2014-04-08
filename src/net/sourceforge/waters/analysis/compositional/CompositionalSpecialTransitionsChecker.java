@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.compositional
-//# CLASS:   CompositionalConflictChecker
+//# CLASS:   CompositionalSpecialTransitionsChecker
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -56,7 +56,6 @@ import net.sourceforge.waters.xsd.des.ConflictKind;
  * by investigating the synchronous product of the whole system.
  * This will begin by finding and counting always enabled and disabled transitions.
  *
- *
  * @author Colin Pilbrow
  */
 
@@ -81,14 +80,14 @@ public class CompositionalSpecialTransitionsChecker
    * Creates a new conflict checker without a model or marking proposition.
    * @param factory
    *          Factory used for trace construction.
-   * @param abstractionFactory
+   * @param abstractionCreator
    *          Factory to define the abstraction sequence to be used.
    */
   public CompositionalSpecialTransitionsChecker
     (final ProductDESProxyFactory factory,
-     final ConflictAbstractionProcedureFactory abstractionFactory)
+     final AbstractionProcedureCreator abstractionCreator)
   {
-    this(null, null, factory, abstractionFactory);
+    this(null, null, factory, abstractionCreator);
   }
 
   /**
@@ -100,7 +99,7 @@ public class CompositionalSpecialTransitionsChecker
    *          Factory used for trace construction.
    */
   public CompositionalSpecialTransitionsChecker(final ProductDESProxy model,
-                                      final ProductDESProxyFactory factory)
+                                                final ProductDESProxyFactory factory)
   {
     this(model, null, factory);
   }
@@ -139,19 +138,19 @@ public class CompositionalSpecialTransitionsChecker
    *          propositions must contain this event (exactly the same object).
    * @param factory
    *          Factory used for trace construction.
-   * @param abstractionFactory
+   * @param abstractionCreator
    *          Factory to define the abstraction sequence to be used.
    */
   public CompositionalSpecialTransitionsChecker
     (final ProductDESProxy model,
      final EventProxy marking,
      final ProductDESProxyFactory factory,
-     final ConflictAbstractionProcedureFactory abstractionFactory)
+     final AbstractionProcedureCreator abstractionCreator)
   {
     this(model,
          marking,
          factory,
-         abstractionFactory,
+         abstractionCreator,
          new PreselectingMethodFactory());
   }
 
@@ -168,20 +167,20 @@ public class CompositionalSpecialTransitionsChecker
    *          propositions must contain this event (exactly the same object).
    * @param factory
    *          Factory used for trace construction.
-   * @param abstractionFactory
+   * @param abstractionCreator
    *          Factory to define the abstraction sequence to be used.
    */
   public CompositionalSpecialTransitionsChecker
     (final ProductDESProxy model,
      final EventProxy marking,
      final ProductDESProxyFactory factory,
-     final ConflictAbstractionProcedureFactory abstractionFactory,
+     final AbstractionProcedureCreator abstractionCreator,
      final AbstractCompositionalModelAnalyzer.PreselectingMethodFactory preselectingMethodFactory)
   {
     super(model,
           factory,
           ConflictKindTranslator.getInstance(),
-          abstractionFactory,
+          abstractionCreator,
           preselectingMethodFactory);
     setPruningDeadlocks(true);
     setConfiguredDefaultMarking(marking);
@@ -209,6 +208,11 @@ public class CompositionalSpecialTransitionsChecker
     mMonolithicSafetyVerifier = checker;
   }
 
+  @Override
+  public ConflictAbstractionProcedureFactory getAbstractionProcedureFactory()
+  {
+    return ConflictAbstractionProcedureFactory.getInstance();
+  }
 
   @Override
   public void setPreselectingMethod(final PreselectingMethod method)
@@ -336,12 +340,12 @@ public class CompositionalSpecialTransitionsChecker
   //#########################################################################
   //# Specific Access
   @Override
-  protected void setupMonolithicVerifier()
+  protected void setupMonolithicAnalyzer()
     throws EventNotFoundException
   {
-    if (getCurrentMonolithicVerifier() == null) {
+    if (getCurrentMonolithicAnalyzer() == null) {
       final ConflictChecker configured =
-        (ConflictChecker) getMonolithicVerifier();
+        (ConflictChecker) getMonolithicAnalyzer();
       final ConflictChecker current;
       if (configured == null) {
         final ProductDESProxyFactory factory = getFactory();
@@ -357,8 +361,8 @@ public class CompositionalSpecialTransitionsChecker
       current.setConfiguredDefaultMarking(defaultMarking);
       final EventProxy preconditionMarking = getUsedPreconditionMarking();
       current.setConfiguredPreconditionMarking(preconditionMarking);
-      setCurrentMonolithicVerifier(current);
-      super.setupMonolithicVerifier();
+      setCurrentMonolithicAnalyzer(current);
+      super.setupMonolithicAnalyzer();
     }
   }
 
@@ -456,8 +460,8 @@ public class CompositionalSpecialTransitionsChecker
     throws AnalysisException
   {
     final EventProxy defaultMarking = createDefaultMarking();
-    final AbstractionProcedureFactory abstraction =
-      getAbstractionProcedureFactory();
+    final AbstractionProcedureCreator abstraction =
+      getAbstractionProcedureCreator();
     final EventProxy preconditionMarking;
     if (abstraction.expectsAllMarkings()) {
       preconditionMarking = createPreconditionMarking();

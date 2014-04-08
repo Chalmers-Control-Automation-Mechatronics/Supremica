@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.compositional
-//# CLASS:   CompositionalSynthesizer
+//# CLASS:   CompositionalAutomataSynthesizer
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -83,14 +83,14 @@ public class CompositionalAutomataSynthesizer extends
    *
    * @param factory
    *          Factory used for trace construction.
-   * @param abstractionFactory
+   * @param abstractionCreator
    *          Factory to define the abstraction sequence to be used.
    */
   public CompositionalAutomataSynthesizer
     (final ProductDESProxyFactory factory,
-     final AutomataSynthesisAbstractionProcedureFactory abstractionFactory)
+     final AbstractionProcedureCreator abstractionCreator)
   {
-    this(factory, IdenticalKindTranslator.getInstance(), abstractionFactory);
+    this(factory, IdenticalKindTranslator.getInstance(), abstractionCreator);
   }
 
   /**
@@ -100,15 +100,15 @@ public class CompositionalAutomataSynthesizer extends
    *          Factory used for trace construction.
    * @param translator
    *          Kind translator used to determine event and component kinds.
-   * @param abstractionFactory
+   * @param abstractionCreator
    *          Factory to define the abstraction sequence to be used.
    */
   public CompositionalAutomataSynthesizer
     (final ProductDESProxyFactory factory,
      final KindTranslator translator,
-     final AutomataSynthesisAbstractionProcedureFactory abstractionFactory)
+     final AbstractionProcedureCreator abstractionCreator)
   {
-    this(null, factory, translator, abstractionFactory);
+    this(null, factory, translator, abstractionCreator);
   }
 
   /**
@@ -118,7 +118,7 @@ public class CompositionalAutomataSynthesizer extends
    *          Factory used for trace construction.
    * @param translator
    *          Kind translator used to determine event and component kinds.
-   * @param abstractionFactory
+   * @param abstractionCreator
    *          Factory to define the abstraction sequence to be used.
    * @param preselectingMethodFactory
    *          Enumeration factory that determines possible candidate
@@ -127,10 +127,10 @@ public class CompositionalAutomataSynthesizer extends
   public CompositionalAutomataSynthesizer
     (final ProductDESProxyFactory factory,
      final KindTranslator translator,
-     final AutomataSynthesisAbstractionProcedureFactory abstractionFactory,
+     final AbstractionProcedureCreator abstractionCreator,
      final PreselectingMethodFactory preselectingMethodFactory)
   {
-    this(null, factory, translator, abstractionFactory,
+    this(null, factory, translator, abstractionCreator,
          preselectingMethodFactory);
   }
 
@@ -144,16 +144,16 @@ public class CompositionalAutomataSynthesizer extends
    *          Factory used for trace construction.
    * @param translator
    *          Kind translator used to determine event and component kinds.
-   * @param abstractionFactory
+   * @param abstractionCreator
    *          Factory to define the abstraction sequence to be used.
    */
   public CompositionalAutomataSynthesizer
     (final ProductDESProxy model,
      final ProductDESProxyFactory factory,
      final KindTranslator translator,
-     final AutomataSynthesisAbstractionProcedureFactory abstractionFactory)
+     final AbstractionProcedureCreator abstractionCreator)
   {
-    this(model, factory, translator, abstractionFactory,
+    this(model, factory, translator, abstractionCreator,
          new PreselectingMethodFactory());
   }
 
@@ -167,7 +167,7 @@ public class CompositionalAutomataSynthesizer extends
    *          Factory used for trace construction.
    * @param translator
    *          Kind translator used to determine event and component kinds.
-   * @param abstractionFactory
+   * @param abstractionCreator
    *          Factory to define the abstraction sequence to be used.
    * @param preselectingMethodFactory
    *          Enumeration factory that determines possible candidate
@@ -177,12 +177,13 @@ public class CompositionalAutomataSynthesizer extends
     (final ProductDESProxy model,
      final ProductDESProxyFactory factory,
      final KindTranslator translator,
-     final AutomataSynthesisAbstractionProcedureFactory abstractionFactory,
+     final AbstractionProcedureCreator abstractionCreator,
      final PreselectingMethodFactory preselectingMethodFactory)
   {
-    super(model, factory, translator, abstractionFactory,
+    super(model, factory, translator, abstractionCreator,
           preselectingMethodFactory);
   }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
@@ -198,8 +199,16 @@ public class CompositionalAutomataSynthesizer extends
     }
   }
 
+
   //#########################################################################
   //# Configuration
+  @Override
+  public AutomataSynthesisAbstractionProcedureFactory
+    getAbstractionProcedureFactory()
+  {
+    return AutomataSynthesisAbstractionProcedureFactory.getInstance();
+  }
+
   public void setSupervisorReductionEnabled(final boolean enable)
   {
     mSupervisorReductionEnabled = enable;
@@ -209,6 +218,7 @@ public class CompositionalAutomataSynthesizer extends
   {
     return mSupervisorReductionEnabled;
   }
+
 
   //#########################################################################
   //# Invocation
@@ -242,6 +252,7 @@ public class CompositionalAutomataSynthesizer extends
       tearDown();
     }
   }
+
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.AbstractModelAnalyser

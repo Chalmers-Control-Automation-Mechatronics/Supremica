@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.compositional
-//# CLASS:   CompositionalSynthesizer
+//# CLASS:   CompositionalStateRepresentationSynthesizer
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -78,13 +78,14 @@ public class CompositionalStateRepresentationSynthesizer extends
    *
    * @param factory
    *          Factory used for trace construction.
-   * @param wsoe
+   * @param abstractionCreator
    *          Factory to define the abstraction sequence to be used.
    */
-  public CompositionalStateRepresentationSynthesizer(final ProductDESProxyFactory factory,
-                                  final StateRepresentationSynthesisAbstractionProcedureFactory wsoe)
+  public CompositionalStateRepresentationSynthesizer
+    (final ProductDESProxyFactory factory,
+     final AbstractionProcedureCreator abstractionCreator)
   {
-    this(factory, IdenticalKindTranslator.getInstance(), wsoe);
+    this(factory, IdenticalKindTranslator.getInstance(), abstractionCreator);
   }
 
   /**
@@ -97,9 +98,10 @@ public class CompositionalStateRepresentationSynthesizer extends
    * @param wsoe
    *          Factory to define the abstraction sequence to be used.
    */
-  public CompositionalStateRepresentationSynthesizer(final ProductDESProxyFactory factory,
-                                  final KindTranslator translator,
-                                  final StateRepresentationSynthesisAbstractionProcedureFactory wsoe)
+  public CompositionalStateRepresentationSynthesizer
+    (final ProductDESProxyFactory factory,
+     final KindTranslator translator,
+     final AbstractionProcedureCreator wsoe)
   {
     this(null, factory, translator, wsoe);
   }
@@ -111,7 +113,7 @@ public class CompositionalStateRepresentationSynthesizer extends
    *          Factory used for trace construction.
    * @param translator
    *          Kind translator used to determine event and component kinds.
-   * @param abstractionFactory
+   * @param abstractionCreator
    *          Factory to define the abstraction sequence to be used.
    * @param preselectingMethodFactory
    *          Enumeration factory that determines possible candidate
@@ -120,10 +122,10 @@ public class CompositionalStateRepresentationSynthesizer extends
   public CompositionalStateRepresentationSynthesizer
     (final ProductDESProxyFactory factory,
      final KindTranslator translator,
-     final StateRepresentationSynthesisAbstractionProcedureFactory abstractionFactory,
+     final AbstractionProcedureCreator abstractionCreator,
      final PreselectingMethodFactory preselectingMethodFactory)
   {
-    this(null, factory, translator, abstractionFactory,
+    this(null, factory, translator, abstractionCreator,
          preselectingMethodFactory);
   }
 
@@ -137,16 +139,16 @@ public class CompositionalStateRepresentationSynthesizer extends
    *          Factory used for trace construction.
    * @param translator
    *          Kind translator used to determine event and component kinds.
-   * @param wsoe
+   * @param abstractionCreator
    *          Factory to define the abstraction sequence to be used.
    */
   public CompositionalStateRepresentationSynthesizer
     (final ProductDESProxy model,
      final ProductDESProxyFactory factory,
      final KindTranslator translator,
-     final StateRepresentationSynthesisAbstractionProcedureFactory wsoe)
+     final AbstractionProcedureCreator abstractionCreator)
   {
-    this(model, factory, translator, wsoe, new PreselectingMethodFactory());
+    this(model, factory, translator, abstractionCreator, new PreselectingMethodFactory());
   }
 
   /**
@@ -159,7 +161,7 @@ public class CompositionalStateRepresentationSynthesizer extends
    *          Factory used for trace construction.
    * @param translator
    *          Kind translator used to determine event and component kinds.
-   * @param wsoe
+   * @param abstractionCreator
    *          Factory to define the abstraction sequence to be used.
    * @param preselectingMethodFactory
    *          Enumeration factory that determines possible candidate
@@ -169,11 +171,23 @@ public class CompositionalStateRepresentationSynthesizer extends
     (final ProductDESProxy model,
      final ProductDESProxyFactory factory,
      final KindTranslator translator,
-     final StateRepresentationSynthesisAbstractionProcedureFactory wsoe,
+     final AbstractionProcedureCreator abstractionCreator,
      final PreselectingMethodFactory preselectingMethodFactory)
   {
-    super(model, factory, translator, wsoe, preselectingMethodFactory);
+    super(model, factory, translator, abstractionCreator,
+          preselectingMethodFactory);
   }
+
+
+  //#########################################################################
+  //# Configuration
+  @Override
+  public StateRepresentationSynthesisAbstractionProcedureFactory
+    getAbstractionProcedureFactory()
+  {
+    return StateRepresentationSynthesisAbstractionProcedureFactory.getInstance();
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
@@ -186,6 +200,7 @@ public class CompositionalStateRepresentationSynthesizer extends
     }
   }
 
+
   //#########################################################################
   //# Invocation
   @Override
@@ -193,7 +208,8 @@ public class CompositionalStateRepresentationSynthesizer extends
   {
     try {
       setUp();
-      final CompositionalStateRepresentationSynthesisResult result = getAnalysisResult();
+      final CompositionalStateRepresentationSynthesisResult result =
+        getAnalysisResult();
       if (!result.isFinished()) {
         runCompositionalMinimisation();
       }
@@ -219,6 +235,7 @@ public class CompositionalStateRepresentationSynthesizer extends
       tearDown();
     }
   }
+
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
@@ -268,6 +285,7 @@ public class CompositionalStateRepresentationSynthesizer extends
     super.tearDown();
     mHalfwaySimplifier = null;
   }
+
 
   //#########################################################################
   //# Hooks
