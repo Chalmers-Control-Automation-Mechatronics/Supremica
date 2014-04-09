@@ -61,8 +61,8 @@ import org.apache.log4j.Logger;
  * @author Sahar Mohajerani, Robi Malik
  */
 
-public class CompositionalAutomataSynthesizer extends
-  AbstractCompositionalSynthesizer
+public class CompositionalAutomataSynthesizer
+  extends AbstractCompositionalSynthesizer
 {
 
   //#########################################################################
@@ -549,6 +549,8 @@ public class CompositionalAutomataSynthesizer extends
                                                   final EventEncoding eventEnc)
     throws AnalysisException
   {
+    final CompositionalSynthesisResult result = getAnalysisResult();
+    recordStatistics(aut);
     final ListBufferTransitionRelation rel =
       new ListBufferTransitionRelation(aut,
                                        eventEnc,
@@ -561,6 +563,7 @@ public class CompositionalAutomataSynthesizer extends
     }
     mHalfwaySimplifier.setDefaultMarkingID(defaultID);
     mHalfwaySimplifier.run();
+    result.addMonolithicAnalysisResult(null);
     final ListBufferTransitionRelation supervisor =
       mHalfwaySimplifier.getTransitionRelation();
     final TRPartition partition = mHalfwaySimplifier.getResultPartition();

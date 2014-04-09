@@ -51,8 +51,9 @@ import org.apache.log4j.Logger;
  * @author Sahar Mohajerani, Robi Malik
  */
 
-public abstract class AbstractCompositionalSynthesizer extends
-  AbstractCompositionalModelAnalyzer implements SupervisorSynthesizer
+public abstract class AbstractCompositionalSynthesizer
+  extends AbstractCompositionalModelAnalyzer
+  implements SupervisorSynthesizer
 {
 
   //#########################################################################

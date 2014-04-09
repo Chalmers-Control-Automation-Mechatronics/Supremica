@@ -86,6 +86,7 @@ public abstract class CompositionalSynthesisResult
   public void print(final PrintWriter writer)
   {
     super.print(writer);
+    writer.println("--------------------------------------------------");
     writer.print("Final number of states: ");
     writer.println(mSynchStates);
     writer.print("Final number of transitions: ");

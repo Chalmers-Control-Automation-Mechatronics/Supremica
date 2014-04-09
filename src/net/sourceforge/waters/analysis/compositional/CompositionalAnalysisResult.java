@@ -280,10 +280,10 @@ public class CompositionalAnalysisResult
       writer.println(mNumberOfSyncProducts);
       mSynchronousProductStats.print(writer);
     }
+    writer.println("--------------------------------------------------");
+    writer.print("Number of monolithic analysis runs: ");
+    writer.println(mNumberOfMonolithicRuns);
     if (mMonolithicStats != null) {
-      writer.println("--------------------------------------------------");
-      writer.print("Number of monolithic verification runs: ");
-      writer.println(mNumberOfMonolithicRuns);
       mMonolithicStats.print(writer);
     }
   }
@@ -308,8 +308,9 @@ public class CompositionalAnalysisResult
       writer.print(",SyncProd,");
       mSynchronousProductStats.printCSVHorizontalHeadings(writer);
     }
+    writer.print(",Monolithic");
     if (mMonolithicStats != null) {
-      writer.print(",Monolithic,");
+      writer.println(',');
       mMonolithicStats.printCSVHorizontalHeadings(writer);
     }
   }
@@ -343,9 +344,9 @@ public class CompositionalAnalysisResult
       writer.print(',');
       mSynchronousProductStats.printCSVHorizontal(writer);
     }
+    writer.print(',');
+    writer.print(mNumberOfMonolithicRuns);
     if (mMonolithicStats != null) {
-      writer.print(',');
-      writer.print(mNumberOfMonolithicRuns);
       writer.print(',');
       mMonolithicStats.printCSVHorizontal(writer);
     }

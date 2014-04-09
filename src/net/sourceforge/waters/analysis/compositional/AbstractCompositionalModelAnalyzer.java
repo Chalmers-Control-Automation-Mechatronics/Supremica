@@ -2045,7 +2045,7 @@ public abstract class AbstractCompositionalModelAnalyzer
 
   //#########################################################################
   //# Statistics
-  private void recordStatistics(final AutomatonProxy aut)
+  void recordStatistics(final AutomatonProxy aut)
   {
     final CompositionalAnalysisResult result = getAnalysisResult();
     result.addCompositionAttempt();
@@ -2064,7 +2064,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     result.updatePeakMemoryUsage();
   }
 
-  private void recordUnsuccessfulComposition()
+  void recordUnsuccessfulComposition()
   {
     final CompositionalAnalysisResult result = getAnalysisResult();
     result.addUnsuccessfulComposition();
