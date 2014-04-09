@@ -396,7 +396,7 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
   {
     final String group = "tests";
     final String dir = "incremental_suite";
-    final String name = "tbed_noderail_block.wmod";
+    final String name = "tbed_noderailb.wmod";
     runModel(group, dir, name, false);
   }
 

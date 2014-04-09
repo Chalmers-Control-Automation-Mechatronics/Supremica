@@ -52,14 +52,14 @@ public class CompositionalStandardConflictCheckerExperiments extends
   {
     verifyBig_BMW();
     verify_ftechnik();
-     verify_verriegel4();
+    verify_verriegel4();
     verify_verriegel4b();
     verify_rhone_alps();
     verify_tbed_ctct();
-   verify_fzelle();
+    verify_fzelle();
     verify_tbed_uncont();
     verify_tbed_noderail();
-    verify_tbed_noderail_block();
+    verify_tbed_noderailb();
     verify_tbed_valid();
     verify_profisafe_i4_host();
     verify_profisafe_i5_host();
@@ -116,11 +116,11 @@ public class CompositionalStandardConflictCheckerExperiments extends
     runModel(group, dir, name);
   }
 
-  private void verify_tbed_noderail_block() throws Exception
+  private void verify_tbed_noderailb() throws Exception
   {
     final String group = "tests";
     final String dir = "incremental_suite";
-    final String name = "tbed_noderail_block.wmod";
+    final String name = "tbed_noderailb.wmod";
     runModel(group, dir, name);
   }
 

@@ -37,6 +37,7 @@ extends AbstractConflictCheckerTest
   //#########################################################################
   //# Overrides for
   //# net.sourceforge.waters.model.analysis.AbstractConflictCheckerTest
+  @Override
   protected LanguageInclusionChecker createLanguageInclusionChecker
     (final ProductDESProxy des, final ProductDESProxyFactory factory)
   {
@@ -96,7 +97,7 @@ extends AbstractConflictCheckerTest
     setConfiguration(10000, 100000, 1000000, 1000000);
     final String group = "tests";
     final String dir = "incremental_suite";
-    final String name = "tbed_noderail_block.wmod";
+    final String name = "tbed_noderailb.wmod";
     runModelVerifier(group, dir, name, false);
   }
 

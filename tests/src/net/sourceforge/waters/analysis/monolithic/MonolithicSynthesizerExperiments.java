@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.Formatter;
 import java.util.List;
 
+import net.sourceforge.waters.analysis.compositional.CompositionalAutomataSynthesizer;
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;
@@ -238,7 +239,7 @@ public class MonolithicSynthesizerExperiments
   @SuppressWarnings("unused")
   private void synthesisFenCaiWon09Synth() throws Exception
   {
-    runModel("tests", "fencaiwon09", "FenCaiWon09_synth.wmod");
+    runModel("tests", "fencaiwon09", "FenCaiWon09s.wmod");
   }
 
   // Train testbed
@@ -251,7 +252,7 @@ public class MonolithicSynthesizerExperiments
   @SuppressWarnings("unused")
   private void synthesiseTbedNoderailB() throws Exception
   {
-    runModel("tests", "incremental_suite", "tbed_noderail_block.wmod");
+    runModel("tests", "incremental_suite", "tbed_noderailb.wmod");
   }
 
   @SuppressWarnings("unused")

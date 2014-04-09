@@ -113,7 +113,7 @@ public abstract class AbstractLargeStandardConflictCheckerTest extends
   {
     final String group = "tests";
     final String dir = "incremental_suite";
-    final String name = "tbed_noderail_block.wmod";
+    final String name = "tbed_noderailb.wmod";
     runModelVerifier(group, dir, name, false);
   }
 

@@ -336,7 +336,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
 
   private void synthesiseTbedNoderailB() throws Exception
   {
-    runModel("tests", "incremental_suite", "tbed_noderail_block.wmod");
+    runModel("tests", "incremental_suite", "tbed_noderailb.wmod");
   }
 
   private void synthesiseTbedCtct() throws Exception
@@ -418,7 +418,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
 
   private void synthesisFenCaiWon09Synth() throws Exception
   {
-    runModel("tests", "fencaiwon09", "FenCaiWon09_synth.wmod");
+    runModel("tests", "fencaiwon09", "FenCaiWon09s.wmod");
   }
 
   private void synthesis6linka() throws Exception
