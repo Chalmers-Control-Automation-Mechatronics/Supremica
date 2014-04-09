@@ -1,0 +1,636 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="Low Level II" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <EventDeclList>
+        <EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="CONTROLLABLE" Name="en_train1_II"/>
+        <EventDecl Kind="CONTROLLABLE" Name="en_train2_II"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="nt_at23"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="nt_at24"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="t1_at23"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="t1_at24"/>
+        <EventDecl Scope="REQUIRED_PARAMETER" Kind="UNCONTROLLABLE" Name="t1_en_II_at22">
+            <ns2:AttributeMap>
+                <ns2:Attribute Value="REQUEST" Name="HISC:EventType"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Scope="REQUIRED_PARAMETER" Kind="UNCONTROLLABLE" Name="t1_lv_II_at26">
+            <ns2:AttributeMap>
+                <ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="t2_at23"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="t2_at24"/>
+        <EventDecl Scope="REQUIRED_PARAMETER" Kind="UNCONTROLLABLE" Name="t2_en_II_at22">
+            <ns2:AttributeMap>
+                <ns2:Attribute Value="REQUEST" Name="HISC:EventType"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Scope="REQUIRED_PARAMETER" Kind="UNCONTROLLABLE" Name="t2_lv_II_at26">
+            <ns2:AttributeMap>
+                <ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="umv_train1_II"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="umv_train2_II"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="SPEC" Name="Interface_I:II">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="160" X="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="20" X="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="1">
+                        <PointGeometry>
+                            <Point Y="160" X="320"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="20" X="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="2">
+                        <PointGeometry>
+                            <Point Y="320" X="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="20" X="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_lv_II_at26"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="18" X="-39"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_en_II_at22"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-18" X="39"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="2" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_en_II_at22"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="39" X="18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_lv_II_at26"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-39" X="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:Interface"/>
+            </ns2:AttributeMap>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="Sup_Interface_II">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="0" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="en_train2_II"/>
+                            <SimpleIdentifier Name="en_train1_II"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_Control_II">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                    <SimpleNode Name="2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="2" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_en_II_at22"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_en_II_at22"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_lv_II_at26"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_lv_II_at26"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_Enable_Train1_II">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="160" X="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="20" X="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="1">
+                        <PointGeometry>
+                            <Point Y="160" X="320"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="20" X="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_lv_II_at26"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="18" X="-39"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="1" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="en_train1_II"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="202" X="362"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_en_II_at22"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-18" X="39"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_Enable_Train2_II">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_lv_II_at26"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="1" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="en_train2_II"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_en_II_at22"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_HISC_II_Train1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="160" X="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="20" X="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="1">
+                        <PointGeometry>
+                            <Point Y="160" X="320"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="20" X="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="2">
+                        <PointGeometry>
+                            <Point Y="320" X="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="20" X="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="3">
+                        <PointGeometry>
+                            <Point Y="320" X="320"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="20" X="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="3" Source="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_at24"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_en_II_at22"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-18" X="39"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="2" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_at23"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_lv_II_at26"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_HISC_II_Train2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                    <SimpleNode Name="2"/>
+                    <SimpleNode Name="3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_en_II_at22"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="2" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_at23"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="3" Source="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_at24"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_lv_II_at26"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_SenDependsmall_II_Train1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                    <SimpleNode Name="2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="umv_train1_II"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="2" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_lv_II_at26"/>
+                            <SimpleIdentifier Name="t1_at24"/>
+                            <SimpleIdentifier Name="t1_at23"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="en_train1_II"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="umv_train1_II"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_SenDependsmall_II_Train2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                    <SimpleNode Name="2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="0" Source="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="umv_train2_II"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="en_train2_II"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="2" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_lv_II_at26"/>
+                            <SimpleIdentifier Name="t2_at23"/>
+                            <SimpleIdentifier Name="t2_at24"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="umv_train2_II"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_Sens23_Enable_Train1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="0" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="en_train1_II"/>
+                            <SimpleIdentifier Name="nt_at23"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_at23"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="en_train1_II"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_Sens23_Enable_Train2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="en_train2_II"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at23"/>
+                            <SimpleIdentifier Name="en_train2_II"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_at23"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_Sens24_Enable_Train1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="en_train1_II"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at24"/>
+                            <SimpleIdentifier Name="en_train1_II"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_at24"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_Sens24_Enable_Train2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="0" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at24"/>
+                            <SimpleIdentifier Name="en_train2_II"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_at24"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="en_train2_II"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_Sensor_23">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0_sen23">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1_sen23"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="0_sen23" Source="1_sen23">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at23"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="1_sen23" Source="0_sen23">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_at23"/>
+                            <SimpleIdentifier Name="t1_at23"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_Sensor_24">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0_sen24">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1_sen24"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1_sen24" Source="0_sen24">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_at24"/>
+                            <SimpleIdentifier Name="t1_at24"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="0_sen24" Source="1_sen24">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at24"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_Train_1_II">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="umv_train1_II"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="en_train1_II"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_Train_2_II">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="0" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="umv_train2_II"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="1" Source="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="en_train2_II"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

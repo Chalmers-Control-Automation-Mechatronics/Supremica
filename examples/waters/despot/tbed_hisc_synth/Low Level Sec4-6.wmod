@@ -1,0 +1,1811 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="Low Level Sec4-6" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Scope="OPTIONAL_PARAMETER" Name=":accepting"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="derail_sw6"/>
+        <EventDecl Kind="CONTROLLABLE" Name="en_train1_Sec4:6"/>
+        <EventDecl Kind="CONTROLLABLE" Name="en_train2_Sec4:6"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="nt_at27"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="nt_at4"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="nt_at9"/>
+        <EventDecl Kind="CONTROLLABLE" Name="str_4"/>
+        <EventDecl Kind="CONTROLLABLE" Name="str_6"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="t1_at27"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="t1_at4"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="t1_at6"/>
+        <EventDecl Kind="UNCONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="t1_en_Sw4:6_at2">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="t1_lv_Sw4:6_at11">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="t1req_sw4"/>
+        <EventDecl Kind="CONTROLLABLE" Name="t1req_sw6"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="t2_at27"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="t2_at4"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="t2_at9"/>
+        <EventDecl Kind="UNCONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="t2_en_Sw4:6_at10">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="t2_en_Sw4:6_at2">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="t2_lv_Sw4:6_at11">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="t2_lv_Sw4:6_at6">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="t2req_sw4"/>
+        <EventDecl Kind="CONTROLLABLE" Name="t2req_sw6"/>
+        <EventDecl Kind="CONTROLLABLE" Name="turn_4"/>
+        <EventDecl Kind="CONTROLLABLE" Name="turn_6"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="umv_train1_Sec4:6"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="umv_train2_Sec4:6"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="SPEC" Name="Interface_I:Sec4:6">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="120" Y="120"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="1">
+                        <PointGeometry>
+                            <Point X="240" Y="120"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="3">
+                        <PointGeometry>
+                            <Point X="120" Y="240"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="4">
+                        <PointGeometry>
+                            <Point X="240" Y="240"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="3" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_lv_Sw4:6_at6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="1" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_lv_Sw4:6_at11"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-19" Y="18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0" Target="3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_en_Sw4:6_at2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="18" Y="19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0" Target="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_en_Sw4:6_at2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="19" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0" Target="4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_en_Sw4:6_at10"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="41" Y="15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="4" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_lv_Sw4:6_at11"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:Interface"/>
+            </ns2:AttributeMap>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_Control_Sec4:6">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="120" Y="120"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="1">
+                        <PointGeometry>
+                            <Point X="240" Y="120"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="3">
+                        <PointGeometry>
+                            <Point X="120" Y="240"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="4">
+                        <PointGeometry>
+                            <Point X="240" Y="240"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="0" Target="4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_en_Sw4:6_at10"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="41" Y="15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0" Target="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_en_Sw4:6_at2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="19" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0" Target="3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_en_Sw4:6_at2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="18" Y="19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="1" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_lv_Sw4:6_at11"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-19" Y="18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="4" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_lv_Sw4:6_at11"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-41" Y="-15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="3" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_lv_Sw4:6_at6"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-18" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_HISC_Sec4:6_Enable_Train1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="1" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_lv_Sw4:6_at11"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="1" Target="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="en_train1_Sec4:6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0" Target="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_en_Sw4:6_at2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_HISC_Sec4:6_Enable_Train2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="1" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_lv_Sw4:6_at6"/>
+                            <SimpleIdentifier Name="t2_lv_Sw4:6_at11"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="1" Target="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="en_train2_Sec4:6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0" Target="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_en_Sw4:6_at10"/>
+                            <SimpleIdentifier Name="t2_en_Sw4:6_at2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_HISC_Switch4:6_Train1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="120" Y="120"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="1">
+                        <PointGeometry>
+                            <Point X="240" Y="120"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="2">
+                        <PointGeometry>
+                            <Point X="360" Y="120"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="3">
+                        <PointGeometry>
+                            <Point X="120" Y="240"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="5"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="0" Target="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_en_Sw4:6_at2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="19" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="1" Target="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_at4"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="19" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="2" Target="3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_at27"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-74" Y="57"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="2" Target="5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_at6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="3" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_lv_Sw4:6_at11"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-18" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_HISC_Switch4:6_Train2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                    <SimpleNode Name="2"/>
+                    <SimpleNode Name="3"/>
+                    <SimpleNode Name="4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="1" Target="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_at4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="3" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_lv_Sw4:6_at11"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0" Target="4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_en_Sw4:6_at10"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0" Target="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_en_Sw4:6_at2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="4" Target="3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_at9"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="2" Target="3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_at27"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="2" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_lv_Sw4:6_at6"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_SenDepend_Switch4_Train_1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="120" Y="120"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="1">
+                        <PointGeometry>
+                            <Point X="240" Y="120"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="2">
+                        <PointGeometry>
+                            <Point X="360" Y="120"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="3">
+                        <PointGeometry>
+                            <Point X="120" Y="240"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="4">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="240" Y="240"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="5">
+                        <PointGeometry>
+                            <Point X="360" Y="240"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="6">
+                        <PointGeometry>
+                            <Point X="120" Y="360"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="7">
+                        <PointGeometry>
+                            <Point X="240" Y="360"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="0" Target="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_at4"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="19" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_4"/>
+                            <SimpleIdentifier Name="nt_at4"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="162" Y="162"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="0" Target="4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_4"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="41" Y="15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="1" Target="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_4"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="282" Y="162"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="1" Target="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at4"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="19" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="1" Target="5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_4"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="41" Y="15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="5" Target="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_4"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-41" Y="-15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="5" Target="6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at4"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-74" Y="57"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="5" Target="5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_4"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="402" Y="282"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="2" Target="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at4"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="402" Y="162"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="2" Target="3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_4"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-74" Y="57"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="2" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_at6"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-79" Y="18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="6" Target="7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_4"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="19" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="6" Target="6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at4"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="162" Y="402"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="6" Target="4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_at27"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="15" Y="-41"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="7" Target="7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_4"/>
+                            <SimpleIdentifier Name="nt_at4"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="282" Y="402"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="7" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_at27"/>
+                            <SimpleIdentifier Name="t1_at6"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-57" Y="-74"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="7" Target="3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_4"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-41" Y="-15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="3" Target="7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_4"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="41" Y="15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="3" Target="3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at4"/>
+                            <SimpleIdentifier Name="str_4"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="162" Y="282"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="3" Target="4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_at27"/>
+                            <SimpleIdentifier Name="t1_at6"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="19" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="4" Target="5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_at4"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="19" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="4" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_4"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-41" Y="-15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="4" Target="4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at4"/>
+                            <SimpleIdentifier Name="str_4"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="282" Y="282"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_SenDepend_Switch4_Train_2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                    <SimpleNode Name="2"/>
+                    <SimpleNode Name="3"/>
+                    <SimpleNode Name="4">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="5"/>
+                    <SimpleNode Name="6"/>
+                    <SimpleNode Name="7"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="6" Target="7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="6" Target="6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_4"/>
+                            <SimpleIdentifier Name="nt_at4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="6" Target="4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_at27"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="1" Target="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="1" Target="5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="1" Target="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="2" Target="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_4"/>
+                            <SimpleIdentifier Name="nt_at4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="2" Target="3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="2" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_lv_Sw4:6_at6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="7" Target="7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_4"/>
+                            <SimpleIdentifier Name="nt_at4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="7" Target="3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="7" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_lv_Sw4:6_at6"/>
+                            <SimpleIdentifier Name="t2_at27"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="5" Target="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="5" Target="5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="5" Target="6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_4"/>
+                            <SimpleIdentifier Name="nt_at4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0" Target="4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0" Target="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_at4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="3" Target="7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="3" Target="3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_4"/>
+                            <SimpleIdentifier Name="nt_at4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="3" Target="4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_lv_Sw4:6_at6"/>
+                            <SimpleIdentifier Name="t2_at27"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="4" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="4" Target="4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_4"/>
+                            <SimpleIdentifier Name="nt_at4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="4" Target="5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_at4"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_SenDepend_Switch6_Train_1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0_sensw6_tr1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="120" Y="120"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="2_sensw6_tr1">
+                        <PointGeometry>
+                            <Point X="360" Y="120"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="3_sensw6_tr1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="120" Y="240"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="5_sensw6_tr1">
+                        <PointGeometry>
+                            <Point X="360" Y="240"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="6">
+                        <PointGeometry>
+                            <Point X="288" Y="192"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="2a">
+                        <PointGeometry>
+                            <Point X="96" Y="288"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="5a">
+                        <PointGeometry>
+                            <Point X="192" Y="288"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="2_sensw6_tr1" Target="5_sensw6_tr1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_6"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="18" Y="19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="2_sensw6_tr1" Target="2a">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at27"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-86" Y="76"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="2_sensw6_tr1" Target="2_sensw6_tr1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_6"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="402" Y="162"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="0_sensw6_tr1" Target="2_sensw6_tr1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_at27"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="79" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0_sensw6_tr1" Target="3_sensw6_tr1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_6"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="18" Y="19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0_sensw6_tr1" Target="0_sensw6_tr1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at27"/>
+                            <SimpleIdentifier Name="turn_6"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="162" Y="162"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="2a" Target="2a">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_6"/>
+                            <SimpleIdentifier Name="nt_at27"/>
+                            <SimpleIdentifier Name="turn_6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="2a" Target="6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="derail_sw6"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="50" Y="-45"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="6" Target="6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_6"/>
+                            <SimpleIdentifier Name="nt_at27"/>
+                            <SimpleIdentifier Name="turn_6"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="330" Y="234"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="5a" Target="5a">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_6"/>
+                            <SimpleIdentifier Name="nt_at27"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="234" Y="330"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="5a" Target="3_sensw6_tr1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_lv_Sw4:6_at11"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-10" Y="15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="5a" Target="2a">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_6"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-7" Y="18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="5_sensw6_tr1" Target="5_sensw6_tr1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_6"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="402" Y="282"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="5_sensw6_tr1" Target="5a">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at27"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-39" Y="30"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="5_sensw6_tr1" Target="2_sensw6_tr1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_6"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-18" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="3_sensw6_tr1" Target="5_sensw6_tr1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_at27"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="79" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="3_sensw6_tr1" Target="3_sensw6_tr1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_6"/>
+                            <SimpleIdentifier Name="nt_at27"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="162" Y="282"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="3_sensw6_tr1" Target="0_sensw6_tr1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_6"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-18" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_SenDepend_Switch6_Train_2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0_sensw6_tr2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1_sensw6_tr2"/>
+                    <SimpleNode Name="2_sensw6_tr2"/>
+                    <SimpleNode Name="3_sensw6_tr2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="4_sensw6_tr2"/>
+                    <SimpleNode Name="5_sensw6_tr2"/>
+                    <SimpleNode Name="1a"/>
+                    <SimpleNode Name="2a"/>
+                    <SimpleNode Name="4a"/>
+                    <SimpleNode Name="5a"/>
+                    <SimpleNode Name="6"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="5_sensw6_tr2" Target="5a">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at27"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="5_sensw6_tr2" Target="5_sensw6_tr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_6"/>
+                            <SimpleIdentifier Name="nt_at9"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="5_sensw6_tr2" Target="2_sensw6_tr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="1a" Target="0_sensw6_tr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_lv_Sw4:6_at11"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="1a" Target="1a">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at27"/>
+                            <SimpleIdentifier Name="turn_6"/>
+                            <SimpleIdentifier Name="nt_at9"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="1a" Target="4a">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="4_sensw6_tr2" Target="4_sensw6_tr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at27"/>
+                            <SimpleIdentifier Name="str_6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="4_sensw6_tr2" Target="1_sensw6_tr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="4_sensw6_tr2" Target="4a">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at9"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="1_sensw6_tr2" Target="1_sensw6_tr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at27"/>
+                            <SimpleIdentifier Name="turn_6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="1_sensw6_tr2" Target="4_sensw6_tr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="1_sensw6_tr2" Target="1a">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at9"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0_sensw6_tr2" Target="0_sensw6_tr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at27"/>
+                            <SimpleIdentifier Name="turn_6"/>
+                            <SimpleIdentifier Name="nt_at9"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0_sensw6_tr2" Target="3_sensw6_tr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0_sensw6_tr2" Target="2_sensw6_tr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_at27"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0_sensw6_tr2" Target="1_sensw6_tr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_at9"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="2_sensw6_tr2" Target="2a">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at27"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="2_sensw6_tr2" Target="5_sensw6_tr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="2_sensw6_tr2" Target="2_sensw6_tr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_6"/>
+                            <SimpleIdentifier Name="nt_at9"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="3_sensw6_tr2" Target="3_sensw6_tr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at27"/>
+                            <SimpleIdentifier Name="str_6"/>
+                            <SimpleIdentifier Name="nt_at9"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="3_sensw6_tr2" Target="0_sensw6_tr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="3_sensw6_tr2" Target="5_sensw6_tr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_at27"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="3_sensw6_tr2" Target="4_sensw6_tr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_at9"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="4a" Target="4a">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at27"/>
+                            <SimpleIdentifier Name="str_6"/>
+                            <SimpleIdentifier Name="turn_6"/>
+                            <SimpleIdentifier Name="nt_at9"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="4a" Target="6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="derail_sw6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="2a" Target="2a">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at27"/>
+                            <SimpleIdentifier Name="str_6"/>
+                            <SimpleIdentifier Name="turn_6"/>
+                            <SimpleIdentifier Name="nt_at9"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="2a" Target="6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="derail_sw6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="5a" Target="3_sensw6_tr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_lv_Sw4:6_at11"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="5a" Target="5a">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at27"/>
+                            <SimpleIdentifier Name="str_6"/>
+                            <SimpleIdentifier Name="nt_at9"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="5a" Target="2a">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="6" Target="6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at27"/>
+                            <SimpleIdentifier Name="str_6"/>
+                            <SimpleIdentifier Name="turn_6"/>
+                            <SimpleIdentifier Name="nt_at9"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_SenDependsmall_Train1_Sec4:6">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                    <SimpleNode Name="2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="2" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="umv_train1_Sec4:6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0" Target="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="en_train1_Sec4:6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="1" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="umv_train1_Sec4:6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="1" Target="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_at27"/>
+                            <SimpleIdentifier Name="t1_at4"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_SenDependsmall_Train2_Sec4:6">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                    <SimpleNode Name="2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="2" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="umv_train2_Sec4:6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0" Target="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="en_train2_Sec4:6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="1" Target="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_at27"/>
+                            <SimpleIdentifier Name="t2_at9"/>
+                            <SimpleIdentifier Name="t2_at4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="1" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="umv_train2_Sec4:6"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_Sens27_Enable_Train1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="0" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at27"/>
+                            <SimpleIdentifier Name="en_train1_Sec4:6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0" Target="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_at27"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="1" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="en_train1_Sec4:6"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_Sens27_Enable_Train2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="1" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="en_train2_Sec4:6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="en_train2_Sec4:6"/>
+                            <SimpleIdentifier Name="nt_at27"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0" Target="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_at27"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_Sens4_Enable_Train1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="160" Y="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="1">
+                        <PointGeometry>
+                            <Point X="320" Y="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="1" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="en_train1_Sec4:6"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-39" Y="18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="en_train1_Sec4:6"/>
+                            <SimpleIdentifier Name="nt_at4"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="202" Y="202"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="0" Target="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_at4"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="39" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_Sens4_Enable_Train2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="1" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="en_train2_Sec4:6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0" Target="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_at4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at4"/>
+                            <SimpleIdentifier Name="en_train2_Sec4:6"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_Sens9_Enable_Train2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="160" Y="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="1">
+                        <PointGeometry>
+                            <Point X="320" Y="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="1" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="en_train2_Sec4:6"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-39" Y="18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0" Target="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_at9"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="39" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="en_train2_Sec4:6"/>
+                            <SimpleIdentifier Name="nt_at9"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="202" Y="202"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_Sensor_27">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0_sen27">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1_sen27"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="1_sen27" Target="0_sen27">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at27"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0_sen27" Target="1_sen27">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_at27"/>
+                            <SimpleIdentifier Name="t2_at27"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_Sensor_4">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0_sen4">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1_sen4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="0_sen4" Target="1_sen4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_at4"/>
+                            <SimpleIdentifier Name="t2_at4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="1_sen4" Target="0_sen4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at4"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_Sensor_9">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0_sen9">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="160" Y="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="1_sen9">
+                        <PointGeometry>
+                            <Point X="320" Y="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="1_sen9" Target="0_sen9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="nt_at9"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-39" Y="18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0_sen9" Target="1_sen9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_at9"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_Switch4_Request">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                    <SimpleNode Name="2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="1" Target="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2req_sw4"/>
+                            <SimpleIdentifier Name="t1req_sw4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="1" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_4"/>
+                            <SimpleIdentifier Name="turn_4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="2" Target="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_4"/>
+                            <SimpleIdentifier Name="turn_4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0" Target="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2req_sw4"/>
+                            <SimpleIdentifier Name="t1req_sw4"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_Switch6_Request">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0_reqsw6">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1_reqsw6"/>
+                    <SimpleNode Name="2_reqsw6"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="1_reqsw6" Target="2_reqsw6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2req_sw6"/>
+                            <SimpleIdentifier Name="t1req_sw6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="1_reqsw6" Target="0_reqsw6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_6"/>
+                            <SimpleIdentifier Name="str_6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="2_reqsw6" Target="1_reqsw6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_6"/>
+                            <SimpleIdentifier Name="str_6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0_reqsw6" Target="1_reqsw6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2req_sw6"/>
+                            <SimpleIdentifier Name="t1req_sw6"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_Switchd_4">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="240" Y="240"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="0" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_4"/>
+                            <SimpleIdentifier Name="turn_4"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="282" Y="282"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_Switchd_6">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="0" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_6"/>
+                            <SimpleIdentifier Name="str_6"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_Train_1_Sec4:6">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="1" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="umv_train1_Sec4:6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0" Target="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="en_train1_Sec4:6"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Plant_Train_2_Sec4:6">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="1" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="umv_train2_Sec4:6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0" Target="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="en_train2_Sec4:6"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

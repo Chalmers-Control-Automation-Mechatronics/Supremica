@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="IPC_lockableswitch" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="IPC_lswitch" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>Example from 'Decentralized Control and Coordination of Discrete-Event Systems with Partial Observation' by F. Lin and W. M. Wonham. Two types of products are produced in a system with two machines, M1 and M2. The products require three operations, type 1 products first visit M1, then M2 and finally M1 and type 2 products first visit M2, then M1 and finally M2. The products enter into M1 and M2 respectively through two infinite buffers and move between the machines through four handlers with 2-place buffers. Each handler and buffer is dedicated to a certain product and a certain direction of movement of that product. 
-This is a modified version with a switch to suspend production by M1, and an additional specification to require that output must always be delivered in batches of three workpieces. As the output event of M1 is uncontrollable, the specification prevents the production cycle of M1 completely.
-The system is uncontrollable (buffer overflow problems) and blocking.</ns2:Comment>
+This is a modified version with a switch to suspend production by M1, and an additional specification to require that output machine M2 must produce exactly two workpieces.
+The system is uncontrollable (buffer overflow problems) and blocking. The reachable state space has 247104 states (1363296 with dump states after plantification).
+
+Reference:
+Simon Ware, Robi Malik, Sahar Mohajerani, Martin Fabian. Certainly unsupervisable states. 2nd International Workshop on Formal Techniques for Safety-Critical Systems (FTSCS 2013), 3-18, Queenstown, New Zealand, 29-30 October 2013.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
         <EventDecl Kind="CONTROLLABLE" Name="get1"/>
