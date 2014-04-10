@@ -42,6 +42,7 @@ import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
+import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.subject.module.ConstantAliasSubject;
@@ -71,9 +72,9 @@ public class ConstantAliasEditorDialog
   {
     super(root.getRootWindow());
     if (alias == null) {
-      setTitle("Creating new definition");
+      setTitle("Creating new named constant");
     } else {
-      setTitle("Editing definition");
+      setTitle("Editing named constant");
     }
     mRoot = root;
     mAlias = alias;
@@ -315,18 +316,19 @@ public class ConstantAliasEditorDialog
       } else {
         final String name = mNameInput.getText();
         final String oldname = mAlias.getName();
-        final boolean namechange = !name.equals(oldname);
-        final SimpleExpressionSubject oldexp = (SimpleExpressionSubject)mAlias.getExpression();
+        final boolean nameChange = !name.equals(oldname);
+        final ExpressionProxy oldexp = mAlias.getExpression();
         final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(true);
-        final boolean expchange = !eq.equals(exp, oldexp);
-        if (namechange || expchange) {
+        final boolean expChange = !eq.equals(exp, oldexp);
+        final boolean scopeChange = scope != mAlias.getScope();
+        if (nameChange || expChange || scopeChange) {
           final ConstantAliasSubject template = mAlias.clone();
-          if (namechange) {
+          if (nameChange) {
             final IdentifierSubject ident =
               (IdentifierSubject) mNameInput.getValue();
             template.setIdentifier(ident);
           }
-          if (expchange) {
+          if (expChange) {
             template.setExpression(exp);
           }
           template.setScope(scope);
@@ -404,7 +406,7 @@ public class ConstantAliasEditorDialog
    *
    * <P>This is a reference to the actual object that is being edited. If
    * a new component is being created, it is <CODE>null</CODE>
-   * until the dialog is commited and the actually created subject is
+   * until the dialog is committed and the actually created subject is
    * assigned.</P>
    *
    * <P>The edited state is stored only in the dialog. Changes are only
