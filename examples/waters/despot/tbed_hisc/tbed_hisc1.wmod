@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="tbed_hisc_synth" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>HISC version of Ryan Leduc's train testbed system. This model was is a re-implementation of the original model [1] developed in 2011 using Hierarchical Interface-Based Supervisory Control (HISC). This version has been made blocking by removing all routing supervisors from the original model. The model is controllable and but blocking.
+<Module Name="tbed_hisc1" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>HISC version of Ryan Leduc's train testbed system. This model was is a re-implementation of the original model [1] developed in 2011 using Hierarchical Interface-Based Supervisory Control (HISC). This is a synthesis version with supervisors deleted from subsystems switch8, sec46, sec57, and switch3. It is controllable and blocking and has 287257200875274240 reachable states.
 
 Reference:
 [1] Ryan J. Leduc. PLC Implementation of a DES Supervisor for a Manufacturing Testbed:  An Implementation Perspective. Masters Thesis, Dept. of Electrical Engineering, Univerisity of Toronto, Canada, 1996.</ns2:Comment>
@@ -212,6 +212,34 @@ Reference:
         <EventDecl Kind="UNCONTROLLABLE" Name="umv_train2"/>
     </EventDeclList>
     <ComponentList>
+        <SimpleComponent Kind="SPEC" Name="Sup_High_Level">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="240" Y="240"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="0" Target="0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="en_train2"/>
+                            <SimpleIdentifier Name="en_train1"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="282" Y="282"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
         <SimpleComponent Kind="PLANT" Name="Plant_HISC_I_Enable_Train1">
             <Graph>
                 <NodeList>
@@ -2727,7 +2755,7 @@ Reference:
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <Instance ModuleName="Low Level Switch8" Name="Low Level Switch8">
+        <Instance ModuleName="switch8nosup" Name="Low Level Switch8">
             <ParameterBinding Name=":accepting">
                 <SimpleIdentifier Name=":accepting"/>
             </ParameterBinding>
@@ -2750,7 +2778,7 @@ Reference:
                 <SimpleIdentifier Name="t2_lv_Sw8_at14"/>
             </ParameterBinding>
         </Instance>
-        <Instance ModuleName="Low Level Sec4-6" Name="Low Level Sec4:6">
+        <Instance ModuleName="sec46nosup" Name="Low Level Sec4:6">
             <ParameterBinding Name=":accepting">
                 <SimpleIdentifier Name=":accepting"/>
             </ParameterBinding>
@@ -2773,7 +2801,7 @@ Reference:
                 <SimpleIdentifier Name="t2_lv_Sw4:6_at6"/>
             </ParameterBinding>
         </Instance>
-        <Instance ModuleName="Low Level Sec5-7" Name="Low Level Sec5:7">
+        <Instance ModuleName="sec57nosup" Name="Low Level Sec5:7">
             <ParameterBinding Name=":accepting">
                 <SimpleIdentifier Name=":accepting"/>
             </ParameterBinding>
@@ -2796,7 +2824,7 @@ Reference:
                 <SimpleIdentifier Name="t2_lv_Sw5:7_at5"/>
             </ParameterBinding>
         </Instance>
-        <Instance ModuleName="Low Level Switch3" Name="Low Level Switch3">
+        <Instance ModuleName="switch3nosup" Name="Low Level Switch3">
             <ParameterBinding Name=":accepting">
                 <SimpleIdentifier Name=":accepting"/>
             </ParameterBinding>

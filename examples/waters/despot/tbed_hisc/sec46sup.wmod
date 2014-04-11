@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="Low Level Sec4-6" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="sec46sup" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Scope="OPTIONAL_PARAMETER" Name=":accepting"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="derail_sw6"/>
@@ -143,6 +143,422 @@
             <ns2:AttributeMap>
                 <ns2:Attribute Name="HISC:Interface"/>
             </ns2:AttributeMap>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="Sup_Routing_Switch4_Train_1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0_supr4_tr1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="160" Y="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="1_supr4_tr1">
+                        <PointGeometry>
+                            <Point X="320" Y="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="2_supr4_tr1">
+                        <PointGeometry>
+                            <Point X="160" Y="320"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="0a_supr4_tr1">
+                        <PointGeometry>
+                            <Point X="320" Y="320"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="1_supr4_tr1" Target="1_supr4_tr1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_4"/>
+                            <SimpleIdentifier Name="turn_4"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="362" Y="202"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="1_supr4_tr1" Target="2_supr4_tr1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1req_sw4"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-35" Y="61"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0_supr4_tr1" Target="0_supr4_tr1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_4"/>
+                            <SimpleIdentifier Name="en_train1_Sec4:6"/>
+                            <SimpleIdentifier Name="turn_4"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="202" Y="202"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="0_supr4_tr1" Target="0a_supr4_tr1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_en_Sw4:6_at2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="61" Y="35"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="2_supr4_tr1" Target="0_supr4_tr1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_4"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-18" Y="-39"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0a_supr4_tr1" Target="0a_supr4_tr1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_4"/>
+                            <SimpleIdentifier Name="en_train1_Sec4:6"/>
+                            <SimpleIdentifier Name="turn_4"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="362" Y="362"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="0a_supr4_tr1" Target="1_supr4_tr1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_at4"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-18" Y="-39"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="Sup_Routing_Switch4_Train_2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0_supr4_tr2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="160" Y="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="1_supr4_tr2">
+                        <PointGeometry>
+                            <Point X="320" Y="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="2_supr4_tr2">
+                        <PointGeometry>
+                            <Point X="160" Y="320"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="0a_supr4_tr2">
+                        <PointGeometry>
+                            <Point X="320" Y="320"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="2_supr4_tr2" Target="0_supr4_tr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_4"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-18" Y="-39"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="1_supr4_tr2" Target="1_supr4_tr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_4"/>
+                            <SimpleIdentifier Name="str_4"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="362" Y="202"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="1_supr4_tr2" Target="2_supr4_tr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2req_sw4"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-35" Y="61"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0_supr4_tr2" Target="0_supr4_tr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_4"/>
+                            <SimpleIdentifier Name="en_train2_Sec4:6"/>
+                            <SimpleIdentifier Name="str_4"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="202" Y="202"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="0_supr4_tr2" Target="0a_supr4_tr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_en_Sw4:6_at2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="61" Y="35"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0a_supr4_tr2" Target="1_supr4_tr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_at4"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-18" Y="-39"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0a_supr4_tr2" Target="0a_supr4_tr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_4"/>
+                            <SimpleIdentifier Name="en_train2_Sec4:6"/>
+                            <SimpleIdentifier Name="str_4"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="362" Y="362"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="Sup_Routing_Switch6_Train_1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0_supsw6_tr1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="120" Y="120"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="1_supsw6_tr1">
+                        <PointGeometry>
+                            <Point X="240" Y="120"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="2_supsw6_tr1">
+                        <PointGeometry>
+                            <Point X="360" Y="120"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="0a_supsw6_tr1">
+                        <PointGeometry>
+                            <Point X="360" Y="240"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="0a_supsw6_tr1" Target="0a_supsw6_tr1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="en_train1_Sec4:6"/>
+                            <SimpleIdentifier Name="str_6"/>
+                            <SimpleIdentifier Name="turn_6"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="402" Y="282"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="0a_supsw6_tr1" Target="1_supsw6_tr1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_at27"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-41" Y="-15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="0_supsw6_tr1" Target="0_supsw6_tr1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="en_train1_Sec4:6"/>
+                            <SimpleIdentifier Name="str_6"/>
+                            <SimpleIdentifier Name="turn_6"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="162" Y="162"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="0_supsw6_tr1" Target="0a_supsw6_tr1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1_en_Sw4:6_at2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="90" Y="25"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="2_supsw6_tr1" Target="0_supsw6_tr1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_6"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-79" Y="18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="1_supsw6_tr1" Target="1_supsw6_tr1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_6"/>
+                            <SimpleIdentifier Name="turn_6"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="282" Y="162"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="1_supsw6_tr1" Target="2_supsw6_tr1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t1req_sw6"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="19" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="Sup_Routing_Switch6_Train_2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0_supsw6_tr2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="120" Y="120"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="1_supsw6_tr2">
+                        <PointGeometry>
+                            <Point X="240" Y="120"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="2_supsw6_tr2">
+                        <PointGeometry>
+                            <Point X="360" Y="120"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="1a_supsw6_tr2">
+                        <PointGeometry>
+                            <Point X="360" Y="240"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="20" Y="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="0_supsw6_tr2" Target="0_supsw6_tr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_6"/>
+                            <SimpleIdentifier Name="str_6"/>
+                            <SimpleIdentifier Name="en_train2_Sec4:6"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="162" Y="162"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="0_supsw6_tr2" Target="1a_supsw6_tr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_en_Sw4:6_at10"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="90" Y="25"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="1_supsw6_tr2" Target="1_supsw6_tr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_6"/>
+                            <SimpleIdentifier Name="str_6"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="282" Y="162"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="1_supsw6_tr2" Target="2_supsw6_tr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2req_sw6"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="19" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="2_supsw6_tr2" Target="0_supsw6_tr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_6"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-79" Y="18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="1a_supsw6_tr2" Target="1_supsw6_tr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="t2_at9"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-41" Y="-15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="1a_supsw6_tr2" Target="1a_supsw6_tr2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="turn_6"/>
+                            <SimpleIdentifier Name="str_6"/>
+                            <SimpleIdentifier Name="en_train2_Sec4:6"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="402" Y="282"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
         </SimpleComponent>
         <SimpleComponent Kind="PLANT" Name="Plant_Control_Sec4:6">
             <Graph>
