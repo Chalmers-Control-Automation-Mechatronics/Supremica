@@ -109,6 +109,17 @@ public class Watchdog extends Thread {
     mAbortables.remove(abortable);
   }
 
+  /**
+   * Sets whether this watchdog is verbose. If verbose, it will print
+   * the message <CODE>&quot;aborting&nbsp;...&nbsp;&quot;</CODE> to
+   * {@link System.out} when the timeout is reached. This is to help
+   * debugging.
+   */
+  public synchronized void setVerbose(final boolean verbose)
+  {
+    mVerbose = verbose;
+  }
+
 
   //#########################################################################
   //# Interface java.lang.Runnable
@@ -131,6 +142,10 @@ public class Watchdog extends Thread {
           }
         } while (System.currentTimeMillis() < mStartTime + mTimeoutMillis);
         mStartTime = -1;
+        if (mVerbose) {
+          System.out.print("aborting ... ");
+          System.out.flush();
+        }
         for (final Abortable abortable : mAbortables) {
           abortable.requestAbort();
         }
@@ -146,5 +161,6 @@ public class Watchdog extends Thread {
   private final long mTimeoutMillis;
   private final Collection<Abortable> mAbortables;
   private long mStartTime;
+  private boolean mVerbose;
 
 }

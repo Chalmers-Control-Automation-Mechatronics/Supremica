@@ -57,8 +57,6 @@ public class UnifiedEFAConflictCheckerExperiments
 
   //#########################################################################
   //# Constructors
-
-
   public UnifiedEFAConflictCheckerExperiments
     (final String statsFilename)
     throws FileNotFoundException
@@ -101,9 +99,12 @@ public class UnifiedEFAConflictCheckerExperiments
   //# Test Suite
   private void runAllTests() throws Exception
   {
+    final long start = System.currentTimeMillis();
     runAllTests(new UnifiedEFAConflictCheckerWrapper());
     runAllTests(new CompositionalConflictCheckerWrapper());
     runAllTests(new BDDConflictCheckerWrapper());
+    final long finish = System.currentTimeMillis();
+    printAndLog(start, finish);
   }
 
   private void runAllTests(final ConflictCheckerWrapper wrapper)
@@ -177,9 +178,12 @@ public class UnifiedEFAConflictCheckerExperiments
       testPrimeSieve4();
       testPrimeSieve4b();
 //      testPrimeSieve5();
-      testPrimeSieve6();
+      if (!(wrapper instanceof BDDConflictCheckerWrapper)) {
+        // CUDD locks up after 56 iterations in relprod (?)
+        testPrimeSieve6();
 //      testPrimeSieve7();
-      testPrimeSieve8();
+        testPrimeSieve8();
+      }
     } catch (final AnalysisException exception) {
       // next please ...
     } catch (final EvalException exception) {
@@ -282,6 +286,7 @@ public class UnifiedEFAConflictCheckerExperiments
   {
     super.setUp();
     mWatchdog = new Watchdog(mTimeout);
+    mWatchdog.setVerbose(true);
     mPrintWriter = new PrintWriter(mOut, true);
     mPrintWriter.println("Timeout," + mTimeout);
     /*
@@ -296,7 +301,6 @@ public class UnifiedEFAConflictCheckerExperiments
   {
     mPrintWriter.close();
     mOut.close();
-    System.out.println("All experiments complete");
     super.tearDown();
   }
 
@@ -359,6 +363,17 @@ public class UnifiedEFAConflictCheckerExperiments
       }
     }
     return buffer.toString();
+  }
+
+  private void printAndLog(final long start, final long finish)
+  {
+    final long duration = (finish - start) / 1000;
+    final int seconds = (int) (duration % 60);
+    final int minutes = (int) ((duration / 60) % 60);
+    final int hours = (int) (duration / 3600);
+    final String msg =
+      String.format("Completed in %d:%02d:%02d", hours, minutes, seconds);
+    printAndLog(msg);
   }
 
   private void printAndLog(final String msg)
@@ -577,6 +592,6 @@ public class UnifiedEFAConflictCheckerExperiments
   private PrintWriter mPrintWriter;
   private boolean mHasBeenPrinted;
 
-  private final int mTimeout = 600;  // 10 minutes
+  private final int mTimeout = 480;  // 8 minutes
 
 }
