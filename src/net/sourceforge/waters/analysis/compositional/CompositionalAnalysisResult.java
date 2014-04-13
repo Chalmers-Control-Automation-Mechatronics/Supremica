@@ -310,7 +310,7 @@ public class CompositionalAnalysisResult
     }
     writer.print(",Monolithic");
     if (mMonolithicStats != null) {
-      writer.println(',');
+      writer.print(',');
       mMonolithicStats.printCSVHorizontalHeadings(writer);
     }
   }
