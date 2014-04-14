@@ -13,8 +13,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
-import net.sourceforge.waters.analysis.hisc.HISCAttributeFactory;
-import net.sourceforge.waters.analysis.hisc.SICPropertyBuilder;
 import net.sourceforge.waters.model.analysis.AbstractConflictCheckerTest;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierTest;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
@@ -246,25 +244,25 @@ public abstract class AbstractSICProperty6VerifierTest extends
   public void testSICProperty6Verifier_tbed_hisc_ll46()
   throws Exception
   {
-    runModelVerifier("despot", "tbed_hisc", "Low Level Sec4-6.wmod", true);
+    runModelVerifier("despot", "tbed_hisc", "sec46sup.wmod", true);
   }
 
   public void testSICProperty6Verifier_tbed_hisc_ll57()
   throws Exception
   {
-    runModelVerifier("despot", "tbed_hisc", "Low Level Sec5-7.wmod", true);
+    runModelVerifier("despot", "tbed_hisc", "sec57sup.wmod", true);
   }
 
   public void testSICProperty6Verifier_tbed_hisc_switch3()
   throws Exception
   {
-    runModelVerifier("despot", "tbed_hisc", "Low Level Switch3.wmod", true);
+    runModelVerifier("despot", "tbed_hisc", "switch3sup.wmod", true);
   }
 
   public void testSICProperty6Verifier_tbed_hisc_switch8()
   throws Exception
   {
-    runModelVerifier("despot", "tbed_hisc", "Low Level Switch8.wmod", true);
+    runModelVerifier("despot", "tbed_hisc", "switch8sup.wmod", true);
   }
 
   // rhone_subsystem1_ld
@@ -288,6 +286,7 @@ public abstract class AbstractSICProperty6VerifierTest extends
    *
    * @see AbstractModelVerifierTest#checkCounterExample(ProductDESProxy,TraceProxy)
    */
+  @Override
   protected void checkCounterExample(final ProductDESProxy des,
                                      final TraceProxy trace) throws Exception
   {
@@ -310,6 +309,7 @@ public abstract class AbstractSICProperty6VerifierTest extends
     }
   }
 
+  @Override
   protected ProductDESProxy createLanguageInclusionModel
     (final ProductDESProxy des, final Map<AutomatonProxy,StateProxy> inittuple)
   {

@@ -428,28 +428,28 @@ public class HISCCPInterfaceConsistencyCheckerTest
     runModelVerifier("despot", "tbed_hisc", "Low Level II.wmod", true);
   }
 
-  public void testHISCCP_tbed_hisc_ll46()
+  public void testHISCCP_tbed_hisc_sec46()
   throws Exception
   {
-    runModelVerifier("despot", "tbed_hisc", "Low Level Sec4-6.wmod", true);
+    runModelVerifier("despot", "tbed_hisc", "sec46sup.wmod", true);
   }
 
-  public void testHISCCP_tbed_hisc_ll57()
+  public void testHISCCP_tbed_hisc_sec57()
   throws Exception
   {
-    runModelVerifier("despot", "tbed_hisc", "Low Level Sec5-7.wmod", true);
+    runModelVerifier("despot", "tbed_hisc", "sec57sup.wmod", true);
   }
 
   public void testHISCCP_tbed_hisc_switch3()
   throws Exception
   {
-    runModelVerifier("despot", "tbed_hisc", "Low Level Switch3.wmod", true);
+    runModelVerifier("despot", "tbed_hisc", "switch3sup.wmod", true);
   }
 
   public void testHISCCP_tbed_hisc_switch8()
   throws Exception
   {
-    runModelVerifier("despot", "tbed_hisc", "Low Level Switch8.wmod", true);
+    runModelVerifier("despot", "tbed_hisc", "switch8sup.wmod", true);
   }
 
   // rhone_subsystem1
