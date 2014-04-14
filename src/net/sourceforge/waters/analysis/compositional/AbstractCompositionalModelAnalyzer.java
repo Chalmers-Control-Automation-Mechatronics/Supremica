@@ -1910,7 +1910,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       }
     }
     final EventProxy tau;
-    if (hidden.isEmpty()) {
+    if (hidden.size() <= 1) {
       tau = null;
     } else {
       final ProductDESProxyFactory factory = getFactory();
