@@ -136,7 +136,7 @@ public class UnifiedEFAConflictCheckerExperiments
       // next please ...
     }
     try {
-      testCaseStudy();
+      // testCaseStudy();
       testCaseStudyNonblocking();
       testProductionCell();
     } catch (final AnalysisException exception) {
@@ -251,7 +251,7 @@ public class UnifiedEFAConflictCheckerExperiments
     }
     try {
       for (int maxseqno = 31; maxseqno <= 150; maxseqno += 32) {
-        checkProfisafe("profisafe_ihost_efa", maxseqno, true);
+        checkProfisafe("profisafe_ihost_efa_1", maxseqno, true);
       }
     } catch (final AnalysisException exception) {
       // next please ...
@@ -411,6 +411,7 @@ public class UnifiedEFAConflictCheckerExperiments
       final String className = getName();
       printAndLog("Running " + fullModuleName + " with " + className + " ... ");
       try {
+        System.gc();
         mWatchdog.reset();
         final long start = System.currentTimeMillis();
         final AnalysisResult stats = runConflictChecker(module, bindings);
@@ -481,7 +482,8 @@ public class UnifiedEFAConflictCheckerExperiments
       final ModuleProxyFactory factory = getModuleProxyFactory();
       final UnifiedEFAConflictChecker checker =
         new UnifiedEFAConflictChecker(module, factory);
-       // Configuration end
+      // Configuration of UnifiedEFAConflictChecker ...
+      // Configuration end
       checker.setBindings(bindings);
       mWatchdog.addAbortable(checker);
       checker.run();
