@@ -23,9 +23,11 @@ import net.sourceforge.waters.analysis.bdd.BDDConflictChecker;
 import net.sourceforge.waters.analysis.bdd.BDDPackage;
 import net.sourceforge.waters.analysis.bdd.TransitionPartitioningStrategy;
 import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer;
+import net.sourceforge.waters.analysis.compositional.ChainSelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.CompositionalConflictChecker;
 import net.sourceforge.waters.analysis.compositional.CompositionalSelectionHeuristicFactory;
 import net.sourceforge.waters.analysis.compositional.ConflictAbstractionProcedureFactory;
+import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.analysis.efa.efsm.EFSMConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
@@ -483,6 +485,13 @@ public class UnifiedEFAConflictCheckerExperiments
       final UnifiedEFAConflictChecker checker =
         new UnifiedEFAConflictChecker(module, factory);
       // Configuration of UnifiedEFAConflictChecker ...
+      final SelectionHeuristic<UnifiedEFACandidate> minF =
+        new MinFrontierSelectionHeuristic();
+      final SelectionHeuristic<UnifiedEFACandidate> minS =
+        new MinStatesSelectionHeuristic();
+      final SelectionHeuristic<UnifiedEFACandidate> chain =
+        new ChainSelectionHeuristic<UnifiedEFACandidate>(minF, minS);
+      checker.setSelectionHeuristic(chain);
       // Configuration end
       checker.setBindings(bindings);
       mWatchdog.addAbortable(checker);
