@@ -197,7 +197,7 @@ public class UnifiedEFAConflictCheckerTest
   public void testCaseStudy()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("efa", "caseStudy-original");
+    final ModuleProxy module = loadModule("efa", "caseStudy-original-sup");
     checkConflict(module, false);
   }
 
@@ -343,6 +343,14 @@ public class UnifiedEFAConflictCheckerTest
   {
     checkProfisafe("profisafe_ihost_efa_block", 3 ,false);
   }
+
+  /*
+  public void testProfisafeIHostEFA191()
+    throws IOException, WatersException
+  {
+    checkProfisafe("profisafe_ihost_efa", 191 ,true);
+  }
+  */
 
   public void testProfisafeIHostEFSM4()
     throws IOException, WatersException
@@ -524,7 +532,20 @@ public class UnifiedEFAConflictCheckerTest
     checkConflict(module, false);
   }
 
+  public void testbench()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "psl", "benchmark");
+    checkConflict(module, false);
+  }
 
+
+  public void testbench_n()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule( "efa", "benchmarksup4");
+    checkConflict(module, false);
+  }
   //#########################################################################
   //# Parametrised Tests
   void checkPhilosophers(final String name,
@@ -622,6 +643,26 @@ public class UnifiedEFAConflictCheckerTest
     checkConflict(module, bindings, expect);
   }
 
+  void checkTransferLineRework(final String name,
+                               final int r, final int n,
+                               final boolean expect)
+    throws IOException, WatersException
+  {
+    final ModuleProxyFactory factory = getModuleProxyFactory();
+    final ModuleProxy module = loadModule("efa", name);
+    final List<ParameterBindingProxy> bindings =
+      new ArrayList<ParameterBindingProxy>(2);
+    final IntConstantProxy constR = factory.createIntConstantProxy(r);
+    final ParameterBindingProxy bindingR =
+      factory.createParameterBindingProxy("R", constR);
+    bindings.add(bindingR);
+    final IntConstantProxy constN = factory.createIntConstantProxy(n);
+    final ParameterBindingProxy bindingN =
+      factory.createParameterBindingProxy("N", constN);
+    bindings.add(bindingN);
+    checkConflict(module, bindings, expect);
+  }
+
   void checkRoundRobin(final int n)
     throws IOException, WatersException
   {
@@ -632,6 +673,27 @@ public class UnifiedEFAConflictCheckerTest
     checkConflict(module, bindings, false);
   }
 
+  void checkPML(final String name,
+                final int c, final int n,
+                final boolean expect)
+    throws IOException, WatersException
+  {
+    final ModuleProxyFactory factory = getModuleProxyFactory();
+    final ModuleProxy module = loadModule("efa", name);
+    final List<ParameterBindingProxy> bindings =
+      new ArrayList<ParameterBindingProxy>(2);
+    final IntConstantProxy constC = factory.createIntConstantProxy(c);
+    final ParameterBindingProxy bindingC =
+      factory.createParameterBindingProxy("C", constC);
+    bindings.add(bindingC);
+    final IntConstantProxy constN = factory.createIntConstantProxy(n);
+    final ParameterBindingProxy bindingN =
+      factory.createParameterBindingProxy("N", constN);
+    bindings.add(bindingN);
+    checkConflict(module, bindings, expect);
+  }
+
+
 
   //#########################################################################
   //# Customisation
@@ -641,13 +703,6 @@ public class UnifiedEFAConflictCheckerTest
     final DocumentManager manager = getDocumentManager();
     checker.setDocumentManager(manager);
     checker.setUsesLocalVariable(true);
-//    final SelectionHeuristic<UnifiedEFACandidate> minS =
-//      new MinStatesSelectionHeuristic();
-//    final SelectionHeuristic<UnifiedEFACandidate> minF =
-//      new MinFrontierSelectionHeuristic();
-//    final SelectionHeuristic<UnifiedEFACandidate> chain =
-//      new ChainSelectionHeuristic<UnifiedEFACandidate>(minF, minS);
-//    checker.setSelectionHeuristic(chain);
   }
 
 
