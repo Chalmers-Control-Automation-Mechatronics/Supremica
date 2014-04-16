@@ -531,7 +531,7 @@ public abstract class TransitionListBuffer
       final int event = data & mEventMask;
       if (state == dest &&
           EventEncoding.isOutsideOnlySelfloopEvent(mEventStatus[event])) {
-        // Suppress tau and outside always-enabled selfloops
+        // Suppress tau and outside selfloop-only selfloops
         continue;
       }
       final int pair = allocatePair();
@@ -647,7 +647,7 @@ public abstract class TransitionListBuffer
          " (only configured for " + mNumEvents + " events)!");
     }
     final boolean selfloop =
-      EventEncoding.isOutsideAlwaysEnabledEvent(mEventStatus[newID]);
+      EventEncoding.isOutsideOnlySelfloopEvent(mEventStatus[newID]);
     final TIntHashSet found = new TIntHashSet();
     final TransitionIterator iter1 = createReadOnlyIterator();
     final TransitionIterator iter2 = createModifyingIterator();
@@ -672,7 +672,7 @@ public abstract class TransitionListBuffer
       while (iter1.advance()) {
         final int to = iter1.getCurrentToState();
         if (selfloop && state == to) {
-          // nothing --- suppress tau and outside always-enabled selfloops ...
+          // nothing --- suppress tau and outside selfloop-only selfloops ...
         } else if (found.add(to)) {
           if (list == NULL) {
             list = createList(state, newID);
@@ -1010,8 +1010,8 @@ public abstract class TransitionListBuffer
         final StateProxy fromState = getFromState(trans);
         final StateProxy toState = getToState(trans);
         if (fromState == toState &&
-            EventEncoding.isOutsideAlwaysEnabledEvent(mEventStatus[e])) {
-          // Suppress tau and outside always-enabled selfloops
+            EventEncoding.isOutsideOnlySelfloopEvent(mEventStatus[e])) {
+          // Suppress tau and outside selfloop-only selfloops
           continue;
         }
         final int from = stateEnc.getStateCode(fromState);

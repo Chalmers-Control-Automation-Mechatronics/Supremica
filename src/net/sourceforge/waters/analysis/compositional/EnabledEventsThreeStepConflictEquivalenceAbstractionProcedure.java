@@ -11,12 +11,12 @@ package net.sourceforge.waters.analysis.compositional;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.EnabledEventsLimitedCertainConflictsTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.EnabledEventsSilentContinuationTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.EnabledEventsSilentIncomingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.IncomingEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.LimitedCertainConflictsTRSimplifier;
@@ -36,6 +36,7 @@ import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
@@ -135,17 +136,12 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
       new IncomingEquivalenceTRSimplifier();
     postChain.add(incomingEquivalenceSimplifier);
 
-    final EnabledEventsSilentContinuationTRSimplifier silentContinuationSimplifier =
-      new EnabledEventsSilentContinuationTRSimplifier();
-    postChain.add(silentContinuationSimplifier);
-
     final MarkingSaturationTRSimplifier saturator =
       new MarkingSaturationTRSimplifier();
     postChain.add(saturator);
     return new EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
       (analyzer, preChain, limitedCertainConflictsRemover,
        enabledEventsLimitedCertainConflictsRemover,
-       silentContinuationSimplifier,
        enabledEventsSilentIncomingSimplifier,
        postChain);
   }
@@ -158,7 +154,6 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
      final ChainTRSimplifier preChain,
      final LimitedCertainConflictsTRSimplifier limitedCCSimplifier,
      final EnabledEventsLimitedCertainConflictsTRSimplifier alwaysEnabledLimitedCCSimplifier,
-     final EnabledEventsSilentContinuationTRSimplifier enabledEventsSilentContinuationSimplifier,
      final EnabledEventsSilentIncomingTRSimplifier enabledEventsSilentIncomingSimplifier,
      final ChainTRSimplifier postChain)
   {
@@ -166,7 +161,6 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     mPreChain = preChain;
     mEnabledEventsLimitedCertainConflictsSimplifier = alwaysEnabledLimitedCCSimplifier;
     mLimitedCertainConflictsSimplifier = limitedCCSimplifier;
-    mEnabledEventsSilentContinuationSimplifier = enabledEventsSilentContinuationSimplifier;
     mEnabledEventsSilentIncomingSimplifier = enabledEventsSilentIncomingSimplifier;
     mPostChain = postChain;
     mCompleteChain = new ChainTRSimplifier();
@@ -246,8 +240,6 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
       }
 
       // Tell the simplifiers how many enabled events there are
-      mEnabledEventsSilentContinuationSimplifier.
-        setNumberOfEnabledEvents(numEnabledEvents);
       mEnabledEventsSilentIncomingSimplifier.
         setNumberOfEnabledEvents(numEnabledEvents);
       if (mEnabledEventsLimitedCertainConflictsSimplifier != null) {
@@ -256,7 +248,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
       }
       // Create Event Encoding in right order with all enabled events at front of list
       final EventEncoding eventEnc =
-        createEventEncoding(eventsList, local, candidate);
+        createEventEncoding(eventsList, local, numEnabledEvents, candidate);
       ListBufferTransitionRelation rel =
         new ListBufferTransitionRelation(aut, eventEnc, inputStateEnc, config);
 
@@ -415,16 +407,46 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
 
   //#########################################################################
   //# Auxiliary Methods
-  @Override
-  protected EventEncoding createEventEncoding(final Collection<EventProxy> events,
-                                              final Collection<EventProxy> local,
-                                              final Candidate candidate)
+  private EventEncoding createEventEncoding(final Collection<EventProxy> events,
+                                            final Collection<EventProxy> local,
+                                            final int numAlwaysEnabled,
+                                            final Candidate candidate)
   {
-    final EventEncoding enc = super.createEventEncoding(events, local, candidate);
+    final EnabledEventsCompositionalConflictChecker analyzer =
+      (EnabledEventsCompositionalConflictChecker) getAnalyzer();
+    final KindTranslator translator = getKindTranslator();
+    Collection<EventProxy> filter = getPropositions();
+    if (filter == null) {
+      filter = Collections.emptyList();
+    }
+    int e = 0;
+    final EventEncoding enc = new EventEncoding();
+    for (final EventProxy event : events) {
+      if (local.contains(event)) {
+        enc.addSilentEvent(event);
+      } else if (translator.getEventKind(event) == EventKind.PROPOSITION) {
+        if (filter.contains(event)) {
+          enc.addEvent(event, translator, 0);
+        }
+      } else {
+        byte status = 0;
+        if (analyzer.isUsingSpecialEvents()) {
+          final AbstractCompositionalModelAnalyzer.EventInfo info =
+            analyzer.getEventInfo(event);
+          if (info.isOnlyNonSelfLoopCandidate(candidate)) {
+            status |= EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP;
+          }
+        }
+        if (e < numAlwaysEnabled) {
+          status |= EventEncoding.STATUS_OUTSIDE_ALWAYS_ENABLED;
+        }
+        enc.addEvent(event, translator, status);
+        e++;
+      }
+    }
     final EventProxy defaultMarking = getUsedDefaultMarking();
     final int defaultMarkingID = enc.getEventCode(defaultMarking);
     if (defaultMarkingID < 0) {
-      final KindTranslator translator = getKindTranslator();
       enc.addEvent(defaultMarking, translator, EventEncoding.STATUS_UNUSED);
     }
     mCompleteChain.setDefaultMarkingID(defaultMarkingID);
@@ -468,8 +490,6 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     mEnabledEventsLimitedCertainConflictsSimplifier;
   private final LimitedCertainConflictsTRSimplifier
     mLimitedCertainConflictsSimplifier;
-  private final EnabledEventsSilentContinuationTRSimplifier
-    mEnabledEventsSilentContinuationSimplifier;
   private final EnabledEventsSilentIncomingTRSimplifier
     mEnabledEventsSilentIncomingSimplifier;
   private final ChainTRSimplifier mPostChain;
