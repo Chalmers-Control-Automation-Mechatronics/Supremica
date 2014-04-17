@@ -197,7 +197,7 @@ public class UnifiedEFAConflictCheckerTest
   public void testCaseStudy()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("efa", "caseStudy-original-sup");
+    final ModuleProxy module = loadModule("efa", "caseStudy-original");
     checkConflict(module, false);
   }
 
@@ -532,20 +532,7 @@ public class UnifiedEFAConflictCheckerTest
     checkConflict(module, false);
   }
 
-  public void testbench()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module = loadModule("tests", "psl", "benchmark");
-    checkConflict(module, false);
-  }
 
-
-  public void testbench_n()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module = loadModule( "efa", "benchmarksup4");
-    checkConflict(module, false);
-  }
   //#########################################################################
   //# Parametrised Tests
   void checkPhilosophers(final String name,
