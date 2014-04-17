@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.compositional
-//# CLASS:   TRSimplifierAbstractionProcedure
+//# CLASS:   TRAbstractionProcedure
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -74,7 +74,7 @@ abstract class TRAbstractionProcedure
                                          inputStateEnc, config);
       getAnalyzer().showDebugLog(rel);
       final int numStates = rel.getNumberOfStates();
-      final int numTrans = rel.getNumberOfTransitions();
+      final int numTrans = aut.getTransitions().size();
       final int numMarkings = rel.getNumberOfMarkings();
       mSimplifier.setTransitionRelation(rel);
       if (mSimplifier.run()) {
@@ -99,7 +99,7 @@ abstract class TRAbstractionProcedure
     } finally {
       mSimplifier.reset();
     }
-                       }
+  }
 
   @Override
   public void storeStatistics()

@@ -255,7 +255,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
       final AbstractCompositionalModelAnalyzer analyzer = getAnalyzer();
       analyzer.showDebugLog(rel);
       final int numStates = rel.getNumberOfStates();
-      final int numTrans = rel.getNumberOfTransitions();
+      final int numTrans = aut.getTransitions().size();
       final int numMarkings = rel.getNumberOfMarkings();
       AutomatonProxy lastAut = aut;
       StateEncoding lastStateEnc = inputStateEnc;

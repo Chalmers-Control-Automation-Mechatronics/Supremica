@@ -99,7 +99,7 @@ public class CompositionalSelectionHeuristicFactory
    * creators. The returned heuristic applies the base heuristic obtained
    * from the given heuristic creators in the specified order.
    */
-  static ChainSelectionHeuristic<Candidate> createChainHeuristic
+  public static ChainSelectionHeuristic<Candidate> createChainHeuristic
     (final SelectionHeuristicCreator... methods)
   {
     @SuppressWarnings("unchecked")
