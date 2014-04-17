@@ -91,6 +91,7 @@ public abstract class PartialOrderComponentsModelVerifier
   public boolean run() throws AnalysisException
   {
     try {
+      //System.out.println("Start");
       setUp();
       final ProductDESProxy model = getModel();
       final KindTranslator translator = getKindTranslator();
@@ -590,20 +591,25 @@ public abstract class PartialOrderComponentsModelVerifier
           }
         }
         selfLoop &= targetState == sourceState;
-        mSuccessor[j] = targetState;
+       // mSuccessor[j] = targetState;
       }
       if (selfLoop){
         continue events;
       }
-      encode(mSuccessor,mStateTuple);
+      /*encode(mSuccessor,mStateTuple);
       if (mStateSet.contains(mStateTuple)){
         mComparator.reachesVisitedState(i);
-      }
+      }*/
       heap.add(i);
     }
     current.setTotalSuccessors(heap.size());
-    mStateTuple = new PartialOrderStateTuple(mStateTupleSize);
+    //mStateTuple = new PartialOrderStateTuple(mStateTupleSize);
     return heap;
+  }
+
+  @SuppressWarnings("unused")
+  private String getEventName(final int eventCode){
+    return mEventCodingList.get(eventCode).toString();
   }
 
   protected int[] ample(final PartialOrderStateTuple current){
@@ -611,8 +617,10 @@ public abstract class PartialOrderComponentsModelVerifier
     if (enabled == null){
       return null;
     }
-    if (enabled.size() == 1){
+    if (enabled.size() <= 1){
       current.setFullyExpanded(true);
+     /* System.out.println(getEventName(enabled.peekFirst()));
+      System.out.println("###########");*/
       return enabled.toArray();
     }
 
@@ -644,6 +652,10 @@ public abstract class PartialOrderComponentsModelVerifier
                 ample.add(dependentCandidate);
                 if(ample.size() == enabledSet.size()){
                   current.setFullyExpanded(ample.size() == enabledSet.size());
+                  /*for (int g = 0; g < ample.size(); g++){
+                    System.out.println(getEventName(ample.get(g)));
+                  }
+                  System.out.println("###########");*/
                   return ample.toArray();
                 }
                 ampleSet.add(dependentCandidate);
@@ -659,6 +671,10 @@ public abstract class PartialOrderComponentsModelVerifier
         }
       }
       if(ample.size()+dependentNonEnabled.size()==mNumEvents){
+        /*for (int t = 0; t < ample.size(); t++){
+          System.out.println(getEventName(ample.get(t)));
+        }
+        System.out.println("###########");*/
         return ample.toArray();
       }
       boolean danger = false;
@@ -683,10 +699,21 @@ public abstract class PartialOrderComponentsModelVerifier
       }
       current.setFullyExpanded(ample.size() == enabledSet.size());
       mNumReducedSets += ample.size() < enabledSet.size() ? 1 : 0;
+      /*for (int t = 0; t < ample.size(); t++){
+        System.out.println(getEventName(ample.get(t)));
+      }
+      System.out.println("###########");*/
+
       return ample.toArray();
     }
     current.setFullyExpanded(true);
-    return enabledSet.toArray();
+
+    final int[] enabledArray = enabledSet.toArray();
+    /*for (final int t : enabledArray){
+      System.out.println(getEventName(t));
+    }
+    System.out.println("###########");*/
+    return enabledArray;
   }
 
   private boolean canBecomeEnabled(final PartialOrderStateTuple current,

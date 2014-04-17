@@ -577,6 +577,7 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
   //# Auxiliary Methods
 
   private boolean isControllableReduced(final int[] sState) throws AnalysisException{
+    //System.out.println("Start");
     mNumReducedSets = 0;
     mStack = new ArrayList<PartialOrderStateTuple>();
     mStateSet = new StateHashSet<PartialOrderStateTuple>(PartialOrderStateTuple.class);
@@ -638,6 +639,11 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
       }
     }
     return true;
+  }
+
+  @SuppressWarnings("unused")
+  private String getEventName(final int eventCode){
+    return mEventCodingList.get(eventCode).toString();
   }
 
   private void expand(final PartialOrderStateTuple current, final int[] events) throws AnalysisException{
@@ -795,6 +801,8 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
       return null;
     }
     if (enabled.length == 1){
+      /*System.out.println(getEventName(enabled[0]));
+      System.out.println("###########");*/
       return enabled;
     }
     final TIntHashSet enabledSet = new TIntHashSet(enabled);
@@ -848,6 +856,10 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
         unionSet.add(ample.get(j));
       }
       if (unionSet.size() == mEventCodingList.size()){
+       /* for (int t = 0; t < ample.size(); t++){
+          System.out.println(getEventName(ample.get(t)));
+        }
+        System.out.println("###########");*/
         return ample.toArray();
       }
       final TIntHashSet eventsSetMinusUnion = new TIntHashSet();
@@ -877,8 +889,16 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
         }
       }
       mNumReducedSets += ample.size() < enabled.length ? 1 : 0;
+     /* for (int t = 0; t < ample.size(); t++){
+        System.out.println(getEventName(ample.get(t)));
+      }
+      System.out.println("###########");*/
       return ample.toArray();
     }
+   /* for (final int t : enabled){
+      System.out.println(getEventName(t));
+    }
+    System.out.println("###########");*/
     return enabled;
   }
 
