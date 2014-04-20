@@ -23,6 +23,7 @@ import net.sourceforge.waters.analysis.bdd.BDDConflictChecker;
 import net.sourceforge.waters.analysis.bdd.BDDPackage;
 import net.sourceforge.waters.analysis.bdd.TransitionPartitioningStrategy;
 import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer;
+import net.sourceforge.waters.analysis.compositional.Candidate;
 import net.sourceforge.waters.analysis.compositional.ChainSelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.CompositionalConflictChecker;
 import net.sourceforge.waters.analysis.compositional.CompositionalSelectionHeuristicFactory;
@@ -116,6 +117,13 @@ public class UnifiedEFAConflictCheckerExperiments
     mHasBeenPrinted = false;
     mConflictCheckerWrapper = wrapper;
     try {
+      testCaseStudy();
+      testCaseStudyNonblocking();
+      testProductionCell();
+    } catch (final AnalysisException | EvalException exception) {
+      // next please ...
+    }
+    try {
       testPslBigWithManyRestartTrans();
     } catch (final AnalysisException | EvalException exception) {
       // next please ...
@@ -130,17 +138,10 @@ public class UnifiedEFAConflictCheckerExperiments
     } catch (final AnalysisException | EvalException exception) {
       // next please ...
     }
-    try {
-      testCaseStudy();
-      testCaseStudyNonblocking();
-      testProductionCell();
-    } catch (final AnalysisException | EvalException exception) {
-      // next please ...
-    }
     if (!(wrapper instanceof BDDConflictCheckerWrapper)) {
       for (int m = 3; m <= 4; m += 1) {
         try {
-          for (int n = 500; n <= 500; n+= 100) {
+          for (int n = 100; n <= 500; n+= 100) {
             checkTransferLineRework("transferline_efsm_rework", m, n, true);
           }
         } catch (final AnalysisException | EvalException exception) {
@@ -149,7 +150,7 @@ public class UnifiedEFAConflictCheckerExperiments
       }
       for (int m = 3; m <= 4; m += 1) {
         try {
-          for (int n = 500; n <= 500; n+= 100) {
+          for (int n = 100; n <= 500; n+= 100) {
             checkTransferLineRework("transferline_efsm_rework_block", m, n, false);
           }
         } catch (final AnalysisException | EvalException exception) {
@@ -199,28 +200,28 @@ public class UnifiedEFAConflictCheckerExperiments
       // next please ...
     }
     try {
-      for (int maxseqno = 31; maxseqno <= 150; maxseqno += 32) {
+      for (int maxseqno = 15; maxseqno <= 255; maxseqno += 16) {
         checkProfisafe("profisafe_ihost_efa_2", maxseqno, false);
       }
     } catch (final AnalysisException | EvalException exception) {
       // next please ...
     }
     try {
-      for (int maxseqno = 31; maxseqno <= 150; maxseqno += 32) {
+      for (int maxseqno = 15; maxseqno <= 255; maxseqno += 16) {
         checkProfisafe("profisafe_ihost_efa_block", maxseqno, false);
       }
     } catch (final AnalysisException | EvalException exception) {
       // next please ...
     }
     try {
-      for (int maxseqno = 31; maxseqno <= 150; maxseqno += 32) {
+      for (int maxseqno = 15; maxseqno <= 255; maxseqno += 16) {
         checkProfisafe("profisafe_islave_efa", maxseqno, true);
       }
     } catch (final AnalysisException | EvalException exception) {
       // next please ...
     }
     try {
-      for(int i=300; i<500; i+=100) {
+      for (int i = 100; i <= 500; i += 100) {
         checkRoundRobin(i);
       }
     } catch (final AnalysisException | EvalException exception) {
@@ -476,8 +477,14 @@ public class UnifiedEFAConflictCheckerExperiments
         (ConflictAbstractionProcedureFactory.NB);
       mConflictChecker.setPreselectingMethod
         (AbstractCompositionalModelAnalyzer.MustL);
-      mConflictChecker.setSelectionHeuristic
-        (CompositionalSelectionHeuristicFactory.MinF);
+      final SelectionHeuristic<Candidate> chain =
+        CompositionalSelectionHeuristicFactory.createChainHeuristic
+          (CompositionalSelectionHeuristicFactory.MinF,
+           CompositionalSelectionHeuristicFactory.MinS,
+           CompositionalSelectionHeuristicFactory.MaxL,
+           CompositionalSelectionHeuristicFactory.MaxC,
+           CompositionalSelectionHeuristicFactory.MinE);
+      mConflictChecker.setSelectionHeuristic(chain);
       mConflictChecker.setInternalStateLimit(10000);
       mConflictChecker.setMonolithicStateLimit(50000000);
       mConflictChecker.setMonolithicTransitionLimit(0);
