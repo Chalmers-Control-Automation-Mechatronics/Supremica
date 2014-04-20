@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="basic_2" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="alwaysEnabledFind03" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>A basic test for all abstraction rules to see whether they can handle an automaton with than one transition between the same two states.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting">
@@ -12,12 +12,8 @@
                 <ns2:Attribute Name="AE"/>
             </ns2:AttributeMap>
         </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="b">
-            <ns2:AttributeMap>
-                <ns2:Attribute Name="AE"/>
-            </ns2:AttributeMap>
-        </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="c"/>
+        <EventDecl Kind="CONTROLLABLE" Name="b"/>
+        <EventDecl Kind="CONTROLLABLE" Observable="false" Name="tau"/>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="PLANT" Name="before">
@@ -25,7 +21,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
                         <PointGeometry>
-                            <Point X="64" Y="64"/>
+                            <Point X="64" Y="48"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="9" Y="-8"/>
@@ -39,31 +35,53 @@
                             <Point X="11" Y="-6"/>
                         </LabelGeometry>
                     </SimpleNode>
+                    <SimpleNode Name="S2">
+                        <PointGeometry>
+                            <Point X="128" Y="96"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Source="S0" Target="S1">
+                    <Edge Source="S0" Target="S2">
                         <LabelBlock>
                             <SimpleIdentifier Name="a"/>
                             <SimpleIdentifier Name="b"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="6" Y="-18"/>
+                                <Point X="7" Y="-22"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="75" Y="107"/>
-                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point X="128" Y="96"/>
+                        </EndPointGeometry>
                     </Edge>
                     <Edge Source="S1" Target="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="a"/>
-                            <SimpleIdentifier Name="b"/>
-                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-19" Y="-20"/>
+                                <Point X="-21" Y="-9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S2" Target="S1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="1" Y="-2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S2" Target="S2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-19" Y="-11"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="53" Y="106"/>
+                            <Point X="172" Y="96"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>

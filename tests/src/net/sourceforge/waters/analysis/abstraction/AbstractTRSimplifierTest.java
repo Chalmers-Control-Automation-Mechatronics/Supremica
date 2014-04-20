@@ -100,74 +100,65 @@ public abstract class AbstractTRSimplifierTest
    */
   public void test_empty_1() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "empty_1.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "empty_1.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_empty_2() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "empty_2.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "empty_2.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_basic_1() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "basic_1.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "basic_1.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_basic_2() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "basic_2.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "basic_2.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_basic_3() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "basic_3.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "basic_3.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_basic_4() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "basic_4.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "basic_4.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_basic_5() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "basic_5.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "basic_5.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_basic_6() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "basic_6.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "basic_6.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_basic_7() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "basic_7.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "basic_7.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
 
@@ -269,11 +260,8 @@ public abstract class AbstractTRSimplifierTest
     runTransitionRelationSimplifier(des);
   }
 
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private void runTransitionRelationSimplifier(final ProductDESProxy des)
-  throws Exception
+  protected void runTransitionRelationSimplifier(final ProductDESProxy des)
+    throws Exception
   {
     getLogger().info("Checking " + des.getName() + " ...");
     final AutomatonProxy before = findAutomaton(des, BEFORE);
@@ -282,6 +270,14 @@ public abstract class AbstractTRSimplifierTest
     getLogger().info("Done " + des.getName());
   }
 
+  protected TransitionRelationSimplifier getSimplifier()
+  {
+    return mSimplifier;
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
   private AutomatonProxy applySimplifier(final ProductDESProxy des,
                                          final AutomatonProxy aut)
   throws Exception
@@ -453,7 +449,7 @@ public abstract class AbstractTRSimplifierTest
   final String ALPHA = ":alpha";
   final String OMEGA = EventDeclProxy.DEFAULT_MARKING_NAME;
 
-  private final String BEFORE = "before";
-  private final String AFTER = "after";
+  final String BEFORE = "before";
+  final String AFTER = "after";
 
 }
