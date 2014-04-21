@@ -70,6 +70,20 @@ public class AlwaysEnabledEventsFinderTest
     runTransitionRelationSimplifier(des);
   }
 
+  public void testAlwaysEnabledFind4() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "alwaysEnabledFind04.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void testAlwaysEnabledFind5() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "alwaysEnabledFind05.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
 
   //#########################################################################
   //# Overrides for abstract base class

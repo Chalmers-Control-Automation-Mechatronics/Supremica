@@ -27,7 +27,6 @@ import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
@@ -714,7 +713,7 @@ public class CompositionalSpecialTransitionsChecker
   //# Events+Automata Maps
   @Override
   protected void initialiseEventsToAutomata()
-    throws OverflowException
+    throws AnalysisException
   {
     super.initialiseEventsToAutomata();
     final ProductDESProxy model = getModel();

@@ -141,7 +141,7 @@ public class CompositionalSafetyVerifier
 
   @Override
   protected void initialiseEventsToAutomata()
-    throws OverflowException
+    throws AnalysisException
   {
     final ProductDESProxy model = getModel();
     final Collection<AutomatonProxy> automata = model.getAutomata();

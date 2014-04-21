@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
+import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
@@ -18,6 +19,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import net.sourceforge.waters.analysis.abstraction.AlwaysEnabledEventsFinder;
+import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.modular.ModularControllabilityChecker;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -213,11 +216,11 @@ public class EnabledEventsCompositionalConflictChecker extends
 
   @Override
   protected void initialiseEventsToAutomata()
-    throws OverflowException
+    throws AnalysisException
   {
     super.initialiseEventsToAutomata();
     for (final AutomatonProxy aut : getCurrentAutomata()) {
-      addDisablingAutomaton(aut);
+      updateAlwaysEnabledStatus(aut, AlwaysEnabledMode.INITIAL);
     }
   }
 
@@ -225,19 +228,19 @@ public class EnabledEventsCompositionalConflictChecker extends
   protected void updateEventsToAutomata
     (final AutomatonProxy autToAdd,
      final List<AutomatonProxy> autToRemove)
-  throws OverflowException
+    throws AnalysisException
   {
     super.updateEventsToAutomata(autToAdd, autToRemove);
-    addDisablingAutomaton(autToAdd);
+    updateAlwaysEnabledStatus(autToAdd, AlwaysEnabledMode.SIMPLIFIED);
   }
 
   @Override
   protected void addEventsToAllAutomata()
-  throws OverflowException
+    throws AnalysisException
   {
     super.addEventsToAllAutomata();
     for (final AutomatonProxy aut : getCurrentAutomata()) {
-      addDisablingAutomaton(aut);
+      updateAlwaysEnabledStatus(aut, AlwaysEnabledMode.TAU_LOOP_FREE);
     }
   }
 
@@ -415,68 +418,90 @@ public class EnabledEventsCompositionalConflictChecker extends
 
   //#########################################################################
   //# Auxiliary Methods
-  private void addDisablingAutomaton(final AutomatonProxy aut)
-    throws OverflowException
+  private void updateAlwaysEnabledStatus(final AutomatonProxy aut,
+                                         final AlwaysEnabledMode mode)
+    throws AnalysisException
+  {
+    final Set<EventProxy> alwaysEnabledEvents;
+    switch (mode) {
+    case INITIAL:
+      alwaysEnabledEvents = findAlwaysEnabledEvents(aut, false);
+      break;
+    case TAU_LOOP_FREE:
+      alwaysEnabledEvents = findAlwaysEnabledEvents(aut, true);
+      break;
+    case SIMPLIFIED:
+      final EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure proc =
+        (EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure)
+        getAbstractionProcedure();
+      alwaysEnabledEvents = proc.getAlwaysEnabledEvents();
+      break;
+    default:
+      throw new IllegalArgumentException
+        ("Unknown always-enabled mode " + mode + "!");
+    }
+    final KindTranslator translator = getKindTranslator();
+    for (final EventProxy event : aut.getEvents()) {
+      if (translator.getEventKind(event) != EventKind.PROPOSITION &&
+          !alwaysEnabledEvents.contains(event)) {
+        final EnabledEventsEventInfo info = getEventInfo(event);
+        info.addDisablingAutomaton(aut);
+      }
+    }
+  }
+
+  private Set<EventProxy> findAlwaysEnabledEvents
+    (final AutomatonProxy aut, boolean tauLoopFree)
+    throws AnalysisException
   {
     final KindTranslator translator = getKindTranslator();
-    int markingID = -1;
-    final Collection<AutomatonProxy> collection =
+    final Collection<AutomatonProxy> singletonAut =
       Collections.singletonList(aut);
     final EventEncoding encoding = new EventEncoding();
+    final EventProxy defaultMarking = getUsedDefaultMarking();
+    int defaultID = -1;
     for (final EventProxy event : aut.getEvents()) {
-      final EventInfo info = getEventInfo(event);
-      if (info == null) {
-        final int code = encoding.addEvent(event, translator, 0);
-        if (event == getUsedDefaultMarking()) {
-          markingID = code;
+      if (event == defaultMarking) {
+        defaultID = encoding.addEvent(event, translator, 0);
+      } else if (translator.getEventKind(event) != EventKind.PROPOSITION) {
+        final EventInfo info = getEventInfo(event);
+        if (info.isLocal(singletonAut)) {
+          encoding.addSilentEvent(event);
+        } else {
+          encoding.addEvent(event, translator, 0);
         }
-        super.addEventsToAutomata(aut);
-      } else if (info.isLocal(collection)) {
-        encoding.addSilentEvent(event);
-      } else {
-        encoding.addEvent(event, translator, 0);
       }
     }
-
-    final ListBufferTransitionRelation transrel =
+    final ListBufferTransitionRelation rel =
       new ListBufferTransitionRelation(aut, encoding,
                                        ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-    final TauClosure tauClosure =
-      transrel.createSuccessorsTauClosure(getInternalTransitionLimit());
-    final TransitionIterator preClosureIterator =
-      tauClosure.createPreEventClosureIterator();
-    final TransitionIterator normalTransIterator =
-      transrel.createSuccessorsReadOnlyIterator();
-
-    //for each event e
-    //for each state
-    //if state canNOT execute tauchain followed by event
-    //and not a dump state
-    //then it is a disabling aut
-    //add aut to info
-    //break
-
-    for (int e = EventEncoding.NONTAU;
-         e < encoding.getNumberOfProperEvents(); e++) {
-      for (int s = 0; s < transrel.getNumberOfStates(); s++) {
-        if (transrel.isReachable(s)) {
-          preClosureIterator.reset(s, e);
-          if (preClosureIterator.advance()) {
-            // It has outgoing transitions.
-          } else {
-            normalTransIterator.resetState(s);
-            if (normalTransIterator.advance() ||
-                markingID < 0 || transrel.isMarked(s, markingID)) {
-              // It's not a dump state.
-              // Record that we have found a disabling automaton.
-              final EventProxy event = encoding.getProperEvent(e);
-              getEventInfo(event).addDisablingAutomaton(aut);
-              break;
-            }
-          }
+    tauLoopFree |= encoding.getProperEvent(EventEncoding.TAU) == null;
+    if (!tauLoopFree) {
+      final TauLoopRemovalTRSimplifier loopRemover =
+        new TauLoopRemovalTRSimplifier(rel);
+      tauLoopFree = !loopRemover.run();
+    }
+    final AlwaysEnabledEventsFinder finder = new AlwaysEnabledEventsFinder(rel);
+    finder.setDefaultMarkingID(defaultID);
+    finder.run();
+    final TIntArrayList alwaysEnabledCodes = finder.getAlwaysEnabledEvents();
+    final Set<EventProxy> alwaysEnabledEvents =
+      new THashSet<>(alwaysEnabledCodes.size());
+    for (int i = 0; i < alwaysEnabledCodes.size(); i++) {
+      final int e = alwaysEnabledCodes.get(i);
+      final EventProxy event = encoding.getProperEvent(e);
+      alwaysEnabledEvents.add(event);
+    }
+    if (!tauLoopFree) {
+      for (int e = EventEncoding.NONTAU; e < rel.getNumberOfProperEvents(); e++) {
+        final byte status = rel.getProperEventStatus(e);
+        if (!EventEncoding.isUsedEvent(status)) {
+          final EventProxy event = encoding.getProperEvent(e);
+          alwaysEnabledEvents.add(event);
         }
       }
     }
+    return alwaysEnabledEvents;
   }
 
   /*
@@ -725,6 +750,27 @@ public class EnabledEventsCompositionalConflictChecker extends
       }
       return result;
     }
+  }
+
+
+  //#########################################################################
+  //# Enumeration AlwaysEnabledMode
+  private static enum AlwaysEnabledMode
+  {
+    /**
+     * Adding an input automaton that may have tau loops.
+     */
+    INITIAL,
+    /**
+     * Adding an input automaton known to be tau-loop free
+     * (when re-introducing a deferred subsystem).
+     */
+    TAU_LOOP_FREE,
+    /**
+     * Adding an automaton obtained by simplification.
+     * The always enabled status is available from the abstraction procedure.
+     */
+    SIMPLIFIED
   }
 
 

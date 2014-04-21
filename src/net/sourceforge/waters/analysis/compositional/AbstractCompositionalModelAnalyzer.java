@@ -1072,7 +1072,7 @@ public abstract class AbstractCompositionalModelAnalyzer
    * event in their alphabet.
    */
   protected void initialiseEventsToAutomata()
-    throws OverflowException
+    throws AnalysisException
   {
     final ProductDESProxy model = getModel();
     final Collection<AutomatonProxy> automata = model.getAutomata();
@@ -1118,7 +1118,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   }
 
   protected void addEventsToAllAutomata()
-    throws OverflowException
+    throws AnalysisException
   {
     for (final AutomatonProxy aut : mCurrentAutomata) {
       addEventsToAutomata(aut);
@@ -1148,7 +1148,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   protected void updateEventsToAutomata
     (final AutomatonProxy autToAdd,
      final List<AutomatonProxy> autToRemove)
-    throws OverflowException
+    throws AnalysisException
   {
     mCurrentAutomata.removeAll(autToRemove);
     mCurrentAutomata.add(autToAdd);
@@ -1671,7 +1671,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   }
 
   private boolean popEventDisjointSubsystem()
-    throws OverflowException
+    throws AnalysisException
   {
     final SubSystem next = mPostponedSubsystems.poll();
     if (next == null) {
@@ -1689,7 +1689,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   }
 
   private void loadSubSystem(final SubSystem task)
-    throws OverflowException
+    throws AnalysisException
   {
     mCurrentAutomata = task.getAutomata();
     mCurrentInternalStateLimit = task.getStateLimit();
