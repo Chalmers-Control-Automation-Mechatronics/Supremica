@@ -49,6 +49,7 @@ public class Candidate implements Comparable<Candidate>
   public Candidate(final List<AutomatonProxy> autList,
                    final Set<EventProxy> localEvents)
   {
+    assert !autList.isEmpty();
     mAutomata = autList;
     mLocalEvents = localEvents;
     mCommonEvents = -1;

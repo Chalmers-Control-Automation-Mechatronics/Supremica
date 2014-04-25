@@ -47,10 +47,14 @@ public class NBAbstractionEnabledEventsStandardConflictCheckerTest
       new EnabledEventsCompositionalConflictChecker(factory);
     checker.setAbstractionProcedureCreator
       (ConflictAbstractionProcedureFactory.EENB);
+    checker.setPreselectingMethod
+      (EnabledEventsCompositionalConflictChecker.MustSp);
+    checker.setSelectionHeuristic(ConflictSelectionHeuristicFactory.MaxL);
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);
     checker.setTraceCheckingEnabled(true);
     return checker;
   }
+
 }

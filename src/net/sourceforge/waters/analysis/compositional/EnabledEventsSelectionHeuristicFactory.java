@@ -46,7 +46,9 @@ public class EnabledEventsSelectionHeuristicFactory
   protected EnabledEventsSelectionHeuristicFactory()
   {
     register(MaxLE);
+    register(MaxSp);
     register(MinSE);
+    register(MinSSp);
   }
 
 
@@ -56,7 +58,8 @@ public class EnabledEventsSelectionHeuristicFactory
    * The selecting method that chooses the candidate with the highest
    * proportion of local and always enabled events.
    */
-  public static final SelectionHeuristicCreator MaxLE = new SelectionHeuristicCreator("MaxLE")
+  public static final SelectionHeuristicCreator MaxLE =
+    new SelectionHeuristicCreator("MaxLE")
   {
     @Override
     SelectionHeuristic<Candidate> createBaseHeuristic()
@@ -73,11 +76,33 @@ public class EnabledEventsSelectionHeuristicFactory
   };
 
   /**
+   * The selecting method that chooses the candidate with the highest
+   * proportion of local, always enabled, and selfloop-only events.
+   */
+  public static final SelectionHeuristicCreator MaxSp =
+    new SelectionHeuristicCreator("MaxSp")
+  {
+    @Override
+    SelectionHeuristic<Candidate> createBaseHeuristic()
+    {
+      return new SelectionHeuristicMaxSp();
+    }
+
+    @Override
+    SelectionHeuristic<Candidate> createChainHeuristic()
+    {
+      return CompositionalSelectionHeuristicFactory.createChainHeuristic
+        (MaxSp, MaxL, MaxC, MinE, MinS);
+    }
+  };
+
+  /**
    * The selecting method that chooses the candidate with the minimum
    * estimated number of states in the synchronous product, while taking
    * into account always enabled events.
    */
-  public static final SelectionHeuristicCreator MinSE = new SelectionHeuristicCreator("MinSE")
+  public static final SelectionHeuristicCreator MinSE =
+    new SelectionHeuristicCreator("MinSE")
   {
     @Override
     SelectionHeuristic<Candidate> createBaseHeuristic()
@@ -90,6 +115,28 @@ public class EnabledEventsSelectionHeuristicFactory
     {
       return CompositionalSelectionHeuristicFactory.createChainHeuristic
         (MinSE, MinS, MaxL, MaxC, MinE);
+    }
+  };
+
+  /**
+   * The selecting method that chooses the candidate with the minimum
+   * estimated number of states in the synchronous product, while taking
+   * into account always enabled events and selfloop-only events.
+   */
+  public static final SelectionHeuristicCreator MinSSp =
+    new SelectionHeuristicCreator("MinSSp")
+  {
+    @Override
+    SelectionHeuristic<Candidate> createBaseHeuristic()
+    {
+      return new SelectionHeuristicMinSSp();
+    }
+
+    @Override
+    SelectionHeuristic<Candidate> createChainHeuristic()
+    {
+      return CompositionalSelectionHeuristicFactory.createChainHeuristic
+        (MinSSp, MinS, MaxL, MaxC, MinE);
     }
   };
 
@@ -131,6 +178,44 @@ public class EnabledEventsSelectionHeuristicFactory
 
 
   //#########################################################################
+  //# Inner Class SelectionHeuristicMaxSp
+  public static class SelectionHeuristicMaxSp
+    extends NumericSelectionHeuristic<Candidate>
+  {
+    //#######################################################################
+    //# Overrides for NumericSelectionHeuristic<Candidate>
+    @Override
+    public void setContext(final Object context)
+    {
+      mChecker = (EnabledEventsCompositionalConflictChecker) context;
+    }
+
+    @Override
+    public double getHeuristicValue(final Candidate candidate)
+    {
+      final double totalEvents = candidate.getNumberOfEvents();
+      int numSpecial = 0;
+      for (final EventProxy event : candidate.getOrderedEvents()) {
+        final EnabledEventsEventInfo info = mChecker.getEventInfo(event);
+        if (info != null) { // not a proposition
+          if (info.isSingleDisablingCandidate(candidate)) {
+            numSpecial++;
+          }
+          if (info.isOnlyNonSelfLoopCandidate(candidate)) {
+            numSpecial++;
+          }
+        }
+      }
+      return - 0.5 * numSpecial / totalEvents;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private EnabledEventsCompositionalConflictChecker mChecker;
+  }
+
+
+  //#########################################################################
   //# Inner Class SelectionHeuristicMinSE
   public static class SelectionHeuristicMinSE
     extends NumericSelectionHeuristic<Candidate>
@@ -152,19 +237,61 @@ public class EnabledEventsSelectionHeuristicFactory
       }
       final double totalEvents = candidate.getNumberOfEvents();
       final double localEvents = candidate.getLocalEventCount();
-      int alwaysEnabledEvents = 0;
-      final List<AutomatonProxy> automataList = candidate.getAutomata();
+      int numAlwaysEnabled = 0;
+      final List<AutomatonProxy> automata = candidate.getAutomata();
       for (final EventProxy event : candidate.getOrderedEvents()) {
         final EnabledEventsEventInfo info = mChecker.getEventInfo(event);
         if (info != null && // not a proposition
             info.getDisablingAutomata() != null &&
-            automataList.containsAll(info.getDisablingAutomata())) {
-          alwaysEnabledEvents++;
+            automata.containsAll(info.getDisablingAutomata())) {
+          numAlwaysEnabled++;
         }
       }
       return product *
-             (totalEvents - localEvents - 0.5 * alwaysEnabledEvents) /
+             (totalEvents - localEvents - 0.5 * numAlwaysEnabled) /
              totalEvents;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private EnabledEventsCompositionalConflictChecker mChecker;
+  }
+
+
+  //#########################################################################
+  //# Inner Class SelectionHeuristicMinSSp
+  public static class SelectionHeuristicMinSSp
+    extends NumericSelectionHeuristic<Candidate>
+  {
+    //#######################################################################
+    //# Overrides for NumericSelectionHeuristic<Candidate>
+    @Override
+    public void setContext(final Object context)
+    {
+      mChecker = (EnabledEventsCompositionalConflictChecker) context;
+    }
+
+    @Override
+    public double getHeuristicValue(final Candidate candidate)
+    {
+      double product = 1.0;
+      for (final AutomatonProxy aut : candidate.getAutomata()) {
+        product *= aut.getStates().size();
+      }
+      final double totalEvents = candidate.getNumberOfEvents();
+      int numSpecial = 0;
+      for (final EventProxy event : candidate.getOrderedEvents()) {
+        final EnabledEventsEventInfo info = mChecker.getEventInfo(event);
+        if (info != null) { // not a proposition
+          if (info.isSingleDisablingCandidate(candidate)) {
+            numSpecial++;
+          }
+          if (info.isOnlyNonSelfLoopCandidate(candidate)) {
+            numSpecial++;
+          }
+        }
+      }
+      return product * (totalEvents - 0.5 * numSpecial) / totalEvents;
     }
 
     //#######################################################################

@@ -585,6 +585,7 @@ public class EnabledEventsCompositionalConflictChecker extends
     protected PreselectingMethodFactory()
     {
       register(MustLE);
+      register(MustSp);
     }
   }
 
@@ -610,7 +611,7 @@ public class EnabledEventsCompositionalConflictChecker extends
         final EnabledEventsEventInfo info = getEventInfo(event); //Get the event info
         assert info.getNumberOfAutomata() > 0; //Make sure that this event is being used by an automaton
         if (info.getNumberOfAutomata() > 1) { //If the event is being used by more than one automaton
-          List<AutomatonProxy> list = null;
+          final List<AutomatonProxy> list;
           if (info.mDisablingAutomata.size() > 1) //If there is more than one automata disabling the event
           {
             list = info.getDisablingAutomataList(); //Get the list of automaton that the event is disabled in
@@ -628,6 +629,68 @@ public class EnabledEventsCompositionalConflictChecker extends
 
       }
       return candidates;
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class HeuristicMustSp
+  private class HeuristicMustSp implements PreselectingHeuristic
+  {
+
+    //#######################################################################
+    //# Interface PreselectingHeuristic
+    @Override
+    public List<Candidate> findCandidates()
+    {
+      final List<Candidate> candidates = new LinkedList<Candidate>(); //Create collection to store candidates to return
+      final Collection<EventProxy> events = getCurrentEvents(); //Get all events and put into a collection
+      final Collection<List<AutomatonProxy>> found = //This is the automaton combinations we have already found
+        new THashSet<List<AutomatonProxy>>(events.size());
+      for (final EventProxy event : events) {
+        final EnabledEventsEventInfo info = getEventInfo(event); //Get the event info
+        final int numAutomata = info.getNumberOfAutomata();
+        assert numAutomata > 0; //Make sure that this event is being used by an automaton
+        if (numAutomata > 1) { //If the event is being used by more than one automaton
+          boolean special = false;
+          final int numDisabling = info.getDisablingAutomata().size();
+          if (numDisabling > 1 && numDisabling < numAutomata) {
+            // Create candidate consisting of all automata disabling this event
+            final List<AutomatonProxy> automata = info.getDisablingAutomataList();
+            addCandidate(automata, found, candidates);
+            special = true;
+          }
+          final int numNonSelfloop = info.getNumberOfNonSelfloopAutomata();
+          if (numNonSelfloop > 1 && numNonSelfloop < numAutomata) {
+            // Create candidate consisting of all automata for which this
+            // event is not selfloop-only
+            final List<AutomatonProxy> automata = info.getNonSelfloopAutomataList();
+            addCandidate(automata, found, candidates);
+            special = true;
+          }
+          if (!special) {
+            // If no candidate has been created above, create a candidate
+            // consisting of all automata using this event.
+            final List<AutomatonProxy> automata = info.getSortedAutomataList();
+            addCandidate(automata, found, candidates);
+            special = true;
+          }
+        }
+      }
+      return candidates;
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private void addCandidate(final List<AutomatonProxy> automata,
+                              final Collection<List<AutomatonProxy>> found,
+                              final List<Candidate> candidates)
+    {
+      if (isPermissibleCandidate(automata) && found.add(automata)) {
+        final Set<EventProxy> localEvents = identifyLocalEvents(automata);
+        final Candidate candidate = new Candidate(automata, localEvents);
+        candidates.add(candidate);
+      }
     }
   }
 
@@ -719,7 +782,6 @@ public class EnabledEventsCompositionalConflictChecker extends
     }
 
     /**
-     *
      * returns true if the candidate is the only disabling candidate
      */
     boolean isSingleDisablingCandidate(final Candidate candidate)
@@ -784,7 +846,7 @@ public class EnabledEventsCompositionalConflictChecker extends
   //# Class Constants
   /**
    * The preselecting method that considers every set of automata with at
-   * least one local event as a candidate.
+   * least one always enabled event as a candidate.
    */
   public static final PreselectingMethod MustLE = new PreselectingMethod("MustLE")
   {
@@ -794,6 +856,21 @@ public class EnabledEventsCompositionalConflictChecker extends
       final EnabledEventsCompositionalConflictChecker everifier =
         (EnabledEventsCompositionalConflictChecker) verifier;
       return everifier.new HeuristicMustLE();
+    }
+  };
+
+  /**
+   * The preselecting method that considers every set of automata with at
+   * least one always enabled or selfloop-only event as a candidate.
+   */
+  public static final PreselectingMethod MustSp = new PreselectingMethod("MustSp")
+  {
+    @Override
+    PreselectingHeuristic createHeuristic(final AbstractCompositionalModelAnalyzer verifier)
+    {
+      final EnabledEventsCompositionalConflictChecker everifier =
+        (EnabledEventsCompositionalConflictChecker) verifier;
+      return everifier.new HeuristicMustSp();
     }
   };
 

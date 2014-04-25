@@ -955,7 +955,7 @@ public abstract class AbstractCompositionalModelAnalyzer
                                          final Set<EventProxy> failing)
     throws AnalysisException
   {
-    if (removed.isEmpty()) {
+    if (removed.isEmpty() && failing.isEmpty()) {
       return null;
     } else {
       showRemovedEvents("Removing events", removed);
@@ -994,7 +994,7 @@ public abstract class AbstractCompositionalModelAnalyzer
             }
           }
           if (mHasRemovedProperTransition) {
-            mDirtyAutomata.add(newAut);
+            setAutomatonDirty(newAut);
           }
         }
       }
@@ -1164,6 +1164,13 @@ public abstract class AbstractCompositionalModelAnalyzer
     }
   }
 
+  protected void setAutomatonDirty(final AutomatonProxy aut)
+  {
+    if (!mDirtyAutomata.contains(aut)) {
+      mDirtyAutomata.add(aut);
+    }
+  }
+
   /**
    * Creates an event information record for the given event.
    * @see EventInfo
@@ -1247,7 +1254,8 @@ public abstract class AbstractCompositionalModelAnalyzer
    * It removes entries from the event information map {@link #mEventInfoMap}),
    * and tests for events that become redundant. Events are redundant if
    * they are known to be globally disabled, or if they only ever appear as
-   * selfloops. Such events are added to the list {@link #mRedundantEvents}.
+   * selfloops, or if they only appear on transitions to deadlock states.
+   * Such events are added to the list {@link #mRedundantEvents}.
    * @param victims
    *          Collection of automata to be removed.
    * @see #removeRedundantEvents()
@@ -2474,6 +2482,16 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     //#######################################################################
     //# Simple Access
+    int getNumberOfAutomata()
+    {
+      return mAutomataMap.size();
+    }
+
+    int getNumberOfNonSelfloopAutomata()
+    {
+      return mNumNonSelfloopAutomata;
+    }
+
     void addAutomaton(final AutomatonProxy aut, final byte status)
     {
       final byte present = mAutomataMap.get(aut);
@@ -2494,11 +2512,6 @@ public abstract class AbstractCompositionalModelAnalyzer
       }
     }
 
-    int getNumberOfAutomata()
-    {
-      return mAutomataMap.size();
-    }
-
     List<AutomatonProxy> getSortedAutomataList()
     {
       if (mSortedAutomataList == null) {
@@ -2509,6 +2522,35 @@ public abstract class AbstractCompositionalModelAnalyzer
         mSortedAutomataList = Arrays.asList(automata);
       }
       return mSortedAutomataList;
+    }
+
+    List<AutomatonProxy> getNonSelfloopAutomataList()
+    {
+      if (mNumNonSelfloopAutomata == 0) {
+        return Collections.emptyList();
+      }
+      final List<AutomatonProxy> result =
+        new ArrayList<AutomatonProxy>(mNumNonSelfloopAutomata);
+      if (mSortedAutomataList != null) {
+        for (final AutomatonProxy aut : mSortedAutomataList) {
+          final byte status = mAutomataMap.get(aut);
+          if (status == NOT_ONLY_SELFLOOP || status == FAILING) {
+            result.add(aut);
+          }
+        }
+      } else {
+        final TObjectByteIterator<AutomatonProxy> iter = mAutomataMap.iterator();
+        while (iter.hasNext()) {
+          iter.advance();
+          final byte status = iter.value();
+          if (status == NOT_ONLY_SELFLOOP || status == FAILING) {
+            result.add(iter.key());
+          }
+        }
+        Collections.sort(result);
+      }
+      assert result.size() == mNumNonSelfloopAutomata;
+      return result;
     }
 
     boolean isEmpty()
@@ -2527,9 +2569,15 @@ public abstract class AbstractCompositionalModelAnalyzer
       }
     }
 
-    private void setReduced()
+    void setReduced()
     {
       mFailingStatus = REDUCED;
+      mNumNonSelfloopAutomata = getNumberOfAutomata();
+      final TObjectByteIterator<AutomatonProxy> iter = mAutomataMap.iterator();
+      while (iter.hasNext()) {
+        iter.advance();
+        iter.setValue(FAILING);
+      }
     }
 
     void removeAutomata(final Collection<AutomatonProxy> automata)
@@ -2581,7 +2629,8 @@ public abstract class AbstractCompositionalModelAnalyzer
       } else {
         int remaining = mNumNonSelfloopAutomata;
         for (final AutomatonProxy aut : candidate.getAutomata()) {
-          if (mAutomataMap.get(aut) == NOT_ONLY_SELFLOOP) {
+          final byte status = mAutomataMap.get(aut);
+          if (status == NOT_ONLY_SELFLOOP || status == FAILING) {
             remaining--;
             if (remaining == 0) {
               return true;
@@ -3022,7 +3071,6 @@ public abstract class AbstractCompositionalModelAnalyzer
   static final byte ONLY_SELFLOOP = 1;
   static final byte NOT_ONLY_SELFLOOP = 2;
   static final byte BLOCKED = 3;
-
 
   static final byte NOT_FAILING = 4;
   static final byte FAILING = 5;

@@ -152,6 +152,9 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
     bisimulator.setTransitionLimit(limit);
     bisimulator.setDumpStateAware(true);
     postChain.add(bisimulator);
+    final IncomingEquivalenceTRSimplifier incomingEquivalenceSimplifier =
+      new IncomingEquivalenceTRSimplifier();
+    postChain.add(incomingEquivalenceSimplifier);
     final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
       new NonAlphaDeterminisationTRSimplifier();
     nonAlphaDeterminiser.setTransitionRemovalMode
@@ -159,9 +162,6 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
     nonAlphaDeterminiser.setTransitionLimit(limit);
     nonAlphaDeterminiser.setDumpStateAware(true);
     postChain.add(nonAlphaDeterminiser);
-    final IncomingEquivalenceTRSimplifier incomingEquivalenceSimplifier =
-      new IncomingEquivalenceTRSimplifier();
-    postChain.add(incomingEquivalenceSimplifier);
     final MarkingSaturationTRSimplifier saturator =
       new MarkingSaturationTRSimplifier();
     postChain.add(saturator);

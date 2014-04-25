@@ -118,6 +118,10 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     slBisimulator.setDumpStateAware(true);
     postChain.add(slBisimulator);
 
+    final IncomingEquivalenceTRSimplifier incomingEquivalenceSimplifier =
+      new IncomingEquivalenceTRSimplifier();
+    postChain.add(incomingEquivalenceSimplifier);
+
     if (includeNonAlphaDeterminisation) {
       final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
         new NonAlphaDeterminisationTRSimplifier();
@@ -128,9 +132,6 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
       postChain.add(nonAlphaDeterminiser);
     }
 
-    final IncomingEquivalenceTRSimplifier incomingEquivalenceSimplifier =
-      new IncomingEquivalenceTRSimplifier();
-    postChain.add(incomingEquivalenceSimplifier);
     final MarkingSaturationTRSimplifier saturator =
       new MarkingSaturationTRSimplifier();
     postChain.add(saturator);
