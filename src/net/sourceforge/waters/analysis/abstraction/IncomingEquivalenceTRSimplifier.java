@@ -124,11 +124,11 @@ public class IncomingEquivalenceTRSimplifier
     mListWriteIterator = mListBuffer.createModifyingIterator();
     mSetBuffer = new IntSetBuffer(numEvents);
     mSetReadIterator = mSetBuffer.iterator();
-    mTauClosureIterator = new TauClosureIterator();
+    final TransitionListBuffer succBuf = rel.getSuccessorBuffer();
+    mTauClosureIterator = new TauClosureIterator(succBuf);
     final TransitionIterator inner1 = rel.createSuccessorsReadOnlyIterator();
     mEventIterator = new EventIterator(inner1);
     mPostEventIterator = new PostEventClosureIterator();
-    final TransitionListBuffer succBuf = rel.getSuccessorBuffer();
     final TransitionIterator inner2 = rel.createSuccessorsReadOnlyIterator();
     mForwardEventIterator = new FullEventClosureIterator(succBuf, inner2);
   }
@@ -172,10 +172,13 @@ public class IncomingEquivalenceTRSimplifier
         break;
       }
       mergeOutgoingEquivalentClasses(mergedRoots);
-      if (mergedRoots.size() == 0 || mNumMergedStates == 1) {
+      if (mergedRoots.size() == 0) {
         break;
       }
       merged = true;
+      if (mNumMergedStates == 1) {
+        break;
+      }
       createNextEquivalenceClasses(mergedRoots);
       mergedRoots.clear();
     } while (mNumProperCandidates > 0);
@@ -1092,11 +1095,11 @@ public class IncomingEquivalenceTRSimplifier
 
     //#######################################################################
     //# Constructor
-    private TauClosureIterator()
+    private TauClosureIterator(final TransitionListBuffer buffer)
     {
+      mTransitionListBuffer = buffer;
       mStack = new TIntArrayStack();
-      final ListBufferTransitionRelation rel = getTransitionRelation();
-      mTransitionIterator = rel.createSuccessorsReadOnlyIterator();
+      mTransitionIterator = buffer.createReadOnlyIterator();
       mTransitionIterator.resetEvent(EventEncoding.TAU);
       mPushIterator = mListBuffer.createReadOnlyIterator();
       mVisited = new TIntHashSet();
@@ -1216,7 +1219,7 @@ public class IncomingEquivalenceTRSimplifier
     @Override
     public int getCurrentSourceState()
     {
-      return getCurrentFromState();
+      return mTransitionListBuffer.getIteratorSourceState(this);
     }
 
     @Override
@@ -1228,7 +1231,7 @@ public class IncomingEquivalenceTRSimplifier
     @Override
     public int getCurrentTargetState()
     {
-      return getCurrentToState();
+      return mTransitionListBuffer.getIteratorTargetState(this);
     }
 
     @Override
@@ -1311,6 +1314,7 @@ public class IncomingEquivalenceTRSimplifier
 
     //#######################################################################
     //# Data Members
+    private final TransitionListBuffer mTransitionListBuffer;
     private final TIntStack mStack;
     private final TransitionIterator mTransitionIterator;
     private final IntListBuffer.Iterator mPushIterator;
@@ -1573,9 +1577,10 @@ public class IncomingEquivalenceTRSimplifier
     private PostEventClosureIterator()
     {
       final ListBufferTransitionRelation rel = getTransitionRelation();
-      final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
+      final TransitionListBuffer succBuf = rel.getSuccessorBuffer();
+      final TransitionIterator iter = succBuf.createReadOnlyIterator();
       mEventIterator = new EventIterator(iter);
-      mTauIterator = new TauClosureIterator();
+      mTauIterator = new TauClosureIterator(succBuf);
       mFromState = null;
       mLevel = -1;
     }
@@ -1761,9 +1766,9 @@ public class IncomingEquivalenceTRSimplifier
                                      final TransitionIterator inner)
     {
       mTransitionListBuffer = buffer;
-      mTauIterator1 = new TauClosureIterator();
+      mTauIterator1 = new TauClosureIterator(buffer);
       mEventIterator = new EventIterator(inner);
-      mTauIterator2 = new TauClosureIterator();
+      mTauIterator2 = new TauClosureIterator(buffer);
       mFromState = null;
       mLevel = -1;
     }
@@ -1829,7 +1834,7 @@ public class IncomingEquivalenceTRSimplifier
           if (!mTauIterator1.advance()) {
             break;
           }
-          state = mTauIterator1.getCurrentTargetState();
+          state = mTauIterator1.getCurrentToState();
           mEventIterator.resume(state);
           mLevel = 2;
           // fall through ...
@@ -1837,7 +1842,7 @@ public class IncomingEquivalenceTRSimplifier
           if (!mEventIterator.advance()) {
             break;
           }
-          state = mEventIterator.getCurrentTargetState();
+          state = mEventIterator.getCurrentToState();
           mTauIterator2.resume(state);
           mLevel = 3;
           // fall through ...
@@ -1949,7 +1954,7 @@ public class IncomingEquivalenceTRSimplifier
   /**
    * State information records for all states.
    * This array contains a {@link StateInfo} entry for all reachable states,
-   * while unreachable have <CODE>null</CODE> entries.
+   * while unreachable states have <CODE>null</CODE> entries.
    */
   private StateInfo[] mStateInfo;
   /**
