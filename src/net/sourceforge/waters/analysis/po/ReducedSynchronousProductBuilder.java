@@ -69,7 +69,6 @@ public class ReducedSynchronousProductBuilder
   extends AbstractAutomatonBuilder
   implements SynchronousProductBuilder
 {
-
   //#########################################################################
   //# Constructors
   public ReducedSynchronousProductBuilder
@@ -320,12 +319,16 @@ public class ReducedSynchronousProductBuilder
     } else {
       mCurrentPropositions = new ArrayList<EventProxy>(mConfiguredPropositions);
     }
-
-    final MaskingPair[] tauList = new MaskingPair[mNumAutomata];
-    final TObjectIntHashMap<EventProxy> tauHash =
+    final LocalTauMask[] tauList = new LocalTauMask[mNumAutomata];
+    final TObjectIntHashMap<EventProxy> tauMaskedEventsHash =
       new TObjectIntHashMap<EventProxy>(mNumInputEvents, 0.5f, -1);
+    final TObjectIntHashMap<EventProxy> tauEventsHash =
+      new TObjectIntHashMap<EventProxy>(mNumInputEvents, 0.5f, -1);
+    final ArrayList<EventProxy> maskedTauEvents = new ArrayList<EventProxy>();
+    mTauEvents = new ArrayList<EventProxy>();
     int autNum = 0;
-    int mNumTauEvents = 0;
+    mNumTauEvents = 0;
+
     for(final AutomatonProxy a : automata){
       final Collection<EventProxy> localEvents = new ArrayList<EventProxy>();
       events:
@@ -338,27 +341,31 @@ public class ReducedSynchronousProductBuilder
             }
           }
           localEvents.add(e);
-          tauHash.put(e, autNum);
+          tauMaskedEventsHash.put(e, autNum);
+          maskedTauEvents.add(e);
         }
       if (localEvents.size() > 0){
         final EventProxy tau = factory.createEventProxy("tau" + autNum,
                                                   EventKind.UNCONTROLLABLE);
-        events.add(tau);
-        tauList[autNum] = new MaskingPair(localEvents,tau,false);
+        final LocalTauMask mask = new LocalTauMask(localEvents, tau, autNum);
+        mTauEvents.add(tau);
+        tauEventsHash.put(tau, autNum);
+        tauList[autNum] = mask;
         mNumTauEvents++;
       }
       autNum++;
     }
 
+
     final Collection<EventProxy> forbidden = new THashSet<EventProxy>();
-    final boolean[] forbiddenTau = new boolean[mNumAutomata];
-    int numForbiddenTau = 0;
+    //final boolean[] forbiddenTau = new boolean[mNumAutomata];
+    final int numForbiddenTau = 0;
     if (mMaskingPairs != null) {
       for (final MaskingPair pair : mMaskingPairs) {
         if (pair.isForbidden()) {
           final ArrayList<EventProxy> hidden =
             new ArrayList<EventProxy>(pair.getHiddenEvents());
-          for(int e = 0; e < hidden.size(); e++){
+          /*for(int e = 0; e < hidden.size(); e++){
             final EventProxy event = hidden.get(e);
             if((autNum = tauHash.get(event)) != -1){
               hidden.remove(e);
@@ -368,7 +375,7 @@ public class ReducedSynchronousProductBuilder
                 numForbiddenTau++;
               }
             }
-          }
+          }*/
           forbidden.addAll(hidden);
         }
       }
@@ -386,16 +393,23 @@ public class ReducedSynchronousProductBuilder
         }
       } else if (forbidden.contains(event)) {
         eventToIndex.put(event, nextForbidden++);
-      } else if ((autNum = tauHash.get(event)) != -1 && !tauAdded[autNum]){
-        event = tauList[autNum].getReplacement();
-        eventToIndex.put(event, nextTau++);
-        tauAdded[autNum] = true;
+      } else if ((autNum = tauMaskedEventsHash.get(event)) != -1){
+        if(!tauAdded[autNum]){
+          event = tauList[autNum].getTauEvent();
+          eventToIndex.put(event, nextTau++);
+          tauAdded[autNum] = true;
+        }
       } else {
         eventToIndex.put(event, nextNormal++);
       }
     }
     mNumForbiddenEvents = nextForbidden;
     mNumInputEvents = nextNormal;
+    for(final EventProxy e : maskedTauEvents){
+      eventToIndex.put(e, nextNormal++);
+    }
+
+
     final boolean pruning;
     if (!mPruningDeadlocks) {
       pruning = false;
@@ -420,8 +434,8 @@ public class ReducedSynchronousProductBuilder
           eventToIndex.put(replacement, e);
         }
         for (EventProxy hidden : pair.getHiddenEvents()) {
-          if((autNum = tauHash.get(hidden))!= -1){
-            hidden = tauList[autNum].getReplacement();
+          if((autNum = tauMaskedEventsHash.get(hidden))!= -1){
+            hidden = tauList[autNum].getTauEvent();
           }
           final int h = eventToIndex.get(hidden);
           mProjectionMask[h] = e;
@@ -436,11 +450,15 @@ public class ReducedSynchronousProductBuilder
     }
     mNumEvents = nextNormal;
     mEvents = new EventProxy[nextNormal];
+    mTauEventAutomataMap = new int[nextNormal];
     final TObjectIntIterator<EventProxy> iter = eventToIndex.iterator();
     while (iter.hasNext()) {
       iter.advance();
       final EventProxy event = iter.key();
       final int e = iter.value();
+      if((autNum = tauEventsHash.get(event)) != -1){
+        mTauEventAutomataMap[e] = autNum;
+      }
       mEvents[e] = event;
     }
     if (mRemovingSelfloops) {
@@ -514,7 +532,8 @@ public class ReducedSynchronousProductBuilder
         new TIntArrayList[mNumInputEvents][numStates];
       for (final TransitionProxy trans : aut.getTransitions()) {
         EventProxy e = trans.getEvent();
-        e = (autNum = tauHash.get(e))!=-1?tauList[autNum].getReplacement():e;
+        e = (autNum = tauMaskedEventsHash.get(e))
+          !=-1?tauList[autNum].getTauEvent():e;
         final int event = eventToIndex.get(e);
         final int source = stateToIndex.get(trans.getSource());
         final int target = stateToIndex.get(trans.getTarget());
@@ -527,7 +546,8 @@ public class ReducedSynchronousProductBuilder
       }
       for (EventProxy event : localEvents) {
         if (translator.getEventKind(event) != EventKind.PROPOSITION) {
-          event = (autNum = tauHash.get(event))!=-1?tauList[autNum].getReplacement():event;
+          event = (autNum = tauMaskedEventsHash.get(event))
+            !=-1?tauList[autNum].getTauEvent():event;
           final int e = eventToIndex.get(event);
           mTransitions[a][e] = new int[numStates][];
           for (int source = 0; source < numStates; source++) {
@@ -548,7 +568,7 @@ public class ReducedSynchronousProductBuilder
       if(tauList[a]==null){
         continue;
       }
-      final int tauRepresentative = eventToIndex.get(tauList[a].getReplacement());
+      final int tauRepresentative = eventToIndex.get(tauList[a].getTauEvent());
       final int[][] trans = mTransitions[a][tauRepresentative];
 
       final int numStates = aut.getStates().size();
@@ -568,11 +588,14 @@ public class ReducedSynchronousProductBuilder
             }
           }
         }
-        if(mTransitions[a][tauRepresentative][s].length != visited.size() -1){
-          visited.remove(s);
-          final int[] tauSuccessors = visited.toArray();
-          Arrays.sort(tauSuccessors);
-          mTransitions[a][tauRepresentative][s] = tauSuccessors;
+        final int[] sourceStates = mTransitions[a][tauRepresentative][s];
+        if(sourceStates != null){
+          if(sourceStates.length != visited.size() -1){
+            visited.remove(s);
+            final int[] tauSuccessors = visited.toArray();
+            Arrays.sort(tauSuccessors);
+            mTransitions[a][tauRepresentative][s] = tauSuccessors;
+          }
         }
       }
       a++;
@@ -694,51 +717,29 @@ public class ReducedSynchronousProductBuilder
         permutations(mNumAutomata, sourceTuple, source, enabledTau.get(0));
       }
       else{
-        final ArrayList<int[]> tauSuccessors = permuteTauSuccessors(enabledTau.size(),
-                                                              enabledTau,
-                                                              sourceTuple);
-        final int[] targetState = tauSuccessors.remove(tauSuccessors.size() - 1);
-        for(final int[] targetTuple : tauSuccessors){
-          events:
-            for (int i=0; i < mNumInputEvents; e++) {
-              Arrays.fill(mNDTuple, null);
-              for (final int a : mEventAutomata[e]) {
-                if (mTransitions[a][e] != null) {
-                  final int[] succ = mTransitions[a][e][targetTuple[a]];
-                  if (succ == null) {
-                    i++;
-                    continue events;
-                  }
-                  mNDTuple[a] = succ;
-                }
-              }
-              permutations(mNumAutomata, sourceTuple, source, e);
-              i++;
-            }
+        if(!permuteTauSuccessors(enabledTau.size(),enabledTau,sourceTuple,source,
+                             sourceTuple,true,true)){
+          return;
         }
-        mTargetTuple = targetState;
-        addTargetState(source, enabledTau.get(0), false);
       }
     }
-    e-=mNumInputEvents;
     events:
-      for (int i=0; i < mNumInputEvents; e++) {
+      for (; e < mNumInputEvents; e++) {
         Arrays.fill(mNDTuple, null);
         for (final int a : mEventAutomata[e]) {
           if (mTransitions[a][e] != null) {
             final int[] succ = mTransitions[a][e][sourceTuple[a]];
             if (succ == null) {
-              i++;
               continue events;
             }
             mNDTuple[a] = succ;
           }
         }
         permutations(mNumAutomata, sourceTuple, source, e);
-        i++;
       }
   }
 
+  @SuppressWarnings("unused")
   private ArrayList<int[]> permuteTauSuccessors(int t, final TIntArrayList enabledTau,
                                                 final int[] sourceTuple)
   {
@@ -766,6 +767,73 @@ public class ReducedSynchronousProductBuilder
       }
       return tauSuccessors;
     }
+  }
+
+  private boolean permuteTauSuccessors(int t,final TIntArrayList enabledTau,
+                                    final int[] sourceTuple,final int source,
+                                    final int[] originalSource,
+                                    final boolean first, final boolean last)
+                                      throws OverflowException
+  {
+    if(t == 0){
+      if(!first && !last){
+        if (!addTauSuccessors(sourceTuple, source)){
+          return false;
+        }
+      }
+      else if(last){
+        mTargetTuple = Arrays.copyOf(sourceTuple, mNumAutomata);
+        addTargetState(source, enabledTau.get(0), false);
+      }
+    }
+    else{
+      t--;
+      permuteTauSuccessors(t, enabledTau, sourceTuple,source,
+                           originalSource,first,false);
+      final int tauEvent = enabledTau.get(t);
+      final int aut = mEventAutomata[tauEvent][0];
+      final int backup = sourceTuple[aut];
+      final int[] successorStates = mTransitions[aut][tauEvent][sourceTuple[aut]];
+      for(final int successor : successorStates){
+        sourceTuple[aut] = successor;
+        permuteTauSuccessors(t, enabledTau, sourceTuple,source,
+                             originalSource,false,last);
+      }
+      sourceTuple[aut] = backup;
+    }
+    return true;
+  }
+
+  private boolean addTauSuccessors(final int[] sourceTuple,final int source)
+    throws OverflowException
+  {
+    int e;
+    forbidden:
+      for (e = 0; e < mNumForbiddenEvents; e++) {
+        for (final int a : mEventAutomata[e]) {
+          if (mTransitions[a][e] != null &&
+            mTransitions[a][e][sourceTuple[a]] == null) {
+            continue forbidden;
+          }
+        }
+        addTransition(source, e, source);
+        return false;
+      }
+    events:
+      for (e += mNumTauEvents; e < mNumInputEvents; e++) {
+        Arrays.fill(mNDTuple, null);
+        for (final int a : mEventAutomata[e]) {
+          if (mTransitions[a][e] != null) {
+            final int[] succ = mTransitions[a][e][sourceTuple[a]];
+            if (succ == null) {
+              continue events;
+            }
+            mNDTuple[a] = succ;
+          }
+        }
+        permutations(mNumAutomata,sourceTuple,source,e);
+      }
+      return true;
   }
 
   private void permutations(int a,
@@ -887,17 +955,22 @@ public class ReducedSynchronousProductBuilder
   {
     final int numSelfloopStates = mNumStates - (mDeadlockState >= 0 ? 1 : 0);
     final Set<EventProxy> skip;
-    if (mMaskingPairs == null) {
+    if (mMaskingPairs == null && mTauEvents.isEmpty()) {
       skip = Collections.emptySet();
     } else {
       skip = new THashSet<EventProxy>(mNumEvents);
-      for (final MaskingPair pair : mMaskingPairs) {
-        final Collection<EventProxy> hidden = pair.getHiddenEvents();
-        skip.addAll(hidden);
+      if(mMaskingPairs != null){
+        for (final MaskingPair pair : mMaskingPairs) {
+          final Collection<EventProxy> hidden = pair.getHiddenEvents();
+          skip.addAll(hidden);
+        }
+        for (final MaskingPair pair : mMaskingPairs) {
+          final EventProxy replacement = pair.getReplacement();
+          skip.remove(replacement);
+        }
       }
-      for (final MaskingPair pair : mMaskingPairs) {
-        final EventProxy replacement = pair.getReplacement();
-        skip.remove(replacement);
+      if(!mTauEvents.isEmpty()){
+        skip.addAll(mTauEvents);
       }
     }
     final int numEvents = mNumEvents + mCurrentPropositions.size() - skip.size();
@@ -1070,6 +1143,49 @@ public class ReducedSynchronousProductBuilder
     private final Collection<EventProxy> mHiddenEvents;
     private final EventProxy mReplacement;
     private final boolean mForbidden;
+  }
+
+//#########################################################################
+  //# Inner Class MaskingPair
+  private static class LocalTauMask
+  {
+    //#######################################################################
+    //# Constructor
+    private LocalTauMask(final Collection<EventProxy> hidden,
+                        final EventProxy replacement, final int aut)
+    {
+      mLocalEvents = hidden;
+      mTauEvent = replacement;
+      mAutNum = aut;
+    }
+
+    //#######################################################################
+    //# Simple Access
+    @SuppressWarnings("unused")
+    private Collection<EventProxy> getLocalEvents()
+    {
+      return mLocalEvents;
+    }
+
+    private EventProxy getTauEvent()
+    {
+      return mTauEvent;
+    }
+
+    @SuppressWarnings("unused")
+    private int getAutNum(){
+      return mAutNum;
+    }
+    @Override
+    public int hashCode(){
+      return mTauEvent.hashCode();
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final Collection<EventProxy> mLocalEvents;
+    private final EventProxy mTauEvent;
+    private final int mAutNum;
   }
 
 
@@ -1283,6 +1399,8 @@ public class ReducedSynchronousProductBuilder
   private Collection<EventProxy> mConfiguredPropositions;
   private StateCallback mStateCallback;
   private Collection<MaskingPair> mMaskingPairs;
+  private int[] mTauEventAutomataMap;
+  private Collection<EventProxy> mTauEvents;
   private boolean mRemovingSelfloops;
   private boolean mPruningDeadlocks;
 
