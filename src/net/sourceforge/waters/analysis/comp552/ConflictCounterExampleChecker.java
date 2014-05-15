@@ -82,7 +82,7 @@ public class ConflictCounterExampleChecker
   //#########################################################################
   //# Constructors
   /**
-   * Creates a new counter example checker.
+   * Creates a new conflict counterexample checker.
    * @param  factory   Factory to be used to construct the language inclusion
    *                   model and secondary counterexample if needed.
    */

@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: COMP452/552-13A Assignment 3
+//# PROJECT: COMP452/552-14A Assignment 3
 //# PACKAGE: net.sourceforge.waters.analysis.comp552
 //# CLASS:   BDDEncoding
 //###########################################################################
@@ -212,6 +212,42 @@ public class BDDEncoding
   }
 
   /**
+   * Computes a BDD representing the monolithic transition relation of a part
+   * of this encoding's model, including event bits.
+   * This method builds the BDD from the automata model, which is a
+   * computationally expensive operation.
+   * @param  compKind     The kind of automata to be included in the
+   *                      transition relation, which should be either
+   *                      {@link ComponentKind#PLANT} or
+   *                      {@link ComponentKind#SPEC}.
+   * @param  eventKind    The kind of events to be included in the transition
+   *                      relation, which should be either
+   *                      {@link EventKind#CONTROLLABLE} or
+   *                      {@link EventKind#UNCONTROLLABLE}.
+   * @return A BDD over the event, current state, and next state variables of
+   *         all automata in the model, which is true precisely when there is
+   *         a transition with the event between the current and next state
+   *         in the synchronous composition of all automata in the encoded
+   *         model.
+   */
+  public BDD computeTransitionRelationBDDWithEvents(final ComponentKind compKind,
+                                                    final EventKind eventKind)
+  {
+    // Compose the transition relations of all automata, bottom-up ...
+    final BDD trans = computeEventsBDD(eventKind);
+    final int end = mAutomata.size();
+    final ListIterator<AutomatonEncoding> iter = mAutomata.listIterator(end);
+    while (iter.hasPrevious()) {
+      final AutomatonEncoding enc = iter.previous();
+      if (enc.getKind() == compKind) {
+        final BDD autTrans = enc.getTransitionRelationBDD();
+        trans.andWith(autTrans);
+      }
+    }
+    return trans;
+  }
+
+  /**
    * Returns the number of non-proposition events in this encoding.
    */
   public int getNumberOfProperEvents()
@@ -250,6 +286,27 @@ public class BDDEncoding
     } else {
       return encodeBDD(code, 0, mNumEventBits, 1);
     }
+  }
+
+  /**
+   * Computes a BDD encoding all events of the given kind.
+   * @param  kind         The desired event kind, which should be either
+   *                      {@link EventKind#CONTROLLABLE} or
+   *                      {@link EventKind#UNCONTROLLABLE}.
+   * @return A BDD over the event variables, which is true precisely when
+   *         the event variables encode an event of the requested kind.
+   */
+  public BDD computeEventsBDD(final EventKind kind)
+  {
+    final BDD result = mBDDFactory.zero();
+    for (final Map.Entry<EventProxy,Integer> entry : mEventMap.entrySet()) {
+      final EventProxy event = entry.getKey();
+      if (event.getKind() == kind) {
+        final BDD eventBDD = computeEventBDD(event);
+        result.orWith(eventBDD);
+      }
+    }
+    return result;
   }
 
   /**
@@ -534,6 +591,17 @@ public class BDDEncoding
     private int getNumberOfBits()
     {
       return mNumBits;
+    }
+
+    /**
+     * Returns the component kind (plant or specification) of the automaton
+     * encoded by this BDD.
+     * @return Either {@link ComponentKind#PLANT} or
+     *         {@link ComponentKind#SPEC}.
+     */
+    private ComponentKind getKind()
+    {
+      return mAutomaton.getKind();
     }
 
     //#########################################################################
