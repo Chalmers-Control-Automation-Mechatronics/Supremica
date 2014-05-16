@@ -112,7 +112,7 @@ public class Watchdog extends Thread {
   /**
    * Sets whether this watchdog is verbose. If verbose, it will print
    * the message <CODE>&quot;aborting&nbsp;...&nbsp;&quot;</CODE> to
-   * {@link System.out} when the timeout is reached. This is to help
+   * {@link System#out} when the timeout is reached. This is to help
    * debugging.
    */
   public synchronized void setVerbose(final boolean verbose)

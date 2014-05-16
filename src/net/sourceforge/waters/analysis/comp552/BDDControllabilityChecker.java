@@ -162,26 +162,30 @@ public class BDDControllabilityChecker extends ModelChecker
       final ProductDESProxy model = getModel();
       // Create an encoding for the events and automata.
       mBDDEncoding = new BDDEncoding(bddFactory, model);
-      // Build the transition relation for uncontrollable events in plants
-      final BDD plantUncontTrans =
-        mBDDEncoding.computeTransitionRelationBDDWithEvents
+      // Skip the following if there are more than 30 automata in the model,
+      // might be too slow otherwise ...
+      if (model.getAutomata().size() <= 30) {
+        // Build the transition relation for uncontrollable events in plants
+        final BDD plantUncontTrans =
+          mBDDEncoding.computeTransitionRelationBDDWithEvents
           (ComponentKind.PLANT, EventKind.UNCONTROLLABLE);
-      // Get event variables
-      final BDDVarSet eventVars = mBDDEncoding.computeEventVarSet();
-      // Quantify them out
-      final BDD plantUncontTrans1 = plantUncontTrans.exist(eventVars);
-      plantUncontTrans.free();
-      eventVars.free();
-      // Get next-state variables
-      final BDDVarSet nextStateVars = mBDDEncoding.computeNextStateVarSet();
-      // Quantify them out, too
-      final BDD plantUncontStates = plantUncontTrans1.exist(nextStateVars);
-      plantUncontTrans1.free();
-      nextStateVars.free();
-      // Now the BDD plantUncontStates represents the set of states where
-      // the plant enables an uncontrollable event.
-      // Use this BDD for something (well, sort of) ...
-      plantUncontStates.free();
+        // Get event variables
+        final BDDVarSet eventVars = mBDDEncoding.computeEventVarSet();
+        // Quantify them out
+        final BDD plantUncontTrans1 = plantUncontTrans.exist(eventVars);
+        plantUncontTrans.free();
+        eventVars.free();
+        // Get next-state variables
+        final BDDVarSet nextStateVars = mBDDEncoding.computeNextStateVarSet();
+        // Quantify them out, too
+        final BDD plantUncontStates = plantUncontTrans1.exist(nextStateVars);
+        plantUncontTrans1.free();
+        nextStateVars.free();
+        // Now the BDD plantUncontStates represents the set of states where
+        // the plant enables an uncontrollable event.
+        // Use this BDD for something (well, sort of) ...
+        plantUncontStates.free();
+      }
 
       // Try to compute a counterexample ...
       // This is not yet implemented and should only be done of the model is
@@ -208,9 +212,10 @@ public class BDDControllabilityChecker extends ModelChecker
   /**
    * Gets a counterexample if the model was found to be not controllable. A
    * controllability counterexample trace is a sequence of <I>n</I>+1 events.
-   * The first <I>n</I>&nbsp;events take the model to a state where the plant
-   * enables the (<I>n</I>+1)-th event, while the specification does not
-   * enable this last event, which must be an uncontrollable event.
+   * The first <I>n</I>&nbsp;events take the model to a state where all plant
+   * automata enable the (<I>n</I>+1)-th event, while at least one of the
+   * specification automata does not enable this last event, which must be
+   * an uncontrollable event.
    * @return A safety trace object representing the counterexample. The
    *         returned trace is constructed for the input product DES of this
    *         controllability checker and shares its automata and event objects.

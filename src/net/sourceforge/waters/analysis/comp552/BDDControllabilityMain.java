@@ -109,8 +109,8 @@ public class BDDControllabilityMain
           compiler.setEnabledPropertyNames(empty);
           des = compiler.compile();
         }
-        final BDDConflictChecker checker =
-          new BDDConflictChecker(des, desFactory);
+        final BDDControllabilityChecker checker =
+          new BDDControllabilityChecker(des, desFactory);
         System.out.print(des.getName() + " ... ");
         System.out.flush();
 

@@ -226,6 +226,8 @@
            name="net/sourceforge/waters/analysis/comp552/ModelChecker.class"/>
         <include
            name="net/sourceforge/waters/analysis/comp552/ConflictCounterExampleChecker.class"/>
+        <include
+           name="net/sourceforge/waters/analysis/comp552/ControllabilityCounterExampleChecker.class"/>
       </fileset>
     </jar>
   </target>
@@ -377,205 +379,6 @@
     </junit>
   </target>
 
-  <target name="runtest1" depends="test-jar,cpp">
-    <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="1024m">
-      <formatter type="xml"/>
-      <batchtest todir="${logs.results}" if="native.make">
-        <fileset dir="${supremica.testsrc}">
-          <include name="**/Native*.java"/>
-          <exclude name="**/Abstract*.java"/>
-        </fileset>
-      </batchtest>
-      <classpath refid="waters.test.classpath"/>
-      <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
-      <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
-      <sysproperty key="waters.test.ant" value="true"/>
-      <sysproperty key="java.library.path" value="${waters.library.path}"/>
-      <jvmarg value="-enableassertions"/>
-    </junit>
-  </target>
-
-  <target name="runtest2" depends="test-jar,cpp">
-    <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="1024m">
-      <formatter type="xml"/>
-      <batchtest todir="${logs.results}">
-        <fileset dir="${supremica.testsrc}">
-          <include name="**/BDD*.java"/>
-          <exclude name="**/Abstract*.java"/>
-          <exclude name="**/Large*.java"/>
-          <exclude name="**/Native*.java"/>
-        </fileset>
-      </batchtest>
-      <classpath refid="waters.test.classpath"/>
-      <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
-      <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
-      <sysproperty key="waters.test.ant" value="true"/>
-      <sysproperty key="java.library.path" value="${waters.library.path}"/>
-      <jvmarg value="-enableassertions"/>
-    </junit>
-  </target>
-  
-  <target name="runtest3" depends="test-jar,cpp">
-    <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="1024m">
-      <formatter type="xml"/>
-      <batchtest todir="${logs.results}">
-        <fileset dir="${supremica.testsrc}">
-          <include name="**/Native*.java"/>
-          <exclude name="**/Abstract*.java"/>
-        </fileset>
-      </batchtest>
-      <classpath refid="waters.test.classpath"/>
-      <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
-      <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
-      <sysproperty key="waters.test.ant" value="true"/>
-      <sysproperty key="java.library.path" value="${waters.library.path}"/>
-      <jvmarg value="-enableassertions"/>
-    </junit>
-  </target>
-  
-  <target name="runtest4" depends="test-jar">
-    <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="1024m">
-      <formatter type="xml"/>
-      <batchtest todir="${logs.results}">
-        <fileset dir="${supremica.testsrc}">
-          <include name="net/sourceforge/waters/analysis/op/OPSearchConflictCheckerTest.java"/>
-        </fileset>
-      </batchtest>
-      <classpath refid="waters.test.classpath"/>
-      <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
-      <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
-      <sysproperty key="waters.test.ant" value="true"/>
-      <sysproperty key="java.library.path" value="${waters.library.path}"/>
-      <jvmarg value="-enableassertions"/>
-    </junit>
-  </target>
-  
-  <target name="runtest5" depends="test-jar,cpp">
-    <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="1024m">
-      <formatter type="xml"/>
-      <batchtest todir="${logs.results}">
-        <fileset dir="${supremica.testsrc}">
-          <include name="net/sourceforge/waters/analysis/modular/*Test.java"/>
-          <exclude name="net/sourceforge/waters/analysis/modular/LateNotAcceptHeuristicTest.java"/>
-        </fileset>
-      </batchtest>
-      <classpath refid="waters.test.classpath"/>
-      <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
-      <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
-      <sysproperty key="waters.test.ant" value="true"/>
-      <sysproperty key="java.library.path" value="${waters.library.path}"/>
-      <jvmarg value="-enableassertions"/>
-    </junit>
-  </target>
-  
-  <target name="runtest6">
-    <java classname="net.sourceforge.waters.analysis.modular.SpeedComparison" fork="true" maxmemory="1024m">
-      <classpath refid="waters.test.classpath"/>
-      <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
-      <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
-      <sysproperty key="waters.test.ant" value="true"/>
-      <sysproperty key="java.library.path" value="${waters.library.path}"/>
-      <jvmarg value="-enableassertions"/>
-    </java>
-  </target>
-  
-  <target name="runtest7" depends="test-jar,cpp">
-    <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="1024m">
-      <formatter type="xml"/>
-      <batchtest todir="${logs.results}">
-        <fileset dir="${supremica.testsrc}">
-          <include name="net/sourceforge/waters/analysis/modular/OneUncontrollableCheckerTest.java"/>
-        </fileset>
-      </batchtest>
-      <classpath refid="waters.test.classpath"/>
-      <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
-      <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
-      <sysproperty key="waters.test.ant" value="true"/>
-      <sysproperty key="java.library.path" value="${waters.library.path}"/>
-      <jvmarg value="-enableassertions"/>
-    </junit>
-  </target>
-
-  <target name="runtest8" depends="test-jar,cpp">
-    <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="1024m">
-      <formatter type="xml"/>
-      <batchtest todir="${logs.results}">
-        <fileset dir="${supremica.testsrc}">
-          <include name="net/sourceforge/waters/analysis/distributed/*CheckerTest.java"/>
-        </fileset>
-      </batchtest>
-      <classpath refid="waters.test.classpath"/>
-      <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
-      <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
-      <sysproperty key="waters.test.ant" value="true"/>
-      <sysproperty key="java.library.path" value="${waters.library.path}"/>
-      <jvmarg value="-enableassertions"/>
-    </junit>
-  </target>
-
-  <target name="runtest9" depends="test-jar,cpp">
-    <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="1024m">
-      <formatter type="xml"/>
-      <batchtest todir="${logs.results}">
-        <fileset dir="${supremica.testsrc}">
-          <include name="net/sourceforge/waters/analysis/NewConflictCheckerTest.java"/>
-          <exclude name="**/Abstract*.java"/>
-        </fileset>
-      </batchtest>
-      <classpath refid="waters.test.classpath"/>
-      <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
-      <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
-      <sysproperty key="waters.test.ant" value="true"/>
-      <sysproperty key="java.library.path" value="${waters.library.path}"/>
-      <jvmarg value="-enableassertions"/>
-    </junit>
-  </target>
-
-  <target name="runtest10" depends="test-jar,cpp">
-    <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="1024m">
-      <formatter type="xml"/>
-      <batchtest todir="${logs.results}">
-        <fileset dir="${supremica.testsrc}">
-          <include name="net/sourceforge/waters/analysis/CompConflictCheckerTest.java"/>
-          <exclude name="**/Abstract*.java"/>
-        </fileset>
-      </batchtest>
-      <classpath refid="waters.test.classpath"/>
-      <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
-      <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
-      <sysproperty key="waters.test.ant" value="true"/>
-      <sysproperty key="java.library.path" value="${waters.library.path}"/>
-      <jvmarg value="-enableassertions"/>
-    </junit>
-  </target>
-
-  <target name="runtest11" depends="test-jar,cpp">
-    <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="1024m">
-      <formatter type="xml"/>
-      <batchtest todir="${logs.results}">
-        <fileset dir="${supremica.testsrc}">
-          <include name="net/sourceforge/waters/samples/maze/NDPRMazeTest.java"/>
-        </fileset>
-      </batchtest>
-      <classpath refid="waters.test.classpath"/>
-      <sysproperty key="waters.test.inputdir" value="${supremica.examples}"/>
-      <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
-      <sysproperty key="waters.test.ant" value="true"/>
-      <sysproperty key="java.library.path" value="${waters.library.path}"/>
-      <jvmarg value="-enableassertions"/>
-    </junit>
-  </target>
-
   <target name="test-report">
     <mkdir dir="${logs.reports}"/>
     <junitreport todir="${logs.reports}">
@@ -589,27 +392,6 @@
   <target name="test" depends="runtest,test-report"
           description="Run the test cases."/>
 
-  <target name="test1" depends="runtest1,test-report"
-          description="Run some test cases."/>
-          
-  <target name="test2" depends="runtest2,test-report"
-          description="Run some test cases."/>
-          
-  <target name="test3" depends="runtest3,test-report"
-          description="Run some test cases."/>
-
-  <target name="test4" depends="runtest4,test-report"
-          description="Run some test cases."/>
-          
-  <target name="test5" depends="runtest5,test-report"
-          description="Run some test cases."/>
-    
-  <target name="test7" depends="runtest7,test-report"
-     description="Run some test cases."/>
-
- <target name="test8" depends="runtest8,test-report"
-     description="Run some test cases."/>
-
   <target name="doc" depends="jaxb-generate"
           description="Generate Javadoc documentation.">
     <delete dir="${javadoc}"/>
@@ -621,6 +403,7 @@
       </packageset>
       <packageset dir="${supremica.src}">
         <include name="net/sourceforge/waters/**"/>
+        <exclude name="net/sourceforge/waters/analysis/efa/simple/**"/>
         <exclude name="net/sourceforge/waters/build/**"/>
         <exclude name="net/sourceforge/waters/external/promela/**"/>
         <exclude name="net/sourceforge/waters/gui/**"/>
@@ -654,12 +437,12 @@
     <copy todir="${javadoc552}/src">
       <fileset dir="${supremica.src}">
         <include
-          name="net/sourceforge/waters/analysis/comp552/BDDConflictChecker.java"/>
+          name="net/sourceforge/waters/analysis/comp552/BDDControllabilityChecker.java"/>
         <include
-          name="net/sourceforge/waters/analysis/comp552/BDDConflictMain.java"/>
+          name="net/sourceforge/waters/analysis/comp552/BDDControllabilityMain.java"/>
         <include
           name="net/sourceforge/waters/analysis/comp552/BDDEncoding.java"/>
-        <include name="net/sourceforge/waters/analysis/comp552/ConflictCounterExampleChecker.java"/>
+        <include name="net/sourceforge/waters/analysis/comp552/ControllabilityCounterExampleChecker.java"/>
         <include
           name="net/sourceforge/waters/analysis/comp552/ModelChecker.java"/>
       </fileset>
