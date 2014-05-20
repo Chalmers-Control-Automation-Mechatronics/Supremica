@@ -70,14 +70,14 @@ public class BDDControllabilityChecker extends ModelChecker
   //#########################################################################
   //# Invocation
   /**
-   * Runs this conflict checker.
+   * Runs this controllability checker.
    * This method starts the model checking process on the model given
    * as parameter to the constructor of this object. On termination,
    * if the result is false, a counterexample can be queried using the
    * {@link #getCounterExample()} method.
    * Presently, this is a dummy implementation that does nothing but always
    * returns <CODE>true</CODE>.
-   * @return <CODE>true</CODE> if the model is nonconflicting, or
+   * @return <CODE>true</CODE> if the model is controllable, or
    *         <CODE>false</CODE> if it is not.
    */
   @Override
@@ -234,8 +234,8 @@ public class BDDControllabilityChecker extends ModelChecker
   /**
    * Computes a counterexample.
    * This method is to be called from {@link #run()} after the model was
-   * found to be conflicting, before the BDD factory has been closed. It
-   * uses BDD operations to build the counterexample.
+   * found to be not controllable, before the BDD factory has been closed.
+   * It uses BDD operations to build the counterexample.
    * @return The computed counterexample.
    */
   private SafetyTraceProxy computeCounterExample()
