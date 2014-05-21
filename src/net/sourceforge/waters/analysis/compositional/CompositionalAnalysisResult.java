@@ -20,6 +20,9 @@ import net.sourceforge.waters.analysis.abstraction.TRSimplifierStatistics;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.DefaultAnalysisResult;
+import net.sourceforge.waters.model.compiler.ModuleCompiler;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.module.ModuleProxy;
 
 
 /**
@@ -44,6 +47,7 @@ public class CompositionalAnalysisResult
    */
   public CompositionalAnalysisResult()
   {
+    mCompileTime = -1;
     mTotalCompositionsCount = 0;
     mUnsuccessfulCompositionsCount = 0;
     mRedundantEventsCount = mFailingEventsCount = 0;
@@ -60,6 +64,17 @@ public class CompositionalAnalysisResult
 
   //#########################################################################
   //# Simple Access Methods
+  /**
+   * Gets the compile time recorded for this analysis result.
+   * The compile time measures the time spent by the {@link ModuleCompiler}
+   * to compile the input {@link ModuleProxy} to a {@link ProductDESProxy},
+   * in milliseconds.
+   */
+  public long getCompileTime()
+  {
+    return mCompileTime;
+  }
+
   /**
    * Gets the total number of times a candidate is chosen and composition and
    * abstraction is attempted. The attempts may or may not have been successful
@@ -126,6 +141,11 @@ public class CompositionalAnalysisResult
 
   //#########################################################################
   //# Providing Statistics
+  public void setCompileTime(final long time)
+  {
+    mCompileTime = time;
+  }
+
   public void addCompositionAttempt()
   {
     mTotalCompositionsCount++;
@@ -207,6 +227,7 @@ public class CompositionalAnalysisResult
     super.merge(other);
     final CompositionalAnalysisResult result =
       (CompositionalAnalysisResult) other;
+    mCompileTime = mergeAdd(mCompileTime, result.mCompileTime);
     mTotalCompositionsCount += result.mTotalCompositionsCount;
     mUnsuccessfulCompositionsCount += result.mUnsuccessfulCompositionsCount;
     mNumberOfSplitAttempts += result.mNumberOfSplitAttempts;
@@ -246,6 +267,8 @@ public class CompositionalAnalysisResult
     super.print(writer);
     @SuppressWarnings("resource")
     final Formatter formatter = new Formatter(writer);
+    formatter.format("Compile time: %.3fs\n",
+                     0.001f * mCompileTime);
     writer.print("Total number of compositions: ");
     writer.println(mTotalCompositionsCount);
     writer.print("Number of unsuccessful compositions: ");
@@ -292,6 +315,7 @@ public class CompositionalAnalysisResult
   public void printCSVHorizontalHeadings(final PrintWriter writer)
   {
     super.printCSVHorizontalHeadings(writer);
+    writer.print(",CompileTime");
     writer.print(",Compositions");
     writer.print(",Overflows");
     writer.print(",SplitAttempts");
@@ -319,6 +343,8 @@ public class CompositionalAnalysisResult
   public void printCSVHorizontal(final PrintWriter writer)
   {
     super.printCSVHorizontal(writer);
+    writer.print(',');
+    writer.print(mCompileTime);
     writer.print(',');
     writer.print(mTotalCompositionsCount);
     writer.print(',');
@@ -355,6 +381,7 @@ public class CompositionalAnalysisResult
 
   //#########################################################################
   //# Data Members
+  private long mCompileTime;
   private int mTotalCompositionsCount;
   private int mUnsuccessfulCompositionsCount;
   private int mNumberOfSplitAttempts;

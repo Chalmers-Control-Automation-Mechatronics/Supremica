@@ -216,6 +216,20 @@ public class UnifiedEFAConflictCheckerTest
     checkConflict(module, false);
   }
 
+  public void testJDEDS2014()
+    throws IOException, WatersException
+  {
+    checkJDEDS2014(2, 1);
+  }
+
+  public void testProductionCell()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "efa", "Production_cell ");
+    checkConflict(module, false);
+  }
+
   public void testRoundRobin2()
     throws IOException, WatersException
   {
@@ -226,14 +240,6 @@ public class UnifiedEFAConflictCheckerTest
     throws IOException, WatersException
   {
     checkRoundRobin(5);
-  }
-
-  public void testProductionCell()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module =
-      loadModule("tests", "efa", "Production_cell ");
-    checkConflict(module, false);
   }
 
 
@@ -535,6 +541,28 @@ public class UnifiedEFAConflictCheckerTest
 
   //#########################################################################
   //# Parametrised Tests
+  void checkJDEDS2014(final int c, final int n)
+    throws IOException, WatersException
+  {
+    final ModuleProxyFactory factory = getModuleProxyFactory();
+    final ModuleProxy module = loadModule("efa", "jdeds2014");
+    final List<ParameterBindingProxy> bindings =
+      new ArrayList<ParameterBindingProxy>(3);
+    final IntConstantProxy constC = factory.createIntConstantProxy(c);
+    final ParameterBindingProxy bindingC =
+      factory.createParameterBindingProxy("C", constC);
+    bindings.add(bindingC);
+    final IntConstantProxy constN = factory.createIntConstantProxy(n);
+    final ParameterBindingProxy bindingN =
+      factory.createParameterBindingProxy("N", constN);
+    bindings.add(bindingN);
+    final IntConstantProxy constW = factory.createIntConstantProxy(c);
+    final ParameterBindingProxy bindingW =
+      factory.createParameterBindingProxy("W", constW);
+    bindings.add(bindingW);
+    checkConflict(module, bindings, false);
+  }
+
   void checkPhilosophers(final String name,
                          final int n,
                          final boolean expect)
@@ -547,6 +575,26 @@ public class UnifiedEFAConflictCheckerTest
     final List<ParameterBindingProxy> bindings =
       Collections.singletonList(bindingN);
     final ModuleProxy module = loadModule("efa", name);
+    checkConflict(module, bindings, expect);
+  }
+
+  void checkPML(final String name,
+                final int c, final int n,
+                final boolean expect)
+    throws IOException, WatersException
+  {
+    final ModuleProxyFactory factory = getModuleProxyFactory();
+    final ModuleProxy module = loadModule("efa", name);
+    final List<ParameterBindingProxy> bindings =
+      new ArrayList<ParameterBindingProxy>(2);
+    final IntConstantProxy constC = factory.createIntConstantProxy(c);
+    final ParameterBindingProxy bindingC =
+      factory.createParameterBindingProxy("C", constC);
+    bindings.add(bindingC);
+    final IntConstantProxy constN = factory.createIntConstantProxy(n);
+    final ParameterBindingProxy bindingN =
+      factory.createParameterBindingProxy("N", constN);
+    bindings.add(bindingN);
     checkConflict(module, bindings, expect);
   }
 
@@ -610,6 +658,16 @@ public class UnifiedEFAConflictCheckerTest
     checkConflict(module, bindings, expect);
   }
 
+  void checkRoundRobin(final int n)
+    throws IOException, WatersException
+  {
+    final ParameterBindingProxy binding = createBinding("N", n);
+    final List<ParameterBindingProxy> bindings =
+      Collections.singletonList(binding);
+    final ModuleProxy module = loadModule("efa", "round_robin_efa.wmod");
+    checkConflict(module, bindings, false);
+  }
+
   void checkTransferLineEFSM(final String name,
                              final int n, final int m,
                              final boolean expect)
@@ -649,37 +707,6 @@ public class UnifiedEFAConflictCheckerTest
     bindings.add(bindingN);
     checkConflict(module, bindings, expect);
   }
-
-  void checkRoundRobin(final int n)
-    throws IOException, WatersException
-  {
-    final ParameterBindingProxy binding = createBinding("N", n);
-    final List<ParameterBindingProxy> bindings =
-      Collections.singletonList(binding);
-    final ModuleProxy module = loadModule("efa", "round_robin_efa.wmod");
-    checkConflict(module, bindings, false);
-  }
-
-  void checkPML(final String name,
-                final int c, final int n,
-                final boolean expect)
-    throws IOException, WatersException
-  {
-    final ModuleProxyFactory factory = getModuleProxyFactory();
-    final ModuleProxy module = loadModule("efa", name);
-    final List<ParameterBindingProxy> bindings =
-      new ArrayList<ParameterBindingProxy>(2);
-    final IntConstantProxy constC = factory.createIntConstantProxy(c);
-    final ParameterBindingProxy bindingC =
-      factory.createParameterBindingProxy("C", constC);
-    bindings.add(bindingC);
-    final IntConstantProxy constN = factory.createIntConstantProxy(n);
-    final ParameterBindingProxy bindingN =
-      factory.createParameterBindingProxy("N", constN);
-    bindings.add(bindingN);
-    checkConflict(module, bindings, expect);
-  }
-
 
 
   //#########################################################################

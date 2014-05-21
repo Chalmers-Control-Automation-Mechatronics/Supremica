@@ -25,6 +25,7 @@ import net.sourceforge.waters.analysis.bdd.TransitionPartitioningStrategy;
 import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer;
 import net.sourceforge.waters.analysis.compositional.Candidate;
 import net.sourceforge.waters.analysis.compositional.ChainSelectionHeuristic;
+import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult;
 import net.sourceforge.waters.analysis.compositional.CompositionalConflictChecker;
 import net.sourceforge.waters.analysis.compositional.CompositionalSelectionHeuristicFactory;
 import net.sourceforge.waters.analysis.compositional.ConflictAbstractionProcedureFactory;
@@ -223,6 +224,14 @@ public class UnifiedEFAConflictCheckerExperiments
     try {
       for (int i = 100; i <= 500; i += 100) {
         checkRoundRobin(i);
+      }
+    } catch (final AnalysisException | EvalException exception) {
+      // next please ...
+    }
+    try {
+      for (int n = 0; n <= 1000; n += 50) {
+        final int nn = n == 0 ? 1 : n;
+        checkJDEDS2014(10, nn);
       }
     } catch (final AnalysisException | EvalException exception) {
       // next please ...
@@ -499,10 +508,15 @@ public class UnifiedEFAConflictCheckerExperiments
                                       final List<ParameterBindingProxy> bindings)
       throws EvalException, AnalysisException
     {
+      final long start = System.currentTimeMillis();
       final ProductDESProxy des = compile(module, bindings);
+      final long finish = System.currentTimeMillis();
       mConflictChecker.setModel(des);
       mConflictChecker.run();
-      return mConflictChecker.getAnalysisResult();
+      final CompositionalAnalysisResult result =
+        mConflictChecker.getAnalysisResult();
+      result.setCompileTime(finish - start);
+      return result;
     }
 
     //#######################################################################
