@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:ProductDES Name="empty_intrange" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
+<Comment>A compiler that involves a foreach block with an empty range.
+This should compile to an empty module.</Comment>
+</ns2:ProductDES>

@@ -80,7 +80,11 @@ public class CompiledIntRange implements CompiledRange
   @Override
   public int size()
   {
-    return mUpper - mLower + 1;
+    if (mLower <= mUpper) {
+      return mUpper - mLower + 1;
+    } else {
+      return 0;
+    }
   }
 
   @Override

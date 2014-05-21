@@ -121,16 +121,22 @@ public abstract class AbstractCompilerTest
     compile("handwritten", "colours");
   }
 
-  public void testCompile_empty_spec()
+  public void testCompile_empty_intrange()
     throws IOException, WatersException
   {
-    compile("tests", "nasty", "empty_spec");
+    compile("tests", "nasty", "empty_intrange");
   }
 
   public void testCompile_empty_prop()
     throws IOException, WatersException
   {
     compile("tests", "nasty", "empty_prop");
+  }
+
+  public void testCompile_empty_spec()
+    throws IOException, WatersException
+  {
+    compile("tests", "nasty", "empty_spec");
   }
 
   public void testCompile_machine()

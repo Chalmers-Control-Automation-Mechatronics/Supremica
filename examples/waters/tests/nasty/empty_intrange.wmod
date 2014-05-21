@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="empty_intrange" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>A compiler that involves a foreach block with an empty range.
+This should compile to an empty module.</ns2:Comment>
+    <ComponentList>
+        <ForeachComponent Name="I">
+            <BinaryExpression Operator="..">
+                <IntConstant Value="1"/>
+                <IntConstant Value="-1"/>
+            </BinaryExpression>
+            <ComponentList>
+                <SimpleComponent Kind="PLANT" Name="aut">
+                    <Graph>
+                        <NodeList>
+                            <SimpleNode Initial="true" Name="S0">
+                                <PointGeometry>
+                                    <Point X="112" Y="96"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point X="0" Y="10"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                        </NodeList>
+                    </Graph>
+                </SimpleComponent>
+            </ComponentList>
+        </ForeachComponent>
+    </ComponentList>
+</Module>
