@@ -27,7 +27,7 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
@@ -120,7 +120,7 @@ public class BDDControllabilityMain
         } else {
           System.out.println("NOT CONTROLLABLE");
           System.out.println("Counterexample:");
-          final TraceProxy counterex = checker.getCounterExample();
+          final SafetyTraceProxy counterex = checker.getCounterExample();
           System.out.println(counterex.toString());
         }
         System.gc();  // Garbage collect all BDDs so init() can be called again.

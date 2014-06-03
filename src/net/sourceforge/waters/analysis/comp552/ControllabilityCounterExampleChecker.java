@@ -101,31 +101,37 @@ public class ControllabilityCounterExampleChecker
   throws AnalysisException
   {
     if (trace == null) {
-      reportMalformedCounterExample(trace, "is NULL", null);
+      reportMalformedCounterExample(trace, "is NULL");
       return false;
     }
     final List<EventProxy> traceEvents = trace.getEvents();
     final Collection<EventProxy> events = des.getEvents();
     if (traceEvents.isEmpty()) {
-      reportMalformedCounterExample(trace, "does not have any event", null);
+      reportMalformedCounterExample(trace, "does not have any event");
     }
+    int step = 0;
     for (final EventProxy event : traceEvents) {
       if (event == null) {
-        reportMalformedCounterExample(trace, "contains NULL event", null);
+        reportMalformedCounterExample
+          (trace, "contains NULL event", null, step);
         return false;
       } else if (event.getKind() == EventKind.PROPOSITION) {
-        reportMalformedCounterExample(trace, "contains proposition", event);
+        reportMalformedCounterExample
+          (trace, "contains proposition", event, step);
         return false;
       } else if (!events.contains(event)) {
-        reportMalformedCounterExample(trace, "contains unknown event", event);
+        reportMalformedCounterExample
+          (trace, "contains unknown event", event, step);
         return false;
       }
+      step++;
     }
     final int numSteps = traceEvents.size();
     final EventProxy lastEvent = traceEvents.get(numSteps - 1);
     if (lastEvent.getKind() == EventKind.CONTROLLABLE) {
       reportMalformedCounterExample(trace, "ends with controllable event",
-                                    lastEvent);
+                                    lastEvent, -1);
+      return false;
     }
     boolean gotRejectingSpec = false;
     for (final AutomatonProxy aut : des.getAutomata()) {
@@ -134,18 +140,16 @@ public class ControllabilityCounterExampleChecker
       case PLANT:
         if (steps < numSteps) {
           reportMalformedCounterExample
-            (trace, "is not accepted by plant", aut);
+            (trace, "is rejected by plant", aut, steps);
           return false;
         }
         break;
       case SPEC:
         if (steps < numSteps - 1) {
           reportMalformedCounterExample
-            (trace,
-             "is rejected too early (in step " + (steps+1) + ") by spec",
-             aut);
+            (trace, "is rejected too early by spec", aut, steps);
           return false;
-        } else {
+        } else if (steps == numSteps - 1) {
           gotRejectingSpec = true;
         }
         break;
@@ -155,7 +159,7 @@ public class ControllabilityCounterExampleChecker
     }
     if (!gotRejectingSpec) {
       reportMalformedCounterExample
-        (trace, "is accepted by all specifications", null);
+        (trace, "is accepted by all specifications");
       return false;
     }
     return true;
@@ -195,15 +199,22 @@ public class ControllabilityCounterExampleChecker
         if (!found) {
           return steps;
         }
-        steps++;
       }
+      steps++;
     }
     return steps;
   }
 
   private void reportMalformedCounterExample(final SafetyTraceProxy trace,
+                                             final String msg)
+  {
+    reportMalformedCounterExample(trace, msg, null, -1);
+  }
+
+  private void reportMalformedCounterExample(final SafetyTraceProxy trace,
                                              final String msg,
-                                             final NamedProxy item)
+                                             final NamedProxy item,
+                                             final int step)
   {
     mDiagnostics = new StringBuilder();
     mDiagnostics.append("Controllability error trace ");
@@ -218,6 +229,10 @@ public class ControllabilityCounterExampleChecker
       mDiagnostics.append(" '");
       mDiagnostics.append(item.getName());
       mDiagnostics.append('\'');
+    }
+    if (step >= 0) {
+      mDiagnostics.append(" in step ");
+      mDiagnostics.append(step + 1);
     }
     mDiagnostics.append('.');
   }

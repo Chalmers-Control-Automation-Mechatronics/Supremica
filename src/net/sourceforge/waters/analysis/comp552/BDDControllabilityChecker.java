@@ -87,7 +87,7 @@ public class BDDControllabilityChecker extends ModelChecker
     // easier to debug than the faster "buddy" factory, but let us try
     // "buddy" first to see whether the native library can be loaded.
     // Another (faster?) alternative is "cudd".
-    final BDDFactory bddFactory = BDDFactory.init("buddy", 10000, 5000);
+    mBDDFactory = BDDFactory.init("buddy", 10000, 5000);
     // You can try to increase performance by increasing the cache sizes,
     // but please be aware of the memory limits. Anything above 1 million
     // is close to suicide, except perhaps when using "cudd". If you
@@ -116,7 +116,7 @@ public class BDDControllabilityChecker extends ModelChecker
     // Comment out the following try-catch block if you want dynamic variable
     // reordering (not supported by all BDD packages).
     try {
-      bddFactory.disableReorder();
+      mBDDFactory.disableReorder();
     } catch (final UnsupportedOperationException exception) {
       // No auto reorder? --- Never mind!
     }
@@ -127,11 +127,11 @@ public class BDDControllabilityChecker extends ModelChecker
       // It has nothing to do with controllability checking.
 
       // Allocate five Boolean variables ...
-      bddFactory.setVarNum(5);
+      mBDDFactory.setVarNum(5);
 
       // Get the first and second variable ...
-      final BDD x0 = bddFactory.ithVar(0);
-      final BDD x1 = bddFactory.ithVar(1);
+      final BDD x0 = mBDDFactory.ithVar(0);
+      final BDD x1 = mBDDFactory.ithVar(1);
 
       // Calculate their logical AND ...
       final BDD and01 = x0.and(x1);
@@ -147,8 +147,8 @@ public class BDDControllabilityChecker extends ModelChecker
       // Since such operations are used very often, there is a shorter
       // alternative. The andWith() (and similar methods) automatically
       // consume the two input BDDs.
-      final BDD x2 = bddFactory.ithVar(2);
-      final BDD x3 = bddFactory.ithVar(3);
+      final BDD x2 = mBDDFactory.ithVar(2);
+      final BDD x3 = mBDDFactory.ithVar(3);
       x2.andWith(x3);
       // Now variable x2 contains the conjunction x2 && x3.
       // The old value of x2 and x3 have been freed and must not be accessed
@@ -161,7 +161,7 @@ public class BDDControllabilityChecker extends ModelChecker
       // First get the model.
       final ProductDESProxy model = getModel();
       // Create an encoding for the events and automata.
-      mBDDEncoding = new BDDEncoding(bddFactory, model);
+      mBDDEncoding = new BDDEncoding(mBDDFactory, model);
       // Skip the following if there are more than 30 automata in the model,
       // might be too slow otherwise ...
       if (model.getAutomata().size() <= 30) {
@@ -201,7 +201,8 @@ public class BDDControllabilityChecker extends ModelChecker
       // Before we leave, we _must_ close the BDD factory, otherwise
       // it cannot be used a second time. This is done in a finally
       // block, to make sure it happens even in case of errors.
-      bddFactory.done();
+      mBDDFactory.done();
+      mBDDFactory = null;
 
     }
   }
@@ -281,7 +282,20 @@ public class BDDControllabilityChecker extends ModelChecker
 
   //#########################################################################
   //# Data Members
+  /**
+   * The BDD factory to be used. Stored in this instance variable so that
+   * all methods have access to it.
+   */
+  private BDDFactory mBDDFactory;
+  /**
+   * The BDD encoding constructed for the current model. Stored in this
+   * instance variable so that in can be used from all methods without the
+   * expensive re-computation.
+   */
   private BDDEncoding mBDDEncoding;
+  /**
+   * The computed counterexample or null if the model is controllable.
+   */
   private SafetyTraceProxy mCounterExample;
 
 }
