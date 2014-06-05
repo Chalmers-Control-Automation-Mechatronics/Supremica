@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -44,7 +43,24 @@ import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.module.*;
+import net.sourceforge.waters.model.module.ComponentProxy;
+import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.EventListExpressionProxy;
+import net.sourceforge.waters.model.module.GraphProxy;
+import net.sourceforge.waters.model.module.GuardActionBlockProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.LabelBlockProxy;
+import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.PlainEventListProxy;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.subject.base.AttributeMapSubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.InstanceSubject;
@@ -159,14 +175,14 @@ public class SimpleEFAHelper {
     return encoding;
   }
 
-  public SimpleNodeProxy getSimpleNodeSubject(final String name, boolean isInitial, boolean isMarked,
-                                              boolean isForbbiden, Map<String, String> attributes)
+  public SimpleNodeProxy getSimpleNodeSubject(final String name, final boolean isInitial, final boolean isMarked,
+                                              final boolean isForbbiden, final Map<String, String> attributes)
   {
     return new SimpleNodeSubject(name, createPropositions(isMarked, isForbbiden), attributes,
                                  isInitial, null, null, null);
   }
 
-  private PlainEventListProxy createPropositions(boolean isMarked, boolean isForbbiden)
+  private PlainEventListProxy createPropositions(final boolean isMarked, final boolean isForbbiden)
   {
     final List<Proxy> list = new ArrayList<>();
     if (isForbbiden) {
@@ -480,10 +496,10 @@ public class SimpleEFAHelper {
   public static void mergeToAttribute(final AttributeMapSubject attribute, final String key,
                                       final String value, final String separator)
   {
-    String oVal = attribute.get(key);
+    final String oVal = attribute.get(key);
     String nVal = "";
     if (oVal != null) {
-      TreeSet<String> values = new TreeSet<>(Arrays.asList(oVal.split(separator)));
+      final TreeSet<String> values = new TreeSet<>(Arrays.asList(oVal.split(separator)));
       values.addAll(Arrays.asList(value.split(separator)));
       for (final String v : values) {
         nVal += v + separator;

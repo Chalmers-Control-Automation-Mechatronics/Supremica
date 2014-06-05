@@ -11,11 +11,8 @@ package net.sourceforge.waters.analysis.efa.simple;
 
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TObjectIntHashMap;
-import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -27,8 +24,8 @@ import net.sourceforge.waters.subject.base.AttributeMapSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 
+
 /**
- *
  * @author Mohammad Reza Shoaei
  */
 public class SimpleEFAStateEncoding implements Iterable<SimpleNodeProxy>
@@ -81,7 +78,7 @@ public class SimpleEFAStateEncoding implements Iterable<SimpleNodeProxy>
       return id;
     } else {
       final int labelId = mStateMap.size();
-      SimpleNodeSubject snode = getSimpleNodeSubject(state);
+      final SimpleNodeSubject snode = getSimpleNodeSubject(state);
       mStateMap.put(snode.getName(), labelId);
       mStateList.add(snode);
       if (state.isInitial()) {
@@ -94,7 +91,7 @@ public class SimpleEFAStateEncoding implements Iterable<SimpleNodeProxy>
         if (state.getPropositions().toString().contains(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
           mForbiddenStates.add(labelId);
         }
-      } catch (Exception e) {
+      } catch (final Exception e) {
       }
       return labelId;
     }
@@ -102,7 +99,7 @@ public class SimpleEFAStateEncoding implements Iterable<SimpleNodeProxy>
 
   public int put(final SimpleNodeProxy state, final int stateId)
   {
-    SimpleNodeSubject snode = getSimpleNodeSubject(state);
+    final SimpleNodeSubject snode = getSimpleNodeSubject(state);
     final int put = mStateMap.put(snode.getName(), stateId);
     mStateList.add(snode);
     return put;
@@ -162,7 +159,7 @@ public class SimpleEFAStateEncoding implements Iterable<SimpleNodeProxy>
 
   public String getAttribute(final int stateId, final String key)
   {
-    Map<String, String> att = getAttributes(stateId);
+    final Map<String, String> att = getAttributes(stateId);
     if (att != null) {
       return att.get(key);
     }
@@ -180,7 +177,7 @@ public class SimpleEFAStateEncoding implements Iterable<SimpleNodeProxy>
     mergeToAttribute(stateId, key, value, SimpleEFAHelper.DEFAULT_VALUE_SEPARATOR);
   }
 
-  public boolean isInitial(int stateId)
+  public boolean isInitial(final int stateId)
   {
     return getInitialStateId() == stateId;
   }
@@ -196,7 +193,7 @@ public class SimpleEFAStateEncoding implements Iterable<SimpleNodeProxy>
     return getSimpleState(mInitialStateId);
   }
 
-  private SimpleNodeSubject getSimpleNodeSubject(SimpleNodeProxy node)
+  private SimpleNodeSubject getSimpleNodeSubject(final SimpleNodeProxy node)
   {
     SimpleNodeSubject snode;
     if (node instanceof SimpleNodeSubject) {

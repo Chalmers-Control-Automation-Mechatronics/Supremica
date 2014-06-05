@@ -17,8 +17,8 @@ import net.sourceforge.waters.analysis.efa.base.AbstractEFASystem;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 /**
@@ -77,6 +77,13 @@ public class SimpleEFASystem
   public SimpleEFAEventEncoding getEventEncoding()
   {
     return mEventEncoding;
+  }
+
+
+  public ModuleSubject getModuleProxy(final ModuleSubjectFactory mFactory)
+  {
+    // TODO Auto-generated method stub
+    return null;
   }
 
   public void addVariables(final Collection<SimpleEFAVariable> variables)

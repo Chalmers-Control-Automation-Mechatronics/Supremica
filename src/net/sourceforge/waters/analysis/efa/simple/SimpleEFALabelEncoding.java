@@ -12,11 +12,11 @@ package net.sourceforge.waters.analysis.efa.simple;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.set.hash.TIntHashSet;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+
 import net.sourceforge.waters.analysis.efa.base.AbstractEFATransitionLabelEncoding;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
+
 
 /**
  * An implementation of {@link AbstractEFATransitionLabelEncoding}.
@@ -53,7 +53,7 @@ public class SimpleEFALabelEncoding
     }
     final int conId = mConstraintEncoder.encode(con);
     final int label = calculateLabel(eventId, conId);
-    int id = super.getTransitionLabelId(label);
+    final int id = super.getTransitionLabelId(label);
     if (id >= 0) {
       return id;
     } else {
@@ -138,7 +138,7 @@ public class SimpleEFALabelEncoding
 
   public int[] getEventListExceptTau()
   {
-    TIntHashSet list = new TIntHashSet(mEventList);
+    final TIntHashSet list = new TIntHashSet(mEventList);
     list.remove(SimpleEFAEventEncoding.TAU);
     return list.toArray();
   }
