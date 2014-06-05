@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters EFA Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efa
-//# CLASS:   SimpleEFATransitionLabelEncoding
+//# CLASS:   SimpleEFALabelEncoding
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import net.sourceforge.waters.analysis.efa.base.AbstractEFATransitionLabelEncoding;
-import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 
 /**
@@ -24,40 +23,27 @@ import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
  * <p/>
  * @author Mohammad Reza Shoaei
  */
-public class SimpleEFATransitionLabelEncoding
+public class SimpleEFALabelEncoding
  extends AbstractEFATransitionLabelEncoding<Integer>
 {
 
-  public SimpleEFATransitionLabelEncoding(final SimpleEFAEventEncoding reference, final int size)
+  public SimpleEFALabelEncoding(final SimpleEFAEventEncoding reference, final int size)
   {
     super(size);
     mEventEncoding = reference;
-    mEventList = new TIntHashSet();
+    mEventList = new TIntHashSet(reference.size());
     mConstraintEncoder = new SimpleInfoEncoder<>();
-    createTransitionLabelId(EventEncoding.TAU, ConstraintList.TRUE);
+    createTransitionLabelId(SimpleEFAEventEncoding.TAU, ConstraintList.TRUE);
   }
 
-  public SimpleEFATransitionLabelEncoding(final SimpleEFAEventEncoding reference)
+  public SimpleEFALabelEncoding(final SimpleEFAEventEncoding reference)
   {
     this(reference, DEFAULT_SIZE);
   }
 
   public final int createTransitionLabelId(final SimpleEFAEventDecl event, final ConstraintList con)
   {
-    final int eventId = mEventEncoding.getEventId(event);
-    if (eventId < 0) {
-      return -1;
-    }
-    final int conId = mConstraintEncoder.encode(con);
-    final int labelId = calculateLabel(eventId, conId);
-    int id = super.getTransitionLabelId(labelId);
-    if (id >= 0) {
-      return id;
-    } else {
-      id = super.createTransitionLabelId(labelId);
-      mEventList.add(eventId);
-      return id;
-    }
+    return createTransitionLabelId(mEventEncoding.getEventId(event), con);
   }
 
   public final int createTransitionLabelId(final int eventId, final ConstraintList con)
@@ -71,9 +57,8 @@ public class SimpleEFATransitionLabelEncoding
     if (id >= 0) {
       return id;
     } else {
-      id = super.createTransitionLabelId(label);
       mEventList.add(eventId);
-      return id;
+      return super.createTransitionLabelId(label);
     }
   }
 
@@ -130,23 +115,55 @@ public class SimpleEFATransitionLabelEncoding
     return super.getTransitionLabelsExceptTau();
   }
 
-  public List<Integer> getTransitionLabelIdsByEventId(final int eventId)
+  public TIntArrayList getTransitionLabelIdsByEventId(final int... eventId)
   {
-    if (!mEventList.contains(eventId)) {
-      return null;
-    }
-    final ArrayList<Integer> list = new ArrayList<>();
-    for (final int lb : super.getTransitionLabelsIncludingTau()) {
-      if (getEventId(lb) == eventId) {
-        list.add(getTransitionLabelId(lb));
+    final TIntArrayList list = new TIntArrayList();
+    for (final int e : eventId) {
+      if (!mEventList.contains(e)) {
+        return null;
+      }
+      for (final int lb : super.getTransitionLabelsIncludingTau()) {
+        if (getEventId(lb) == e) {
+          list.add(getTransitionLabelId(lb));
+        }
       }
     }
-    return Collections.unmodifiableList(list);
+    return list;
   }
 
-  public TIntArrayList getEventList()
+  public int[] getEventList()
   {
-    return new TIntArrayList(mEventList);
+    return mEventList.toArray();
+  }
+
+  public int[] getEventListExceptTau()
+  {
+    TIntHashSet list = new TIntHashSet(mEventList);
+    list.remove(SimpleEFAEventEncoding.TAU);
+    return list.toArray();
+  }
+
+  public boolean isControllable(final int labelId)
+  {
+    return SimpleEFAEventEncoding.isControllable(mEventEncoding.getEventStatus(getEventIdByLabelId(
+     labelId)));
+  }
+
+  public boolean isLocal(final int labelId)
+  {
+    return SimpleEFAEventEncoding.isLocal(mEventEncoding.getEventStatus(getEventIdByLabelId(
+     labelId)));
+  }
+
+  public boolean isObservable(final int labelId)
+  {
+    return SimpleEFAEventEncoding.isObservable(mEventEncoding.getEventStatus(getEventIdByLabelId(
+     labelId)));
+  }
+
+  public int getEventSize()
+  {
+    return mEventList.size() - 1;
   }
 
   public static int getEventId(final int label)
@@ -184,7 +201,6 @@ public class SimpleEFATransitionLabelEncoding
     return events.toString();
   }
 
-  public static final int TRUE_INDEX = 0;
   private final SimpleInfoEncoder<ConstraintList> mConstraintEncoder;
   private final SimpleEFAEventEncoding mEventEncoding;
   private final TIntHashSet mEventList;

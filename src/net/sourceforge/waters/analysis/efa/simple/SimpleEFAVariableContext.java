@@ -104,9 +104,11 @@ public class SimpleEFAVariableContext extends AbstractEFAVariableContext<Integer
 
   public TIntArrayList getVariablesId(final Collection<SimpleEFAVariable> vars)
   {
-    final TIntArrayList list = new TIntArrayList(vars.size());
-    for (final SimpleEFAVariable var : vars) {
-      list.add(getVariableId(var));
+    final TIntArrayList list = new TIntArrayList();
+    if (vars != null && !vars.isEmpty()) {
+      for (final SimpleEFAVariable var : vars) {
+        list.add(getVariableId(var));
+      }
     }
     return list;
   }
@@ -155,13 +157,13 @@ public class SimpleEFAVariableContext extends AbstractEFAVariableContext<Integer
     return false;
   }
 
-  public void collectAllVariables(final SimpleEFATransitionLabelEncoding encoding,
+  public void collectAllVariables(final SimpleEFALabelEncoding encoding,
                                   final Collection<SimpleEFAVariable> vars)
   {
     collectAllVariables(encoding, vars, vars);
   }
 
-  public void collectAllVariables(final SimpleEFATransitionLabelEncoding encoding,
+  public void collectAllVariables(final SimpleEFALabelEncoding encoding,
                                   final Collection<SimpleEFAVariable> unprimed,
                                   final Collection<SimpleEFAVariable> primed)
   {
@@ -205,13 +207,13 @@ public class SimpleEFAVariableContext extends AbstractEFAVariableContext<Integer
     primed.addAll(getVariablesId(prs));
   }
 
-  public void collectAllVariables(final SimpleEFATransitionLabelEncoding encoding,
+  public void collectAllVariables(final SimpleEFALabelEncoding encoding,
                                   final TIntSet vars)
   {
     collectAllVariables(encoding, vars, vars);
   }
 
-  public void collectAllVariables(final SimpleEFATransitionLabelEncoding encoding,
+  public void collectAllVariables(final SimpleEFALabelEncoding encoding,
                                   final TIntSet unprimed,
                                   final TIntSet primed)
   {

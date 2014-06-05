@@ -95,6 +95,11 @@ public class SimpleInfoEncoder<L>
     return Collections.unmodifiableList(mInfoList);
   }
 
+  protected int[] getIds()
+  {
+    return mInfoMap.values();
+  }
+
   @Override
   public String toString()
   {

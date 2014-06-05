@@ -23,6 +23,7 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
 /**
  * A utility to compile the model and construct
@@ -73,9 +74,7 @@ public class SimpleEFACompiler
       checkAbort();
       final ModuleProxy intermediate = mModuleInstanceCompiler.compile(bindings);
       mCompilationInfo.shift();
-      mEFASystemBuilder = new SimpleEFASystemBuilder(modfactory,
-              mCompilationInfo,
-                                                     intermediate);
+      mEFASystemBuilder = new SimpleEFASystemBuilder(modfactory, mCompilationInfo, intermediate);
       mEFASystemBuilder.setOptimizationEnabled(mIsOptimizationEnabled);
       mEFASystemBuilder.setMarkingVariablEFAEnable(mIsMarkingVariablEFAEnable);
       return mEFASystemBuilder.compile();

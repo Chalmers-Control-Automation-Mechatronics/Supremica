@@ -9,8 +9,6 @@
 
 package net.sourceforge.waters.analysis.efa.simple;
 
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.THashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.set.hash.THashSet;
 
@@ -18,11 +16,15 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,6 +45,7 @@ import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.*;
+import net.sourceforge.waters.subject.base.AttributeMapSubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.InstanceSubject;
 import net.sourceforge.waters.subject.module.IntConstantSubject;
@@ -50,6 +53,7 @@ import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
+import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
@@ -96,22 +100,18 @@ public class SimpleEFAHelper {
     return mOperatorTable;
   }
 
-  public Collection<EventDeclProxy> getEventDeclProxy(
-   final Collection<SimpleEFAEventDecl> list)
+  public Collection<EventDeclProxy> getEventDeclProxy(final Collection<SimpleEFAEventDecl> list)
   {
-    final Collection<EventDeclProxy> decls =
-     new THashSet<>(list.size());
+    final Collection<EventDeclProxy> decls = new THashSet<>(list.size());
     for (final SimpleEFAEventDecl e : list) {
-      final IdentifierProxy identifier =
-              mFactory.createSimpleIdentifierProxy(e.getName());
-      final EventDeclProxy event =
-              mFactory.createEventDeclProxy(identifier,
-                      e.getKind(),
-                      e.isObservable(),
-                      ScopeKind.LOCAL,
-                      e.getRanges(),
-                      null,
-                      null);
+      final IdentifierProxy identifier = mFactory.createSimpleIdentifierProxy(e.getName());
+      final EventDeclProxy event = mFactory.createEventDeclProxy(identifier,
+                                                                 e.getKind(),
+                                                                 e.isObservable(),
+                                                                 ScopeKind.LOCAL,
+                                                                 e.getRanges(),
+                                                                 null,
+                                                                 null);
       decls.add(event);
     }
     return decls;
@@ -140,63 +140,45 @@ public class SimpleEFAHelper {
     }
   }
 
-  public static SimpleEFAStateEncoding getStateEncoding(final ListBufferTransitionRelation rel)
+  public SimpleEFAStateEncoding getStateEncoding(final ListBufferTransitionRelation rel)
   {
-    final SimpleEFAStateEncoding encoding =
-     new SimpleEFAStateEncoding(rel.getNumberOfStates());
-    final boolean isMarkingIsUsed =
-     rel.isUsedProposition(DEFAULT_MARKING_ID);
-    final boolean isForbiddenIsUsed =
-     rel.isUsedProposition(DEFAULT_FORBIDDEN_ID);
+    final SimpleEFAStateEncoding encoding = new SimpleEFAStateEncoding(rel.getNumberOfStates());
     final int numStates = rel.getNumberOfStates();
     for (int i = 0; i < numStates; i++) {
       if (!rel.isReachable(i)) {
         continue;
       }
       final boolean isInitial = rel.isInitial(i);
-      final boolean isMarked =
-       rel.isMarked(i, DEFAULT_MARKING_ID);
-      final boolean isForbidden =
-       rel.isMarked(i, DEFAULT_FORBIDDEN_ID);
+      final boolean isMarked = rel.isMarked(i, DEFAULT_MARKING_ID);
+      final boolean isForbidden = rel.isMarked(i, DEFAULT_FORBIDDEN_ID);
       final String nodeName = "S" + i;
-      final SimpleEFAState state = new SimpleEFAState(nodeName, isInitial,
-                                                      isMarkingIsUsed && isMarked,
-                                                      isForbiddenIsUsed && isForbidden, null);
+      final SimpleNodeProxy state = getSimpleNodeSubject(nodeName, isInitial, isMarked, isForbidden,
+                                                         null);
       encoding.createSimpleStateId(state);
     }
     return encoding;
   }
 
-  public SimpleNodeProxy getNodeProxy(final SimpleEFAState state)
+  public SimpleNodeProxy getSimpleNodeSubject(final String name, boolean isInitial, boolean isMarked,
+                                              boolean isForbbiden, Map<String, String> attributes)
   {
-    return mFactory.createSimpleNodeProxy(state.getName(),
-                                          createPropositions(state),
-                                          state.getAttributes(), state.isInitial(), null, null, null);
+    return new SimpleNodeSubject(name, createPropositions(isMarked, isForbbiden), attributes,
+                                 isInitial, null, null, null);
   }
 
-  private PlainEventListProxy createPropositions(final SimpleEFAState state)
+  private PlainEventListProxy createPropositions(boolean isMarked, boolean isForbbiden)
   {
     final List<Proxy> list = new ArrayList<>();
-    final PlainEventListProxy propositions = state.getPropositions();
-    if ((propositions != null) && (propositions.getEventIdentifierList() != null)) {
-      list.addAll(propositions.getEventIdentifierList());
+    if (isForbbiden) {
+      list.add(mFactory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_FORBIDDEN_NAME));
     }
-    if (state.isForbidden() && !containsForbiddenProposition(propositions)) {
-      list.add(getForbiddenIdentifier());
-    }
-    if (!state.isForbidden()) {
-      list.remove(getForbiddenIdentifier());
-    }
-    if (state.isMarked() && !containsMarkingProposition(propositions)) {
-      list.add(getMarkingIdentifier());
-    }
-    if (!state.isMarked()) {
-      list.remove(getMarkingIdentifier());
+    if (isMarked) {
+      list.add(mFactory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME));
     }
     if (list.isEmpty()) {
       return null;
     } else {
-      return mFactory.createPlainEventListProxy(mFactory.getCloner().getClonedList(list));
+      return mFactory.createPlainEventListProxy(list);
     }
   }
 
@@ -204,18 +186,10 @@ public class SimpleEFAHelper {
   {
     final List<SimpleEFAVariable> variableList = system.getVariables();
     final List<SimpleEFAComponent> comps = system.getComponents();
-    final Collection<EventDeclProxy> events = new ArrayList<>();
-    final Collection<EventDeclProxy> decls
-     = getEventDeclProxy(system.getEventEncoding().getEventDeclListExceptTau());
-    for (final EventDeclProxy e : decls) {
-      if (e != null) {
-        events.add(e);
-      }
-    }
-    final TreeMap<String, SimpleComponentProxy> compList = new TreeMap<>(
-     String.CASE_INSENSITIVE_ORDER);
-    final TreeMap<String, VariableComponentProxy> varList = new TreeMap<>(
-     String.CASE_INSENSITIVE_ORDER);
+    final Collection<EventDeclProxy> decls = getEventDeclProxy(system.getEventEncoding()
+     .getEventDeclListExceptTau());
+    final TreeMap<String, SimpleComponentProxy> compList = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    final TreeMap<String, VariableComponentProxy> varList = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     for (final SimpleEFAComponent comp : comps) {
       compList.put(comp.getName(), getSimpleComponentProxy(comp));
     }
@@ -226,39 +200,8 @@ public class SimpleEFAHelper {
     list.addAll(compList.values());
     list.addAll(varList.values());
 
-    return mFactory.createModuleProxy(
-     system.getName(), null, null, null, events, null, list);
+    return mFactory.createModuleProxy(system.getName(), null, null, null, decls, null, list);
   }
-
-//  public List<EdgeProxy> getEdgeListProxy(ListBufferTransitionRelation rel,
-//                                          SimpleEFATransitionLabelEncoding labelEncoding,
-//                                          SimpleEFAStateEncoding stateEncoding)
-//  {
-//    if (stateEncoding == null) {
-//      stateEncoding = this.getStateEncoding(rel);
-//    }
-//    final List<EdgeProxy> edgeList = new ArrayList<>(rel.getNumberOfTransitions());
-//    final TransitionIterator iter = rel.createAllTransitionsReadOnlyIterator();
-//    while (iter.advance()) {
-//      final int label = iter.getCurrentEvent();
-//      final int source = iter.getCurrentSourceState();
-//      final int target = iter.getCurrentTargetState();
-//      final ConstraintList condition = labelEncoding.getConstraintByLabelId(label);
-//      final List<SimpleIdentifierProxy> identList = new ArrayList<>();
-//      final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy(labelEncoding
-//       .getEventDeclByLabelId(label).getName());
-//      identList.add(ident);
-//      final GuardActionBlockProxy guardActionBlock = this.createGuardActionBlock(condition, OPTABLE);
-//      final LabelBlockProxy block = mFactory.createLabelBlockProxy(identList, null);
-//      final SimpleNodeProxy sourceNode = getNodeProxy(stateEncoding.getSimpleState(source));
-//      final SimpleNodeProxy targetNode = getNodeProxy(stateEncoding.getSimpleState(target));
-//      final EdgeProxy edge = mFactory.createEdgeProxy(sourceNode,
-//                                                      targetNode,
-//                                                      block, guardActionBlock, null, null, null);
-//      edgeList.add(edge);
-//    }
-//    return edgeList;
-//  }
 
   public SimpleComponentProxy getSimpleComponentProxy(final SimpleEFAComponent component)
   {
@@ -268,10 +211,10 @@ public class SimpleEFAHelper {
   }
 
   public SimpleComponentProxy getSimpleComponentProxy(final String name, final ListBufferTransitionRelation rel,
-                                                      final SimpleEFATransitionLabelEncoding labelEncoding,
+                                                      final SimpleEFALabelEncoding labelEncoding,
                                                       SimpleEFAStateEncoding stateEncoding,
                                                       final ComponentKind kind,
-                                                      final TIntArrayList blockedLabels)
+                                                      final int[] blockedLabels)
   {
     if (stateEncoding == null) {
       stateEncoding = getStateEncoding(rel);
@@ -290,8 +233,8 @@ public class SimpleEFAHelper {
       identList.add(ident);
       final GuardActionBlockProxy guardActionBlock = createGuardActionBlock(condition, OPTABLE);
       final LabelBlockProxy block = mFactory.createLabelBlockProxy(identList, null);
-      final SimpleNodeProxy sourceNode = getNodeProxy(stateEncoding.getSimpleState(source));
-      final SimpleNodeProxy targetNode = getNodeProxy(stateEncoding.getSimpleState(target));
+      final SimpleNodeProxy sourceNode = (SimpleNodeProxy) mCloner.getClone(stateEncoding.getSimpleState(source));
+      final SimpleNodeProxy targetNode = (SimpleNodeProxy) mCloner.getClone(stateEncoding.getSimpleState(target));
       if (!nodeMap.contains(source)) {
         nodeMap.put(source, sourceNode);
       }
@@ -299,9 +242,8 @@ public class SimpleEFAHelper {
         nodeMap.put(target, targetNode);
       }
 
-      final EdgeProxy edge = mFactory.createEdgeProxy(sourceNode,
-                                                      targetNode,
-                                                      block, guardActionBlock, null, null, null);
+      final EdgeProxy edge = mFactory.createEdgeProxy(sourceNode, targetNode, block,
+                                                      guardActionBlock, null, null, null);
       edgeList.add(edge);
     }
 
@@ -310,7 +252,7 @@ public class SimpleEFAHelper {
     LabelBlockProxy markingBlock = null;
     final List<SimpleIdentifierProxy> identList = new ArrayList<>();
     final Collection<SimpleEFAEventDecl> blockedEvents = new ArrayList<>();
-    for (final int block : blockedLabels.toArray()) {
+    for (final int block : blockedLabels) {
       blockedEvents.add(labelEncoding.getEventDecl(block));
     }
     if (!blockedEvents.isEmpty()) {
@@ -327,7 +269,7 @@ public class SimpleEFAHelper {
     if (!identList.isEmpty()) {
       markingBlock = mFactory.createLabelBlockProxy(identList, null);
     }
-    final GraphProxy graph = mFactory.createGraphProxy(false, markingBlock,
+    final GraphProxy graph = mFactory.createGraphProxy(true, markingBlock,
                                                        nodeMap.valueCollection(),
                                                        edgeList);
     final SimpleIdentifierProxy ident = mFactory.createSimpleIdentifierProxy(name);
@@ -340,9 +282,7 @@ public class SimpleEFAHelper {
     if (list == null) {
       return false;
     }
-    final EventListExpressionProxy cList = (EventListExpressionProxy) mCloner.getClone(list);
-    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
-    return eq.contains(cList.getEventIdentifierList(), getMarkingIdentifier());
+    return list.toString().contains(EventDeclProxy.DEFAULT_MARKING_NAME);
   }
 
   public boolean containsForbiddenProposition(final EventListExpressionProxy list)
@@ -350,9 +290,7 @@ public class SimpleEFAHelper {
     if (list == null) {
       return false;
     }
-    final EventListExpressionProxy cList = (EventListExpressionProxy) mCloner.getClone(list);
-    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
-    return eq.contains(cList.getEventIdentifierList(), getForbiddenIdentifier());
+    return list.toString().contains(EventDeclProxy.DEFAULT_FORBIDDEN_NAME);
   }
 
   public SimpleIdentifierProxy getMarkingIdentifier()
@@ -373,51 +311,12 @@ public class SimpleEFAHelper {
                                          ScopeKind.LOCAL, null, null, null);
   }
 
-  public EventDeclProxy getMarkingDecl()
-  {
-    final SimpleIdentifierProxy iden =
-            mFactory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_MARKING_NAME);
-    return mFactory.createEventDeclProxy(iden, EventKind.PROPOSITION);
-  }
-
-  public EventDeclProxy getForbiddenDecl()
-  {
-    final SimpleIdentifierProxy iden =
-            mFactory.createSimpleIdentifierProxy(EventDeclProxy.DEFAULT_FORBIDDEN_NAME);
-    return mFactory.createEventDeclProxy(iden, EventKind.PROPOSITION);
-  }
-
   public SimpleEFAVariable getSimpleEFAVariable(
    final VariableComponentProxy comp,
    final CompiledRange range)
   {
-    final VariableComponentProxy cloneVar =
-     (VariableComponentProxy) mCloner.getClone(comp);
+    final VariableComponentProxy cloneVar = (VariableComponentProxy) mCloner.getClone(comp);
     return new SimpleEFAVariable(cloneVar, range, mFactory, mOperatorTable);
-  }
-
-  public static String printer(final ConstraintList constraints,
-                               final String opening,
-                               final String separator,
-                               final String closing)
-  {
-    final StringBuilder result = new StringBuilder();
-    result.append(opening);
-    for (final SimpleExpressionProxy exp : constraints.getConstraints()) {
-      result.append(exp.toString());
-      result.append(separator);
-    }
-    result.delete(result.length() - separator.length(), result.length());
-    result.append(closing);
-    return result.toString();
-  }
-
-  public String printer(final List<SimpleExpressionProxy> exps,
-                        final String opening,
-                        final String separator,
-                        final String closing)
-  {
-    return printer(new ConstraintList(exps), opening, separator, closing);
   }
 
   public List<SimpleExpressionProxy> parseString(final String str,
@@ -437,8 +336,7 @@ public class SimpleEFAHelper {
 
   public List<SimpleExpressionProxy> parse(final String... str)
   {
-    final ExpressionParser parser =
-     new ExpressionParser(mFactory, mOperatorTable);
+    final ExpressionParser parser = new ExpressionParser(mFactory, mOperatorTable);
     final List<SimpleExpressionProxy> exps = new ArrayList<>();
     for (final String s : str) {
       try {
@@ -452,8 +350,7 @@ public class SimpleEFAHelper {
   public List<SimpleExpressionProxy> parse(final String str,
                                            final String seperator)
   {
-    final ExpressionParser parser = new ExpressionParser(mFactory,
-                                                         mOperatorTable);
+    final ExpressionParser parser = new ExpressionParser(mFactory, mOperatorTable);
     final List<SimpleExpressionProxy> exps = new ArrayList<>();
     final String[] values = str.split(seperator);
     for (final String s : values) {
@@ -507,57 +404,95 @@ public class SimpleEFAHelper {
     panel.clearSelection(false);
   }
 
-  public static Collection<SimpleEFAVariable> getStateVariables(
-   final SimpleEFAState state,
-   final Collection<SimpleEFAVariable> vars)
+  public static Collection<SimpleEFAVariable> getStateVariables(final String value,
+                                                                final Collection<SimpleEFAVariable> vars)
   {
     final Collection<SimpleEFAVariable> list = new THashSet<>();
-    final String str = state.getStateValue();
-    for (final SimpleEFAVariable var : vars) {
-      if (str.contains(var.getName())) {
-        list.add(var);
+    if (value != null && !value.isEmpty() && !vars.isEmpty()) {
+      for (final SimpleEFAVariable var : vars) {
+        if (value.contains(var.getName())) {
+          list.add(var);
+        }
       }
     }
     return list;
   }
 
-  public static Collection<SimpleEFAVariable> getStateVariables(
-   final String value,
-   final Collection<SimpleEFAVariable> vars)
+  public static String printer(final List<SimpleExpressionProxy> exps,
+                               final String opening,
+                               final String separator,
+                               final String closing)
   {
-    final Collection<SimpleEFAVariable> list = new THashSet<>();
-    for (final SimpleEFAVariable var : vars) {
-      if (value.contains(var.getName())) {
-        list.add(var);
-      }
+    final StringBuilder result = new StringBuilder();
+    result.append(opening);
+    for (final SimpleExpressionProxy exp : exps) {
+      result.append(exp.toString());
+      result.append(separator);
     }
-    return list;
+    result.delete(result.length() - separator.length(), result.length());
+    result.append(closing);
+    return result.toString();
   }
 
-  public static THashMap<String, String> merge(
-   final THashMap<String, String> attribute1,
-   final THashMap<String, String> attribute2,
-   final String separator)
+  public static String printer(final ConstraintList constraints,
+                               final String opening,
+                               final String separator,
+                               final String closing)
   {
-    if ((attribute1 == null) || attribute1.isEmpty()) {
-      return attribute2;
-    }
-    if ((attribute2 == null) || attribute2.isEmpty()) {
-      return attribute1;
-    }
+    return printer(constraints.getConstraints(), opening, separator, closing);
+  }
 
-    final THashMap<String, String> result = new THashMap<>(attribute1);
-    for (final String att2 : attribute2.keySet()) {
-      final String val2 = attribute2.get(att2);
-      String val = result.get(att2);
-      if ((val != null) && !val.isEmpty()) {
-        val += separator + val2;
-      } else {
-        val = val2;
-      }
-      result.put(att2, val);
+  public static String printer(final ConstraintList constraints, final String separator)
+  {
+    return printer(constraints, "", separator, "");
+  }
+
+  public static String printer(final ConstraintList constraints)
+  {
+    return printer(constraints, DEFAULT_VALUE_SEPARATOR);
+  }
+
+  public static String printer(final List<SimpleExpressionProxy> exps, final String separator)
+  {
+    return printer(exps, "", separator, "");
+  }
+
+  public static void merge(final AttributeMapSubject attribute1,
+                           final AttributeMapSubject attribute2,
+                           final String separator)
+  {
+    if ((attribute1 == null) || (attribute2 == null) || attribute2.isEmpty()) {
+      return;
     }
-    return result;
+    if (attribute1.isEmpty()) {
+      attribute1.putAll(attribute2);
+      return;
+    }
+    for (final String key2 : attribute2.keySet()) {
+      final String val2 = attribute2.get(key2);
+      if (val2 == null || val2.isEmpty()) {
+        continue;
+      }
+      mergeToAttribute(attribute1, key2, val2, separator);
+    }
+  }
+
+  public static void mergeToAttribute(final AttributeMapSubject attribute, final String key,
+                                      final String value, final String separator)
+  {
+    String oVal = attribute.get(key);
+    String nVal = "";
+    if (oVal != null) {
+      TreeSet<String> values = new TreeSet<>(Arrays.asList(oVal.split(separator)));
+      values.addAll(Arrays.asList(value.split(separator)));
+      for (final String v : values) {
+        nVal += v + separator;
+      }
+      nVal = nVal.substring(0, nVal.length() - separator.length());
+    } else {
+      nVal = value;
+    }
+    attribute.put(key, nVal);
   }
 
   public static ConstraintList merge(final ConstraintList con1, final ConstraintList con2)
@@ -568,16 +503,19 @@ public class SimpleEFAHelper {
     if (con2.isTrue()) {
       return con1;
     }
-    final List<SimpleExpressionProxy> con = new ArrayList<>(con1
-     .getConstraints());
+    final List<SimpleExpressionProxy> con = new ArrayList<>(con1.getConstraints());
     con.addAll(con2.getConstraints());
     return new ConstraintList(con);
   }
 
-  public static ConstraintList getFalseConstraintList()
+  public static ConstraintList getFalseConstraint()
   {
-    final SimpleExpressionProxy False = new IntConstantSubject(0);
-    return new ConstraintList(Collections.singleton(False));
+    return new ConstraintList(getFalseExpression());
+  }
+
+  public static List<SimpleExpressionProxy> getFalseExpression()
+  {
+    return Collections.singletonList((SimpleExpressionProxy) new IntConstantSubject(0));
   }
 
   public static SimpleEFAEventDecl getSubjectTAUDecl()
@@ -597,13 +535,16 @@ public class SimpleEFAHelper {
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;
   private final ModuleProxyCloner mCloner;
-
-  public static final String DEFAULT_MARKINGEVENT_NAME = "vm:";
-  public static final String DEFAULT_TAU_NAME = "tau:";
-  public static final String DEFAULT_STATEVALUE_STRING = "PE:";
-  public static final String DEFAULT_VALUE_OPENING = "<";
-  public static final String DEFAULT_VALUE_CLOSING = ">";
+  public static final String DEFAULT_MARKINGEVENT_NAME = ":vm";
+  public static final String DEFAULT_TAU_NAME = ":tau";
+  public static final String DEFAULT_STATEVALUE_KEY = "PE:";
+  public static final String DEFAULT_SPEC_KEY = "SPEC:";
+  public static final String DEFAULT_STATE_NAME = "S";
+  public static final String DEFAULT_OPENING_STRING = "(";
+  public static final String DEFAULT_CLOSING_STRING = ")";
   public static final String DEFAULT_VALUE_SEPARATOR = ",";
+  public static final String DEFAULT_SPEC_SEPARATOR = ";";
+  public static final String DEFAULT_SPEC_LOCGUARD = "_";
   public static final ModuleSubjectFactory FACTORY = ModuleSubjectFactory.getInstance();
   public static final CompilerOperatorTable OPTABLE = CompilerOperatorTable.getInstance();
 

@@ -57,12 +57,6 @@ public class SimpleEFASystem
     return super.getTransitionRelations().size();
   }
 
-  public ModuleSubject getModuleProxy(final ModuleProxyFactory mFactory)
-  {
-    throw new UnsupportedOperationException
-      ("getModuleProxy() not implemented for SimpleEFASystem!");
-  }
-
   public List<SimpleEFAComponent> getComponents()
   {
     return super.getTransitionRelations();
@@ -110,7 +104,7 @@ public class SimpleEFASystem
 
   public void removeComponent(final SimpleEFAComponent component)
   {
-    for (final int id : component.getEvents().toArray()) {
+    for (final int id : component.getEvents()) {
       final SimpleEFAEventDecl event = mEventEncoding.getEventDecl(id);
       if (event.isLocalIn(component) && !event.isProposition()) {
         mEventEncoding.removeEventDecl(event);
@@ -138,7 +132,7 @@ public class SimpleEFASystem
   {
     for (final SimpleEFAComponent comp : getComponents()) {
       final ListBufferTransitionRelation tr = comp.getTransitionRelation();
-      final SimpleEFATransitionLabelEncoding trEncoding =
+      final SimpleEFALabelEncoding trEncoding =
        comp.getTransitionLabelEncoding();
       for (int id = 0; id < trEncoding.size(); id++) {
         final int label = trEncoding.getTransitionLabel(id);
