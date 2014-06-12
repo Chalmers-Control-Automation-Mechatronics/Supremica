@@ -63,6 +63,17 @@ public class ControllabilityCounterExampleChecker
    */
   public ControllabilityCounterExampleChecker()
   {
+    this(true);
+  }
+
+  /**
+   * Creates a new controllability counterexample checker.
+   * @param fullDiag Whether the diagnostic text should include the
+   *                 name of the trace. The default is <CODE>true</CODE>.
+   */
+  public ControllabilityCounterExampleChecker(final boolean fullDiag)
+  {
+    mFullDiagnostics = fullDiag;
   }
 
 
@@ -217,12 +228,14 @@ public class ControllabilityCounterExampleChecker
                                              final int step)
   {
     mDiagnostics = new StringBuilder();
-    mDiagnostics.append("Controllability error trace ");
-    final String name = trace.getName();
-    if (name != null) {
-      mDiagnostics.append('\'');
-      mDiagnostics.append(trace.getName());
-      mDiagnostics.append("' ");
+    if (mFullDiagnostics) {
+      mDiagnostics.append("Controllability error trace ");
+      final String name = trace.getName();
+      if (name != null) {
+        mDiagnostics.append('\'');
+        mDiagnostics.append(trace.getName());
+        mDiagnostics.append("' ");
+      }
     }
     mDiagnostics.append(msg);
     if (item != null) {
@@ -234,12 +247,15 @@ public class ControllabilityCounterExampleChecker
       mDiagnostics.append(" in step ");
       mDiagnostics.append(step + 1);
     }
-    mDiagnostics.append('.');
+    if (mFullDiagnostics) {
+      mDiagnostics.append('.');
+    }
   }
 
 
   //#########################################################################
   //# Data Members
+  private final boolean mFullDiagnostics;
   private StringBuilder mDiagnostics;
 
 }

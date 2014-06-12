@@ -89,8 +89,7 @@ public class BDDControllabilityChecker extends ModelChecker
     // Another (faster?) alternative is "cudd".
     mBDDFactory = BDDFactory.init("buddy", 10000, 5000);
     // You can try to increase performance by increasing the cache sizes,
-    // but please be aware of the memory limits. Anything above 1 million
-    // is close to suicide, except perhaps when using "cudd". If you
+    // but please be aware of the memory limits. If you
     // want to push the limits, please test your program inside
     // 'ulimit -v 1048576 -m 1048576', and pass the -Xmx argument to
     // the Java VM.
