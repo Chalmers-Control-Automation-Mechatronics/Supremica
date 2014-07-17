@@ -506,9 +506,12 @@ public abstract class BDDModelVerifier
     }
     mTransitionPartitioning.startIteration();
     final Logger logger = getLogger();
-    BDD current = getInitialStateBDD();
+    final BDD init = getInitialStateBDD();
+    BDD current = init;
     List<TransitionPartitionBDD> group =
       mTransitionPartitioning.startIteration();
+    final boolean multiPart =
+      group != null && group.size() < partitioning.size();
     while (true) {
       checkAbort();
       if (logger.isDebugEnabled()) {
@@ -524,16 +527,17 @@ public abstract class BDDModelVerifier
       if (group == null) {
         break;
       }
-      final BDD next = current.id();
+      final BDD next = mBDDFactory.zero();
       for (final TransitionPartitionBDD part : group) {
         checkAbort();
         final BDD transpart = part.getBDD();
         final BDDVarSet cube = part.getCurrentStateCube();
-        final BDD nextpart = current.relprod(transpart, cube);
+        final BDD nextPart = current.relprod(transpart, cube);
         final BDDPairing renaming = part.getNextToCurrent();
-        nextpart.replaceWith(renaming);
-        next.orWith(nextpart);
+        nextPart.replaceWith(renaming);
+        next.orWith(nextPart);
       }
+      next.orWith(multiPart ? current.id() : init.id());
       final boolean stable = next.equals(current);
       if (!stable) {
         mLevels.add(next);
