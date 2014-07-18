@@ -981,6 +981,22 @@ public abstract class BDDModelVerifier
 
 
   //#########################################################################
+  //# Debugging
+  @SuppressWarnings("unused")
+  private void showOrder(final Collection<AutomatonProxy> ordering)
+  {
+    final Logger logger = getLogger();
+    if (logger.isDebugEnabled()) {
+      logger.debug("AUTOMATON ORDERING:");
+      for (final AutomatonProxy aut : ordering) {
+        logger.debug(aut.getName());
+      }
+      logger.debug("(end of ordering)");
+    }
+  }
+
+
+  //#########################################################################
   //# Data Members
   private BDDPackage mBDDPackage;
   private VariableOrdering mVariableOrdering;

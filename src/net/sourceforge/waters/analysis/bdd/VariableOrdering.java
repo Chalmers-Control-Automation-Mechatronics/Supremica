@@ -11,8 +11,6 @@ package net.sourceforge.waters.analysis.bdd;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -76,19 +74,6 @@ public enum VariableOrdering
       final Collection<AutomatonProxy> greedy =
         GREEDY.getOrder(des, translator);
       return new ForceVariableOrdering(des, greedy);
-    }
-  },
-
-  RFORCE {
-    @Override
-    Collection<AutomatonProxy> getOrder(final ProductDESProxy des,
-                                        final KindTranslator translator)
-    {
-      final Collection<AutomatonProxy> preorder =
-        DEFAULT.getOrder(des, translator);
-      final List<AutomatonProxy> reversed = new ArrayList<>(preorder);
-      Collections.reverse(reversed);
-      return new ForceVariableOrdering(des, reversed);
     }
   };
 

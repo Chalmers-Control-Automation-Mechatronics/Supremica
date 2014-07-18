@@ -84,6 +84,20 @@ class ForceVariableOrdering
         autEntry.setIndex(index++);
       }
     }
+    // Reverse the order if the centre of gravity (of states) is beyond
+    // the half-way point.
+    index = 0;
+    double weightedStates = 0.0;
+    double totalStates = 0.0;
+    for (final AutomatonEntry autEntry : mAutomatonEntries) {
+      final double numStates = autEntry.getNumberOfStates();
+      weightedStates += numStates * index;
+      totalStates += numStates;
+      index++;
+    }
+    if (weightedStates > 0.5 * (mAutomatonEntries.size() - 1) * totalStates) {
+      Collections.reverse(mAutomatonEntries);
+    }
   }
 
 
@@ -122,6 +136,11 @@ class ForceVariableOrdering
     private AutomatonProxy getAutomaton()
     {
       return mAutomaton;
+    }
+
+    private int getNumberOfStates()
+    {
+      return mAutomaton.getStates().size();
     }
 
     private void addEventEntry(final EventEntry event)
