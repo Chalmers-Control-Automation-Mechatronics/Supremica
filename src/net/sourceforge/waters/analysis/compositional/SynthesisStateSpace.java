@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.compositional;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -212,7 +213,13 @@ public class SynthesisStateSpace implements AutomatonProxy
 
   public void addStateMap(final SynthesisStateMap map)
   {
-    mStateMaps.add(map);
+    if (map.containsBadState()) {
+      mStateMaps.add(map);
+    } else {
+      for (final SynthesisStateMap parent:map.getParents()){
+        addStateMap(parent);
+      }
+    }
   }
 
   public int getNumberOfMaps()
@@ -260,11 +267,15 @@ public class SynthesisStateSpace implements AutomatonProxy
   //# Inner Class
   abstract static class SynthesisStateMap
   {
+    abstract Collection<SynthesisStateMap> getParents();
+
     abstract int getStateNumber(Map<AutomatonProxy,StateProxy> tuple);
 
     abstract int getNumberOfMaps();
 
     abstract int getMemoryEstimate();
+
+    abstract boolean containsBadState();
   }
 
 
@@ -283,6 +294,12 @@ public class SynthesisStateSpace implements AutomatonProxy
     //#######################################################################
     //# Override for SynthesisStateSpace
     @Override
+    Collection<SynthesisStateMap> getParents()
+    {
+      return Collections.emptyList();
+    }
+
+    @Override
     int getStateNumber(final Map<AutomatonProxy,StateProxy> tuple)
     {
       final StateProxy state = tuple.get(mAutomaton);
@@ -299,6 +316,12 @@ public class SynthesisStateSpace implements AutomatonProxy
     int getMemoryEstimate()
     {
       return mStateEncoding.getNumberOfStates()*4;
+    }
+
+    @Override
+    boolean containsBadState()
+    {
+      return false;
     }
 
     //#######################################################################
@@ -336,6 +359,12 @@ public class SynthesisStateSpace implements AutomatonProxy
     //#######################################################################
     //# Override for SynthesisStateSpace
     @Override
+    Collection<SynthesisStateMap> getParents()
+    {
+      return Collections.singletonList(mParent);
+    }
+
+    @Override
     int getStateNumber(final Map<AutomatonProxy,StateProxy> tuple)
     {
       final int state = mParent.getStateNumber(tuple);
@@ -353,6 +382,18 @@ public class SynthesisStateSpace implements AutomatonProxy
     {
       return mStateToClass.length*4 + mParent.getMemoryEstimate();
     }
+
+    @Override
+    boolean containsBadState()
+    {
+      for (final int state: mStateToClass) {
+        if (state < 0) {
+          return true;
+        }
+      }
+      return false;
+    }
+
     //#######################################################################
     //# Data Members
     private final int[] mStateToClass;
@@ -376,6 +417,12 @@ public class SynthesisStateSpace implements AutomatonProxy
 
     //#######################################################################
     //# Override for SynthesisStateSpace
+    @Override
+    Collection<SynthesisStateMap> getParents()
+    {
+      return mParents;
+    }
+
     @Override
     int getStateNumber(final Map<AutomatonProxy,StateProxy> fullTuple)
     {
@@ -407,6 +454,12 @@ public class SynthesisStateSpace implements AutomatonProxy
         mem += parent.getMemoryEstimate();
       }
       return mSynchronisationEncoding.getMemoryEstimate()+mem;
+    }
+
+    @Override
+    boolean containsBadState()
+    {
+      return false;
     }
 
     //#######################################################################

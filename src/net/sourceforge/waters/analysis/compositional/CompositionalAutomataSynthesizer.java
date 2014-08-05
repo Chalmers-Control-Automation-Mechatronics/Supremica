@@ -626,7 +626,7 @@ public class CompositionalAutomataSynthesizer
           // skip
           continue;
         } else if (info.containsReplacedEvent(deferredEvents) ||
-                   !isDeterministic(rel, info)) {
+          !isDeterministic(rel, info)) {
           // defer
           info.addDeferredEvents(deferredEvents);
           if (firstDeferred == null) {

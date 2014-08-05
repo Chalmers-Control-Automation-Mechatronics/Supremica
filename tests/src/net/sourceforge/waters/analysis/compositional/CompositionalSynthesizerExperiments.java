@@ -265,6 +265,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     synthesisePSLWithResetTransWithPartLeftCounters();
     synthesisePSLWithResetTransWithPartLeftPlants();
     synthesiseTbedCtct();
+    synthesiseTbedHISC();
     synthesiseTbedNoderailB();// 7
     synthesiseTbedNoderailUncont();// 8
     synthesiseCentralLockingVerriegel3b();// 9
@@ -342,6 +343,12 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
   private void synthesiseTbedCtct() throws Exception
   {
     runModel("tests", "incremental_suite", "tbed_ctct.wmod");
+  }
+
+
+  private void synthesiseTbedHISC() throws Exception
+  {
+    runModel("despot", "tbed_hisc", "tbed_hisc1.wmod");
   }
 
   //AGV
