@@ -546,11 +546,12 @@ public class UnifiedEFAConflictCheckerExperiments
       final ProductDESProxyFactory factory = getProductDESProxyFactory();
       mConflictChecker =  new BDDConflictChecker(factory);
       mWatchdog.addAbortable(mConflictChecker);
-      // Configuration of CompositionalConflictChecker ...
+      // Configuration of BDDConflictChecker ...
       mConflictChecker.setBDDPackage(BDDPackage.CUDD);
       mConflictChecker.setTransitionPartitioningStrategy
         (TransitionPartitioningStrategy.AUTOMATA);
       mConflictChecker.setPartitioningSizeLimit(5000);
+      mConflictChecker.setInitialSize(1000000);
       mConflictChecker.setNodeLimit(25000000);
       mConflictChecker.setCounterExampleEnabled(false);
       // Configuration end

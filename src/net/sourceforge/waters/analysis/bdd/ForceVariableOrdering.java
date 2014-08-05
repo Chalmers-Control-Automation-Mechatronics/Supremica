@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters BDD
 //# PACKAGE: net.sourceforge.waters.analysis.bdd
 //# CLASS:   ForceVariableOrdering
 //###########################################################################
@@ -64,18 +64,19 @@ class ForceVariableOrdering
     }
     final int numEntries = mAutomatonEntries.size();
     final int iterCount = (int) Math.round(MAX_ITER * Math.log(numEntries));
-    double lastDelta = Double.POSITIVE_INFINITY;
     for (int i = 0; i < iterCount; i++) {
-      double delta = 0.0;
       for (final EventEntry eventEntry : eventMap.values()) {
-        delta += eventEntry.estimatePosition();
+        eventEntry.estimatePosition();
       }
-      if (delta >= lastDelta) {
-        break;
-      }
-      lastDelta = delta;
+      boolean change = false;
+      double prevPos = Double.NEGATIVE_INFINITY;
       for (final AutomatonEntry autEntry : mAutomatonEntries) {
-        autEntry.estimatePosition();
+        final double newPos = autEntry.estimatePosition();
+        change |= newPos < prevPos;
+        prevPos = newPos;
+      }
+      if (!change) {
+        break;
       }
       Collections.sort(mAutomatonEntries);
       index = 0;
@@ -83,16 +84,32 @@ class ForceVariableOrdering
         autEntry.setIndex(index++);
       }
     }
+    // Reverse the order if the centre of gravity (of states) is beyond
+    // the half-way point.
+    index = 0;
+    double weightedStates = 0.0;
+    double totalStates = 0.0;
+    for (final AutomatonEntry autEntry : mAutomatonEntries) {
+      final double numStates = autEntry.getNumberOfStates();
+      weightedStates += numStates * index;
+      totalStates += numStates;
+      index++;
+    }
+    if (weightedStates > 0.5 * (mAutomatonEntries.size() - 1) * totalStates) {
+      Collections.reverse(mAutomatonEntries);
+    }
   }
 
 
   //#########################################################################
   //# Interface java.util.Collection<AutomatonProxy>
+  @Override
   public int size()
   {
     return mAutomatonEntries.size();
   }
 
+  @Override
   public Iterator<AutomatonProxy> iterator()
   {
     final Iterator<AutomatonEntry> entryIterator = mAutomatonEntries.iterator();
@@ -121,6 +138,11 @@ class ForceVariableOrdering
       return mAutomaton;
     }
 
+    private int getNumberOfStates()
+    {
+      return mAutomaton.getStates().size();
+    }
+
     private void addEventEntry(final EventEntry event)
     {
       mEventEntries.add(event);
@@ -136,7 +158,7 @@ class ForceVariableOrdering
       mEstimatedPosition = mIndex = index;
     }
 
-    private void estimatePosition()
+    private double estimatePosition()
     {
       if (mEventEntries.isEmpty()) {
         mEstimatedPosition = Double.POSITIVE_INFINITY;
@@ -147,6 +169,7 @@ class ForceVariableOrdering
         }
         mEstimatedPosition = sum / mEventEntries.size();
       }
+      return mEstimatedPosition;
     }
 
     private void remove(final EventEntry entry)
@@ -156,6 +179,7 @@ class ForceVariableOrdering
 
     //#######################################################################
     //# Interface java.util.Comparable
+    @Override
     public int compareTo(final AutomatonEntry entry)
     {
       final double delta = mEstimatedPosition - entry.mEstimatedPosition;
@@ -207,17 +231,14 @@ class ForceVariableOrdering
       return mEstimatedPosition;
     }
 
-    private double estimatePosition()
+    private void estimatePosition()
     {
-      double delta = 0.0;
       double sum = 0.0;
       for (final AutomatonEntry aut : mAutomatonEntries) {
         final double autpos = aut.getEstimatedPosition();
         sum += autpos;
-        delta += Math.abs(mEstimatedPosition - autpos);
       }
       mEstimatedPosition = sum / mAutomatonEntries.size();
-      return delta;
     }
 
     private void dispose()
@@ -251,17 +272,20 @@ class ForceVariableOrdering
 
     //#######################################################################
     //# Interface java.util.Iterator
+    @Override
     public boolean hasNext()
     {
       return mEntryIterator.hasNext();
     }
 
+    @Override
     public AutomatonProxy next()
     {
       final AutomatonEntry entry = mEntryIterator.next();
       return entry.getAutomaton();
     }
 
+    @Override
     public void remove()
     {
       throw new UnsupportedOperationException
@@ -282,6 +306,6 @@ class ForceVariableOrdering
 
   //#########################################################################
   //# Class Constants
-  private static final int MAX_ITER = 32;
+  private static final int MAX_ITER = 127;
 
 }

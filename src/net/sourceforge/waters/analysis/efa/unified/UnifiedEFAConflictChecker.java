@@ -1093,7 +1093,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     /**
      * Checks whether this event can be removed.
      * An event can be removed if it has no listed transition relations
-     * or variables, and of the following conditions holds.
+     * or variables, and one of the following conditions holds.
      * Either the event has children (in which case the children can
      * be linked to its parent), or the event is a leave and none
      * of its ancestors has any listed transition relations or variables.
