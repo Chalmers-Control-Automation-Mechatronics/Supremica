@@ -258,9 +258,12 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       (mCompilerOperatorTable, context);
     final Comparator<VariableInfo> maxEvents = new ComparatorMaxEvents();
     final Comparator<VariableInfo> maxSelfloops = new ComparatorMaxSelfloops();
+    final Comparator<VariableInfo> minDomain = new ComparatorMinDomain();
     mVariableComparator =
-      new VariableComparator(maxEvents, maxSelfloops);
+      new VariableComparator(maxEvents, maxSelfloops, minDomain);
     if (mSelectionHeuristic == null) {
+      // The following is the default. Can be overridden from outside
+      // using setSelectionHeuristic().
       final SelectionHeuristic<UnifiedEFACandidate> minS =
         new MinStatesSelectionHeuristic();
       final SelectionHeuristic<UnifiedEFACandidate> minF =
@@ -1613,14 +1616,11 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       final Collection<VariableInfo> primedVariables =
         collectOnlyPrimedVariables();
       if (!primedVariables.isEmpty()) {
-        final Set<UnifiedEFATransitionRelation> trs = Collections.emptySet();
-        final VariableInfo selectedVariable =
-          Collections.min(primedVariables, mVariableComparator);
-        final Set<VariableInfo> selectedVariableSet =
-          Collections.singleton(selectedVariable);
-        final UnifiedEFACandidate candidate =
-          new UnifiedEFACandidate(trs, selectedVariableSet);
-        return candidate;
+        return createVariablesCandidate(primedVariables);
+      }
+      final Collection<VariableInfo> onlyVariables = collectOnlyVariablesOfUpdates();
+      if (!onlyVariables.isEmpty()) {
+        return createVariablesCandidate(onlyVariables);
       }
       if (mUsesLocalVariable) {
         final Collection<VariableInfo> localVars = collectLocalVariables();
@@ -1642,6 +1642,18 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       final Collection<UnifiedEFACandidate> candidates =
         createMustLCandidates();
       return mSelectionHeuristic.select(candidates);
+    }
+
+    private UnifiedEFACandidate createVariablesCandidate(final Collection<VariableInfo> vars)
+    {
+      final Set<UnifiedEFATransitionRelation> trs = Collections.emptySet();
+      final VariableInfo selectedVariable =
+        Collections.min(vars, mVariableComparator);
+      final Set<VariableInfo> selectedVariableSet =
+        Collections.singleton(selectedVariable);
+      final UnifiedEFACandidate candidate =
+        new UnifiedEFACandidate(trs, selectedVariableSet);
+      return candidate;
     }
 
     private UnifiedEFACandidate createLocalTRCandidate()
@@ -1679,6 +1691,19 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       final Collection<VariableInfo> candidates = new ArrayList<>();
       for (final VariableInfo var : vars) {
         if (var.isPrimedOnly() || var.isUnPrimedOnly()) {
+          candidates.add(var);
+        }
+      }
+      return candidates;
+    }
+
+    private Collection<VariableInfo> collectOnlyVariablesOfUpdates()
+    {
+      final Collection<VariableInfo> candidates = new THashSet<>();
+      for (final EventInfo event : mEventInfoMap.values()) {
+        final Collection<VariableInfo> vars = event.getVariables();
+        if (vars.size()==1) {
+          final VariableInfo var = vars.iterator().next();
           candidates.add(var);
         }
       }
@@ -1823,6 +1848,19 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     {
       return candidate2.getNumberOfSelfloops() -
              candidate1.getNumberOfSelfloops();
+    }
+  }
+
+  //#########################################################################
+  //# Inner Class ComparatorMinDomain
+  private static class ComparatorMinDomain implements Comparator<VariableInfo>
+  {
+    @Override
+    public int compare(final VariableInfo candidate1,
+                       final VariableInfo candidate2)
+    {
+      return candidate1.getRangeSize() -
+             candidate2.getRangeSize();
     }
   }
 

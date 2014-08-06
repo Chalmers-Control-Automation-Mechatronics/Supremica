@@ -2330,21 +2330,25 @@ public class ListBufferTransitionRelation
    */
   public boolean removeTauSelfLoops()
   {
-    if ((mEventStatus[EventEncoding.TAU] & EventEncoding.STATUS_UNUSED) == 0) {
-      boolean removable = false;
-      if (mSuccessorBuffer != null) {
-        removable = mSuccessorBuffer.removeTauSelfloops();
+    boolean removedSome = false;
+    for (int e = 0; e < getNumberOfProperEvents(); e++) {
+      final byte status = mEventStatus[e];
+      if ((status & EventEncoding.STATUS_UNUSED) == 0 &&
+          (status & EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0) {
+        boolean removable = false;
+        if (mSuccessorBuffer != null) {
+          removable = mSuccessorBuffer.removeTauSelfloops(e);
+        }
+        if (mPredecessorBuffer != null) {
+          removable = mPredecessorBuffer.removeTauSelfloops(e);
+        }
+        if (removable) {
+          mEventStatus[e] |= EventEncoding.STATUS_UNUSED;
+          removedSome = true;
+        }
       }
-      if (mPredecessorBuffer != null) {
-        removable = mPredecessorBuffer.removeTauSelfloops();
-      }
-      if (removable) {
-        mEventStatus[EventEncoding.TAU] |= EventEncoding.STATUS_UNUSED;
-      }
-      return removable;
-    } else {
-      return false;
     }
+    return removedSome;
   }
 
   /**
