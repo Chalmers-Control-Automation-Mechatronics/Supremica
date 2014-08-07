@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.compositional;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer.PreselectingMethod;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
@@ -21,7 +22,7 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
  * This class can be used to automatically run experiments for different
  * properties with all possible combinations of heuristics.
  *
- * @author Sahar Mohajerani
+ * @author Sahar Mohajerani, Robi Malik
  */
 
 public class SelfRunningExperimentCompositionalSynthesis
@@ -33,32 +34,48 @@ public class SelfRunningExperimentCompositionalSynthesis
       //final String outputDir = System.getProperty("waters.test.outputdir");
       final ProductDESProxyFactory factory =
         ProductDESElementFactory.getInstance();
-      final AbstractCompositionalSynthesizer automataSynthesizer =
+      final CompositionalAutomataSynthesizer automataSynthesizer =
         new CompositionalAutomataSynthesizer(factory);
+      automataSynthesizer.setDetailedOutputEnabled(false);
       final List<Configuration> configurations = new LinkedList<>();
-      final Configuration configWSOE =
-        new Configuration(automataSynthesizer,
-                          AutomataSynthesisAbstractionProcedureFactory.WSOE);
-      configurations.add(configWSOE);
-//      final Configuration configWSOEUnsup =
+//      final Configuration configWSOE =
 //        new Configuration(automataSynthesizer,
-//                          AutomataSynthesisAbstractionProcedureFactory.WSOE_UNSUP);
-//      configurations.add(configWSOEUnsup);
+//                          AutomataSynthesisAbstractionProcedureFactory.WSOE);
+//      configurations.add(configWSOE);
+      final Configuration configWSOEUnsup =
+        new Configuration(automataSynthesizer,
+                          AutomataSynthesisAbstractionProcedureFactory.WSOE_UNSUP);
+      configurations.add(configWSOEUnsup);
       final AbstractCompositionalSynthesizer stateRepresentationSynthesizer =
         new CompositionalStateRepresentationSynthesizer(factory);
+      stateRepresentationSynthesizer.setFailingEventsEnabled(false);
+//      stateRepresentationSynthesizer.setUsingSpecialEvents(false);
       final Configuration configStateRepresent =
         new Configuration(stateRepresentationSynthesizer,
-                          StateRepresentationSynthesisAbstractionProcedureFactory.WSOE);
+                          StateRepresentationSynthesisAbstractionProcedureFactory.WSOE_UNSUP);
       configurations.add(configStateRepresent);
       final AbstractCompositionalModelAnalyzer.PreselectingMethodFactory
       preselectingFactory = automataSynthesizer.getPreselectingMethodFactory();
       final CompositionalSelectionHeuristicFactory selectionFactory =
         automataSynthesizer.getSelectionHeuristicFactory();
       int methodCount = 0;
+      final PreselectingMethod[] preSelectingMethods = new PreselectingMethod[] {
+          AbstractCompositionalModelAnalyzer.MustL
+//          AbstractCompositionalModelAnalyzer.Pairs
+      };
+      final SelectionHeuristicCreator[] selectingMethods = new SelectionHeuristicCreator[] {
+        CompositionalSelectionHeuristicFactory.MaxL
+//        CompositionalSelectionHeuristicFactory.MinS,
+//        CompositionalSelectionHeuristicFactory.MinF
+      };
+//      for (final AbstractCompositionalModelAnalyzer.PreselectingMethod
+//           preselectingMethod : preselectingFactory.getEnumConstants()) {
+//        for (final SelectionHeuristicCreator
+//             selectingMethod: selectionFactory.getEnumConstants()) {
       for (final AbstractCompositionalModelAnalyzer.PreselectingMethod
-           preselectingMethod : preselectingFactory.getEnumConstants()) {
+           preselectingMethod : preSelectingMethods) {
         for (final SelectionHeuristicCreator
-             selectingMethod: selectionFactory.getEnumConstants()) {
+             selectingMethod: selectingMethods) {
           methodCount++;
           for (final Configuration config: configurations) {
             final AbstractCompositionalSynthesizer synthesizer = config.getSynthesizer();

@@ -255,7 +255,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     synthesisAGV();// 1
     synthesisAGVB();// 2
     synthesissAip0Alps();// 3
-    synthesiseAip0though();
+//    synthesiseAip0though();
     synthesisFenCaiWon09B();// 4
     synthesisFenCaiWon09Synth();// 5
     synthesisFms2003();// 6
@@ -264,7 +264,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     synthesisePSLWithResetTrans();
     synthesisePSLWithResetTransWithPartLeftCounters();
     synthesisePSLWithResetTransWithPartLeftPlants();
-    synthesiseTbedCtct();
+//    synthesiseTbedCtct(); No supervisor
     synthesiseTbedHISC();
     synthesiseTbedNoderailB();// 7
     synthesiseTbedNoderailUncont();// 8
@@ -274,11 +274,11 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     synthesis6linki();// 12
     synthesis6linkp();// 13
     synthesis6linkre();// 14
-    for (int n = 100; n <= 1000; n+=100) {
-      if (!synthesisTransferline(n)) {
-        break;
-      }
-    }
+//    for (int n = 100; n <= 1000; n+=100) {
+//      if (!synthesisTransferline(n)) {
+//        break;
+//      }
+//    }
 
 
     //synthesiseCentralLockingKoordwspBlock();
