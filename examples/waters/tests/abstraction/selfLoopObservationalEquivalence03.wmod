@@ -73,12 +73,6 @@
         </SimpleComponent>
         <SimpleComponent Kind="SPEC" Name="after">
             <Graph Deterministic="false">
-                <LabelBlock>
-                    <SimpleIdentifier Name="a"/>
-                    <LabelGeometry Anchor="NW">
-                        <Point X="100" Y="69"/>
-                    </LabelGeometry>
-                </LabelBlock>
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
                         <PointGeometry>
