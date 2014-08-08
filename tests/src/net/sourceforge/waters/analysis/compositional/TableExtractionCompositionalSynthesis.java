@@ -40,6 +40,8 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
 {
 
+  //#########################################################################
+  //# Main
   public static void main(final String[] args)
   {
     final TableExtractionCompositionalSynthesis extractor =
@@ -49,6 +51,9 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
     extractor.extract(heuristicFile, compareFile);
   }
 
+
+  //#########################################################################
+  //# Constructor
   private TableExtractionCompositionalSynthesis()
   {
     final Map<String, Result> automataMap = new TreeMap<String, Result>();
@@ -83,6 +88,8 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
   }
 
 
+  //#########################################################################
+  //# Table Extraction
   private void extract(final File heuristicFile, final File compareFile)
   {
     try {
@@ -99,7 +106,6 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
       final AbstractCompositionalSynthesizer stateRepresentationSynthesizer =
         new CompositionalStateRepresentationSynthesizer(factory);
       stateRepresentationSynthesizer.setFailingEventsEnabled(false);
-//      stateRepresentationSynthesizer.setUsingSpecialEvents(false);
       final Configuration configStateRepresent =
         new Configuration(stateRepresentationSynthesizer,
                           StateRepresentationSynthesisAbstractionProcedureFactory.WSOE_UNSUP);
@@ -171,7 +177,7 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
       final int nameColumn = 0;
       int timeColumn = 0;
       int totalTrColumn = 0;
-      int totalStateColumn = 0;
+      int totalStatesColumn = 0;
       int memColumn = 0;
       int resultColumn = 0;
       final BufferedReader br = new BufferedReader(new FileReader(fileName));
@@ -183,14 +189,14 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
             resultColumn = findIndex(words, "Result");
             timeColumn = findIndex(words, "RunTime");
             totalTrColumn = findIndex(words, "TotTrans");
-            totalStateColumn = findIndex(words, "TotStates");
+            totalStatesColumn = findIndex(words, "TotStates");
             memColumn = findIndex(words, "UnrenamedSupervisorMemoryEstimate");
             if (memColumn < 0) {
               memColumn = findIndex(words, "MemoryEstimate");
             }
           } else {
-            final String result = words[resultColumn].toLowerCase();
-            if (result.equals("true")) {
+            final String result = words[resultColumn];
+            if (result.equalsIgnoreCase("true")) {
               String name = words[nameColumn];
               final int dotpos = name.indexOf('.');
               if (dotpos >= 0) {
@@ -198,13 +204,13 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
               }
               final double time = 0.001 * Long.parseLong(words[timeColumn]);
               final int totTrans = Integer.parseInt(words[totalTrColumn]);
-              final int totStates = Integer.parseInt(words[totalStateColumn]);
+              final int totStates = Integer.parseInt(words[totalStatesColumn]);
               final int supMem = Integer.parseInt(words[memColumn]);
               final Map<String,Result> map = mResults.get(mapIndex);
               final Result oldResult = map.get(name);
               if (oldResult == null || oldResult.getMemory() > supMem) {
-                final Result newResult = new Result(name, time, totStates,
-                                              totTrans, supMem, heuristics);
+                final Result newResult =new Result(name, time, totStates,
+                                                   totTrans, supMem, heuristics);
                 map.put(name, newResult);
               }
             }
@@ -247,11 +253,11 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
     writer.close();
   }
 
-  private void printStateComparisonTable(final File outputFile) throws IOException
+  private void printStateComparisonTable(final File outputFile)
+    throws IOException
   {
     final OutputStream stream = new FileOutputStream(outputFile);
     final PrintWriter writer = new PrintWriter(stream);
-    final Map <String, Result> automataMap = mResults.get(0);
     for (final Map.Entry<String,ModelInfo> entry : mModelInfoMap.entrySet()) {
       final String name = entry.getKey();
       final ModelInfo info = entry.getValue();
@@ -269,8 +275,9 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
           final int totTrans = result.getTotalTransition();
           final double time = result.getTime();
           final int memory = result.getMemory();
-          text = " & " + totStates + " & " + totTrans + " & " + String.format((Locale) null, "%.2f\\,s", time)
-            + " & " + memory;
+          text = " & " + totStates + " & " + totTrans + " & " +
+                 String.format((Locale) null, "%.2f\\,s", time) + " & " +
+                 memory;
           System.out.print(text);
           writer.print(text);
         }
@@ -282,6 +289,9 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
     writer.close();
   }
 
+
+  //#########################################################################
+  //# Auxiliary Methods
   private int findIndex(final String[] array, final String label)
   {
     for (int i = 0; i < array.length; i++) {
@@ -292,10 +302,13 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
     return -1;
   }
 
+
   //#########################################################################
-  //# Inner class
+  //# Inner Class Configuration
   private static class Configuration
   {
+    //#######################################################################
+    //# Constructor
     private Configuration(final AbstractCompositionalSynthesizer synthesizer,
                           final AbstractionProcedureCreator factory)
     {
@@ -303,6 +316,8 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
       mFactory = factory;
     }
 
+    //#######################################################################
+    //# Overrides for java.lang.Object
     @Override
     public String toString()
     {
@@ -317,29 +332,21 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
       return name;
     }
 
-    @SuppressWarnings("unused")
-    private int getIndex()
-    {
-      final String name = ProxyTools.getShortClassName(mSynthesizer);
-      if (name.indexOf("StateRepresentation") >= 0) {
-        return STATE_REPRESENTATION;
-      } else {
-        return COMPOSITIONAL;
-      }
-    }
-
     //#######################################################################
-    //# Data members
+    //# Data Members
     private final AbstractCompositionalSynthesizer mSynthesizer;
     private final AbstractionProcedureCreator mFactory;
   }
 
 
   //#########################################################################
-  //# Inner class ModelInfo
+  //# Inner Class ModelInfo
   private static class ModelInfo
   {
-    ModelInfo(final String fullName, final String shortName, final boolean controllable,
+    //#######################################################################
+    //# Constructor
+    ModelInfo(final String fullName, final String shortName,
+              final boolean controllable,
               final boolean nonblocking, final String size)
     {
       mFullName = fullName;
@@ -349,13 +356,17 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
       mSize = size;
     }
 
+    //#######################################################################
+    //# Simple Access
     private String getTableText()
     {
-      return mShortName + " & " + mControllable + " & " + mNonblocking + " & " + mSize;
+      return mShortName + " & " + mControllable + " & " + mNonblocking +
+             " & " + mSize;
     }
 
     //#######################################################################
-    //# Data members
+    //# Data Members
+    @SuppressWarnings("unused")
     private final String mFullName;
     private final String mShortName;
     private final boolean mControllable;
@@ -365,9 +376,12 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
 
 
   //#########################################################################
-  //# Inner class Result
+  //# Inner Class Result
   private static class Result
   {
+
+    //#######################################################################
+    //# Constructor
     private Result(final String name, final double time, final int totStates,
                    final int totTrans, final int memory,
                    final String heuristics)
@@ -405,9 +419,9 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
       return mHeuristics;
     }
 
-
     //#######################################################################
-    //# Data members
+    //# Data Members
+    @SuppressWarnings("unused")
     private final String mName;
     private final double mTime;
     private final int mTotStates;
@@ -430,15 +444,10 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
 
 
   //#######################################################################
-  //# Data members
+  //# Data Members
   private final Map<String, ModelInfo> mModelInfoMap =
     new TreeMap<String, ModelInfo>(new LowerCaseComparator());
   private final List<Map<String,Result>> mResults =
     new ArrayList<Map<String,Result>>(2);
-
-  //#######################################################################
-  //# Class Constants
-  private static final int COMPOSITIONAL = 0;
-  private static final int STATE_REPRESENTATION = 1;
 
 }

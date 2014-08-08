@@ -12,7 +12,6 @@ package net.sourceforge.waters.analysis.compositional;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer.PreselectingMethod;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
@@ -55,27 +54,27 @@ public class SelfRunningExperimentCompositionalSynthesis
                           StateRepresentationSynthesisAbstractionProcedureFactory.WSOE_UNSUP);
       configurations.add(configStateRepresent);
       final AbstractCompositionalModelAnalyzer.PreselectingMethodFactory
-      preselectingFactory = automataSynthesizer.getPreselectingMethodFactory();
+        preselectingFactory = automataSynthesizer.getPreselectingMethodFactory();
       final CompositionalSelectionHeuristicFactory selectionFactory =
         automataSynthesizer.getSelectionHeuristicFactory();
-      int methodCount = 0;
-      final PreselectingMethod[] preSelectingMethods = new PreselectingMethod[] {
-          AbstractCompositionalModelAnalyzer.MustL
+//      final PreselectingMethod[] preSelectingMethods = new PreselectingMethod[] {
+//          AbstractCompositionalModelAnalyzer.MustL,
 //          AbstractCompositionalModelAnalyzer.Pairs
-      };
-      final SelectionHeuristicCreator[] selectingMethods = new SelectionHeuristicCreator[] {
-        CompositionalSelectionHeuristicFactory.MaxL
+//      };
+//      final SelectionHeuristicCreator[] selectingMethods = new SelectionHeuristicCreator[] {
+//        CompositionalSelectionHeuristicFactory.MaxL,
 //        CompositionalSelectionHeuristicFactory.MinS,
 //        CompositionalSelectionHeuristicFactory.MinF
-      };
-//      for (final AbstractCompositionalModelAnalyzer.PreselectingMethod
-//           preselectingMethod : preselectingFactory.getEnumConstants()) {
-//        for (final SelectionHeuristicCreator
-//             selectingMethod: selectionFactory.getEnumConstants()) {
+//      };
+      int methodCount = 0;
       for (final AbstractCompositionalModelAnalyzer.PreselectingMethod
-           preselectingMethod : preSelectingMethods) {
+           preselectingMethod : preselectingFactory.getEnumConstants()) {
         for (final SelectionHeuristicCreator
-             selectingMethod: selectingMethods) {
+             selectingMethod: selectionFactory.getEnumConstants()) {
+//      for (final AbstractCompositionalModelAnalyzer.PreselectingMethod
+//           preselectingMethod : preSelectingMethods) {
+//        for (final SelectionHeuristicCreator
+//             selectingMethod: selectingMethods) {
           methodCount++;
           for (final Configuration config: configurations) {
             final AbstractCompositionalSynthesizer synthesizer = config.getSynthesizer();

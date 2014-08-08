@@ -324,6 +324,8 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     runModel("tests", "incremental_suite", "aip0aip.wmod");
   }
 
+  // This one cannot be solved yet ...
+  @SuppressWarnings("unused")
   private void synthesiseAip0though() throws Exception
   {
     runModel("tests", "incremental_suite", "aip0tough.wmod");
@@ -340,6 +342,8 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     runModel("tests", "incremental_suite", "tbed_noderailb.wmod");
   }
 
+  // This one does not have a solution.
+  @SuppressWarnings("unused")
   private void synthesiseTbedCtct() throws Exception
   {
     runModel("tests", "incremental_suite", "tbed_ctct.wmod");
@@ -448,6 +452,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     runModel("tests", "6link", "6linkre.wmod");
   }
 
+  @SuppressWarnings("unused")
   private boolean synthesisTransferline(final int n) throws Exception
   {
     final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
