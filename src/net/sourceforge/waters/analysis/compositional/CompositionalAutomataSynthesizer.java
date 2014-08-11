@@ -484,7 +484,7 @@ public class CompositionalAutomataSynthesizer
     }
   }
 
-  void recordDistinuisherInfo(final Map<EventProxy,List<EventProxy>> renamings,
+  void recordDistinguisherInfo(final Map<EventProxy,List<EventProxy>> renamings,
                               final AutomatonProxy distinguisherAutomaton)
   {
     final DistinguisherInfo info = new DistinguisherInfo(distinguisherAutomaton);
@@ -563,6 +563,7 @@ public class CompositionalAutomataSynthesizer
     }
     mHalfwaySimplifier.setDefaultMarkingID(defaultID);
     mHalfwaySimplifier.run();
+    // TODO Reachability check correct?
     result.addMonolithicAnalysisResult(null);
     final ListBufferTransitionRelation supervisor =
       mHalfwaySimplifier.getTransitionRelation();

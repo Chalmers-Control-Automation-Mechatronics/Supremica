@@ -183,6 +183,7 @@ public class ListBufferTransitionRelation
     final int numEvents = eventEnc.getNumberOfProperEvents();
     final int numStates = stateEnc.getNumberOfStatesIncludingExtra();
     final int numTrans = aut.getTransitions().size();
+    // TODO Fig bug: check whether events are in automaton. 
     mEventStatus = new byte[numEvents];
     for (int e = 0; e < numEvents; e++) {
       byte status = eventEnc.getProperEventStatus(e);

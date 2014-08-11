@@ -402,6 +402,20 @@ public abstract class AbstractSupervisorSynthesizerTest
     runSynthesizer(des, true);
   }
 
+  public void testSelfloop1() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "selfloop1.wmod");
+    runSynthesizer(des, true);
+  }
+
+  public void testSelfloop2() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "selfloop2.wmod");
+    runSynthesizer(des, true);
+  }
+
   public void testSimpleManufacturingSystem() throws Exception
   {
     final ProductDESProxy des =

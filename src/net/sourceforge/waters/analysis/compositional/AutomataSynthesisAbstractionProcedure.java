@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.compositional;
 
 import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.sourceforge.waters.analysis.abstraction.CertainUnsupervisabilityTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
@@ -206,7 +208,7 @@ public class AutomataSynthesisAbstractionProcedure extends
           final AutomatonProxy distinguisher =
             createDistinguisher(before, originalEnc, renaming,
                                 inputStateEnc, partition);
-          synthesizer.recordDistinuisherInfo(renaming, distinguisher);
+          synthesizer.recordDistinguisherInfo(renaming, distinguisher);
           synthesizer.reportAbstractionResult(abstractedAut, distinguisher);
         }
         reportAutomaton("abstraction", abstractedAut);
@@ -580,8 +582,21 @@ public class AutomataSynthesisAbstractionProcedure extends
         mode != HalfWaySynthesisTRSimplifier.OutputMode.ABSTRACTION) {
       return null;
     }
-    return new ListBufferTransitionRelation
+    final ListBufferTransitionRelation sup = new ListBufferTransitionRelation
       (supervisorAut, eventEnc, outputStateEnc, config);
+    // TODO Move the following cleanup into ListBufferTransitionRelation
+    // constructor. But beware other callers may not like it ...
+    final int numEvents = eventEnc.getNumberOfProperEvents();
+    final Set<EventProxy> events = new THashSet<>(supervisorAut.getEvents());
+    for (int e = EventEncoding.NONTAU; e <numEvents; e++) {
+      final EventProxy event = eventEnc.getProperEvent(e);
+      if (!events.contains(event)) {
+        final byte status =
+          (byte) (sup.getProperEventStatus(e) | EventEncoding.STATUS_UNUSED);
+        sup.setProperEventStatus(e, status);
+      }
+    }
+    return sup;
   }
 
   private AutomatonProxy createPseudoSupervisorAut
