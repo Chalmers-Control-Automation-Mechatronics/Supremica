@@ -657,15 +657,15 @@ Reference:
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point X="240" Y="160"/>
+                            <Point X="176" Y="64"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="20" Y="20"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="0">
                         <PointGeometry>
-                            <Point X="80" Y="80"/>
+                            <Point X="288" Y="480"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="20" Y="20"/>
@@ -673,7 +673,7 @@ Reference:
                     </SimpleNode>
                     <SimpleNode Name="1">
                         <PointGeometry>
-                            <Point X="160" Y="80"/>
+                            <Point X="192" Y="496"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="20" Y="20"/>
@@ -681,7 +681,7 @@ Reference:
                     </SimpleNode>
                     <SimpleNode Name="2">
                         <PointGeometry>
-                            <Point X="240" Y="80"/>
+                            <Point X="80" Y="496"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="20" Y="20"/>
@@ -689,7 +689,7 @@ Reference:
                     </SimpleNode>
                     <SimpleNode Name="3">
                         <PointGeometry>
-                            <Point X="320" Y="80"/>
+                            <Point X="82" Y="416"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="20" Y="20"/>
@@ -697,7 +697,7 @@ Reference:
                     </SimpleNode>
                     <SimpleNode Name="4">
                         <PointGeometry>
-                            <Point X="400" Y="80"/>
+                            <Point X="70" Y="290"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="20" Y="20"/>
@@ -705,7 +705,7 @@ Reference:
                     </SimpleNode>
                     <SimpleNode Name="5">
                         <PointGeometry>
-                            <Point X="80" Y="160"/>
+                            <Point X="56" Y="165"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="20" Y="20"/>
@@ -713,39 +713,39 @@ Reference:
                     </SimpleNode>
                     <SimpleNode Name="6">
                         <PointGeometry>
-                            <Point X="160" Y="160"/>
+                            <Point X="64" Y="80"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="20" Y="20"/>
+                            <Point X="5" Y="2"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="8">
                         <PointGeometry>
-                            <Point X="320" Y="160"/>
+                            <Point X="288" Y="64"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="20" Y="20"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="9">
                         <PointGeometry>
-                            <Point X="400" Y="160"/>
+                            <Point X="288" Y="176"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="20" Y="20"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="10">
                         <PointGeometry>
-                            <Point X="80" Y="240"/>
+                            <Point X="288" Y="288"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="20" Y="20"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="11">
                         <PointGeometry>
-                            <Point X="160" Y="240"/>
+                            <Point X="288" Y="384"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="20" Y="20"/>
@@ -753,7 +753,7 @@ Reference:
                     </SimpleNode>
                     <SimpleNode Name="12">
                         <PointGeometry>
-                            <Point X="240" Y="240"/>
+                            <Point X="446" Y="409"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="20" Y="20"/>
@@ -761,7 +761,7 @@ Reference:
                     </SimpleNode>
                     <SimpleNode Name="14">
                         <PointGeometry>
-                            <Point X="320" Y="240"/>
+                            <Point X="536" Y="249"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="20" Y="20"/>
@@ -769,23 +769,23 @@ Reference:
                     </SimpleNode>
                     <SimpleNode Name="15">
                         <PointGeometry>
-                            <Point X="400" Y="240"/>
+                            <Point X="499" Y="164"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="20" Y="20"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="16">
                         <PointGeometry>
-                            <Point X="80" Y="320"/>
+                            <Point X="415" Y="107"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="20" Y="20"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="17">
                         <PointGeometry>
-                            <Point X="160" Y="320"/>
+                            <Point X="160" Y="304"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="20" Y="20"/>
@@ -793,7 +793,7 @@ Reference:
                     </SimpleNode>
                     <SimpleNode Name="18">
                         <PointGeometry>
-                            <Point X="240" Y="320"/>
+                            <Point X="160" Y="272"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="20" Y="20"/>
@@ -801,7 +801,7 @@ Reference:
                     </SimpleNode>
                     <SimpleNode Name="13">
                         <PointGeometry>
-                            <Point X="320" Y="320"/>
+                            <Point X="517" Y="339"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="20" Y="20"/>
@@ -816,22 +816,31 @@ Reference:
                                 <Point X="-50" Y="-5"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="223" Y="275"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="16" Target="8">
                         <LabelBlock>
                             <SimpleIdentifier Name="t2_en_Sw8_at26"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="74" Y="-71"/>
+                                <Point X="-4" Y="-13"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="355" Y="81"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="17" Target="4">
                         <LabelBlock>
                             <SimpleIdentifier Name="t2_en_Sw4:6_at10"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="75" Y="-101"/>
+                                <Point X="-74" Y="-2"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="109" Y="303"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="11" Target="0">
                         <LabelBlock>
@@ -845,7 +854,7 @@ Reference:
                         <LabelBlock>
                             <SimpleIdentifier Name="t2_lv_Sw8_at14"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-1" Y="-18"/>
+                                <Point X="-38" Y="-2"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -856,6 +865,9 @@ Reference:
                                 <Point X="-1" Y="-18"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="118" Y="64"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="7" Target="8">
                         <LabelBlock>
@@ -864,6 +876,9 @@ Reference:
                                 <Point X="-1" Y="-18"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="231" Y="58"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="5" Target="6">
                         <LabelBlock>
@@ -872,6 +887,9 @@ Reference:
                                 <Point X="-1" Y="-18"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="54" Y="121"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="13" Target="14">
                         <LabelBlock>
@@ -880,14 +898,20 @@ Reference:
                                 <Point X="-18" Y="1"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="532" Y="295"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="15" Target="16">
                         <LabelBlock>
                             <SimpleIdentifier Name="t2_lv_II_at26"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-115" Y="47"/>
+                                <Point X="9" Y="-13"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="460" Y="132"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="10" Target="11">
                         <LabelBlock>
@@ -904,6 +928,9 @@ Reference:
                                 <Point X="21" Y="-5"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="223" Y="300"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="12" Target="13">
                         <LabelBlock>
@@ -912,6 +939,9 @@ Reference:
                                 <Point X="21" Y="-5"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="486" Y="378"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="14" Target="15">
                         <LabelBlock>
@@ -920,28 +950,37 @@ Reference:
                                 <Point X="-1" Y="-18"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="522" Y="205"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="4" Target="18">
                         <LabelBlock>
                             <SimpleIdentifier Name="t2_lv_Sw4:6_at6"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-41" Y="94"/>
+                                <Point X="-66" Y="-17"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="108" Y="275"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="4" Target="5">
                         <LabelBlock>
                             <SimpleIdentifier Name="t2_lv_Sw4:6_at11"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-115" Y="47"/>
+                                <Point X="0" Y="-17"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="55" Y="227"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="9" Target="10">
                         <LabelBlock>
                             <SimpleIdentifier Name="t2_en_Sw5:7_at14"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-115" Y="47"/>
+                                <Point X="0" Y="-10"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -952,6 +991,9 @@ Reference:
                                 <Point X="-1" Y="-18"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="135" Y="503"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="2" Target="3">
                         <LabelBlock>
@@ -960,6 +1002,9 @@ Reference:
                                 <Point X="-1" Y="-18"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="76" Y="456"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="3" Target="4">
                         <LabelBlock>
@@ -968,6 +1013,9 @@ Reference:
                                 <Point X="-1" Y="-18"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="69" Y="355"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="0" Target="1">
                         <LabelBlock>
@@ -976,14 +1024,20 @@ Reference:
                                 <Point X="-1" Y="-18"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="240" Y="493"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="0" Target="12">
                         <LabelBlock>
                             <SimpleIdentifier Name="t2_lv_Sw3_at19"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="61" Y="35"/>
+                                <Point X="8" Y="2"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="372" Y="451"/>
+                        </SplineGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>
@@ -2755,7 +2809,7 @@ Reference:
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <Instance ModuleName="switch8nosup" Name="Low Level Switch8">
+        <Instance ModuleName="switch8nosup" Name="switch8">
             <ParameterBinding Name=":accepting">
                 <SimpleIdentifier Name=":accepting"/>
             </ParameterBinding>
@@ -2778,7 +2832,7 @@ Reference:
                 <SimpleIdentifier Name="t2_lv_Sw8_at14"/>
             </ParameterBinding>
         </Instance>
-        <Instance ModuleName="sec46nosup" Name="Low Level Sec4:6">
+        <Instance ModuleName="sec46nosup" Name="sec46">
             <ParameterBinding Name=":accepting">
                 <SimpleIdentifier Name=":accepting"/>
             </ParameterBinding>
@@ -2801,7 +2855,7 @@ Reference:
                 <SimpleIdentifier Name="t2_lv_Sw4:6_at6"/>
             </ParameterBinding>
         </Instance>
-        <Instance ModuleName="sec57nosup" Name="Low Level Sec5:7">
+        <Instance ModuleName="sec57nosup" Name="sec57">
             <ParameterBinding Name=":accepting">
                 <SimpleIdentifier Name=":accepting"/>
             </ParameterBinding>
@@ -2824,7 +2878,7 @@ Reference:
                 <SimpleIdentifier Name="t2_lv_Sw5:7_at5"/>
             </ParameterBinding>
         </Instance>
-        <Instance ModuleName="switch3nosup" Name="Low Level Switch3">
+        <Instance ModuleName="switch3nosup" Name="switch3">
             <ParameterBinding Name=":accepting">
                 <SimpleIdentifier Name=":accepting"/>
             </ParameterBinding>
@@ -2847,7 +2901,7 @@ Reference:
                 <SimpleIdentifier Name="t2_lv_Sw3_at19"/>
             </ParameterBinding>
         </Instance>
-        <Instance ModuleName="Low Level II" Name="Low Level II">
+        <Instance ModuleName="Low Level II" Name="ll2">
             <ParameterBinding Name=":accepting">
                 <SimpleIdentifier Name=":accepting"/>
             </ParameterBinding>
@@ -2864,7 +2918,7 @@ Reference:
                 <SimpleIdentifier Name="t2_lv_II_at26"/>
             </ParameterBinding>
         </Instance>
-        <Instance ModuleName="Low Level Crane1" Name="Low Level Crane1">
+        <Instance ModuleName="Low Level Crane1" Name="crane1">
             <ParameterBinding Name=":accepting">
                 <SimpleIdentifier Name=":accepting"/>
             </ParameterBinding>
@@ -2881,7 +2935,7 @@ Reference:
                 <SimpleIdentifier Name="t2_lv_Cr1_at15"/>
             </ParameterBinding>
         </Instance>
-        <Instance ModuleName="Low Level Crane2" Name="Low Level Crane2">
+        <Instance ModuleName="Low Level Crane2" Name="crane2">
             <ParameterBinding Name=":accepting">
                 <SimpleIdentifier Name=":accepting"/>
             </ParameterBinding>
@@ -2898,7 +2952,7 @@ Reference:
                 <SimpleIdentifier Name="t2_lv_Cr2_at2"/>
             </ParameterBinding>
         </Instance>
-        <Instance ModuleName="Low Level Crane3" Name="Low Level Crane3">
+        <Instance ModuleName="Low Level Crane3" Name="crane3">
             <ParameterBinding Name=":accepting">
                 <SimpleIdentifier Name=":accepting"/>
             </ParameterBinding>

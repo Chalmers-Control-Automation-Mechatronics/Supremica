@@ -117,6 +117,18 @@ public abstract class SelectionHeuristic<T>
   {
   }
 
+  /**
+   * Returns whether this comparator is guaranteed to make a proper decision
+   * for every two candidates. Most heuristics are not decisive because
+   * the heuristic values of structurally isomorphic candidates usually are
+   * equal. A decisive heuristic has to compare candidates by name as a final
+   * resort.
+   * @return <CODE>false</CODE>.
+   */
+  protected boolean isDecisive()
+  {
+    return false;
+  }
 
   //#########################################################################
   //# Interface java.lang.Cloneable
