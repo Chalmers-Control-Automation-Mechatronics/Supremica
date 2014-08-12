@@ -46,22 +46,8 @@ class EventRemovalStep extends AbstractionStep
    *                   matching those of results. The automaton at position
    *                   <I>i</I> in originals is replaced by the automaton
    *                   at the same position in results.
-   */
-  EventRemovalStep(final AbstractCompositionalModelAnalyzer analyzer,
-                   final List<AutomatonProxy> results,
-                   final List<AutomatonProxy> originals)
-  {
-    this(analyzer, results, originals, null);
-  }
-
-  /**
-   * Creates a new event removal step.
-   * @param  analyzer  The model analyser that owns this abstraction step.
-   * @param  results   List of automata after event removal.
-   * @param  originals List of automata before removal, with indexes
-   *                   matching those of results. The automaton at position
-   *                   <I>i</I> in originals is replaced by the automaton
-   *                   at the same position in results.
+   * @param  stateMap  If states have been replaced during event removal,
+   *                   this map contains mappings from old to new states.
    * @param  failing   Collection of failing events or <CODE>null</CODE>.
    *                   Failing events need special (slow) treatment in
    *                   trace expansion.
@@ -69,14 +55,32 @@ class EventRemovalStep extends AbstractionStep
   EventRemovalStep(final AbstractCompositionalModelAnalyzer analyzer,
                    final List<AutomatonProxy> results,
                    final List<AutomatonProxy> originals,
+                   final Map<StateProxy,StateProxy> stateMap,
                    final Collection<EventProxy> failing)
   {
     super(analyzer, results, originals);
+    mStateMap = stateMap;
     if (failing == null || failing.isEmpty()){
       mFailingEvents = null;
     } else {
       mFailingEvents = failing;
     }
+  }
+
+
+  //#######################################################################
+  //# Simple Access
+  public Map<StateProxy,StateProxy> getStateMap()
+  {
+    return mStateMap;
+  }
+
+  public void addAutomatonPair(final AutomatonProxy result,
+                               final AutomatonProxy original,
+                               final Map<StateProxy,StateProxy> stateMap)
+  {
+    addAutomatonPair(result, original);
+    mStateMap.putAll(stateMap);
   }
 
 
@@ -144,18 +148,11 @@ class EventRemovalStep extends AbstractionStep
                              final Map<StateProxy,StateProxy> stateMap)
   {
     if (result != original) {
-      final Collection<StateProxy> originalStates = original.getStates();
-      final Collection<StateProxy> resultStates = result.getStates();
-      StateProxy originalState = originalStates.iterator().next();
-      StateProxy resultState = resultStates.iterator().next();
-      if (resultState != originalState) {
-        final Iterator<StateProxy> originalStatesIter =
-          originalStates.iterator();
-        final Iterator<StateProxy> resultStatesIter =
-          resultStates.iterator();
-        while (originalStatesIter.hasNext()) {
-          originalState = originalStatesIter.next();
-          resultState = resultStatesIter.next();
+      for (final StateProxy originalState : original.getStates()) {
+        final StateProxy resultState = mStateMap.get(originalState);
+        if (resultState == null) {
+          stateMap.put(originalState, originalState);
+        } else {
           stateMap.put(resultState, originalState);
         }
       }
@@ -187,6 +184,7 @@ class EventRemovalStep extends AbstractionStep
 
   //#######################################################################
   //# Data Members
+  private final Map<StateProxy,StateProxy> mStateMap;
   private final Collection<EventProxy> mFailingEvents;
 
 }

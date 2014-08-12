@@ -951,8 +951,8 @@ public abstract class AbstractCompositionalModelAnalyzer
    *         after all.
    * @see #removeRedundantEvents()
    */
-  protected AbstractionStep removeEvents(final Set<EventProxy> removed,
-                                         final Set<EventProxy> failing)
+  protected EventRemovalStep removeEvents(final Set<EventProxy> removed,
+                                          final Set<EventProxy> failing)
     throws AnalysisException
   {
     if (removed.isEmpty() && failing.isEmpty()) {
@@ -967,9 +967,10 @@ public abstract class AbstractCompositionalModelAnalyzer
         new ArrayList<AutomatonProxy>(numAutomata);
       final ListIterator<AutomatonProxy> iter =
         mCurrentAutomata.listIterator();
+      final Map<StateProxy,StateProxy> stateMap = new HashMap<>();
       while (iter.hasNext()) {
         final AutomatonProxy aut = iter.next();
-        final AutomatonProxy newAut = removeEvents(aut, removed);
+        final AutomatonProxy newAut = removeEvents(aut, removed, stateMap);
         if (newAut != aut) {
           originals.add(aut);
           results.add(newAut);
@@ -1003,7 +1004,8 @@ public abstract class AbstractCompositionalModelAnalyzer
       stats.addRedundantEvents(numRemoved);
       final int numFailing = failing.size();
       stats.addFailingEvents(numFailing);
-      return new EventRemovalStep(this, results, originals, failing);
+      return
+        new EventRemovalStep(this, results, originals, stateMap, failing);
     }
   }
 
@@ -1012,15 +1014,18 @@ public abstract class AbstractCompositionalModelAnalyzer
    * redundant events from an automaton.
    * @param  aut      An automaton to be simplified.
    * @param  removed  Set of events to be removed.
+   * @param  stateMap If states have to be replaced, mappings from old
+   *                  to new states are added to this map.
    * @return New automaton representing result of event removal.
    *         May be the same as the input automaton, if no events can be
    *         removed.
    */
-  protected AutomatonProxy removeEvents(final AutomatonProxy aut,
-                                        final Set<EventProxy> removed)
+  protected AutomatonProxy removeEvents
+    (final AutomatonProxy aut, final Set<EventProxy> removed,
+     final Map<StateProxy,StateProxy> stateMap)
     throws AnalysisException
   {
-    return removeEvents(aut, removed, null);
+    return removeEvents(aut, removed, stateMap, null);
   }
 
   /**
@@ -1390,15 +1395,17 @@ public abstract class AbstractCompositionalModelAnalyzer
    * redundant events from an automaton.
    * @param  aut       An automaton to be simplified.
    * @param  removed   Set of events to be removed.
+   * @param  stateMap  If states have to be replaced, mappings from old
+   *                   to new states are added to this map.
    * @param  dumpState Dump state to be used for failing events,
    *                   or <CODE>null</CODE>.
    * @return New automaton representing result of event removal.
    *         May be the same as the input automaton, if no events can be
    *         removed.
    */
-  private AutomatonProxy removeEvents(final AutomatonProxy aut,
-                                      Set<EventProxy> removed,
-                                      StateProxy dumpState)
+  private AutomatonProxy removeEvents
+    (final AutomatonProxy aut, Set<EventProxy> removed,
+     final Map<StateProxy,StateProxy> stateMap, StateProxy dumpState)
     throws AnalysisException
   {
     checkAbort();
@@ -1521,8 +1528,9 @@ public abstract class AbstractCompositionalModelAnalyzer
           } else {
             // The marking proposition is not in the alphabet ...
             dumpState = factory.createStateProxy(":dump");
-            final AutomatonProxy copy = markStatesAndAddDump(aut, dumpState);
-            return removeEvents(copy, removed, dumpState);
+            final AutomatonProxy copy =
+              markStatesAndAddDump(aut, dumpState, stateMap);
+            return removeEvents(copy, removed, stateMap, dumpState);
           }
         }
         if (trans.getTarget() == dumpState) {
@@ -1549,8 +1557,9 @@ public abstract class AbstractCompositionalModelAnalyzer
     return newAut;
   }
 
-  private AutomatonProxy markStatesAndAddDump(final AutomatonProxy aut,
-                                              final StateProxy dump)
+  private AutomatonProxy markStatesAndAddDump
+    (final AutomatonProxy aut, final StateProxy dump,
+     final Map<StateProxy,StateProxy> stateMap)
   {
     final ProductDESProxyFactory factory = getFactory();
     final EventProxy defaultMarking = getUsedDefaultMarking();
@@ -1560,7 +1569,6 @@ public abstract class AbstractCompositionalModelAnalyzer
     newEvents.add(defaultMarking);
     final Collection<StateProxy> states = aut.getStates();
     final Collection<StateProxy> newStates = new ArrayList<>(states.size() + 1);
-    final Map<StateProxy,StateProxy> stateMap = new HashMap<>(states.size());
     for (final StateProxy state : states) {
       final String name = state.getName();
       final boolean init = state.isInitial();

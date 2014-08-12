@@ -13,7 +13,6 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest;
-import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -40,37 +39,19 @@ public class CompositionalStateRepresentationSynthesizerMustLMinSTest
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
   @Override
-  protected AbstractCompositionalSynthesizer createSynthesizer
+  protected CompositionalStateRepresentationSynthesizer createSynthesizer
     (final ProductDESProxyFactory factory)
   {
-    @SuppressWarnings("unused")
-    final CompositionalStateRepresentationSynthesizer synthesizerSR =
+    final CompositionalStateRepresentationSynthesizer synthesizer =
       new CompositionalStateRepresentationSynthesizer(factory,
-          StateRepresentationSynthesisAbstractionProcedureFactory.NO_TRANSITIONREMOVAL);
-    final CompositionalAutomataSynthesizer synthesizerAut =
-      new CompositionalAutomataSynthesizer(factory,
-          AutomataSynthesisAbstractionProcedureFactory.WSOE);
-    final AbstractCompositionalSynthesizer synthesizer = synthesizerAut;
-    synthesizer.setInternalStateLimit(20000);
-    synthesizer.setMonolithicStateLimit(1000000);
-    synthesizer.setInternalTransitionLimit(1000000);
-    synthesizer.setMonolithicTransitionLimit(5000000);
-    synthesizer.setPreselectingMethod(AbstractCompositionalModelAnalyzer.Pairs);
+          StateRepresentationSynthesisAbstractionProcedureFactory.WSOE);
+    synthesizer.setInternalStateLimit(5000);
+    synthesizer.setMonolithicStateLimit(100000);
+    synthesizer.setInternalTransitionLimit(500000);
+    synthesizer.setPreselectingMethod(AbstractCompositionalModelAnalyzer.MustL);
     synthesizer.setSelectionHeuristic
-      (CompositionalSelectionHeuristicFactory.MinSync);
-    synthesizer.setDetailedOutputEnabled(false);
-    synthesizer.setFailingEventsEnabled(false);
+      (CompositionalSelectionHeuristicFactory.MinS);
     return synthesizer;
-  }
-
-
-  //#########################################################################
-  //# Test Cases --- just debugging
-  public void testTbedHisc1() throws Exception
-  {
-    final ProductDESProxy des =
-      getCompiledDES("despot", "tbed_hisc", "tbed_hisc1.wmod");
-    runSynthesizer(des, true);
   }
 
 }

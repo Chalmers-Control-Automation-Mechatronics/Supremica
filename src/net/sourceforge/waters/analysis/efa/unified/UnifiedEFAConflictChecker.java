@@ -1618,10 +1618,13 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       if (!primedVariables.isEmpty()) {
         return createVariablesCandidate(primedVariables);
       }
-      final Collection<VariableInfo> onlyVariables = collectOnlyVariablesOfUpdates();
+      /*
+      final Collection<VariableInfo> onlyVariables =
+        collectOnlyVariablesOfUpdates();
       if (!onlyVariables.isEmpty()) {
         return createVariablesCandidate(onlyVariables);
       }
+      */
       if (mUsesLocalVariable) {
         final Collection<VariableInfo> localVars = collectLocalVariables();
         if (!localVars.isEmpty()) {
@@ -1697,12 +1700,13 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       return candidates;
     }
 
+    @SuppressWarnings("unused")
     private Collection<VariableInfo> collectOnlyVariablesOfUpdates()
     {
       final Collection<VariableInfo> candidates = new THashSet<>();
       for (final EventInfo event : mEventInfoMap.values()) {
         final Collection<VariableInfo> vars = event.getVariables();
-        if (vars.size()==1) {
+        if (vars.size() == 1) {
           final VariableInfo var = vars.iterator().next();
           candidates.add(var);
         }

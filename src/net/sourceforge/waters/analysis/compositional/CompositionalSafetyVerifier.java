@@ -16,8 +16,10 @@ import gnu.trove.set.hash.THashSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -36,6 +38,7 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
@@ -214,22 +217,23 @@ public class CompositionalSafetyVerifier
   }
 
   @Override
-  protected AbstractionStep removeEvents(final Set<EventProxy> removed,
-                                         final Set<EventProxy> failing)
+  protected EventRemovalStep removeEvents(final Set<EventProxy> removed,
+                                          final Set<EventProxy> failing)
     throws AnalysisException
   {
-    final AbstractionStep step = super.removeEvents(removed, failing);
+    final EventRemovalStep step = super.removeEvents(removed, failing);
     if (step != null) {
       final ListIterator<AutomatonProxy> iter = mProperties.listIterator();
       while (iter.hasNext()) {
+        final Map<StateProxy,StateProxy> stateMap = new HashMap<>();
         final AutomatonProxy aut = iter.next();
-        final AutomatonProxy newAut = removeEvents(aut, removed);
+        final AutomatonProxy newAut = removeEvents(aut, removed, stateMap);
         if (newAut == aut) {
           continue;
         } else if (isTrivialProperty(newAut)) {
           iter.remove();
         } else {
-          step.addAutomatonPair(newAut, aut);
+          step.addAutomatonPair(newAut, aut, stateMap);
           iter.set(newAut);
         }
       }
