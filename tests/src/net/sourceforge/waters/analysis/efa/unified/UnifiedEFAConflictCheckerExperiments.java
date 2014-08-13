@@ -103,9 +103,9 @@ public class UnifiedEFAConflictCheckerExperiments
   private void runAllTests() throws Exception
   {
     final long start = System.currentTimeMillis();
-    runAllTests(new BDDConflictCheckerWrapper());
+//    runAllTests(new BDDConflictCheckerWrapper());
     runAllTests(new UnifiedEFAConflictCheckerWrapper());
-    runAllTests(new CompositionalConflictCheckerWrapper());
+//    runAllTests(new CompositionalConflictCheckerWrapper());
     final long finish = System.currentTimeMillis();
     printAndLog(start, finish);
   }
@@ -117,18 +117,50 @@ public class UnifiedEFAConflictCheckerExperiments
     mPrintWriter.println(wrapper.getName());
     mHasBeenPrinted = false;
     mConflictCheckerWrapper = wrapper;
+    for (int c = 2; c <= 3; c += 1) {
+      try {
+        for (int n = 50; n <= 50; n += 5) {
+          checkPML("pml3", c, n, true);
+//          checkPML("pml4", c, n, true);
+        }
+      } catch (final AnalysisException | EvalException exception) {
+        // next please ...
+      }
+    }
     try {
-      testCaseStudy();
-      testCaseStudyNonblocking();
+      testPrimeSieve4b();
+      testPrimeSieve4();
+      if (!(wrapper instanceof BDDConflictCheckerWrapper)) {
+//        testPrimeSieve5();
+        // CUDD locks up after 56 iterations in relprod (?)
+        testPrimeSieve6();
+//        testPrimeSieve7();
+        testPrimeSieve8();
+      }
+    } catch (final AnalysisException | EvalException exception) {
+      // next please ...
+    }
+
+    try {
+//      testCaseStudy();
+//      testCaseStudyNonblocking();
       testProductionCell();
     } catch (final AnalysisException | EvalException exception) {
       // next please ...
     }
     try {
-      testPslBigWithManyRestartTrans();
+      for (int maxseqno = 127; maxseqno <= 255; maxseqno += 128) {
+        checkProfisafe("profisafe_ihost_efa_block", maxseqno, false);
+      }
     } catch (final AnalysisException | EvalException exception) {
       // next please ...
     }
+    try {
+      testPslBig();
+    } catch (final AnalysisException | EvalException exception) {
+      // next please ...
+    }
+
     try {
       testPslBigBlocking();
     } catch (final AnalysisException | EvalException exception) {
@@ -139,11 +171,17 @@ public class UnifiedEFAConflictCheckerExperiments
     } catch (final AnalysisException | EvalException exception) {
       // next please ...
     }
+    try {
+      testPslBigWithManyRestartTrans();
+    } catch (final AnalysisException | EvalException exception) {
+      // next please ...
+    }
     if (!(wrapper instanceof BDDConflictCheckerWrapper)) {
+
       for (int m = 3; m <= 4; m += 1) {
         try {
-          for (int n = 100; n <= 500; n+= 100) {
-            checkTransferLineRework("transferline_efsm_rework", m, n, true);
+          for (int n = 500; n <= 500; n+= 100) {
+            checkTransferLineRework("transferline_efsm_rework_block", m, n, false);
           }
         } catch (final AnalysisException | EvalException exception) {
           // next please ...
@@ -151,8 +189,8 @@ public class UnifiedEFAConflictCheckerExperiments
       }
       for (int m = 3; m <= 4; m += 1) {
         try {
-          for (int n = 100; n <= 500; n+= 100) {
-            checkTransferLineRework("transferline_efsm_rework_block", m, n, false);
+          for (int n = 500; n <= 500; n+= 100) {
+            checkTransferLineRework("transferline_efsm_rework", m, n, true);
           }
         } catch (final AnalysisException | EvalException exception) {
           // next please ...
@@ -168,74 +206,46 @@ public class UnifiedEFAConflictCheckerExperiments
 //        // next please ...
 //      }
     }
-    for (int c = 2; c <= 3; c += 1) {
-      try {
-        for (int n = 10; n <= 50; n += 5) {
-          checkPML("pml3", c, n, true);
-//          checkPML("pml4", c, n, true);
-        }
-      } catch (final AnalysisException | EvalException exception) {
-        // next please ...
-      }
-    }
+
+ //    try {
+//      final int[] primes = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31};
+//      for (int s = 3; s < primes.length; s++) {
+//        final int maxval = primes[s] * primes[s] - 1;
+//        checkPrimeSieve("dynamic_prime_sieve", s, maxval, true);
+//      }
+//    } catch (final AnalysisException | EvalException exception) {
+//      // next please ...
+//    }
+//    try {
+//      for (int maxseqno = 15; maxseqno <= 255; maxseqno += 16) {
+//        checkProfisafe("profisafe_ihost_efa_2", maxseqno, false);
+//      }
+//    } catch (final AnalysisException | EvalException exception) {
+//      // next please ...
+//    }
+
+//    try {
+//      for (int maxseqno = 127; maxseqno <= 255; maxseqno += 128) {
+//        checkProfisafe("profisafe_islave_efa", maxseqno, true);
+//      }
+//    } catch (final AnalysisException | EvalException exception) {
+//      // next please ...
+//    }
     try {
-      testPrimeSieve4();
-      testPrimeSieve4b();
-      if (!(wrapper instanceof BDDConflictCheckerWrapper)) {
-        testPrimeSieve5();
-        // CUDD locks up after 56 iterations in relprod (?)
-        testPrimeSieve6();
-        testPrimeSieve7();
-        testPrimeSieve8();
-      }
-    } catch (final AnalysisException | EvalException exception) {
-      // next please ...
-    }
-    try {
-      final int[] primes = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31};
-      for (int s = 3; s < primes.length; s++) {
-        final int maxval = primes[s] * primes[s] - 1;
-        checkPrimeSieve("dynamic_prime_sieve", s, maxval, true);
-      }
-    } catch (final AnalysisException | EvalException exception) {
-      // next please ...
-    }
-    try {
-      for (int maxseqno = 15; maxseqno <= 255; maxseqno += 16) {
-        checkProfisafe("profisafe_ihost_efa_2", maxseqno, false);
-      }
-    } catch (final AnalysisException | EvalException exception) {
-      // next please ...
-    }
-    try {
-      for (int maxseqno = 15; maxseqno <= 255; maxseqno += 16) {
-        checkProfisafe("profisafe_ihost_efa_block", maxseqno, false);
-      }
-    } catch (final AnalysisException | EvalException exception) {
-      // next please ...
-    }
-    try {
-      for (int maxseqno = 15; maxseqno <= 255; maxseqno += 16) {
-        checkProfisafe("profisafe_islave_efa", maxseqno, true);
-      }
-    } catch (final AnalysisException | EvalException exception) {
-      // next please ...
-    }
-    try {
-      for (int i = 100; i <= 500; i += 100) {
+      for (int i = 300; i <= 400; i += 100) {
         checkRoundRobin(i);
       }
     } catch (final AnalysisException | EvalException exception) {
       // next please ...
     }
-    try {
-      for (int n = 0; n <= 1000; n += 50) {
-        final int nn = n == 0 ? 1 : n;
-        checkJDEDS2014(10, nn);
-      }
-    } catch (final AnalysisException | EvalException exception) {
-      // next please ...
-    }
+//    try {
+//      for (int n = 0; n <= 1000; n += 50) {
+//        final int nn = n == 0 ? 1 : n;
+//        checkJDEDS2014(10, nn);
+//      }
+//    } catch (final AnalysisException | EvalException exception) {
+//      // next please ...
+//    }
   }
 
 
@@ -454,7 +464,7 @@ public class UnifiedEFAConflictCheckerExperiments
       final SelectionHeuristic<UnifiedEFACandidate> minS =
         new MinStatesSelectionHeuristic();
       final SelectionHeuristic<UnifiedEFACandidate> chain =
-        new ChainSelectionHeuristic<UnifiedEFACandidate>(minF, minS);
+        new ChainSelectionHeuristic<UnifiedEFACandidate>( minS, minF);
       checker.setSelectionHeuristic(chain);
       checker.setUsesLocalVariable(true);
       // Configuration end
@@ -592,6 +602,6 @@ public class UnifiedEFAConflictCheckerExperiments
   private PrintWriter mPrintWriter;
   private boolean mHasBeenPrinted;
 
-  private final int mTimeout = 480;  // 8 minutes
+  private final int mTimeout = 600;  // 8 minutes
 
 }
