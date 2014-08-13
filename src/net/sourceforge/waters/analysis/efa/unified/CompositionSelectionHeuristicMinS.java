@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters EFA Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efa.unified
-//# CLASS:   MinStatesSelectionHeuristic
+//# CLASS:   MinStatesCompositionSelectionHeuristic
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -27,7 +27,7 @@ import net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic;
  * @author Robi Malik, Sahar Mohajerani
  */
 
-public class MinStatesSelectionHeuristic
+public class CompositionSelectionHeuristicMinS
   extends NumericSelectionHeuristic<UnifiedEFACandidate>
 {
 
@@ -40,7 +40,7 @@ public class MinStatesSelectionHeuristic
     Set<AbstractEFAEvent> eventSet = new THashSet<>();
     double numStates = 1.0;
     final Collection<UnifiedEFAConflictChecker.VariableInfo> vars =
-      candidate.getVariables();
+      candidate.getVariableInfo();
     for (final UnifiedEFAConflictChecker.VariableInfo var : vars) {
       numStates *= var.getRangeSize();
       final List<AbstractEFAEvent> events = var.getLeaveEvents();
