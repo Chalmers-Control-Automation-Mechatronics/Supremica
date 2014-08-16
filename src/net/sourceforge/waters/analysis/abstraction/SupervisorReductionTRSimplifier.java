@@ -68,14 +68,14 @@ public class SupervisorReductionTRSimplifier
 
   //#########################################################################
   //# Configuration
-  public void setControlledEvent(final int event)
+  public void setRestrictedEvent(final int event)
   {
-    mControlledEvent = event;
+    mRestrictedEvent = event;
   }
 
-  public int getControlledEvent()
+  public int getRestrictedEvent()
   {
-    return mControlledEvent;
+    return mRestrictedEvent;
   }
 
 
@@ -95,7 +95,8 @@ public class SupervisorReductionTRSimplifier
     final TRPartition partition;
     if (findBadStates()) {
       setUpClasses();
-      if (mControlledEvent < 0) {
+      if (mRestrictedEvent < 0) {
+        // monolithic supervisor reduction
         final TIntArrayList enabDisabEvents = new TIntArrayList();
         final TIntArrayList disabEvents = new TIntArrayList();
         setUpEventList(enabDisabEvents, disabEvents);
@@ -105,8 +106,9 @@ public class SupervisorReductionTRSimplifier
           partition = reduceSupervisor(enabDisabEvents);
         }
       } else {
+        // supervisor localization
         final TIntArrayList singletonList = new TIntArrayList(1);
-        singletonList.add(mControlledEvent);
+        singletonList.add(mRestrictedEvent);
         partition = reduceSupervisor(singletonList);
       }
     } else {
@@ -639,7 +641,7 @@ public class SupervisorReductionTRSimplifier
   private int mNumProperEvents;
   private int mBadStateIndex;
   private int mNumBadStates;
-  private int mControlledEvent;
+  private int mRestrictedEvent;
   private int[] mStateToClass;
   private IntListBuffer mClasses;
   private int[] mShadowStateToClass;

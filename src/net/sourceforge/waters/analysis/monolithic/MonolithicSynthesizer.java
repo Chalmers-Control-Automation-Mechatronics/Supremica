@@ -615,7 +615,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           // Supervisor Reduction Enabled
           mSupervisorSimplifier.setDefaultMarkingID(marking);
           mSupervisorSimplifier.setTransitionRelation(mTransitionRelation);//set TR
-          mSupervisorSimplifier.setControlledEvent(-1);//set event
+          mSupervisorSimplifier.setRestrictedEvent(-1);//set event
           mSupervisorSimplifier.run();
           mTransitionRelation = mSupervisorSimplifier.getTransitionRelation();
           if (!mSupervisorLocalizationEnabled) {
@@ -623,7 +623,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             mTransitionRelation.setName("supervisor");
             des = createDESProxy(mTransitionRelation);
           } else {
-            // Supervisor Localisation Enabled
+            // Supervisor Localization Enabled
             final TIntArrayList enabDisabEvents = new TIntArrayList();
             final TIntArrayList disabEvents = new TIntArrayList(0);
             mSupervisorSimplifier
@@ -642,7 +642,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
                   new ListBufferTransitionRelation(mTransitionRelation,
                                                    ListBufferTransitionRelation.CONFIG_SUCCESSORS);
                 mSupervisorSimplifier.setTransitionRelation(copy);//set TR
-                mSupervisorSimplifier.setControlledEvent(e);//set event
+                mSupervisorSimplifier.setRestrictedEvent(e);//set event
                 simplified &= mSupervisorSimplifier.run();
                 if (!simplified) {
                   mTransitionRelation.removeDeadlockStateTransitions(marking);
@@ -681,8 +681,22 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             des = AutomatonTools.createProductDESProxy
               ("localised_sup", autList, getFactory());
           }
+        } else if (mSupervisorLocalizationEnabled) {
+
+          // run new algorithm
+
+          // ... temp code for debugging ...
+          mSupervisorSimplifier.setDefaultMarkingID(marking);
+          mSupervisorSimplifier.setTransitionRelation(mTransitionRelation);
+          mSupervisorSimplifier.setRestrictedEvent(-1);
+          mSupervisorSimplifier.run();
+          mTransitionRelation = mSupervisorSimplifier.getTransitionRelation();
+          mTransitionRelation.removeDeadlockStateTransitions(marking);
+          mTransitionRelation.setName("supervisor");
+          des = createDESProxy(mTransitionRelation);
+
         } else {
-          // Supervisor Reduction not enabled
+          // Both Reduction & Localization Disabled
           mTransitionRelation.removeDeadlockStateTransitions(marking);
           mTransitionRelation.removeProperSelfLoopEvents();
           mTransitionRelation.removeRedundantPropositions();
