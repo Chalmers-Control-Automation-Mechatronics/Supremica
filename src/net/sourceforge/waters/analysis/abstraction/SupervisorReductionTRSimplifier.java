@@ -35,8 +35,8 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
  * @author Fangqian Qiu, Robi Malik
  */
 
-public class SupervisorReductionTRSimplifier
-  extends AbstractMarkingTRSimplifier
+public class SupervisorReductionTRSimplifier extends
+  AbstractMarkingTRSimplifier
 {
 
   //#########################################################################
@@ -49,7 +49,6 @@ public class SupervisorReductionTRSimplifier
   {
     super(rel);
   }
-
 
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
@@ -65,7 +64,6 @@ public class SupervisorReductionTRSimplifier
     return false;
   }
 
-
   //#########################################################################
   //# Configuration
   public void setRestrictedEvent(final int event)
@@ -78,6 +76,15 @@ public class SupervisorReductionTRSimplifier
     return mRestrictedEvent;
   }
 
+  public void setExperimentalMode(final boolean experimentalMode)
+  {
+    mExperimentalMode = experimentalMode;
+  }
+
+  public boolean getExperimentalMode()
+  {
+    return mExperimentalMode;
+  }
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
@@ -109,7 +116,12 @@ public class SupervisorReductionTRSimplifier
         // supervisor localization
         final TIntArrayList singletonList = new TIntArrayList(1);
         singletonList.add(mRestrictedEvent);
-        partition = reduceSupervisor(singletonList);
+        if (mExperimentalMode) {
+          System.out.println("experimental mode ON ... ");
+          partition = reduceSupervisorExperimental(singletonList);
+        } else {
+          partition = reduceSupervisor(singletonList);
+        }
       }
     } else {
       partition = createOneStateTR(new TIntArrayList(0));
@@ -122,8 +134,7 @@ public class SupervisorReductionTRSimplifier
   }
 
   @Override
-  protected void applyResultPartition()
-    throws AnalysisException
+  protected void applyResultPartition() throws AnalysisException
   {
     super.applyResultPartition();
     final ListBufferTransitionRelation rel = getTransitionRelation();
@@ -163,10 +174,9 @@ public class SupervisorReductionTRSimplifier
     mShadowClasses = null;
   }
 
-
   //#########################################################################
   //# Methods for Supervisor Reduction
-  private TRPartition reduceSupervisor(final TIntArrayList ctrlEvents)
+  private TRPartition reduceSupervisor(final TIntArrayList restrictedEventList)
     throws AnalysisAbortException
   {
     boolean merged = false;
@@ -174,15 +184,13 @@ public class SupervisorReductionTRSimplifier
     final int numStates = rel.getNumberOfStates();
     final int marking = getDefaultMarkingID();
     for (int i = 0; i < numStates - 1; i++) {
-      if (!rel.isReachable(i) ||
-          rel.isDeadlockState(i, marking) ||
-          i > getMinimum(i)) {
+      if (!rel.isReachable(i) || rel.isDeadlockState(i, marking)
+          || i > getMinimum(i)) {
         continue;
       }
       for (int j = i + 1; j < numStates; j++) {
-        if (!rel.isReachable(j) ||
-            rel.isDeadlockState(j, marking) ||
-            j > getMinimum(j)) {
+        if (!rel.isReachable(j) || rel.isDeadlockState(j, marking)
+            || j > getMinimum(j)) {
           continue;
         }
         checkAbort();
@@ -192,7 +200,7 @@ public class SupervisorReductionTRSimplifier
         for (int s = 0; s < numStates; s++) {
           mShadowStateToClass[s] = IntListBuffer.NULL;
         }
-        if (checkMergibility(i, j, i, j, mergedPairs, ctrlEvents)) {
+        if (checkMergibility(i, j, i, j, mergedPairs, restrictedEventList)) {
           merge(mergedPairs);
           merged = true;
         }
@@ -208,8 +216,48 @@ public class SupervisorReductionTRSimplifier
     }
   }
 
-  private boolean checkMergibility(final int x, final int y,
-                                   final int x0, final int y0,
+  private TRPartition reduceSupervisorExperimental(final TIntArrayList restrictedEventList)
+    throws AnalysisAbortException
+  {
+    boolean merged = false;
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final int numStates = rel.getNumberOfStates();
+    final int marking = getDefaultMarkingID();
+    for (int i = 0; i < numStates - 1; i++) {
+      if (!rel.isReachable(i) || rel.isDeadlockState(i, marking)
+          || i > getMinimum(i)) {
+        continue;
+      }
+      for (int j = i + 1; j < numStates; j++) {
+        if (!rel.isReachable(j) || rel.isDeadlockState(j, marking)
+            || j > getMinimum(j)) {
+          continue;
+        }
+        checkAbort();
+        TLongHashSet mergedPairs = new TLongHashSet();
+        mShadowClasses = new IntListBuffer();
+        mShadowStateToClass = new int[numStates];
+        for (int s = 0; s < numStates; s++) {
+          mShadowStateToClass[s] = IntListBuffer.NULL;
+        }
+        if (checkMergibility(i, j, i, j, mergedPairs, restrictedEventList)) {
+          merge(mergedPairs);
+          merged = true;
+        }
+        mergedPairs = null;
+        mShadowClasses = null;
+        mShadowStateToClass = null;
+      }
+    }
+    if (merged) {
+      return createResultPartition();
+    } else {
+      return null;
+    }
+  }
+
+  private boolean checkMergibility(final int x, final int y, final int x0,
+                                   final int y0,
                                    final TLongHashSet mergedPairs,
                                    final TIntArrayList ctrlEvents)
     throws AnalysisAbortException
@@ -353,39 +401,41 @@ public class SupervisorReductionTRSimplifier
     disabEvents.clear();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int marking = getDefaultMarkingID();
-    final TIntArrayList[] disabledStates =
+    final TIntArrayList[] disabledEventsToStates =
       new TIntArrayList[mNumProperEvents + 1];
-    final TIntArrayList[] enabledStates =
+    final TIntArrayList[] enabledEventsToStates =
       new TIntArrayList[mNumProperEvents + 1];
     final TransitionIterator iter =
-      rel.createAllTransitionsReadOnlyIteratorByStatus
-        (EventEncoding.STATUS_CONTROLLABLE);
+      rel
+        .createAllTransitionsReadOnlyIteratorByStatus(EventEncoding.STATUS_CONTROLLABLE);
     while (iter.advance()) {
+      // for each controllable event ...
       checkAbort();
       final int currentEvent = iter.getCurrentEvent();
       final int succ = iter.getCurrentTargetState();
       final int pre = iter.getCurrentSourceState();
       if (rel.isDeadlockState(succ, marking)) {
-        if (disabledStates[currentEvent] == null) {
-          disabledStates[currentEvent] = new TIntArrayList();
+        if (disabledEventsToStates[currentEvent] == null) {
+          disabledEventsToStates[currentEvent] = new TIntArrayList();
         }
-        disabledStates[currentEvent].add(pre);
+        disabledEventsToStates[currentEvent].add(pre);
       } else {
-        if (enabledStates[currentEvent] == null) {
-          enabledStates[currentEvent] = new TIntArrayList();
+        if (enabledEventsToStates[currentEvent] == null) {
+          enabledEventsToStates[currentEvent] = new TIntArrayList();
         }
-        enabledStates[currentEvent].add(pre);
+        enabledEventsToStates[currentEvent].add(pre);
       }
     }
     for (int i = 0; i < mNumProperEvents; i++) {
       for (int j = i + 1; j <= mNumProperEvents; j++) {
         checkAbort();
-        if (disabledStates[i] != null &&
-            enabledStates[i] != null &&
-            disabledStates[i].equals(disabledStates[j]) &&
-            enabledStates[i].equals(enabledStates[j])) {
-          disabledStates[j] = null;
-          enabledStates[j] = null;
+        // if event e1 is enabled and disabled in the same set of states as event e2, then ignore one of them
+        if (disabledEventsToStates[i] != null
+            && enabledEventsToStates[i] != null
+            && disabledEventsToStates[i].equals(disabledEventsToStates[j])
+            && enabledEventsToStates[i].equals(enabledEventsToStates[j])) {
+          disabledEventsToStates[j] = null;
+          enabledEventsToStates[j] = null;
         }
 
       }
@@ -393,8 +443,8 @@ public class SupervisorReductionTRSimplifier
     for (int e = EventEncoding.NONTAU; e <= mNumProperEvents; e++) {
       final byte status = rel.getProperEventStatus(e);
       if (EventEncoding.isControllableEvent(status)) {
-        if (disabledStates[e] != null) {
-          if (enabledStates[e] != null) {
+        if (disabledEventsToStates[e] != null) {
+          if (enabledEventsToStates[e] != null) {
             enabDisabEvents.add(e);
           } else {
             disabEvents.add(e);
@@ -403,7 +453,6 @@ public class SupervisorReductionTRSimplifier
       }
     }
   }
-
 
   //#########################################################################
   //# Auxiliary Methods
@@ -570,7 +619,8 @@ public class SupervisorReductionTRSimplifier
     // otherwise create a two-state automaton
     final int numStates = disabEvents.isEmpty() ? 1 : 2;
     final ListBufferTransitionRelation rel =
-      new ListBufferTransitionRelation("OneStateSup",
+      new ListBufferTransitionRelation(
+                                       "OneStateSup",
                                        ComponentKind.SUPERVISOR,
                                        mNumProperEvents + 1,
                                        oldRel.getNumberOfPropositions(),
@@ -626,7 +676,6 @@ public class SupervisorReductionTRSimplifier
     }
   }
 
-
   //#########################################################################
   //# For Debugging
   public int[] showClassList(final IntListBuffer classes, final int list)
@@ -634,7 +683,6 @@ public class SupervisorReductionTRSimplifier
     final int[] array = classes.toArray(list);
     return array;
   }
-
 
   //#########################################################################
   //# Data Members
@@ -646,4 +694,5 @@ public class SupervisorReductionTRSimplifier
   private IntListBuffer mClasses;
   private int[] mShadowStateToClass;
   private IntListBuffer mShadowClasses;
+  private boolean mExperimentalMode = false;
 }
