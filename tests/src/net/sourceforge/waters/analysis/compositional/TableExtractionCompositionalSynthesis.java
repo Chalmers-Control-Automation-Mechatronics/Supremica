@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.compositional;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -48,7 +49,8 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
       new TableExtractionCompositionalSynthesis();
     final File heuristicFile = new File(args[0]);
     final File compareFile = new File(args[1]);
-    extractor.extract(heuristicFile, compareFile);
+    final File chartFile = new File(args[2]);
+    extractor.extract(heuristicFile, compareFile, chartFile);
   }
 
 
@@ -71,7 +73,7 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
     createModelInfo("pslWithResetTransWithPartLeftPlants", "psl\\_partleft", true, true, "7.7 \\cdot 10^7");
     createModelInfo("tbed_hisc1", "tbed\\_hisc1", false, true, "2.9 \\cdot 10^{17}");
     createModelInfo("tbed_noderailb", "tbed\\_noderailb", false, true, "3.2 \\cdot 10^{12}");
-    createModelInfo("tbed_uncont", "tbed\\_noderailb", true, false, "3.6 \\cdot 10^{12}");
+    createModelInfo("tbed_uncont", "tbed\\_uncont", true, false, "3.6 \\cdot 10^{12}");
     createModelInfo("verriegel3b", "verriegel3b", false, true, "1.3 \\cdot 10^{9}");
     createModelInfo("verriegel4b", "verriegel4b", false, true, "6.2 \\cdot 10^{10}");
     createModelInfo("6linka", "6linka", false,true,"2.4 \\cdot 10^{14}");
@@ -90,7 +92,7 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
 
   //#########################################################################
   //# Table Extraction
-  private void extract(final File heuristicFile, final File compareFile)
+  private void extract(final File heuristicFile, final File compareFile, final File chartFile)
   {
     try {
       final ProductDESProxyFactory factory =
@@ -117,7 +119,7 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
       final AbstractCompositionalModelAnalyzer.PreselectingMethod
         comparePreselectingMethod = AbstractCompositionalModelAnalyzer.MustL;
       final SelectionHeuristicCreator
-        compareSelectingMethod = CompositionalSelectionHeuristicFactory.MaxL;
+        compareSelectingMethod = CompositionalSelectionHeuristicFactory.MinF;
       int compareIndex = 0;
       int methodCount = 0;
       for (final AbstractCompositionalModelAnalyzer.PreselectingMethod
@@ -147,6 +149,7 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
                     compareSelectingMethod, mapIndex, config);
         mapIndex++;
       }
+      printChart(chartFile);
       printStateComparisonTable(compareFile);
     } catch (final Throwable exception) {
       System.err.println("FATAL ERROR");
@@ -289,6 +292,68 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
     writer.close();
   }
 
+  private void printChart(final File outputFile) throws FileNotFoundException
+  {
+    final OutputStream stream = new FileOutputStream(outputFile);
+    final PrintWriter writer = new PrintWriter(stream);
+    writer.println("\\psset{linewidth=.4pt}\\psset{unit=.1mm}\\newgray{lightgray}{0.9}");
+    writer.println("\\begin{pspicture}(-75,-200)(730,330)");
+    int maxTransition = 0;
+    for (final Map.Entry<String,ModelInfo> entry : mModelInfoMap.entrySet()) {
+      final String name = entry.getKey();
+      for (int mapIndex = 0; mapIndex <mResults.size(); mapIndex++) {
+        final Map<String, Result> map = mResults.get(mapIndex);
+        final Result result = map.get(name);
+        if (result != null) {
+          final int totTrans = result.getTotalTransition();
+          if (totTrans > maxTransition) {
+            maxTransition = totTrans;
+          }
+        }
+      }
+    }
+    int groupStartX = 10;
+    for (final Map.Entry<String,ModelInfo> entry : mModelInfoMap.entrySet()) {
+      double barStartX = groupStartX + OFFSET_IN_GROUP;
+      final String name = entry.getKey();
+      final ModelInfo info = entry.getValue();
+      for (int mapIndex = 0; mapIndex <mResults.size(); mapIndex++) {
+        final Map<String, Result> map = mResults.get(mapIndex);
+        final Result result = map.get(name);
+        if (result != null) {
+          final int totTrans = result.getTotalTransition();
+          final double barHeight = (double)totTrans/ maxTransition * BAR_HEIGHT;
+          final double x1 = barStartX;
+          final double x2 = x1 + BAR_WIDTH;
+          final double y1 = 0;
+          final double y2 = barHeight;
+          final String colour = BAR_COLOUR[mapIndex];
+          writer.format("\\pspolygon[%s](%.2f,%.2f)"
+            + "(%.2f,%.2f)(%.2f,%.2f)(%.2f,%.2f)",colour,x1,y1,x1,y2,x2,y2,x2,y1 );
+        }
+        barStartX = barStartX + BAR_WIDTH;
+
+      }
+      final String text = info.getShortName();
+      final int x = groupStartX + GROUP_WIDTH/2;
+      writer.format("\\rput[r]{90}(%d,-7){\\scriptsize %s}\n",x,text);
+      groupStartX = groupStartX + GROUP_WIDTH;
+
+    }
+    for (int tr=500000; tr<maxTransition; tr+=500000) {
+      final double  y = (double)tr/ maxTransition * BAR_HEIGHT;
+      writer.format("\\psline[linewidth=.4pt](-5,%.2f)(5,%.2f)",y, y);
+      final double label = tr/1e6;
+      writer.format("\\rput[r]{0}(-7,%.2f){\\scriptsize %.1f}", y, label);
+    }
+    writer.println("\\psline[linewidth=.8pt](-10,0)(730,0)");
+    writer.format("\\psline[arrows=->,arrowsize=15,arrowlength=2,"
+      + "arrowinset=0.3,linewidth=.8pt](0,0)(0,%d)",BAR_HEIGHT+30);
+    writer.format("\\rput[tr]{0}(-7,%d){\\scriptsize $\\times 10^6$}",BAR_HEIGHT+30);
+    writer.println("\\end{pspicture}");
+    writer.close();
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods
@@ -362,6 +427,10 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
     {
       return mShortName + " & " + mControllable + " & " + mNonblocking +
              " & " + mSize;
+    }
+    private String getShortName()
+    {
+      return mShortName;
     }
 
     //#######################################################################
@@ -449,5 +518,10 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
     new TreeMap<String, ModelInfo>(new LowerCaseComparator());
   private final List<Map<String,Result>> mResults =
     new ArrayList<Map<String,Result>>(2);
-
+  private static final int GROUP_WIDTH = 40;
+  private static final int BAR_WIDTH = 15;
+  private static final double OFFSET_IN_GROUP = 0.5*GROUP_WIDTH - BAR_WIDTH;
+  private static final int BAR_HEIGHT = 300;
+  private static final String[] BAR_COLOUR = {"fillstyle=solid,fillcolor=lightgray",
+                                              "fillstyle=solid,fillcolor=gray"};
 }
