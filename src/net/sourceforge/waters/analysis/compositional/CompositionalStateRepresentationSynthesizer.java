@@ -200,6 +200,15 @@ public class CompositionalStateRepresentationSynthesizer extends
     }
   }
 
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    if (mHalfwaySimplifier != null) {
+      mHalfwaySimplifier.resetAbort();
+    }
+  }
+
 
   //#########################################################################
   //# Invocation

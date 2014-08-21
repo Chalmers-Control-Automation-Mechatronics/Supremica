@@ -18,8 +18,9 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 
 /**
- * This class can be used to automatically run experiments for different
- * properties with all possible combinations of heuristics.
+ * This class can be used to automatically run experiments for
+ * automata vs. state representation synthesis, with all possible
+ * combinations of heuristics.
  *
  * @author Sahar Mohajerani, Robi Malik
  */

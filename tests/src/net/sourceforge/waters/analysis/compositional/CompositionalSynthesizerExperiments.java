@@ -70,6 +70,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     mPreselecting = preselectingHeuristic;
     mSelecting = selectionHeuristic;
     mWatchdog = new Watchdog(mSynthesizer, mTimeout);
+    mWatchdog.setVerbose(true);
   }
 
 
@@ -90,10 +91,9 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     mSynthesizer.setMonolithicTransitionLimit(finalTransitionLimit);
     mSynthesizer.setPreselectingMethod(mPreselecting);
     mSynthesizer.setSelectionHeuristic(mSelecting);
-    mPrintWriter.println("InternalStateLimit," + internalStateLimit
-                         + ",InternalTransitionLimit,"
-                         + internalTransitionLimit + ",FinalStateLimit,"
-                         + finalStateLimit);
+    mPrintWriter.println("InternalStateLimit," + internalStateLimit +
+                         ",InternalTransitionLimit," + internalTransitionLimit +
+                         ",FinalStateLimit," + finalStateLimit);
     mPrintWriter.println("PreselHeuristic," + mPreselecting +
                          ",SelecHeuristic," + mSelecting +
                          ",Method," + mMethod);
@@ -107,6 +107,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     mSynthesizer = null;
     mPrintWriter.close();
     mOut.close();
+    mWatchdog.terminate();
     System.out.println("All experiments complete");
     super.tearDown();
   }
@@ -239,11 +240,10 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
         exception.printStackTrace(System.err);
       }
     } else {
-      System.err
-        .println("Usage: CompositionalSynthesizerExperiments "
-                 + "<outputFilename> Automata|StateRepresentation " +
-                 "<preselectingHeuristic> " +
-                 "<selectingHeuristic> [supervisorReductionEnabled]");
+      System.err.println("Usage: CompositionalSynthesizerExperiments " +
+                         "<outputFilename> Automata|StateRepresentation " +
+                         "<preselectingHeuristic> " +
+                         "<selectingHeuristic> [supervisorReductionEnabled]");
     }
   }
 

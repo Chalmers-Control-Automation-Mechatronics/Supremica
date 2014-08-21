@@ -120,6 +120,21 @@ public class Watchdog extends Thread {
     mVerbose = verbose;
   }
 
+  /**
+   * Terminates this watchdog. This method removes all abortables,
+   * interrupts the tread and waits for it to terminate.
+   */
+  public synchronized void terminate()
+  {
+    try {
+      mAbortables.clear();
+      interrupt();
+      join();
+    } catch (final InterruptedException exception) {
+      // Shouldn't get interrupted ...
+    }
+  }
+
 
   //#########################################################################
   //# Interface java.lang.Runnable
@@ -151,7 +166,7 @@ public class Watchdog extends Thread {
         }
       }
     } catch (final InterruptedException exception) {
-      // Shouldn't get interrupted ...
+      // Interrupt means terminate ...
     }
   }
 
