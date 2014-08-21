@@ -38,10 +38,6 @@ public class SelfRunningExperimentCompositionalSynthesis
         new CompositionalAutomataSynthesizer(factory);
       automataSynthesizer.setDetailedOutputEnabled(false);
       final List<Configuration> configurations = new LinkedList<>();
-//      final Configuration configWSOE =
-//        new Configuration(automataSynthesizer,
-//                          AutomataSynthesisAbstractionProcedureFactory.WSOE);
-//      configurations.add(configWSOE);
       final Configuration configWSOEUnsup =
         new Configuration(automataSynthesizer,
                           AutomataSynthesisAbstractionProcedureFactory.WSOE_UNSUP);
@@ -49,7 +45,7 @@ public class SelfRunningExperimentCompositionalSynthesis
       final AbstractCompositionalSynthesizer stateRepresentationSynthesizer =
         new CompositionalStateRepresentationSynthesizer(factory);
       stateRepresentationSynthesizer.setFailingEventsEnabled(false);
-//      stateRepresentationSynthesizer.setUsingSpecialEvents(false);
+      stateRepresentationSynthesizer.setUsingSpecialEvents(false);
       final Configuration configStateRepresent =
         new Configuration(stateRepresentationSynthesizer,
                           StateRepresentationSynthesisAbstractionProcedureFactory.WSOE_UNSUP);
@@ -59,12 +55,9 @@ public class SelfRunningExperimentCompositionalSynthesis
       final CompositionalSelectionHeuristicFactory selectionFactory =
         automataSynthesizer.getSelectionHeuristicFactory();
 //      final PreselectingMethod[] preSelectingMethods = new PreselectingMethod[] {
-//          AbstractCompositionalModelAnalyzer.MustL,
-//          AbstractCompositionalModelAnalyzer.Pairs
+//          AbstractCompositionalModelAnalyzer.MustL
 //      };
 //      final SelectionHeuristicCreator[] selectingMethods = new SelectionHeuristicCreator[] {
-//        CompositionalSelectionHeuristicFactory.MaxL,
-//        CompositionalSelectionHeuristicFactory.MinS,
 //        CompositionalSelectionHeuristicFactory.MinF
 //      };
       int methodCount = 0;
@@ -80,6 +73,7 @@ public class SelfRunningExperimentCompositionalSynthesis
           for (final Configuration config: configurations) {
             final AbstractCompositionalSynthesizer synthesizer = config.getSynthesizer();
             final AbstractionProcedureCreator method = config.getMethod();
+            synthesizer.setAbstractionProcedureCreator(method);
             final String preName = preselectingMethod.toString();
             final String selName = selectingMethod.toString();
             // without supervisor reduction:

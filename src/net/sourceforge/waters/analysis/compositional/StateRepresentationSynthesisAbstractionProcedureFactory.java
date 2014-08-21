@@ -113,10 +113,9 @@ public class StateRepresentationSynthesisAbstractionProcedureFactory
       return StateRepresentationSynthesisAbstractionProcedure.
         createSynthesisAbstractionProcedure
           (synthesizer,
-            StateRepresentationSynthesisAbstractionProcedure.USE_HALFWAY|
+           StateRepresentationSynthesisAbstractionProcedure.USE_HALFWAY |
            StateRepresentationSynthesisAbstractionProcedure.USE_BISIMULATION |
-           StateRepresentationSynthesisAbstractionProcedure.USE_WSOE
-           );
+           StateRepresentationSynthesisAbstractionProcedure.USE_WSOE);
     }
   };
 
@@ -159,6 +158,28 @@ public class StateRepresentationSynthesisAbstractionProcedureFactory
            StateRepresentationSynthesisAbstractionProcedure.USE_BISIMULATION |
            StateRepresentationSynthesisAbstractionProcedure.USE_WSOE |
            StateRepresentationSynthesisAbstractionProcedure.USE_TRANSITIONREMOVAL);
+    }
+  };
+
+  /**
+   * An abstraction chain consisting of certain unsupervisability, bisimulation,
+   * and weak synthesis observation equivalence.
+   */
+  public static final AbstractionProcedureCreator WSOE_UNSUP_NOTR =
+    new AbstractionProcedureCreator("WSOE_UNSUP_NOTR")
+  {
+    @Override
+    public AbstractionProcedure createAbstractionProcedure
+      (final AbstractCompositionalModelAnalyzer analyzer)
+    {
+      final CompositionalStateRepresentationSynthesizer synthesizer =
+        (CompositionalStateRepresentationSynthesizer) analyzer;
+      return StateRepresentationSynthesisAbstractionProcedure.
+        createSynthesisAbstractionProcedure
+          (synthesizer,
+           StateRepresentationSynthesisAbstractionProcedure.USE_UNSUP |
+           StateRepresentationSynthesisAbstractionProcedure.USE_BISIMULATION |
+           StateRepresentationSynthesisAbstractionProcedure.USE_WSOE);
     }
   };
 
