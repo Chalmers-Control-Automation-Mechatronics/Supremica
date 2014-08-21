@@ -32,11 +32,15 @@ public class SelfRunningExperimentCompositionalSynthesis
   {
     try {
       //final String outputDir = System.getProperty("waters.test.outputdir");
+      final boolean special = true;
+      final boolean failing = false;
       final ProductDESProxyFactory factory =
         ProductDESElementFactory.getInstance();
       final CompositionalAutomataSynthesizer automataSynthesizer =
         new CompositionalAutomataSynthesizer(factory);
       automataSynthesizer.setDetailedOutputEnabled(false);
+      automataSynthesizer.setUsingSpecialEvents(special);
+      automataSynthesizer.setFailingEventsEnabled(failing);
       final List<Configuration> configurations = new LinkedList<>();
       final Configuration configWSOEUnsup =
         new Configuration(automataSynthesizer,
@@ -44,8 +48,8 @@ public class SelfRunningExperimentCompositionalSynthesis
       configurations.add(configWSOEUnsup);
       final AbstractCompositionalSynthesizer stateRepresentationSynthesizer =
         new CompositionalStateRepresentationSynthesizer(factory);
-      stateRepresentationSynthesizer.setFailingEventsEnabled(false);
-      stateRepresentationSynthesizer.setUsingSpecialEvents(false);
+      stateRepresentationSynthesizer.setUsingSpecialEvents(special);
+      stateRepresentationSynthesizer.setFailingEventsEnabled(failing);
       final Configuration configStateRepresent =
         new Configuration(stateRepresentationSynthesizer,
                           StateRepresentationSynthesisAbstractionProcedureFactory.WSOE_UNSUP);
