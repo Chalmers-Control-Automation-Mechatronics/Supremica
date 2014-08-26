@@ -654,10 +654,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           }
         } else if (mSupervisorLocalizationEnabled) {
 
-          // run new algorithm
-
           // localization only ...
-          System.out.println("localization only ... ");
           mSupervisorSimplifier.setDefaultMarkingID(marking);
           mSupervisorSimplifier.setTransitionRelation(mTransitionRelation);
           mSupervisorSimplifier.setRestrictedEvent(-1);

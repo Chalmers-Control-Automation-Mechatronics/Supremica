@@ -454,14 +454,14 @@ public class SynthesizerDialog implements ActionListener
         .setToolTipText("Increment by one plant at a time");
 
       reduceSupervisorsBox =
-        new JCheckBox("Reduce supervisors (experimental)");
+        new JCheckBox("Supervisor Reduction");
       reduceSupervisorsBox
         .setToolTipText("Remove redundant states and events from "
                         + "synthesized supervisors");
       reduceSupervisorsBox.addActionListener(this);
 
       localizeSupervisorsBox =
-        new JCheckBox("Localize supervisors (experimental)");
+        new JCheckBox("Supervisor Localization");
       localizeSupervisorsBox
         .setToolTipText("Apply localization to synthesized supervisors");
       localizeSupervisorsBox.addActionListener(this);
@@ -510,12 +510,6 @@ public class SynthesizerDialog implements ActionListener
       maximallyPermissiveOnePlantAtATimeBox
         .setEnabled(maximallyPermissiveIncrementalBox.isSelected()
                     && maximallyPermissiveIncrementalBox.isEnabled());
-      if (reduceSupervisorsBox.isSelected()
-          && standardPanel.getAlgorithmSelector().getAlgorithm() == SynthesisAlgorithm.MONOLITHIC_WATERS) {
-        localizeSupervisorsBox.setEnabled(true);
-      } else {
-        localizeSupervisorsBox.setEnabled(false);
-      }
 
       final boolean watersSelected =
         standardPanel.getAlgorithmSelector().getAlgorithm() == SynthesisAlgorithm.MONOLITHIC_WATERS;
