@@ -424,8 +424,8 @@ public class SupervisorReductionTRSimplifier extends
     if (minX == minY) {
       return true;
     }
-    final long p1 = constructPair(minX, minY);
-    final long p2 = constructPair(x0, y0);
+    final long p1 = constructPair(mInverseMap[minX], mInverseMap[minY]);
+    final long p2 = constructPair(mInverseMap[x0], mInverseMap[y0]);
     if (compare(p1, p2) < 0) {
       return false;
     }

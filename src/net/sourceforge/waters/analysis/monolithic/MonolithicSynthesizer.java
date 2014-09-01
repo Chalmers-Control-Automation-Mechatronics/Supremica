@@ -721,12 +721,14 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
         simplified &= mSupervisorSimplifier.run();
         if (!simplified) {
           mTransitionRelation.removeDeadlockStateTransitions(marking);
+          autList.clear();
           autList.add(mTransitionRelation.createAutomaton(getFactory(),
                                                           mEventEncoding));
           break;
         }
         copy = mSupervisorSimplifier.getTransitionRelation();
         copy.removeDeadlockStateTransitions(marking);
+        copy.removeProperSelfLoopEvents(marking);
         final EventProxy event = mEventEncoding.getProperEvent(e);
         copy.setName("sup:" + event.getName());
         autList.add(copy.createAutomaton(getFactory(), mEventEncoding));
