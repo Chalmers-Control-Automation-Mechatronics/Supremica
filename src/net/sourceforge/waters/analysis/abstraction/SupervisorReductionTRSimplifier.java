@@ -15,7 +15,6 @@ import gnu.trove.set.hash.TIntHashSet;
 import gnu.trove.set.hash.TLongHashSet;
 
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -93,29 +92,22 @@ public class SupervisorReductionTRSimplifier extends
   protected void setUp() throws AnalysisException
   {
     super.setUp();
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    mNumProperEvents = rel.getNumberOfProperEvents() - 1;
   }
 
   @Override
   public boolean runSimplifier() throws AnalysisException
   {
     final TRPartition partition;
-    final ListBufferTransitionRelation rel = getTransitionRelation();
     if (findBadStates()) {
-      setUpClasses();
-      mBitset = new BitSet();
-      mMerged = false;
+      final TIntArrayList enabDisabEvents = new TIntArrayList();
+      final TIntArrayList disabEvents = new TIntArrayList();
       if (mRestrictedEvent < 0) {
         // monolithic supervisor reduction
-        final TIntArrayList enabDisabEvents = new TIntArrayList();
-        final TIntArrayList disabEvents = new TIntArrayList();
+        setUpClasses();
         setUpEventList(enabDisabEvents, disabEvents);
         if (enabDisabEvents.size() == 0) {
           partition = createOneStateTR(disabEvents);
         } else {
-          mBitset.clear();
-          mBitset.flip(0, rel.getNumberOfStates());
           partition = reduceSupervisor(enabDisabEvents);
         }
       } else {
@@ -123,11 +115,21 @@ public class SupervisorReductionTRSimplifier extends
         final TIntArrayList singletonList = new TIntArrayList(1);
         singletonList.add(mRestrictedEvent);
         if (mExperimentalMode) {
+          final ListBufferTransitionRelation rel = getTransitionRelation();
+          final int numStates = rel.getNumberOfStates();
+          mStateToClass = new int[numStates];
+          mClasses = new IntListBuffer();
           partition = reduceSupervisorExperimental(singletonList);
         } else {
-          mBitset.clear();
-          mBitset.flip(0, rel.getNumberOfStates());
-          partition = reduceSupervisor(singletonList);
+          //setUpClasses();//NO EXPMode
+          //partition = reduceSupervisor(singletonList);//NO EXPMode
+
+          mExperimentalMode = true;//EXPMode
+          final ListBufferTransitionRelation rel = getTransitionRelation();//EXPMode
+          final int numStates = rel.getNumberOfStates();//EXPMode
+          mStateToClass = new int[numStates];//EXPMode
+          mClasses = new IntListBuffer();//EXPMode
+          partition = reduceSupervisorExperimental(singletonList);//EXPMode
         }
       }
     } else {
@@ -189,15 +191,16 @@ public class SupervisorReductionTRSimplifier extends
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
     final int marking = getDefaultMarkingID();
+    mMerged = false;
 
     for (int i = 0; i < numStates - 1; i++) {
-      if (!mBitset.get(i) || !rel.isReachable(i)
-          || rel.isDeadlockState(i, marking) || i > getMinimum(i)) {
+      if (!rel.isReachable(i) || rel.isDeadlockState(i, marking)
+          || i > getMinimum(i)) {
         continue;
       }
       for (int j = i + 1; j < numStates; j++) {
-        if (!mBitset.get(j) || !rel.isReachable(j)
-            || rel.isDeadlockState(j, marking) || j > getMinimum(j)) {
+        if (!rel.isReachable(j) || rel.isDeadlockState(j, marking)
+            || j > getMinimum(j)) {
           continue;
         }
         checkAbort();
@@ -216,103 +219,6 @@ public class SupervisorReductionTRSimplifier extends
         mShadowStateToClass = null;
       }
     }
-    if (mMerged) {
-      return createResultPartition();
-    } else {
-      return null;
-    }
-  }
-
-  private TRPartition reduceSupervisorExperimental(final TIntArrayList restrictedEventList)
-    throws AnalysisAbortException
-  {
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    final int marking = getDefaultMarkingID();
-    final TransitionIterator iter =
-      rel.createAllTransitionsReadOnlyIterator(restrictedEventList.get(0));
-
-    // setup enabled & disabled states
-    final TIntArrayList disabledStates = new TIntArrayList();
-    final TIntArrayList enabledStates = new TIntArrayList();
-    while (iter.advance()) {
-      final int pre = iter.getCurrentSourceState();
-      final int succ = iter.getCurrentTargetState();
-      if (rel.isDeadlockState(succ, marking)) {
-        mStateProperties[pre] = StateProperty.DISABLED;
-        disabledStates.add(pre);
-      } else {
-        mStateProperties[pre] = StateProperty.ENABLED;
-        enabledStates.add(pre);
-      }
-    }
-    // try merging all enabled states
-    mBitset.clear();
-    for (int s = 0; s < enabledStates.size(); s++) {
-      mBitset.set(enabledStates.get(s));
-    }
-    reduceSupervisor(restrictedEventList);
-    // try merging all disabled states
-    mBitset.clear();
-    for (int s = 0; s < disabledStates.size(); s++) {
-      mBitset.set(disabledStates.get(s));
-    }
-    reduceSupervisor(restrictedEventList);
-
-
-
-    // try merging similar states
-    int count = 0;
-    final TransitionIterator preIter =
-      rel.createPredecessorsReadOnlyIterator();
-    for (int e = 0; e < rel.getNumberOfProperEvents(); e++) {
-      mBitset.clear();
-      int numStates = rel.getNumberOfStates();
-      count = 0;
-      int state = 0;
-      while (mStateProperties[state] != StateProperty.DISABLED) {
-        state++;
-        if (state >= numStates) {
-          break;
-        }
-        preIter.reset(state, e);
-        while (preIter.advance()) {
-          mBitset.set(preIter.getCurrentSourceState());
-          count++;
-        }
-        if (state >= numStates) {
-          break;
-        }
-      }
-      if (count > 1) {
-        reduceSupervisor(restrictedEventList);
-      }
-      mBitset.clear();
-      numStates = rel.getNumberOfStates();
-      count = 0;
-      state = 0;
-      while (mStateProperties[state] != StateProperty.ENABLED) {
-        state++;
-        if (state >= numStates) {
-          break;
-        }
-        preIter.reset(state, e);
-        while (preIter.advance()) {
-          mBitset.set(preIter.getCurrentSourceState());
-          count++;
-        }
-        if (state >= numStates) {
-          break;
-        }
-      }
-      if (count > 1) {
-        reduceSupervisor(restrictedEventList);
-      }
-    }
-
-    mBitset.clear();
-    mBitset.flip(0, rel.getNumberOfStates());
-    reduceSupervisor(restrictedEventList);
-
     if (mMerged) {
       return createResultPartition();
     } else {
@@ -438,6 +344,208 @@ public class SupervisorReductionTRSimplifier extends
     return true;
   }
 
+  private TRPartition reduceSupervisorExperimental(final TIntArrayList restrictedEventList)
+    throws AnalysisAbortException
+  {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final int numStates = rel.getNumberOfStates();
+    final int marking = getDefaultMarkingID();
+    mMerged = false;
+
+    // reorder states
+    mStateMap = new int[numStates];
+    mInverseMap = new int[numStates];
+    for (int position = 0; position < numStates; position++) {
+      //final int state = position;
+      final int state = numStates - position - 1; // REVERSE ORDER!
+      if (rel.isDeadlockState(state, marking)) {
+        mStateToClass[position] = IntListBuffer.NULL;
+      } else {
+        final int list = mClasses.createList();
+        mClasses.add(list, state);
+        mStateToClass[position] = list;
+      }
+      mInverseMap[state] = position;
+      mStateMap[position] = state;
+    }
+
+    // reduce
+    for (int i = 0; i < numStates - 1; i++) {
+      if (!rel.isReachable(mStateMap[i])
+          || rel.isDeadlockState(mStateMap[i], marking)
+          || mStateMap[i] > getMinimum(i)) {
+        continue;
+      }
+      for (int j = i + 1; j < numStates; j++) {
+        if (!rel.isReachable(mStateMap[j])
+            || rel.isDeadlockState(mStateMap[j], marking)
+            || mStateMap[j] > getMinimum(j)) {
+          continue;
+        }
+        checkAbort();
+        TLongHashSet statePairs = new TLongHashSet();
+        mShadowClasses = new IntListBuffer();
+        mShadowStateToClass = new int[numStates];
+        for (int s = 0; s < numStates; s++) {
+          mShadowStateToClass[s] = IntListBuffer.NULL;
+        }
+        if (checkMergibilityExperimental(mStateMap[i], mStateMap[j],
+                                         mStateMap[i], mStateMap[j],
+                                         statePairs, restrictedEventList)) {
+          mergeExperimental(statePairs);
+          mMerged = true;
+        }
+        statePairs = null;
+        mShadowClasses = null;
+        mShadowStateToClass = null;
+      }
+    }
+    if (mMerged) {
+      return createResultPartition();
+    } else {
+      return null;
+    }
+
+  }
+
+  private boolean checkMergibilityExperimental(final int x, final int y,
+                                               final int x0, final int y0,
+                                               final TLongHashSet statePairs,
+                                               final TIntArrayList ctrlEvents)
+    throws AnalysisAbortException
+  {
+    checkAbort();
+    if (mStateToClass[mInverseMap[x]] == mStateToClass[mInverseMap[y]]) {
+      return true;
+    }
+
+    final int minX = getMinimum(mInverseMap[x]);
+    final int minY = getMinimum(mInverseMap[y]);
+    if (minX == minY) {
+      return true;
+    }
+    final long p1 = constructPair(minX, minY);
+    final long p2 = constructPair(x0, y0);
+    if (compare(p1, p2) < 0) {
+      return false;
+    }
+
+    if (mShadowStateToClass[mInverseMap[x]] == IntListBuffer.NULL) {
+      final int newlist =
+        mShadowClasses.copy(mStateToClass[mInverseMap[x]], mClasses);
+      final ReadOnlyIterator iter =
+        mShadowClasses.createReadOnlyIterator(newlist);
+      iter.reset(newlist);
+      while (iter.advance()) {
+        final int current = iter.getCurrentData();
+        mShadowStateToClass[mInverseMap[current]] = newlist;
+      }
+    }
+    if (mShadowStateToClass[mInverseMap[y]] == IntListBuffer.NULL) {
+      final int newlist =
+        mShadowClasses.copy(mStateToClass[mInverseMap[y]], mClasses);
+      final ReadOnlyIterator iter =
+        mShadowClasses.createReadOnlyIterator(newlist);
+      iter.reset(newlist);
+      while (iter.advance()) {
+        final int current = iter.getCurrentData();
+        mShadowStateToClass[mInverseMap[current]] = newlist;
+      }
+    }
+
+    final int lx = mShadowStateToClass[mInverseMap[x]];
+    final int ly = mShadowStateToClass[mInverseMap[y]];
+    final int[] listX = mShadowClasses.toArray(lx);
+    final int[] listY = mShadowClasses.toArray(ly);
+
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final int marking = getDefaultMarkingID();
+    final TIntHashSet xSet = new TIntHashSet();
+    final TIntHashSet ySet = new TIntHashSet();
+    final TIntArrayList xList = new TIntArrayList();
+    final TIntArrayList yList = new TIntArrayList();
+
+    for (int i = 0; i < ctrlEvents.size(); i++) {
+      final int e = ctrlEvents.get(i);
+      xSet.clear();
+      xList.clear();
+      boolean enabled = false;
+      boolean disabled = false;
+      for (final int xx : listX) {
+        final int succ = getSuccessorState(xx, e);
+        if (succ >= 0) {
+          if (xSet.add(xx)) {
+            xList.add(xx);
+          }
+          if (rel.isDeadlockState(succ, marking)) {
+            disabled = true;
+          } else {
+            enabled = true;
+          }
+        }
+      }
+      if (disabled) {
+        for (final int yy : listY) {
+          final int succ = getSuccessorState(yy, e);
+          if (succ >= 0 && !rel.isDeadlockState(succ, marking)) {
+            return false;
+          }
+        }
+      }
+      if (enabled) {
+        for (final int yy : listY) {
+          final int succ = getSuccessorState(yy, e);
+          if (succ >= 0 && rel.isDeadlockState(succ, marking)) {
+            return false;
+          }
+        }
+      }
+    }
+
+    final int l = mergeLists(lx, ly, mShadowClasses);
+    updateStateToClassExperimental(l, mShadowStateToClass, mShadowClasses);
+
+    final long pair = constructPair(x, y);
+    statePairs.add(pair);
+
+    for (int e = EventEncoding.NONTAU; e <= mNumProperEvents; e++) {
+      xSet.clear();
+      ySet.clear();
+      xList.clear();
+      yList.clear();
+      for (final int xx : listX) {
+        final int xSucc = getSuccessorState(xx, e);
+        if (xSucc >= 0 && !rel.isDeadlockState(xSucc, marking)) {
+          final int xmin = getMinimum(mInverseMap[xSucc]);
+          if (xSet.add(xmin)) {
+            xList.add(xmin);
+          }
+        }
+      }
+      if (xList.isEmpty()) {
+        continue;
+      }
+      for (final int yy : listY) {
+        final int ySucc = getSuccessorState(yy, e);
+        if (ySucc >= 0 && !rel.isDeadlockState(ySucc, marking)) {
+          final int ymin = getMinimum(mInverseMap[ySucc]);
+          if (ySet.add(ymin)) {
+            yList.add(ymin);
+          }
+        }
+      }
+      for (int i = 0; i < xList.size(); i++) {
+        for (int j = 0; j < yList.size(); j++) {
+          if (!checkMergibilityExperimental(xList.get(i), yList.get(j), x0,
+                                            y0, statePairs, ctrlEvents)) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
+
   private void setUpClasses() throws AnalysisAbortException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
@@ -455,9 +563,6 @@ public class SupervisorReductionTRSimplifier extends
         mStateToClass[s] = list;
       }
     }
-    if (mExperimentalMode) {
-      mStateProperties = new StateProperty[numStates];
-    }
   }
 
   public void setUpEventList(final TIntArrayList enabDisabEvents,
@@ -467,6 +572,7 @@ public class SupervisorReductionTRSimplifier extends
     enabDisabEvents.clear();
     disabEvents.clear();
     final ListBufferTransitionRelation rel = getTransitionRelation();
+    mNumProperEvents = rel.getNumberOfProperEvents() - 1;
     final int marking = getDefaultMarkingID();
     final TIntArrayList[] disabledEventsToStates =
       new TIntArrayList[mNumProperEvents + 1];
@@ -558,7 +664,10 @@ public class SupervisorReductionTRSimplifier extends
         if (rel.isDeadlockState(s, marking)) {
           badClass[nextBad++] = s;
         } else {
-          final int listID = mStateToClass[s];
+          int listID = mStateToClass[s];
+          if (mExperimentalMode) {
+            listID = mStateToClass[mInverseMap[s]];
+          }
           if (mClasses.getFirst(listID) == s) {
             final int[] states = mClasses.toArray(listID);
             classes.add(states);
@@ -593,16 +702,23 @@ public class SupervisorReductionTRSimplifier extends
         final int list3 = mergeLists(list1, list2, mClasses);
         updateStateToClass(list3, mStateToClass, mClasses);
       }
-      if (mExperimentalMode) {
-        if (mStateProperties[hi] == StateProperty.ENABLED
-            || mStateProperties[lo] == StateProperty.ENABLED) {
-          mStateProperties[hi] = mStateProperties[lo] = StateProperty.ENABLED;
-        }
-        if (mStateProperties[hi] == StateProperty.DISABLED
-            || mStateProperties[lo] == StateProperty.DISABLED) {
-          mStateProperties[hi] =
-            mStateProperties[lo] = StateProperty.DISABLED;
-        }
+    }
+  }
+
+  private void mergeExperimental(final TLongHashSet statePairs)
+    throws AnalysisAbortException
+  {
+    final TLongIterator itr = statePairs.iterator();
+    while (itr.hasNext()) {
+      checkAbort();
+      final long pair = itr.next();
+      final int hi = getState(0, pair);
+      final int lo = getState(1, pair);
+      if (mStateToClass[mInverseMap[hi]] != mStateToClass[mInverseMap[lo]]) {
+        final int list1 = mStateToClass[mInverseMap[hi]];
+        final int list2 = mStateToClass[mInverseMap[lo]];
+        final int list3 = mergeLists(list1, list2, mClasses);
+        updateStateToClassExperimental(list3, mStateToClass, mClasses);
       }
     }
   }
@@ -644,6 +760,19 @@ public class SupervisorReductionTRSimplifier extends
     while (iter.advance()) {
       final int current = iter.getCurrentData();
       stateToClass[current] = list;
+    }
+  }
+
+  private void updateStateToClassExperimental(final int list,
+                                              final int[] stateToClass,
+                                              final IntListBuffer classes)
+    throws AnalysisAbortException
+  {
+    final ReadOnlyIterator iter = classes.createReadOnlyIterator(list);
+    iter.reset(list);
+    while (iter.advance()) {
+      final int current = iter.getCurrentData();
+      stateToClass[mInverseMap[current]] = list;
     }
   }
 
@@ -773,14 +902,7 @@ public class SupervisorReductionTRSimplifier extends
   private int[] mShadowStateToClass;
   private IntListBuffer mShadowClasses;
   private boolean mExperimentalMode = false;
-  private BitSet mBitset;
   private boolean mMerged;
-
-
-  private enum StateProperty
-  {
-    NEUTRAL, ENABLED, DISABLED;
-  }
-
-  private StateProperty[] mStateProperties;
+  private int[] mStateMap;
+  private int[] mInverseMap;
 }

@@ -622,7 +622,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           } else {
             // (Reduction &) Localization Enabled
             final TIntArrayList enabDisabEvents = new TIntArrayList();
-            final TIntArrayList disabEvents = new TIntArrayList(0);
+            final TIntArrayList disabEvents = new TIntArrayList();
             final List<AutomatonProxy> autList =
               new ArrayList<AutomatonProxy>();
             final boolean simplified =
@@ -657,11 +657,9 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           // localization only ...
           mSupervisorSimplifier.setDefaultMarkingID(marking);
           mSupervisorSimplifier.setTransitionRelation(mTransitionRelation);
-          mSupervisorSimplifier.setRestrictedEvent(-1);
-          mSupervisorSimplifier.run();
           mTransitionRelation = mSupervisorSimplifier.getTransitionRelation();
           final TIntArrayList enabDisabEvents = new TIntArrayList();
-          final TIntArrayList disabEvents = new TIntArrayList(0);
+          final TIntArrayList disabEvents = new TIntArrayList();
           final List<AutomatonProxy> autList =
             new ArrayList<AutomatonProxy>();
           mSupervisorSimplifier.setExperimentalMode(true);
