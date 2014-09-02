@@ -109,6 +109,17 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     return mSupervisorLocalizationEnabled;
   }
 
+  public void setNonFailingUncontrollableEvents(final Collection<EventProxy> events)
+  {
+    mNonFailingUncontrollableEvents = events;
+  }
+
+  public Collection<EventProxy> getNonFailingUncontrollableEvents()
+  {
+    return mNonFailingUncontrollableEvents;
+  }
+
+
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
@@ -162,6 +173,17 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
                         EventEncoding.FILTER_PROPOSITIONS);
     mEventEncoding.sortProperEvents(EventEncoding.STATUS_CONTROLLABLE);
     mNumProperEvents = mEventEncoding.getNumberOfProperEvents();
+    mFailingUncontrollableEventIndexes = new BitSet();
+    if (mNonFailingUncontrollableEvents != null) {
+      for (int e=EventEncoding.NONTAU; e<mNumProperEvents; e++) {
+        final EventProxy event = mEventEncoding.getProperEvent(e);
+        if (translator.getEventKind(event) == EventKind.UNCONTROLLABLE &&
+            !mNonFailingUncontrollableEvents.contains(event)) {
+          mFailingUncontrollableEventIndexes.set(e);
+        }
+      }
+    }
+    mFailedUncontrollableEventIndex = -1;
 
     ArrayList<AutomatonProxy> plants = new ArrayList<AutomatonProxy>();
     ArrayList<AutomatonProxy> specs = new ArrayList<AutomatonProxy>();
@@ -429,6 +451,10 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     super.tearDown();
     mOriginalStates = null;
     mStateMarkings = null;
+    if (mFailedUncontrollableEventIndex >= 0) {
+      mFailedUncontrollableEvent =
+        mEventEncoding.getProperEvent(mFailedUncontrollableEventIndex);
+    }
     mEventEncoding = null;
     mGlobalVisited = null;
     mStateTuples = null;
@@ -444,7 +470,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   {
     try {
       setUp();
-      // initial search
+      initialSearch:
       while (!mGlobalStack.isEmpty()) {
         final int[] sentinel = new int[1];
         final int[] encodedRoot = mGlobalStack.pop();
@@ -465,7 +491,12 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             mBackTrace.push(current);
             safe = mUnctrlInitialReachabilityExplorer.explore(current);
             if (!safe) {
-              break;
+              if (mFailedUncontrollableEventIndex >= 0) {
+                mInitialIsBad = true;
+                break initialSearch;
+              } else {
+                break;
+              }
             }
           }
         }
@@ -501,6 +532,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       }
 
       mMustContinue = false;
+      nonblocking:
       do {
         // mark non-coreachable states (trim)
         mNonCoreachableStates.set(0, mNumStates);
@@ -535,6 +567,10 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             while (!mUnvisited.isEmpty()) {
               final int[] s = mUnvisited.remove();
               mBackwardsUncontrollableExplorer.explore(s);
+              if (mFailedUncontrollableEventIndex >= 0) {
+                mInitialIsBad = true;
+                break nonblocking;
+              }
             }
           }
         }
@@ -742,6 +778,12 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   {
     return true;
   }
+
+  public EventProxy getFailedUncontrollableEvent()
+  {
+    return mFailedUncontrollableEvent;
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods
@@ -1079,6 +1121,9 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             final int[] succ = mmTransitions[a][e][mmDecodedTuple[a]];
             if (succ == null) {
               if (a >= mNumPlants) {
+                if (mFailingUncontrollableEventIndexes.get(e)) {
+                  mFailedUncontrollableEventIndex = e;
+                }
                 return false;
               } else {
                 continue events;
@@ -1177,6 +1222,10 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           mUnvisited.offer(mStateTuples.get(s));
           mBadStates.set(s);
           mMustContinue = true;
+        }
+        if (mFailingUncontrollableEventIndexes.get(event)) {
+          mFailedUncontrollableEventIndex = event;
+          return false;
         }
       }
       return true;
@@ -1298,6 +1347,10 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   private EventProxy mUsedMarking;
   private boolean mSupervisorReductionEnabled = false;
   private boolean mSupervisorLocalizationEnabled = false;
+  private Collection<EventProxy> mNonFailingUncontrollableEvents;
+
+  //# Additional result
+  private EventProxy mFailedUncontrollableEvent;
 
   //# Variables used for encoding/decoding
   /** a list contains number of bits needed for each automaton */
@@ -1352,9 +1405,14 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   private BitSet mGoodStates;
   private int[] mStateMap;
 
+  private BitSet mFailingUncontrollableEventIndexes;
+  private int mFailedUncontrollableEventIndex;
+
+
   //#########################################################################
   //# Class Constants
   private static final int MAX_TABLE_SIZE = 500000;
   private static final int SIZE_INT = 32;
+
 
 }
