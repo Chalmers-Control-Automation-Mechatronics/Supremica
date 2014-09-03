@@ -186,6 +186,16 @@ public class CompositionalAutomataSynthesizer
 
 
   //#########################################################################
+  //# Configuration
+  @Override
+  public AutomataSynthesisAbstractionProcedureFactory
+    getAbstractionProcedureFactory()
+  {
+    return AutomataSynthesisAbstractionProcedureFactory.getInstance();
+  }
+
+
+  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
   public void requestAbort()
@@ -201,22 +211,28 @@ public class CompositionalAutomataSynthesizer
 
 
   //#########################################################################
-  //# Configuration
+  //# Interface net.sourceforge.waters.model.analysis.SupervisorSynthesizer
   @Override
-  public AutomataSynthesisAbstractionProcedureFactory
-    getAbstractionProcedureFactory()
-  {
-    return AutomataSynthesisAbstractionProcedureFactory.getInstance();
-  }
-
   public void setSupervisorReductionEnabled(final boolean enable)
   {
     mSupervisorReductionEnabled = enable;
   }
 
+  @Override
   public boolean getSupervisorReductionEnabled()
   {
     return mSupervisorReductionEnabled;
+  }
+
+  @Override
+  public void setSupervisorLocalizationEnabled(final boolean enable)
+  {
+  }
+
+  @Override
+  public boolean getSupervisorLocalizationEnabled()
+  {
+    return false;
   }
 
 

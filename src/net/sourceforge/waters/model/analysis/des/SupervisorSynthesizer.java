@@ -63,4 +63,38 @@ public interface SupervisorSynthesizer
    */
   public EventProxy getConfiguredDefaultMarking();
 
+  /**
+   * <P>Sets whether synthesis should use supervisor reduction.</P>
+   * <P>If enabled, every synthesised supervisor component may be replaced by
+   * a single smaller automaton.</P>
+   * <P><STRONG>Reference:</STRONG> Rong Su and W. Murray Wonham. Supervisor
+   * Reduction for Discrete-Event Systems. Discrete Event Dynamic Systems
+   * <STRONG>14</STRONG>&nbsp;(1), 31-53, 2004.</P>
+   */
+  public void setSupervisorReductionEnabled(final boolean enable);
+
+  /**
+   * Returns whether the synthesiser uses supervisor reduction.
+   * @see #setSupervisorReductionEnabled(boolean) setSupervisorReductionEnabled()
+   */
+  public boolean getSupervisorReductionEnabled();
+
+  /**
+   * <P>Sets whether synthesis should use supervisor localisation.</P>
+   * <P>If enabled, every synthesised supervisor component may be replaced by
+   * several smaller automata, one for each controllable event to be disabled
+   * by the supervisor.</P>
+   * <P><STRONG>Reference:</STRONG> Kai Cai and W. M. Wonham. Supervisor
+   * Localization: A Top-Down Approach to Distributed Control of Discrete
+   * Event Systems. IEEE Transactions on Automatic Control,
+   * <STRONG>55</STRONG>&nbsp;(3), 605-618, March 2010.</P>
+   */
+  public void setSupervisorLocalizationEnabled(final boolean enable);
+
+  /**
+   * Returns whether the synthesiser uses supervisor localisation.
+   * @see #setSupervisorLocalizationEnabled(boolean) setSupervisorLocalizationEnabled()
+   */
+  public boolean getSupervisorLocalizationEnabled();
+
 }

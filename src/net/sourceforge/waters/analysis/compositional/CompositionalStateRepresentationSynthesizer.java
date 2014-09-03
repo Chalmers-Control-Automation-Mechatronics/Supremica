@@ -211,6 +211,31 @@ public class CompositionalStateRepresentationSynthesizer extends
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.SupervisorSynthesizer
+  @Override
+  public void setSupervisorReductionEnabled(final boolean enable)
+  {
+  }
+
+  @Override
+  public boolean getSupervisorReductionEnabled()
+  {
+    return false;
+  }
+
+  @Override
+  public void setSupervisorLocalizationEnabled(final boolean enable)
+  {
+  }
+
+  @Override
+  public boolean getSupervisorLocalizationEnabled()
+  {
+    return false;
+  }
+
+
+  //#########################################################################
   //# Invocation
   @Override
   public boolean run() throws AnalysisException

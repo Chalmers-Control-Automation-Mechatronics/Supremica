@@ -676,9 +676,8 @@ public abstract class AbstractSupervisorSynthesizerTest
         factory.createProductDESProxy(name, comment, null, events, automata);
       saveDES(replaced, basename);
       assertTrue("Expected failed synthesis, but got a result!", expect);
-      verifySupervisor(replaced, mControllabilityChecker,
-                       null, "controllable");
-      verifySupervisor(replaced, mConflictChecker, null, "nonconflicting");
+      verifySupervisorControllability(replaced);
+      verifySupervisorNonblocking(replaced);
       automata.addAll(expectedSupervisors);
       final ProductDESProxy combined =
         factory.createProductDESProxy(name, comment, null, events, automata);
@@ -690,6 +689,18 @@ public abstract class AbstractSupervisorSynthesizerTest
       assertFalse("Synthesis failed, but the problem has a solution!",
                   expect);
     }
+  }
+
+  protected void verifySupervisorControllability(final ProductDESProxy des)
+    throws Exception
+  {
+    verifySupervisor(des, mControllabilityChecker, null, "controllable");
+  }
+
+  protected void verifySupervisorNonblocking(final ProductDESProxy des)
+    throws Exception
+  {
+    verifySupervisor(des, mConflictChecker, null, "nonconflicting");
   }
 
   private void verifySupervisor(final ProductDESProxy des,

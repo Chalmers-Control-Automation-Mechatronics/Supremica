@@ -22,9 +22,7 @@ import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.analysis.ProxyResult;
 import net.sourceforge.waters.model.analysis.des.AbstractProductDESBuilder;
-import net.sourceforge.waters.model.analysis.des.ProductDESResult;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
@@ -38,12 +36,30 @@ import org.apache.log4j.Logger;
 
 
 /**
- * The modular synthesis algorithm.
+ * <P>The modular synthesis algorithm.</P>
+ *
+ * <P>This synthesis algorithm produces a least restrictive supervisor
+ * that ensures controllability, but not necessarily nonblocking.
+ * For each specification, it takes into account all plants containing
+ * the controllable events disabled by the specification and possibly
+ * further plants as needed, to produce a supervisor component ensuring
+ * controllability of that specification.</P>
+ *
+ * <P>This implementation also attempts to ensure nonblocking, but only
+ * locally for each subsystems considered. No attempt is made to ensure
+ * global nonblocking, and the resultant supervised behaviour may indeed
+ * be blocking.</P>
+ *
+ * <P><STRONG>Reference:</STRONG> K.&nbsp;&Aring;kesson, H.&nbsp;Flordal, and
+ * M.&nbsp;Fabian. Exploiting Modularity for Synthesis and Verification of
+ * Supervisors. Proc. 15th IFAC World Congress on Automatic Control,
+ * Barcelona, 2002.</P>
  *
  * @author Sahar Mohajerani, Robi Malik
  */
 
-public class ModularControllabilitySynthesizer extends AbstractProductDESBuilder
+public class ModularControllabilitySynthesizer
+  extends AbstractProductDESBuilder
   implements SupervisorSynthesizer
 {
 
@@ -52,42 +68,48 @@ public class ModularControllabilitySynthesizer extends AbstractProductDESBuilder
   public ModularControllabilitySynthesizer(final ProductDESProxyFactory factory)
   {
     super(factory);
+    mMonolithicSynthesizer = new MonolithicSynthesizer(factory);
   }
 
   public ModularControllabilitySynthesizer(final ProductDESProxy model,
-                               final ProductDESProxyFactory factory)
+                                           final ProductDESProxyFactory factory)
   {
     super(model, factory);
+    mMonolithicSynthesizer = new MonolithicSynthesizer(factory);
   }
 
   public ModularControllabilitySynthesizer(final ProductDESProxy model,
-                               final ProductDESProxyFactory factory,
-                               final KindTranslator translator)
+                                           final ProductDESProxyFactory factory,
+                                           final KindTranslator translator)
   {
     super(model, factory, translator);
+    mMonolithicSynthesizer = new MonolithicSynthesizer(factory);
   }
 
 
   //#########################################################################
   //# Configuration
-  public void setSupervisorReductionEnabled(final boolean enable)
+  /**
+   * Sets whether the synthesised supervisor should include automata from
+   * the original model that have not been used in synthesis.
+   * If <CODE>true</CODE>, the synthesis result will also include
+   * specifications that are already controllable and plants that were
+   * not needed for any synthesis; otherwise only computed supervisors
+   * will be included.
+   */
+  public void setIncludesAllAutomata(final boolean include)
   {
-    mSupervisorReductionEnabled = enable;
+    mIncludesAllAutomata = include;
   }
 
-  public boolean getSupervisorReductionEnabled()
+  /**
+   * Returns whether the synthesised supervisor includes automata from
+   * the original model that have not been used in synthesis.
+   * @see #setIncludesAllAutomata(boolean) setIncludesAllAutomata()
+   */
+  public boolean getIncludesAllAutomata()
   {
-    return mSupervisorReductionEnabled;
-  }
-
-  public void setSupervisorLocalizationEnabled(final boolean enable)
-  {
-    mSupervisorLocalizationEnabled = enable;
-  }
-
-  public boolean getSupervisorLocalizationEnabled()
-  {
-    return mSupervisorLocalizationEnabled;
+    return mIncludesAllAutomata;
   }
 
 
@@ -102,18 +124,52 @@ public class ModularControllabilitySynthesizer extends AbstractProductDESBuilder
     }
   }
 
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    if (mMonolithicSynthesizer != null) {
+      mMonolithicSynthesizer.resetAbort();
+    }
+  }
+
+
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.SynchronousProductBuilder
+  //# Interface net.sourceforge.waters.model.analysis.SupervisorSynthesizer
   @Override
   public void setConfiguredDefaultMarking(final EventProxy marking)
   {
-    mConfiguredMarking = marking;
+    mMonolithicSynthesizer.setConfiguredDefaultMarking(marking);
   }
 
   @Override
   public EventProxy getConfiguredDefaultMarking()
   {
-    return mConfiguredMarking;
+    return mMonolithicSynthesizer.getConfiguredDefaultMarking();
+  }
+
+  @Override
+  public void setSupervisorReductionEnabled(final boolean enable)
+  {
+    mMonolithicSynthesizer.setSupervisorReductionEnabled(enable);
+  }
+
+  @Override
+  public boolean getSupervisorReductionEnabled()
+  {
+    return mMonolithicSynthesizer.getSupervisorReductionEnabled();
+  }
+
+  @Override
+  public void setSupervisorLocalizationEnabled(final boolean enable)
+  {
+    mMonolithicSynthesizer.setSupervisorLocalizationEnabled(enable);
+  }
+
+  @Override
+  public boolean getSupervisorLocalizationEnabled()
+  {
+    return mMonolithicSynthesizer.getSupervisorLocalizationEnabled();
   }
 
 
@@ -125,13 +181,19 @@ public class ModularControllabilitySynthesizer extends AbstractProductDESBuilder
   {
     super.setUp();
     final KindTranslator translator = getKindTranslator();
+    mMonolithicSynthesizer.setKindTranslator(translator);
+    mMonolithicSynthesizer.setNodeLimit(getNodeLimit());
+    mMonolithicSynthesizer.setTransitionLimit(getTransitionLimit());
+    mMonolithicSynthesizer.setNonblockingSupported(false);
     final ProductDESProxy model = getModel();
-    mUncontrollableEventMap = new HashMap<>(model.getEvents().size());
+    final int numEvents = model.getEvents().size();
+    mUncontrollableEventMap = new HashMap<>(numEvents);
     for (final AutomatonProxy aut : model.getAutomata()) {
       if (translator.getComponentKind(aut) == ComponentKind.PLANT) {
         for (final EventProxy event : aut.getEvents()) {
           if (translator.getEventKind(event) == EventKind.UNCONTROLLABLE) {
-            Collection<AutomatonProxy> automata = mUncontrollableEventMap.get(event);
+            Collection<AutomatonProxy> automata =
+              mUncontrollableEventMap.get(event);
             if (automata == null) {
               automata = new ArrayList<>();
               mUncontrollableEventMap.put(event, automata);
@@ -141,27 +203,21 @@ public class ModularControllabilitySynthesizer extends AbstractProductDESBuilder
         }
       }
     }
-    mMonolithicSynthesizer = new MonolithicSynthesizer(getFactory());
-    mMonolithicSynthesizer.setKindTranslator(translator);
-    mMonolithicSynthesizer.setConfiguredDefaultMarking(mConfiguredMarking);
-    mMonolithicSynthesizer.setSupervisorLocalizationEnabled(mSupervisorLocalizationEnabled);
-    mMonolithicSynthesizer.setSupervisorReductionEnabled(mSupervisorReductionEnabled);
-    mUsedAutomata = new THashSet<>();
+    if (mIncludesAllAutomata) {
+      mUsedAutomata = new THashSet<>(numEvents);
+    }
   }
 
   @Override
   protected void addStatistics()
   {
     super.addStatistics();
-    final ProxyResult<ProductDESProxy> result = getAnalysisResult();
-    result.setNumberOfAutomata(mNumAutomata);
   }
 
   @Override
   protected void tearDown()
   {
     super.tearDown();
-    mMonolithicSynthesizer = null;
     mUncontrollableEventMap = null;
     mUsedAutomata = null;
   }
@@ -174,50 +230,70 @@ public class ModularControllabilitySynthesizer extends AbstractProductDESBuilder
   {
     try {
       setUp();
-      final Collection<AutomatonProxy> supervisors = new ArrayList<>();
-
       final ProductDESProxy model = getModel();
+      final int numAutomata = model.getAutomata().size();
+      final Collection<AutomatonProxy> supervisors =
+        new ArrayList<>(numAutomata);
       final KindTranslator translator = getKindTranslator();
-      final ProductDESResult result = getAnalysisResult();
       for (final AutomatonProxy aut : model.getAutomata()) {
         if (translator.getComponentKind(aut) == ComponentKind.SPEC) {
-          final Collection<EventProxy> uncontrollable = getUncontrollableEvents(aut);
+          checkAbort();
+          final Collection<EventProxy> uncontrollable =
+            getUncontrollableEvents(aut);
           if (uncontrollable.isEmpty()) {
             continue;
           }
           final Collection<AutomatonProxy> plants =
             new THashSet<>(model.getAutomata().size());
           for (final EventProxy event : uncontrollable) {
-            plants.addAll(mUncontrollableEventMap.get(event));
+            final Collection<AutomatonProxy> automata =
+              mUncontrollableEventMap.get(event);
+            if (automata != null) {
+              plants.addAll(automata);
+            }
           }
           ProductDESProxy des = createProductDES(aut, plants);
+          mMonolithicSynthesizer.setOutputName("sup:" + aut.getName());
           mMonolithicSynthesizer.setModel(des);
           mMonolithicSynthesizer.setNonFailingUncontrollableEvents(uncontrollable);
           while (!mMonolithicSynthesizer.run()) {
-            final EventProxy failedEvent = mMonolithicSynthesizer.getFailedUncontrollableEvent();
+            final EventProxy failedEvent =
+              mMonolithicSynthesizer.getFailedUncontrollableEvent();
             if (failedEvent == null) {
-              result.setSatisfied(false);
-              return false;
+              return setBooleanResult(false);
             }
-            plants.addAll(mUncontrollableEventMap.get(failedEvent));
+            final Collection<AutomatonProxy> automata =
+              mUncontrollableEventMap.get(failedEvent);
+            if (automata != null) {
+              plants.addAll(automata);
+            }
             uncontrollable.add(failedEvent);
             mMonolithicSynthesizer.setNonFailingUncontrollableEvents(uncontrollable);
             des = createProductDES(aut, plants);
             mMonolithicSynthesizer.setModel(des);
           }
-          supervisors.addAll(mMonolithicSynthesizer.getAnalysisResult().getComputedAutomata());
+          supervisors.addAll
+            (mMonolithicSynthesizer.getAnalysisResult().getComputedAutomata());
         }
       }
-      for (final AutomatonProxy aut : model.getAutomata()) {
-        if (!mUsedAutomata.contains(aut)) {
-          supervisors.add(aut);
+      if (mIncludesAllAutomata) {
+        for (final AutomatonProxy aut : model.getAutomata()) {
+          switch (translator.getComponentKind(aut)) {
+          case PLANT:
+          case SPEC:
+            if (!mUsedAutomata.contains(aut)) {
+              supervisors.add(aut);
+            }
+            break;
+          default:
+            break;
+          }
         }
       }
-      final ProductDESProxy des = AutomatonTools.createProductDESProxy("supervisor",
-                                                                 supervisors,
-                                                                 getFactory());
-      result.setComputedProductDES(des);
-      return true;
+      final ProductDESProxy des =
+        AutomatonTools.createProductDESProxy("supervisor", supervisors,
+                                             getFactory());
+      return setProxyResult(des);
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
     } catch (final OutOfMemoryError error) {
@@ -243,7 +319,6 @@ public class ModularControllabilitySynthesizer extends AbstractProductDESBuilder
 
   //#########################################################################
   //# Auxiliary Methods
-
   private Collection<EventProxy> getUncontrollableEvents(final AutomatonProxy aut)
   {
     final Collection<EventProxy> result = new ArrayList<>();
@@ -259,27 +334,58 @@ public class ModularControllabilitySynthesizer extends AbstractProductDESBuilder
   private ProductDESProxy createProductDES(final AutomatonProxy spec,
                                            final Collection<AutomatonProxy> plants)
   {
-    final List<AutomatonProxy> list = new ArrayList<>();
+    final int numAutomata = plants.size() + 1;
+    final List<AutomatonProxy> list = new ArrayList<>(numAutomata);
     list.add(spec);
     list.addAll(plants);
     Collections.sort(list);
-    mUsedAutomata.addAll(list);
-    return AutomatonTools.createProductDESProxy("subsystem:" + spec.getName(),
-                                                list, getFactory());
+    if (mIncludesAllAutomata) {
+      mUsedAutomata.addAll(list);
+    }
+    final ProductDESProxy des =
+      AutomatonTools.createProductDESProxy("subsystem:" + spec.getName(),
+                                           list, getFactory());
+    logSubsystem(des);
+    return des;
   }
+
+
+  //#########################################################################
+  //# Debugging
+  private void logSubsystem(final ProductDESProxy des)
+  {
+    final Logger logger = getLogger();
+    if (logger.isDebugEnabled()) {
+      final KindTranslator translator = getKindTranslator();
+      final StringBuilder builder =
+        new StringBuilder("Attempting monolithic synthesis for: ");
+      final ComponentKind[] kinds = {ComponentKind.SPEC, ComponentKind.PLANT};
+      String sep = "";
+      for (final ComponentKind kind : kinds) {
+        for (final AutomatonProxy aut : des.getAutomata()) {
+          if (translator.getComponentKind(aut) == kind) {
+            builder.append(sep);
+            builder.append(aut.getName());
+            sep = ", ";
+          }
+        }
+        sep = "; ";
+      }
+      logger.debug(builder);
+    }
+  }
+
 
   //#########################################################################
   //# Data Members
-  private EventProxy mConfiguredMarking;
-  private boolean mSupervisorReductionEnabled = false;
-  private boolean mSupervisorLocalizationEnabled = false;
+  // Configuration options
+  private boolean mIncludesAllAutomata = false;
 
-  //# Variables used for encoding/decoding
+  // Permanent tools
+  private final MonolithicSynthesizer mMonolithicSynthesizer;
 
-  private int mNumAutomata;
-
-  private MonolithicSynthesizer mMonolithicSynthesizer;
-  private Map<EventProxy, Collection<AutomatonProxy>> mUncontrollableEventMap;
+  // Algorithm variables
+  private Map<EventProxy,Collection<AutomatonProxy>> mUncontrollableEventMap;
   private Collection<AutomatonProxy> mUsedAutomata;
 
 

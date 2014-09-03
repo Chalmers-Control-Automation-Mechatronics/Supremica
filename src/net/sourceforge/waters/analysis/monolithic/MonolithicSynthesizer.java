@@ -87,26 +87,17 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     super(model, factory, translator);
   }
 
+
   //#########################################################################
   //# Configuration
-  public void setSupervisorReductionEnabled(final boolean enable)
+  public void setNonblockingSupported(final boolean support)
   {
-    mSupervisorReductionEnabled = enable;
+    mNonblockingSupported = support;
   }
 
-  public boolean getSupervisorReductionEnabled()
+  public boolean getNonblockingSupported()
   {
-    return mSupervisorReductionEnabled;
-  }
-
-  public void setSupervisorLocalizationEnabled(final boolean enable)
-  {
-    mSupervisorLocalizationEnabled = enable;
-  }
-
-  public boolean getSupervisorLocalizationEnabled()
-  {
-    return mSupervisorLocalizationEnabled;
+    return mNonblockingSupported;
   }
 
   public void setNonFailingUncontrollableEvents(final Collection<EventProxy> events)
@@ -117,6 +108,26 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   public Collection<EventProxy> getNonFailingUncontrollableEvents()
   {
     return mNonFailingUncontrollableEvents;
+  }
+
+  /**
+   * Sets the preferred name (or name prefix) for any supervisors produced
+   * as output.
+   */
+  @Override
+  public void setOutputName(final String name)
+  {
+    mOutputName = name;
+  }
+
+  /**
+   * Gets the preferred name of supervisors produced as output.
+   * @see #setOutputName(String) setOutputName()
+   */
+  @Override
+  public String getOutputName()
+  {
+    return mOutputName;
   }
 
 
@@ -131,8 +142,18 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     }
   }
 
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    if (mSupervisorSimplifier != null) {
+      mSupervisorSimplifier.resetAbort();
+    }
+  }
+
+
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.SynchronousProductBuilder
+  //# Interface net.sourceforge.waters.model.analysis.SupervisorSynthesizer
   @Override
   public void setConfiguredDefaultMarking(final EventProxy marking)
   {
@@ -145,6 +166,31 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   {
     return mConfiguredMarking;
   }
+
+  @Override
+  public void setSupervisorReductionEnabled(final boolean enable)
+  {
+    mSupervisorReductionEnabled = enable;
+  }
+
+  @Override
+  public boolean getSupervisorReductionEnabled()
+  {
+    return mSupervisorReductionEnabled;
+  }
+
+  @Override
+  public void setSupervisorLocalizationEnabled(final boolean enable)
+  {
+    mSupervisorLocalizationEnabled = enable;
+  }
+
+  @Override
+  public boolean getSupervisorLocalizationEnabled()
+  {
+    return mSupervisorLocalizationEnabled;
+  }
+
 
   //#########################################################################
   //# Overrides for Base Class
@@ -173,9 +219,10 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
                         EventEncoding.FILTER_PROPOSITIONS);
     mEventEncoding.sortProperEvents(EventEncoding.STATUS_CONTROLLABLE);
     mNumProperEvents = mEventEncoding.getNumberOfProperEvents();
+    mFailedUncontrollableEvent = null;
     mFailingUncontrollableEventIndexes = new BitSet();
     if (mNonFailingUncontrollableEvents != null) {
-      for (int e=EventEncoding.NONTAU; e<mNumProperEvents; e++) {
+      for (int e = EventEncoding.NONTAU; e < mNumProperEvents; e++) {
         final EventProxy event = mEventEncoding.getProperEvent(e);
         if (translator.getEventKind(event) == EventKind.UNCONTROLLABLE &&
             !mNonFailingUncontrollableEvents.contains(event)) {
@@ -183,7 +230,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
         }
       }
     }
-    mFailedUncontrollableEventIndex = -1;
 
     ArrayList<AutomatonProxy> plants = new ArrayList<AutomatonProxy>();
     ArrayList<AutomatonProxy> specs = new ArrayList<AutomatonProxy>();
@@ -349,8 +395,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     mBadStates = new BitSet(mNumStates);
     mSafeStates = new BitSet(mNumStates);
     final IntArrayHashingStrategy strategy = new IntArrayHashingStrategy();
-    mGlobalVisited = new TObjectIntCustomHashMap<int[]>(strategy);
-    mGlobalVisited.ensureCapacity(tableSize);
+    mGlobalVisited =
+      new TObjectIntCustomHashMap<int[]>(strategy, tableSize, 0.5f, -1);
     mLocalVisited = new WatersHashSet<int[]>(strategy);
     mGlobalStack = new ArrayDeque<int[]>();
     mLocalStack = new ArrayDeque<int[]>();
@@ -405,7 +451,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       new CtrlInitialReachabilityExplorer(eventAutomata, transitions,
                                           ndTuple1, firstControllable,
                                           mNumProperEvents - 1);
-
+    mInitialIsBad = false;
     mCtrlInitialReachabilityExplorer.permutations(mNumAutomata, null, -1);
     ndTuple2 = Arrays.copyOf(ndTuple1, mNumAutomata);
     ndTuple3 = Arrays.copyOf(ndTuple1, mNumAutomata);
@@ -415,6 +461,12 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       new UnctrlInitialReachabilityExplorer(eventAutomata, transitions,
                                             ndTuple1, EventEncoding.NONTAU,
                                             lastUncontrollable);
+    if (mNonFailingUncontrollableEvents != null) {
+      mUnctrlInitialReExplorer =
+        new UnctrlInitialReExplorer(eventAutomata, transitions,
+                                    ndTuple1, EventEncoding.NONTAU,
+                                    lastUncontrollable);
+    }
     mCoreachabilityExplorer =
       new CoreachabilityExplorer(reverseEventAutomata, reverseTransitions,
                                  ndTuple1, EventEncoding.NONTAU,
@@ -449,12 +501,16 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   protected void tearDown()
   {
     super.tearDown();
+    mCtrlInitialReachabilityExplorer = null;
+    mUnctrlInitialReachabilityExplorer = null;
+    mUnctrlInitialReExplorer = null;
+    mCoreachabilityExplorer = null;
+    mBackwardsUncontrollableExplorer = null;
+    mReachabilityExplorer = null;
+    mFinalStateExplorer = null;
+    mSupervisorSimplifier = null;
     mOriginalStates = null;
     mStateMarkings = null;
-    if (mFailedUncontrollableEventIndex >= 0) {
-      mFailedUncontrollableEvent =
-        mEventEncoding.getProperEvent(mFailedUncontrollableEventIndex);
-    }
     mEventEncoding = null;
     mGlobalVisited = null;
     mStateTuples = null;
@@ -463,6 +519,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     mTargetTuple = null;
   }
 
+
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
   @Override
@@ -470,9 +527,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   {
     try {
       setUp();
-      initialSearch:
+      final int[] sentinel = new int[1];
       while (!mGlobalStack.isEmpty()) {
-        final int[] sentinel = new int[1];
         final int[] encodedRoot = mGlobalStack.pop();
         final int r = mGlobalVisited.get(encodedRoot);
         if (mSafeStates.get(r) || mBadStates.get(r)) {
@@ -491,9 +547,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             mBackTrace.push(current);
             safe = mUnctrlInitialReachabilityExplorer.explore(current);
             if (!safe) {
-              if (mFailedUncontrollableEventIndex >= 0) {
-                mInitialIsBad = true;
-                break initialSearch;
+              if (mInitialIsBad) {
+                return setBooleanResult(false);
               } else {
                 break;
               }
@@ -508,73 +563,76 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           for (final int[] current : mLocalVisited) {
             mCtrlInitialReachabilityExplorer.explore(current);
           }
+          mBackTrace.clear();
         } else {
-          for (final int[] current : mBackTrace) {
-            if (current == sentinel) {
-              continue;
-            } else {
-              int n = 0;
-              if (mGlobalVisited.containsKey(current)) {
-                n = mGlobalVisited.get(current);
-                if (n < mNumInitialStates) {
-                  return setBooleanResult(false);
-                }
-              } else {
-                n = addEncodedNewState(current);
-              }
-              mBadStates.set(n);
+          int[] current = mBackTrace.pop();
+          while (current != sentinel) {
+            if (mUnctrlInitialReExplorer != null &&
+                !mUnctrlInitialReExplorer.explore(current)) {
+              return setBooleanResult(false);
             }
+            int n = mGlobalVisited.get(current);
+            if (n >= 0) {
+              if (n < mNumInitialStates) {
+                mInitialIsBad = true;
+                return setBooleanResult(false);
+              }
+            } else {
+              n = addEncodedNewState(current);
+            }
+            mBadStates.set(n);
+            current = mBackTrace.pop();
           }
         }
         mLocalStack.clear();
         mLocalVisited.clear();
-        mBackTrace.clear();
       }
 
-      mMustContinue = false;
-      nonblocking:
-      do {
-        // mark non-coreachable states (trim)
-        mNonCoreachableStates.set(0, mNumStates);
-        for (int t = 0; t < mNumStates; t++) {
-          if (!mBadStates.get(t)) {
-            final int[] tuple = new int[mNumAutomata];
-            final int[] encodedTuple = mStateTuples.get(t);
-            decode(encodedTuple, tuple);
-            if (isMarkedState(tuple)) {
-              mUnvisited.add(encodedTuple);
-              mNonCoreachableStates.set(t, false);
+      if (mNonblockingSupported) {
+        mMustContinue = false;
+        do {
+          // mark non-coreachable states (trim)
+          mNonCoreachableStates.set(0, mNumStates);
+          for (int t = 0; t < mNumStates; t++) {
+            if (!mBadStates.get(t)) {
+              final int[] tuple = new int[mNumAutomata];
+              final int[] encodedTuple = mStateTuples.get(t);
+              decode(encodedTuple, tuple);
+              if (isMarkedState(tuple)) {
+                mUnvisited.add(encodedTuple);
+                mNonCoreachableStates.set(t, false);
+                while (!mUnvisited.isEmpty()) {
+                  final int[] s = mUnvisited.remove();
+                  mCoreachabilityExplorer.explore(s);
+                }
+              }
+            }
+          }
+
+          for (int b = 0; b < mNumInitialStates; b++) {
+            if (!mBadStates.get(b) && mNonCoreachableStates.get(b)) {
+              mInitialIsBad = true;
+              return setBooleanResult(false);
+            }
+          }
+          // mark uncontrollable states
+          mMustContinue = false;
+          mUnvisited.clear();
+          for (int state = 0; state < mNumStates; state++) {
+            if (!mBadStates.get(state) && mNonCoreachableStates.get(state)) {
+              mBadStates.set(state);
+              mUnvisited.offer(mStateTuples.get(state));
               while (!mUnvisited.isEmpty()) {
                 final int[] s = mUnvisited.remove();
-                mCoreachabilityExplorer.explore(s);
+                mBackwardsUncontrollableExplorer.explore(s);
+                if (mInitialIsBad) {
+                  return setBooleanResult(false);
+                }
               }
             }
           }
-        }
-
-        for (int b = 0; b < mNumInitialStates; b++) {
-          if (!mBadStates.get(b) && mNonCoreachableStates.get(b)) {
-            mInitialIsBad = true;
-          }
-        }
-        // mark uncontrollable states
-        mMustContinue = false;
-        mUnvisited.clear();
-        for (int state = 0; state < mNumStates; state++) {
-          if (!mBadStates.get(state) && mNonCoreachableStates.get(state)) {
-            mBadStates.set(state);
-            mUnvisited.offer(mStateTuples.get(state));
-            while (!mUnvisited.isEmpty()) {
-              final int[] s = mUnvisited.remove();
-              mBackwardsUncontrollableExplorer.explore(s);
-              if (mFailedUncontrollableEventIndex >= 0) {
-                mInitialIsBad = true;
-                break nonblocking;
-              }
-            }
-          }
-        }
-      } while (mMustContinue);
+        } while (mMustContinue);
+      }
 
       // reachability search (count the number of reachable states)
       mNumGoodStates = 0;
@@ -589,10 +647,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       for (int b = 0; b < mNumInitialStates; b++) {
         if (!mReachableStates.get(b)) {
           mInitialIsBad = true;
+          return setBooleanResult(false);
         }
-      }
-      if (mInitialIsBad) {
-        return setBooleanResult(false);
       }
 
       // re-encode states (make only one bad state)
@@ -897,9 +953,17 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   private ProductDESProxy createDESProxy(final ListBufferTransitionRelation rel)
     throws EventNotFoundException
   {
+    rel.setName(mOutputName);
     final AutomatonProxy aut =
       rel.createAutomaton(getFactory(), mEventEncoding);
     return AutomatonTools.createProductDESProxy(aut, getFactory());
+  }
+
+  private boolean setFailedUncontrollableEvent(final int event)
+  {
+    mFailedUncontrollableEvent = mEventEncoding.getProperEvent(event);
+    mInitialIsBad = true;
+    return false;
   }
 
 
@@ -1114,7 +1178,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     {
       checkAbort();
       decode(encodedTuple, mmDecodedTuple);
-      events: for (int e = mmFirstEvent; e <= mmLastEvent; e++) {
+      events:
+      for (int e = mmFirstEvent; e <= mmLastEvent; e++) {
         Arrays.fill(mmNDTuple, null);
         for (final int a : mmEventAutomata[e]) {
           if (mmTransitions[a][e] != null) {
@@ -1122,7 +1187,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             if (succ == null) {
               if (a >= mNumPlants) {
                 if (mFailingUncontrollableEventIndexes.get(e)) {
-                  mFailedUncontrollableEventIndex = e;
+                  setFailedUncontrollableEvent(e);
                 }
                 return false;
               } else {
@@ -1147,9 +1212,14 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       final int[] encoded = encode(mTargetTuple);
       if (mLocalVisited.contains(encoded)) {
         return true;
-      } else if (mGlobalVisited.containsKey(encoded)) {
+      } else {
         final int s = mGlobalVisited.get(encoded);
-        if (mBadStates.get(s)) {
+        if (s < 0) {
+          // nothing ...
+        } else if (mBadStates.get(s)) {
+          if (mFailingUncontrollableEventIndexes.get(event)) {
+            setFailedUncontrollableEvent(event);
+          }
           return false;
         } else if (mSafeStates.get(s)) {
           return true;
@@ -1159,6 +1229,64 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       mLocalStack.push(encoded);
       return true;
     }
+  }
+
+
+  //#########################################################################
+  //# Inner Class UnctrlInitialReExplorer
+  private class UnctrlInitialReExplorer extends StateExplorer
+  {
+    public UnctrlInitialReExplorer(final int[][] eventAutomata,
+                                   final int[][][][] transitions,
+                                   final int[][] NDTuple,
+                                   final int firstEvent,
+                                   final int lastEvent)
+    {
+      super(eventAutomata, transitions, NDTuple, firstEvent, lastEvent);
+    }
+
+    @Override
+    public boolean explore(final int[] encodedTuple)
+      throws OverflowException, AnalysisAbortException
+    {
+      checkAbort();
+      decode(encodedTuple, mmDecodedTuple);
+      events:
+      for (int e = mmFirstEvent; e <= mmLastEvent; e++) {
+        if (mFailingUncontrollableEventIndexes.get(e)) {
+          Arrays.fill(mmNDTuple, null);
+          for (final int a : mmEventAutomata[e]) {
+            if (mmTransitions[a][e] != null) {
+              final int[] succ = mmTransitions[a][e][mmDecodedTuple[a]];
+              if (succ == null) {
+                continue events;
+              }
+              mmNDTuple[a] = succ;
+            }
+          }
+          if (!permutations(mNumAutomata, mmDecodedTuple, e)) {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+
+    @Override
+    public boolean processNewState(final int[] decodedSource,
+                                   final int event,
+                                   final boolean isInitial)
+      throws OverflowException
+    {
+      final int[] encoded = encode(mTargetTuple);
+      final int s = mGlobalVisited.get(encoded);
+      if (s >= 0 && mBadStates.get(s)) {
+        return setFailedUncontrollableEvent(event);
+      } else {
+        return true;
+      }
+    }
+
   }
 
 
@@ -1224,8 +1352,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           mMustContinue = true;
         }
         if (mFailingUncontrollableEventIndexes.get(event)) {
-          mFailedUncontrollableEventIndex = event;
-          return false;
+          return setFailedUncontrollableEvent(event);
         }
       }
       return true;
@@ -1345,9 +1472,11 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   //# Data Members
   private EventProxy mConfiguredMarking;
   private EventProxy mUsedMarking;
+  private boolean mNonblockingSupported = true;
   private boolean mSupervisorReductionEnabled = false;
   private boolean mSupervisorLocalizationEnabled = false;
-  private Collection<EventProxy> mNonFailingUncontrollableEvents;
+  private Collection<EventProxy> mNonFailingUncontrollableEvents = null;
+  private String mOutputName = "supervisor";
 
   //# Additional result
   private EventProxy mFailedUncontrollableEvent;
@@ -1393,6 +1522,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
 
   private StateExplorer mCtrlInitialReachabilityExplorer;
   private StateExplorer mUnctrlInitialReachabilityExplorer;
+  private StateExplorer mUnctrlInitialReExplorer;
   private StateExplorer mCoreachabilityExplorer;
   private StateExplorer mBackwardsUncontrollableExplorer;
   private StateExplorer mReachabilityExplorer;
@@ -1406,7 +1536,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   private int[] mStateMap;
 
   private BitSet mFailingUncontrollableEventIndexes;
-  private int mFailedUncontrollableEventIndex;
 
 
   //#########################################################################

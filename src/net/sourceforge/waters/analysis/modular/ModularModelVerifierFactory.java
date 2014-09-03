@@ -18,6 +18,7 @@ import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
+import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -81,6 +82,13 @@ public class ModularModelVerifierFactory
     final SafetyVerifier mono =
       new NativeLanguageInclusionChecker(factory);
     return new ModularLanguageInclusionChecker(null, factory, mono);
+  }
+
+  @Override
+  public SupervisorSynthesizer createSupervisorSynthesizer
+    (final ProductDESProxyFactory factory)
+  {
+    return new ModularControllabilitySynthesizer(factory);
   }
 
 
