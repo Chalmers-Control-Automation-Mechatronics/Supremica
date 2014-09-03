@@ -252,28 +252,32 @@ public class ModularControllabilitySynthesizer
               plants.addAll(automata);
             }
           }
-          ProductDESProxy des = createProductDES(aut, plants);
           mMonolithicSynthesizer.setOutputName("sup:" + aut.getName());
-          mMonolithicSynthesizer.setModel(des);
-          mMonolithicSynthesizer.setNonFailingUncontrollableEvents(uncontrollable);
-          while (!mMonolithicSynthesizer.run()) {
-            final EventProxy failedEvent =
-              mMonolithicSynthesizer.getFailedUncontrollableEvent();
-            if (failedEvent == null) {
+          boolean moreEvents = false;
+          do {
+            final ProductDESProxy des = createProductDES(aut, plants);
+            mMonolithicSynthesizer.setModel(des);
+            extendUncontrollableEvents(uncontrollable, plants);
+            final MonolithicKindTranslator monolithicTranslator =
+              new MonolithicKindTranslator(uncontrollable);
+            mMonolithicSynthesizer.setKindTranslator(monolithicTranslator);
+            if (!mMonolithicSynthesizer.run()) {
               return setBooleanResult(false);
             }
-            final Collection<AutomatonProxy> automata =
-              mUncontrollableEventMap.get(failedEvent);
-            if (automata != null) {
-              plants.addAll(automata);
+            moreEvents = false;
+            for (final EventProxy event : mMonolithicSynthesizer.getDisabledEvents()) {
+              if (translator.getEventKind(event) == EventKind.UNCONTROLLABLE) {
+                final Collection<AutomatonProxy> automata =
+                  mUncontrollableEventMap.get(event);
+                uncontrollable.add(event);
+                if (automata != null) {
+                  moreEvents |= plants.addAll(automata);
+                }
+              }
             }
-            uncontrollable.add(failedEvent);
-            mMonolithicSynthesizer.setNonFailingUncontrollableEvents(uncontrollable);
-            des = createProductDES(aut, plants);
-            mMonolithicSynthesizer.setModel(des);
-          }
+          } while (moreEvents);
           supervisors.addAll
-            (mMonolithicSynthesizer.getAnalysisResult().getComputedAutomata());
+          (mMonolithicSynthesizer.getAnalysisResult().getComputedAutomata());
         }
       }
       if (mIncludesAllAutomata) {
@@ -349,6 +353,20 @@ public class ModularControllabilitySynthesizer
     return des;
   }
 
+  private void extendUncontrollableEvents(final Collection<EventProxy> uncontrollable,
+                                          final Collection<AutomatonProxy> plant)
+  {
+    final KindTranslator translator = getKindTranslator();
+    final ProductDESProxy model = getModel();
+    for (final EventProxy event : model.getEvents()) {
+      if (translator.getEventKind(event) == EventKind.UNCONTROLLABLE){
+        final Collection<AutomatonProxy> automata = mUncontrollableEventMap.get(event);
+        if (automata == null || plant.containsAll(automata)) {
+          uncontrollable.add(event);
+        }
+      }
+    }
+  }
 
   //#########################################################################
   //# Debugging
@@ -374,7 +392,39 @@ public class ModularControllabilitySynthesizer
       logger.debug(builder);
     }
   }
+  //#########################################################################
+  //# Inner Class
+  private class MonolithicKindTranslator implements KindTranslator
+  {
+    MonolithicKindTranslator (final Collection<EventProxy> localUncont) {
+      mLocalUncontrollable = localUncont;
+    }
 
+    @Override
+    public ComponentKind getComponentKind(final AutomatonProxy aut)
+    {
+      final KindTranslator translator = getKindTranslator();
+      return translator.getComponentKind(aut);
+    }
+
+    @Override
+    public EventKind getEventKind(final EventProxy event)
+    {
+      final KindTranslator translator = getKindTranslator();
+      final EventKind kind = translator.getEventKind(event);
+      if (kind == EventKind.UNCONTROLLABLE ) {
+        if (mLocalUncontrollable.contains(event)) {
+          return EventKind.UNCONTROLLABLE;
+        } else {
+          return EventKind.CONTROLLABLE;
+        }
+      } else {
+        return kind;
+      }
+    }
+
+    private final Collection<EventProxy> mLocalUncontrollable;
+  }
 
   //#########################################################################
   //# Data Members

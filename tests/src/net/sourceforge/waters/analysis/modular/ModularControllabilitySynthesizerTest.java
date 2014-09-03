@@ -54,18 +54,6 @@ public class ModularControllabilitySynthesizerTest
   //#########################################################################
   //# Specific Test Cases
   @Override
-  public void testAip0Sub1P0() throws Exception
-  {
-    // too tough :-(
-  }
-
-  @Override
-  public void testTbedMinsync() throws Exception
-  {
-    // too tough :-(
-  }
-
-  @Override
   public void testZeroSup() throws Exception
   {
     final ProductDESProxy des =
