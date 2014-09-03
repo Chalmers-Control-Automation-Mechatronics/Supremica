@@ -110,6 +110,15 @@ public class AutomataSynthesisAbstractionProcedure extends
         (ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION);
       chain.add(bisimulator);
     }
+    if ((abstractionMethods & USE_OE) != 0) {
+      final ObservationEquivalenceTRSimplifier bisimulator =
+        new ObservationEquivalenceTRSimplifier();
+      bisimulator.setEquivalence
+        (ObservationEquivalenceTRSimplifier.Equivalence.OBSERVATION_EQUIVALENCE);
+      bisimulator.setTransitionRemovalMode
+        (ObservationEquivalenceTRSimplifier.TransitionRemoval.NONE);
+      chain.add(bisimulator);
+    }
     if ((abstractionMethods & USE_SOE) != 0) {
       final SynthesisObservationEquivalenceTRSimplifier synthesisAbstraction =
         new SynthesisObservationEquivalenceTRSimplifier();
@@ -976,18 +985,22 @@ public class AutomataSynthesisAbstractionProcedure extends
    */
   static final int USE_UNSUP = 0x02;
   /**
-   * Flag to include halfway bisimulation in abstraction chain.
+   * Flag to include bisimulation in abstraction chain.
    */
   static final int USE_BISIMULATION = 0x04;
   /**
+   * Flag to include observation equivalence in abstraction chain.
+   */
+  static final int USE_OE = 0x08;
+  /**
    * Flag to include synthesis observation equivalence in abstraction chain.
    */
-  static final int USE_SOE = 0x08;
+  static final int USE_SOE = 0x10;
   /**
    * Flag to include weak synthesis observation equivalence in abstraction
    * chain.
    */
-  static final int USE_WSOE = 0x10;
+  static final int USE_WSOE = 0x20;
 
   /**
    * Argument to
@@ -997,6 +1010,14 @@ public class AutomataSynthesisAbstractionProcedure extends
    * observation equivalence.
    */
   static final int CHAIN_SOE = USE_HALFWAY | USE_BISIMULATION | USE_SOE;
+  /**
+   * Argument to
+   * {@link #createSynthesisAbstractionProcedure(CompositionalAutomataSynthesizer,int)
+   * createSynthesisAbstractionProcedure()} for specifying an abstraction
+   * chain consisting of halfway synthesis and observation equivalence.
+   */
+  static final int CHAIN_OE = USE_HALFWAY | USE_OE;
+
   /**
    * Argument to
    * {@link #createSynthesisAbstractionProcedure(CompositionalAutomataSynthesizer,int)

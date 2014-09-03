@@ -472,6 +472,13 @@ public abstract class AbstractSupervisorSynthesizerTest
     runSynthesizer(des, true);
   }
 
+//  public void testAGV() throws Exception
+//  {
+//    final ProductDESProxy des =
+//      getCompiledDES("tests", "incremental_suite", "agv.wmod");
+//    runSynthesizer(des, true);
+//  }
+
   public void testTeleNetwork() throws Exception
   {
     final ProductDESProxy des =

@@ -12,7 +12,9 @@ package net.sourceforge.waters.analysis.compositional;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -45,6 +47,7 @@ public class CompositionalAutomataSynthesisResult
   {
     mNumberOfSupervisors = 0;
     mSupervisors = new ArrayList<>();
+    mDisabledEventMap = new HashMap<>();
     mMaxUnrenamedSupervisorStates = -1;
     mMaxUnrenamedSupervisorStates = -1;
     mTotalUnrenamedSupervisorStates = -1;
@@ -130,6 +133,16 @@ public class CompositionalAutomataSynthesisResult
     mTotalRenamedSupervisorTransitions =
       mergeAdd(mTotalRenamedSupervisorTransitions, numberOfTrans);
     mSupervisors.add(sup);
+  }
+
+  void addDisabledEvents(final AutomatonProxy sup, final Collection<EventProxy> events)
+  {
+    mDisabledEventMap.put(sup, events);
+  }
+
+  Collection<EventProxy> getDisabledEvents(final AutomatonProxy sup)
+  {
+    return mDisabledEventMap.get(sup);
   }
 
   void setNumberOfRenamings(final int renaming)
@@ -350,6 +363,7 @@ public class CompositionalAutomataSynthesisResult
   private ProductDESProxy mProductDES;
   private int mNumberOfSupervisors;
   private final List<AutomatonProxy> mSupervisors;
+  private final Map<AutomatonProxy, Collection<EventProxy>> mDisabledEventMap;
   private int mNumberOfRenamings;
   private int mMaxUnrenamedSupervisorStates;
   private int mTotalUnrenamedSupervisorStates;

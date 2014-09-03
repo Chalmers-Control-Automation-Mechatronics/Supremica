@@ -206,6 +206,7 @@ public class ModularControllabilitySynthesizer
     if (mIncludesAllAutomata) {
       mUsedAutomata = new THashSet<>(numEvents);
     }
+    mDisabledEvents = new THashSet<>();
   }
 
   @Override
@@ -265,7 +266,8 @@ public class ModularControllabilitySynthesizer
               return setBooleanResult(false);
             }
             moreEvents = false;
-            for (final EventProxy event : mMonolithicSynthesizer.getDisabledEvents()) {
+            final Collection<EventProxy> disabledEvents = mMonolithicSynthesizer.getDisabledEvents();
+            for (final EventProxy event : disabledEvents) {
               if (translator.getEventKind(event) == EventKind.UNCONTROLLABLE) {
                 final Collection<AutomatonProxy> automata =
                   mUncontrollableEventMap.get(event);
@@ -277,7 +279,9 @@ public class ModularControllabilitySynthesizer
             }
           } while (moreEvents);
           supervisors.addAll
-          (mMonolithicSynthesizer.getAnalysisResult().getComputedAutomata());
+            (mMonolithicSynthesizer.getAnalysisResult().getComputedAutomata());
+          final Collection<EventProxy> disabledEvents = mMonolithicSynthesizer.getDisabledEvents();
+          mDisabledEvents.addAll(disabledEvents);
         }
       }
       if (mIncludesAllAutomata) {
@@ -368,6 +372,11 @@ public class ModularControllabilitySynthesizer
     }
   }
 
+  public Collection<EventProxy> getDisabledEvents()
+  {
+    return mDisabledEvents;
+  }
+
   //#########################################################################
   //# Debugging
   private void logSubsystem(final ProductDESProxy des)
@@ -437,6 +446,7 @@ public class ModularControllabilitySynthesizer
   // Algorithm variables
   private Map<EventProxy,Collection<AutomatonProxy>> mUncontrollableEventMap;
   private Collection<AutomatonProxy> mUsedAutomata;
+  private Collection<EventProxy> mDisabledEvents;
 
 
   //#########################################################################
