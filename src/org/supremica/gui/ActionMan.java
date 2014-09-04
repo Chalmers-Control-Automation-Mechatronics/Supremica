@@ -1172,7 +1172,7 @@ public class ActionMan
             return;
         }
 
-        //AutomataSynthesisWorker worker = new AutomataSynthesisWorker(gui, selectedAutomata, options);
+        // AutomataSynthesisWorker worker = new AutomataSynthesisWorker(gui, selectedAutomata, options);
         System.err.println("Migrate to IDE, old Supremica no longer supported.");
 
         /*
