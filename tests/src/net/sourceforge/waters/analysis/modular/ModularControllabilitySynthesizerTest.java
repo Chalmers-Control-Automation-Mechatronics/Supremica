@@ -32,6 +32,7 @@ public class ModularControllabilitySynthesizerTest
       new ModularControllabilitySynthesizer(factory);
     synthesizer.setSupervisorReductionEnabled(false);
     synthesizer.setSupervisorLocalizationEnabled(false);
+    synthesizer.setLocalNonblockingSupported(true);
     return synthesizer;
   }
 
@@ -55,12 +56,6 @@ public class ModularControllabilitySynthesizerTest
   //# Specific Test Cases
   @Override
   public void testAip0Sub1P0() throws Exception
-  {
-    // too tough :-(
-  }
-
-  @Override
-  public void testTbedMinsync() throws Exception
   {
     // too tough :-(
   }

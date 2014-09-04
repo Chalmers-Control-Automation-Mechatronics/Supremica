@@ -262,11 +262,11 @@ public class ModularControllabilitySynthesizer
       final Collection<AutomatonProxy> supervisors =
         new ArrayList<>(numAutomata);
       final KindTranslator translator = getKindTranslator();
-      for (final AutomatonProxy aut : model.getAutomata()) {
-        if (translator.getComponentKind(aut) == ComponentKind.SPEC) {
+      for (final AutomatonProxy spec : model.getAutomata()) {
+        if (translator.getComponentKind(spec) == ComponentKind.SPEC) {
           checkAbort();
           final Collection<EventProxy> specUncontrollableEvents =
-            getUncontrollableEvents(aut);
+            getUncontrollableEvents(spec);
           if (specUncontrollableEvents.isEmpty()) {
             continue;
           }
@@ -281,10 +281,10 @@ public class ModularControllabilitySynthesizer
               plants.addAll(automata);
             }
           }
-          mMonolithicSynthesizer.setOutputName("sup:" + aut.getName());
+          mMonolithicSynthesizer.setOutputName("sup:" + spec.getName());
           boolean moreEvents = false;
           do {
-            final ProductDESProxy des = createProductDES(aut, plants);
+            final ProductDESProxy des = createProductDES(spec, plants);
             mMonolithicSynthesizer.setModel(des);
             extendUncontrollableEvents(uncontrollableEvents, plants);
             final MonolithicKindTranslator monolithicTranslator =
@@ -307,11 +307,21 @@ public class ModularControllabilitySynthesizer
               }
             }
           } while (moreEvents);
-          supervisors.addAll
-            (mMonolithicSynthesizer.getAnalysisResult().getComputedAutomata());
           final Collection<EventProxy> disabledEvents =
             mMonolithicSynthesizer.getDisabledEvents();
-          mDisabledEvents.addAll(disabledEvents);
+          // If the synthesised supervisor does not disable *any* events,
+          // this means the specification is controllable alone.
+          // Then we do not need to include a supervisor.
+          if (!disabledEvents.isEmpty()) {
+            final Collection<? extends AutomatonProxy> localSups =
+              mMonolithicSynthesizer.getAnalysisResult().getComputedAutomata();
+            supervisors.addAll(localSups);
+            mDisabledEvents.addAll(disabledEvents);
+            if (mIncludesAllAutomata) {
+              mUsedAutomata.add(spec);
+              mUsedAutomata.addAll(plants);
+            }
+          }
         }
       }
       if (mIncludesAllAutomata) {
@@ -377,9 +387,6 @@ public class ModularControllabilitySynthesizer
     list.add(spec);
     list.addAll(plants);
     Collections.sort(list);
-    if (mIncludesAllAutomata) {
-      mUsedAutomata.addAll(list);
-    }
     final ProductDESProxy des =
       AutomatonTools.createProductDESProxy("subsystem:" + spec.getName(),
                                            list, getFactory());
