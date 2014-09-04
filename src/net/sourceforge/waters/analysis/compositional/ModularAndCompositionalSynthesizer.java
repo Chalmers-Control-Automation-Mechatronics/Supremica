@@ -9,15 +9,23 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
+import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer.PreselectingMethod;
+import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer.PreselectingMethodFactory;
 import net.sourceforge.waters.analysis.modular.ModularControllabilitySynthesizer;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.AbstractProductDESBuilder;
+import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
@@ -70,7 +78,45 @@ public class ModularAndCompositionalSynthesizer
 
   //#########################################################################
   //# Configuration
+  public CompositionalSelectionHeuristicFactory getSelectionHeuristicFactory()
+  {
+    return mCompositionalSynthesizer.getSelectionHeuristicFactory();
+  }
 
+  public PreselectingMethodFactory getPreselectingMethodFactory()
+  {
+    return mCompositionalSynthesizer.getPreselectingMethodFactory();
+  }
+
+  public void setInternalStateLimit(final int internalStateLimit)
+  {
+    mCompositionalSynthesizer.setInternalStateLimit(internalStateLimit);
+  }
+
+  public void setInternalTransitionLimit(final int internalTransitionLimit)
+  {
+    mCompositionalSynthesizer.setInternalTransitionLimit(internalTransitionLimit);
+  }
+
+  public void setMonolithicStateLimit(final int finalStateLimit)
+  {
+    setNodeLimit(finalStateLimit);
+  }
+
+  public void setMonolithicTransitionLimit(final int finalTransitionLimit)
+  {
+    setTransitionLimit(finalTransitionLimit);
+  }
+
+  public void setPreselectingMethod(final PreselectingMethod preselecting)
+  {
+    mCompositionalSynthesizer.setPreselectingMethod(preselecting);
+  }
+
+  public void setSelectionHeuristic(final SelectionHeuristicCreator selecting)
+  {
+    mCompositionalSynthesizer.setSelectionHeuristic(selecting);
+  }
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
@@ -104,14 +150,14 @@ public class ModularAndCompositionalSynthesizer
   @Override
   public void setConfiguredDefaultMarking(final EventProxy marking)
   {
-    mModularSynthesizer.setConfiguredDefaultMarking(marking);
-    mCompositionalSynthesizer.setConfiguredDefaultMarking(marking);
+    mConfiguredMarking = marking;
+    mUsedMarking = null;
   }
 
   @Override
   public EventProxy getConfiguredDefaultMarking()
   {
-    return mModularSynthesizer.getConfiguredDefaultMarking();
+    return mConfiguredMarking;
   }
 
   @Override
@@ -148,10 +194,18 @@ public class ModularAndCompositionalSynthesizer
   protected void setUp() throws AnalysisException
   {
     super.setUp();
+    getUsedDefaultMarking();
     final KindTranslator translator = ConflictKindTranslator.getInstanceControllable();
     mCompositionalSynthesizer.setKindTranslator(translator);
     mCompositionalSynthesizer.setAbstractionProcedureCreator
-    (AutomataSynthesisAbstractionProcedureFactory.OE);
+      (AutomataSynthesisAbstractionProcedureFactory.OE);
+    mCompositionalSynthesizer.setNodeLimit(getNodeLimit());
+    mCompositionalSynthesizer.setTransitionLimit(getTransitionLimit());
+    mCompositionalSynthesizer.setConfiguredDefaultMarking(mUsedMarking);
+    mModularSynthesizer.setIncludesAllAutomata(true);
+    mModularSynthesizer.setNodeLimit(getNodeLimit());
+    mModularSynthesizer.setTransitionLimit(getTransitionLimit());
+    mModularSynthesizer.setConfiguredDefaultMarking(mUsedMarking);
   }
 
   @Override
@@ -164,6 +218,7 @@ public class ModularAndCompositionalSynthesizer
   protected void tearDown()
   {
     super.tearDown();
+    mUsedMarking = null;
   }
 
 
@@ -181,14 +236,22 @@ public class ModularAndCompositionalSynthesizer
       if (!mModularSynthesizer.run()) {
         return setBooleanResult(false);
       }
+      final Collection<AutomatonProxy> supervisors = new THashSet<>();
+      collectSupervisors(supervisors, mModularSynthesizer);
       boolean maybeBlocking = false;
+      int supCount = 1;
       do {
+        mCompositionalSynthesizer.setSupervisorNamePrefix("sup" + supCount + ":");
         final ProductDESProxy modularResults =
           mModularSynthesizer.getComputedProductDES();
+        if (!modularResults.getEvents().contains(mUsedMarking)) {
+          break;
+        }
         mCompositionalSynthesizer.setModel(modularResults);
         if (!mCompositionalSynthesizer.run()) {
           return setBooleanResult(false);
         }
+        supervisors.addAll(mCompositionalSynthesizer.getComputedProductDES().getAutomata());
         final Collection<AutomatonProxy> specToBe = new ArrayList<>();
         final CompositionalAutomataSynthesisResult compositionalResults =
           mCompositionalSynthesizer.getAnalysisResult();
@@ -215,9 +278,16 @@ public class ModularAndCompositionalSynthesizer
         if (!mModularSynthesizer.run()) {
           return setBooleanResult(false);
         }
+        collectSupervisors(supervisors, mModularSynthesizer);
         maybeBlocking = !mModularSynthesizer.getDisabledEvents().isEmpty();
+        supCount++;
       } while (maybeBlocking);
-      return true;
+      final List<AutomatonProxy> supervisorsList = new ArrayList<>(supervisors);
+      Collections.sort(supervisorsList);
+      final ProductDESProxy supervisorsDES =
+        AutomatonTools.createProductDESProxy("supervisor", supervisorsList,
+                                             getFactory());
+      return setProxyResult(supervisorsDES);
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
     } catch (final OutOfMemoryError error) {
@@ -243,6 +313,40 @@ public class ModularAndCompositionalSynthesizer
 
   //#########################################################################
   //# Auxiliary Methods
+  /**
+   * Gets the marking proposition to be used.
+   * This method returns the marking proposition specified by the {@link
+   * #setConfiguredDefaultMarking(EventProxy) setMarkingProposition()} method,
+   * if non-null, or the default marking proposition of the input model.
+   * @throws EventNotFoundException to indicate that the a
+   *         <CODE>null</CODE> marking was specified, but input model does
+   *         not contain any proposition with the default marking name.
+   */
+  protected EventProxy getUsedDefaultMarking()
+    throws EventNotFoundException
+  {
+    if (mUsedMarking == null) {
+      if (mConfiguredMarking == null) {
+        final ProductDESProxy model = getModel();
+        mUsedMarking = AbstractConflictChecker.getMarkingProposition(model);
+      } else {
+        mUsedMarking = mConfiguredMarking;
+      }
+    }
+    return mUsedMarking;
+  }
+
+  private void collectSupervisors(final Collection<AutomatonProxy> supervisors,
+                                  final SupervisorSynthesizer synthesizer)
+  {
+    final Collection<AutomatonProxy> model = getModel().getAutomata();
+    for (final AutomatonProxy aut : synthesizer.getComputedProductDES().getAutomata()) {
+      if (!model.contains(aut)) {
+        supervisors.add(aut);
+      }
+    }
+  }
+
 
   //#########################################################################
   //# Debugging
@@ -278,6 +382,8 @@ public class ModularAndCompositionalSynthesizer
   //#########################################################################
   //# Data Members
   // Configuration options
+  private EventProxy mConfiguredMarking;
+  private EventProxy mUsedMarking;
 
   // Permanent tools
   private final ModularControllabilitySynthesizer mModularSynthesizer;

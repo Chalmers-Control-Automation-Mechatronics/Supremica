@@ -1016,7 +1016,7 @@ public class AutomataSynthesisAbstractionProcedure extends
    * createSynthesisAbstractionProcedure()} for specifying an abstraction
    * chain consisting of halfway synthesis and observation equivalence.
    */
-  static final int CHAIN_OE = USE_HALFWAY | USE_OE;
+  static final int CHAIN_OE =   USE_OE;
 
   /**
    * Argument to

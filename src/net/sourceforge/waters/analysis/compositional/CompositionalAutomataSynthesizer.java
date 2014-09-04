@@ -194,6 +194,15 @@ public class CompositionalAutomataSynthesizer
     return AutomataSynthesisAbstractionProcedureFactory.getInstance();
   }
 
+  public void setSupervisorNamePrefix(final String name)
+  {
+    mSupervisorNamePrefix = name;
+  }
+
+  public String getSupervisorNamePrefix()
+  {
+    return mSupervisorNamePrefix;
+  }
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
@@ -844,9 +853,9 @@ public class CompositionalAutomataSynthesizer
     boolean found;
     do {
       if (index == 0) {
-        supname = "sup:" + rel.getName();
+        supname = mSupervisorNamePrefix + rel.getName();
       } else {
-        supname = "sup" + index + ":" + rel.getName();
+        supname = mSupervisorNamePrefix + index + ":" + rel.getName();
       }
       found = false;
       for (final AutomatonProxy aut : supervisors) {
@@ -1158,6 +1167,7 @@ public class CompositionalAutomataSynthesizer
   //# Data Members
   private boolean mSupervisorReductionEnabled = false;
   private final boolean mReduceIncrementally = false;
+  private String mSupervisorNamePrefix = "sup:";
 
   private SupervisorReductionTRSimplifier mSupervisorSimplifier;
   private HalfWaySynthesisTRSimplifier mHalfwaySimplifier;
