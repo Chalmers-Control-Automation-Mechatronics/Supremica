@@ -119,7 +119,7 @@ public class NativeConflictChecker
                                final EventProxy marking,
                                final ProductDESProxyFactory factory)
   {
-    super(model, factory, ConflictKindTranslator.getInstance());
+    super(model, factory, ConflictKindTranslator.getInstanceUncontrollable());
     mMarking = marking;
   }
 

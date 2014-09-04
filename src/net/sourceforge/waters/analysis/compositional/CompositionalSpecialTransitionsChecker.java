@@ -178,7 +178,7 @@ public class CompositionalSpecialTransitionsChecker
   {
     super(model,
           factory,
-          ConflictKindTranslator.getInstance(),
+          ConflictKindTranslator.getInstanceUncontrollable(),
           abstractionCreator,
           preselectingMethodFactory);
     setPruningDeadlocks(true);

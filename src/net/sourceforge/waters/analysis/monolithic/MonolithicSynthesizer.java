@@ -29,6 +29,7 @@ import net.sourceforge.waters.analysis.abstraction.SupervisorReductionTRSimplifi
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.IntArrayHashingStrategy;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.analysis.tr.WatersHashSet;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -524,11 +525,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             mBackTrace.push(current);
             safe = mUnctrlInitialReachabilityExplorer.explore(current);
             if (!safe) {
-              if (mInitialIsBad) {
-                return setBooleanResult(false);
-              } else {
-                break;
-              }
+              break;
             }
           }
         }
@@ -542,6 +539,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           }
           mBackTrace.clear();
         } else {
+          mLocalStack.clear();
           int[] current = mBackTrace.pop();
           while (current != sentinel) {
             int n = mGlobalVisited.get(current);
@@ -557,7 +555,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             current = mBackTrace.pop();
           }
         }
-        mLocalStack.clear();
         mLocalVisited.clear();
       }
 
@@ -736,7 +733,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
 
         } else {
           // Both Reduction & Localization Disabled
-          mTransitionRelation.removeDeadlockStateTransitions(marking);
+          removeDumpStateTransitions(mTransitionRelation, mNumGoodStates);
           mTransitionRelation.removeProperSelfLoopEvents();
           mTransitionRelation.removeRedundantPropositions();
           des = createDESProxy(mTransitionRelation);
@@ -917,6 +914,18 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       mStateTuples.add(encodedTuple);
       return code;
     }
+  }
+
+  private void removeDumpStateTransitions(final ListBufferTransitionRelation rel,
+                                          final int dump)
+  {
+    final TransitionIterator iter = rel.createAllTransitionsModifyingIterator();
+    while (iter.advance()) {
+      if (iter.getCurrentTargetState() == dump) {
+        iter.remove();
+      }
+    }
+    rel.setReachable(dump, false);
   }
 
   private ProductDESProxy createDESProxy(final ListBufferTransitionRelation rel)

@@ -95,7 +95,7 @@ public abstract class AbstractConflictChecker
                                    final EventProxy preMarking,
                                    final ProductDESProxyFactory factory)
     {
-      super(model, factory, ConflictKindTranslator.getInstance());
+      super(model, factory, ConflictKindTranslator.getInstanceUncontrollable());
       mConfiguredMarking = marking;
       mPreconditionMarking = preMarking;
       mUsedMarking = null;

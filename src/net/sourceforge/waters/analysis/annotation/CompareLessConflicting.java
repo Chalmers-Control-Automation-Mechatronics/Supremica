@@ -498,9 +498,9 @@ public class CompareLessConflicting
         if (ev.getName().equals(tauname)) {tauproxy = ev;}
       }
       final EventEncoding ee = new EventEncoding(lprox,
-                                ConflictKindTranslator.getInstance(), tauproxy);
+                                ConflictKindTranslator.getInstanceUncontrollable(), tauproxy);
       if (!lprox.getEvents().contains(mproxy)) {
-        ee.addEvent(mproxy, ConflictKindTranslator.getInstance(),
+        ee.addEvent(mproxy, ConflictKindTranslator.getInstanceUncontrollable(),
                     EventEncoding.STATUS_UNUSED);
       }
       final ListBufferTransitionRelation lessbuff =
