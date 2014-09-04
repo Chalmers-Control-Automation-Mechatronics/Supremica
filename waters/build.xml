@@ -21,8 +21,8 @@
 
   <property name="activation.jar" location="${supremica.lib}/activation.jar"/>
   <property name="anarres.jar" location="${supremica.lib}/anarres-cpp.jar"/>
-  <property name="antlr.complete.jar" location="${supremica.lib}/antlr-3.3-complete.jar"/>
-  <property name="antlr.runtime.jar" location="${supremica.lib}/antlr-runtime-3.3.jar"/>
+  <property name="antlr.complete.jar" location="${supremica.lib}/antlr-3.5.2-complete.jar"/>
+  <property name="antlr.runtime.jar" location="${supremica.lib}/antlr-runtime-3.5.2.jar"/>
   <property name="javabdd.jar" location="${supremica.lib}/javabdd-2.0.jar"/>
   <property name="jaxb-api.jar" location="${supremica.lib}/jaxb-api.jar"/>
   <property name="jaxb-impl.jar" location="${supremica.lib}/jaxb-impl.jar"/>
@@ -121,8 +121,7 @@
   </target>
 
   <target name="antlr-promela">
-    <java classname="org.antlr.Tool" fork="true" failonerror="true">
-      <classpath refid="antlr.compile.classpath"/>
+    <java jar="${antlr.complete.jar}" fork="true" failonerror="true">
       <arg value="-verbose"/>
       <arg value="-make"/>
       <arg value="-o"/>
