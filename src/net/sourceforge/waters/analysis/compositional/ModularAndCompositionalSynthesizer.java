@@ -228,8 +228,8 @@ public class ModularAndCompositionalSynthesizer
     final KindTranslator translator =
       ConflictKindTranslator.getInstanceControllable();
     mCompositionalSynthesizer.setKindTranslator(translator);
-    mCompositionalSynthesizer.setNodeLimit(getNodeLimit());
-    mCompositionalSynthesizer.setTransitionLimit(getTransitionLimit());
+    mCompositionalSynthesizer.setMonolithicStateLimit(getNodeLimit());
+    mCompositionalSynthesizer.setMonolithicTransitionLimit(getTransitionLimit());
     mCompositionalSynthesizer.setConfiguredDefaultMarking(mUsedMarking);
     mModularSynthesizer.setIncludesAllAutomata(true);
     mModularSynthesizer.setNodeLimit(getNodeLimit());

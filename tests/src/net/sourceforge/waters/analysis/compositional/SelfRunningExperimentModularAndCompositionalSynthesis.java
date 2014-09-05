@@ -32,21 +32,18 @@ public class SelfRunningExperimentModularAndCompositionalSynthesis
   {
     try {
       //final String outputDir = System.getProperty("waters.test.outputdir");
-      final boolean special = true;
-      final boolean failing = false;
       final ProductDESProxyFactory factory =
         ProductDESElementFactory.getInstance();
       final ModularAndCompositionalSynthesizer automataSynthesizer =
         new ModularAndCompositionalSynthesizer(factory);
       automataSynthesizer.setDetailedOutputEnabled(false);
+      automataSynthesizer.setSupervisorReductionEnabled(true);
+      automataSynthesizer.setInternalStateLimit(20000);
+      automataSynthesizer.setInternalTransitionLimit(1000000);
       final List<Configuration> configurations = new LinkedList<>();
       final Configuration configWSOEUnsup =
         new Configuration(automataSynthesizer);
       configurations.add(configWSOEUnsup);
-      final AbstractCompositionalSynthesizer stateRepresentationSynthesizer =
-        new CompositionalStateRepresentationSynthesizer(factory);
-      stateRepresentationSynthesizer.setUsingSpecialEvents(special);
-      stateRepresentationSynthesizer.setFailingEventsEnabled(failing);
       final AbstractCompositionalModelAnalyzer.PreselectingMethodFactory
         preselectingFactory = automataSynthesizer.getPreselectingMethodFactory();
       final CompositionalSelectionHeuristicFactory selectionFactory =

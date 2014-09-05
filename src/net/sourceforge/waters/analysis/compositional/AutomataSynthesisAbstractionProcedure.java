@@ -117,6 +117,7 @@ public class AutomataSynthesisAbstractionProcedure extends
         (ObservationEquivalenceTRSimplifier.Equivalence.OBSERVATION_EQUIVALENCE);
       bisimulator.setTransitionRemovalMode
         (ObservationEquivalenceTRSimplifier.TransitionRemoval.NONE);
+      bisimulator.setUsingLocalEvents(true);
       chain.add(bisimulator);
     }
     if ((abstractionMethods & USE_SOE) != 0) {
@@ -1016,7 +1017,7 @@ public class AutomataSynthesisAbstractionProcedure extends
    * createSynthesisAbstractionProcedure()} for specifying an abstraction
    * chain consisting of halfway synthesis and observation equivalence.
    */
-  static final int CHAIN_OE =   USE_OE;
+  static final int CHAIN_OE = USE_HALFWAY | USE_OE;
 
   /**
    * Argument to

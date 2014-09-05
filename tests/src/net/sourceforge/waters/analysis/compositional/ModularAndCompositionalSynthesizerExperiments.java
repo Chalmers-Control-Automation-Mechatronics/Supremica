@@ -79,7 +79,7 @@ public class ModularAndCompositionalSynthesizerExperiments extends AbstractAnaly
   {
     super.setUp();
     mPrintWriter = new PrintWriter(mOut, true);
-    final int internalStateLimit = 20000;
+    final int internalStateLimit = 5000;
     mSynthesizer.setInternalStateLimit(internalStateLimit);
     final int internalTransitionLimit = 1000000;
     mSynthesizer.setInternalTransitionLimit(internalTransitionLimit);
