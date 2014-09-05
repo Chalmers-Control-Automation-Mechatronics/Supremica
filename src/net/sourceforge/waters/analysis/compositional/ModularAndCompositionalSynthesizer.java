@@ -21,6 +21,7 @@ import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelA
 import net.sourceforge.waters.analysis.modular.ModularControllabilitySynthesizer;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
+import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
@@ -53,26 +54,24 @@ public class ModularAndCompositionalSynthesizer
   //# Constructors
   public ModularAndCompositionalSynthesizer(final ProductDESProxyFactory factory)
   {
-    super(factory);
-    mModularSynthesizer = new ModularControllabilitySynthesizer(factory);
-    mCompositionalSynthesizer = new CompositionalAutomataSynthesizer(factory);
+    this(null, factory);
   }
 
   public ModularAndCompositionalSynthesizer(final ProductDESProxy model,
-                                           final ProductDESProxyFactory factory)
+                                            final ProductDESProxyFactory factory)
   {
-    super(model, factory);
-    mModularSynthesizer = new ModularControllabilitySynthesizer(factory);
-    mCompositionalSynthesizer = new CompositionalAutomataSynthesizer(factory);
+    this(model, factory, IdenticalKindTranslator.getInstance());
   }
 
   public ModularAndCompositionalSynthesizer(final ProductDESProxy model,
-                                           final ProductDESProxyFactory factory,
-                                           final KindTranslator translator)
+                                            final ProductDESProxyFactory factory,
+                                            final KindTranslator translator)
   {
     super(model, factory, translator);
     mModularSynthesizer = new ModularControllabilitySynthesizer(factory);
     mCompositionalSynthesizer = new CompositionalAutomataSynthesizer(factory);
+    mCompositionalSynthesizer.setAbstractionProcedureCreator
+      (AutomataSynthesisAbstractionProcedureFactory.OE);
   }
 
 
@@ -88,9 +87,34 @@ public class ModularAndCompositionalSynthesizer
     return mCompositionalSynthesizer.getPreselectingMethodFactory();
   }
 
+  public void setPreselectingMethod(final PreselectingMethod preselecting)
+  {
+    mCompositionalSynthesizer.setPreselectingMethod(preselecting);
+  }
+
+  public PreselectingMethod getPreselectingMethod()
+  {
+    return mCompositionalSynthesizer.getPreselectingMethod();
+  }
+
+  public void setSelectionHeuristic(final SelectionHeuristicCreator selecting)
+  {
+    mCompositionalSynthesizer.setSelectionHeuristic(selecting);
+  }
+
+  public SelectionHeuristic<Candidate> getSelectionHeuristic()
+  {
+    return mCompositionalSynthesizer.getSelectionHeuristic();
+  }
+
   public void setInternalStateLimit(final int internalStateLimit)
   {
     mCompositionalSynthesizer.setInternalStateLimit(internalStateLimit);
+  }
+
+  public int getInternalStateLimit()
+  {
+    return mCompositionalSynthesizer.getInternalStateLimit();
   }
 
   public void setInternalTransitionLimit(final int internalTransitionLimit)
@@ -98,9 +122,19 @@ public class ModularAndCompositionalSynthesizer
     mCompositionalSynthesizer.setInternalTransitionLimit(internalTransitionLimit);
   }
 
+  public int getInternalTransitionLimit()
+  {
+    return mCompositionalSynthesizer.getInternalTransitionLimit();
+  }
+
   public void setMonolithicStateLimit(final int finalStateLimit)
   {
     setNodeLimit(finalStateLimit);
+  }
+
+  public int getMonolithicStateLimit()
+  {
+    return getNodeLimit();
   }
 
   public void setMonolithicTransitionLimit(final int finalTransitionLimit)
@@ -108,15 +142,11 @@ public class ModularAndCompositionalSynthesizer
     setTransitionLimit(finalTransitionLimit);
   }
 
-  public void setPreselectingMethod(final PreselectingMethod preselecting)
+  public int getMonolithicTransitionLimit()
   {
-    mCompositionalSynthesizer.setPreselectingMethod(preselecting);
+    return getTransitionLimit();
   }
 
-  public void setSelectionHeuristic(final SelectionHeuristicCreator selecting)
-  {
-    mCompositionalSynthesizer.setSelectionHeuristic(selecting);
-  }
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
@@ -195,10 +225,9 @@ public class ModularAndCompositionalSynthesizer
   {
     super.setUp();
     getUsedDefaultMarking();
-    final KindTranslator translator = ConflictKindTranslator.getInstanceControllable();
+    final KindTranslator translator =
+      ConflictKindTranslator.getInstanceControllable();
     mCompositionalSynthesizer.setKindTranslator(translator);
-    mCompositionalSynthesizer.setAbstractionProcedureCreator
-      (AutomataSynthesisAbstractionProcedureFactory.OE);
     mCompositionalSynthesizer.setNodeLimit(getNodeLimit());
     mCompositionalSynthesizer.setTransitionLimit(getTransitionLimit());
     mCompositionalSynthesizer.setConfiguredDefaultMarking(mUsedMarking);
@@ -242,21 +271,24 @@ public class ModularAndCompositionalSynthesizer
       int supCount = 1;
       do {
         mCompositionalSynthesizer.setSupervisorNamePrefix("sup" + supCount + ":");
-        final ProductDESProxy modularResults =
+        final ProductDESProxy modularResult =
           mModularSynthesizer.getComputedProductDES();
-        if (!modularResults.getEvents().contains(mUsedMarking)) {
+        if (!modularResult.getEvents().contains(mUsedMarking)) {
           break;
         }
-        mCompositionalSynthesizer.setModel(modularResults);
+        mCompositionalSynthesizer.setModel(modularResult);
         if (!mCompositionalSynthesizer.run()) {
           return setBooleanResult(false);
         }
-        supervisors.addAll(mCompositionalSynthesizer.getComputedProductDES().getAutomata());
-        final Collection<AutomatonProxy> specToBe = new ArrayList<>();
-        final CompositionalAutomataSynthesisResult compositionalResults =
+        final CompositionalAutomataSynthesisResult compositionalResult =
           mCompositionalSynthesizer.getAnalysisResult();
-        for (final AutomatonProxy aut : compositionalResults.getComputedAutomata()){
-          for (final EventProxy event : compositionalResults.getDisabledEvents(aut)) {
+        final Collection<AutomatonProxy> computedAutomata =
+          compositionalResult.getComputedAutomata();
+        supervisors.addAll(computedAutomata);
+        final Collection<AutomatonProxy> specToBe =
+          new ArrayList<>(computedAutomata.size());
+        for (final AutomatonProxy aut : computedAutomata) {
+          for (final EventProxy event : compositionalResult.getDisabledEvents(aut)) {
             if (translator.getEventKind(event) == EventKind.UNCONTROLLABLE) {
               specToBe.add(aut);
               break;
@@ -266,15 +298,18 @@ public class ModularAndCompositionalSynthesizer
         if (specToBe.isEmpty()) {
           break;
         }
-        final Collection<AutomatonProxy> combinedAutomata = new ArrayList<>();
-        final Collection<AutomatonProxy> modularAutomata = modularResults.getAutomata();
+        final Collection<AutomatonProxy> modularAutomata =
+          modularResult.getAutomata();
+        final Collection<AutomatonProxy> combinedAutomata =
+          new ArrayList<>(modularAutomata.size() + computedAutomata.size());
         combinedAutomata.addAll(modularAutomata);
-        combinedAutomata.addAll(compositionalResults.getComputedAutomata());
+        combinedAutomata.addAll(computedAutomata);
         final ProductDESProxy modularDES = AutomatonTools.createProductDESProxy
           (model.getName(), combinedAutomata, getFactory());
-        final ModularKindTranslator modularTranslator = new ModularKindTranslator(specToBe);
-        mModularSynthesizer.setKindTranslator(modularTranslator);
         mModularSynthesizer.setModel(modularDES);
+        final ModularKindTranslator modularTranslator =
+          new ModularKindTranslator(specToBe);
+        mModularSynthesizer.setKindTranslator(modularTranslator);
         if (!mModularSynthesizer.run()) {
           return setBooleanResult(false);
         }
@@ -349,15 +384,18 @@ public class ModularAndCompositionalSynthesizer
 
 
   //#########################################################################
-  //# Debugging
-  //#########################################################################
-  //# Inner Class
+  //# Inner Class ModularKindTranslator
   private class ModularKindTranslator implements KindTranslator
   {
-    ModularKindTranslator (final Collection<AutomatonProxy> specToBe) {
+    //#######################################################################
+    //# Constructors
+    ModularKindTranslator(final Collection<AutomatonProxy> specToBe)
+    {
       mSpecificationToBe = specToBe;
     }
 
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.analysis.KindTranslator
     @Override
     public EventKind getEventKind(final EventProxy event)
     {
@@ -375,6 +413,8 @@ public class ModularAndCompositionalSynthesizer
       }
     }
 
+    //#######################################################################
+    //# Data Members
     private final Collection<AutomatonProxy> mSpecificationToBe;
   }
 
@@ -388,11 +428,5 @@ public class ModularAndCompositionalSynthesizer
   // Permanent tools
   private final ModularControllabilitySynthesizer mModularSynthesizer;
   private final CompositionalAutomataSynthesizer mCompositionalSynthesizer;
-
-  // Algorithm variables
-
-
-  //#########################################################################
-  //# Class Constants
 
 }

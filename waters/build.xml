@@ -349,7 +349,7 @@
 
   <target name="runtest" depends="test-jar,cpp">
     <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="1024m">
+    <junit printsummary="on" fork="true" maxmemory="2048m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
@@ -358,7 +358,6 @@
           <exclude name="net/sourceforge/waters/analysis/**/*HeuristicTest.java"/>
           <exclude name="net/sourceforge/waters/analysis/monolithic/MonolithicSupervisorLocalizationTest.java"/>
           <exclude name="net/sourceforge/waters/analysis/distributed/**/*.java"/>
-          <exclude name="net/sourceforge/waters/analysis/po/**/*.java"/>
           <exclude name="**/Abstract*.java"/>
           <exclude name="**/Large*.java"/>
           <exclude name="**/Native*.java"/>
