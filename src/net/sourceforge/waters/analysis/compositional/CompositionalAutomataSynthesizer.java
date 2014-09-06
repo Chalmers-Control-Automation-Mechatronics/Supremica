@@ -676,33 +676,16 @@ public class CompositionalAutomataSynthesizer
     if (!reduced) {
       rel = reduceSupervisor(rel);
     }
-    final Collection<EventProxy> disabledEvents = findAndRemoveDumpStateTransitions(rel);
+    final EventProxy defaultMarking = getUsedDefaultMarking();
+    final int defaultID = mTempEventEncoding.getEventCode(defaultMarking);
+    rel.removeDeadlockStateTransitions(defaultID);
     final ProductDESProxyFactory factory = getFactory();
     rel.setName(name);
     rel.setKind(ComponentKind.SUPERVISOR);
     final AutomatonProxy sup = rel.createAutomaton(factory, mTempEventEncoding);
     final CompositionalAutomataSynthesisResult result = getAnalysisResult();
     result.addBackRenamedSupervisor(sup);
-    result.addDisabledEvents(sup, disabledEvents);
     return sup;
-  }
-
-  private Collection<EventProxy> findAndRemoveDumpStateTransitions
-  (final ListBufferTransitionRelation rel)
-  {
-    final Collection<EventProxy> disabledEvents = new THashSet<>();
-    final EventProxy defaultMarking = getUsedDefaultMarking();
-    final int defaultID = mTempEventEncoding.getEventCode(defaultMarking);
-    final TransitionIterator it = rel.createAllTransitionsModifyingIterator();
-    while(it.advance()) {
-      final int target = it.getCurrentTargetState();
-      if (rel.isDeadlockState(target, defaultID)) {
-        final int e = it.getCurrentEvent();
-        disabledEvents.add(mTempEventEncoding.getProperEvent(e));
-        it.remove();
-      }
-    }
-    return disabledEvents;
   }
 
   private boolean isDeterministic(final ListBufferTransitionRelation rel,

@@ -349,7 +349,7 @@ public class ModularControllabilitySynthesizer
           mMonolithicSynthesizer.getAnalysisResult().getComputedAutomata();
         supervisors.addAll(localSups);
         mDisabledEvents.addAll(disabledEvents);
-        if (mIncludesAllAutomata) {
+        if (mIncludesAllAutomata && !getSupervisorReductionEnabled()) {
           mUsedAutomata.add(spec);
           mUsedAutomata.addAll(plants);
         }

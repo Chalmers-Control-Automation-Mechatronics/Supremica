@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer.PreselectingMethod;
 import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer.PreselectingMethodFactory;
@@ -260,7 +261,22 @@ public class ModularAndCompositionalSynthesizer
       setUp();
       final ProductDESProxy model = getModel();
       final KindTranslator translator = getKindTranslator();
-      mModularSynthesizer.setModel(model);
+      final int numAutomata = model.getAutomata().size();
+      final Collection<AutomatonProxy> automata = new ArrayList<>(numAutomata);
+      for (final AutomatonProxy aut : model.getAutomata()) {
+        switch (translator.getComponentKind(aut)) {
+        case PLANT:
+        case SPEC:
+          automata.add(aut);
+          break;
+        default:
+          break;
+        }
+      }
+      final ProductDESProxyFactory factory = getFactory();
+      final ProductDESProxy sanitizedModel =
+        AutomatonTools.createProductDESProxy(model.getName(), automata, factory);
+      mModularSynthesizer.setModel(sanitizedModel);
       mModularSynthesizer.setKindTranslator(translator);
       if (!mModularSynthesizer.run()) {
         return setBooleanResult(false);
@@ -282,33 +298,20 @@ public class ModularAndCompositionalSynthesizer
         }
         final CompositionalAutomataSynthesisResult compositionalResult =
           mCompositionalSynthesizer.getAnalysisResult();
-        final Collection<AutomatonProxy> computedAutomata =
+        final Collection<AutomatonProxy> compSupervisors =
           compositionalResult.getComputedAutomata();
-        supervisors.addAll(computedAutomata);
-        final Collection<AutomatonProxy> specToBe =
-          new ArrayList<>(computedAutomata.size());
-        for (final AutomatonProxy aut : computedAutomata) {
-          for (final EventProxy event : compositionalResult.getDisabledEvents(aut)) {
-            if (translator.getEventKind(event) == EventKind.UNCONTROLLABLE) {
-              specToBe.add(aut);
-              break;
-            }
-          }
-        }
-        if (specToBe.isEmpty()) {
-          break;
-        }
+        supervisors.addAll(compSupervisors);
         final Collection<AutomatonProxy> modularAutomata =
           modularResult.getAutomata();
         final Collection<AutomatonProxy> combinedAutomata =
-          new ArrayList<>(modularAutomata.size() + computedAutomata.size());
+          new ArrayList<>(modularAutomata.size() + compSupervisors.size());
         combinedAutomata.addAll(modularAutomata);
-        combinedAutomata.addAll(computedAutomata);
+        combinedAutomata.addAll(compSupervisors);
         final ProductDESProxy modularDES = AutomatonTools.createProductDESProxy
-          (model.getName(), combinedAutomata, getFactory());
+          (model.getName(), combinedAutomata, factory);
         mModularSynthesizer.setModel(modularDES);
         final ModularKindTranslator modularTranslator =
-          new ModularKindTranslator(specToBe);
+          new ModularKindTranslator(compSupervisors);
         mModularSynthesizer.setKindTranslator(modularTranslator);
         if (!mModularSynthesizer.run()) {
           return setBooleanResult(false);
@@ -321,7 +324,7 @@ public class ModularAndCompositionalSynthesizer
       Collections.sort(supervisorsList);
       final ProductDESProxy supervisorsDES =
         AutomatonTools.createProductDESProxy("supervisor", supervisorsList,
-                                             getFactory());
+                                             factory);
       return setProxyResult(supervisorsDES);
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
@@ -391,7 +394,7 @@ public class ModularAndCompositionalSynthesizer
     //# Constructors
     ModularKindTranslator(final Collection<AutomatonProxy> specToBe)
     {
-      mSpecificationToBe = specToBe;
+      mSpecificationToBe = new THashSet<>(specToBe);
     }
 
     //#######################################################################
@@ -407,7 +410,7 @@ public class ModularAndCompositionalSynthesizer
     public ComponentKind getComponentKind(final AutomatonProxy aut)
     {
       if (mSpecificationToBe.contains(aut)) {
-          return ComponentKind.SPEC;
+        return ComponentKind.SPEC;
       } else {
         return ComponentKind.PLANT;
       }
@@ -415,7 +418,7 @@ public class ModularAndCompositionalSynthesizer
 
     //#######################################################################
     //# Data Members
-    private final Collection<AutomatonProxy> mSpecificationToBe;
+    private final Set<AutomatonProxy> mSpecificationToBe;
   }
 
 
