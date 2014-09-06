@@ -30,18 +30,15 @@ public class SDPlantCompletenessChecker
   public SDPlantCompletenessChecker(final ProductDESProxyFactory factory,
                                     final SafetyVerifier checker)
   {
-    this(null,factory,checker,false);
+    this(null, factory, checker);
   }
 
   public SDPlantCompletenessChecker(final ProductDESProxy model,
                                     final ProductDESProxyFactory factory,
-                                    final SafetyVerifier checker,
-                                    final boolean least)
+                                    final SafetyVerifier checker)
   {
-    super(model, factory,checker, false);
+    super(model, factory, checker);
     setKindTranslator(SDPlantCompletenessKindTranslator.getInstance());
-
-
   }
 
 }

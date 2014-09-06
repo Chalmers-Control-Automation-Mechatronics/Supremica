@@ -51,10 +51,10 @@ import org.apache.log4j.Logger;
  * ensure global nonblocking, and the resultant supervised behaviour may
  * indeed be blocking.</P>
  *
- * <P><STRONG>Reference:</STRONG> K.&nbsp;&Aring;kesson, H.&nbsp;Flordal, and
- * M.&nbsp;Fabian. Exploiting Modularity for Synthesis and Verification of
- * Supervisors. Proc. 15th IFAC World Congress on Automatic Control,
- * Barcelona, 2002.</P>
+ * <P><I>Reference:</I><BR>
+ * K.&nbsp;&Aring;kesson, H.&nbsp;Flordal, and M.&nbsp;Fabian.
+ * Exploiting Modularity for Synthesis and Verification of Supervisors.
+ * Proc. 15th IFAC World Congress on Automatic Control, Barcelona, 2002.</P>
  *
  * @author Sahar Mohajerani, Robi Malik
  */

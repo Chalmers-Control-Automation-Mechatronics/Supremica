@@ -9,15 +9,21 @@
 
 package net.sourceforge.waters.analysis.modular;
 
+import gnu.trove.set.hash.THashSet;
+
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import net.sourceforge.waters.analysis.abstraction.TraceFinder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -25,10 +31,12 @@ import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -37,6 +45,12 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 /**
  * The modular controllability check algorithm.
+ *
+ * <P><I>Reference:</I><BR>
+ * Bertil A. Brandin, Robi Malik, Petra Malik. Incremental verification
+ * and synthesis of discrete-event systems guided by counter-examples.
+ * IEEE Transactions on Control Systems Technology, 12&nbsp;(3), 387-401,
+ * 2004.</P>
  *
  * @author Simon Ware
  */
@@ -51,18 +65,38 @@ public class ModularControllabilityChecker
   public ModularControllabilityChecker(final ProductDESProxyFactory factory,
                                        final SafetyVerifier secondary)
   {
-    this(null, factory, secondary, false);
+    this(null, factory, secondary);
   }
 
   public ModularControllabilityChecker(final ProductDESProxy model,
                                        final ProductDESProxyFactory factory,
-                                       final SafetyVerifier secondary,
-                                       final boolean least)
+                                       final SafetyVerifier secondary)
   {
     super(model, factory, secondary);
     setKindTranslator(ControllabilityKindTranslator.getInstance());
-    mStates = 0;
-    mLeast = least;
+  }
+
+
+  //#########################################################################
+  //# Configuration
+  public void setCollectsFailedSpecs(final boolean collect)
+  {
+    mCollectsFailedSpecs = collect;
+  }
+
+  public boolean getCollectsFailedSpecs()
+  {
+    return mCollectsFailedSpecs;
+  }
+
+  public void setStartsWithSmallestSpec(final boolean least)
+  {
+    mStartsWithSmallestSpec = least;
+  }
+
+  public boolean getStartsWithSmallestSpec()
+  {
+    return mStartsWithSmallestSpec;
   }
 
 
@@ -74,127 +108,162 @@ public class ModularControllabilityChecker
     super.setUp();
     final SafetyVerifier mono = getMonolithicVerifier();
     mono.setNodeLimit(getNodeLimit());
-    mStates = 0;
+    if (mCollectsFailedSpecs) {
+      mFailedSpecs = new LinkedList<>();
+    }
   }
 
   @Override
   public boolean run()
     throws AnalysisException
   {
-    setUp();
-    final Set<AutomatonProxy> plants = new HashSet<AutomatonProxy>();
-    final Set<AutomatonProxy> specplants = new HashSet<AutomatonProxy>();
-    final SortedSet<AutomatonProxy> specs =
-      new TreeSet<AutomatonProxy>(new Comparator<AutomatonProxy>() {
-      @Override
-      public int compare(final AutomatonProxy a1, final AutomatonProxy a2)
-      {
-        if (a1.getStates().size() < a2.getStates().size()) {
-          return -1;
-        } else if (a1.getStates().size() > a2.getStates().size()) {
-          return 1;
+    try {
+      setUp();
+      final ProductDESProxy des = getModel();
+      final Collection<AutomatonProxy> input = des.getAutomata();
+      final int numAutomata = input.size();
+      final Set<AutomatonProxy> plants = new THashSet<>(numAutomata);
+      final Set<AutomatonProxy> specPlants = new THashSet<>(numAutomata);
+      final SortedSet<AutomatonProxy> specs =
+        new TreeSet<>(new Comparator<AutomatonProxy>() {
+          @Override
+          public int compare(final AutomatonProxy a1, final AutomatonProxy a2)
+          {
+            if (a1.getStates().size() < a2.getStates().size()) {
+              return -1;
+            } else if (a1.getStates().size() > a2.getStates().size()) {
+              return 1;
+            }
+            if (a1.getTransitions().size() < a2.getTransitions().size()) {
+              return -1;
+            } else if (a1.getTransitions().size() > a2.getTransitions().size()) {
+              return 1;
+            }
+            if (a1.getEvents().size() < a2.getEvents().size()) {
+              return -1;
+            } else if (a1.getEvents().size() > a2.getEvents().size()) {
+              return 1;
+            }
+            return a1.compareTo(a2);
+          }
+        });
+
+      final List<AutomatonProxy> automata = new ArrayList<>(numAutomata);
+      for (final AutomatonProxy aut : input) {
+        switch (getKindTranslator().getComponentKind(aut)) {
+        case PLANT:
+          automata.add(aut);
+          plants.add(aut);
+          break;
+        case SPEC:
+          automata.add(aut);
+          specs.add(aut);
+          break;
+        default:
+          break;
         }
-        if (a1.getTransitions().size() < a2.getTransitions().size()) {
-          return -1;
-        } else if (a1.getTransitions().size() > a2.getTransitions().size()) {
-          return 1;
-        }
-        if (a1.getEvents().size() < a2.getEvents().size()) {
-          return -1;
-        } else if (a1.getEvents().size() > a2.getEvents().size()) {
-          return 1;
-        }
-        return a1.getName().compareTo(a2.getName());
       }
-    });
 
-    final ProductDESProxy des = getModel();
-    final Collection<AutomatonProxy> input = des.getAutomata();
-    final int numAutomata = input.size();
-    final List<AutomatonProxy> automata = new ArrayList<AutomatonProxy>(numAutomata);
-    for (final AutomatonProxy aut : input) {
-      switch (getKindTranslator().getComponentKind(aut)) {
-      case PLANT:
-        automata.add(aut);
-        plants.add(aut);
-        break;
-      case SPEC:
-        automata.add(aut);
-        specs.add(aut);
-        break;
-      default:
-        break;
-      }
-    }
-
-    final SafetyVerifier mono = getMonolithicVerifier();
-    while (!specs.isEmpty()) {
-      final Collection<AutomatonProxy> composition = new ArrayList<AutomatonProxy>();
-      final Set<EventProxy> events = new HashSet<EventProxy>();
-      final SortedSet<AutomatonProxy> uncomposedplants = new TreeSet<AutomatonProxy>(new AutomatonComparator());
-      final SortedSet<AutomatonProxy> uncomposedspecplants = new TreeSet<AutomatonProxy>(new AutomatonComparator());
-      final SortedSet<AutomatonProxy> uncomposedspecs = new TreeSet<AutomatonProxy>(new AutomatonComparator());
-      uncomposedplants.addAll(plants);
-      uncomposedspecplants.addAll(specplants);
-      uncomposedspecs.addAll(specs);
-      final AutomatonProxy spec = mLeast ? specs.first() : specs.last();
-      composition.add(spec);
-      events.addAll(spec.getEvents());
-      uncomposedspecs.remove(spec);
-      ProductDESProxy comp =
-        getFactory().createProductDESProxy("comp", events, composition);
-      mono.setModel(comp);
-      mono.setKindTranslator(new KindTranslator()
-      {
-        @Override
-        public EventKind getEventKind(final EventProxy e)
-        {
-          return getKindTranslator().getEventKind(e);
-        }
-
-        @Override
-        public ComponentKind getComponentKind(final AutomatonProxy a)
-        {
-          return specs.contains(a) ? ComponentKind.SPEC
-                                   : ComponentKind.PLANT;
-        }
-      });
+      final ProductDESProxyFactory factory = getFactory();
+      final SafetyVerifier mono = getMonolithicVerifier();
       final ModularHeuristic heuristic = getHeuristic();
-      while (!mono.run()) {
-        mStates += mono.getAnalysisResult().getTotalNumberOfStates();
-        final Collection<AutomatonProxy> newComp =
-          heuristic.heur(comp,
-                         uncomposedplants,
-                         uncomposedspecplants,
-                         uncomposedspecs,
-                         mono.getCounterExample());
-        if (newComp == null) {
-          final ProductDESProxyFactory factory = getFactory();
-          final SafetyTraceProxy trace = mono.getCounterExample();
-          final SafetyTraceProxy extended =
-            heuristic.extendTrace(factory, trace, automata);
-          return setFailedResult(extended);
+      final Collection<AutomatonProxy> subsystem = new ArrayList<>(numAutomata);
+      specLoop:
+      while (!specs.isEmpty()) {
+        checkAbort();
+        subsystem.clear();
+        final Set<AutomatonProxy> uncomposedPlants = new TreeSet<>(plants);
+        final Set<AutomatonProxy> uncomposedSpecPlants = new TreeSet<>(specPlants);
+        final Set<AutomatonProxy> uncomposedSpecs = new TreeSet<>(specs);
+        final AutomatonProxy spec =
+          mStartsWithSmallestSpec ? specs.first() : specs.last();
+        subsystem.add(spec);
+        uncomposedSpecs.remove(spec);
+        ProductDESProxy subDES =
+          AutomatonTools.createProductDESProxy(spec, factory);
+        mono.setModel(subDES);
+        mono.setKindTranslator(new KindTranslator() {
+          @Override
+          public EventKind getEventKind(final EventProxy e)
+          {
+            return getKindTranslator().getEventKind(e);
+          }
+
+          @Override
+          public ComponentKind getComponentKind(final AutomatonProxy a)
+          {
+            return specs.contains(a) ? ComponentKind.SPEC
+              : ComponentKind.PLANT;
+          }
+        });
+        while (!mono.run()) {
+          recordStats(mono.getAnalysisResult());
+          final Collection<AutomatonProxy> selectedAutomata =
+            heuristic.heur(subDES,
+                           uncomposedPlants,
+                           uncomposedSpecPlants,
+                           uncomposedSpecs,
+                           mono.getCounterExample());
+          checkAbort();
+          if (selectedAutomata == null) {
+            final SafetyTraceProxy trace = mono.getCounterExample();
+            final SafetyTraceProxy extended =
+              extendTrace(heuristic, trace, automata);
+            setFailedResult(extended);
+            if (mCollectsFailedSpecs) {
+              specs.removeAll(mFailedSpecs);
+              continue specLoop;
+            } else {
+              return false;
+            }
+          }
+          subsystem.addAll(selectedAutomata);
+          uncomposedPlants.removeAll(selectedAutomata);
+          uncomposedSpecPlants.removeAll(selectedAutomata);
+          uncomposedSpecs.removeAll(selectedAutomata);
+          subDES = AutomatonTools.createProductDESProxy(spec.getName(),
+                                                        subsystem, factory);
+          mono.setModel(subDES);
         }
-        for (final AutomatonProxy automaton : newComp) {
-          composition.add(automaton);
-          uncomposedplants.remove(automaton);
-          uncomposedspecplants.remove(automaton);
-          uncomposedspecs.remove(automaton);
-          events.addAll(automaton.getEvents());
+        recordStats(mono.getAnalysisResult());
+        for (final AutomatonProxy automaton : subsystem) {
+          if (specs.remove(automaton)) {
+            specPlants.add(automaton);
+          }
         }
-        comp = getFactory().createProductDESProxy("comp", events, composition);
-        mono.setModel(comp);
       }
-      mStates += mono.getAnalysisResult().getTotalNumberOfStates();
-      for (final AutomatonProxy automaton : composition) {
-        if (specs.contains(automaton)) {
-          specs.remove(automaton);
-          specplants.add(automaton);
-        }
+      if (mCollectsFailedSpecs && !mFailedSpecs.isEmpty()) {
+        final ModularVerificationResult result = getAnalysisResult();
+        result.addFailedSpecs(mFailedSpecs);
+        return false;
+      } else {
+        return setSatisfiedResult();
       }
+    } finally {
+      tearDown();
     }
-    setSatisfiedResult();
-    return true;
+  }
+
+  @Override
+  protected void tearDown()
+  {
+    super.tearDown();
+    mFailedSpecs = null;
+  }
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.model.analysis.AbstractModelAnalyser
+  @Override
+  public ModularVerificationResult getAnalysisResult()
+  {
+    return (ModularVerificationResult) super.getAnalysisResult();
+  }
+
+  @Override
+  protected ModularVerificationResult createAnalysisResult()
+  {
+    return new ModularVerificationResult();
   }
 
 
@@ -216,31 +285,102 @@ public class ModularControllabilityChecker
     return super.setFailedResult(wrapper);
   }
 
-  @Override
-  protected void addStatistics()
+
+  //#########################################################################
+  //# Trace Computation
+  private SafetyTraceProxy extendTrace(final ModularHeuristic heuristic,
+                                       final SafetyTraceProxy trace,
+                                       final List<AutomatonProxy> automata)
+    throws AnalysisException
   {
-    super.addStatistics();
-    final VerificationResult result = getAnalysisResult();
-    result.setNumberOfStates(mStates);
+    final Set<AutomatonProxy> oldAutomata =
+      new THashSet<AutomatonProxy>(trace.getAutomata());
+    boolean done = false;
+    boolean det = true;
+    for (final AutomatonProxy aut : automata) {
+      if (!oldAutomata.contains(aut)) {
+        done = false;
+        final TraceFinder finder = heuristic.getTraceFinder(aut);
+        det &= finder.isDeterministic();
+      }
+    }
+    if (done) {
+      return trace;
+    }
+    final ProductDESProxyFactory factory = getFactory();
+    final String name = trace.getName();
+    final String comment = trace.getComment();
+    final URI location = trace.getLocation();
+    final ProductDESProxy des = trace.getProductDES();
+    final List<TraceStepProxy> oldSteps = trace.getTraceSteps();
+    if (det) {
+      return factory.createSafetyTraceProxy(name, comment, location,
+                                            des, automata, oldSteps);
+    }
+    final int numSteps = oldSteps.size();
+    final KindTranslator translator = getKindTranslator();
+    final List<TraceStepProxy> newSteps = new ArrayList<>(numSteps);
+    int depth = 0;
+    for (final TraceStepProxy oldStep : oldSteps) {
+      checkAbort();
+      final EventProxy event = oldStep.getEvent();
+      final Map<AutomatonProxy,StateProxy> oldMap = oldStep.getStateMap();
+      Map<AutomatonProxy,StateProxy> newMap = null;
+      boolean endOfTrace = false;
+      for (final AutomatonProxy aut : automata) {
+        if (!oldAutomata.contains(aut)) {
+          final TraceFinder finder = heuristic.getTraceFinder(aut);
+          if (translator.getComponentKind(aut) == ComponentKind.SPEC &&
+              depth > finder.getNumberOfAcceptedSteps()) {
+            // Found nonaccepting spec --- trace ends here.
+            endOfTrace = true;
+            if (mFailedSpecs != null) {
+              mFailedSpecs.add(aut);
+            }
+            continue;
+          }
+          final StateProxy state = finder.getState(depth);
+          if (state != null) {
+            if (newMap == null) {
+              newMap = new HashMap<>(oldMap);
+            }
+            newMap.put(aut, state);
+          }
+        }
+      }
+      if (newMap == null) {
+        newSteps.add(oldStep);
+      } else {
+        final TraceStepProxy newStep =
+          factory.createTraceStepProxy(event, newMap);
+        newSteps.add(newStep);
+      }
+      if (endOfTrace) {
+        break;
+      }
+      depth++;
+    }
+    return factory.createSafetyTraceProxy(name, comment, location,
+                                          des, automata, newSteps);
   }
 
 
   //#########################################################################
-  //# Inner Class AutomatonComparator
-  private final static class AutomatonComparator
-    implements Comparator<AutomatonProxy>
+  //# Collecting Statistics
+  private void recordStats(final VerificationResult subresult)
   {
-    @Override
-    public int compare(final AutomatonProxy a1, final AutomatonProxy a2)
-    {
-      return a1.getName().compareTo(a2.getName());
-    }
+    final ModularVerificationResult result = getAnalysisResult();
+    result.updateNumberOfAutomata(subresult.getTotalNumberOfAutomata());
+    result.updateNumberOfStates(subresult.getTotalNumberOfStates());
+    result.updateNumberOfTransitions(subresult.getTotalNumberOfTransitions());
   }
 
 
   //#########################################################################
   //# Data Members
-  private int mStates;
-  private final boolean mLeast;
+  private boolean mCollectsFailedSpecs = false;
+  private boolean mStartsWithSmallestSpec = false;
+
+  private Collection<AutomatonProxy> mFailedSpecs;
 
 }

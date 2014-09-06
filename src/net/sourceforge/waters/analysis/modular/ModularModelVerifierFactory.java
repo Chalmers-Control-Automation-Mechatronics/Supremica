@@ -62,10 +62,7 @@ public class ModularModelVerifierFactory
     (final ProductDESProxyFactory factory)
   {
     return new ModularControllabilityChecker
-      (null,
-       factory,
-       new NativeControllabilityChecker(factory),
-       false);
+      (null, factory, new NativeControllabilityChecker(factory));
   }
 
   @Override
