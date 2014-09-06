@@ -55,7 +55,7 @@ public class ModularVerificationResult
   //# Providing Statistics
   void addFailedSpecs(final Collection<AutomatonProxy> failedSpecs)
   {
-    if (mFailedSpecs != null) {
+    if (mFailedSpecs == null) {
       mFailedSpecs = new ArrayList<AutomatonProxy>(failedSpecs);
     } else {
       mFailedSpecs.addAll(failedSpecs);

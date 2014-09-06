@@ -19,11 +19,13 @@ import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
+import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.AbstractProductDESBuilder;
+import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
@@ -82,6 +84,10 @@ public class ModularControllabilitySynthesizer
                                            final KindTranslator translator)
   {
     super(model, factory, translator);
+    final SafetyVerifier inner = new NativeControllabilityChecker(factory);
+    mModularControllabilityChecker =
+      new ModularControllabilityChecker(factory, inner);
+    mModularControllabilityChecker.setCollectsFailedSpecs(true);
     mMonolithicSynthesizer = new MonolithicSynthesizer(factory);
     mMonolithicSynthesizer.setNonblockingSupported(false);
   }
@@ -141,27 +147,6 @@ public class ModularControllabilitySynthesizer
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.Abortable
-  @Override
-  public void requestAbort()
-  {
-    super.requestAbort();
-    if (mMonolithicSynthesizer != null) {
-      mMonolithicSynthesizer.requestAbort();
-    }
-  }
-
-  @Override
-  public void resetAbort()
-  {
-    super.resetAbort();
-    if (mMonolithicSynthesizer != null) {
-      mMonolithicSynthesizer.resetAbort();
-    }
-  }
-
-
-  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.SupervisorSynthesizer
   @Override
   public void setConfiguredDefaultMarking(final EventProxy marking)
@@ -201,6 +186,33 @@ public class ModularControllabilitySynthesizer
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
+  public void requestAbort()
+  {
+    super.requestAbort();
+    if (mModularControllabilityChecker != null) {
+      mModularControllabilityChecker.requestAbort();
+    }
+    if (mMonolithicSynthesizer != null) {
+      mMonolithicSynthesizer.requestAbort();
+    }
+  }
+
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    if (mModularControllabilityChecker != null) {
+      mModularControllabilityChecker.resetAbort();
+    }
+    if (mMonolithicSynthesizer != null) {
+      mMonolithicSynthesizer.resetAbort();
+    }
+  }
+
+
+  //#########################################################################
   //# Overrides for Base Class
   //# net.sourceforge.waters.model.analysis.AbstractModelAnalyser
   @Override
@@ -208,27 +220,15 @@ public class ModularControllabilitySynthesizer
   {
     super.setUp();
     final KindTranslator translator = getKindTranslator();
+    mModularControllabilityChecker.setKindTranslator(translator);
+    mModularControllabilityChecker.setNodeLimit(getNodeLimit());
+    mModularControllabilityChecker.setTransitionLimit(getTransitionLimit());
     mMonolithicSynthesizer.setKindTranslator(translator);
     mMonolithicSynthesizer.setNodeLimit(getNodeLimit());
     mMonolithicSynthesizer.setTransitionLimit(getTransitionLimit());
     final ProductDESProxy model = getModel();
     final int numEvents = model.getEvents().size();
     mUncontrollableEventMap = new HashMap<>(numEvents);
-    for (final AutomatonProxy aut : model.getAutomata()) {
-      if (translator.getComponentKind(aut) == ComponentKind.PLANT) {
-        for (final EventProxy event : aut.getEvents()) {
-          if (translator.getEventKind(event) == EventKind.UNCONTROLLABLE) {
-            Collection<AutomatonProxy> automata =
-              mUncontrollableEventMap.get(event);
-            if (automata == null) {
-              automata = new ArrayList<>();
-              mUncontrollableEventMap.put(event, automata);
-            }
-            automata.add(aut);
-          }
-        }
-      }
-    }
     if (mIncludesAllAutomata) {
       mUsedAutomata = new THashSet<>(numEvents);
     }
@@ -257,73 +257,105 @@ public class ModularControllabilitySynthesizer
   {
     try {
       setUp();
-      final ProductDESProxy model = getModel();
-      final int numAutomata = model.getAutomata().size();
-      final Collection<AutomatonProxy> supervisors =
-        new ArrayList<>(numAutomata);
+
+      // 1. Find uncontrollable specifications
+      final ProductDESProxyFactory factory = getFactory();
       final KindTranslator translator = getKindTranslator();
-      for (final AutomatonProxy spec : model.getAutomata()) {
-        if (translator.getComponentKind(spec) == ComponentKind.SPEC) {
-          checkAbort();
-          final Collection<EventProxy> specUncontrollableEvents =
-            getUncontrollableEvents(spec);
-          if (specUncontrollableEvents.isEmpty()) {
-            continue;
-          }
-          final Collection<EventProxy> uncontrollableEvents =
-            new THashSet<>(specUncontrollableEvents);
-          final Collection<AutomatonProxy> plants =
-            new THashSet<>(model.getAutomata().size());
-          for (final EventProxy event : specUncontrollableEvents) {
-            final Collection<AutomatonProxy> automata =
-              mUncontrollableEventMap.get(event);
-            if (automata != null) {
-              plants.addAll(automata);
-            }
-          }
-          mMonolithicSynthesizer.setOutputName("sup:" + spec.getName());
-          boolean moreEvents = false;
-          do {
-            final ProductDESProxy des = createProductDES(spec, plants);
-            mMonolithicSynthesizer.setModel(des);
-            extendUncontrollableEvents(uncontrollableEvents, plants);
-            final MonolithicKindTranslator monolithicTranslator =
-              new MonolithicKindTranslator(uncontrollableEvents);
-            mMonolithicSynthesizer.setKindTranslator(monolithicTranslator);
-            if (!mMonolithicSynthesizer.run()) {
-              return setBooleanResult(false);
-            }
-            moreEvents = false;
-            final Collection<EventProxy> disabledEvents =
-              mMonolithicSynthesizer.getDisabledEvents();
-            for (final EventProxy event : disabledEvents) {
-              if (translator.getEventKind(event) == EventKind.UNCONTROLLABLE) {
-                final Collection<AutomatonProxy> automata =
-                  mUncontrollableEventMap.get(event);
-                uncontrollableEvents.add(event);
-                if (automata != null) {
-                  moreEvents |= plants.addAll(automata);
-                }
+      mModularControllabilityChecker.setKindTranslator(translator);
+      final ProductDESProxy model = getModel();
+      mModularControllabilityChecker.setModel(model);
+      if (mModularControllabilityChecker.run()) {
+        // The system is already controllable!
+        if (mIncludesAllAutomata) {
+          return setProxyResult(model);
+        } else {
+          final Collection<AutomatonProxy> empty = Collections.emptyList();
+          final ProductDESProxy emptyDES =
+            AutomatonTools.createProductDESProxy("empty", empty, factory);
+          return setProxyResult(emptyDES);
+        }
+      }
+
+      // 2. Establish map from uncontrollable events to plants
+      final Collection<AutomatonProxy> uncontrollableSpecs =
+        mModularControllabilityChecker.getAnalysisResult().getFailedSpecs();
+      final Collection<AutomatonProxy> uncontrollableSpecSet =
+        new THashSet<>(uncontrollableSpecs);
+      for (final AutomatonProxy aut : model.getAutomata()) {
+        if (!uncontrollableSpecSet.contains(aut)) {
+          for (final EventProxy event : aut.getEvents()) {
+            if (translator.getEventKind(event) == EventKind.UNCONTROLLABLE) {
+              Collection<AutomatonProxy> automata =
+                mUncontrollableEventMap.get(event);
+              if (automata == null) {
+                automata = new ArrayList<>();
+                mUncontrollableEventMap.put(event, automata);
               }
-            }
-          } while (moreEvents);
-          final Collection<EventProxy> disabledEvents =
-            mMonolithicSynthesizer.getDisabledEvents();
-          // If the synthesised supervisor does not disable *any* events,
-          // this means the specification is controllable alone.
-          // Then we do not need to include a supervisor.
-          if (!disabledEvents.isEmpty()) {
-            final Collection<? extends AutomatonProxy> localSups =
-              mMonolithicSynthesizer.getAnalysisResult().getComputedAutomata();
-            supervisors.addAll(localSups);
-            mDisabledEvents.addAll(disabledEvents);
-            if (mIncludesAllAutomata) {
-              mUsedAutomata.add(spec);
-              mUsedAutomata.addAll(plants);
+              automata.add(aut);
             }
           }
         }
       }
+
+      // 3. Perform synthesis for uncontrollable specifications
+      final int numAutomata = model.getAutomata().size();
+      final Collection<AutomatonProxy> supervisors =
+        new ArrayList<>(numAutomata);
+      for (final AutomatonProxy spec : uncontrollableSpecs) {
+        checkAbort();
+        final Collection<EventProxy> specUncontrollableEvents =
+          getUncontrollableEvents(spec);
+        final Collection<EventProxy> uncontrollableEvents =
+          new THashSet<>(specUncontrollableEvents);
+        final Collection<AutomatonProxy> plants =
+          new THashSet<>(model.getAutomata().size());
+        for (final EventProxy event : specUncontrollableEvents) {
+          final Collection<AutomatonProxy> automata =
+            mUncontrollableEventMap.get(event);
+          if (automata != null) {
+            plants.addAll(automata);
+          }
+        }
+        mMonolithicSynthesizer.setOutputName("sup:" + spec.getName());
+        boolean moreEvents = false;
+        do {
+          checkAbort();
+          final ProductDESProxy des = createProductDES(spec, plants);
+          mMonolithicSynthesizer.setModel(des);
+          extendUncontrollableEvents(uncontrollableEvents, plants);
+          final MonolithicKindTranslator monolithicTranslator =
+            new MonolithicKindTranslator(spec, uncontrollableEvents);
+          mMonolithicSynthesizer.setKindTranslator(monolithicTranslator);
+          if (!mMonolithicSynthesizer.run()) {
+            return setBooleanResult(false);
+          }
+          moreEvents = false;
+          final Collection<EventProxy> disabledEvents =
+            mMonolithicSynthesizer.getDisabledEvents();
+          for (final EventProxy event : disabledEvents) {
+            if (translator.getEventKind(event) == EventKind.UNCONTROLLABLE) {
+              final Collection<AutomatonProxy> automata =
+                mUncontrollableEventMap.get(event);
+              uncontrollableEvents.add(event);
+              if (automata != null) {
+                moreEvents |= plants.addAll(automata);
+              }
+            }
+          }
+        } while (moreEvents);
+        final Collection<EventProxy> disabledEvents =
+          mMonolithicSynthesizer.getDisabledEvents();
+        final Collection<? extends AutomatonProxy> localSups =
+          mMonolithicSynthesizer.getAnalysisResult().getComputedAutomata();
+        supervisors.addAll(localSups);
+        mDisabledEvents.addAll(disabledEvents);
+        if (mIncludesAllAutomata) {
+          mUsedAutomata.add(spec);
+          mUsedAutomata.addAll(plants);
+        }
+      }
+
+      // 4. Create product DES containing supervisors
       if (mIncludesAllAutomata) {
         for (final AutomatonProxy aut : model.getAutomata()) {
           switch (translator.getComponentKind(aut)) {
@@ -340,7 +372,7 @@ public class ModularControllabilitySynthesizer
       }
       final ProductDESProxy des =
         AutomatonTools.createProductDESProxy("supervisor", supervisors,
-                                             getFactory());
+                                             factory);
       return setProxyResult(des);
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
@@ -444,8 +476,9 @@ public class ModularControllabilitySynthesizer
     //#######################################################################
     //# Constructor
     private MonolithicKindTranslator
-      (final Collection<EventProxy> localUncont)
+      (final AutomatonProxy spec, final Collection<EventProxy> localUncont)
     {
+      mSpec = spec;
       mLocalUncontrollables = localUncont;
     }
 
@@ -454,8 +487,11 @@ public class ModularControllabilitySynthesizer
     @Override
     public ComponentKind getComponentKind(final AutomatonProxy aut)
     {
-      final KindTranslator translator = getKindTranslator();
-      return translator.getComponentKind(aut);
+      if (aut == mSpec) {
+        return ComponentKind.SPEC;
+      } else {
+        return ComponentKind.PLANT;
+      }
     }
 
     @Override
@@ -476,6 +512,7 @@ public class ModularControllabilitySynthesizer
 
     //#######################################################################
     //# Data Members
+    private final AutomatonProxy mSpec;
     private final Collection<EventProxy> mLocalUncontrollables;
   }
 
@@ -489,6 +526,7 @@ public class ModularControllabilitySynthesizer
   private Collection<EventProxy> mDisabledEvents;
 
   // Permanent tools
+  private final ModularControllabilityChecker mModularControllabilityChecker;
   private final MonolithicSynthesizer mMonolithicSynthesizer;
 
   // Algorithm variables

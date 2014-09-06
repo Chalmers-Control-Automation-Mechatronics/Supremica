@@ -108,9 +108,6 @@ public class ModularControllabilityChecker
     super.setUp();
     final SafetyVerifier mono = getMonolithicVerifier();
     mono.setNodeLimit(getNodeLimit());
-    if (mCollectsFailedSpecs) {
-      mFailedSpecs = new LinkedList<>();
-    }
   }
 
   @Override
@@ -167,6 +164,7 @@ public class ModularControllabilityChecker
       final ProductDESProxyFactory factory = getFactory();
       final SafetyVerifier mono = getMonolithicVerifier();
       final ModularHeuristic heuristic = getHeuristic();
+      SafetyTraceProxy trace = null;
       final Collection<AutomatonProxy> subsystem = new ArrayList<>(numAutomata);
       specLoop:
       while (!specs.isEmpty()) {
@@ -206,12 +204,19 @@ public class ModularControllabilityChecker
                            mono.getCounterExample());
           checkAbort();
           if (selectedAutomata == null) {
-            final SafetyTraceProxy trace = mono.getCounterExample();
-            final SafetyTraceProxy extended =
-              extendTrace(heuristic, trace, automata);
-            setFailedResult(extended);
+            if (trace == null) {
+              trace = mono.getCounterExample();
+              trace = extendTrace(heuristic, trace, automata);
+              setFailedResult(trace);
+            }
             if (mCollectsFailedSpecs) {
-              specs.removeAll(mFailedSpecs);
+              trace = mono.getCounterExample();
+              final Collection<AutomatonProxy> failedSpecs =
+                collectFailedSpecs(heuristic, trace);
+              specs.removeAll(failedSpecs);
+              if (!failedSpecs.contains(spec)) {
+                specs.add(spec);
+              }
               continue specLoop;
             } else {
               return false;
@@ -232,9 +237,7 @@ public class ModularControllabilityChecker
           }
         }
       }
-      if (mCollectsFailedSpecs && !mFailedSpecs.isEmpty()) {
-        final ModularVerificationResult result = getAnalysisResult();
-        result.addFailedSpecs(mFailedSpecs);
+      if (trace != null) {
         return false;
       } else {
         return setSatisfiedResult();
@@ -242,13 +245,6 @@ public class ModularControllabilityChecker
     } finally {
       tearDown();
     }
-  }
-
-  @Override
-  protected void tearDown()
-  {
-    super.tearDown();
-    mFailedSpecs = null;
   }
 
 
@@ -288,13 +284,32 @@ public class ModularControllabilityChecker
 
   //#########################################################################
   //# Trace Computation
+  private Collection<AutomatonProxy> collectFailedSpecs
+    (final ModularHeuristic heuristic, final SafetyTraceProxy trace)
+  {
+    final KindTranslator translator = getKindTranslator();
+    final int traceLength = trace.getEvents().size();
+    final Collection<AutomatonProxy> failedSpecs = new LinkedList<>();
+    for (final AutomatonProxy aut : trace.getAutomata()) {
+      if (translator.getComponentKind(aut) == ComponentKind.SPEC) {
+        final TraceFinder finder = heuristic.getTraceFinder(aut);
+        if (finder.computeNumberOfAcceptedSteps(trace) < traceLength) {
+          failedSpecs.add(aut);
+        }
+      }
+    }
+    assert !failedSpecs.isEmpty();
+    final ModularVerificationResult result = getAnalysisResult();
+    result.addFailedSpecs(failedSpecs);
+    return failedSpecs;
+  }
+
   private SafetyTraceProxy extendTrace(final ModularHeuristic heuristic,
                                        final SafetyTraceProxy trace,
                                        final List<AutomatonProxy> automata)
     throws AnalysisException
   {
-    final Set<AutomatonProxy> oldAutomata =
-      new THashSet<AutomatonProxy>(trace.getAutomata());
+    final Set<AutomatonProxy> oldAutomata = new THashSet<>(trace.getAutomata());
     boolean done = false;
     boolean det = true;
     for (final AutomatonProxy aut : automata) {
@@ -331,12 +346,9 @@ public class ModularControllabilityChecker
         if (!oldAutomata.contains(aut)) {
           final TraceFinder finder = heuristic.getTraceFinder(aut);
           if (translator.getComponentKind(aut) == ComponentKind.SPEC &&
-              depth > finder.getNumberOfAcceptedSteps()) {
+              depth > finder.computeNumberOfAcceptedSteps(trace)) {
             // Found nonaccepting spec --- trace ends here.
             endOfTrace = true;
-            if (mFailedSpecs != null) {
-              mFailedSpecs.add(aut);
-            }
             continue;
           }
           final StateProxy state = finder.getState(depth);
@@ -380,7 +392,5 @@ public class ModularControllabilityChecker
   //# Data Members
   private boolean mCollectsFailedSpecs = false;
   private boolean mStartsWithSmallestSpec = false;
-
-  private Collection<AutomatonProxy> mFailedSpecs;
 
 }
