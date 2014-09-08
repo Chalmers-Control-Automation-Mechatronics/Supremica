@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -87,7 +88,6 @@ public class ModularControllabilitySynthesizer
     final SafetyVerifier inner = new NativeControllabilityChecker(factory);
     mModularControllabilityChecker =
       new ModularControllabilityChecker(factory, inner);
-    mModularControllabilityChecker.setCollectsFailedSpecs(true);
     mMonolithicSynthesizer = new MonolithicSynthesizer(factory);
     mMonolithicSynthesizer.setNonblockingSupported(false);
   }
@@ -139,6 +139,17 @@ public class ModularControllabilitySynthesizer
   {
     return mIncludesAllAutomata;
   }
+
+  public void setRemovesUnnecessarySupervisors(final boolean removes)
+  {
+    mRemovesUnnecessarySupervisors = removes;
+  }
+
+  public boolean getRemovesUnnecessarySupervisors()
+  {
+    return mRemovesUnnecessarySupervisors;
+  }
+
 
   public Collection<EventProxy> getDisabledEvents()
   {
@@ -230,7 +241,7 @@ public class ModularControllabilitySynthesizer
     final int numEvents = model.getEvents().size();
     mUncontrollableEventMap = new HashMap<>(numEvents);
     if (mIncludesAllAutomata) {
-      mUsedAutomata = new THashSet<>(numEvents);
+      mSupervisorUsedAutomataMap = new HashMap<>();
     }
     mDisabledEvents = new THashSet<>();
   }
@@ -246,7 +257,7 @@ public class ModularControllabilitySynthesizer
   {
     super.tearDown();
     mUncontrollableEventMap = null;
-    mUsedAutomata = null;
+    mSupervisorUsedAutomataMap = null;
   }
 
 
@@ -264,6 +275,7 @@ public class ModularControllabilitySynthesizer
       mModularControllabilityChecker.setKindTranslator(translator);
       final ProductDESProxy model = getModel();
       mModularControllabilityChecker.setModel(model);
+      mModularControllabilityChecker.setCollectsFailedSpecs(true);
       if (mModularControllabilityChecker.run()) {
         // The system is already controllable!
         if (mIncludesAllAutomata) {
@@ -350,18 +362,52 @@ public class ModularControllabilitySynthesizer
         supervisors.addAll(localSups);
         mDisabledEvents.addAll(disabledEvents);
         if (mIncludesAllAutomata && !getSupervisorReductionEnabled()) {
-          mUsedAutomata.add(spec);
-          mUsedAutomata.addAll(plants);
+          final Collection<AutomatonProxy> usedAutomata =
+            mMonolithicSynthesizer.getModel().getAutomata();
+          for (final AutomatonProxy sup:localSups) {
+            mSupervisorUsedAutomataMap.put(sup, usedAutomata);
+          }
         }
       }
 
-      // 4. Create product DES containing supervisors
+      // 4. Remove unnecessary supervisors
+      if (mRemovesUnnecessarySupervisors) {
+        final ControllabilityCheckKindTranslator controllabilityTranslator =
+          new ControllabilityCheckKindTranslator(supervisors);
+        mModularControllabilityChecker.setKindTranslator(controllabilityTranslator);
+        mModularControllabilityChecker.setCollectsFailedSpecs(false);
+        final Iterator<AutomatonProxy> supIter = supervisors.iterator();
+        while (supIter.hasNext()) {
+          final AutomatonProxy sup = supIter.next();
+          final Collection<AutomatonProxy> automata = model.getAutomata();
+          final Collection<AutomatonProxy> supervisorDuplicate = new ArrayList<>(automata);
+          for (final AutomatonProxy addSup: supervisors) {
+            if (sup != addSup) {
+              supervisorDuplicate.add(addSup);
+            }
+          }
+          final ProductDESProxy controllabilityCheckModel =
+            AutomatonTools.createProductDESProxy(sup.getName(), supervisorDuplicate, factory);
+          mModularControllabilityChecker.setModel(controllabilityCheckModel);
+          if (mModularControllabilityChecker.run()) {
+            supIter.remove();
+          }
+        }
+      }
+
+      // 5. Create product DES containing supervisors
       if (mIncludesAllAutomata) {
+        final Collection<AutomatonProxy> usedAutomata = new THashSet<>();
+        if (!getSupervisorReductionEnabled()) {
+          for (final AutomatonProxy sup : supervisors) {
+            usedAutomata.addAll(mSupervisorUsedAutomataMap.get(sup));
+          }
+        }
         for (final AutomatonProxy aut : model.getAutomata()) {
           switch (translator.getComponentKind(aut)) {
           case PLANT:
           case SPEC:
-            if (!mUsedAutomata.contains(aut)) {
+            if (!usedAutomata.contains(aut)) {
               supervisors.add(aut);
             }
             break;
@@ -518,9 +564,48 @@ public class ModularControllabilitySynthesizer
 
 
   //#########################################################################
+  //# Inner Class ControllabilityCheckKindTranslator
+  private class ControllabilityCheckKindTranslator implements KindTranslator
+  {
+    //#######################################################################
+    //# Constructor
+    private ControllabilityCheckKindTranslator
+      (final Collection<AutomatonProxy> supervisors)
+    {
+      mSupervisors = new THashSet<>(supervisors);
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.analysis.KindTranslator
+    @Override
+    public ComponentKind getComponentKind(final AutomatonProxy aut)
+    {
+      if (mSupervisors.contains(aut)) {
+        return ComponentKind.SPEC;
+      } else {
+        final KindTranslator translator = getKindTranslator();
+        return translator.getComponentKind(aut);
+      }
+    }
+
+    @Override
+    public EventKind getEventKind(final EventProxy event)
+    {
+      final KindTranslator translator = getKindTranslator();
+      return translator.getEventKind(event);
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final Collection<AutomatonProxy> mSupervisors;
+  }
+
+
+  //#########################################################################
   //# Data Members
   // Configuration options
   private boolean mIncludesAllAutomata = false;
+  private boolean mRemovesUnnecessarySupervisors = false;
 
   // Additional results
   private Collection<EventProxy> mDisabledEvents;
@@ -531,6 +616,6 @@ public class ModularControllabilitySynthesizer
 
   // Algorithm variables
   private Map<EventProxy,Collection<AutomatonProxy>> mUncontrollableEventMap;
-  private Collection<AutomatonProxy> mUsedAutomata;
+  private Map<AutomatonProxy,Collection<AutomatonProxy>> mSupervisorUsedAutomataMap;
 
 }

@@ -132,6 +132,11 @@ public class CompositionalAutomataSynthesisResult
     mSupervisors.add(sup);
   }
 
+  void increaseNumberOfSupervisors(final int num)
+  {
+    mNumberOfSupervisors += num;
+  }
+
   void setNumberOfRenamings(final int renaming)
   {
     mNumberOfRenamings = renaming;

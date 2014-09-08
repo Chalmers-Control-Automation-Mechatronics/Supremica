@@ -59,6 +59,7 @@ public class ModularAndCompositionalSynthesizerTest
     final ModularAndCompositionalSynthesizer synthesizer =
       new ModularAndCompositionalSynthesizer(factory);
     synthesizer.setInternalStateLimit(5000);
+    synthesizer.setRemovesUnnecessarySupervisors(true);
     return synthesizer;
   }
 

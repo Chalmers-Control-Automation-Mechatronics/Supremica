@@ -33,6 +33,7 @@ public class ModularControllabilitySynthesizerTest
     synthesizer.setSupervisorReductionEnabled(false);
     synthesizer.setSupervisorLocalizationEnabled(false);
     synthesizer.setLocalNonblockingSupported(true);
+    synthesizer.setRemovesUnnecessarySupervisors(false);
     return synthesizer;
   }
 

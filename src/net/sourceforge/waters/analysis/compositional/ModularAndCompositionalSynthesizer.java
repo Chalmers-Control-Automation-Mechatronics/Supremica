@@ -13,8 +13,6 @@ import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer.PreselectingMethod;
@@ -73,6 +71,8 @@ public class ModularAndCompositionalSynthesizer
     mCompositionalSynthesizer = new CompositionalAutomataSynthesizer(factory);
     mCompositionalSynthesizer.setAbstractionProcedureCreator
       (AutomataSynthesisAbstractionProcedureFactory.OE);
+    mCompositionalConflictChecker = new CompositionalConflictChecker(factory);
+    mCompositionalConflictChecker.setAbstractionProcedureCreator(ConflictAbstractionProcedureFactory.NBA);
   }
 
 
@@ -91,6 +91,7 @@ public class ModularAndCompositionalSynthesizer
   public void setPreselectingMethod(final PreselectingMethod preselecting)
   {
     mCompositionalSynthesizer.setPreselectingMethod(preselecting);
+    mCompositionalConflictChecker.setPreselectingMethod(preselecting);
   }
 
   public PreselectingMethod getPreselectingMethod()
@@ -101,6 +102,7 @@ public class ModularAndCompositionalSynthesizer
   public void setSelectionHeuristic(final SelectionHeuristicCreator selecting)
   {
     mCompositionalSynthesizer.setSelectionHeuristic(selecting);
+    mCompositionalConflictChecker.setSelectionHeuristic(selecting);
   }
 
   public SelectionHeuristic<Candidate> getSelectionHeuristic()
@@ -111,6 +113,7 @@ public class ModularAndCompositionalSynthesizer
   public void setInternalStateLimit(final int internalStateLimit)
   {
     mCompositionalSynthesizer.setInternalStateLimit(internalStateLimit);
+    mCompositionalConflictChecker.setInternalStateLimit(internalStateLimit);
   }
 
   public int getInternalStateLimit()
@@ -121,6 +124,7 @@ public class ModularAndCompositionalSynthesizer
   public void setInternalTransitionLimit(final int internalTransitionLimit)
   {
     mCompositionalSynthesizer.setInternalTransitionLimit(internalTransitionLimit);
+    mCompositionalConflictChecker.setInternalTransitionLimit(internalTransitionLimit);
   }
 
   public int getInternalTransitionLimit()
@@ -148,6 +152,17 @@ public class ModularAndCompositionalSynthesizer
     return getTransitionLimit();
   }
 
+  public void setRemovesUnnecessarySupervisors(final boolean removes)
+  {
+    mModularSynthesizer.setRemovesUnnecessarySupervisors(removes);
+  }
+
+  public boolean getRemovesUnnecessarySupervisors()
+  {
+    return mModularSynthesizer.getRemovesUnnecessarySupervisors();
+  }
+
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
@@ -161,6 +176,9 @@ public class ModularAndCompositionalSynthesizer
     if (mCompositionalSynthesizer != null) {
       mCompositionalSynthesizer.requestAbort();
     }
+    if (mCompositionalConflictChecker != null) {
+      mCompositionalConflictChecker.requestAbort();
+    }
   }
 
   @Override
@@ -172,6 +190,9 @@ public class ModularAndCompositionalSynthesizer
     }
     if (mCompositionalSynthesizer != null) {
       mCompositionalSynthesizer.resetAbort();
+    }
+    if (mCompositionalConflictChecker != null) {
+      mCompositionalConflictChecker.resetAbort();
     }
   }
 
@@ -232,6 +253,10 @@ public class ModularAndCompositionalSynthesizer
     mCompositionalSynthesizer.setMonolithicStateLimit(getNodeLimit());
     mCompositionalSynthesizer.setMonolithicTransitionLimit(getTransitionLimit());
     mCompositionalSynthesizer.setConfiguredDefaultMarking(mUsedMarking);
+    mCompositionalConflictChecker.setKindTranslator(translator);
+    mCompositionalConflictChecker.setMonolithicStateLimit(getNodeLimit());
+    mCompositionalConflictChecker.setMonolithicTransitionLimit(getTransitionLimit());
+    mCompositionalConflictChecker.setConfiguredDefaultMarking(mUsedMarking);
     mModularSynthesizer.setIncludesAllAutomata(true);
     mModularSynthesizer.setNodeLimit(getNodeLimit());
     mModularSynthesizer.setTransitionLimit(getTransitionLimit());
@@ -249,6 +274,18 @@ public class ModularAndCompositionalSynthesizer
   {
     super.tearDown();
     mUsedMarking = null;
+  }
+
+  @Override
+  protected CompositionalAutomataSynthesisResult createAnalysisResult()
+  {
+    return new CompositionalAutomataSynthesisResult();
+  }
+
+  @Override
+  public CompositionalAutomataSynthesisResult getAnalysisResult()
+  {
+    return (CompositionalAutomataSynthesisResult) super.getAnalysisResult();
   }
 
 
@@ -281,8 +318,8 @@ public class ModularAndCompositionalSynthesizer
       if (!mModularSynthesizer.run()) {
         return setBooleanResult(false);
       }
-      final Collection<AutomatonProxy> supervisors = new THashSet<>();
-      collectSupervisors(supervisors, mModularSynthesizer);
+      final CompositionalAutomataSynthesisResult results = getAnalysisResult();
+      collectSupervisors(mModularSynthesizer);
       boolean maybeBlocking = false;
       int supCount = 1;
       do {
@@ -292,15 +329,19 @@ public class ModularAndCompositionalSynthesizer
         if (!modularResult.getEvents().contains(mUsedMarking)) {
           break;
         }
+        mCompositionalConflictChecker.setModel(modularResult);
+        if (mCompositionalConflictChecker.run()) {
+          break;
+        }
         mCompositionalSynthesizer.setModel(modularResult);
         if (!mCompositionalSynthesizer.run()) {
           return setBooleanResult(false);
         }
         final CompositionalAutomataSynthesisResult compositionalResult =
           mCompositionalSynthesizer.getAnalysisResult();
+        results.merge(compositionalResult);
         final Collection<AutomatonProxy> compSupervisors =
           compositionalResult.getComputedAutomata();
-        supervisors.addAll(compSupervisors);
         final Collection<AutomatonProxy> modularAutomata =
           modularResult.getAutomata();
         final Collection<AutomatonProxy> combinedAutomata =
@@ -316,16 +357,12 @@ public class ModularAndCompositionalSynthesizer
         if (!mModularSynthesizer.run()) {
           return setBooleanResult(false);
         }
-        collectSupervisors(supervisors, mModularSynthesizer);
+        collectSupervisors(mModularSynthesizer);
         maybeBlocking = !mModularSynthesizer.getDisabledEvents().isEmpty();
         supCount++;
       } while (maybeBlocking);
-      final List<AutomatonProxy> supervisorsList = new ArrayList<>(supervisors);
-      Collections.sort(supervisorsList);
-      final ProductDESProxy supervisorsDES =
-        AutomatonTools.createProductDESProxy("supervisor", supervisorsList,
-                                             factory);
-      return setProxyResult(supervisorsDES);
+      results.setSatisfied(true);
+      return true;
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
     } catch (final OutOfMemoryError error) {
@@ -374,13 +411,16 @@ public class ModularAndCompositionalSynthesizer
     return mUsedMarking;
   }
 
-  private void collectSupervisors(final Collection<AutomatonProxy> supervisors,
-                                  final SupervisorSynthesizer synthesizer)
+  private void collectSupervisors(final SupervisorSynthesizer synthesizer)
   {
-    final Collection<AutomatonProxy> model = getModel().getAutomata();
+    final CompositionalAutomataSynthesisResult results = getAnalysisResult();
+    final Collection<AutomatonProxy> supressedAutomata = new THashSet<>();
+    supressedAutomata.addAll(getModel().getAutomata());
+    supressedAutomata.addAll(results.getComputedAutomata());
     for (final AutomatonProxy aut : synthesizer.getComputedProductDES().getAutomata()) {
-      if (!model.contains(aut)) {
-        supervisors.add(aut);
+      if (!supressedAutomata.contains(aut)) {
+        results.addBackRenamedSupervisor(aut);
+        results.increaseNumberOfSupervisors(1);
       }
     }
   }
@@ -431,5 +471,6 @@ public class ModularAndCompositionalSynthesizer
   // Permanent tools
   private final ModularControllabilitySynthesizer mModularSynthesizer;
   private final CompositionalAutomataSynthesizer mCompositionalSynthesizer;
+  private final CompositionalConflictChecker mCompositionalConflictChecker;
 
 }

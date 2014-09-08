@@ -97,6 +97,7 @@ public class ModularAndCompositionalSynthesizerExperiments extends AbstractAnaly
     // mPrintWriter.println("SupervisorReduction," + mSupervisorReductionEnabled);
     mHasBeenPrinted = false;
     mSynthesizer.setSupervisorReductionEnabled(true);
+    mSynthesizer.setRemovesUnnecessarySupervisors(true);
   }
 
   @Override
@@ -238,22 +239,22 @@ public class ModularAndCompositionalSynthesizerExperiments extends AbstractAnaly
   void runAllTests() throws Exception
   {
     mWatchdog.start();
+   synthesissAip0Alps();// 3
     synthesisAGV();// 1
     synthesisAGVB();// 2
-    synthesissAip0Alps();// 3
-//    synthesiseAip0though();
-    synthesisFenCaiWon09B();// 4
-    synthesisFenCaiWon09Synth();// 5
+ //    synthesiseAip0though();
+//    synthesisFenCaiWon09B();// 4
+//    synthesisFenCaiWon09Synth();// 5
     synthesisFms2003();// 6
     synthesisePSLBig();
-    synthesisePSLBigWithManyRestartTrans();
-    synthesisePSLWithResetTrans();
-    synthesisePSLWithResetTransWithPartLeftCounters();
-    synthesisePSLWithResetTransWithPartLeftPlants();
-//    synthesiseTbedCtct(); No supervisor
-    synthesiseTbedHISC();
-    synthesiseTbedNoderailB();// 7
-    synthesiseTbedNoderailUncont();// 8
+//    synthesisePSLBigWithManyRestartTrans();
+//    synthesisePSLWithResetTrans();
+//    synthesisePSLWithResetTransWithPartLeftCounters();
+//    synthesisePSLWithResetTransWithPartLeftPlants();
+////    synthesiseTbedCtct(); No supervisor
+//    synthesiseTbedHISC();
+//    synthesiseTbedNoderailB();// 7
+//    synthesiseTbedNoderailUncont();// 8
     synthesiseCentralLockingVerriegel3b();// 9
     synthesiseVerrigel4B();// 10
     synthesis6linka();// 11
