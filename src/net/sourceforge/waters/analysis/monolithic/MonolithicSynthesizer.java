@@ -773,6 +773,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     } else {
       for (int i = 0; i < enabDisabEvents.size(); i++) {
         final int e = enabDisabEvents.get(i);
+        //System.out.println("[------" + e + "------]");
         ListBufferTransitionRelation copy =
           new ListBufferTransitionRelation(
                                            mTransitionRelation,
@@ -792,8 +793,9 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
         copy.removeDeadlockStateTransitions(marking);
         copy.removeProperSelfLoopEvents(marking);
         final EventProxy event = mEventEncoding.getProperEvent(e);
-        copy.setName("sup:" + event.getName());
+        copy.setName("sup:" + event.getName()+ "[event" + e + "]");
         autList.add(copy.createAutomaton(getFactory(), mEventEncoding));
+        //System.out.println("sup:" + event.getName() + "(event" + e + ")_END.");
       }
     }
     return simplified;

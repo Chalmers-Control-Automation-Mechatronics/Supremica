@@ -14,8 +14,12 @@ import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.set.hash.TIntHashSet;
 import gnu.trove.set.hash.TLongHashSet;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Deque;
 import java.util.List;
+import java.util.Queue;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
@@ -121,15 +125,8 @@ public class SupervisorReductionTRSimplifier extends
           mClasses = new IntListBuffer();
           partition = reduceSupervisorExperimental(singletonList);
         } else {
-          //setUpClasses();//NO EXPMode
-          //partition = reduceSupervisor(singletonList);//NO EXPMode
-
-          mExperimentalMode = true;//EXPMode
-          final ListBufferTransitionRelation rel = getTransitionRelation();//EXPMode
-          final int numStates = rel.getNumberOfStates();//EXPMode
-          mStateToClass = new int[numStates];//EXPMode
-          mClasses = new IntListBuffer();//EXPMode
-          partition = reduceSupervisorExperimental(singletonList);//EXPMode
+          setUpClasses();
+          partition = reduceSupervisor(singletonList);
         }
       }
     } else {
@@ -181,6 +178,10 @@ public class SupervisorReductionTRSimplifier extends
     mClasses = null;
     mShadowStateToClass = null;
     mShadowClasses = null;
+
+    mStateMap = null;
+    mInverseMap = null;
+    mSearchingBitSet = null;
   }
 
   //#########################################################################
@@ -229,7 +230,7 @@ public class SupervisorReductionTRSimplifier extends
   private boolean checkMergibility(final int x, final int y, final int x0,
                                    final int y0,
                                    final TLongHashSet statePairs,
-                                   final TIntArrayList ctrlEvents)
+                                   final TIntArrayList restrictedEventList)
     throws AnalysisAbortException
   {
     checkAbort();
@@ -242,8 +243,8 @@ public class SupervisorReductionTRSimplifier extends
     if (minX == minY) {
       return true;
     }
-    final long p1 = constructPair(minX, minY);
-    final long p2 = constructPair(x0, y0);
+    final long p1 = constructLong(minX, minY);
+    final long p2 = constructLong(x0, y0);
     if (compare(p1, p2) < 0) {
       return false;
     }
@@ -263,8 +264,8 @@ public class SupervisorReductionTRSimplifier extends
     final TIntArrayList xList = new TIntArrayList();
     final TIntArrayList yList = new TIntArrayList();
 
-    for (int i = 0; i < ctrlEvents.size(); i++) {
-      final int e = ctrlEvents.get(i);
+    for (int i = 0; i < restrictedEventList.size(); i++) {
+      final int e = restrictedEventList.get(i);
       xSet.clear();
       xList.clear();
       boolean enabled = false;
@@ -303,7 +304,7 @@ public class SupervisorReductionTRSimplifier extends
     final int l = mergeLists(lx, ly, mShadowClasses);
     updateStateToClass(l, mShadowStateToClass, mShadowClasses);
 
-    final long pair = constructPair(x, y);
+    final long pair = constructLong(x, y);
     statePairs.add(pair);
 
     for (int e = EventEncoding.NONTAU; e <= mNumProperEvents; e++) {
@@ -335,7 +336,7 @@ public class SupervisorReductionTRSimplifier extends
       for (int i = 0; i < xList.size(); i++) {
         for (int j = 0; j < yList.size(); j++) {
           if (!checkMergibility(xList.get(i), yList.get(j), x0, y0,
-                                statePairs, ctrlEvents)) {
+                                statePairs, restrictedEventList)) {
             return false;
           }
         }
@@ -352,34 +353,70 @@ public class SupervisorReductionTRSimplifier extends
     final int marking = getDefaultMarkingID();
     mMerged = false;
 
+    // find disabled states
+    mSearchingBitSet = new BitSet();
+    mQueue = new ArrayDeque<Integer>();
+    final TransitionIterator iter =
+      rel.createAllTransitionsReadOnlyIterator();
+    iter.resetEvent(restrictedEventList.get(0));
+    while (iter.advance()) {
+      final int pre = iter.getCurrentSourceState();
+      final int succ = iter.getCurrentTargetState();
+      if (rel.isDeadlockState(succ, marking)) {
+        mQueue.add(pre);
+        mSearchingBitSet.set(pre);
+      }
+    }
+
     // reorder states
     mStateMap = new int[numStates];
     mInverseMap = new int[numStates];
-    for (int position = 0; position < numStates; position++) {
-      //final int state = position;
-      final int state = numStates - position - 1; // REVERSE ORDER!
+    int count = 0;
+    final TransitionIterator preIter =
+      rel.createPredecessorsReadOnlyIterator();
+    while (!mQueue.isEmpty()) {
+      final int state = mQueue.remove().intValue();
       if (rel.isDeadlockState(state, marking)) {
-        mStateToClass[position] = IntListBuffer.NULL;
-      } else {
-        final int list = mClasses.createList();
-        mClasses.add(list, state);
-        mStateToClass[position] = list;
+        continue;
       }
-      mInverseMap[state] = position;
-      mStateMap[position] = state;
+      final int list = mClasses.createList();
+      mClasses.add(list, state);
+      mStateToClass[count] = list;
+      mInverseMap[state] = count;
+      mStateMap[count++] = state;
+      preIter.resetState(state);
+      while (preIter.advance()) {
+        final int source = preIter.getCurrentSourceState();
+        if (mSearchingBitSet.get(source)) {
+          continue;
+        } else {
+          mSearchingBitSet.set(source);
+          mQueue.add(new Integer(source));
+        }
+      }
+    }
+
+    for (int s = 0; s < numStates; s++) {
+      if (!mSearchingBitSet.get(s)) {
+        final int list = mClasses.createList();
+        mClasses.add(list, s);
+        mStateToClass[count] = list;
+        mInverseMap[s] = count;
+        mStateMap[count++] = s;
+      }
     }
 
     // reduce
     for (int i = 0; i < numStates - 1; i++) {
       if (!rel.isReachable(mStateMap[i])
           || rel.isDeadlockState(mStateMap[i], marking)
-          || mStateMap[i] > getMinimum(i)) {
+          || mStateMap[i] > getMinimumExperimental(mStateMap[i])) {
         continue;
       }
       for (int j = i + 1; j < numStates; j++) {
         if (!rel.isReachable(mStateMap[j])
             || rel.isDeadlockState(mStateMap[j], marking)
-            || mStateMap[j] > getMinimum(j)) {
+            || mStateMap[j] > getMinimumExperimental(mStateMap[j])) {
           continue;
         }
         checkAbort();
@@ -390,7 +427,6 @@ public class SupervisorReductionTRSimplifier extends
           mShadowStateToClass[s] = IntListBuffer.NULL;
         }
         if (checkMergibilityExperimental(mStateMap[i], mStateMap[j],
-                                         mStateMap[i], mStateMap[j],
                                          statePairs, restrictedEventList)) {
           mergeExperimental(statePairs);
           mMerged = true;
@@ -400,145 +436,154 @@ public class SupervisorReductionTRSimplifier extends
         mShadowStateToClass = null;
       }
     }
+
     if (mMerged) {
+      PrintStateToClassToConsole(restrictedEventList.get(0));
       return createResultPartition();
     } else {
       return null;
     }
-
   }
 
-  private boolean checkMergibilityExperimental(final int x, final int y,
-                                               final int x0, final int y0,
+  private boolean checkMergibilityExperimental(final int x0,
+                                               final int y0,
                                                final TLongHashSet statePairs,
-                                               final TIntArrayList ctrlEvents)
+                                               final TIntArrayList restrictedEventList)
     throws AnalysisAbortException
   {
-    checkAbort();
-    if (mStateToClass[mInverseMap[x]] == mStateToClass[mInverseMap[y]]) {
-      return true;
-    }
+    final Deque<Long> pairStack = new ArrayDeque<Long>();
+    pairStack.push(constructLong(x0, y0));
+    final long initialPairPositions =
+      constructLong(mInverseMap[x0], mInverseMap[y0]);
 
-    final int minX = getMinimum(mInverseMap[x]);
-    final int minY = getMinimum(mInverseMap[y]);
-    if (minX == minY) {
-      return true;
-    }
-    final long p1 = constructPair(mInverseMap[minX], mInverseMap[minY]);
-    final long p2 = constructPair(mInverseMap[x0], mInverseMap[y0]);
-    if (compare(p1, p2) < 0) {
-      return false;
-    }
+    while (!pairStack.isEmpty()) {
+      checkAbort();
+      final long pair = pairStack.pop().longValue();
+      final int x = getState(0, pair);
+      final int y = getState(1, pair);
 
-    if (mShadowStateToClass[mInverseMap[x]] == IntListBuffer.NULL) {
-      final int newlist =
-        mShadowClasses.copy(mStateToClass[mInverseMap[x]], mClasses);
-      final ReadOnlyIterator iter =
-        mShadowClasses.createReadOnlyIterator(newlist);
-      iter.reset(newlist);
-      while (iter.advance()) {
-        final int current = iter.getCurrentData();
-        mShadowStateToClass[mInverseMap[current]] = newlist;
-      }
-    }
-    if (mShadowStateToClass[mInverseMap[y]] == IntListBuffer.NULL) {
-      final int newlist =
-        mShadowClasses.copy(mStateToClass[mInverseMap[y]], mClasses);
-      final ReadOnlyIterator iter =
-        mShadowClasses.createReadOnlyIterator(newlist);
-      iter.reset(newlist);
-      while (iter.advance()) {
-        final int current = iter.getCurrentData();
-        mShadowStateToClass[mInverseMap[current]] = newlist;
-      }
-    }
-
-    final int lx = mShadowStateToClass[mInverseMap[x]];
-    final int ly = mShadowStateToClass[mInverseMap[y]];
-    final int[] listX = mShadowClasses.toArray(lx);
-    final int[] listY = mShadowClasses.toArray(ly);
-
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    final int marking = getDefaultMarkingID();
-    final TIntHashSet xSet = new TIntHashSet();
-    final TIntHashSet ySet = new TIntHashSet();
-    final TIntArrayList xList = new TIntArrayList();
-    final TIntArrayList yList = new TIntArrayList();
-
-    for (int i = 0; i < ctrlEvents.size(); i++) {
-      final int e = ctrlEvents.get(i);
-      xSet.clear();
-      xList.clear();
-      boolean enabled = false;
-      boolean disabled = false;
-      for (final int xx : listX) {
-        final int succ = getSuccessorState(xx, e);
-        if (succ >= 0) {
-          if (xSet.add(xx)) {
-            xList.add(xx);
-          }
-          if (rel.isDeadlockState(succ, marking)) {
-            disabled = true;
-          } else {
-            enabled = true;
-          }
-        }
-      }
-      if (disabled) {
-        for (final int yy : listY) {
-          final int succ = getSuccessorState(yy, e);
-          if (succ >= 0 && !rel.isDeadlockState(succ, marking)) {
-            return false;
-          }
-        }
-      }
-      if (enabled) {
-        for (final int yy : listY) {
-          final int succ = getSuccessorState(yy, e);
-          if (succ >= 0 && rel.isDeadlockState(succ, marking)) {
-            return false;
-          }
-        }
-      }
-    }
-
-    final int l = mergeLists(lx, ly, mShadowClasses);
-    updateStateToClassExperimental(l, mShadowStateToClass, mShadowClasses);
-
-    final long pair = constructPair(x, y);
-    statePairs.add(pair);
-
-    for (int e = EventEncoding.NONTAU; e <= mNumProperEvents; e++) {
-      xSet.clear();
-      ySet.clear();
-      xList.clear();
-      yList.clear();
-      for (final int xx : listX) {
-        final int xSucc = getSuccessorState(xx, e);
-        if (xSucc >= 0 && !rel.isDeadlockState(xSucc, marking)) {
-          final int xmin = getMinimum(mInverseMap[xSucc]);
-          if (xSet.add(xmin)) {
-            xList.add(xmin);
-          }
-        }
-      }
-      if (xList.isEmpty()) {
+      if (mStateToClass[mInverseMap[x]] == mStateToClass[mInverseMap[y]]) {
         continue;
       }
-      for (final int yy : listY) {
-        final int ySucc = getSuccessorState(yy, e);
-        if (ySucc >= 0 && !rel.isDeadlockState(ySucc, marking)) {
-          final int ymin = getMinimum(mInverseMap[ySucc]);
-          if (ySet.add(ymin)) {
-            yList.add(ymin);
+
+      final int minX = getMinimumExperimental(x);
+      final int minY = getMinimumExperimental(y);
+      if (minX == minY) {
+        continue;
+      }
+
+      final long minPairPositions =
+        constructLong(mInverseMap[minX], mInverseMap[minY]);
+      if (compare(minPairPositions, initialPairPositions) < 0) {
+        return false;
+      }
+
+      if (mShadowStateToClass[mInverseMap[x]] == IntListBuffer.NULL) {
+        final int newlist =
+          mShadowClasses.copy(mStateToClass[mInverseMap[x]], mClasses);
+        final ReadOnlyIterator iter =
+          mShadowClasses.createReadOnlyIterator(newlist);
+        iter.reset(newlist);
+        while (iter.advance()) {
+          final int current = iter.getCurrentData();
+          mShadowStateToClass[mInverseMap[current]] = newlist;
+        }
+      }
+      if (mShadowStateToClass[mInverseMap[y]] == IntListBuffer.NULL) {
+        final int newlist =
+          mShadowClasses.copy(mStateToClass[mInverseMap[y]], mClasses);
+        final ReadOnlyIterator iter =
+          mShadowClasses.createReadOnlyIterator(newlist);
+        iter.reset(newlist);
+        while (iter.advance()) {
+          final int current = iter.getCurrentData();
+          mShadowStateToClass[mInverseMap[current]] = newlist;
+        }
+      }
+
+      final int lx = mShadowStateToClass[mInverseMap[x]];
+      final int ly = mShadowStateToClass[mInverseMap[y]];
+      final int[] listX = mShadowClasses.toArray(lx);
+      final int[] listY = mShadowClasses.toArray(ly);
+
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      final int marking = getDefaultMarkingID();
+      final TIntHashSet xSet = new TIntHashSet();
+      final TIntHashSet ySet = new TIntHashSet();
+      final TIntArrayList xList = new TIntArrayList();
+      final TIntArrayList yList = new TIntArrayList();
+
+      for (int i = 0; i < restrictedEventList.size(); i++) {
+        final int e = restrictedEventList.get(i);
+        xSet.clear();
+        xList.clear();
+        boolean enabled = false;
+        boolean disabled = false;
+        for (final int xx : listX) {
+          final int succ = getSuccessorState(xx, e);
+          if (succ >= 0) {
+            if (xSet.add(xx)) {
+              xList.add(xx);
+            }
+            if (rel.isDeadlockState(succ, marking)) {
+              disabled = true;
+            } else {
+              enabled = true;
+            }
+          }
+        }
+        if (disabled) {
+          for (final int yy : listY) {
+            final int succ = getSuccessorState(yy, e);
+            if (succ >= 0 && !rel.isDeadlockState(succ, marking)) {
+              return false;
+            }
+          }
+        }
+        if (enabled) {
+          for (final int yy : listY) {
+            final int succ = getSuccessorState(yy, e);
+            if (succ >= 0 && rel.isDeadlockState(succ, marking)) {
+              return false;
+            }
           }
         }
       }
-      for (int i = 0; i < xList.size(); i++) {
-        for (int j = 0; j < yList.size(); j++) {
-          if (!checkMergibilityExperimental(xList.get(i), yList.get(j), x0,
-                                            y0, statePairs, ctrlEvents)) {
-            return false;
+
+      final int l = mergeLists(lx, ly, mShadowClasses);
+      updateStateToClassExperimental(l, mShadowStateToClass, mShadowClasses);
+
+      statePairs.add(pair);
+
+      for (int e = EventEncoding.NONTAU; e <= mNumProperEvents; e++) {
+        xSet.clear();
+        ySet.clear();
+        xList.clear();
+        yList.clear();
+        for (final int xx : listX) {
+          final int xSucc = getSuccessorState(xx, e);
+          if (xSucc >= 0 && !rel.isDeadlockState(xSucc, marking)) {
+            final int xmin = getMinimumExperimental(xSucc);
+            if (xSet.add(xmin)) {
+              xList.add(xmin);
+            }
+          }
+        }
+        if (xList.isEmpty()) {
+          continue;
+        }
+        for (final int yy : listY) {
+          final int ySucc = getSuccessorState(yy, e);
+          if (ySucc >= 0 && !rel.isDeadlockState(ySucc, marking)) {
+            final int ymin = getMinimumExperimental(ySucc);
+            if (ySet.add(ymin)) {
+              yList.add(ymin);
+            }
+          }
+        }
+        for (int i = 0; i < xList.size(); i++) {
+          for (int j = 0; j < yList.size(); j++) {
+            pairStack.push(constructLong(xList.get(i), yList.get(j)));
           }
         }
       }
@@ -797,6 +842,16 @@ public class SupervisorReductionTRSimplifier extends
     }
   }
 
+  private int getMinimumExperimental(final int state)
+  {
+    if (mShadowStateToClass == null
+        || mShadowStateToClass[mInverseMap[state]] == IntListBuffer.NULL) {
+      return mClasses.getFirst(mStateToClass[mInverseMap[state]]);
+    } else {
+      return mShadowClasses.getFirst(mShadowStateToClass[mInverseMap[state]]);
+    }
+  }
+
   private int getState(final int position, final long pair)
   {
     if (position == 0) {
@@ -807,7 +862,7 @@ public class SupervisorReductionTRSimplifier extends
     return -1;
   }
 
-  private long constructPair(int state1, int state2)
+  private long constructLong(int state1, int state2)
   {
     if (state1 > state2) {
       state1 = state1 + state2;
@@ -891,6 +946,12 @@ public class SupervisorReductionTRSimplifier extends
     return array;
   }
 
+  public void PrintStateToClassToConsole(final int event) {
+    System.out.println("[------" + event + "------]");
+    for (int i = 0; i < mStateToClass.length; i++) {
+      System.out.println(mStateToClass[i]);
+    }
+  }
   //#########################################################################
   //# Data Members
   private int mNumProperEvents;
@@ -905,4 +966,7 @@ public class SupervisorReductionTRSimplifier extends
   private boolean mMerged;
   private int[] mStateMap;
   private int[] mInverseMap;
+
+  private Queue<Integer> mQueue;
+  private BitSet mSearchingBitSet;
 }
