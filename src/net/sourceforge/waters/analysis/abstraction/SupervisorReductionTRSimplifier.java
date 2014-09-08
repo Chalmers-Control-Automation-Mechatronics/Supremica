@@ -96,47 +96,54 @@ public class SupervisorReductionTRSimplifier extends
   protected void setUp() throws AnalysisException
   {
     super.setUp();
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    mNumProperEvents = rel.getNumberOfProperEvents();
   }
 
   @Override
   public boolean runSimplifier() throws AnalysisException
   {
-    final TRPartition partition;
-    if (findBadStates()) {
-      final TIntArrayList enabDisabEvents = new TIntArrayList();
-      final TIntArrayList disabEvents = new TIntArrayList();
-      if (mRestrictedEvent < 0) {
-        // monolithic supervisor reduction
-        setUpClasses();
-        setUpEventList(enabDisabEvents, disabEvents);
-        if (enabDisabEvents.size() == 0) {
-          partition = createOneStateTR(disabEvents);
+    try {
+      setUp();
+      final TRPartition partition;
+      if (findBadStates()) {
+        final TIntArrayList enabDisabEvents = new TIntArrayList();
+        final TIntArrayList disabEvents = new TIntArrayList();
+        if (mRestrictedEvent < 0) {
+          // monolithic supervisor reduction
+          setUpClasses();
+          setUpEventList(enabDisabEvents, disabEvents);
+          if (enabDisabEvents.size() == 0) {
+            partition = createOneStateTR(disabEvents);
+          } else {
+            partition = reduceSupervisor(enabDisabEvents);
+          }
         } else {
-          partition = reduceSupervisor(enabDisabEvents);
+          // supervisor localization
+          final TIntArrayList singletonList = new TIntArrayList(1);
+          singletonList.add(mRestrictedEvent);
+          if (mExperimentalMode) {
+            final ListBufferTransitionRelation rel = getTransitionRelation();
+            final int numStates = rel.getNumberOfStates();
+            mStateToClass = new int[numStates];
+            mClasses = new IntListBuffer();
+            partition = reduceSupervisorExperimental(singletonList);
+          } else {
+            setUpClasses();
+            partition = reduceSupervisor(singletonList);
+          }
         }
       } else {
-        // supervisor localization
-        final TIntArrayList singletonList = new TIntArrayList(1);
-        singletonList.add(mRestrictedEvent);
-        if (mExperimentalMode) {
-          final ListBufferTransitionRelation rel = getTransitionRelation();
-          final int numStates = rel.getNumberOfStates();
-          mStateToClass = new int[numStates];
-          mClasses = new IntListBuffer();
-          partition = reduceSupervisorExperimental(singletonList);
-        } else {
-          setUpClasses();
-          partition = reduceSupervisor(singletonList);
-        }
+        partition = createOneStateTR(new TIntArrayList(0));
       }
-    } else {
-      partition = createOneStateTR(new TIntArrayList(0));
+      setResultPartition(partition);
+      if (partition != null) {
+        applyResultPartitionAutomatically();
+      }
+      return partition != null;
+    } finally {
+      tearDown();
     }
-    setResultPartition(partition);
-    if (partition != null) {
-      applyResultPartitionAutomatically();
-    }
-    return partition != null;
   }
 
   @Override
@@ -147,7 +154,7 @@ public class SupervisorReductionTRSimplifier extends
     // Remove uncontrollable events that are selfloop-only
     final TransitionIterator iter =
       rel.createAllTransitionsReadOnlyIterator();
-    for (int e = EventEncoding.NONTAU; e <= mNumProperEvents; e++) {
+    for (int e = EventEncoding.NONTAU; e < mNumProperEvents; e++) {
       checkAbort();
       final byte status = rel.getProperEventStatus(e);
       if (!EventEncoding.isControllableEvent(status)) {
@@ -178,11 +185,11 @@ public class SupervisorReductionTRSimplifier extends
     mClasses = null;
     mShadowStateToClass = null;
     mShadowClasses = null;
-
     mStateMap = null;
     mInverseMap = null;
     mSearchingBitSet = null;
   }
+
 
   //#########################################################################
   //# Methods for Supervisor Reduction
@@ -307,7 +314,7 @@ public class SupervisorReductionTRSimplifier extends
     final long pair = constructLong(x, y);
     statePairs.add(pair);
 
-    for (int e = EventEncoding.NONTAU; e <= mNumProperEvents; e++) {
+    for (int e = EventEncoding.NONTAU; e < mNumProperEvents; e++) {
       xSet.clear();
       ySet.clear();
       xList.clear();
@@ -555,7 +562,7 @@ public class SupervisorReductionTRSimplifier extends
 
       statePairs.add(pair);
 
-      for (int e = EventEncoding.NONTAU; e <= mNumProperEvents; e++) {
+      for (int e = EventEncoding.NONTAU; e < mNumProperEvents; e++) {
         xSet.clear();
         ySet.clear();
         xList.clear();
@@ -617,12 +624,11 @@ public class SupervisorReductionTRSimplifier extends
     enabDisabEvents.clear();
     disabEvents.clear();
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    mNumProperEvents = rel.getNumberOfProperEvents() - 1;
     final int marking = getDefaultMarkingID();
     final TIntArrayList[] disabledEventsToStates =
-      new TIntArrayList[mNumProperEvents + 1];
+      new TIntArrayList[mNumProperEvents];
     final TIntArrayList[] enabledEventsToStates =
-      new TIntArrayList[mNumProperEvents + 1];
+      new TIntArrayList[mNumProperEvents];
     final TransitionIterator iter =
       rel
         .createAllTransitionsReadOnlyIteratorByStatus(EventEncoding.STATUS_CONTROLLABLE);
@@ -644,8 +650,8 @@ public class SupervisorReductionTRSimplifier extends
         enabledEventsToStates[currentEvent].add(pre);
       }
     }
-    for (int i = 0; i < mNumProperEvents; i++) {
-      for (int j = i + 1; j <= mNumProperEvents; j++) {
+    for (int i = 0; i < mNumProperEvents - 1; i++) {
+      for (int j = i + 1; j < mNumProperEvents; j++) {
         checkAbort();
         // if event e1 is enabled and disabled in the same set of states as event e2, then ignore one of them
         if (disabledEventsToStates[i] != null
@@ -658,7 +664,7 @@ public class SupervisorReductionTRSimplifier extends
 
       }
     }
-    for (int e = EventEncoding.NONTAU; e <= mNumProperEvents; e++) {
+    for (int e = EventEncoding.NONTAU; e < mNumProperEvents; e++) {
       final byte status = rel.getProperEventStatus(e);
       if (EventEncoding.isControllableEvent(status)) {
         if (disabledEventsToStates[e] != null) {
@@ -881,10 +887,9 @@ public class SupervisorReductionTRSimplifier extends
     // otherwise create a two-state automaton
     final int numStates = disabEvents.isEmpty() ? 1 : 2;
     final ListBufferTransitionRelation rel =
-      new ListBufferTransitionRelation(
-                                       "OneStateSup",
+      new ListBufferTransitionRelation("OneStateSup",
                                        ComponentKind.SUPERVISOR,
-                                       mNumProperEvents + 1,
+                                       mNumProperEvents,
                                        oldRel.getNumberOfPropositions(),
                                        numStates,
                                        ListBufferTransitionRelation.CONFIG_SUCCESSORS);
