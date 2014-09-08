@@ -82,7 +82,7 @@ public abstract class AbstractProductDESBuilder
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.analysis.AbstractModelAnalyser
   @Override
-  protected ProductDESResult createAnalysisResult()
+  public ProductDESResult createAnalysisResult()
   {
     return new DefaultProductDESResult();
   }

@@ -726,7 +726,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   }
 
   @Override
-  protected CompositionalAnalysisResult createAnalysisResult()
+  public CompositionalAnalysisResult createAnalysisResult()
   {
     return new CompositionalAnalysisResult();
   }

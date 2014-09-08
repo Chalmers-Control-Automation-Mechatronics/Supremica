@@ -273,7 +273,7 @@ public abstract class AbstractCompositionalModelVerifier
   }
 
   @Override
-  protected CompositionalVerificationResult createAnalysisResult()
+  public CompositionalVerificationResult createAnalysisResult()
   {
     return new CompositionalVerificationResult();
   }

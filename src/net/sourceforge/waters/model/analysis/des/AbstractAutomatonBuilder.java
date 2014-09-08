@@ -94,7 +94,7 @@ public abstract class AbstractAutomatonBuilder
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.analysis.AbstractModelAnalyser
   @Override
-  protected AutomatonResult createAnalysisResult()
+  public AutomatonResult createAnalysisResult()
   {
     return new DefaultAutomatonResult();
   }

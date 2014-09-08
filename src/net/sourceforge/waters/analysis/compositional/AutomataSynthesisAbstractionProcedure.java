@@ -248,6 +248,11 @@ public class AutomataSynthesisAbstractionProcedure extends
   public void storeStatistics()
   {
     final CompositionalAutomataSynthesisResult result = getAnalysisResult();
+    storeStatistics(result);
+  }
+
+  public void storeStatistics(final CompositionalAutomataSynthesisResult result)
+  {
     result.setSimplifierStatistics(mChain);
   }
 

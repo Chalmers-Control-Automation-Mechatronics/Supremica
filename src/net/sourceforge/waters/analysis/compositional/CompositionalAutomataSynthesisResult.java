@@ -46,7 +46,6 @@ public class CompositionalAutomataSynthesisResult
     mNumberOfSupervisors = 0;
     mSupervisors = new ArrayList<>();
     mMaxUnrenamedSupervisorStates = -1;
-    mMaxUnrenamedSupervisorStates = -1;
     mTotalUnrenamedSupervisorStates = -1;
     mMaxUnrenamedSupervisorTransitions = -1;
     mTotalUnrenamedSupervisorTransitions = -1;
@@ -147,6 +146,7 @@ public class CompositionalAutomataSynthesisResult
     return mNumberOfRenamings;
   }
 
+
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.analysis.DefaultAnalysisResult
   @Override
@@ -165,6 +165,8 @@ public class CompositionalAutomataSynthesisResult
     final CompositionalAutomataSynthesisResult result =
       (CompositionalAutomataSynthesisResult) other;
     final Collection<AutomatonProxy> sups = result.getComputedAutomata();
+    mNumberOfSupervisors =
+      mergeAdd(mNumberOfSupervisors, result.mNumberOfSupervisors);
     mSupervisors.addAll(sups);
     mNumberOfRenamings = mergeAdd(mNumberOfRenamings, result.mNumberOfRenamings);
     mMaxUnrenamedSupervisorStates = Math.max(mMaxUnrenamedSupervisorStates,

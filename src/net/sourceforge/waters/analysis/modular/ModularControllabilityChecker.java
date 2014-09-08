@@ -257,7 +257,7 @@ public class ModularControllabilityChecker
   }
 
   @Override
-  protected ModularVerificationResult createAnalysisResult()
+  public ModularVerificationResult createAnalysisResult()
   {
     return new ModularVerificationResult();
   }

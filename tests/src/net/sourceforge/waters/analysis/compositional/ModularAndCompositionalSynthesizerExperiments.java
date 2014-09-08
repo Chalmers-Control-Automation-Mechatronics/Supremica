@@ -152,11 +152,16 @@ public class ModularAndCompositionalSynthesizerExperiments extends AbstractAnaly
     return runModel(group, subdir, name, null);
   }
 
-  boolean runModel(final String group, final String subdir, final String name,
-                final List<ParameterBindingProxy> bindings) throws Exception
+  boolean runModel(final String group,
+                   final String subdir,
+                   final String name,
+                   final List<ParameterBindingProxy> bindings)
+    throws Exception
   {
-    printAndLog("Running " + name + " with " + mPreselecting + "/"
-                + mSelecting + " ... ", false);
+    final String with =
+      mSynthesizer.getSupervisorReductionEnabled() ? " with" : " without";
+    printAndLog("Running " + name + " with " + mPreselecting + "/" +
+                mSelecting + with + " supervisor reduction ... ", false);
     final String inputprop = System.getProperty("waters.test.inputdir");
     final File inputRoot = new File(inputprop);
     final File rootdir = new File(inputRoot, "waters");
@@ -239,22 +244,22 @@ public class ModularAndCompositionalSynthesizerExperiments extends AbstractAnaly
   void runAllTests() throws Exception
   {
     mWatchdog.start();
-   synthesissAip0Alps();// 3
     synthesisAGV();// 1
     synthesisAGVB();// 2
- //    synthesiseAip0though();
-//    synthesisFenCaiWon09B();// 4
-//    synthesisFenCaiWon09Synth();// 5
+    synthesiseAip0Alps();// 3
+//    synthesiseAip0though();
+    synthesisFenCaiWon09B();// 4
+    synthesisFenCaiWon09Synth();// 5
     synthesisFms2003();// 6
     synthesisePSLBig();
-//    synthesisePSLBigWithManyRestartTrans();
-//    synthesisePSLWithResetTrans();
-//    synthesisePSLWithResetTransWithPartLeftCounters();
-//    synthesisePSLWithResetTransWithPartLeftPlants();
-////    synthesiseTbedCtct(); No supervisor
-//    synthesiseTbedHISC();
-//    synthesiseTbedNoderailB();// 7
-//    synthesiseTbedNoderailUncont();// 8
+    synthesisePSLBigWithManyRestartTrans();
+    synthesisePSLWithResetTrans();
+    synthesisePSLWithResetTransWithPartLeftCounters();
+    synthesisePSLWithResetTransWithPartLeftPlants();
+//    synthesiseTbedCtct(); No supervisor
+    synthesiseTbedHISC();
+    synthesiseTbedNoderailB();// 7
+    synthesiseTbedNoderailUncont();// 8
     synthesiseCentralLockingVerriegel3b();// 9
     synthesiseVerrigel4B();// 10
     synthesis6linka();// 11
@@ -300,7 +305,7 @@ public class ModularAndCompositionalSynthesizerExperiments extends AbstractAnaly
   }
 
   // AIP
-  private void synthesissAip0Alps() throws Exception
+  private void synthesiseAip0Alps() throws Exception
   {
     runModel("tests", "incremental_suite", "aip0alps.wmod");
   }

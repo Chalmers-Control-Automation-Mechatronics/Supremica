@@ -353,7 +353,7 @@ public class ModularControlLoopChecker
   //#########################################################################
   //# Setting the Result
   @Override
-  protected LoopResult createAnalysisResult()
+  public LoopResult createAnalysisResult()
   {
     return new LoopResult();
   }

@@ -67,10 +67,11 @@ public class SelfRunningExperimentModularAndCompositionalSynthesis
           for (final Configuration config: configurations) {
             final String preName = preselectingMethod.toString();
             final String selName = selectingMethod.toString();
-            // without supervisor reduction:
+            final String with =
+              automataSynthesizer.getSupervisorReductionEnabled() ? " with" : " without";
             System.out.println
               ("Method " + methodCount + " *** " + config + "/" + preName +
-               "/" + selName + " without reduction" + " ***");
+               "/" + selName + with + " reduction" + " ***");
             final ModularAndCompositionalSynthesizerExperiments experiment =
               new ModularAndCompositionalSynthesizerExperiments
                 (methodCount + "_" + config + "_" + preName + "_" +  selName +

@@ -274,7 +274,7 @@ public class CompositionalStateRepresentationSynthesizer extends
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
   @Override
-  protected CompositionalStateRepresentationSynthesisResult createAnalysisResult()
+  public CompositionalStateRepresentationSynthesisResult createAnalysisResult()
   {
     return new CompositionalStateRepresentationSynthesisResult();
   }

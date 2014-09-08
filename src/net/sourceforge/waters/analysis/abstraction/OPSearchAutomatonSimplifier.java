@@ -302,7 +302,7 @@ public class OPSearchAutomatonSimplifier
   }
 
   @Override
-  protected OPSearchAutomatonResult createAnalysisResult()
+  public OPSearchAutomatonResult createAnalysisResult()
   {
     return new OPSearchAutomatonResult();
   }

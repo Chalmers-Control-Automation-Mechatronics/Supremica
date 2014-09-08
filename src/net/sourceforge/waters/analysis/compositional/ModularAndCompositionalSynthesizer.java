@@ -18,7 +18,9 @@ import java.util.Set;
 import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer.PreselectingMethod;
 import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer.PreselectingMethodFactory;
 import net.sourceforge.waters.analysis.modular.ModularControllabilitySynthesizer;
+import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -277,9 +279,21 @@ public class ModularAndCompositionalSynthesizer
   }
 
   @Override
-  protected CompositionalAutomataSynthesisResult createAnalysisResult()
+  public CompositionalAutomataSynthesisResult createAnalysisResult()
   {
-    return new CompositionalAutomataSynthesisResult();
+    final CompositionalAutomataSynthesisResult result =
+      new CompositionalAutomataSynthesisResult();
+    final AbstractionProcedureCreator creator =
+      mCompositionalSynthesizer.getAbstractionProcedureCreator();
+    final AutomataSynthesisAbstractionProcedure proc =
+      (AutomataSynthesisAbstractionProcedure)
+      creator.createAbstractionProcedure(mCompositionalSynthesizer);
+    proc.storeStatistics(result);
+    final MonolithicSynchronousProductBuilder synch =
+      mCompositionalSynthesizer.getSynchronousProductBuilder();
+    final AnalysisResult synchResult = synch.createAnalysisResult();
+    result.addSynchronousProductAnalysisResult(synchResult);
+    return result;
   }
 
   @Override

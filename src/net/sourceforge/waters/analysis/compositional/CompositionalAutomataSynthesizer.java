@@ -282,7 +282,7 @@ public class CompositionalAutomataSynthesizer
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
   @Override
-  protected CompositionalAutomataSynthesisResult createAnalysisResult()
+  public CompositionalAutomataSynthesisResult createAnalysisResult()
   {
     return new CompositionalAutomataSynthesisResult();
   }

@@ -126,7 +126,7 @@ public class CompositionalSimplifier
   }
 
   @Override
-  protected CompositionalSimplificationResult createAnalysisResult()
+  public CompositionalSimplificationResult createAnalysisResult()
   {
     return new CompositionalSimplificationResult();
   }

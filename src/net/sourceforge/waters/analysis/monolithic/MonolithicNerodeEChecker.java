@@ -416,7 +416,7 @@ public class MonolithicNerodeEChecker
   }
 
   @Override
-  protected NerodeEquVerificationResult createAnalysisResult()
+  public NerodeEquVerificationResult createAnalysisResult()
   {
     return new NerodeEquVerificationResult();
   }
