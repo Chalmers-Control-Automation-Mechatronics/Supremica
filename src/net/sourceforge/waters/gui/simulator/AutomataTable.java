@@ -25,6 +25,7 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
+import net.sourceforge.waters.gui.util.IconLoader;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 
 
@@ -39,7 +40,9 @@ class AutomataTable extends JTable
     super(new AutomataTableModel(sim, desktop));
     mSimulation = sim;
     mDesktop = desktop;
-    setRowHeight(AUTOMATA_TABLE_HEIGHT);
+    final int height =
+      Math.max(AUTOMATA_TABLE_MINHEIGHT, IconLoader.getWatersIconHeight());
+    setRowHeight(height);
     final TableCellRenderer textrenderer = new TextCellRenderer();
     setDefaultRenderer(String.class, textrenderer);
     final TableCellRenderer iconrenderer = new IconCellRenderer();
@@ -64,11 +67,13 @@ class AutomataTable extends JTable
     setShowGrid(!DISABLE_AUTOMATON_GRIDLINES);
     mPopupFactory = new SimulatorPopupFactory(sim);
     this.addMouseMotionListener(new MouseMotionListener(){
+      @Override
       public void mouseDragged(final MouseEvent e)
       {
         // Do nothing
       }
 
+      @Override
       public void mouseMoved(final MouseEvent e)
       {
         final int row = AutomataTable.this.rowAtPoint(e.getPoint());
@@ -84,6 +89,7 @@ class AutomataTable extends JTable
 
   //#########################################################################
   //# Overrides for javax.swing.JTable
+  @Override
   public AutomataTableModel getModel()
   {
     return (AutomataTableModel) super.getModel();
@@ -97,6 +103,7 @@ class AutomataTable extends JTable
 
     //#######################################################################
     //# Interface javax.swing.table.TableCellRenderer
+    @Override
     public Component getTableCellRendererComponent
       (final JTable table, final Object value, final boolean selected,
        final boolean focused, final int row, final int column)
@@ -125,6 +132,7 @@ class AutomataTable extends JTable
 
     //#######################################################################
     //# Interface javax.swing.table.TableCellRenderer
+    @Override
     public Component getTableCellRendererComponent
       (final JTable table, final Object value, final boolean selected,
        final boolean focused, final int row, final int column)
@@ -151,6 +159,7 @@ class AutomataTable extends JTable
 
     //#######################################################################
     //# Interface java.awt.event.MouseListener
+    @Override
     public void mouseClicked(final MouseEvent event)
     {
       if (event.getButton() == MouseEvent.BUTTON1) {
@@ -162,6 +171,7 @@ class AutomataTable extends JTable
       }
     }
 
+    @Override
     public void mousePressed(final MouseEvent event)
     {
       final AutomatonProxy aut = getAutomaton(event);
@@ -170,6 +180,7 @@ class AutomataTable extends JTable
       }
     }
 
+    @Override
     public void mouseReleased(final MouseEvent event)
     {
       final AutomatonProxy aut = getAutomaton(event);
@@ -200,6 +211,7 @@ class AutomataTable extends JTable
 
     //#######################################################################
     //# Interface java.awt.event.MouseListener
+    @Override
     public void mouseClicked(final MouseEvent event)
     {
       if (event.getButton() == MouseEvent.BUTTON1) {
@@ -224,7 +236,7 @@ class AutomataTable extends JTable
   //# Class Constants
   private static final boolean DISABLE_AUTOMATON_GRIDLINES = true;
 
-  private static final int AUTOMATA_TABLE_HEIGHT = 20;
+  private static final int AUTOMATA_TABLE_MINHEIGHT = 20;
 
   // Arbitrary value: Any value will work,
   // but this is close to the 'normal' value
