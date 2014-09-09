@@ -445,7 +445,7 @@ public class SupervisorReductionTRSimplifier extends
     }
 
     if (mMerged) {
-      PrintStateToClassToConsole(restrictedEventList.get(0));
+      //PrintStateToClassToConsole(restrictedEventList.get(0));
       return createResultPartition();
     } else {
       return null;
@@ -624,6 +624,7 @@ public class SupervisorReductionTRSimplifier extends
     enabDisabEvents.clear();
     disabEvents.clear();
     final ListBufferTransitionRelation rel = getTransitionRelation();
+    mNumProperEvents = rel.getNumberOfProperEvents();
     final int marking = getDefaultMarkingID();
     final TIntArrayList[] disabledEventsToStates =
       new TIntArrayList[mNumProperEvents];
