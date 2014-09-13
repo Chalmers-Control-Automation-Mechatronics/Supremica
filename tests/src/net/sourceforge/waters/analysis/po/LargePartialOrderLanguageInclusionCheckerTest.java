@@ -18,7 +18,7 @@ import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class PartialOrderLanguageInclusionCheckerTest
+public class LargePartialOrderLanguageInclusionCheckerTest
   extends AbstractLanguageInclusionCheckerTest
 {
 
@@ -26,7 +26,7 @@ public class PartialOrderLanguageInclusionCheckerTest
   //# Entry points in junit.framework.TestCase
   public static Test suite() {
     final TestSuite testSuite =
-      new TestSuite(PartialOrderLanguageInclusionCheckerTest.class);
+      new TestSuite(LargePartialOrderLanguageInclusionCheckerTest.class);
     return testSuite;
   }
 

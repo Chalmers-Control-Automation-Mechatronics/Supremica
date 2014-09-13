@@ -69,7 +69,7 @@ extends PartialOrderComponentsModelVerifier implements ConflictChecker
   public PartialOrderComponentsConflictChecker(final ProductDESProxy model,
                                    final ProductDESProxyFactory factory)
   {
-    super(model, factory, ConflictKindTranslator.getInstance());
+    super(model, factory, ConflictKindTranslator.getInstanceUncontrollable());
   }
 
   /**
@@ -90,7 +90,7 @@ extends PartialOrderComponentsModelVerifier implements ConflictChecker
                                    final EventProxy marking,
                                    final ProductDESProxyFactory factory)
   {
-    super(model, factory, ConflictKindTranslator.getInstance());
+    super(model, factory, ConflictKindTranslator.getInstanceUncontrollable());
     mConfiguredMarking = marking;
     mUsedMarking = null;
   }

@@ -15,7 +15,6 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -102,15 +101,26 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     mCompilerOperatorTable = op;
   }
 
-  public SelectionHeuristic<UnifiedEFACandidate> getSelectionHeuristic()
+  public SelectionHeuristic<UnifiedEFACandidate> getCompositionSelectionHeuristic()
   {
-    return mSelectionHeuristic;
+    return mCompositionSelectionHeuristic;
   }
 
-  public void setSelectionHeuristic
+  public void setCompositionSelectionHeuristic
     (final SelectionHeuristic<UnifiedEFACandidate> heuristic)
   {
-    mSelectionHeuristic = heuristic;
+    mCompositionSelectionHeuristic = heuristic;
+  }
+
+  public SelectionHeuristic<UnifiedEFAVariable> getVariableSelectionHeuristic()
+  {
+    return mVariableSelectionHeuristic;
+  }
+
+  public void setVariableSelectionHeuristic
+    (final SelectionHeuristic<UnifiedEFAVariable> heuristic)
+  {
+    mVariableSelectionHeuristic = heuristic;
   }
 
   @Override
@@ -170,6 +180,11 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
   List<UnifiedEFAVariable> getVariables()
   {
     return mCurrentSubSystem.getVariables();
+  }
+
+  VariableInfo getVariableInfo(final UnifiedEFAVariable var)
+  {
+    return mCurrentSubSystem.getVariableInfo(var);
   }
 
   EventInfo getEventInfo(final AbstractEFAEvent event)
@@ -256,19 +271,30 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     mSubSystemQueue = new PriorityQueue<SubSystemInfo>();
     mVariableCollector = new UnifiedEFAVariableCollector
       (mCompilerOperatorTable, context);
-    final Comparator<VariableInfo> maxEvents = new ComparatorMaxEvents();
-    final Comparator<VariableInfo> maxSelfloops = new ComparatorMaxSelfloops();
-    mVariableComparator =
-      new VariableComparator(maxEvents, maxSelfloops);
-    if (mSelectionHeuristic == null) {
-      final SelectionHeuristic<UnifiedEFACandidate> minS =
-        new MinStatesSelectionHeuristic();
-      final SelectionHeuristic<UnifiedEFACandidate> minF =
-        new MinFrontierSelectionHeuristic();
-      mSelectionHeuristic =
-        new ChainSelectionHeuristic<UnifiedEFACandidate>(minS, minF);
+    if (mVariableSelectionHeuristic == null) {
+      // The following is the default. Can be overridden from outside
+      // using setVariableSelectionHeuristic().
+      final SelectionHeuristic<UnifiedEFAVariable> maxE =
+        new VariableSelectionHeuristicMaxE();
+      final SelectionHeuristic<UnifiedEFAVariable> maxS =
+        new VariableSelectionHeuristicMaxS();
+      final SelectionHeuristic<UnifiedEFAVariable> minD =
+        new VariableSelectionHeuristicMinD();
+      mVariableSelectionHeuristic =
+        new ChainSelectionHeuristic<UnifiedEFAVariable>(maxE, maxS, minD);
     }
-    mSelectionHeuristic.setContext(this);
+    mVariableSelectionHeuristic.setContext(this);
+    if (mCompositionSelectionHeuristic == null) {
+      // The following is the default. Can be overridden from outside
+      // using setCompositionSelectionHeuristic().
+      final SelectionHeuristic<UnifiedEFACandidate> minS =
+        new CompositionSelectionHeuristicMinS();
+      final SelectionHeuristic<UnifiedEFACandidate> minF =
+        new CompositionSelectionHeuristicMinF();
+      mCompositionSelectionHeuristic =
+        new ChainSelectionHeuristic<UnifiedEFACandidate>(minF, minS);
+    }
+    mCompositionSelectionHeuristic.setContext(this);
     mUnfolder = new UnifiedEFAVariableUnfolder
       (getFactory(), mCompilerOperatorTable, context);
     mDummyRoot = new SilentEFAEvent(":root");
@@ -376,8 +402,8 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     mNonblockingChecker = null;
     mSubSystemQueue = null;
     mDummyRoot = null;
-    if (mSelectionHeuristic != null) {
-      mSelectionHeuristic.setContext(null);
+    if (mCompositionSelectionHeuristic != null) {
+      mCompositionSelectionHeuristic.setContext(null);
     }
   }
 
@@ -499,16 +525,16 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     throws AnalysisException, EvalException
   {
     checkAbort();
-    final List<VariableInfo> vars = candidate.getVariables();
+    final List<UnifiedEFAVariable> vars = candidate.getVariables();
     List<UnifiedEFATransitionRelation> trs =
       candidate.getTransitionRelations();
     final UnifiedEFAConflictCheckerAnalysisResult result =
       getAnalysisResult();
     mLocalVariableTR = null;
     if (!vars.isEmpty()) {
-      final VariableInfo selectedVarInfo =
-        Collections.min(vars, mVariableComparator);
-      final UnifiedEFAVariable selectedVar = selectedVarInfo.getVariable();
+      final UnifiedEFAVariable selectedVar =
+        mVariableSelectionHeuristic.select(vars);
+      final VariableInfo selectedVarInfo = getVariableInfo(selectedVar);
       mUnfolder.setUnfoldedVariable(selectedVar);
       final List<AbstractEFAEvent> originalEvents =
         selectedVarInfo.getLeaveEvents();
@@ -1093,7 +1119,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     /**
      * Checks whether this event can be removed.
      * An event can be removed if it has no listed transition relations
-     * or variables, and of the following conditions holds.
+     * or variables, and one of the following conditions holds.
      * Either the event has children (in which case the children can
      * be linked to its parent), or the event is a leave and none
      * of its ancestors has any listed transition relations or variables.
@@ -1286,6 +1312,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     private boolean mIsRoot;
   }
 
+
   //#########################################################################
   //# Inner Class VariableInfo
   class VariableInfo implements Comparable<VariableInfo>
@@ -1300,7 +1327,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
 
     //#######################################################################
     //# Simple Access
-    private UnifiedEFAVariable getVariable()
+    UnifiedEFAVariable getVariable()
     {
       return mVariable;
     }
@@ -1362,7 +1389,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       return true;
     }
 
-    private int getNumberOfEvents()
+    int getNumberOfEvents()
     {
       return getEvents().size();
     }
@@ -1375,7 +1402,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
      * relation and whose ancestors do not appear in any transition
      * relation.
      */
-    private int getNumberOfSelfloops()
+    int getNumberOfSelfloops()
     {
       if (mNumberOfSelfloops < 0) {
         final Collection<EventInfo> eventInfo = getEvents();
@@ -1464,7 +1491,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
 
   //#########################################################################
   //# Inner Class SubSystemInfo
-  private class SubSystemInfo implements Comparable<SubSystemInfo>
+  class SubSystemInfo implements Comparable<SubSystemInfo>
   {
     //#######################################################################
     //# Constructors
@@ -1534,7 +1561,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       return events;
     }
 
-    private VariableInfo getVariableInfo(final UnifiedEFAVariable var)
+    VariableInfo getVariableInfo(final UnifiedEFAVariable var)
     {
       return mVariableInfoMap.get(var);
     }
@@ -1610,27 +1637,27 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
           return candidate;
         }
       }
-      final Collection<VariableInfo> primedVariables =
+      final Collection<UnifiedEFAVariable> primedVariables =
         collectOnlyPrimedVariables();
       if (!primedVariables.isEmpty()) {
-        final Set<UnifiedEFATransitionRelation> trs = Collections.emptySet();
-        final VariableInfo selectedVariable =
-          Collections.min(primedVariables, mVariableComparator);
-        final Set<VariableInfo> selectedVariableSet =
-          Collections.singleton(selectedVariable);
-        final UnifiedEFACandidate candidate =
-          new UnifiedEFACandidate(trs, selectedVariableSet);
-        return candidate;
+        return createVariablesCandidate(primedVariables);
       }
+      /* only-variables-of-updates seems a bad strategy ...
+      final Collection<UnifiedEFAVariable> onlyVariables =
+        collectOnlyVariablesOfUpdates();
+      if (!onlyVariables.isEmpty()) {
+        return createVariablesCandidate(onlyVariables);
+      }
+      */
       if (mUsesLocalVariable) {
-        final Collection<VariableInfo> localVars = collectLocalVariables();
+        final Collection<UnifiedEFAVariable> localVars = collectLocalVariables();
         if (!localVars.isEmpty()) {
-          final VariableInfo selectedVariable =
-            Collections.min(localVars, mVariableComparator);
+          final UnifiedEFAVariable var =
+            mVariableSelectionHeuristic.select(localVars);
+          final VariableInfo info = getVariableInfo(var);
           final Set<VariableInfo> selectedVariableSet =
-            Collections.singleton(selectedVariable);
-          final UnifiedEFATransitionRelation tr =
-            selectedVariable.getLocalTR();
+            Collections.singleton(info);
+          final UnifiedEFATransitionRelation tr = info.getLocalTR();
           final Set<UnifiedEFATransitionRelation> trs =
             Collections.singleton(tr);
           final UnifiedEFACandidate candidate =
@@ -1641,7 +1668,22 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       }
       final Collection<UnifiedEFACandidate> candidates =
         createMustLCandidates();
-      return mSelectionHeuristic.select(candidates);
+      return mCompositionSelectionHeuristic.select(candidates);
+    }
+
+    private UnifiedEFACandidate createVariablesCandidate
+      (final Collection<UnifiedEFAVariable> vars)
+      throws AnalysisException
+    {
+      final Set<UnifiedEFATransitionRelation> trs = Collections.emptySet();
+      final UnifiedEFAVariable var =
+        mVariableSelectionHeuristic.select(vars);
+      final VariableInfo info = getVariableInfo(var);
+      final Set<VariableInfo> selectedVariableSet =
+        Collections.singleton(info);
+      final UnifiedEFACandidate candidate =
+        new UnifiedEFACandidate(trs, selectedVariableSet);
+      return candidate;
     }
 
     private UnifiedEFACandidate createLocalTRCandidate()
@@ -1673,24 +1715,40 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       }
     }
 
-    private Collection<VariableInfo> collectOnlyPrimedVariables()
+    private Collection<UnifiedEFAVariable> collectOnlyPrimedVariables()
     {
-      final Collection<VariableInfo> vars = mVariableInfoMap.values();
-      final Collection<VariableInfo> candidates = new ArrayList<>();
-      for (final VariableInfo var : vars) {
-        if (var.isPrimedOnly() || var.isUnPrimedOnly()) {
+      final Collection<UnifiedEFAVariable> candidates = new ArrayList<>();
+      for (final VariableInfo info : mVariableInfoMap.values()) {
+        if (info.isPrimedOnly() || info.isUnPrimedOnly()) {
+          final UnifiedEFAVariable var = info.getVariable();
           candidates.add(var);
         }
       }
       return candidates;
     }
 
-    private Collection<VariableInfo> collectLocalVariables()
+    @SuppressWarnings("unused")
+    private Collection<UnifiedEFAVariable> collectOnlyVariablesOfUpdates()
     {
-      final Collection<VariableInfo> localVars = new ArrayList<>();
-      for (final VariableInfo varInfo : mVariableInfoMap.values()) {
-        if (varInfo.getLocalTR() != null) {
-          localVars.add(varInfo);
+      final Collection<UnifiedEFAVariable> candidates = new THashSet<>();
+      for (final EventInfo event : mEventInfoMap.values()) {
+        final Collection<VariableInfo> vars = event.getVariables();
+        if (vars.size() == 1) {
+          final VariableInfo info = vars.iterator().next();
+          final UnifiedEFAVariable var = info.getVariable();
+          candidates.add(var);
+        }
+      }
+      return candidates;
+    }
+
+    private Collection<UnifiedEFAVariable> collectLocalVariables()
+    {
+      final Collection<UnifiedEFAVariable> localVars = new ArrayList<>();
+      for (final VariableInfo info : mVariableInfoMap.values()) {
+        if (info.getLocalTR() != null) {
+          final UnifiedEFAVariable var = info.getVariable();
+          localVars.add(var);
         }
       }
       return localVars;
@@ -1801,76 +1859,17 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
 
 
   //#########################################################################
-  //# Inner Class ComparatorMaxEvents
-  private static class ComparatorMaxEvents implements Comparator<VariableInfo>
-  {
-    @Override
-    public int compare(final VariableInfo candidate1,
-                       final VariableInfo candidate2)
-    {
-      return candidate2.getNumberOfEvents() - candidate1.getNumberOfEvents();
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class ComparatorMaxSelfloops
-  private static class ComparatorMaxSelfloops implements Comparator<VariableInfo>
-  {
-    @Override
-    public int compare(final VariableInfo candidate1,
-                       final VariableInfo candidate2)
-    {
-      return candidate2.getNumberOfSelfloops() -
-             candidate1.getNumberOfSelfloops();
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class VariableComparator
-  private static class VariableComparator implements Comparator<VariableInfo>
-  {
-    //#######################################################################
-    //# Constructor
-    @SafeVarargs
-    private VariableComparator(final Comparator<VariableInfo>... comparators)
-    {
-      mComparators = comparators;
-    }
-
-    //#######################################################################
-    //# Interface java.util.Comparator<VariableInfo>
-    @Override
-    public int compare(final VariableInfo candidate1, final VariableInfo candidate2)
-    {
-      for (final Comparator<VariableInfo> comparator : mComparators) {
-        final int result = comparator.compare(candidate1, candidate2);
-        if (result != 0) {
-          return result;
-        }
-      }
-      return candidate1.compareTo(candidate2);
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final Comparator<VariableInfo>[] mComparators;
-  }
-
-
-  //#########################################################################
   //# Data Members
   private DocumentManager mDocumentManager;
   private CompilerOperatorTable mCompilerOperatorTable;
   private UnifiedEFASimplifierFactory mSimplifierFactory;
-  private SelectionHeuristic<UnifiedEFACandidate> mSelectionHeuristic;
+  private SelectionHeuristic<UnifiedEFACandidate> mCompositionSelectionHeuristic;
+  private SelectionHeuristic<UnifiedEFAVariable> mVariableSelectionHeuristic;
   private int mInternalStateLimit = Integer.MAX_VALUE;
   private int mInternalTransitionLimit = Integer.MAX_VALUE;
   private boolean mUsesLocalVariable;
 
   private UnifiedEFAVariableCollector mVariableCollector;
-  private Comparator<VariableInfo> mVariableComparator;
   private UnifiedEFAVariableUnfolder mUnfolder;
   private UnifiedEFASimplifier mSimplifier;
   private UnifiedEFAUpdateMerger mUpdateMerger;

@@ -103,7 +103,7 @@ public class ModularLanguageInclusionChecker
       final ProductDESProxyFactory factory = getFactory();
       final SafetyVerifier mono = getMonolithicVerifier();
       mUsedControllabilityChecker =
-        new ModularControllabilityChecker(null, factory, mono, false);
+        new ModularControllabilityChecker(null, factory, mono);
     } else {
       mUsedControllabilityChecker = mConfiguredControllabilityChecker;
     }

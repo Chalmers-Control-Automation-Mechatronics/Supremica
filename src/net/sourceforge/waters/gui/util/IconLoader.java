@@ -26,7 +26,15 @@ public class IconLoader
 {
 
   //#########################################################################
-  //# Static Class Methods
+  //# Public Static Class Methods
+  public static int getWatersIconHeight()
+  {
+    return ICON_PLANT.getIconHeight();
+  }
+
+
+  //#########################################################################
+  //# Private Static Class Methods
   private static final ImageIcon getWatersIcon(final String name)
   {
     final String subdir = Config.GUI_EDITOR_ICONSET.getAsString();

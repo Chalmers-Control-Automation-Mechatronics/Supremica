@@ -37,7 +37,7 @@ public class MonolithicSupervisorLocalizationTest extends
   {
     final MonolithicSynthesizer synthesizer =
       new MonolithicSynthesizer(factory);
-    synthesizer.setSupervisorReductionEnabled(true);
+    synthesizer.setSupervisorReductionEnabled(false);
     synthesizer.setSupervisorLocalizationEnabled(true);
     return synthesizer;
   }

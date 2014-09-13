@@ -14,12 +14,14 @@ import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.efa.base.AbstractEFATransitionRelation;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 /**
@@ -35,7 +37,7 @@ public class SimpleEFAComponent
                             final int[] variables,
                             final SimpleEFAVariableContext varContext,
                             final SimpleEFAStateEncoding stateEncoding,
-                            final SimpleEFATransitionLabelEncoding labelEncoding,
+                            final SimpleEFALabelEncoding labelEncoding,
                             final ListBufferTransitionRelation rel,
                             final int[] blockedEvents,
                             final ComponentKind kind)
@@ -46,9 +48,7 @@ public class SimpleEFAComponent
     mStateEncoding = stateEncoding;
     mVariables = new TIntArrayList(variables);
     mVarContext = varContext;
-    mUnprimedVars = new TIntArrayList();
-    mPrimedVars = new TIntArrayList();
-    mStateVariables = new TIntArrayList();
+    mStateVars = findStateVariables(mStateEncoding.getInitialStateId());
     mBlockedEvents = new TIntArrayList(blockedEvents);
     mKind = kind != null ? kind : ComponentKind.PLANT;
     rel.setKind(mKind);
@@ -59,7 +59,7 @@ public class SimpleEFAComponent
                             final int[] variables,
                             final SimpleEFAVariableContext varContext,
                             final SimpleEFAStateEncoding stateEncoding,
-                            final SimpleEFATransitionLabelEncoding labels,
+                            final SimpleEFALabelEncoding labels,
                             final ListBufferTransitionRelation rel)
   {
     this(name, variables, varContext, stateEncoding, labels, rel, null, null);
@@ -71,9 +71,9 @@ public class SimpleEFAComponent
   }
 
   @Override
-  public SimpleEFATransitionLabelEncoding getTransitionLabelEncoding()
+  public SimpleEFALabelEncoding getTransitionLabelEncoding()
   {
-    return (SimpleEFATransitionLabelEncoding) super.getTransitionLabelEncoding();
+    return (SimpleEFALabelEncoding) super.getTransitionLabelEncoding();
   }
 
   public void addVariable(final SimpleEFAVariable variable)
@@ -110,10 +110,16 @@ public class SimpleEFAComponent
       mVarContext.getVariable(var).addModifier(this);
     }
 
-    for (final int var : mStateVariables.toArray()) {
+    for (final int var : mStateVars.toArray()) {
       mVarContext.getVariable(var).addUseInState(this);
     }
 
+    SimpleEFAEventEncoding eventEncoding = getEventEncoding();
+    for (int e : getEvents()) {
+      SimpleEFAEventDecl event = eventEncoding.getEventDecl(e);
+      event.addComponent(this);
+      eventEncoding.resetEventStatus(event);
+    }
   }
 
   /**
@@ -133,27 +139,39 @@ public class SimpleEFAComponent
         mVarContext.getVariable(var).removeModifier(this);
       }
 
-      for (final int var : mStateVariables.toArray()) {
+      for (final int var : mStateVars.toArray()) {
         mVarContext.getVariable(var).removeUseInState(this);
+      }
+
+      SimpleEFAEventEncoding eventEncoding = getEventEncoding();
+      for (int e : getEvents()) {
+        SimpleEFAEventDecl event = eventEncoding.getEventDecl(e);
+        event.removeComponent(this);
+        eventEncoding.resetEventStatus(event);
       }
     } catch (Exception ex) {
     } finally {
       mVariables = null;
       mUnprimedVars = null;
       mPrimedVars = null;
-      mStateVariables = null;
+      mStateVars = null;
       mStateEncoding = null;
     }
   }
 
-  public TIntArrayList getEvents()
+  public int[] getEvents()
   {
-    return getTransitionLabelEncoding().getEventList();
+    return getTransitionLabelEncoding().getEventListExceptTau();
   }
 
-  public TIntArrayList getBlockedEvents()
+  public List<Integer> getTransitionLabels()
   {
-    return mBlockedEvents;
+    return getTransitionLabelEncoding().getTransitionLabels();
+  }
+
+  public int[] getBlockedEvents()
+  {
+    return mBlockedEvents.toArray();
   }
 
   public void setBlockedEvents(final TIntArrayList blocked)
@@ -171,7 +189,7 @@ public class SimpleEFAComponent
     mStateEncoding = encoding;
   }
 
-  public SimpleEFAState getInitialState()
+  public SimpleNodeProxy getInitialState()
   {
     return mStateEncoding.getInitialState();
   }
@@ -266,8 +284,7 @@ public class SimpleEFAComponent
 
   public int getNumberOfEvents()
   {
-    final int extras = (hasMarkedState() ? 1 : 0) + (hasForbiddenState() ? 1 : 0);
-    return getTransitionLabelEncoding().getEventList().size() - extras;
+    return getTransitionLabelEncoding().getEventSize();
   }
 
   public int getNumberOfStates()
@@ -290,6 +307,16 @@ public class SimpleEFAComponent
     mPrimedVars = new TIntArrayList(pvars);
   }
 
+  public void setStateVariables(final int[] svars)
+  {
+    mStateVars = new TIntArrayList(svars);
+  }
+
+  public void setStateVariables(final int stateId)
+  {
+    mStateVars = findStateVariables(stateId);
+  }
+
   public TIntArrayList getUnprimeVariables()
   {
     return mUnprimedVars;
@@ -300,31 +327,47 @@ public class SimpleEFAComponent
     return mPrimedVars;
   }
 
+  public TIntArrayList getStateVariables()
+  {
+    return mStateVars;
+  }
+
   public TIntArrayList getVariables()
   {
     return mVariables;
   }
 
-  public void setStateVariables(final TIntArrayList svars)
+  private TIntArrayList findStateVariables(int stateId)
   {
-    mStateVariables = svars;
+    return mVarContext.getVariablesId(SimpleEFAHelper.getStateVariables(mStateEncoding.getAttribute(
+     stateId, SimpleEFAHelper.DEFAULT_STATEVALUE_KEY), mVarContext.getVariables()));
   }
-
-  public TIntArrayList getStateVariables()
-  {
-    return mStateVariables;
-  }
-
 
   //#########################################################################
   //# Data Members
+  public static final Comparator<SimpleEFAComponent> KindComparator
+   = new Comparator<SimpleEFAComponent>()
+   {
+     @Override
+     public int compare(SimpleEFAComponent e1, SimpleEFAComponent e2)
+     {
+       if (e1.getKind() == ComponentKind.PLANT && e2.getKind() == ComponentKind.SPEC) {
+         return -1;
+       }
+       if (e1.getKind() == ComponentKind.SPEC && e2.getKind() == ComponentKind.PLANT) {
+         return 1;
+       }
+       return 0;
+     }
+   };
+
   private SimpleEFAStateEncoding mStateEncoding;
   private TIntArrayList mVariables;
   private TIntArrayList mBlockedEvents;
   private List<SimpleEFASystem> mSystems;
   private TIntArrayList mUnprimedVars;
   private TIntArrayList mPrimedVars;
-  private TIntArrayList mStateVariables;
+  private TIntArrayList mStateVars;
   private boolean mIsStructurallyDeterministic;
   private boolean mIsEFA = true;
   private final IdentifierProxy mIdentifier;

@@ -50,7 +50,7 @@ public class BDDConflictChecker
    */
   public BDDConflictChecker(final ProductDESProxyFactory factory)
   {
-    this(ConflictKindTranslator.getInstance(), factory);
+    this(ConflictKindTranslator.getInstanceUncontrollable(), factory);
   }
 
   /**
@@ -87,7 +87,7 @@ public class BDDConflictChecker
   public BDDConflictChecker(final ProductDESProxy model,
                             final ProductDESProxyFactory factory)
   {
-    this(model, ConflictKindTranslator.getInstance(), factory);
+    this(model, ConflictKindTranslator.getInstanceUncontrollable(), factory);
   }
 
   /**

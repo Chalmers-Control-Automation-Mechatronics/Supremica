@@ -81,8 +81,8 @@ import org.supremica.automata.Alphabet;
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
-import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.State;
 
 
 /**
@@ -137,6 +137,7 @@ public class AutomataToWaters
         final AutomatonProxy proxy = convertAutomaton(aut);
         proxies.add(proxy);
       }
+      Collections.sort(mEventList);
       return mFactory.createProductDESProxy(name, comment, null,
                                             mEventList, proxies);
     } finally {

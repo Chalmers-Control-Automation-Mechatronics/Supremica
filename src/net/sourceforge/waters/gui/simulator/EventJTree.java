@@ -10,6 +10,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
+
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -24,6 +25,7 @@ import javax.swing.tree.TreeSelectionModel;
 
 import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.ModuleContext;
+import net.sourceforge.waters.gui.util.IconLoader;
 import net.sourceforge.waters.model.base.Pair;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -56,11 +58,15 @@ public class EventJTree
     getSelectionModel().setSelectionMode
       (TreeSelectionModel.SINGLE_TREE_SELECTION);
     setRootVisible(false);
+    final int height =
+      Math.max(MIN_ROW_HEIGHT, IconLoader.getWatersIconHeight());
+    setRowHeight(height);
     setShowsRootHandles(true);
     setAutoscrolls(true);
     setToggleClickCount(0);
     mPopupFactory = new SimulatorPopupFactory(sim);
     addMouseListener(new MouseListener() {
+      @Override
       public void mouseClicked(final MouseEvent e)
       {
         if (e.getClickCount() == 2) {
@@ -81,6 +87,7 @@ public class EventJTree
         }
       }
 
+      @Override
       public void mousePressed(final MouseEvent event)
       {
         final TreePath path = getPathForLocation(event.getX(), event.getY());
@@ -90,16 +97,19 @@ public class EventJTree
         }
       }
 
+      @Override
       public void mouseEntered(final MouseEvent e)
       {
         // Do nothing
       }
 
+      @Override
       public void mouseExited(final MouseEvent e)
       {
         // Do nothing
       }
 
+      @Override
       public void mouseReleased(final MouseEvent event)
       {
         final TreePath path = getPathForLocation(event.getX(), event.getY());
@@ -110,6 +120,7 @@ public class EventJTree
       }
     });
     this.addMouseMotionListener(new MouseMotionListener(){
+      @Override
       public void mouseMoved(final MouseEvent e)
       {
         final TreePath path = EventJTree.this.getClosestPathForLocation(e.getX(), e.getY());
@@ -120,6 +131,7 @@ public class EventJTree
         setToolTipText(tooltip);
       }
 
+      @Override
       public void mouseDragged(final MouseEvent e)
       {
         // Do nothing
@@ -127,6 +139,7 @@ public class EventJTree
     });
     this.addTreeWillExpandListener(new TreeWillExpandListener(){
 
+      @Override
       public void treeWillCollapse(final TreeExpansionEvent event)
           throws ExpandVetoException
       {
@@ -136,6 +149,7 @@ public class EventJTree
         }
       }
 
+      @Override
       public void treeWillExpand(final TreeExpansionEvent event)
           throws ExpandVetoException
       {
@@ -216,6 +230,7 @@ public class EventJTree
     }
   }
 
+  @Override
   public void simulationChanged(final SimulationChangeEvent event)
   {
     // Any event can change the order, so ALWAYS redraw the entire graph
@@ -225,21 +240,25 @@ public class EventJTree
   // #################################################################
   // # Interface ComponentListener
 
+  @Override
   public void componentHidden(final ComponentEvent e)
   {
     // Do nothing
   }
 
+  @Override
   public void componentMoved(final ComponentEvent e)
   {
     // Do nothing
   }
 
+  @Override
   public void componentResized(final ComponentEvent e)
   {
     forceRecalculation();
   }
 
+  @Override
   public void componentShown(final ComponentEvent e)
   {
     forceRecalculation();
@@ -248,6 +267,7 @@ public class EventJTree
   //##################################################################
   // # Interface InternalFrameObserver
 
+  @Override
   public void onFrameEvent(final InternalFrameEvent event)
   {
     if (event.isOpeningEvent())
@@ -298,6 +318,7 @@ public class EventJTree
 
     //#######################################################################
     //# Interface javax.swing.tree.TreeCellRenderer
+    @Override
     public Component getTreeCellRendererComponent
       (final JTree tree, final Object value, final boolean sel,
        final boolean expanded, final boolean leaf,
@@ -316,12 +337,13 @@ public class EventJTree
         mEventNameLabel.setText(event.getName());
         final Icon eventActivityIcon = mSim.getEventActivityIcon(event);
         mEventStatusLabel.setIcon(eventActivityIcon);
+        final int height = getRowHeight();
         final int width = mPane.getViewport().getWidth();
-        final int rightWidth = eventColumnWidth[1];
+        final int rightWidth = Math.max(eventColumnWidth[1], height);
         final int leftWidth = width - rightWidth - noduleWidth;
-        mEventPanel.setPreferredSize(new Dimension(width, rowHeight));
-        mEventNameLabel.setPreferredSize(new Dimension(leftWidth, rowHeight));
-        mEventStatusLabel.setPreferredSize(new Dimension(rightWidth, rowHeight));
+        mEventPanel.setPreferredSize(new Dimension(width, height));
+        mEventNameLabel.setPreferredSize(new Dimension(leftWidth, height));
+        mEventStatusLabel.setPreferredSize(new Dimension(rightWidth, height));
         return mEventPanel;
       } else if (value instanceof AutomatonProxy) {
         if (sel) {
@@ -347,13 +369,14 @@ public class EventJTree
           mAutomatonStatusLabel.setIcon
             (mSim.getMarkingIcon(currentState, aut));
         }
+        final int height = getRowHeight();
         final int width = mPane.getWidth();
         final int rightWidth = (width * automataColumnWidth[2] - 2 * noduleWidth * automataColumnWidth[2]) / (sum(automataColumnWidth));
         final int centerWidth = (width * automataColumnWidth[1] - 2 * noduleWidth * automataColumnWidth[1]) / (sum(automataColumnWidth));
         final int leftWidth = (width * automataColumnWidth[0] - 2 * noduleWidth * automataColumnWidth[0]) / (sum(automataColumnWidth));
-        mAutomatonNameLabel.setPreferredSize(new Dimension(leftWidth, rowHeight));
-        mAutomatonIconLabel.setPreferredSize(new Dimension(centerWidth, rowHeight));
-        mAutomatonStatusLabel.setPreferredSize(new Dimension(rightWidth, rowHeight));
+        mAutomatonNameLabel.setPreferredSize(new Dimension(leftWidth, height));
+        mAutomatonIconLabel.setPreferredSize(new Dimension(centerWidth, height));
+        mAutomatonStatusLabel.setPreferredSize(new Dimension(rightWidth, height));
         if (automatonAreOpen.contains(aut.getName())) {
           mAutomatonNameLabel.setFont(mAutomatonNameLabel.getFont().deriveFont(Font.BOLD));
           mAutomatonStatusLabel.setFont(mAutomatonStatusLabel.getFont().deriveFont(Font.BOLD));
@@ -410,7 +433,7 @@ public class EventJTree
 
   //#########################################################################
   //# Class Constants
-  static final int rowHeight = 20;
+  private static final int MIN_ROW_HEIGHT = 20;
 
   private static final long serialVersionUID = -4373175227919642063L;
   private static final int[] automataColumnWidth = {110, 20, 60};

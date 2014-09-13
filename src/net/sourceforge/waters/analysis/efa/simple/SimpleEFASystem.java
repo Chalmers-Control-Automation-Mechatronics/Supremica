@@ -17,8 +17,8 @@ import net.sourceforge.waters.analysis.efa.base.AbstractEFASystem;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 /**
@@ -57,12 +57,6 @@ public class SimpleEFASystem
     return super.getTransitionRelations().size();
   }
 
-  public ModuleSubject getModuleProxy(final ModuleProxyFactory mFactory)
-  {
-    throw new UnsupportedOperationException
-      ("getModuleProxy() not implemented for SimpleEFASystem!");
-  }
-
   public List<SimpleEFAComponent> getComponents()
   {
     return super.getTransitionRelations();
@@ -83,6 +77,13 @@ public class SimpleEFASystem
   public SimpleEFAEventEncoding getEventEncoding()
   {
     return mEventEncoding;
+  }
+
+
+  public ModuleSubject getModuleProxy(final ModuleSubjectFactory mFactory)
+  {
+    // TODO Auto-generated method stub
+    return null;
   }
 
   public void addVariables(final Collection<SimpleEFAVariable> variables)
@@ -110,7 +111,7 @@ public class SimpleEFASystem
 
   public void removeComponent(final SimpleEFAComponent component)
   {
-    for (final int id : component.getEvents().toArray()) {
+    for (final int id : component.getEvents()) {
       final SimpleEFAEventDecl event = mEventEncoding.getEventDecl(id);
       if (event.isLocalIn(component) && !event.isProposition()) {
         mEventEncoding.removeEventDecl(event);
@@ -138,7 +139,7 @@ public class SimpleEFASystem
   {
     for (final SimpleEFAComponent comp : getComponents()) {
       final ListBufferTransitionRelation tr = comp.getTransitionRelation();
-      final SimpleEFATransitionLabelEncoding trEncoding =
+      final SimpleEFALabelEncoding trEncoding =
        comp.getTransitionLabelEncoding();
       for (int id = 0; id < trEncoding.size(); id++) {
         final int label = trEncoding.getTransitionLabel(id);

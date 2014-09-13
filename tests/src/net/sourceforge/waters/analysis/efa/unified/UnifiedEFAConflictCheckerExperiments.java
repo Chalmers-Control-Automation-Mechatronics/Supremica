@@ -14,6 +14,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Formatter;
 import java.util.Iterator;
@@ -60,41 +61,30 @@ public class UnifiedEFAConflictCheckerExperiments
 {
 
   //#########################################################################
+  //# Main Method
+  public static void main(final String[] args)
+  {
+    try {
+      final UnifiedEFAConflictCheckerExperiments experiment =
+        new UnifiedEFAConflictCheckerExperiments();
+      experiment.setUp();
+      experiment.runAllTests();
+      experiment.tearDown();
+    } catch (final Throwable exception) {
+      System.err.println("FATAL ERROR");
+      exception.printStackTrace(System.err);
+    }
+  }
+
+
+  //#########################################################################
   //# Constructors
-  public UnifiedEFAConflictCheckerExperiments(final String statsFilename)
+  public UnifiedEFAConflictCheckerExperiments()
     throws FileNotFoundException
   {
     final String outputprop = System.getProperty("waters.test.outputdir");
     final File dir = new File(outputprop);
     ensureDirectoryExists(dir);
-    final File statsFile = new File(dir, statsFilename);
-    mOut = new FileOutputStream(statsFile);
-    mPrintWriter = null;
-  }
-
-
-  //#########################################################################
-  //# Main Method
-  public static void main(final String[] args)
-  {
-    if (args.length == 1) {
-      try {
-        final String filename = args[0];
-        final UnifiedEFAConflictCheckerExperiments experiment =
-          new UnifiedEFAConflictCheckerExperiments(filename);
-        experiment.setUp();
-        experiment.runAllTests();
-        experiment.tearDown();
-      } catch (final Throwable exception) {
-        System.err.println("FATAL ERROR");
-        exception.printStackTrace(System.err);
-      }
-    } else {
-      System.err.println
-        ("USAGE: java " +
-         ProxyTools.getShortClassName(UnifiedEFAConflictCheckerExperiments.class) +
-         "<outputFilename>");
-    }
   }
 
 
@@ -103,9 +93,21 @@ public class UnifiedEFAConflictCheckerExperiments
   private void runAllTests() throws Exception
   {
     final long start = System.currentTimeMillis();
-    runAllTests(new BDDConflictCheckerWrapper());
-    runAllTests(new UnifiedEFAConflictCheckerWrapper());
-    runAllTests(new CompositionalConflictCheckerWrapper());
+    final ConflictCheckerWrapper bddWrapper = new BDDConflictCheckerWrapper();
+    bddWrapper.runAllTests();
+    for (final SelectionHeuristic<UnifiedEFACandidate>
+         candidateSelectionHeuristic : CANDIDATE_SELECTION_HEURISTICS) {
+      for (final SelectionHeuristic<UnifiedEFAVariable>
+           variableSelectionHeuristic : VARIABLE_SELECTION_HEURISTICS) {
+        final ConflictCheckerWrapper unifiedWrapper =
+          new UnifiedEFAConflictCheckerWrapper(candidateSelectionHeuristic,
+                                               variableSelectionHeuristic);
+        unifiedWrapper.runAllTests();
+      }
+    }
+    final ConflictCheckerWrapper compWrapper =
+      new CompositionalConflictCheckerWrapper();
+    compWrapper.runAllTests();
     final long finish = System.currentTimeMillis();
     printAndLog(start, finish);
   }
@@ -113,22 +115,52 @@ public class UnifiedEFAConflictCheckerExperiments
   private void runAllTests(final ConflictCheckerWrapper wrapper)
     throws Exception
   {
-    mPrintWriter.println();
-    mPrintWriter.println(wrapper.getName());
-    mHasBeenPrinted = false;
     mConflictCheckerWrapper = wrapper;
+    for (int c = 2; c <= 3; c += 1) {
+      try {
+        for (int n = 50; n <= 50; n += 5) {
+          checkPML("pml3", c, n, true);
+//          checkPML("pml4", c, n, true);
+        }
+      } catch (final AnalysisException | EvalException exception) {
+        // next please ...
+      }
+    }
+
     try {
-      testCaseStudy();
-      testCaseStudyNonblocking();
+      testPrimeSieve4b();
+      testPrimeSieve4();
+      if (!(wrapper instanceof BDDConflictCheckerWrapper)) {
+//        testPrimeSieve5();
+        // CUDD locks up after 56 iterations in relprod (?)
+        testPrimeSieve6();
+//        testPrimeSieve7();
+        testPrimeSieve8();
+      }
+    } catch (final AnalysisException | EvalException exception) {
+      // next please ...
+    }
+
+    try {
+//      testCaseStudy();
+//      testCaseStudyNonblocking();
       testProductionCell();
     } catch (final AnalysisException | EvalException exception) {
       // next please ...
     }
     try {
-      testPslBigWithManyRestartTrans();
+      for (int maxseqno = 127; maxseqno <= 255; maxseqno += 128) {
+        checkProfisafe("profisafe_ihost_efa_block", maxseqno, false);
+      }
     } catch (final AnalysisException | EvalException exception) {
       // next please ...
     }
+    try {
+      testPslBig();
+    } catch (final AnalysisException | EvalException exception) {
+      // next please ...
+    }
+
     try {
       testPslBigBlocking();
     } catch (final AnalysisException | EvalException exception) {
@@ -139,11 +171,17 @@ public class UnifiedEFAConflictCheckerExperiments
     } catch (final AnalysisException | EvalException exception) {
       // next please ...
     }
+    try {
+      testPslBigWithManyRestartTrans();
+    } catch (final AnalysisException | EvalException exception) {
+      // next please ...
+    }
     if (!(wrapper instanceof BDDConflictCheckerWrapper)) {
+
       for (int m = 3; m <= 4; m += 1) {
         try {
-          for (int n = 100; n <= 500; n+= 100) {
-            checkTransferLineRework("transferline_efsm_rework", m, n, true);
+          for (int n = 500; n <= 500; n+= 100) {
+            checkTransferLineRework("transferline_efsm_rework_block", m, n, false);
           }
         } catch (final AnalysisException | EvalException exception) {
           // next please ...
@@ -151,8 +189,8 @@ public class UnifiedEFAConflictCheckerExperiments
       }
       for (int m = 3; m <= 4; m += 1) {
         try {
-          for (int n = 100; n <= 500; n+= 100) {
-            checkTransferLineRework("transferline_efsm_rework_block", m, n, false);
+          for (int n = 500; n <= 500; n+= 100) {
+            checkTransferLineRework("transferline_efsm_rework", m, n, true);
           }
         } catch (final AnalysisException | EvalException exception) {
           // next please ...
@@ -168,79 +206,52 @@ public class UnifiedEFAConflictCheckerExperiments
 //        // next please ...
 //      }
     }
-    for (int c = 2; c <= 3; c += 1) {
-      try {
-        for (int n = 10; n <= 50; n += 5) {
-          checkPML("pml3", c, n, true);
-//          checkPML("pml4", c, n, true);
-        }
-      } catch (final AnalysisException | EvalException exception) {
-        // next please ...
-      }
-    }
+
+ //    try {
+//      final int[] primes = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31};
+//      for (int s = 3; s < primes.length; s++) {
+//        final int maxval = primes[s] * primes[s] - 1;
+//        checkPrimeSieve("dynamic_prime_sieve", s, maxval, true);
+//      }
+//    } catch (final AnalysisException | EvalException exception) {
+//      // next please ...
+//    }
+//    try {
+//      for (int maxseqno = 15; maxseqno <= 255; maxseqno += 16) {
+//        checkProfisafe("profisafe_ihost_efa_2", maxseqno, false);
+//      }
+//    } catch (final AnalysisException | EvalException exception) {
+//      // next please ...
+//    }
+
+//    try {
+//      for (int maxseqno = 127; maxseqno <= 255; maxseqno += 128) {
+//        checkProfisafe("profisafe_islave_efa", maxseqno, true);
+//      }
+//    } catch (final AnalysisException | EvalException exception) {
+//      // next please ...
+//    }
     try {
-      testPrimeSieve4();
-      testPrimeSieve4b();
-      if (!(wrapper instanceof BDDConflictCheckerWrapper)) {
-        testPrimeSieve5();
-        // CUDD locks up after 56 iterations in relprod (?)
-        testPrimeSieve6();
-        testPrimeSieve7();
-        testPrimeSieve8();
-      }
-    } catch (final AnalysisException | EvalException exception) {
-      // next please ...
-    }
-    try {
-      final int[] primes = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31};
-      for (int s = 3; s < primes.length; s++) {
-        final int maxval = primes[s] * primes[s] - 1;
-        checkPrimeSieve("dynamic_prime_sieve", s, maxval, true);
-      }
-    } catch (final AnalysisException | EvalException exception) {
-      // next please ...
-    }
-    try {
-      for (int maxseqno = 15; maxseqno <= 255; maxseqno += 16) {
-        checkProfisafe("profisafe_ihost_efa_2", maxseqno, false);
-      }
-    } catch (final AnalysisException | EvalException exception) {
-      // next please ...
-    }
-    try {
-      for (int maxseqno = 15; maxseqno <= 255; maxseqno += 16) {
-        checkProfisafe("profisafe_ihost_efa_block", maxseqno, false);
-      }
-    } catch (final AnalysisException | EvalException exception) {
-      // next please ...
-    }
-    try {
-      for (int maxseqno = 15; maxseqno <= 255; maxseqno += 16) {
-        checkProfisafe("profisafe_islave_efa", maxseqno, true);
-      }
-    } catch (final AnalysisException | EvalException exception) {
-      // next please ...
-    }
-    try {
-      for (int i = 100; i <= 500; i += 100) {
+      for (int i = 300; i <= 400; i += 100) {
         checkRoundRobin(i);
       }
     } catch (final AnalysisException | EvalException exception) {
       // next please ...
     }
-    try {
-      for (int n = 0; n <= 1000; n += 50) {
-        final int nn = n == 0 ? 1 : n;
-        checkJDEDS2014(10, nn);
-      }
-    } catch (final AnalysisException | EvalException exception) {
-      // next please ...
-    }
+//    try {
+//      for (int n = 0; n <= 1000; n += 50) {
+//        final int nn = n == 0 ? 1 : n;
+//        checkJDEDS2014(10, nn);
+//      }
+//    } catch (final AnalysisException | EvalException exception) {
+//      // next please ...
+//    }
   }
 
 
   //#########################################################################
   //# Tests
+  @SuppressWarnings("unused")
   private void testPrimeSieve7()
     throws IOException, WatersException
   {
@@ -264,20 +275,12 @@ public class UnifiedEFAConflictCheckerExperiments
     super.setUp();
     mWatchdog = new Watchdog(mTimeout);
     mWatchdog.setVerbose(true);
-    mPrintWriter = new PrintWriter(mOut, true);
-    mPrintWriter.println("Timeout," + mTimeout);
-    /*
-    mPrintWriter.println("CompositionSelectionHeuristic," +
-                         mCompositionSelectionHeuristic);
-    */
     mWatchdog.start();
   }
 
   @Override
   protected void tearDown() throws Exception
   {
-    mPrintWriter.close();
-    mOut.close();
     super.tearDown();
   }
 
@@ -366,6 +369,27 @@ public class UnifiedEFAConflictCheckerExperiments
   {
     //#######################################################################
     //# Inner Class ConflictCheckerWrapper
+    void printHeader()
+    {
+      mPrintWriter.println(getName());
+      mPrintWriter.println("Timeout," + mTimeout);
+    }
+
+    void runAllTests() throws Exception
+    {
+      final String outputProp = System.getProperty("waters.test.outputdir");
+      final String fileName = getFileName() + ".csv";
+      final File statsFile = new File(outputProp, fileName);
+      mOut = new FileOutputStream(statsFile);
+      mPrintWriter = new PrintWriter(mOut, true);
+      try {
+        printHeader();
+        UnifiedEFAConflictCheckerExperiments.this.runAllTests(this);
+      } finally {
+        mPrintWriter.close();
+      }
+    }
+
     private boolean run(final ModuleProxy module,
                         final List<ParameterBindingProxy> bindings,
                         final boolean expected)
@@ -373,8 +397,8 @@ public class UnifiedEFAConflictCheckerExperiments
     {
       final String moduleName = module.getName();
       final String fullModuleName = getFullModuleName(moduleName, bindings);
-      final String className = getName();
-      printAndLog("Running " + fullModuleName + " with " + className + " ... ");
+      final String fileName = getFileName();
+      printAndLog("Running " + fullModuleName + " with " + fileName + " ... ");
       try {
         System.gc();
         mWatchdog.reset();
@@ -400,7 +424,7 @@ public class UnifiedEFAConflictCheckerExperiments
       } catch (final Throwable exception) {
         System.out.println(ProxyTools.getShortClassName(exception));
         mPrintWriter.println('\"' + fullModuleName + "\"," +
-                exception.getMessage());
+                             exception.getMessage());
         if (exception instanceof AnalysisException) {
           throw (AnalysisException) exception;
         } else if (exception instanceof EvalException) {
@@ -413,7 +437,7 @@ public class UnifiedEFAConflictCheckerExperiments
       }
     }
 
-    private String getName()
+    String getName()
     {
       final String className = ProxyTools.getShortClassName(this);
       if (className.endsWith("Wrapper")) {
@@ -424,22 +448,72 @@ public class UnifiedEFAConflictCheckerExperiments
       }
     }
 
+    String getFileName()
+    {
+      return getName();
+    }
+
+    PrintWriter getPrintWriter()
+    {
+      return mPrintWriter;
+    }
 
     //#########################################################################
     //# Abstract Methods
     abstract AnalysisResult runConflictChecker
       (ModuleProxy module, List<ParameterBindingProxy> bindings)
       throws EvalException, AnalysisException;
+
+    //#########################################################################
+    //# Data Members
+    private FileOutputStream mOut;
+    private PrintWriter mPrintWriter;
+    private boolean mHasBeenPrinted = false;
   }
 
 
   //#########################################################################
   //# Inner Class UnifiedEFAConflictCheckerWrapper
-  private class UnifiedEFAConflictCheckerWrapper extends ConflictCheckerWrapper
+  private class UnifiedEFAConflictCheckerWrapper
+    extends ConflictCheckerWrapper
   {
 
     //#######################################################################
+    //# Constructor
+    private UnifiedEFAConflictCheckerWrapper()
+    {
+      this(CHAIN_MINF, CHAIN_MAXE);
+    }
+
+    private UnifiedEFAConflictCheckerWrapper
+      (final SelectionHeuristic<UnifiedEFACandidate> compositionSelectionHeuristic,
+       final SelectionHeuristic<UnifiedEFAVariable> variableSelectionHeuristic)
+    {
+      mCompositionSelectionHeuristic = compositionSelectionHeuristic;
+      mVariableSelectionHeuristic = variableSelectionHeuristic;
+    }
+
+    //#######################################################################
     //# Overrides for ConflictCheckerWrapper
+    @Override
+    String getFileName()
+    {
+      return super.getFileName() + "_" +
+        mCompositionSelectionHeuristic.getName() + "_" +
+        mVariableSelectionHeuristic.getName();
+    }
+
+    @Override
+    void printHeader()
+    {
+      super.printHeader();
+      final PrintWriter writer = getPrintWriter();
+      writer.println("Composition selection heuristic," +
+                     mCompositionSelectionHeuristic);
+      writer.println("Variable selection heuristic," +
+                     mVariableSelectionHeuristic);
+    }
+
     @Override
     AnalysisResult runConflictChecker(final ModuleProxy module,
                                       final List<ParameterBindingProxy> bindings)
@@ -448,14 +522,9 @@ public class UnifiedEFAConflictCheckerExperiments
       final ModuleProxyFactory factory = getModuleProxyFactory();
       final UnifiedEFAConflictChecker checker =
         new UnifiedEFAConflictChecker(module, factory);
+      checker.setCompositionSelectionHeuristic(mCompositionSelectionHeuristic);
+      checker.setVariableSelectionHeuristic(mVariableSelectionHeuristic);
       // Configuration of UnifiedEFAConflictChecker ...
-      final SelectionHeuristic<UnifiedEFACandidate> minF =
-        new MinFrontierSelectionHeuristic();
-      final SelectionHeuristic<UnifiedEFACandidate> minS =
-        new MinStatesSelectionHeuristic();
-      final SelectionHeuristic<UnifiedEFACandidate> chain =
-        new ChainSelectionHeuristic<UnifiedEFACandidate>(minF, minS);
-      checker.setSelectionHeuristic(chain);
       checker.setUsesLocalVariable(true);
       // Configuration end
       checker.setBindings(bindings);
@@ -465,6 +534,10 @@ public class UnifiedEFAConflictCheckerExperiments
       return checker.getAnalysisResult();
     }
 
+    //#######################################################################
+    //# Data Members
+    private final SelectionHeuristic<UnifiedEFACandidate> mCompositionSelectionHeuristic;
+    private final SelectionHeuristic<UnifiedEFAVariable> mVariableSelectionHeuristic;
   }
 
 
@@ -546,11 +619,12 @@ public class UnifiedEFAConflictCheckerExperiments
       final ProductDESProxyFactory factory = getProductDESProxyFactory();
       mConflictChecker =  new BDDConflictChecker(factory);
       mWatchdog.addAbortable(mConflictChecker);
-      // Configuration of CompositionalConflictChecker ...
+      // Configuration of BDDConflictChecker ...
       mConflictChecker.setBDDPackage(BDDPackage.CUDD);
       mConflictChecker.setTransitionPartitioningStrategy
         (TransitionPartitioningStrategy.AUTOMATA);
       mConflictChecker.setPartitioningSizeLimit(5000);
+      mConflictChecker.setInitialSize(1000000);
       mConflictChecker.setNodeLimit(25000000);
       mConflictChecker.setCounterExampleEnabled(false);
       // Configuration end
@@ -587,10 +661,51 @@ public class UnifiedEFAConflictCheckerExperiments
   //# Data Members
   private ConflictCheckerWrapper mConflictCheckerWrapper;
   private Watchdog mWatchdog;
-  private final FileOutputStream mOut;
-  private PrintWriter mPrintWriter;
-  private boolean mHasBeenPrinted;
 
-  private final int mTimeout = 480;  // 8 minutes
+  private final int mTimeout = 600;  // measured in seconds
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final SelectionHeuristic<UnifiedEFACandidate> CHAIN_MINS;
+  private static final SelectionHeuristic<UnifiedEFACandidate> CHAIN_MINF;
+  private static final List<SelectionHeuristic<UnifiedEFACandidate>>
+    CANDIDATE_SELECTION_HEURISTICS;
+
+  private static final SelectionHeuristic<UnifiedEFAVariable> CHAIN_MAXE;
+  private static final SelectionHeuristic<UnifiedEFAVariable> CHAIN_MAXS;
+  private static final SelectionHeuristic<UnifiedEFAVariable> CHAIN_MIND;
+  private static final List<SelectionHeuristic<UnifiedEFAVariable>>
+    VARIABLE_SELECTION_HEURISTICS;
+
+
+  static {
+    final SelectionHeuristic<UnifiedEFACandidate> minF =
+      new CompositionSelectionHeuristicMinF();
+    final SelectionHeuristic<UnifiedEFACandidate> minS =
+      new CompositionSelectionHeuristicMinS();
+    CHAIN_MINF = new ChainSelectionHeuristic<UnifiedEFACandidate>(minF, minS);
+    CHAIN_MINS = new ChainSelectionHeuristic<UnifiedEFACandidate>(minS, minF);
+    CANDIDATE_SELECTION_HEURISTICS = new ArrayList<>(2);
+    CANDIDATE_SELECTION_HEURISTICS.add(CHAIN_MINF);
+    CANDIDATE_SELECTION_HEURISTICS.add(CHAIN_MINS);
+
+    final SelectionHeuristic<UnifiedEFAVariable> maxE =
+      new VariableSelectionHeuristicMaxE();
+    final SelectionHeuristic<UnifiedEFAVariable> maxS =
+      new VariableSelectionHeuristicMaxS();
+    final SelectionHeuristic<UnifiedEFAVariable> minD =
+      new VariableSelectionHeuristicMinD();
+    CHAIN_MAXE =
+      new ChainSelectionHeuristic<UnifiedEFAVariable>(maxE, maxS, minD);
+    CHAIN_MAXS =
+      new ChainSelectionHeuristic<UnifiedEFAVariable>(maxS, maxE, minD);
+    CHAIN_MIND =
+      new ChainSelectionHeuristic<UnifiedEFAVariable>(minD, maxE, maxS);
+    VARIABLE_SELECTION_HEURISTICS = new ArrayList<>(3);
+    VARIABLE_SELECTION_HEURISTICS.add(CHAIN_MAXE);
+    VARIABLE_SELECTION_HEURISTICS.add(CHAIN_MAXS);
+    VARIABLE_SELECTION_HEURISTICS.add(CHAIN_MIND);
+  }
 
 }

@@ -200,6 +200,40 @@ public class CompositionalStateRepresentationSynthesizer extends
     }
   }
 
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    if (mHalfwaySimplifier != null) {
+      mHalfwaySimplifier.resetAbort();
+    }
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.SupervisorSynthesizer
+  @Override
+  public void setSupervisorReductionEnabled(final boolean enable)
+  {
+  }
+
+  @Override
+  public boolean getSupervisorReductionEnabled()
+  {
+    return false;
+  }
+
+  @Override
+  public void setSupervisorLocalizationEnabled(final boolean enable)
+  {
+  }
+
+  @Override
+  public boolean getSupervisorLocalizationEnabled()
+  {
+    return false;
+  }
+
 
   //#########################################################################
   //# Invocation
@@ -240,7 +274,7 @@ public class CompositionalStateRepresentationSynthesizer extends
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
   @Override
-  protected CompositionalStateRepresentationSynthesisResult createAnalysisResult()
+  public CompositionalStateRepresentationSynthesisResult createAnalysisResult()
   {
     return new CompositionalStateRepresentationSynthesisResult();
   }
@@ -379,13 +413,21 @@ public class CompositionalStateRepresentationSynthesizer extends
 
     final List<AutomatonProxy> originals = step.getOriginalAutomata();
     final List<AutomatonProxy> results = step.getResultAutomata();
+    final Map<StateProxy,StateProxy> stateMap;
+    if (step instanceof EventRemovalStep) {
+      final EventRemovalStep removalStep = (EventRemovalStep) step;
+      stateMap = removalStep.getStateMap();
+    } else {
+      stateMap = Collections.emptyMap();
+    }
     for (int i = 0; i < originals.size(); i++) {
       final AutomatonProxy original = originals.get(i);
       final AutomatonProxy result = results.get(i);
       final StateEncoding originalEncoding = new StateEncoding(original);
       final StateEncoding resultEncoding = new StateEncoding(result);
       final TRPartition reencoding =
-        TRPartition.createReencodingPartition(originalEncoding, resultEncoding);
+        TRPartition.createReencodingPartition
+          (originalEncoding, resultEncoding, stateMap);
       final SynthesisStateSpace.SynthesisStateMap parent =
         mStateRepresentationMap.remove(original);
       if (reencoding == null) {

@@ -10,13 +10,11 @@
 package net.sourceforge.waters.analysis.modular;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
+import net.sourceforge.waters.analysis.abstraction.TraceFinder;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 
 
@@ -34,6 +32,8 @@ public interface ModularHeuristic
    */
   public String getName();
 
+  public TraceFinder getTraceFinder(AutomatonProxy aut);
+
   /**
    * Evaluates this heuristic.
    * @return Set of candidate automata to be considered.
@@ -44,9 +44,5 @@ public interface ModularHeuristic
      Set<AutomatonProxy> nonComposedSpecPlants,
      Set<AutomatonProxy> nonComposedSpecs,
      TraceProxy counterExample);
-
-  public SafetyTraceProxy extendTrace(final ProductDESProxyFactory factory,
-                                      final SafetyTraceProxy trace,
-                                      final List<AutomatonProxy> automata);
 
 }

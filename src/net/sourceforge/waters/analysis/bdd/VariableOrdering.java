@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters/Supremica GUI
+//# PROJECT: Waters BDD
 //# PACKAGE: net.sourceforge.waters.analysis.bdd
 //# CLASS:   VariableOrdering
 //###########################################################################
@@ -28,6 +28,7 @@ public enum VariableOrdering
   //#########################################################################
   //# Enumeration
   DEFAULT {
+    @Override
     Collection<AutomatonProxy> getOrder(final ProductDESProxy des,
                                         final KindTranslator translator)
     {
@@ -46,6 +47,7 @@ public enum VariableOrdering
   },
 
   GREEDY {
+    @Override
     Collection<AutomatonProxy> getOrder(final ProductDESProxy des,
                                         final KindTranslator translator)
     {
@@ -54,6 +56,18 @@ public enum VariableOrdering
   },
 
   FORCE {
+    @Override
+    Collection<AutomatonProxy> getOrder(final ProductDESProxy des,
+                                        final KindTranslator translator)
+    {
+      final Collection<AutomatonProxy> preorder =
+        DEFAULT.getOrder(des, translator);
+      return new ForceVariableOrdering(des, preorder);
+    }
+  },
+
+  GFORCE {
+    @Override
     Collection<AutomatonProxy> getOrder(final ProductDESProxy des,
                                         final KindTranslator translator)
     {

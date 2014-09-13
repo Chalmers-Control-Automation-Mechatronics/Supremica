@@ -94,7 +94,7 @@ public abstract class AbstractModelVerifier
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.analysis.AbstractModelAnalyser
   @Override
-  protected VerificationResult createAnalysisResult()
+  public VerificationResult createAnalysisResult()
   {
     return new DefaultVerificationResult();
   }

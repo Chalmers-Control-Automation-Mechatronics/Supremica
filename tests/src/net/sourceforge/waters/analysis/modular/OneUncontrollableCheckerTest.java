@@ -13,8 +13,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
-import net.sourceforge.waters.model.analysis.
-       AbstractControllabilityCheckerTest;
+import net.sourceforge.waters.model.analysis.AbstractControllabilityCheckerTest;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -42,6 +41,7 @@ public class OneUncontrollableCheckerTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractControllabilityCheckerTest
+  @Override
   public void testHISCRhoneSubsystem1Patch0() throws Exception
   {
     try {
@@ -51,6 +51,7 @@ public class OneUncontrollableCheckerTest
     }
   }
 
+  @Override
   public void testHISCRhoneSubsystem1Patch1() throws Exception
   {
     try {
@@ -60,6 +61,7 @@ public class OneUncontrollableCheckerTest
     }
   }
 
+  @Override
   public void testHISCRhoneSubsystem1Patch2() throws Exception
   {
     try {
@@ -69,6 +71,7 @@ public class OneUncontrollableCheckerTest
     }
   }
 
+  @Override
   public void testTransferline__5() throws Exception
   {
     try {
@@ -82,15 +85,14 @@ public class OneUncontrollableCheckerTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  @Override
   protected ControllabilityChecker createModelVerifier
     (final ProductDESProxyFactory desfactory)
   {
     return new OneUncontrollableChecker
       (null, desfactory,
        new ModularControllabilityChecker
-       (null, desfactory,
-        new NativeControllabilityChecker(null, desfactory),
-        false));
+         (null, desfactory, new NativeControllabilityChecker(null, desfactory)));
   }
 
 }

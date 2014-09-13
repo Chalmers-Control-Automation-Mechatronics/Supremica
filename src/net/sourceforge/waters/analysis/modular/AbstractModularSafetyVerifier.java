@@ -107,6 +107,27 @@ abstract class AbstractModularSafetyVerifier
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
+  public void requestAbort()
+  {
+    super.requestAbort();
+    if (mMonolithicVerifier != null) {
+      mMonolithicVerifier.requestAbort();
+    }
+  }
+
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    if (mMonolithicVerifier != null) {
+      mMonolithicVerifier.resetAbort();
+    }
+  }
+
+
+  //#########################################################################
   //# Data Members
   private SafetyVerifier mMonolithicVerifier;
   private ModularHeuristicFactory.Method mHeuristicMethod;

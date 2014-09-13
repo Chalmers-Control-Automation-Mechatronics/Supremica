@@ -70,6 +70,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     mPreselecting = preselectingHeuristic;
     mSelecting = selectionHeuristic;
     mWatchdog = new Watchdog(mSynthesizer, mTimeout);
+    mWatchdog.setVerbose(true);
   }
 
 
@@ -90,10 +91,9 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     mSynthesizer.setMonolithicTransitionLimit(finalTransitionLimit);
     mSynthesizer.setPreselectingMethod(mPreselecting);
     mSynthesizer.setSelectionHeuristic(mSelecting);
-    mPrintWriter.println("InternalStateLimit," + internalStateLimit
-                         + ",InternalTransitionLimit,"
-                         + internalTransitionLimit + ",FinalStateLimit,"
-                         + finalStateLimit);
+    mPrintWriter.println("InternalStateLimit," + internalStateLimit +
+                         ",InternalTransitionLimit," + internalTransitionLimit +
+                         ",FinalStateLimit," + finalStateLimit);
     mPrintWriter.println("PreselHeuristic," + mPreselecting +
                          ",SelecHeuristic," + mSelecting +
                          ",Method," + mMethod);
@@ -107,6 +107,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     mSynthesizer = null;
     mPrintWriter.close();
     mOut.close();
+    mWatchdog.terminate();
     System.out.println("All experiments complete");
     super.tearDown();
   }
@@ -239,11 +240,10 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
         exception.printStackTrace(System.err);
       }
     } else {
-      System.err
-        .println("Usage: CompositionalSynthesizerExperiments "
-                 + "<outputFilename> Automata|StateRepresentation " +
-                 "<preselectingHeuristic> " +
-                 "<selectingHeuristic> [supervisorReductionEnabled]");
+      System.err.println("Usage: CompositionalSynthesizerExperiments " +
+                         "<outputFilename> Automata|StateRepresentation " +
+                         "<preselectingHeuristic> " +
+                         "<selectingHeuristic> [supervisorReductionEnabled]");
     }
   }
 
@@ -255,7 +255,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     synthesisAGV();// 1
     synthesisAGVB();// 2
     synthesissAip0Alps();// 3
-    synthesiseAip0though();
+//    synthesiseAip0though();
     synthesisFenCaiWon09B();// 4
     synthesisFenCaiWon09Synth();// 5
     synthesisFms2003();// 6
@@ -264,7 +264,8 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     synthesisePSLWithResetTrans();
     synthesisePSLWithResetTransWithPartLeftCounters();
     synthesisePSLWithResetTransWithPartLeftPlants();
-    synthesiseTbedCtct();
+//    synthesiseTbedCtct(); No supervisor
+    synthesiseTbedHISC();
     synthesiseTbedNoderailB();// 7
     synthesiseTbedNoderailUncont();// 8
     synthesiseCentralLockingVerriegel3b();// 9
@@ -273,11 +274,11 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     synthesis6linki();// 12
     synthesis6linkp();// 13
     synthesis6linkre();// 14
-    for (int n = 100; n <= 1000; n+=100) {
-      if (!synthesisTransferline(n)) {
-        break;
-      }
-    }
+//    for (int n = 100; n <= 1000; n+=100) {
+//      if (!synthesisTransferline(n)) {
+//        break;
+//      }
+//    }
 
 
     //synthesiseCentralLockingKoordwspBlock();
@@ -323,6 +324,8 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     runModel("tests", "incremental_suite", "aip0aip.wmod");
   }
 
+  // This one cannot be solved yet ...
+  @SuppressWarnings("unused")
   private void synthesiseAip0though() throws Exception
   {
     runModel("tests", "incremental_suite", "aip0tough.wmod");
@@ -339,9 +342,17 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     runModel("tests", "incremental_suite", "tbed_noderailb.wmod");
   }
 
+  // This one does not have a solution.
+  @SuppressWarnings("unused")
   private void synthesiseTbedCtct() throws Exception
   {
     runModel("tests", "incremental_suite", "tbed_ctct.wmod");
+  }
+
+
+  private void synthesiseTbedHISC() throws Exception
+  {
+    runModel("despot", "tbed_hisc", "tbed_hisc1.wmod");
   }
 
   //AGV
@@ -441,6 +452,7 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     runModel("tests", "6link", "6linkre.wmod");
   }
 
+  @SuppressWarnings("unused")
   private boolean synthesisTransferline(final int n) throws Exception
   {
     final ModuleProxyFactory factory = ModuleElementFactory.getInstance();

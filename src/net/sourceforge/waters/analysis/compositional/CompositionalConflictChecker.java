@@ -179,7 +179,7 @@ public class CompositionalConflictChecker
   {
     super(model,
           factory,
-          ConflictKindTranslator.getInstance(),
+          ConflictKindTranslator.getInstanceUncontrollable(),
           abstractionCreator,
           preselectingMethodFactory);
     setPruningDeadlocks(true);

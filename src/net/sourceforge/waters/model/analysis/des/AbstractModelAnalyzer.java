@@ -273,7 +273,7 @@ public abstract class AbstractModelAnalyzer implements ModelAnalyzer
    * overridden by subclasses the require a more specific analysis result
    * type.
    */
-  protected AnalysisResult createAnalysisResult()
+  public AnalysisResult createAnalysisResult()
   {
     return new DefaultAnalysisResult();
   }

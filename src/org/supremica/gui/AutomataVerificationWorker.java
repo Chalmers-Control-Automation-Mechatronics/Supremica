@@ -234,7 +234,7 @@ public class AutomataVerificationWorker
             }
             else
             {
-                JOptionPane.showMessageDialog(workbench.getFrame(), failureMessage, "Bad news", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(workbench.getFrame(), failureMessage, "Bad news", JOptionPane.ERROR_MESSAGE);
                 logger.info(failureMessage);
             }
 

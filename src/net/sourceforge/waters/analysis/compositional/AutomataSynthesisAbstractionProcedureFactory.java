@@ -46,6 +46,7 @@ public class AutomataSynthesisAbstractionProcedureFactory
   protected AutomataSynthesisAbstractionProcedureFactory()
   {
     register(SOE);
+    register(OE);
     register(SOE_ONLY);
     register(WSOE);
     register(WSOE_UNSUP);
@@ -71,6 +72,30 @@ public class AutomataSynthesisAbstractionProcedureFactory
       return AutomataSynthesisAbstractionProcedure.
         createSynthesisAbstractionProcedure
           (synthesizer, AutomataSynthesisAbstractionProcedure.CHAIN_SOE);
+    }
+
+    @Override
+    public boolean supportsNondeterminism()
+    {
+      return false;
+    }
+  };
+
+  /**
+   * An abstraction chain consisting of halfway synthesis and observation equivalence.
+   */
+  public static final AbstractionProcedureCreator OE =
+    new AbstractionProcedureCreator("OE")
+  {
+    @Override
+    public AbstractionProcedure createAbstractionProcedure
+      (final AbstractCompositionalModelAnalyzer analyzer)
+    {
+      final CompositionalAutomataSynthesizer synthesizer =
+        (CompositionalAutomataSynthesizer) analyzer;
+      return AutomataSynthesisAbstractionProcedure.
+        createSynthesisAbstractionProcedure
+          (synthesizer, AutomataSynthesisAbstractionProcedure.CHAIN_OE);
     }
 
     @Override

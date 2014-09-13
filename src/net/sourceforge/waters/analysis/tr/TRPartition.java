@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.waters.model.des.StateProxy;
 
@@ -222,15 +223,62 @@ public class TRPartition
 
   /**
    * Creates a partition to convert from one state encoding to another.
+   * The two given state encodings must contain the same states, but possibly
+   * with different codes. The computed partition maps states in the first
+   * encoding to singleton classes in the second encoding, marking any states
+   * not present in the second encoding as bad.
+   * @param  first      State encoding containing states to be partitioned.
+   * @param  second     State encoding containing result states of partition.
+   * @return A partition, or <CODE>null</CODE> if the partition is found to
+   *         be trivial
    */
-  public static TRPartition createReencodingPartition(final StateEncoding first,
-                                                      final StateEncoding second)
+  public static TRPartition createReencodingPartition
+    (final StateEncoding first, final StateEncoding second)
   {
     final int[] stateToClass = new int[first.getNumberOfStates()];
     boolean trivial = first.getNumberOfStates() == second.getNumberOfStates();
-    for (int i=0; i< first.getNumberOfStates(); i++) {
+    for (int i = 0; i < first.getNumberOfStates(); i++) {
       final StateProxy state = first.getState(i);
       final int clazz = second.getStateCode(state);
+      if (clazz != i) {
+        trivial = false;
+      }
+      stateToClass[i] = clazz;
+    }
+    if (trivial) {
+      return null;
+    } else {
+      return new TRPartition(stateToClass, second.getNumberOfStates());
+    }
+  }
+
+  /**
+   * Creates a partition to convert from one state encoding to another.
+   * The two given state encodings may contain different states, with the
+   * re-encoding map linking states from the first encoding to states of
+   * the second. The computed partition maps states in the first encoding
+   * to singleton classes in the second encoding, marking any states not
+   * present in the second encoding as bad.
+   * @param  first      State encoding containing states to be partitioned.
+   * @param  second     State encoding containing result states of partition.
+   * @param  reencoding State map from first to second states. Missing entries
+   *                    in the mapped are assumed to map states to themselves.
+   * @return A partition, or <CODE>null</CODE> if the partition is found to
+   *         be trivial
+   */
+  public static TRPartition createReencodingPartition
+    (final StateEncoding first, final StateEncoding second,
+     final Map<StateProxy,StateProxy> reencoding)
+  {
+    final int[] stateToClass = new int[first.getNumberOfStates()];
+    boolean trivial = first.getNumberOfStates() == second.getNumberOfStates();
+    for (int i = 0; i < first.getNumberOfStates(); i++) {
+      final StateProxy state1 = first.getState(i);
+      StateProxy state2 = reencoding.get(state1);
+      if (state2 == null) {
+        state2 = state1;
+      }
+      final int clazz = second.getStateCode(state2);
       if (clazz != i) {
         trivial = false;
       }

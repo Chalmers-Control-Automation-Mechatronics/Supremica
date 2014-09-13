@@ -214,6 +214,16 @@ public class ObservationEquivalenceTRSimplifier
     return mUsingSpecialEvents;
   }
 
+  public void setUsingLocalEvents(final boolean enable)
+  {
+    mUsingLocalEvents = enable;
+  }
+
+  public boolean getUsingLocalEvents()
+  {
+    return mUsingLocalEvents;
+  }
+
   /**
    * Sets the transition limit. The transition limit specifies the maximum
    * number of transitions (including stored silent transitions of the
@@ -647,9 +657,17 @@ public class ObservationEquivalenceTRSimplifier
         final int limit = getTransitionLimit();
         final int config = rel.getConfiguration();
         if ((config & ListBufferTransitionRelation.CONFIG_PREDECESSORS) != 0) {
-          mTauClosure = rel.createPredecessorsTauClosure(limit);
+          if (mUsingLocalEvents) {
+            mTauClosure = rel.createPredecessorsTauClosureByStatus(limit, EventEncoding.STATUS_LOCAL);
+          } else {
+            mTauClosure = rel.createPredecessorsTauClosure(limit);
+          }
         } else {
-          mTauClosure = rel.createSuccessorsTauClosure(limit);
+          if (mUsingLocalEvents) {
+            mTauClosure = rel.createSuccessorsTauClosureByStatus(limit, EventEncoding.STATUS_LOCAL);
+          } else {
+            mTauClosure = rel.createSuccessorsTauClosure(limit);
+          }
         }
         final TransitionIterator inner = mTauClosure.createIterator();
         mTauIterator = new OneEventCachingTransitionIterator
@@ -661,7 +679,16 @@ public class ObservationEquivalenceTRSimplifier
 
   private TransitionIterator getPredecessorIterator(final int event)
   {
-    if (event == EventEncoding.TAU && mEquivalence.respectsTau()) {
+    final boolean tau;
+    if (!mEquivalence.respectsTau()) {
+      tau = false;
+    } else if (mUsingLocalEvents) {
+      final byte status = getTransitionRelation().getProperEventStatus(event);
+      tau = EventEncoding.isLocalEvent(status);
+    } else {
+      tau = (event == EventEncoding.TAU);
+    }
+    if (tau) {
       mTauIterator.reset();
       return mTauIterator;
     } else {
@@ -2316,6 +2343,7 @@ public class ObservationEquivalenceTRSimplifier
   private int mDefaultMarkingID = -1;
   private boolean mDumpStateAware = false;
   private boolean mUsingSpecialEvents = true;
+  private boolean mUsingLocalEvents = false;
   private int mTransitionLimit = Integer.MAX_VALUE;
   private int mInitialInfoSize = -1;
 

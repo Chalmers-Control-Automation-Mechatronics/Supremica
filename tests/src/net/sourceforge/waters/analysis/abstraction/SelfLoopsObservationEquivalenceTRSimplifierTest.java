@@ -21,8 +21,10 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 
 
 /**
- * A test for the observation equivalence simplifier (
- * {@link ObservationEquivalenceTRSimplifier}).
+ * A test for the observation equivalence simplifier
+ * ({@link ObservationEquivalenceTRSimplifier}) with selfloop-only events
+ * enabled. This test considers all controllable events in the input automaton
+ * as selfloop-only.
  *
  * This test is to be used with caution because the same bisimulation module
  * ({@link ObservationEquivalenceTRSimplifier}) is used by the abstraction rule

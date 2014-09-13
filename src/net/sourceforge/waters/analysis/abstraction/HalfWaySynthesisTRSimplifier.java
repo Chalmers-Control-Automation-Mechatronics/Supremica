@@ -177,20 +177,21 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
 
     // 4. Create result partition.
     //  Singleton classes for all safe states, no entries for bad states.
-    final List<int[]> classes = new ArrayList<>(numStates);
-    for (int s = 0; s < numStates; s++) {
-      if (mBadStates.get(s) || !rel.isReachable(s)) {
-        classes.add(null);
-      } else {
-        final int[] clazz = new int[1];
-        clazz[0] = s;
-        classes.add(clazz);
+    if (needPartition || mOutputMode == OutputMode.PSEUDO_SUPERVISOR) {
+      final List<int[]> classes = new ArrayList<>(numStates);
+      for (int s = 0; s < numStates; s++) {
+        if (mBadStates.get(s) || !rel.isReachable(s)) {
+          classes.add(null);
+        } else {
+          final int[] clazz = new int[1];
+          clazz[0] = s;
+          classes.add(clazz);
+        }
       }
+      final TRPartition partition = new TRPartition(classes, numStates);
+      setResultPartition(partition);
+      applyResultPartitionAutomatically();
     }
-    final TRPartition partition = new TRPartition(classes, numStates);
-    setResultPartition(partition);
-    applyResultPartitionAutomatically();
-
     return needPartition;
   }
 

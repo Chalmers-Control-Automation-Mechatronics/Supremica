@@ -45,9 +45,19 @@ class UnifiedEFACandidate implements Comparable<UnifiedEFACandidate>
     return mTransitionRelations;
   }
 
-  List<UnifiedEFAConflictChecker.VariableInfo> getVariables()
+  List<UnifiedEFAConflictChecker.VariableInfo> getVariableInfo()
   {
     return mVariables;
+  }
+
+  List<UnifiedEFAVariable> getVariables()
+  {
+    final List<UnifiedEFAVariable> vars =
+      new ArrayList<UnifiedEFAVariable>(mVariables.size());
+    for (final UnifiedEFAConflictChecker.VariableInfo info : mVariables) {
+      vars.add(info.getVariable());
+    }
+    return vars;
   }
 
   List<UnifiedEFAConflictChecker.EventInfo> getLocalEvents()

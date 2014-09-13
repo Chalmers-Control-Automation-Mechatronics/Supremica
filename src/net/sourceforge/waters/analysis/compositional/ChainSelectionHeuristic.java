@@ -62,7 +62,11 @@ public class ChainSelectionHeuristic<T extends Comparable<? super T>>
    */
   public void setPreOrder(final SelectionHeuristic<T> preorder)
   {
-    mPreOrder = preorder;
+    if (preorder == null || preorder.isDecisive()) {
+      mPreOrder = preorder;
+    } else {
+      mPreOrder = new ChainSelectionHeuristic<T>(preorder);
+    }
   }
 
 
@@ -137,6 +141,12 @@ public class ChainSelectionHeuristic<T extends Comparable<? super T>>
     for (final SelectionHeuristic<? extends T> step : mSteps) {
       step.reset();
     }
+  }
+
+  @Override
+  protected boolean isDecisive()
+  {
+    return true;
   }
 
 

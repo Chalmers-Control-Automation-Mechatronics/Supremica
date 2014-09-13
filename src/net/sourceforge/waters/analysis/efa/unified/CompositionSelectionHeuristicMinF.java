@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters EFA Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.efa.unified
-//# CLASS:   MinFrontierSelectionHeuristic
+//# CLASS:   MinFrontierCompositionSelectionHeuristic
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -27,7 +27,7 @@ import net.sourceforge.waters.analysis.efa.unified.UnifiedEFAConflictChecker.Var
  * @author Robi Malik, Sahar Mohajerani
  */
 
-public class MinFrontierSelectionHeuristic
+public class CompositionSelectionHeuristicMinF
   extends NumericSelectionHeuristic<UnifiedEFACandidate>
 {
 
@@ -54,7 +54,7 @@ public class MinFrontierSelectionHeuristic
       frontierCount.add(tr);
       events.addAll(tr.getUsedEventsExceptTau());
     }
-    for (final VariableInfo var : candidate.getVariables()) {
+    for (final VariableInfo var : candidate.getVariableInfo()) {
       frontierCount.add(var);
       for (final EventInfo info : var.getEvents()) {
         events.add(info.getEvent());

@@ -140,7 +140,7 @@ public class SimpleEFAEventDecl
 
   public boolean isLocal()
   {
-    return mComponents.size() < 2;
+    return mComponents.size() == 1;
   }
 
   public boolean isProposition()

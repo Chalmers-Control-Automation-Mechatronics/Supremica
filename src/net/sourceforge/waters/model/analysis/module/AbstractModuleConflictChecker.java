@@ -99,7 +99,7 @@ public abstract class AbstractModuleConflictChecker
                                          final IdentifierProxy preMarking,
                                          final ModuleProxyFactory factory)
     {
-      super(model, factory, ConflictKindTranslator.getInstance());
+      super(model, factory, ConflictKindTranslator.getInstanceUncontrollable());
       mMarking = marking;
       mPreconditionMarking = preMarking;
       mUsedMarking = null;

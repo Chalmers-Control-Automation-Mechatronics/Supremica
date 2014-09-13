@@ -20,7 +20,9 @@ import net.sourceforge.waters.xsd.base.EventKind;
 /**
  * <P>A kind translator used for conflict checking.
  * This translator remaps all plants and specifications as plants,
- * and all controllable and uncontrollable events as uncontrollable.
+ * and all controllable and uncontrollable events as the same kind.
+ * There are two instances of this kind translator that return either
+ * controllable or uncontrollable events.
  * The use of kind translators is optional in conflict checking,
  * but the unification of types may make things easier for some
  * implementations.</P>
@@ -34,18 +36,29 @@ public class ConflictKindTranslator
 
   //#########################################################################
   //# Singleton Pattern
-  public static ConflictKindTranslator getInstance()
+  public static ConflictKindTranslator getInstanceControllable()
   {
-    return SingletonHolder.theInstance;
+    return SingletonHolderControllable.theInstance;
   }
 
-  private static class SingletonHolder {
+  public static ConflictKindTranslator getInstanceUncontrollable()
+  {
+    return SingletonHolderUncontrollable.theInstance;
+  }
+
+  private static class SingletonHolderControllable {
     private static final ConflictKindTranslator theInstance =
-      new ConflictKindTranslator();
+      new ConflictKindTranslator(EventKind.CONTROLLABLE);
   }
 
-  private ConflictKindTranslator()
+  private static class SingletonHolderUncontrollable {
+    private static final ConflictKindTranslator theInstance =
+      new ConflictKindTranslator(EventKind.UNCONTROLLABLE);
+  }
+
+  private ConflictKindTranslator(final EventKind kind)
   {
+    mEventKind = kind;
   }
 
 
@@ -57,6 +70,7 @@ public class ConflictKindTranslator
    * @return {@link ComponentKind#PLANT}, if the given automaton is
    *         a plant, spec, or supervisor.
    */
+  @Override
   public ComponentKind getComponentKind(final AutomatonProxy aut)
   {
     final ComponentKind kind = aut.getKind();
@@ -71,21 +85,28 @@ public class ConflictKindTranslator
   }
 
   /**
-   * Returns the event kind of the given event in a language
-   * inclusion check.
-   * @return {@link EventKind#UNCONTROLLABLE}.
+   * Returns the event kind of the given event in a conflict check.
+   * @return Either {@link EventKind#CONTROLLABLE} or
+   *         {@link EventKind#UNCONTROLLABLE}, depending on which
+   *         version of the conflict kind translator is used.
    */
+  @Override
   public EventKind getEventKind(final EventProxy event)
   {
     final EventKind kind = event.getKind();
     switch (kind) {
     case CONTROLLABLE:
     case UNCONTROLLABLE:
-      return EventKind.UNCONTROLLABLE;
+      return mEventKind;
     default:
       return kind;
     }
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private final EventKind mEventKind;
 
 
   //#########################################################################

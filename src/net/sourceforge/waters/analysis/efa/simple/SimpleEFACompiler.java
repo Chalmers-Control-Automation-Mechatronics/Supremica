@@ -24,6 +24,7 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
+
 /**
  * A utility to compile the model and construct
  * an EFA system ({@link SimpleEFASystem}).
@@ -61,7 +62,7 @@ public class SimpleEFACompiler
     final ModuleInstanceCompiler mModuleInstanceCompiler;
     try {
       final ModuleProxyFactory modfactory = ModuleElementFactory.getInstance();
-      CompilationInfo mCompilationInfo = new CompilationInfo(mIsSourceInfoEnabled,
+      final CompilationInfo mCompilationInfo = new CompilationInfo(mIsSourceInfoEnabled,
               mIsMultiExceptionsEnabled);
       mModuleInstanceCompiler = new ModuleInstanceCompiler(mDocumentManager,
                                                            modfactory,
@@ -73,9 +74,7 @@ public class SimpleEFACompiler
       checkAbort();
       final ModuleProxy intermediate = mModuleInstanceCompiler.compile(bindings);
       mCompilationInfo.shift();
-      mEFASystemBuilder = new SimpleEFASystemBuilder(modfactory,
-              mCompilationInfo,
-                                                     intermediate);
+      mEFASystemBuilder = new SimpleEFASystemBuilder(modfactory, mCompilationInfo, intermediate);
       mEFASystemBuilder.setOptimizationEnabled(mIsOptimizationEnabled);
       mEFASystemBuilder.setMarkingVariablEFAEnable(mIsMarkingVariablEFAEnable);
       return mEFASystemBuilder.compile();

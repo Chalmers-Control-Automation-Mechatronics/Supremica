@@ -173,7 +173,7 @@ public class CompositionalGeneralisedConflictChecker
   }
 
   @Override
-  protected CompositionalGeneralisedConflictCheckerVerificationResult createAnalysisResult()
+  public CompositionalGeneralisedConflictCheckerVerificationResult createAnalysisResult()
   {
     return new CompositionalGeneralisedConflictCheckerVerificationResult();
   }

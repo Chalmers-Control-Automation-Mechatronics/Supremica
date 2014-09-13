@@ -192,7 +192,9 @@ public class CompositionalAnalysisResult
 
   public void addSynchronousProductAnalysisResult(final AnalysisResult result)
   {
-    mNumberOfSyncProducts++;
+    if (result == null || result.isFinished()) {
+      mNumberOfSyncProducts++;
+    }
     if (mSynchronousProductStats == null) {
       mSynchronousProductStats = result;
     } else if (result != null) {
@@ -206,7 +208,9 @@ public class CompositionalAnalysisResult
 
   public void addMonolithicAnalysisResult(final AnalysisResult result)
   {
-    mNumberOfMonolithicRuns++;
+    if (result == null || result.isFinished()) {
+      mNumberOfMonolithicRuns++;
+    }
     if (mMonolithicStats == null) {
       mMonolithicStats = result;
     } else if (result != null) {

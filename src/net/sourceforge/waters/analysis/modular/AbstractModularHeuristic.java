@@ -9,10 +9,6 @@
 
 package net.sourceforge.waters.analysis.modular;
 
-import gnu.trove.set.hash.THashSet;
-
-import java.net.URI;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -23,13 +19,7 @@ import net.sourceforge.waters.analysis.abstraction.TraceFinder;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
-import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
-import net.sourceforge.waters.model.des.TraceStepProxy;
-import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
@@ -79,76 +69,14 @@ abstract class AbstractModularHeuristic
     }
   }
 
-  @Override
-  public SafetyTraceProxy extendTrace(final ProductDESProxyFactory factory,
-                                      final SafetyTraceProxy trace,
-                                      final List<AutomatonProxy> automata)
+  public TraceFinder getTraceFinder(final AutomatonProxy aut)
   {
-    final Set<AutomatonProxy> oldAutomata =
-      new THashSet<AutomatonProxy>(trace.getAutomata());
-    boolean done = false;
-    boolean det = true;
-    for (final AutomatonProxy aut : automata) {
-      if (!oldAutomata.contains(aut)) {
-        done = false;
-        final TraceFinder finder = getTraceFinder(aut);
-        det &= finder.isDeterministic();
-      }
+    TraceFinder finder = mTraceFinders.get(aut);
+    if (finder == null) {
+      finder = new TraceFinder(aut, mKindTranslator);
+      mTraceFinders.put(aut, finder);
     }
-    if (done) {
-      return trace;
-    }
-    final String name = trace.getName();
-    final String comment = trace.getComment();
-    final URI location = trace.getLocation();
-    final ProductDESProxy des = trace.getProductDES();
-    final List<TraceStepProxy> oldSteps = trace.getTraceSteps();
-    if (det) {
-      return factory.createSafetyTraceProxy(name, comment, location,
-                                            des, automata, oldSteps);
-    }
-    final int numSteps = oldSteps.size();
-    final KindTranslator translator = getKindTranslator();
-    final List<TraceStepProxy> newSteps =
-      new ArrayList<TraceStepProxy>(numSteps);
-    int depth = 0;
-    for (final TraceStepProxy oldStep : oldSteps) {
-      final EventProxy event = oldStep.getEvent();
-      final Map<AutomatonProxy,StateProxy> oldMap = oldStep.getStateMap();
-      Map<AutomatonProxy,StateProxy> newMap = null;
-      boolean endOfTrace = false;
-      for (final AutomatonProxy aut : automata) {
-        if (!oldAutomata.contains(aut)) {
-          final TraceFinder finder = getTraceFinder(aut);
-          if (translator.getComponentKind(aut) == ComponentKind.SPEC &&
-              depth > finder.getNumberOfAcceptedSteps()) {
-            // Found nonaccepting spec --- trace ends here.
-            endOfTrace = true;
-            continue;
-          }
-          final StateProxy state = finder.getState(depth);
-          if (state != null) {
-            if (newMap == null) {
-              newMap = new HashMap<AutomatonProxy,StateProxy>(oldMap);
-            }
-            newMap.put(aut, state);
-          }
-        }
-      }
-      if (newMap == null) {
-        newSteps.add(oldStep);
-      } else {
-        final TraceStepProxy newStep =
-          factory.createTraceStepProxy(event, newMap);
-        newSteps.add(newStep);
-      }
-      if (endOfTrace) {
-        break;
-      }
-      depth++;
-    }
-    return factory.createSafetyTraceProxy(name, comment, location,
-                                          des, automata, newSteps);
+    return finder;
   }
 
 
@@ -207,17 +135,6 @@ abstract class AbstractModularHeuristic
     return finder.computeNumberOfAcceptedSteps(trace);
   }
 
-  private TraceFinder getTraceFinder(final AutomatonProxy aut)
-  {
-    TraceFinder finder = mTraceFinders.get(aut);
-    if (finder == null) {
-      finder = new TraceFinder(aut, mKindTranslator);
-      mTraceFinders.put(aut, finder);
-    }
-    return finder;
-  }
-
-
   //#########################################################################
   //# Data Members
   private final KindTranslator mKindTranslator;
@@ -229,4 +146,3 @@ abstract class AbstractModularHeuristic
   static final String HEURISTIC_SUFFIX = "Heuristic";
 
 }
-

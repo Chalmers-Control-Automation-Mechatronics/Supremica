@@ -402,6 +402,20 @@ public abstract class AbstractSupervisorSynthesizerTest
     runSynthesizer(des, true);
   }
 
+  public void testSelfloop1() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "selfloop1.wmod");
+    runSynthesizer(des, true);
+  }
+
+  public void testSelfloop2() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "selfloop2.wmod");
+    runSynthesizer(des, true);
+  }
+
   public void testSimpleManufacturingSystem() throws Exception
   {
     final ProductDESProxy des =
@@ -457,6 +471,13 @@ public abstract class AbstractSupervisorSynthesizerTest
       getCompiledDES("tests", "synthesis", "tbed_minsync.wmod");
     runSynthesizer(des, true);
   }
+
+//  public void testAGV() throws Exception
+//  {
+//    final ProductDESProxy des =
+//      getCompiledDES("tests", "incremental_suite", "agv.wmod");
+//    runSynthesizer(des, true);
+//  }
 
   public void testTeleNetwork() throws Exception
   {
@@ -662,9 +683,8 @@ public abstract class AbstractSupervisorSynthesizerTest
         factory.createProductDESProxy(name, comment, null, events, automata);
       saveDES(replaced, basename);
       assertTrue("Expected failed synthesis, but got a result!", expect);
-      verifySupervisor(replaced, mControllabilityChecker,
-                       null, "controllable");
-      verifySupervisor(replaced, mConflictChecker, null, "nonconflicting");
+      verifySupervisorControllability(replaced);
+      verifySupervisorNonblocking(replaced);
       automata.addAll(expectedSupervisors);
       final ProductDESProxy combined =
         factory.createProductDESProxy(name, comment, null, events, automata);
@@ -676,6 +696,18 @@ public abstract class AbstractSupervisorSynthesizerTest
       assertFalse("Synthesis failed, but the problem has a solution!",
                   expect);
     }
+  }
+
+  protected void verifySupervisorControllability(final ProductDESProxy des)
+    throws Exception
+  {
+    verifySupervisor(des, mControllabilityChecker, null, "controllable");
+  }
+
+  protected void verifySupervisorNonblocking(final ProductDESProxy des)
+    throws Exception
+  {
+    verifySupervisor(des, mConflictChecker, null, "nonconflicting");
   }
 
   private void verifySupervisor(final ProductDESProxy des,

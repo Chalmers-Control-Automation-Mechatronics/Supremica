@@ -127,7 +127,7 @@
         <unjar src="${lib}/JGo.jar" dest="${lib}/${unjared}"/>  
         <unjar src="${lib}/JGoLayout.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/anarres-cpp.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/antlr-runtime-3.3.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/antlr-runtime-3.5.2.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/grappa.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/help.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/jdom.jar" dest="${lib}/${unjared}"/>

@@ -18,10 +18,11 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 
 /**
- * This class can be used to automatically run experiments for different
- * properties with all possible combinations of heuristics.
+ * This class can be used to automatically run experiments for
+ * automata vs. state representation synthesis, with all possible
+ * combinations of heuristics.
  *
- * @author Sahar Mohajerani
+ * @author Sahar Mohajerani, Robi Malik
  */
 
 public class SelfRunningExperimentCompositionalSynthesis
@@ -31,38 +32,52 @@ public class SelfRunningExperimentCompositionalSynthesis
   {
     try {
       //final String outputDir = System.getProperty("waters.test.outputdir");
+      final boolean special = true;
+      final boolean failing = false;
       final ProductDESProxyFactory factory =
         ProductDESElementFactory.getInstance();
-      final AbstractCompositionalSynthesizer automataSynthesizer =
+      final CompositionalAutomataSynthesizer automataSynthesizer =
         new CompositionalAutomataSynthesizer(factory);
+      automataSynthesizer.setDetailedOutputEnabled(false);
+      automataSynthesizer.setUsingSpecialEvents(special);
+      automataSynthesizer.setFailingEventsEnabled(failing);
       final List<Configuration> configurations = new LinkedList<>();
-      final Configuration configWSOE =
+      final Configuration configWSOEUnsup =
         new Configuration(automataSynthesizer,
-                          AutomataSynthesisAbstractionProcedureFactory.WSOE);
-      configurations.add(configWSOE);
-//      final Configuration configWSOEUnsup =
-//        new Configuration(automataSynthesizer,
-//                          AutomataSynthesisAbstractionProcedureFactory.WSOE_UNSUP);
-//      configurations.add(configWSOEUnsup);
+                          AutomataSynthesisAbstractionProcedureFactory.WSOE_UNSUP);
+      configurations.add(configWSOEUnsup);
       final AbstractCompositionalSynthesizer stateRepresentationSynthesizer =
         new CompositionalStateRepresentationSynthesizer(factory);
+      stateRepresentationSynthesizer.setUsingSpecialEvents(special);
+      stateRepresentationSynthesizer.setFailingEventsEnabled(failing);
       final Configuration configStateRepresent =
         new Configuration(stateRepresentationSynthesizer,
-                          StateRepresentationSynthesisAbstractionProcedureFactory.WSOE);
+                          StateRepresentationSynthesisAbstractionProcedureFactory.WSOE_UNSUP);
       configurations.add(configStateRepresent);
       final AbstractCompositionalModelAnalyzer.PreselectingMethodFactory
-      preselectingFactory = automataSynthesizer.getPreselectingMethodFactory();
+        preselectingFactory = automataSynthesizer.getPreselectingMethodFactory();
       final CompositionalSelectionHeuristicFactory selectionFactory =
         automataSynthesizer.getSelectionHeuristicFactory();
+//      final PreselectingMethod[] preSelectingMethods = new PreselectingMethod[] {
+//          AbstractCompositionalModelAnalyzer.MustL
+//      };
+//      final SelectionHeuristicCreator[] selectingMethods = new SelectionHeuristicCreator[] {
+//        CompositionalSelectionHeuristicFactory.MinF
+//      };
       int methodCount = 0;
       for (final AbstractCompositionalModelAnalyzer.PreselectingMethod
            preselectingMethod : preselectingFactory.getEnumConstants()) {
         for (final SelectionHeuristicCreator
              selectingMethod: selectionFactory.getEnumConstants()) {
+//      for (final AbstractCompositionalModelAnalyzer.PreselectingMethod
+//           preselectingMethod : preSelectingMethods) {
+//        for (final SelectionHeuristicCreator
+//             selectingMethod: selectingMethods) {
           methodCount++;
           for (final Configuration config: configurations) {
             final AbstractCompositionalSynthesizer synthesizer = config.getSynthesizer();
             final AbstractionProcedureCreator method = config.getMethod();
+            synthesizer.setAbstractionProcedureCreator(method);
             final String preName = preselectingMethod.toString();
             final String selName = selectingMethod.toString();
             // without supervisor reduction:

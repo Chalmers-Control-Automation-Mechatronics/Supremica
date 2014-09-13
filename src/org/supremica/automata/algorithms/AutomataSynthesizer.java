@@ -422,7 +422,7 @@ public class AutomataSynthesizer
           final EventProxy marking;
           switch (synthesizerOptions.getSynthesisType()) {
           case NONBLOCKING:
-            translator = ConflictKindTranslator.getInstance();
+            translator = ConflictKindTranslator.getInstanceUncontrollable();
             marking = null;
             break;
           case CONTROLLABLE:

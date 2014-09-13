@@ -37,8 +37,8 @@ public class SDControllabilityChecker
                                   final ProductDESProxyFactory factory,
                                   final SafetyVerifier checker,
                                   final boolean least)
-  {super(model, factory,checker, false);
-
+  {
+    super(model, factory, checker);
   }
 
 }
