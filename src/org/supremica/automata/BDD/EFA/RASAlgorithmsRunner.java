@@ -63,7 +63,7 @@ public class RASAlgorithmsRunner {
 
             try {
                 timer.restart();
-                manager.removeLargerStatesThirdWay(boundaryUnsafeStates);
+                manager.removeLargerStates(boundaryUnsafeStates);
                 timer.stop();
                 System.out.println("Time for minimizing the boundary unsafe states is: "
                         + timer.elapsedTime() / 1000);

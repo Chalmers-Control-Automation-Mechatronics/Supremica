@@ -1362,15 +1362,15 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
         if (synType.equals(SynthesisAlgorithm.MINIMALITY_M)){
             boundaryUnsafeStates = manager.computeBoundaryUnsafeStatesAlternative();
-            boundaryUnsafeStates = manager.removeLargerStatesThirdWay(boundaryUnsafeStates);
+            boundaryUnsafeStates = manager.removeLargerStates(boundaryUnsafeStates);
         }
         else if (synType.equals(SynthesisAlgorithm.MINIMALITY_C)) {
             boundaryUnsafeStates = manager.computeBoundaryUnsafeStatesClassic();
-            boundaryUnsafeStates = manager.removeLargerStatesThirdWay(boundaryUnsafeStates);
+            boundaryUnsafeStates = manager.removeLargerStates(boundaryUnsafeStates);
         }
         else if (synType.equals(SynthesisAlgorithm.MINIMALITY_P)) {
             boundaryUnsafeStates = manager.computeBoundaryUnsafeStatesEventPartitioning();
-            boundaryUnsafeStates = manager.removeLargerStatesThirdWay(boundaryUnsafeStates);
+            boundaryUnsafeStates = manager.removeLargerStates(boundaryUnsafeStates);
         }
 
         nbrOfBoundaryUnsafeStates = manager.nbrMinBoundUnsafeStates;
