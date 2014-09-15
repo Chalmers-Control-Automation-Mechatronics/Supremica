@@ -147,21 +147,21 @@ public class BackgroundCompiler
   public void compilationFinished(final ProductDESProxy compiledDES,
                                   final EvalException evalException)
   {
+    assert compiledDES != null || evalException != null;
     mRunning = false;
     if (mRestart) {
       mRestart = false;
       mCompiler.resetAbort();
       compile(mObserver);
     } else {
-      if (!mModuleChanged) {
-        mCompiledDES = compiledDES;
-        mEvalException = evalException;
-        mSourceInfoMap = mCompiler.getSourceInfoMap();
-      } else {
-        mTimer.restart();
-      }
+      mCompiledDES = compiledDES;
+      mEvalException = evalException;
+      mSourceInfoMap = mCompiler.getSourceInfoMap();
       mModuleContainer.setCompilationException(evalException);
       notifyObserver();
+      if (mModuleChanged) {
+        mTimer.restart();
+      }
     }
   }
 
