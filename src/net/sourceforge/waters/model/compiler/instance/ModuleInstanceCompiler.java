@@ -164,10 +164,10 @@ public class ModuleInstanceCompiler
       mHasEFAElements = false;
       mContext = new ModuleBindingContext(mInputModule);
       mNameSpace = new CompiledNameSpace();
-      mCompiledEvents = new TreeSet<EventDeclProxy>();
-      mCompiledComponents = new LinkedList<Proxy>();
+      mCompiledEvents = new TreeSet<>();
+      mCompiledComponents = new LinkedList<>();
       if (bindings != null) {
-        mParameterMap = new TreeMap<String,CompiledParameterBinding>();
+        mParameterMap = new TreeMap<>();
         visitCollection(bindings);
       }
       visitModuleProxy(mInputModule);
@@ -752,7 +752,7 @@ public class ModuleInstanceCompiler
         new EmptyLabelBlockException(block, mCurrentEdge, mCurrentComponent);
       throw wrap(exception);
     } else {
-      return visitEventListExpressionProxy(block);
+      return visitEventListExpressionProxy(block, mask);
     }
   }
 

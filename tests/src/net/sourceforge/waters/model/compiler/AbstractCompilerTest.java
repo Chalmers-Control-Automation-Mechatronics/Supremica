@@ -27,6 +27,7 @@ import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierExceptio
 import net.sourceforge.waters.model.compiler.efa.ActionSyntaxException;
 import net.sourceforge.waters.model.compiler.graph.NondeterministicModuleException;
 import net.sourceforge.waters.model.compiler.instance.EmptyLabelBlockException;
+import net.sourceforge.waters.model.compiler.instance.EventKindException;
 import net.sourceforge.waters.model.compiler.instance.InstantiationException;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -578,6 +579,13 @@ public abstract class AbstractCompilerTest
   {
     compileError("handwritten", "error7_small", null,
                  UndefinedIdentifierException.class, "'buffer.curr'");
+  }
+
+  public void testCompile_error8_small()
+    throws IOException, WatersException
+  {
+    compileError("handwritten", "error8_small", null,
+                 EventKindException.class, "'repair1'");
   }
 
   public void testCompile_markus1()

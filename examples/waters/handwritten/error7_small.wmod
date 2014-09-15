@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="error7_small" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>A compiler test to check whether undefined namespaces produce a proper error message. The automaton machine1 include a guard mentioning 'buffer.current', but buffer is an automaton, which cannot be further qualified. This should result in an UndefinedIdentifierException.</ns2:Comment>
+    <ns2:Comment>A compiler test to check whether undefined namespaces produce a proper error message. The automaton machine1 includes a guard mentioning 'buffer.current', but buffer is an automaton, which cannot be further qualified. This should result in an UndefinedIdentifierException.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="start1"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="finish1"/>
@@ -21,39 +21,39 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="59" X="70"/>
+                            <Point X="70" Y="59"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="working">
                         <PointGeometry>
-                            <Point Y="136" X="88"/>
+                            <Point X="88" Y="136"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="down">
                         <PointGeometry>
-                            <Point Y="80" X="159"/>
+                            <Point X="159" Y="80"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="working" Source="idle">
+                    <Edge Source="idle" Target="working">
                         <LabelBlock>
                             <SimpleIdentifier Name="start1"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="94" X="82"/>
+                            <Point X="82" Y="94"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -73,55 +73,55 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="20" X="0"/>
+                                <Point X="0" Y="20"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="idle" Source="working">
+                    <Edge Source="working" Target="idle">
                         <LabelBlock>
                             <SimpleIdentifier Name="finish1"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-14" X="-55"/>
+                                <Point X="-55" Y="-14"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="103" X="62"/>
+                            <Point X="62" Y="103"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="20" X="0"/>
+                                <Point X="0" Y="20"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="down" Source="working">
+                    <Edge Source="working" Target="down">
                         <LabelBlock>
                             <SimpleIdentifier Name="break1"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="115" X="129"/>
+                            <Point X="129" Y="115"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="20" X="0"/>
+                                <Point X="0" Y="20"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="idle" Source="down">
+                    <Edge Source="down" Target="idle">
                         <LabelBlock>
                             <SimpleIdentifier Name="repair1"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="61" X="116"/>
+                            <Point X="116" Y="61"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="20" X="0"/>
+                                <Point X="0" Y="20"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -140,25 +140,25 @@
                     <SimpleNode Name="down"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="working" Source="idle">
+                    <Edge Source="idle" Target="working">
                         <LabelBlock>
                             <SimpleIdentifier Name="start2"/>
                         </LabelBlock>
                         <GuardActionBlock/>
                     </Edge>
-                    <Edge Target="idle" Source="working">
+                    <Edge Source="working" Target="idle">
                         <LabelBlock>
                             <SimpleIdentifier Name="finish2"/>
                         </LabelBlock>
                         <GuardActionBlock/>
                     </Edge>
-                    <Edge Target="down" Source="working">
+                    <Edge Source="working" Target="down">
                         <LabelBlock>
                             <SimpleIdentifier Name="break2"/>
                         </LabelBlock>
                         <GuardActionBlock/>
                     </Edge>
-                    <Edge Target="idle" Source="down">
+                    <Edge Source="down" Target="idle">
                         <LabelBlock>
                             <SimpleIdentifier Name="repair2"/>
                         </LabelBlock>
@@ -175,43 +175,43 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="103" X="95"/>
+                            <Point X="95" Y="103"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="full">
                         <PointGeometry>
-                            <Point Y="171" X="156"/>
+                            <Point X="156" Y="171"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="full" Source="empty">
+                    <Edge Source="empty" Target="full">
                         <LabelBlock>
                             <SimpleIdentifier Name="finish1"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="144" X="117"/>
+                            <Point X="117" Y="144"/>
                         </SplineGeometry>
                         <GuardActionBlock/>
                     </Edge>
-                    <Edge Target="empty" Source="full">
+                    <Edge Source="full" Target="empty">
                         <LabelBlock>
                             <SimpleIdentifier Name="start2"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="130" X="134"/>
+                            <Point X="134" Y="130"/>
                         </SplineGeometry>
                         <GuardActionBlock/>
                     </Edge>
@@ -226,67 +226,67 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="114" X="82"/>
+                            <Point X="82" Y="114"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="m2down">
                         <PointGeometry>
-                            <Point Y="193" X="128"/>
+                            <Point X="128" Y="193"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="5"/>
+                            <Point X="5" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="m2ok" Source="m2ok">
+                    <Edge Source="m2ok" Target="m2ok">
                         <LabelBlock>
                             <SimpleIdentifier Name="repair1"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="69" X="56"/>
+                            <Point X="56" Y="69"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="20" X="0"/>
+                                <Point X="0" Y="20"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="m2down" Source="m2ok">
+                    <Edge Source="m2ok" Target="m2down">
                         <LabelBlock>
                             <SimpleIdentifier Name="break2"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="149" X="115"/>
+                            <Point X="115" Y="149"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="20" X="0"/>
+                                <Point X="0" Y="20"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="m2ok" Source="m2down">
+                    <Edge Source="m2down" Target="m2ok">
                         <LabelBlock>
                             <SimpleIdentifier Name="repair2"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="10" X="0"/>
+                                <Point X="0" Y="10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="160" X="95"/>
+                            <Point X="95" Y="160"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="20" X="0"/>
+                                <Point X="0" Y="20"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
