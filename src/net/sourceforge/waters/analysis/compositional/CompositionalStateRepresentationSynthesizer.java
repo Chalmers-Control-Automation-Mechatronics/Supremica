@@ -360,7 +360,7 @@ public class CompositionalStateRepresentationSynthesizer extends
         final TRPartition combinedPartition =
           TRPartition.combine(partition, reencoding);
         final SynthesisStateSpace.SynthesisStateMap map =
-          mSynthesisStateSpace.createPartitionMap(combinedPartition, parent);
+          parent.compose(combinedPartition);
         mStateRepresentationMap.put(result, map);
       }
       return;
@@ -434,7 +434,7 @@ public class CompositionalStateRepresentationSynthesizer extends
         mStateRepresentationMap.put(result, parent);
       } else {
         final SynthesisStateSpace.SynthesisStateMap map =
-          mSynthesisStateSpace.createPartitionMap(reencoding, parent);
+          parent.compose(reencoding);
         mStateRepresentationMap.put(result, map);
       }
     }
@@ -529,7 +529,6 @@ public class CompositionalStateRepresentationSynthesizer extends
     (final AutomatonProxy aut, final EventEncoding eventEnc)
     throws AnalysisException
   {
-
     final SynthesisStateSpace.SynthesisStateMap parent =
       mStateRepresentationMap.get(aut);
     final ListBufferTransitionRelation rel =
@@ -554,7 +553,7 @@ public class CompositionalStateRepresentationSynthesizer extends
       return false;
     } else {
       final SynthesisStateSpace.SynthesisStateMap map =
-        mSynthesisStateSpace.createPartitionMap(partition, parent);
+        parent.compose(partition);
       mSynthesisStateSpace.addStateMap(map);
       return true;
     }

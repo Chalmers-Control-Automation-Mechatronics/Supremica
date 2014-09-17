@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.analysis.tr;
 
+import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
 
@@ -26,6 +27,7 @@ public class ArraySynchronisationEncoding extends
   //# Constructor
   public ArraySynchronisationEncoding(final int[] sizes, final int numStates)
   {
+    super(sizes, numStates);
     mWordIndex = new int[sizes.length];
     mShiftAmount = new int[sizes.length];
     mMask = new int[sizes.length];
@@ -49,7 +51,7 @@ public class ArraySynchronisationEncoding extends
     }
     mNumberOfWords = occupied.size();
     final IntArrayHashingStrategy strategy = new IntArrayHashingStrategy();
-    mMap = new TObjectIntCustomHashMap<int[]>(strategy);
+    mMap = new TObjectIntCustomHashMap<int[]>(strategy, numStates, 0.5f, -1);
   }
 
   //#######################################################################
@@ -71,11 +73,29 @@ public class ArraySynchronisationEncoding extends
   }
 
   @Override
-  public int getMemoryEstimate()
+  public int getMapSize()
   {
-    return (mNumberOfWords+1)*4*mMap.size();
+    return mMap.size();
   }
 
+  @Override
+  public boolean compose(final TRPartition partition)
+  {
+    boolean containsBadState = false;
+    final TObjectIntIterator<int[]> iter = mMap.iterator();
+    while (iter.hasNext()) {
+      iter.advance();
+      final int value = iter.value();
+      final int clazz = partition.getClassCode(value);
+      if (clazz < 0) {
+        iter.remove();
+        containsBadState = true;
+      } else {
+        iter.setValue(clazz);
+      }
+    }
+    return containsBadState;
+  }
 
   //#######################################################################
   //# Specific methods
@@ -107,5 +127,6 @@ public class ArraySynchronisationEncoding extends
   private final int[] mMask;
   private final int mNumberOfWords;
   private final TObjectIntCustomHashMap<int[]> mMap;
+
 
 }

@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.analysis.tr;
 
+import gnu.trove.iterator.TLongIntIterator;
 import gnu.trove.map.hash.TLongIntHashMap;
 
 import net.sourceforge.waters.model.des.AutomatonTools;
@@ -24,6 +25,7 @@ public class LongSynchronisationEncoding
   //# Constructor
   public LongSynchronisationEncoding(final int[] sizes, final int numStates)
   {
+    super(sizes, numStates);
     mShiftAmount = new int[sizes.length+1];
     mMask = new int[sizes.length];
     int shift = 0;
@@ -55,10 +57,30 @@ public class LongSynchronisationEncoding
   }
 
   @Override
-  public int getMemoryEstimate()
+  public int getMapSize()
   {
-    return mMap.size()*12;
+    return mMap.size();
   }
+
+  @Override
+  public boolean compose(final TRPartition partition)
+  {
+    boolean containsBadState = false;
+    final TLongIntIterator iter = mMap.iterator();
+    while (iter.hasNext()) {
+      iter.advance();
+      final int value = iter.value();
+      final int clazz = partition.getClassCode(value);
+      if (clazz < 0) {
+        iter.remove();
+        containsBadState = true;
+      } else {
+        iter.setValue(clazz);
+      }
+    }
+    return containsBadState;
+  }
+
 
   //#######################################################################
   //# Specific methods

@@ -190,6 +190,30 @@ public class TRPartition
     return count;
   }
 
+  /**
+   * Returns whether this partition merges at least two states
+   * into a proper state (not undefined) in the output.
+   */
+  public boolean containsMergedStates()
+  {
+    if (mClasses != null) {
+      for (final int[] clazz : mClasses) {
+        if (clazz != null && clazz.length >= 2) {
+          return true;
+        }
+      }
+      return false;
+    } else {
+      int count = 0;
+      for (int s = 0; s < mNumberOfStates; s++) {
+        if (mStateToClass[s] >= 0) {
+          count++;
+        }
+      }
+      return count > mNumberOfClasses;
+    }
+  }
+
 
   //#########################################################################
   //# Static Methods

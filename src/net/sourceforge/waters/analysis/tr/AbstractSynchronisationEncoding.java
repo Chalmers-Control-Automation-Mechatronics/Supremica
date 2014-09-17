@@ -23,7 +23,7 @@ public abstract class AbstractSynchronisationEncoding
   public static AbstractSynchronisationEncoding createEncoding
     (final int[] sizes, final int numStates)
   {
-    int size = 0;
+     int size = 0;
     for(int i=0; i< sizes.length; i++) {
       size += AutomatonTools.log2(sizes[i]);
     }
@@ -38,11 +38,31 @@ public abstract class AbstractSynchronisationEncoding
 
 
   //#######################################################################
+  //# Constructor
+  AbstractSynchronisationEncoding(final int[] sizes, final int numStates)
+  {
+    mNumberOfAutomata = sizes.length;
+  }
+
+
+  //#######################################################################
   //# Access
   public abstract int getStateCode(int[] tuple);
 
   public abstract void addState(int[] tuple, int code);
 
-  public abstract int getMemoryEstimate();
+  public abstract int getMapSize();
+
+  public int getMemoryEstimate()
+  {
+    return mNumberOfAutomata*getMapSize();
+  }
+
+  public abstract boolean compose(TRPartition partition);
+
+
+  //#######################################################################
+  //# Data members
+  private final int mNumberOfAutomata;
 
 }

@@ -86,20 +86,6 @@ public class SynthesisStateSpace implements AutomatonProxy
     return new StateEncodingMap(automaton, encoding);
   }
 
-  public SynthesisStateMap createPartitionMap
-  (final TRPartition partition, final SynthesisStateMap parent)
-  {
-    if (parent instanceof PartitionMap) {
-      final PartitionMap parentDown = (PartitionMap)parent;
-      final TRPartition parentPartition = parentDown.getPartition();
-      final TRPartition newPartition = TRPartition.combine(parentPartition, partition);
-      final SynthesisStateMap grandParent = parentDown.getParent();
-      return new PartitionMap(newPartition, grandParent);
-    } else {
-      return new PartitionMap(partition, parent);
-    }
-  }
-
   public SynthesisStateMap createSynchronisationMap
                             (final AbstractSynchronisationEncoding encoding,
                              final List<SynthesisStateMap> parents)
@@ -276,6 +262,13 @@ public class SynthesisStateSpace implements AutomatonProxy
     abstract int getMemoryEstimate();
 
     abstract boolean containsBadState();
+
+    abstract boolean containsMergedStates();
+
+    SynthesisStateMap compose(final TRPartition partition)
+    {
+      return new PartitionMap(partition, this);
+    }
   }
 
 
@@ -291,6 +284,7 @@ public class SynthesisStateSpace implements AutomatonProxy
       mAutomaton = automaton;
       mStateEncoding = encoding;
     }
+
     //#######################################################################
     //# Override for SynthesisStateSpace
     @Override
@@ -309,13 +303,13 @@ public class SynthesisStateSpace implements AutomatonProxy
     @Override
     int getNumberOfMaps()
     {
-      return 1;
+      return 0;
     }
 
     @Override
     int getMemoryEstimate()
     {
-      return mStateEncoding.getNumberOfStates()*4;
+      return 0;
     }
 
     @Override
@@ -324,10 +318,17 @@ public class SynthesisStateSpace implements AutomatonProxy
       return false;
     }
 
+    @Override
+    boolean containsMergedStates()
+    {
+      return false;
+    }
+
     //#######################################################################
     //# Data Members
     private final AutomatonProxy mAutomaton;
     private final StateEncoding mStateEncoding;
+
   }
 
 
@@ -340,20 +341,10 @@ public class SynthesisStateSpace implements AutomatonProxy
     private PartitionMap(final TRPartition partition,
                          final SynthesisStateMap parent)
     {
+      mContainsMergedStates = partition.containsMergedStates();
       mStateToClass = partition.getStateToClass();
       mParent = parent;
       mNumberOfClasses = partition.getNumberOfClasses();
-    }
-    //#######################################################################
-    //# Simple access
-    TRPartition getPartition()
-    {
-      return new TRPartition(mStateToClass, mNumberOfClasses);
-    }
-
-    SynthesisStateMap getParent()
-    {
-      return mParent;
     }
 
     //#######################################################################
@@ -380,7 +371,7 @@ public class SynthesisStateSpace implements AutomatonProxy
     @Override
     int getMemoryEstimate()
     {
-      return mStateToClass.length*4 + mParent.getMemoryEstimate();
+      return mStateToClass.length + mParent.getMemoryEstimate();
     }
 
     @Override
@@ -394,11 +385,33 @@ public class SynthesisStateSpace implements AutomatonProxy
       return false;
     }
 
+    @Override
+    boolean containsMergedStates()
+    {
+      return mContainsMergedStates;
+    }
+
+    @Override
+    SynthesisStateMap compose(final TRPartition partition)
+    {
+      final TRPartition parentPartition =
+        new TRPartition(mStateToClass, mNumberOfClasses);
+      final TRPartition newPartition =
+        TRPartition.combine(parentPartition, partition);
+      mStateToClass = newPartition.getStateToClass();
+      mNumberOfClasses = newPartition.getNumberOfClasses();
+      mContainsMergedStates |= newPartition.containsMergedStates();
+      return this;
+    }
+
+
     //#######################################################################
     //# Data Members
-    private final int[] mStateToClass;
     private final SynthesisStateMap mParent;
-    private final int mNumberOfClasses;
+    private int[] mStateToClass;
+    private int mNumberOfClasses;
+    private boolean mContainsMergedStates;
+
   }
 
 
@@ -459,13 +472,30 @@ public class SynthesisStateSpace implements AutomatonProxy
     @Override
     boolean containsBadState()
     {
-      return false;
+      return mContainsBadState;
+    }
+
+    @Override
+    boolean containsMergedStates()
+    {
+      return mContainsMergedStates;
+    }
+
+    @Override
+    SynthesisStateMap compose(final TRPartition partition)
+    {
+      mContainsBadState |= mSynchronisationEncoding.compose(partition);
+      mContainsMergedStates |= partition.containsMergedStates();
+      return this;
     }
 
     //#######################################################################
     //# Data Members
     private final AbstractSynchronisationEncoding mSynchronisationEncoding;
     private final List<SynthesisStateMap> mParents;
+    private boolean mContainsBadState = false;
+    private boolean mContainsMergedStates = false;
+
   }
 
 
