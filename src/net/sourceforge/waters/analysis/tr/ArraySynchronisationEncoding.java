@@ -13,6 +13,9 @@ import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
 
+import java.util.Arrays;
+import java.util.List;
+
 import net.sourceforge.waters.model.des.AutomatonTools;
 
 
@@ -79,6 +82,23 @@ public class ArraySynchronisationEncoding extends
   }
 
   @Override
+  public List<int[]> getInverseMap()
+  {
+    final int numOfAutomata = getNumberOfAutomata();
+    final TObjectIntIterator<int[]> iter = mMap.iterator();
+    final int[][] inverseMap = new int[getNumberOfStates()][];
+    while (iter.hasNext()) {
+      iter.advance();
+      final int value = iter.value();
+      final int[] key = iter.key();
+      final int[] array = new int[numOfAutomata];
+      decode(key, array);
+      inverseMap[value] = array;
+    }
+     return Arrays.asList(inverseMap);
+  }
+
+  @Override
   public boolean compose(final TRPartition partition)
   {
     boolean containsBadState = false;
@@ -95,6 +115,12 @@ public class ArraySynchronisationEncoding extends
       }
     }
     return containsBadState;
+  }
+
+  @Override
+  public TObjectIntIterator<int[]> iterator()
+  {
+    return new ArraySynchronisationIterator();
   }
 
   //#######################################################################
@@ -119,6 +145,74 @@ public class ArraySynchronisationEncoding extends
       tuple[i] = ((encoded[position] >>> mShiftAmount[i]) & mMask[i]);
     }
   }
+
+  //#######################################################################
+  //# Auxiliary methods
+  private int getNumberOfStates()
+  {
+    final TObjectIntIterator<int[]> iter = mMap.iterator();
+    int max = 0;
+    while (iter.hasNext()) {
+      iter.advance();
+      final int value = iter.value();
+      if (value > max) {
+        max = value;
+      }
+    }
+    return max + 1;
+  }
+  //#######################################################################
+  //# Inner Class ArraySynchronisationIterator
+  private class ArraySynchronisationIterator implements TObjectIntIterator<int[]>
+  {
+
+    private ArraySynchronisationIterator()
+    {
+      mInnerIterator = mMap.iterator();
+    }
+
+    @Override
+    public void advance()
+    {
+      mInnerIterator.advance();
+    }
+
+    @Override
+    public boolean hasNext()
+    {
+      return mInnerIterator.hasNext();
+    }
+
+    @Override
+    public void remove()
+    {
+      mInnerIterator.remove();
+    }
+
+    @Override
+    public int[] key()
+    {
+      final int[] key = mInnerIterator.key();
+      final int[] keys = new int[getNumberOfAutomata()];
+      decode(key, keys);
+      return keys;
+    }
+
+    @Override
+    public int setValue(final int arg0)
+    {
+      return mInnerIterator.setValue(arg0);
+    }
+
+    @Override
+    public int value()
+    {
+      return mInnerIterator.value();
+    }
+
+    private final TObjectIntIterator<int[]> mInnerIterator;
+  }
+
 
   //#######################################################################
   //# Data Members

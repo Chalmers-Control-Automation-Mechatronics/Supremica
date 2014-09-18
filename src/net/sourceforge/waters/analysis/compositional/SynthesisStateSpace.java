@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
+import gnu.trove.iterator.TObjectIntIterator;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -90,8 +92,72 @@ public class SynthesisStateSpace implements AutomatonProxy
                             (final AbstractSynchronisationEncoding encoding,
                              final List<SynthesisStateMap> parents)
   {
-    return new SynchronisationMap(encoding, parents);
+    boolean merging = false;
+    for (final SynthesisStateMap parent : parents) {
+      if (parent.isMergibleParent()) {
+        merging = true;
+        break;
+      }
+    }
+    if (!merging) {
+      return new SynchronisationMap(encoding, parents);
+    }
+    int numParents = 0;
+    for (final SynthesisStateMap parent : parents) {
+      if (parent.isMergibleParent()) {
+        numParents += parent.getParents().size();
+      } else {
+        numParents++;
+      }
+    }
+    boolean containsBadState = false;
+    int i = 0;
+    final List<SynthesisStateMap> newParents = new ArrayList<>(numParents);
+    final int[] sizes = new int[numParents];
+    final List<List<int[]>> inverseMaps = new ArrayList<List<int[]>>();
+    for (final SynthesisStateMap parent : parents) {
+      if (parent.isMergibleParent()) {
+        containsBadState |= parent.containsBadState();
+        newParents.addAll(parent.getParents());
+        for (final SynthesisStateMap grandparent :parent.getParents()) {
+          sizes[i++] = grandparent.getNumberOfMergedStates();
+        }
+        inverseMaps.add(parent.getInverseMap());
+      } else {
+        newParents.add(parent);
+        sizes[i++] = parent.getNumberOfMergedStates();
+        inverseMaps.add(null);
+      }
+    }
+    final AbstractSynchronisationEncoding newEncoding =
+      AbstractSynchronisationEncoding.createEncoding(sizes,
+                                                     encoding.getMapSize());
+    final TObjectIntIterator<int[]> iter = encoding.iterator();
+    tuple: while (iter.hasNext()) {
+      iter.advance();
+      final int[] oldTuple = iter.key();
+      final int value = iter.value();
+      final int[] newTuple = new int[numParents];
+      i = 0;
+      for (int j = 0; j < oldTuple.length; j++) {
+        final List<int[]> inverseMap = inverseMaps.get(j);
+        if (inverseMap == null) {
+          newTuple[i++] = oldTuple[j];
+        } else {
+          final int[] inverse = inverseMap.get(oldTuple[j]);
+          if (inverse == null) {
+            continue tuple;
+          }
+          for (int k=0; k< inverse.length; k++) {
+            newTuple[i++] = inverse[k];
+          }
+        }
+      }
+      newEncoding.addState(newTuple, value);
+    }
+    return new SynchronisationMap(newEncoding, newParents, containsBadState);
   }
+
 
 
   //#########################################################################
@@ -263,7 +329,11 @@ public class SynthesisStateSpace implements AutomatonProxy
 
     abstract boolean containsBadState();
 
-    abstract boolean containsMergedStates();
+    abstract boolean isMergibleParent();
+
+    abstract int getNumberOfMergedStates();
+
+    abstract List<int[]> getInverseMap();
 
     SynthesisStateMap compose(final TRPartition partition)
     {
@@ -319,15 +389,35 @@ public class SynthesisStateSpace implements AutomatonProxy
     }
 
     @Override
-    boolean containsMergedStates()
+    boolean isMergibleParent()
     {
       return false;
+    }
+
+    @Override
+    int getNumberOfMergedStates()
+    {
+       return mStateEncoding.getNumberOfStates();
+    }
+
+    @Override
+    List<int[]> getInverseMap()
+    {
+      final int numStates = mStateEncoding.getNumberOfStates();
+      final List<int[]> list = new ArrayList<>();
+      for (int i = 0; i < numStates; i++) {
+        final int[] array = new int[1];
+        array[0] = i;
+        list.add(array);
+      }
+      return list;
     }
 
     //#######################################################################
     //# Data Members
     private final AutomatonProxy mAutomaton;
     private final StateEncoding mStateEncoding;
+
 
   }
 
@@ -386,9 +476,23 @@ public class SynthesisStateSpace implements AutomatonProxy
     }
 
     @Override
-    boolean containsMergedStates()
+    boolean isMergibleParent()
     {
-      return mContainsMergedStates;
+      return !mContainsMergedStates;
+    }
+
+    @Override
+    int getNumberOfMergedStates()
+    {
+      return mNumberOfClasses;
+    }
+
+    @Override
+    List<int[]> getInverseMap()
+    {
+      final TRPartition partition =
+        new TRPartition(mStateToClass, mNumberOfClasses);
+      return partition.getClasses();
     }
 
     @Override
@@ -411,7 +515,6 @@ public class SynthesisStateSpace implements AutomatonProxy
     private int[] mStateToClass;
     private int mNumberOfClasses;
     private boolean mContainsMergedStates;
-
   }
 
 
@@ -424,9 +527,18 @@ public class SynthesisStateSpace implements AutomatonProxy
     private SynchronisationMap(final AbstractSynchronisationEncoding encoding,
                                final List<SynthesisStateMap> parents)
     {
+      this(encoding,parents,false);
+    }
+
+    private SynchronisationMap(final AbstractSynchronisationEncoding encoding,
+                               final List<SynthesisStateMap> parents,
+                               final boolean containsBadState)
+    {
       mSynchronisationEncoding = encoding;
       mParents = parents;
+      mContainsBadState = containsBadState;
     }
+
 
     //#######################################################################
     //# Override for SynthesisStateSpace
@@ -476,9 +588,21 @@ public class SynthesisStateSpace implements AutomatonProxy
     }
 
     @Override
-    boolean containsMergedStates()
+    boolean isMergibleParent()
     {
-      return mContainsMergedStates;
+      return !mContainsMergedStates;
+    }
+
+    @Override
+    int getNumberOfMergedStates()
+    {
+      return mSynchronisationEncoding.getMapSize();
+    }
+
+    @Override
+    List<int[]> getInverseMap()
+    {
+      return mSynchronisationEncoding.getInverseMap();
     }
 
     @Override
@@ -493,8 +617,9 @@ public class SynthesisStateSpace implements AutomatonProxy
     //# Data Members
     private final AbstractSynchronisationEncoding mSynchronisationEncoding;
     private final List<SynthesisStateMap> mParents;
-    private boolean mContainsBadState = false;
+    private boolean mContainsBadState;
     private boolean mContainsMergedStates = false;
+
 
   }
 

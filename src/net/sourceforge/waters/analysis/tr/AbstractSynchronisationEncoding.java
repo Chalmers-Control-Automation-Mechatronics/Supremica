@@ -9,6 +9,10 @@
 
 package net.sourceforge.waters.analysis.tr;
 
+import gnu.trove.iterator.TObjectIntIterator;
+
+import java.util.List;
+
 import net.sourceforge.waters.model.des.AutomatonTools;
 
 
@@ -44,6 +48,10 @@ public abstract class AbstractSynchronisationEncoding
     mNumberOfAutomata = sizes.length;
   }
 
+  int getNumberOfAutomata()
+  {
+    return mNumberOfAutomata;
+  }
 
   //#######################################################################
   //# Access
@@ -53,12 +61,16 @@ public abstract class AbstractSynchronisationEncoding
 
   public abstract int getMapSize();
 
+  public abstract List<int[]> getInverseMap();
+
+  public abstract TObjectIntIterator<int[]> iterator();
+
+  public abstract boolean compose(TRPartition partition);
+
   public int getMemoryEstimate()
   {
     return mNumberOfAutomata*getMapSize();
   }
-
-  public abstract boolean compose(TRPartition partition);
 
 
   //#######################################################################
