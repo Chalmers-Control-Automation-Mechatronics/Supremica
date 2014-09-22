@@ -317,10 +317,13 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
       double barStartX = groupStartX + OFFSET_IN_GROUP;
       final String name = entry.getKey();
       final ModelInfo info = entry.getValue();
-      for (int mapIndex = 0; mapIndex <mResults.size(); mapIndex++) {
+      for (int mapIndex = 0; mapIndex < mResults.size(); mapIndex++) {
         final Map<String, Result> map = mResults.get(mapIndex);
         final Result result = map.get(name);
-        if (result != null) {
+        if (result == null) {
+          final double x = barStartX + 0.5 * BAR_WIDTH;
+          writer.format("\\rput[l]{90}(%.2f,7){\\tiny Out of memory}", x);
+        } else {
           final int totTrans = result.getTotalTransition();
           final double barHeight = (double)totTrans/ maxTransition * BAR_HEIGHT;
           final double x1 = barStartX;
@@ -328,8 +331,8 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
           final double y1 = 0;
           final double y2 = barHeight;
           final String colour = BAR_COLOUR[mapIndex];
-          writer.format("\\pspolygon[%s](%.2f,%.2f)"
-            + "(%.2f,%.2f)(%.2f,%.2f)(%.2f,%.2f)",colour,x1,y1,x1,y2,x2,y2,x2,y1 );
+          writer.format("\\pspolygon[%s](%.2f,%.2f)(%.2f,%.2f)(%.2f,%.2f)(%.2f,%.2f)",
+                        colour, x1, y1, x1, y2, x2, y2, x2, y1);
         }
         barStartX = barStartX + BAR_WIDTH;
 
