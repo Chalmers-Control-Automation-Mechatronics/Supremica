@@ -9,7 +9,12 @@
 
 package net.sourceforge.waters.analysis.tr;
 
+import gnu.trove.iterator.TLongIntIterator;
+import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.hash.TLongIntHashMap;
+
+import java.util.Arrays;
+import java.util.List;
 
 import net.sourceforge.waters.model.des.AutomatonTools;
 
@@ -24,6 +29,7 @@ public class LongSynchronisationEncoding
   //# Constructor
   public LongSynchronisationEncoding(final int[] sizes, final int numStates)
   {
+    super(sizes, numStates);
     mShiftAmount = new int[sizes.length+1];
     mMask = new int[sizes.length];
     int shift = 0;
@@ -55,9 +61,51 @@ public class LongSynchronisationEncoding
   }
 
   @Override
-  public int getMemoryEstimate()
+  public int getMapSize()
   {
-    return mMap.size()*12;
+    return mMap.size();
+  }
+
+  @Override
+  public List<int[]> getInverseMap()
+  {
+    final int numOfAutomata = getNumberOfAutomata();
+    final TLongIntIterator iter = mMap.iterator();
+    final int[][] inverseMap = new int[getNumberOfStates()][];
+    while (iter.hasNext()) {
+      iter.advance();
+      final int value = iter.value();
+      final long key = iter.key();
+      final int[] array = new int[numOfAutomata];
+      decode(key, array);
+      inverseMap[value] = array;
+    }
+     return Arrays.asList(inverseMap);
+  }
+
+  @Override
+  public boolean compose(final TRPartition partition)
+  {
+    boolean containsBadState = false;
+    final TLongIntIterator iter = mMap.iterator();
+    while (iter.hasNext()) {
+      iter.advance();
+      final int value = iter.value();
+      final int clazz = partition.getClassCode(value);
+      if (clazz < 0) {
+        iter.remove();
+        containsBadState = true;
+      } else {
+        iter.setValue(clazz);
+      }
+    }
+    return containsBadState;
+  }
+
+  @Override
+  public TObjectIntIterator<int[]> iterator()
+  {
+    return new LongSynchronisationIterator();
   }
 
   //#######################################################################
@@ -77,6 +125,75 @@ public class LongSynchronisationEncoding
       tuple[i] = (int) ((code >>> mShiftAmount[i]) & mMask[i]);
     }
   }
+
+  //#######################################################################
+  //# Auxiliary methods
+  private int getNumberOfStates()
+  {
+    final TLongIntIterator iter = mMap.iterator();
+    int max = 0;
+    while (iter.hasNext()) {
+      iter.advance();
+      final int value = iter.value();
+      if (value > max) {
+        max = value;
+      }
+    }
+    return max + 1;
+  }
+
+  //#######################################################################
+  //# Inner Class LongSynchronisationIterator
+  private class LongSynchronisationIterator implements TObjectIntIterator<int[]>
+  {
+
+    private LongSynchronisationIterator()
+    {
+      mInnerIterator = mMap.iterator();
+    }
+
+    @Override
+    public void advance()
+    {
+      mInnerIterator.advance();
+    }
+
+    @Override
+    public boolean hasNext()
+    {
+      return mInnerIterator.hasNext();
+    }
+
+    @Override
+    public void remove()
+    {
+      mInnerIterator.remove();
+    }
+
+    @Override
+    public int[] key()
+    {
+      final long key = mInnerIterator.key();
+      final int[] keys = new int[getNumberOfAutomata()];
+      decode(key, keys);
+      return keys;
+    }
+
+    @Override
+    public int setValue(final int arg0)
+    {
+      return mInnerIterator.setValue(arg0);
+    }
+
+    @Override
+    public int value()
+    {
+      return mInnerIterator.value();
+    }
+
+    private final TLongIntIterator mInnerIterator;
+  }
+
 
 
   //#######################################################################

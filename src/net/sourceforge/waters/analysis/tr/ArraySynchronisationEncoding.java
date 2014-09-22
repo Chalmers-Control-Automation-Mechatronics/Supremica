@@ -9,8 +9,12 @@
 
 package net.sourceforge.waters.analysis.tr;
 
+import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
+
+import java.util.Arrays;
+import java.util.List;
 
 import net.sourceforge.waters.model.des.AutomatonTools;
 
@@ -26,6 +30,7 @@ public class ArraySynchronisationEncoding extends
   //# Constructor
   public ArraySynchronisationEncoding(final int[] sizes, final int numStates)
   {
+    super(sizes, numStates);
     mWordIndex = new int[sizes.length];
     mShiftAmount = new int[sizes.length];
     mMask = new int[sizes.length];
@@ -49,7 +54,7 @@ public class ArraySynchronisationEncoding extends
     }
     mNumberOfWords = occupied.size();
     final IntArrayHashingStrategy strategy = new IntArrayHashingStrategy();
-    mMap = new TObjectIntCustomHashMap<int[]>(strategy);
+    mMap = new TObjectIntCustomHashMap<int[]>(strategy, numStates, 0.5f, -1);
   }
 
   //#######################################################################
@@ -71,11 +76,52 @@ public class ArraySynchronisationEncoding extends
   }
 
   @Override
-  public int getMemoryEstimate()
+  public int getMapSize()
   {
-    return (mNumberOfWords+1)*4*mMap.size();
+    return mMap.size();
   }
 
+  @Override
+  public List<int[]> getInverseMap()
+  {
+    final int numOfAutomata = getNumberOfAutomata();
+    final TObjectIntIterator<int[]> iter = mMap.iterator();
+    final int[][] inverseMap = new int[getNumberOfStates()][];
+    while (iter.hasNext()) {
+      iter.advance();
+      final int value = iter.value();
+      final int[] key = iter.key();
+      final int[] array = new int[numOfAutomata];
+      decode(key, array);
+      inverseMap[value] = array;
+    }
+     return Arrays.asList(inverseMap);
+  }
+
+  @Override
+  public boolean compose(final TRPartition partition)
+  {
+    boolean containsBadState = false;
+    final TObjectIntIterator<int[]> iter = mMap.iterator();
+    while (iter.hasNext()) {
+      iter.advance();
+      final int value = iter.value();
+      final int clazz = partition.getClassCode(value);
+      if (clazz < 0) {
+        iter.remove();
+        containsBadState = true;
+      } else {
+        iter.setValue(clazz);
+      }
+    }
+    return containsBadState;
+  }
+
+  @Override
+  public TObjectIntIterator<int[]> iterator()
+  {
+    return new ArraySynchronisationIterator();
+  }
 
   //#######################################################################
   //# Specific methods
@@ -101,11 +147,80 @@ public class ArraySynchronisationEncoding extends
   }
 
   //#######################################################################
+  //# Auxiliary methods
+  private int getNumberOfStates()
+  {
+    final TObjectIntIterator<int[]> iter = mMap.iterator();
+    int max = 0;
+    while (iter.hasNext()) {
+      iter.advance();
+      final int value = iter.value();
+      if (value > max) {
+        max = value;
+      }
+    }
+    return max + 1;
+  }
+  //#######################################################################
+  //# Inner Class ArraySynchronisationIterator
+  private class ArraySynchronisationIterator implements TObjectIntIterator<int[]>
+  {
+
+    private ArraySynchronisationIterator()
+    {
+      mInnerIterator = mMap.iterator();
+    }
+
+    @Override
+    public void advance()
+    {
+      mInnerIterator.advance();
+    }
+
+    @Override
+    public boolean hasNext()
+    {
+      return mInnerIterator.hasNext();
+    }
+
+    @Override
+    public void remove()
+    {
+      mInnerIterator.remove();
+    }
+
+    @Override
+    public int[] key()
+    {
+      final int[] key = mInnerIterator.key();
+      final int[] keys = new int[getNumberOfAutomata()];
+      decode(key, keys);
+      return keys;
+    }
+
+    @Override
+    public int setValue(final int arg0)
+    {
+      return mInnerIterator.setValue(arg0);
+    }
+
+    @Override
+    public int value()
+    {
+      return mInnerIterator.value();
+    }
+
+    private final TObjectIntIterator<int[]> mInnerIterator;
+  }
+
+
+  //#######################################################################
   //# Data Members
   private final int[] mWordIndex;
   private final int[] mShiftAmount;
   private final int[] mMask;
   private final int mNumberOfWords;
   private final TObjectIntCustomHashMap<int[]> mMap;
+
 
 }

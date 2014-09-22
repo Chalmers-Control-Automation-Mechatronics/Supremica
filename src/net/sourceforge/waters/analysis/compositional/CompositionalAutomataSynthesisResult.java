@@ -348,7 +348,7 @@ public class CompositionalAutomataSynthesisResult
 
   private static int getMemoryEstimate(final int states, final int transitions)
   {
-    return 4*states + 8*transitions;
+    return states + 2*transitions;
   }
 
 
