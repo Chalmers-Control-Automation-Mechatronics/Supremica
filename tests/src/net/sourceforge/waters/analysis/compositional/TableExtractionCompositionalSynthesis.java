@@ -119,7 +119,7 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
       final AbstractCompositionalModelAnalyzer.PreselectingMethod
         comparePreselectingMethod = AbstractCompositionalModelAnalyzer.MustL;
       final SelectionHeuristicCreator
-        compareSelectingMethod = CompositionalSelectionHeuristicFactory.MinF;
+        compareSelectingMethod = CompositionalSelectionHeuristicFactory.MaxC;
       int compareIndex = 0;
       int methodCount = 0;
       for (final AbstractCompositionalModelAnalyzer.PreselectingMethod
@@ -297,7 +297,7 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
     final OutputStream stream = new FileOutputStream(outputFile);
     final PrintWriter writer = new PrintWriter(stream);
     writer.println("\\psset{linewidth=.4pt}\\psset{unit=.1mm}\\newgray{lightgray}{0.9}");
-    writer.println("\\begin{pspicture}(-75,-200)(730,330)");
+    writer.println("\\begin{pspicture}(-75,-200)(766,330)");
     int maxTransition = 0;
     for (final Map.Entry<String,ModelInfo> entry : mModelInfoMap.entrySet()) {
       final String name = entry.getKey();
@@ -321,8 +321,9 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
         final Map<String, Result> map = mResults.get(mapIndex);
         final Result result = map.get(name);
         if (result == null) {
-          final double x = barStartX + 0.5 * BAR_WIDTH;
-          writer.format("\\rput[l]{90}(%.2f,7){\\tiny Out of memory}", x);
+          final double x = groupStartX + OFFSET_IN_GROUP + BAR_WIDTH;
+          final String pos = mapIndex == 0 ? "lb" : "rb";
+          writer.format("\\rput[%s]{90}(%.2f,7){\\tiny Out of memory}", pos, x);
         } else {
           final int totTrans = result.getTotalTransition();
           final double barHeight = (double)totTrans/ maxTransition * BAR_HEIGHT;
@@ -349,9 +350,9 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
       final double label = tr/1e6;
       writer.format("\\rput[r]{0}(-7,%.2f){\\scriptsize %.1f}", y, label);
     }
-    writer.println("\\psline[linewidth=.8pt](-10,0)(730,0)");
+    writer.println("\\psline[linewidth=.1pt](-10,0)(766,0)");
     writer.format("\\psline[arrows=->,arrowsize=15,arrowlength=2,"
-      + "arrowinset=0.3,linewidth=.8pt](0,0)(0,%d)",BAR_HEIGHT+30);
+      + "arrowinset=0.3,linewidth=.1pt](0,0)(0,%d)",BAR_HEIGHT+30);
     writer.format("\\rput[tr]{0}(-7,%d){\\scriptsize $\\times 10^6$}",BAR_HEIGHT+30);
     writer.println("\\end{pspicture}");
     writer.close();
@@ -521,8 +522,8 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
     new TreeMap<String, ModelInfo>(new LowerCaseComparator());
   private final List<Map<String,Result>> mResults =
     new ArrayList<Map<String,Result>>(2);
-  private static final int GROUP_WIDTH = 40;
-  private static final int BAR_WIDTH = 15;
+  private static final int GROUP_WIDTH = 42;
+  private static final int BAR_WIDTH = 16;
   private static final double OFFSET_IN_GROUP = 0.5*GROUP_WIDTH - BAR_WIDTH;
   private static final int BAR_HEIGHT = 300;
   private static final String[] BAR_COLOUR = {"fillstyle=solid,fillcolor=lightgray",
