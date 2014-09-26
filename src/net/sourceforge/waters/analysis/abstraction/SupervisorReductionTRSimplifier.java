@@ -190,7 +190,6 @@ public class SupervisorReductionTRSimplifier extends
     mSearchingBitSet = null;
   }
 
-
   //#########################################################################
   //# Methods for Supervisor Reduction
   private TRPartition reduceSupervisor(final TIntArrayList restrictedEventList)
@@ -413,39 +412,37 @@ public class SupervisorReductionTRSimplifier extends
       }
     }
 
-    // reduce
-    for (int i = 0; i < numStates - 1; i++) {
-      if (!rel.isReachable(mStateMap[i])
-          || rel.isDeadlockState(mStateMap[i], marking)
-          || mStateMap[i] > getMinimumExperimental(mStateMap[i])) {
-        continue;
-      }
-      for (int j = i + 1; j < numStates; j++) {
-        if (!rel.isReachable(mStateMap[j])
-            || rel.isDeadlockState(mStateMap[j], marking)
-            || mStateMap[j] > getMinimumExperimental(mStateMap[j])) {
-          continue;
+    for (int sum = 1; sum < 2 * (numStates - 1); sum++) {
+      final int hi = (sum - 1) / 2;
+      final int lo = Math.max(0, sum - numStates + 1);
+      for (int b = hi; b >= lo; b--) {
+        final int a = sum - b;
+        if (rel.isReachable(a) && !rel.isDeadlockState(a, marking)
+            && rel.isReachable(b) && !rel.isDeadlockState(b, marking)) {
+          if (mStateMap[a] > getMinimumExperimental(mStateMap[a])
+              || mStateMap[b] > getMinimumExperimental(mStateMap[b])) {
+            continue;
+          }
+          checkAbort();
+          TLongHashSet statePairs = new TLongHashSet();
+          mShadowClasses = new IntListBuffer();
+          mShadowStateToClass = new int[numStates];
+          for (int s = 0; s < numStates; s++) {
+            mShadowStateToClass[s] = IntListBuffer.NULL;
+          }
+          if (checkMergibilityExperimental(mStateMap[a], mStateMap[b],
+                                           statePairs, restrictedEventList)) {
+            mergeExperimental(statePairs);
+            mMerged = true;
+          }
+          statePairs = null;
+          mShadowClasses = null;
+          mShadowStateToClass = null;
         }
-        checkAbort();
-        TLongHashSet statePairs = new TLongHashSet();
-        mShadowClasses = new IntListBuffer();
-        mShadowStateToClass = new int[numStates];
-        for (int s = 0; s < numStates; s++) {
-          mShadowStateToClass[s] = IntListBuffer.NULL;
-        }
-        if (checkMergibilityExperimental(mStateMap[i], mStateMap[j],
-                                         statePairs, restrictedEventList)) {
-          mergeExperimental(statePairs);
-          mMerged = true;
-        }
-        statePairs = null;
-        mShadowClasses = null;
-        mShadowStateToClass = null;
       }
     }
 
     if (mMerged) {
-      //PrintStateToClassToConsole(restrictedEventList.get(0));
       return createResultPartition();
     } else {
       return null;
@@ -460,8 +457,7 @@ public class SupervisorReductionTRSimplifier extends
   {
     final Deque<Long> pairStack = new ArrayDeque<Long>();
     pairStack.push(constructLong(x0, y0));
-    final long initialPairPositions =
-      constructLong(mInverseMap[x0], mInverseMap[y0]);
+    final long initialPair = constructLong(mInverseMap[x0], mInverseMap[y0]);
 
     while (!pairStack.isEmpty()) {
       checkAbort();
@@ -479,9 +475,9 @@ public class SupervisorReductionTRSimplifier extends
         continue;
       }
 
-      final long minPairPositions =
+      final long minPair =
         constructLong(mInverseMap[minX], mInverseMap[minY]);
-      if (compare(minPairPositions, initialPairPositions) < 0) {
+      if (compareOrder(minPair, initialPair) < 0) {
         return false;
       }
 
@@ -888,7 +884,8 @@ public class SupervisorReductionTRSimplifier extends
     // otherwise create a two-state automaton
     final int numStates = disabEvents.isEmpty() ? 1 : 2;
     final ListBufferTransitionRelation rel =
-      new ListBufferTransitionRelation("OneStateSup",
+      new ListBufferTransitionRelation(
+                                       "OneStateSup",
                                        ComponentKind.SUPERVISOR,
                                        mNumProperEvents,
                                        oldRel.getNumberOfPropositions(),
@@ -944,6 +941,21 @@ public class SupervisorReductionTRSimplifier extends
     }
   }
 
+  private int compareOrder(final long pair1, final long pair2)
+  {
+    final int pair1a = getState(0, pair1);
+    final int pair1b = getState(1, pair1);
+    final int pair2a = getState(0, pair2);
+    final int pair2b = getState(1, pair2);
+    if (pair1a + pair1b < pair2a + pair2b) {
+      return -1;
+    } else if (pair1a + pair1b > pair2a + pair2b) {
+      return 1;
+    } else {
+      return pair2a - pair1a;
+    }
+  }
+
   //#########################################################################
   //# For Debugging
   public int[] showClassList(final IntListBuffer classes, final int list)
@@ -952,12 +964,14 @@ public class SupervisorReductionTRSimplifier extends
     return array;
   }
 
-  public void PrintStateToClassToConsole(final int event) {
+  public void PrintStateToClassToConsole(final int event)
+  {
     System.out.println("[------" + event + "------]");
     for (int i = 0; i < mStateToClass.length; i++) {
       System.out.println(mStateToClass[i]);
     }
   }
+
   //#########################################################################
   //# Data Members
   private int mNumProperEvents;
