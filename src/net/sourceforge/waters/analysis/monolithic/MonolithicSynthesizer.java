@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
+import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionTRSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.IntArrayHashingStrategy;
@@ -637,10 +639,23 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
         ProductDESProxy des = null;
         if (mSupervisorReductionEnabled) {
           // Supervisor Reduction Enabled
-          mSupervisorSimplifier.setDefaultMarkingID(marking);
-          mSupervisorSimplifier.setTransitionRelation(mTransitionRelation);//set TR
-          mSupervisorSimplifier.setRestrictedEvent(-1);//set event
-          mSupervisorSimplifier.run();
+          final ChainTRSimplifier chain = new ChainTRSimplifier();
+          final ObservationEquivalenceTRSimplifier bisimulator =
+            new ObservationEquivalenceTRSimplifier();
+          bisimulator.setUsingSpecialEvents(false);
+          bisimulator.setEquivalence
+          (ObservationEquivalenceTRSimplifier.Equivalence.
+           DETERMINISTIC_MINSTATE);
+          bisimulator.setTransitionLimit(getTransitionLimit());
+          chain.add(bisimulator);
+
+          mSupervisorSimplifier.setRestrictedEvent(-1);
+
+          chain.add(mSupervisorSimplifier);
+          chain.setTransitionRelation(mTransitionRelation);
+          chain.setDefaultMarkingID(marking);
+          chain.run();
+
           mTransitionRelation = mSupervisorSimplifier.getTransitionRelation();
           if (!mSupervisorLocalizationEnabled) {
             mTransitionRelation.removeDeadlockStateTransitions(marking);
@@ -881,9 +896,24 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           new ListBufferTransitionRelation(
                                            mTransitionRelation,
                                            ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-        mSupervisorSimplifier.setTransitionRelation(copy);
+
+        final ChainTRSimplifier chain = new ChainTRSimplifier();
+        final ObservationEquivalenceTRSimplifier bisimulator =
+          new ObservationEquivalenceTRSimplifier();
+        bisimulator.setUsingSpecialEvents(false);
+        bisimulator.setEquivalence
+        (ObservationEquivalenceTRSimplifier.Equivalence.
+         DETERMINISTIC_MINSTATE);
+        bisimulator.setTransitionLimit(getTransitionLimit());
+        chain.add(bisimulator);
+
         mSupervisorSimplifier.setRestrictedEvent(e);
-        simplified &= mSupervisorSimplifier.run();
+
+        chain.add(mSupervisorSimplifier);
+        chain.setTransitionRelation(copy);
+        chain.setDefaultMarkingID(marking);
+        simplified &= chain.run();
+
         if (!simplified) {
           mTransitionRelation.removeDeadlockStateTransitions(marking);
           autList.clear();
