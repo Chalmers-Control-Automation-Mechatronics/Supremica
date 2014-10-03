@@ -770,9 +770,9 @@ public class CompositionalAutomataSynthesizer
         if (mTempEventEncoding.getEventCode(original) < 0) {
           if (events == null) {
             final int size = mTempEventEncoding.getNumberOfEvents();
-            events = new ArrayList<EventProxy>(size);
+            events = new ArrayList<>(size);
             events.add(null);
-            events.addAll(mTempEventEncoding.getEvents());
+            events.addAll(mTempEventEncoding.getUsedEvents());
           }
           events.set(r, original);
         }

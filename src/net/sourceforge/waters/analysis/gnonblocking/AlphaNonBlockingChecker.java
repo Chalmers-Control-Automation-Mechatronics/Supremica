@@ -9,8 +9,8 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import gnu.trove.set.hash.THashSet;
 import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -98,10 +98,8 @@ public class AlphaNonBlockingChecker
     final SortedSet<AutomatonProxy> newmodel = new TreeSet<AutomatonProxy>();
     for (final AutomatonProxy aut : model) {
       final EventEncoding ee = new EventEncoding(aut, getKindTranslator());
-      if (!ee.getEvents().contains(getUsedDefaultMarking())) {
-        ee.addEvent(getUsedDefaultMarking(), getKindTranslator(),
-                    EventEncoding.STATUS_UNUSED);
-      }
+      ee.addEvent(getUsedDefaultMarking(), getKindTranslator(),
+                  EventEncoding.STATUS_UNUSED);
       ee.addEvent(mAlpha, getKindTranslator(), EventEncoding.STATUS_UNUSED);
       ee.addEvent(mCont, getKindTranslator(), EventEncoding.STATUS_NONE);
       final ListBufferTransitionRelation tr =

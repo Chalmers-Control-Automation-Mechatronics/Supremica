@@ -15,11 +15,15 @@ import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.procedure.TObjectIntProcedure;
 
+import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -422,21 +426,14 @@ public class EventEncoding
   }
 
   /**
-   * Gets a list containing all events in this encoding.
-   * The list returned contains all proper events and propositions;
-   * the silent (tau) event is only included if it was specified.
+   * Gets a collection containing all events marked as used in this encoding.
+   * The returned collection is backed by the event encoding and updates if
+   * it changes. It contains proper events and propositions, the silent (tau)
+   * event is only included if it was specified.
    */
-  public List<EventProxy> getEvents()
+  public Set<EventProxy> getUsedEvents()
   {
-    final int numEvents = getNumberOfEvents();
-    final List<EventProxy> list = new ArrayList<EventProxy>(numEvents);
-    for (final EventProxy event : mProperEvents) {
-      if (event != null) {
-        list.add(event);
-      }
-    }
-    list.addAll(mPropositions);
-    return list;
+    return new UsedEventList();
   }
 
   /**
@@ -699,6 +696,101 @@ public class EventEncoding
   public static boolean isUsedEvent(final byte status)
   {
     return (status & STATUS_UNUSED) == 0;
+  }
+
+
+  //#########################################################################
+  //# Inner Class EventList
+  private class UsedEventList extends AbstractSet<EventProxy>
+  {
+    //#######################################################################
+    //# Interface java.util.Set<EventProxy>
+    @Override
+    public Iterator<EventProxy> iterator()
+    {
+      return new UsedEventListIterator();
+    }
+
+    @Override
+    public int size()
+    {
+      int count = 0;
+      for (int e = 0; e < mProperEvents.size(); e++) {
+        final byte status = mProperEventStatus.get(e);
+        if (isUsedEvent(status)) {
+          count++;
+        }
+      }
+      for (int p = 0; p < mPropositions.size(); p++) {
+        final byte status = mPropositionStatus.get(p);
+        if (isUsedEvent(status)) {
+          count++;
+        }
+      }
+      return count;
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class UsedEventListIterator
+  private class UsedEventListIterator implements Iterator<EventProxy>
+  {
+    //#######################################################################
+    //# Constructor
+    private UsedEventListIterator()
+    {
+      mIndex = 0;
+    }
+
+    //#######################################################################
+    //# Interface java.util.Iterator<EventProxy>
+    @Override
+    public boolean hasNext()
+    {
+      final int numProperEvents = mProperEvents.size();
+      byte status;
+      while (true) {
+        if (mIndex < numProperEvents) {
+          status = mProperEventStatus.get(mIndex);
+        } else if (mIndex < numProperEvents + mPropositions.size()) {
+          status = mPropositionStatus.get(mIndex - numProperEvents);
+        } else {
+          return false;
+        }
+        if (isUsedEvent(status)) {
+          return true;
+        }
+        mIndex++;
+      }
+    }
+
+    @Override
+    public EventProxy next()
+    {
+      if (hasNext()) {
+        final int numProperEvents = mProperEvents.size();
+        if (mIndex < numProperEvents) {
+          return mProperEvents.get(mIndex++);
+        } else {
+          return mPropositions.get(mIndex++ - numProperEvents);
+        }
+      } else {
+        throw new NoSuchElementException
+          ("Attempting to read past end of event encoding!");
+      }
+    }
+
+    @Override
+    public void remove()
+    {
+      throw new UnsupportedOperationException
+        ("Event encoding does not support event removal!");
+    }
+
+    //#######################################################################
+    //# Data Members
+    private int mIndex;
   }
 
 
