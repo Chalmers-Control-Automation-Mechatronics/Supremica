@@ -170,7 +170,6 @@
         <unjar src="${lib}/fsa2sat-1.0.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/javailp-1.2.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/lpsolve55j.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/junit.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/minisatjni1.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/cplex.jar" dest="${lib}/${unjared}"/>
         
@@ -211,6 +210,8 @@
         <unjar src="${jaxb-impl.jar}" dest="${lib}/${unjared}"/>
         <unjar src="${jaxb1-impl.jar}" dest="${lib}/${unjared}"/>
         <unjar src="${jsr173_api.jar}" dest="${lib}/${unjared}"/>   
+        <!-- JUnit -->
+        <unjar src="${lib}/junit.jar" dest="${lib}/${unjared}"/>
     </target>
     
     <target name="clean_build">
@@ -740,7 +741,7 @@ Class-Path: ${manifest.pathlist}</echo>
         <delete>
             <fileset dir="${logs.results}" includes="**/log4j.log"/>
         </delete>
-        <junit printsummary="on" fork="true" maxmemory="512m" haltonfailure="false">
+        <junit printsummary="on" fork="true" maxmemory="2048m" haltonfailure="false">
             <formatter type="xml"/>
             <batchtest todir="${logs.results}">
                 <fileset dir="${testssrc}">
@@ -751,7 +752,7 @@ Class-Path: ${manifest.pathlist}</echo>
                     <exclude name="**/Abstract*.java"/>
                     <exclude name="**/Native*.java"/>
                     <exclude name="**/Large*.java"/>
-                    <exclude name="net/sourceforge/waters/analysis/composing/**/*.java"/>
+                    <exclude name="net/sourceforge/waters/analysis/comp552/**/*.java"/>
                     <exclude name="net/sourceforge/waters/analysis/distributed/**/*.java"/>
                     <exclude name="net/sourceforge/waters/analysis/modular/**/*.java"/>
                 </fileset>
@@ -774,7 +775,7 @@ Class-Path: ${manifest.pathlist}</echo>
     <target name="-run_tests_short"
             depends="-jar_supremica,-jar_supremica_tests">
         <mkdir dir="${logs.results}"/>
-        <junit printsummary="on" fork="true" maxmemory="512m" haltonfailure="false">
+        <junit printsummary="on" fork="true" maxmemory="2048m" haltonfailure="false">
             <formatter type="xml"/>
             <batchtest todir="${logs.results}">
                 <fileset dir="${testssrc}">
@@ -806,7 +807,7 @@ Class-Path: ${manifest.pathlist}</echo>
         <delete>
             <fileset dir="${logs.results}/algorithms/minimization" includes="**/log4j.log"/>
         </delete>
-        <junit printsummary="on" fork="true" maxmemory="512m">
+        <junit printsummary="on" fork="true" maxmemory="2048m">
             <formatter type="xml"/>
             <batchtest todir="${logs.results}">
                 <fileset dir="${testssrc}">
@@ -879,7 +880,7 @@ Class-Path: ${manifest.pathlist}</echo>
         <delete>
             <fileset dir="${logs.results}" includes="**/log4j.log"/>
         </delete>
-        <junit printsummary="on" fork="true" maxmemory="512m" haltonfailure="false">
+        <junit printsummary="on" fork="true" maxmemory="2048m" haltonfailure="false">
             <formatter type="xml"/>
             <batchtest todir="${logs.results}">
                 <fileset dir="${testssrc}">
@@ -910,7 +911,7 @@ Class-Path: ${manifest.pathlist}</echo>
         <delete>
             <fileset dir="${logs.results}" includes="**/log4j.log"/>
         </delete>
-        <junit printsummary="on" fork="true" maxmemory="512m" haltonfailure="false">
+        <junit printsummary="on" fork="true" maxmemory="2048m" haltonfailure="false">
             <formatter type="xml"/>
             <batchtest todir="${logs.results}">
                 <fileset dir="${testssrc}">
@@ -1041,7 +1042,7 @@ Class-Path: ${manifest.pathlist}</echo>
                 <pathelement path="${java.class.path}" />
             </classpath>
             <jvmarg value="-Xms128M"/>
-            <jvmarg value="-Xmx512M" />  
+            <jvmarg value="-Xmx2048M" />  
         </java>                
     </target>
     
@@ -1072,7 +1073,7 @@ Class-Path: ${manifest.pathlist}</echo>
                 <pathelement path="${java.class.path}" />
             </classpath>
             <jvmarg value="-Xms128M"/>
-            <jvmarg value="-Xmx512M" />  
+            <jvmarg value="-Xmx2048M" />  
         </java>                
     </target>
     
@@ -1088,7 +1089,7 @@ Class-Path: ${manifest.pathlist}</echo>
                 <pathelement path="${java.class.path}" />
             </classpath>            
             <jvmarg value="-Xms128M"/>
-            <jvmarg value="-Xmx512M" />       
+            <jvmarg value="-Xmx2048M" />       
         </java>
     </target>
     
