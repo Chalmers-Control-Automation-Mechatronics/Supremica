@@ -2466,7 +2466,7 @@ public abstract class AbstractCompositionalModelAnalyzer
      */
     protected boolean isFailing()
     {
-      return mFailingStatus == FAILING;
+      return mFailingStatus == FAILING && !mIsBlocked;
     }
 
    /**
@@ -2654,7 +2654,9 @@ public abstract class AbstractCompositionalModelAnalyzer
     @Override
     public String toString()
     {
-      final StringBuilder buffer = new StringBuilder("[");
+      final String name = mEvent.getName();
+      final StringBuilder buffer = new StringBuilder(name);
+      buffer.append(" [");
       boolean first = true;
       for (final AutomatonProxy aut : getSortedAutomataList()) {
         if (first) {
