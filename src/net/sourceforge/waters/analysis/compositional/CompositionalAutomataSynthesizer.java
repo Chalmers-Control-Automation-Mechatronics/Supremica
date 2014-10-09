@@ -650,7 +650,7 @@ public class CompositionalAutomataSynthesizer
           // skip
           continue;
         } else if (info.containsReplacedEvent(deferredEvents) ||
-          !isDeterministic(rel, info)) {
+                   !isDeterministic(rel, info)) {
           // defer
           info.addDeferredEvents(deferredEvents);
           if (firstDeferred == null) {
@@ -700,13 +700,13 @@ public class CompositionalAutomataSynthesizer
         checkAbort();
         int foundSuccessor = -1;
         for (final EventProxy event : pair.getReplacedEvents()) {
-          final int code = mTempEventEncoding.getEventCode(event);
+          final int e = getUsedEvent(event, mTempEventEncoding, rel);
           final int successor;
-          if (code < 0) {
+          if (e < 0) {
             // not in alphabet - selflooped in all states
             successor = state;
           } else {
-            transitionIter.reset(state, code);
+            transitionIter.reset(state, e);
             if (transitionIter.advance()) {
               successor = transitionIter.getCurrentTargetState();
             } else {
@@ -739,8 +739,7 @@ public class CompositionalAutomataSynthesizer
       // nondeterminism, these events will be all-selfloops.
       boolean selfloop = false;
       for (final EventProxy event : replacement) {
-        final int e = mTempEventEncoding.getEventCode(event);
-        if (e < 0) {
+        if (getUsedEvent(event, mTempEventEncoding, rel) < 0) {
           selfloop = true;
           break;
         }
@@ -850,6 +849,19 @@ public class CompositionalAutomataSynthesizer
       index++;
     } while (found);
     return supname;
+  }
+
+  private int getUsedEvent(final EventProxy event,
+                              final EventEncoding enc,
+                              final ListBufferTransitionRelation rel)
+  {
+    final int e = enc.getEventCode(event);
+    if (e < 0) {
+      return -1;
+    } else {
+      final byte status = rel.getProperEventStatus(e);
+      return EventEncoding.isUsedEvent(status) ? e : -1;
+    }
   }
 
 

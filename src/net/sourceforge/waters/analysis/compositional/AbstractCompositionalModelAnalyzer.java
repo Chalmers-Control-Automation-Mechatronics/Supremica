@@ -172,7 +172,6 @@ public abstract class AbstractCompositionalModelAnalyzer
     mSelectionHeuristic =
       CompositionalSelectionHeuristicFactory.MinS.createChainHeuristic();
     mSubsumptionEnabled = false;
-    mUsingSpecialEvents = true;
     mLowerInternalStateLimit = mUpperInternalStateLimit =
       super.getNodeLimit();
     mInternalTransitionLimit = super.getTransitionLimit();
@@ -348,23 +347,50 @@ public abstract class AbstractCompositionalModelAnalyzer
 
   /**
    * Sets whether special events are to be considered in abstraction.
-   * If enabled, compositional minimisation will not only exploit local
-   * events (used only in the subsystem being simplified), but also
-   * selfloop-only events (used only as selfloops outside of the subsystem
-   * being simplified.
+   * This method enabled or disables blocked events, selfloop-only events,
+   * and failing events.
+   * @see #setBlockedEventsEnabled(boolean) setBlockedEventsEnabled()
+   * @see #setFailingEventsEnabled(boolean) setFailingEventsEnabled()
+   * @see #setSelfloopEventsEnabled(boolean) setSelfloopEventsEnabled()
    */
   public void setUsingSpecialEvents(final boolean enable)
   {
-    mUsingSpecialEvents = enable;
+    mBlockedEventsEnabled = mFailingEventsEnabled =
+      mSelfloopOnlyEventsEnabled = enable;
   }
 
   /**
-   * Returns whether special events are considered in abstraction.
+   * Returns whether all kinds special events are considered in abstraction.
    * @see #setUsingSpecialEvents(boolean)
+   * @see #isBlockedEventsEnabled()
+   * @see #isFailingEventsEnabled()
+   * @see #isSelfloopOnlyEventsEnabled()
    */
   public boolean isUsingSpecialEvents()
   {
-    return mUsingSpecialEvents;
+    return
+      mBlockedEventsEnabled && mFailingEventsEnabled && mBlockedEventsEnabled;
+  }
+
+  /**
+   * Sets whether blocked events are to be considered in abstraction.
+   * @see #isBlockedEventsEnabled()
+   */
+  public void setBlockedEventsEnabled(final boolean enable)
+  {
+    mBlockedEventsEnabled = enable;
+  }
+
+  /**
+   * Returns whether blocked events are considered in abstraction.
+   * Blocked events are events that disabled in all reachable states of some
+   * automaton. If enabled, this will remove all transitions with blocked
+   * events from the model.
+   * @see #setBlockedEventsEnabled(boolean) setBlockedEventsEnabled()
+   */
+  public boolean isBlockedEventsEnabled()
+  {
+    return mBlockedEventsEnabled;
   }
 
   /**
@@ -377,15 +403,38 @@ public abstract class AbstractCompositionalModelAnalyzer
   }
 
   /**
-   * Returns whether failure events are considered in abstraction.
-   * Failure Events are events that always lead to a dump state in some
-   * automaton. If enabled, this will redirect failure events in other
+   * Returns whether failing events are considered in abstraction.
+   * Failing events are events that always lead to a dump state in some
+   * automaton. If enabled, this will redirect failing events in other
    * automata to dump states.
    * @see #setFailingEventsEnabled(boolean) setFailingEventsEnabled()
    */
   public boolean isFailingEventsEnabled()
   {
     return mFailingEventsEnabled;
+  }
+
+  /**
+   * Sets whether selfloop-only events are to be considered in abstraction.
+   * @see #isSelfloopOnlyEventsEnabled()
+   */
+  public void setSelfloopOnlyEventsEnabled(final boolean enable)
+  {
+    mSelfloopOnlyEventsEnabled = enable;
+  }
+
+  /**
+   * Returns whether selfloop-only events are considered in abstraction.
+   * Selfloop-only events are events that appear only as selfloops in the
+   * entire model or in all but one automata in the model. Events that
+   * are selfloop-only in the entire model can be removed, while events
+   * that are selfloop-only in all but one automata can be used to
+   * simplify that automaton.
+   * @see #setSelfloopEventsEnabled(boolean) setSelfloopEventsEnabled()
+   */
+  public boolean isSelfloopOnlyEventsEnabled()
+  {
+    return mSelfloopOnlyEventsEnabled;
   }
 
   /**
@@ -931,7 +980,7 @@ public abstract class AbstractCompositionalModelAnalyzer
 
   /**
    * Returns whether failure events are considered in abstraction.
-   * Failure Events are events that always lead to a dump state in some
+   * Failing Events are events that always lead to a dump state in some
    * automaton. If enabled, this will redirect failure events in other
    * automata to dump states.
    * @return <CODE>false</CODE>. Failure events are disabled by default
@@ -1113,7 +1162,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     }
     mRedundantEvents = new LinkedList<EventProxy>();
     for (final EventInfo info : mEventInfoMap.values()) {
-      if (info.isRemovable(mUsingSpecialEvents) || info.isFailing()) {
+      if (info.isRemovable(mSelfloopOnlyEventsEnabled) || info.isFailing()) {
         final EventProxy event = info.getEvent();
         mRedundantEvents.add(event);
       }
@@ -1217,25 +1266,28 @@ public abstract class AbstractCompositionalModelAnalyzer
     }
     final int numEvents = events.size();
     final TObjectByteHashMap<EventProxy> statusMap =
-      new TObjectByteHashMap<EventProxy>(numEvents);
-    for (final TransitionProxy trans : aut.getTransitions()) {
-      final EventProxy event = trans.getEvent();
-      final byte status = statusMap.get(event);
-      if (trans.getSource() == trans.getTarget()) {
-        if (status == UNKNOWN_SELFLOOP) {
-          statusMap.put(event, ONLY_SELFLOOP);
-        } else if (status == FAILING) {
+      new TObjectByteHashMap<>(numEvents);
+    if (mBlockedEventsEnabled || isUsingFailingEvents() ||
+        mSelfloopOnlyEventsEnabled) {
+      for (final TransitionProxy trans : aut.getTransitions()) {
+        final EventProxy event = trans.getEvent();
+        final byte status = statusMap.get(event);
+        if (trans.getSource() == trans.getTarget()) {
+          if (status == UNKNOWN_SELFLOOP) {
+            statusMap.put(event, ONLY_SELFLOOP);
+          } else if (status == FAILING) {
+            statusMap.put(event, NOT_ONLY_SELFLOOP);
+          }
+        } else if (nonDumpStates != null &&
+                   !nonDumpStates.contains(trans.getTarget())) {
+          if (status == UNKNOWN_SELFLOOP) {
+            statusMap.put(event, FAILING);
+          } else if (status == ONLY_SELFLOOP) {
+            statusMap.put(event, NOT_ONLY_SELFLOOP);
+          }
+        } else {
           statusMap.put(event, NOT_ONLY_SELFLOOP);
         }
-      } else if (nonDumpStates != null &&
-                 !nonDumpStates.contains(trans.getTarget())) {
-        if (status == UNKNOWN_SELFLOOP) {
-          statusMap.put(event, FAILING);
-        } else if (status == ONLY_SELFLOOP) {
-          statusMap.put(event, NOT_ONLY_SELFLOOP);
-        }
-      } else {
-        statusMap.put(event, NOT_ONLY_SELFLOOP);
       }
     }
     final KindTranslator translator = getKindTranslator();
@@ -1246,8 +1298,10 @@ public abstract class AbstractCompositionalModelAnalyzer
           info = createEventInfo(event);
           mEventInfoMap.put(event, info);
         }
-        final byte lookup = statusMap.get(event);
-        final byte status = lookup == UNKNOWN_SELFLOOP ? BLOCKED : lookup;
+        byte status = statusMap.get(event);
+        if (status == UNKNOWN_SELFLOOP && mBlockedEventsEnabled) {
+          status = BLOCKED;
+        }
         info.addAutomaton(aut, status);
       }
     }
@@ -1277,7 +1331,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       info.removeAutomata(victims);
       if (info.isEmpty()) {
         iter.remove();
-      } else if (info.isRemovable(mUsingSpecialEvents) || info.isFailing()) {
+      } else if (info.isRemovable(mSelfloopOnlyEventsEnabled) || info.isFailing()) {
         final EventProxy event = entry.getKey();
         mRedundantEvents.add(event);
       }
@@ -2999,8 +3053,9 @@ public abstract class AbstractCompositionalModelAnalyzer
   private PreselectingMethod mPreselectingMethod;
   private SelectionHeuristic<Candidate> mSelectionHeuristic;
   private boolean mSubsumptionEnabled;
-  private boolean mUsingSpecialEvents;
+  private boolean mBlockedEventsEnabled = true;
   private boolean mFailingEventsEnabled = false;
+  private boolean mSelfloopOnlyEventsEnabled = false;
   private int mLowerInternalStateLimit;
   private int mUpperInternalStateLimit;
   private int mInternalTransitionLimit;

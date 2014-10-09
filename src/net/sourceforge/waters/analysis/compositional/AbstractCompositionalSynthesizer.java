@@ -84,7 +84,6 @@ public abstract class AbstractCompositionalSynthesizer
     super(model, factory, translator, abstractionFactory,
           preselectingMethodFactory);
     setPruningDeadlocks(true);
-    setFailingEventsEnabled(true);
   }
 
 
