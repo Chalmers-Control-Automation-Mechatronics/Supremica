@@ -1299,8 +1299,8 @@ public abstract class AbstractCompositionalModelAnalyzer
           mEventInfoMap.put(event, info);
         }
         byte status = statusMap.get(event);
-        if (status == UNKNOWN_SELFLOOP && mBlockedEventsEnabled) {
-          status = BLOCKED;
+        if (status == UNKNOWN_SELFLOOP) {
+          status = mBlockedEventsEnabled ? BLOCKED : NOT_ONLY_SELFLOOP;
         }
         info.addAutomaton(aut, status);
       }
@@ -1437,7 +1437,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         info.setReduced();
       }
       mRedundantEvents.clear();
-      mMayBeSplit = true;
+      mMayBeSplit = true; // TODO bug ???
       return true;
     } else {
       return false;
