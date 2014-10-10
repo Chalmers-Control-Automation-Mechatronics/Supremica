@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.model.analysis;
 
-import java.util.Iterator;
+import java.util.ListIterator;
 
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ControlLoopChecker;
@@ -100,7 +100,7 @@ public abstract class CommandLineArgumentChain
   //#######################################################################
   //# Parsing
   @Override
-  public void parse(final Iterator<String> iter)
+  public void parse(final ListIterator<String> iter)
   {
     super.parse(iter);
     final ModelAnalyzerFactoryLoader loader = getValue();

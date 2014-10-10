@@ -23,6 +23,7 @@ import java.util.Formatter;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
@@ -210,7 +211,7 @@ public class CommandLineTool
         keepPropositions = true;
       }
       final Collection<String> empty = Collections.emptyList();
-      final Iterator<String> argIter = argList.iterator();
+      final ListIterator<String> argIter = argList.listIterator();
       factory.parse(argIter);
       factory.configure(analyzer);
       final Watchdog watchdog = new Watchdog(wrapper, timeout);

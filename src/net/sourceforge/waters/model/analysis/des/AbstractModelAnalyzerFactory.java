@@ -17,9 +17,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
@@ -80,8 +80,9 @@ public abstract class AbstractModelAnalyzerFactory
 
   protected void addArgument(final CommandLineArgument argument)
   {
-    final String name = argument.getName();
-    mArgumentMap.put(name, argument);
+    for (final String name : argument.getNames()) {
+      mArgumentMap.put(name, argument);
+    }
     mArgumentList.add(argument);
   }
 
@@ -131,7 +132,7 @@ public abstract class AbstractModelAnalyzerFactory
 
 
   @Override
-  public void parse(final Iterator<String> iter)
+  public void parse(final ListIterator<String> iter)
   {
     mArgumentMap.clear();
     mArgumentList.clear();
@@ -140,7 +141,6 @@ public abstract class AbstractModelAnalyzerFactory
       final String name = iter.next();
       final CommandLineArgument arg = mArgumentMap.get(name);
       if (arg != null) {
-        iter.remove();
         arg.parse(iter);
       } else if (name.startsWith("-")) {
         System.err.println("Unsupported option " + name +
@@ -225,8 +225,9 @@ public abstract class AbstractModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void parse(final Iterator<String> iter)
+    public void parse(final ListIterator<String> iter)
     {
+      iter.remove();
       while (iter.hasNext()) {
         iter.next();
       }
@@ -256,8 +257,7 @@ public abstract class AbstractModelAnalyzerFactory
           ProxyTools.getShortClassName(AbstractModelAnalyzerFactory.this);
         System.err.println
           (name + " supports the following command line options:");
-        final List<CommandLineArgument> args =
-          new ArrayList<CommandLineArgument>(mArgumentMap.values());
+        final List<CommandLineArgument> args = new ArrayList<>(mArgumentList);
         Collections.sort(args);
         for (final CommandLineArgument arg : args) {
           arg.dump(System.err, analyzer);
@@ -278,7 +278,7 @@ public abstract class AbstractModelAnalyzerFactory
     private HISCArgument()
     {
       super("-hisc",
-            "Compile as HISC module, only including interfaces of low levels");
+            "Compile as HISC module, only including interfaces\nof low levels");
     }
 
     //#######################################################################

@@ -10,7 +10,9 @@
 package net.sourceforge.waters.model.analysis;
 
 import java.io.PrintStream;
-import java.util.Iterator;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.ListIterator;
 
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
@@ -77,6 +79,11 @@ public abstract class CommandLineArgument
     return mName;
   }
 
+  public Collection<String> getNames()
+  {
+    return Collections.singletonList(mName);
+  }
+
   protected String getArgumentTemplate()
   {
     return null;
@@ -116,7 +123,7 @@ public abstract class CommandLineArgument
 
   //#########################################################################
   //# Parsing
-  public abstract void parse(Iterator<String> iter);
+  public abstract void parse(ListIterator<String> iter);
 
   public void configure(final ModelAnalyzer analyzer)
   {

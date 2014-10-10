@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.compositional;
 
 import java.io.PrintStream;
 
+import net.sourceforge.waters.model.analysis.CommandLineArgumentBoolean;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentChain;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
@@ -68,10 +69,11 @@ public class CompositionalModelAnalyzerFactory
     addArgument(new PreselectingMethodArgument());
     addArgument(new SelectingMethodArgument());
     addArgument(new SubsumptionArgument());
-    addArgument(new NoSpecialEventsArgument());
-    addArgument(new NoSelfloopEventsArgument());
-    addArgument(new NoFailingEventsArgument());
-    addArgument(new NoDeadlockPruningArgument());
+    addArgument(new SpecialEventsArgument());
+    addArgument(new BlockedEventsArgument());
+    addArgument(new FailingEventsArgument());
+    addArgument(new SelfloopOnlyEventsArgument());
+    addArgument(new DeadlockPruningArgument());
     addArgument(new SecondaryFactoryArgument());
   }
 
@@ -462,15 +464,16 @@ public class CompositionalModelAnalyzerFactory
 
 
   //#########################################################################
-  //# Inner Class NoSpecialEventsArgument
-  private static class NoSpecialEventsArgument extends CommandLineArgumentFlag
+  //# Inner Class SpecialEventsArgument
+  private static class SpecialEventsArgument extends CommandLineArgumentBoolean
   {
 
     //#######################################################################
     //# Constructors
-    private NoSpecialEventsArgument()
+    private SpecialEventsArgument()
     {
-      super("-nse", "Disable special events");
+      super("-se",
+            "Enable or disable blocked, failing, and selfloop-only events");
     }
 
     //#######################################################################
@@ -481,23 +484,24 @@ public class CompositionalModelAnalyzerFactory
     {
       final AbstractCompositionalModelAnalyzer composer =
         (AbstractCompositionalModelAnalyzer) analyzer;
-      composer.setUsingSpecialEvents(false);
-      composer.setFailingEventsEnabled(false);
+      final boolean enable = getValue();
+      composer.setUsingSpecialEvents(enable);
     }
 
   }
 
 
   //#########################################################################
-  //# Inner Class NoSelfloopEventsArgument
-  private static class NoSelfloopEventsArgument extends CommandLineArgumentFlag
+  //# Inner Class BlockedEventsArgument
+  private static class BlockedEventsArgument
+    extends CommandLineArgumentBoolean
   {
 
     //#######################################################################
     //# Constructors
-    private NoSelfloopEventsArgument()
+    private BlockedEventsArgument()
     {
-      super("-nsl", "Disable selfloop removal");
+      super("-be", "Enable or disable blocked events removal");
     }
 
     //#######################################################################
@@ -508,22 +512,24 @@ public class CompositionalModelAnalyzerFactory
     {
       final AbstractCompositionalModelAnalyzer composer =
         (AbstractCompositionalModelAnalyzer) analyzer;
-      composer.setUsingSpecialEvents(false);
+      final boolean enable = getValue();
+      composer.setBlockedEventsEnabled(enable);
     }
 
   }
 
 
   //#########################################################################
-  //# Inner Class NoFailingEventsArgument
-  private static class NoFailingEventsArgument extends CommandLineArgumentFlag
+  //# Inner Class FailingEventsArgument
+  private static class FailingEventsArgument
+    extends CommandLineArgumentBoolean
   {
 
     //#######################################################################
     //# Constructors
-    private NoFailingEventsArgument()
+    private FailingEventsArgument()
     {
-      super("-nfe", "Disable failing events removal");
+      super("-fe", "Enable or disable failing events redirection");
     }
 
     //#######################################################################
@@ -534,22 +540,54 @@ public class CompositionalModelAnalyzerFactory
     {
       final AbstractCompositionalModelAnalyzer composer =
         (AbstractCompositionalModelAnalyzer) analyzer;
-      composer.setFailingEventsEnabled(false);
+      final boolean enable = getValue();
+      composer.setFailingEventsEnabled(enable);
     }
 
   }
 
 
   //#########################################################################
-  //# Inner Class NoDeadlockPruning
-  private static class NoDeadlockPruningArgument extends CommandLineArgumentFlag
+  //# Inner Class SelfloopOnlyEventsArgument
+  private static class SelfloopOnlyEventsArgument
+    extends CommandLineArgumentBoolean
   {
 
     //#######################################################################
     //# Constructors
-    private NoDeadlockPruningArgument()
+    private SelfloopOnlyEventsArgument()
     {
-      super("-ndp", "Disable deadlock pruning in synchronous composition");
+      super("-sl",
+            "Enable or disable selfloop-only events and selfloop removal");
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    @Override
+    public void configure(final ModelAnalyzer analyzer)
+    {
+      final AbstractCompositionalModelAnalyzer composer =
+        (AbstractCompositionalModelAnalyzer) analyzer;
+      final boolean enable = getValue();
+      composer.setSelfloopOnlyEventsEnabled(enable);
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class DeadlockPruningArgument
+  private static class DeadlockPruningArgument
+    extends CommandLineArgumentBoolean
+  {
+
+    //#######################################################################
+    //# Constructors
+    private DeadlockPruningArgument()
+    {
+      super("-dp",
+            "Enable or disable deadlock pruning in synchronous product");
     }
 
     //#######################################################################
@@ -560,7 +598,8 @@ public class CompositionalModelAnalyzerFactory
     {
       final AbstractCompositionalModelAnalyzer composer =
         (AbstractCompositionalModelAnalyzer) verifier;
-      composer.setPruningDeadlocks(false);
+      final boolean enable = getValue();
+      composer.setPruningDeadlocks(enable);
     }
 
   }

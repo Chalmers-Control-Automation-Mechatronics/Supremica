@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
-import java.util.Iterator;
+import java.util.ListIterator;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
@@ -59,7 +59,7 @@ public interface ModelAnalyzerFactory
 
   //#########################################################################
   //# Command Line Arguments
-  public void parse(Iterator<String> iter);
+  public void parse(ListIterator<String> iter);
 
   /**
    * Configures the given model analyser according to any command line
