@@ -71,6 +71,7 @@ public abstract class CommandLineArgumentBoolean
   {
     return getOnName() + "|" + getOffName();
   }
+
   @Override
   public Collection<String> getNames()
   {
@@ -80,12 +81,12 @@ public abstract class CommandLineArgumentBoolean
     return names;
   }
 
-  public String getOnName()
+  protected String getOnName()
   {
     return super.getName();
   }
 
-  public String getOffName()
+  protected String getOffName()
   {
     final String onName = getOnName();
     return "-n" + onName.substring(1);
@@ -106,6 +107,7 @@ public abstract class CommandLineArgumentBoolean
     final String onName = getOnName();
     mValue = parsed.equals(onName);
     iter.remove();
+    setUsed(true);
   }
 
 

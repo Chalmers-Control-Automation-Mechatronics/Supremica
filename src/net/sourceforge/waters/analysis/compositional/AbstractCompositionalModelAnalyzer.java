@@ -347,7 +347,7 @@ public abstract class AbstractCompositionalModelAnalyzer
 
   /**
    * Sets whether special events are to be considered in abstraction.
-   * This method enabled or disables blocked events, selfloop-only events,
+   * This method enables or disables blocked events, selfloop-only events,
    * and failing events.
    * @see #setBlockedEventsEnabled(boolean) setBlockedEventsEnabled()
    * @see #setFailingEventsEnabled(boolean) setFailingEventsEnabled()
@@ -360,7 +360,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   }
 
   /**
-   * Returns whether all kinds special events are considered in abstraction.
+   * Returns whether all kinds of special events are considered in abstraction.
    * @see #setUsingSpecialEvents(boolean)
    * @see #isBlockedEventsEnabled()
    * @see #isFailingEventsEnabled()
@@ -383,8 +383,8 @@ public abstract class AbstractCompositionalModelAnalyzer
 
   /**
    * Returns whether blocked events are considered in abstraction.
-   * Blocked events are events that disabled in all reachable states of some
-   * automaton. If enabled, this will remove all transitions with blocked
+   * Blocked events are events that are disabled in all reachable states of
+   * some automaton. If enabled, this will remove all transitions with blocked
    * events from the model.
    * @see #setBlockedEventsEnabled(boolean) setBlockedEventsEnabled()
    */
@@ -426,9 +426,9 @@ public abstract class AbstractCompositionalModelAnalyzer
   /**
    * Returns whether selfloop-only events are considered in abstraction.
    * Selfloop-only events are events that appear only as selfloops in the
-   * entire model or in all but one automata in the model. Events that
+   * entire model or in all but one automaton in the model. Events that
    * are selfloop-only in the entire model can be removed, while events
-   * that are selfloop-only in all but one automata can be used to
+   * that are selfloop-only in all but one automaton can be used to
    * simplify that automaton.
    * @see #setSelfloopEventsEnabled(boolean) setSelfloopEventsEnabled()
    */
