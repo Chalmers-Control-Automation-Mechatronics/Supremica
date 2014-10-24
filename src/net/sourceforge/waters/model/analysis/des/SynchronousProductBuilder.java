@@ -29,6 +29,12 @@ public interface SynchronousProductBuilder
 {
 
   //#########################################################################
+  //# More Specific Access to the Results
+  @Override
+  public SynchronousProductResult getAnalysisResult();
+
+
+  //#########################################################################
   //# Parameterisation
   /**
    * Defines the set of propositions to be retained in the synchronous
@@ -65,15 +71,5 @@ public interface SynchronousProductBuilder
    * so any further computation is done without hiding.
    */
   public void clearMask();
-
-
-  //#########################################################################
-  //# More Specific Access to the Results
-  /**
-   * Gets a state map that can be used to decompose the states of the
-   * computed synchronous product automaton and map them to the states
-   * of the automata in the original model.
-   */
-  public SynchronousProductStateMap getStateMap();
 
 }

@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.analysis.tr
-//# CLASS:   PlainAutomatonTest
+//# CLASS:   TRAutomatonTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -44,7 +44,7 @@ public class TRAutomatonTest extends AbstractAutomatonTest
 
   //#########################################################################
   //# Overrides for Abstract Base Class
-  //# net.sourceforge.waters.model.des.AutomatonTest
+  //# net.sourceforge.waters.model.des.AbstractAutomatonTest
   @Override
   protected ProductDESProxyFactory getProductDESProxyFactory()
   {

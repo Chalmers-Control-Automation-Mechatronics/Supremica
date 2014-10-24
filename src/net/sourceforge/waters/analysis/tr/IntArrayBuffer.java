@@ -175,7 +175,7 @@ public class IntArrayBuffer implements WatersIntHashingStrategy
 
   /**
    * Retrieves the contents of the given array.
-   * @param  array   The unique set index identifying the array to be examined
+   * @param  array   The unique index identifying the array to be examined
    *                 in this integer array buffer.
    * @param  data    Array to receive data. Must be allocated to the size of
    *                 the arrays in this buffer.

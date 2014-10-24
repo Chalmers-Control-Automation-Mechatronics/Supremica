@@ -175,6 +175,14 @@ public class TRAutomatonProxy
     return mTransitionRelation;
   }
 
+  public StateProxy getState(final int stateIndex)
+  {
+    if (mStates == null) {
+      mStates = new TRStateList();
+    }
+    return mStates.get(stateIndex);
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.des.AutomatonProxy
@@ -251,7 +259,7 @@ public class TRAutomatonProxy
 
   //#########################################################################
   //# Inner Class TRState
-  private class TRState
+  class TRState
     implements StateProxy, Cloneable
   {
     //#######################################################################
@@ -350,6 +358,13 @@ public class TRAutomatonProxy
     public String toString()
     {
       return ProductDESProxyPrinter.getPrintString(this);
+    }
+
+    //#######################################################################
+    //# Specific Access
+    int getStateIndex()
+    {
+      return mIndex;
     }
 
     //#######################################################################

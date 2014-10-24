@@ -50,7 +50,9 @@ public class NBAbstractionStandardConflictCheckerTest
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);
-    checker.setUsingSpecialEvents(true);
+    checker.setBlockedEventsEnabled(false);
+    checker.setFailingEventsEnabled(true);
+    checker.setSelfloopOnlyEventsEnabled(false);
     checker.setTraceCheckingEnabled(true);
     return checker;
   }

@@ -228,11 +228,11 @@ public class EventEncoding
                        final int filterMode)
   {
     final int numEvents = events.size();
-    mProperEvents = new ArrayList<EventProxy>(numEvents);
-    mPropositions = new ArrayList<EventProxy>(numEvents);
+    mProperEvents = new ArrayList<>(numEvents);
+    mPropositions = new ArrayList<>(numEvents);
     mProperEventStatus = new TByteArrayList(numEvents);
     mPropositionStatus = new TByteArrayList(numEvents);
-    mEventCodeMap = new TObjectIntHashMap<EventProxy>(numEvents, 0.5f, -1);
+    mEventCodeMap = new TObjectIntHashMap<>(numEvents, 0.5f, -1);
     mProperEvents.add(tau);
     if (tau == null) {
       mProperEventStatus.add((byte) (STATUS_FULLY_LOCAL | STATUS_UNUSED));
@@ -269,6 +269,18 @@ public class EventEncoding
         }
       }
     }
+  }
+
+  /**
+   * Creates a new event encoding by copying another.
+   */
+  public EventEncoding(final EventEncoding enc)
+  {
+    mProperEvents = new ArrayList<>(enc.mProperEvents);
+    mPropositions = new ArrayList<>(enc.mPropositions);
+    mProperEventStatus = new TByteArrayList(enc.mProperEventStatus);
+    mPropositionStatus = new TByteArrayList(enc.mPropositionStatus);
+    mEventCodeMap = new TObjectIntHashMap<>(enc.mEventCodeMap);
   }
 
 
@@ -463,8 +475,9 @@ public class EventEncoding
    *                     of the bits {@link #STATUS_CONTROLLABLE},
    *                     {@link #STATUS_LOCAL},
    *                     {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
-   *                     {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, and
-   *                     {@link #STATUS_UNUSED}.
+   *                     {@link #STATUS_OUTSIDE_ONLY_SELFLOOP},
+   *                     {@link #STATUS_BLOCKED}, {@link #STATUS_FAILING},
+   *                     and {@link #STATUS_UNUSED}.
    * @return The event (or proposition) code that was assigned to the event.
    */
   public int addEvent(final EventProxy event,
@@ -515,8 +528,9 @@ public class EventEncoding
    *                     of the bits {@link #STATUS_CONTROLLABLE},
    *                     {@link #STATUS_LOCAL},
    *                     {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
-   *                     {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, and
-   *                     {@link #STATUS_UNUSED}.
+   *                     {@link #STATUS_OUTSIDE_ONLY_SELFLOOP},
+   *                     {@link #STATUS_BLOCKED}, {@link #STATUS_FAILING},
+   *                     and {@link #STATUS_UNUSED}.
    * @return The event code that was assigned to the event.
    */
   public int addEventAlias(final EventProxy alias,
@@ -536,8 +550,8 @@ public class EventEncoding
    *                {@link #getNumberOfProperEvents()}-1.
    * @return A combination of the bits {@link #STATUS_CONTROLLABLE},
    *         {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
-   *         {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, and
-   *         {@link #STATUS_UNUSED}.
+   *         {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, {@link #STATUS_BLOCKED},
+   *         {@link #STATUS_FAILING}, and {@link #STATUS_UNUSED}.
    */
   public byte getProperEventStatus(final int event)
   {
@@ -551,8 +565,9 @@ public class EventEncoding
    *                {@link #getNumberOfProperEvents()}-1.
    * @param  status A combination of the bits {@link #STATUS_CONTROLLABLE},
    *                {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
-   *                {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, and
-   *                {@link #STATUS_UNUSED}.
+   *                {@link #STATUS_OUTSIDE_ONLY_SELFLOOP},
+   *                {@link #STATUS_BLOCKED}, {@link #STATUS_FAILING},
+   *                and {@link #STATUS_UNUSED}.
    */
   public void setProperEventStatus(final int event, final int status)
   {
@@ -566,8 +581,8 @@ public class EventEncoding
    *                {@link #getNumberOfPropositions()}-1.
    * @return A combination of the bits {@link #STATUS_CONTROLLABLE},
    *         {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
-   *         {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, and
-   *         {@link #STATUS_UNUSED}.
+   *         {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, {@link #STATUS_BLOCKED},
+   *         {@link #STATUS_FAILING}, and {@link #STATUS_UNUSED}.
    */
   public byte getPropositionStatus(final int prop)
   {
@@ -581,8 +596,9 @@ public class EventEncoding
    *                {@link #getNumberOfPropositions()}-1.
    * @param  status A combination of the bits {@link #STATUS_CONTROLLABLE},
    *                {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
-   *                {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, and
-   *                {@link #STATUS_UNUSED}.
+   *                {@link #STATUS_OUTSIDE_ONLY_SELFLOOP},
+   *                {@link #STATUS_BLOCKED}, {@link #STATUS_FAILING},
+   *                and {@link #STATUS_UNUSED}.
    */
   public void setPropositionStatus(final int prop, final int status)
   {
@@ -613,12 +629,32 @@ public class EventEncoding
   }
 
   /**
+   * Removes all proper events and aliases from this event encoding.
+   */
+  public void removeAllProperEvents()
+  {
+    mProperEvents.clear();
+    mProperEventStatus.clear();
+    mEventCodeMap.clear();
+  }
+
+  /**
+   * Removes all propositions from this event encoding.
+   */
+  public void removeAllPropositions()
+  {
+    mPropositions.clear();
+    mPropositionStatus.clear();
+  }
+
+  /**
    * Reorders the proper events in this encoding based on their status.
    * @param  flags  List of flags to define the ordering, represented by
    *                a sequence of the bits or bit combinations
    *                {@link #STATUS_CONTROLLABLE}, {@link #STATUS_LOCAL},
    *                {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
-   *                {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, and
+   *                {@link #STATUS_OUTSIDE_ONLY_SELFLOOP},
+   *                {@link #STATUS_BLOCKED}, {@link #STATUS_FAILING}, and
    *                {@link #STATUS_UNUSED} or their complements.<BR>
    *                For example, to sort events by controllability first
    *                and second by locality, two arguments STATUS_CONTROLLABLE
@@ -685,7 +721,17 @@ public class EventEncoding
    */
   public static boolean isBlockedEvent(final byte status)
   {
-    return (status & STATUS_BLOCKED) == 0;
+    return (status & STATUS_BLOCKED) != 0;
+  }
+
+  /**
+   * Returns whether the given event status bits identify an event as
+   * failing in an event encoding.
+   * @see #STATUS_FAILING
+   */
+  public static boolean isFailingEvent(final byte status)
+  {
+    return (status & STATUS_FAILING) != 0;
   }
 
   /**
@@ -848,7 +894,8 @@ public class EventEncoding
      *                a sequence of the bits or bit combinations
      *                {@link #STATUS_CONTROLLABLE}, {@link #STATUS_LOCAL},
      *                {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
-     *                {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, and
+     *                {@link #STATUS_OUTSIDE_ONLY_SELFLOOP},
+     *                {@link #STATUS_BLOCKED}, {@link #STATUS_FAILING}, and
      *                {@link #STATUS_UNUSED} or their complements.<BR>
      *                The flags must appear in the ordering that matches
      *                the original call to the {@link
@@ -871,7 +918,8 @@ public class EventEncoding
      *                a sequence of the bits or bit combinations
      *                {@link #STATUS_CONTROLLABLE}, {@link #STATUS_LOCAL},
      *                {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
-     *                {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, and
+     *                {@link #STATUS_OUTSIDE_ONLY_SELFLOOP},
+     *                {@link #STATUS_BLOCKED}, {@link #STATUS_FAILING}, and
      *                {@link #STATUS_UNUSED} or their complements.<BR>
      *                The flags must appear in the ordering that matches
      *                the original call to the {@link
@@ -1204,11 +1252,18 @@ public class EventEncoding
    */
   public static final byte STATUS_BLOCKED = 0x10;
   /**
+   * A status flag indicating a <I>failing</I> event. In a conflict check,
+   * failing events are events known to take the system to a blocking state.
+   * In safety verification, failing events are events are events known to
+   * cause the property checked to fail if they are ever enabled.
+   */
+  public static final byte STATUS_FAILING = 0x20;
+  /**
    * A status flag indicating an event not in the alphabet of the current
    * transition relation. This event is assumed to be implicitly selflooped
    * in all states.
    */
-  public static final byte STATUS_UNUSED = 0x20;
+  public static final byte STATUS_UNUSED = 0x40;
 
   /**
    * Status flags indicating a local event.
@@ -1227,11 +1282,12 @@ public class EventEncoding
    */
   public static final byte STATUS_ALL =
     STATUS_CONTROLLABLE | STATUS_LOCAL | STATUS_OUTSIDE_ONLY_SELFLOOP |
-    STATUS_OUTSIDE_ALWAYS_ENABLED | STATUS_BLOCKED | STATUS_UNUSED;
+    STATUS_OUTSIDE_ALWAYS_ENABLED | STATUS_BLOCKED | STATUS_FAILING |
+    STATUS_UNUSED;
 
   private static final String[] STATUS_NAMES = {
     "CONTROLLABLE", "LOCAL", "OUTSIDE_ONLY_SELFLOOP",
-    "OUTSIDE_ALWAYS_ENABLED", "BLOCKED", "UNUSED"
+    "OUTSIDE_ALWAYS_ENABLED", "BLOCKED", "FAILING", "UNUSED"
   };
 
   private static final Collection<EventProxy> NO_EVENTS =

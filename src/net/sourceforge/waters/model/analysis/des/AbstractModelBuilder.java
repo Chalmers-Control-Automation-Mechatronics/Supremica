@@ -73,13 +73,13 @@ public abstract class AbstractModelBuilder<P extends Proxy>
   @Override
   public void setOutputName(final String name)
   {
-    mOuptutName = name;
+    mOutputName = name;
   }
 
   @Override
   public String getOutputName()
   {
-    return mOuptutName;
+    return mOutputName;
   }
 
   @Override
@@ -127,8 +127,8 @@ public abstract class AbstractModelBuilder<P extends Proxy>
    */
   protected String computeOutputName()
   {
-    if (mOuptutName != null) {
-      return mOuptutName;
+    if (mOutputName != null) {
+      return mOutputName;
     } else {
       final StringBuilder buffer = new StringBuilder("{");
       final ProductDESProxy model = getModel();
@@ -150,7 +150,7 @@ public abstract class AbstractModelBuilder<P extends Proxy>
 
   //#########################################################################
   //# Data Members
-  private String mOuptutName;
+  private String mOutputName;
 
 }
 

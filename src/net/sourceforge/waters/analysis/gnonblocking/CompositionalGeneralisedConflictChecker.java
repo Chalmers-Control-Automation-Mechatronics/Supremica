@@ -41,6 +41,7 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -795,9 +796,9 @@ public class CompositionalGeneralisedConflictChecker
     if (numberOfTransitions > mPeakNumberOfTransitions) {
       mPeakNumberOfTransitions = numberOfTransitions;
     }
-
-    final CompositionStep step =
-        new CompositionStep(syncProduct, composer.getStateMap());
+    final SynchronousProductResult result = composer.getAnalysisResult();
+    final SynchronousProductStateMap stateMap = result.getStateMap();
+    final CompositionStep step = new CompositionStep(syncProduct, stateMap);
     mTemporaryModifyingSteps.add(step);
     return syncProduct;
   }

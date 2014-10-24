@@ -12,9 +12,9 @@ package net.sourceforge.waters.model.analysis.des;
 import java.util.Collection;
 
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
@@ -69,16 +69,19 @@ public abstract class AbstractAutomatonBuilder
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.AutomatonBuilder
+  @Override
   public void setOutputKind(final ComponentKind kind)
   {
     mOutputKind = kind;
   }
 
+  @Override
   public ComponentKind getOutputKind()
   {
     return mOutputKind;
   }
 
+  @Override
   public AutomatonProxy getComputedAutomaton()
   {
     return getComputedProxy();
@@ -147,7 +150,7 @@ public abstract class AbstractAutomatonBuilder
 
   //#########################################################################
   //# Data Members
-  private ComponentKind mOutputKind;
+  private ComponentKind mOutputKind = ComponentKind.PLANT;
 
 }
 

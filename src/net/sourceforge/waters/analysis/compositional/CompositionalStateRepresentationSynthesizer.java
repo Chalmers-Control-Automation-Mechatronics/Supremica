@@ -30,6 +30,7 @@ import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -448,7 +449,8 @@ public class CompositionalStateRepresentationSynthesizer extends
      final EventProxy tau)
   {
     final SynchronousProductBuilder builder = getSynchronousProductBuilder();
-    final SynchronousProductStateMap stateMap =  builder.getStateMap();
+    final SynchronousProductResult result = builder.getAnalysisResult();
+    final SynchronousProductStateMap stateMap = result.getStateMap();
     return new HidingStep(this, sync, hidden, tau, stateMap);
   }
 
@@ -486,7 +488,8 @@ public class CompositionalStateRepresentationSynthesizer extends
       syncBuilder.run();
       automaton = syncBuilder.getComputedAutomaton();
       final Collection<EventProxy> localEvents = Collections.emptyList();
-      final SynchronousProductStateMap stateMap = syncBuilder.getStateMap();
+      final SynchronousProductResult result = syncBuilder.getAnalysisResult();
+      final SynchronousProductStateMap stateMap = result.getStateMap();
       final HidingStep step =
         new HidingStep(this, automaton, localEvents, null, stateMap);
       recordAbstractionStep(step);

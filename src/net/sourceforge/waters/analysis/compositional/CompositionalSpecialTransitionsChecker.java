@@ -34,6 +34,7 @@ import net.sourceforge.waters.model.analysis.des.LanguageInclusionDiagnostics;
 import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.analysis.des.TraceChecker;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -520,8 +521,8 @@ public class CompositionalSpecialTransitionsChecker
     builder.setModel(getModel());
     builder.run();
     final AutomatonProxy sync = builder.getComputedAutomaton();
-    final SynchronousProductStateMap synchronousStateMap =
-      builder.getStateMap();
+    final SynchronousProductResult result = builder.getAnalysisResult();
+    final SynchronousProductStateMap synchronousStateMap = result.getStateMap();
 
     //For each transition of the synchronous product
     for (final TransitionProxy trans : sync.getTransitions()) {
@@ -637,7 +638,8 @@ public class CompositionalSpecialTransitionsChecker
      final EventProxy tau)
   {
     final SynchronousProductBuilder builder = getSynchronousProductBuilder();
-    final SynchronousProductStateMap stateMap =  builder.getStateMap();
+    final SynchronousProductResult result = builder.getAnalysisResult();
+    final SynchronousProductStateMap stateMap = result.getStateMap();
     return new ConflictHidingStep(this, sync, hidden, tau, stateMap);
   }
 

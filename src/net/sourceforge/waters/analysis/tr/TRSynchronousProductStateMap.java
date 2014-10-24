@@ -1,0 +1,135 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.tr
+//# CLASS:   TRSynchronousProductStateMap
+//###########################################################################
+//# $Id$
+//###########################################################################
+
+package net.sourceforge.waters.analysis.tr;
+
+import gnu.trove.map.hash.TObjectIntHashMap;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import net.sourceforge.waters.analysis.monolithic.StateTupleEncoding;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.StateProxy;
+
+
+/**
+ * @author Robi Malik
+ */
+public class TRSynchronousProductStateMap
+  implements SynchronousProductStateMap
+{
+
+  //#########################################################################
+  //# Constructor
+  public TRSynchronousProductStateMap(final Collection<AutomatonProxy> inputAutomata,
+                                      final StateTupleEncoding stateTupleEncoding,
+                                      final IntArrayBuffer stateSpace)
+  {
+    this(new ArrayList<AutomatonProxy>(inputAutomata),
+         stateTupleEncoding, stateSpace);
+  }
+
+  public TRSynchronousProductStateMap(final List<AutomatonProxy> inputAutomata,
+                                      final StateTupleEncoding stateTupleEncoding,
+                                      final IntArrayBuffer stateSpace)
+  {
+    mInputAutomata = inputAutomata;
+    mStateTupleEncoding = stateTupleEncoding;
+    mStateSpace = stateSpace;
+    mEncodedTuple = new int[stateTupleEncoding.getNumberOfWords()];
+  }
+
+
+  //#########################################################################
+  //# Interface
+  //# net.sourceforge.waters.analysis.monolithic.SynchronousProductStateMap
+  @Override
+  public Collection<AutomatonProxy> getInputAutomata()
+  {
+    return mInputAutomata;
+  }
+
+  @Override
+  public StateProxy getOriginalState(final StateProxy syncState,
+                                     final AutomatonProxy aut)
+  {
+    final TRAutomatonProxy.TRState trState =
+      (TRAutomatonProxy.TRState) syncState;
+    final int syncStateIndex = trState.getStateIndex();
+    final int autIndex = getInputAutomatonIndex(aut);
+    final int autStateIndex = getOriginalState(syncStateIndex, autIndex);
+    return getInputAutomatonState(autIndex, autStateIndex);
+  }
+
+
+  //#########################################################################
+  //# Specific Access
+  public int getOriginalState(final int syncState, final int autIndex)
+  {
+    mStateSpace.getContents(syncState, mEncodedTuple);
+    return mStateTupleEncoding.get(mEncodedTuple, autIndex);
+  }
+
+  public void getOriginalState(final int syncState, final int[] decodedTuple)
+  {
+    mStateSpace.getContents(syncState, mEncodedTuple);
+    mStateTupleEncoding.decode(mEncodedTuple, decodedTuple);
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private int getInputAutomatonIndex(final AutomatonProxy aut)
+  {
+    if (mAutomataMap == null) {
+      mAutomataMap =
+        new TObjectIntHashMap<AutomatonProxy>(mInputAutomata.size());
+      int a = 0;
+      for (final AutomatonProxy in : mInputAutomata) {
+        mAutomataMap.put(in, a++);
+      }
+    }
+    return mAutomataMap.get(aut);
+  }
+
+  private StateProxy getInputAutomatonState(final int autIndex,
+                                            final int stateIndex)
+  {
+    final AutomatonProxy aut = mInputAutomata.get(autIndex);
+    if (aut instanceof TRAutomatonProxy) {
+      final TRAutomatonProxy tr = (TRAutomatonProxy) aut;
+      return tr.getState(stateIndex);
+    }
+    if (mStateArrays == null) {
+      mStateArrays = new StateProxy[mInputAutomata.size()][];
+    }
+    if (mStateArrays[autIndex] == null) {
+      int s = 0;
+      for (final StateProxy state : aut.getStates()) {
+        mStateArrays[autIndex][s++] = state;
+      }
+    }
+    return mStateArrays[autIndex][stateIndex];
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final List<AutomatonProxy> mInputAutomata;
+  private final StateTupleEncoding mStateTupleEncoding;
+  private final IntArrayBuffer mStateSpace;
+
+  private final int[] mEncodedTuple;
+  private TObjectIntHashMap<AutomatonProxy> mAutomataMap;
+  private StateProxy[][] mStateArrays;
+
+}
