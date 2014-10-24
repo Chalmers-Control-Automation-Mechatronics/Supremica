@@ -70,6 +70,7 @@ public class TRSynchronousProductBuilderTest
     final Collection<EventProxy> events = des.getEvents();
     final KindTranslator translator = IdenticalKindTranslator.getInstance();
     final EventEncoding enc = new EventEncoding();
+    EventProxy tau = null;
     for (final EventProxy event : events) {
       final EventKind kind = event.getKind();
       final String name = event.getName();
@@ -78,9 +79,17 @@ public class TRSynchronousProductBuilderTest
         enc.addEvent(event, translator,
                      EventEncoding.STATUS_FAILING |
                      EventEncoding.STATUS_OUTSIDE_ALWAYS_ENABLED);
+      } else if (!event.isObservable()) {
+        if (tau == null) {
+          final ProductDESProxyFactory factory = getProductDESProxyFactory();
+          tau = factory.createEventProxy
+            (":tau", EventKind.UNCONTROLLABLE, false);
+          enc.addSilentEvent(tau);
+        }
+        enc.addEventAlias(event, tau, translator, EventEncoding.STATUS_NONE);
       }
     }
-    if (enc.getNumberOfProperEvents() > 1) {
+    if (enc.getNumberOfProperEvents() > 1 || tau != null) {
       try {
         final EventProxy marking =
           AbstractConflictChecker.getMarkingProposition(des);
@@ -95,7 +104,18 @@ public class TRSynchronousProductBuilderTest
 
 
   //#########################################################################
-  //# Specific Test Cases
+  //# Hiding Test Cases
+  public void testHiding01() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "hiding01";
+    runAutomatonBuilder(group, subdir, name);
+  }
+
+
+  //#########################################################################
+  //# Forbidden Events Test Cases
   public void testForbid() throws Exception
   {
     final String group = "tests";
@@ -104,6 +124,9 @@ public class TRSynchronousProductBuilderTest
     runAutomatonBuilder(group, subdir, name);
   }
 
+
+  //#########################################################################
+  //# Deadlock Pruning Test Cases
   public void testDeadlockPruning() throws Exception
   {
     try {

@@ -11,6 +11,7 @@
 package net.sourceforge.waters.analysis.monolithic;
 
 import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Set;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.IntArrayBuffer;
@@ -334,30 +336,40 @@ public class TRSynchronousProductBuilder
     // Set up event info
     final Collection<EventProxy> events = des.getEvents();
     final int numEvents = events.size();
+    final Set<EventProxy> outputEvents;
+    if (mConfiguredEventEncoding == null) {
+      mOutputEventEncoding = new EventEncoding();
+      outputEvents = null;
+    } else {
+      mOutputEventEncoding = new EventEncoding(mConfiguredEventEncoding);
+      outputEvents = new THashSet<>(numEvents);
+    }
     final Map<EventProxy,EventInfo> eventInfoMap = new HashMap<>(numEvents);
     for (final EventProxy event : events) {
       if (translator.getEventKind(event) != EventKind.PROPOSITION) {
         final EventInfo info = new EventInfo(event);
         eventInfoMap.put(event, info);
-      }
-    }
-    if (mConfiguredEventEncoding == null) {
-      mOutputEventEncoding = new EventEncoding();
-    } else {
-      mOutputEventEncoding = new EventEncoding(mConfiguredEventEncoding);
-      // Check for unused events in configured event encoding ...
-      final int numConfigured = mConfiguredEventEncoding.getNumberOfProperEvents();
-      for (int e = EventEncoding.TAU; e < numConfigured; e++) {
-        final EventProxy event = mConfiguredEventEncoding.getProperEvent(e);
-        if (event != null) {
-          final byte status = mConfiguredEventEncoding.getProperEventStatus(e);
-          final EventInfo info = eventInfoMap.get(event);
-          if (info == null) {
-            mOutputEventEncoding.setProperEventStatus
-              (e, status | EventEncoding.STATUS_UNUSED);
-          } else if (mPruningForbiddenEvents) {
+        if (mConfiguredEventEncoding != null) {
+          final int e = mConfiguredEventEncoding.getEventCode(event);
+          if (e >= 0) {
+            final EventProxy output = mConfiguredEventEncoding.getProperEvent(e);
+            outputEvents.add(output);
+            final byte status = mConfiguredEventEncoding.getProperEventStatus(e);
             info.setForbidden(status);
           }
+        }
+      }
+    }
+    if (mConfiguredEventEncoding != null) {
+      // Check for unused events in configured event encoding ...
+      final int numConfigured =
+        mConfiguredEventEncoding.getNumberOfProperEvents();
+      for (int e = EventEncoding.TAU; e < numConfigured; e++) {
+        final EventProxy event = mConfiguredEventEncoding.getProperEvent(e);
+        if (event != null && !outputEvents.contains(event)) {
+          final byte status = mConfiguredEventEncoding.getProperEventStatus(e);
+          mOutputEventEncoding.setProperEventStatus
+            (e, status | EventEncoding.STATUS_UNUSED);
         }
       }
     }
@@ -701,6 +713,7 @@ public class TRSynchronousProductBuilder
       }
       mPreTransitionBuffer.addOutgoingTransitions(rel);
       if (getRemovingSelfloops()) {
+        rel.removeTauSelfLoops();
         if (getPruningDeadlocks() && hasProps) {
           removeSelfloopsConsideringDeadlocks(rel);
         } else {
@@ -965,8 +978,15 @@ public class TRSynchronousProductBuilder
     }
 
     //#######################################################################
+    //# Debugging
+    @Override
+    public String toString()
+    {
+      return mEvent.getName();
+    }
+
+    //#######################################################################
     //# Data Members
-    @SuppressWarnings("unused")
     private final EventProxy mEvent;
     private int mOutputCode;
     private boolean mForbidden;
