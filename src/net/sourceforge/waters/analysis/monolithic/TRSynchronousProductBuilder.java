@@ -1219,13 +1219,14 @@ public class TRSynchronousProductBuilder
   //#########################################################################
   //# Data Members
   // Configuration
-  private EventEncoding mConfiguredEventEncoding;
-  private boolean mHasConfiguredPropositions;
-  private boolean mRemovingSelfloops;
-  private boolean mPruningDeadlocks;
-  private boolean mPruningForbiddenEvents;
-  private StateCallback mStateCallback;
+  private EventEncoding mConfiguredEventEncoding = null;
+  private boolean mHasConfiguredPropositions = false;
+  private boolean mRemovingSelfloops = true;
+  private boolean mPruningDeadlocks = false;
+  private boolean mPruningForbiddenEvents = false;
+  private StateCallback mStateCallback = null;
 
+  // Data structures for state space representation
   private TRAutomatonProxy[] mInputAutomata;
   private Collection<EventInfo> mEventInfo;
   private StateTupleEncoding mStateTupleEncoding;
@@ -1235,6 +1236,7 @@ public class TRSynchronousProductBuilder
   private DeadlockInfo[] mDeadlockInfo;
   private int mNumberOfInitialStates;
 
+  // Temporary variables
   private int mCurrentSource;
   private int mCurrentEvent;
   private TIntHashSet mCurrentTargets;

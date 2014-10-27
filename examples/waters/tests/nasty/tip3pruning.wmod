@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="tip3pruning" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>A test case to check whether to MonolithicSynchronousProductBuilder correctly refrains from pruning of deadlock states in cases where all states are implicitly marked.</ns2:Comment>
+    <ns2:Comment>A test case to check whether a synchronous product builder correctly refrains from pruning of deadlock states in cases where all states are implicitly marked.</ns2:Comment>
     <ConstantAliasList>
         <ConstantAlias Name="SIGHTS">
             <ConstantAliasExpression>

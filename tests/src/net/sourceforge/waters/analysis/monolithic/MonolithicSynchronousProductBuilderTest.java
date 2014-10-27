@@ -75,23 +75,20 @@ public class MonolithicSynchronousProductBuilderTest
 
 
   //#########################################################################
-  //# Specific Test Cases
+  //# Forbidden Events Test Cases
   public void testForbid() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "forbid";
-    runAutomatonBuilder(group, subdir, name);
+    runAutomatonBuilder("tests", "abstraction", "forbid.wmod");
   }
 
+
+  //#########################################################################
+  //# Deadlock Pruning Test Cases
   public void testDeadlockPruning() throws Exception
   {
     try {
       mPruningDeadlocks = true;
-      final String group = "tests";
-      final String subdir = "abstraction";
-      final String name = "deadlockPruning";
-      runAutomatonBuilder(group, subdir, name);
+      runAutomatonBuilder("tests", "abstraction", "deadlockPruning.wmod");
     } finally {
       mPruningDeadlocks = false;
     }
@@ -101,10 +98,7 @@ public class MonolithicSynchronousProductBuilderTest
   {
     try {
       mPruningDeadlocks = true;
-      final String group = "tests";
-      final String subdir = "nasty";
-      final String name = "tip3pruning";
-      runAutomatonBuilder(group, subdir, name);
+      runAutomatonBuilder("tests", "nasty", "tip3pruning.wmod");
     } finally {
       mPruningDeadlocks = false;
     }

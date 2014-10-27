@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
-//# CLASS:   MonolithicSynchronousProductBuilderTest
+//# CLASS:   TRSynchronousProductBuilderTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -104,13 +104,18 @@ public class TRSynchronousProductBuilderTest
 
 
   //#########################################################################
+  //# Selfloop Removal Test Cases
+  public void testSyncSelfloop() throws Exception
+  {
+    runAutomatonBuilder("tests", "nasty", "syncselfloop.wmod");
+  }
+
+
+  //#########################################################################
   //# Hiding Test Cases
   public void testHiding01() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "hiding01";
-    runAutomatonBuilder(group, subdir, name);
+    runAutomatonBuilder("tests", "abstraction", "hiding01.wmod");
   }
 
 
@@ -118,10 +123,7 @@ public class TRSynchronousProductBuilderTest
   //# Forbidden Events Test Cases
   public void testForbid() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "forbid";
-    runAutomatonBuilder(group, subdir, name);
+    runAutomatonBuilder("tests", "abstraction", "forbid.wmod");
   }
 
 
@@ -131,10 +133,7 @@ public class TRSynchronousProductBuilderTest
   {
     try {
       mPruningDeadlocks = true;
-      final String group = "tests";
-      final String subdir = "abstraction";
-      final String name = "deadlockPruning";
-      runAutomatonBuilder(group, subdir, name);
+      runAutomatonBuilder("tests", "abstraction", "deadlockPruning.wmod");
     } finally {
       mPruningDeadlocks = false;
     }
@@ -144,10 +143,7 @@ public class TRSynchronousProductBuilderTest
   {
     try {
       mPruningDeadlocks = true;
-      final String group = "tests";
-      final String subdir = "nasty";
-      final String name = "tip3pruning";
-      runAutomatonBuilder(group, subdir, name);
+      runAutomatonBuilder("tests", "nasty", "tip3pruning.wmod");
     } finally {
       mPruningDeadlocks = false;
     }

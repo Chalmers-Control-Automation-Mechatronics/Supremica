@@ -9,7 +9,6 @@
 
 package net.sourceforge.waters.model.analysis;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
@@ -41,6 +40,7 @@ public abstract class AbstractAutomatonBuilderTest
     super(name);
   }
 
+  @Override
   protected void setUp() throws Exception
   {
     super.setUp();
@@ -50,6 +50,7 @@ public abstract class AbstractAutomatonBuilderTest
     setNodeLimit();
   }
 
+  @Override
   protected void tearDown()
     throws Exception
   {
@@ -61,125 +62,27 @@ public abstract class AbstractAutomatonBuilderTest
 
 
   //#########################################################################
-  //# Instantiating and Checking Modules
-  protected void runAutomatonBuilder(final String group, final String name,
-                                     final List<ParameterBindingProxy> bindings)
+  //# Invocation
+  protected void runAutomatonBuilder(final String... path)
     throws Exception
   {
-    final File rootdir = getWatersInputRoot();
-    final File groupdir = new File(rootdir, group);
-    runAutomatonBuilder(groupdir, name, bindings);
+    runAutomatonBuilder(null, path);
   }
 
-  protected void runAutomatonBuilder(final String group, final String subdir,
-                                     final String name,
-                                     final List<ParameterBindingProxy> bindings)
+  protected void runAutomatonBuilder(final List<ParameterBindingProxy> bindings,
+                                     final String... path)
     throws Exception
   {
-    final File rootdir = getWatersInputRoot();
-    final File groupdir = new File(rootdir, group);
-    runAutomatonBuilder(groupdir, subdir, name, bindings);
-  }
-
-  protected void runAutomatonBuilder(final File groupdir, final String subdir,
-                                     final String name,
-                                     final List<ParameterBindingProxy> bindings)
-    throws Exception
-  {
-    final File dir = new File(groupdir, subdir);
-    runAutomatonBuilder(dir, name, bindings);
-  }
-
-  protected void runAutomatonBuilder(final File dir, final String name,
-                                     final List<ParameterBindingProxy> bindings)
-    throws Exception
-  {
-    final String ext = getTestExtension();
-    final File filename = new File(dir, name + ext);
-    final String suffixed = appendSuffixes(name, bindings);
-    final String expectedName = getExpectedName(suffixed);
-    final File expectedFile = new File(dir, expectedName + ext);
-    runAutomatonBuilder(filename, bindings, expectedFile);
+    final ProductDESProxy des = getCompiledDES(bindings, path);
+    final int last = path.length - 1;
+    path[last] = getExpectedName(path[last], bindings);
+    final ProductDESProxy expect = getCompiledDES(bindings, path);
+    runAutomatonBuilderWithBindings(des, expect);
   }
 
 
   //#########################################################################
-  //# Checking Instantiated Product DES problems
-  protected void runAutomatonBuilder(final String group,
-                                     final String name)
-    throws Exception
-  {
-    final File rootdir = getWatersInputRoot();
-    final File groupdir = new File(rootdir, group);
-    runAutomatonBuilder(groupdir, name);
-  }
-
-  protected void runAutomatonBuilder(final String group,
-                                     final String subdir,
-                                     final String name)
-      throws Exception
-  {
-    final File rootdir = getWatersInputRoot();
-    final File groupdir = new File(rootdir, group);
-    runAutomatonBuilder(groupdir, subdir, name);
-  }
-
-  protected void runAutomatonBuilder(final File groupdir,
-                                     final String subdir,
-                                     final String name)
-      throws Exception
-  {
-    final File dir = new File(groupdir, subdir);
-    runAutomatonBuilder(dir, name);
-  }
-
-  protected void runAutomatonBuilder(final File dir,
-                                     final String name)
-    throws Exception
-  {
-    final String ext = getTestExtension();
-    final File filename = new File(dir, name + ext);
-    final String expectedName = getExpectedName(name);
-    final File expectedFile = new File(dir, expectedName + ext);
-    runAutomatonBuilder(filename, expectedFile);
-  }
-
-  protected void runAutomatonBuilder(final File filename,
-                                     final File expectedFile)
-    throws Exception
-  {
-    runAutomatonBuilder(filename,
-                        (List<ParameterBindingProxy>) null,
-                        expectedFile);
-  }
-
-  protected void runAutomatonBuilder(final File filename,
-                                     final List<ParameterBindingProxy> bindings,
-                                     final File expectedFile)
-    throws Exception
-  {
-    mBindings = bindings;
-    final ProductDESProxy des = getCompiledDES(filename, bindings);
-    final ProductDESProxy expect = getCompiledDES(expectedFile);
-    runAutomatonBuilderWithBindings(des, expect);
-  }
-
-  protected void runAutomatonBuilder(final ProductDESProxy des,
-                                     final ProductDESProxy expect)
-    throws Exception
-  {
-    runAutomatonBuilder(des, null, expect);
-  }
-
-  protected void runAutomatonBuilder(final ProductDESProxy des,
-                                     final List<ParameterBindingProxy> bindings,
-                                     final ProductDESProxy expect)
-    throws Exception
-  {
-    mBindings = bindings;
-    runAutomatonBuilderWithBindings(des, expect);
-  }
-
+  //# Hooks
   protected AutomatonBuilder getAutomatonBuilder()
   {
     return mAutomatonBuilder;
@@ -228,13 +131,17 @@ public abstract class AbstractAutomatonBuilderTest
   /**
    * Returns the name of the file that contains the expected result
    * for a given test.
-   * @param desname
-   *          The base bane of the file containing the test data,
-   *          without path and extension.
-   * @return  The base name of the file containing the expected result
-   *          for the test, without path and extension.
+   * @param  desname
+   *           The name of the file containing the test data,
+   *           with or without path.
+   * @param  bindings
+   *           Parameter bindings used to instantiate the module.
+   * @return The base name of the file containing the expected result
+   *         for the test, without path and extension.
    */
-  protected abstract String getExpectedName(final String desname);
+  protected abstract String getExpectedName
+    (final String desname,
+     final List<ParameterBindingProxy> bindings);
 
   /**
    * Returns the extension used for all test files
