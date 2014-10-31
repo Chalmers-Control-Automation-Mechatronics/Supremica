@@ -13,16 +13,12 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.set.hash.THashSet;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,6 +32,7 @@ import java.util.TreeSet;
 import net.sourceforge.waters.analysis.modular.BlockedEvents;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -92,19 +89,20 @@ public class AlphaNonBlockingChecker
     return true;
   }
 
-  public SortedSet<AutomatonProxy> addAlpha(final Set<AutomatonProxy> model)
+  private SortedSet<AutomatonProxy> addAlpha(final Set<AutomatonProxy> model)
     throws AnalysisException
   {
-    final SortedSet<AutomatonProxy> newmodel = new TreeSet<AutomatonProxy>();
+    final SortedSet<AutomatonProxy> newmodel = new TreeSet<>();
     for (final AutomatonProxy aut : model) {
       final EventEncoding ee = new EventEncoding(aut, getKindTranslator());
       ee.addEvent(getUsedDefaultMarking(), getKindTranslator(),
-                  EventEncoding.STATUS_UNUSED);
-      ee.addEvent(mAlpha, getKindTranslator(), EventEncoding.STATUS_UNUSED);
-      ee.addEvent(mCont, getKindTranslator(), EventEncoding.STATUS_NONE);
+                  EventStatus.STATUS_UNUSED);
+      ee.addEvent(mAlpha, getKindTranslator(), EventStatus.STATUS_UNUSED);
+      ee.addEvent(mCont, getKindTranslator(), EventStatus.STATUS_NONE);
       final ListBufferTransitionRelation tr =
         new ListBufferTransitionRelation(aut, ee,
                                          ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      tr.addRedundantPropositions();
       newmodel.add(tr.createAutomaton(getFactory(), ee));
     }
     return newmodel;
@@ -137,22 +135,14 @@ public class AlphaNonBlockingChecker
     mFinalTrans = checker.getAnalysisResult().getTotalNumberOfTransitions();
 
     if (!result) {
-      final List<EventProxy> e = new ArrayList<EventProxy>();
-      final TraceProxy counter = getFactory().createSafetyTraceProxy(getModel().getName(),
-                                                               getModel(), e);
+      final List<EventProxy> e = new ArrayList<>();
+      final TraceProxy counter =
+        getFactory().createSafetyTraceProxy(getModel().getName(), getModel(), e);
       setFailedResult(counter);
     } else {
       setSatisfiedResult();
     }
     mTime += System.currentTimeMillis();
-    try {
-      final BufferedWriter write = new BufferedWriter(new FileWriter("/home/darius/Projects/supr/supremica/alpha/" + getModel().getName()));
-      write.append(getStats());
-      write.append("result:" + result);
-      write.close();
-    } catch (final IOException exception) {
-      // No writing --- never mind ...
-    }
     clearStats();
     return result;
   }
@@ -228,7 +218,7 @@ public class AlphaNonBlockingChecker
     throws AnalysisException
   {
     super.setUp();
-    final Set<EventProxy> mPropositions = new HashSet<EventProxy>();
+    final Set<EventProxy> mPropositions = new THashSet<>();
     final ProductDESProxyFactory factory = getFactory();
     mPropositions.add(mAlpha);
     mPropositions.add(getUsedDefaultMarking());
@@ -484,7 +474,7 @@ public class AlphaNonBlockingChecker
     final Collection<AutomatonProxy> tautomata = automata;
     for (final AutomatonProxy a : tautomata) {
       p = new ProjectionList(p, automata, Collections.singleton(a));
-      automata = new TreeSet<AutomatonProxy>(p.getAutomata());
+      automata = new TreeSet<>(p.getAutomata());
     }
     while (true) {
       final List<Set<AutomatonProxy>> possible = getMinTransitions(model, automata);
@@ -505,7 +495,7 @@ public class AlphaNonBlockingChecker
       }
       if (minlist != null) {
         p = minlist;
-        automata = new TreeSet<AutomatonProxy>(p.getAutomata());
+        automata = new TreeSet<>(p.getAutomata());
         stop = false;
       }
       stop = automata.size() == 2 ? true : stop;
@@ -618,14 +608,14 @@ public class AlphaNonBlockingChecker
       mParent = null;// parent;
       mCompautomata = new TreeSet<AutomatonProxy>(new AutomatonComparator());
       mCompautomata.addAll(compAutomata);
-      mAutomata = new TreeSet<AutomatonProxy>(automata);
-      final Set<EventProxy> events = new TreeSet<EventProxy>();
+      mAutomata = new TreeSet<>(automata);
+      final Set<EventProxy> events = new TreeSet<>();
       for (final AutomatonProxy a : mCompautomata) {
         events.addAll(a.getEvents());
       }
       mAutomata.removeAll(compAutomata);
       mOriginalAlphabet = events;
-      mHidden = new HashSet<EventProxy>(events);
+      mHidden = new THashSet<>(events);
       for (final AutomatonProxy a : mAutomata) {
         if (!compAutomata.contains(a)) {
           mHidden.removeAll(a.getEvents());
@@ -633,6 +623,7 @@ public class AlphaNonBlockingChecker
       }
       mHidden.remove(getUsedDefaultMarking());
       mHidden.remove(mAlpha);
+      mHidden.remove(mCont);
       AutomatonProxy minAutomaton;
       try {
         final ProductDESProxy compmodel =
@@ -699,7 +690,7 @@ public class AlphaNonBlockingChecker
       mAutomata.add(minAutomaton);
       mDontOnOwn.add(minAutomaton);
       mNew = minAutomaton;
-      mTarget = new HashSet<EventProxy>();
+      mTarget = new THashSet<>();
       for (final AutomatonProxy a : mAutomata) {
         mTarget.addAll(a.getEvents());
       }
@@ -742,7 +733,7 @@ public class AlphaNonBlockingChecker
             .size()));
         automata
             .add(new HashMap<Key,StateProxy>(proxy.getTransitions().size()));
-        final Set<EventProxy> autevents = new HashSet<EventProxy>(mOriginalAlphabet);
+        final Set<EventProxy> autevents = new THashSet<>(mOriginalAlphabet);
         autevents.removeAll(proxy.getEvents());
         int init = 0;
         final Set<StateProxy> states = proxy.getStates();
@@ -751,7 +742,7 @@ public class AlphaNonBlockingChecker
             init++;
             currstate.add(s);
           }
-          events.get(i).put(s, new HashSet<EventProxy>(autevents));
+          events.get(i).put(s, new THashSet<>(autevents));
         }
         assert (init == 1);
         final Collection<TransitionProxy> trans = proxy.getTransitions();
@@ -763,12 +754,12 @@ public class AlphaNonBlockingChecker
         aut[i] = proxy;
         i++;
       }
-      Queue<Place> stateList = new PriorityQueue<Place>();
+      Queue<Place> stateList = new PriorityQueue<>();
       Place place = new Place(currstate, null, 0, null);
       stateList.offer(place);
       final List<EventProxy> oldevents = trace.getEvents();
 
-      final Set<Place> visited = new HashSet<Place>();
+      final Set<Place> visited = new THashSet<>();
       visited.add(place);
       while (true) {
         place = stateList.poll();
@@ -776,10 +767,9 @@ public class AlphaNonBlockingChecker
           break;
         }
         currstate = place.mCurrState;
-        final Set<EventProxy> possevents = new HashSet<EventProxy>(mHidden);
+        final Set<EventProxy> possevents = new THashSet<>(mHidden);
         hidden: for (final EventProxy pe : possevents) {
-          final List<StateProxy> newstate =
-              new ArrayList<StateProxy>(currstate.size());
+          final List<StateProxy> newstate = new ArrayList<>(currstate.size());
           for (i = 0; i < currstate.size(); i++) {
             if (aut[i].getEvents().contains(pe)) {
               final StateProxy t = automata.get(i).get(new Key(currstate.get(i), pe));
@@ -998,17 +988,16 @@ public class AlphaNonBlockingChecker
     return abstractedAut;
   }
 
+
   //#########################################################################
   //# Data Members
   private int minSize = 10000;
   private int mStates;
   private int mMaxProjStates;
   private final Map<AutomataHidden,AutomatonProxy> mMinAutMap =
-      new HashMap<AutomataHidden,AutomatonProxy>();
-  private final Set<AutomataHidden> mChecked =
-    new THashSet<AutomataHidden>();
-  private final Set<AutomatonProxy> mDontOnOwn =
-    new THashSet<AutomatonProxy>();
+      new HashMap<>();
+  private final Set<AutomataHidden> mChecked = new THashSet<>();
+  private final Set<AutomatonProxy> mDontOnOwn = new THashSet<>();
   private TObjectIntHashMap<Set<AutomatonProxy>> mCommon = null;
 
   private int maxsize = 1000;

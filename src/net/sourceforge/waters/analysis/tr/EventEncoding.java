@@ -11,7 +11,6 @@ package net.sourceforge.waters.analysis.tr;
 
 import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.list.array.TByteArrayList;
-import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.procedure.TObjectIntProcedure;
 
@@ -26,6 +25,8 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -61,6 +62,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  */
 
 public class EventEncoding
+  implements EventStatusProvider
 {
 
   //#########################################################################
@@ -72,9 +74,13 @@ public class EventEncoding
    * @param  aut         The automaton to be encoded.
    * @param  translator  Kind translator to distinguish propositions from
    *                     proper events.
+   * @throws OverflowException to indicate that the number of propositions
+   *                    exceeds the supported maximum
+   *                    {@link EventStatusProvider#MAX_PROPOSITIONS}.
    */
   public EventEncoding(final AutomatonProxy aut,
                        final KindTranslator translator)
+    throws OverflowException
   {
     this(aut, translator, null);
   }
@@ -88,10 +94,14 @@ public class EventEncoding
    *                     proper events.
    * @param  tau         The silent event to be used,
    *                     or <CODE>null</CODE> if none is to be configured.
+   * @throws OverflowException to indicate that the number of propositions
+   *                    exceeds the supported maximum
+   *                    {@link EventStatusProvider#MAX_PROPOSITIONS}.
    */
   public EventEncoding(final AutomatonProxy aut,
                        final KindTranslator translator,
                        final EventProxy tau)
+    throws OverflowException
   {
     this(aut, translator, tau, null, FILTER_NONE);
   }
@@ -106,11 +116,15 @@ public class EventEncoding
    * @param  filterMode  Flags defining how the filter is to be used,
    *                     should be one of {@link #FILTER_PROPER_EVENTS},
    *                     {@link #FILTER_PROPOSITIONS}, or {@link #FILTER_ALL}.
+   * @throws OverflowException to indicate that the number of propositions
+   *                    exceeds the supported maximum
+   *                    {@link EventStatusProvider#MAX_PROPOSITIONS}.
    */
   public EventEncoding(final AutomatonProxy aut,
                        final KindTranslator translator,
                        final Collection<EventProxy> filter,
                        final int filterMode)
+    throws OverflowException
   {
     this(aut.getEvents(), translator, filter, filterMode);
   }
@@ -126,12 +140,16 @@ public class EventEncoding
    * @param  filterMode  Flags defining how the filter is to be used,
    *                     should be one of {@link #FILTER_PROPER_EVENTS},
    *                     {@link #FILTER_PROPOSITIONS}, or {@link #FILTER_ALL}.
+   * @throws OverflowException to indicate that the number of propositions
+   *                    exceeds the supported maximum
+   *                    {@link EventStatusProvider#MAX_PROPOSITIONS}.
    */
   public EventEncoding(final AutomatonProxy aut,
                        final KindTranslator translator,
                        final EventProxy tau,
                        final Collection<EventProxy> filter,
                        final int filterMode)
+    throws OverflowException
   {
     this(aut.getEvents(), translator, tau, filter, filterMode);
   }
@@ -145,7 +163,14 @@ public class EventEncoding
    */
   public EventEncoding()
   {
-    this(NO_EVENTS, null);
+    mProperEvents = new ArrayList<>();
+    mProperEvents.add(null);
+    mProperEventStatus = new TByteArrayList();
+    mProperEventStatus.add((byte) (EventStatus.STATUS_FULLY_LOCAL |
+                                   EventStatus.STATUS_UNUSED));
+    mPropositions = new ArrayList<>();
+    mUsedPropositions = 0;
+    mEventCodeMap = new TObjectIntHashMap<>(0, 0.5f, -1);
   }
 
   /**
@@ -158,9 +183,12 @@ public class EventEncoding
    *                     to the silent event, even though it is not used.
    * @param  translator  Kind translator to distinguish propositions from
    *                     proper events.
+   * @throws OverflowException to indicate that the number of propositions
+   *                    exceeds the supported maximum
+   *                    {@link EventStatusProvider#MAX_PROPOSITIONS}.
    */
   public EventEncoding(final Collection<EventProxy> events,
-                       final KindTranslator translator)
+                       final KindTranslator translator) throws OverflowException
   {
     this(events, translator, null, FILTER_NONE);
   }
@@ -176,10 +204,13 @@ public class EventEncoding
    *                     proper events.
    * @param  tau         The silent event to be used,
    *                     or <CODE>null</CODE> if none is to be configured.
+   * @throws OverflowException to indicate that the number of propositions
+   *                    exceeds the supported maximum
+   *                    {@link EventStatusProvider#MAX_PROPOSITIONS}.
    */
   public EventEncoding(final Collection<EventProxy> events,
                        final KindTranslator translator,
-                       final EventProxy tau)
+                       final EventProxy tau) throws OverflowException
   {
     this(events, translator, tau, null, FILTER_NONE);
   }
@@ -197,11 +228,15 @@ public class EventEncoding
    * @param  filterMode  Flags defining how the filter is to be used,
    *                     should be one of {@link #FILTER_PROPER_EVENTS},
    *                     {@link #FILTER_PROPOSITIONS}, or {@link #FILTER_ALL}.
+   * @throws OverflowException to indicate that the number of propositions
+   *                    exceeds the supported maximum
+   *                    {@link EventStatusProvider#MAX_PROPOSITIONS}.
    */
   public EventEncoding(final Collection<EventProxy> events,
                        final KindTranslator translator,
                        final Collection<EventProxy> filter,
                        final int filterMode)
+    throws OverflowException
   {
     this(events, translator, null, filter, filterMode);
   }
@@ -220,24 +255,29 @@ public class EventEncoding
    * @param  filterMode  Flags defining how the filter is to be used,
    *                     should be one of {@link #FILTER_PROPER_EVENTS},
    *                     {@link #FILTER_PROPOSITIONS}, or {@link #FILTER_ALL}.
+   * @throws OverflowException to indicate that the number of propositions
+   *                    exceeds the supported maximum
+   *                    {@link EventStatusProvider#MAX_PROPOSITIONS}.
    */
   public EventEncoding(final Collection<EventProxy> events,
                        final KindTranslator translator,
                        final EventProxy tau,
                        final Collection<EventProxy> filter,
                        final int filterMode)
+    throws OverflowException
   {
     final int numEvents = events.size();
     mProperEvents = new ArrayList<>(numEvents);
     mPropositions = new ArrayList<>(numEvents);
     mProperEventStatus = new TByteArrayList(numEvents);
-    mPropositionStatus = new TByteArrayList(numEvents);
+    mUsedPropositions = 0;
     mEventCodeMap = new TObjectIntHashMap<>(numEvents, 0.5f, -1);
     mProperEvents.add(tau);
     if (tau == null) {
-      mProperEventStatus.add((byte) (STATUS_FULLY_LOCAL | STATUS_UNUSED));
+      mProperEventStatus.add((byte) (EventStatus.STATUS_FULLY_LOCAL |
+                                     EventStatus.STATUS_UNUSED));
     } else {
-      mProperEventStatus.add(STATUS_FULLY_LOCAL);
+      mProperEventStatus.add(EventStatus.STATUS_FULLY_LOCAL);
       mEventCodeMap.put(tau, TAU);
     }
     for (final EventProxy event : events) {
@@ -245,7 +285,7 @@ public class EventEncoding
         byte status = 0;
         switch (translator.getEventKind(event)) {
         case CONTROLLABLE:
-          status = STATUS_CONTROLLABLE;
+          status = EventStatus.STATUS_CONTROLLABLE;
         case UNCONTROLLABLE:
           if ((filterMode & FILTER_PROPER_EVENTS) == 0 ||
               filter.contains(event)) {
@@ -258,10 +298,11 @@ public class EventEncoding
         case PROPOSITION:
           if ((filterMode & FILTER_PROPOSITIONS) == 0 ||
               filter.contains(event)) {
+            checkNumberOfPropositions(1);
             final int p = mPropositions.size();
             mEventCodeMap.put(event, p);
             mPropositions.add(event);
-            mPropositionStatus.add(STATUS_NONE);
+            mUsedPropositions |= (1 << p);
           }
           break;
         default:
@@ -279,8 +320,9 @@ public class EventEncoding
     mProperEvents = new ArrayList<>(enc.mProperEvents);
     mPropositions = new ArrayList<>(enc.mPropositions);
     mProperEventStatus = new TByteArrayList(enc.mProperEventStatus);
-    mPropositionStatus = new TByteArrayList(enc.mPropositionStatus);
+    mUsedPropositions = enc.mUsedPropositions;
     mEventCodeMap = new TObjectIntHashMap<>(enc.mEventCodeMap);
+    mOrderingInfo = enc.getOrderingInfo();
   }
 
 
@@ -303,7 +345,7 @@ public class EventEncoding
         buffer.append('=');
         buffer.append(event == null ? "(null)" : event.getName());
         final byte status = mProperEventStatus.get(ecode++);
-        appendStatusInfo(buffer, status);
+        EventStatus.appendStatusInfo(buffer, status);
       }
     }
     final TObjectIntIterator<EventProxy> iter = mEventCodeMap.iterator();
@@ -322,7 +364,7 @@ public class EventEncoding
         buffer.append('=');
         buffer.append(event == null ? "(null)" : event.getName());
         final byte status = mProperEventStatus.get(code);
-        appendStatusInfo(buffer, status);
+        EventStatus.appendStatusInfo(buffer, status);
       }
     }
     if (mPropositions != null) {
@@ -336,29 +378,60 @@ public class EventEncoding
         buffer.append(pcode);
         buffer.append('=');
         buffer.append(prop == null ? "(null)" : prop.getName());
-        final byte status = mPropositionStatus.get(pcode++);
-        appendStatusInfo(buffer, status);
+        if ((mUsedPropositions & (1 << pcode)) == 0) {
+          buffer.append("<UNUSED>");
+        }
+        pcode++;
       }
     }
     buffer.append('}');
     return buffer.toString();
   }
 
-  private void appendStatusInfo(final StringBuilder buffer, final byte status)
+
+  //#########################################################################
+  //# Interface java.lang.Cloneable
+  @Override
+  public EventEncoding clone()
   {
-    if (status != STATUS_NONE) {
-      char sep = '<';
-      byte bit = 1;
-      for (final String name : STATUS_NAMES) {
-        if ((status & bit) != 0) {
-          buffer.append(sep);
-          sep = ',';
-          buffer.append(name);
-        }
-        bit <<= 1;
-      }
-      buffer.append('>');
+    return new EventEncoding(this);
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.analysis.tr.EventStatusProvider
+  @Override
+  public byte getProperEventStatus(final int event)
+  {
+    return mProperEventStatus.get(event);
+  }
+
+  @Override
+  public void setProperEventStatus(final int event, final int status)
+  {
+    mProperEventStatus.set(event, (byte) status);
+  }
+
+  @Override
+  public boolean isPropositionUsed(final int prop)
+  {
+    return (mUsedPropositions & (1 << prop)) != 0;
+  }
+
+  @Override
+  public void setPropositionUsed(final int prop, final boolean used)
+  {
+    if (used) {
+      mUsedPropositions |= (1 << prop);
+    } else {
+      mUsedPropositions &= ~(1 << prop);
     }
+  }
+
+  @Override
+  public int getUsedPropositions()
+  {
+    return mUsedPropositions;
   }
 
 
@@ -379,6 +452,7 @@ public class EventEncoding
    * in this encoding. The number of proper events always includes the
    * silent (tau) event, even if none has been specified.
    */
+  @Override
   public int getNumberOfProperEvents()
   {
     return mProperEvents.size();
@@ -387,6 +461,7 @@ public class EventEncoding
   /**
    * Gets the number of proposition events in this encoding.
    */
+  @Override
   public int getNumberOfPropositions()
   {
     return mPropositions.size();
@@ -456,6 +531,7 @@ public class EventEncoding
    *         <CODE>null</CODE> otherwise.
    * @see #sortProperEvents(byte...) sortProperEvents()
    */
+  @Override
   public OrderingInfo getOrderingInfo()
   {
     return mOrderingInfo;
@@ -472,17 +548,22 @@ public class EventEncoding
    * @param  translator  Kind translator to get event kind information.
    * @param  status      Collection of status flags providing additional
    *                     information about the event. Should be a combination
-   *                     of the bits {@link #STATUS_CONTROLLABLE},
-   *                     {@link #STATUS_LOCAL},
-   *                     {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
-   *                     {@link #STATUS_OUTSIDE_ONLY_SELFLOOP},
-   *                     {@link #STATUS_BLOCKED}, {@link #STATUS_FAILING},
-   *                     and {@link #STATUS_UNUSED}.
+   *                     of the bits {@link EventStatus#STATUS_CONTROLLABLE},
+   *                     {@link EventStatus#STATUS_LOCAL},
+   *                     {@link EventStatus#STATUS_OUTSIDE_ALWAYS_ENABLED},
+   *                     {@link EventStatus#STATUS_OUTSIDE_ONLY_SELFLOOP},
+   *                     {@link EventStatus#STATUS_BLOCKED},
+   *                     {@link EventStatus#STATUS_FAILING},
+   *                     and {@link EventStatus#STATUS_UNUSED}.
    * @return The event (or proposition) code that was assigned to the event.
+   * @throws OverflowException to indicate that the number of propositions
+   *                     exceeds the supported maximum
+   *                     {@link EventStatusProvider#MAX_PROPOSITIONS}.
    */
   public int addEvent(final EventProxy event,
                       final KindTranslator translator,
                       int status)
+    throws OverflowException
   {
     int code = mEventCodeMap.get(event);
     if (code >= 0) {
@@ -490,7 +571,7 @@ public class EventEncoding
     }
     switch (translator.getEventKind(event)) {
     case CONTROLLABLE:
-      status |= STATUS_CONTROLLABLE;
+      status |= EventStatus.STATUS_CONTROLLABLE;
     case UNCONTROLLABLE:
       code = mProperEvents.size();
       mEventCodeMap.put(event, code);
@@ -498,10 +579,13 @@ public class EventEncoding
       mProperEventStatus.add((byte) status);
       break;
     case PROPOSITION:
+      checkNumberOfPropositions(1);
       code = mPropositions.size();
       mEventCodeMap.put(event, code);
       mPropositions.add(event);
-      mPropositionStatus.add((byte) status);
+      if (EventStatus.isUsedEvent((byte) status)) {
+        mUsedPropositions |= (1 << code);
+      }
       break;
     default:
       throw new IllegalArgumentException
@@ -525,84 +609,26 @@ public class EventEncoding
    * @param  translator  Kind translator to get event kind information.
    * @param  status      Collection of status flags providing additional
    *                     information about the event. Should be a combination
-   *                     of the bits {@link #STATUS_CONTROLLABLE},
-   *                     {@link #STATUS_LOCAL},
-   *                     {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
-   *                     {@link #STATUS_OUTSIDE_ONLY_SELFLOOP},
-   *                     {@link #STATUS_BLOCKED}, {@link #STATUS_FAILING},
-   *                     and {@link #STATUS_UNUSED}.
+   *                     of the bits {@link EventStatus#STATUS_CONTROLLABLE},
+   *                     {@link EventStatus#STATUS_LOCAL},
+   *                     {@link EventStatus#STATUS_OUTSIDE_ALWAYS_ENABLED},
+   *                     {@link EventStatus#STATUS_OUTSIDE_ONLY_SELFLOOP},
+   *                     {@link EventStatus#STATUS_BLOCKED}, {@link EventStatus#STATUS_FAILING},
+   *                     and {@link EventStatus#STATUS_UNUSED}.
    * @return The event code that was assigned to the event.
+   * @throws OverflowException to indicate that the number of propositions
+   *                     exceeds the supported maximum
+   *                     {@link EventStatusProvider#MAX_PROPOSITIONS}.
    */
   public int addEventAlias(final EventProxy alias,
                            final EventProxy event,
                            final KindTranslator translator,
                            final int status)
+    throws OverflowException
   {
     final int code = addEvent(event, translator, status);
     mEventCodeMap.put(alias, code);
     return code;
-  }
-
-  /**
-   * Retrieves the status flags for the given proper event.
-   * @param  event  Code of the proper event to be looked up.
-   *                Must be in the range from 0 to
-   *                {@link #getNumberOfProperEvents()}-1.
-   * @return A combination of the bits {@link #STATUS_CONTROLLABLE},
-   *         {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
-   *         {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, {@link #STATUS_BLOCKED},
-   *         {@link #STATUS_FAILING}, and {@link #STATUS_UNUSED}.
-   */
-  public byte getProperEventStatus(final int event)
-  {
-    return mProperEventStatus.get(event);
-  }
-
-  /**
-   * Assigns new status flags to the given proper event.
-   * @param  event  Code of the proper event to be modified.
-   *                Must be in the range from 0 to
-   *                {@link #getNumberOfProperEvents()}-1.
-   * @param  status A combination of the bits {@link #STATUS_CONTROLLABLE},
-   *                {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
-   *                {@link #STATUS_OUTSIDE_ONLY_SELFLOOP},
-   *                {@link #STATUS_BLOCKED}, {@link #STATUS_FAILING},
-   *                and {@link #STATUS_UNUSED}.
-   */
-  public void setProperEventStatus(final int event, final int status)
-  {
-    mProperEventStatus.set(event, (byte) status);
-  }
-
-  /**
-   * Retrieves the status flags for the given proposition.
-   * @param  prop   Code of the proposition to be looked up.
-   *                Must be in the range from 0 to
-   *                {@link #getNumberOfPropositions()}-1.
-   * @return A combination of the bits {@link #STATUS_CONTROLLABLE},
-   *         {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
-   *         {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, {@link #STATUS_BLOCKED},
-   *         {@link #STATUS_FAILING}, and {@link #STATUS_UNUSED}.
-   */
-  public byte getPropositionStatus(final int prop)
-  {
-    return mPropositionStatus.get(prop);
-  }
-
-  /**
-   * Assigns new status flags to the given proposition.
-   * @param  prop   Code of the proposition to be modified.
-   *                Must be in the range from 0 to
-   *                {@link #getNumberOfPropositions()}-1.
-   * @param  status A combination of the bits {@link #STATUS_CONTROLLABLE},
-   *                {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
-   *                {@link #STATUS_OUTSIDE_ONLY_SELFLOOP},
-   *                {@link #STATUS_BLOCKED}, {@link #STATUS_FAILING},
-   *                and {@link #STATUS_UNUSED}.
-   */
-  public void setPropositionStatus(final int prop, final int status)
-  {
-    mPropositionStatus.set(prop, (byte) status);
   }
 
 
@@ -623,7 +649,7 @@ public class EventEncoding
     if (mProperEvents.get(TAU) == null) {
       mProperEvents.set(TAU, event);
       final byte status = mProperEventStatus.get(TAU);
-      mProperEventStatus.set(TAU, (byte) (status & ~STATUS_UNUSED));
+      mProperEventStatus.set(TAU, (byte) (status & ~EventStatus.STATUS_UNUSED));
     }
     mEventCodeMap.put(event, TAU);
   }
@@ -644,18 +670,18 @@ public class EventEncoding
   public void removeAllPropositions()
   {
     mPropositions.clear();
-    mPropositionStatus.clear();
+    mUsedPropositions = 0;
   }
 
   /**
    * Reorders the proper events in this encoding based on their status.
    * @param  flags  List of flags to define the ordering, represented by
    *                a sequence of the bits or bit combinations
-   *                {@link #STATUS_CONTROLLABLE}, {@link #STATUS_LOCAL},
-   *                {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
-   *                {@link #STATUS_OUTSIDE_ONLY_SELFLOOP},
-   *                {@link #STATUS_BLOCKED}, {@link #STATUS_FAILING}, and
-   *                {@link #STATUS_UNUSED} or their complements.<BR>
+   *                {@link EventStatus#STATUS_CONTROLLABLE}, {@link EventStatus#STATUS_LOCAL},
+   *                {@link EventStatus#STATUS_OUTSIDE_ALWAYS_ENABLED},
+   *                {@link EventStatus#STATUS_OUTSIDE_ONLY_SELFLOOP},
+   *                {@link EventStatus#STATUS_BLOCKED}, {@link EventStatus#STATUS_FAILING}, and
+   *                {@link EventStatus#STATUS_UNUSED} or their complements.<BR>
    *                For example, to sort events by controllability first
    *                and second by locality, two arguments STATUS_CONTROLLABLE
    *                and&nbsp;STATUS_LOCAL are passed into the method.<BR>
@@ -675,73 +701,17 @@ public class EventEncoding
 
 
   //#########################################################################
-  //# Event Status
-  /**
-   * Returns whether the given event status bits identify an event as
-   * a controllable in an event encoding.
-   */
-  public static boolean isControllableEvent(final byte status)
+  //# Auxiliary Methods
+  private void checkNumberOfPropositions(final int extra)
+    throws OverflowException
   {
-    return (status & STATUS_CONTROLLABLE) != 0;
-  }
-
-  /**
-   * Returns whether the given event status bits identify an event as
-   * a local event in an event encoding.
-   */
-  public static boolean isLocalEvent(final byte status)
-  {
-    return (status & STATUS_LOCAL) != 0;
-  }
-
-  /**
-   * Returns whether the given event status bits identify an event as
-   * outside only-selfloop in an event encoding.
-   * @see #STATUS_OUTSIDE_ONLY_SELFLOOP
-   */
-  public static boolean isOutsideOnlySelfloopEvent(final byte status)
-  {
-    return (status & STATUS_OUTSIDE_ONLY_SELFLOOP) != 0;
-  }
-
-  /**
-   * Returns whether the given event status bits identify an event as
-   * outside always enabled in an event encoding.
-   * @see #STATUS_OUTSIDE_ALWAYS_ENABLED
-   */
-  public static boolean isOutsideAlwaysEnabledEvent(final byte status)
-  {
-    return (status & STATUS_OUTSIDE_ALWAYS_ENABLED) != 0;
-  }
-
-  /**
-   * Returns whether the given event status bits identify an event as
-   * blocked in an event encoding.
-   * @see #STATUS_BLOCKED
-   */
-  public static boolean isBlockedEvent(final byte status)
-  {
-    return (status & STATUS_BLOCKED) != 0;
-  }
-
-  /**
-   * Returns whether the given event status bits identify an event as
-   * failing in an event encoding.
-   * @see #STATUS_FAILING
-   */
-  public static boolean isFailingEvent(final byte status)
-  {
-    return (status & STATUS_FAILING) != 0;
-  }
-
-  /**
-   * Returns whether the given event status bits identify an event as
-   * used (i.e., not unused) in an event encoding.
-   * @see #STATUS_UNUSED
-   */
-  public static boolean isUsedEvent(final byte status)
-  {
-    return (status & STATUS_UNUSED) == 0;
+    final int numProps = mPropositions.size() + extra;
+    if (numProps > EventStatusProvider.MAX_PROPOSITIONS) {
+      throw new OverflowException
+        ("Encoding has " + numProps + " propositions, but " +
+         ProxyTools.getShortClassName(this) + " can only handle up to " +
+         MAX_PROPOSITIONS + " different propositions!");
+    }
   }
 
 
@@ -763,13 +733,12 @@ public class EventEncoding
       int count = 0;
       for (int e = 0; e < mProperEvents.size(); e++) {
         final byte status = mProperEventStatus.get(e);
-        if (isUsedEvent(status)) {
+        if (EventStatus.isUsedEvent(status)) {
           count++;
         }
       }
       for (int p = 0; p < mPropositions.size(); p++) {
-        final byte status = mPropositionStatus.get(p);
-        if (isUsedEvent(status)) {
+        if ((mUsedPropositions & (1 << p)) != 0) {
           count++;
         }
       }
@@ -799,13 +768,16 @@ public class EventEncoding
       while (true) {
         if (mIndex < numProperEvents) {
           status = mProperEventStatus.get(mIndex);
+          if (EventStatus.isUsedEvent(status)) {
+            return true;
+          }
         } else if (mIndex < numProperEvents + mPropositions.size()) {
-          status = mPropositionStatus.get(mIndex - numProperEvents);
+          final int p = mIndex - numProperEvents;
+          if ((mUsedPropositions & (1 << p)) != 0) {
+            return true;
+          }
         } else {
           return false;
-        }
-        if (isUsedEvent(status)) {
-          return true;
         }
         mIndex++;
       }
@@ -841,234 +813,6 @@ public class EventEncoding
 
 
   //#########################################################################
-  //# Inner Class OrderingInfo
-  /**
-   * Ordering information for an {@link EventEncoding}.
-   * The ordering information records the positions of the events
-   * with the specific status flags in an encoding sorted by event
-   * status. This can be used to iterate over events with specific
-   * type more efficiently.
-   * @see EventEncoding#sortProperEvents(byte...)
-   * @see TransitionIterator#resetEvents(int, int)
-   */
-  public static class OrderingInfo
-  {
-    //#######################################################################
-    //# Constructor
-    /**
-     * Creates new ordering information.
-     * @param  statusArrayList  Array list containing event status bytes,
-     *                          contains one entry for each event.
-     * @param  flags            Ordering flags used to establish the
-     *                          ordering, as passed to the {@link
-     *                          EventEncoding#sortProperEvents(byte...)
-     *                          sortProperEvents()} method.
-     */
-    public OrderingInfo(final TByteArrayList statusArrayList,
-                        final byte... flags)
-    {
-      mFlags = flags;
-      mIndexes = new int[(1 << flags.length) + 1];
-      final int numEvents = statusArrayList.size();
-      int lastIndex = -1;
-      for (int e = NONTAU; e < numEvents; e++) {
-        final byte status = statusArrayList.get(e);
-        final int offset = getOffset(status);
-        assert offset >= lastIndex : "Events not in required order!";
-        while (lastIndex < offset) {
-          mIndexes[++lastIndex] = e;
-        }
-      }
-      lastIndex++;
-      while (lastIndex < mIndexes.length) {
-        mIndexes[lastIndex++] = numEvents;
-      }
-    }
-
-    //#######################################################################
-    //# Access Methods
-    /**
-     * Gets the index of the first event with the given status flags
-     * in the ordering.
-     * @param  flags  List of event status flags, represented by
-     *                a sequence of the bits or bit combinations
-     *                {@link #STATUS_CONTROLLABLE}, {@link #STATUS_LOCAL},
-     *                {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
-     *                {@link #STATUS_OUTSIDE_ONLY_SELFLOOP},
-     *                {@link #STATUS_BLOCKED}, {@link #STATUS_FAILING}, and
-     *                {@link #STATUS_UNUSED} or their complements.<BR>
-     *                The flags must appear in the ordering that matches
-     *                the original call to the {@link
-     *                EventEncoding#sortProperEvents(byte...)
-     *                sortProperEvents()} method. If a flag is negated,
-     *                the method looks for the first event without what
-     *                property, otherwise for the first event with the
-     *                property.
-     */
-    public int getFirstEventIndex(final int... flags)
-    {
-      final int offset = getOffset(flags);
-      return mIndexes[offset];
-    }
-
-    /**
-     * Gets the index of the last event with the given status flags
-     * in the ordering.
-     * @param  flags  List of event status flags, represented by
-     *                a sequence of the bits or bit combinations
-     *                {@link #STATUS_CONTROLLABLE}, {@link #STATUS_LOCAL},
-     *                {@link #STATUS_OUTSIDE_ALWAYS_ENABLED},
-     *                {@link #STATUS_OUTSIDE_ONLY_SELFLOOP},
-     *                {@link #STATUS_BLOCKED}, {@link #STATUS_FAILING}, and
-     *                {@link #STATUS_UNUSED} or their complements.<BR>
-     *                The flags must appear in the ordering that matches
-     *                the original call to the {@link
-     *                EventEncoding#sortProperEvents(byte...)
-     *                sortProperEvents()} method. If a flag is negated,
-     *                the method looks for the last event without what
-     *                property, otherwise for the last event with the
-     *                property.
-     */
-    public int getLastEventIndex(final int... flags)
-    {
-      int offset = getOffset(flags);
-      offset += 1 << (mFlags.length - flags.length);
-      return mIndexes[offset] - 1;
-    }
-
-    /**
-     * Determines whether this ordering supports queries based on the given
-     * flags.
-     * @param  flags  List of event status flags, as passed to the {@link
-     *                #getFirstEventIndex(int...) getFirstEventIndex()}
-     *                method.
-     * @return <CODE>true</CODE> if the {@link #getFirstEventIndex(int...)
-     *         getFirstEventIndex()} and {@link #getLastEventIndex(int...)
-     *         getLastEventIndex()} can provide ordering indexes based on
-     *         the given sequence of flags, <CODE>false</CODE> otherwise.
-     */
-    public boolean isSupportedOrdering(final int...flags)
-    {
-      if (flags.length <= mFlags.length) {
-        for (int i = 0; i < flags.length; i++) {
-          if (flags[i] != mFlags[i] && flags[i] != ~mFlags[i]) {
-            return false;
-          }
-        }
-        return true;
-      } else {
-        return false;
-      }
-    }
-
-    /**
-     * Computes a set of group boundaries to cover all events with
-     * the given ordering flags.
-     * @param  flags  List of event status flags, as passed to the {@link
-     *                #getFirstEventIndex(int...) getFirstEventIndex()}
-     *                method.
-     * @return Array of event index pairs. Alternates between start and end
-     *         of one or more event sequences. An iteration over all
-     *         these sequences covers all events with the specified flags.
-     * @see StatusGroupTransitionIterator
-     */
-    public int[] getBoundaries(final int... flags)
-    {
-      int count = 0;
-      int end = -1;
-      for (int i = 0; i < mFlags.length; i++) {
-        if (findFlag(mFlags[i], flags) >= 0) {
-          count++;
-          end = i;
-        }
-      }
-      assert flags.length == count :
-        "Ordering does not support all requested flags!";
-      end++;
-      final int groups = 1 << (end - count);
-      final TIntArrayList boundaries = new TIntArrayList(2 * groups);
-      final int[] pattern = new int[end];
-      for (int g = 0; g < groups; g++) {
-        int bit = 1;
-        for (int i = 0; i < end; i++) {
-          final int flag = mFlags[i];
-          final int f = findFlag(flag, flags);
-          if (f >= 0) {
-            pattern[i] = flags[f];
-          } else {
-            if ((g & bit) != 0) {
-              pattern[i] = flag;
-            } else {
-              pattern[i] = ~flag;
-            }
-            bit <<= 1;
-          }
-        }
-        final int first = getFirstEventIndex(pattern);
-        final int last = getLastEventIndex(pattern);
-        if (first <= last) {
-          boundaries.add(first);
-          boundaries.add(last);
-        }
-      }
-      return boundaries.toArray();
-    }
-
-
-    //#######################################################################
-    //# Auxiliary Methods
-    private int getOffset(final int... flags)
-    {
-      int offset = 0;
-      int shift = mFlags.length - 1;
-      for (int i = 0; i < flags.length; i++, shift--) {
-        final int flag = flags[i];
-        if (flag == mFlags[i]) {
-          offset |= (1 << shift);
-        } else {
-          assert flag == ~mFlags[i] : "Unexpected event ordering flag!";
-        }
-      }
-      return offset;
-    }
-
-    private int getOffset(final byte status)
-    {
-      int offset = 0;
-      int shift = mFlags.length - 1;
-      for (final byte flag : mFlags) {
-        final boolean bit;
-        if ((flag & ~STATUS_ALL) == 0) {
-          bit = (status & flag) != 0;
-        } else {
-          bit = (status & ~flag) == 0;
-        }
-        if (bit) {
-          offset |= (1 << shift);
-        }
-        shift--;
-      }
-      return offset;
-    }
-
-    private static int findFlag(final int flag, final int[] flags)
-    {
-      for (int i = 0; i < flags.length; i++) {
-        if (flags[i] == flag || flags[i] == ~flag) {
-          return i;
-        }
-      }
-      return -1;
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final byte[] mFlags;
-    private final int[] mIndexes;
-  }
-
-
-  //#########################################################################
   //# Inner Class EventOrdering
   private class EventOrdering
     implements Comparator<EventProxy>
@@ -1081,7 +825,7 @@ public class EventEncoding
       mReverse = new boolean[flags.length];
       for (int i = 0; i < flags.length; i++) {
         final byte flag = flags[i];
-        if ((flag & ~STATUS_ALL) == 0) {
+        if ((flag & ~EventStatus.STATUS_ALL) == 0) {
           mMasks[i] = flag;
         } else {
           mMasks[i] = (byte) ~flag;
@@ -1174,7 +918,7 @@ public class EventEncoding
   private final List<EventProxy> mPropositions;
   private final TObjectIntHashMap<EventProxy> mEventCodeMap;
   private final TByteArrayList mProperEventStatus;
-  private final TByteArrayList mPropositionStatus;
+  private int mUsedPropositions;
   private OrderingInfo mOrderingInfo;
 
 
@@ -1217,80 +961,5 @@ public class EventEncoding
    */
   public static final int FILTER_ALL =
     FILTER_PROPER_EVENTS | FILTER_PROPOSITIONS;
-
-  /**
-   * An empty status byte to define an event with none of the available
-   * status bits sets.
-   */
-  public static final byte STATUS_NONE = 0x00;
-  /**
-   * A status flag indicating a controllable event.
-   */
-  public static final byte STATUS_CONTROLLABLE = 0x01;
-  /**
-   * A status flags indicating a local event.
-   * A local event is assumed not to be used in any other automaton
-   * except the current one.
-   * Unlike {@link #STATUS_OUTSIDE_ALWAYS_ENABLED} and
-   * {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, this flag is purely informational.
-   */
-  public static final byte STATUS_LOCAL = 0x02;
-  /**
-   * A status flag indicating an event that outside of the current automaton
-   * only appears in selfloop transitions.
-   */
-  public static final byte STATUS_OUTSIDE_ONLY_SELFLOOP = 0x04;
-  /**
-   * A status flag indicating an event that outside of the current automaton
-   * is always enabled. The only automaton ever disabling this event is the
-   * current automaton. Selfloops by events with this status flag are
-   * automatically suppressed in a {@link ListBufferTransitionRelation}.
-   */
-  public static final byte STATUS_OUTSIDE_ALWAYS_ENABLED = 0x08;
-  /**
-   * A status flag indicating an event known to be globally disabled.
-   */
-  public static final byte STATUS_BLOCKED = 0x10;
-  /**
-   * A status flag indicating a <I>failing</I> event. In a conflict check,
-   * failing events are events known to take the system to a blocking state.
-   * In safety verification, failing events are events are events known to
-   * cause the property checked to fail if they are ever enabled.
-   */
-  public static final byte STATUS_FAILING = 0x20;
-  /**
-   * A status flag indicating an event not in the alphabet of the current
-   * transition relation. This event is assumed to be implicitly selflooped
-   * in all states.
-   */
-  public static final byte STATUS_UNUSED = 0x40;
-
-  /**
-   * Status flags indicating a local event.
-   * This is a combination of the bits {@link #STATUS_LOCAL},
-   * {@link #STATUS_OUTSIDE_ALWAYS_ENABLED}, and
-   * {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}.
-   * Although {@link #STATUS_LOCAL} usually implies the other two flags,
-   * it is separated from the other two for synthesis and other applications,
-   * where the automatic suppression of local selfloops is not desired.
-   */
-  public static final byte STATUS_FULLY_LOCAL =
-    STATUS_LOCAL | STATUS_OUTSIDE_ONLY_SELFLOOP | STATUS_OUTSIDE_ALWAYS_ENABLED;
-
-  /**
-   * All status flags combined.
-   */
-  public static final byte STATUS_ALL =
-    STATUS_CONTROLLABLE | STATUS_LOCAL | STATUS_OUTSIDE_ONLY_SELFLOOP |
-    STATUS_OUTSIDE_ALWAYS_ENABLED | STATUS_BLOCKED | STATUS_FAILING |
-    STATUS_UNUSED;
-
-  private static final String[] STATUS_NAMES = {
-    "CONTROLLABLE", "LOCAL", "OUTSIDE_ONLY_SELFLOOP",
-    "OUTSIDE_ALWAYS_ENABLED", "BLOCKED", "FAILING", "UNUSED"
-  };
-
-  private static final Collection<EventProxy> NO_EVENTS =
-    Collections.emptySet();
 
 }

@@ -94,6 +94,7 @@ public abstract class AbstractAutomatonBuilderTest
   }
 
   protected void configureAutomatonBuilder(final AutomatonProxy aut)
+    throws AnalysisException
   {
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     final ProductDESProxy des =
@@ -124,6 +125,7 @@ public abstract class AbstractAutomatonBuilderTest
    *          The model to be analysed for the current test case.
    */
   protected void configureAutomatonBuilder(final ProductDESProxy des)
+    throws AnalysisException
   {
     mAutomatonBuilder.setModel(des);
   }

@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.abstraction;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -166,7 +167,7 @@ public class TransitionRemovalTRSimplifier
       final byte status = rel.getProperEventStatus(e);
       final boolean selflooped =
         mUsingSpecialEvents &&
-        EventEncoding.isOutsideOnlySelfloopEvent(status);
+        EventStatus.isOutsideOnlySelfloopEvent(status);
       final int from0 = iterCandidate.getCurrentFromState();
       final int to0 = iterCandidate.getCurrentToState();
       boolean remove = false;

@@ -23,6 +23,7 @@ import net.sourceforge.waters.analysis.abstraction.AlwaysEnabledEventsFinder;
 import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.modular.ModularControllabilityChecker;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -495,7 +496,7 @@ public class EnabledEventsCompositionalConflictChecker extends
     if (!tauLoopFree) {
       for (int e = EventEncoding.NONTAU; e < rel.getNumberOfProperEvents(); e++) {
         final byte status = rel.getProperEventStatus(e);
-        if (!EventEncoding.isUsedEvent(status)) {
+        if (!EventStatus.isUsedEvent(status)) {
           final EventProxy event = encoding.getProperEvent(e);
           alwaysEnabledEvents.add(event);
         }

@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntArrayBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.PreTransitionBuffer;
@@ -159,10 +160,10 @@ public class TRSynchronousProductBuilder
 
   /**
    * Sets whether forbidden events are supported. If enabled, any transitions
-   * with events marked as {@link EventEncoding#STATUS_FAILING} in the output
+   * with events marked as {@link EventStatus#STATUS_FAILING} in the output
    * event encoding are replaced by selfloops regardless of their target
-   * states. Events marked as {@link EventEncoding#STATUS_FAILING} and
-   * {@link EventEncoding#STATUS_OUTSIDE_ALWAYS_ENABLED} in addition
+   * states. Events marked as {@link EventStatus#STATUS_FAILING} and
+   * {@link EventStatus#STATUS_OUTSIDE_ALWAYS_ENABLED} in addition
    * suppress all other transitions from states where they are enabled.
    * This is useful in verification that only seeks to determine
    * whether or not forbidden events are ever enabled.
@@ -217,8 +218,7 @@ public class TRSynchronousProductBuilder
       final int numProps = mConfiguredEventEncoding.getNumberOfPropositions();
       final Collection<EventProxy> props = new ArrayList<>(numProps);
       for (int p = 0; p < numProps; p++) {
-        final byte status = mConfiguredEventEncoding.getPropositionStatus(p);
-        if (EventEncoding.isUsedEvent(status)) {
+        if (mConfiguredEventEncoding.isPropositionUsed(p)) {
           final EventProxy prop = mConfiguredEventEncoding.getProposition(p);
           props.add(prop);
         }
@@ -229,6 +229,7 @@ public class TRSynchronousProductBuilder
 
   @Override
   public void setPropositions(final Collection<EventProxy> props)
+    throws OverflowException
   {
     mHasConfiguredPropositions = (props != null);
     if (props == null || props.isEmpty()) {
@@ -243,12 +244,16 @@ public class TRSynchronousProductBuilder
     } else {
       final KindTranslator translator = getKindTranslator();
       if (mConfiguredEventEncoding == null) {
-        mConfiguredEventEncoding = new EventEncoding(props, translator);
+        try {
+          mConfiguredEventEncoding = new EventEncoding(props, translator);
+        } catch (final OverflowException exception) {
+          throw new IllegalArgumentException(exception);
+        }
       } else {
         mConfiguredEventEncoding.removeAllPropositions();
         for (final EventProxy prop : props) {
           mConfiguredEventEncoding.addEvent(prop, translator,
-                                            EventEncoding.STATUS_NONE);
+                                            EventStatus.STATUS_NONE);
         }
       }
     }
@@ -257,6 +262,7 @@ public class TRSynchronousProductBuilder
   @Override
   public void addMask(final Collection<EventProxy> hidden,
                       final EventProxy replacement)
+    throws OverflowException
   {
     if (mConfiguredEventEncoding == null) {
       mConfiguredEventEncoding = new EventEncoding();
@@ -264,7 +270,7 @@ public class TRSynchronousProductBuilder
     final KindTranslator translator = getKindTranslator();
     for (final EventProxy alias : hidden) {
       mConfiguredEventEncoding.addEventAlias(alias, replacement, translator,
-                                             EventEncoding.STATUS_NONE);
+                                             EventStatus.STATUS_NONE);
     }
   }
 
@@ -369,7 +375,7 @@ public class TRSynchronousProductBuilder
         if (event != null && !outputEvents.contains(event)) {
           final byte status = mConfiguredEventEncoding.getProperEventStatus(e);
           mOutputEventEncoding.setProperEventStatus
-            (e, status | EventEncoding.STATUS_UNUSED);
+            (e, status | EventStatus.STATUS_UNUSED);
         }
       }
     }
@@ -381,7 +387,7 @@ public class TRSynchronousProductBuilder
         final EventProxy event = enc.getProperEvent(local);
         if (event != null) {
           final byte status = enc.getProperEventStatus(local);
-          if (EventEncoding.isUsedEvent(status)) {
+          if (EventStatus.isUsedEvent(status)) {
             final int global =
               mOutputEventEncoding.addEvent(event, translator, status);
             final EventInfo info = eventInfoMap.get(event);
@@ -418,11 +424,10 @@ public class TRSynchronousProductBuilder
         final TRAutomatonProxy aut = mInputAutomata[a];
         final EventEncoding enc = aut.getEventEncoding();
         for (int p = 0; p < enc.getNumberOfPropositions(); p++) {
-          final byte status = enc.getPropositionStatus(p);
-          if (EventEncoding.isUsedEvent(status)) {
+          if (enc.isPropositionUsed(p)) {
             final EventProxy prop = enc.getProposition(p);
             mOutputEventEncoding.addEvent(prop, translator,
-                                          EventEncoding.STATUS_NONE);
+                                          EventStatus.STATUS_NONE);
           }
         }
       }
@@ -439,11 +444,10 @@ public class TRSynchronousProductBuilder
         final int numProps = mOutputEventEncoding.getNumberOfPropositions();
         long pattern = rel.createMarkings();
         for (int global = 0; global < numProps; global++) {
-          final byte status = mOutputEventEncoding.getPropositionStatus(global);
-          if (EventEncoding.isUsedEvent(status)) {
+          if (mOutputEventEncoding.isPropositionUsed(global)) {
             final EventProxy prop = mOutputEventEncoding.getProposition(global);
             final int local = enc.getEventCode(prop);
-            if (rel.isUsedProposition(local)) {
+            if (rel.isPropositionUsed(local)) {
               pattern = rel.addMarking(pattern, local);
             } else {
               continue deadlock;
@@ -704,8 +708,7 @@ public class TRSynchronousProductBuilder
       final int numProps = mOutputEventEncoding.getNumberOfPropositions();
       boolean hasProps = false;
       for (int p = 0; p < numProps; p++) {
-        final byte status = mOutputEventEncoding.getPropositionStatus(p);
-        if (EventEncoding.isUsedEvent(status)) {
+        if (mOutputEventEncoding.isPropositionUsed(p)) {
           final EventProxy prop = mOutputEventEncoding.getProposition(p);
           addMarkings(rel, prop);
           hasProps = true;
@@ -771,9 +774,7 @@ public class TRSynchronousProductBuilder
       outputRel.setMarked(globalS, globalP, true);
     }
     if (!allMarked || !getRemovingSelfloops()) {
-      long pattern = outputRel.getUsedPropositions();
-      pattern = outputRel.addMarking(pattern, globalP);
-      outputRel.setUsedPropositions(pattern);
+      outputRel.setPropositionUsed(globalP, true);
     }
   }
 
@@ -881,8 +882,8 @@ public class TRSynchronousProductBuilder
 
     private void setForbidden(final byte status)
     {
-      mForbidden = EventEncoding.isFailingEvent(status);
-      mOutsideAlwaysEnabled = EventEncoding.isOutsideAlwaysEnabledEvent(status);
+      mForbidden = EventStatus.isFailingEvent(status);
+      mOutsideAlwaysEnabled = EventStatus.isOutsideAlwaysEnabledEvent(status);
     }
 
     private void addAutomatonEventInfo(final AutomatonEventInfo info)

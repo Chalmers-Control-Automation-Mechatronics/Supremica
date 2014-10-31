@@ -22,6 +22,7 @@ import net.sourceforge.waters.analysis.compositional.CompositionalSimplifier;
 import net.sourceforge.waters.analysis.compositional.ConflictAbstractionProcedureFactory;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -190,7 +191,7 @@ public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
       // Collect interface events ...
       final ProductDESProxy des = getModel();
       final Collection<EventProxy> events = des.getEvents();
-      final Collection<EventProxy> interfaceEvents = new ArrayList<EventProxy>();
+      final Collection<EventProxy> interfaceEvents = new ArrayList<>();
       final KindTranslator translator = getKindTranslator();
       final EventEncoding eventEnc = new EventEncoding();
       boolean hasInterface = false;
@@ -200,14 +201,14 @@ public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
           // nothing
         } else if (HISCAttributeFactory.isParameter(attribs)) {
           interfaceEvents.add(event);
-          eventEnc.addEvent(event, translator, EventEncoding.STATUS_UNUSED);
+          eventEnc.addEvent(event, translator, EventStatus.STATUS_NONE);
           hasInterface = true;
         } else {
           eventEnc.addSilentEvent(event);
         }
       }
       final int markingID =
-        eventEnc.addEvent(mUsedMarking, translator, EventEncoding.STATUS_UNUSED);
+        eventEnc.addEvent(mUsedMarking, translator, EventStatus.STATUS_NONE);
       checkAbort();
 
       // Separate into interface and subsystem automata ...

@@ -30,8 +30,10 @@ import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionTRSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntArrayHashingStrategy;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.OrderingInfo;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.analysis.tr.WatersHashSet;
@@ -214,7 +216,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     mEventEncoding =
       new EventEncoding(events, translator, filter,
                         EventEncoding.FILTER_PROPOSITIONS);
-    mEventEncoding.sortProperEvents(EventEncoding.STATUS_CONTROLLABLE);
+    mEventEncoding.sortProperEvents(EventStatus.STATUS_CONTROLLABLE);
     mNumProperEvents = mEventEncoding.getNumberOfProperEvents();
 
     ArrayList<AutomatonProxy> plants = new ArrayList<AutomatonProxy>();
@@ -322,7 +324,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       new ArrayList<AutomatonEventInfo>(mNumAutomata);
     for (int e = EventEncoding.NONTAU; e < mNumProperEvents; e++) {
       final byte status = mEventEncoding.getProperEventStatus(e);
-      final boolean controllable = EventEncoding.isControllableEvent(status);
+      final boolean controllable = EventStatus.isControllableEvent(status);
       for (a = 0; a < mNumAutomata; a++) {
         if (transitions[a][e] != null) {
           final int numStates = transitions[a][e].length;
@@ -396,11 +398,11 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
 
     mSTEncoding = new StateTupleEncoding(mAutomata);
 
-    final EventEncoding.OrderingInfo info = mEventEncoding.getOrderingInfo();
+    final OrderingInfo info = mEventEncoding.getOrderingInfo();
     final int lastUncontrollable =
-      info.getLastEventIndex(~EventEncoding.STATUS_CONTROLLABLE);
+      info.getLastEventIndex(~EventStatus.STATUS_CONTROLLABLE);
     final int firstControllable =
-      info.getFirstEventIndex(EventEncoding.STATUS_CONTROLLABLE);
+      info.getFirstEventIndex(EventStatus.STATUS_CONTROLLABLE);
     mCtrlInitialReachabilityExplorer =
       new CtrlInitialReachabilityExplorer(eventAutomata, transitions,
                                           ndTuple1, firstControllable,

@@ -27,6 +27,7 @@ import net.sourceforge.waters.analysis.abstraction.HalfWaySynthesisTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SynthesisObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TRPartition;
@@ -163,7 +164,7 @@ public class AutomataSynthesisAbstractionProcedure extends
       final StateEncoding inputStateEnc = createStateEncoding(aut);
       final int inputConfig = mChain.getPreferredInputConfiguration();
       ListBufferTransitionRelation rel =
-        new ListBufferTransitionRelation(aut, mergedEnc,
+        new ListBufferTransitionRelation(aut, mergedEnc.clone(),
                                          inputStateEnc, inputConfig);
       final CompositionalAutomataSynthesizer synthesizer = getAnalyzer();
       synthesizer.showDebugLog(rel);
@@ -305,6 +306,7 @@ public class AutomataSynthesisAbstractionProcedure extends
   private EventEncoding createEventEncoding(final AutomatonProxy aut,
                                             final Collection<EventProxy> local,
                                             final boolean useRenaming)
+    throws OverflowException
   {
     final CompositionalAutomataSynthesizer synthesizer = getAnalyzer();
     final KindTranslator translator = getKindTranslator();
@@ -333,30 +335,30 @@ public class AutomataSynthesisAbstractionProcedure extends
       } else if (kind == EventKind.CONTROLLABLE) { // local controllable
         if (tauC == null || !useRenaming) {
           encoding.addEvent(event, translator,
-                            EventEncoding.STATUS_LOCAL);
+                            EventStatus.STATUS_LOCAL);
           tauC = event;
         } else {
           encoding.addEventAlias(event, tauC, translator,
-                                 EventEncoding.STATUS_LOCAL);
+                                 EventStatus.STATUS_LOCAL);
           mUsingRenaming = true;
         }
       } else { // local uncontrollable
         if (tauU == null || !useRenaming) {
           encoding.addEvent(event, translator,
-                            EventEncoding.STATUS_LOCAL);
+                            EventStatus.STATUS_LOCAL);
           tauU = event;
         } else {
           encoding.addEventAlias(event, tauU, translator,
-                                 EventEncoding.STATUS_LOCAL);
+                                 EventStatus.STATUS_LOCAL);
           mUsingRenaming = true;
         }
       }
     }
     if (useRenaming) {
-      encoding.sortProperEvents((byte) ~EventEncoding.STATUS_LOCAL,
-                                EventEncoding.STATUS_CONTROLLABLE);
+      encoding.sortProperEvents((byte) ~EventStatus.STATUS_LOCAL,
+                                EventStatus.STATUS_CONTROLLABLE);
     } else {
-      encoding.sortProperEvents(EventEncoding.STATUS_CONTROLLABLE);
+      encoding.sortProperEvents(EventStatus.STATUS_CONTROLLABLE);
     }
     return encoding;
   }
@@ -413,7 +415,7 @@ public class AutomataSynthesisAbstractionProcedure extends
     final int numStates = dump == numClasses ? numClasses + 1 : numClasses;
     final int config = ListBufferTransitionRelation.CONFIG_SUCCESSORS;
     final ListBufferTransitionRelation abstractRel =
-      new ListBufferTransitionRelation(name, kind, originalEventEnc,
+      new ListBufferTransitionRelation(name, kind, originalEventEnc.clone(),
                                        numStates, config);
     final EventProxy defaultMarking = getUsedDefaultMarking();
     final int mergedMarkingID =
@@ -421,10 +423,8 @@ public class AutomataSynthesisAbstractionProcedure extends
     final int originalMarkingID =
       originalEventEnc.getEventCode(defaultMarking);
     final boolean usingDefaultMarking =
-      outputRel.isUsedProposition(mergedMarkingID);
-    if (!usingDefaultMarking) {
-      abstractRel.setUsedPropositions(0);
-    }
+      outputRel.isPropositionUsed(mergedMarkingID);
+    abstractRel.setPropositionUsed(0, usingDefaultMarking);
     for (int origE = EventEncoding.NONTAU;
          origE < abstractRel.getNumberOfProperEvents(); origE++) {
       final EventProxy event = originalEventEnc.getProperEvent(origE);
@@ -441,7 +441,7 @@ public class AutomataSynthesisAbstractionProcedure extends
         // Is this event in the abstracted transition relation?
         final int e = originalEventEnc.getEventCode(event);
         final byte status = abstractRel.getProperEventStatus(e);
-        if (!EventEncoding.isUsedEvent(status)) {
+        if (!EventStatus.isUsedEvent(status)) {
           continue;
         }
         // Is the source state safe?
@@ -463,7 +463,7 @@ public class AutomataSynthesisAbstractionProcedure extends
           if (iter.getCurrentTargetState() != t) {
             return null;
           }
-        } else if (t != dump || !EventEncoding.isControllableEvent(status)) {
+        } else if (t != dump || !EventStatus.isControllableEvent(status)) {
           abstractRel.addTransition(s, e, t);
         }
       }
@@ -508,7 +508,7 @@ public class AutomataSynthesisAbstractionProcedure extends
       before.createSuccessorsReadOnlyIterator();
     for (int e = 0; e < numEvents; e++) {
       final byte status = before.getProperEventStatus(e);
-      if (EventEncoding.isUsedEvent(status)) {
+      if (EventStatus.isUsedEvent(status)) {
         int maxCount = 0;
         for (final int[] clazz : partition.getClasses()) {
           if (clazz != null) {
@@ -550,6 +550,7 @@ public class AutomataSynthesisAbstractionProcedure extends
   private EventEncoding createRenamedEventEncoding
     (final EventEncoding eventEnc,
      final Map<EventProxy,List<EventProxy>> renaming)
+    throws OverflowException
   {
     final KindTranslator translator = getKindTranslator();
     final EventEncoding renamedEnc = new EventEncoding();
@@ -598,7 +599,7 @@ public class AutomataSynthesisAbstractionProcedure extends
       return null;
     }
     final ListBufferTransitionRelation sup = new ListBufferTransitionRelation
-      (supervisorAut, eventEnc, outputStateEnc, config);
+      (supervisorAut, eventEnc.clone(), outputStateEnc, config);
     // TODO Move the following cleanup into ListBufferTransitionRelation
     // constructor. But beware other callers may not like it ...
     final int numEvents = eventEnc.getNumberOfProperEvents();
@@ -607,7 +608,7 @@ public class AutomataSynthesisAbstractionProcedure extends
       final EventProxy event = eventEnc.getProperEvent(e);
       if (!events.contains(event)) {
         final byte status =
-          (byte) (sup.getProperEventStatus(e) | EventEncoding.STATUS_UNUSED);
+          (byte) (sup.getProperEventStatus(e) | EventStatus.STATUS_UNUSED);
         sup.setProperEventStatus(e, status);
       }
     }
@@ -890,7 +891,7 @@ public class AutomataSynthesisAbstractionProcedure extends
       for (final int r : rs) {
         after.setProperEventStatus(r, status);
       }
-      if (EventEncoding.isUsedEvent(status)) {
+      if (EventStatus.isUsedEvent(status)) {
         for (int sc = 0; sc < numClasses; sc++) {
           final int[] clazz = partition.getStates(sc);
           if (clazz != null) {
@@ -939,7 +940,7 @@ public class AutomataSynthesisAbstractionProcedure extends
     final List<EventProxy> events = new ArrayList<EventProxy>(numEvents);
     for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
       final byte status = rel.getProperEventStatus(e);
-      if (EventEncoding.isUsedEvent(status)) {
+      if (EventStatus.isUsedEvent(status)) {
         final EventProxy event = originalEnc.getProperEvent(e);
         if (renaming.get(event) != null) {
           events.addAll(renaming.get(event));
@@ -949,7 +950,7 @@ public class AutomataSynthesisAbstractionProcedure extends
       }
     }
     for (int p = 0; p < originalEnc.getNumberOfPropositions(); p++) {
-      if (rel.isUsedProposition(p)) {
+      if (rel.isPropositionUsed(p)) {
         final EventProxy prop = originalEnc.getProposition(p);
         events.add(prop);
       }

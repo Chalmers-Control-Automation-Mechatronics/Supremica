@@ -18,6 +18,7 @@ import java.util.List;
 import net.sourceforge.waters.analysis.efa.base.AbstractEFAAlgorithm;
 import net.sourceforge.waters.analysis.efa.efsm.EFSMVariable;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.Proxy;
@@ -323,7 +324,7 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
         mTransitionRelation = new ListBufferTransitionRelation
           (name, kind, numProperEvents, numPropositions, numStates, config);
         mTransitionRelation.setProperEventStatus(EventEncoding.TAU,
-          EventEncoding.STATUS_FULLY_LOCAL | EventEncoding.STATUS_UNUSED);
+          EventStatus.STATUS_FULLY_LOCAL | EventStatus.STATUS_UNUSED);
         visitGraphProxy(graph);
         simplifyTransitionRelation();
         if (isTrivial()) {
@@ -459,12 +460,12 @@ public class UnifiedEFASystemBuilder extends AbstractEFAAlgorithm
       for (int e = EventEncoding.TAU;
            e < mTransitionRelation.getNumberOfProperEvents(); e++) {
         final byte status = mTransitionRelation.getProperEventStatus(e);
-        if (EventEncoding.isUsedEvent(status)) {
+        if (EventStatus.isUsedEvent(status)) {
           return false;
         }
       }
       for (int p = 0; p < mTransitionRelation.getNumberOfPropositions(); p++) {
-        if (mTransitionRelation.isUsedProposition(p)) {
+        if (mTransitionRelation.isPropositionUsed(p)) {
           return false;
         }
       }

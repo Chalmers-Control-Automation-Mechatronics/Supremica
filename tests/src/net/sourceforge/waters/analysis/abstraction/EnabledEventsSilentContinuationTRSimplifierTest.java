@@ -18,6 +18,7 @@ import junit.framework.TestSuite;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -61,55 +62,43 @@ public class EnabledEventsSilentContinuationTRSimplifierTest
   @Override
   protected EventEncoding createEventEncoding(final ProductDESProxy des,
                                               final AutomatonProxy aut)
+    throws OverflowException
   {
     final KindTranslator translator = IdenticalKindTranslator.getInstance();
     final EventProxy tau = getEvent(aut, TAU);
-    final Collection<EventProxy> events = new ArrayList<EventProxy>();
+    final int numEvents = aut.getEvents().size();
+    final Collection<EventProxy> events = new ArrayList<>(numEvents);
     int uncontrollableCount = 0;
-    //go through automaton
-    for(final EventProxy event : aut.getEvents())
-    {
-    //find events
-
-
-    //see if controllable
-    if(event.getKind() == EventKind.UNCONTROLLABLE)
-    {
-    //put in the order you want to encode
-    //don't need to worry about tau because of the constructor I'm using
-      events.add(event);
-    //Collection<EventProxy> create list of events in right order
-
-      if(event != tau)
-      uncontrollableCount++;
+    for (final EventProxy event : aut.getEvents()) {
+      //see if controllable
+      if (event.getKind() == EventKind.UNCONTROLLABLE) {
+        //put in the order you want to encode
+        //don't need to worry about tau because of the constructor
+        events.add(event);
+        if (event != tau) {
+          uncontrollableCount++;
+        }
+      }
     }
-    }
-    for(final EventProxy event : aut.getEvents())
-    {
-    //find events
-
-
-    //see if controllable
-    if(event.getKind() != EventKind.UNCONTROLLABLE)
-    {
-    //put in the order you want to encode
-      events.add(event);
-    }
+    for (final EventProxy event : aut.getEvents()) {
+      //see if controllable
+      if (event.getKind() != EventKind.UNCONTROLLABLE) {
+        //put in the order you want to encode
+        events.add(event);
+      }
     }
     //returns a list where all uncontrollable events are first
-
-    final EnabledEventsSilentContinuationTRSimplifier simplifier = getTransitionRelationSimplifier();
+    final EnabledEventsSilentContinuationTRSimplifier simplifier =
+      getTransitionRelationSimplifier();
     simplifier.setNumberOfEnabledEvents(uncontrollableCount);
-
     return new EventEncoding(events, translator, tau);
-
   }
+
   @Override
   protected EnabledEventsSilentContinuationTRSimplifier getTransitionRelationSimplifier()
   {
-
-    return (EnabledEventsSilentContinuationTRSimplifier) super.getTransitionRelationSimplifier();
-
+    return (EnabledEventsSilentContinuationTRSimplifier)
+      super.getTransitionRelationSimplifier();
   }
 
 
@@ -118,7 +107,6 @@ public class EnabledEventsSilentContinuationTRSimplifierTest
   public void test_silentContinuation_1()
   throws Exception
   {
-
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "silentContinuation_1.wmod";
@@ -133,6 +121,7 @@ public class EnabledEventsSilentContinuationTRSimplifierTest
     final String name = "silentContinuation_2.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
+
   public void test_alwaysEnabledSilentContinuation01()
   throws Exception
   {
@@ -141,6 +130,7 @@ public class EnabledEventsSilentContinuationTRSimplifierTest
     final String name = "alwaysEnabledSilentContinuation01.wmod";
     runTransitionRelationSimplifier(group,subdir,name);
   }
+
   public void test_alwaysEnabledSilentContinuation02()
   throws Exception
   {
@@ -149,6 +139,7 @@ public class EnabledEventsSilentContinuationTRSimplifierTest
     final String name = "alwaysEnabledSilentContinuation02.wmod";
     runTransitionRelationSimplifier(group,subdir,name);
   }
+
   public void test_alwaysEnabledSilentContinuation03()
   throws Exception
   {
@@ -157,6 +148,7 @@ public class EnabledEventsSilentContinuationTRSimplifierTest
     final String name = "alwaysEnabledSilentContinuation03.wmod";
     runTransitionRelationSimplifier(group,subdir,name);
   }
+
   public void test_alwaysEnabledSilentContinuation04()
   throws Exception
   {
@@ -165,6 +157,7 @@ public class EnabledEventsSilentContinuationTRSimplifierTest
     final String name = "alwaysEnabledSilentContinuation04.wmod";
     runTransitionRelationSimplifier(group,subdir,name);
   }
+
   public void test_alwaysEnabledSilentContinuation05()
   throws Exception
   {
@@ -173,14 +166,16 @@ public class EnabledEventsSilentContinuationTRSimplifierTest
     final String name = "alwaysEnabledSilentContinuation05.wmod";
     runTransitionRelationSimplifier(group,subdir,name);
   }
+
   public void test_alwaysEnabledSilentContinuation06()
     throws Exception
-    {
-      final String group = "tests";
-      final String subdir = "abstraction";
-      final String name = "alwaysEnabledSilentContinuation06.wmod";
-      runTransitionRelationSimplifier(group,subdir,name);
-    }
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "alwaysEnabledSilentContinuation06.wmod";
+    runTransitionRelationSimplifier(group,subdir,name);
+  }
+
   public void test_alwaysEnabledSilentContinuation07()
   throws Exception
   {
@@ -189,6 +184,7 @@ public class EnabledEventsSilentContinuationTRSimplifierTest
     final String name = "alwaysEnabledSilentContinuation07.wmod";
     runTransitionRelationSimplifier(group,subdir,name);
   }
+
   public void test_alwaysEnabledSilentContinuation08()
   throws Exception
   {

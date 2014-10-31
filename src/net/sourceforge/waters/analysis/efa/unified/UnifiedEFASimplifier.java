@@ -251,7 +251,7 @@ class UnifiedEFASimplifier extends AbstractEFAAlgorithm
       final int numMarkings = rel.getNumberOfMarkings();
       mSimplifier.setTransitionRelation(rel);
       final int prop =
-        rel.isUsedProposition(UnifiedEFAEventEncoding.OMEGA) ? 0 : -1;
+        rel.isPropositionUsed(UnifiedEFAEventEncoding.OMEGA) ? 0 : -1;
       mSimplifier.setDefaultMarkingID(prop);
       if (mSimplifier.run()) {
         rel = mSimplifier.getTransitionRelation();

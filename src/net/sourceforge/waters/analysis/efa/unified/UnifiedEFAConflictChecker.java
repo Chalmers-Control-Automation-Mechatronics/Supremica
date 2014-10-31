@@ -29,6 +29,7 @@ import net.sourceforge.waters.analysis.compositional.ChainSelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.analysis.efa.base.EFANonblockingChecker;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
@@ -445,7 +446,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       final UnifiedEFATransitionRelation tr = iter.next();
       if (tr.getUsedEventsExceptTau().isEmpty()) {
         final ListBufferTransitionRelation rel = tr.getTransitionRelation();
-        if (rel.isUsedProposition(UnifiedEFAEventEncoding.OMEGA)) {
+        if (rel.isPropositionUsed(UnifiedEFAEventEncoding.OMEGA)) {
           final Set<UnifiedEFATransitionRelation> singletonTR =
             Collections.singleton(tr);
           mCurrentSubSystem = new SubSystemInfo(0, 0, singletonTR);
@@ -606,11 +607,11 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       final int code = encoding.getEventId(event);
       byte status = rel.getProperEventStatus(code);
       if (info.isBlocked()) {
-        status |= EventEncoding.STATUS_BLOCKED;
+        status |= EventStatus.STATUS_BLOCKED;
       } else if (info.isLocal(tr)) {
         final Logger logger = getLogger();
         logger.debug("Hiding event: " + event.getName());
-        status |= EventEncoding.STATUS_LOCAL;
+        status |= EventStatus.STATUS_LOCAL;
       }
       rel.setProperEventStatus(code, status);
     }
@@ -738,10 +739,10 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     final UnifiedEFAEventEncoding encoding = tr.getEventEncoding();
     for (int e = EventEncoding.NONTAU; e < numberOfProperEvents; e++) {
       final byte status = rel.getProperEventStatus(e);
-      if (EventEncoding.isUsedEvent(status) && !used[e]) {
+      if (EventStatus.isUsedEvent(status) && !used[e]) {
         final AbstractEFAEvent event = encoding.getEvent(e);
         final EventInfo info = mCurrentSubSystem.getEventInfo(event);
-        rel.setProperEventStatus(e, status | EventEncoding.STATUS_UNUSED);
+        rel.setProperEventStatus(e, status | EventStatus.STATUS_UNUSED);
         info.removeTransitionRelation(tr);
         info.setBlocked();
         removeEmptyEventInfo(info);
@@ -860,8 +861,8 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
         rel.addTransition(0, code, 0);
       }
       rel.setProperEventStatus(EventEncoding.TAU,
-                               EventEncoding.STATUS_FULLY_LOCAL |
-                               EventEncoding.STATUS_UNUSED);
+                               EventStatus.STATUS_FULLY_LOCAL |
+                               EventStatus.STATUS_UNUSED);
       rel.setInitial(0, true);
       final UnifiedEFATransitionRelation selfloop = new
         UnifiedEFATransitionRelation(rel, encoding);
@@ -959,8 +960,8 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
                                          encoding.size(), 0, 1,
                                          ListBufferTransitionRelation.CONFIG_SUCCESSORS);
       rel.setProperEventStatus(EventEncoding.TAU,
-                               EventEncoding.STATUS_FULLY_LOCAL |
-                               EventEncoding.STATUS_UNUSED);
+                               EventStatus.STATUS_FULLY_LOCAL |
+                               EventStatus.STATUS_UNUSED);
       rel.setInitial(0, true);
       return new UnifiedEFATransitionRelation(rel, encoding);
     } else {

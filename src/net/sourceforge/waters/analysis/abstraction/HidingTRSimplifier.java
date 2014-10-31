@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.abstraction;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 
 
@@ -17,7 +18,7 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
  * A transition relation simplifier that implements hiding.
  * This simplifier replaces all local events found in its input
  * transition relation (i.e., all events with {@link
- * EventEncoding#STATUS_LOCAL}) with silent events
+ * EventStatus#STATUS_LOCAL}) with silent events
  * ({@link EventEncoding#TAU}).
  *
  * @author Robi Malik
@@ -68,8 +69,8 @@ public class HidingTRSimplifier
   @Override
   protected boolean runSimplifier()
   {
-    final int mask = EventEncoding.STATUS_LOCAL | EventEncoding.STATUS_UNUSED;
-    final int pattern = mask & ~EventEncoding.STATUS_UNUSED;
+    final int mask = EventStatus.STATUS_LOCAL | EventStatus.STATUS_UNUSED;
+    final int pattern = mask & ~EventStatus.STATUS_UNUSED;
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numEvents = rel.getNumberOfProperEvents();
     boolean modified = false;
@@ -77,7 +78,7 @@ public class HidingTRSimplifier
       final byte status = rel.getProperEventStatus(e);
       if ((status & mask) == pattern) {
         rel.replaceEvent(e, EventEncoding.TAU);
-        rel.setProperEventStatus(e, status | EventEncoding.STATUS_UNUSED);
+        rel.setProperEventStatus(e, status | EventStatus.STATUS_UNUSED);
         modified = true;
       }
     }

@@ -25,7 +25,7 @@ public class StatusGroupTransitionIterator implements TransitionIterator
   //#########################################################################
   //# Constructors
   public StatusGroupTransitionIterator(final TransitionIterator inner,
-                                       final EventEncoding.OrderingInfo info,
+                                       final OrderingInfo info,
                                        final int... flags)
   {
     mInnerIterator = inner;
@@ -147,7 +147,7 @@ public class StatusGroupTransitionIterator implements TransitionIterator
   //#########################################################################
   //# Data Members
   private final TransitionIterator mInnerIterator;
-  private final EventEncoding.OrderingInfo mOrderingInfo;
+  private final OrderingInfo mOrderingInfo;
   private int mIndex;
   private int[] mBoundaries;
 

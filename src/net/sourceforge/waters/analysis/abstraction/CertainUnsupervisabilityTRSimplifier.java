@@ -19,9 +19,9 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sourceforge.waters.analysis.tr.EventEncoding;
-import net.sourceforge.waters.analysis.tr.EventEncoding.OrderingInfo;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.OrderingInfo;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -238,12 +238,14 @@ public class CertainUnsupervisabilityTRSimplifier
         rel.setReachable(state, false);
       }
       final int numEvents = rel.getNumberOfProperEvents();
-      for (int event = 0; event < numEvents; event++) {
-        final byte status = rel.getProperEventStatus(event);
-        rel.setProperEventStatus(event, status | EventEncoding.STATUS_UNUSED);
+      for (int e = 0; e < numEvents; e++) {
+        final byte status = rel.getProperEventStatus(e);
+        rel.setProperEventStatus(e, status | EventStatus.STATUS_UNUSED);
       }
-      final long none = rel.createMarkings();
-      rel.setUsedPropositions(none);
+      final int numProps = rel.getNumberOfPropositions();
+      for (int p = 0; p < numProps; p++) {
+        rel.setPropositionUsed(p, false);
+      }
     } else {
       // 5b. Check transitions from safe states to bad states.
       //  Delete controllable transitions to bad state.
@@ -328,16 +330,16 @@ public class CertainUnsupervisabilityTRSimplifier
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final OrderingInfo info = rel.getOrderingInfo();
     final int firstLocalUnont = info.getFirstEventIndex
-      (EventEncoding.STATUS_LOCAL, ~EventEncoding.STATUS_CONTROLLABLE);
+      (EventStatus.STATUS_LOCAL, ~EventStatus.STATUS_CONTROLLABLE);
     final int lastLocalUncont = info.getLastEventIndex
-      (EventEncoding.STATUS_LOCAL, ~EventEncoding.STATUS_CONTROLLABLE);
+      (EventStatus.STATUS_LOCAL, ~EventStatus.STATUS_CONTROLLABLE);
     final TauClosure closure = rel.createPredecessorsTauClosure
       (firstLocalUnont, lastLocalUncont, mTransitionLimit);
     final TransitionIterator tauIter = closure.createIterator();
     final TransitionIterator tauEventIter =
       closure.createPreEventClosureIterator();
-    tauEventIter.resetEventsByStatus(~EventEncoding.STATUS_LOCAL,
-                                     ~EventEncoding.STATUS_CONTROLLABLE);
+    tauEventIter.resetEventsByStatus(~EventStatus.STATUS_LOCAL,
+                                     ~EventStatus.STATUS_CONTROLLABLE);
     final TransitionIterator eventIter =
       rel.createPredecessorsReadOnlyIterator();
     final TIntStack stack = new TIntArrayStack();

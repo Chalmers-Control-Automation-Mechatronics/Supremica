@@ -21,6 +21,7 @@ import java.util.ListIterator;
 import java.util.Map;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.MemStateProxy;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
@@ -309,7 +310,7 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
     final int numEvents = eventEnc.getNumberOfEvents();
     final Collection<EventProxy> events = new ArrayList<EventProxy>(numEvents);
     for (int e = 0; e < eventEnc.getNumberOfProperEvents(); e++) {
-      if ((rel.getProperEventStatus(e) & EventEncoding.STATUS_UNUSED) == 0) {
+      if ((rel.getProperEventStatus(e) & EventStatus.STATUS_UNUSED) == 0) {
         final EventProxy event = eventEnc.getProperEvent(e);
         if (event != null) {
           events.add(event);

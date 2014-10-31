@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.abstraction;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 
 
@@ -17,7 +18,7 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
  * A transition relation simplifier to remove blocked events.
  * This simplifier removes all blocked events found in its input
  * transition relation (i.e., all events with {@link
- * EventEncoding#STATUS_BLOCKED}). These events are marked as unused.
+ * EventStatus#STATUS_BLOCKED}). These events are marked as unused.
  *
  * @author Robi Malik, Sahar Mohajerani
  */
@@ -87,8 +88,8 @@ public class BlockedEventsRemovalTRSimplifier
   @Override
   protected boolean runSimplifier()
   {
-    final int mask = EventEncoding.STATUS_BLOCKED | EventEncoding.STATUS_UNUSED;
-    final int pattern = mask & ~EventEncoding.STATUS_UNUSED;
+    final int mask = EventStatus.STATUS_BLOCKED | EventStatus.STATUS_UNUSED;
+    final int pattern = mask & ~EventStatus.STATUS_UNUSED;
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numEvents = rel.getNumberOfProperEvents();
     boolean modified = false;

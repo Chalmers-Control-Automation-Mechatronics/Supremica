@@ -26,6 +26,7 @@ import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TRPartition;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 
@@ -167,6 +168,7 @@ class TRConflictEquivalenceAbstractionProcedure
   protected EventEncoding createEventEncoding(final Collection<EventProxy> events,
                                               final Collection<EventProxy> local,
                                               final Candidate candidate)
+    throws OverflowException
   {
     final EventEncoding enc = super.createEventEncoding(events, local, candidate);
     final EventProxy preconditionMarking = getUsedPreconditionMarking();

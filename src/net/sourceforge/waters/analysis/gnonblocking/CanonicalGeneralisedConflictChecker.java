@@ -37,6 +37,7 @@ import net.sourceforge.waters.analysis.annotation.TransitionRelation;
 import net.sourceforge.waters.analysis.modular.BlockedEvents;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -1245,7 +1246,7 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
             final EventEncoding ee = new EventEncoding(minAutomaton, getKindTranslator(),tauproxy);
             if (!minAutomaton.getEvents().contains(mAlpha)) {
               ee.addEvent(mAlpha, getKindTranslator(),
-                          EventEncoding.STATUS_UNUSED);
+                          EventStatus.STATUS_UNUSED);
             }
             final ListBufferTransitionRelation tr =
               new ListBufferTransitionRelation(minAutomaton, ee,

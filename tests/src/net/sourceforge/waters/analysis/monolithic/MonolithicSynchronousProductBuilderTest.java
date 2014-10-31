@@ -15,6 +15,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.model.analysis.AbstractSynchronousProductBuilderTest;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -58,6 +59,7 @@ public class MonolithicSynchronousProductBuilderTest
 
   @Override
   protected void configureAutomatonBuilder(final ProductDESProxy des)
+    throws AnalysisException
   {
     super.configureAutomatonBuilder(des);
     final MonolithicSynchronousProductBuilder builder = getAutomatonBuilder();

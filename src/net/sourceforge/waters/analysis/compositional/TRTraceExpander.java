@@ -24,6 +24,7 @@ import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.MarkingRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.HashFunctions;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
@@ -131,7 +132,7 @@ public abstract class TRTraceExpander
           mEventEncoding.getEventCode(preconditionMarking);
         if (mPreconditionMarkingID < 0) {
           mPreconditionMarkingID = mEventEncoding.addEvent
-            (preconditionMarking, translator, EventEncoding.STATUS_UNUSED);
+            (preconditionMarking, translator, EventStatus.STATUS_UNUSED);
         }
       }
     }
@@ -146,7 +147,7 @@ public abstract class TRTraceExpander
     }
     mPartition = partition;
     mTransitionRelation = new ListBufferTransitionRelation
-      (originalAut, mEventEncoding, mOriginalStateEncoding,
+      (originalAut, mEventEncoding.clone(), mOriginalStateEncoding,
        ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     if (preconditionMarkingReduced) {
       recoverPreconditionMarking();
@@ -497,8 +498,11 @@ public abstract class TRTraceExpander
       chain.add(new TauLoopRemovalTRSimplifier());
       chain.add(new MarkingRemovalTRSimplifier());
       final int config = chain.getPreferredInputConfiguration();
-      ListBufferTransitionRelation rel = new ListBufferTransitionRelation
-        (mOriginalAutomaton, mEventEncoding, mOriginalStateEncoding, config);
+      ListBufferTransitionRelation rel =
+        new ListBufferTransitionRelation(mOriginalAutomaton,
+                                         mEventEncoding.clone(),
+                                         mOriginalStateEncoding,
+                                         config);
       chain.setTransitionRelation(rel);
       chain.run();
       rel = chain.getTransitionRelation();

@@ -14,7 +14,10 @@ import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.BitSet;
 
+import net.sourceforge.waters.analysis.tr.DefaultEventStatusProvider;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
+import net.sourceforge.waters.analysis.tr.EventStatusProvider;
 import net.sourceforge.waters.analysis.tr.IntSetBuffer;
 import net.sourceforge.waters.analysis.tr.IntStateBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -179,7 +182,7 @@ public class SubsetConstructionTRSimplifier
     super.setUp();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     if ((rel.getProperEventStatus(EventEncoding.TAU) &
-         EventEncoding.STATUS_UNUSED) == 0) {
+         EventStatus.STATUS_UNUSED) == 0) {
       mIsDeterministic = false;
       final TauClosure closure =
         rel.createSuccessorsTauClosure(mTransitionLimit);
@@ -199,7 +202,7 @@ public class SubsetConstructionTRSimplifier
     int normalIndex = 0;
     int forbiddenIndex = 0;
     for (int event = EventEncoding.NONTAU; event < numEvents; event++) {
-      if ((rel.getProperEventStatus(event) & EventEncoding.STATUS_UNUSED) == 0) {
+      if ((rel.getProperEventStatus(event) & EventStatus.STATUS_UNUSED) == 0) {
         if (isForbiddenEvent(event)) {
           forbiddenIndex++;
         } else {
@@ -212,7 +215,7 @@ public class SubsetConstructionTRSimplifier
     normalIndex = 0;
     forbiddenIndex = 0;
     for (int event = EventEncoding.NONTAU; event < numEvents; event++) {
-      if ((rel.getProperEventStatus(event) & EventEncoding.STATUS_UNUSED) == 0) {
+      if ((rel.getProperEventStatus(event) & EventStatus.STATUS_UNUSED) == 0) {
         if (isForbiddenEvent(event)) {
           mForbiddenEventIndexes[forbiddenIndex++] = event;
         } else {
@@ -328,10 +331,10 @@ public class SubsetConstructionTRSimplifier
     if (mSetOffsets != null) {
       final ListBufferTransitionRelation rel = getTransitionRelation();
       final int numDetStates = mSetOffsets.size();
-      final int numProps = rel.getNumberOfPropositions();
-      final long usedProps = rel.getUsedPropositions();
+      final int numEvents = rel.getNumberOfProperEvents();
+      final EventStatusProvider propStatus = new DefaultEventStatusProvider(rel);
       final IntStateBuffer detStates =
-        new IntStateBuffer(numDetStates, numProps, usedProps);
+        new IntStateBuffer(numDetStates, propStatus);
       detStates.setInitial(0, true);
       final IntSetBuffer.IntSetIterator iter = mStateSetBuffer.iterator();
       for (int detstate = 0; detstate < numDetStates; detstate++) {
@@ -359,7 +362,6 @@ public class SubsetConstructionTRSimplifier
       } else {
         final TIntArrayList forbiddenVictims =
           new TIntArrayList(mForbiddenEventIndexes.length);
-        final int numEvents = rel.getNumberOfProperEvents();
         for (int event = 0; event < numEvents; event++) {
           if (isSelfloopEventExceptInForbiddenStates(event)) {
             if (mForbiddenEvents.get(event)) {
@@ -390,7 +392,7 @@ public class SubsetConstructionTRSimplifier
   private boolean isSelfloopEventExceptInForbiddenStates(final int event)
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    if ((rel.getProperEventStatus(event) & EventEncoding.STATUS_UNUSED) == 0) {
+    if ((rel.getProperEventStatus(event) & EventStatus.STATUS_UNUSED) == 0) {
       final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
       final int numStates = rel.getNumberOfStates();
       states:

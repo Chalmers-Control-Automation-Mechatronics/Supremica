@@ -13,11 +13,13 @@ import java.io.File;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.IsomorphismChecker;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
@@ -346,6 +348,7 @@ public abstract class AbstractTRSimplifierTest
    */
   protected EventEncoding createEventEncoding(final ProductDESProxy des,
                                               final AutomatonProxy aut)
+    throws OverflowException
   {
     final KindTranslator translator = IdenticalKindTranslator.getInstance();
     final EventProxy tau = getEvent(aut, TAU);
@@ -371,6 +374,7 @@ public abstract class AbstractTRSimplifierTest
    */
   protected EventEncoding createEventEncodingWithPropositions
     (final ProductDESProxy des, final AutomatonProxy aut)
+    throws OverflowException
   {
     final KindTranslator translator = IdenticalKindTranslator.getInstance();
     final EventProxy tau = getEvent(aut, TAU);
@@ -378,12 +382,12 @@ public abstract class AbstractTRSimplifierTest
     final EventProxy alpha = getEvent(des, ALPHA);
     mAlphaID = enc.getEventCode(alpha);
     if (alpha != null && mAlphaID < 0) {
-      mAlphaID = enc.addEvent(alpha, translator, EventEncoding.STATUS_UNUSED);
+      mAlphaID = enc.addEvent(alpha, translator, EventStatus.STATUS_UNUSED);
     }
     final EventProxy omega = getEvent(des, OMEGA);
     mOmegaID = enc.getEventCode(omega);
     if (omega != null && mOmegaID < 0) {
-      mOmegaID = enc.addEvent(omega, translator, EventEncoding.STATUS_UNUSED);
+      mOmegaID = enc.addEvent(omega, translator, EventStatus.STATUS_UNUSED);
     }
     return enc;
   }

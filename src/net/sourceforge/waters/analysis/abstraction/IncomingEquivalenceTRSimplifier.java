@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.IntSetBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -418,7 +419,7 @@ public class IncomingEquivalenceTRSimplifier
           if (!hasAlwaysEnabled) {
             final byte status = rel.getProperEventStatus(e);
             hasAlwaysEnabled =
-              EventEncoding.isOutsideAlwaysEnabledEvent(status);
+              EventStatus.isOutsideAlwaysEnabledEvent(status);
           }
         }
       }

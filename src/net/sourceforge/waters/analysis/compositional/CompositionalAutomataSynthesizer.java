@@ -26,6 +26,7 @@ import net.sourceforge.waters.analysis.abstraction.HalfWaySynthesisTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionTRSimplifier;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -547,6 +548,7 @@ public class CompositionalAutomataSynthesizer
   }
 
   private EventEncoding createSynthesisEventEncoding(final AutomatonProxy aut)
+    throws OverflowException
   {
     final KindTranslator translator = getKindTranslator();
     final Collection<EventProxy> props = getPropositions();
@@ -561,10 +563,10 @@ public class CompositionalAutomataSynthesizer
                         EventEncoding.FILTER_PROPOSITIONS);
     for (int e = EventEncoding.NONTAU; e < encoding.getNumberOfProperEvents(); e++) {
       final byte status = encoding.getProperEventStatus(e);
-      encoding.setProperEventStatus(e, status | EventEncoding.STATUS_LOCAL);
+      encoding.setProperEventStatus(e, status | EventStatus.STATUS_LOCAL);
     }
-    encoding.sortProperEvents((byte) ~EventEncoding.STATUS_LOCAL,
-                              EventEncoding.STATUS_CONTROLLABLE);
+    encoding.sortProperEvents((byte) ~EventStatus.STATUS_LOCAL,
+                              EventStatus.STATUS_CONTROLLABLE);
     return encoding;
   }
 
@@ -576,7 +578,7 @@ public class CompositionalAutomataSynthesizer
     recordStatistics(aut);
     final ListBufferTransitionRelation rel =
       new ListBufferTransitionRelation(aut,
-                                       eventEnc,
+                                       eventEnc.clone(),
                                        ListBufferTransitionRelation.CONFIG_PREDECESSORS);
     mHalfwaySimplifier.setTransitionRelation(rel);
     final EventProxy defaultMarking = getUsedDefaultMarking();
@@ -603,7 +605,7 @@ public class CompositionalAutomataSynthesizer
       if (partition.getClassCode(t) < 0) {
         final int e = iter.getCurrentEvent();
         final byte status = rel.getProperEventStatus(e);
-        if (EventEncoding.isControllableEvent(status)) {
+        if (EventStatus.isControllableEvent(status)) {
           return supervisor;
         }
       }
@@ -641,7 +643,7 @@ public class CompositionalAutomataSynthesizer
     while (true) {
       boolean applied = false;
       DistinguisherInfo firstDeferred = null;
-      final Set<EventProxy> deferredEvents = new THashSet<EventProxy>();
+      final Set<EventProxy> deferredEvents = new THashSet<>();
       final ListIterator<DistinguisherInfo> iter =
         mDistinguisherInfoList.listIterator(mDistinguisherInfoList.size());
       while (iter.hasPrevious()) {
@@ -762,7 +764,7 @@ public class CompositionalAutomataSynthesizer
             checkAbort();
             rel.replaceEvent(e, r);
             final byte status = rel.getProperEventStatus(e);
-            rel.setProperEventStatus(e, status | EventEncoding.STATUS_UNUSED);
+            rel.setProperEventStatus(e, status | EventStatus.STATUS_UNUSED);
           }
         }
         assert r >= 0 : "Replacement event not found!";
@@ -819,9 +821,9 @@ public class CompositionalAutomataSynthesizer
     final AutomatonProxy newSupervisor = builder.getComputedAutomaton();
     final KindTranslator translator = getKindTranslator();
     mTempEventEncoding = new EventEncoding(newSupervisor, translator);
-    mTempEventEncoding.sortProperEvents(EventEncoding.STATUS_CONTROLLABLE);
+    mTempEventEncoding.sortProperEvents(EventStatus.STATUS_CONTROLLABLE);
     return new ListBufferTransitionRelation(newSupervisor,
-                                            mTempEventEncoding,
+                                            mTempEventEncoding.clone(),
                                             ListBufferTransitionRelation.CONFIG_SUCCESSORS);
   }
 
@@ -860,7 +862,7 @@ public class CompositionalAutomataSynthesizer
       return -1;
     } else {
       final byte status = rel.getProperEventStatus(e);
-      return EventEncoding.isUsedEvent(status) ? e : -1;
+      return EventStatus.isUsedEvent(status) ? e : -1;
     }
   }
 
@@ -1063,7 +1065,7 @@ public class CompositionalAutomataSynthesizer
         final int e = enc.getEventCode(event);
         if (e >= 0) {
           final byte status = enc.getProperEventStatus(e);
-          if (EventEncoding.isUsedEvent(status)) {
+          if (EventStatus.isUsedEvent(status)) {
             return true;
           }
         }

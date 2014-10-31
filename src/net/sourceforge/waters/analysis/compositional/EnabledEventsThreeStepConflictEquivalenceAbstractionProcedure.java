@@ -33,11 +33,13 @@ import net.sourceforge.waters.analysis.abstraction.OnlySilentOutgoingTRSimplifie
 import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -422,6 +424,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
                                             final Collection<EventProxy> local,
                                             final int numAlwaysEnabled,
                                             final Candidate candidate)
+    throws OverflowException
   {
     final EnabledEventsCompositionalConflictChecker analyzer =
       (EnabledEventsCompositionalConflictChecker) getAnalyzer();
@@ -445,11 +448,11 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
           final AbstractCompositionalModelAnalyzer.EventInfo info =
             analyzer.getEventInfo(event);
           if (info.isOnlyNonSelfLoopCandidate(candidate)) {
-            status |= EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP;
+            status |= EventStatus.STATUS_OUTSIDE_ONLY_SELFLOOP;
           }
         }
         if (e < numAlwaysEnabled) {
-          status |= EventEncoding.STATUS_OUTSIDE_ALWAYS_ENABLED;
+          status |= EventStatus.STATUS_OUTSIDE_ALWAYS_ENABLED;
         }
         enc.addEvent(event, translator, status);
         e++;
@@ -458,7 +461,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     final EventProxy defaultMarking = getUsedDefaultMarking();
     final int defaultMarkingID = enc.getEventCode(defaultMarking);
     if (defaultMarkingID < 0) {
-      enc.addEvent(defaultMarking, translator, EventEncoding.STATUS_UNUSED);
+      enc.addEvent(defaultMarking, translator, EventStatus.STATUS_UNUSED);
     }
     mCompleteChain.setDefaultMarkingID(defaultMarkingID);
     return enc;

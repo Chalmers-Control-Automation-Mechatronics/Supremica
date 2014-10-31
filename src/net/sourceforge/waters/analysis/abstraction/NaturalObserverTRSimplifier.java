@@ -17,6 +17,7 @@ import gnu.trove.stack.array.TIntArrayStack;
 
 import java.util.ArrayList;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -84,7 +85,7 @@ public class NaturalObserverTRSimplifier
 
   /**
    * The constructor of the the natural observer simplifier. In this, the local
-   * events (i.e. events with local status {@link EventEncoding#STATUS_LOCAL})
+   * events (i.e. events with local status {@link EventStatus#STATUS_LOCAL})
    * are considered as unobservable events hence will be projected.
    * <p/>
    * @param rel The original transition relation where the local events are
@@ -475,7 +476,7 @@ public class NaturalObserverTRSimplifier
         mIter.resetState(source);
         while (mIter.advance()) {
           final int event = mIter.getCurrentEvent();
-          if (mRel.getProperEventStatus(event) != EventEncoding.STATUS_LOCAL) {
+          if (mRel.getProperEventStatus(event) != EventStatus.STATUS_LOCAL) {
             mObsEvents.add(event);
           } else {
             mUnObsEvents.add(event);

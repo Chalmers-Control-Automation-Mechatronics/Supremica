@@ -133,13 +133,8 @@ public class TRAutomatonProxy
     assert eventEnc.getNumberOfPropositions() == rel.getNumberOfPropositions() :
       "Unexpected number of propositions for TRAutomatonProxy!";
     for (int p = 0; p < eventEnc.getNumberOfPropositions(); p++) {
-      byte status = eventEnc.getPropositionStatus(p);
-      if (rel.isUsedProposition(p)) {
-        status &= ~EventEncoding.STATUS_UNUSED;
-      } else {
-        status |= EventEncoding.STATUS_UNUSED;
-      }
-      eventEnc.setPropositionStatus(p, status);
+      final boolean used = rel.isPropositionUsed(p);
+      eventEnc.setPropositionUsed(p, used);
     }
   }
 

@@ -82,24 +82,18 @@ public abstract class TransitionListBuffer
    * Creates a new transition list buffer.
    * The transition buffer is set up for a fixed number of states and events,
    * which defines an encoding and can no more be changed.
-   * @param  numEvents    The number of events that can be encoded in
-   *                      transitions.
    * @param  numStates    The number of states that can be encoded in
    *                      transitions.
    * @param  eventStatus  Status flags of events, based on constants defined
-   *                      in {@link EventEncoding}.
-   * @param  orderingInfo Ordering information to to describe event ordering,
-   *                      or <CODE>null</CODE>
+   *                      in {@link EventStatus}.
    * @throws OverflowException if the encoding for states and events does
    *         not fit in the 32 bits available.
    */
-  public TransitionListBuffer(final int numEvents,
-                              final int numStates,
-                              final byte[] eventStatus,
-                              final EventEncoding.OrderingInfo orderingInfo)
+  public TransitionListBuffer(final int numStates,
+                              final EventStatusProvider eventStatus)
     throws OverflowException
   {
-    this(numEvents, numStates, eventStatus, orderingInfo, MAX_BLOCK_SIZE);
+    this(numStates, eventStatus, MAX_BLOCK_SIZE);
   }
 
 
@@ -107,27 +101,20 @@ public abstract class TransitionListBuffer
    * Creates a new transition list buffer.
    * The transition buffer is set up for a fixed number of states and events,
    * which defines an encoding and can no more be changed.
-   * @param  numEvents   The number of events that can be encoded in
-   *                     transitions.
    * @param  numStates   The number of states that can be encoded in
    *                     transitions.
    * @param  eventStatus  Status flags of events, based on constants defined
-   *                      in {@link EventEncoding}.
-   * @param  orderingInfo Ordering information to to describe event ordering,
-   *                      or <CODE>null</CODE>
+   *                      in {@link EventStatus}.
    * @param  numTrans    Estimated number of transitions, used to determine
    *                     buffer size.
    * @throws OverflowException if the encoding for states and events does
    *         not fit in the 32 bits available.
    */
-  public TransitionListBuffer(final int numEvents,
-                              final int numStates,
-                              final byte[] eventStatus,
-                              final EventEncoding.OrderingInfo orderingInfo,
+  public TransitionListBuffer(final int numStates,
+                              final EventStatusProvider eventStatus,
                               final int numTrans)
     throws OverflowException
   {
-    mOrderingInfo = orderingInfo;
     final int estimate = 2 * (numTrans + numStates);
     if (estimate <= MIN_BLOCK_SIZE) {
       mBlockSize = MIN_BLOCK_SIZE;
@@ -139,8 +126,8 @@ public abstract class TransitionListBuffer
     mBlockShift = AutomatonTools.log2(mBlockSize);
     mBlockMask = mBlockSize - 1;
     mNumStates = numStates;
-    mNumEvents = numEvents;
-    mStateShift = AutomatonTools.log2(mNumEvents);
+    final int numEvents = eventStatus.getNumberOfProperEvents();
+    mStateShift = AutomatonTools.log2(numEvents);
     final int numBits = mStateShift + AutomatonTools.log2(mNumStates);
     if (numBits > 32) {
       throw new OverflowException
@@ -170,7 +157,6 @@ public abstract class TransitionListBuffer
     mBlockMask = buffer.mBlockMask;
     mBlockSize = buffer.mBlockSize;
     mNumStates = buffer.mNumStates;
-    mNumEvents = buffer.mNumEvents;
     mStateShift = buffer.mStateShift;
     mEventMask = buffer.mEventMask;
     mBlocks = buffer.mBlocks;
@@ -184,19 +170,9 @@ public abstract class TransitionListBuffer
 
   //#########################################################################
   //# Simple Access
-  public int getNumberOfEvents()
-  {
-    return mNumEvents;
-  }
-
   int getNumberOfStates()
   {
     return mStateTransitions.length;
-  }
-
-  EventEncoding.OrderingInfo getOrderingInfo()
-  {
-    return mOrderingInfo;
   }
 
 
@@ -257,8 +233,8 @@ public abstract class TransitionListBuffer
    */
   public boolean addTransition(final int from, final int event, final int to)
   {
-    if (from == to &&
-        EventEncoding.isOutsideOnlySelfloopEvent(mEventStatus[event])) {
+    final byte status = mEventStatus.getProperEventStatus(event);
+    if (from == to && EventStatus.isOutsideOnlySelfloopEvent(status)) {
       return false;
     }
     final int newData = (to << mStateShift) | event;
@@ -309,7 +285,8 @@ public abstract class TransitionListBuffer
       return false;
     }
     final TIntHashSet existing = new TIntHashSet();
-    if (EventEncoding.isOutsideOnlySelfloopEvent(mEventStatus[event])) {
+    final byte status = mEventStatus.getProperEventStatus(event);
+    if (EventStatus.isOutsideOnlySelfloopEvent(status)) {
       existing.add(from);
     }
     int list = createList(from, event);
@@ -529,8 +506,8 @@ public abstract class TransitionListBuffer
       }
       final int state = data >>> mStateShift;
       final int event = data & mEventMask;
-      if (state == dest &&
-          EventEncoding.isOutsideOnlySelfloopEvent(mEventStatus[event])) {
+      final byte status = mEventStatus.getProperEventStatus(event);
+      if (state == dest && EventStatus.isOutsideOnlySelfloopEvent(status)) {
         // Suppress tau and outside selfloop-only selfloops
         continue;
       }
@@ -638,16 +615,17 @@ public abstract class TransitionListBuffer
    */
   public void replaceEvent(final int oldID, final int newID)
   {
+    final int numEvents = mEventStatus.getNumberOfProperEvents();
     if (oldID == newID) {
       return;
-    } else if (newID < 0 || newID >= mNumEvents) {
+    } else if (newID < 0 || newID >= numEvents) {
       throw new IllegalArgumentException
         ("New event ID " + newID + " out of range in " +
          ProxyTools.getShortClassName(this) +
-         " (only configured for " + mNumEvents + " events)!");
+         " (only configured for " + numEvents + " events)!");
     }
-    final boolean selfloop =
-      EventEncoding.isOutsideOnlySelfloopEvent(mEventStatus[newID]);
+    final byte status = mEventStatus.getProperEventStatus(newID);
+    final boolean selfloop = EventStatus.isOutsideOnlySelfloopEvent(status);
     final TIntHashSet found = new TIntHashSet();
     final TransitionIterator iter1 = createReadOnlyIterator();
     final TransitionIterator iter2 = createModifyingIterator();
@@ -1009,8 +987,9 @@ public abstract class TransitionListBuffer
       if (e >= 0) {
         final StateProxy fromState = getFromState(trans);
         final StateProxy toState = getToState(trans);
+        final byte status = mEventStatus.getProperEventStatus(e);
         if (fromState == toState &&
-            EventEncoding.isOutsideOnlySelfloopEvent(mEventStatus[e])) {
+            EventStatus.isOutsideOnlySelfloopEvent(status)) {
           // Suppress tau and outside selfloop-only selfloops
           continue;
         }
@@ -1039,7 +1018,7 @@ public abstract class TransitionListBuffer
     final int numEvents = eventEnc.getNumberOfProperEvents();
     for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
       final byte status = eventEnc.getProperEventStatus(e);
-      if ((status & EventEncoding.STATUS_UNUSED) != 0) {
+      if ((status & EventStatus.STATUS_UNUSED) != 0) {
         final EventProxy event = eventEnc.getProperEvent(e);
         if (!events.contains(event)) {
           for (int s = 0; s < numStates; s++) {
@@ -1114,7 +1093,8 @@ public abstract class TransitionListBuffer
       final int numTrans = other.getNumberOfTransitions();
       final long[] transitions = new long[numTrans];
       final int eventShift = AutomatonTools.log2(mNumStates);
-      final int fromShift = eventShift + AutomatonTools.log2(mNumEvents);
+      final int numEvents = mEventStatus.getNumberOfProperEvents();
+      final int fromShift = eventShift + AutomatonTools.log2(numEvents);
       final int toMask = (1 << eventShift) - 1;
       int i = 0;
       while (iter.advance()) {
@@ -1194,8 +1174,9 @@ public abstract class TransitionListBuffer
             final int data = block[offset + OFFSET_DATA];
             final int event = data & mEventMask;
             final int target = partition.getClassCode(data >>> mStateShift);
+            final byte status = mEventStatus.getProperEventStatus(event);
             final boolean selfloop =
-              EventEncoding.isOutsideOnlySelfloopEvent(mEventStatus[event]);
+              EventStatus.isOutsideOnlySelfloopEvent(status);
             if (!selfloop || code != target) {
               // suppress tau-selfloops and only-other selfloops
               final int trans = (event << eventShift) | target;
@@ -1345,7 +1326,8 @@ public abstract class TransitionListBuffer
 
   private void checkEvent(final int event)
   {
-    if (event < 0 || event >= mNumEvents) {
+    final int numEvents = mEventStatus.getNumberOfProperEvents();
+    if (event < 0 || event >= numEvents) {
       throw new AssertionError("Invalid event number " + event + " in " +
                                ProxyTools.getShortClassName(this) + "!");
     }
@@ -1510,14 +1492,15 @@ public abstract class TransitionListBuffer
     (final TransitionIterator iter,
      final int... flags)
   {
-    if (mOrderingInfo == null) {
+    final OrderingInfo info = mEventStatus.getOrderingInfo();
+    if (info == null) {
       throw new IllegalStateException
         ("Iteration by event status requested for unordered event encoding!");
-    } else if (mOrderingInfo.isSupportedOrdering(flags)) {
+    } else if (info.isSupportedOrdering(flags)) {
       iter.resetEventsByStatus(flags);
       return iter;
     } else {
-      return new StatusGroupTransitionIterator(iter, mOrderingInfo, flags);
+      return new StatusGroupTransitionIterator(iter, info, flags);
     }
   }
 
@@ -1565,7 +1548,7 @@ public abstract class TransitionListBuffer
     {
       mCurrent = NULL;
       mFirstEvent = 0;
-      mLastEvent = mNumEvents - 1;
+      mLastEvent = mEventStatus.getNumberOfProperEvents() - 1;
       mFromState = -1;
     }
 
@@ -1598,7 +1581,7 @@ public abstract class TransitionListBuffer
     {
       if (event < 0) {
         mFirstEvent = 0;
-        mLastEvent = mNumEvents - 1;
+        mLastEvent = mEventStatus.getNumberOfProperEvents() - 1;
       } else {
         mFirstEvent = mLastEvent = event;
       }
@@ -1609,15 +1592,21 @@ public abstract class TransitionListBuffer
     public void resetEvents(final int first, final int last)
     {
       mFirstEvent = first < 0 ? 0 : first;
-      mLastEvent = last >= mNumEvents ? mNumEvents - 1 : last;
+      final int numEvents = mEventStatus.getNumberOfProperEvents();
+      mLastEvent = last >= numEvents ? numEvents - 1 : last;
       reset();
     }
 
     @Override
     public void resetEventsByStatus(final int... flags)
     {
-      final int first = mOrderingInfo.getFirstEventIndex(flags);
-      final int last = mOrderingInfo.getLastEventIndex(flags);
+      final OrderingInfo info = mEventStatus.getOrderingInfo();
+      if (info == null) {
+        throw new IllegalStateException
+          ("Iteration by event status requested for unordered event encoding!");
+      }
+      final int first = info.getFirstEventIndex(flags);
+      final int last = info.getLastEventIndex(flags);
       resetEvents(first, last);
     }
 
@@ -1876,8 +1865,13 @@ public abstract class TransitionListBuffer
     @Override
     public void resetEventsByStatus(final int... flags)
     {
-      final int first = mOrderingInfo.getFirstEventIndex(flags);
-      final int last = mOrderingInfo.getLastEventIndex(flags);
+      final OrderingInfo info = mEventStatus.getOrderingInfo();
+      if (info == null) {
+        throw new IllegalStateException
+          ("Iteration by event status requested for unordered event encoding!");
+      }
+      final int first = info.getFirstEventIndex(flags);
+      final int last = info.getLastEventIndex(flags);
       resetEvents(first, last);
     }
 
@@ -2025,13 +2019,11 @@ public abstract class TransitionListBuffer
 
   //#########################################################################
   //# Data Members
-  private EventEncoding.OrderingInfo mOrderingInfo;
   private final int mBlockShift;
   private final int mBlockMask;
   private final int mBlockSize;
 
-  private final int mNumEvents;
-  private final byte[] mEventStatus;
+  private final EventStatusProvider mEventStatus;
   private final int mStateShift;
   private final int mEventMask;
   private final List<int[]> mBlocks;

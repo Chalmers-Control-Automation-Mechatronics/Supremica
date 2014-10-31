@@ -26,6 +26,7 @@ import net.sourceforge.waters.analysis.efa.base.AbstractEFATransitionRelation;
 import net.sourceforge.waters.analysis.efa.base.EFASimplifierStatistics;
 import net.sourceforge.waters.analysis.efa.base.UnfoldingVariableContext;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -711,7 +712,7 @@ public class EFSMPartialUnfolder extends AbstractEFSMAlgorithm
         mUnfoldedEventNumber = mUnfoldedEventEncoding.createEventId(mUpdate);
         if (mIsPureGuard) {
           mUnfoldedTransitionRelation.setProperEventStatus
-           (mUnfoldedEventNumber, EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP);
+           (mUnfoldedEventNumber, EventStatus.STATUS_OUTSIDE_ONLY_SELFLOOP);
         }
       }
       return mUnfoldedEventNumber;

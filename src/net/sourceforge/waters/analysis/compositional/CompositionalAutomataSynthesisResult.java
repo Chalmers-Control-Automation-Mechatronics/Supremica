@@ -315,7 +315,7 @@ public class CompositionalAutomataSynthesisResult
   private static int getNumberOfSupervisorStates
     (final ListBufferTransitionRelation sup, final int defaultMarking)
   {
-    if (defaultMarking < 0 || !sup.isUsedProposition(defaultMarking)) {
+    if (defaultMarking < 0 || !sup.isPropositionUsed(defaultMarking)) {
       return sup.getNumberOfReachableStates();
     } else {
       int numStates = 0;
@@ -331,7 +331,7 @@ public class CompositionalAutomataSynthesisResult
   private static int getNumberOfSupervisorTransitions
     (final ListBufferTransitionRelation sup, final int defaultMarking)
   {
-    if (defaultMarking < 0 || !sup.isUsedProposition(defaultMarking)) {
+    if (defaultMarking < 0 || !sup.isPropositionUsed(defaultMarking)) {
       return sup.getNumberOfTransitions();
     } else {
       int numTrans = 0;

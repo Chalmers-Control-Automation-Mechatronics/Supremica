@@ -15,7 +15,9 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.model.analysis.AbstractSynchronousProductBuilderTest;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
@@ -63,6 +65,7 @@ public class TRSynchronousProductBuilderTest
 
   @Override
   protected void configureAutomatonBuilder(final ProductDESProxy des)
+    throws AnalysisException
   {
     super.configureAutomatonBuilder(des);
     final TRSynchronousProductBuilder builder = getAutomatonBuilder();
@@ -77,8 +80,8 @@ public class TRSynchronousProductBuilderTest
       if (kind != EventKind.PROPOSITION &&
           name.startsWith(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
         enc.addEvent(event, translator,
-                     EventEncoding.STATUS_FAILING |
-                     EventEncoding.STATUS_OUTSIDE_ALWAYS_ENABLED);
+                     EventStatus.STATUS_FAILING |
+                     EventStatus.STATUS_OUTSIDE_ALWAYS_ENABLED);
       } else if (!event.isObservable()) {
         if (tau == null) {
           final ProductDESProxyFactory factory = getProductDESProxyFactory();
@@ -86,14 +89,14 @@ public class TRSynchronousProductBuilderTest
             (":tau", EventKind.UNCONTROLLABLE, false);
           enc.addSilentEvent(tau);
         }
-        enc.addEventAlias(event, tau, translator, EventEncoding.STATUS_NONE);
+        enc.addEventAlias(event, tau, translator, EventStatus.STATUS_NONE);
       }
     }
     if (enc.getNumberOfProperEvents() > 1 || tau != null) {
       try {
         final EventProxy marking =
           AbstractConflictChecker.getMarkingProposition(des);
-        enc.addEvent(marking, translator, EventEncoding.STATUS_NONE);
+        enc.addEvent(marking, translator, EventStatus.STATUS_NONE);
       } catch (final EventNotFoundException e) {
         // No marking---never mind!
       }

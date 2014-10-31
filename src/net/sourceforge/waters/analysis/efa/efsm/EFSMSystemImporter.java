@@ -155,7 +155,7 @@ public class EFSMSystemImporter
     final EFSMEventEncoding efsmEvents = efsmTransition.getEventEncoding();
     final String name = rel.getName();
     // Should marking ID be zero?
-    final boolean isMarkingIsUsed = rel.isUsedProposition(0);
+    final boolean isMarkingIsUsed = rel.isPropositionUsed(0);
     final String eventName = "tau:" + name;
     final SimpleIdentifierProxy identEvent =
       mModuleFactory.createSimpleIdentifierProxy(eventName);

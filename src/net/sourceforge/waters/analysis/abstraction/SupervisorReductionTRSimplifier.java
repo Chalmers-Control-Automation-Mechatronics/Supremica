@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Queue;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.IntListBuffer.ReadOnlyIterator;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -157,7 +158,7 @@ public class SupervisorReductionTRSimplifier extends
     for (int e = EventEncoding.NONTAU; e < mNumProperEvents; e++) {
       checkAbort();
       final byte status = rel.getProperEventStatus(e);
-      if (!EventEncoding.isControllableEvent(status)) {
+      if (!EventStatus.isControllableEvent(status)) {
         iter.resetEvent(e);
         boolean selfloopOnly = true;
         while (iter.advance()) {
@@ -628,7 +629,7 @@ public class SupervisorReductionTRSimplifier extends
       new TIntArrayList[mNumProperEvents];
     final TransitionIterator iter =
       rel
-        .createAllTransitionsReadOnlyIteratorByStatus(EventEncoding.STATUS_CONTROLLABLE);
+        .createAllTransitionsReadOnlyIteratorByStatus(EventStatus.STATUS_CONTROLLABLE);
     while (iter.advance()) {
       // for each controllable event ...
       checkAbort();
@@ -663,7 +664,7 @@ public class SupervisorReductionTRSimplifier extends
     }
     for (int e = EventEncoding.NONTAU; e < mNumProperEvents; e++) {
       final byte status = rel.getProperEventStatus(e);
-      if (EventEncoding.isControllableEvent(status)) {
+      if (EventStatus.isControllableEvent(status)) {
         if (disabledEventsToStates[e] != null) {
           if (enabledEventsToStates[e] != null) {
             enabDisabEvents.add(e);
@@ -896,7 +897,7 @@ public class SupervisorReductionTRSimplifier extends
     for (int e = EventEncoding.TAU; e < rel.getNumberOfProperEvents(); e++) {
       if (!disabEvents.contains(e)) {
         final byte status = rel.getProperEventStatus(e);
-        rel.setProperEventStatus(e, status | EventEncoding.STATUS_UNUSED);
+        rel.setProperEventStatus(e, status | EventStatus.STATUS_UNUSED);
       }
     }
     if (numStates == 2) {
@@ -911,8 +912,10 @@ public class SupervisorReductionTRSimplifier extends
       }
     } else if (numStates == 1) {
       // set initial state markings
-      final long markings = rel.createMarkings();
-      rel.setUsedPropositions(markings);
+      final int numProps = rel.getNumberOfPropositions();
+      for (int p = 0; p < numProps; p++) {
+        rel.setPropositionUsed(p, false);
+      }
     }
     final int marking = getDefaultMarkingID();
     final int oldNumStates = oldRel.getNumberOfStates();

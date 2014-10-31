@@ -14,6 +14,7 @@ import gnu.trove.list.array.TIntArrayList;
 import java.util.Arrays;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -96,7 +97,7 @@ public class AlwaysEnabledEventsFinder
       mAlwaysEnabledEvents = new TIntArrayList(numEvents - 1);
       for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
         final byte status = rel.getProperEventStatus(e);
-        if (EventEncoding.isUsedEvent(status) && !disabled[e]) {
+        if (EventStatus.isUsedEvent(status) && !disabled[e]) {
           mAlwaysEnabledEvents.add(e);
         }
       }
@@ -127,7 +128,7 @@ public class AlwaysEnabledEventsFinder
       final boolean[] found = new boolean[numStates];
       for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
         final byte status = rel.getProperEventStatus(e);
-        if (EventEncoding.isUsedEvent(status)) {
+        if (EventStatus.isUsedEvent(status)) {
           Arrays.fill(found, false);
           int numStatesFound = 0;
           iter.resetEvent(e);

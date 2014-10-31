@@ -14,7 +14,10 @@ import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.AbstractMarkingTRSimplifier;
+import net.sourceforge.waters.analysis.tr.DefaultEventStatusProvider;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
+import net.sourceforge.waters.analysis.tr.EventStatusProvider;
 import net.sourceforge.waters.analysis.tr.IntSetBuffer;
 import net.sourceforge.waters.analysis.tr.IntStateBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -54,14 +57,14 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
     final int numEvents = rel.getNumberOfProperEvents();
     int index = 0;
     for (int event = EventEncoding.NONTAU; event < numEvents; event++) {
-      if ((rel.getProperEventStatus(event) & EventEncoding.STATUS_UNUSED) == 0) {
+      if ((rel.getProperEventStatus(event) & EventStatus.STATUS_UNUSED) == 0) {
         index++;
       }
     }
     mEventIndexes = new int[index];
     index = 0;
     for (int event = EventEncoding.NONTAU; event < numEvents; event++) {
-      if ((rel.getProperEventStatus(event) & EventEncoding.STATUS_UNUSED) == 0) {
+      if ((rel.getProperEventStatus(event) & EventStatus.STATUS_UNUSED) == 0) {
         mEventIndexes[index++] = event;
       }
     }
@@ -121,7 +124,7 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
       return false;
     }
     if ((rel.getProperEventStatus(EventEncoding.TAU) &
-         EventEncoding.STATUS_UNUSED) == 0) {
+         EventStatus.STATUS_UNUSED) == 0) {
       mIsDeterministic = false;
       final TauClosure closure = rel.createSuccessorsTauClosure(mTransitionLimit);
       mTauIterator = closure.createIterator();
@@ -255,10 +258,8 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
     if (mSetOffsets != null) {
       ListBufferTransitionRelation rel = getTransitionRelation();
       final int numDetStates = mSetOffsets.size();
-      final int numProps = rel.getNumberOfPropositions();
-      final long usedProps = rel.getUsedPropositions();
-      final IntStateBuffer detStates =
-        new IntStateBuffer(numDetStates, numProps, usedProps);
+      final EventStatusProvider status = new DefaultEventStatusProvider(rel);
+      final IntStateBuffer detStates = new IntStateBuffer(numDetStates, status);
       for (int init = 0; init < mNumInitialStates; init++) {
         detStates.setInitial(init, true);
       }
@@ -550,7 +551,7 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
       final int numEvents = eventEnc.getNumberOfEvents();
       final Collection<EventProxy> events = new ArrayList<EventProxy>(numEvents);
       for (int e = 0; e < eventEnc.getNumberOfProperEvents(); e++) {
-        if ((rel.getProperEventStatus(e) & EventEncoding.STATUS_UNUSED) == 0) {
+        if ((rel.getProperEventStatus(e) & EventStatus.STATUS_UNUSED) == 0) {
           final EventProxy event = eventEnc.getProperEvent(e);
           if (event != null) {
             events.add(event);

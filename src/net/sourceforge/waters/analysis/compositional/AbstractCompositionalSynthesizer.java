@@ -155,8 +155,7 @@ public abstract class AbstractCompositionalSynthesizer
       new EventEncoding(uncontrollables, translator);
     final StateEncoding stateEnc = new StateEncoding(spec);
     final ListBufferTransitionRelation rel =
-      new ListBufferTransitionRelation(
-                                       spec,
+      new ListBufferTransitionRelation(spec,
                                        eventEnc,
                                        stateEnc,
                                        ListBufferTransitionRelation.CONFIG_SUCCESSORS);

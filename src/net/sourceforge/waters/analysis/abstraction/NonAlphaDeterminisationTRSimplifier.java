@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -234,7 +235,7 @@ public class NonAlphaDeterminisationTRSimplifier
     final ListBufferTransitionRelation rel = getTransitionRelation();
     if (getPreconditionMarkingID() < 0 &&
         (rel.getProperEventStatus(EventEncoding.TAU) &
-         EventEncoding.STATUS_UNUSED) != 0) {
+         EventStatus.STATUS_UNUSED) != 0) {
       return false;
     }
     final int numStates = rel.getNumberOfStates();

@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.efa.efsm;
 
 import net.sourceforge.waters.analysis.efa.base.AbstractEFATransitionLabelEncoding;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 
@@ -65,7 +66,7 @@ public class EFSMEventEncoding extends AbstractEFATransitionLabelEncoding<Constr
       if (!finder.findPrime(update)) {
         final byte status = rel.getProperEventStatus(e);
         rel.setProperEventStatus
-          (e, status | EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP);
+          (e, status | EventStatus.STATUS_OUTSIDE_ONLY_SELFLOOP);
       }
     }
   }

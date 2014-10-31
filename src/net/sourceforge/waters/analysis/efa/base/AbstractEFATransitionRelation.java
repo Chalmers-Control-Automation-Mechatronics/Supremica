@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
@@ -88,7 +88,7 @@ public abstract class AbstractEFATransitionRelation<L>
   protected boolean isUsedTransitionLabel(final int code)
   {
     final byte status = mTransitionRelation.getProperEventStatus(code);
-    return EventEncoding.isUsedEvent(status);
+    return EventStatus.isUsedEvent(status);
   }
 
   /**

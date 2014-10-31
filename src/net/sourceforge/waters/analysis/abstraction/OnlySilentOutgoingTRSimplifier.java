@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.abstraction;
 import gnu.trove.list.array.TIntArrayList;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -94,7 +95,7 @@ public class OnlySilentOutgoingTRSimplifier
     final int omegaID = getDefaultMarkingID();
     final int tauID = EventEncoding.TAU;
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    if ((rel.getProperEventStatus(tauID) & EventEncoding.STATUS_UNUSED) != 0) {
+    if ((rel.getProperEventStatus(tauID) & EventStatus.STATUS_UNUSED) != 0) {
       return false;
     }
     final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();

@@ -13,8 +13,10 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -66,6 +68,7 @@ public class SelfLoopsObservationEquivalenceTRSimplifierTest
   @Override
   protected EventEncoding createEventEncoding(final ProductDESProxy des,
                                               final AutomatonProxy aut)
+    throws OverflowException
   {
     final KindTranslator translator = IdenticalKindTranslator.getInstance();
     final EventProxy tau = getEvent(aut, TAU);
@@ -74,9 +77,9 @@ public class SelfLoopsObservationEquivalenceTRSimplifierTest
     final int numEvents = encoding.getNumberOfProperEvents();
     for (int event = EventEncoding.NONTAU; event < numEvents; event++) {
       final byte status = encoding.getProperEventStatus(event);
-      if (!EventEncoding.isControllableEvent(status)) {
+      if (!EventStatus.isControllableEvent(status)) {
         encoding.setProperEventStatus
-          (event, status | EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP);
+          (event, status | EventStatus.STATUS_OUTSIDE_ONLY_SELFLOOP);
       }
     }
     return encoding;

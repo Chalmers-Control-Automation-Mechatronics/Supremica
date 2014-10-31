@@ -17,6 +17,7 @@ import gnu.trove.stack.array.TIntArrayStack;
 import java.util.BitSet;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -158,7 +159,7 @@ public class EnabledEventsSilentIncomingTRSimplifier
   {
     final int tauID = EventEncoding.TAU;
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    if ((rel.getProperEventStatus(tauID) & EventEncoding.STATUS_UNUSED) != 0) {
+    if ((rel.getProperEventStatus(tauID) & EventStatus.STATUS_UNUSED) != 0) {
       return false;
     } else if (getPreconditionMarkingID() < 0) {        //what is the precondition marking alpha
       mTauTestIterator = rel.createSuccessorsReadOnlyIterator();

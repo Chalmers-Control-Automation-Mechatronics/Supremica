@@ -13,9 +13,11 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -61,6 +63,7 @@ public class SynthesisObservationEquivalenceTRSimplifierTest
   @Override
   protected EventEncoding createEventEncoding(final ProductDESProxy des,
                                               final AutomatonProxy aut)
+    throws OverflowException
   {
     final KindTranslator translator = IdenticalKindTranslator.getInstance();
     final EventEncoding encoding = new EventEncoding(aut, translator);
@@ -70,7 +73,7 @@ public class SynthesisObservationEquivalenceTRSimplifierTest
       if (!event.isObservable()) {
         final byte status = encoding.getProperEventStatus(e);
         encoding.setProperEventStatus
-          (e, status | EventEncoding.STATUS_LOCAL);
+          (e, status | EventStatus.STATUS_LOCAL);
       }
     }
     mDefaultMarkingID = -1;
@@ -82,8 +85,8 @@ public class SynthesisObservationEquivalenceTRSimplifierTest
         break;
       }
     }
-    encoding.sortProperEvents((byte) ~EventEncoding.STATUS_LOCAL,
-                              EventEncoding.STATUS_CONTROLLABLE);
+    encoding.sortProperEvents((byte) ~EventStatus.STATUS_LOCAL,
+                              EventStatus.STATUS_CONTROLLABLE);
     return encoding;
   }
 

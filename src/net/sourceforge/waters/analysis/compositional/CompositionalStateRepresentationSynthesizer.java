@@ -21,6 +21,7 @@ import net.sourceforge.waters.analysis.abstraction.HalfWaySynthesisTRSimplifier;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.AbstractSynchronisationEncoding;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TRPartition;
@@ -507,6 +508,7 @@ public class CompositionalStateRepresentationSynthesizer extends
   //#########################################################################
   //# Synthesis
   private EventEncoding createSynthesisEventEncoding(final AutomatonProxy aut)
+    throws OverflowException
   {
     final KindTranslator translator = getKindTranslator();
     final Collection<EventProxy> props = getPropositions();
@@ -521,10 +523,10 @@ public class CompositionalStateRepresentationSynthesizer extends
                         EventEncoding.FILTER_PROPOSITIONS);
     for (int e = EventEncoding.NONTAU; e < encoding.getNumberOfProperEvents(); e++) {
       final byte status = encoding.getProperEventStatus(e);
-      encoding.setProperEventStatus(e, status | EventEncoding.STATUS_LOCAL);
+      encoding.setProperEventStatus(e, status | EventStatus.STATUS_LOCAL);
     }
-    encoding.sortProperEvents((byte) ~EventEncoding.STATUS_LOCAL,
-                              EventEncoding.STATUS_CONTROLLABLE);
+    encoding.sortProperEvents((byte) ~EventStatus.STATUS_LOCAL,
+                              EventStatus.STATUS_CONTROLLABLE);
     return encoding;
   }
 

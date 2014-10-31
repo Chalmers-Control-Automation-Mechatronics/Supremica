@@ -98,7 +98,7 @@ public class MarkingRemovalTRSimplifier
 
     // For each proposition, visit all marked states. For each of them, do a
     // depth-first search, removing markings from all states encountered
-    // except the start state of the state.
+    // except the start state of the search.
     final TransitionIterator iter = rel.createPredecessorsReadOnlyIterator();
     final int numStates = rel.getNumberOfStates();
     final TIntHashSet visitedStates = new TIntHashSet();

@@ -131,6 +131,7 @@ public class OPVerifierExperiment
   public void runExperiment(final AutomatonProxy aut,
                             final EventProxy tau,
                             final EventProxy omega)
+    throws OverflowException
   {
     // 1. Check OP for determinised automaton
     final AutomatonProxy detAut = makeDeterministic(aut, tau);
@@ -379,6 +380,7 @@ public class OPVerifierExperiment
   private AutomatonProxy findOPAbstraction(final AutomatonProxy aut,
                                            final EventProxy tau,
                                            final EventProxy omega)
+    throws OverflowException
   {
     final Collection<StateProxy> states = aut.getStates();
     boolean hasInit = false;
@@ -398,7 +400,8 @@ public class OPVerifierExperiment
     final int config = mOEQSimplifier.getPreferredInputConfiguration();
     final ListBufferTransitionRelation rel;
     try {
-      rel = new ListBufferTransitionRelation(aut, eventEnc, stateEnc, config);
+      rel = new ListBufferTransitionRelation(aut, eventEnc.clone(),
+                                             stateEnc, config);
       mOEQSimplifier.setTransitionRelation(rel);
       final int omegaID = eventEnc.getEventCode(omega);
       mOEQSimplifier.setDefaultMarkingID(omegaID);

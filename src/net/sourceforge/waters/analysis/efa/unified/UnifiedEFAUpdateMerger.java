@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.efa.base.AbstractEFAAlgorithm;
-import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.analysis.tr.WatersHashSet;
@@ -166,7 +166,7 @@ class UnifiedEFAUpdateMerger extends AbstractEFAAlgorithm
           final int oldCode = encoding.getEventId(oldEvent);
           rel.replaceEvent(oldCode, newCode);
           byte status = rel.getProperEventStatus(oldCode);
-          status |= EventEncoding.STATUS_UNUSED;
+          status |= EventStatus.STATUS_UNUSED;
           rel.setProperEventStatus(oldCode, status);
           mRemovedEvents.add(oldEvent);
           mCandidateEvents.remove(oldEvent);

@@ -30,6 +30,7 @@ import java.util.Set;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -2011,7 +2012,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         eventEnc.addSilentEvent(event);
       } else if (translator.getEventKind(event) != EventKind.PROPOSITION ||
                  (mPropositions != null && mPropositions.contains(event))) {
-        eventEnc.addEvent(event, translator, EventEncoding.STATUS_NONE);
+        eventEnc.addEvent(event, translator, EventStatus.STATUS_NONE);
       }
     }
     final StateEncoding stateEnc = new StateEncoding(aut);

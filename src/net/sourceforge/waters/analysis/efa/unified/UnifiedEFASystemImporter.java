@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -114,7 +115,7 @@ public class UnifiedEFASystemImporter
     final List<SimpleNodeProxy> nodeList = new ArrayList<>(numStates);
     final SimpleNodeProxy[] nodeArray = new SimpleNodeProxy[numStates];
     final boolean isMarkingIsUsed =
-      rel.isUsedProposition(UnifiedEFAEventEncoding.OMEGA);
+      rel.isPropositionUsed(UnifiedEFAEventEncoding.OMEGA);
     int numMarkedStates = isMarkingIsUsed ? 0 : -1;
     for (int s = 0; s < numStates; s++) {
       if (rel.isReachable(s)) {
@@ -210,7 +211,7 @@ public class UnifiedEFASystemImporter
     }
     for (int e = 0; e < numEvents; e++) {
       final byte status = rel.getProperEventStatus(e);
-      if (EventEncoding.isUsedEvent(status) && !foundEvent[e]) {
+      if (EventStatus.isUsedEvent(status) && !foundEvent[e]) {
         final AbstractEFAEvent event = eventEncoding.getUpdate(e);
         final String eventName = event.getName();
         final IdentifierProxy ident =

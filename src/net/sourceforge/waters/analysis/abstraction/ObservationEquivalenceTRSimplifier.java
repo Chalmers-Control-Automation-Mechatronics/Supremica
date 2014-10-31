@@ -27,6 +27,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.OneEventCachingTransitionIterator;
@@ -553,7 +554,7 @@ public class ObservationEquivalenceTRSimplifier
       mOnlySelfLoopEvents = new TIntArrayList(rel.getNumberOfProperEvents());
       for (int e = first; e < numEvents; e++) {
         if ((rel.getProperEventStatus(e) &
-          EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0) {
+          EventStatus.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0) {
           mOnlySelfLoopEvents.add(e);
         }
       }
@@ -658,13 +659,13 @@ public class ObservationEquivalenceTRSimplifier
         final int config = rel.getConfiguration();
         if ((config & ListBufferTransitionRelation.CONFIG_PREDECESSORS) != 0) {
           if (mUsingLocalEvents) {
-            mTauClosure = rel.createPredecessorsTauClosureByStatus(limit, EventEncoding.STATUS_LOCAL);
+            mTauClosure = rel.createPredecessorsTauClosureByStatus(limit, EventStatus.STATUS_LOCAL);
           } else {
             mTauClosure = rel.createPredecessorsTauClosure(limit);
           }
         } else {
           if (mUsingLocalEvents) {
-            mTauClosure = rel.createSuccessorsTauClosureByStatus(limit, EventEncoding.STATUS_LOCAL);
+            mTauClosure = rel.createSuccessorsTauClosureByStatus(limit, EventStatus.STATUS_LOCAL);
           } else {
             mTauClosure = rel.createSuccessorsTauClosure(limit);
           }
@@ -684,7 +685,7 @@ public class ObservationEquivalenceTRSimplifier
       tau = false;
     } else if (mUsingLocalEvents) {
       final byte status = getTransitionRelation().getProperEventStatus(event);
-      tau = EventEncoding.isLocalEvent(status);
+      tau = EventStatus.isLocalEvent(status);
     } else {
       tau = (event == EventEncoding.TAU);
     }
@@ -836,12 +837,12 @@ public class ObservationEquivalenceTRSimplifier
       while (iter0.advance()) {
         final int e = iter0.getCurrentEvent();
         final byte status = rel.getProperEventStatus(e);
-        if ((status & EventEncoding.STATUS_UNUSED) != 0 || e == skipped) {
+        if ((status & EventStatus.STATUS_UNUSED) != 0 || e == skipped) {
           continue;
         }
         checkAbort();
         final boolean selflooped =
-          (status & EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0 &&
+          (status & EventStatus.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0 &&
           mUsingSpecialEvents && doNonTau && e != EventEncoding.TAU;
         final int from0 = iter0.getCurrentFromState();
         final int to0 = iter0.getCurrentToState();
@@ -1266,7 +1267,7 @@ public class ObservationEquivalenceTRSimplifier
         {
           final boolean outsideOnlySelfloop = mUsingSpecialEvents &&
             (rel.getProperEventStatus(event) &
-             EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0;
+             EventStatus.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0;
           TIntHashSet visitedStates = null;
           if (outsideOnlySelfloop) {
             if (mEquivalence.respectsTau()) {
@@ -1463,7 +1464,7 @@ public class ObservationEquivalenceTRSimplifier
           final ListBufferTransitionRelation rel = getTransitionRelation();
           final boolean outsideOnlySelfloop = mUsingSpecialEvents &&
             (rel.getProperEventStatus(event) &
-             EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0;
+             EventStatus.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0;
           final TransitionIterator transIter =
             getPredecessorIterator(event);
           final TIntHashSet visitedStates = new TIntHashSet();
@@ -1772,7 +1773,7 @@ public class ObservationEquivalenceTRSimplifier
           final ListBufferTransitionRelation rel = getTransitionRelation();
           final boolean outsideOnlySelfloop = mUsingSpecialEvents &&
             (rel.getProperEventStatus(event) &
-             EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0;
+             EventStatus.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0;
           final TransitionIterator transIter =
             getPredecessorIterator(event);
           final TIntHashSet visitedStates = new TIntHashSet();

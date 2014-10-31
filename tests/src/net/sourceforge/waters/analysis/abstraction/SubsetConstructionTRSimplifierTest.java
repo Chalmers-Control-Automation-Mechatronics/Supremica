@@ -10,15 +10,15 @@
 package net.sourceforge.waters.analysis.abstraction;
 
 import gnu.trove.list.array.TIntArrayList;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 
 /**
@@ -59,6 +59,7 @@ public class SubsetConstructionTRSimplifierTest
   @Override
   protected EventEncoding createEventEncoding(final ProductDESProxy des,
                                               final AutomatonProxy aut)
+    throws OverflowException
   {
     final EventEncoding enc = super.createEventEncoding(des, aut);
     final int numEvents = enc.getNumberOfProperEvents();

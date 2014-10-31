@@ -17,6 +17,7 @@ import java.util.Map;
 
 import net.sourceforge.waters.analysis.efa.base.AbstractEFAAlgorithm;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntArrayBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.PreTransitionBuffer;
@@ -201,9 +202,9 @@ public class UnifiedEFASynchronousProductBuilder
       final UnifiedEFATransitionRelation tr =
         mInputTransitionRelations.get(trIndex);
       final ListBufferTransitionRelation rel = tr.getTransitionRelation();
-      mUsesMarking |= rel.isUsedProposition(UnifiedEFAEventEncoding.OMEGA);
+      mUsesMarking |= rel.isPropositionUsed(UnifiedEFAEventEncoding.OMEGA);
       final byte tauStatus = rel.getProperEventStatus(EventEncoding.TAU);
-      mUsesTau |= EventEncoding.isUsedEvent(tauStatus);
+      mUsesTau |= EventStatus.isUsedEvent(tauStatus);
       mTransitionIterators[trIndex] = rel.createSuccessorsReadOnlyIterator();
     }
     final int[] targetTuple = new int[numTR];
@@ -288,8 +289,8 @@ public class UnifiedEFASynchronousProductBuilder
                                        config);
     if (!mUsesTau) {
       resultRel.setProperEventStatus(EventEncoding.TAU,
-                                     EventEncoding.STATUS_FULLY_LOCAL |
-                                     EventEncoding.STATUS_UNUSED);
+                                     EventStatus.STATUS_FULLY_LOCAL |
+                                     EventStatus.STATUS_UNUSED);
     }
     for (int e = EventEncoding.NONTAU; e < mEventEncoding.size(); e++) {
       final EventInfo eventInfo = mEventInfoList.get(e);

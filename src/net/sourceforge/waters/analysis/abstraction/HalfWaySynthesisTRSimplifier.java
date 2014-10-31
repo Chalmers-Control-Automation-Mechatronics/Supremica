@@ -17,7 +17,7 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -208,12 +208,14 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
         rel.setReachable(state, false);
       }
       final int numEvents = rel.getNumberOfProperEvents();
-      for (int event = 0; event < numEvents; event++) {
-        final byte status = rel.getProperEventStatus(event);
-        rel.setProperEventStatus(event, status | EventEncoding.STATUS_UNUSED);
+      for (int e = 0; e < numEvents; e++) {
+        final byte status = rel.getProperEventStatus(e);
+        rel.setProperEventStatus(e, status | EventStatus.STATUS_UNUSED);
       }
-      final long none = rel.createMarkings();
-      rel.setUsedPropositions(none);
+      final int numProps = rel.getNumberOfPropositions();
+      for (int p = 0; p < numProps; p++) {
+        rel.setPropositionUsed(p, false);
+      }
     } else {
       // 5b. Check transitions from safe states to bad states.
       //  Delete controllable transitions to bad state.
@@ -313,8 +315,8 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
     final BitSet oldBadStates = (BitSet) mBadStates.clone();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final TransitionIterator iter = rel.createPredecessorsReadOnlyIterator();
-    iter.resetEventsByStatus(EventEncoding.STATUS_LOCAL,
-                             ~EventEncoding.STATUS_CONTROLLABLE);
+    iter.resetEventsByStatus(EventStatus.STATUS_LOCAL,
+                             ~EventStatus.STATUS_CONTROLLABLE);
     final TIntStack unvisited = new TIntArrayStack();
     for (int state = oldBadStates.nextSetBit(0); state >= 0;
          state = oldBadStates.nextSetBit(state + 1)) {
@@ -355,7 +357,7 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
       @Override
       public boolean isRetainedEvent(final byte status)
       {
-        return !EventEncoding.isControllableEvent(status);
+        return !EventStatus.isControllableEvent(status);
       }
 
       @Override
@@ -373,7 +375,7 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
       @Override
       public boolean isRetainedEvent(final byte status)
       {
-        return EventEncoding.isControllableEvent(status);
+        return EventStatus.isControllableEvent(status);
       }
 
       @Override

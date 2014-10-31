@@ -31,6 +31,7 @@ import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -248,7 +249,7 @@ class EFSMTRSimplifier extends AbstractEFSMAlgorithm
       final int numTrans = rel.getNumberOfTransitions();
       final int numMarkings = rel.getNumberOfMarkings();
       mSimplifier.setTransitionRelation(rel);
-      final int prop = rel.isUsedProposition(0) ? 0 : -1;
+      final int prop = rel.isPropositionUsed(0) ? 0 : -1;
       mSimplifier.setDefaultMarkingID(prop);
       mSelfloopedUpdates = new ArrayList<ConstraintList>();
       if (mSimplifier.run()) {
@@ -260,7 +261,7 @@ class EFSMTRSimplifier extends AbstractEFSMAlgorithm
             rel.getNumberOfMarkings() == numMarkings) {
           return null;
         }
-        final int newProp = rel.isUsedProposition(0) ? 0 : -1;
+        final int newProp = rel.isPropositionUsed(0) ? 0 : -1;
         final EFSMEventEncoding eventEncoding = efsmTR.getEventEncoding();
         final int numEvents = eventEncoding.size();
         int newNumEvents = 1;
@@ -285,7 +286,7 @@ class EFSMTRSimplifier extends AbstractEFSMAlgorithm
               final ConstraintList update = eventEncoding.getUpdate(e);
               newEventEncoding.createEventId(update);
             } else if ((rel.getProperEventStatus(e) &
-                        EventEncoding.STATUS_UNUSED) != 0){
+                        EventStatus.STATUS_UNUSED) != 0){
               final ConstraintList update = eventEncoding.getUpdate(e);
               mSelfloopedUpdates.add(update);
             }

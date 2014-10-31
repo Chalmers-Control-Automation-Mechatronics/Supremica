@@ -355,7 +355,7 @@ public abstract class AbstractTRSimplifier
       if (logger.isDebugEnabled()) {
         int numberOfProposition = 0;
         for (int p=0; p< mTransitionRelation.getNumberOfPropositions(); p++) {
-          if (mTransitionRelation.isUsedProposition(p)) {
+          if (mTransitionRelation.isPropositionUsed(p)) {
             numberOfProposition++;
           }
         }

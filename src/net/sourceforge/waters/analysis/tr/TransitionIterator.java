@@ -48,11 +48,11 @@ public interface TransitionIterator
    * events of the given type.
    * @param  flags  List of event status flags, represented by
    *                a sequence of the bits or bit combinations
-   *                {@link EventEncoding#STATUS_CONTROLLABLE},
-   *                {@link EventEncoding#STATUS_LOCAL},
-   *                {@link EventEncoding#STATUS_OUTSIDE_ALWAYS_ENABLED},
-   *                {@link EventEncoding#STATUS_OUTSIDE_ONLY_SELFLOOP}, and
-   *                {@link EventEncoding#STATUS_UNUSED} or their complements.<BR>
+   *                {@link EventStatus#STATUS_CONTROLLABLE},
+   *                {@link EventStatus#STATUS_LOCAL},
+   *                {@link EventStatus#STATUS_OUTSIDE_ALWAYS_ENABLED},
+   *                {@link EventStatus#STATUS_OUTSIDE_ONLY_SELFLOOP}, and
+   *                {@link EventStatus#STATUS_UNUSED} or their complements.<BR>
    *                The flags must appear in the correct ordering, which must
    *                match the ordering of the {@link EventEncoding}. If a flag
    *                is complemented, iteration is performed over events

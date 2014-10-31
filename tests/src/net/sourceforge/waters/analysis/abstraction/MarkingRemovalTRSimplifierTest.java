@@ -9,12 +9,13 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import net.sourceforge.waters.analysis.tr.EventEncoding;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
+
+import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 
 
 public class MarkingRemovalTRSimplifierTest
@@ -48,6 +49,7 @@ public class MarkingRemovalTRSimplifierTest
   @Override
   protected EventEncoding createEventEncoding(final ProductDESProxy des,
                                               final AutomatonProxy aut)
+    throws OverflowException
   {
     return createEventEncodingWithPropositions(des, aut);
   }
