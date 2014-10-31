@@ -108,7 +108,7 @@ public interface EventStatusProvider
    * can be used to iterate over events more efficiently.
    * @return Ordering information if available,
    *         <CODE>null</CODE> otherwise.
-   * @see #sortProperEvents(byte...) sortProperEvents()
+   * @see EventEncoding#sortProperEvents(byte...) EventEncoding.sortProperEvents()
    */
   public OrderingInfo getOrderingInfo();
 

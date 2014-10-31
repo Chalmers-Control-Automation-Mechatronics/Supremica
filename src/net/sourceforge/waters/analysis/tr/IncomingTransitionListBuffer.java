@@ -40,8 +40,6 @@ public class IncomingTransitionListBuffer extends TransitionListBuffer
    *                      transitions.
    * @param  eventStatus  Status flags of events, based on constants defined
    *                      in {@link EventStatus}.
-   * @param  orderingInfo Ordering information to to describe event ordering,
-   *                      or <CODE>null</CODE>
    * @throws OverflowException if the encoding for states and events does
    *         not fit in the 32 bits available.
    */
@@ -60,8 +58,6 @@ public class IncomingTransitionListBuffer extends TransitionListBuffer
    *                      transitions.
    * @param  eventStatus  Status flags of events, based on constants defined
    *                      in {@link EventStatus}.
-   * @param  orderingInfo Ordering information to to describe event ordering,
-   *                      or <CODE>null</CODE>
    * @param  numTrans     Estimated number of transitions, used to determine
    *                      buffer size.
    * @throws OverflowException if the encoding for states and events does

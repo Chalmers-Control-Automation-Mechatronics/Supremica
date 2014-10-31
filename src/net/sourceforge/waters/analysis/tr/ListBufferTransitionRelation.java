@@ -859,7 +859,7 @@ public class ListBufferTransitionRelation
    * with events of the specified status.
    * @param  flags  Event status flags to specify the type of events,
    *                as passed to the {@link
-   *                EventEncoding.OrderingInfo#getFirstEventIndex(int...)
+   *                OrderingInfo#getFirstEventIndex(int...)
    *                OrderingInfo.getFirstEventIndex()} method.
    */
   public TransitionIterator createSuccessorsReadOnlyIteratorByStatus
@@ -941,7 +941,7 @@ public class ListBufferTransitionRelation
    * with events of the specified status.
    * @param  flags  Event status flags to specify the type of events,
    *                as passed to the {@link
-   *                EventEncoding.OrderingInfo#getFirstEventIndex(int...)
+   *                OrderingInfo#getFirstEventIndex(int...)
    *                OrderingInfo.getFirstEventIndex()} method.
    */
   public TransitionIterator createPredecessorsReadOnlyIteratorByStatus
@@ -1023,7 +1023,7 @@ public class ListBufferTransitionRelation
    * transitions of a given state with events of the specified status.
    * @param  flags  Event status flags to specify the type of events,
    *                as passed to the {@link
-   *                EventEncoding.OrderingInfo#getFirstEventIndex(int...)
+   *                OrderingInfo#getFirstEventIndex(int...)
    *                OrderingInfo.getFirstEventIndex()} method.
    */
   public TransitionIterator createAnyReadOnlyIteratorByStatus
@@ -1090,7 +1090,7 @@ public class ListBufferTransitionRelation
    * {@link TransitionIterator#remove()} method.
    * @param  flags  Event status flags to specify the type of events,
    *                as passed to the {@link
-   *                EventEncoding.OrderingInfo#getFirstEventIndex(int...)
+   *                OrderingInfo#getFirstEventIndex(int...)
    *                OrderingInfo.getFirstEventIndex()} method.
    */
   public TransitionIterator createAllTransitionsReadOnlyIteratorByStatus
@@ -1137,7 +1137,7 @@ public class ListBufferTransitionRelation
    * predecessor buffer will be closed!</P>
    * @param  flags  Event status flags to specify the type of events,
    *                as passed to the {@link
-   *                EventEncoding.OrderingInfo#getFirstEventIndex(int...)
+   *                OrderingInfo#getFirstEventIndex(int...)
    *                OrderingInfo.getFirstEventIndex()} method.
    */
   public TransitionIterator createSuccessorsModifyingIteratorByStatus
@@ -1183,7 +1183,7 @@ public class ListBufferTransitionRelation
    * successor buffer will be closed!</P>
    * @param  flags  Event status flags to specify the type of events,
    *                as passed to the {@link
-   *                EventEncoding.OrderingInfo#getFirstEventIndex(int...)
+   *                OrderingInfo#getFirstEventIndex(int...)
    *                OrderingInfo.getFirstEventIndex()} method.
    */
   public TransitionIterator createPredecessorsModifyingIteratorByStatus
@@ -1261,7 +1261,7 @@ public class ListBufferTransitionRelation
    * predecessor buffer will be closed!</P>
    * @param  flags  Event status flags to specify the type of events,
    *                as passed to the {@link
-   *                EventEncoding.OrderingInfo#getFirstEventIndex(int...)
+   *                OrderingInfo#getFirstEventIndex(int...)
    *                OrderingInfo.getFirstEventIndex()} method.
    */
   public TransitionIterator createAllTransitionsModifyingIteratorByStatus

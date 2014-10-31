@@ -89,8 +89,8 @@ public class IntStateBuffer
    * attributes and markings of the states are initialised to be
    * <CODE>false</CODE>.
    * @param  size       The number of states in the new buffer.
-   * @param  used       Marking pattern identifying propositions to be
-   *                    marked as used.
+   * @param  propStatus Event status provider to determine the number of
+   *                    propositions and which propositions are used.
    */
   public IntStateBuffer(final int size,
                         final EventStatusProvider propStatus)
@@ -104,7 +104,10 @@ public class IntStateBuffer
    * Creates a new state buffer that is an identical copy of the given
    * state buffer. This copy constructor constructs a deep copy that does
    * not share any data structures with the given state buffer.
-   */
+   * @param  buffer     The state buffer to be copied from.
+   * @param  propStatus Event status provider to determine the number of
+   *                    propositions and which propositions are used.
+  */
   public IntStateBuffer(final IntStateBuffer buffer,
                         final EventStatusProvider propStatus)
   {
@@ -218,7 +221,6 @@ public class IntStateBuffer
    *         different sets of markings will always have different marking
    *         patterns. Only propositions marked as used are considered.
    * @see #setAllMarkings(int,long) setAllMarkings()
-   * @see #isPropositionUsed(int) isUsedProposition()
    */
   public long getAllMarkings(final int state)
   {
@@ -417,7 +419,6 @@ public class IntStateBuffer
    * and if so, removes the proposition by marking it as unused.
    * @return <CODE>true</CODE> if at least one proposition was removed,
    *         <CODE>false</CODE> otherwise.
-   * @see #isPropositionUsed(int) isUsedProposition()
    */
   public boolean removeRedundantPropositions()
   {

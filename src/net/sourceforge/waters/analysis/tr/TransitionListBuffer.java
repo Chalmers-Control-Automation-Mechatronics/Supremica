@@ -770,7 +770,7 @@ public abstract class TransitionListBuffer
    * to start iterating from a state.
    * @param  flags  Event status flags to specify the type of events,
    *                as passed to the {@link
-   *                EventEncoding.OrderingInfo#getFirstEventIndex(int...)
+   *                OrderingInfo#getFirstEventIndex(int...)
    *                OrderingInfo.getFirstEventIndex()} method.
    */
   public TransitionIterator createReadOnlyIteratorByStatus(final int...flags)
@@ -825,7 +825,7 @@ public abstract class TransitionListBuffer
    * to start iterating from a state.
    * @param  flags  Event status flags to specify the type of events,
    *                as passed to the {@link
-   *                EventEncoding.OrderingInfo#getFirstEventIndex(int...)
+   *                OrderingInfo#getFirstEventIndex(int...)
    *                OrderingInfo.getFirstEventIndex()} method.
    */
   public TransitionIterator createModifyingIteratorByStatus(final int...flags)
@@ -877,7 +877,7 @@ public abstract class TransitionListBuffer
    * {@link TransitionIterator#remove()} method.
    * @param  flags  Event status flags to specify the type of events,
    *                as passed to the {@link
-   *                EventEncoding.OrderingInfo#getFirstEventIndex(int...)
+   *                OrderingInfo#getFirstEventIndex(int...)
    *                OrderingInfo.getFirstEventIndex()} method.
    */
   public TransitionIterator createAllTransitionsReadOnlyIteratorByStatus
@@ -924,7 +924,7 @@ public abstract class TransitionListBuffer
    * or {@link TransitionIterator#reset(int,int)}.
    * @param  flags  Event status flags to specify the type of events,
    *                as passed to the {@link
-   *                EventEncoding.OrderingInfo#getFirstEventIndex(int...)
+   *                OrderingInfo#getFirstEventIndex(int...)
    *                OrderingInfo.getFirstEventIndex()} method.
    */
   public TransitionIterator createAllTransitionsModifyingIteratorByStatus

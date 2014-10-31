@@ -352,7 +352,7 @@ public abstract class AbstractCompositionalModelAnalyzer
    * and failing events.
    * @see #setBlockedEventsEnabled(boolean) setBlockedEventsEnabled()
    * @see #setFailingEventsEnabled(boolean) setFailingEventsEnabled()
-   * @see #setSelfloopEventsEnabled(boolean) setSelfloopEventsEnabled()
+   * @see #setSelfloopOnlyEventsEnabled(boolean) setSelfloopOnlyEventsEnabled()
    */
   public void setUsingSpecialEvents(final boolean enable)
   {
@@ -431,7 +431,7 @@ public abstract class AbstractCompositionalModelAnalyzer
    * are selfloop-only in the entire model can be removed, while events
    * that are selfloop-only in all but one automaton can be used to
    * simplify that automaton.
-   * @see #setSelfloopEventsEnabled(boolean) setSelfloopEventsEnabled()
+   * @see #setSelfloopOnlyEventsEnabled(boolean) setSelfloopOnlyEventsEnabled()
    */
   public boolean isSelfloopOnlyEventsEnabled()
   {
