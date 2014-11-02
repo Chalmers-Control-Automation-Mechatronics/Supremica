@@ -16,10 +16,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.BitSet;
 import java.util.Collection;
 
-import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 
@@ -474,33 +472,6 @@ public class IntStateBuffer
       }
     }
     return count;
-  }
-
-  /**
-   * Check for any states in the given state encoding that are not
-   * present in the given automaton, and sets any such states unreachable.
-   * @return <CODE>true</CODE> if at least one state was set unreachable.
-   */
-  public boolean setMissingStatesUnreachable(final AutomatonProxy aut,
-                                             final StateEncoding stateEnc)
-  {
-    final Collection<StateProxy> states = aut.getStates();
-    final int numStates = states.size();
-    if (numStates < stateEnc.getNumberOfStates()) {
-      final BitSet reachable = new BitSet(numStates);
-      for (final StateProxy state : states) {
-        final int s = stateEnc.getStateCode(state);
-        reachable.set(s);
-      }
-      final int last = stateEnc.getNumberOfStates() - 1;
-      for (int s = reachable.previousClearBit(last); s >= 0;
-           s = reachable.previousClearBit(s - 1)) {
-        setReachable(s, false);
-      }
-      return true;
-    } else {
-      return false;
-    }
   }
 
   /**

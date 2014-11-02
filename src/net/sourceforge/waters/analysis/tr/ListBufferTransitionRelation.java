@@ -180,7 +180,6 @@ public class ListBufferTransitionRelation
     final int numStates = stateEnc.getNumberOfStatesIncludingExtra();
     final int numTrans = aut.getTransitions().size();
     mStateBuffer = new IntStateBuffer(eventEnc, stateEnc);
-    mStateBuffer.setMissingStatesUnreachable(aut, stateEnc);
     mExtraStates = stateEnc.getNumberOfExtraStates();
     mEventStatus = eventEnc;
     if ((config & CONFIG_SUCCESSORS) != 0) {
@@ -193,7 +192,6 @@ public class ListBufferTransitionRelation
         new IncomingTransitionListBuffer(numStates, mEventStatus,  numTrans);
       mPredecessorBuffer.setUpTransitions(events, list, eventEnc, stateEnc);
     }
-
   }
 
   /**
