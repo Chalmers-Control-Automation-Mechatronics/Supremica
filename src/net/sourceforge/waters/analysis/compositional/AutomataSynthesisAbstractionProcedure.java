@@ -161,11 +161,11 @@ public class AutomataSynthesisAbstractionProcedure extends
     try {
       reportAutomaton("input", aut);
       final EventEncoding mergedEnc = createEventEncoding(aut, local, true);
-      final StateEncoding inputStateEnc = createStateEncoding(aut);
+      final StateEncoding inputStateEnc = new StateEncoding(aut);
       final int inputConfig = mChain.getPreferredInputConfiguration();
       ListBufferTransitionRelation rel =
         new ListBufferTransitionRelation(aut, mergedEnc.clone(),
-                                         inputStateEnc, inputConfig);
+                                         inputStateEnc, 1, inputConfig);
       final CompositionalAutomataSynthesizer synthesizer = getAnalyzer();
       synthesizer.showDebugLog(rel);
       mChain.setTransitionRelation(rel);
@@ -360,13 +360,6 @@ public class AutomataSynthesisAbstractionProcedure extends
     } else {
       encoding.sortProperEvents(EventStatus.STATUS_CONTROLLABLE);
     }
-    return encoding;
-  }
-
-  private StateEncoding createStateEncoding(final AutomatonProxy aut)
-  {
-    final StateEncoding encoding = new StateEncoding(aut);
-    encoding.setNumberOfExtraStates(1);
     return encoding;
   }
 

@@ -285,10 +285,12 @@ public abstract class AbstractTRSimplifierTest
   throws Exception
   {
     final EventEncoding eventEnc = createEventEncoding(des, aut);
-    final StateEncoding inputStateEnc = createStateEncoding(aut);
+    final StateEncoding inputStateEnc = new StateEncoding(aut);
+    final int numExtraStates = getNumberOfExtraStates();
     final int config = ListBufferTransitionRelation.CONFIG_SUCCESSORS;
     ListBufferTransitionRelation rel =
-      new ListBufferTransitionRelation(aut, eventEnc, inputStateEnc, config);
+      new ListBufferTransitionRelation(aut, eventEnc, inputStateEnc,
+                                       numExtraStates, config);
     rel.checkReachability();
     mSimplifier.setTransitionRelation(rel);
     configureTransitionRelationSimplifier();
@@ -356,13 +358,12 @@ public abstract class AbstractTRSimplifierTest
   }
 
   /**
-   * Creates a state encoding for use with the given automaton.
-   * This method is called automatically and should be overridden
-   * by subclasses that need a more specific implementation.
+   * Returns the number of extra states to be reserved when creating a
+   * transition relation.
    */
-  protected StateEncoding createStateEncoding(final AutomatonProxy aut)
+  protected int getNumberOfExtraStates()
   {
-    return new StateEncoding(aut);
+    return 0;
   }
 
   /**

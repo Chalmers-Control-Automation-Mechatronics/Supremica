@@ -14,7 +14,6 @@ import junit.framework.TestSuite;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
-import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -91,11 +90,9 @@ public class SynthesisObservationEquivalenceTRSimplifierTest
   }
 
   @Override
-  protected StateEncoding createStateEncoding(final AutomatonProxy aut)
+  protected int getNumberOfExtraStates()
   {
-    final StateEncoding encoding = new StateEncoding(aut);
-    encoding.setNumberOfExtraStates(1);
-    return encoding;
+    return 1;
   }
 
   @Override

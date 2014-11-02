@@ -163,7 +163,43 @@ public class ListBufferTransitionRelation
    */
   public ListBufferTransitionRelation(final AutomatonProxy aut,
                                       final EventEncoding eventEnc,
+                                      final StateEncoding stateEnc,
+                                      final int config)
+    throws OverflowException
+  {
+    this(aut, eventEnc, stateEnc, 0, config);
+  }
+
+  /**
+   * Creates a new transition relation from the given automaton, using the
+   * given state and event encoding.
+   *
+   * @param aut
+   *          The automaton to be encoded.
+   * @param eventEnc
+   *          Event encoding to define the assignment of integer codes to
+   *          events in the transition buffers.
+   * @param stateEnc
+   *          State encoding to define the assignment of integer codes to
+   *          events in the transition buffers, or <CODE>null</CODE> to
+   *          use a default state encoding.
+   * @param numExtraStates
+   *          The number of extra states. If non-zero, the transition relation
+   *          reserves the indicated number of unreachable states to be
+   *          added to the end of the state space.
+   * @param config
+   *          Configuration flags defining which transition buffers are to be
+   *          created. Should be one of {@link #CONFIG_SUCCESSORS},
+   *          {@link #CONFIG_PREDECESSORS}, or {@link #CONFIG_ALL}.
+   * @throws OverflowException
+   *           to indicate that the given number of states and events is too
+   *           large to be encoded in the bit sizes used by the transition
+   *           list buffer implementation.
+   */
+  public ListBufferTransitionRelation(final AutomatonProxy aut,
+                                      final EventEncoding eventEnc,
                                       StateEncoding stateEnc,
+                                      final int numExtraStates,
                                       final int config)
     throws OverflowException
   {
@@ -174,13 +210,13 @@ public class ListBufferTransitionRelation
     if (stateEnc == null) {
       stateEnc = new StateEncoding(aut);
     }
+    // Copy transitions so transition list buffer constructors can sort ...
     final Collection<TransitionProxy> transitions = aut.getTransitions();
-    final List<TransitionProxy> list =
-      new ArrayList<TransitionProxy>(transitions);
-    final int numStates = stateEnc.getNumberOfStatesIncludingExtra();
+    final List<TransitionProxy> list = new ArrayList<>(transitions);
+    final int numStates = stateEnc.getNumberOfStates() + numExtraStates;
     final int numTrans = aut.getTransitions().size();
-    mStateBuffer = new IntStateBuffer(eventEnc, stateEnc);
-    mExtraStates = stateEnc.getNumberOfExtraStates();
+    mStateBuffer = new IntStateBuffer(eventEnc, stateEnc, numExtraStates);
+    mExtraStates = numExtraStates;
     mEventStatus = eventEnc;
     if ((config & CONFIG_SUCCESSORS) != 0) {
       mSuccessorBuffer =
@@ -2873,6 +2909,12 @@ public class ListBufferTransitionRelation
   private IntStateBuffer mStateBuffer;
   private OutgoingTransitionListBuffer mSuccessorBuffer;
   private IncomingTransitionListBuffer mPredecessorBuffer;
+  /**
+   * The number of extra states. If non-zero, the transition relation
+   * reserves the indicated number of unreachable states to be added to the
+   * end of the state space. The extra states will also be available after
+   * repartitioning of the transition relation.
+   */
   private int mExtraStates;
 
 

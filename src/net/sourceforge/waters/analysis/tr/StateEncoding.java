@@ -9,11 +9,11 @@
 
 package net.sourceforge.waters.analysis.tr;
 
+import gnu.trove.map.hash.TObjectIntHashMap;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-
-import gnu.trove.map.hash.TObjectIntHashMap;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.StateProxy;
@@ -96,6 +96,7 @@ public class StateEncoding
 
   //#########################################################################
   //# Overrides for java.lang.Object
+  @Override
   public String toString()
   {
     final StringBuilder buffer = new StringBuilder("{");
@@ -244,27 +245,11 @@ public class StateEncoding
     return mStateCodeMap;
   }
 
-  public int getNumberOfExtraStates()
-  {
-    return mExtraStates;
-  }
-
-  public void setNumberOfExtraStates(final int extra)
-  {
-    mExtraStates = extra;
-  }
-
-  public int getNumberOfStatesIncludingExtra()
-  {
-    return mStates.length + mExtraStates;
-  }
-
 
   //#########################################################################
   //# Data Members
   private StateProxy[] mStates;
   private TObjectIntHashMap<StateProxy> mStateCodeMap;
-  private int mExtraStates;
 
 }
 

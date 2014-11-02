@@ -199,11 +199,9 @@ public class StateRepresentationSynthesisAbstractionProcedure extends
   }
 
   @Override
-  protected StateEncoding createStateEncoding(final AutomatonProxy automaton)
+  protected int getNumberOfExtraStates()
   {
-    final StateEncoding encoding = new StateEncoding(automaton);
-    encoding.setNumberOfExtraStates(1);
-    return encoding;
+    return 1;
   }
 
   @Override
@@ -218,6 +216,7 @@ public class StateRepresentationSynthesisAbstractionProcedure extends
     return new MergeStep(analyzer, output, input, tau, inputStateEnc,
                          partition, false, outputStateEnc);
   }
+
 
   //#########################################################################
   //# Class Constants

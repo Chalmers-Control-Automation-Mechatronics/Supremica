@@ -139,7 +139,7 @@ public class AlwaysEnabledEventsFinderTest
     throws AnalysisException
   {
     final EventEncoding eventEnc = createEventEncoding(des, aut);
-    final StateEncoding inputStateEnc = createStateEncoding(aut);
+    final StateEncoding inputStateEnc = new StateEncoding(aut);
     final ListBufferTransitionRelation rel =
       new ListBufferTransitionRelation(aut, eventEnc, inputStateEnc, config);
     final AlwaysEnabledEventsFinder finder =

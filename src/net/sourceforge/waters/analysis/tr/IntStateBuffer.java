@@ -48,15 +48,32 @@ public class IntStateBuffer
   //# Constructors
   /**
    * Creates a new state buffer.
-   * @param  eventEnc   Event encoding that defines event codes for proposition
-   *                    events used as markings of the states.
-   * @param  stateEnc   State encoding that defines the assignment of state
-   *                    codes for the states in the buffer.
+   * @param  eventEnc        Event encoding that defines event codes for
+   *                         proposition events used as markings of the states.
+   * @param  stateEnc        State encoding that defines the assignment of
+   *                         state codes for the states in the buffer.
    */
   public IntStateBuffer(final EventEncoding eventEnc,
                         final StateEncoding stateEnc)
   {
-    this(stateEnc.getNumberOfStatesIncludingExtra(), eventEnc);
+    this(eventEnc, stateEnc, 0);
+  }
+
+  /**
+   * Creates a new state buffer.
+   * @param  eventEnc        Event encoding that defines event codes for
+   *                         proposition events used as markings of the states.
+   * @param  stateEnc        State encoding that defines the assignment of
+   *                         state codes for the states in the buffer.
+   * @param  numExtraStates  The number of extra states. If non-zero, the
+   *                         indicated number of unreachable states are
+   *                         added to the end of the state space.
+   */
+  public IntStateBuffer(final EventEncoding eventEnc,
+                        final StateEncoding stateEnc,
+                        final int numExtraStates)
+  {
+    this(stateEnc.getNumberOfStates() + numExtraStates, eventEnc);
     final int numStates = stateEnc.getNumberOfStates();
     for (int s = 0; s < numStates; s++) {
       final StateProxy state = stateEnc.getState(s);
@@ -74,7 +91,7 @@ public class IntStateBuffer
         }
       }
     }
-    final int numIncludingExtra = stateEnc.getNumberOfStatesIncludingExtra();
+    final int numIncludingExtra = numStates + numExtraStates;
     for (int s = numStates; s < numIncludingExtra; s++) {
       mStateInfo[s] &= ~TAG_REACHABLE;
     }
