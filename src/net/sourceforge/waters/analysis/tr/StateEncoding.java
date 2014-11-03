@@ -11,9 +11,7 @@ package net.sourceforge.waters.analysis.tr;
 
 import gnu.trove.map.hash.TObjectIntHashMap;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.StateProxy;
@@ -103,11 +101,11 @@ public class StateEncoding
     if (mStates != null) {
       int code = 0;
       for (final StateProxy state : mStates) {
+        if (code > 0) {
+          buffer.append(", ");
+        }
+        buffer.append(code);
         if (state != null) {
-          if (code > 0) {
-            buffer.append(", ");
-          }
-          buffer.append(code);
           buffer.append('=');
           buffer.append(state.getName());
         }
@@ -122,7 +120,7 @@ public class StateEncoding
   //#########################################################################
   //# Initialisation
   /**
-   * Creates a new state encoding for the given states.
+   * Resets this state encoding to use the given states.
    * State codes are assigned in the order they appear in the given
    * collection. Any <CODE>null</CODE> entries cause code numbers to be
    * skipped.
@@ -131,11 +129,11 @@ public class StateEncoding
   {
     final int numStates = states.size();
     mStates = new StateProxy[numStates];
-    mStateCodeMap = new TObjectIntHashMap<StateProxy>(numStates);
+    mStateCodeMap = new TObjectIntHashMap<>(numStates, 0.5f, -1);
     int code = 0;
     for (final StateProxy state : states) {
-      mStates[code] = state;
       if (state != null) {
+        mStates[code] = state;
         mStateCodeMap.put(state, code);
       }
       code++;
@@ -152,7 +150,7 @@ public class StateEncoding
   {
     final int numStates = states.length;
     mStates = states;
-    mStateCodeMap = new TObjectIntHashMap<StateProxy>(numStates);
+    mStateCodeMap = new TObjectIntHashMap<>(numStates, 0.5f, -1);
     for (int code = 0; code < numStates; code++) {
       final StateProxy state = states[code];
       if (state != null) {
@@ -196,11 +194,7 @@ public class StateEncoding
    */
   public int getStateCode(final StateProxy state)
   {
-    if (mStateCodeMap.containsKey(state)) {
-      return mStateCodeMap.get(state);
-    } else {
-      return -1;
-    }
+    return mStateCodeMap.get(state);
   }
 
   /**
@@ -225,15 +219,6 @@ public class StateEncoding
   public StateProxy[] getStatesArray()
   {
     return mStates;
-  }
-
-  /**
-   * Gets a list containing all states in the encoding, indexed by their
-   * codes.
-   */
-  public List<StateProxy> getStates()
-  {
-    return Arrays.asList(mStates);
   }
 
   /**
