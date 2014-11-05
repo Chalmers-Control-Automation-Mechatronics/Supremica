@@ -565,33 +565,50 @@ public class EventEncoding
                       int status)
     throws OverflowException
   {
-    int code = mEventCodeMap.get(event);
-    if (code >= 0) {
-      return code;
-    }
-    switch (translator.getEventKind(event)) {
-    case CONTROLLABLE:
-      status |= EventStatus.STATUS_CONTROLLABLE;
-    case UNCONTROLLABLE:
-      code = mProperEvents.size();
-      mEventCodeMap.put(event, code);
-      mProperEvents.add(event);
-      mProperEventStatus.add((byte) status);
-      break;
-    case PROPOSITION:
-      checkNumberOfPropositions(1);
-      code = mPropositions.size();
-      mEventCodeMap.put(event, code);
-      mPropositions.add(event);
+    int e = mEventCodeMap.get(event);
+    if (e >= 0) {
       if (EventStatus.isUsedEvent((byte) status)) {
-        mUsedPropositions |= (1 << code);
+        switch (translator.getEventKind(event)) {
+        case CONTROLLABLE:
+        case UNCONTROLLABLE:
+          status = mProperEventStatus.get(e);
+          status &= ~EventStatus.STATUS_UNUSED;
+          mProperEventStatus.set(e, (byte) status);
+          break;
+        case PROPOSITION:
+          mUsedPropositions |= (1 << e);
+          break;
+        default:
+          throw new IllegalArgumentException
+            ("Unknown event kind " + event.getKind() + "!");
+        }
       }
-      break;
-    default:
-      throw new IllegalArgumentException
-        ("Unknown event kind " + event.getKind() + "!");
+      return e;
+    } else {
+      switch (translator.getEventKind(event)) {
+      case CONTROLLABLE:
+        status |= EventStatus.STATUS_CONTROLLABLE;
+      case UNCONTROLLABLE:
+        e = mProperEvents.size();
+        mEventCodeMap.put(event, e);
+        mProperEvents.add(event);
+        mProperEventStatus.add((byte) status);
+        break;
+      case PROPOSITION:
+        checkNumberOfPropositions(1);
+        e = mPropositions.size();
+        mEventCodeMap.put(event, e);
+        mPropositions.add(event);
+        if (EventStatus.isUsedEvent((byte) status)) {
+          mUsedPropositions |= (1 << e);
+        }
+        break;
+      default:
+        throw new IllegalArgumentException
+          ("Unknown event kind " + event.getKind() + "!");
+      }
     }
-    return code;
+    return e;
   }
 
   /**

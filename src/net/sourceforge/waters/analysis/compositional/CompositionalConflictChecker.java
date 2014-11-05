@@ -452,11 +452,7 @@ public class CompositionalConflictChecker
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
-  /**
-   * Initialises required variables to default values if the user has not
-   * configured them.
-   */
+  //# Overrides for net.sourceforge.waters.model.analysis.des.AbstractModelAnalyser
   @Override
   protected void setUp()
     throws AnalysisException

@@ -99,22 +99,22 @@ public class TRAutomatonProxy
     if (aut instanceof TRAutomatonProxy) {
       return (TRAutomatonProxy) aut;
     } else {
-      final EventEncoding eventEnc = new EventEncoding(aut, translator);
-      final StateEncoding stateEnc = new StateEncoding(aut);
-      final ListBufferTransitionRelation rel =
-        new ListBufferTransitionRelation(aut, eventEnc, stateEnc, config);
-      return new TRAutomatonProxy(eventEnc, stateEnc, rel);
+      return new TRAutomatonProxy(aut, translator, config);
     }
   }
 
 
   //#########################################################################
   //# Constructors
-  public TRAutomatonProxy(final EventEncoding eventEnc,
-                          final StateEncoding stateEnc,
-                          final ListBufferTransitionRelation rel)
+  public TRAutomatonProxy(final AutomatonProxy aut,
+                          final KindTranslator translator,
+                          final int config)
+    throws OverflowException
   {
-    this(eventEnc, rel);
+    mEventEncoding = new EventEncoding(aut, translator);
+    final StateEncoding stateEnc = new StateEncoding(aut);
+    mTransitionRelation =
+      new ListBufferTransitionRelation(aut, mEventEncoding, stateEnc, config);
     mStates = new TRStateList(stateEnc);
   }
 
@@ -122,20 +122,8 @@ public class TRAutomatonProxy
                           final ListBufferTransitionRelation rel)
   {
     mEventEncoding = eventEnc;
-    mTransitionRelation = rel;
     mStates = null;
-    assert eventEnc.getNumberOfProperEvents() == rel.getNumberOfProperEvents() :
-      "Unexpected number of proper events for TRAutomatonProxy!";
-    for (int e = 0; e < eventEnc.getNumberOfProperEvents(); e++) {
-      final byte status = rel.getProperEventStatus(e);
-      eventEnc.setProperEventStatus(e, status);
-    }
-    assert eventEnc.getNumberOfPropositions() == rel.getNumberOfPropositions() :
-      "Unexpected number of propositions for TRAutomatonProxy!";
-    for (int p = 0; p < eventEnc.getNumberOfPropositions(); p++) {
-      final boolean used = rel.isPropositionUsed(p);
-      eventEnc.setPropositionUsed(p, used);
-    }
+    mTransitionRelation = rel;
   }
 
   public TRAutomatonProxy(final TRAutomatonProxy aut)

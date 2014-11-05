@@ -503,9 +503,15 @@ public class TRSynchronousProductBuilder
   {
     super.addStatistics();
     final AutomatonResult result = getAnalysisResult();
-    result.setNumberOfAutomata(mInputAutomata.length);
-    result.setNumberOfStates(mStateSpace.size());
-    result.setNumberOfTransitions(mPreTransitionBuffer.size());
+    if (mInputAutomata != null) {
+      result.setNumberOfAutomata(mInputAutomata.length);
+    }
+    if (mStateSpace != null) {
+      result.setNumberOfStates(mStateSpace.size());
+    }
+    if (mPreTransitionBuffer != null) {
+      result.setNumberOfTransitions(mPreTransitionBuffer.size());
+    }
   }
 
   @Override
