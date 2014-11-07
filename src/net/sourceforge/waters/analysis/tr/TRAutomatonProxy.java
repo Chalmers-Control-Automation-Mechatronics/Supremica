@@ -106,24 +106,32 @@ public class TRAutomatonProxy
 
   //#########################################################################
   //# Constructors
-  public TRAutomatonProxy(final AutomatonProxy aut,
-                          final KindTranslator translator,
-                          final int config)
-    throws OverflowException
-  {
-    mEventEncoding = new EventEncoding(aut, translator);
-    final StateEncoding stateEnc = new StateEncoding(aut);
-    mTransitionRelation =
-      new ListBufferTransitionRelation(aut, mEventEncoding, stateEnc, config);
-    mStates = new TRStateList(stateEnc);
-  }
-
   public TRAutomatonProxy(final EventEncoding eventEnc,
                           final ListBufferTransitionRelation rel)
   {
     mEventEncoding = eventEnc;
     mStates = null;
     mTransitionRelation = rel;
+  }
+
+  public TRAutomatonProxy(final AutomatonProxy aut,
+                          final KindTranslator translator,
+                          final int config)
+    throws OverflowException
+  {
+    this(aut, new EventEncoding(aut, translator), config);
+  }
+
+  public TRAutomatonProxy(final AutomatonProxy aut,
+                          final EventEncoding eventEnc,
+                          final int config)
+    throws OverflowException
+  {
+    mEventEncoding = eventEnc;
+    final StateEncoding stateEnc = new StateEncoding(aut);
+    mTransitionRelation =
+      new ListBufferTransitionRelation(aut, mEventEncoding, stateEnc, config);
+    mStates = new TRStateList(stateEnc);
   }
 
   public TRAutomatonProxy(final TRAutomatonProxy aut)

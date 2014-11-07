@@ -24,6 +24,7 @@ import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.apache.log4j.Logger;
@@ -264,6 +265,21 @@ public abstract class AbstractModelAnalyzer implements ModelAnalyzer
     final KindTranslator translator = getKindTranslator();
     final EventKind kind = translator.getEventKind(event);
     return kind == EventKind.CONTROLLABLE || kind == EventKind.UNCONTROLLABLE;
+  }
+
+  /**
+   * Returns whether the given automaton should be included in the
+   * analysis. This default implementation returns <CODE>true</CODE> if
+   * the given automaton is a plant or specification under the current
+   * {@link KindTranslator}.
+   * @see #getKindTranslator()
+   * @see ComponentKind
+   */
+  protected boolean isProperAutomaton(final AutomatonProxy aut)
+  {
+    final KindTranslator translator = getKindTranslator();
+    final ComponentKind kind = translator.getComponentKind(aut);
+    return kind == ComponentKind.PLANT || kind == ComponentKind.SPEC;
   }
 
   /**
