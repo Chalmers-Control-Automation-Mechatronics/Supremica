@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
+import net.sourceforge.waters.analysis.abstraction.SpecialEventsFinder;
 import net.sourceforge.waters.analysis.tr.DuplicateFreeQueue;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
@@ -126,6 +127,111 @@ public class TRCompositionalConflictChecker
 
 
   //#########################################################################
+  //# Configuration
+  /**
+   * Sets whether blocked events are to be considered in abstraction.
+   * @see #isBlockedEventsSupported()
+   */
+  public void setBlockedEventsSupported(final boolean enable)
+  {
+    mBlockedEventsSupported = enable;
+  }
+
+  /**
+   * Returns whether blocked events are considered in abstraction.
+   * Blocked events are events that are disabled in all reachable states of
+   * some automaton. If supported, this will remove all transitions with
+   * blocked events from the model.
+   * @see #setBlockedEventsSupported(boolean) setBlockedEventsSupported()
+   */
+  public boolean isBlockedEventsSupported()
+  {
+    return mBlockedEventsSupported;
+  }
+
+  /**
+   * Sets whether failing events are to be considered in abstraction.
+   * @see #isFailingEventsSupported()
+   */
+  public void setFailingEventsSupported(final boolean enable)
+  {
+    mFailingEventsSupported = enable;
+  }
+
+  /**
+   * Returns whether failing events are considered in abstraction.
+   * Failing events are events that always lead to a dump state in some
+   * automaton. If supported, this will redirect failing events in other
+   * automata to dump states.
+   * @see #setFailingEventsSupported(boolean) setFailingEventsSupported()
+   */
+  public boolean isFailingEventsSupported()
+  {
+    return mFailingEventsSupported;
+  }
+
+  /**
+   * Sets whether selfloop-only events are to be considered in abstraction.
+   * @see #isSelfloopOnlyEventsSupported()
+   */
+  public void setSelfloopOnlyEventsSupported(final boolean enable)
+  {
+    mSelfloopOnlyEventsSupported = enable;
+  }
+
+  /**
+   * Returns whether selfloop-only events are considered in abstraction.
+   * Selfloop-only events are events that appear only as selfloops in the
+   * entire model or in all but one automaton in the model. Events that
+   * are selfloop-only in the entire model can be removed, while events
+   * that are selfloop-only in all but one automaton can be used to
+   * simplify that automaton.
+   * @see #setSelfloopOnlyEventsSupported(boolean) setSelfloopOnlyEventsSupported()
+   */
+  public boolean isSelfloopOnlyEventsSupported()
+  {
+    return mSelfloopOnlyEventsSupported;
+  }
+
+  /**
+   * Sets whether always enabled events are to be considered in abstraction.
+   * @see #isAlwaysEnabledEventsSupported()
+   */
+  public void setAlwaysEnabledEventsSupported(final boolean enable)
+  {
+    mAlwaysEnabledEventsSupported = enable;
+  }
+
+  /**
+   * Returns whether always enabled events are considered in abstraction.
+   * Always enabled events are events that are enabled in all states of the
+   * entire model or of all but one automaton in the model. Always enabled
+   * events can help to simplify automata.
+   * @see #setAlwaysEnabledEventsSupported(boolean) setAlwaysEnabledEventsSupported()
+   * @see #isControllabilityConsidered()
+   */
+  public boolean isAlwaysEnabledEventsSupported()
+  {
+    return mAlwaysEnabledEventsSupported;
+  }
+
+
+  //#########################################################################
+  //# Hooks
+  /**
+   * Returns whether simplification needs to distinguish controllable and
+   * uncontrollable events. If this is the case, it can affect how events
+   * are encoded, and how special events are recognised. For example,
+   * only uncontrollable events are ever considered as always enabled.
+   * @see #isAlwaysEnabledEventsSupported()
+   */
+  protected boolean isControllabilityConsidered()
+  {
+    return false;
+  }
+
+
+  //#########################################################################
   //# Invocation
   @Override
   protected void setUp()
@@ -150,9 +256,26 @@ public class TRCompositionalConflictChecker
       }
     }
     final int numEvents = model.getEvents().size();
+    mSpecialEventsFinder = new SpecialEventsFinder();
+    mSpecialEventsFinder.setDefaultMarkingID(DEFAULT_MARKING);
+    mSpecialEventsFinder.setBlockedEventsDetected(mBlockedEventsSupported);
+    mSpecialEventsFinder.setFailingEventsDetected(mFailingEventsSupported);
+    mSpecialEventsFinder.setSelfloopOnlyEventsDetected(mSelfloopOnlyEventsSupported);
+    mSpecialEventsFinder.setAlwaysEnabledEventsDetected(false);
+    mSpecialEventsFinder.setControllabilityConsidered(isControllabilityConsidered());
     mCurrentSubsystem = new SubsystemInfo(trs, numEvents);
+    for (final TRAutomatonProxy aut : trs) {
+      final ListBufferTransitionRelation rel = aut.getTransitionRelation();
+      mSpecialEventsFinder.setTransitionRelation(rel);
+      mSpecialEventsFinder.run();
+      final byte[] status = mSpecialEventsFinder.getComputedEventStatus();
+      mCurrentSubsystem.registerEvents(aut, status);
+    }
+    mSpecialEventsFinder.setAlwaysEnabledEventsDetected(mAlwaysEnabledEventsSupported);
     mSubsystemQueue = new PriorityQueue<>();
     mNeedsSimplification = new DuplicateFreeQueue<>(trs);
+    mNeedsDisjointSubsystemsCheck = true;
+    mAlwaysEnabledDetectedInitially = !mAlwaysEnabledEventsSupported;
   }
 
   @Override
@@ -210,12 +333,13 @@ public class TRCompositionalConflictChecker
   }
 
   private void analyseCurrentSubsystemCompositionally()
+    throws AnalysisException
   {
     while (mCurrentSubsystem.getNumberOfAutomata() >= 2) {
       if (earlyTerminationCheckCurrentSubsystem()) {
         return;
       }
-      final boolean simplified = simplifyAutomata();
+      final boolean simplified = simplifyAllAutomataIndividually();
       if (simplified && earlyTerminationCheckCurrentSubsystem()) {
         return;
       } else if (disjointSubsystemsCheck()) {
@@ -250,16 +374,80 @@ public class TRCompositionalConflictChecker
     return allMarked;
   }
 
+  private boolean simplifyAllAutomataIndividually()
+    throws AnalysisException
+  {
+    boolean simplified = false;
+    int remaining =
+      mAlwaysEnabledDetectedInitially ? 0 : mNeedsSimplification.size();
+    while (!mNeedsSimplification.isEmpty()) {
+      final TRAutomatonProxy aut = mNeedsSimplification.poll();
+      simplified |= simplifyAutomatonIndividually(aut);
+      if (remaining > 0) {
+        mAlwaysEnabledDetectedInitially = (--remaining == 0);
+      }
+      // TODO Update automaton information?
+    }
+    return simplified;
+  }
+
+  private boolean simplifyAutomatonIndividually(final TRAutomatonProxy aut)
+    throws AnalysisException
+  {
+    // Set event status ...
+    final EventEncoding enc = aut.getEventEncoding();
+    final int numEvents = enc.getNumberOfProperEvents();
+    final byte[] oldStatus = new byte[numEvents];
+    for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+      byte status = enc.getProperEventStatus(e);
+      if (EventStatus.isUsedEvent(status)) {
+        final EventProxy event = enc.getProperEvent(e);
+        final TREventInfo info = mCurrentSubsystem.getEventInfo(event);
+        final byte newStatus = info.getEventStatus(aut);
+        if (newStatus != status) {
+          status = newStatus;
+          enc.setProperEventStatus(e, status);
+        }
+      }
+      oldStatus[e] = status;
+    }
+    // TODO simplify ...
+    final boolean simplified = false;
+    // Update event status ...
+    if (simplified || !mAlwaysEnabledDetectedInitially) {
+      final ListBufferTransitionRelation rel = aut.getTransitionRelation();
+      mSpecialEventsFinder.setTransitionRelation(rel);
+      mSpecialEventsFinder.run();
+      final byte[] newStatus = mSpecialEventsFinder.getComputedEventStatus();
+      for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+        if (EventStatus.isUsedEvent(oldStatus[e])) {
+          final EventProxy event = enc.getProperEvent(e);
+          final TREventInfo info = mCurrentSubsystem.getEventInfo(event);
+          info.updateAutomatonStatus(aut, newStatus[e], mNeedsSimplification);
+          mNeedsDisjointSubsystemsCheck |=
+            !EventStatus.isLocalEvent(oldStatus[e]) &&
+            !EventStatus.isUsedEvent(newStatus[e]);
+        }
+      }
+    }
+    return simplified;
+  }
+
   private boolean disjointSubsystemsCheck()
   {
-    final List<SubsystemInfo> splits =
-      mCurrentSubsystem.findEventDisjointSubsystems();
-    if (splits == null) {
-      return false;
+    if (mNeedsDisjointSubsystemsCheck) {
+      mNeedsDisjointSubsystemsCheck = false;
+      final List<SubsystemInfo> splits =
+        mCurrentSubsystem.findEventDisjointSubsystems();
+      if (splits == null) {
+        return false;
+      } else {
+        mCurrentSubsystem = null;
+        mSubsystemQueue.addAll(splits);
+        return true;
+      }
     } else {
-      mCurrentSubsystem = null;
-      mSubsystemQueue.addAll(splits);
-      return true;
+      return false;
     }
   }
 
@@ -270,32 +458,26 @@ public class TRCompositionalConflictChecker
   }
 
 
-  private boolean simplifyAutomata()
-  {
-    while (!mNeedsSimplification.isEmpty()) {
-      @SuppressWarnings("unused")
-      final TRAutomatonProxy aut = mNeedsSimplification.poll();
-      // TODO
-      // simplify aut
-      // replace aut in mCurrentSubsystem
-      // update event information
-    }
-    return false;
-  }
-
-
-
   //#########################################################################
   //# Data Members
   // Configuration
   private EventProxy mConfiguredDefaultMarking;
   private EventProxy mConfiguredPreconditionMarking;
+  private boolean mBlockedEventsSupported;
+  private boolean mFailingEventsSupported;
+  private boolean mSelfloopOnlyEventsSupported;
+  private boolean mAlwaysEnabledEventsSupported;
+
+  // Tools
+  private SpecialEventsFinder mSpecialEventsFinder;
 
   // Data Structures
   private EventProxy mUsedDefaultMarking;
   private Queue<SubsystemInfo> mSubsystemQueue;
   private SubsystemInfo mCurrentSubsystem;
   private Queue<TRAutomatonProxy> mNeedsSimplification;
+  private boolean mNeedsDisjointSubsystemsCheck;
+  private boolean mAlwaysEnabledDetectedInitially;
 
 
   //#########################################################################

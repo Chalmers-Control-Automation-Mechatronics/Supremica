@@ -9,7 +9,6 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
@@ -19,7 +18,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import net.sourceforge.waters.analysis.abstraction.AlwaysEnabledEventsFinder;
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.EnabledEventsLimitedCertainConflictsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.EnabledEventsSilentIncomingTRSimplifier;
@@ -30,6 +28,7 @@ import net.sourceforge.waters.analysis.abstraction.MarkingSaturationTRSimplifier
 import net.sourceforge.waters.analysis.abstraction.NonAlphaDeterminisationTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.OnlySilentOutgoingTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.SpecialEventsFinder;
 import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -138,7 +137,8 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
       new MarkingSaturationTRSimplifier();
     postChain.add(saturator);
 
-    final AlwaysEnabledEventsFinder finder = new AlwaysEnabledEventsFinder();
+    final SpecialEventsFinder finder = new SpecialEventsFinder();
+    finder.setAlwaysEnabledEventsDetected(true);
     postChain.add(finder);
 
     return new EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
@@ -158,7 +158,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
      final LimitedCertainConflictsTRSimplifier limitedCCSimplifier,
      final EnabledEventsLimitedCertainConflictsTRSimplifier alwaysEnabledLimitedCCSimplifier,
      final EnabledEventsSilentIncomingTRSimplifier enabledEventsSilentIncomingSimplifier,
-     final AlwaysEnabledEventsFinder finder)
+     final SpecialEventsFinder finder)
   {
     super(analyzer);
     mPreChain = preChain;
@@ -469,13 +469,14 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
 
   private void collectAlwaysEnabledEvents(final EventEncoding eventEnc)
   {
-    final TIntArrayList codes =
-      mAlwaysEnabledEventsFinder.getAlwaysEnabledEvents();
-    mAlwaysEnabledEvents = new THashSet<>(codes.size());
-    for (int i = 0; i < codes.size(); i++) {
-      final int e = codes.get(i);
-      final EventProxy event = eventEnc.getProperEvent(e);
-      mAlwaysEnabledEvents.add(event);
+    final byte[] computedStatus =
+      mAlwaysEnabledEventsFinder.getComputedEventStatus();
+    mAlwaysEnabledEvents = new THashSet<>(computedStatus.length);
+    for (int e = 0; e < computedStatus.length; e++) {
+      if (EventStatus.isOutsideAlwaysEnabledEvent(computedStatus[e])) {
+        final EventProxy event = eventEnc.getProperEvent(e);
+        mAlwaysEnabledEvents.add(event);
+      }
     }
   }
 
@@ -518,7 +519,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     mLimitedCertainConflictsSimplifier;
   private final EnabledEventsSilentIncomingTRSimplifier
     mEnabledEventsSilentIncomingSimplifier;
-  private final AlwaysEnabledEventsFinder mAlwaysEnabledEventsFinder;
+  private final SpecialEventsFinder mAlwaysEnabledEventsFinder;
   private final ChainTRSimplifier mPostChain;
   private final ChainTRSimplifier mCompleteChain;
 

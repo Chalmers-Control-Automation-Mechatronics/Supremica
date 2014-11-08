@@ -2,14 +2,12 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.abstraction
-//# CLASS:   AlwaysEnabledEventsFinderTest
+//# CLASS:   SpecialEventsFinderTest
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.abstraction;
-
-import gnu.trove.list.array.TIntArrayList;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,6 +18,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -29,7 +28,7 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 
 
-public class AlwaysEnabledEventsFinderTest
+public class SpecialEventsFinderTest
   extends AbstractTRSimplifierTest
 {
 
@@ -38,7 +37,7 @@ public class AlwaysEnabledEventsFinderTest
   public static Test suite()
   {
     final TestSuite testSuite =
-        new TestSuite(AlwaysEnabledEventsFinderTest.class);
+        new TestSuite(SpecialEventsFinderTest.class);
     return testSuite;
   }
 
@@ -92,7 +91,15 @@ public class AlwaysEnabledEventsFinderTest
   @Override
   protected TransitionRelationSimplifier createTransitionRelationSimplifier()
   {
-    return new AlwaysEnabledEventsFinder();
+    final SpecialEventsFinder finder = new SpecialEventsFinder();
+    finder.setAlwaysEnabledEventsDetected(true);
+    return finder;
+  }
+
+  @Override
+  protected SpecialEventsFinder getTransitionRelationSimplifier()
+  {
+    return (SpecialEventsFinder) super.getTransitionRelationSimplifier();
   }
 
   @Override
@@ -142,19 +149,18 @@ public class AlwaysEnabledEventsFinderTest
     final StateEncoding inputStateEnc = new StateEncoding(aut);
     final ListBufferTransitionRelation rel =
       new ListBufferTransitionRelation(aut, eventEnc, inputStateEnc, config);
-    final AlwaysEnabledEventsFinder finder =
-      (AlwaysEnabledEventsFinder) getSimplifier();
+    final SpecialEventsFinder finder = getTransitionRelationSimplifier();
     finder.setTransitionRelation(rel);
     configureTransitionRelationSimplifier();
     final boolean result = finder.run();
-    assertFalse("Unexpected 'true' result from AlwaysEnabledEventsFinder!",
-                result);
-    final TIntArrayList codes = finder.getAlwaysEnabledEvents();
-    final List<EventProxy> events = new ArrayList<>(codes.size());
-    for (int i = 0; i < codes.size(); i++) {
-      final int e = codes.get(i);
-      final EventProxy event = eventEnc.getProperEvent(e);
-      events.add(event);
+    assertFalse("Unexpected 'true' result from SpecialEventsFinder!", result);
+    final byte[] computedStatus = finder.getComputedEventStatus();
+    final List<EventProxy> events = new ArrayList<>(computedStatus.length);
+    for (int e = 0; e < computedStatus.length; e++) {
+      if (EventStatus.isOutsideAlwaysEnabledEvent(computedStatus[e])) {
+        final EventProxy event = eventEnc.getProperEvent(e);
+        events.add(event);
+      }
     }
     return events;
   }
@@ -164,14 +170,14 @@ public class AlwaysEnabledEventsFinderTest
   {
     for (final EventProxy event : events) {
       final Map<String,String> attribs = event.getAttributes();
-      assertTrue("AlwaysEnabledEventsFinder incorrectly asserts event '" +
+      assertTrue("SpecialEventsFinder incorrectly asserts event '" +
                  event.getName() + "' to be always enabled!",
                  attribs.containsKey(KEY));
     }
     for (final EventProxy event : des.getEvents()) {
       final Map<String,String> attribs = event.getAttributes();
       if (attribs.containsKey(KEY)) {
-        assertTrue("AlwaysEnabledEventsFinder did not find always enabled event '" +
+        assertTrue("SpecialEventsFinder did not find always enabled event '" +
                    event.getName() + "'!",
                    events.contains(event));
       }

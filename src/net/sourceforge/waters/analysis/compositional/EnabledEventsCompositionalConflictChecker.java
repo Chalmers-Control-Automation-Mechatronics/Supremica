@@ -9,7 +9,6 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
@@ -19,7 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import net.sourceforge.waters.analysis.abstraction.AlwaysEnabledEventsFinder;
+import net.sourceforge.waters.analysis.abstraction.SpecialEventsFinder;
 import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.modular.ModularControllabilityChecker;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -482,16 +481,18 @@ public class EnabledEventsCompositionalConflictChecker extends
         new TauLoopRemovalTRSimplifier(rel);
       tauLoopFree = !loopRemover.run();
     }
-    final AlwaysEnabledEventsFinder finder = new AlwaysEnabledEventsFinder(rel);
+    final SpecialEventsFinder finder = new SpecialEventsFinder(rel);
+    finder.setAlwaysEnabledEventsDetected(true);
     finder.setDefaultMarkingID(defaultID);
     finder.run();
-    final TIntArrayList alwaysEnabledCodes = finder.getAlwaysEnabledEvents();
+    final byte[] computedStatus = finder.getComputedEventStatus();
     final Set<EventProxy> alwaysEnabledEvents =
-      new THashSet<>(alwaysEnabledCodes.size());
-    for (int i = 0; i < alwaysEnabledCodes.size(); i++) {
-      final int e = alwaysEnabledCodes.get(i);
-      final EventProxy event = encoding.getProperEvent(e);
-      alwaysEnabledEvents.add(event);
+      new THashSet<>(computedStatus.length);
+    for (int e = 0; e < computedStatus.length; e++) {
+      if (EventStatus.isOutsideAlwaysEnabledEvent(computedStatus[e])) {
+        final EventProxy event = encoding.getProperEvent(e);
+        alwaysEnabledEvents.add(event);
+      }
     }
     if (!tauLoopFree) {
       for (int e = EventEncoding.NONTAU; e < rel.getNumberOfProperEvents(); e++) {

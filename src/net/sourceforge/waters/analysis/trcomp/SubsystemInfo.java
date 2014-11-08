@@ -10,21 +10,19 @@
 package net.sourceforge.waters.analysis.trcomp;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.tr.DFSSearchSpace;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
-import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
-import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.des.EventProxy;
 
 
@@ -43,9 +41,6 @@ class SubsystemInfo
   {
     mAutomata = automata;
     mEvents = new HashMap<>(numEvents);
-    for (final TRAutomatonProxy aut : automata) {
-      registerEvents(aut);
-    }
   }
 
   SubsystemInfo(final Collection<TRAutomatonProxy> automata,
@@ -72,38 +67,35 @@ class SubsystemInfo
     return mAutomata;
   }
 
+  TREventInfo getEventInfo(final EventProxy event)
+  {
+    return mEvents.get(event);
+  }
+
 
   //#########################################################################
   //# Set up
-  void registerEvents(final TRAutomatonProxy aut)
+  void registerEvents(final TRAutomatonProxy aut,
+                      final byte[] eventStatus)
   {
-    final EventEncoding eventEnc = aut.getEventEncoding();
-    final int numEvents = eventEnc.getNumberOfProperEvents();
-    final byte[] eventStatus = new byte[numEvents];
-    Arrays.fill(eventStatus, (byte) (EventStatus.STATUS_BLOCKED |
-                                     EventStatus.STATUS_FAILING |
-                                     EventStatus.STATUS_OUTSIDE_ONLY_SELFLOOP));
-    final ListBufferTransitionRelation rel = aut.getTransitionRelation();
-    final TransitionIterator iter = rel.createAllTransitionsReadOnlyIterator();
-    while (iter.advance()) {
-      final int e = iter.getCurrentEvent();
-      final int s = iter.getCurrentSourceState();
-      final int t = iter.getCurrentTargetState();
-      if (rel.isDeadlockState(t, TRCompositionalConflictChecker.DEFAULT_MARKING)) {
-        eventStatus[e] &= EventStatus.STATUS_FAILING;
-      } else if (s == t) {
-        eventStatus[e] &= EventStatus.STATUS_OUTSIDE_ONLY_SELFLOOP;
-      } else {
-        eventStatus[e] = 0;
-      }
+    final EventEncoding enc = aut.getEventEncoding();
+    for (int e = EventEncoding.NONTAU; e < eventStatus.length; e++) {
+      final EventProxy event = enc.getProperEvent(e);
+      final byte status = enc.getProperEventStatus(e);
+      final TREventInfo info = createEventInfo(event, status);
+      info.setAutomatonStatus(aut, eventStatus[e]);
     }
-    for (int e = EventEncoding.TAU; e < numEvents; e++) {
-      final byte status = eventEnc.getProperEventStatus(e);
-      if (EventStatus.isUsedEvent(status)) {
-        final EventProxy event = eventEnc.getProperEvent(e);
-        final TREventInfo info = createEventInfo(event);
-        info.addAutomaton(aut, eventStatus[e]);
-      }
+  }
+
+  void updateEvents(final TRAutomatonProxy aut,
+                    final byte[] eventStatus,
+                    final Queue<TRAutomatonProxy> needsSimplification)
+  {
+    final EventEncoding enc = aut.getEventEncoding();
+    for (int e = EventEncoding.NONTAU; e < eventStatus.length; e++) {
+      final EventProxy event = enc.getProperEvent(e);
+      final TREventInfo info = getEventInfo(event);
+      info.setAutomatonStatus(aut, eventStatus[e]); // TODO needsSimplification
     }
   }
 
@@ -138,7 +130,10 @@ class SubsystemInfo
       while (!automataQueue.isEmpty() || !eventQueue.isEmpty()) {
         if (automataQueue.visitedSize() == remainingAutomata.size()) {
           break;
-        } else if (!automataQueue.isEmpty()) {
+        } else if (!eventQueue.isEmpty()) {
+          final TREventInfo info = eventQueue.poll();
+          automataQueue.addAll(info.getAutomata());
+        } else {
           final TRAutomatonProxy aut = automataQueue.poll();
           final EventEncoding enc = aut.getEventEncoding();
           for (int e = EventEncoding.NONTAU;
@@ -150,9 +145,6 @@ class SubsystemInfo
               eventQueue.offer(info);
             }
           }
-        } else {
-          final TREventInfo info = eventQueue.poll();
-          automataQueue.addAll(info.getAutomata());
         }
       }
       if (result == null) {
@@ -176,11 +168,12 @@ class SubsystemInfo
 
   //#########################################################################
   //# Auxiliary Methods
-  private TREventInfo createEventInfo(final EventProxy event)
+  private TREventInfo createEventInfo(final EventProxy event,
+                                      final byte status)
   {
     TREventInfo info = mEvents.get(event);
     if (info == null) {
-      info = new TREventInfo(event);
+      info = new TREventInfo(event, status);
       mEvents.put(event, info);
     }
     return info;

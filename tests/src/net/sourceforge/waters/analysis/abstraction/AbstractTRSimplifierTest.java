@@ -272,11 +272,6 @@ public abstract class AbstractTRSimplifierTest
     getLogger().info("Done " + des.getName());
   }
 
-  protected TransitionRelationSimplifier getSimplifier()
-  {
-    return mSimplifier;
-  }
-
 
   //#########################################################################
   //# Auxiliary Methods
