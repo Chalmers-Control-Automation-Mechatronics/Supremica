@@ -12,6 +12,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.table.JTableHeader;
 
 import net.sourceforge.waters.model.des.TraceProxy;
+
 import org.supremica.gui.WhiteScrollPane;
 import org.supremica.gui.ide.IDEDimensions;
 import org.supremica.gui.ide.MainPanel;
@@ -31,7 +32,7 @@ public class SimulatorPanel
     mSimulation = new Simulation(moduleContainer);
     mModuleContainer = moduleContainer;
     setupDesktop();
-    mTabbedPane = new JTabbedPane(JTabbedPane.BOTTOM);
+    mTabbedPane = new JTabbedPane();
     mTabbedPane.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
     mTabbedPane.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
     setupAutomata();
