@@ -281,11 +281,9 @@ public abstract class AbstractTRSimplifierTest
   {
     final EventEncoding eventEnc = createEventEncoding(des, aut);
     final StateEncoding inputStateEnc = new StateEncoding(aut);
-    final int numExtraStates = getNumberOfExtraStates();
     final int config = ListBufferTransitionRelation.CONFIG_SUCCESSORS;
     ListBufferTransitionRelation rel =
-      new ListBufferTransitionRelation(aut, eventEnc, inputStateEnc,
-                                       numExtraStates, config);
+      new ListBufferTransitionRelation(aut, eventEnc, inputStateEnc, config);
     rel.checkReachability();
     mSimplifier.setTransitionRelation(rel);
     configureTransitionRelationSimplifier();
@@ -350,15 +348,6 @@ public abstract class AbstractTRSimplifierTest
     final KindTranslator translator = IdenticalKindTranslator.getInstance();
     final EventProxy tau = getEvent(aut, TAU);
     return new EventEncoding(aut, translator, tau);
-  }
-
-  /**
-   * Returns the number of extra states to be reserved when creating a
-   * transition relation.
-   */
-  protected int getNumberOfExtraStates()
-  {
-    return 0;
   }
 
   /**

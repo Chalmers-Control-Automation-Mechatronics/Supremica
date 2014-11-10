@@ -702,12 +702,24 @@ public class TRSynchronousProductBuilder
     throws OverflowException
   {
     if (isDetailedOutputEnabled()) {
-      final ListBufferTransitionRelation rel =
-        new ListBufferTransitionRelation(computeOutputName(),
-                                         getOutputKind(),
-                                         mOutputEventEncoding,
-                                         mStateSpace.size(),
-                                         ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      final ListBufferTransitionRelation rel;
+      if (mDeadlockState >= 0) {
+        rel = new ListBufferTransitionRelation(computeOutputName(),
+                                               getOutputKind(),
+                                               mOutputEventEncoding,
+                                               mStateSpace.size(),
+                                               mDeadlockState,
+                                               ListBufferTransitionRelation.
+                                               CONFIG_SUCCESSORS);
+      } else {
+        rel = new ListBufferTransitionRelation(computeOutputName(),
+                                               getOutputKind(),
+                                               mOutputEventEncoding,
+                                               mStateSpace.size(),
+                                               ListBufferTransitionRelation.
+                                               CONFIG_SUCCESSORS);
+
+      }
       for (int s = 0; s < mNumberOfInitialStates; s++) {
         rel.setInitial(s, true);
       }

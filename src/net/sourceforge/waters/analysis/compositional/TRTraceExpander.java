@@ -517,7 +517,8 @@ public abstract class TRTraceExpander
         }
       } else {
         for (int state = 0; state < numStates; state++) {
-          if (!rel.isMarked(state, mPreconditionMarkingID)) {
+          if (rel.isReachable(state) &&
+              !rel.isMarked(state, mPreconditionMarkingID)) {
             for (final int member : partition.getStates(state)) {
               mTransitionRelation.setMarked(member, mPreconditionMarkingID,
                                             false);

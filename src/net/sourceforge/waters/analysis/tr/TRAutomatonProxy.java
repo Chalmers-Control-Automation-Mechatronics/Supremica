@@ -39,6 +39,7 @@ import net.sourceforge.waters.model.printer.ProductDESProxyPrinter;
 import net.sourceforge.waters.plain.base.AbstractNamedElement;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
@@ -127,10 +128,19 @@ public class TRAutomatonProxy
                           final int config)
     throws OverflowException
   {
+    this(aut, eventEnc, null, config);
+  }
+
+  public TRAutomatonProxy(final AutomatonProxy aut,
+                          final EventEncoding eventEnc,
+                          final StateProxy dumpState,
+                          final int config)
+    throws OverflowException
+  {
     mEventEncoding = eventEnc;
     final StateEncoding stateEnc = new StateEncoding(aut);
-    mTransitionRelation =
-      new ListBufferTransitionRelation(aut, mEventEncoding, stateEnc, config);
+    mTransitionRelation = new ListBufferTransitionRelation
+      (aut, mEventEncoding, stateEnc, dumpState, config);
     mStates = new TRStateList(stateEnc);
   }
 
@@ -155,7 +165,7 @@ public class TRAutomatonProxy
 
 
   //#########################################################################
-  //# Simple Access
+  //# Specific Access
   public EventEncoding getEventEncoding()
   {
     return mEventEncoding;
@@ -172,6 +182,30 @@ public class TRAutomatonProxy
       mStates = new TRStateList();
     }
     return mStates.get(stateIndex);
+  }
+
+  /**
+   * Ensures that the event encoding contains a silent event with code
+   * {@link EventEncoding#TAU} if this event code is in use.
+   * This method is called automatically when the user requests the event
+   * or transition list of this automaton. This makes it possible to create
+   * and use event encodings without the silent event defined (kept at
+   * <CODE>null</CODE>), and only create an event object when the transition
+   * relation is accessed as an automaton.
+   */
+  public void createTauEvent()
+  {
+    final byte status = mEventEncoding.getProperEventStatus(EventEncoding.TAU);
+    if (EventStatus.isUsedEvent(status) &&
+        mEventEncoding.getProperEvent(EventEncoding.TAU) == null) {
+      final ProductDESProxyFactory factory =
+        ProductDESElementFactory.getInstance();
+      final String name = "tau:" + mTransitionRelation.getName();
+      final EventKind kind = EventStatus.isControllableEvent(status) ?
+        EventKind.CONTROLLABLE : EventKind.UNCONTROLLABLE;
+      final EventProxy event = factory.createEventProxy(name, kind, false);
+      mEventEncoding.addSilentEvent(event);
+    }
   }
 
 
@@ -212,6 +246,7 @@ public class TRAutomatonProxy
   @Override
   public Set<EventProxy> getEvents()
   {
+    createTauEvent();
     return mEventEncoding.getUsedEvents();
   }
 
@@ -378,9 +413,7 @@ public class TRAutomatonProxy
 
     public TRStateList(final StateEncoding stateEnc)
     {
-      assert stateEnc.getNumberOfStates() == mTransitionRelation.getNumberOfStates() :
-        "Unexpected number of states for TRAutomatonProxy!";
-      mStates = new StateProxy[stateEnc.getNumberOfStates()];
+      mStates = new StateProxy[mTransitionRelation.getNumberOfStates()];
       for (int s = 0; s < stateEnc.getNumberOfStates(); s++) {
         mStates[s] = stateEnc.getState(s);
       }
@@ -543,6 +576,7 @@ public class TRAutomatonProxy
     @Override
     public Iterator<TransitionProxy> iterator()
     {
+      createTauEvent();
       return new TRTransitionCollectionIterator();
     }
 

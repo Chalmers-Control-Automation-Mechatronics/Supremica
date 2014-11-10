@@ -159,7 +159,7 @@ public abstract class AbstractCompositionalSynthesizer
                                        eventEnc,
                                        stateEnc,
                                        ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-    final int numStates = rel.getNumberOfStates();
+    final int numStates = stateEnc.getNumberOfStates();
     final Collection<StateProxy> states =
       new ArrayList<StateProxy>(numStates + 1);
     states.addAll(spec.getStates());

@@ -595,11 +595,10 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       // re-encode states (make only one bad state)
       final int markingID = 0;
       mTransitionRelation =
-        new ListBufferTransitionRelation(
-                                         "supervisor",
+        new ListBufferTransitionRelation("supervisor",
                                          ComponentKind.SUPERVISOR,
                                          mEventEncoding,
-                                         mNumGoodStates + 1,
+                                         mNumGoodStates,
                                          ListBufferTransitionRelation.CONFIG_SUCCESSORS);
       mStateMap = new int[mNumStates];
       int index = 0;
@@ -622,7 +621,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       // final search (add transitions)
       mUnvisited.clear();
       mGoodStates = new BitSet();
-      mFinalStateExplorer.setBadStateIndex();
       mFinalStateExplorer.permutations(mNumAutomata, null, -1);
       while (!mUnvisited.isEmpty()) {
         final int[] s = mUnvisited.remove();
@@ -1419,14 +1417,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     }
 
     //#######################################################################
-    //# Set Up
-    private void setBadStateIndex()
-    {
-      mBadStateIndex = mTransitionRelation.getNumberOfStates() - 1;
-      mTransitionRelation.setReachable(mBadStateIndex, false);
-    }
-
-    //#######################################################################
     //# State Exploration
     @Override
     public boolean processNewState(final int[] decodedSource, final int e,
@@ -1449,7 +1439,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       target = mStateMap[target];
       if (!isInitial) {
         mTransitionRelation.addTransition(source, e, target);
-        if (target == mBadStateIndex) {
+        if (target == mTransitionRelation.getDumpStateIndex()) {
           mTransitionRelation.setReachable(target, true);
           final EventProxy event = mEventEncoding.getProperEvent(e);
           mDisabledEvents.add(event);
@@ -1457,10 +1447,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       }
       return true;
     }
-
-    //#######################################################################
-    //# Data Members
-    private int mBadStateIndex;
   }
 
 

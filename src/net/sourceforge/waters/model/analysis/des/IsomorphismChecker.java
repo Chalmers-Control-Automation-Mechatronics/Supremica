@@ -489,23 +489,25 @@ public class IsomorphismChecker
     final int[] count = new int[2];
     final int[] initCount = new int[2];
     for (final int[] clazz : partition.getClasses()) {
-      Arrays.fill(count, 0);
-      Arrays.fill(initCount, 0);
-      for (int i = 0; i < clazz.length; i++) {
-        final int s = clazz[i];
-        final StateProxy state = enc.getState(s);
-        final int split = mSplitMap.get(state);
-        count[split]++;
-        if (state.isInitial()) {
-          initCount[split]++;
+      if (clazz != null) {
+        Arrays.fill(count, 0);
+        Arrays.fill(initCount, 0);
+        for (int i = 0; i < clazz.length; i++) {
+          final int s = clazz[i];
+          final StateProxy state = enc.getState(s);
+          final int split = mSplitMap.get(state);
+          count[split]++;
+          if (state.isInitial()) {
+            initCount[split]++;
+          }
         }
-      }
-      if (count[0] != count[1]) {
-        throw new IsomorphismException
+        if (count[0] != count[1]) {
+          throw new IsomorphismException
           ("Automata contain non-isomorphic states!");
-      } else if (initCount[0] != initCount[1]) {
-        throw new IsomorphismException
+        } else if (initCount[0] != initCount[1]) {
+          throw new IsomorphismException
           ("Initial states do not match!");
+        }
       }
     }
   }
@@ -519,28 +521,31 @@ public class IsomorphismChecker
     final boolean[] count = new boolean[2];
     final boolean[] initCount = new boolean[2];
     for (final int[] clazz : partition.getClasses()) {
-      Arrays.fill(count, false);
-      Arrays.fill(initCount, false);
-      for (int i = 0; i < clazz.length; i++) {
-        final int s = clazz[i];
-        final StateProxy state = enc.getState(s);
-        final int split = mSplitMap.get(state);
-        count[split] = true;
-        if (state.isInitial()) {
-          initCount[split] = true;
+      if (clazz != null) {
+        Arrays.fill(count, false);
+        Arrays.fill(initCount, false);
+        for (int i = 0; i < clazz.length; i++) {
+          final int s = clazz[i];
+          final StateProxy state = enc.getState(s);
+          final int split = mSplitMap.get(state);
+          count[split] = true;
+          if (state.isInitial()) {
+            initCount[split] = true;
+          }
         }
-      }
-      if (count[0] != count[1]) {
-        if (mThrowingExceptions) {
-          throw new IsomorphismException("Automata contain non-bisimilar states!");
-        } else {
-          return false;
-        }
-      } else if (initCount[0] != initCount[1]) {
-        if (mThrowingExceptions) {
-          throw new IsomorphismException("Initial states do not match!");
-        } else {
-          return false;
+        if (count[0] != count[1]) {
+          if (mThrowingExceptions) {
+            throw new IsomorphismException
+              ("Automata contain non-bisimilar states!");
+          } else {
+            return false;
+          }
+        } else if (initCount[0] != initCount[1]) {
+          if (mThrowingExceptions) {
+            throw new IsomorphismException("Initial states do not match!");
+          } else {
+            return false;
+          }
         }
       }
     }

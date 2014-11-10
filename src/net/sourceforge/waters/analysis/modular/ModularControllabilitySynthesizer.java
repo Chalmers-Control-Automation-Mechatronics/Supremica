@@ -364,7 +364,7 @@ public class ModularControllabilitySynthesizer
         if (mIncludesAllAutomata && !getSupervisorReductionEnabled()) {
           final Collection<AutomatonProxy> usedAutomata =
             mMonolithicSynthesizer.getModel().getAutomata();
-          for (final AutomatonProxy sup:localSups) {
+          for (final AutomatonProxy sup : localSups) {
             mSupervisorUsedAutomataMap.put(sup, usedAutomata);
           }
         }

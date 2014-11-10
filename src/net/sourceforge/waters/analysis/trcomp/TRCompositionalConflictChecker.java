@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.trcomp;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -30,10 +31,12 @@ import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.StateProxy;
 
 
 /**
@@ -244,14 +247,18 @@ public class TRCompositionalConflictChecker
     } else {
       mUsedDefaultMarking = mConfiguredDefaultMarking;
     }
+    // TODO Generalised nonblocking ...
+    final Collection<EventProxy> markings =
+      Collections.singleton(mUsedDefaultMarking);
     final Collection<AutomatonProxy> automata = model.getAutomata();
     final int numAutomata = automata.size();
     final Collection<TRAutomatonProxy> trs = new ArrayList<>(numAutomata);
     for (final AutomatonProxy aut : automata) {
       if (isProperAutomaton(aut)) {
         final EventEncoding eventEnc = createInitialEventEncoding(aut);
+        final StateProxy dumpState = AutomatonTools.findDumpState(aut, markings);
         final TRAutomatonProxy tr =
-          new TRAutomatonProxy(aut, eventEnc, INITIAL_CONFIG);
+          new TRAutomatonProxy(aut, eventEnc, dumpState, INITIAL_CONFIG);
         trs.add(tr);
       }
     }
@@ -307,10 +314,32 @@ public class TRCompositionalConflictChecker
   protected void tearDown()
   {
     super.tearDown();
+    mSpecialEventsFinder = null;
     mUsedDefaultMarking = null;
     mSubsystemQueue = null;
     mCurrentSubsystem = null;
     mNeedsSimplification = null;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
+  public void requestAbort()
+  {
+    super.requestAbort();
+    if (mSpecialEventsFinder != null) {
+      mSpecialEventsFinder.requestAbort();
+    }
+  }
+
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    if (mSpecialEventsFinder != null) {
+      mSpecialEventsFinder.resetAbort();
+    }
   }
 
 
@@ -336,6 +365,7 @@ public class TRCompositionalConflictChecker
     throws AnalysisException
   {
     while (mCurrentSubsystem.getNumberOfAutomata() >= 2) {
+      checkAbort();
       if (earlyTerminationCheckCurrentSubsystem()) {
         return;
       }

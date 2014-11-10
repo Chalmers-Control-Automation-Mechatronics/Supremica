@@ -201,6 +201,9 @@ public class IncomingEquivalenceTRSimplifier
           info.setClassNumber(stateToClass, classNo++);
         }
       }
+      if (mStateInfo[rel.getDumpStateIndex()] == null) {
+        classNo++;
+      }
       final TRPartition partition = new TRPartition(stateToClass, classNo);
       setResultPartition(partition);
       applyResultPartitionAutomatically();

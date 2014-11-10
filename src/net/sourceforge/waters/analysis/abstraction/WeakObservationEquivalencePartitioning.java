@@ -77,8 +77,10 @@ public class WeakObservationEquivalencePartitioning
     mClassMap = new int[numStates];
     for (int c = 0; c < numClasses; c++) {
       final int[] clazz = mPartition.getStates(c);
-      for (final int state : clazz) {
-        mClassMap[state] = c;
+      if (clazz != null) {
+        for (final int state : clazz) {
+          mClassMap[state] = c;
+        }
       }
     }
   }
@@ -99,7 +101,7 @@ public class WeakObservationEquivalencePartitioning
     final TIntHashSet visitedClasses = new TIntHashSet();
     for (int c = 0; c < numClasses; c++) {
       final int[] clazz = mPartition.getStates(c);
-      final int csize = clazz.length;
+      final int csize = clazz == null ? 0 : clazz.length;
       if (csize > 1) {
         visitedClasses.add(c);
         tauClosureIter.resetState(clazz[0]);
@@ -159,6 +161,9 @@ public class WeakObservationEquivalencePartitioning
     final int numClasses = mPartition.getNumberOfClasses();
     for (int c = 0; c < numClasses; c++) {
       final int[] clazz = mPartition.getStates(c);
+      if (clazz == null) {
+        continue;
+      }
       long markings = 0;
       for (final int root : clazz) {
         tauSuccessors.add(root);
@@ -266,7 +271,7 @@ public class WeakObservationEquivalencePartitioning
       mTransitionRelation.createSuccessorsModifyingIterator();
     for (int c = 0; c < numClasses; c++) {
       final int[] clazz = mPartition.getStates(c);
-      if (clazz.length > 1) {
+      if (clazz != null && clazz.length > 1) {
         iter.reset(c, tau);
         while (iter.advance()) {
           final int target = iter.getCurrentTargetState();

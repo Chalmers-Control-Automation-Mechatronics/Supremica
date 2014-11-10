@@ -203,6 +203,41 @@ public final class AutomatonTools
     return true;
   }
 
+  /**
+   * Finds a first dump state in the given automaton.
+   * A dump state is an unmarked state without any outgoing transitions.
+   * @param  aut       The automaton to be searched.
+   * @param  markings  The set of marking propositions to be considered.
+   *                   An automaton can only have dump states, if all the
+   *                   relevant markings are in its event set; otherwise
+   *                   all states are implicitly marked by some marking
+   *                   and there is no dump state.
+   * @return The first dump state found in the automaton,
+   *         or <CODE>null</CODE>.
+   */
+  public static StateProxy findDumpState(final AutomatonProxy aut,
+                                         final Collection<EventProxy> markings)
+  {
+    if (aut.getEvents().containsAll(markings)) {
+      final Set<StateProxy> states = aut.getStates();
+      final int numStates = states.size();
+      final Set<StateProxy> nonDumpStates = new THashSet<>(numStates);
+      for (final TransitionProxy trans : aut.getTransitions()) {
+        if (nonDumpStates.add(trans.getSource()) &&
+            nonDumpStates.size() == numStates) {
+          return null;
+        }
+      }
+      for (final StateProxy state : aut.getStates()) {
+        if (state.getPropositions().isEmpty() &&
+            !nonDumpStates.contains(state)) {
+          return state;
+        }
+      }
+    }
+    return null;
+  }
+
 
   //#########################################################################
   //# Inner Class TransitionHashingStrategy

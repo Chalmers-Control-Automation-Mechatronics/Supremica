@@ -390,6 +390,7 @@ public class EnabledEventsLimitedCertainConflictsTRSimplifier
             stateToClass[s] = -1;
           }
         }
+        stateToClass[rel.getDumpStateIndex()] = 0;
         final TRPartition partition = new TRPartition(stateToClass, 1);
         setResultPartition(partition);
         applyResultPartitionAutomatically();
@@ -424,9 +425,13 @@ public class EnabledEventsLimitedCertainConflictsTRSimplifier
       // More than one state of certain conflicts.
       // Create a partition that can be applied separately.
       result = true;
+      final int dumpIndex = rel.getDumpStateIndex();
       final int numClasses = numCoreachable + 1;
       final List<int[]> classes = new ArrayList<>(numClasses);
-      final int numBlocking = numReachable - numCoreachable;
+      int numBlocking = numReachable - numCoreachable;
+      if (!rel.isReachable(dumpIndex)) {
+        numBlocking++;
+      }
       final int[] bclazz = new int[numBlocking];
       int bindex = 0;
       for (int state = 0; state < numStates; state++) {
@@ -434,7 +439,7 @@ public class EnabledEventsLimitedCertainConflictsTRSimplifier
           final int[] clazz = new int[1];
           clazz[0] = state;
           classes.add(clazz);
-        } else if (rel.isReachable(state)) {
+        } else if (rel.isReachable(state) || state == dumpIndex) {
           bclazz[bindex++] = state;
         }
       }

@@ -359,12 +359,14 @@ public class ObservationEquivalenceTRSimplifier
     final int size = partition.getNumberOfClasses();
     setUpPartition(size);
     for (final int[] clazz : partition.getClasses()) {
-      final EquivalenceClass sec =
-        mEquivalence.createEquivalenceClass(this, clazz);
-      sec.enqueue(true);
-      if (clazz.length > 1) {
-        for (final int state : clazz) {
-          mStateToClass[state] = sec;
+      if (clazz != null) {
+        final EquivalenceClass sec =
+          mEquivalence.createEquivalenceClass(this, clazz);
+        sec.enqueue(true);
+        if (clazz.length > 1) {
+          for (final int state : clazz) {
+            mStateToClass[state] = sec;
+          }
         }
       }
     }
@@ -748,8 +750,7 @@ public class ObservationEquivalenceTRSimplifier
   {
     if (mNumClasses < mNumReachableStates) {
       final ListBufferTransitionRelation rel = getTransitionRelation();
-      final int numStates =
-        rel.getNumberOfStates() - rel.getNumberOfExtraStates();
+      final int numStates = rel.getNumberOfStates();
       final List<int[]> classes = new ArrayList<int[]>(mNumClasses);
       for (int state = 0; state < numStates; state++) {
         if (rel.isReachable(state)) {
@@ -765,6 +766,10 @@ public class ObservationEquivalenceTRSimplifier
             }
           }
         }
+      }
+      final int dumpIndex = rel.getDumpStateIndex();
+      if (!rel.isReachable(dumpIndex)) {
+        classes.add(null);
       }
       final TRPartition partition = new TRPartition(classes, numStates);
       setResultPartition(partition);

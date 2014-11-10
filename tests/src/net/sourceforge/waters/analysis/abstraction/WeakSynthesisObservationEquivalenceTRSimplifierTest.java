@@ -89,12 +89,6 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
   }
 
   @Override
-  protected int getNumberOfExtraStates()
-  {
-    return 1;
-  }
-
-  @Override
   protected void configureTransitionRelationSimplifier()
   {
     super.configureTransitionRelationSimplifier();
@@ -398,6 +392,22 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "wsoe35.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_synthesisAbstraction_36() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "soe36.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_synthesisAbstraction_37() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "soe37.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 

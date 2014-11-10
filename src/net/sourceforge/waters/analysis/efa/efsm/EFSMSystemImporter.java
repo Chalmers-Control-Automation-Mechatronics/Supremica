@@ -167,30 +167,32 @@ public class EFSMSystemImporter
     final List<SimpleNodeProxy> nodeList =
       new ArrayList<SimpleNodeProxy>(numStates);
     int numOfMarkingState = 0;
-    for (int i = 0; i < numStates; i++) {
-      final boolean isInitial = rel.isInitial(i);
-      final boolean isMarked = rel.isMarked(i, 0);
-      PlainEventListProxy props = null;
-      if (isMarked && isMarkingIsUsed) {
-        numOfMarkingState++;
-        final SimpleIdentifierProxy ident =
-          mModuleFactory.createSimpleIdentifierProxy
+    for (int s = 0; s < numStates; s++) {
+      if (rel.isReachable(s)) {
+        final boolean isInitial = rel.isInitial(s);
+        final boolean isMarked = rel.isMarked(s, 0);
+        PlainEventListProxy props = null;
+        if (isMarked && isMarkingIsUsed) {
+          numOfMarkingState++;
+          final SimpleIdentifierProxy ident =
+            mModuleFactory.createSimpleIdentifierProxy
             (EventDeclProxy.DEFAULT_MARKING_NAME);
-        final List<SimpleIdentifierProxy> identList =
-          Collections.singletonList(ident);
-        props = mModuleFactory.createPlainEventListProxy(identList);
+          final List<SimpleIdentifierProxy> identList =
+            Collections.singletonList(ident);
+          props = mModuleFactory.createPlainEventListProxy(identList);
+        }
+        final String nodeName;
+        if (nodeListFromEFSM == null) {
+          nodeName = "S" + s;
+        } else {
+          final SimpleNodeProxy nodeFromEFSM = nodeListFromEFSM.get(s);
+          nodeName = nodeFromEFSM.getName();
+        }
+        final SimpleNodeProxy node =
+          mModuleFactory.createSimpleNodeProxy(nodeName, props, null,
+                                               isInitial, null, null, null);
+        nodeList.add(node);
       }
-      final String nodeName;
-      if (nodeListFromEFSM == null) {
-        nodeName = "S" + i;
-      } else {
-        final SimpleNodeProxy nodeFromEFSM = nodeListFromEFSM.get(i);
-        nodeName = nodeFromEFSM.getName();
-      }
-      final SimpleNodeProxy node =
-        mModuleFactory.createSimpleNodeProxy(nodeName, props, null,
-                                             isInitial, null, null, null);
-      nodeList.add(node);
     }
     LabelBlockProxy markingBlock = null;
     if (isMarkingIsUsed && numOfMarkingState < 1) {

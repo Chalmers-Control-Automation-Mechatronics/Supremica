@@ -165,7 +165,7 @@ public class AutomataSynthesisAbstractionProcedure extends
       final int inputConfig = mChain.getPreferredInputConfiguration();
       ListBufferTransitionRelation rel =
         new ListBufferTransitionRelation(aut, mergedEnc.clone(),
-                                         inputStateEnc, 1, inputConfig);
+                                         inputStateEnc, inputConfig);
       final CompositionalAutomataSynthesizer synthesizer = getAnalyzer();
       synthesizer.showDebugLog(rel);
       mChain.setTransitionRelation(rel);

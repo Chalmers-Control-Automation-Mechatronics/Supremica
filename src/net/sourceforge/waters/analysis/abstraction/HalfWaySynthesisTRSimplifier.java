@@ -109,8 +109,7 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
       return false;
     }
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    final int numStates =
-      rel.getNumberOfStates() - rel.getNumberOfExtraStates();
+    final int numStates = rel.getNumberOfStates();
 
     // 1. Do synthesis --- find bad states
     final BitSet coreachableStates = new BitSet(numStates);

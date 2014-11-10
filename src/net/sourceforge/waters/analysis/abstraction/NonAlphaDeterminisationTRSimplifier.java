@@ -262,18 +262,18 @@ public class NonAlphaDeterminisationTRSimplifier
     final List<int[]> initialPartition = new ArrayList<int[]>();
     final TIntArrayList remainingStates = new TIntArrayList();
     for (int state = 0; state < numStates; state++) {
-      if (isAlphaMarked(state)) {
+      if (!rel.isReachable(state)) {
+        continue;
+      } else if (isAlphaMarked(state)) {
         // create a separate equivalence class for every state marked alpha
         final int[] alphaClass = new int[1];
         alphaClass[0] = state;
         initialPartition.add(alphaClass);
       } else {
-        // create an equivalence class for all states which don't fit into the
-        // above two categories
+        // create an equivalence class for all other states
         remainingStates.add(state);
       }
     }
-    assert remainingStates.size() > 1;
     final int[] remainingStatesArray = remainingStates.toArray();
     initialPartition.add(remainingStatesArray);
     return new TRPartition(initialPartition, numStates);

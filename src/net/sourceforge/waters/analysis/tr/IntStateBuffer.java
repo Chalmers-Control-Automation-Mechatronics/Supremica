@@ -47,7 +47,11 @@ public class IntStateBuffer
   //#########################################################################
   //# Constructors
   /**
-   * Creates a new state buffer.
+   * Creates a new state buffer. This constructor creates a new state buffer
+   * with the states in the given encoding. If the state encoding contains
+   * a <CODE>null</CODE> state, it is used as a reachable dump state,
+   * otherwise an additional unreachable dump state is added to the end of
+   * the state space.
    * @param  eventEnc        Event encoding that defines event codes for
    *                         proposition events used as markings of the states.
    * @param  stateEnc        State encoding that defines the assignment of
@@ -56,7 +60,7 @@ public class IntStateBuffer
   public IntStateBuffer(final EventEncoding eventEnc,
                         final StateEncoding stateEnc)
   {
-    this(eventEnc, stateEnc, 0);
+    this(eventEnc, stateEnc, null);
   }
 
   /**
@@ -65,36 +69,65 @@ public class IntStateBuffer
    *                         proposition events used as markings of the states.
    * @param  stateEnc        State encoding that defines the assignment of
    *                         state codes for the states in the buffer.
-   * @param  numExtraStates  The number of extra states. If non-zero, the
-   *                         indicated number of unreachable states are
-   *                         added to the end of the state space.
+   * @param  dumpState       Dump state to be used, or <CODE>null</CODE>.
+   *                         If the state encoding contains the indicated
+   *                         state, it is used as a reachable dump state,
+   *                         otherwise an additional unreachable dump state
+   *                         is added to the end of the state space.
    */
   public IntStateBuffer(final EventEncoding eventEnc,
                         final StateEncoding stateEnc,
-                        final int numExtraStates)
+                        final StateProxy dumpState)
   {
-    this(stateEnc.getNumberOfStates() + numExtraStates, eventEnc);
+    mPropositionStatus = eventEnc;
     final int numStates = stateEnc.getNumberOfStates();
+    mDumpStateIndex = -1;
+    for (int s = 0; s < numStates; s++) {
+      if (stateEnc.getState(s) == dumpState) {
+        mDumpStateIndex = s;
+        break;
+      }
+    }
+    if (mDumpStateIndex >= 0) {
+      mStateInfo = new int[numStates];
+    } else {
+      mDumpStateIndex = numStates;
+      mStateInfo = new int[numStates + 1];
+    }
     for (int s = 0; s < numStates; s++) {
       final StateProxy state = stateEnc.getState(s);
-      if (state == null) {
-        mStateInfo[s] &= ~TAG_REACHABLE;
-      } else {
+      if (state != null) {
+        int info = TAG_REACHABLE;
         if (state.isInitial()) {
-          mStateInfo[s] |= TAG_INITIAL;
+          info |= TAG_INITIAL;
         }
         for (final EventProxy prop : state.getPropositions()) {
           final int p = eventEnc.getEventCode(prop);
           if (p >= 0 && eventEnc.isPropositionUsed(p)) {
-            mStateInfo[s] |= (1 << p);
+            info |= (1 << p);
           }
         }
+        mStateInfo[s] = info;
       }
     }
-    final int numIncludingExtra = numStates + numExtraStates;
-    for (int s = numStates; s < numIncludingExtra; s++) {
-      mStateInfo[s] &= ~TAG_REACHABLE;
-    }
+  }
+
+  /**
+   * Creates a new empty state buffer.
+   * This constructor allocates a new state buffer with the given number
+   * of states. States are initially marked as reachable, while all other
+   * attributes and markings of the states are initialised to be
+   * <CODE>false</CODE>. An additional unreachable dump state is added
+   * at the end.
+   * @param  size       The number of states in the new buffer.
+   * @param  propStatus Event status provider to determine the number of
+   *                    propositions and which propositions are used.
+   */
+  public IntStateBuffer(final int size,
+                        final EventStatusProvider propStatus)
+  {
+    this(size + 1, size, propStatus);
+    mStateInfo[mDumpStateIndex] = 0;
   }
 
   /**
@@ -104,13 +137,20 @@ public class IntStateBuffer
    * attributes and markings of the states are initialised to be
    * <CODE>false</CODE>.
    * @param  size       The number of states in the new buffer.
+   * @param  dumpIndex  The index of the dump state in the new buffer.
+   *                    The dump state signifies a unmarked state without
+   *                    outgoing transitions. It must be specified for
+   *                    every state buffer to provide for algorithms that
+   *                    redirect transitions to such a state.
    * @param  propStatus Event status provider to determine the number of
    *                    propositions and which propositions are used.
    */
   public IntStateBuffer(final int size,
+                        final int dumpIndex,
                         final EventStatusProvider propStatus)
   {
     mPropositionStatus = propStatus;
+    mDumpStateIndex = dumpIndex;
     mStateInfo = new int[size];
     Arrays.fill(mStateInfo, TAG_REACHABLE);
   }
@@ -127,6 +167,7 @@ public class IntStateBuffer
                         final EventStatusProvider propStatus)
   {
     mPropositionStatus = propStatus;
+    mDumpStateIndex = buffer.mDumpStateIndex;
     final int size = buffer.getNumberOfStates();
     mStateInfo = Arrays.copyOf(buffer.mStateInfo, size);
   }
@@ -140,6 +181,17 @@ public class IntStateBuffer
   public int getNumberOfStates()
   {
     return mStateInfo.length;
+  }
+
+  /**
+   * Gets the index of the dump state in this state buffer. The dump state
+   * signifies a unmarked state without outgoing transitions. It is set
+   * for every state buffer to provide for algorithms that redirect
+   * transitions to such a state.
+   */
+  public int getDumpStateIndex()
+  {
+    return mDumpStateIndex;
   }
 
   /**
@@ -596,6 +648,7 @@ public class IntStateBuffer
   //# Data Members
   private final EventStatusProvider mPropositionStatus;
   private final int[] mStateInfo;
+  private int mDumpStateIndex;
 
 
   //#########################################################################

@@ -881,16 +881,12 @@ public class SupervisorReductionTRSimplifier extends
     throws OverflowException, AnalysisAbortException
   {
     final ListBufferTransitionRelation oldRel = getTransitionRelation();
-    // create a one-state automaton if the disabled event set is empty
-    // otherwise create a two-state automaton
-    final int numStates = disabEvents.isEmpty() ? 1 : 2;
     final ListBufferTransitionRelation rel =
-      new ListBufferTransitionRelation(
-                                       "OneStateSup",
+      new ListBufferTransitionRelation("OneStateSup",
                                        ComponentKind.SUPERVISOR,
                                        mNumProperEvents,
                                        oldRel.getNumberOfPropositions(),
-                                       numStates,
+                                       2, 1,
                                        ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     rel.setInitial(0, true);
     // set all events in disabEvents USED
@@ -900,7 +896,17 @@ public class SupervisorReductionTRSimplifier extends
         rel.setProperEventStatus(e, status | EventStatus.STATUS_UNUSED);
       }
     }
-    if (numStates == 2) {
+    // Create a one-reachable-state automaton if the disabled event set is
+    // empty, otherwise create a two-reachable-state automaton.
+    if (disabEvents.isEmpty()) {
+      // set initial state markings
+      final int numProps = rel.getNumberOfPropositions();
+      for (int p = 0; p < numProps; p++) {
+        rel.setPropositionUsed(p, false);
+      }
+      // dump state not reachable
+      rel.setReachable(1, false);
+    } else {
       // add transitions from state 0 to dump state
       for (int i = 0; i < disabEvents.size(); i++) {
         rel.addTransition(0, disabEvents.get(i), 1);
@@ -909,12 +915,6 @@ public class SupervisorReductionTRSimplifier extends
       final int numProps = rel.getNumberOfPropositions();
       for (int p = 0; p < numProps; p++) {
         rel.setMarked(0, p, true);
-      }
-    } else if (numStates == 1) {
-      // set initial state markings
-      final int numProps = rel.getNumberOfPropositions();
-      for (int p = 0; p < numProps; p++) {
-        rel.setPropositionUsed(p, false);
       }
     }
     final int marking = getDefaultMarkingID();
@@ -929,7 +929,7 @@ public class SupervisorReductionTRSimplifier extends
         stateToClass[s] = 1;
       }
     }
-    return new TRPartition(stateToClass, numStates);
+    return new TRPartition(stateToClass, 2);
   }
 
   private int getSuccessorState(final int source, final int event)

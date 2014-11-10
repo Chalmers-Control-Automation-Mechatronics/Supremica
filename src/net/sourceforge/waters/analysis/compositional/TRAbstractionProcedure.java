@@ -70,11 +70,9 @@ abstract class TRAbstractionProcedure
       final EventProxy tau = iter.hasNext() ? iter.next() : null;
       final EventEncoding eventEnc = createEventEncoding(aut, local, candidate);
       final StateEncoding inputStateEnc = new StateEncoding(aut);
-      final int numExtraStates = getNumberOfExtraStates();
       final int config = mSimplifier.getPreferredInputConfiguration();
       ListBufferTransitionRelation rel =
-        new ListBufferTransitionRelation(aut, eventEnc, inputStateEnc,
-                                         numExtraStates, config);
+        new ListBufferTransitionRelation(aut, eventEnc, inputStateEnc, config);
       getAnalyzer().showDebugLog(rel);
       final int numStates = rel.getNumberOfStates();
       final int numTrans = aut.getTransitions().size();
@@ -179,11 +177,6 @@ abstract class TRAbstractionProcedure
     }
     mSimplifier.setPropositions(preconditionMarkingID, defaultMarkingID);
     return enc;
-  }
-
-  protected int getNumberOfExtraStates()
-  {
-    return 0;
   }
 
 

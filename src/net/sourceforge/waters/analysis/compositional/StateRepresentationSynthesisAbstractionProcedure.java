@@ -199,12 +199,6 @@ public class StateRepresentationSynthesisAbstractionProcedure extends
   }
 
   @Override
-  protected int getNumberOfExtraStates()
-  {
-    return 1;
-  }
-
-  @Override
   AbstractionStep createStep(final AutomatonProxy input,
                              final StateEncoding inputStateEnc,
                              final AutomatonProxy output,

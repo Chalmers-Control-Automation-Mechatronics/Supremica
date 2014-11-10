@@ -234,7 +234,9 @@ public class SpecialEventsFinder
           }
         }
         for (int s = 0; s < numStates; s++) {
-          if (dumpInfo[s] == DUMP && rel.isMarked(s, defaultID)) {
+          if (dumpInfo[s] == DUMP &&
+              rel.isReachable(s) &&
+              rel.isMarked(s, defaultID)) {
             dumpInfo[s] = NONDUMP;
             canHaveAlwaysEnabledEvents = false;
           }

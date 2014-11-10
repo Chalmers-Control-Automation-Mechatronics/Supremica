@@ -161,12 +161,17 @@ public class EFSMPartialUnfolder extends AbstractEFSMAlgorithm
         mReducedRangeSize = mRangeValues.size();
       } else {
         mClassToValue = new int[partition.getNumberOfClasses()];
+        mReducedRangeSize = 0;
         int clazzNum = 0;
         for (final int[] clazz : partition.getClasses()) {
-          mClassToValue[clazzNum] = clazz[0];
+          if (clazz == null) {
+            mClassToValue[clazzNum] = -1;
+          } else {
+            mClassToValue[clazzNum] = clazz[0];
+            mReducedRangeSize++;
+          }
           clazzNum++;
         }
-        mReducedRangeSize = partition.getNumberOfClasses();
       }
       checkAbort();
       mUnfoldingVariableContext =

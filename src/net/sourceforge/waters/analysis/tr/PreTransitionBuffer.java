@@ -73,7 +73,7 @@ public class PreTransitionBuffer
    *         by its transition limit.
    */
   public void addTransition(final int from, final int event, final int to)
-  throws OverflowException
+    throws OverflowException
   {
     if (mNumTransitions < mTransitionLimit) {
       if (mCurrentState != from || mCurrentEvent != event) {
@@ -161,6 +161,7 @@ public class PreTransitionBuffer
         mMaxFanout = mCurrentFanout;
       }
     }
+    mCurrentState = -1;
   }
 
 
