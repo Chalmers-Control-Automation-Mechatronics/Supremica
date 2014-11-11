@@ -11,9 +11,7 @@ package net.sourceforge.waters.analysis.efa.unified;
 
 import java.util.List;
 
-import net.sourceforge.waters.analysis.abstraction.BlockedEventsRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.HidingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.IncomingEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.LimitedCertainConflictsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.MarkingRemovalTRSimplifier;
@@ -23,6 +21,7 @@ import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimpl
 import net.sourceforge.waters.analysis.abstraction.OmegaRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.OnlySilentOutgoingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SilentIncomingTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.SpecialEventsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TRSimplifierStatistics;
 import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
@@ -54,11 +53,8 @@ class UnifiedEFASimplifier extends AbstractEFAAlgorithm
        final int limit)
   {
     final ChainTRSimplifier chain = new ChainTRSimplifier();
-    final HidingTRSimplifier hiding = new HidingTRSimplifier();
+    final SpecialEventsTRSimplifier hiding = new SpecialEventsTRSimplifier();
     chain.add(hiding);
-    final BlockedEventsRemovalTRSimplifier blockedRemover =
-      new BlockedEventsRemovalTRSimplifier();
-    chain.add(blockedRemover);
     final TransitionRelationSimplifier loopRemover =
       new TauLoopRemovalTRSimplifier();
     chain.add(loopRemover);
@@ -80,11 +76,8 @@ class UnifiedEFASimplifier extends AbstractEFAAlgorithm
        final int limit)
   {
     final ChainTRSimplifier chain = new ChainTRSimplifier();
-    final HidingTRSimplifier hiding = new HidingTRSimplifier();
+    final SpecialEventsTRSimplifier hiding = new SpecialEventsTRSimplifier();
     chain.add(hiding);
-    final BlockedEventsRemovalTRSimplifier blockedRemover =
-      new BlockedEventsRemovalTRSimplifier();
-    chain.add(blockedRemover);
     final TauLoopRemovalTRSimplifier loopRemover =
       new TauLoopRemovalTRSimplifier();
     chain.add(loopRemover);
@@ -127,11 +120,8 @@ class UnifiedEFASimplifier extends AbstractEFAAlgorithm
        final int limit)
   {
     final ChainTRSimplifier chain = new ChainTRSimplifier();
-    final HidingTRSimplifier hiding = new HidingTRSimplifier();
+    final SpecialEventsTRSimplifier hiding = new SpecialEventsTRSimplifier();
     chain.add(hiding);
-    final BlockedEventsRemovalTRSimplifier blockedRemover =
-      new BlockedEventsRemovalTRSimplifier();
-    chain.add(blockedRemover);
     final TauLoopRemovalTRSimplifier tauLoopRemover =
       new TauLoopRemovalTRSimplifier();
     tauLoopRemover.setDumpStateAware(true);
