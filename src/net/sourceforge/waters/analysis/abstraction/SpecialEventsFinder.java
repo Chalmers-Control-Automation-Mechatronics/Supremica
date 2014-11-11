@@ -202,6 +202,7 @@ public class SpecialEventsFinder
 
     // Check for unused and controllable events ...
     for (int e = EventEncoding.TAU; e < numEvents; e++) {
+      checkAbort();
       final byte status = rel.getProperEventStatus(e);
       if (!EventStatus.isUsedEvent(status)) {
         mComputedEventStatus[e] = EventStatus.STATUS_UNUSED;
@@ -219,6 +220,7 @@ public class SpecialEventsFinder
       if ((rel.getConfiguration() &
           ListBufferTransitionRelation.CONFIG_SUCCESSORS) != 0) {
         for (int s = 0; s < numStates; s++) {
+          checkAbort();
           if (rel.isReachable(s) && !rel.isDeadlockState(s, defaultID)) {
             dumpInfo[s] = NONDUMP;
           }
@@ -227,6 +229,7 @@ public class SpecialEventsFinder
         final TransitionIterator iter =
           rel.createAllTransitionsReadOnlyIterator();
         while (iter.advance()) {
+          checkAbort();
           final int s = iter.getCurrentSourceState();
           dumpInfo[s] |= NONDUMP;
           if (iter.getCurrentEvent() == EventEncoding.TAU) {
@@ -248,6 +251,7 @@ public class SpecialEventsFinder
     if (initialStatus != 0) {
       final TransitionIterator iter = rel.createAllTransitionsReadOnlyIterator();
       while (iter.advance()) {
+        checkAbort();
         final int e = iter.getCurrentEvent();
         final int s = iter.getCurrentSourceState();
         final int t = iter.getCurrentTargetState();
@@ -270,6 +274,7 @@ public class SpecialEventsFinder
         final boolean[] disabled = new boolean[numEvents];
         states:
         for (int s = 0; s < numStates; s++) {
+          checkAbort();
           if (dumpInfo[s] == NONDUMP) {
             int lastEvent = EventEncoding.TAU;
             iter.resetState(s);
@@ -290,6 +295,7 @@ public class SpecialEventsFinder
           }
         }
         for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+          checkAbort();
           final byte status = rel.getProperEventStatus(e);
           if (canBeAlwaysEnabledEvent(status) && !disabled[e]) {
             mComputedEventStatus[e] |=
@@ -302,6 +308,7 @@ public class SpecialEventsFinder
           rel.createAllTransitionsReadOnlyIterator();
         int numStatesChecked = 0;
         for (int s = 0; s < numStates; s++) {
+          checkAbort();
           if (!rel.isReachable(s)) {
             dumpInfo[s] = DUMP;
           } else if (dumpInfo[s] == NONDUMP) {
@@ -310,6 +317,7 @@ public class SpecialEventsFinder
         }
         final boolean[] found = new boolean[numStates];
         for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+          checkAbort();
           final byte status = rel.getProperEventStatus(e);
           if (canBeAlwaysEnabledEvent(status)) {
             Arrays.fill(found, false);

@@ -15,6 +15,7 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 
 
 /**
@@ -89,6 +90,7 @@ public class SpecialEventsTRSimplifier
   //# Overrides for net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
   @Override
   protected boolean runSimplifier()
+    throws AnalysisAbortException
   {
     // Set up ...
     final ListBufferTransitionRelation rel = getTransitionRelation();
@@ -106,6 +108,7 @@ public class SpecialEventsTRSimplifier
       for (int s = 0; s < numStates; s++) {
         iter.resetState(s);
         while (iter.advance()) {
+          checkAbort();
           final int e = iter.getCurrentEvent();
           if (e == EventEncoding.TAU) {
             continue;
@@ -148,6 +151,7 @@ public class SpecialEventsTRSimplifier
       for (int t = 0; t < numStates; t++) {
         iter.resetState(t);
         while (iter.advance()) {
+          checkAbort();
           final int e = iter.getCurrentEvent();
           if (e == EventEncoding.TAU) {
             continue;
@@ -191,6 +195,7 @@ public class SpecialEventsTRSimplifier
     if (modified) {
       final int numEvents = rel.getNumberOfProperEvents();
       for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+        checkAbort();
         final byte status = rel.getProperEventStatus(e);
         if ((status &
              (EventStatus.STATUS_LOCAL | EventStatus.STATUS_BLOCKED)) != 0) {

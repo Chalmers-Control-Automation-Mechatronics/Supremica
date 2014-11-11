@@ -16,7 +16,12 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
+import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SpecialEventsFinder;
+import net.sourceforge.waters.analysis.abstraction.SpecialEventsTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.tr.DuplicateFreeQueue;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
@@ -55,6 +60,24 @@ public class TRCompositionalConflictChecker
                                         final KindTranslator translator)
   {
     super(model, factory, translator);
+    final ChainTRSimplifier chain = new ChainTRSimplifier();
+    final SpecialEventsTRSimplifier special = new SpecialEventsTRSimplifier();
+    chain.add(special);
+    final TransitionRelationSimplifier loopRemover =
+      new TauLoopRemovalTRSimplifier();
+    chain.add(loopRemover);
+    final ObservationEquivalenceTRSimplifier bisimulator =
+      new ObservationEquivalenceTRSimplifier();
+    bisimulator.setEquivalence(ObservationEquivalenceTRSimplifier.
+                               Equivalence.OBSERVATION_EQUIVALENCE);
+    bisimulator.setTransitionRemovalMode
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+    bisimulator.setMarkingMode
+      (ObservationEquivalenceTRSimplifier.MarkingMode.SATURATE);
+    // TODO bisimulator.setTransitionLimit(limit);
+    chain.add(bisimulator);
+    chain.setPropositions(PRECONDITION_MARKING, DEFAULT_MARKING);
+    mTRSimplifier = chain;
   }
 
 
@@ -331,6 +354,9 @@ public class TRCompositionalConflictChecker
     if (mSpecialEventsFinder != null) {
       mSpecialEventsFinder.requestAbort();
     }
+    if (mTRSimplifier != null) {
+      mTRSimplifier.requestAbort();
+    }
   }
 
   @Override
@@ -339,6 +365,9 @@ public class TRCompositionalConflictChecker
     super.resetAbort();
     if (mSpecialEventsFinder != null) {
       mSpecialEventsFinder.resetAbort();
+    }
+    if (mTRSimplifier != null) {
+      mTRSimplifier.resetAbort();
     }
   }
 
@@ -429,6 +458,7 @@ public class TRCompositionalConflictChecker
     final int numEvents = enc.getNumberOfProperEvents();
     final byte[] oldStatus = new byte[numEvents];
     for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+      checkAbort();
       byte status = enc.getProperEventStatus(e);
       if (EventStatus.isUsedEvent(status)) {
         final EventProxy event = enc.getProperEvent(e);
@@ -441,15 +471,17 @@ public class TRCompositionalConflictChecker
       }
       oldStatus[e] = status;
     }
-    // TODO simplify ...
-    final boolean simplified = false;
+    // Simplify ...
+    final ListBufferTransitionRelation rel = aut.getTransitionRelation();
+    mTRSimplifier.setTransitionRelation(rel);
+    final boolean simplified = mTRSimplifier.run();
     // Update event status ...
     if (simplified || !mAlwaysEnabledDetectedInitially) {
-      final ListBufferTransitionRelation rel = aut.getTransitionRelation();
       mSpecialEventsFinder.setTransitionRelation(rel);
       mSpecialEventsFinder.run();
       final byte[] newStatus = mSpecialEventsFinder.getComputedEventStatus();
       for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+        checkAbort();
         if (EventStatus.isUsedEvent(oldStatus[e])) {
           final EventProxy event = enc.getProperEvent(e);
           final TREventInfo info = mCurrentSubsystem.getEventInfo(event);
@@ -500,6 +532,7 @@ public class TRCompositionalConflictChecker
 
   // Tools
   private SpecialEventsFinder mSpecialEventsFinder;
+  private final TransitionRelationSimplifier mTRSimplifier;
 
   // Data Structures
   private EventProxy mUsedDefaultMarking;

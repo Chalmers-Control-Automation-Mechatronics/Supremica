@@ -562,53 +562,87 @@ public class EventEncoding
    */
   public int addEvent(final EventProxy event,
                       final KindTranslator translator,
-                      int status)
+                      final int status)
     throws OverflowException
+  {
+    switch (translator.getEventKind(event)) {
+    case CONTROLLABLE:
+      return addProperEvent(event, status | EventStatus.STATUS_CONTROLLABLE);
+    case UNCONTROLLABLE:
+      return addProperEvent(event, status & ~EventStatus.STATUS_CONTROLLABLE);
+    case PROPOSITION:
+      return addProposition(event, EventStatus.isUsedEvent((byte) status));
+    default:
+      throw new IllegalArgumentException
+        ("Unknown event kind " + event.getKind() + "!");
+    }
+  }
+
+  /**
+   * Adds a proper event to this encoding. If the given event is not
+   * in the encoding, this method enlarges it with a new event, assigning a
+   * new code.
+   * @param  event       The event to be added, which must be a proper event
+   *                     and not a proposition.
+   * @param  status      Collection of status flags providing additional
+   *                     information about the event. Should be a combination
+   *                     of the bits {@link EventStatus#STATUS_CONTROLLABLE},
+   *                     {@link EventStatus#STATUS_LOCAL},
+   *                     {@link EventStatus#STATUS_OUTSIDE_ALWAYS_ENABLED},
+   *                     {@link EventStatus#STATUS_OUTSIDE_ONLY_SELFLOOP},
+   *                     {@link EventStatus#STATUS_BLOCKED},
+   *                     {@link EventStatus#STATUS_FAILING},
+   *                     and {@link EventStatus#STATUS_UNUSED}.
+   * @return The event code assigned to the event.
+   */
+  public int addProperEvent(final EventProxy event, int status)
   {
     int e = mEventCodeMap.get(event);
     if (e >= 0) {
       if (EventStatus.isUsedEvent((byte) status)) {
-        switch (translator.getEventKind(event)) {
-        case CONTROLLABLE:
-        case UNCONTROLLABLE:
-          status = mProperEventStatus.get(e);
-          status &= ~EventStatus.STATUS_UNUSED;
-          mProperEventStatus.set(e, (byte) status);
-          break;
-        case PROPOSITION:
-          mUsedPropositions |= (1 << e);
-          break;
-        default:
-          throw new IllegalArgumentException
-            ("Unknown event kind " + event.getKind() + "!");
-        }
+        status = mProperEventStatus.get(e);
+        status &= ~EventStatus.STATUS_UNUSED;
+        mProperEventStatus.set(e, (byte) status);
       }
-      return e;
     } else {
-      switch (translator.getEventKind(event)) {
-      case CONTROLLABLE:
-        status |= EventStatus.STATUS_CONTROLLABLE;
-      case UNCONTROLLABLE:
-        e = mProperEvents.size();
-        mEventCodeMap.put(event, e);
-        mProperEvents.add(event);
-        mProperEventStatus.add((byte) status);
-        break;
-      case PROPOSITION:
-        checkNumberOfPropositions(1);
-        e = mPropositions.size();
-        mEventCodeMap.put(event, e);
-        mPropositions.add(event);
-        if (EventStatus.isUsedEvent((byte) status)) {
-          mUsedPropositions |= (1 << e);
-        }
-        break;
-      default:
-        throw new IllegalArgumentException
-          ("Unknown event kind " + event.getKind() + "!");
-      }
+      e = mProperEvents.size();
+      mEventCodeMap.put(event, e);
+      mProperEvents.add(event);
+      mProperEventStatus.add((byte) status);
     }
     return e;
+  }
+
+  /**
+   * Adds a proposition to this encoding. If the given event is not
+   * in the encoding, this method enlarges it with a new proposition,
+   * assigning a new code.
+   * @param  event       The event to be added, which must be a proposition.
+   * @param  used        Flag indicating whether the proposition should be
+   *                     marked as used after addition.
+   * @return The proposition code assigned to the event.
+   * @throws OverflowException to indicate that the number of propositions
+   *                     exceeds the supported maximum
+   *                     {@link EventStatusProvider#MAX_PROPOSITIONS}.
+   */
+  public int addProposition(final EventProxy event, final boolean used)
+    throws OverflowException
+  {
+    int p = mEventCodeMap.get(event);
+    if (p >= 0) {
+      if (used) {
+        mUsedPropositions |= (1 << p);
+      }
+    } else {
+      checkNumberOfPropositions(1);
+      p = mPropositions.size();
+      mEventCodeMap.put(event, p);
+      mPropositions.add(event);
+      if (used) {
+        mUsedPropositions |= (1 << p);
+      }
+    }
+    return p;
   }
 
   /**
