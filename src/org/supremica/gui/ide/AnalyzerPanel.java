@@ -51,7 +51,7 @@ public class AnalyzerPanel
 
         mDocumentContainer = moduleContainer;
 
-        tabPanel = new JTabbedPane(JTabbedPane.BOTTOM);
+        tabPanel = new JTabbedPane();
         tabPanel.setPreferredSize(IDEDimensions.leftAnalyzerPreferredSize);
         tabPanel.setMinimumSize(IDEDimensions.leftAnalyzerMinimumSize);
 
