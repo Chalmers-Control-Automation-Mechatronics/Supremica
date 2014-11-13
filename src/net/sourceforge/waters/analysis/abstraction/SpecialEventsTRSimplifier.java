@@ -96,111 +96,82 @@ public class SpecialEventsTRSimplifier
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
     final int dump = rel.getDumpStateIndex();
+    final boolean forward =
+      (rel.getConfiguration() &
+       ListBufferTransitionRelation.CONFIG_SUCCESSORS) != 0;
+    final TransitionIterator iter = forward ?
+      rel.createSuccessorsModifyingIterator() :
+      rel.createPredecessorsModifyingIterator();
     final TIntArrayList tauTargets = new TIntArrayList();
     boolean modified = false;
     boolean needsReachabilityCheck = false;
 
     // Remove/redirect transitions ...
-    if ((rel.getConfiguration() &
-         ListBufferTransitionRelation.CONFIG_SUCCESSORS) != 0) {
-      // Algorithm for forward transitions ....
-      final TransitionIterator iter = rel.createSuccessorsModifyingIterator();
-      for (int s = 0; s < numStates; s++) {
-        iter.resetState(s);
-        while (iter.advance()) {
-          checkAbort();
-          final int e = iter.getCurrentEvent();
-          if (e == EventEncoding.TAU) {
-            continue;
+    for (int from = 0; from < numStates; from++) {
+      iter.resetState(from);
+      while (iter.advance()) {
+        checkAbort();
+        final int e = iter.getCurrentEvent();
+        if (e == EventEncoding.TAU) {
+          continue;
+        }
+        final int to = iter.getCurrentToState();
+        final byte status = rel.getProperEventStatus(e);
+        if (EventStatus.isLocalEvent(status)) {
+          if (from != to) {
+            tauTargets.add(to);
           }
-          final int t = iter.getCurrentTargetState();
-          final byte status = rel.getProperEventStatus(e);
-          if (EventStatus.isLocalEvent(status)) {
-            if (s != t) {
-              tauTargets.add(t);
-            }
-            iter.remove();
-            modified = true;
-          } else if (EventStatus.isBlockedEvent(status)) {
-            iter.remove();
-            modified = true;
-            needsReachabilityCheck |= s != t;
-          } else if (EventStatus.isFailingEvent(status)) {
-            if (t != dump) {
+          iter.remove();
+          modified = true;
+        } else if (EventStatus.isBlockedEvent(status)) {
+          iter.remove();
+          modified = true;
+          needsReachabilityCheck |= from != to;
+        } else if (EventStatus.isFailingEvent(status)) {
+          if (forward) {
+            if (to != dump) {
               iter.setCurrentToState(dump);
               modified = needsReachabilityCheck = true;
             }
-          } else if (EventStatus.isOutsideOnlySelfloopEvent(status)) {
-            if (s == t) {
+          } else {
+            if (from != dump) {
               iter.remove();
-              modified = true;
+              rel.addTransition(to, e, dump);
+              modified = needsReachabilityCheck = true;
             }
           }
-        }
-        if (!tauTargets.isEmpty()) {
-          rel.addTransitions(s, EventEncoding.TAU, tauTargets);
-          tauTargets.clear();
-          final byte tauStatus = rel.getProperEventStatus(EventEncoding.TAU);
-          rel.setProperEventStatus(EventEncoding.TAU,
-                                   tauStatus & ~EventStatus.STATUS_UNUSED);
+        } else if (EventStatus.isOutsideOnlySelfloopEvent(status)) {
+          if (from == to) {
+            iter.remove();
+            modified = true;
+          }
         }
       }
-    } else {
-      // Algorithm for backward transitions ....
-      final TransitionIterator iter = rel.createPredecessorsModifyingIterator();
-      for (int t = 0; t < numStates; t++) {
-        iter.resetState(t);
-        while (iter.advance()) {
-          checkAbort();
-          final int e = iter.getCurrentEvent();
-          if (e == EventEncoding.TAU) {
-            continue;
-          }
-          final int s = iter.getCurrentSourceState();
-          final byte status = rel.getProperEventStatus(e);
-          if (EventStatus.isLocalEvent(status)) {
-            if (s != t) {
-              tauTargets.add(s);
-            }
-            iter.remove();
-            modified = true;
-          } else if (EventStatus.isBlockedEvent(status)) {
-            iter.remove();
-            modified = true;
-            needsReachabilityCheck |= s != t;
-          } else if (EventStatus.isFailingEvent(status)) {
-            if (t != dump) {
-              iter.remove();
-              rel.addTransition(s, e, dump);
-              needsReachabilityCheck = modified = true;
-            }
-          } else if (EventStatus.isOutsideOnlySelfloopEvent(status)) {
-            if (s == t) {
-              iter.remove();
-              modified = true;
-            }
-          }
+      if (!tauTargets.isEmpty()) {
+        if (forward) {
+          rel.addTransitions(from, EventEncoding.TAU, tauTargets);
+        } else {
+          rel.addTransitions(tauTargets, EventEncoding.TAU, from);
         }
-        if (!tauTargets.isEmpty()) {
-          rel.addTransitions(tauTargets, EventEncoding.TAU, t);
-          tauTargets.clear();
-          final byte tauStatus = rel.getProperEventStatus(EventEncoding.TAU);
-          rel.setProperEventStatus(EventEncoding.TAU,
-                                   tauStatus & ~EventStatus.STATUS_UNUSED);
-        }
+        tauTargets.clear();
+        final byte tauStatus = rel.getProperEventStatus(EventEncoding.TAU);
+        rel.setProperEventStatus(EventEncoding.TAU,
+                                 tauStatus & ~EventStatus.STATUS_UNUSED);
       }
     }
 
     // Remove events ...
-    if (modified) {
-      final int numEvents = rel.getNumberOfProperEvents();
-      for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
-        checkAbort();
-        final byte status = rel.getProperEventStatus(e);
-        if ((status &
-             (EventStatus.STATUS_LOCAL | EventStatus.STATUS_BLOCKED)) != 0) {
-          rel.setProperEventStatus(e, status | EventStatus.STATUS_UNUSED);
-        }
+    //   (Check even if not modified, as there may be blocked events
+    //   that appear on no transitions.
+    final int numEvents = rel.getNumberOfProperEvents();
+    for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+      checkAbort();
+      final byte status = rel.getProperEventStatus(e);
+      if (EventStatus.isUsedEvent(status) &&
+          (status &
+           (EventStatus.STATUS_LOCAL | EventStatus.STATUS_BLOCKED)) != 0) {
+        rel.setProperEventStatus(e, status | EventStatus.STATUS_UNUSED);
+        modified = true;
       }
     }
 

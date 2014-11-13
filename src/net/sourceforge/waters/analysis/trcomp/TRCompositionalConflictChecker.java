@@ -9,12 +9,15 @@
 
 package net.sourceforge.waters.analysis.trcomp;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Set;
 
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
@@ -22,13 +25,19 @@ import net.sourceforge.waters.analysis.abstraction.SpecialEventsFinder;
 import net.sourceforge.waters.analysis.abstraction.SpecialEventsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
+import net.sourceforge.waters.analysis.compositional.ChainSelectionHeuristic;
+import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
+import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.DuplicateFreeQueue;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
+import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
+import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
+import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
@@ -43,6 +52,8 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * @author Robi Malik
@@ -55,11 +66,13 @@ public class TRCompositionalConflictChecker
 
   //#########################################################################
   //# Constructors
-  public TRCompositionalConflictChecker(final ProductDESProxy model,
-                                        final ProductDESProxyFactory factory,
-                                        final KindTranslator translator)
+  public TRCompositionalConflictChecker(final ProductDESProxyFactory factory)
   {
-    super(model, factory, translator);
+    super(factory, ConflictKindTranslator.getInstanceControllable());
+    // TODO Make these configurable
+    mPreselectionHeuristic = new PreselectionHeuristicMustL();
+    final SelectionHeuristic<TRCandidate> minS = new SelectionHeuristicMinS();
+    mSelectionHeuristic = new ChainSelectionHeuristic<>(minS);
     final ChainTRSimplifier chain = new ChainTRSimplifier();
     final SpecialEventsTRSimplifier special = new SpecialEventsTRSimplifier();
     chain.add(special);
@@ -77,7 +90,10 @@ public class TRCompositionalConflictChecker
     // TODO bisimulator.setTransitionLimit(limit);
     chain.add(bisimulator);
     chain.setPropositions(PRECONDITION_MARKING, DEFAULT_MARKING);
+    chain.setPreferredOutputConfiguration
+      (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     mTRSimplifier = chain;
+    mMonolithicAnalyzer = new NativeConflictChecker(factory);
   }
 
 
@@ -93,6 +109,12 @@ public class TRCompositionalConflictChecker
   public VerificationResult getAnalysisResult()
   {
     return (VerificationResult) super.getAnalysisResult();
+  }
+
+  @Override
+  public VerificationResult createAnalysisResult()
+  {
+    return new DefaultVerificationResult();
   }
 
 
@@ -285,6 +307,7 @@ public class TRCompositionalConflictChecker
         trs.add(tr);
       }
     }
+
     final int numEvents = model.getEvents().size();
     mSpecialEventsFinder = new SpecialEventsFinder();
     mSpecialEventsFinder.setDefaultMarkingID(DEFAULT_MARKING);
@@ -293,7 +316,7 @@ public class TRCompositionalConflictChecker
     mSpecialEventsFinder.setSelfloopOnlyEventsDetected(mSelfloopOnlyEventsSupported);
     mSpecialEventsFinder.setAlwaysEnabledEventsDetected(false);
     mSpecialEventsFinder.setControllabilityConsidered(isControllabilityConsidered());
-    mCurrentSubsystem = new SubsystemInfo(trs, numEvents);
+    mCurrentSubsystem = new TRSubsystemInfo(trs, numEvents);
     for (final TRAutomatonProxy aut : trs) {
       final ListBufferTransitionRelation rel = aut.getTransitionRelation();
       mSpecialEventsFinder.setTransitionRelation(rel);
@@ -302,8 +325,21 @@ public class TRCompositionalConflictChecker
       mCurrentSubsystem.registerEvents(aut, status);
     }
     mSpecialEventsFinder.setAlwaysEnabledEventsDetected(mAlwaysEnabledEventsSupported);
+
+    final ProductDESProxyFactory factory = getFactory();
+    final KindTranslator translator = getKindTranslator();
+    mSynchronousProductBuilder = new TRSynchronousProductBuilder(factory);
+    mSynchronousProductBuilder.setDetailedOutputEnabled(true);
+    mSynchronousProductBuilder.setKindTranslator(translator);
+    mSynchronousProductBuilder.setPruningDeadlocks(true);
+    mSynchronousProductBuilder.setPruningForbiddenEvents(false);
+    mSynchronousProductBuilder.setRemovingSelfloops(true);
+    //mSynchronousProductBuilder.setTransitionLimit(limit);
+
+    mMonolithicAnalyzer.setKindTranslator(translator);
+
     mSubsystemQueue = new PriorityQueue<>();
-    mNeedsSimplification = new DuplicateFreeQueue<>(trs);
+    mNeedsSimplification = new SimplificationQueue(trs);
     mNeedsDisjointSubsystemsCheck = true;
     mAlwaysEnabledDetectedInitially = !mAlwaysEnabledEventsSupported;
   }
@@ -312,9 +348,20 @@ public class TRCompositionalConflictChecker
   public boolean run() throws AnalysisException
   {
     try {
+      final Logger logger = getLogger();
       setUp();
       final AnalysisResult result = getAnalysisResult();
       do {
+        if (logger.isDebugEnabled()) {
+          final String name = mCurrentSubsystem.toString();
+          if (name.length() <= 40) {
+            logger.debug("Processing new subsystem " + name + " ...");
+          } else {
+            logger.debug("Processing new subsystem with " +
+                         mCurrentSubsystem.getNumberOfAutomata() +
+                         " automata ...");
+          }
+        }
         analyseCurrentSubsystemCompositionally();
         if (result.isFinished()) {
           // TODO Trace expansion ???
@@ -337,6 +384,7 @@ public class TRCompositionalConflictChecker
   protected void tearDown()
   {
     super.tearDown();
+    mSynchronousProductBuilder = null;
     mSpecialEventsFinder = null;
     mUsedDefaultMarking = null;
     mSubsystemQueue = null;
@@ -351,11 +399,17 @@ public class TRCompositionalConflictChecker
   public void requestAbort()
   {
     super.requestAbort();
+    if (mSynchronousProductBuilder != null) {
+      mSynchronousProductBuilder.requestAbort();
+    }
     if (mSpecialEventsFinder != null) {
       mSpecialEventsFinder.requestAbort();
     }
     if (mTRSimplifier != null) {
       mTRSimplifier.requestAbort();
+    }
+    if (mMonolithicAnalyzer != null) {
+      mMonolithicAnalyzer.requestAbort();
     }
   }
 
@@ -363,11 +417,17 @@ public class TRCompositionalConflictChecker
   public void resetAbort()
   {
     super.resetAbort();
+    if (mSynchronousProductBuilder != null) {
+      mSynchronousProductBuilder.resetAbort();
+    }
     if (mSpecialEventsFinder != null) {
       mSpecialEventsFinder.resetAbort();
     }
     if (mTRSimplifier != null) {
       mTRSimplifier.resetAbort();
+    }
+    if (mMonolithicAnalyzer != null) {
+      mMonolithicAnalyzer.resetAbort();
     }
   }
 
@@ -377,13 +437,12 @@ public class TRCompositionalConflictChecker
   private EventEncoding createInitialEventEncoding(final AutomatonProxy aut)
     throws OverflowException
   {
-    final KindTranslator translator = getKindTranslator();
     final EventEncoding enc = new EventEncoding();
-    enc.addEvent(mUsedDefaultMarking, translator, EventStatus.STATUS_UNUSED);
+    enc.addProposition(mUsedDefaultMarking, false);
     if (mConfiguredPreconditionMarking != null) {
-      enc.addEvent(mConfiguredPreconditionMarking, translator,
-                   EventStatus.STATUS_UNUSED);
+      enc.addProposition(mConfiguredPreconditionMarking, false);
     }
+    final KindTranslator translator = getKindTranslator();
     for (final EventProxy event : aut.getEvents()) {
       enc.addEvent(event, translator, EventStatus.STATUS_NONE);
     }
@@ -393,11 +452,11 @@ public class TRCompositionalConflictChecker
   private void analyseCurrentSubsystemCompositionally()
     throws AnalysisException
   {
+    if (earlyTerminationCheckCurrentSubsystem()) {
+      return;
+    }
     while (mCurrentSubsystem.getNumberOfAutomata() >= 2) {
       checkAbort();
-      if (earlyTerminationCheckCurrentSubsystem()) {
-        return;
-      }
       final boolean simplified = simplifyAllAutomataIndividually();
       if (simplified && earlyTerminationCheckCurrentSubsystem()) {
         return;
@@ -406,7 +465,16 @@ public class TRCompositionalConflictChecker
       } else if (mCurrentSubsystem.getNumberOfAutomata() == 2) {
         break;
       }
-      // TODO candidate selection & simplification
+      final Collection<TRCandidate> candidates =
+        mPreselectionHeuristic.collectCandidates(mCurrentSubsystem);
+      final TRCandidate candidate = mSelectionHeuristic.select(candidates);
+      if (candidate == null) {
+        break;
+      }
+      computeSynchronousProduct(candidate);
+      if (earlyTerminationCheckCurrentSubsystem()) {
+        return;
+      }
     }
     analyseCurrentSubsystemMonolithically();
   }
@@ -426,10 +494,16 @@ public class TRCompositionalConflictChecker
         }
         final AnalysisResult result = getAnalysisResult();
         result.setSatisfied(false);
+        getLogger().debug("Subsystem is blocking, because " + aut.getName() +
+                          "has no marked states.");
         return true;
       }
     }
     // TODO Generalised nonblocking stuff ...
+    if (allMarked) {
+      final Logger logger = getLogger();
+      logger.debug("Subsystem is nonblocking, because all states are marked.");
+    }
     return allMarked;
   }
 
@@ -453,6 +527,13 @@ public class TRCompositionalConflictChecker
   private boolean simplifyAutomatonIndividually(final TRAutomatonProxy aut)
     throws AnalysisException
   {
+    // Log ...
+    final Logger logger = getLogger();
+    final ListBufferTransitionRelation rel = aut.getTransitionRelation();
+    if (logger.isDebugEnabled()) {
+      logger.debug("Simplifying " + aut.getName() + " ...");
+      rel.logSizes(logger);
+    }
     // Set event status ...
     final EventEncoding enc = aut.getEventEncoding();
     final int numEvents = enc.getNumberOfProperEvents();
@@ -472,34 +553,109 @@ public class TRCompositionalConflictChecker
       oldStatus[e] = status;
     }
     // Simplify ...
-    final ListBufferTransitionRelation rel = aut.getTransitionRelation();
+    final int oldNumStates = rel.getNumberOfStates();
     mTRSimplifier.setTransitionRelation(rel);
     final boolean simplified = mTRSimplifier.run();
     // Update event status ...
     if (simplified || !mAlwaysEnabledDetectedInitially) {
-      mSpecialEventsFinder.setTransitionRelation(rel);
-      mSpecialEventsFinder.run();
-      final byte[] newStatus = mSpecialEventsFinder.getComputedEventStatus();
-      for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
-        checkAbort();
-        if (EventStatus.isUsedEvent(oldStatus[e])) {
-          final EventProxy event = enc.getProperEvent(e);
-          final TREventInfo info = mCurrentSubsystem.getEventInfo(event);
-          info.updateAutomatonStatus(aut, newStatus[e], mNeedsSimplification);
-          mNeedsDisjointSubsystemsCheck |=
-            !EventStatus.isLocalEvent(oldStatus[e]) &&
-            !EventStatus.isUsedEvent(newStatus[e]);
-        }
-      }
+      updateEventStatus(aut, oldStatus);
+    }
+    if (rel.getNumberOfStates() != oldNumStates) {
+      aut.resetStateNames();
     }
     return simplified;
+  }
+
+  private TRAutomatonProxy computeSynchronousProduct
+    (final TRCandidate candidate)
+    throws AnalysisException
+  {
+    final Logger logger = getLogger();
+    if (logger.isDebugEnabled()) {
+      logger.debug("Composing " + candidate + " ...");
+    }
+    // Set up event encoding ...
+    final EventEncoding rawEncoding = candidate.getEventEncoding();
+    final int numEvents = rawEncoding.getNumberOfProperEvents();
+    int numProperEvents = 0;
+    for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+      final byte status = rawEncoding.getProperEventStatus(e);
+      if (!EventStatus.isLocalEvent(status)) {
+        numProperEvents++;
+      }
+    }
+    final EventEncoding syncEncoding = new EventEncoding();
+    final byte[] oldStatus = new byte[numProperEvents + 1];
+    for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+      final EventProxy event = rawEncoding.getProperEvent(e);
+      final byte status = rawEncoding.getProperEventStatus(e);
+      if (EventStatus.isLocalEvent(status)) {
+        syncEncoding.setProperEventStatus(EventEncoding.TAU, status);
+        syncEncoding.addSilentEvent(event);
+      } else {
+        final int code = syncEncoding.addProperEvent(event, status);
+        oldStatus[code] = status;
+      }
+    }
+    syncEncoding.addProposition(mUsedDefaultMarking, true);
+    if (mConfiguredPreconditionMarking != null) {
+      syncEncoding.addProposition(mConfiguredPreconditionMarking, false);
+    }
+    // Synchronise ...
+    final ProductDESProxyFactory factory = getFactory();
+    final ProductDESProxy des = candidate.createProductDESProxy(factory);
+    mSynchronousProductBuilder.setModel(des);
+    mSynchronousProductBuilder.setEventEncoding(syncEncoding);
+    mSynchronousProductBuilder.run();
+    // Simplify ...
+    final TRAutomatonProxy sync =
+      mSynchronousProductBuilder.getComputedAutomaton();
+    final ListBufferTransitionRelation rel = sync.getTransitionRelation();
+    rel.logSizes(logger);
+    mTRSimplifier.setTransitionRelation(rel);
+    mTRSimplifier.run();
+    // Update event status ...
+    mNeedsSimplification.setCurrentComposition(candidate);
+    mCurrentSubsystem.addAutomaton(sync);
+    updateEventStatus(sync, oldStatus);
+    for (final TRAutomatonProxy aut : candidate.getAutomata()) {
+      mCurrentSubsystem.removeAutomaton(aut, mNeedsSimplification);
+    }
+    mNeedsSimplification.setCurrentComposition(null);
+    return sync;
+  }
+
+  private void updateEventStatus(final TRAutomatonProxy aut,
+                                 final byte[] oldStatus)
+    throws AnalysisException
+  {
+    final EventEncoding enc = aut.getEventEncoding();
+    final ListBufferTransitionRelation rel = aut.getTransitionRelation();
+    final int numEvents = rel.getNumberOfProperEvents();
+    mSpecialEventsFinder.setTransitionRelation(rel);
+    mSpecialEventsFinder.run();
+    final byte[] newStatus = mSpecialEventsFinder.getComputedEventStatus();
+    for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+      checkAbort();
+      if (EventStatus.isUsedEvent(oldStatus[e])) {
+        final EventProxy event = enc.getProperEvent(e);
+        final TREventInfo info = mCurrentSubsystem.getEventInfo(event);
+        info.updateAutomatonStatus(aut, newStatus[e], mNeedsSimplification);
+        if (info.isEmpty()) {
+          mCurrentSubsystem.removeEvent(event);
+        }
+        mNeedsDisjointSubsystemsCheck |=
+          !EventStatus.isLocalEvent(oldStatus[e]) &&
+          !EventStatus.isUsedEvent(newStatus[e]);
+      }
+    }
   }
 
   private boolean disjointSubsystemsCheck()
   {
     if (mNeedsDisjointSubsystemsCheck) {
       mNeedsDisjointSubsystemsCheck = false;
-      final List<SubsystemInfo> splits =
+      final List<TRSubsystemInfo> splits =
         mCurrentSubsystem.findEventDisjointSubsystems();
       if (splits == null) {
         return false;
@@ -513,10 +669,77 @@ public class TRCompositionalConflictChecker
     }
   }
 
-  private boolean analyseCurrentSubsystemMonolithically()
+  private void analyseCurrentSubsystemMonolithically()
+    throws AnalysisException
   {
-    // TODO Auto-generated method stub
-    return false;
+    final Collection<TRAutomatonProxy> automata =
+      mCurrentSubsystem.getAutomata();
+    final Logger logger = getLogger();
+    if (logger.isDebugEnabled()) {
+      double estimate = 1.0;
+      for (final TRAutomatonProxy aut : automata) {
+        final ListBufferTransitionRelation rel = aut.getTransitionRelation();
+        estimate *= rel.getNumberOfReachableStates();
+      }
+      final String msg = String.format("Monolithically composing %d automata, " +
+                                       "estimated %.0f states.",
+                                       automata.size(), estimate);
+      logger.debug(msg);
+    }
+    if (!automata.isEmpty()) {
+      final String name = AutomatonTools.getCompositionName(automata);
+      final ProductDESProxyFactory factory = getFactory();
+      final ProductDESProxy des =
+        AutomatonTools.createProductDESProxy(name, automata, factory);
+      mMonolithicAnalyzer.setModel(des);
+      final boolean satisfied = mMonolithicAnalyzer.run();
+      if (!satisfied) {
+        final AnalysisResult result = getAnalysisResult();
+        result.setSatisfied(false);
+      }
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class SimplificationQueue
+  private static class SimplificationQueue
+    extends DuplicateFreeQueue<TRAutomatonProxy>
+  {
+    //#########################################################################
+    //# Constructor
+    public SimplificationQueue(final Collection<TRAutomatonProxy> automata)
+    {
+      super(automata);
+      mSupressed = Collections.emptySet();
+    }
+
+    //#########################################################################
+    //# Interface java.util.Queue<TRAutomatonProxy>
+    @Override
+    public boolean offer(final TRAutomatonProxy aut)
+    {
+      if (mSupressed.contains(aut)) {
+        return true;
+      } else {
+        return super.offer(aut);
+      }
+    }
+
+    //#########################################################################
+    //# Data Members
+    private void setCurrentComposition(final TRCandidate candidate)
+    {
+      if (candidate == null) {
+        mSupressed = Collections.emptySet();
+      } else {
+        mSupressed = new THashSet<>(candidate.getAutomata());
+      }
+    }
+
+    //#########################################################################
+    //# Data Members
+    private Set<TRAutomatonProxy> mSupressed;
   }
 
 
@@ -531,14 +754,18 @@ public class TRCompositionalConflictChecker
   private boolean mAlwaysEnabledEventsSupported;
 
   // Tools
-  private SpecialEventsFinder mSpecialEventsFinder;
+  private final PreselectionHeuristic mPreselectionHeuristic;
+  private final SelectionHeuristic<TRCandidate> mSelectionHeuristic;
   private final TransitionRelationSimplifier mTRSimplifier;
+  private TRSynchronousProductBuilder mSynchronousProductBuilder;
+  private SpecialEventsFinder mSpecialEventsFinder;
+  private final ConflictChecker mMonolithicAnalyzer;
 
   // Data Structures
   private EventProxy mUsedDefaultMarking;
-  private Queue<SubsystemInfo> mSubsystemQueue;
-  private SubsystemInfo mCurrentSubsystem;
-  private Queue<TRAutomatonProxy> mNeedsSimplification;
+  private Queue<TRSubsystemInfo> mSubsystemQueue;
+  private TRSubsystemInfo mCurrentSubsystem;
+  private SimplificationQueue mNeedsSimplification;
   private boolean mNeedsDisjointSubsystemsCheck;
   private boolean mAlwaysEnabledDetectedInitially;
 

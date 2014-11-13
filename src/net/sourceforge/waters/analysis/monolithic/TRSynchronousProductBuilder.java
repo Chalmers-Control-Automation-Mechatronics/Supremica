@@ -294,6 +294,15 @@ public class TRSynchronousProductBuilder
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.AutomatonBuilder
+  @Override
+  public TRAutomatonProxy getComputedAutomaton()
+  {
+    return (TRAutomatonProxy) getComputedProxy();
+  }
+
+
+  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
   @Override
   public boolean supportsNondeterminism()
@@ -325,7 +334,8 @@ public class TRSynchronousProductBuilder
     int a = 0;
     for (final AutomatonProxy aut : automata) {
       mInputAutomata[a++] =
-        TRAutomatonProxy.createTRAutomatonProxy(aut, translator);
+        TRAutomatonProxy.createTRAutomatonProxy
+          (aut, translator, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     }
 
     // Set up state encoding
@@ -379,15 +389,29 @@ public class TRSynchronousProductBuilder
         }
       }
     }
+    final List<EventInfo> eventInfoList = new ArrayList<>(numEvents);
     for (a = 0; a < numAutomata; a++) {
       final TRAutomatonProxy aut = mInputAutomata[a];
       final EventEncoding enc = aut.getEventEncoding();
       final int numLocalEvents = enc.getNumberOfProperEvents();
       for (int local = EventEncoding.TAU; local < numLocalEvents; local++) {
-        final EventProxy event = enc.getProperEvent(local);
-        if (event != null) {
-          final byte status = enc.getProperEventStatus(local);
-          if (EventStatus.isUsedEvent(status)) {
+        final byte status = enc.getProperEventStatus(local);
+        if (EventStatus.isUsedEvent(status)) {
+          final EventProxy event = enc.getProperEvent(local);
+          if (event == null) {
+            assert local == EventEncoding.TAU;
+            final AutomatonEventInfo autInfo =
+              new AutomatonEventInfo(a, aut, local);
+            if (!autInfo.isBlocked()) {
+              final EventInfo info = new EventInfo(null);
+              info.addAutomatonEventInfo(autInfo);
+              info.setOutputCode(EventEncoding.TAU);
+              info.sort();
+              eventInfoList.add(info);
+              mOutputEventEncoding.setProperEventStatus(EventEncoding.TAU,
+                                                        status);
+            }
+          } else {
             final int global =
               mOutputEventEncoding.addEvent(event, translator, status);
             final EventInfo info = eventInfoMap.get(event);
@@ -403,7 +427,6 @@ public class TRSynchronousProductBuilder
         }
       }
     }
-    final List<EventInfo> eventInfoList = new ArrayList<>(numEvents);
     for (final EventProxy event : events) {
       final EventInfo info = eventInfoMap.get(event);
       if (info != null && info.getOutputCode() >= 0 && !info.isBlocked()) {
@@ -1001,7 +1024,14 @@ public class TRSynchronousProductBuilder
     @Override
     public String toString()
     {
-      return mEvent.getName();
+      if (mEvent != null) {
+        return mEvent.getName();
+      } else if (mUpdatingAutomata.size() == 1) {
+        final AutomatonEventInfo info = mUpdatingAutomata.get(0);
+        return "tau:" + info.mAutomatonIndex;
+      } else {
+        return "(null)";
+      }
     }
 
     //#######################################################################

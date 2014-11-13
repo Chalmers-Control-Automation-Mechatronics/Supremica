@@ -130,6 +130,7 @@ public abstract class SelectionHeuristic<T>
     return false;
   }
 
+
   //#########################################################################
   //# Interface java.lang.Cloneable
   @Override

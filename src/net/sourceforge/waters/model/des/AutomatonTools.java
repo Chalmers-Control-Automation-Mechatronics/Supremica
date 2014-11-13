@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
+import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.WatersHashSet;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
@@ -119,7 +120,7 @@ public final class AutomatonTools
    */
   public static ProductDESProxy createProductDESProxy
     (final String name,
-     final Collection<AutomatonProxy> automata,
+     final Collection<? extends AutomatonProxy> automata,
      final ProductDESProxyFactory factory)
   {
     int numEvents = 0;
@@ -236,6 +237,49 @@ public final class AutomatonTools
       }
     }
     return null;
+  }
+
+  /**
+   * Calculates a name that can be given to a synchronous product automaton.
+   *
+   * @param automata
+   *          List of automata constituting synchronous product.
+   * @return A string consisting of the names of the given automata, with
+   *         appropriate separators between them.
+   */
+  public static String getCompositionName
+    (final Collection<TRAutomatonProxy> automata)
+  {
+    return getCompositionName("", automata);
+  }
+
+  /**
+   * Calculates a name that can be given to a synchronous product automaton.
+   *
+   * @param prefix
+   *          A string to be prepended to the result.
+   * @param automata
+   *          List of automata constituting synchronous product.
+   * @return A string consisting of the prefix followed by the names of the
+   *         given automata, with appropriate separators between them.
+   */
+  public static String getCompositionName
+    (final String prefix,
+     final Collection<? extends AutomatonProxy> automata)
+  {
+    final StringBuilder buffer = new StringBuilder(prefix);
+    buffer.append('{');
+    boolean first = true;
+    for (final AutomatonProxy aut : automata) {
+      if (first) {
+        first = false;
+      } else {
+        buffer.append(',');
+      }
+      buffer.append(aut.getName());
+    }
+    buffer.append('}');
+    return buffer.toString();
   }
 
 

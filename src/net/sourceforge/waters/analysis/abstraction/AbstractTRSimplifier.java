@@ -352,19 +352,7 @@ public abstract class AbstractTRSimplifier
   {
     if (success && mAppliesPartitionAutomatically) {
       final Logger logger = getLogger();
-      if (logger.isDebugEnabled()) {
-        int numberOfProposition = 0;
-        for (int p=0; p< mTransitionRelation.getNumberOfPropositions(); p++) {
-          if (mTransitionRelation.isPropositionUsed(p)) {
-            numberOfProposition++;
-          }
-        }
-        logger.debug
-          (mTransitionRelation.getNumberOfReachableStates() + " states, " +
-           mTransitionRelation.getNumberOfTransitions() + " transitions, " +
-           mTransitionRelation.getNumberOfMarkings() + "(" +
-           numberOfProposition + ") markings.");
-      }
+      mTransitionRelation.logSizes(logger);
     }
   }
 

@@ -48,6 +48,11 @@ class TREventInfo
     return mEvent;
   }
 
+  boolean isEmpty()
+  {
+    return mStatusMap.isEmpty();
+  }
+
   boolean isControllable()
   {
     return mIsControllable;
@@ -107,6 +112,11 @@ class TREventInfo
   Set<TRAutomatonProxy> getAutomata()
   {
     return mStatusMap.keySet();
+  }
+
+  byte getAutomatonStatus(final TRAutomatonProxy aut)
+  {
+    return mStatusMap.get(aut);
   }
 
 
@@ -176,7 +186,7 @@ class TREventInfo
   {
     if (EventStatus.isUsedEvent(newStatus)) {
       if (mIsBlocked) {
-        return;
+        // nothing
       } else if (EventStatus.isBlockedEvent(newStatus)) {
         mIsBlocked = true;
         mIsFailing = false;
@@ -234,6 +244,15 @@ class TREventInfo
         queue.offer(aut);
       }
     }
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  @Override
+  public String toString()
+  {
+    return mEvent.getName();
   }
 
 

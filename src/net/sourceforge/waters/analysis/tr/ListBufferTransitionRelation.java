@@ -41,6 +41,8 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * A more convenient means to store and retrieve transitions of an automaton.
@@ -2879,6 +2881,30 @@ public class ListBufferTransitionRelation
                     ": no buffer configured.}");
     }
     printer.println();
+  }
+
+  public void logSizes(final Logger logger)
+  {
+    if (logger.isDebugEnabled()) {
+      int numEvents = 0;
+      for (int e = EventEncoding.NONTAU; e < getNumberOfProperEvents(); e++) {
+        final byte status = getProperEventStatus(e);
+        if (EventStatus.isUsedEvent(status)) {
+          numEvents++;
+        }
+      }
+      int numProps = 0;
+      for (int p = 0; p < getNumberOfPropositions(); p++) {
+        if (isPropositionUsed(p)) {
+          numProps++;
+        }
+      }
+      logger.debug
+        (getNumberOfReachableStates() + " states, " +
+         getNumberOfTransitions() + " transitions, " +
+         numEvents + " proper events, " +
+         getNumberOfMarkings() + "(" + numProps + ") markings.");
+    }
   }
 
   public void checkIntegrity()

@@ -395,7 +395,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
       configureModelVerifier(des);
       final boolean result = mModelVerifier.run();
       TraceProxy counterexample = null;
-      if (!result) {
+      if (!result && mModelVerifier.isCounterExampleEnabled()) {
         counterexample = mModelVerifier.getCounterExample();
         precheckCounterExample(counterexample);
         if (counterexample != null) {
@@ -404,7 +404,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
       }
       assertEquals("Wrong result from model checker: got " + result +
                    " but should have been " + expect + "!", expect, result);
-      if (!expect) {
+      if (!expect && mModelVerifier.isCounterExampleEnabled()) {
         checkCounterExample(des, counterexample);
       }
     } catch (final NondeterministicDESException exception) {

@@ -40,18 +40,14 @@ public abstract class NumericSelectionHeuristic<T>
     } else {
       value2 = getHeuristicValue(candidate2);
     }
-    if (value1 < value2) {
+    if (value1 <= value2) {
       mBestCandidate = candidate1;
       mBestValue = value1;
-      return -1;
-    } else if (value2 < value1) {
+      return value1 < value2 ? -1 : 0;
+    } else {
       mBestCandidate = candidate2;
       mBestValue = value2;
       return 1;
-    } else {
-      mBestCandidate = candidate1;
-      mBestValue = value1;
-      return 0;
     }
   }
 

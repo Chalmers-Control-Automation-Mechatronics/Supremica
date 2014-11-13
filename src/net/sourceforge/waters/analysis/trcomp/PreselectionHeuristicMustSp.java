@@ -1,0 +1,91 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.trcomp
+//# CLASS:   PreselectionHeuristicMustL
+//###########################################################################
+//# $Id$
+//###########################################################################
+
+package net.sourceforge.waters.analysis.trcomp;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import net.sourceforge.waters.analysis.tr.EventStatus;
+import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
+import net.sourceforge.waters.model.analysis.OverflowException;
+
+
+/**
+ * @author Robi Malik
+ */
+
+class PreselectionHeuristicMustSp extends PreselectionHeuristic
+{
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.analysis.trcomp.PreselectingHeuristic
+  @Override
+  public Collection<TRCandidate> collectCandidates(final TRSubsystemInfo subsys)
+    throws OverflowException
+  {
+    final Collection<TREventInfo> events = subsys.getEvents();
+    final int numEvents = events.size();
+    final Map<List<TRAutomatonProxy>,TRCandidate> candidates =
+      new HashMap<>(numEvents);
+    for (final TREventInfo info : events) {
+      final Set<TRAutomatonProxy> automata = info.getAutomata();
+      final int numAutomata = automata.size();
+      List<TRAutomatonProxy> notAlwaysEnabled = new ArrayList<>(numAutomata);
+      List<TRAutomatonProxy> notSelfloopOnly = notAlwaysEnabled;
+      boolean useNotAlwaysEnabled = false;
+      boolean useNotSelfloopOnly = false;
+      for (final TRAutomatonProxy aut : automata) {
+        final byte status = info.getAutomatonStatus(aut);
+        final boolean alwaysEnabled =
+          EventStatus.isOutsideAlwaysEnabledEvent(status);
+        final boolean selfloopOnly =
+          EventStatus.isOutsideOnlySelfloopEvent(status);
+        if (notAlwaysEnabled == notSelfloopOnly) {
+          if (!alwaysEnabled && !selfloopOnly) {
+            notAlwaysEnabled.add(aut);
+          } else if (!selfloopOnly) {
+            notSelfloopOnly = new ArrayList<>(notAlwaysEnabled);
+            notSelfloopOnly.add(aut);
+            useNotAlwaysEnabled = true;
+          } else {
+            notAlwaysEnabled = new ArrayList<>(notSelfloopOnly);
+            notAlwaysEnabled.add(aut);
+            useNotSelfloopOnly = true;
+          }
+        } else {
+          if (!selfloopOnly) {
+            notSelfloopOnly.add(aut);
+            useNotAlwaysEnabled = true;
+          }
+          if (!alwaysEnabled) {
+            notAlwaysEnabled.add(aut);
+            useNotSelfloopOnly = true;
+          }
+        }
+      }
+      if (notAlwaysEnabled == notSelfloopOnly) {
+        recordCandidate(notAlwaysEnabled, subsys, candidates);
+      } else {
+        if (useNotAlwaysEnabled) {
+          recordCandidate(notAlwaysEnabled, subsys, candidates);
+        }
+        if (useNotSelfloopOnly) {
+          recordCandidate(notSelfloopOnly, subsys, candidates);
+        }
+      }
+    }
+    return candidates.values();
+  }
+
+}

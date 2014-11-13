@@ -697,12 +697,27 @@ public class EventEncoding
    */
   public void addSilentEvent(final EventProxy event)
   {
-    if (mProperEvents.get(TAU) == null) {
+    final byte status = mProperEventStatus.get(TAU);
+    if (!EventStatus.isUsedEvent(status)) {
       mProperEvents.set(TAU, event);
-      final byte status = mProperEventStatus.get(TAU);
       mProperEventStatus.set(TAU, (byte) (status & ~EventStatus.STATUS_UNUSED));
     }
     mEventCodeMap.put(event, TAU);
+  }
+
+  /**
+   * Sets a new silent event. This method replaces the silent event
+   * with code {@link #TAU} by the given new event. The event status
+   * is not changed by this method.
+   */
+  public void setTauEvent(final EventProxy newTau)
+  {
+    final EventProxy oldTau = mProperEvents.get(TAU);
+    if (oldTau != null) {
+      mEventCodeMap.remove(oldTau);
+    }
+    mProperEvents.set(TAU, newTau);
+    mEventCodeMap.put(newTau, TAU);
   }
 
   /**

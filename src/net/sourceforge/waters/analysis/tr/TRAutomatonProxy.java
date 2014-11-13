@@ -76,7 +76,8 @@ public class TRAutomatonProxy
 
   //#########################################################################
   //# Factory Methods
-  public static TRAutomatonProxy createTRAutomatonProxy(final AutomatonProxy aut)
+  public static TRAutomatonProxy createTRAutomatonProxy
+    (final AutomatonProxy aut)
     throws OverflowException
   {
     final KindTranslator translator = IdenticalKindTranslator.getInstance();
@@ -87,8 +88,7 @@ public class TRAutomatonProxy
     (final AutomatonProxy aut, final KindTranslator translator)
     throws OverflowException
   {
-    return createTRAutomatonProxy(aut, translator,
-                                  ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    return createTRAutomatonProxy(aut, translator, 0);
   }
 
   public static TRAutomatonProxy createTRAutomatonProxy
@@ -98,9 +98,17 @@ public class TRAutomatonProxy
     throws OverflowException
   {
     if (aut instanceof TRAutomatonProxy) {
-      return (TRAutomatonProxy) aut;
-    } else {
+      final TRAutomatonProxy tr = (TRAutomatonProxy) aut;
+      final ListBufferTransitionRelation rel = tr.getTransitionRelation();
+      if (config != 0) {
+        rel.reconfigure(config);
+      }
+      return tr;
+    } else if (config != 0) {
       return new TRAutomatonProxy(aut, translator, config);
+    } else {
+      return new TRAutomatonProxy(aut, translator,
+                                  ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     }
   }
 
@@ -141,7 +149,13 @@ public class TRAutomatonProxy
     final StateEncoding stateEnc = new StateEncoding(aut);
     mTransitionRelation = new ListBufferTransitionRelation
       (aut, mEventEncoding, stateEnc, dumpState, config);
-    mStates = new TRStateList(stateEnc);
+    mStates = new TRStateList();
+    final int numStates = stateEnc.getNumberOfStates();
+    mStateNames = new String[numStates];
+    for (int s = 0; s < numStates; s++) {
+      final StateProxy state = stateEnc.getState(s);
+      mStateNames[s] = state.getName();
+    }
   }
 
   public TRAutomatonProxy(final TRAutomatonProxy aut)
@@ -149,18 +163,7 @@ public class TRAutomatonProxy
     mEventEncoding = aut.mEventEncoding;
     mTransitionRelation = aut.mTransitionRelation;
     mStates = null;
-    if (aut.mStates != null) {
-      for (int s = 0; s < aut.mStates.capacity(); s++) {
-        final StateProxy state = aut.mStates.get(s);
-        if (state != null && !(state instanceof TRState)) {
-          if (mStates == null) {
-            mStates = new TRStateList();
-          }
-          final StateProxy cloned = (StateProxy) state.clone();
-          mStates.set(s, cloned);
-        }
-      }
-    }
+    mStateNames = aut.mStateNames;
   }
 
 
@@ -204,8 +207,21 @@ public class TRAutomatonProxy
       final EventKind kind = EventStatus.isControllableEvent(status) ?
         EventKind.CONTROLLABLE : EventKind.UNCONTROLLABLE;
       final EventProxy event = factory.createEventProxy(name, kind, false);
-      mEventEncoding.addSilentEvent(event);
+      mEventEncoding.setTauEvent(event);
     }
+  }
+
+  /**
+   * Clears all state names. When a TRAutomatonProxy object is created from
+   * an automaton, it remembers the state names of the input automaton.
+   * However, as the transition relation is modified, the original state
+   * names may longer be accurate. Then this method can be used to reset
+   * all state names and use automatically generated names based on the
+   * state numbers instead.
+   */
+  public void resetStateNames()
+  {
+    mStateNames = null;
   }
 
 
@@ -300,7 +316,14 @@ public class TRAutomatonProxy
     @Override
     public String getName()
     {
-      return "t" + mIndex;
+      if (mStateNames != null) {
+        if (mIndex < mStateNames.length) {
+          return mStateNames[mIndex];
+        } else if (mIndex != mTransitionRelation.getDumpStateIndex()) {
+          mStateNames = null;
+        }
+      }
+      return ":" + mIndex;
     }
 
     @Override
@@ -411,15 +434,6 @@ public class TRAutomatonProxy
       mMarkings = null;
     }
 
-    public TRStateList(final StateEncoding stateEnc)
-    {
-      mStates = new StateProxy[mTransitionRelation.getNumberOfStates()];
-      for (int s = 0; s < stateEnc.getNumberOfStates(); s++) {
-        mStates[s] = stateEnc.getState(s);
-      }
-      mMarkings = null;
-    }
-
     //#######################################################################
     //# Interface java.util.Set<StateProxy>
     @Override
@@ -436,19 +450,9 @@ public class TRAutomatonProxy
 
     //#######################################################################
     //# Simple Access
-    private int capacity()
-    {
-      return mStates.length;
-    }
-
     private StateProxy get(final int index)
     {
       return mStates[index];
-    }
-
-    private void set(final int index, final StateProxy state)
-    {
-      mStates[index] = state;
     }
 
     //#######################################################################
@@ -654,6 +658,7 @@ public class TRAutomatonProxy
   private final EventEncoding mEventEncoding;
   private final ListBufferTransitionRelation mTransitionRelation;
   private TRStateList mStates;
+  private String[] mStateNames;
 
 
   //#########################################################################
