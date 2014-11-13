@@ -82,8 +82,8 @@ public abstract class AbstractStandardConflictCheckerTest
   {
     try {
       final ModelVerifier verifier = getModelVerifier();
-      verifier.setNodeLimit(2);
-      testBigFactory();
+      verifier.setNodeLimit(4);
+      testCell();
       fail("Expected overflow not caught!");
     } catch (final OverflowException exception) {
       // O.K.

@@ -45,9 +45,9 @@ public class TRStandardConflictCheckerTest
   {
     final TRCompositionalConflictChecker checker =
       new TRCompositionalConflictChecker(factory);
-    //checker.setInternalStateLimit(5000);
-    //checker.setMonolithicStateLimit(100000);
-    //checker.setInternalTransitionLimit(500000);
+    checker.setInternalStateLimit(5000);
+    checker.setMonolithicStateLimit(100000);
+    checker.setInternalTransitionLimit(500000);
     checker.setBlockedEventsSupported(true);
     checker.setFailingEventsSupported(true);
     checker.setSelfloopOnlyEventsSupported(true);
@@ -62,10 +62,9 @@ public class TRStandardConflictCheckerTest
   //# Test Cases
   public void testBigComponent() throws Exception
   {
-    @SuppressWarnings("unused")
     final TRCompositionalConflictChecker checker =
       (TRCompositionalConflictChecker) getModelVerifier();
-    // checker.setInternalStateLimit(1000);
+    checker.setInternalStateLimit(1000);
     final String group = "tests";
     final String subdir = "nasty";
     final String name = "big_component.wmod";

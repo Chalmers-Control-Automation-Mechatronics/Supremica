@@ -72,7 +72,7 @@ public class TRCompositionalConflictChecker
     // TODO Make these configurable
     mPreselectionHeuristic = new PreselectionHeuristicMustL();
     final SelectionHeuristic<TRCandidate> minS = new SelectionHeuristicMinS();
-    mSelectionHeuristic = new ChainSelectionHeuristic<>(minS);
+    mSelectionHeuristic = new ChainSelectionHeuristic<TRCandidate>(minS);
     final ChainTRSimplifier chain = new ChainTRSimplifier();
     final SpecialEventsTRSimplifier special = new SpecialEventsTRSimplifier();
     chain.add(special);
@@ -99,6 +99,36 @@ public class TRCompositionalConflictChecker
 
   //#########################################################################
   //# Interface for net.sourceforge.waters.model.analysis.des.ModelAnalyser
+  @Override
+  public void setNodeLimit(final int limit)
+  {
+    setMonolithicStateLimit(limit);
+    setInternalStateLimit(limit);
+  }
+
+  @Override
+  public int getNodeLimit()
+  {
+    final int limit1 = getMonolithicStateLimit();
+    final int limit2 = getInternalStateLimit();
+    return Math.max(limit1, limit2);
+  }
+
+  @Override
+  public void setTransitionLimit(final int limit)
+  {
+    setMonolithicTransitionLimit(limit);
+    setInternalTransitionLimit(limit);
+  }
+
+  @Override
+  public int getTransitionLimit()
+  {
+    final int limit1 = getInternalTransitionLimit();
+    final int limit2 = getMonolithicTransitionLimit();
+    return Math.max(limit1, limit2);
+  }
+
   @Override
   public boolean supportsNondeterminism()
   {
@@ -176,6 +206,46 @@ public class TRCompositionalConflictChecker
 
   //#########################################################################
   //# Configuration
+  public int getInternalStateLimit()
+  {
+    return mInternalStateLimit;
+  }
+
+  public void setInternalStateLimit(final int limit)
+  {
+    mInternalStateLimit = limit;
+  }
+
+  public int getMonolithicStateLimit()
+  {
+    return super.getNodeLimit();
+  }
+
+  public void setMonolithicStateLimit(final int limit)
+  {
+    super.setNodeLimit(limit);
+  }
+
+  public int getInternalTransitionLimit()
+  {
+    return mInternalTransitionLimit;
+  }
+
+  public void setInternalTransitionLimit(final int limit)
+  {
+    mInternalTransitionLimit = limit;
+  }
+
+  public int getMonolithicTransitionLimit()
+  {
+    return super.getTransitionLimit();
+  }
+
+  public void setMonolithicTransitionLimit(final int limit)
+  {
+    super.setTransitionLimit(limit);
+  }
+
   /**
    * Sets whether blocked events are to be considered in abstraction.
    * @see #isBlockedEventsSupported()
@@ -334,9 +404,12 @@ public class TRCompositionalConflictChecker
     mSynchronousProductBuilder.setPruningDeadlocks(true);
     mSynchronousProductBuilder.setPruningForbiddenEvents(false);
     mSynchronousProductBuilder.setRemovingSelfloops(true);
-    //mSynchronousProductBuilder.setTransitionLimit(limit);
+    mSynchronousProductBuilder.setNodeLimit(mInternalStateLimit);
+    mSynchronousProductBuilder.setTransitionLimit(mInternalTransitionLimit);
 
     mMonolithicAnalyzer.setKindTranslator(translator);
+    mMonolithicAnalyzer.setNodeLimit(getMonolithicStateLimit());
+    mMonolithicAnalyzer.setTransitionLimit(getMonolithicTransitionLimit());
 
     mSubsystemQueue = new PriorityQueue<>();
     mNeedsSimplification = new SimplificationQueue(trs);
@@ -467,12 +540,19 @@ public class TRCompositionalConflictChecker
       }
       final Collection<TRCandidate> candidates =
         mPreselectionHeuristic.collectCandidates(mCurrentSubsystem);
-      final TRCandidate candidate = mSelectionHeuristic.select(candidates);
+      TRCandidate candidate = mSelectionHeuristic.select(candidates);
+      while (candidate != null) {
+        try {
+          computeSynchronousProduct(candidate);
+          break;
+        } catch (final OverflowException exception) {
+          candidates.remove(candidate);
+          candidate = mSelectionHeuristic.select(candidates);
+        }
+      }
       if (candidate == null) {
         break;
-      }
-      computeSynchronousProduct(candidate);
-      if (earlyTerminationCheckCurrentSubsystem()) {
+      } else if (earlyTerminationCheckCurrentSubsystem()) {
         return;
       }
     }
@@ -519,7 +599,6 @@ public class TRCompositionalConflictChecker
       if (remaining > 0) {
         mAlwaysEnabledDetectedInitially = (--remaining == 0);
       }
-      // TODO Update automaton information?
     }
     return simplified;
   }
@@ -748,6 +827,8 @@ public class TRCompositionalConflictChecker
   // Configuration
   private EventProxy mConfiguredDefaultMarking;
   private EventProxy mConfiguredPreconditionMarking;
+  private int mInternalStateLimit;
+  private int mInternalTransitionLimit;
   private boolean mBlockedEventsSupported;
   private boolean mFailingEventsSupported;
   private boolean mSelfloopOnlyEventsSupported;
