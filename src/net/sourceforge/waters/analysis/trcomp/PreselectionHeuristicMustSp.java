@@ -31,7 +31,7 @@ class PreselectionHeuristicMustSp extends PreselectionHeuristic
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.trcomp.PreselectingHeuristic
   @Override
-  public Collection<TRCandidate> collectCandidates(final TRSubsystemInfo subsys)
+  Collection<TRCandidate> collectCandidates(final TRSubsystemInfo subsys)
     throws OverflowException
   {
     final Collection<TREventInfo> events = subsys.getEvents();
@@ -77,11 +77,18 @@ class PreselectionHeuristicMustSp extends PreselectionHeuristic
       if (notAlwaysEnabled == notSelfloopOnly) {
         recordCandidate(notAlwaysEnabled, subsys, candidates);
       } else {
-        if (useNotAlwaysEnabled) {
+        boolean recorded = false;
+        if (useNotAlwaysEnabled && notAlwaysEnabled.size() > 1) {
           recordCandidate(notAlwaysEnabled, subsys, candidates);
+          recorded = true;
         }
-        if (useNotSelfloopOnly) {
+        if (useNotSelfloopOnly && notSelfloopOnly.size() > 1) {
           recordCandidate(notSelfloopOnly, subsys, candidates);
+          recorded = true;
+        }
+        if (!recorded) {
+          final List<TRAutomatonProxy> list = new ArrayList<>(automata);
+          recordCandidate(list, subsys, candidates);
         }
       }
     }

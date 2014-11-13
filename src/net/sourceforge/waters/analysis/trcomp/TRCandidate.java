@@ -97,6 +97,25 @@ public class TRCandidate
     return factory.createProductDESProxy(name, events, mAutomata);
   }
 
+  boolean hasSameEventStatus(final TRCandidate candidate)
+  {
+    final EventEncoding enc1 = mEventEncoding;
+    final EventEncoding enc2 = candidate.mEventEncoding;
+    final int numEvents1 = enc1.getNumberOfProperEvents();
+    final int numEvents2 = enc2.getNumberOfProperEvents();
+    if (numEvents1 != numEvents2) {
+      return false;
+    }
+    for (int e = EventEncoding.NONTAU; e < numEvents1; e++) {
+      final byte status1 = enc1.getProperEventStatus(e);
+      final byte status2 = enc2.getProperEventStatus(e);
+      if (status1 != status2) {
+        return false;
+      }
+    }
+    return true;
+  }
+
 
   //#########################################################################
   //# Interface java.util.Comparable<Candidate>

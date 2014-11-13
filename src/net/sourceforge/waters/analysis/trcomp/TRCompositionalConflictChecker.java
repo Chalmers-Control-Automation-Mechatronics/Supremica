@@ -374,6 +374,11 @@ public class TRCompositionalConflictChecker
         final StateProxy dumpState = AutomatonTools.findDumpState(aut, markings);
         final TRAutomatonProxy tr =
           new TRAutomatonProxy(aut, eventEnc, dumpState, INITIAL_CONFIG);
+        if (!hasInitialState(tr)) {
+          final VerificationResult result = getAnalysisResult();
+          result.setSatisfied(true);
+          return;
+        }
         trs.add(tr);
       }
     }
@@ -424,26 +429,30 @@ public class TRCompositionalConflictChecker
       final Logger logger = getLogger();
       setUp();
       final AnalysisResult result = getAnalysisResult();
-      do {
-        if (logger.isDebugEnabled()) {
-          final String name = mCurrentSubsystem.toString();
-          if (name.length() <= 40) {
-            logger.debug("Processing new subsystem " + name + " ...");
-          } else {
-            logger.debug("Processing new subsystem with " +
-                         mCurrentSubsystem.getNumberOfAutomata() +
-                         " automata ...");
+      if (result.isFinished()) {
+        return result.isSatisfied();
+      } else {
+        do {
+          if (logger.isDebugEnabled()) {
+            final String name = mCurrentSubsystem.toString();
+            if (name.length() <= 40) {
+              logger.debug("Processing new subsystem " + name + " ...");
+            } else {
+              logger.debug("Processing new subsystem with " +
+                           mCurrentSubsystem.getNumberOfAutomata() +
+                           " automata ...");
+            }
           }
-        }
-        analyseCurrentSubsystemCompositionally();
-        if (result.isFinished()) {
-          // TODO Trace expansion ???
-          return result.isSatisfied();
-        }
-        mCurrentSubsystem = mSubsystemQueue.poll();
-      } while (mCurrentSubsystem != null);
-      result.setSatisfied(true);
-      return true;
+          analyseCurrentSubsystemCompositionally();
+          if (result.isFinished()) {
+            // TODO Trace expansion ???
+            return result.isSatisfied();
+          }
+          mCurrentSubsystem = mSubsystemQueue.poll();
+        } while (mCurrentSubsystem != null);
+        result.setSatisfied(true);
+        return true;
+      }
     } catch (final OutOfMemoryError error) {
       throw new OverflowException(error);
     } catch (final StackOverflowError error) {
@@ -507,6 +516,21 @@ public class TRCompositionalConflictChecker
 
   //#########################################################################
   //# Auxiliary Methods
+  private boolean hasInitialState(final TRAutomatonProxy aut)
+  {
+    final ListBufferTransitionRelation rel = aut.getTransitionRelation();
+    boolean hasInit = false;
+    boolean hasAlpha = !rel.isPropositionUsed(PRECONDITION_MARKING);
+    for (int s = 0; s < rel.getNumberOfStates(); s++) {
+      hasInit |= rel.isInitial(s);
+      hasAlpha |= rel.isMarked(s, PRECONDITION_MARKING);
+      if (hasInit && hasAlpha) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   private EventEncoding createInitialEventEncoding(final AutomatonProxy aut)
     throws OverflowException
   {
@@ -546,6 +570,7 @@ public class TRCompositionalConflictChecker
           computeSynchronousProduct(candidate);
           break;
         } catch (final OverflowException exception) {
+          mPreselectionHeuristic.addOverflowCandidate(candidate);
           candidates.remove(candidate);
           candidate = mSelectionHeuristic.select(candidates);
         }
@@ -561,30 +586,38 @@ public class TRCompositionalConflictChecker
 
   private boolean earlyTerminationCheckCurrentSubsystem()
   {
-    boolean allMarked = true;
-    outer:
+    boolean allStatesMarked = true;
     for (final TRAutomatonProxy aut : mCurrentSubsystem.getAutomata()) {
       final ListBufferTransitionRelation rel = aut.getTransitionRelation();
       if (rel.isPropositionUsed(DEFAULT_MARKING)) {
-        allMarked = false;
+        boolean noStatesMarked = true;
         for (int s = 0; s < rel.getNumberOfStates(); s++) {
-          if (rel.isReachable(s) && rel.isMarked(s, DEFAULT_MARKING)) {
-            continue outer;
+          if (rel.isReachable(s)) {
+            if (rel.isMarked(s, DEFAULT_MARKING)) {
+              noStatesMarked = false;
+            } else {
+              allStatesMarked = false;
+            }
+            if (!allStatesMarked && !noStatesMarked) {
+              break;
+            }
           }
         }
-        final AnalysisResult result = getAnalysisResult();
-        result.setSatisfied(false);
-        getLogger().debug("Subsystem is blocking, because " + aut.getName() +
-                          "has no marked states.");
-        return true;
+        if (noStatesMarked) {
+          final AnalysisResult result = getAnalysisResult();
+          result.setSatisfied(false);
+          getLogger().debug("Subsystem is blocking, because " + aut.getName() +
+                            "has no marked states.");
+          return true;
+        }
       }
     }
     // TODO Generalised nonblocking stuff ...
-    if (allMarked) {
+    if (allStatesMarked) {
       final Logger logger = getLogger();
       logger.debug("Subsystem is nonblocking, because all states are marked.");
     }
-    return allMarked;
+    return allStatesMarked;
   }
 
   private boolean simplifyAllAutomataIndividually()
@@ -638,6 +671,10 @@ public class TRCompositionalConflictChecker
     // Update event status ...
     if (simplified || !mAlwaysEnabledDetectedInitially) {
       updateEventStatus(aut, oldStatus);
+    }
+    if (simplified && isTrivialAutomaton(aut)) {
+      logger.debug("Dropping trivial automaton " + aut.getName());
+      mCurrentSubsystem.removeAutomaton(aut, mNeedsSimplification);
     }
     if (rel.getNumberOfStates() != oldNumStates) {
       aut.resetStateNames();
@@ -695,13 +732,43 @@ public class TRCompositionalConflictChecker
     mTRSimplifier.run();
     // Update event status ...
     mNeedsSimplification.setCurrentComposition(candidate);
-    mCurrentSubsystem.addAutomaton(sync);
+    if (isTrivialAutomaton(sync)) {
+      logger.debug("Dropping trivial automaton " + sync.getName());
+    } else {
+      mCurrentSubsystem.addAutomaton(sync);
+    }
     updateEventStatus(sync, oldStatus);
     for (final TRAutomatonProxy aut : candidate.getAutomata()) {
       mCurrentSubsystem.removeAutomaton(aut, mNeedsSimplification);
     }
     mNeedsSimplification.setCurrentComposition(null);
     return sync;
+  }
+
+  private boolean isTrivialAutomaton(final TRAutomatonProxy aut)
+  {
+    final ListBufferTransitionRelation rel = aut.getTransitionRelation();
+    final int numEvents = rel.getNumberOfProperEvents();
+    for (int e = EventEncoding.TAU; e < numEvents; e++) {
+      final byte status = rel.getProperEventStatus(e);
+      if (EventStatus.isUsedEvent(status)) {
+        return false;
+      }
+    }
+    for (int s = 0; s < rel.getNumberOfStates(); s++) {
+      if (rel.isReachable(s)) {
+        if (!rel.isInitial(s)) {
+          return false;
+        } else if (rel.isPropositionUsed(DEFAULT_MARKING) &&
+                   !rel.isMarked(s, DEFAULT_MARKING)) {
+          return false;
+        } else if (rel.isPropositionUsed(PRECONDITION_MARKING) &&
+                   !rel.isMarked(s, PRECONDITION_MARKING)) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   private void updateEventStatus(final TRAutomatonProxy aut,

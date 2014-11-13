@@ -29,7 +29,7 @@ class PreselectionHeuristicMustL extends PreselectionHeuristic
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.trcomp.PreselectingHeuristic
   @Override
-  public Collection<TRCandidate> collectCandidates(final TRSubsystemInfo subsys)
+  Collection<TRCandidate> collectCandidates(final TRSubsystemInfo subsys)
     throws OverflowException
   {
     final Collection<TREventInfo> events = subsys.getEvents(); // unordered!

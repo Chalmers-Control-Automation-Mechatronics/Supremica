@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.Queue;
 import java.util.Set;
 
+import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -163,7 +164,12 @@ class TREventInfo
     final int oldNumDisablingAutomata = mNumDisablingAutomata;
     setAutomatonStatus(aut, newStatus);
     if (mIsBlocked && !wasBlocked) {
-      enqueueAutomataExcept(needsSimplification, null);
+      final EventEncoding enc = aut.getEventEncoding();
+      final int e = enc.getEventCode(mEvent);
+      final byte status = enc.getProperEventStatus(e);
+      enc.setProperEventStatus(e, status | EventStatus.STATUS_UNUSED);
+      removeAutomaton(aut);
+      enqueueAutomataExcept(needsSimplification, aut);
     } else if (mNumNonSelfloopAutomata == 0 && oldNumNonSelfloopAutomata > 0) {
       enqueueAutomataExcept(needsSimplification, null);
     } else if (mIsFailing && !wasFailing) {

@@ -415,10 +415,33 @@ public class ListBufferTransitionRelation
   public ListBufferTransitionRelation(final ListBufferTransitionRelation rel,
                                       final int config)
   {
+    this(rel, rel.mEventStatus.clone(), config);
+  }
+
+  /**
+   * Creates a new transition relation that contains the same states and
+   * transitions as the given transition relation. This copy constructor
+   * constructs a deep copy that does not share any data structures with the
+   * given transition relation.
+   *
+   * @param rel
+   *          The transition relation to be copied.
+   * @param eventStatus
+   *          The event status provider (event encoding) used for the
+   *          copied transition relation.
+   * @param config
+   *          Configuration flags defining which transition buffers are to be
+   *          created in the copy. Should be one of {@link #CONFIG_SUCCESSORS},
+   *          {@link #CONFIG_PREDECESSORS}, or {@link #CONFIG_ALL}.
+   */
+  public ListBufferTransitionRelation(final ListBufferTransitionRelation rel,
+                                      final EventStatusProvider eventStatus,
+                                      final int config)
+  {
     checkConfig(config);
     mName = rel.getName();
     mKind = rel.getKind();
-    mEventStatus = rel.mEventStatus.clone();
+    mEventStatus = eventStatus;
     mStateBuffer = new IntStateBuffer(rel.mStateBuffer, mEventStatus);
     final int numStates = mStateBuffer.getNumberOfStates();
     try {

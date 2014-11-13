@@ -60,12 +60,6 @@ import net.sourceforge.waters.xsd.base.EventKind;
  *     objects will be returned.</LI>
  * </UL>
  *
- * <P>The <CODE>TRAutomatonProxy</CODE> object is to be considered as
- * <STRONG>immutable</STRONG>. While the underlying {@link EventEncoding} and
- * {@link ListBufferTransitionRelation} can be accessed for better performance,
- * any changes to these objects may result in unpredictable behaviour when
- * accessed through the <CODE>TRAutomatonProxy</CODE>.</P>
- *
  * @author Robi Malik
  */
 
@@ -149,7 +143,7 @@ public class TRAutomatonProxy
     final StateEncoding stateEnc = new StateEncoding(aut);
     mTransitionRelation = new ListBufferTransitionRelation
       (aut, mEventEncoding, stateEnc, dumpState, config);
-    mStates = new TRStateList();
+    mStates = null;
     final int numStates = stateEnc.getNumberOfStates();
     mStateNames = new String[numStates];
     for (int s = 0; s < numStates; s++) {
@@ -160,8 +154,11 @@ public class TRAutomatonProxy
 
   public TRAutomatonProxy(final TRAutomatonProxy aut)
   {
-    mEventEncoding = aut.mEventEncoding;
-    mTransitionRelation = aut.mTransitionRelation;
+    mEventEncoding = new EventEncoding(aut.mEventEncoding);
+    final ListBufferTransitionRelation rel = aut.mTransitionRelation;
+    final int config = rel.getConfiguration();
+    mTransitionRelation =
+      new ListBufferTransitionRelation(rel, mEventEncoding, config);
     mStates = null;
     mStateNames = aut.mStateNames;
   }
@@ -663,6 +660,6 @@ public class TRAutomatonProxy
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 8587507142812682382L;
+  private static final long serialVersionUID = 8587507142812682383L;
 
 }

@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.trcomp;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,14 +32,14 @@ public abstract class PreselectionHeuristic
 
   //#########################################################################
   //# Invocation
-  public abstract Collection<TRCandidate> collectCandidates
+  abstract Collection<TRCandidate> collectCandidates
     (TRSubsystemInfo subsys)
     throws AnalysisException;
 
 
   //#########################################################################
   //# Auxiliary Methods
-  protected void recordCandidate
+  void recordCandidate
     (final List<TRAutomatonProxy> automata,
      final TRSubsystemInfo subsys,
      final Map<List<TRAutomatonProxy>,TRCandidate> candidates)
@@ -47,8 +48,20 @@ public abstract class PreselectionHeuristic
     Collections.sort(automata);
     if (!candidates.containsKey(automata)) {
       final TRCandidate candidate = new TRCandidate(automata, subsys);
-      candidates.put(automata, candidate);
+      final TRCandidate overflow = mOverflowCandidates.get(automata);
+      if (overflow == null) {
+        candidates.put(automata, candidate);
+      } else if (!candidate.hasSameEventStatus(overflow)) {
+        mOverflowCandidates.remove(automata);
+        candidates.put(automata, candidate);
+      }
     }
+  }
+
+  void addOverflowCandidate(final TRCandidate candidate)
+  {
+    final List<TRAutomatonProxy> automata = candidate.getAutomata();
+    mOverflowCandidates.put(automata, candidate);
   }
 
 
@@ -77,5 +90,11 @@ public abstract class PreselectionHeuristic
     final Class<?> clazz = getClass();
     return Logger.getLogger(clazz);
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private final Map<List<TRAutomatonProxy>,TRCandidate> mOverflowCandidates =
+    new HashMap<>();
 
 }
