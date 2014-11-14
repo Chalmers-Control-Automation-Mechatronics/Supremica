@@ -49,7 +49,7 @@ public abstract class TraceElement
    * @param  comment      A comment describing the new trace,
    *                      or <CODE>null</CODE>.
    * @param  location     The URI to be associated with the new
-   *                      document, or <CODE>null</CODE>.
+   *                      trace, or <CODE>null</CODE>.
    * @param  des          The product DES for which this trace is
    *                      generated.
    * @param  automata     The set of automata for the new trace,
@@ -135,6 +135,7 @@ public abstract class TraceElement
   /**
    * Returns a copy of this trace.
    */
+  @Override
   public TraceElement clone()
   {
     return (TraceElement) super.clone();
@@ -143,21 +144,25 @@ public abstract class TraceElement
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.des.TraceProxy
+  @Override
   public ProductDESProxy getProductDES()
   {
     return mProductDES;
   }
 
+  @Override
   public Set<AutomatonProxy> getAutomata()
   {
     return mAutomata;
   }
 
+  @Override
   public List<TraceStepProxy> getTraceSteps()
   {
     return mTraceSteps;
   }
 
+  @Override
   public List<EventProxy> getEvents()
   {
     if (mTraceEvents == null) {
@@ -181,6 +186,7 @@ public abstract class TraceElement
     //#######################################################################
     //# Overrides from abstract class
     //# net.sourceforge.waters.model.base.ImmutableOrderedSet
+    @Override
     protected DuplicateNameException createDuplicateName(final String name)
     {
       return new DuplicateNameException
@@ -207,11 +213,13 @@ public abstract class TraceElement
 
     //#######################################################################
     //# Interface java.util.List
+    @Override
     public int size()
     {
       return mTraceSteps.size() - 1;
     }
 
+    @Override
     public EventProxy get(final int index)
     {
       if (index >= 0) {

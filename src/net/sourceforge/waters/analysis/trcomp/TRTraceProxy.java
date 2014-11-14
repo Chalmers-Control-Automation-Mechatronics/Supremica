@@ -1,0 +1,432 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.trcomp
+//# CLASS:   TRTraceProxy
+//###########################################################################
+//# $Id$
+//###########################################################################
+
+package net.sourceforge.waters.analysis.trcomp;
+
+import java.net.URI;
+import java.util.AbstractList;
+import java.util.AbstractMap;
+import java.util.AbstractSet;
+import java.util.Arrays;
+import java.util.ConcurrentModificationException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
+
+import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyVisitor;
+import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.des.TraceStepProxy;
+import net.sourceforge.waters.plain.base.DocumentElement;
+import net.sourceforge.waters.plain.base.Element;
+
+
+/**
+ * @author Robi Malik
+ */
+
+public abstract class TRTraceProxy
+  extends DocumentElement
+  implements TraceProxy
+{
+
+  //#########################################################################
+  //# Constructor
+  /**
+   * Creates a new empty trace.
+   * @param  name         The name to be given to the new trace.
+   * @param  comment      A comment describing the new trace,
+   *                      or <CODE>null</CODE>.
+   * @param  location     The URI to be associated with the new
+   *                      trace, or <CODE>null</CODE>.
+   * @param  des          The product DES for which this trace is
+   *                      generated.
+   */
+  TRTraceProxy(final String name,
+               final String comment,
+               final URI location,
+               final ProductDESProxy des)
+  {
+    super(name, comment, location);
+    mProductDES = des;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.des.TraceProxy
+  @Override
+  public ProductDESProxy getProductDES()
+  {
+    return mProductDES;
+  }
+
+  @Override
+  public Set<AutomatonProxy> getAutomata()
+  {
+    return new AutomataSet();
+  }
+
+  @Override
+  public List<EventProxy> getEvents()
+  {
+    return Arrays.asList(mEvents);
+  }
+
+  @Override
+  public List<TraceStepProxy> getTraceSteps()
+  {
+    return new TraceStepList();
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private int getNumberOfAutomata()
+  {
+    int count = 0;
+    for (final TRAbstractionStep step : mTraceData.keySet()) {
+      if (step instanceof TRInputStep) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  private void ensureAutomataMap()
+  {
+    if (mAutomataMap == null) {
+      createAutomataMap();
+    }
+  }
+
+  private void createAutomataMap()
+  {
+    mAutomataMap = new HashMap<>(getNumberOfAutomata());
+    for (final TRAbstractionStep step : mTraceData.keySet()) {
+      if (step instanceof TRInputStep) {
+        final TRInputStep inputStep = (TRInputStep) step;
+        final AutomatonProxy aut = inputStep.getInputAutomaton();
+        mAutomataMap.put(aut, inputStep);
+      }
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class AutomataSet
+  private class AutomataSet extends AbstractSet<AutomatonProxy>
+  {
+    //#######################################################################
+    //# Interface java.util.Set<AutomatonProxy>
+    @Override
+    public Iterator<AutomatonProxy> iterator()
+    {
+      final Iterator<TRAbstractionStep> inner = mTraceData.keySet().iterator();
+      return new AutomataIterator(inner);
+    }
+
+    @Override
+    public int size()
+    {
+      return getNumberOfAutomata();
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class AutomataSet
+  private class AutomataIterator implements Iterator<AutomatonProxy>
+  {
+    //#######################################################################
+    //# Constructor
+    private AutomataIterator(final Iterator<TRAbstractionStep> inner)
+    {
+      mInnerIterator = inner;
+    }
+
+    //#######################################################################
+    //# Interface java.util.Iterator<AutomatonProxy>
+    @Override
+    public boolean hasNext()
+    {
+      if (mNext != null) {
+        return true;
+      } else {
+        while (mInnerIterator.hasNext()) {
+          final TRAbstractionStep next = mInnerIterator.next();
+          if (next instanceof TRInputStep) {
+            mNext = (TRInputStep) next;
+            return true;
+          }
+        }
+        return false;
+      }
+    }
+
+    @Override
+    public AutomatonProxy next()
+    {
+      if (hasNext()) {
+        final AutomatonProxy aut = mNext.getInputAutomaton();
+        mNext = null;
+        return aut;
+      } else {
+        throw new NoSuchElementException
+          ("Attempting to read past end of TRTraceProxy automata list!");
+      }
+    }
+
+    @Override
+    public void remove()
+    {
+      mInnerIterator.remove();
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final Iterator<TRAbstractionStep> mInnerIterator;
+    private TRInputStep mNext;
+  }
+
+
+  //#########################################################################
+  //# Inner Class StepList
+  private class TraceStepList extends AbstractList<TraceStepProxy>
+  {
+    //#######################################################################
+    //# Interface java.util.List<TraceStepProxy>
+    @Override
+    public TraceStepProxy get(final int index)
+    {
+      if (index >= 0 && index <= mEvents.length) {
+        return new TraceStep(index);
+      } else {
+        throw new ArrayIndexOutOfBoundsException(index);
+      }
+    }
+
+    @Override
+    public int size()
+    {
+      return mEvents.length + 1;
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class TraceStep
+  private class TraceStep
+    extends Element
+    implements TraceStepProxy
+  {
+    //#######################################################################
+    //# Constructor
+    private TraceStep(final int index)
+    {
+      mIndex = index;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.base.Proxy
+    @Override
+    public Class<? extends Proxy> getProxyInterface()
+    {
+      return TraceStepProxy.class;
+    }
+
+    @Override
+    public Object acceptVisitor(final ProxyVisitor visitor)
+      throws VisitorException
+    {
+      final ProductDESProxyVisitor desVisitor =
+        (ProductDESProxyVisitor) visitor;
+      return desVisitor.visitTraceStepProxy(this);
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.des.TraceStepProxy
+    @Override
+    public EventProxy getEvent()
+    {
+      return mIndex == 0 ? null : mEvents[mIndex - 1];
+    }
+
+    @Override
+    public Map<AutomatonProxy,StateProxy> getStateMap()
+    {
+      return new TraceStepMap(mIndex);
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final int mIndex;
+
+    //#######################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 7069861297185779685L;
+  }
+
+
+  //#########################################################################
+  //# Inner Class TraceStepMap
+  private class TraceStepMap
+    extends AbstractMap<AutomatonProxy,StateProxy>
+  {
+    //#######################################################################
+    //# Constructor
+    private TraceStepMap(final int index)
+    {
+      mIndex = index;
+    }
+
+    //#######################################################################
+    //# Interface java.util.Map<AutomatonProxy,StateProxy>
+    @Override
+    public Set<Map.Entry<AutomatonProxy,StateProxy>> entrySet()
+    {
+      return new TraceStepSet(mIndex);
+    }
+
+    @Override
+    public StateProxy get(final Object aut)
+    {
+      ensureAutomataMap();
+      TRInputStep step = mAutomataMap.get(aut);
+      if (step == null || step.getInputAutomaton() != aut) {
+        createAutomataMap();
+        step = mAutomataMap.get(aut);
+      }
+      final int[] states = mTraceData.get(step);
+      final int s = states[mIndex];
+      final StateEncoding enc = step.getStateEncoding();
+      return enc.getState(s);
+    }
+
+    @Override
+    public int size()
+    {
+      return getNumberOfAutomata();
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final int mIndex;
+  }
+
+
+  //#########################################################################
+  //# Inner Class TraceStepSet
+  private class TraceStepSet
+    extends AbstractSet<Map.Entry<AutomatonProxy,StateProxy>>
+  {
+    //#######################################################################
+    //# Constructor
+    private TraceStepSet(final int index)
+    {
+      mIndex = index;
+    }
+
+    //#######################################################################
+    //# Interface java.util.Set<Map.Entry<AutomatonProxy,StateProxy>>
+    @Override
+    public Iterator<Map.Entry<AutomatonProxy,StateProxy>> iterator()
+    {
+      return new TraceStepIterator(mIndex);
+    }
+
+    @Override
+    public int size()
+    {
+      return getNumberOfAutomata();
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final int mIndex;
+  }
+
+
+  //#########################################################################
+  //# Inner Class TraceStepIterator
+  private class TraceStepIterator
+    implements Iterator<Map.Entry<AutomatonProxy,StateProxy>>
+  {
+    //#######################################################################
+    //# Constructor
+    private TraceStepIterator(final int index)
+    {
+      ensureAutomataMap();
+      mInnerIterator = mAutomataMap.entrySet().iterator();
+      mIndex = index;
+    }
+
+    //#######################################################################
+    //# Interface java.util.Iterator<Map.Entry<AutomatonProxy,StateProxy>>
+    @Override
+    public boolean hasNext()
+    {
+      return mInnerIterator.hasNext();
+    }
+
+    @Override
+    public Map.Entry<AutomatonProxy,StateProxy> next()
+    {
+      final Map.Entry<AutomatonProxy,TRInputStep> innerEntry =
+        mInnerIterator.next();
+      final AutomatonProxy aut = innerEntry.getKey();
+      final TRInputStep step = innerEntry.getValue();
+      if (step.getInputAutomaton() != aut) {
+        throw new ConcurrentModificationException
+          ("Attempting to modify TRTraceProxy while iterating!");
+      }
+      final int[] states = mTraceData.get(step);
+      final int s = states[mIndex];
+      final StateEncoding enc = step.getStateEncoding();
+      final StateProxy state = enc.getState(s);
+      return new AbstractMap.SimpleEntry<>(aut, state);
+    }
+
+    @Override
+    public void remove()
+    {
+      throw new UnsupportedOperationException
+        ("TRTraceProxy does not support step modification!");
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final Iterator<Map.Entry<AutomatonProxy,TRInputStep>> mInnerIterator;
+    private final int mIndex;
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final ProductDESProxy mProductDES;
+  private EventProxy[] mEvents;
+  private Map<TRAbstractionStep,int[]> mTraceData;
+
+  private Map<AutomatonProxy,TRInputStep> mAutomataMap;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 6433743484084272294L;
+
+}

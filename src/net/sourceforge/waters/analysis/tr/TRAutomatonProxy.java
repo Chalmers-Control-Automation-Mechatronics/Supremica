@@ -139,8 +139,17 @@ public class TRAutomatonProxy
                           final int config)
     throws OverflowException
   {
+    this(aut, eventEnc, new StateEncoding(aut), dumpState, config);
+  }
+
+  public TRAutomatonProxy(final AutomatonProxy aut,
+                          final EventEncoding eventEnc,
+                          final StateEncoding stateEnc,
+                          final StateProxy dumpState,
+                          final int config)
+    throws OverflowException
+  {
     mEventEncoding = eventEnc;
-    final StateEncoding stateEnc = new StateEncoding(aut);
     mTransitionRelation = new ListBufferTransitionRelation
       (aut, mEventEncoding, stateEnc, dumpState, config);
     mStates = null;
@@ -162,6 +171,7 @@ public class TRAutomatonProxy
     mStates = null;
     mStateNames = aut.mStateNames;
   }
+
 
 
   //#########################################################################
