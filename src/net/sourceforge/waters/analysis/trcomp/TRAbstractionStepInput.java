@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.trcomp
-//# CLASS:   TRInputStep
+//# CLASS:   TRAbstractionStepInput
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -26,17 +26,17 @@ import net.sourceforge.waters.model.des.StateProxy;
  * @author Robi Malik
  */
 
-class TRInputStep
+class TRAbstractionStepInput
   extends TRAbstractionStep
-  implements Comparable<TRInputStep>
+  implements Comparable<TRAbstractionStepInput>
 {
 
   //#########################################################################
   //# Constructor
-  TRInputStep(final AutomatonProxy aut,
-              final EventEncoding enc,
-              final StateProxy dumpState,
-              final int config)
+  TRAbstractionStepInput(final AutomatonProxy aut,
+                         final EventEncoding enc,
+                         final StateProxy dumpState,
+                         final int config)
   {
     mInputAutomaton = aut;
     mEventEncoding = enc;
@@ -87,13 +87,14 @@ class TRInputStep
   @Override
   public void expandTrace(final TRTraceProxy trace)
   {
+    trace.addInputAutomaton(this);
   }
 
 
   //#########################################################################
   //# Interface java.util.Comparable<TRInputStep>
   @Override
-  public int compareTo(final TRInputStep step)
+  public int compareTo(final TRAbstractionStepInput step)
   {
     return mInputAutomaton.compareTo(step.mInputAutomaton);
   }

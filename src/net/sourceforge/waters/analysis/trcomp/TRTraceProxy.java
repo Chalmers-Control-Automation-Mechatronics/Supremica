@@ -14,7 +14,6 @@ import java.util.AbstractList;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.Arrays;
-import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -65,8 +64,18 @@ public abstract class TRTraceProxy
   {
     super(name, comment, location);
     mProductDES = des;
+    mEvents = new EventProxy[0];
+    mTraceData = new HashMap<>();
+    mAutomataMap = new HashMap<>();
   }
 
+
+  //#########################################################################
+  //# Simple Access
+  int getNumberOfSteps()
+  {
+    return mEvents.length + 1;
+  }
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.des.TraceProxy
@@ -96,35 +105,37 @@ public abstract class TRTraceProxy
 
 
   //#########################################################################
+  //# Trace Expansion
+  void addInputAutomaton(final TRAbstractionStepInput step)
+  {
+    final TRAbstractionStep succ = step.getSuccessor();
+    final int[] states = mTraceData.remove(succ);
+    assert states != null;
+    mTraceData.put(step, states);
+    final AutomatonProxy aut = step.getInputAutomaton();
+    mAutomataMap.put(aut, step);
+  }
+
+  void addDroppedAutomaton(final TRAbstractionStepDrop step)
+  {
+    final int numSteps = getNumberOfSteps();
+    final int[] states = new int[numSteps];
+    Arrays.fill(states, step.getInitialState());
+    mTraceData.put(step, states);
+  }
+
+
+  //#########################################################################
   //# Auxiliary Methods
   private int getNumberOfAutomata()
   {
     int count = 0;
     for (final TRAbstractionStep step : mTraceData.keySet()) {
-      if (step instanceof TRInputStep) {
+      if (step instanceof TRAbstractionStepInput) {
         count++;
       }
     }
     return count;
-  }
-
-  private void ensureAutomataMap()
-  {
-    if (mAutomataMap == null) {
-      createAutomataMap();
-    }
-  }
-
-  private void createAutomataMap()
-  {
-    mAutomataMap = new HashMap<>(getNumberOfAutomata());
-    for (final TRAbstractionStep step : mTraceData.keySet()) {
-      if (step instanceof TRInputStep) {
-        final TRInputStep inputStep = (TRInputStep) step;
-        final AutomatonProxy aut = inputStep.getInputAutomaton();
-        mAutomataMap.put(aut, inputStep);
-      }
-    }
   }
 
 
@@ -170,8 +181,8 @@ public abstract class TRTraceProxy
       } else {
         while (mInnerIterator.hasNext()) {
           final TRAbstractionStep next = mInnerIterator.next();
-          if (next instanceof TRInputStep) {
-            mNext = (TRInputStep) next;
+          if (next instanceof TRAbstractionStepInput) {
+            mNext = (TRAbstractionStepInput) next;
             return true;
           }
         }
@@ -201,12 +212,12 @@ public abstract class TRTraceProxy
     //#######################################################################
     //# Data Members
     private final Iterator<TRAbstractionStep> mInnerIterator;
-    private TRInputStep mNext;
+    private TRAbstractionStepInput mNext;
   }
 
 
   //#########################################################################
-  //# Inner Class StepList
+  //# Inner Class TraceStepList
   private class TraceStepList extends AbstractList<TraceStepProxy>
   {
     //#######################################################################
@@ -224,7 +235,7 @@ public abstract class TRTraceProxy
     @Override
     public int size()
     {
-      return mEvents.length + 1;
+      return getNumberOfSteps();
     }
   }
 
@@ -306,12 +317,9 @@ public abstract class TRTraceProxy
     @Override
     public StateProxy get(final Object aut)
     {
-      ensureAutomataMap();
-      TRInputStep step = mAutomataMap.get(aut);
-      if (step == null || step.getInputAutomaton() != aut) {
-        createAutomataMap();
-        step = mAutomataMap.get(aut);
-      }
+      final TRAbstractionStepInput step = mAutomataMap.get(aut);
+      assert step != null;
+      assert step.getInputAutomaton() == aut;
       final int[] states = mTraceData.get(step);
       final int s = states[mIndex];
       final StateEncoding enc = step.getStateEncoding();
@@ -371,7 +379,6 @@ public abstract class TRTraceProxy
     //# Constructor
     private TraceStepIterator(final int index)
     {
-      ensureAutomataMap();
       mInnerIterator = mAutomataMap.entrySet().iterator();
       mIndex = index;
     }
@@ -387,14 +394,11 @@ public abstract class TRTraceProxy
     @Override
     public Map.Entry<AutomatonProxy,StateProxy> next()
     {
-      final Map.Entry<AutomatonProxy,TRInputStep> innerEntry =
+      final Map.Entry<AutomatonProxy,TRAbstractionStepInput> innerEntry =
         mInnerIterator.next();
       final AutomatonProxy aut = innerEntry.getKey();
-      final TRInputStep step = innerEntry.getValue();
-      if (step.getInputAutomaton() != aut) {
-        throw new ConcurrentModificationException
-          ("Attempting to modify TRTraceProxy while iterating!");
-      }
+      final TRAbstractionStepInput step = innerEntry.getValue();
+      assert step.getInputAutomaton() == aut;
       final int[] states = mTraceData.get(step);
       final int s = states[mIndex];
       final StateEncoding enc = step.getStateEncoding();
@@ -411,7 +415,8 @@ public abstract class TRTraceProxy
 
     //#######################################################################
     //# Data Members
-    private final Iterator<Map.Entry<AutomatonProxy,TRInputStep>> mInnerIterator;
+    private final Iterator<Map.Entry<AutomatonProxy,TRAbstractionStepInput>>
+      mInnerIterator;
     private final int mIndex;
   }
 
@@ -419,10 +424,9 @@ public abstract class TRTraceProxy
   //#########################################################################
   //# Data Members
   private final ProductDESProxy mProductDES;
-  private EventProxy[] mEvents;
-  private Map<TRAbstractionStep,int[]> mTraceData;
-
-  private Map<AutomatonProxy,TRInputStep> mAutomataMap;
+  private final EventProxy[] mEvents;
+  private final Map<TRAbstractionStep,int[]> mTraceData;
+  private final Map<AutomatonProxy,TRAbstractionStepInput> mAutomataMap;
 
 
   //#########################################################################

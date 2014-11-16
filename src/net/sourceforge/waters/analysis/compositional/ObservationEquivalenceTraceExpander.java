@@ -116,7 +116,7 @@ public class ObservationEquivalenceTraceExpander extends TRTraceExpander
    * @param crucialStep
    *         Search record containing code of the event and state number of
    *         the target state in the simplified automaton (code of state
-   *         class), with -1 request search for an alpha-marked state.
+   *         class), with -1 requesting search for an alpha-marked state.
    * @return Search record describing the trace from source to
    *         target, in reverse order. The last entry in the list represents
    *         the first step after the source state, with its event and target
