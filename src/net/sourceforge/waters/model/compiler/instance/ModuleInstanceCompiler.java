@@ -944,7 +944,7 @@ public class ModuleInstanceCompiler
       addSourceInfo(newvar, var);
       return newvar;
     } catch (final EvalException exception) {
-      exception.provideLocation(var); // ???
+      exception.provideLocation(var);
       throw wrap(exception);
     }
   }

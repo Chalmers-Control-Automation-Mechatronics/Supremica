@@ -20,6 +20,7 @@ import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.compiler.context.SourceInfoCloner;
 import net.sourceforge.waters.model.compiler.efa.EFACompiler;
 import net.sourceforge.waters.model.compiler.graph.ModuleGraphCompiler;
+import net.sourceforge.waters.model.compiler.groupnode.GroupNodeCompiler;
 import net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -135,15 +136,23 @@ public class ModuleCompiler extends AbortableCompiler
       ModuleProxy intermediate = mInstanceCompiler.compile(bindings);
       final boolean efa = mInstanceCompiler.getHasEFAElements();
       mInstanceCompiler = null;
+
+      checkAbort();
+      mCompilationInfo.shift();
+      mGroupNodeCompiler = new GroupNodeCompiler(modfactory, mCompilationInfo, intermediate);
+      intermediate = mGroupNodeCompiler.compile();
+      mGroupNodeCompiler = null;
+      checkAbort();
+
       if (efa && mIsExpandingEFATransitions) {
-        mCompilationInfo.shift();
+        //mCompilationInfo.shift();
         mEFACompiler =
           new EFACompiler(modfactory, mCompilationInfo, intermediate);
         checkAbort();
         intermediate = mEFACompiler.compile();
         mEFACompiler = null;
       }
-      mCompilationInfo.shift();
+      //mCompilationInfo.shift();
       mGraphCompiler =
         new ModuleGraphCompiler(mFactory, mCompilationInfo, intermediate);
       mGraphCompiler.setOptimizationEnabled(mIsOptimizationEnabled);
@@ -297,6 +306,7 @@ public class ModuleCompiler extends AbortableCompiler
   private CompilationInfo mCompilationInfo;
   private boolean mCompilationInfoIsDirty;
   private ModuleInstanceCompiler mInstanceCompiler;
+  private GroupNodeCompiler mGroupNodeCompiler;
   private EFACompiler mEFACompiler;
   private ModuleGraphCompiler mGraphCompiler;
 
