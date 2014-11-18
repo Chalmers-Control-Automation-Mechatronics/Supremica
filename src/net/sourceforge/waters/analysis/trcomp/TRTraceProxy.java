@@ -77,6 +77,13 @@ public abstract class TRTraceProxy
     return mEvents.length + 1;
   }
 
+  int getState(final TRAbstractionStep step, final int index)
+  {
+    final int[] states = mTraceData.get(step);
+    return states[index];
+  }
+
+
   //#########################################################################
   //# Interface net.sourceforge.waters.model.des.TraceProxy
   @Override
@@ -122,6 +129,32 @@ public abstract class TRTraceProxy
     final int[] states = new int[numSteps];
     Arrays.fill(states, step.getInitialState());
     mTraceData.put(step, states);
+  }
+
+  void expandPartitionStep(final TRAbstractionStepPartition step,
+                           final int[] stepStates,
+                           final EventProxy[] newEvents)
+  {
+    final TRAbstractionStep succ = step.getSuccessor();
+    mTraceData.remove(succ);
+    final int numStates = stepStates.length;
+    for (final Map.Entry<TRAbstractionStep,int[]> entry : mTraceData.entrySet()) {
+      final int[] oldStates = entry.getValue();
+      final int[] newStates = new int[numStates];
+      newStates[0] = oldStates[0];
+      int oldIndex = 0;
+      int newIndex = 0;
+      for (final EventProxy event : newEvents) {
+        if (event == mEvents[oldIndex]) {
+          oldIndex++;
+        }
+        newIndex++;
+        newStates[newIndex] = oldStates[oldIndex];
+      }
+      entry.setValue(newStates);
+    }
+    mTraceData.put(step, stepStates);
+    mEvents = newEvents;
   }
 
 
@@ -424,7 +457,7 @@ public abstract class TRTraceProxy
   //#########################################################################
   //# Data Members
   private final ProductDESProxy mProductDES;
-  private final EventProxy[] mEvents;
+  private EventProxy[] mEvents;
   private final Map<TRAbstractionStep,int[]> mTraceData;
   private final Map<AutomatonProxy,TRAbstractionStepInput> mAutomataMap;
 

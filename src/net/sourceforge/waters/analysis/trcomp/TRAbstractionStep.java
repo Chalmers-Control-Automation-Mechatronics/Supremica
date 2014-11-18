@@ -12,7 +12,7 @@ package net.sourceforge.waters.analysis.trcomp;
 import java.util.Collection;
 
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
-import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 
 
 /**
@@ -34,33 +34,43 @@ abstract class TRAbstractionStep
   //# Interface Methods
   abstract Collection<TRAbstractionStep> getPredecessors();
 
-  abstract TRAbstractionStep getSuccessor();
+  abstract TRAutomatonProxy createOutputAutomaton(int preferredConfig)
+    throws AnalysisException;
 
-  abstract TRAutomatonProxy createOutputAutomaton()
-    throws OverflowException;
-
-  abstract void expandTrace(TRTraceProxy trace);
+  abstract void expandTrace(TRTraceProxy trace)
+    throws AnalysisException;
 
 
   //#########################################################################
   //# Access Methods
+  TRAutomatonProxy getOutputAutomaton(final int preferredConfig)
+    throws AnalysisException
+  {
+    if (mOutputAutomaton == null) {
+      mOutputAutomaton = createOutputAutomaton(preferredConfig);
+    }
+    return mOutputAutomaton;
+  }
+
   void setOutputAutomaton(final TRAutomatonProxy aut)
   {
     mOutputAutomaton = aut;
   }
 
-  TRAutomatonProxy getOutputAutomaton()
-    throws OverflowException
+  TRAbstractionStep getSuccessor()
   {
-    if (mOutputAutomaton == null) {
-      mOutputAutomaton = createOutputAutomaton();
-    }
-    return mOutputAutomaton;
+    return mSuccessor;
+  }
+
+  void setSuccessor(final TRAbstractionStep step)
+  {
+    mSuccessor = step;
   }
 
 
   //#########################################################################
   //# Data Members
   private TRAutomatonProxy mOutputAutomaton;
+  private TRAbstractionStep mSuccessor;
 
 }

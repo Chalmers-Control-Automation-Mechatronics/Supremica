@@ -74,13 +74,7 @@ class TRAbstractionStepDrop
   }
 
   @Override
-  public TRAbstractionStep getSuccessor()
-  {
-    return null;
-  }
-
-  @Override
-  public TRAutomatonProxy createOutputAutomaton()
+  public TRAutomatonProxy createOutputAutomaton(final int preferredConfig)
     throws OverflowException
   {
     final EventEncoding enc = new EventEncoding();
@@ -90,8 +84,7 @@ class TRAbstractionStepDrop
       new ListBufferTransitionRelation(":dummy",
                                        ComponentKind.PLANT,
                                        enc, numStates, dumpIndex,
-                                       ListBufferTransitionRelation.
-                                       CONFIG_SUCCESSORS);
+                                       preferredConfig);
     for (int s = 0; s < numStates; s++) {
       final boolean init = s == mInitialState;
       rel.setReachable(s, init);
@@ -108,7 +101,7 @@ class TRAbstractionStepDrop
 
 
   //#########################################################################
-  //# Instance Variables
+  //# Data Members
   private final TRAbstractionStep mPredecessor;
   private final int mInitialState;
 

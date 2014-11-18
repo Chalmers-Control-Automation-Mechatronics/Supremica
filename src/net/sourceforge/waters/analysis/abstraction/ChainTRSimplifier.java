@@ -85,7 +85,7 @@ public class ChainTRSimplifier
         return result;
       }
     }
-    return 0;
+    return getPreferredOutputConfiguration();
   }
 
   @Override

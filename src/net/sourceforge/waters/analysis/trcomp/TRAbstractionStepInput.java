@@ -35,13 +35,11 @@ class TRAbstractionStepInput
   //# Constructor
   TRAbstractionStepInput(final AutomatonProxy aut,
                          final EventEncoding enc,
-                         final StateProxy dumpState,
-                         final int config)
+                         final StateProxy dumpState)
   {
     mInputAutomaton = aut;
     mEventEncoding = enc;
     mDumpState = dumpState;
-    mInitialConfiguration = config;
   }
 
 
@@ -67,13 +65,7 @@ class TRAbstractionStepInput
   }
 
   @Override
-  public TRAbstractionStep getSuccessor()
-  {
-    return mSuccessor;
-  }
-
-  @Override
-  public TRAutomatonProxy createOutputAutomaton()
+  public TRAutomatonProxy createOutputAutomaton(final int preferredConfig)
     throws OverflowException
   {
     mStateEncoding = new StateEncoding(mInputAutomaton);
@@ -81,7 +73,7 @@ class TRAbstractionStepInput
                                 mEventEncoding,
                                 mStateEncoding,
                                 mDumpState,
-                                mInitialConfiguration);
+                                preferredConfig);
   }
 
   @Override
@@ -101,13 +93,11 @@ class TRAbstractionStepInput
 
 
   //#########################################################################
-  //# Instance Variables
+  //# Data Members
   private final AutomatonProxy mInputAutomaton;
   private final EventEncoding mEventEncoding;
   private final StateProxy mDumpState;
-  private final int mInitialConfiguration;
 
   private StateEncoding mStateEncoding;
-  private TRAbstractionStep mSuccessor;
 
 }
