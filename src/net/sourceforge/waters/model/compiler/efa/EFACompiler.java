@@ -66,7 +66,7 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
 
 
 /**
- * <P>The second pass of the compiler.</P>
+ * <P>The third pass of the compiler.</P>
  *
  * <P>This compiler accepts a module ({@link ModuleProxy}) as input and
  * produces another module as output. It expands all guard/action blocks by

@@ -122,28 +122,30 @@ public abstract class AbstractCompilerTest
     compile("handwritten", "colours");
   }
 
-  public void testCompile_empty_intrange()
-    throws IOException, WatersException
+  public void testCompile_empty_intrange() throws IOException,
+    WatersException
   {
     compile("tests", "nasty", "empty_intrange");
   }
 
-  public void testCompile_empty_prop()
-    throws IOException, WatersException
+  public void testCompile_empty_prop() throws IOException, WatersException
   {
     compile("tests", "nasty", "empty_prop");
   }
 
-  public void testCompile_empty_spec()
-    throws IOException, WatersException
+  public void testCompile_empty_spec() throws IOException, WatersException
   {
     compile("tests", "nasty", "empty_spec");
   }
 
-  public void testCompile_machine()
-    throws IOException, WatersException
+  public void testCompile_machine() throws IOException, WatersException
   {
     compile("handwritten", "machine");
+  }
+
+  public void testCompile_nested_groups() throws IOException, WatersException
+  {
+    compile("tests", "nasty", "nested_groups");
   }
 
   public void testCompile_nodegroup1()
