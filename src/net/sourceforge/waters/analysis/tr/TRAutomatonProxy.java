@@ -194,6 +194,12 @@ public class TRAutomatonProxy
     return mStates.get(stateIndex);
   }
 
+  public int getStateIndex(final StateProxy state)
+  {
+    final TRState trState = (TRState) state;
+    return trState.getStateIndex();
+  }
+
   /**
    * Ensures that the event encoding contains a silent event with code
    * {@link EventEncoding#TAU} if this event code is in use.
@@ -437,7 +443,7 @@ public class TRAutomatonProxy
     //# Constructor
     private TRStateList()
     {
-      mStates = new StateProxy[mTransitionRelation.getNumberOfStates()];
+      mStates = new TRState[mTransitionRelation.getNumberOfStates()];
       mMarkings = null;
     }
 
@@ -464,9 +470,9 @@ public class TRAutomatonProxy
 
     //#######################################################################
     //# Auxiliary Methods
-    private StateProxy createState(final int index)
+    private TRState createState(final int index)
     {
-      StateProxy state = mStates[index];
+      TRState state = mStates[index];
       if (state == null) {
         mStates[index] = state = new TRState(index);
       }
@@ -524,7 +530,7 @@ public class TRAutomatonProxy
 
     //#######################################################################
     //# Data Members
-    private final StateProxy[] mStates;
+    private final TRState[] mStates;
     private TLongObjectHashMap<Collection<EventProxy>> mMarkings;
   }
 

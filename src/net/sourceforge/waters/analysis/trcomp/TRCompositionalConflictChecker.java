@@ -691,31 +691,13 @@ public class TRCompositionalConflictChecker
       logger.debug("Composing " + candidate + " ...");
     }
     // Set up event encoding ...
-    final EventEncoding rawEncoding = candidate.getEventEncoding();
-    final int numEvents = rawEncoding.getNumberOfProperEvents();
-    int numProperEvents = 0;
-    for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
-      final byte status = rawEncoding.getProperEventStatus(e);
-      if (!EventStatus.isLocalEvent(status)) {
-        numProperEvents++;
-      }
-    }
-    final EventEncoding syncEncoding = new EventEncoding();
-    final byte[] oldStatus = new byte[numProperEvents + 1];
-    for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
-      final EventProxy event = rawEncoding.getProperEvent(e);
-      final byte status = rawEncoding.getProperEventStatus(e);
-      if (EventStatus.isLocalEvent(status)) {
-        syncEncoding.setProperEventStatus(EventEncoding.TAU, status);
-        syncEncoding.addSilentEvent(event);
-      } else {
-        final int code = syncEncoding.addProperEvent(event, status);
-        oldStatus[code] = status;
-      }
-    }
-    syncEncoding.addProposition(mUsedDefaultMarking, true);
-    if (mConfiguredPreconditionMarking != null) {
-      syncEncoding.addProposition(mConfiguredPreconditionMarking, false);
+    final EventEncoding syncEncoding =
+      candidate.createSyncEventEncoding(mUsedDefaultMarking,
+                                        mConfiguredPreconditionMarking);
+    final int numProperEvents = syncEncoding.getNumberOfProperEvents();
+    final byte[] oldStatus = new byte[numProperEvents];
+    for (int e = EventEncoding.TAU; e < numProperEvents; e++) {
+      oldStatus[e] = syncEncoding.getProperEventStatus(e);
     }
     // Synchronise ...
     final ProductDESProxyFactory factory = getFactory();

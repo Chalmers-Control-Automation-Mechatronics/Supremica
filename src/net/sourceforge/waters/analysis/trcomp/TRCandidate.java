@@ -38,6 +38,13 @@ public class TRCandidate
   //#########################################################################
   //# Constructors
   TRCandidate(final List<TRAutomatonProxy> automata,
+              final EventEncoding enc)
+  {
+    mAutomata = automata;
+    mEventEncoding = enc;
+  }
+
+  TRCandidate(final List<TRAutomatonProxy> automata,
               final TRSubsystemInfo subsys)
     throws OverflowException
   {
@@ -95,6 +102,29 @@ public class TRCandidate
       }
     }
     return factory.createProductDESProxy(name, events, mAutomata);
+  }
+
+  EventEncoding createSyncEventEncoding(final EventProxy defaultMarking,
+                                        final EventProxy preconditionMarking)
+    throws OverflowException
+  {
+    final int numEvents = mEventEncoding.getNumberOfProperEvents();
+    final EventEncoding syncEncoding = new EventEncoding();
+    for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+      final EventProxy event = mEventEncoding.getProperEvent(e);
+      final byte status = mEventEncoding.getProperEventStatus(e);
+      if (EventStatus.isLocalEvent(status)) {
+        syncEncoding.setProperEventStatus(EventEncoding.TAU, status);
+        syncEncoding.addSilentEvent(event);
+      } else {
+        syncEncoding.addProperEvent(event, status);
+      }
+    }
+    syncEncoding.addProposition(defaultMarking, true);
+    if (preconditionMarking != null) {
+      syncEncoding.addProposition(preconditionMarking, false);
+    }
+    return syncEncoding;
   }
 
   boolean hasSameEventStatus(final TRCandidate candidate)

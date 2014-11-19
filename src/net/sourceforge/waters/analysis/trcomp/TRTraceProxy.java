@@ -113,6 +113,24 @@ public abstract class TRTraceProxy
 
   //#########################################################################
   //# Trace Expansion
+  public void reset(final List<EventProxy> events)
+  {
+    mEvents = new EventProxy[events.size()];
+    events.toArray(mEvents);
+    mTraceData.clear();
+    mAutomataMap.clear();
+  }
+
+  void addAutomaton(final TRAbstractionStep step, final int[] states)
+  {
+    mTraceData.put(step, states);
+  }
+
+  void removeAutomaton(final TRAbstractionStep step)
+  {
+    mTraceData.remove(step);
+  }
+
   void addInputAutomaton(final TRAbstractionStepInput step)
   {
     final TRAbstractionStep succ = step.getSuccessor();
@@ -121,14 +139,6 @@ public abstract class TRTraceProxy
     mTraceData.put(step, states);
     final AutomatonProxy aut = step.getInputAutomaton();
     mAutomataMap.put(aut, step);
-  }
-
-  void addDroppedAutomaton(final TRAbstractionStepDrop step)
-  {
-    final int numSteps = getNumberOfSteps();
-    final int[] states = new int[numSteps];
-    Arrays.fill(states, step.getInitialState());
-    mTraceData.put(step, states);
   }
 
   void expandPartitionStep(final TRAbstractionStepPartition step,
@@ -465,5 +475,7 @@ public abstract class TRTraceProxy
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 6433743484084272294L;
+
+
 
 }

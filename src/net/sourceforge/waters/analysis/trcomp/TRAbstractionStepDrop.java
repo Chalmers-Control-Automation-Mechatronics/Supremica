@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.analysis.trcomp;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -96,7 +97,10 @@ class TRAbstractionStepDrop
   @Override
   public void expandTrace(final TRTraceProxy trace)
   {
-    trace.addDroppedAutomaton(this);
+    final int numSteps = trace.getNumberOfSteps();
+    final int[] states = new int[numSteps];
+    Arrays.fill(states, mInitialState);
+    trace.addAutomaton(this, states);
   }
 
 

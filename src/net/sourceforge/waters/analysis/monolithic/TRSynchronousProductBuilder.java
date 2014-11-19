@@ -36,10 +36,8 @@ import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.AbstractAutomatonBuilder;
 import net.sourceforge.waters.model.analysis.des.AutomatonResult;
-import net.sourceforge.waters.model.analysis.des.DefaultSynchronousProductResult;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
-import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -287,9 +285,9 @@ public class TRSynchronousProductBuilder
   }
 
   @Override
-  public SynchronousProductResult getAnalysisResult()
+  public TRSynchronousProductResult getAnalysisResult()
   {
-    return (SynchronousProductResult) super.getAnalysisResult();
+    return (TRSynchronousProductResult) super.getAnalysisResult();
   }
 
 
@@ -314,9 +312,9 @@ public class TRSynchronousProductBuilder
   //#########################################################################
   //# Invocation
   @Override
-  public SynchronousProductResult createAnalysisResult()
+  public TRSynchronousProductResult createAnalysisResult()
   {
-    return new DefaultSynchronousProductResult();
+    return new TRSynchronousProductResult();
   }
 
   @Override
@@ -766,7 +764,7 @@ public class TRSynchronousProductBuilder
       }
       final TRAutomatonProxy aut =
         new TRAutomatonProxy(mOutputEventEncoding, rel);
-      final SynchronousProductResult result = getAnalysisResult();
+      final TRSynchronousProductResult result = getAnalysisResult();
       result.setComputedAutomaton(aut);
       final ProductDESProxy model = getModel();
       final Collection<AutomatonProxy> automata = model.getAutomata();
