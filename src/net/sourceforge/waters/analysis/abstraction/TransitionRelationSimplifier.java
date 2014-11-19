@@ -100,6 +100,15 @@ public interface TransitionRelationSimplifier
   public boolean getAppliesPartitionAutomatically();
 
   /**
+   * Sets a listener to be called before this simplifier starts executing
+   * on a transition relation and after it finishes. This can be used
+   * to execute custom code before and after simplification, and to
+   * cancel simplification on user-specific conditions.
+   * @see TRSimplificationListener
+   */
+  public void setSimplificationListener(TRSimplificationListener listener);
+
+  /**
    * Runs this simplifier.
    * When run, the simplifier may destructively modify its transition
    * relation by modifying markings or transitions.

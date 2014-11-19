@@ -53,6 +53,9 @@ class TRAbstractionStepSync
     mPreconditionMarking = preconditionMarking;
     mFactory = factory;
     mSynchronousProductBuilder = builder;
+    for (final TRAbstractionStep pred : preds) {
+      pred.setSuccessor(this);
+    }
   }
 
 

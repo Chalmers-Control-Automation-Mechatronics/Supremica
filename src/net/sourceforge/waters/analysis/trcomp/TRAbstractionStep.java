@@ -67,6 +67,14 @@ abstract class TRAbstractionStep
     mSuccessor = step;
   }
 
+  void dispose()
+  {
+    mOutputAutomaton = null;
+    for (final TRAbstractionStep pred : getPredecessors()) {
+      pred.mSuccessor = null;
+    }
+  }
+
 
   //#########################################################################
   //# Data Members

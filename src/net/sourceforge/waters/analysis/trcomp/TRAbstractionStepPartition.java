@@ -48,15 +48,16 @@ class TRAbstractionStepPartition
                              final EventEncoding eventEncoding,
                              final int defaultMarking,
                              final int preconditionMarking,
-                             final TRPartition partition,
-                             final List<TransitionRelationSimplifier> steps)
+                             final TransitionRelationSimplifier simplifier)
   {
     mPredecessor = pred;
     mEventEncoding = eventEncoding;
     mDefaultMarking = defaultMarking;
     mPreconditionMarking = preconditionMarking;
-    mPartition = partition;
-    mSimplificationSteps = steps;
+    mSimplificationSteps = new LinkedList<>();
+    mSimplificationSteps.add(simplifier);
+    mPartition = simplifier.getResultPartition();
+    pred.setSuccessor(this);
   }
 
 
@@ -65,6 +66,13 @@ class TRAbstractionStepPartition
   TRPartition getPartition()
   {
     return mPartition;
+  }
+
+  void merge(final TransitionRelationSimplifier simplifier)
+  {
+    mSimplificationSteps.add(simplifier);
+    final TRPartition partition = simplifier.getResultPartition();
+    mPartition = TRPartition.combine(mPartition, partition);
   }
 
 
@@ -444,7 +452,7 @@ class TRAbstractionStepPartition
   private final EventEncoding mEventEncoding;
   private final int mDefaultMarking;
   private final int mPreconditionMarking;
-  private final TRPartition mPartition;
   private final List<TransitionRelationSimplifier> mSimplificationSteps;
+  private TRPartition mPartition;
 
 }

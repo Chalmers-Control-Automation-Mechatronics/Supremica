@@ -42,6 +42,9 @@ class TRAbstractionStepMonolithic
   {
     mPredecessors = preds;
     mMonolithicTrace = trace;
+    for (final TRAbstractionStep pred : preds) {
+      pred.setSuccessor(this);
+    }
   }
 
 

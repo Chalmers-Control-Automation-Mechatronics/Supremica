@@ -14,7 +14,9 @@ import gnu.trove.set.hash.THashSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
@@ -363,21 +365,35 @@ public class TRCompositionalConflictChecker
       mUsedDefaultMarking = mConfiguredDefaultMarking;
     }
     // TODO Generalised nonblocking ...
+    mTRSimplifier.setPreferredOutputConfiguration
+      (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    final int config = mTRSimplifier.getPreferredInputConfiguration();
+
     final Collection<EventProxy> markings =
       Collections.singleton(mUsedDefaultMarking);
     final Collection<AutomatonProxy> automata = model.getAutomata();
     final int numAutomata = automata.size();
+    if (isCounterExampleEnabled()) {
+      mAbstractionSequence = new ArrayList<>(4 * numAutomata);
+      mCurrentAutomataMap = new HashMap<>(numAutomata);
+    }
     final Collection<TRAutomatonProxy> trs = new ArrayList<>(numAutomata);
     for (final AutomatonProxy aut : automata) {
       if (isProperAutomaton(aut)) {
         final EventEncoding eventEnc = createInitialEventEncoding(aut);
         final StateProxy dumpState = AutomatonTools.findDumpState(aut, markings);
         final TRAutomatonProxy tr =
-          new TRAutomatonProxy(aut, eventEnc, dumpState, INITIAL_CONFIG);
+          new TRAutomatonProxy(aut, eventEnc, dumpState, config);
         if (!hasInitialState(tr)) {
           final VerificationResult result = getAnalysisResult();
           result.setSatisfied(true);
           return;
+        }
+        if (isCounterExampleEnabled()) {
+          final TRAbstractionStepInput step =
+            new TRAbstractionStepInput(aut, eventEnc, dumpState);
+          mAbstractionSequence.add(step);
+          mCurrentAutomataMap.put(tr, step);
         }
         trs.add(tr);
       }
@@ -469,6 +485,8 @@ public class TRCompositionalConflictChecker
     mSynchronousProductBuilder = null;
     mSpecialEventsFinder = null;
     mUsedDefaultMarking = null;
+    mAbstractionSequence = null;
+    mCurrentAutomataMap = null;
     mSubsystemQueue = null;
     mCurrentSubsystem = null;
     mNeedsSimplification = null;
@@ -893,6 +911,8 @@ public class TRCompositionalConflictChecker
 
   // Data Structures
   private EventProxy mUsedDefaultMarking;
+  private List<TRAbstractionStep> mAbstractionSequence;
+  private Map<TRAutomatonProxy,TRAbstractionStep> mCurrentAutomataMap;
   private Queue<TRSubsystemInfo> mSubsystemQueue;
   private TRSubsystemInfo mCurrentSubsystem;
   private SimplificationQueue mNeedsSimplification;
@@ -904,8 +924,5 @@ public class TRCompositionalConflictChecker
   //# Class Constants
   static final int DEFAULT_MARKING = 0;
   static final int PRECONDITION_MARKING = 1;
-
-  private static final int INITIAL_CONFIG =
-    ListBufferTransitionRelation.CONFIG_SUCCESSORS;
 
 }

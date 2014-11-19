@@ -48,6 +48,7 @@ class TRAbstractionStepDrop
     }
     assert init >= 0;
     mInitialState = init;
+    pred.setSuccessor(this);
   }
 
   TRAbstractionStepDrop(final TRAbstractionStep pred,
@@ -55,6 +56,7 @@ class TRAbstractionStepDrop
   {
     mPredecessor = pred;
     mInitialState = initialState;
+    pred.setSuccessor(this);
   }
 
 
