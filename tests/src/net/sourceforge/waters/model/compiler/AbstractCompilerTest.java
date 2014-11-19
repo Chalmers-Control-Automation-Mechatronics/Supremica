@@ -361,6 +361,12 @@ public abstract class AbstractCompilerTest
     compile("handwritten", "GlobalAndLocalVariables");
   }
 
+  public void testCompile_host_sets_fv_after_host_crc_fault_notinit()
+    throws IOException, WatersException
+  {
+    compile("tests", "profisafe", "host_sets_fv_after_host_crc_fault_notinit");
+  }
+
   public void testCompile_increment()
   throws IOException, WatersException
   {
@@ -391,10 +397,16 @@ public abstract class AbstractCompilerTest
     compile("handwritten", "markedvar");
   }
 
-  public void testCompile_nodegroup_efa()
+  public void testCompile_nodegroup_efa1()
     throws IOException, WatersException
   {
-    compile("handwritten", "nodegroup_efa");
+    compile("handwritten", "nodegroup_efa1");
+  }
+
+  public void testCompile_nodegroup_efa2()
+    throws IOException, WatersException
+  {
+    compile("handwritten", "nodegroup_efa2");
   }
 
   public void testCompile_nondetvar()

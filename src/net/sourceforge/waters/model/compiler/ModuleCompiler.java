@@ -136,13 +136,15 @@ public class ModuleCompiler extends AbortableCompiler
       ModuleProxy intermediate = mInstanceCompiler.compile(bindings);
       final boolean efa = mInstanceCompiler.getHasEFAElements();
       mInstanceCompiler = null;
-
       checkAbort();
-      mCompilationInfo.shift();
-      mGroupNodeCompiler = new GroupNodeCompiler(modfactory, mCompilationInfo, intermediate);
+
+      /*
+      mGroupNodeCompiler =
+        new GroupNodeCompiler(modfactory, mCompilationInfo, intermediate);
       intermediate = mGroupNodeCompiler.compile();
       mGroupNodeCompiler = null;
       checkAbort();
+      */
 
       if (efa && mIsExpandingEFATransitions) {
         //mCompilationInfo.shift();
@@ -306,6 +308,7 @@ public class ModuleCompiler extends AbortableCompiler
   private CompilationInfo mCompilationInfo;
   private boolean mCompilationInfoIsDirty;
   private ModuleInstanceCompiler mInstanceCompiler;
+  @SuppressWarnings("unused")
   private GroupNodeCompiler mGroupNodeCompiler;
   private EFACompiler mEFACompiler;
   private ModuleGraphCompiler mGraphCompiler;

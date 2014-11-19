@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ProductDES Name="nodegroup_efa"
+<ProductDES Name="nodegroup_efa1"
   xmlns:ns2="http://waters.sourceforge.net/xsd/base"
   xmlns="http://waters.sourceforge.net/xsd/des">
 <ns2:Comment>A test that involves some nodegroups in combination with EFA actions.</ns2:Comment>

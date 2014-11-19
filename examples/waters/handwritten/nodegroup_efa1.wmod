@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="nodegroup_efa" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="nodegroup_efa1" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>A test that involves some nodegroups in combination with EFA actions.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="restart_host_timer"/>
@@ -13,50 +13,50 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="OFF">
                         <PointGeometry>
-                            <Point Y="64" X="176"/>
+                            <Point X="176" Y="64"/>
                         </PointGeometry>
                         <InitialArrowGeometry>
-                            <Point Y="-5" X="-5"/>
+                            <Point X="-5" Y="-5"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-18" X="5"/>
+                            <Point X="5" Y="-18"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="HOST">
                         <PointGeometry>
-                            <Point Y="160" X="96"/>
+                            <Point X="96" Y="160"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-9" X="12"/>
+                            <Point X="12" Y="-9"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="DELAY">
                         <PointGeometry>
-                            <Point Y="160" X="256"/>
+                            <Point X="256" Y="160"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-5" X="-49"/>
+                            <Point X="-49" Y="-5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <GroupNode Name="G0">
+                        <NodeRef Name="OFF"/>
                         <NodeRef Name="DELAY"/>
                         <NodeRef Name="HOST"/>
-                        <NodeRef Name="OFF"/>
                         <BoxGeometry>
-                            <Box Y="32" X="32" Width="288" Height="224"/>
+                            <Box Height="224" Width="288" X="32" Y="32"/>
                         </BoxGeometry>
                     </GroupNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="HOST" Source="G0">
+                    <Edge Source="G0" Target="HOST">
                         <LabelBlock>
                             <SimpleIdentifier Name="restart_host_timer"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-22" X="-54"/>
+                                <Point X="-54" Y="-22"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <StartPointGeometry>
-                            <Point Y="256" X="97"/>
+                            <Point X="97" Y="256"/>
                         </StartPointGeometry>
                         <GuardActionBlock>
                             <Actions>
@@ -70,15 +70,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="0" X="-53"/>
+                                <Point X="-53" Y="0"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="OFF" Source="HOST">
+                    <Edge Source="HOST" Target="OFF">
                         <LabelBlock>
                             <SimpleIdentifier Name="host_timeout"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-38" X="-93"/>
+                                <Point X="-93" Y="-38"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -89,19 +89,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-24" X="-94"/>
+                                <Point X="-94" Y="-24"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="DELAY" Source="G0">
+                    <Edge Source="G0" Target="DELAY">
                         <LabelBlock>
                             <SimpleIdentifier Name="restart_delay_timer"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-23" X="-69"/>
+                                <Point X="-69" Y="-23"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <StartPointGeometry>
-                            <Point Y="256" X="256"/>
+                            <Point X="256" Y="256"/>
                         </StartPointGeometry>
                         <GuardActionBlock>
                             <Actions>
@@ -115,15 +115,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="0" X="-70"/>
+                                <Point X="-70" Y="0"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="OFF" Source="DELAY">
+                    <Edge Source="DELAY" Target="OFF">
                         <LabelBlock>
                             <SimpleIdentifier Name="delay_timeout"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-38" X="-33"/>
+                                <Point X="-33" Y="-38"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -134,7 +134,7 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-24" X="-33"/>
+                                <Point X="-33" Y="-24"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
