@@ -52,6 +52,9 @@ class TRAbstractionStepInput
 
   StateEncoding getStateEncoding()
   {
+    if (mStateEncoding == null) {
+      mStateEncoding = new StateEncoding(mInputAutomaton);
+    }
     return mStateEncoding;
   }
 
@@ -68,10 +71,9 @@ class TRAbstractionStepInput
   public TRAutomatonProxy createOutputAutomaton(final int preferredConfig)
     throws OverflowException
   {
-    mStateEncoding = new StateEncoding(mInputAutomaton);
     return new TRAutomatonProxy(mInputAutomaton,
                                 mEventEncoding,
-                                mStateEncoding,
+                                getStateEncoding(),
                                 mDumpState,
                                 preferredConfig);
   }
@@ -79,7 +81,7 @@ class TRAbstractionStepInput
   @Override
   public void expandTrace(final TRTraceProxy trace)
   {
-    trace.addInputAutomaton(this);
+    trace.setInputAutomaton(this);
   }
 
 

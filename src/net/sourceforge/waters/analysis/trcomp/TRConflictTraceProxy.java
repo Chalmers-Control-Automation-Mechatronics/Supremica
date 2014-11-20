@@ -9,8 +9,7 @@
 
 package net.sourceforge.waters.analysis.trcomp;
 
-import java.net.URI;
-
+import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -29,21 +28,15 @@ public class TRConflictTraceProxy
 
   //#########################################################################
   //# Constructors
-  public TRConflictTraceProxy(final String name,
-                              final String comment,
-                              final URI location,
-                              final ProductDESProxy des)
+  public TRConflictTraceProxy(final ProductDESProxy des)
   {
-    this(name, comment, location, des, ConflictKind.CONFLICT);
+    this(des, ConflictKind.CONFLICT);
   }
 
-  public TRConflictTraceProxy(final String name,
-                              final String comment,
-                              final URI location,
-                              final ProductDESProxy des,
+  public TRConflictTraceProxy(final ProductDESProxy des,
                               final ConflictKind kind)
   {
-    super(name, comment, location, des);
+    super(AbstractConflictChecker.getTraceName(des), null, des);
     mKind = kind;
   }
 

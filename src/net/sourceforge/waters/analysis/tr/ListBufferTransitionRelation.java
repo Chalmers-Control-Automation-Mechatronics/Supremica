@@ -665,6 +665,22 @@ public class ListBufferTransitionRelation
   }
 
   /**
+   * Returns the state code of the first initial state in this transition
+   * relation, or <CODE>-1</CODE> if the transition relation has no initial
+   * state.
+   */
+  public int getFirstInitialState()
+  {
+    for (int s = 0; s < getNumberOfStates(); s++) {
+      if (isInitial(s)) {
+        return s;
+      }
+    }
+    return -1;
+  }
+
+
+  /**
    * Gets the reachability status of the given state. Each state has a
    * reachability flag associated with it, which is used to suppress
    * unreachable states when creating an automaton from the transition

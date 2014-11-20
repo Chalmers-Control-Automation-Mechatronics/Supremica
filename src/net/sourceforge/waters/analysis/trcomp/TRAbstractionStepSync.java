@@ -210,7 +210,6 @@ class TRAbstractionStepSync
                              final int numSteps,
                              final int defaultMarking)
     {
-      aut.createTauEvent();
       mEventEncoding = aut.getEventEncoding();
       mTransitionRelation = aut.getTransitionRelation();
       mDefaultMarking =

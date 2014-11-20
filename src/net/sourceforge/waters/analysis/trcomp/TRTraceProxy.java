@@ -9,7 +9,6 @@
 
 package net.sourceforge.waters.analysis.trcomp;
 
-import java.net.URI;
 import java.util.AbstractList;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
@@ -52,17 +51,14 @@ public abstract class TRTraceProxy
    * @param  name         The name to be given to the new trace.
    * @param  comment      A comment describing the new trace,
    *                      or <CODE>null</CODE>.
-   * @param  location     The URI to be associated with the new
-   *                      trace, or <CODE>null</CODE>.
    * @param  des          The product DES for which this trace is
    *                      generated.
    */
   TRTraceProxy(final String name,
                final String comment,
-               final URI location,
                final ProductDESProxy des)
   {
-    super(name, comment, location);
+    super(name, comment, null);
     mProductDES = des;
     mEvents = new EventProxy[0];
     mTraceData = new HashMap<>();
@@ -131,12 +127,8 @@ public abstract class TRTraceProxy
     mTraceData.remove(step);
   }
 
-  void addInputAutomaton(final TRAbstractionStepInput step)
+  void setInputAutomaton(final TRAbstractionStepInput step)
   {
-    final TRAbstractionStep succ = step.getSuccessor();
-    final int[] states = mTraceData.remove(succ);
-    assert states != null;
-    mTraceData.put(step, states);
     final AutomatonProxy aut = step.getInputAutomaton();
     mAutomataMap.put(aut, step);
   }
@@ -145,8 +137,7 @@ public abstract class TRTraceProxy
                            final int[] stepStates,
                            final EventProxy[] newEvents)
   {
-    final TRAbstractionStep succ = step.getSuccessor();
-    mTraceData.remove(succ);
+    mTraceData.remove(step);
     final int numStates = stepStates.length;
     for (final Map.Entry<TRAbstractionStep,int[]> entry : mTraceData.entrySet()) {
       final int[] oldStates = entry.getValue();
@@ -163,7 +154,8 @@ public abstract class TRTraceProxy
       }
       entry.setValue(newStates);
     }
-    mTraceData.put(step, stepStates);
+    final TRAbstractionStep pred = step.getPredecessor();
+    mTraceData.put(pred, stepStates);
     mEvents = newEvents;
   }
 

@@ -29,6 +29,8 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
@@ -703,6 +705,31 @@ public class EventEncoding
       mProperEventStatus.set(TAU, (byte) (status & ~EventStatus.STATUS_UNUSED));
     }
     mEventCodeMap.put(event, TAU);
+  }
+
+  /**
+   * Ensures that the event encoding contains a silent event with code
+   * {@link #TAU} if it does not already have such an event.
+   * @param  suffix    The name suffix for the silent event.
+   *                   If a silent event is created, its name will be
+   *                   <CODE>&quot;tau:suffix&quot;</CODE>.
+   * @return The silent event, whether previously existing or newly created.
+   */
+  public EventProxy provideTauEvent(final String suffix)
+  {
+    EventProxy tau = mProperEvents.get(TAU);
+    if (tau == null) {
+      final ProductDESProxyFactory factory =
+        ProductDESElementFactory.getInstance();
+      final String name = "tau:" + suffix;
+      final byte status = mProperEventStatus.get(TAU);
+      final EventKind kind = EventStatus.isControllableEvent(status) ?
+        EventKind.CONTROLLABLE : EventKind.UNCONTROLLABLE;
+      tau = factory.createEventProxy(name, kind, false);
+      mProperEvents.set(TAU, tau);
+      mEventCodeMap.put(tau, TAU);
+    }
+    return tau;
   }
 
   /**

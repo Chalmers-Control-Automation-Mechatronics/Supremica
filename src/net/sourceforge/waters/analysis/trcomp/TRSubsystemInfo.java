@@ -40,14 +40,14 @@ class TRSubsystemInfo
 
   //#########################################################################
   //# Constructors
-  TRSubsystemInfo(final Collection<TRAutomatonProxy> automata,
+  TRSubsystemInfo(final List<TRAutomatonProxy> automata,
                   final int numEvents)
   {
     mAutomata = automata;
     mEvents = new HashMap<>(numEvents);
   }
 
-  TRSubsystemInfo(final Collection<TRAutomatonProxy> automata,
+  TRSubsystemInfo(final List<TRAutomatonProxy> automata,
                   final Collection<TREventInfo> events)
   {
     mAutomata = automata;
@@ -66,7 +66,7 @@ class TRSubsystemInfo
     return mAutomata.size();
   }
 
-  Collection<TRAutomatonProxy> getAutomata()
+  List<TRAutomatonProxy> getAutomata()
   {
     return mAutomata;
   }
@@ -263,7 +263,7 @@ class TRSubsystemInfo
 
   //#########################################################################
   //# Data Members
-  private final Collection<TRAutomatonProxy> mAutomata;
+  private final List<TRAutomatonProxy> mAutomata;
   private final Map<EventProxy,TREventInfo> mEvents;
 
 }

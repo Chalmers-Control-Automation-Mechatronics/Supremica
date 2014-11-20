@@ -39,7 +39,6 @@ import net.sourceforge.waters.model.printer.ProductDESProxyPrinter;
 import net.sourceforge.waters.plain.base.AbstractNamedElement;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
@@ -115,6 +114,7 @@ public class TRAutomatonProxy
     mEventEncoding = eventEnc;
     mStates = null;
     mTransitionRelation = rel;
+    provideTauEvent();
   }
 
   public TRAutomatonProxy(final AutomatonProxy aut,
@@ -159,6 +159,7 @@ public class TRAutomatonProxy
       final StateProxy state = stateEnc.getState(s);
       mStateNames[s] = state.getName();
     }
+    provideTauEvent();
   }
 
   public TRAutomatonProxy(final TRAutomatonProxy aut)
@@ -198,30 +199,6 @@ public class TRAutomatonProxy
   {
     final TRState trState = (TRState) state;
     return trState.getStateIndex();
-  }
-
-  /**
-   * Ensures that the event encoding contains a silent event with code
-   * {@link EventEncoding#TAU} if this event code is in use.
-   * This method is called automatically when the user requests the event
-   * or transition list of this automaton. This makes it possible to create
-   * and use event encodings without the silent event defined (kept at
-   * <CODE>null</CODE>), and only create an event object when the transition
-   * relation is accessed as an automaton.
-   */
-  public void createTauEvent()
-  {
-    final byte status = mEventEncoding.getProperEventStatus(EventEncoding.TAU);
-    if (EventStatus.isUsedEvent(status) &&
-        mEventEncoding.getProperEvent(EventEncoding.TAU) == null) {
-      final ProductDESProxyFactory factory =
-        ProductDESElementFactory.getInstance();
-      final String name = "tau:" + mTransitionRelation.getName();
-      final EventKind kind = EventStatus.isControllableEvent(status) ?
-        EventKind.CONTROLLABLE : EventKind.UNCONTROLLABLE;
-      final EventProxy event = factory.createEventProxy(name, kind, false);
-      mEventEncoding.setTauEvent(event);
-    }
   }
 
   /**
@@ -275,7 +252,6 @@ public class TRAutomatonProxy
   @Override
   public Set<EventProxy> getEvents()
   {
-    createTauEvent();
     return mEventEncoding.getUsedEvents();
   }
 
@@ -303,6 +279,12 @@ public class TRAutomatonProxy
 
   //#########################################################################
   //# Auxiliary Methods
+  private void provideTauEvent()
+  {
+    final String name = mTransitionRelation.getName();
+    mEventEncoding.provideTauEvent(name);
+  }
+
   private StateProxy createState(final int index)
   {
     if (mStates == null) {
@@ -593,7 +575,6 @@ public class TRAutomatonProxy
     @Override
     public Iterator<TransitionProxy> iterator()
     {
-      createTauEvent();
       return new TRTransitionCollectionIterator();
     }
 

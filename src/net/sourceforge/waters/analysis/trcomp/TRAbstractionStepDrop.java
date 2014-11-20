@@ -102,7 +102,7 @@ class TRAbstractionStepDrop
     final int numSteps = trace.getNumberOfSteps();
     final int[] states = new int[numSteps];
     Arrays.fill(states, mInitialState);
-    trace.addAutomaton(this, states);
+    trace.addAutomaton(mPredecessor, states);
   }
 
 

@@ -102,28 +102,23 @@ class TRAbstractionStepMonolithic
 
 
   //#########################################################################
-  //# Auxiliary Methods
-  private int findInitialState(final ListBufferTransitionRelation rel)
+  //# Auxiliary Static Methods
+  static int findInitialState(final ListBufferTransitionRelation rel)
   {
-    for (int s = 0; s < rel.getNumberOfStates(); s++) {
-      if (rel.isInitial(s)) {
-        return s;
-      }
-    }
-    assert false : "Initial state for trace not found in automaton " +
-                   rel.getName() + "!";
-    return -1;
+    final int init = rel.getFirstInitialState();
+    assert init >= 0 : "Initial state for trace not found in automaton " +
+                       rel.getName() + "!";
+    return init;
   }
 
-  private int findSuccessorState(final ListBufferTransitionRelation rel,
-                                 final int source,
-                                 final int event)
+  private static int findSuccessorState(final ListBufferTransitionRelation rel,
+                                        final int source,
+                                        final int event)
   {
     final TransitionIterator iter =
       rel.createSuccessorsReadOnlyIterator(source, event);
     assert iter.advance() :
-      "No successor state for trace not found in automaton " +
-      rel.getName() + "!";
+      "No successor state for trace found in automaton " + rel.getName() + "!";
     final int target = iter.getCurrentTargetState();
     assert !iter.advance() :
       "Nondeterministic successor states for trace found in automaton " +

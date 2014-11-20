@@ -45,15 +45,17 @@ public abstract class PreselectionHeuristic
      final Map<List<TRAutomatonProxy>,TRCandidate> candidates)
     throws OverflowException
   {
-    Collections.sort(automata);
-    if (!candidates.containsKey(automata)) {
-      final TRCandidate candidate = new TRCandidate(automata, subsys);
-      final TRCandidate overflow = mOverflowCandidates.get(automata);
-      if (overflow == null) {
-        candidates.put(automata, candidate);
-      } else if (!candidate.hasSameEventStatus(overflow)) {
-        mOverflowCandidates.remove(automata);
-        candidates.put(automata, candidate);
+    if (automata.size() < subsys.getNumberOfAutomata()) {
+      Collections.sort(automata);
+      if (!candidates.containsKey(automata)) {
+        final TRCandidate candidate = new TRCandidate(automata, subsys);
+        final TRCandidate overflow = mOverflowCandidates.get(automata);
+        if (overflow == null) {
+          candidates.put(automata, candidate);
+        } else if (!candidate.hasSameEventStatus(overflow)) {
+          mOverflowCandidates.remove(automata);
+          candidates.put(automata, candidate);
+        }
       }
     }
   }

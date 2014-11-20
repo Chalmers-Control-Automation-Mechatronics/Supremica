@@ -63,6 +63,11 @@ class TRAbstractionStepPartition
 
   //#########################################################################
   //# Simple Access
+  TRAbstractionStep getPredecessor()
+  {
+    return mPredecessor;
+  }
+
   TRPartition getPartition()
   {
     return mPartition;
@@ -183,15 +188,14 @@ class TRAbstractionStepPartition
       }
       final int numTREvents = mEventEncoding.getNumberOfProperEvents();
       mLocalEventRanges = new TIntArrayList(numTREvents);
-      final byte pattern = EventStatus.STATUS_LOCAL | EventStatus.STATUS_UNUSED;
       int i = -1;
       for (int e = EventEncoding.TAU; e < numTREvents; e++) {
-        final byte status = rel.getProperEventStatus(e);
-        if ((status & pattern) != EventStatus.STATUS_LOCAL) {
-          // not a local event
-          if (EventStatus.isUsedEvent(status)) {
-            i = -1;
-          }
+        final byte status = mEventEncoding.getProperEventStatus(e);
+        if (!EventStatus.isUsedEvent(status)) {
+          // skip unused event
+        } else if (!EventStatus.isLocalEvent(status)) {
+          // shared event cancels range
+          i = -1;
         } else if (i < 0) {
           // local event starts new range
           mLocalEventRanges.add(e);
@@ -202,7 +206,7 @@ class TRAbstractionStepPartition
           mLocalEventRanges.set(i, e);
         }
       }
-      mSearchSpace = new BFSSearchSpace<>(mPartition.getNumberOfStates());
+      mSearchSpace = new BFSSearchSpace<>(rel.getNumberOfStates());
       mStartOfNextLevel = mNonDeadlockTarget = null;
     }
 
@@ -232,14 +236,17 @@ class TRAbstractionStepPartition
           mStartOfNextLevel = null;
         }
         final int s = current.getState();
+        iter.resetState(s);
         final int depth = current.getNumberOfConsumedEvents();
-        final int e = mEventSequence.get(depth);
-        iter.reset(s, e);
-        while (iter.advance()) {
-          final int t = iter.getCurrentTargetState();
-          final SearchRecord next = new SearchRecord(t, current, e, false);
-          if (processSearchRecord(next)) {
-            return next;
+        if (depth < mEventSequence.size()) {
+          final int e = mEventSequence.get(depth);
+          iter.resetEvent(e);
+          while (iter.advance()) {
+            final int t = iter.getCurrentTargetState();
+            final SearchRecord next = new SearchRecord(t, current, e, false);
+            if (processSearchRecord(next)) {
+              return next;
+            }
           }
         }
         for (int i = 0; i < mLocalEventRanges.size(); i += 2) {
@@ -314,8 +321,17 @@ class TRAbstractionStepPartition
         if (nextSearchRecord == null && searchRecordIter.hasNext()) {
           nextSearchRecord = searchRecordIter.next();
         }
-        if (nextInputEvent == null && inputEventIter.hasNext()) {
-          nextInputEvent = inputEventIter.next();
+        while (nextInputEvent == null && inputEventIter.hasNext()) {
+          final EventProxy event = inputEventIter.next();
+          final int e = mEventEncoding.getEventCode(event);
+          if (e < 0) {
+            nextInputEvent = event;
+          } else {
+            final byte status = mEventEncoding.getProperEventStatus(e);
+            if (!EventStatus.isLocalEvent(status)) {
+              nextInputEvent = event;
+            }
+          }
         }
         if (nextSearchRecord == null && nextInputEvent == null) {
           break;
@@ -435,6 +451,14 @@ class TRAbstractionStepPartition
     public int hashCode()
     {
       return mState + 5 * mNumConsumedEvents;
+    }
+
+    //#######################################################################
+    //# Debugging
+    @Override
+    public String toString()
+    {
+      return mState + "@" + mNumConsumedEvents;
     }
 
     //#######################################################################

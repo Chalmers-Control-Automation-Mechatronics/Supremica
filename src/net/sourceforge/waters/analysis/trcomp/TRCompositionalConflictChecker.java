@@ -15,7 +15,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -25,6 +27,7 @@ import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SpecialEventsFinder;
 import net.sourceforge.waters.analysis.abstraction.SpecialEventsTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.TRSimplificationListener;
 import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.compositional.ChainSelectionHeuristic;
@@ -53,6 +56,7 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
 
 import org.apache.log4j.Logger;
 
@@ -75,11 +79,15 @@ public class TRCompositionalConflictChecker
     mPreselectionHeuristic = new PreselectionHeuristicMustL();
     final SelectionHeuristic<TRCandidate> minS = new SelectionHeuristicMinS();
     mSelectionHeuristic = new ChainSelectionHeuristic<TRCandidate>(minS);
+    final TRSimplificationListener partitioningListener =
+      new PartitioningListener();
     final ChainTRSimplifier chain = new ChainTRSimplifier();
     final SpecialEventsTRSimplifier special = new SpecialEventsTRSimplifier();
+    special.setSimplificationListener(partitioningListener);
     chain.add(special);
     final TransitionRelationSimplifier loopRemover =
       new TauLoopRemovalTRSimplifier();
+    loopRemover.setSimplificationListener(partitioningListener);
     chain.add(loopRemover);
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier();
@@ -89,7 +97,9 @@ public class TRCompositionalConflictChecker
       (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     bisimulator.setMarkingMode
       (ObservationEquivalenceTRSimplifier.MarkingMode.SATURATE);
-    // TODO bisimulator.setTransitionLimit(limit);
+    final int limit = getInternalTransitionLimit();
+    bisimulator.setTransitionLimit(limit);
+    bisimulator.setSimplificationListener(partitioningListener);
     chain.add(bisimulator);
     chain.setPropositions(PRECONDITION_MARKING, DEFAULT_MARKING);
     chain.setPreferredOutputConfiguration
@@ -377,7 +387,7 @@ public class TRCompositionalConflictChecker
       mAbstractionSequence = new ArrayList<>(4 * numAutomata);
       mCurrentAutomataMap = new HashMap<>(numAutomata);
     }
-    final Collection<TRAutomatonProxy> trs = new ArrayList<>(numAutomata);
+    final List<TRAutomatonProxy> trs = new ArrayList<>(numAutomata);
     for (final AutomatonProxy aut : automata) {
       if (isProperAutomaton(aut)) {
         final EventEncoding eventEnc = createInitialEventEncoding(aut);
@@ -431,6 +441,7 @@ public class TRCompositionalConflictChecker
     mMonolithicAnalyzer.setKindTranslator(translator);
     mMonolithicAnalyzer.setNodeLimit(getMonolithicStateLimit());
     mMonolithicAnalyzer.setTransitionLimit(getMonolithicTransitionLimit());
+    mMonolithicAnalyzer.setCounterExampleEnabled(isCounterExampleEnabled());
 
     mSubsystemQueue = new PriorityQueue<>();
     mNeedsSimplification = new SimplificationQueue(trs);
@@ -461,7 +472,7 @@ public class TRCompositionalConflictChecker
           }
           analyseCurrentSubsystemCompositionally();
           if (result.isFinished()) {
-            // TODO Trace expansion ???
+            computeCounterExample();
             return result.isSatisfied();
           }
           mCurrentSubsystem = mSubsystemQueue.poll();
@@ -486,6 +497,7 @@ public class TRCompositionalConflictChecker
     mSpecialEventsFinder = null;
     mUsedDefaultMarking = null;
     mAbstractionSequence = null;
+    mIntermediateAbstractionSequence = null;
     mCurrentAutomataMap = null;
     mSubsystemQueue = null;
     mCurrentSubsystem = null;
@@ -553,13 +565,15 @@ public class TRCompositionalConflictChecker
     throws OverflowException
   {
     final EventEncoding enc = new EventEncoding();
-    enc.addProposition(mUsedDefaultMarking, false);
-    if (mConfiguredPreconditionMarking != null) {
-      enc.addProposition(mConfiguredPreconditionMarking, false);
-    }
+    final String name = aut.getName();
+    enc.provideTauEvent(name);
     final KindTranslator translator = getKindTranslator();
     for (final EventProxy event : aut.getEvents()) {
       enc.addEvent(event, translator, EventStatus.STATUS_NONE);
+    }
+    enc.addProposition(mUsedDefaultMarking, false);
+    if (mConfiguredPreconditionMarking != null) {
+      enc.addProposition(mConfiguredPreconditionMarking, false);
     }
     return enc;
   }
@@ -625,7 +639,8 @@ public class TRCompositionalConflictChecker
           final AnalysisResult result = getAnalysisResult();
           result.setSatisfied(false);
           getLogger().debug("Subsystem is blocking, because " + aut.getName() +
-                            "has no marked states.");
+                            " has no marked states.");
+          dropCurrentSubsystem();
           return true;
         }
       }
@@ -634,6 +649,7 @@ public class TRCompositionalConflictChecker
     if (allStatesMarked) {
       final Logger logger = getLogger();
       logger.debug("Subsystem is nonblocking, because all states are marked.");
+      dropCurrentSubsystem();
     }
     return allStatesMarked;
   }
@@ -667,7 +683,6 @@ public class TRCompositionalConflictChecker
     // Set event status ...
     final EventEncoding enc = aut.getEventEncoding();
     final int numEvents = enc.getNumberOfProperEvents();
-    final byte[] oldStatus = new byte[numEvents];
     for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
       checkAbort();
       byte status = enc.getProperEventStatus(e);
@@ -680,24 +695,36 @@ public class TRCompositionalConflictChecker
           enc.setProperEventStatus(e, status);
         }
       }
-      oldStatus[e] = status;
     }
-    // Simplify ...
-    final int oldNumStates = rel.getNumberOfStates();
-    mTRSimplifier.setTransitionRelation(rel);
-    final boolean simplified = mTRSimplifier.run();
-    // Update event status ...
-    if (simplified || !mAlwaysEnabledDetectedInitially) {
-      updateEventStatus(aut, oldStatus);
+    try {
+      // Set up trace computation ...
+      mIntermediateAbstractionSequence =
+        new IntermediateAbstractionSequence(aut);
+      // Simplify ...
+      final int oldNumStates = rel.getNumberOfStates();
+      mTRSimplifier.setTransitionRelation(rel);
+      final boolean simplified = mTRSimplifier.run();
+      if (rel.getNumberOfStates() != oldNumStates) {
+        aut.resetStateNames();
+      }
+      // Record steps and update event status ...
+      mIntermediateAbstractionSequence.commit(aut);
+      if (simplified || !mAlwaysEnabledDetectedInitially) {
+        final EventEncoding oldEncoding =
+          mIntermediateAbstractionSequence.getEventEncoding();
+        updateEventStatus(aut, oldEncoding);
+      }
+      if (simplified && isTrivialAutomaton(aut)) {
+        logger.debug("Dropping trivial automaton " + aut.getName());
+        dropTrivialAutomaton(aut);
+        mCurrentSubsystem.removeAutomaton(aut, mNeedsSimplification);
+      }
+      return simplified;
+    } catch (final OverflowException exception) {
+      return false;
+    } finally {
+      mIntermediateAbstractionSequence = null;
     }
-    if (simplified && isTrivialAutomaton(aut)) {
-      logger.debug("Dropping trivial automaton " + aut.getName());
-      mCurrentSubsystem.removeAutomaton(aut, mNeedsSimplification);
-    }
-    if (rel.getNumberOfStates() != oldNumStates) {
-      aut.resetStateNames();
-    }
-    return simplified;
   }
 
   private TRAutomatonProxy computeSynchronousProduct
@@ -709,40 +736,65 @@ public class TRCompositionalConflictChecker
       logger.debug("Composing " + candidate + " ...");
     }
     // Set up event encoding ...
-    final EventEncoding syncEncoding =
-      candidate.createSyncEventEncoding(mUsedDefaultMarking,
-                                        mConfiguredPreconditionMarking);
-    final int numProperEvents = syncEncoding.getNumberOfProperEvents();
-    final byte[] oldStatus = new byte[numProperEvents];
-    for (int e = EventEncoding.TAU; e < numProperEvents; e++) {
-      oldStatus[e] = syncEncoding.getProperEventStatus(e);
+    try {
+      final EventEncoding syncEncoding =
+        candidate.createSyncEventEncoding(mUsedDefaultMarking,
+                                          mConfiguredPreconditionMarking);
+      mIntermediateAbstractionSequence =
+        new IntermediateAbstractionSequence(syncEncoding);
+      // Synchronise ...
+      final ProductDESProxyFactory factory = getFactory();
+      final ProductDESProxy des = candidate.createProductDESProxy(factory);
+      mSynchronousProductBuilder.setModel(des);
+      mSynchronousProductBuilder.setEventEncoding(syncEncoding);
+      mSynchronousProductBuilder.run();
+      final TRAutomatonProxy sync =
+        mSynchronousProductBuilder.getComputedAutomaton();
+      // Set up trace computation ...
+      if (isCounterExampleEnabled()) {
+        final List<TRAutomatonProxy> automata = candidate.getAutomata();
+        final List<TRAbstractionStep> preds = getAbstractionSteps(automata);
+        final EventEncoding enc = candidate.getEventEncoding();
+        final TRAbstractionStep step =
+          new TRAbstractionStepSync(preds,
+                                    enc,
+                                    mUsedDefaultMarking,
+                                    mConfiguredPreconditionMarking,
+                                    factory,
+                                    mSynchronousProductBuilder);
+        mIntermediateAbstractionSequence.append(step);
+      }
+      // Simplify ...
+      final ListBufferTransitionRelation rel = sync.getTransitionRelation();
+      rel.logSizes(logger);
+      mTRSimplifier.setTransitionRelation(rel);
+      mTRSimplifier.run();
+      // Update trace information ...
+      if (isCounterExampleEnabled()) {
+        for (final TRAutomatonProxy aut : candidate.getAutomata()) {
+          mCurrentAutomataMap.remove(aut);
+        }
+        mIntermediateAbstractionSequence.commit(sync);
+      }
+      // Update event status ...
+      mNeedsSimplification.setCurrentComposition(candidate);
+      if (isTrivialAutomaton(sync)) {
+        logger.debug("Dropping trivial automaton " + sync.getName());
+        dropTrivialAutomaton(sync);
+      } else {
+        mCurrentSubsystem.addAutomaton(sync);
+      }
+      final EventEncoding oldEncoding =
+        mIntermediateAbstractionSequence.getEventEncoding();
+      updateEventStatus(sync, oldEncoding);
+      for (final TRAutomatonProxy aut : candidate.getAutomata()) {
+        mCurrentSubsystem.removeAutomaton(aut, mNeedsSimplification);
+      }
+      mNeedsSimplification.setCurrentComposition(null);
+      return sync;
+    } finally {
+      mIntermediateAbstractionSequence = null;
     }
-    // Synchronise ...
-    final ProductDESProxyFactory factory = getFactory();
-    final ProductDESProxy des = candidate.createProductDESProxy(factory);
-    mSynchronousProductBuilder.setModel(des);
-    mSynchronousProductBuilder.setEventEncoding(syncEncoding);
-    mSynchronousProductBuilder.run();
-    // Simplify ...
-    final TRAutomatonProxy sync =
-      mSynchronousProductBuilder.getComputedAutomaton();
-    final ListBufferTransitionRelation rel = sync.getTransitionRelation();
-    rel.logSizes(logger);
-    mTRSimplifier.setTransitionRelation(rel);
-    mTRSimplifier.run();
-    // Update event status ...
-    mNeedsSimplification.setCurrentComposition(candidate);
-    if (isTrivialAutomaton(sync)) {
-      logger.debug("Dropping trivial automaton " + sync.getName());
-    } else {
-      mCurrentSubsystem.addAutomaton(sync);
-    }
-    updateEventStatus(sync, oldStatus);
-    for (final TRAutomatonProxy aut : candidate.getAutomata()) {
-      mCurrentSubsystem.removeAutomaton(aut, mNeedsSimplification);
-    }
-    mNeedsSimplification.setCurrentComposition(null);
-    return sync;
   }
 
   private boolean isTrivialAutomaton(final TRAutomatonProxy aut)
@@ -772,7 +824,7 @@ public class TRCompositionalConflictChecker
   }
 
   private void updateEventStatus(final TRAutomatonProxy aut,
-                                 final byte[] oldStatus)
+                                 final EventEncoding oldEncoding)
     throws AnalysisException
   {
     final EventEncoding enc = aut.getEventEncoding();
@@ -783,7 +835,8 @@ public class TRCompositionalConflictChecker
     final byte[] newStatus = mSpecialEventsFinder.getComputedEventStatus();
     for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
       checkAbort();
-      if (EventStatus.isUsedEvent(oldStatus[e])) {
+      final byte oldStatus = oldEncoding.getProperEventStatus(e);
+      if (EventStatus.isUsedEvent(oldStatus)) {
         final EventProxy event = enc.getProperEvent(e);
         final TREventInfo info = mCurrentSubsystem.getEventInfo(event);
         info.updateAutomatonStatus(aut, newStatus[e], mNeedsSimplification);
@@ -791,7 +844,7 @@ public class TRCompositionalConflictChecker
           mCurrentSubsystem.removeEvent(event);
         }
         mNeedsDisjointSubsystemsCheck |=
-          !EventStatus.isLocalEvent(oldStatus[e]) &&
+          !EventStatus.isLocalEvent(oldStatus) &&
           !EventStatus.isUsedEvent(newStatus[e]);
       }
     }
@@ -818,8 +871,7 @@ public class TRCompositionalConflictChecker
   private void analyseCurrentSubsystemMonolithically()
     throws AnalysisException
   {
-    final Collection<TRAutomatonProxy> automata =
-      mCurrentSubsystem.getAutomata();
+    final List<TRAutomatonProxy> automata = mCurrentSubsystem.getAutomata();
     final Logger logger = getLogger();
     if (logger.isDebugEnabled()) {
       double estimate = 1.0;
@@ -839,10 +891,77 @@ public class TRCompositionalConflictChecker
         AutomatonTools.createProductDESProxy(name, automata, factory);
       mMonolithicAnalyzer.setModel(des);
       final boolean satisfied = mMonolithicAnalyzer.run();
-      if (!satisfied) {
-        final AnalysisResult result = getAnalysisResult();
+      if (satisfied) {
+        logger.debug("Subsystem is nonblocking.");
+        dropCurrentSubsystem();
+      } else {
+        logger.debug("Subsystem is blocking.");
+        final VerificationResult result = getAnalysisResult();
         result.setSatisfied(false);
+        if (isCounterExampleEnabled()) {
+          final List<TRAbstractionStep> preds = new ArrayList<>(automata.size());
+          for (final TRAutomatonProxy aut : automata) {
+            final TRAbstractionStep pred = mCurrentAutomataMap.get(aut);
+            pred.setOutputAutomaton(aut);
+            preds.add(pred);
+          }
+          final TraceProxy trace = mMonolithicAnalyzer.getCounterExample();
+          final TRAbstractionStep step =
+            new TRAbstractionStepMonolithic(preds, trace);
+          mAbstractionSequence.add(step);
+          mCurrentAutomataMap = null;
+        }
       }
+    }
+  }
+
+  private List<TRAbstractionStep> getAbstractionSteps
+    (final List<TRAutomatonProxy> automata)
+  {
+    final List<TRAbstractionStep> preds = new ArrayList<>(automata.size());
+    for (final TRAutomatonProxy aut : automata) {
+      final TRAbstractionStep pred = mCurrentAutomataMap.get(aut);
+      preds.add(pred);
+    }
+    return preds;
+  }
+
+  private void dropCurrentSubsystem()
+  {
+    if (isCounterExampleEnabled()) {
+      for (final TRAutomatonProxy aut : mCurrentSubsystem.getAutomata()) {
+        dropTrivialAutomaton(aut);
+      }
+    }
+  }
+
+  private void dropTrivialAutomaton(final TRAutomatonProxy aut)
+  {
+    if (isCounterExampleEnabled()) {
+      final TRAbstractionStep pred = mCurrentAutomataMap.remove(aut);
+      final ListBufferTransitionRelation rel = aut.getTransitionRelation();
+      final int init = rel.getFirstInitialState();
+      final TRAbstractionStep step = new TRAbstractionStepDrop(pred, init);
+      mAbstractionSequence.add(step);
+    }
+  }
+
+  private void computeCounterExample() throws AnalysisException
+  {
+    final VerificationResult result = getAnalysisResult();
+    if (!result.isSatisfied() && isCounterExampleEnabled()) {
+      final ProductDESProxy des = getModel();
+      final TRTraceProxy trace = new TRConflictTraceProxy(des);
+      final int end = mAbstractionSequence.size();
+      final ListIterator<TRAbstractionStep> iter =
+        mAbstractionSequence.listIterator(end);
+      while (iter.hasPrevious()) {
+        final TRAbstractionStep step = iter.previous();
+        step.expandTrace(trace);
+        step.dispose();
+        iter.remove();
+      }
+      result.setCounterExample(trace);
     }
   }
 
@@ -852,15 +971,15 @@ public class TRCompositionalConflictChecker
   private static class SimplificationQueue
     extends DuplicateFreeQueue<TRAutomatonProxy>
   {
-    //#########################################################################
+    //#######################################################################
     //# Constructor
-    public SimplificationQueue(final Collection<TRAutomatonProxy> automata)
+    private SimplificationQueue(final Collection<TRAutomatonProxy> automata)
     {
       super(automata);
       mSupressed = Collections.emptySet();
     }
 
-    //#########################################################################
+    //#######################################################################
     //# Interface java.util.Queue<TRAutomatonProxy>
     @Override
     public boolean offer(final TRAutomatonProxy aut)
@@ -872,7 +991,7 @@ public class TRCompositionalConflictChecker
       }
     }
 
-    //#########################################################################
+    //#######################################################################
     //# Data Members
     private void setCurrentComposition(final TRCandidate candidate)
     {
@@ -883,9 +1002,113 @@ public class TRCompositionalConflictChecker
       }
     }
 
-    //#########################################################################
+    //#######################################################################
     //# Data Members
     private Set<TRAutomatonProxy> mSupressed;
+  }
+
+
+  //#########################################################################
+  //# Inner Class IntermediateAbstractionSequence
+  private class IntermediateAbstractionSequence
+  {
+    //#######################################################################
+    //# Constructor
+    private IntermediateAbstractionSequence(final EventEncoding enc)
+
+    {
+      mEventEncoding = new EventEncoding(enc);
+      mPredecessor = null;
+      mSteps = new LinkedList<>();
+    }
+
+    private IntermediateAbstractionSequence(final TRAutomatonProxy aut)
+    {
+      mEventEncoding = new EventEncoding(aut.getEventEncoding());
+      mPredecessor =
+        mCurrentAutomataMap == null ? null : mCurrentAutomataMap.get(aut);
+      mSteps = new LinkedList<>();
+    }
+
+    //#######################################################################
+    //# Access
+    private EventEncoding getEventEncoding()
+    {
+      return mEventEncoding;
+    }
+
+    private TRAbstractionStep getPredecessor()
+    {
+      return mPredecessor;
+    }
+
+    private TRAbstractionStep getLastIntermediateStep()
+    {
+      return mSteps.peekLast();
+    }
+
+    private void append(final TRAbstractionStep step)
+    {
+      mSteps.add(step);
+    }
+
+    private void commit(final TRAutomatonProxy result)
+    {
+      final TRAbstractionStep last = mSteps.peekLast();
+      if (last != null && isCounterExampleEnabled()) {
+        mAbstractionSequence.addAll(mSteps);
+        last.setOutputAutomaton(result);
+        mCurrentAutomataMap.put(result, last);
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final TRAbstractionStep mPredecessor;
+    private final EventEncoding mEventEncoding;
+    private final LinkedList<TRAbstractionStep> mSteps;
+  }
+
+
+  //#########################################################################
+  //# Inner Class PartitioningListener
+  private class PartitioningListener implements TRSimplificationListener
+  {
+    //#######################################################################
+    //# Interface
+    //# net.sourceforge.waters.analysis.abstraction.TRSimplificationListener
+    @Override
+    public boolean onSimplificationStart
+      (final TransitionRelationSimplifier simplifier)
+    {
+      return true;
+    }
+
+    @Override
+    public void onSimplificationFinish
+      (final TransitionRelationSimplifier simplifier, final boolean result)
+    {
+      if (result && mIntermediateAbstractionSequence != null) {
+        final TRAbstractionStep last =
+          mIntermediateAbstractionSequence.getLastIntermediateStep();
+        if (last != null && last instanceof TRAbstractionStepPartition) {
+          final TRAbstractionStepPartition partPred =
+            (TRAbstractionStepPartition) last;
+          partPred.merge(simplifier);
+        } else {
+          final TRAbstractionStep pred = last == null ?
+            mIntermediateAbstractionSequence.getPredecessor() : last;
+          final EventEncoding enc =
+            mIntermediateAbstractionSequence.getEventEncoding();
+          final TRAbstractionStep step =
+            new TRAbstractionStepPartition(pred, enc,
+                                           DEFAULT_MARKING,
+                                           PRECONDITION_MARKING,
+                                           simplifier);
+          mIntermediateAbstractionSequence.append(step);
+        }
+      }
+    }
   }
 
 
@@ -912,6 +1135,7 @@ public class TRCompositionalConflictChecker
   // Data Structures
   private EventProxy mUsedDefaultMarking;
   private List<TRAbstractionStep> mAbstractionSequence;
+  private IntermediateAbstractionSequence mIntermediateAbstractionSequence;
   private Map<TRAutomatonProxy,TRAbstractionStep> mCurrentAutomataMap;
   private Queue<TRSubsystemInfo> mSubsystemQueue;
   private TRSubsystemInfo mCurrentSubsystem;

@@ -93,12 +93,23 @@ public class TRCandidate
   {
     final String name = getName();
     final int numEvents = mEventEncoding.getNumberOfProperEvents();
-    final List<EventProxy> events = new ArrayList<>(numEvents - 1);
+    final List<EventProxy> events =
+      new ArrayList<>(numEvents + mAutomata.size());
     for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
       final byte status = mEventEncoding.getProperEventStatus(e);
       if (EventStatus.isUsedEvent(status)) {
         final EventProxy event = mEventEncoding.getProperEvent(e);
         events.add(event);
+      }
+    }
+    for (final TRAutomatonProxy aut : mAutomata) {
+      final EventEncoding enc = aut.getEventEncoding();
+      final byte status = enc.getProperEventStatus(EventEncoding.TAU);
+      if (EventStatus.isUsedEvent(status)) {
+        final EventProxy tau = enc.getProperEvent(EventEncoding.TAU);
+        if (tau != null) {
+          events.add(tau);
+        }
       }
     }
     return factory.createProductDESProxy(name, events, mAutomata);
@@ -110,6 +121,8 @@ public class TRCandidate
   {
     final int numEvents = mEventEncoding.getNumberOfProperEvents();
     final EventEncoding syncEncoding = new EventEncoding();
+    final String name = getName();
+    syncEncoding.provideTauEvent(name);
     for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
       final EventProxy event = mEventEncoding.getProperEvent(e);
       final byte status = mEventEncoding.getProperEventStatus(e);
@@ -118,6 +131,16 @@ public class TRCandidate
         syncEncoding.addSilentEvent(event);
       } else {
         syncEncoding.addProperEvent(event, status);
+      }
+    }
+    for (final TRAutomatonProxy aut : mAutomata) {
+      final EventEncoding enc = aut.getEventEncoding();
+      final byte status = enc.getProperEventStatus(EventEncoding.TAU);
+      if (EventStatus.isUsedEvent(status)) {
+        final EventProxy tau = enc.getProperEvent(EventEncoding.TAU);
+        if (tau != null) {
+          syncEncoding.addSilentEvent(tau);
+        }
       }
     }
     syncEncoding.addProposition(defaultMarking, true);
