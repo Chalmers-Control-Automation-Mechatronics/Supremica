@@ -133,30 +133,42 @@ public abstract class TRTraceProxy
     mAutomataMap.put(aut, step);
   }
 
-  void expandPartitionStep(final TRAbstractionStepPartition step,
-                           final int[] stepStates,
-                           final EventProxy[] newEvents)
+  void addStutteringSteps(final List<EventProxy> newEvents,
+                          final List<EventProxy> nonStutterEvents)
   {
-    mTraceData.remove(step);
-    final int numStates = stepStates.length;
+    final int newNumEvents = newEvents.size();
+    final EventProxy[] newEventsArray = new EventProxy[newNumEvents];
+    newEvents.toArray(newEventsArray);
     for (final Map.Entry<TRAbstractionStep,int[]> entry : mTraceData.entrySet()) {
       final int[] oldStates = entry.getValue();
-      final int[] newStates = new int[numStates];
-      newStates[0] = oldStates[0];
+      final int[] newStates = new int[newNumEvents + 1];
+      int oldState = newStates[0] = oldStates[0];
       int oldIndex = 0;
       int newIndex = 0;
-      for (final EventProxy event : newEvents) {
-        if (event == mEvents[oldIndex]) {
+      final Iterator<EventProxy> nonStutterIter = nonStutterEvents.iterator();
+      EventProxy nextNonStutterEvent =
+        nonStutterIter.hasNext() ? nonStutterIter.next() : null;
+      while (newIndex < newNumEvents) {
+        while (oldIndex < mEvents.length &&
+               mEvents[oldIndex] != nextNonStutterEvent) {
           oldIndex++;
+          assert oldState == oldStates[oldIndex] :
+            "State-change on non-stutter event detected!";
+        }
+        if (newEventsArray[newIndex] == nextNonStutterEvent) {
+          oldIndex++;
+          oldState = oldStates[oldIndex];
+          nextNonStutterEvent =
+            nonStutterIter.hasNext() ? nonStutterIter.next() : null;
         }
         newIndex++;
-        newStates[newIndex] = oldStates[oldIndex];
+        newStates[newIndex] = oldState;
       }
+      assert nextNonStutterEvent == null :
+        "Failed to consume all non-stutter events!";
       entry.setValue(newStates);
     }
-    final TRAbstractionStep pred = step.getPredecessor();
-    mTraceData.put(pred, stepStates);
-    mEvents = newEvents;
+    mEvents = newEventsArray;
   }
 
 

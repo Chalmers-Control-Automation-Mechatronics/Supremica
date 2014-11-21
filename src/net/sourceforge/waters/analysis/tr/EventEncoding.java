@@ -692,7 +692,7 @@ public class EventEncoding
    * <P>If the encoding already has a silent event, the new event is mapped
    * to the silent event code {@link #TAU}, without adding it to the
    * encoding. This provides a simple means to implement hiding: by adding
-   * a silent event followed by another set events to be hidden. all these
+   * a silent event followed by another set events to be hidden. All these
    * events will be encoded as {@link #TAU}, and can later all be decoded to
    * the first silent event that was added.</P>
    * @param  event  A new silent event.

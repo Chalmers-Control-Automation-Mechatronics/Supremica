@@ -96,14 +96,19 @@ class TRAbstractionStepPartition
     final ChainTRSimplifier chain = new ChainTRSimplifier(mSimplificationSteps);
     chain.setPreferredOutputConfiguration(preferredConfig);
     final int inputConfig = chain.getPreferredInputConfiguration();
-    final TRAutomatonProxy inputAut = mPredecessor.getOutputAutomaton(inputConfig);
+    final TRAutomatonProxy inputAut =
+      mPredecessor.getOutputAutomaton(inputConfig);
+    // We are going to destructively change this automaton,
+    // so we need to clear the copy cached on the predecessor.
+    mPredecessor.setOutputAutomaton(null);
     final ListBufferTransitionRelation inputRel =
       inputAut.getTransitionRelation();
+    final EventEncoding inputEventEncoding = new EventEncoding(mEventEncoding);
     final ListBufferTransitionRelation outputRel =
-      new ListBufferTransitionRelation(inputRel, mEventEncoding, inputConfig);
+      new ListBufferTransitionRelation(inputRel, inputEventEncoding, inputConfig);
     chain.setTransitionRelation(outputRel);
     chain.run();
-    return new TRAutomatonProxy(mEventEncoding, outputRel);
+    return new TRAutomatonProxy(inputEventEncoding, outputRel);
   }
 
   @Override
@@ -118,13 +123,16 @@ class TRAbstractionStepPartition
     final SearchRecord found = expander.findTrace();
     final List<SearchRecord> searchRecordTrace = found.getSearchRecordTrace();
     final int maxLength = trace.getNumberOfSteps() + searchRecordTrace.size();
-    final List<EventProxy> eventTrace = new ArrayList<>(maxLength);
+    final List<EventProxy> newEvents = new ArrayList<>(maxLength);
+    final List<EventProxy> nonStutterEvents =
+      new ArrayList<>(trace.getNumberOfSteps());
     final TIntArrayList states = new TIntArrayList(maxLength);
-    expander.mergeEventTrace(trace, searchRecordTrace, eventTrace, states);
-    final int[] stepStates = states.toArray();
-    final EventProxy[] newEvents = new EventProxy[eventTrace.size()];
-    eventTrace.toArray(newEvents);
-    trace.expandPartitionStep(this, stepStates, newEvents);
+    expander.mergeEventTrace
+      (trace, searchRecordTrace, newEvents, nonStutterEvents, states);
+    trace.removeAutomaton(this);
+    trace.addStutteringSteps(newEvents, nonStutterEvents);
+    final int[] statesArray = states.toArray();
+    trace.addAutomaton(mPredecessor, statesArray);
   }
 
 
@@ -225,10 +233,8 @@ class TRAbstractionStepPartition
       }
       final TransitionIterator iter =
         mInputTransitionRelation.createSuccessorsReadOnlyIterator();
-      while (true) {
+      while (!mSearchSpace.isEmpty()) {
         final SearchRecord current = mSearchSpace.poll();
-        assert current != null : "Failed to expand trace for input automaton " +
-                                 mInputTransitionRelation.getName() + "!";
         if (current == mStartOfNextLevel) {
           if (mNonDeadlockTarget != null) {
             return mNonDeadlockTarget;
@@ -263,6 +269,10 @@ class TRAbstractionStepPartition
           }
         }
       }
+      assert mNonDeadlockTarget != null :
+        "Failed to expand trace for input automaton " +
+        mInputTransitionRelation.getName() + "!";
+      return mNonDeadlockTarget;
     }
 
     private boolean processSearchRecord(final SearchRecord record)
@@ -275,7 +285,7 @@ class TRAbstractionStepPartition
         if (mInputTransitionRelation.isDeadlockState(state, mDefaultMarking)) {
           return true;
         }
-        if (mNonDeadlockTarget != null) {
+        if (mNonDeadlockTarget == null) {
           mNonDeadlockTarget = record;
         }
       }
@@ -307,9 +317,11 @@ class TRAbstractionStepPartition
     private void mergeEventTrace(final TRTraceProxy trace,
                                  final List<SearchRecord> searchRecordTrace,
                                  final List<EventProxy> outputEvents,
+                                 final List<EventProxy> nonStutterEvents,
                                  final TIntArrayList outputStates)
     {
-      final Iterator<SearchRecord> searchRecordIter = searchRecordTrace.iterator();
+      final Iterator<SearchRecord> searchRecordIter =
+        searchRecordTrace.iterator();
       SearchRecord nextSearchRecord = searchRecordIter.next();
       int currentState = nextSearchRecord.getState();
       outputStates.add(currentState);
@@ -340,6 +352,7 @@ class TRAbstractionStepPartition
           final int e = mEventEncoding.getEventCode(nextInputEvent);
           if (e < 0) {
             outputEvents.add(nextInputEvent);
+            nonStutterEvents.add(nextInputEvent);
             outputStates.add(currentState);
             nextInputEvent = null;
             continue;
@@ -353,6 +366,7 @@ class TRAbstractionStepPartition
         outputStates.add(currentState);
         nextSearchRecord = null;
         if (searchRecordEvent == nextInputEvent) {
+          nonStutterEvents.add(nextInputEvent);
           nextInputEvent = null;
         }
       }

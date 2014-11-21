@@ -31,6 +31,19 @@ abstract class TRAbstractionStep
 {
 
   //#########################################################################
+  //# Constructors
+  TRAbstractionStep()
+  {
+    this (null);
+  }
+
+  TRAbstractionStep(final TRAutomatonProxy outputAut)
+  {
+    mOutputAutomaton = outputAut;
+  }
+
+
+  //#########################################################################
   //# Interface Methods
   abstract Collection<TRAbstractionStep> getPredecessors();
 
@@ -52,9 +65,11 @@ abstract class TRAbstractionStep
     return mOutputAutomaton;
   }
 
-  void setOutputAutomaton(final TRAutomatonProxy aut)
+  TRAutomatonProxy setOutputAutomaton(final TRAutomatonProxy aut)
   {
+    final TRAutomatonProxy old = mOutputAutomaton;
     mOutputAutomaton = aut;
+    return old;
   }
 
   TRAbstractionStep getSuccessor()

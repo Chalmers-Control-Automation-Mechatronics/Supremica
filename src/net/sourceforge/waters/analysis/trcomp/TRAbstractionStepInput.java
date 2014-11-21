@@ -33,11 +33,13 @@ class TRAbstractionStepInput
 
   //#########################################################################
   //# Constructor
-  TRAbstractionStepInput(final AutomatonProxy aut,
+  TRAbstractionStepInput(final AutomatonProxy inputAut,
                          final EventEncoding enc,
-                         final StateProxy dumpState)
+                         final StateProxy dumpState,
+                         final TRAutomatonProxy outputAut)
   {
-    mInputAutomaton = aut;
+    super(outputAut);
+    mInputAutomaton = inputAut;
     mEventEncoding = enc;
     mDumpState = dumpState;
   }

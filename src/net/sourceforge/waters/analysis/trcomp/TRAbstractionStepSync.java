@@ -45,14 +45,20 @@ class TRAbstractionStepSync
                         final EventProxy defaultMarking,
                         final EventProxy preconditionMarking,
                         final ProductDESProxyFactory factory,
-                        final TRSynchronousProductBuilder builder)
+                        final TRSynchronousProductBuilder builder,
+                        final TRSynchronousProductResult result)
   {
+    super(result.getComputedAutomaton());
     mPredecessors = preds;
     mEventEncoding = enc;
     mDefaultMarking = defaultMarking;
     mPreconditionMarking = preconditionMarking;
     mFactory = factory;
     mSynchronousProductBuilder = builder;
+    final TRAutomatonProxy outputAut = result.getComputedAutomaton();
+    final ListBufferTransitionRelation rel = outputAut.getTransitionRelation();
+    mDumpStateIndex = rel.getDumpStateIndex();
+    mStateMap = result.getStateMap();
     for (final TRAbstractionStep pred : preds) {
       pred.setSuccessor(this);
     }
@@ -82,7 +88,7 @@ class TRAbstractionStepSync
     final List<TRAutomatonProxy> automata =
       new ArrayList<>(mPredecessors.size());
     for (final TRAbstractionStep pred : mPredecessors) {
-      final TRAutomatonProxy aut = pred.createOutputAutomaton
+      final TRAutomatonProxy aut = pred.getOutputAutomaton
         (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
       automata.add(aut);
     }
@@ -103,6 +109,19 @@ class TRAbstractionStepSync
   }
 
   @Override
+  TRAutomatonProxy setOutputAutomaton(final TRAutomatonProxy outputAut)
+  {
+    final TRAutomatonProxy old = super.setOutputAutomaton(outputAut);
+    assert outputAut == null || outputAut == old :
+      "Output automaton of TRAbstractionStepSync must be set through " +
+      "constructor or createOutputAutomaton() method!";
+    if (outputAut == null) {
+      mStateMap = null;
+    }
+    return old;
+  }
+
+  @Override
   public void expandTrace(final TRTraceProxy trace)
     throws AnalysisException
   {
@@ -114,12 +133,11 @@ class TRAbstractionStepSync
     final int numSteps = events.size() + 1;
     final int numAutomata = mPredecessors.size();
     final TransitionFinder[] finders = new TransitionFinder[numAutomata];
-    final int defaultMarking = mEventEncoding.getEventCode(mDefaultMarking);
     for (int autIndex = 0; autIndex < numAutomata; autIndex++) {
       final TRAbstractionStep pred = mPredecessors.get(autIndex);
       final TRAutomatonProxy aut =
         pred.getOutputAutomaton(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-      finders[autIndex] = new TransitionFinder(aut, numSteps, defaultMarking);
+      finders[autIndex] = new TransitionFinder(aut, numSteps);
     }
     // Store initial states ...
     final int[] tuple = new int[numAutomata];
@@ -182,7 +200,7 @@ class TRAbstractionStepSync
             }
           }
           if (found) {
-            events.set(stepIndex, alt);
+            events.set(stepIndex - 1, alt);
             break;
           }
         }
@@ -207,13 +225,12 @@ class TRAbstractionStepSync
     //#######################################################################
     //# Constructor
     private TransitionFinder(final TRAutomatonProxy aut,
-                             final int numSteps,
-                             final int defaultMarking)
+                             final int numSteps)
     {
       mEventEncoding = aut.getEventEncoding();
       mTransitionRelation = aut.getTransitionRelation();
-      mDefaultMarking =
-        mTransitionRelation.isPropositionUsed(defaultMarking) ? defaultMarking : -1;
+      mHasDefaultMarking = mTransitionRelation.isPropositionUsed
+        (TRCompositionalConflictChecker.DEFAULT_MARKING);
       mTransitionIterator = mTransitionRelation.createSuccessorsReadOnlyIterator();
       mDumpIterator = null;
       mStateSequence = new int[numSteps];
@@ -235,7 +252,7 @@ class TRAbstractionStepSync
 
     private boolean storeInitialDumpState()
     {
-      if (mDefaultMarking >= 0) {
+      if (mHasDefaultMarking) {
         int foundInit = -1;
         for (int s = 0; s < mTransitionRelation.getNumberOfStates(); s++) {
           if (mTransitionRelation.isInitial(s)) {
@@ -301,7 +318,7 @@ class TRAbstractionStepSync
       int foundTarget = -1;
       while (mTransitionIterator.advance()) {
         final int target = mTransitionIterator.getCurrentTargetState();
-        if (mDefaultMarking < 0 || isDumpState(target)) {
+        if (!mHasDefaultMarking || isDumpState(target)) {
           return mStateSequence[stepIndex] = target;
         } else if (foundTarget < 0) {
           foundTarget = target;
@@ -312,8 +329,9 @@ class TRAbstractionStepSync
 
     private boolean isDumpState(final int state)
     {
-      if (mDefaultMarking < 0 ||
-          mTransitionRelation.isMarked(state, mDefaultMarking)) {
+      if (!mHasDefaultMarking ||
+          mTransitionRelation.isMarked
+            (state, TRCompositionalConflictChecker.DEFAULT_MARKING)) {
         return false;
       }
       if (mDumpIterator == null) {
@@ -337,7 +355,7 @@ class TRAbstractionStepSync
     //# Data Members
     private final EventEncoding mEventEncoding;
     private final ListBufferTransitionRelation mTransitionRelation;
-    private final int mDefaultMarking;
+    private final boolean mHasDefaultMarking;
     private final TransitionIterator mTransitionIterator;
     private TransitionIterator mDumpIterator;
     private final int[] mStateSequence;
@@ -353,7 +371,7 @@ class TRAbstractionStepSync
   private final ProductDESProxyFactory mFactory;
   private final TRSynchronousProductBuilder mSynchronousProductBuilder;
 
-  private int mDumpStateIndex = -1;
+  private int mDumpStateIndex;
   private TRSynchronousProductStateMap mStateMap;
 
 }

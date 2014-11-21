@@ -191,7 +191,7 @@ public class ListBufferTransitionRelation
     final List<TransitionProxy> list = new ArrayList<>(transitions);
     final int numStates = stateEnc.getNumberOfStates() + 1;
     final int numTrans = aut.getTransitions().size();
-    mStateBuffer = new IntStateBuffer(eventEnc, stateEnc);
+    mStateBuffer = new IntStateBuffer(eventEnc, stateEnc, dumpState);
     mEventStatus = eventEnc;
     if ((config & CONFIG_SUCCESSORS) != 0) {
       mSuccessorBuffer =

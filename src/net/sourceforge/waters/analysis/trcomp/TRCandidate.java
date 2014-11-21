@@ -119,10 +119,11 @@ public class TRCandidate
                                         final EventProxy preconditionMarking)
     throws OverflowException
   {
+    final String name = getName();
+    final EventProxy tau = mEventEncoding.provideTauEvent(name);
     final int numEvents = mEventEncoding.getNumberOfProperEvents();
     final EventEncoding syncEncoding = new EventEncoding();
-    final String name = getName();
-    syncEncoding.provideTauEvent(name);
+    syncEncoding.setTauEvent(tau);
     for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
       final EventProxy event = mEventEncoding.getProperEvent(e);
       final byte status = mEventEncoding.getProperEventStatus(e);
@@ -137,9 +138,9 @@ public class TRCandidate
       final EventEncoding enc = aut.getEventEncoding();
       final byte status = enc.getProperEventStatus(EventEncoding.TAU);
       if (EventStatus.isUsedEvent(status)) {
-        final EventProxy tau = enc.getProperEvent(EventEncoding.TAU);
-        if (tau != null) {
-          syncEncoding.addSilentEvent(tau);
+        final EventProxy event = enc.getProperEvent(EventEncoding.TAU);
+        if (event != null) {
+          syncEncoding.addSilentEvent(event);
         }
       }
     }
