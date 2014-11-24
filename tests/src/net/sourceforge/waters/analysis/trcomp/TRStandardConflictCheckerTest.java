@@ -53,7 +53,7 @@ public class TRStandardConflictCheckerTest
     checker.setSelfloopOnlyEventsSupported(true);
     checker.setAlwaysEnabledEventsSupported(true);
     checker.setCounterExampleEnabled(true);
-    //checker.setTraceCheckingEnabled(true);
+    checker.setTraceCheckingEnabled(true);
     return checker;
   }
 

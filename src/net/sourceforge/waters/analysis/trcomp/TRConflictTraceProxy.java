@@ -40,6 +40,17 @@ public class TRConflictTraceProxy
     mKind = kind;
   }
 
+  /**
+   * Creates a new conflict trace by copying another.
+   * This copy constructor performs a deep copy of events and state lists,
+   * but only shallow copy of the automata and abstraction steps.
+   */
+  TRConflictTraceProxy(final TRConflictTraceProxy trace)
+  {
+    super(trace);
+    mKind = trace.mKind;
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.base.Proxy
@@ -64,6 +75,15 @@ public class TRConflictTraceProxy
   public ConflictKind getKind()
   {
     return mKind;
+  }
+
+
+  //#########################################################################
+  //# Interface java.lang.Cloneable
+  @Override
+  public TRConflictTraceProxy clone()
+  {
+    return (TRConflictTraceProxy) super.clone();
   }
 
 

@@ -10,6 +10,7 @@
 package net.sourceforge.waters.model.analysis.des;
 
 import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -23,6 +24,7 @@ import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -248,6 +250,37 @@ public class TraceChecker
   }
 
   /**
+   * Checks whether trace forms a correct conflict error trace for its
+   * automata. A conflict error trace must be accepted by all automata and
+   * end in a state marking by the precondition marking. Furthermore, the end
+   * state must be blocking, i.e., it must not be possible to reach a terminal
+   * state. The latter condition is verified using a language inclusion check,
+   * which may be quite time consuming.
+   * @param  trace      The counterexample to be checked.
+   * @param  premarking Precondition marking for generalised nonblocking or
+   *                    <CODE>null</CODE>.
+   * @param  marking    Marking proposition to identify terminal states.
+   * @param  sat        A flag, indicating that the trace is expected to be
+   *                    saturated. If true, any missing step entry for the
+   *                    any of the given automata will also lead to an exception.
+   * @param  translator Kind translator used for filtering propositions when
+   *                    creating language inclusion model.
+   * @throws AssertionError to indicate that something is wrong with the
+   *                        trace.
+   */
+  public static void checkConflictCounterExample
+    (final ConflictTraceProxy trace,
+     final EventProxy premarking,
+     final EventProxy marking,
+     final boolean sat,
+     final KindTranslator translator)
+  throws AnalysisException
+  {
+    checkConflictCounterExample(trace.getTraceSteps(), trace.getAutomata(),
+                                premarking, marking, sat, translator);
+  }
+
+  /**
    * Checks whether the given list of trace steps forms a correct conflict
    * error trace for the given automata. A conflict error trace must be
    * accepted by all the given automata and end in a state marking by the
@@ -281,8 +314,7 @@ public class TraceChecker
     final int length = steps.size();
     assertTrue(length > 0, "Trace has no initial step!");
     final int numAutomata = automata.size();
-    final Map<AutomatonProxy,StateProxy> map =
-      new HashMap<AutomatonProxy,StateProxy>(numAutomata);
+    final Map<AutomatonProxy,StateProxy> map = new HashMap<>(numAutomata);
     for (final AutomatonProxy aut : automata) {
       final StateProxy state =
         checkCounterExample(steps, aut, premarking, sat, false);
@@ -468,7 +500,7 @@ public class TraceChecker
     final ProductDESProxyFactory factory =
       ProductDESElementFactory.getInstance();
     final Collection<AutomatonProxy> oldautomata = inittuple.keySet();
-    final Collection<EventProxy> events = new THashSet<EventProxy>();
+    final Collection<EventProxy> events = new THashSet<>();
     final String markingname = oldmarking.getName();
     final EventProxy newmarking =
       factory.createEventProxy(markingname, EventKind.UNCONTROLLABLE);
@@ -481,8 +513,7 @@ public class TraceChecker
       }
     }
     final int numaut = oldautomata.size();
-    final Collection<AutomatonProxy> newautomata =
-      new ArrayList<AutomatonProxy>(numaut + 1);
+    final Collection<AutomatonProxy> newautomata = new ArrayList<>(numaut + 1);
     for (final AutomatonProxy oldaut : oldautomata) {
       final StateProxy init = inittuple.get(oldaut);
       final AutomatonProxy newaut =
@@ -505,8 +536,7 @@ public class TraceChecker
       ProductDESElementFactory.getInstance();
     final Collection<EventProxy> oldevents = aut.getEvents();
     final int numevents = oldevents.size();
-    final Collection<EventProxy> newevents =
-      new ArrayList<EventProxy>(numevents);
+    final Collection<EventProxy> newevents = new ArrayList<>(numevents);
     for (final EventProxy oldevent : oldevents) {
       if (oldevent == oldmarking) {
         newevents.add(newmarking);
@@ -523,7 +553,7 @@ public class TraceChecker
     final Collection<TransitionProxy> oldtransitions = aut.getTransitions();
     final int numtrans = oldtransitions.size();
     final Collection<TransitionProxy> newtransitions =
-      new ArrayList<TransitionProxy>(numstates + numtrans);
+      new ArrayList<>(numstates + numtrans);
     for (final StateProxy oldstate : oldstates) {
       final String statename = oldstate.getName();
       final StateProxy newstate =

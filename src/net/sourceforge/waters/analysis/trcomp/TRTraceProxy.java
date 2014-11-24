@@ -17,10 +17,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -65,6 +67,26 @@ public abstract class TRTraceProxy
     mAutomataMap = new HashMap<>();
   }
 
+  /**
+   * Creates a new trace by copying another.
+   * This copy constructor performs a deep copy of events and state lists,
+   * but only shallow copy of the automata and abstraction steps.
+   */
+  TRTraceProxy(final TRTraceProxy trace)
+  {
+    super(trace);
+    mProductDES = trace.mProductDES;
+    mEvents = Arrays.copyOf(trace.mEvents, trace.mEvents.length);
+    mTraceData = new HashMap<>(trace.mTraceData.size());
+    for (final Map.Entry<TRAbstractionStep,int[]> entry :
+         trace.mTraceData.entrySet()) {
+      final TRAbstractionStep step = entry.getKey();
+      final int[] states = entry.getValue();
+      mTraceData.put(step, Arrays.copyOf(states, states.length));
+    }
+    mAutomataMap = new HashMap<>(trace.mAutomataMap);
+  }
+
 
   //#########################################################################
   //# Simple Access
@@ -91,7 +113,7 @@ public abstract class TRTraceProxy
   @Override
   public Set<AutomatonProxy> getAutomata()
   {
-    return new AutomataSet();
+    return mAutomataMap.keySet();
   }
 
   @Override
@@ -104,6 +126,25 @@ public abstract class TRTraceProxy
   public List<TraceStepProxy> getTraceSteps()
   {
     return new TraceStepList();
+  }
+
+
+  //#########################################################################
+  //# Interface java.lang.Cloneable
+  @Override
+  public TRTraceProxy clone()
+  {
+    final TRTraceProxy cloned = (TRTraceProxy) super.clone();
+    cloned.mEvents = Arrays.copyOf(mEvents, mEvents.length);
+    cloned.mTraceData = new HashMap<>(mTraceData.size());
+    for (final Map.Entry<TRAbstractionStep,int[]> entry :
+         mTraceData.entrySet()) {
+      final TRAbstractionStep step = entry.getKey();
+      final int[] states = entry.getValue();
+      cloned.mTraceData.put(step, Arrays.copyOf(states, states.length));
+    }
+    cloned.mAutomataMap = new HashMap<>(mAutomataMap);
+    return cloned;
   }
 
 
@@ -173,93 +214,40 @@ public abstract class TRTraceProxy
 
 
   //#########################################################################
+  //# Debugging
+  void setUpForTraceChecking() throws AnalysisException
+  {
+    for (final TRAbstractionStep step : mTraceData.keySet()) {
+      if (step instanceof TRAbstractionStepInput) {
+        final TRAbstractionStepInput inputStep = (TRAbstractionStepInput) step;
+        final AutomatonProxy inputAut = inputStep.getInputAutomaton();
+        if (mAutomataMap.containsKey(inputAut)) {
+          continue;
+        }
+      }
+      final TRAutomatonProxy aut =
+        step.getOutputAutomaton(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      mAutomataMap.put(aut, step);
+    }
+  }
+
+
+  //#########################################################################
   //# Auxiliary Methods
   private int getNumberOfAutomata()
   {
-    int count = 0;
-    for (final TRAbstractionStep step : mTraceData.keySet()) {
-      if (step instanceof TRAbstractionStepInput) {
-        count++;
-      }
-    }
-    return count;
+    return mAutomataMap.size();
   }
 
-
-  //#########################################################################
-  //# Inner Class AutomataSet
-  private class AutomataSet extends AbstractSet<AutomatonProxy>
+  private boolean isInputAutomaton(final AutomatonProxy aut,
+                                   final TRAbstractionStep step)
   {
-    //#######################################################################
-    //# Interface java.util.Set<AutomatonProxy>
-    @Override
-    public Iterator<AutomatonProxy> iterator()
-    {
-      final Iterator<TRAbstractionStep> inner = mTraceData.keySet().iterator();
-      return new AutomataIterator(inner);
+    if (step instanceof TRAbstractionStepInput) {
+      final TRAbstractionStepInput inputStep = (TRAbstractionStepInput) step;
+      return inputStep.getInputAutomaton() == aut;
+    } else {
+      return false;
     }
-
-    @Override
-    public int size()
-    {
-      return getNumberOfAutomata();
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class AutomataSet
-  private class AutomataIterator implements Iterator<AutomatonProxy>
-  {
-    //#######################################################################
-    //# Constructor
-    private AutomataIterator(final Iterator<TRAbstractionStep> inner)
-    {
-      mInnerIterator = inner;
-    }
-
-    //#######################################################################
-    //# Interface java.util.Iterator<AutomatonProxy>
-    @Override
-    public boolean hasNext()
-    {
-      if (mNext != null) {
-        return true;
-      } else {
-        while (mInnerIterator.hasNext()) {
-          final TRAbstractionStep next = mInnerIterator.next();
-          if (next instanceof TRAbstractionStepInput) {
-            mNext = (TRAbstractionStepInput) next;
-            return true;
-          }
-        }
-        return false;
-      }
-    }
-
-    @Override
-    public AutomatonProxy next()
-    {
-      if (hasNext()) {
-        final AutomatonProxy aut = mNext.getInputAutomaton();
-        mNext = null;
-        return aut;
-      } else {
-        throw new NoSuchElementException
-          ("Attempting to read past end of TRTraceProxy automata list!");
-      }
-    }
-
-    @Override
-    public void remove()
-    {
-      mInnerIterator.remove();
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final Iterator<TRAbstractionStep> mInnerIterator;
-    private TRAbstractionStepInput mNext;
   }
 
 
@@ -362,15 +350,25 @@ public abstract class TRTraceProxy
     }
 
     @Override
-    public StateProxy get(final Object aut)
+    public StateProxy get(final Object key)
     {
-      final TRAbstractionStepInput step = mAutomataMap.get(aut);
+      final AutomatonProxy aut = (AutomatonProxy) key;
+      final TRAbstractionStep step = mAutomataMap.get(aut);
       assert step != null;
-      assert step.getInputAutomaton() == aut;
       final int[] states = mTraceData.get(step);
       final int s = states[mIndex];
-      final StateEncoding enc = step.getStateEncoding();
-      return enc.getState(s);
+      if (isInputAutomaton(aut, step)) {
+        final TRAbstractionStepInput inputStep = (TRAbstractionStepInput) step;
+        final StateEncoding enc = inputStep.getStateEncoding();
+        assert enc.getState(s) != null;
+        return enc.getState(s);
+      } else {
+        final TRAutomatonProxy tr = (TRAutomatonProxy) aut;
+        if (tr.getState(s) == null) {
+          tr.getState(s);
+        }
+        return tr.getState(s);
+      }
     }
 
     @Override
@@ -441,16 +439,22 @@ public abstract class TRTraceProxy
     @Override
     public Map.Entry<AutomatonProxy,StateProxy> next()
     {
-      final Map.Entry<AutomatonProxy,TRAbstractionStepInput> innerEntry =
+      final Map.Entry<AutomatonProxy,TRAbstractionStep> innerEntry =
         mInnerIterator.next();
       final AutomatonProxy aut = innerEntry.getKey();
-      final TRAbstractionStepInput step = innerEntry.getValue();
-      assert step.getInputAutomaton() == aut;
+      final TRAbstractionStep step = innerEntry.getValue();
       final int[] states = mTraceData.get(step);
       final int s = states[mIndex];
-      final StateEncoding enc = step.getStateEncoding();
-      final StateProxy state = enc.getState(s);
-      return new AbstractMap.SimpleEntry<>(aut, state);
+      if (isInputAutomaton(aut, step)) {
+        final TRAbstractionStepInput inputStep = (TRAbstractionStepInput) step;
+        final StateEncoding enc = inputStep.getStateEncoding();
+        final StateProxy state = enc.getState(s);
+        return new AbstractMap.SimpleEntry<>(aut, state);
+      } else {
+        final TRAutomatonProxy tr = (TRAutomatonProxy) aut;
+        final StateProxy state = tr.getState(s);
+        return new AbstractMap.SimpleEntry<>(aut, state);
+      }
     }
 
     @Override
@@ -462,7 +466,7 @@ public abstract class TRTraceProxy
 
     //#######################################################################
     //# Data Members
-    private final Iterator<Map.Entry<AutomatonProxy,TRAbstractionStepInput>>
+    private final Iterator<Map.Entry<AutomatonProxy,TRAbstractionStep>>
       mInnerIterator;
     private final int mIndex;
   }
@@ -472,8 +476,8 @@ public abstract class TRTraceProxy
   //# Data Members
   private final ProductDESProxy mProductDES;
   private EventProxy[] mEvents;
-  private final Map<TRAbstractionStep,int[]> mTraceData;
-  private final Map<AutomatonProxy,TRAbstractionStepInput> mAutomataMap;
+  private Map<TRAbstractionStep,int[]> mTraceData;
+  private Map<AutomatonProxy,TRAbstractionStep> mAutomataMap;
 
 
   //#########################################################################

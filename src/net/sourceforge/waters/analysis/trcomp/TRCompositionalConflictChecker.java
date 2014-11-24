@@ -50,6 +50,7 @@ import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
+import net.sourceforge.waters.model.analysis.des.TraceChecker;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
@@ -346,6 +347,27 @@ public class TRCompositionalConflictChecker
     return mAlwaysEnabledEventsSupported;
   }
 
+  /**
+   * Sets whether counterexample checking is enabled.
+   * If enabled, the generated counterexample is checked for correctness
+   * after each step during counterexample. This is a very slow process,
+   * and only recommend for testing and debugging.
+   * This setting is disabled by default.
+   */
+  public void setTraceCheckingEnabled(final boolean checking)
+  {
+    mTraceCheckingEnabled = checking;
+  }
+
+  /**
+   * Returns whether counterexample checking is enabled.
+   * @see #setTraceCheckingEnabled(boolean) setTraceCheckingEnabled()
+   */
+  public boolean isTraceCheckingEnabled()
+  {
+    return mTraceCheckingEnabled;
+  }
+
 
   //#########################################################################
   //# Hooks
@@ -401,8 +423,9 @@ public class TRCompositionalConflictChecker
           return;
         }
         if (isCounterExampleEnabled()) {
+          final EventEncoding clonedEnc = new EventEncoding(eventEnc);
           final TRAbstractionStepInput step =
-            new TRAbstractionStepInput(aut, eventEnc, dumpState, tr);
+            new TRAbstractionStepInput(aut, clonedEnc, dumpState, tr);
           mAbstractionSequence.add(step);
           mCurrentAutomataMap.put(tr, step);
         }
@@ -961,17 +984,33 @@ public class TRCompositionalConflictChecker
       mSpecialEventsListener.setEnabled(true);
       dropPendingSubsystems();
       final ProductDESProxy des = getModel();
-      final TRTraceProxy trace = new TRConflictTraceProxy(des);
+      final TRConflictTraceProxy trace = new TRConflictTraceProxy(des);
       final int end = mAbstractionSequence.size();
       final ListIterator<TRAbstractionStep> iter =
         mAbstractionSequence.listIterator(end);
       while (iter.hasPrevious()) {
         final TRAbstractionStep step = iter.previous();
         step.expandTrace(trace);
+        checkIntermediateCounterExample(trace);
         step.dispose();
         iter.remove();
       }
       result.setCounterExample(trace);
+    }
+  }
+
+  private void checkIntermediateCounterExample(final TRConflictTraceProxy trace)
+    throws AnalysisException
+  {
+    if (mTraceCheckingEnabled) {
+      final TRConflictTraceProxy cloned = new TRConflictTraceProxy(trace);
+      cloned.setUpForTraceChecking();
+      final KindTranslator translator = getKindTranslator();
+      TraceChecker.checkConflictCounterExample(cloned,
+                                               mConfiguredPreconditionMarking,
+                                               mUsedDefaultMarking,
+                                               true,
+                                               translator);
     }
   }
 
@@ -1148,6 +1187,7 @@ public class TRCompositionalConflictChecker
   private boolean mFailingEventsSupported;
   private boolean mSelfloopOnlyEventsSupported;
   private boolean mAlwaysEnabledEventsSupported;
+  private boolean mTraceCheckingEnabled;
 
   // Tools
   private final PreselectionHeuristic mPreselectionHeuristic;

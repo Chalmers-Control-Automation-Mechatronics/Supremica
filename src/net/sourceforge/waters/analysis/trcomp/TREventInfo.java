@@ -17,13 +17,33 @@ import java.util.Collections;
 import java.util.Queue;
 import java.util.Set;
 
-import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 
 
 /**
+ * <P>Event information for compositional verification.</P>
+ *
+ * <P>An event information record remembers all automata using an event,
+ * plus details of the special-event status. An event can be <I>blocked</I>,
+ * <I>failing</I>, <I>always enabled</I>, or <I>selfloop-only</I>.
+ * In addition, an event is <I>local</I> if it appears in only one
+ * automaton.</P>
+ *
+ * <P>If an event is blocked in one automaton, it is blocked in the system.
+ * Nevertheless, the blocked status is recorded with the automaton, to
+ * ensure that the blocked event is only hidden from its blocking automaton
+ * after it has been removed from all other automata.</P>
+ *
+ * <P>The failing status is recorded globally on the event information record
+ * as it affects all automata in the same way.</P>
+ *
+ * <P>Events are recognised as <I>locally</I> selfloop-only or locally always
+ * enabled, if they are selfloop-only or always enabled in all but one
+ * automata. They are recognised as globally selfloop-only or globally always
+ * enabled, if they are selfloop-only or always enabled in all automata.</P>
+ *
  * @author Robi Malik
  */
 
@@ -131,7 +151,7 @@ class TREventInfo
 
   byte getEventStatus(final Set<TRAutomatonProxy> candidate)
   {
-    if (mIsBlocked || mNumNonSelfloopAutomata == 0) {
+    if (mNumNonSelfloopAutomata == 0) {
       if (mIsControllable) {
         return EventStatus.STATUS_BLOCKED | EventStatus.STATUS_CONTROLLABLE;
       } else {
@@ -164,11 +184,6 @@ class TREventInfo
     final int oldNumDisablingAutomata = mNumDisablingAutomata;
     setAutomatonStatus(aut, newStatus);
     if (mIsBlocked && !wasBlocked) {
-      final EventEncoding enc = aut.getEventEncoding();
-      final int e = enc.getEventCode(mEvent);
-      final byte status = enc.getProperEventStatus(e);
-      enc.setProperEventStatus(e, status | EventStatus.STATUS_UNUSED);
-      removeAutomaton(aut);
       enqueueAutomataExcept(needsSimplification, aut);
     } else if (mNumNonSelfloopAutomata == 0 && oldNumNonSelfloopAutomata > 0) {
       enqueueAutomataExcept(needsSimplification, null);
@@ -188,11 +203,11 @@ class TREventInfo
     }
   }
 
-  void setAutomatonStatus(final TRAutomatonProxy aut, final byte newStatus)
+  void setAutomatonStatus(final TRAutomatonProxy aut, byte newStatus)
   {
     if (EventStatus.isUsedEvent(newStatus)) {
       if (mIsBlocked) {
-        // nothing
+        newStatus &= ~EventStatus.STATUS_BLOCKED;
       } else if (EventStatus.isBlockedEvent(newStatus)) {
         mIsBlocked = true;
         mIsFailing = false;
@@ -218,7 +233,7 @@ class TREventInfo
       } else if (!oldAlwaysEnabled && newAlwaysEnabled) {
         mNumDisablingAutomata--;
       }
-      mStatusMap.put(aut, (byte) (newStatus & EventStatus.STATUS_FULLY_LOCAL));
+      mStatusMap.put(aut, (byte) (newStatus & USED_BITS));
     } else {
       removeAutomaton(aut);
     }
@@ -279,25 +294,29 @@ class TREventInfo
     @Override
     public boolean execute(final TRAutomatonProxy aut, final byte status)
     {
-      if (mCandidate.contains(aut)) {
-        return true;
-      } else {
-        mResult &= status;
-        return mResult != 0;
+      if (!mCandidate.contains(aut)) {
+        mBlocked |= EventStatus.isBlockedEvent(status);
+        mStatus &= status;
       }
+      return true;
     }
 
     //#######################################################################
     //# Simple Access
     private byte getResult()
     {
-      return mResult;
+      if (mBlocked) {
+        return (byte) (mStatus | EventStatus.STATUS_BLOCKED);
+      } else {
+        return mStatus;
+      }
     }
 
     //#######################################################################
     //# Data Members
     private final Set<TRAutomatonProxy> mCandidate;
-    private byte mResult = EventStatus.STATUS_FULLY_LOCAL;
+    private boolean mBlocked = false;
+    private byte mStatus = EventStatus.STATUS_FULLY_LOCAL;
   }
 
 
@@ -350,5 +369,11 @@ class TREventInfo
   private boolean mIsFailing;
   private int mNumNonSelfloopAutomata;
   private int mNumDisablingAutomata;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final byte USED_BITS =
+    EventStatus.STATUS_FULLY_LOCAL | EventStatus.STATUS_BLOCKED;
 
 }

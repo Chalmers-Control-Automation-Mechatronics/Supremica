@@ -111,6 +111,7 @@ public class TRAutomatonProxy
   public TRAutomatonProxy(final EventEncoding eventEnc,
                           final ListBufferTransitionRelation rel)
   {
+    rel.checkEventStatusProvider(eventEnc);
     mEventEncoding = eventEnc;
     mStates = null;
     mTransitionRelation = rel;
@@ -192,7 +193,7 @@ public class TRAutomatonProxy
     if (mStates == null) {
       mStates = new TRStateList();
     }
-    return mStates.get(stateIndex);
+    return mStates.createState(stateIndex);
   }
 
   public int getStateIndex(final StateProxy state)
@@ -441,13 +442,6 @@ public class TRAutomatonProxy
     public int size()
     {
       return mTransitionRelation.getNumberOfReachableStates();
-    }
-
-    //#######################################################################
-    //# Simple Access
-    private StateProxy get(final int index)
-    {
-      return mStates[index];
     }
 
     //#######################################################################

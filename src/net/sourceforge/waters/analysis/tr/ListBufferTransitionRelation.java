@@ -2946,6 +2946,17 @@ public class ListBufferTransitionRelation
     }
   }
 
+  /**
+   * Checks whether the transition relation's event status provider
+   * is the same object as the argument.
+   * @throws AssertionFailedError to indicate that the transition relation
+   *         does not have the expected event status provider.
+   */
+  public void checkEventStatusProvider(final EventStatusProvider expected)
+  {
+    assert mEventStatus == expected;
+  }
+
   public void checkIntegrity()
   {
     if (mPredecessorBuffer == null && mSuccessorBuffer == null) {
