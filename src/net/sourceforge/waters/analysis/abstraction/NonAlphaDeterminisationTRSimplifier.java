@@ -130,27 +130,6 @@ public class NonAlphaDeterminisationTRSimplifier
     return mDumpStateAware;
   }
 
-  /**
-   * Sets whether special events are to be considered in abstraction.
-   * If enabled, events marked as selfloop-only in all other automata
-   * will be treated specially. For such events, it is possible to assume
-   * implicit selfloops on all states of the automaton being simplified,
-   * potentially giving better state reduction.
-   */
-  public void setUsingSpecialEvents(final boolean enable)
-  {
-    mBisimulator.setUsingSpecialEvents(enable);
-  }
-
-  /**
-   * Returns whether special events are considered in abstraction.
-   * @see #setUsingSpecialEvents(boolean)
-   */
-  public boolean isUsingSpecialEvents()
-  {
-    return mBisimulator.isUsingSpecialEvents();
-  }
-
 
   //#########################################################################
   //# Interface

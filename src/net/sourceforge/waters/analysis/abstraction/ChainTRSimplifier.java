@@ -120,6 +120,17 @@ public class ChainTRSimplifier
   }
 
   @Override
+  public boolean isSupportingAlwaysEnabledEvents()
+  {
+    for (final TransitionRelationSimplifier step : mSteps) {
+      if (step.isSupportingAlwaysEnabledEvents()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
   public boolean isReducedMarking(final int propID)
   {
     return mReducedMarkings[propID];

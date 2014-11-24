@@ -170,6 +170,12 @@ public abstract class AbstractTRSimplifier
   }
 
   @Override
+  public boolean isSupportingAlwaysEnabledEvents()
+  {
+    return false;
+  }
+
+  @Override
   public boolean isReducedMarking(final int propID)
   {
     return false;

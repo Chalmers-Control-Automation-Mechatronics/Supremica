@@ -60,14 +60,12 @@ class ProjectionAbstractionProcedure extends TRAbstractionProcedure
       new ObservationEquivalenceTRSimplifier();
     bisimulator1.setEquivalence
       (ObservationEquivalenceTRSimplifier.Equivalence.DETERMINISTIC_MINSTATE);
-    bisimulator1.setUsingSpecialEvents(false);
     if (verifier.isUsingSpecialEvents()) {
       // Selfloop-only events must be handled through bisimulation.
       final ObservationEquivalenceTRSimplifier bisimulator2 =
         new ObservationEquivalenceTRSimplifier();
       bisimulator2.setEquivalence
-      (ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION);
-      bisimulator2.setUsingSpecialEvents(true);
+        (ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION);
       bisimulator2.setInfoEnabled(true);
     }
     chain.add(bisimulator1);

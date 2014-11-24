@@ -433,12 +433,19 @@ public class TRCompositionalConflictChecker
       }
     }
 
+    mBlockedEventsUsed = mBlockedEventsSupported;
+    mFailingEventsUsed =
+      mFailingEventsSupported && mConfiguredPreconditionMarking == null;
+    mSelfloopOnlyEventsUsed = mSelfloopOnlyEventsSupported;
+    mAlwaysEnabledEventsUsed =
+      mAlwaysEnabledEventsSupported && mTRSimplifier.isSupportingAlwaysEnabledEvents();
+
     final int numEvents = model.getEvents().size();
     mSpecialEventsFinder = new SpecialEventsFinder();
     mSpecialEventsFinder.setDefaultMarkingID(DEFAULT_MARKING);
-    mSpecialEventsFinder.setBlockedEventsDetected(mBlockedEventsSupported);
-    mSpecialEventsFinder.setFailingEventsDetected(mFailingEventsSupported);
-    mSpecialEventsFinder.setSelfloopOnlyEventsDetected(mSelfloopOnlyEventsSupported);
+    mSpecialEventsFinder.setBlockedEventsDetected(mBlockedEventsUsed);
+    mSpecialEventsFinder.setFailingEventsDetected(mFailingEventsUsed);
+    mSpecialEventsFinder.setSelfloopOnlyEventsDetected(mSelfloopOnlyEventsUsed);
     mSpecialEventsFinder.setAlwaysEnabledEventsDetected(false);
     mSpecialEventsFinder.setControllabilityConsidered(isControllabilityConsidered());
     mCurrentSubsystem = new TRSubsystemInfo(trs, numEvents);
@@ -449,7 +456,7 @@ public class TRCompositionalConflictChecker
       final byte[] status = mSpecialEventsFinder.getComputedEventStatus();
       mCurrentSubsystem.registerEvents(aut, status);
     }
-    mSpecialEventsFinder.setAlwaysEnabledEventsDetected(mAlwaysEnabledEventsSupported);
+    mSpecialEventsFinder.setAlwaysEnabledEventsDetected(mAlwaysEnabledEventsUsed);
 
     final ProductDESProxyFactory factory = getFactory();
     final KindTranslator translator = getKindTranslator();
@@ -470,7 +477,7 @@ public class TRCompositionalConflictChecker
     mSubsystemQueue = new PriorityQueue<>();
     mNeedsSimplification = new SimplificationQueue(trs);
     mNeedsDisjointSubsystemsCheck = true;
-    mAlwaysEnabledDetectedInitially = !mAlwaysEnabledEventsSupported;
+    mAlwaysEnabledDetectedInitially = !mAlwaysEnabledEventsUsed;
   }
 
   @Override
@@ -1188,6 +1195,11 @@ public class TRCompositionalConflictChecker
   private boolean mSelfloopOnlyEventsSupported;
   private boolean mAlwaysEnabledEventsSupported;
   private boolean mTraceCheckingEnabled;
+
+  private boolean mBlockedEventsUsed;
+  private boolean mFailingEventsUsed;
+  private boolean mSelfloopOnlyEventsUsed;
+  private boolean mAlwaysEnabledEventsUsed;
 
   // Tools
   private final PreselectionHeuristic mPreselectionHeuristic;

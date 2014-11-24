@@ -194,27 +194,6 @@ public class ObservationEquivalenceTRSimplifier
     return mDumpStateAware;
   }
 
-  /**
-   * Sets whether special events are to be considered in abstraction.
-   * If enabled, events marked as selfloop-only in all other automata
-   * will be treated specially. For such events, it is possible to assume
-   * implicit selfloops on all states of the automaton being simplified,
-   * potentially giving better state reduction.
-   */
-  public void setUsingSpecialEvents(final boolean enable)
-  {
-    mUsingSpecialEvents = enable;
-  }
-
-  /**
-   * Returns whether special events are considered in abstraction.
-   * @see #setUsingSpecialEvents(boolean)
-   */
-  public boolean isUsingSpecialEvents()
-  {
-    return mUsingSpecialEvents;
-  }
-
   public void setUsingLocalEvents(final boolean enable)
   {
     mUsingLocalEvents = enable;
@@ -549,9 +528,7 @@ public class ObservationEquivalenceTRSimplifier
     super.setUp();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int first = mEquivalence.getFirstSplitEvent();
-    if (mUsingSpecialEvents) {
-      assert mEquivalence != Equivalence.DETERMINISTIC_MINSTATE :
-        "Can't use deterministic-minstate with selfloop-only events!";
+    if (mEquivalence != Equivalence.DETERMINISTIC_MINSTATE) {
       final int numEvents = rel.getNumberOfProperEvents();
       mOnlySelfLoopEvents = new TIntArrayList(rel.getNumberOfProperEvents());
       for (int e = first; e < numEvents; e++) {
@@ -560,9 +537,6 @@ public class ObservationEquivalenceTRSimplifier
           mOnlySelfLoopEvents.add(e);
         }
       }
-    } else if (first == EventEncoding.TAU) {
-      mOnlySelfLoopEvents = new TIntArrayList(1);
-      mOnlySelfLoopEvents.add(first);
     } else {
       mOnlySelfLoopEvents = null;
     }
@@ -848,7 +822,7 @@ public class ObservationEquivalenceTRSimplifier
         checkAbort();
         final boolean selflooped =
           (status & EventStatus.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0 &&
-          mUsingSpecialEvents && doNonTau && e != EventEncoding.TAU;
+          doNonTau && e != EventEncoding.TAU;
         final int from0 = iter0.getCurrentFromState();
         final int to0 = iter0.getCurrentToState();
         iter1.resetState(from0);
@@ -1270,7 +1244,7 @@ public class ObservationEquivalenceTRSimplifier
         @Override
         public boolean execute(final int event)
         {
-          final boolean outsideOnlySelfloop = mUsingSpecialEvents &&
+          final boolean outsideOnlySelfloop =
             (rel.getProperEventStatus(event) &
              EventStatus.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0;
           TIntHashSet visitedStates = null;
@@ -1467,7 +1441,7 @@ public class ObservationEquivalenceTRSimplifier
         public boolean execute(final int event)
         {
           final ListBufferTransitionRelation rel = getTransitionRelation();
-          final boolean outsideOnlySelfloop = mUsingSpecialEvents &&
+          final boolean outsideOnlySelfloop =
             (rel.getProperEventStatus(event) &
              EventStatus.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0;
           final TransitionIterator transIter =
@@ -1776,7 +1750,7 @@ public class ObservationEquivalenceTRSimplifier
         public boolean execute(final int event)
         {
           final ListBufferTransitionRelation rel = getTransitionRelation();
-          final boolean outsideOnlySelfloop = mUsingSpecialEvents &&
+          final boolean outsideOnlySelfloop =
             (rel.getProperEventStatus(event) &
              EventStatus.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0;
           final TransitionIterator transIter =
@@ -2348,7 +2322,6 @@ public class ObservationEquivalenceTRSimplifier
   private long mPropositionMask = ~0;
   private int mDefaultMarkingID = -1;
   private boolean mDumpStateAware = false;
-  private boolean mUsingSpecialEvents = true;
   private boolean mUsingLocalEvents = false;
   private int mTransitionLimit = Integer.MAX_VALUE;
   private int mInitialInfoSize = -1;

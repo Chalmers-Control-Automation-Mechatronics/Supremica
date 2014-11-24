@@ -151,7 +151,6 @@ class UnifiedEFASimplifier extends AbstractEFAAlgorithm
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier();
     bisimulator.setEquivalence(equivalence);
-    bisimulator.setUsingSpecialEvents(true);
     bisimulator.setDumpStateAware(true);
     bisimulator.setTransitionRemovalMode
       (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER);

@@ -642,10 +642,9 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           final ChainTRSimplifier chain = new ChainTRSimplifier();
           final ObservationEquivalenceTRSimplifier bisimulator =
             new ObservationEquivalenceTRSimplifier();
-          bisimulator.setUsingSpecialEvents(false);
           bisimulator.setEquivalence
-          (ObservationEquivalenceTRSimplifier.Equivalence.
-           DETERMINISTIC_MINSTATE);
+            (ObservationEquivalenceTRSimplifier.Equivalence.
+             DETERMINISTIC_MINSTATE);
           bisimulator.setTransitionLimit(getTransitionLimit());
           chain.add(bisimulator);
 
@@ -900,10 +899,9 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
         final ChainTRSimplifier chain = new ChainTRSimplifier();
         final ObservationEquivalenceTRSimplifier bisimulator =
           new ObservationEquivalenceTRSimplifier();
-        bisimulator.setUsingSpecialEvents(false);
         bisimulator.setEquivalence
-        (ObservationEquivalenceTRSimplifier.Equivalence.
-         DETERMINISTIC_MINSTATE);
+          (ObservationEquivalenceTRSimplifier.Equivalence.
+           DETERMINISTIC_MINSTATE);
         bisimulator.setTransitionLimit(getTransitionLimit());
         chain.add(bisimulator);
 
