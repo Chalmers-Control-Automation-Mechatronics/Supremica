@@ -12,7 +12,7 @@ package net.sourceforge.waters.analysis.compositional;
 
 /**
  * A factory class to obtain {@link SelectionHeuristic} objects.
- * The selection heuristic creator is obtain from a
+ * The selection heuristic creator is obtained from a
  * {@link CompositionalSelectionHeuristicFactory} and produces the actual
  * selection heuristics through its {@link #createBaseHeuristic()} and
  * {@link #createChainHeuristic()} methods.

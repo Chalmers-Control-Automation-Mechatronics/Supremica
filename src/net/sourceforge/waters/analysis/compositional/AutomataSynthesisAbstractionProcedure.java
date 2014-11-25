@@ -254,7 +254,7 @@ public class AutomataSynthesisAbstractionProcedure extends
 
   public void storeStatistics(final CompositionalAutomataSynthesisResult result)
   {
-    result.setSimplifierStatistics(mChain);
+    result.addSimplifierStatistics(mChain);
   }
 
   @Override

@@ -106,7 +106,7 @@ abstract class TRAbstractionProcedure
   public void storeStatistics()
   {
     final CompositionalAnalysisResult result = getAnalysisResult();
-    result.setSimplifierStatistics(mSimplifier);
+    result.addSimplifierStatistics(mSimplifier);
   }
 
   @Override

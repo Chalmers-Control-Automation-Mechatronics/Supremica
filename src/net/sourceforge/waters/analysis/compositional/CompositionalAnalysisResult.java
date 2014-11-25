@@ -20,6 +20,7 @@ import net.sourceforge.waters.analysis.abstraction.TRSimplifierStatistics;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.DefaultAnalysisResult;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
@@ -183,14 +184,17 @@ public class CompositionalAnalysisResult
     mSimplifierStatistics.addAll(stats);
   }
 
-  public void setSimplifierStatistics
+  public void addSimplifierStatistics
     (final TransitionRelationSimplifier simplifier)
   {
-    mSimplifierStatistics = new LinkedList<TRSimplifierStatistics>();
+    if (mSimplifierStatistics == null) {
+      mSimplifierStatistics = new LinkedList<TRSimplifierStatistics>();
+    }
     simplifier.collectStatistics(mSimplifierStatistics);
   }
 
-  public void addSynchronousProductAnalysisResult(final AnalysisResult result)
+  public void addSynchronousProductAnalysisResult
+    (final SynchronousProductResult result)
   {
     if (result == null || result.isFinished()) {
       mNumberOfSyncProducts++;
@@ -271,8 +275,9 @@ public class CompositionalAnalysisResult
     super.print(writer);
     @SuppressWarnings("resource")
     final Formatter formatter = new Formatter(writer);
-    formatter.format("Compile time: %.3fs\n",
-                     0.001f * mCompileTime);
+    if (mCompileTime >= 0) {
+      formatter.format("Compile time: %.3fs\n", 0.001f * mCompileTime);
+    }
     writer.print("Total number of compositions: ");
     writer.println(mTotalCompositionsCount);
     writer.print("Number of unsuccessful compositions: ");

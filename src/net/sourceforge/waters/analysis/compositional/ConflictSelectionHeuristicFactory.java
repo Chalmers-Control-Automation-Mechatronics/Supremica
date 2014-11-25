@@ -16,6 +16,7 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
 import net.sourceforge.waters.model.analysis.des.AutomatonResult;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -209,7 +210,7 @@ public class ConflictSelectionHeuristicFactory
       } finally {
         final CompositionalVerificationResult stats =
           mChecker.getAnalysisResult();
-        final AutomatonResult result = syncBuilder.getAnalysisResult();
+        final SynchronousProductResult result = syncBuilder.getAnalysisResult();
         stats.addSynchronousProductAnalysisResult(result);
       }
       return mCount;

@@ -329,7 +329,7 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
   public void storeStatistics()
   {
     final CompositionalAnalysisResult result = getAnalysisResult();
-    result.setSimplifierStatistics(mCompleteChain);
+    result.addSimplifierStatistics(mCompleteChain);
   }
 
   @Override

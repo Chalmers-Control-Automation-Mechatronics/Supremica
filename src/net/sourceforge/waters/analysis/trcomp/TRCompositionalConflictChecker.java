@@ -31,6 +31,8 @@ import net.sourceforge.waters.analysis.abstraction.TRSimplificationListener;
 import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.compositional.ChainSelectionHeuristic;
+import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult;
+import net.sourceforge.waters.analysis.compositional.CompositionalVerificationResult;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductResult;
@@ -43,7 +45,6 @@ import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
-import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
@@ -150,15 +151,15 @@ public class TRCompositionalConflictChecker
   }
 
   @Override
-  public VerificationResult getAnalysisResult()
+  public CompositionalVerificationResult getAnalysisResult()
   {
-    return (VerificationResult) super.getAnalysisResult();
+    return (CompositionalVerificationResult) super.getAnalysisResult();
   }
 
   @Override
-  public VerificationResult createAnalysisResult()
+  public CompositionalVerificationResult createAnalysisResult()
   {
-    return new DefaultVerificationResult();
+    return new CompositionalVerificationResult();
   }
 
 
@@ -478,6 +479,10 @@ public class TRCompositionalConflictChecker
     mNeedsSimplification = new SimplificationQueue(trs);
     mNeedsDisjointSubsystemsCheck = true;
     mAlwaysEnabledDetectedInitially = !mAlwaysEnabledEventsUsed;
+
+    final CompositionalAnalysisResult result = getAnalysisResult();
+    result.addSimplifierStatistics(mSpecialEventsFinder);
+    result.addSimplifierStatistics(mTRSimplifier);
   }
 
   @Override
@@ -711,6 +716,7 @@ public class TRCompositionalConflictChecker
       logger.debug("Simplifying " + aut.getName() + " ...");
       rel.logSizes(logger);
     }
+    recordStatistics(aut);
     // Set event status ...
     final EventEncoding enc = aut.getEventEncoding();
     final int numEvents = enc.getNumberOfProperEvents();
@@ -753,6 +759,7 @@ public class TRCompositionalConflictChecker
       }
       return simplified;
     } catch (final OverflowException exception) {
+      recordUnsuccessfulComposition();
       return false;
     } finally {
       mIntermediateAbstractionSequence = null;
@@ -778,9 +785,12 @@ public class TRCompositionalConflictChecker
       mSynchronousProductBuilder.setModel(des);
       mSynchronousProductBuilder.setEventEncoding(syncEncoding);
       mSynchronousProductBuilder.run();
-      final TRSynchronousProductResult result =
+      final TRSynchronousProductResult syncResult =
         mSynchronousProductBuilder.getAnalysisResult();
-      final TRAutomatonProxy sync = result.getComputedAutomaton();
+      final CompositionalAnalysisResult combinedResult = getAnalysisResult();
+      combinedResult.addSynchronousProductAnalysisResult(syncResult);
+      final TRAutomatonProxy sync = syncResult.getComputedAutomaton();
+      recordStatistics(sync);
       mIntermediateAbstractionSequence =
         new IntermediateAbstractionSequence(sync);
       // Set up trace computation ...
@@ -795,7 +805,7 @@ public class TRCompositionalConflictChecker
                                     mConfiguredPreconditionMarking,
                                     factory,
                                     mSynchronousProductBuilder,
-                                    result);
+                                    syncResult);
         mIntermediateAbstractionSequence.append(step);
       }
       // Simplify ...
@@ -827,6 +837,10 @@ public class TRCompositionalConflictChecker
       }
       mNeedsSimplification.setCurrentComposition(null);
       return sync;
+    } catch (final OverflowException exception) {
+      // BUG May or may not have been counted by recordStatistics() already?
+      recordUnsuccessfulComposition();
+      throw exception;
     } finally {
       mIntermediateAbstractionSequence = null;
     }
@@ -888,16 +902,19 @@ public class TRCompositionalConflictChecker
   private boolean disjointSubsystemsCheck()
   {
     if (mNeedsDisjointSubsystemsCheck) {
+      final long start = System.currentTimeMillis();
       mNeedsDisjointSubsystemsCheck = false;
       final List<TRSubsystemInfo> splits =
         mCurrentSubsystem.findEventDisjointSubsystems();
-      if (splits == null) {
-        return false;
-      } else {
+      final boolean splitSuccess = splits != null;
+      if (splitSuccess) {
         mCurrentSubsystem = null;
         mSubsystemQueue.addAll(splits);
-        return true;
       }
+      final long stop = System.currentTimeMillis();
+      final CompositionalAnalysisResult result = getAnalysisResult();
+      result.addSplitAttempt(splitSuccess, stop - start);
+      return splitSuccess;
     } else {
       return false;
     }
@@ -925,14 +942,17 @@ public class TRCompositionalConflictChecker
       final ProductDESProxy des =
         AutomatonTools.createProductDESProxy(name, automata, factory);
       mMonolithicAnalyzer.setModel(des);
-      final boolean satisfied = mMonolithicAnalyzer.run();
-      if (satisfied) {
+      mMonolithicAnalyzer.run();
+      final AnalysisResult monolithicResult =
+        mMonolithicAnalyzer.getAnalysisResult();
+      final CompositionalAnalysisResult combinedResult = getAnalysisResult();
+      combinedResult.addMonolithicAnalysisResult(monolithicResult);
+      if (monolithicResult.isSatisfied()) {
         logger.debug("Subsystem is nonblocking.");
         dropSubsystem(mCurrentSubsystem);
       } else {
         logger.debug("Subsystem is blocking.");
-        final VerificationResult result = getAnalysisResult();
-        result.setSatisfied(false);
+        combinedResult.setSatisfied(false);
         if (isCounterExampleEnabled()) {
           final List<TRAbstractionStep> preds = getAbstractionSteps(automata);
           final TraceProxy trace = mMonolithicAnalyzer.getCounterExample();
@@ -1019,6 +1039,35 @@ public class TRCompositionalConflictChecker
                                                true,
                                                translator);
     }
+  }
+
+
+  //#########################################################################
+  //# Statistics
+  void recordStatistics(final TRAutomatonProxy aut)
+  {
+    final CompositionalAnalysisResult result = getAnalysisResult();
+    result.addCompositionAttempt();
+    final ListBufferTransitionRelation rel = aut.getTransitionRelation();
+    final int numStates = rel.getNumberOfStates();
+    final int numTrans = rel.getNumberOfTransitions();
+    final double totalStates = result.getTotalNumberOfStates() + numStates;
+    result.setTotalNumberOfStates(totalStates);
+    final double peakStates =
+      Math.max(result.getPeakNumberOfStates(), numStates);
+    result.setPeakNumberOfStates(peakStates);
+    final double totalTrans = result.getTotalNumberOfTransitions() + numTrans;
+    result.setTotalNumberOfTransitions(totalTrans);
+    final double peakTrans =
+      Math.max(result.getPeakNumberOfTransitions(), numTrans);
+    result.setPeakNumberOfTransitions(peakTrans);
+    result.updatePeakMemoryUsage();
+  }
+
+  void recordUnsuccessfulComposition()
+  {
+    final CompositionalAnalysisResult result = getAnalysisResult();
+    result.addUnsuccessfulComposition();
   }
 
 

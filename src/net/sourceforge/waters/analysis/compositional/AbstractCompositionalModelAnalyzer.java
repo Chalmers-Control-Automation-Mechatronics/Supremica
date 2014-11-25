@@ -41,9 +41,9 @@ import net.sourceforge.waters.model.analysis.ListedEnumFactory;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzer;
-import net.sourceforge.waters.model.analysis.des.AutomatonResult;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -2069,7 +2069,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       return createSynchronousProductStep(automata, sync, hidden, tau);
     } finally {
       final CompositionalAnalysisResult stats = getAnalysisResult();
-      final AutomatonResult result =
+      final SynchronousProductResult result =
         mSynchronousProductBuilder.getAnalysisResult();
       stats.addSynchronousProductAnalysisResult(result);
       mSynchronousProductBuilder.clearMask();
