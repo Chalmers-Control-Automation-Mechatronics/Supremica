@@ -138,23 +138,20 @@ public class ModuleCompiler extends AbortableCompiler
       mInstanceCompiler = null;
       checkAbort();
 
-      /*
       mGroupNodeCompiler =
         new GroupNodeCompiler(modfactory, mCompilationInfo, intermediate);
       intermediate = mGroupNodeCompiler.compile();
       mGroupNodeCompiler = null;
       checkAbort();
-      */
 
       if (efa && mIsExpandingEFATransitions) {
-        //mCompilationInfo.shift();
         mEFACompiler =
           new EFACompiler(modfactory, mCompilationInfo, intermediate);
         checkAbort();
         intermediate = mEFACompiler.compile();
         mEFACompiler = null;
       }
-      //mCompilationInfo.shift();
+
       mGraphCompiler =
         new ModuleGraphCompiler(mFactory, mCompilationInfo, intermediate);
       mGraphCompiler.setOptimizationEnabled(mIsOptimizationEnabled);

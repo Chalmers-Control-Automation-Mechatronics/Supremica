@@ -361,6 +361,19 @@ public abstract class AbstractCompilerTest
     compile("handwritten", "GlobalAndLocalVariables");
   }
 
+  public void testCompile_guard_conflict_1()
+    throws IOException, WatersException
+  {
+    compile("handwritten", "guard_conflict_1");
+  }
+
+  public void testCompile_guard_conflict_2()
+    throws IOException, WatersException
+  {
+    compile("handwritten", "guard_conflict_2");
+  }
+
+
   public void testCompile_host_sets_fv_after_host_crc_fault_notinit()
     throws IOException, WatersException
   {

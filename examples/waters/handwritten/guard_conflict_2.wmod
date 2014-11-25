@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="guard_conflict_2" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Name="a"/>
+        <EventDecl Kind="CONTROLLABLE" Name="b"/>
+        <EventDecl Kind="CONTROLLABLE" Name="c"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="SPEC" Name="machine">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="S0">
+                        <PointGeometry>
+                            <Point X="192" Y="112"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point X="-33" Y="-34"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="8" Y="-2"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S1">
+                        <PointGeometry>
+                            <Point X="288" Y="112"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="6" Y="-3"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <GroupNode Name="G0">
+                        <NodeRef Name="S0"/>
+                        <NodeRef Name="S1"/>
+                        <BoxGeometry>
+                            <Box Height="112" Width="256" X="112" Y="64"/>
+                        </BoxGeometry>
+                    </GroupNode>
+                    <GroupNode Name="G1">
+                        <NodeRef Name="G0"/>
+                        <BoxGeometry>
+                            <Box Height="224" Width="416" X="32" Y="16"/>
+                        </BoxGeometry>
+                    </GroupNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="G1" Target="S1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="a"/>
+                            <SimpleIdentifier Name="c"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="4" Y="-29"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point X="288" Y="16"/>
+                        </StartPointGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==">
+                                    <SimpleIdentifier Name="x"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-41" Y="-18"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="G0" Target="S0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="a"/>
+                            <SimpleIdentifier Name="b"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-15" Y="-2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point X="192" Y="176"/>
+                        </StartPointGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==">
+                                    <SimpleIdentifier Name="x"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <VariableComponent Name="x">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="x"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+    </ComponentList>
+</Module>
