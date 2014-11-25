@@ -119,11 +119,9 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
       final ModuleProxy instantiated =
         mModuleInstanceCompiler.compile(bindings);
       mModuleInstanceCompiler = null;
-      mCompilationInfo.shift();
       mEFAUnifier =
         new EFAUnifier(modfactory, mCompilationInfo, instantiated);
       final ModuleProxy unified = mEFAUnifier.compile();
-      mCompilationInfo.shift();
       final ProxyAccessorMap<IdentifierProxy, ConstraintList> map =
         mEFAUnifier.getEventUpdateMap();
       mEFAUnifier = null;

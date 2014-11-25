@@ -118,7 +118,6 @@ class EFSMCompiler extends AbstractEFSMAlgorithm
       mModuleInstanceCompiler.setEnabledPropositionNames(propositions);
       final ModuleProxy intermediate = mModuleInstanceCompiler.compile(bindings);
       mModuleInstanceCompiler = null;
-      mCompilationInfo.shift();
       mEFSMSystemBuilder = new EFSMSystemBuilder
         (modfactory, mCompilationInfo, intermediate);
       mEFSMSystemBuilder.setOptimizationEnabled(mIsOptimizationEnabled);
