@@ -690,24 +690,41 @@ public class EFACompiler extends AbortableCompiler
       throws EvalException
     {
       final List<EFAAutomatonTransition> parts =
-        new ArrayList<EFAAutomatonTransition>(group.getPartialTransitions());
+        new ArrayList<>(group.getPartialTransitions());
       final int size = parts.size();
       final ListIterator<EFAAutomatonTransition> iter = parts.listIterator();
-      final List<EFAAutomatonTransition> selected =
-        new ArrayList<EFAAutomatonTransition>(size);
-      final Collection<EFAAutomatonTransition> result =
-        new LinkedList<EFAAutomatonTransition>();
+      final List<EFAAutomatonTransition> selected = new ArrayList<>(size);
+      final Set<EFAAutomatonTransition> everSelected = new THashSet<>(size);
+      final Collection<EFAAutomatonTransition> result = new LinkedList<>();
       final ConstraintPropagator propagator =
-        new ConstraintPropagator(mFactory, mCompilationInfo, mOperatorTable,
-                                 mRootContext);
+        new ConstraintPropagator(mFactory, mCompilationInfo,
+                                 mOperatorTable, mRootContext);
       final SimpleComponentProxy comp =
         catchAll ? group.getSimpleComponent() : null;
-      makeDisjoint(iter, selected, result, propagator, comp);
+      makeDisjoint(iter, selected, everSelected, result, propagator, comp);
+      if (everSelected.size() < size) {
+        // Create an explicit transition with FALSE guard for those
+        // transitions that have been dropped.
+        final SimpleExpressionProxy falseExpr =
+          mFactory.createIntConstantProxy(0);
+        final List<SimpleExpressionProxy> falseList =
+          Collections.singletonList(falseExpr);
+        final ConstraintList falseGuard = new ConstraintList(falseList);
+        final EFAAutomatonTransition falseTrans =
+          new EFAAutomatonTransition(falseGuard);
+        for (final EFAAutomatonTransition trans : parts) {
+          if (!everSelected.contains(trans)) {
+            falseTrans.addSources(trans);
+          }
+        }
+        result.add(falseTrans);
+      }
       group.setPartialTransitions(result);
     }
 
     private void makeDisjoint(final ListIterator<EFAAutomatonTransition> iter,
                               final List<EFAAutomatonTransition> selected,
+                              final Set<EFAAutomatonTransition> everSelected,
                               final Collection<EFAAutomatonTransition> result,
                               final ConstraintPropagator parent,
                               final SimpleComponentProxy catchAll)
@@ -723,14 +740,17 @@ public class EFACompiler extends AbortableCompiler
         if (!propagator.isUnsatisfiable()) {
           final int end = selected.size();
           selected.add(trans);
-          makeDisjoint(iter, selected, result, propagator, catchAll);
+          everSelected.add(trans);
+          makeDisjoint(iter, selected, everSelected,
+                       result, propagator, catchAll);
           selected.remove(end);
         }
         propagator = new ConstraintPropagator(parent);
         propagator.addNegation(guard);
         propagator.propagate();
         if (!propagator.isUnsatisfiable()) {
-          makeDisjoint(iter, selected, result, propagator, catchAll);
+          makeDisjoint(iter, selected, everSelected,
+                       result, propagator, catchAll);
         }
         iter.previous();
       } else if (catchAll != null || !selected.isEmpty()) {
@@ -1067,7 +1087,7 @@ public class EFACompiler extends AbortableCompiler
    * A map that assigns to each identifier of an event label on an edge the
    * list of EFA events to be associated with it. Likewise, it assigns to
    * each automaton ({@link SimpleComponentProxy}) a list of events to be
-   * blocked in globally in the automaton. Identifiers associated with true
+   * blocked globally in the automaton. Identifiers associated with true
    * guards do not have entries in this table, as they will simply receive
    * all events associated with the event declaration; all other
    * identifiers receive mappings that reflect the results of simplifying

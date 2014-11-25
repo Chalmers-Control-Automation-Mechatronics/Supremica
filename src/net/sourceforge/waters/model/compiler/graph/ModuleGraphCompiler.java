@@ -508,6 +508,7 @@ public class ModuleGraphCompiler
 
     //#######################################################################
     //# Simple Access
+    @SuppressWarnings("unused")
     SimpleNodeProxy getNode()
     {
       return mmNode;
@@ -649,6 +650,7 @@ public class ModuleGraphCompiler
       return mTarget;
     }
 
+    @SuppressWarnings("unused")
     CompiledNode getCause()
     {
       return mCause;

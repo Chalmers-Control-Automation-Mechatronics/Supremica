@@ -516,6 +516,12 @@ public abstract class AbstractCompilerTest
     compile("handwritten", "stick_picking_game");
   }
 
+  public void testCompile_unsat_guard()
+    throws IOException, WatersException
+  {
+    compile("tests", "nasty", "unsat_guard");
+  }
+
 
   //#########################################################################
   //# Test Cases that Expect Exceptions

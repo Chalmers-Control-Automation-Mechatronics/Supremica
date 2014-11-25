@@ -305,7 +305,6 @@ public class ModuleCompiler extends AbortableCompiler
   private CompilationInfo mCompilationInfo;
   private boolean mCompilationInfoIsDirty;
   private ModuleInstanceCompiler mInstanceCompiler;
-  @SuppressWarnings("unused")
   private GroupNodeCompiler mGroupNodeCompiler;
   private EFACompiler mEFACompiler;
   private ModuleGraphCompiler mGraphCompiler;
