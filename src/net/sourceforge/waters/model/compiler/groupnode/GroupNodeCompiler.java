@@ -73,8 +73,9 @@ import net.sourceforge.waters.model.module.VariableComponentProxy;
  *
  * @author Roger Su
  */
-public class GroupNodeCompiler extends DefaultModuleProxyVisitor implements
-  Abortable
+public class GroupNodeCompiler
+  extends DefaultModuleProxyVisitor
+  implements Abortable
 {
   //#########################################################################
   //# Constructor

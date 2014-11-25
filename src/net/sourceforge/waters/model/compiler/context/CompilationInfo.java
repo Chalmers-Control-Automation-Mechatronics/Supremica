@@ -23,7 +23,7 @@ import net.sourceforge.waters.model.expr.MultiEvalException;
  * A utility class that helps to collect source information records and
  * compilation errors while compiling a module.
  *
- * @author Robi Malik, Tom Levy
+ * @author Robi Malik, Tom Levy, Roger Su
  */
 
 public class CompilationInfo
@@ -40,8 +40,7 @@ public class CompilationInfo
   public CompilationInfo(final boolean sourceInfoEnabled,
                          final boolean multiExceptionsEnabled)
   {
-    mParentMap = null;
-    mResultMap = sourceInfoEnabled ? new HashMap<Object,SourceInfo>() : null;
+    mMap = sourceInfoEnabled ? new HashMap<Object,SourceInfo>() : null;
     mExceptions = multiExceptionsEnabled ? new MultiEvalException() : null;
   }
 
@@ -50,7 +49,7 @@ public class CompilationInfo
   //# Access
   public boolean isSourceInfoEnabled()
   {
-    return mResultMap != null;
+    return mMap != null;
   }
 
   public boolean isMultiExceptionsEnabled()
@@ -58,31 +57,17 @@ public class CompilationInfo
     return mExceptions != null;
   }
 
-  public void shift()
-  {
-    if (isSourceInfoEnabled()) {
-      mParentMap = mResultMap;
-      mResultMap = new HashMap<>(mResultMap.size());
-    }
-  }
-
   public void add(final Object target, final Proxy source)
   {
     add(target, source, null);
   }
 
-  public void add(final Object target,
-                  final Proxy source,
-                  final BindingContext context)
+  public void add(final Object target, final Proxy source,
+                                       final BindingContext context)
   {
     if (isSourceInfoEnabled()) {
       SourceInfo info = getSourceInfo(source);
-      if (info == null) {
-        if (mParentMap == null) {
-          info = new SourceInfo(source, context);
-          add(target, info);
-        }
-      } else {
+      if (info != null) {
         if (context != null) {
           info = new SourceInfo(info.getSourceObject(), context);
         }
@@ -94,21 +79,19 @@ public class CompilationInfo
   public void add(final Object target, final SourceInfo info)
   {
     if (isSourceInfoEnabled()) {
-      mResultMap.put(target, info);
+      mMap.put(target, info);
     }
   }
 
   public Map<Object,SourceInfo> getResultMap()
   {
-    return mResultMap;
+    return mMap;
   }
 
   public SourceInfo getSourceInfo(final Object target)
   {
-    if (mResultMap != null && mResultMap.containsKey(target)) {
-      return mResultMap.get(target);
-    } else if (mParentMap != null && mParentMap.containsKey(target)) {
-      return mParentMap.get(target);
+    if (mMap != null && mMap.containsKey(target)) {
+      return mMap.get(target);
     } else {
       return null;
     }
@@ -118,16 +101,18 @@ public class CompilationInfo
   //#########################################################################
   //# Exception Handling
   /**
-   * Signals that a compilation error occurred.
+   * <p>Signals that a compilation error occurred.</p>
    *
+   * <p>
    * The exception's location is adjusted if source information is enabled.
+   * </p>
    *
-   * If multiple exceptions are enabled (and the exception is not an abort
+   * <p>If multiple exceptions are enabled (and the exception is not an abort
    * exception) the exception is logged and the method returns normally.
-   * Otherwise the exception is thrown.
+   * Otherwise the exception is thrown.</p>
    *
-   * Calling this method with the <CODE>MultiEvalException</CODE> of this
-   * instance is permitted and has no effect.
+   * <p>Calling this method with the <CODE>MultiEvalException</CODE> of this
+   * instance is permitted and has no effect.</p>
    *
    * @param exception The compilation exception.
    * @throws EvalException if multiple exception are disabled.
@@ -200,8 +185,6 @@ public class CompilationInfo
 
   //#########################################################################
   //# Data Members
-  private Map<Object,SourceInfo> mParentMap;
-  private Map<Object,SourceInfo> mResultMap;
+  private final Map<Object,SourceInfo> mMap;
   private MultiEvalException mExceptions;
-
 }

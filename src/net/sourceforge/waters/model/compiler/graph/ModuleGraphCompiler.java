@@ -58,11 +58,11 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 /**
  * <p>
- * The fourth and final pass of the compiler
+ * The fourth and final pass of the compiler.
  * </p>
  *
  * <p>
- * This compiler accepts a module ({@link ModuleProxy}) as the input and
+ * This compiler accepts a {@link ModuleProxy} as the input and
  * returns a {@link ProductDESProxy} as the output. It assumes that the input
  * module only contains nodes of the type {@link SimpleNodeProxy} and that
  * its edges have neither guards nor actions.
@@ -151,7 +151,7 @@ public class ModuleGraphCompiler
   //##########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
   /**
-   * Converts a module ({@link ModuleProxy}) to a {@link ProductDESProxy}.
+   * Converts a {@link ModuleProxy} to a {@link ProductDESProxy}.
    */
   @Override
   public ProductDESProxy visitModuleProxy(final ModuleProxy module)
@@ -639,7 +639,6 @@ public class ModuleGraphCompiler
       mSource = source;
       mEvent = event;
       mTarget = target;
-      mCause = cause;
       mLocation = loc;
     }
 
@@ -648,12 +647,6 @@ public class ModuleGraphCompiler
     CompiledNode getTarget()
     {
       return mTarget;
-    }
-
-    @SuppressWarnings("unused")
-    CompiledNode getCause()
-    {
-      return mCause;
     }
 
     //#######################################################################
@@ -687,7 +680,6 @@ public class ModuleGraphCompiler
     private final CompiledNode mSource;
     private final EventProxy mEvent;
     private final CompiledNode mTarget;
-    private final CompiledNode mCause;
     private final Proxy mLocation;
   }
 
