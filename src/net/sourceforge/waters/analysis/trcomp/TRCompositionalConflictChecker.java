@@ -108,6 +108,7 @@ public class TRCompositionalConflictChecker
     chain.setPreferredOutputConfiguration
       (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     mTRSimplifier = chain;
+    mSynchronousProductBuilder = new TRSynchronousProductBuilder(factory);
     mMonolithicAnalyzer = new NativeConflictChecker(factory);
   }
 
@@ -228,7 +229,7 @@ public class TRCompositionalConflictChecker
 
   public void setInternalStateLimit(final int limit)
   {
-    mInternalStateLimit = limit;
+    mInternalStateLimit = limit > 0 ? limit : Integer.MAX_VALUE;
   }
 
   public int getMonolithicStateLimit()
@@ -248,7 +249,7 @@ public class TRCompositionalConflictChecker
 
   public void setInternalTransitionLimit(final int limit)
   {
-    mInternalTransitionLimit = limit;
+    mInternalTransitionLimit = limit > 0 ? limit : Integer.MAX_VALUE;
   }
 
   public int getMonolithicTransitionLimit()
@@ -324,6 +325,24 @@ public class TRCompositionalConflictChecker
   public boolean isSelfloopOnlyEventsSupported()
   {
     return mSelfloopOnlyEventsSupported;
+  }
+
+  /**
+   * Sets whether deadlock states are pruned in synchronous products.
+   * @see TRSynchronousProductBuilder#setPruningDeadlocks(boolean)
+   */
+  public void setPruningDeadlocks(final boolean pruning)
+  {
+    mSynchronousProductBuilder.setPruningDeadlocks(pruning);
+  }
+
+  /**
+   * Returns whether deadlock states are pruned.
+   * @see #setPruningDeadlocks(boolean) setPruningDeadlocks()
+   */
+  public boolean isPruningDeadlocks()
+  {
+    return mSynchronousProductBuilder.getPruningDeadlocks();
   }
 
   /**
@@ -434,12 +453,22 @@ public class TRCompositionalConflictChecker
       }
     }
 
-    mBlockedEventsUsed = mBlockedEventsSupported;
-    mFailingEventsUsed =
-      mFailingEventsSupported && mConfiguredPreconditionMarking == null;
-    mSelfloopOnlyEventsUsed = mSelfloopOnlyEventsSupported;
-    mAlwaysEnabledEventsUsed =
-      mAlwaysEnabledEventsSupported && mTRSimplifier.isSupportingAlwaysEnabledEvents();
+    final CompositionalVerificationResult result = getAnalysisResult();
+    if ( (mBlockedEventsUsed = mBlockedEventsSupported) ) {
+      result.addBlockedEvents(0);
+    }
+    if ( (mFailingEventsUsed =
+          mFailingEventsSupported && mConfiguredPreconditionMarking == null) ) {
+      result.addFailingEvents(0);
+    }
+    if ( (mSelfloopOnlyEventsUsed = mSelfloopOnlyEventsSupported) ) {
+      result.addSelfloopOnlyEvents(0);
+    }
+    if ( (mAlwaysEnabledEventsUsed =
+          mAlwaysEnabledEventsSupported &&
+          mTRSimplifier.isSupportingAlwaysEnabledEvents()) ) {
+      result.addAlwaysEnabledEvents(0);
+    }
 
     final int numEvents = model.getEvents().size();
     mSpecialEventsFinder = new SpecialEventsFinder();
@@ -459,9 +488,7 @@ public class TRCompositionalConflictChecker
     }
     mSpecialEventsFinder.setAlwaysEnabledEventsDetected(mAlwaysEnabledEventsUsed);
 
-    final ProductDESProxyFactory factory = getFactory();
     final KindTranslator translator = getKindTranslator();
-    mSynchronousProductBuilder = new TRSynchronousProductBuilder(factory);
     mSynchronousProductBuilder.setDetailedOutputEnabled(true);
     mSynchronousProductBuilder.setKindTranslator(translator);
     mSynchronousProductBuilder.setPruningDeadlocks(true);
@@ -480,7 +507,6 @@ public class TRCompositionalConflictChecker
     mNeedsDisjointSubsystemsCheck = true;
     mAlwaysEnabledDetectedInitially = !mAlwaysEnabledEventsUsed;
 
-    final CompositionalAnalysisResult result = getAnalysisResult();
     result.addSimplifierStatistics(mSpecialEventsFinder);
     result.addSimplifierStatistics(mTRSimplifier);
   }
@@ -529,7 +555,6 @@ public class TRCompositionalConflictChecker
   protected void tearDown()
   {
     super.tearDown();
-    mSynchronousProductBuilder = null;
     mSpecialEventsFinder = null;
     mUsedDefaultMarking = null;
     mAbstractionSequence = null;
@@ -733,6 +758,7 @@ public class TRCompositionalConflictChecker
         }
       }
     }
+    countSpecialEvents(enc);
     try {
       // Set up trace computation ...
       mIntermediateAbstractionSequence =
@@ -779,6 +805,7 @@ public class TRCompositionalConflictChecker
       final EventEncoding syncEncoding =
         candidate.createSyncEventEncoding(mUsedDefaultMarking,
                                           mConfiguredPreconditionMarking);
+      countSpecialEvents(syncEncoding);
       // Synchronise ...
       final ProductDESProxyFactory factory = getFactory();
       final ProductDESProxy des = candidate.createProductDESProxy(factory);
@@ -1044,6 +1071,20 @@ public class TRCompositionalConflictChecker
 
   //#########################################################################
   //# Statistics
+  void countSpecialEvents(final EventEncoding enc)
+  {
+    final CompositionalAnalysisResult stats = getAnalysisResult();
+    final int numEvents = enc.getNumberOfProperEvents();
+    for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+      final byte status = enc.getProperEventStatus(e);
+      if (EventStatus.isUsedEvent(status)) {
+        final EventProxy event = enc.getProperEvent(e);
+        final TREventInfo info = mCurrentSubsystem.getEventInfo(event);
+        info.countSpecialEvents(status, stats);
+      }
+    }
+  }
+
   void recordStatistics(final TRAutomatonProxy aut)
   {
     final CompositionalAnalysisResult result = getAnalysisResult();
@@ -1237,8 +1278,8 @@ public class TRCompositionalConflictChecker
   // Configuration
   private EventProxy mConfiguredDefaultMarking;
   private EventProxy mConfiguredPreconditionMarking;
-  private int mInternalStateLimit;
-  private int mInternalTransitionLimit;
+  private int mInternalStateLimit = Integer.MAX_VALUE;
+  private int mInternalTransitionLimit = Integer.MAX_VALUE;
   private boolean mBlockedEventsSupported;
   private boolean mFailingEventsSupported;
   private boolean mSelfloopOnlyEventsSupported;
@@ -1256,7 +1297,7 @@ public class TRCompositionalConflictChecker
   private final TransitionRelationSimplifier mTRSimplifier;
   private final PartitioningListener mSpecialEventsListener;
   private final PartitioningListener mPartitioningListener;
-  private TRSynchronousProductBuilder mSynchronousProductBuilder;
+  private final TRSynchronousProductBuilder mSynchronousProductBuilder;
   private SpecialEventsFinder mSpecialEventsFinder;
   private final ConflictChecker mMonolithicAnalyzer;
 

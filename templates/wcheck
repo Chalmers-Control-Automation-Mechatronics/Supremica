@@ -44,6 +44,9 @@ for F in "$@"; do
     -proj)
         FACTORY="Projecting"
         ;;
+    -trcomp)
+        FACTORY="TRCompositional"
+        ;;
     -conf)
         CHECK="ConflictChecker"
         ;;
