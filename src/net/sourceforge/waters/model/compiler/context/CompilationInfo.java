@@ -23,7 +23,7 @@ import net.sourceforge.waters.model.expr.MultiEvalException;
  * A utility class that helps to collect source information records and
  * compilation errors while compiling a module.
  *
- * @author Robi Malik, Tom Levy, Roger Su
+ * @author Robi Malik, Tom Levy
  */
 
 public class CompilationInfo
@@ -40,7 +40,7 @@ public class CompilationInfo
   public CompilationInfo(final boolean sourceInfoEnabled,
                          final boolean multiExceptionsEnabled)
   {
-    mMap = sourceInfoEnabled ? new HashMap<Object,SourceInfo>() : null;
+    mResultMap = sourceInfoEnabled ? new HashMap<Object,SourceInfo>() : null;
     mExceptions = multiExceptionsEnabled ? new MultiEvalException() : null;
   }
 
@@ -49,7 +49,7 @@ public class CompilationInfo
   //# Access
   public boolean isSourceInfoEnabled()
   {
-    return mMap != null;
+    return mResultMap != null;
   }
 
   public boolean isMultiExceptionsEnabled()
@@ -62,12 +62,16 @@ public class CompilationInfo
     add(target, source, null);
   }
 
-  public void add(final Object target, final Proxy source,
-                                       final BindingContext context)
+  public void add(final Object target,
+                  final Proxy source,
+                  final BindingContext context)
   {
     if (isSourceInfoEnabled()) {
       SourceInfo info = getSourceInfo(source);
-      if (info != null) {
+      if (info == null) {
+          info = new SourceInfo(source, context);
+          add(target, info);
+      } else {
         if (context != null) {
           info = new SourceInfo(info.getSourceObject(), context);
         }
@@ -79,19 +83,19 @@ public class CompilationInfo
   public void add(final Object target, final SourceInfo info)
   {
     if (isSourceInfoEnabled()) {
-      mMap.put(target, info);
+      mResultMap.put(target, info);
     }
   }
 
   public Map<Object,SourceInfo> getResultMap()
   {
-    return mMap;
+    return mResultMap;
   }
 
   public SourceInfo getSourceInfo(final Object target)
   {
-    if (mMap != null && mMap.containsKey(target)) {
-      return mMap.get(target);
+    if (mResultMap != null && mResultMap.containsKey(target)) {
+      return mResultMap.get(target);
     } else {
       return null;
     }
@@ -101,18 +105,16 @@ public class CompilationInfo
   //#########################################################################
   //# Exception Handling
   /**
-   * <p>Signals that a compilation error occurred.</p>
+   * Signals that a compilation error occurred.
    *
-   * <p>
    * The exception's location is adjusted if source information is enabled.
-   * </p>
    *
-   * <p>If multiple exceptions are enabled (and the exception is not an abort
+   * If multiple exceptions are enabled (and the exception is not an abort
    * exception) the exception is logged and the method returns normally.
-   * Otherwise the exception is thrown.</p>
+   * Otherwise the exception is thrown.
    *
-   * <p>Calling this method with the <CODE>MultiEvalException</CODE> of this
-   * instance is permitted and has no effect.</p>
+   * Calling this method with the <CODE>MultiEvalException</CODE> of this
+   * instance is permitted and has no effect.
    *
    * @param exception The compilation exception.
    * @throws EvalException if multiple exception are disabled.
@@ -185,6 +187,7 @@ public class CompilationInfo
 
   //#########################################################################
   //# Data Members
-  private final Map<Object,SourceInfo> mMap;
+  private final Map<Object,SourceInfo> mResultMap;
   private MultiEvalException mExceptions;
+
 }
