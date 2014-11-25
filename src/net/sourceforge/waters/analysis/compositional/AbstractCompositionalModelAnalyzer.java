@@ -1051,7 +1051,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       }
       final CompositionalAnalysisResult stats = getAnalysisResult();
       final int numRemoved = removed.size();
-      stats.addRedundantEvents(numRemoved);
+      stats.addBlockedEvents(numRemoved);
       final int numFailing = failing.size();
       stats.addFailingEvents(numFailing);
       return

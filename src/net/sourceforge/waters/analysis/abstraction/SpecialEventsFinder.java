@@ -176,6 +176,18 @@ public class SpecialEventsFinder
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.analysis.abstraction.
+  //# TransitionRelationSimplifier
+  @Override
+  public TRSimplifierStatistics createStatistics()
+  {
+    final TRSimplifierStatistics stats =
+      new TRSimplifierStatistics(this, false, false, false);
+    return setStatistics(stats);
+  }
+
+
+  //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
   @Override
   protected boolean runSimplifier()

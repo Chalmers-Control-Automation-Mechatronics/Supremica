@@ -51,7 +51,8 @@ public class CompositionalAnalysisResult
     mCompileTime = -1;
     mTotalCompositionsCount = 0;
     mUnsuccessfulCompositionsCount = 0;
-    mRedundantEventsCount = mFailingEventsCount = 0;
+    mBlockedEventsCount = mFailingEventsCount =
+      mSelfloopOnlyEventsCount = mAlwaysEnabledEventsCount = -1;
     mNumberOfSplitAttempts = 0;
     mNumberOfSplits = 0;
     mSplitTime = 0;
@@ -96,23 +97,41 @@ public class CompositionalAnalysisResult
   }
 
   /**
-   * Gets the number of events that were found to be redundant and have
-   * been removed. Events are removed if they are found to be globally
-   * disabled, i.e., always blocked by one automaton, or globally selflooped,
-   * i.e., appear only in selfloops in all automata.
+   * Gets the number of automata that have been simplified by removing
+   * a blocked event. This may include the number of globally selfloop-only
+   * events (if the implementation does not count selfloop-only events
+   * separately).
    */
-  public int getRedundantEventsCount()
+  public int getBlockedEventsCount()
   {
-    return mRedundantEventsCount;
+    return mBlockedEventsCount;
   }
 
   /**
-   * Gets the number of events that were found to be failing and have
-   * been redirected to dump states.
+   * Gets the number of automata that have been simplified by redirecting
+   * transitions with a failing event to dump states.
    */
   public int getFailingEventsCount()
   {
     return mFailingEventsCount;
+  }
+
+  /**
+   * Gets the number of automata that have been simplified by deleting
+   * a selfloop-only event.
+   */
+  public int getSelfloopOnlyEventsCount()
+  {
+    return mSelfloopOnlyEventsCount;
+  }
+
+  /**
+   * Gets the number of automata that have been simplified using an
+   * always enabled event.
+   */
+  public int getAlwaysEnabledEventsCount()
+  {
+    return mAlwaysEnabledEventsCount;
   }
 
   /**
@@ -166,14 +185,36 @@ public class CompositionalAnalysisResult
     mSplitTime += time;
   }
 
-  public void addRedundantEvents(final int count)
+  public void addBlockedEvents(final int count)
   {
-    mRedundantEventsCount += count;
+    if (mBlockedEventsCount < 0) {
+      mBlockedEventsCount = 0;
+    }
+    mBlockedEventsCount += count;
   }
 
   public void addFailingEvents(final int count)
   {
+    if (mFailingEventsCount < 0) {
+      mFailingEventsCount = 0;
+    }
     mFailingEventsCount += count;
+  }
+
+  public void addSelfloopOnlyEvents(final int count)
+  {
+    if (mSelfloopOnlyEventsCount < 0) {
+      mSelfloopOnlyEventsCount = 0;
+    }
+    mSelfloopOnlyEventsCount += count;
+  }
+
+  public void addAlwaysEnabledEvents(final int count)
+  {
+    if (mAlwaysEnabledEventsCount < 0) {
+      mAlwaysEnabledEventsCount = 0;
+    }
+    mAlwaysEnabledEventsCount += count;
   }
 
   public void setSimplifierStatistics
@@ -241,6 +282,14 @@ public class CompositionalAnalysisResult
     mNumberOfSplitAttempts += result.mNumberOfSplitAttempts;
     mNumberOfSplits += result.mNumberOfSplits;
     mSplitTime += result.mSplitTime;
+    mBlockedEventsCount =
+      mergeAdd(mBlockedEventsCount, result.mBlockedEventsCount);
+    mFailingEventsCount =
+      mergeAdd(mFailingEventsCount, result.mFailingEventsCount);
+    mSelfloopOnlyEventsCount =
+      mergeAdd(mSelfloopOnlyEventsCount, result.mSelfloopOnlyEventsCount);
+    mAlwaysEnabledEventsCount =
+      mergeAdd(mAlwaysEnabledEventsCount, result.mAlwaysEnabledEventsCount);
     if (mSimplifierStatistics != null && result.mSimplifierStatistics != null) {
       final Iterator<TRSimplifierStatistics> iter1 =
         mSimplifierStatistics.iterator();
@@ -288,10 +337,22 @@ public class CompositionalAnalysisResult
     writer.println(mNumberOfSplits);
     formatter.format("Time consumed by split attempts: %.3fs\n",
                      0.001f * mSplitTime);
-    writer.print("Number of redundant events: ");
-    writer.println(mRedundantEventsCount);
-    writer.print("Number of failing events: ");
-    writer.println(mFailingEventsCount);
+    if (mBlockedEventsCount >= 0) {
+      writer.print("Number of blocked events: ");
+      writer.println(mBlockedEventsCount);
+    }
+    if (mFailingEventsCount >= 0) {
+      writer.print("Number of failing events: ");
+      writer.println(mFailingEventsCount);
+    }
+    if (mSelfloopOnlyEventsCount >= 0) {
+      writer.print("Number of selfloop-only events: ");
+      writer.println(mSelfloopOnlyEventsCount);
+    }
+    if (mAlwaysEnabledEventsCount >= 0) {
+      writer.print("Number of always enabled events: ");
+      writer.println(mAlwaysEnabledEventsCount);
+    }
     if (mUnsuccessfulCompositionsCount > 0) {
       final float probability =
         (float) (mTotalCompositionsCount - mUnsuccessfulCompositionsCount) /
@@ -330,8 +391,10 @@ public class CompositionalAnalysisResult
     writer.print(",SplitAttempts");
     writer.print(",Splits");
     writer.print(",SplitTime");
-    writer.print(",RedundantEvents");
+    writer.print(",BlockedEvents");
     writer.print(",FailingEvents");
+    writer.print(",SelfloopOnlyEvents");
+    writer.print(",AlwaysEnabledEvents");
     if (mSimplifierStatistics != null) {
       for (final TRSimplifierStatistics ruleStats : mSimplifierStatistics) {
         ruleStats.printCSVHorizontalHeadings(writer);
@@ -365,9 +428,13 @@ public class CompositionalAnalysisResult
     writer.print(',');
     writer.print(mSplitTime);
     writer.print(',');
-    writer.print(mRedundantEventsCount);
+    writer.print(mBlockedEventsCount);
     writer.print(',');
     writer.print(mFailingEventsCount);
+    writer.print(',');
+    writer.print(mSelfloopOnlyEventsCount);
+    writer.print(',');
+    writer.print(mAlwaysEnabledEventsCount);
     if (mSimplifierStatistics != null) {
       for (final TRSimplifierStatistics ruleStats : mSimplifierStatistics) {
         ruleStats.printCSVHorizontal(writer);
@@ -396,8 +463,10 @@ public class CompositionalAnalysisResult
   private int mNumberOfSplitAttempts;
   private int mNumberOfSplits;
   private long mSplitTime;
-  private int mRedundantEventsCount;
+  private int mBlockedEventsCount;
   private int mFailingEventsCount;
+  private int mSelfloopOnlyEventsCount;
+  private int mAlwaysEnabledEventsCount;
   private List<TRSimplifierStatistics> mSimplifierStatistics;
   private int mNumberOfSyncProducts;
   private AnalysisResult mSynchronousProductStats;

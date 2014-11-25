@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.Queue;
 import java.util.Set;
 
+import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -168,6 +169,26 @@ class TREventInfo
         result |= EventStatus.STATUS_FAILING;
       }
       return result;
+    }
+  }
+
+  void countSpecialEvents(final byte usedStatus,
+                          final CompositionalAnalysisResult stats)
+  {
+    if (EventStatus.isLocalEvent(usedStatus)) {
+      // do not count
+    } else if (EventStatus.isBlockedEvent(usedStatus)) {
+      if (mIsBlocked) {
+        stats.addBlockedEvents(1);
+      } else {
+        stats.addSelfloopOnlyEvents(1);
+      }
+    } else if (EventStatus.isFailingEvent(usedStatus)) {
+      stats.addFailingEvents(1);
+    } else if (EventStatus.isOutsideOnlySelfloopEvent(usedStatus)) {
+      stats.addSelfloopOnlyEvents(1);
+    } else if (EventStatus.isOutsideAlwaysEnabledEvent(usedStatus)) {
+      stats.addAlwaysEnabledEvents(1);
     }
   }
 
