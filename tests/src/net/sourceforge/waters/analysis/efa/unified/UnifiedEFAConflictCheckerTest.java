@@ -350,13 +350,23 @@ public class UnifiedEFAConflictCheckerTest
     checkProfisafe("profisafe_ihost_efa_block", 3 ,false);
   }
 
-  /*
-  public void testProfisafeIHostEFA191()
+  public void testProfisafeIHostEFAv0()
     throws IOException, WatersException
   {
-    checkProfisafe("profisafe_ihost_efa", 191 ,true);
+    checkProfisafe("profisafe_ihost_efa_0", 4 ,true);
   }
-  */
+
+  public void testProfisafeIHostEFAv1()
+    throws IOException, WatersException
+  {
+    checkProfisafe("profisafe_ihost_efa_1", 4 ,true);
+  }
+
+  public void testProfisafeIHostEFAv2()
+    throws IOException, WatersException
+  {
+    checkProfisafe("profisafe_ihost_efa_2", 4 ,true);
+  }
 
   public void testProfisafeIHostEFSM4()
     throws IOException, WatersException

@@ -1514,7 +1514,7 @@ Properties are not included.</ns2:Comment>
                 <NodeList>
                     <SimpleNode Initial="true" Name="OFF">
                         <PointGeometry>
-                            <Point X="480" Y="160"/>
+                            <Point X="192" Y="64"/>
                         </PointGeometry>
                         <InitialArrowGeometry>
                             <Point X="-5" Y="-5"/>
@@ -1525,7 +1525,7 @@ Properties are not included.</ns2:Comment>
                     </SimpleNode>
                     <SimpleNode Name="HOST">
                         <PointGeometry>
-                            <Point X="272" Y="352"/>
+                            <Point X="112" Y="160"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="12" Y="-9"/>
@@ -1533,14 +1533,48 @@ Properties are not included.</ns2:Comment>
                     </SimpleNode>
                     <SimpleNode Name="DELAY">
                         <PointGeometry>
-                            <Point X="688" Y="352"/>
+                            <Point X="272" Y="160"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="-49" Y="-5"/>
                         </LabelGeometry>
                     </SimpleNode>
+                    <GroupNode Name="G0">
+                        <NodeRef Name="DELAY"/>
+                        <NodeRef Name="OFF"/>
+                        <NodeRef Name="HOST"/>
+                        <BoxGeometry>
+                            <Box Height="224" Width="288" X="48" Y="32"/>
+                        </BoxGeometry>
+                    </GroupNode>
                 </NodeList>
                 <EdgeList>
+                    <Edge Source="G0" Target="HOST">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="restart_host_timer"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-54" Y="-22"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point X="113" Y="256"/>
+                        </StartPointGeometry>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="got_host_timeout"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="got_delay_timeout"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-53" Y="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
                     <Edge Source="HOST" Target="OFF">
                         <LabelBlock>
                             <SimpleIdentifier Name="host_timeout"/>
@@ -1548,9 +1582,6 @@ Properties are not included.</ns2:Comment>
                                 <Point X="-93" Y="-38"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="351" Y="229"/>
-                        </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
                                 <BinaryExpression Operator="=">
@@ -1563,6 +1594,32 @@ Properties are not included.</ns2:Comment>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
+                    <Edge Source="G0" Target="DELAY">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="restart_delay_timer"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-69" Y="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point X="272" Y="256"/>
+                        </StartPointGeometry>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="got_host_timeout"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="got_delay_timeout"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-70" Y="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
                     <Edge Source="DELAY" Target="OFF">
                         <LabelBlock>
                             <SimpleIdentifier Name="delay_timeout"/>
@@ -1570,9 +1627,6 @@ Properties are not included.</ns2:Comment>
                                 <Point X="-33" Y="-38"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="559" Y="283"/>
-                        </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
                                 <BinaryExpression Operator="=">
@@ -1582,147 +1636,6 @@ Properties are not included.</ns2:Comment>
                             </Actions>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-33" Y="-24"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                    <Edge Source="DELAY" Target="HOST">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="restart_host_timer"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-48" Y="-25"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="480" Y="394"/>
-                        </SplineGeometry>
-                        <GuardActionBlock>
-                            <Actions>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="got_host_timeout"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="got_delay_timeout"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                            </Actions>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-58" Y="-17"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                    <Edge Source="OFF" Target="HOST">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="restart_host_timer"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="401" Y="283"/>
-                        </SplineGeometry>
-                        <GuardActionBlock>
-                            <Actions>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="got_host_timeout"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="got_delay_timeout"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                            </Actions>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-36" Y="-15"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                    <Edge Source="HOST" Target="DELAY">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="restart_delay_timer"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="475" Y="468"/>
-                        </SplineGeometry>
-                        <GuardActionBlock>
-                            <Actions>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="got_host_timeout"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="got_delay_timeout"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                            </Actions>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="0" Y="20"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                    <Edge Source="OFF" Target="DELAY">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="restart_delay_timer"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="602" Y="223"/>
-                        </SplineGeometry>
-                        <GuardActionBlock>
-                            <Actions>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="got_host_timeout"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="got_delay_timeout"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                            </Actions>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="0" Y="20"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                    <Edge Source="DELAY" Target="DELAY">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="restart_delay_timer"/>
-                        </LabelBlock>
-                        <GuardActionBlock>
-                            <Actions>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="got_host_timeout"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="got_delay_timeout"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                            </Actions>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="0" Y="20"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                    <Edge Source="HOST" Target="HOST">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="restart_host_timer"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-88" Y="-34"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="215" Y="339"/>
-                        </SplineGeometry>
-                        <GuardActionBlock>
-                            <Actions>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="got_host_timeout"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="got_delay_timeout"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                            </Actions>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-134" Y="9"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
