@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="profisafe_ihost_efa_1" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="profisafe_ihost_efa_0" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>PROFIsafe host model for input-slave configuration.
-This EFA model is a direct conversion from the original VALID models.
-The only change is the removal of the group node in automaton timers.</ns2:Comment>
+This EFA model is a direct conversion from the original VALID models.</ns2:Comment>
     <ConstantAliasList>
         <ConstantAlias Scope="REQUIRED_PARAMETER" Name="MAXSEQNO">
             <ConstantAliasExpression>
@@ -1757,7 +1756,7 @@ The only change is the removal of the group node in automaton timers.</ns2:Comme
                 <NodeList>
                     <SimpleNode Initial="true" Name="OFF">
                         <PointGeometry>
-                            <Point X="480" Y="160"/>
+                            <Point X="192" Y="64"/>
                         </PointGeometry>
                         <InitialArrowGeometry>
                             <Point X="-5" Y="-5"/>
@@ -1768,7 +1767,7 @@ The only change is the removal of the group node in automaton timers.</ns2:Comme
                     </SimpleNode>
                     <SimpleNode Name="HOST">
                         <PointGeometry>
-                            <Point X="272" Y="352"/>
+                            <Point X="112" Y="160"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="12" Y="-9"/>
@@ -1776,14 +1775,48 @@ The only change is the removal of the group node in automaton timers.</ns2:Comme
                     </SimpleNode>
                     <SimpleNode Name="DELAY">
                         <PointGeometry>
-                            <Point X="688" Y="352"/>
+                            <Point X="272" Y="160"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="-49" Y="-5"/>
                         </LabelGeometry>
                     </SimpleNode>
+                    <GroupNode Name="G0">
+                        <NodeRef Name="HOST"/>
+                        <NodeRef Name="OFF"/>
+                        <NodeRef Name="DELAY"/>
+                        <BoxGeometry>
+                            <Box Height="224" Width="288" X="48" Y="32"/>
+                        </BoxGeometry>
+                    </GroupNode>
                 </NodeList>
                 <EdgeList>
+                    <Edge Source="G0" Target="HOST">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="restart_host_timer"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-54" Y="-22"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point X="113" Y="256"/>
+                        </StartPointGeometry>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="got_host_timeout"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="got_delay_timeout"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-53" Y="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
                     <Edge Source="HOST" Target="OFF">
                         <LabelBlock>
                             <SimpleIdentifier Name="host_timeout"/>
@@ -1791,9 +1824,6 @@ The only change is the removal of the group node in automaton timers.</ns2:Comme
                                 <Point X="-93" Y="-38"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="351" Y="229"/>
-                        </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
                                 <BinaryExpression Operator="=">
@@ -1806,6 +1836,32 @@ The only change is the removal of the group node in automaton timers.</ns2:Comme
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
+                    <Edge Source="G0" Target="DELAY">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="restart_delay_timer"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-69" Y="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point X="272" Y="256"/>
+                        </StartPointGeometry>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="got_host_timeout"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="got_delay_timeout"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-70" Y="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
                     <Edge Source="DELAY" Target="OFF">
                         <LabelBlock>
                             <SimpleIdentifier Name="delay_timeout"/>
@@ -1813,9 +1869,6 @@ The only change is the removal of the group node in automaton timers.</ns2:Comme
                                 <Point X="-33" Y="-38"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="559" Y="283"/>
-                        </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
                                 <BinaryExpression Operator="=">
@@ -1825,147 +1878,6 @@ The only change is the removal of the group node in automaton timers.</ns2:Comme
                             </Actions>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-33" Y="-24"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                    <Edge Source="DELAY" Target="HOST">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="restart_host_timer"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-48" Y="-25"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="480" Y="394"/>
-                        </SplineGeometry>
-                        <GuardActionBlock>
-                            <Actions>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="got_host_timeout"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="got_delay_timeout"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                            </Actions>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-58" Y="-17"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                    <Edge Source="OFF" Target="HOST">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="restart_host_timer"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="401" Y="283"/>
-                        </SplineGeometry>
-                        <GuardActionBlock>
-                            <Actions>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="got_host_timeout"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="got_delay_timeout"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                            </Actions>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-36" Y="-15"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                    <Edge Source="HOST" Target="DELAY">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="restart_delay_timer"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="475" Y="468"/>
-                        </SplineGeometry>
-                        <GuardActionBlock>
-                            <Actions>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="got_host_timeout"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="got_delay_timeout"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                            </Actions>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="0" Y="20"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                    <Edge Source="OFF" Target="DELAY">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="restart_delay_timer"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="602" Y="223"/>
-                        </SplineGeometry>
-                        <GuardActionBlock>
-                            <Actions>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="got_host_timeout"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="got_delay_timeout"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                            </Actions>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="0" Y="20"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                    <Edge Source="DELAY" Target="DELAY">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="restart_delay_timer"/>
-                        </LabelBlock>
-                        <GuardActionBlock>
-                            <Actions>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="got_host_timeout"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="got_delay_timeout"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                            </Actions>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="0" Y="20"/>
-                            </LabelGeometry>
-                        </GuardActionBlock>
-                    </Edge>
-                    <Edge Source="HOST" Target="HOST">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="restart_host_timer"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-88" Y="-34"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="215" Y="339"/>
-                        </SplineGeometry>
-                        <GuardActionBlock>
-                            <Actions>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="got_host_timeout"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                                <BinaryExpression Operator="=">
-                                    <SimpleIdentifier Name="got_delay_timeout"/>
-                                    <IntConstant Value="0"/>
-                                </BinaryExpression>
-                            </Actions>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-134" Y="9"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -3307,10 +3219,10 @@ The only change is the removal of the group node in automaton timers.</ns2:Comme
                         </LabelGeometry>
                     </SimpleNode>
                     <GroupNode Name="G0">
-                        <NodeRef Name="init_nok"/>
+                        <NodeRef Name="init0ok"/>
                         <NodeRef Name="init0nok"/>
                         <NodeRef Name="init_ok"/>
-                        <NodeRef Name="init0ok"/>
+                        <NodeRef Name="init_nok"/>
                         <BoxGeometry>
                             <Box Height="80" Width="416" X="112" Y="160"/>
                         </BoxGeometry>
@@ -3322,10 +3234,10 @@ The only change is the removal of the group node in automaton timers.</ns2:Comme
                         </BoxGeometry>
                     </GroupNode>
                     <GroupNode Name="G2">
-                        <NodeRef Name="pre_nok"/>
-                        <NodeRef Name="pre0nok"/>
-                        <NodeRef Name="pre0ok"/>
                         <NodeRef Name="pre_ok"/>
+                        <NodeRef Name="pre_nok"/>
+                        <NodeRef Name="pre0ok"/>
+                        <NodeRef Name="pre0nok"/>
                         <BoxGeometry>
                             <Box Height="80" Width="416" X="112" Y="32"/>
                         </BoxGeometry>
@@ -4182,15 +4094,15 @@ The only change is the removal of the group node in automaton timers.</ns2:Comme
                         </LabelGeometry>
                     </SimpleNode>
                     <GroupNode Name="G0">
-                        <NodeRef Name="seqfault"/>
                         <NodeRef Name="ok"/>
+                        <NodeRef Name="seqfault"/>
                         <BoxGeometry>
                             <Box Height="80" Width="288" X="128" Y="400"/>
                         </BoxGeometry>
                     </GroupNode>
                     <GroupNode Name="G1">
-                        <NodeRef Name="fv_fault"/>
                         <NodeRef Name="fv_ok"/>
+                        <NodeRef Name="fv_fault"/>
                         <BoxGeometry>
                             <Box Height="80" Width="288" X="128" Y="528"/>
                         </BoxGeometry>
@@ -4221,8 +4133,8 @@ The only change is the removal of the group node in automaton timers.</ns2:Comme
                         </BoxGeometry>
                     </GroupNode>
                     <GroupNode Name="G6">
-                        <NodeRef Name="pre_other"/>
                         <NodeRef Name="pre_0"/>
+                        <NodeRef Name="pre_other"/>
                         <BoxGeometry>
                             <Box Height="80" Width="288" X="128" Y="32"/>
                         </BoxGeometry>
@@ -5043,8 +4955,8 @@ The only change is the removal of the group node in automaton timers.</ns2:Comme
                                 </LabelGeometry>
                             </SimpleNode>
                             <GroupNode Name="G0">
-                                <NodeRef Name="seqfault"/>
                                 <NodeRef Name="ok"/>
+                                <NodeRef Name="seqfault"/>
                                 <BoxGeometry>
                                     <Box Height="80" Width="288" X="128" Y="288"/>
                                 </BoxGeometry>
@@ -5082,16 +4994,16 @@ The only change is the removal of the group node in automaton timers.</ns2:Comme
                                 </BoxGeometry>
                             </GroupNode>
                             <GroupNode Name="G6">
-                                <NodeRef Name="pre_0"/>
                                 <NodeRef Name="pre_other"/>
+                                <NodeRef Name="pre_0"/>
                                 <BoxGeometry>
                                     <Box Height="80" Width="288" X="128" Y="32"/>
                                 </BoxGeometry>
                             </GroupNode>
                             <GroupNode Name="G7">
+                                <NodeRef Name="init_fault"/>
                                 <NodeRef Name="init_other"/>
                                 <NodeRef Name="init_0"/>
-                                <NodeRef Name="init_fault"/>
                                 <BoxGeometry>
                                     <Box Height="80" Width="400" X="128" Y="160"/>
                                 </BoxGeometry>
