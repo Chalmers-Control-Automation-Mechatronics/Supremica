@@ -19,6 +19,7 @@ import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.efa.EFAUnifier;
+import net.sourceforge.waters.model.compiler.groupnode.GroupNodeCompiler;
 import net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
@@ -97,7 +98,9 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
   public UnifiedEFASystem compile(final List<ParameterBindingProxy> bindings)
     throws EvalException, AnalysisException
   {
-    try {
+    try
+    {
+      //Preparation
       setUp();
       final ModuleProxyFactory modfactory = ModuleElementFactory.getInstance();
       final IdentifierProxy marking;
@@ -111,26 +114,40 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
         Collections.singletonList(marking.toString());
       mCompilationInfo = new CompilationInfo(mIsSourceInfoEnabled,
                                              mIsMultiExceptionsEnabled);
+
+      //Instance Compiler
       mModuleInstanceCompiler = new ModuleInstanceCompiler
         (mDocumentManager, modfactory, mCompilationInfo, mInputModule);
       mModuleInstanceCompiler.setOptimizationEnabled(mIsOptimizationEnabled);
       mModuleInstanceCompiler.setEnabledPropertyNames(mEnabledPropertyNames);
       mModuleInstanceCompiler.setEnabledPropositionNames(propositionNames);
-      final ModuleProxy instantiated =
+      ModuleProxy instantiated =
         mModuleInstanceCompiler.compile(bindings);
       mModuleInstanceCompiler = null;
+
+      //Group Node Compiler
+      mGroupNodeCompiler = new GroupNodeCompiler
+                                (modfactory, mCompilationInfo, instantiated);
+      instantiated = mGroupNodeCompiler.compile();
+      mGroupNodeCompiler = null;
+
+      //Normalisation
       mEFAUnifier =
         new EFAUnifier(modfactory, mCompilationInfo, instantiated);
       final ModuleProxy unified = mEFAUnifier.compile();
       final ProxyAccessorMap<IdentifierProxy, ConstraintList> map =
         mEFAUnifier.getEventUpdateMap();
       mEFAUnifier = null;
+
+      //Create UnifiedEFASystem
       mSystemBuilder = new UnifiedEFASystemBuilder
         (modfactory, mCompilationInfo, unified, map);
       mSystemBuilder.setOptimizationEnabled(mIsOptimizationEnabled);
       mSystemBuilder.setConfiguredDefaultMarking(marking);
       return mSystemBuilder.compile();
-    } finally {
+    }
+
+    finally { //Reset
       tearDown();
     }
   }
@@ -203,6 +220,7 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
   private final ModuleProxy mInputModule;
 
   private ModuleInstanceCompiler mModuleInstanceCompiler;
+  private GroupNodeCompiler mGroupNodeCompiler;
   private EFAUnifier mEFAUnifier;
   private UnifiedEFASystemBuilder mSystemBuilder;
   private CompilationInfo mCompilationInfo;
