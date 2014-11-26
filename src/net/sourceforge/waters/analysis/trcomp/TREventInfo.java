@@ -22,6 +22,8 @@ import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * <P>Event information for compositional verification.</P>
@@ -152,13 +154,15 @@ class TREventInfo
 
   byte getEventStatus(final Set<TRAutomatonProxy> candidate)
   {
-    if (mNumNonSelfloopAutomata == 0) {
+    if (mNumNonSelfloopAutomata == 0 && !mIsBlocked) {
       if (mIsControllable) {
         return EventStatus.STATUS_BLOCKED | EventStatus.STATUS_CONTROLLABLE;
       } else {
         return EventStatus.STATUS_BLOCKED;
       }
     } else {
+      // Blocked status is recorded in mStatusMap:
+      // do not report blocked status for the automaton blocking an event.
       final StatusChecker checker = new StatusChecker(candidate);
       mStatusMap.forEachEntry(checker);
       byte result = checker.getResult();
@@ -173,22 +177,37 @@ class TREventInfo
   }
 
   void countSpecialEvents(final byte usedStatus,
-                          final CompositionalAnalysisResult stats)
+                          final CompositionalAnalysisResult stats,
+                          final Logger logger)
   {
     if (EventStatus.isLocalEvent(usedStatus)) {
-      // do not count
+      reportEventStatus(logger, "local");
     } else if (EventStatus.isBlockedEvent(usedStatus)) {
       if (mIsBlocked) {
         stats.addBlockedEvents(1);
+        reportEventStatus(logger, "blocked");
       } else {
         stats.addSelfloopOnlyEvents(1);
+        reportEventStatus(logger, "globally selfloop-only");
       }
     } else if (EventStatus.isFailingEvent(usedStatus)) {
       stats.addFailingEvents(1);
+      reportEventStatus(logger, "failing");
     } else if (EventStatus.isOutsideOnlySelfloopEvent(usedStatus)) {
       stats.addSelfloopOnlyEvents(1);
+      reportEventStatus(logger, "locally selfloop-only");
     } else if (EventStatus.isOutsideAlwaysEnabledEvent(usedStatus)) {
       stats.addAlwaysEnabledEvents(1);
+      reportEventStatus(logger, "always enabled");
+    }
+  }
+
+  void reportEventStatus(final Logger logger, final String status)
+  {
+    if (logger.isDebugEnabled()) {
+      final String msg =
+        "Event " + mEvent.getName() + " is considered as " + status + ".";
+      logger.debug(msg);
     }
   }
 
@@ -205,13 +224,13 @@ class TREventInfo
     final int oldNumDisablingAutomata = mNumDisablingAutomata;
     setAutomatonStatus(aut, newStatus);
     if (mIsBlocked && !wasBlocked) {
-      enqueueAutomataExcept(needsSimplification, aut);
+      enqueueAllAutomata(needsSimplification);
     } else if (mNumNonSelfloopAutomata == 0 && oldNumNonSelfloopAutomata > 0) {
-      enqueueAutomataExcept(needsSimplification, null);
+      enqueueAllAutomata(needsSimplification);
     } else if (mIsFailing && !wasFailing) {
-      enqueueAutomataExcept(needsSimplification, aut);
+      enqueueAllAutomata(needsSimplification);
     } else if (mNumDisablingAutomata == 0 && oldNumDisablingAutomata > 0) {
-      enqueueAutomataExcept(needsSimplification, aut);
+      enqueueAllAutomata(needsSimplification);
     } else {
       if (mNumNonSelfloopAutomata == 1 && oldNumNonSelfloopAutomata > 1) {
         final TRAutomatonProxy simplifiable = getNonSelfloopAutomaton();
@@ -227,15 +246,17 @@ class TREventInfo
   void setAutomatonStatus(final TRAutomatonProxy aut, byte newStatus)
   {
     if (EventStatus.isUsedEvent(newStatus)) {
+      final byte oldStatus = mStatusMap.get(aut);
       if (mIsBlocked) {
-        newStatus &= ~EventStatus.STATUS_BLOCKED;
+        if (!EventStatus.isBlockedEvent(oldStatus)) {
+          newStatus &= ~EventStatus.STATUS_BLOCKED;
+        }
       } else if (EventStatus.isBlockedEvent(newStatus)) {
         mIsBlocked = true;
         mIsFailing = false;
       } else if (EventStatus.isFailingEvent(newStatus)) {
         mIsFailing = true;
       }
-      final byte oldStatus = mStatusMap.get(aut);
       final boolean oldSelfloopOnly =
         EventStatus.isOutsideOnlySelfloopEvent(oldStatus);
       final boolean newSelfloopOnly =
@@ -274,17 +295,14 @@ class TREventInfo
 
   //#########################################################################
   //# Auxiliary Methods
-  private void enqueueAutomataExcept(final Queue<TRAutomatonProxy> queue,
-                                     final TRAutomatonProxy except)
+  private void enqueueAllAutomata(final Queue<TRAutomatonProxy> queue)
   {
     final TRAutomatonProxy[] automata =
       new TRAutomatonProxy[mStatusMap.size()];
     mStatusMap.keys(automata);
     Arrays.sort(automata);
     for (final TRAutomatonProxy aut : automata) {
-      if (aut != except) {
-        queue.offer(aut);
-      }
+      queue.offer(aut);
     }
   }
 

@@ -21,7 +21,6 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
-import java.util.Set;
 
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
@@ -472,6 +471,7 @@ public class TRCompositionalConflictChecker
 
     final int numEvents = model.getEvents().size();
     mSpecialEventsFinder = new SpecialEventsFinder();
+    mSpecialEventsFinder.setAppliesPartitionAutomatically(false);
     mSpecialEventsFinder.setDefaultMarkingID(DEFAULT_MARKING);
     mSpecialEventsFinder.setBlockedEventsDetected(mBlockedEventsUsed);
     mSpecialEventsFinder.setFailingEventsDetected(mFailingEventsUsed);
@@ -773,6 +773,7 @@ public class TRCompositionalConflictChecker
       }
       // Record steps and update event status ...
       mIntermediateAbstractionSequence.commit(aut);
+      mNeedsSimplification.setSuppressed(aut);
       if (simplified || !mAlwaysEnabledDetectedInitially) {
         final EventEncoding oldEncoding =
           mIntermediateAbstractionSequence.getInputEventEncoding();
@@ -788,6 +789,7 @@ public class TRCompositionalConflictChecker
       recordUnsuccessfulComposition();
       return false;
     } finally {
+      mNeedsSimplification.clearSuppressed();
       mIntermediateAbstractionSequence = null;
     }
   }
@@ -849,7 +851,7 @@ public class TRCompositionalConflictChecker
         mIntermediateAbstractionSequence.commit(sync);
       }
       // Update event status ...
-      mNeedsSimplification.setCurrentComposition(candidate);
+      mNeedsSimplification.setSuppressed(candidate, sync);
       if (isTrivialAutomaton(sync)) {
         logger.debug("Dropping trivial automaton " + sync.getName());
         dropTrivialAutomaton(sync);
@@ -862,13 +864,13 @@ public class TRCompositionalConflictChecker
       for (final TRAutomatonProxy aut : candidate.getAutomata()) {
         mCurrentSubsystem.removeAutomaton(aut, mNeedsSimplification);
       }
-      mNeedsSimplification.setCurrentComposition(null);
       return sync;
     } catch (final OverflowException exception) {
       // BUG May or may not have been counted by recordStatistics() already?
       recordUnsuccessfulComposition();
       throw exception;
     } finally {
+      mNeedsSimplification.clearSuppressed();
       mIntermediateAbstractionSequence = null;
     }
   }
@@ -1074,13 +1076,14 @@ public class TRCompositionalConflictChecker
   void countSpecialEvents(final EventEncoding enc)
   {
     final CompositionalAnalysisResult stats = getAnalysisResult();
+    final Logger logger = getLogger();
     final int numEvents = enc.getNumberOfProperEvents();
     for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
       final byte status = enc.getProperEventStatus(e);
       if (EventStatus.isUsedEvent(status)) {
         final EventProxy event = enc.getProperEvent(e);
         final TREventInfo info = mCurrentSubsystem.getEventInfo(event);
-        info.countSpecialEvents(status, stats);
+        info.countSpecialEvents(status, stats, logger);
       }
     }
   }
@@ -1090,18 +1093,10 @@ public class TRCompositionalConflictChecker
     final CompositionalAnalysisResult result = getAnalysisResult();
     result.addCompositionAttempt();
     final ListBufferTransitionRelation rel = aut.getTransitionRelation();
-    final int numStates = rel.getNumberOfStates();
+    final int numStates = rel.getNumberOfReachableStates();
+    result.updateNumberOfStates(numStates);
     final int numTrans = rel.getNumberOfTransitions();
-    final double totalStates = result.getTotalNumberOfStates() + numStates;
-    result.setTotalNumberOfStates(totalStates);
-    final double peakStates =
-      Math.max(result.getPeakNumberOfStates(), numStates);
-    result.setPeakNumberOfStates(peakStates);
-    final double totalTrans = result.getTotalNumberOfTransitions() + numTrans;
-    result.setTotalNumberOfTransitions(totalTrans);
-    final double peakTrans =
-      Math.max(result.getPeakNumberOfTransitions(), numTrans);
-    result.setPeakNumberOfTransitions(peakTrans);
+    result.updateNumberOfTransitions(numTrans);
     result.updatePeakMemoryUsage();
   }
 
@@ -1138,19 +1133,34 @@ public class TRCompositionalConflictChecker
     }
 
     //#######################################################################
-    //# Data Members
-    private void setCurrentComposition(final TRCandidate candidate)
+    //# Suppressing Automata Currently Being Modified
+    private void setSuppressed(final TRAutomatonProxy aut)
     {
-      if (candidate == null) {
-        mSupressed = Collections.emptySet();
+      mSupressed = Collections.singleton(aut);
+    }
+
+    private void setSuppressed(final TRCandidate candidate,
+                               final TRAutomatonProxy aut)
+    {
+      final Collection<TRAutomatonProxy> automata = candidate.getAutomata();
+      final int size = automata.size() + 1;
+      if (size <= 4) {
+        mSupressed = new ArrayList<>(size);
       } else {
-        mSupressed = new THashSet<>(candidate.getAutomata());
+        mSupressed = new THashSet<>(size);
       }
+      mSupressed.addAll(automata);
+      mSupressed.add(aut);
+    }
+
+    private void clearSuppressed()
+    {
+      mSupressed = Collections.emptySet();
     }
 
     //#######################################################################
     //# Data Members
-    private Set<TRAutomatonProxy> mSupressed;
+    private Collection<TRAutomatonProxy> mSupressed;
   }
 
 
@@ -1244,7 +1254,8 @@ public class TRCompositionalConflictChecker
     public void onSimplificationFinish
       (final TransitionRelationSimplifier simplifier, final boolean result)
     {
-      if (result && mIntermediateAbstractionSequence != null) {
+      if (result && isCounterExampleEnabled() &&
+          mIntermediateAbstractionSequence != null) {
         final TRAbstractionStep last =
           mIntermediateAbstractionSequence.getLastIntermediateStep();
         if (last != null && last instanceof TRAbstractionStepPartition) {
