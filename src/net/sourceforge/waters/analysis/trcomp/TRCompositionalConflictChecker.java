@@ -804,10 +804,11 @@ public class TRCompositionalConflictChecker
     }
     // Set up event encoding ...
     try {
+      final EventEncoding candidateEncoding = candidate.getEventEncoding();
+      countSpecialEvents(candidateEncoding);
       final EventEncoding syncEncoding =
         candidate.createSyncEventEncoding(mUsedDefaultMarking,
                                           mConfiguredPreconditionMarking);
-      countSpecialEvents(syncEncoding);
       // Synchronise ...
       final ProductDESProxyFactory factory = getFactory();
       final ProductDESProxy des = candidate.createProductDESProxy(factory);
