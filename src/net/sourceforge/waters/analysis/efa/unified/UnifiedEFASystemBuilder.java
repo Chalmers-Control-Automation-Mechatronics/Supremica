@@ -51,7 +51,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
- * A compiler to convert an instantiated module ({@link ModuleProxy}) into and
+ * A compiler to convert an instantiated module ({@link ModuleProxy}) into an
  * EFSM system ({@link UnifiedEFASystem}).
  *
  * @author Robi Malik, Sahar Mohajerani
