@@ -135,12 +135,25 @@ public class TRSynchronousProductBuilder
   }
 
   /**
-   * Sets whether deadlock states are pruned. If enabled, the synchronous
-   * product builder checks for deadlock states in the input automata, i.e.,
-   * for states that are not marked by any of the configured propositions,
-   * and which do not have any outgoing transitions. Synchronous product
-   * states, of which at least one state component is a deadlock state, are
-   * not expanded and instead merged into a single state.
+   * <P>Sets whether deadlock states are pruned.</P>
+   *
+   * <P>If enabled, and there are propositions in the output automaton, the
+   * synchronous product builder checks for deadlock states in the input
+   * automata, i.e., for states that are not marked by any of the
+   * propositions, and which do not have any outgoing transitions.
+   * Synchronous product states, of which at least one state component is a
+   * deadlock state, are not expanded and instead merged into the dump state
+   * of the output automaton.</P>
+   *
+   * <P>In addition, transitions with events marked as <I>failing</I>
+   * ({@link EventStatus#STATUS_FAILING}) in the event encoding are replaced
+   * by transitions to the dump state regardless of their target states.
+   * Events marked as <I>failing</I> ({@link EventStatus#STATUS_FAILING}) and
+   * <I>always enabled</I> ({@link EventStatus#STATUS_OUTSIDE_ALWAYS_ENABLED})
+   * in addition suppress other transitions from states where they are
+   * enabled. This is useful in verification that only seeks to determine
+   * whether or not failing events are ever enabled.</P>
+   *
    * @see #getPropositions()
    */
   public void setPruningDeadlocks(final boolean pruning)
@@ -155,31 +168,6 @@ public class TRSynchronousProductBuilder
   public boolean getPruningDeadlocks()
   {
     return mPruningDeadlocks;
-  }
-
-  /**
-   * Sets whether forbidden events are supported. If enabled, any transitions
-   * with events marked as {@link EventStatus#STATUS_FAILING} in the output
-   * event encoding are replaced by selfloops regardless of their target
-   * states. Events marked as {@link EventStatus#STATUS_FAILING} and
-   * {@link EventStatus#STATUS_OUTSIDE_ALWAYS_ENABLED} in addition
-   * suppress all other transitions from states where they are enabled.
-   * This is useful in verification that only seeks to determine
-   * whether or not forbidden events are ever enabled.
-   * @see #getPruningForbiddenEvents()
-   */
-  public void setPruningForbiddenEvents(final boolean pruning)
-  {
-    mPruningForbiddenEvents = pruning;
-  }
-
-  /**
-   * Returns whether forbidden events are supported.
-   * @see #setPruningForbiddenEvents(boolean) setPruningForbiddenEvents()
-   */
-  public boolean getPruningForbiddenEvents()
-  {
-    return mPruningForbiddenEvents;
   }
 
   /**
@@ -243,11 +231,7 @@ public class TRSynchronousProductBuilder
     } else {
       final KindTranslator translator = getKindTranslator();
       if (mConfiguredEventEncoding == null) {
-        try {
-          mConfiguredEventEncoding = new EventEncoding(props, translator);
-        } catch (final OverflowException exception) {
-          throw new IllegalArgumentException(exception);
-        }
+        mConfiguredEventEncoding = new EventEncoding(props, translator);
       } else {
         mConfiguredEventEncoding.removeAllPropositions();
         for (final EventProxy prop : props) {
@@ -354,18 +338,7 @@ public class TRSynchronousProductBuilder
       mDecodedDeadlockState[0] = sizes[0]++;
     }
 
-    // Set up state encoding
-    mStateTupleEncoding = new StateTupleEncoding(sizes);
-    final int numWords = mStateTupleEncoding.getNumberOfWords();
-    final int stateLimit = getNodeLimit();
-    final int tableSize = Math.min(stateLimit, MAX_TABLE_SIZE);
-    mStateSpace = new IntArrayBuffer(numWords, stateLimit, tableSize, -1);
-    mDecodedSource = new int[numAutomata];
-    mEncodedSource = new int[numWords];
-    mDecodedTarget = new int[numAutomata];
-    mEncodedTarget = new int[numWords];
-
-    // Set up event info
+    // Set up output event encoding
     final Collection<EventProxy> events = des.getEvents();
     final int numEvents = events.size();
     final Set<EventProxy> outputEvents;
@@ -376,86 +349,6 @@ public class TRSynchronousProductBuilder
       mOutputEventEncoding = new EventEncoding(mConfiguredEventEncoding);
       outputEvents = new THashSet<>(numEvents);
     }
-    final Map<EventProxy,EventInfo> eventInfoMap = new HashMap<>(numEvents);
-    for (final EventProxy event : events) {
-      if (translator.getEventKind(event) != EventKind.PROPOSITION) {
-        final EventInfo info = new EventInfo(event);
-        eventInfoMap.put(event, info);
-        if (mConfiguredEventEncoding != null) {
-          final int e = mConfiguredEventEncoding.getEventCode(event);
-          if (e >= 0) {
-            final EventProxy output = mConfiguredEventEncoding.getProperEvent(e);
-            outputEvents.add(output);
-            final byte status = mConfiguredEventEncoding.getProperEventStatus(e);
-            info.setForbidden(status);
-          }
-        }
-      }
-    }
-    if (mConfiguredEventEncoding != null) {
-      // Check for unused events in configured event encoding ...
-      final int numConfigured =
-        mConfiguredEventEncoding.getNumberOfProperEvents();
-      for (int e = EventEncoding.TAU; e < numConfigured; e++) {
-        final EventProxy event = mConfiguredEventEncoding.getProperEvent(e);
-        if (event != null && !outputEvents.contains(event)) {
-          final byte status = mConfiguredEventEncoding.getProperEventStatus(e);
-          mOutputEventEncoding.setProperEventStatus
-            (e, status | EventStatus.STATUS_UNUSED);
-        }
-      }
-    }
-    final List<EventInfo> eventInfoList = new ArrayList<>(numEvents);
-    for (a = 0; a < numAutomata; a++) {
-      final TRAutomatonProxy aut = mInputAutomata[a];
-      final EventEncoding enc = aut.getEventEncoding();
-      final int numLocalEvents = enc.getNumberOfProperEvents();
-      for (int local = EventEncoding.TAU; local < numLocalEvents; local++) {
-        final byte status = enc.getProperEventStatus(local);
-        if (EventStatus.isUsedEvent(status)) {
-          final EventProxy event = enc.getProperEvent(local);
-          if (event == null) {
-            assert local == EventEncoding.TAU;
-            final AutomatonEventInfo autInfo =
-              new AutomatonEventInfo(a, aut, local);
-            if (!autInfo.isBlocked()) {
-              final EventInfo info = new EventInfo(null);
-              info.addAutomatonEventInfo(autInfo);
-              info.setOutputCode(EventEncoding.TAU);
-              info.sort();
-              eventInfoList.add(info);
-              mOutputEventEncoding.setProperEventStatus(EventEncoding.TAU,
-                                                        status);
-            }
-          } else {
-            final int global =
-              mOutputEventEncoding.addEvent(event, translator, status);
-            final EventInfo info = eventInfoMap.get(event);
-            if (info == null) {
-              throw new EventNotFoundException(des, event.getName());
-            } else if (!info.isBlocked()) {
-              info.setOutputCode(global);
-              final AutomatonEventInfo autInfo =
-                new AutomatonEventInfo(a, aut, local);
-              info.addAutomatonEventInfo(autInfo);
-            }
-          }
-        }
-      }
-    }
-    for (final EventProxy event : events) {
-      final EventInfo info = eventInfoMap.get(event);
-      if (info != null && info.getOutputCode() >= 0 && !info.isBlocked()) {
-        info.sort();
-        eventInfoList.add(info);
-      }
-    }
-    Collections.sort(eventInfoList);
-    mEventInfo = eventInfoList;
-    final int numOutputEvents = mOutputEventEncoding.getNumberOfProperEvents();
-    final int transitionLimit = getTransitionLimit();
-    mPreTransitionBuffer =
-      new PreTransitionBuffer(numOutputEvents, transitionLimit);
 
     // Add propositions to output event encoding ...
     if (!mHasConfiguredPropositions) {
@@ -472,7 +365,7 @@ public class TRSynchronousProductBuilder
       }
     }
 
-    // Set up deadlock information
+    // Set up deadlock information ...
     if (mPruningDeadlocks &&
         mOutputEventEncoding.getNumberOfPropositions() > 0) {
       deadlock:
@@ -507,6 +400,103 @@ public class TRSynchronousProductBuilder
       }
     }
     mDeadlockState = -1;
+
+    // Add proper events to output event encoding and create event info ...
+    final Map<EventProxy,EventInfo> eventInfoMap = new HashMap<>(numEvents);
+    for (final EventProxy event : events) {
+      if (translator.getEventKind(event) != EventKind.PROPOSITION) {
+        final EventInfo info = new EventInfo(event);
+        eventInfoMap.put(event, info);
+        if (mConfiguredEventEncoding != null) {
+          final int e = mConfiguredEventEncoding.getEventCode(event);
+          if (e >= 0) {
+            final EventProxy output = mConfiguredEventEncoding.getProperEvent(e);
+            outputEvents.add(output);
+            final byte status = mConfiguredEventEncoding.getProperEventStatus(e);
+            info.setForbidden(status);
+          }
+        }
+      }
+    }
+    if (mConfiguredEventEncoding != null) {
+      // Check for unused events in configured event encoding ...
+      final int numConfigured =
+        mConfiguredEventEncoding.getNumberOfProperEvents();
+      for (int e = EventEncoding.TAU; e < numConfigured; e++) {
+        final EventProxy event = mConfiguredEventEncoding.getProperEvent(e);
+        if (event != null && !outputEvents.contains(event)) {
+          final byte status = mConfiguredEventEncoding.getProperEventStatus(e);
+          mOutputEventEncoding.setProperEventStatus
+            (e, status | EventStatus.STATUS_UNUSED);
+        }
+      }
+    }
+
+    // Add transition information to event info ...
+    final List<EventInfo> eventInfoList = new ArrayList<>(numEvents);
+    for (a = 0; a < numAutomata; a++) {
+      final TRAutomatonProxy aut = mInputAutomata[a];
+      final DeadlockInfo deadlockInfo =
+        mDeadlockInfo == null ? null : mDeadlockInfo[a];
+      final EventEncoding enc = aut.getEventEncoding();
+      final int numLocalEvents = enc.getNumberOfProperEvents();
+      for (int local = EventEncoding.TAU; local < numLocalEvents; local++) {
+        final byte status = enc.getProperEventStatus(local);
+        if (EventStatus.isUsedEvent(status)) {
+          final EventProxy event = enc.getProperEvent(local);
+          if (event == null) {
+            assert local == EventEncoding.TAU;
+            final AutomatonEventInfo autInfo =
+              new AutomatonEventInfo(a, aut, local, deadlockInfo);
+            if (!autInfo.isBlocked()) {
+              final EventInfo info = new EventInfo(null);
+              info.addAutomatonEventInfo(autInfo);
+              info.setOutputCode(EventEncoding.TAU);
+              info.sort();
+              eventInfoList.add(info);
+              mOutputEventEncoding.setProperEventStatus(EventEncoding.TAU,
+                                                        status);
+            }
+          } else {
+            final int global =
+              mOutputEventEncoding.addEvent(event, translator, status);
+            final EventInfo info = eventInfoMap.get(event);
+            if (info == null) {
+              throw new EventNotFoundException(des, event.getName());
+            } else if (!info.isBlocked()) {
+              info.setOutputCode(global);
+              final AutomatonEventInfo autInfo =
+                new AutomatonEventInfo(a, aut, local, deadlockInfo);
+              info.addAutomatonEventInfo(autInfo);
+            }
+          }
+        }
+      }
+    }
+    for (final EventProxy event : events) {
+      final EventInfo info = eventInfoMap.get(event);
+      if (info != null && info.getOutputCode() >= 0 && !info.isBlocked()) {
+        info.sort();
+        eventInfoList.add(info);
+      }
+    }
+    Collections.sort(eventInfoList);
+    mEventInfo = eventInfoList;
+    final int numOutputEvents = mOutputEventEncoding.getNumberOfProperEvents();
+    final int transitionLimit = getTransitionLimit();
+    mPreTransitionBuffer =
+      new PreTransitionBuffer(numOutputEvents, transitionLimit);
+
+    // Set up state encoding
+    mStateTupleEncoding = new StateTupleEncoding(sizes);
+    final int numWords = mStateTupleEncoding.getNumberOfWords();
+    final int stateLimit = getNodeLimit();
+    final int tableSize = Math.min(stateLimit, MAX_TABLE_SIZE);
+    mStateSpace = new IntArrayBuffer(numWords, stateLimit, tableSize, -1);
+    mDecodedSource = new int[numAutomata];
+    mEncodedSource = new int[numWords];
+    mDecodedTarget = new int[numAutomata];
+    mEncodedTarget = new int[numWords];
   }
 
   @Override
@@ -629,7 +619,7 @@ public class TRSynchronousProductBuilder
       mStateTupleEncoding.decode(mEncodedSource, mDecodedSource);
       for (final EventInfo event : mEventInfo) {
         if (event.isEnabled(mDecodedSource)) {
-          if (mPruningForbiddenEvents && event.isForbidden()) {
+          if (mPruningDeadlocks && event.isForbidden()) {
             createDeadlockState();
             final int e = event.getOutputCode();
             createTransition(e, mDeadlockState);
@@ -1117,7 +1107,8 @@ public class TRSynchronousProductBuilder
     //# Constructor
     private AutomatonEventInfo(final int autIndex,
                                final TRAutomatonProxy aut,
-                               final int e)
+                               final int e,
+                               final DeadlockInfo deadlockInfo)
     {
       mAutomatonIndex = autIndex;
       final ListBufferTransitionRelation rel = aut.getTransitionRelation();
@@ -1130,7 +1121,8 @@ public class TRSynchronousProductBuilder
       int numReachable = 0;
       int numEnabled = 0;
       for (int s = 0; s < numStates; s++) {
-        if (rel.isReachable(s)) {
+        if (rel.isReachable(s) &&
+            (deadlockInfo == null || !deadlockInfo.isDeadlockState(s))) {
           numReachable++;
           mTransitionIterator.resetState(s);
           int count = 0;
@@ -1347,7 +1339,6 @@ public class TRSynchronousProductBuilder
   private boolean mHasConfiguredPropositions = false;
   private boolean mRemovingSelfloops = true;
   private boolean mPruningDeadlocks = false;
-  private boolean mPruningForbiddenEvents = false;
   private StateCallback mStateCallback = null;
 
   // Data structures for state space representation

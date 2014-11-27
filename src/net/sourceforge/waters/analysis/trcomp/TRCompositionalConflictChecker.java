@@ -492,7 +492,6 @@ public class TRCompositionalConflictChecker
     mSynchronousProductBuilder.setDetailedOutputEnabled(true);
     mSynchronousProductBuilder.setKindTranslator(translator);
     mSynchronousProductBuilder.setPruningDeadlocks(true);
-    mSynchronousProductBuilder.setPruningForbiddenEvents(false);
     mSynchronousProductBuilder.setRemovingSelfloops(true);
     mSynchronousProductBuilder.setNodeLimit(mInternalStateLimit);
     mSynchronousProductBuilder.setTransitionLimit(mInternalTransitionLimit);

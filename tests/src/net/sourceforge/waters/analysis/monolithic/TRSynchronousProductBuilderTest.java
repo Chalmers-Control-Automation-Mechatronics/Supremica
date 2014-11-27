@@ -100,7 +100,6 @@ public class TRSynchronousProductBuilderTest
       } catch (final EventNotFoundException e) {
         // No marking---never mind!
       }
-      builder.setPruningForbiddenEvents(true);
       builder.setEventEncoding(enc);
     }
   }
@@ -126,7 +125,12 @@ public class TRSynchronousProductBuilderTest
   //# Forbidden Events Test Cases
   public void testForbid() throws Exception
   {
-    runAutomatonBuilder("tests", "abstraction", "forbid2.wmod");
+    try {
+      mPruningDeadlocks = true;
+      runAutomatonBuilder("tests", "abstraction", "forbid2.wmod");
+    } finally {
+      mPruningDeadlocks = false;
+    }
   }
 
 
