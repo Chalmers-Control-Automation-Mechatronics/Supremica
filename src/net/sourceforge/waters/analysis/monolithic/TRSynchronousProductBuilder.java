@@ -39,6 +39,7 @@ import net.sourceforge.waters.model.analysis.des.AutomatonResult;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -323,21 +324,38 @@ public class TRSynchronousProductBuilder
   {
     super.setUp();
 
-    // Set up input automata
+    // Set up input automata and find their sizes
     final KindTranslator translator = getKindTranslator();
     final ProductDESProxy des = getModel();
     final Collection<AutomatonProxy> automata = des.getAutomata();
     final int numAutomata = automata.size();
     mInputAutomata = new TRAutomatonProxy[numAutomata];
+    mDecodedDeadlockState = new int[numAutomata];
+    final int[] sizes = new int[numAutomata];
     int a = 0;
+    boolean gotDump = false;
     for (final AutomatonProxy aut : automata) {
-      mInputAutomata[a++] =
-        TRAutomatonProxy.createTRAutomatonProxy
-          (aut, translator, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      final TRAutomatonProxy tr = TRAutomatonProxy.createTRAutomatonProxy
+        (aut, translator, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      mInputAutomata[a] = tr;
+      final ListBufferTransitionRelation rel = tr.getTransitionRelation();
+      int numStates = getLastReachableState(rel) + 1;
+      final int dumpIndex = getAlternativeDumpState(rel, numStates);
+      if (dumpIndex >= 0) {
+        gotDump = true;
+        mDecodedDeadlockState[a] = dumpIndex;
+        if (dumpIndex >= numStates) {
+          numStates = dumpIndex + 1;
+        }
+      }
+      sizes[a++] = numStates;
+    }
+    if (numAutomata > 0 && !gotDump) {
+      mDecodedDeadlockState[0] = sizes[0]++;
     }
 
     // Set up state encoding
-    mStateTupleEncoding = new StateTupleEncoding(automata);
+    mStateTupleEncoding = new StateTupleEncoding(sizes);
     final int numWords = mStateTupleEncoding.getNumberOfWords();
     final int stateLimit = getNodeLimit();
     final int tableSize = Math.min(stateLimit, MAX_TABLE_SIZE);
@@ -612,8 +630,9 @@ public class TRSynchronousProductBuilder
       for (final EventInfo event : mEventInfo) {
         if (event.isEnabled(mDecodedSource)) {
           if (mPruningForbiddenEvents && event.isForbidden()) {
+            createDeadlockState();
             final int e = event.getOutputCode();
-            createTransition(e, source);
+            createTransition(e, mDeadlockState);
             if (event.isOutsideAlwaysEnabled()) {
               break;
             }
@@ -633,6 +652,18 @@ public class TRSynchronousProductBuilder
     }
   }
 
+  private int createDeadlockState() throws OverflowException
+  {
+    if (mDeadlockState < 0) {
+      final int[] backup = mEncodedTarget;
+      final int numWords = mStateTupleEncoding.getNumberOfWords();
+      mEncodedTarget = new int[numWords];
+      mDeadlockState = createNewStateDecoded(mDecodedDeadlockState);
+      mEncodedTarget = backup;
+    }
+    return mDeadlockState;
+  }
+
   private int createNewStateDecoded(final int[] decoded)
     throws OverflowException
   {
@@ -648,6 +679,13 @@ public class TRSynchronousProductBuilder
     throws OverflowException
   {
     return mStateSpace.add(encoded);
+  }
+
+  private void createDeadlockTransition(final int event)
+    throws OverflowException
+  {
+    createDeadlockState();
+    createTransition(event, mDeadlockState);
   }
 
   private void createTransition(final int event, final int target)
@@ -670,21 +708,15 @@ public class TRSynchronousProductBuilder
     (final AutomatonEventInfo updateSequence,
      final int event,
      final int[] encodedTarget,
-     final TRSynchronousProductBuilder builder,
-     final boolean deadlock)
+     final TRSynchronousProductBuilder builder)
     throws OverflowException
   {
-    if (deadlock && builder.mDeadlockState >= 0) {
-      builder.createTransition(event, builder.mDeadlockState);
-    } else if (updateSequence == null) {
+    if (updateSequence == null) {
       final int target = builder.createNewStateEncoded(encodedTarget);
       builder.createTransition(event, target);
-      if (deadlock) {
-        builder.mDeadlockState = target;
-      }
     } else {
       updateSequence.createSuccessorStatesEncoded
-        (event, encodedTarget, builder, deadlock);
+        (event, encodedTarget, builder);
     }
   }
 
@@ -692,21 +724,15 @@ public class TRSynchronousProductBuilder
     (final AutomatonEventInfo updateSequence,
      final int event,
      final int[] decodedTarget,
-     final TRSynchronousProductBuilder builder,
-     final boolean deadlock)
+     final TRSynchronousProductBuilder builder)
     throws OverflowException
   {
-    if (deadlock && builder.mDeadlockState >= 0) {
-      builder.createTransition(event, builder.mDeadlockState);
-    } else if (updateSequence == null) {
+    if (updateSequence == null) {
       final int target = builder.createNewStateDecoded(decodedTarget);
       builder.createTransition(event, target);
-      if (deadlock) {
-        builder.mDeadlockState = target;
-      }
     } else {
       updateSequence.createSuccessorStatesDecoded
-        (event, decodedTarget, builder, deadlock);
+        (event, decodedTarget, builder);
     }
   }
 
@@ -801,16 +827,18 @@ public class TRSynchronousProductBuilder
     final int numStates = outputRel.getNumberOfStates();
     states:
     for (int globalS = 0; globalS < numStates; globalS++) {
-      mStateSpace.getContents(globalS, mEncodedSource);
-      for (final MarkingInfo info : list) {
-        a = info.getAutomatonIndex();
-        final int localS = mStateTupleEncoding.get(mEncodedSource, a);
-        if (!info.isMarked(localS)) {
-          allMarked = false;
-          continue states;
+      if (globalS != mDeadlockState) {
+        mStateSpace.getContents(globalS, mEncodedSource);
+        for (final MarkingInfo info : list) {
+          a = info.getAutomatonIndex();
+          final int localS = mStateTupleEncoding.get(mEncodedSource, a);
+          if (!info.isMarked(localS)) {
+            allMarked = false;
+            continue states;
+          }
         }
+        outputRel.setMarked(globalS, globalP, true);
       }
-      outputRel.setMarked(globalS, globalP, true);
     }
     if (!allMarked || !getRemovingSelfloops()) {
       outputRel.setPropositionUsed(globalP, true);
@@ -849,6 +877,41 @@ public class TRSynchronousProductBuilder
         rel.removeEvent(e);
       }
     }
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Static Methods
+  private static int getLastReachableState
+    (final ListBufferTransitionRelation rel)
+  {
+    for (int s = rel.getNumberOfStates() - 1; s >= 0; s--) {
+      if (rel.isReachable(s)) {
+        return s;
+      }
+    }
+    return -1;
+  }
+
+  private static int getAlternativeDumpState
+    (final ListBufferTransitionRelation rel, final int numStates)
+  {
+    final int dumpIndex = rel.getDumpStateIndex();
+    if (dumpIndex < numStates) {
+      return dumpIndex;
+    }
+    final int topIndex = AutomatonTools.log2(numStates);
+    if (dumpIndex < topIndex) {
+      return dumpIndex;
+    } else if (numStates < topIndex) {
+      return numStates;
+    }
+    for (int s = 0; s < numStates; s++) {
+      if (!rel.isReachable(s)) {
+        return s;
+      }
+    }
+    return -1;
   }
 
 
@@ -989,7 +1052,7 @@ public class TRSynchronousProductBuilder
       throws OverflowException
     {
       TRSynchronousProductBuilder.createSuccessorStatesEncoded
-        (mUpdateSequence, mOutputCode, encodedTarget, builder, false);
+        (mUpdateSequence, mOutputCode, encodedTarget, builder);
     }
 
     private void createSuccessorStatesDecoded
@@ -998,7 +1061,7 @@ public class TRSynchronousProductBuilder
       throws OverflowException
     {
       TRSynchronousProductBuilder.createSuccessorStatesDecoded
-        (mUpdateSequence, mOutputCode, decodedTarget, builder, false);
+        (mUpdateSequence, mOutputCode, decodedTarget, builder);
     }
 
     //#######################################################################
@@ -1121,24 +1184,32 @@ public class TRSynchronousProductBuilder
     private void createSuccessorStatesEncoded
       (final int event,
        final int[] encodedTarget,
-       final TRSynchronousProductBuilder builder,
-       final boolean deadlock)
+       final TRSynchronousProductBuilder builder)
       throws OverflowException
     {
-      if (mDeterministic || deadlock) {
+      if (mDeterministic) {
         final int target = mTransitionIterator.getCurrentTargetState();
-        builder.mStateTupleEncoding.set(encodedTarget, mAutomatonIndex, target);
-        TRSynchronousProductBuilder.createSuccessorStatesEncoded
-          (mNextUpdate, event, encodedTarget, builder,
-           deadlock || builder.isDeadlockState(mAutomatonIndex, target));
+        if (builder.isDeadlockState(mAutomatonIndex, target)) {
+          builder.createDeadlockTransition(event);
+        } else {
+          builder.mStateTupleEncoding.set
+            (encodedTarget, mAutomatonIndex, target);
+          TRSynchronousProductBuilder.createSuccessorStatesEncoded
+            (mNextUpdate, event, encodedTarget, builder);
+        }
       } else {
         mTransitionIterator.reset();
         while (mTransitionIterator.advance()) {
           final int target = mTransitionIterator.getCurrentTargetState();
-          builder.mStateTupleEncoding.set(encodedTarget, mAutomatonIndex, target);
-          TRSynchronousProductBuilder.createSuccessorStatesEncoded
-            (mNextUpdate, event, encodedTarget, builder,
-             builder.isDeadlockState(mAutomatonIndex, target));
+          if (builder.isDeadlockState(mAutomatonIndex, target)) {
+            builder.createDeadlockTransition(event);
+            break;
+          } else {
+            builder.mStateTupleEncoding.set
+              (encodedTarget, mAutomatonIndex, target);
+            TRSynchronousProductBuilder.createSuccessorStatesEncoded
+              (mNextUpdate, event, encodedTarget, builder);
+          }
         }
       }
     }
@@ -1146,24 +1217,30 @@ public class TRSynchronousProductBuilder
     private void createSuccessorStatesDecoded
       (final int event,
        final int[] decodedTarget,
-       final TRSynchronousProductBuilder builder,
-       final boolean deadlock)
+       final TRSynchronousProductBuilder builder)
       throws OverflowException
     {
-      if (mDeterministic || deadlock) {
+      if (mDeterministic) {
         final int target = mTransitionIterator.getCurrentTargetState();
-        decodedTarget[mAutomatonIndex] = target;
-        TRSynchronousProductBuilder.createSuccessorStatesDecoded
-          (mNextUpdate, event, decodedTarget, builder,
-           deadlock || builder.isDeadlockState(mAutomatonIndex, target));
+        if (builder.isDeadlockState(mAutomatonIndex, target)) {
+          builder.createDeadlockTransition(event);
+        } else {
+          decodedTarget[mAutomatonIndex] = target;
+          TRSynchronousProductBuilder.createSuccessorStatesDecoded
+            (mNextUpdate, event, decodedTarget, builder);
+        }
       } else {
         mTransitionIterator.reset();
         while (mTransitionIterator.advance()) {
           final int target = mTransitionIterator.getCurrentTargetState();
-          decodedTarget[mAutomatonIndex] = target;
-          TRSynchronousProductBuilder.createSuccessorStatesDecoded
-            (mNextUpdate, event, decodedTarget, builder,
-             builder.isDeadlockState(mAutomatonIndex, target));
+          if (builder.isDeadlockState(mAutomatonIndex, target)) {
+            builder.createDeadlockTransition(event);
+            break;
+          } else {
+            decodedTarget[mAutomatonIndex] = target;
+            TRSynchronousProductBuilder.createSuccessorStatesDecoded
+              (mNextUpdate, event, decodedTarget, builder);
+          }
         }
       }
     }
@@ -1291,6 +1368,7 @@ public class TRSynchronousProductBuilder
   private int[] mEncodedSource;
   private int[] mDecodedTarget;
   private int[] mEncodedTarget;
+  private int[] mDecodedDeadlockState;
   private int mDeadlockState;
 
 

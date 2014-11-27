@@ -396,7 +396,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     mUnvisited = new ArrayDeque<int[]>(100);
     mNumStates = 0;
 
-    mSTEncoding = new StateTupleEncoding(mAutomata);
+    final int[] sizes = StateTupleEncoding.getAutomataSizes(mAutomata);
+    mSTEncoding = new StateTupleEncoding(sizes);
 
     final OrderingInfo info = mEventEncoding.getOrderingInfo();
     final int lastUncontrollable =
@@ -787,8 +788,10 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
                 reducedAutomata.add(aut);
               }
             }
+            final int[] sizes =
+              StateTupleEncoding.getAutomataSizes(reducedAutomata);
             final StateTupleEncoding reducedEncoding =
-              new StateTupleEncoding(reducedAutomata);
+              new StateTupleEncoding(sizes);
             // create statusMap
             final int tableSize = Math.min(getNodeLimit(), MAX_TABLE_SIZE);
             final IntArrayHashingStrategy strategy =

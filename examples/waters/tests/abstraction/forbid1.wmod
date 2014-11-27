@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="forbid" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>A test case to check whether to MonolithicSynchronousProductBuilder correctly supports forbidden events.</ns2:Comment>
+<Module Name="forbid1" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>A test case to check whether MonolithicSynchronousProductBuilder correctly supports forbidden events. This test is for the old version where forbidden event transitions are selfloops.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="a"/>
         <EventDecl Kind="CONTROLLABLE" Name="b"/>
@@ -13,39 +13,39 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
                         <PointGeometry>
-                            <Point Y="64" X="96"/>
+                            <Point X="96" Y="64"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="8" X="0"/>
+                            <Point X="0" Y="8"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
                         <PointGeometry>
-                            <Point Y="64" X="192"/>
+                            <Point X="192" Y="64"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="8" X="-14"/>
+                            <Point X="-14" Y="8"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="S1" Source="S0">
+                    <Edge Source="S0" Target="S1">
                         <LabelBlock>
                             <SimpleIdentifier Name="a"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="6" X="-8"/>
+                                <Point X="-8" Y="6"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S1" Source="S1">
+                    <Edge Source="S1" Target="S1">
                         <LabelBlock>
                             <SimpleIdentifier Name=":forbidden_a"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-34" X="-36"/>
+                                <Point X="-36" Y="-34"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="65" X="232"/>
+                            <Point X="232" Y="65"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
@@ -56,39 +56,39 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
                         <PointGeometry>
-                            <Point Y="64" X="96"/>
+                            <Point X="96" Y="64"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="8" X="0"/>
+                            <Point X="0" Y="8"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
                         <PointGeometry>
-                            <Point Y="64" X="192"/>
+                            <Point X="192" Y="64"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="8" X="-14"/>
+                            <Point X="-14" Y="8"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="S1" Source="S0">
+                    <Edge Source="S0" Target="S1">
                         <LabelBlock>
                             <SimpleIdentifier Name="b"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="6" X="-8"/>
+                                <Point X="-8" Y="6"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S1" Source="S1">
+                    <Edge Source="S1" Target="S1">
                         <LabelBlock>
                             <SimpleIdentifier Name=":forbidden_b"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-34" X="-36"/>
+                                <Point X="-36" Y="-34"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="65" X="232"/>
+                            <Point X="232" Y="65"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>

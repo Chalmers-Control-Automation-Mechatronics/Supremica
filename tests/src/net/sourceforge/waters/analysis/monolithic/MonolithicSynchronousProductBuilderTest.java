@@ -80,7 +80,7 @@ public class MonolithicSynchronousProductBuilderTest
   //# Forbidden Events Test Cases
   public void testForbid() throws Exception
   {
-    runAutomatonBuilder("tests", "abstraction", "forbid.wmod");
+    runAutomatonBuilder("tests", "abstraction", "forbid1.wmod");
   }
 
 

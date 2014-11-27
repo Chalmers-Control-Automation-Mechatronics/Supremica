@@ -179,6 +179,7 @@ public class SpecialEventsTRSimplifier
     if (needsReachabilityCheck) {
       final int config = getPreferredOutputConfiguration();
       if (rel.checkReachability(config)) {
+        rel.removeTauSelfLoops();
         removeProperSelfLoopEvents();
       }
     }

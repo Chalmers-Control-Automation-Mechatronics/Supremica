@@ -45,22 +45,22 @@ public class StateTupleEncoding
 {
 
   //#########################################################################
-  //# Constructor
+  //# Constructors
   /**
-   * Creates a new encoding for the given automata.
-   * @param automata  Automata defining the encoding. The encoding assumes
-   *                  decoded state tuples for the input automata in exactly
-   *                  the same order as produced by the iterator over this
-   *                  collection.
+   * Creates a new encoding for the given state numbers.
+   * @param sizes     State numbers defining the encoding. For each automaton
+   *                  index, the created encoding assumes with possible values
+   *                  from 0 to one less than the corresponding size. The
+   *                  method {@link StateTupleEncoding#getAutomataSizes(Collection)
+   *                  getAutomataSizes()} can be used to obtain this array.
    */
-  public StateTupleEncoding(final Collection<AutomatonProxy> automata)
+  public StateTupleEncoding(final int[] sizes)
   {
-    mAutomatonInfo = new AutomatonInfo[automata.size()];
+    mAutomatonInfo = new AutomatonInfo[sizes.length];
     mWordInfo = new ArrayList<>();
     final TIntArrayList used = new TIntArrayList();
     int autIndex = 0;
-    for (final AutomatonProxy aut : automata) {
-      final int numStates = aut.getStates().size();
+    for (final int numStates : sizes) {
       final int numBits = AutomatonTools.log2(numStates);
       int wordIndex;
       for (wordIndex = 0; wordIndex < used.size(); wordIndex++) {
@@ -85,6 +85,24 @@ public class StateTupleEncoding
       mAutomatonInfo[autIndex++] = info;
       list.add(info);
     }
+  }
+
+
+  /**
+   * Returns an array with the state numbers of the given automata.
+   * Each entry in the array is assigned the number of states of the
+   * corresponding automaton in the order it appears in the input.
+   */
+  public static int[] getAutomataSizes
+    (final Collection<AutomatonProxy> automata)
+  {
+    final int numAutomata = automata.size();
+    final int[] sizes = new int[numAutomata];
+    int a = 0;
+    for (final AutomatonProxy aut : automata) {
+      sizes[a++] = aut.getStates().size();
+    }
+    return sizes;
   }
 
 

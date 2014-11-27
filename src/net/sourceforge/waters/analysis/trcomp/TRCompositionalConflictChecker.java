@@ -984,12 +984,12 @@ public class TRCompositionalConflictChecker
         logger.debug("Subsystem is blocking.");
         combinedResult.setSatisfied(false);
         if (isCounterExampleEnabled()) {
+          dropPendingSubsystems();
           final List<TRAbstractionStep> preds = getAbstractionSteps(automata);
           final TraceProxy trace = mMonolithicAnalyzer.getCounterExample();
           final TRAbstractionStep step =
             new TRAbstractionStepMonolithic(preds, trace);
           mAbstractionSequence.add(step);
-          mCurrentAutomataMap = null;
         }
       }
     }
@@ -1039,7 +1039,6 @@ public class TRCompositionalConflictChecker
     final VerificationResult result = getAnalysisResult();
     if (!result.isSatisfied() && isCounterExampleEnabled()) {
       mSpecialEventsListener.setEnabled(true);
-      dropPendingSubsystems();
       final ProductDESProxy des = getModel();
       final TRConflictTraceProxy trace = new TRConflictTraceProxy(des);
       final int end = mAbstractionSequence.size();
