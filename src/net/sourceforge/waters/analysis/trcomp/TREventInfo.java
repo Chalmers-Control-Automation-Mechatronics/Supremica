@@ -47,6 +47,11 @@ import org.apache.log4j.Logger;
  * automata. They are recognised as globally selfloop-only or globally always
  * enabled, if they are selfloop-only or always enabled in all automata.</P>
  *
+ * <P>Events used outside of the system subject to compositional minimisation
+ * may be marked with an <I>external status</I>. Such events will not be
+ * reported as <I>local</I>, <I>selfloop-only</I>, or <I>always enabled</I>,
+ * but they may still be <I>blocked</I> or <I>failing</I>.</P>
+ *
  * @author Robi Malik
  */
 
@@ -54,14 +59,45 @@ class TREventInfo
 {
   //#########################################################################
   //# Constructor
+  /**
+   * Creates a new event information record.
+   * The newly created record has the default <I>external</I> status
+   * indicating that the event is not used externally.
+   * @param  event         The event object represented by the new event
+   *                       information.
+   * @param  status        Initial status flags to determine whether the new
+   *                       event is to be marked as <I>controllable</I>.
+   */
   TREventInfo(final EventProxy event, final byte status)
+  {
+    this(event, status, EventStatus.STATUS_FULLY_LOCAL);
+  }
+
+  /**
+   * Creates a new event information record.
+   * @param  event          The event object represented by the new event
+   *                        information.
+   * @param  status         Initial status flags to determine whether the new
+   *                        event is to be marked as <I>controllable</I>.
+   * @param  externalStatus Status flags indicating how the event is used
+   *                        externally, i.e., outside of the system subject
+   *                        to compositional minimisation.
+   */
+  TREventInfo(final EventProxy event,
+              final byte status,
+              final byte externalStatus)
   {
     mEvent = event;
     mStatusMap =
       new TObjectByteHashMap<>(0, 0.5f, EventStatus.STATUS_FULLY_LOCAL);
-    mIsControllable = EventStatus.isControllableEvent(status);
-    mIsBlocked = mIsFailing = false;
-    mNumNonSelfloopAutomata = mNumDisablingAutomata = 0;
+    mControllable = EventStatus.isControllableEvent(status);
+    mExternalStatus = externalStatus;
+    mBlocked = EventStatus.isBlockedEvent(externalStatus);
+    mFailing = EventStatus.isFailingEvent(externalStatus);
+    mNumNonSelfloopAutomata =
+      EventStatus.isOutsideOnlySelfloopEvent(externalStatus) ? 0 : 1;
+    mNumDisablingAutomata =
+      EventStatus.isOutsideAlwaysEnabledEvent(externalStatus) ? 0 : 1;
   }
 
 
@@ -77,19 +113,35 @@ class TREventInfo
     return mStatusMap.isEmpty();
   }
 
+  /**
+   * Returns the <I>external</I> status of this event. The external status
+   * indicates how the event is used externally, i.e., outside of the system
+   * subject to compositional minimisation.
+   * The default value {@link EventStatus#STATUS_FULLY_LOCAL} indicates an
+   * <I>internal</I> event used only within the system.
+   * If the external status is not <I>local</I>, <I>selfloop-only</I>, or
+   * <I>always enabled</I> then the methods {@link #getEventStatus(Set)}
+   * and {@link #getEventStatus(TRAutomatonProxy)} will never report that
+   * simplification is possible with such such status.
+   */
+  byte getExternalStatus()
+  {
+    return mExternalStatus;
+  }
+
   boolean isControllable()
   {
-    return mIsControllable;
+    return mControllable;
   }
 
   boolean isBlocked()
   {
-    return mIsBlocked;
+    return mBlocked;
   }
 
   boolean isFailing()
   {
-    return mIsFailing;
+    return mFailing;
   }
 
   boolean isLocal()
@@ -154,26 +206,24 @@ class TREventInfo
 
   byte getEventStatus(final Set<TRAutomatonProxy> candidate)
   {
-    if (mNumNonSelfloopAutomata == 0 && !mIsBlocked) {
-      if (mIsControllable) {
-        return EventStatus.STATUS_BLOCKED | EventStatus.STATUS_CONTROLLABLE;
-      } else {
-        return EventStatus.STATUS_BLOCKED;
-      }
+    // Note 'blocked' status is recorded in mStatusMap:
+    // only return blocked when another automaton blocks the event.
+    byte result;
+    if (mNumNonSelfloopAutomata == 0 && !mBlocked) {
+      result = EventStatus.STATUS_BLOCKED;
     } else {
-      // Blocked status is recorded in mStatusMap:
-      // do not report blocked status for the automaton blocking an event.
-      final StatusChecker checker = new StatusChecker(candidate);
+      final StatusChecker checker =
+        new StatusChecker(candidate, mExternalStatus);
       mStatusMap.forEachEntry(checker);
-      byte result = checker.getResult();
-      if (mIsControllable) {
-        result |= EventStatus.STATUS_CONTROLLABLE;
-      }
-      if (mIsFailing) {
-        result |= EventStatus.STATUS_FAILING;
-      }
-      return result;
+      result = checker.getResult();
     }
+    if (mControllable) {
+      result |= EventStatus.STATUS_CONTROLLABLE;
+    }
+    if (mFailing) {
+      result |= EventStatus.STATUS_FAILING;
+    }
+    return result;
   }
 
   void countSpecialEvents(final byte usedStatus,
@@ -183,7 +233,7 @@ class TREventInfo
     if (EventStatus.isLocalEvent(usedStatus)) {
       reportEventStatus(logger, "local");
     } else if (EventStatus.isBlockedEvent(usedStatus)) {
-      if (mIsBlocked) {
+      if (mBlocked) {
         stats.addBlockedEvents(1);
         reportEventStatus(logger, "blocked");
       } else {
@@ -218,45 +268,43 @@ class TREventInfo
                              final byte newStatus,
                              final Queue<TRAutomatonProxy> needsSimplification)
   {
-    final boolean wasBlocked = mIsBlocked;
-    final boolean wasFailing = mIsFailing;
+    final boolean wasBlocked = mBlocked;
+    final boolean wasFailing = mFailing;
     final int oldNumNonSelfloopAutomata = mNumNonSelfloopAutomata;
     final int oldNumDisablingAutomata = mNumDisablingAutomata;
     setAutomatonStatus(aut, newStatus);
-    if (mIsBlocked && !wasBlocked) {
+    if (mBlocked && !wasBlocked) {
       enqueueAllAutomata(needsSimplification);
     } else if (mNumNonSelfloopAutomata == 0 && oldNumNonSelfloopAutomata > 0) {
       enqueueAllAutomata(needsSimplification);
-    } else if (mIsFailing && !wasFailing) {
+    } else if (mFailing && !wasFailing) {
       enqueueAllAutomata(needsSimplification);
     } else if (mNumDisablingAutomata == 0 && oldNumDisablingAutomata > 0) {
       enqueueAllAutomata(needsSimplification);
     } else {
-      if (mNumNonSelfloopAutomata == 1 && oldNumNonSelfloopAutomata > 1) {
+      if (mNumNonSelfloopAutomata == 1 && oldNumNonSelfloopAutomata > 1 &&
+          EventStatus.isOutsideOnlySelfloopEvent(mExternalStatus)) {
         final TRAutomatonProxy simplifiable = getNonSelfloopAutomaton();
         needsSimplification.offer(simplifiable);
       }
-      if (mNumDisablingAutomata == 1 && oldNumDisablingAutomata > 1) {
+      if (mNumDisablingAutomata == 1 && oldNumDisablingAutomata > 1 &&
+          EventStatus.isOutsideAlwaysEnabledEvent(mExternalStatus)) {
         final TRAutomatonProxy simplifiable = getDisablingAutomaton();
         needsSimplification.offer(simplifiable);
       }
     }
   }
 
-  void setAutomatonStatus(final TRAutomatonProxy aut, byte newStatus)
+  void setAutomatonStatus(final TRAutomatonProxy aut, final byte newStatus)
   {
     if (EventStatus.isUsedEvent(newStatus)) {
-      final byte oldStatus = mStatusMap.get(aut);
-      if (mIsBlocked) {
-        if (!EventStatus.isBlockedEvent(oldStatus)) {
-          newStatus &= ~EventStatus.STATUS_BLOCKED;
-        }
-      } else if (EventStatus.isBlockedEvent(newStatus)) {
-        mIsBlocked = true;
-        mIsFailing = false;
+      if (EventStatus.isBlockedEvent(newStatus)) {
+        mBlocked = true;
+        mFailing = false;
       } else if (EventStatus.isFailingEvent(newStatus)) {
-        mIsFailing = true;
+        mFailing = true;
       }
+      final byte oldStatus = mStatusMap.get(aut);
       final boolean oldSelfloopOnly =
         EventStatus.isOutsideOnlySelfloopEvent(oldStatus);
       final boolean newSelfloopOnly =
@@ -323,9 +371,12 @@ class TREventInfo
   {
     //#######################################################################
     //# Constructor
-    private StatusChecker(final Set<TRAutomatonProxy> candidate)
+    private StatusChecker(final Set<TRAutomatonProxy> candidate,
+                          final byte externalStatus)
     {
       mCandidate = candidate;
+      mBlocked = EventStatus.isBlockedEvent(externalStatus);
+      mStatus = (byte) (externalStatus & EventStatus.STATUS_FULLY_LOCAL);
     }
 
     //#######################################################################
@@ -354,8 +405,8 @@ class TREventInfo
     //#######################################################################
     //# Data Members
     private final Set<TRAutomatonProxy> mCandidate;
-    private boolean mBlocked = false;
-    private byte mStatus = EventStatus.STATUS_FULLY_LOCAL;
+    private boolean mBlocked;
+    private byte mStatus;
   }
 
 
@@ -403,9 +454,10 @@ class TREventInfo
   //# Data Members
   private final EventProxy mEvent;
   private final TObjectByteHashMap<TRAutomatonProxy> mStatusMap;
-  private final boolean mIsControllable;
-  private boolean mIsBlocked;
-  private boolean mIsFailing;
+  private final boolean mControllable;
+  private final byte mExternalStatus;
+  private boolean mBlocked;
+  private boolean mFailing;
   private int mNumNonSelfloopAutomata;
   private int mNumDisablingAutomata;
 
