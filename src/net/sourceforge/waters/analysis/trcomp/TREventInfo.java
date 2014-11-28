@@ -129,6 +129,17 @@ class TREventInfo
     return mExternalStatus;
   }
 
+  /**
+   * Returns whether this event is external.
+   * @return <CODE>true</CODE> if the external status is something else than
+   *         {@link EventStatus#STATUS_FULLY_LOCAL}.
+   * @see #getExternalStatus()
+   */
+  boolean isExternal()
+  {
+    return mExternalStatus != EventStatus.STATUS_FULLY_LOCAL;
+  }
+
   boolean isControllable()
   {
     return mControllable;
@@ -295,6 +306,28 @@ class TREventInfo
     }
   }
 
+  void addExternalStatus(byte status)
+  {
+    if (EventStatus.isUsedEvent(status)) {
+      mBlocked |= EventStatus.isBlockedEvent(status);
+      if (mBlocked) {
+        mFailing = false;
+        status &= ~EventStatus.STATUS_FAILING;
+      } else {
+        mFailing |= EventStatus.isFailingEvent(status);
+      }
+      if (EventStatus.isOutsideOnlySelfloopEvent(mExternalStatus) &&
+          !EventStatus.isOutsideOnlySelfloopEvent(status)) {
+        mNumNonSelfloopAutomata--;
+      }
+      if (EventStatus.isOutsideAlwaysEnabledEvent(mExternalStatus) &&
+          !EventStatus.isOutsideAlwaysEnabledEvent(status)) {
+        mNumDisablingAutomata--;
+      }
+      mExternalStatus = EventStatus.combine(mExternalStatus, status);
+    }
+  }
+
   void setAutomatonStatus(final TRAutomatonProxy aut, final byte newStatus)
   {
     if (EventStatus.isUsedEvent(newStatus)) {
@@ -455,7 +488,7 @@ class TREventInfo
   private final EventProxy mEvent;
   private final TObjectByteHashMap<TRAutomatonProxy> mStatusMap;
   private final boolean mControllable;
-  private final byte mExternalStatus;
+  private byte mExternalStatus;
   private boolean mBlocked;
   private boolean mFailing;
   private int mNumNonSelfloopAutomata;

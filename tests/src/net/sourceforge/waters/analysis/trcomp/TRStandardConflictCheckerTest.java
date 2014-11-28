@@ -48,10 +48,10 @@ public class TRStandardConflictCheckerTest
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);
-    checker.setBlockedEventsSupported(true);
-    checker.setFailingEventsSupported(true);
-    checker.setSelfloopOnlyEventsSupported(true);
-    checker.setAlwaysEnabledEventsSupported(true);
+    checker.setBlockedEventsEnabled(true);
+    checker.setFailingEventsEnabled(true);
+    checker.setSelfloopOnlyEventsEnabled(true);
+    checker.setAlwaysEnabledEventsEnabled(true);
     checker.setCounterExampleEnabled(true);
     checker.setTraceCheckingEnabled(true);
     return checker;

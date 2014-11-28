@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.trcomp;
 
 import net.sourceforge.waters.model.analysis.CommandLineArgumentBoolean;
+import net.sourceforge.waters.model.analysis.CommandLineArgumentChain;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
@@ -63,6 +64,7 @@ public class TRCompositionalModelAnalyzerFactory
     addArgument(new SelfloopOnlyEventsArgument());
     addArgument(new AlwaysEnabledEventsArgument());
     addArgument(new DeadlockPruningArgument());
+    addArgument(new SecondaryFactoryArgument());
   }
 
 
@@ -379,10 +381,10 @@ public class TRCompositionalModelAnalyzerFactory
       final TRCompositionalConflictChecker composer =
         (TRCompositionalConflictChecker) analyzer;
       final boolean enable = getValue();
-      composer.setBlockedEventsSupported(enable);
-      composer.setFailingEventsSupported(enable);
-      composer.setSelfloopOnlyEventsSupported(enable);
-      composer.setAlwaysEnabledEventsSupported(enable);
+      composer.setBlockedEventsEnabled(enable);
+      composer.setFailingEventsEnabled(enable);
+      composer.setSelfloopOnlyEventsEnabled(enable);
+      composer.setAlwaysEnabledEventsEnabled(enable);
     }
 
   }
@@ -410,7 +412,7 @@ public class TRCompositionalModelAnalyzerFactory
       final TRCompositionalConflictChecker composer =
         (TRCompositionalConflictChecker) analyzer;
       final boolean enable = getValue();
-      composer.setBlockedEventsSupported(enable);
+      composer.setBlockedEventsEnabled(enable);
     }
 
   }
@@ -438,7 +440,7 @@ public class TRCompositionalModelAnalyzerFactory
       final TRCompositionalConflictChecker composer =
         (TRCompositionalConflictChecker) analyzer;
       final boolean enable = getValue();
-      composer.setFailingEventsSupported(enable);
+      composer.setFailingEventsEnabled(enable);
     }
 
   }
@@ -467,7 +469,7 @@ public class TRCompositionalModelAnalyzerFactory
       final TRCompositionalConflictChecker composer =
         (TRCompositionalConflictChecker) analyzer;
       final boolean enable = getValue();
-      composer.setSelfloopOnlyEventsSupported(enable);
+      composer.setSelfloopOnlyEventsEnabled(enable);
     }
 
   }
@@ -496,7 +498,7 @@ public class TRCompositionalModelAnalyzerFactory
       final TRCompositionalConflictChecker composer =
         (TRCompositionalConflictChecker) analyzer;
       final boolean enable = getValue();
-      composer.setAlwaysEnabledEventsSupported(enable);
+      composer.setAlwaysEnabledEventsEnabled(enable);
     }
 
   }
@@ -532,8 +534,7 @@ public class TRCompositionalModelAnalyzerFactory
 
 
   //#########################################################################
-  //# Inner Class SecondaryFactoryArgyment
-  /*
+  //# Inner Class SecondaryFactoryArgument
   private static class SecondaryFactoryArgument
     extends CommandLineArgumentChain
   {
@@ -556,6 +557,5 @@ public class TRCompositionalModelAnalyzerFactory
       composer.setMonolithicAnalyzer(secondaryAnalyzer);
     }
   }
-  */
 
 }

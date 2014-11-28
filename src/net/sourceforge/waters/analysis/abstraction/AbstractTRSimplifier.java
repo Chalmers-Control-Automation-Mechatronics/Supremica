@@ -170,7 +170,7 @@ public abstract class AbstractTRSimplifier
   }
 
   @Override
-  public boolean isSupportingAlwaysEnabledEvents()
+  public boolean isAlwaysEnabledEventsSupported()
   {
     return false;
   }

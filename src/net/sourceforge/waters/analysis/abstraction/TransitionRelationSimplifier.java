@@ -150,7 +150,7 @@ public interface TransitionRelationSimplifier
    * This information can be used to avoid the effort to find always
    * enabled events when they are not needed.
    */
-  public boolean isSupportingAlwaysEnabledEvents();
+  public boolean isAlwaysEnabledEventsSupported();
 
   /**
    * Returns whether the last call to {@link #run()} has removed any

@@ -40,6 +40,13 @@ class TRSubsystemInfo
 
   //#########################################################################
   //# Constructors
+  TRSubsystemInfo(final int numAutomata,
+                  final int numEvents)
+  {
+    mAutomata = new ArrayList<>(numAutomata);
+    mEvents = new HashMap<>(numEvents);
+  }
+
   TRSubsystemInfo(final List<TRAutomatonProxy> automata,
                   final int numEvents)
   {
@@ -84,15 +91,31 @@ class TRSubsystemInfo
 
   //#########################################################################
   //# Update
+  void addAutomata(final Collection<TRAutomatonProxy> automata)
+  {
+    mAutomata.addAll(automata);
+  }
+
   void registerEvents(final TRAutomatonProxy aut,
                       final byte[] eventStatus)
+  {
+    registerEvents(aut, eventStatus, false);
+  }
+
+  void registerEvents(final TRAutomatonProxy aut,
+                      final byte[] eventStatus,
+                      final boolean external)
   {
     final EventEncoding enc = aut.getEventEncoding();
     for (int e = EventEncoding.NONTAU; e < eventStatus.length; e++) {
       final EventProxy event = enc.getProperEvent(e);
       final byte status = enc.getProperEventStatus(e);
       final TREventInfo info = createEventInfo(event, status);
-      info.setAutomatonStatus(aut, eventStatus[e]);
+      if (external) {
+        info.addExternalStatus(eventStatus[e]);
+      } else {
+        info.setAutomatonStatus(aut, eventStatus[e]);
+      }
     }
   }
 

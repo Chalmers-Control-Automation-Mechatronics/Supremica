@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.trcomp;
 import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -115,8 +116,7 @@ public class TRCandidate
     return factory.createProductDESProxy(name, events, mAutomata);
   }
 
-  EventEncoding createSyncEventEncoding(final EventProxy defaultMarking,
-                                        final EventProxy preconditionMarking)
+  EventEncoding createSyncEventEncoding(final Collection<EventProxy> props)
     throws OverflowException
   {
     final String name = getName();
@@ -144,9 +144,8 @@ public class TRCandidate
         }
       }
     }
-    syncEncoding.addProposition(defaultMarking, true);
-    if (preconditionMarking != null) {
-      syncEncoding.addProposition(preconditionMarking, false);
+    for (final EventProxy prop : props) {
+      syncEncoding.addProposition(prop, true);
     }
     return syncEncoding;
   }

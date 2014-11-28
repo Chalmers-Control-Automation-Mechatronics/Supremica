@@ -102,6 +102,16 @@ public class EventStatus
     return (status & STATUS_UNUSED) == 0;
   }
 
+  /**
+   * Returns the combined status of an event in the synchronous composition
+   * of two automata with the given status.
+   */
+  public static byte combine(final byte status1, final byte status2)
+  {
+    final int conj = (status1 & status2) & STATUS_BITS_CONJUNCTIVE;
+    final int disj = (status1 | status2) & STATUS_BITS_DISJUNCTIVE;
+    return (byte) (conj | disj);
+  }
 
   public static void appendStatusInfo(final StringBuilder buffer,
                                       final byte status)
@@ -190,6 +200,19 @@ public class EventStatus
     STATUS_CONTROLLABLE | STATUS_LOCAL | STATUS_OUTSIDE_ONLY_SELFLOOP |
     STATUS_OUTSIDE_ALWAYS_ENABLED | STATUS_BLOCKED | STATUS_FAILING |
     STATUS_UNUSED;
+  /**
+   * Status flags that combine conjunctively. The composition of two
+   * or more automata only has this status when all automata have it.
+   */
+  public static final byte STATUS_BITS_CONJUNCTIVE =
+    STATUS_CONTROLLABLE | STATUS_LOCAL | STATUS_OUTSIDE_ONLY_SELFLOOP |
+    STATUS_OUTSIDE_ALWAYS_ENABLED | STATUS_UNUSED;
+  /**
+   * Status flags that combine disjunctively. The composition of two
+   * or more automata has this status when at least one automaton has it.
+   */
+  public static final byte STATUS_BITS_DISJUNCTIVE =
+    STATUS_BLOCKED | STATUS_FAILING;
 
   private static final String[] STATUS_NAMES = {
     "CONTROLLABLE", "LOCAL", "OUTSIDE_ONLY_SELFLOOP",

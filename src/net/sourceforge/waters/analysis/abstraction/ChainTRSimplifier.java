@@ -120,10 +120,10 @@ public class ChainTRSimplifier
   }
 
   @Override
-  public boolean isSupportingAlwaysEnabledEvents()
+  public boolean isAlwaysEnabledEventsSupported()
   {
     for (final TransitionRelationSimplifier step : mSteps) {
-      if (step.isSupportingAlwaysEnabledEvents()) {
+      if (step.isAlwaysEnabledEventsSupported()) {
         return true;
       }
     }

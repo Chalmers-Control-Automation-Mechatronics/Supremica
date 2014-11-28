@@ -620,9 +620,8 @@ public class TRSynchronousProductBuilder
       for (final EventInfo event : mEventInfo) {
         if (event.isEnabled(mDecodedSource)) {
           if (mPruningDeadlocks && event.isForbidden()) {
-            createDeadlockState();
             final int e = event.getOutputCode();
-            createTransition(e, mDeadlockState);
+            createDeadlockTransition(e);
             if (event.isOutsideAlwaysEnabled()) {
               break;
             }

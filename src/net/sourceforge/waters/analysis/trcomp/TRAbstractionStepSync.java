@@ -42,8 +42,7 @@ class TRAbstractionStepSync
   //# Constructor
   TRAbstractionStepSync(final List<TRAbstractionStep> preds,
                         final EventEncoding enc,
-                        final EventProxy defaultMarking,
-                        final EventProxy preconditionMarking,
+                        final Collection<EventProxy> props,
                         final ProductDESProxyFactory factory,
                         final TRSynchronousProductBuilder builder,
                         final TRSynchronousProductResult result)
@@ -51,8 +50,7 @@ class TRAbstractionStepSync
     super(result.getComputedAutomaton());
     mPredecessors = preds;
     mEventEncoding = enc;
-    mDefaultMarking = defaultMarking;
-    mPreconditionMarking = preconditionMarking;
+    mPropositions = props;
     mFactory = factory;
     mSynchronousProductBuilder = builder;
     final TRAutomatonProxy outputAut = result.getComputedAutomaton();
@@ -95,7 +93,7 @@ class TRAbstractionStepSync
     final TRCandidate candidate = new TRCandidate(automata, mEventEncoding);
     final ProductDESProxy des = candidate.createProductDESProxy(mFactory);
     final EventEncoding syncEncoding =
-      candidate.createSyncEventEncoding(mDefaultMarking, mPreconditionMarking);
+      candidate.createSyncEventEncoding(mPropositions);
     mSynchronousProductBuilder.setModel(des);
     mSynchronousProductBuilder.setEventEncoding(syncEncoding);
     mSynchronousProductBuilder.run();
@@ -366,8 +364,7 @@ class TRAbstractionStepSync
   //# Data Members
   private final List<TRAbstractionStep> mPredecessors;
   private final EventEncoding mEventEncoding;
-  private final EventProxy mDefaultMarking;
-  private final EventProxy mPreconditionMarking;
+  private final Collection<EventProxy> mPropositions;
   private final ProductDESProxyFactory mFactory;
   private final TRSynchronousProductBuilder mSynchronousProductBuilder;
 
