@@ -81,7 +81,7 @@ public class TRSynchronousProductBuilderTest
           name.startsWith(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
         enc.addEvent(event, translator,
                      EventStatus.STATUS_FAILING |
-                     EventStatus.STATUS_OUTSIDE_ALWAYS_ENABLED);
+                     EventStatus.STATUS_ALWAYS_ENABLED);
       } else if (!event.isObservable()) {
         if (tau == null) {
           final ProductDESProxyFactory factory = getProductDESProxyFactory();

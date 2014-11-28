@@ -95,9 +95,9 @@ class TREventInfo
     mBlocked = EventStatus.isBlockedEvent(externalStatus);
     mFailing = EventStatus.isFailingEvent(externalStatus);
     mNumNonSelfloopAutomata =
-      EventStatus.isOutsideOnlySelfloopEvent(externalStatus) ? 0 : 1;
+      EventStatus.isSelfloopOnlyEvent(externalStatus) ? 0 : 1;
     mNumDisablingAutomata =
-      EventStatus.isOutsideAlwaysEnabledEvent(externalStatus) ? 0 : 1;
+      EventStatus.isAlwaysEnabledEvent(externalStatus) ? 0 : 1;
   }
 
 
@@ -173,7 +173,7 @@ class TREventInfo
   TRAutomatonProxy getNonSelfloopAutomaton()
   {
     final StatusFinder finder =
-      new StatusFinder(EventStatus.STATUS_OUTSIDE_ONLY_SELFLOOP);
+      new StatusFinder(EventStatus.STATUS_SELFLOOP_ONLY);
     mStatusMap.forEachEntry(finder);
     return finder.getResult();
   }
@@ -191,7 +191,7 @@ class TREventInfo
   TRAutomatonProxy getDisablingAutomaton()
   {
     final StatusFinder finder =
-      new StatusFinder(EventStatus.STATUS_OUTSIDE_ALWAYS_ENABLED);
+      new StatusFinder(EventStatus.STATUS_ALWAYS_ENABLED);
     mStatusMap.forEachEntry(finder);
     return finder.getResult();
   }
@@ -254,10 +254,10 @@ class TREventInfo
     } else if (EventStatus.isFailingEvent(usedStatus)) {
       stats.addFailingEvents(1);
       reportEventStatus(logger, "failing");
-    } else if (EventStatus.isOutsideOnlySelfloopEvent(usedStatus)) {
+    } else if (EventStatus.isSelfloopOnlyEvent(usedStatus)) {
       stats.addSelfloopOnlyEvents(1);
       reportEventStatus(logger, "locally selfloop-only");
-    } else if (EventStatus.isOutsideAlwaysEnabledEvent(usedStatus)) {
+    } else if (EventStatus.isAlwaysEnabledEvent(usedStatus)) {
       stats.addAlwaysEnabledEvents(1);
       reportEventStatus(logger, "always enabled");
     }
@@ -294,12 +294,12 @@ class TREventInfo
       enqueueAllAutomata(needsSimplification);
     } else {
       if (mNumNonSelfloopAutomata == 1 && oldNumNonSelfloopAutomata > 1 &&
-          EventStatus.isOutsideOnlySelfloopEvent(mExternalStatus)) {
+          EventStatus.isSelfloopOnlyEvent(mExternalStatus)) {
         final TRAutomatonProxy simplifiable = getNonSelfloopAutomaton();
         needsSimplification.offer(simplifiable);
       }
       if (mNumDisablingAutomata == 1 && oldNumDisablingAutomata > 1 &&
-          EventStatus.isOutsideAlwaysEnabledEvent(mExternalStatus)) {
+          EventStatus.isAlwaysEnabledEvent(mExternalStatus)) {
         final TRAutomatonProxy simplifiable = getDisablingAutomaton();
         needsSimplification.offer(simplifiable);
       }
@@ -316,13 +316,13 @@ class TREventInfo
       } else {
         mFailing |= EventStatus.isFailingEvent(status);
       }
-      if (EventStatus.isOutsideOnlySelfloopEvent(mExternalStatus) &&
-          !EventStatus.isOutsideOnlySelfloopEvent(status)) {
-        mNumNonSelfloopAutomata--;
+      if (EventStatus.isSelfloopOnlyEvent(mExternalStatus) &&
+          !EventStatus.isSelfloopOnlyEvent(status)) {
+        mNumNonSelfloopAutomata++;
       }
-      if (EventStatus.isOutsideAlwaysEnabledEvent(mExternalStatus) &&
-          !EventStatus.isOutsideAlwaysEnabledEvent(status)) {
-        mNumDisablingAutomata--;
+      if (EventStatus.isAlwaysEnabledEvent(mExternalStatus) &&
+          !EventStatus.isAlwaysEnabledEvent(status)) {
+        mNumDisablingAutomata++;
       }
       mExternalStatus = EventStatus.combine(mExternalStatus, status);
     }
@@ -339,18 +339,18 @@ class TREventInfo
       }
       final byte oldStatus = mStatusMap.get(aut);
       final boolean oldSelfloopOnly =
-        EventStatus.isOutsideOnlySelfloopEvent(oldStatus);
+        EventStatus.isSelfloopOnlyEvent(oldStatus);
       final boolean newSelfloopOnly =
-        EventStatus.isOutsideOnlySelfloopEvent(newStatus);
+        EventStatus.isSelfloopOnlyEvent(newStatus);
       if (oldSelfloopOnly && !newSelfloopOnly) {
         mNumNonSelfloopAutomata++;
       } else if (!oldSelfloopOnly && newSelfloopOnly) {
         mNumNonSelfloopAutomata--;
       }
       final boolean oldAlwaysEnabled =
-        EventStatus.isOutsideAlwaysEnabledEvent(oldStatus);
+        EventStatus.isAlwaysEnabledEvent(oldStatus);
       final boolean newAlwaysEnabled =
-        EventStatus.isOutsideAlwaysEnabledEvent(newStatus);
+        EventStatus.isAlwaysEnabledEvent(newStatus);
       if (oldAlwaysEnabled && !newAlwaysEnabled) {
         mNumDisablingAutomata++;
       } else if (!oldAlwaysEnabled && newAlwaysEnabled) {
@@ -365,10 +365,10 @@ class TREventInfo
   void removeAutomaton(final TRAutomatonProxy aut)
   {
     final byte oldStatus = mStatusMap.remove(aut);
-    if (!EventStatus.isOutsideOnlySelfloopEvent(oldStatus)) {
+    if (!EventStatus.isSelfloopOnlyEvent(oldStatus)) {
       mNumNonSelfloopAutomata--;
     }
-    if (!EventStatus.isOutsideAlwaysEnabledEvent(oldStatus)) {
+    if (!EventStatus.isAlwaysEnabledEvent(oldStatus)) {
       mNumDisablingAutomata--;
     }
   }

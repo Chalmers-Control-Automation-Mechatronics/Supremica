@@ -152,7 +152,7 @@ public class SynthesisTransitionRemovalTRSimplifier
       final int e = iterCandidate.getCurrentEvent();
       final byte status = rel.getProperEventStatus(e);
       final boolean selflooped =
-        (status & EventStatus.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0 &&
+        (status & EventStatus.STATUS_SELFLOOP_ONLY) != 0 &&
         mUsingSpecialEvents && e != EventEncoding.TAU;
       final boolean controllable = EventStatus.isControllableEvent(status);
       final boolean local = EventStatus.isLocalEvent(status);

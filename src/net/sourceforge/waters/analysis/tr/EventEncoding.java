@@ -552,8 +552,8 @@ public class EventEncoding
    *                     information about the event. Should be a combination
    *                     of the bits {@link EventStatus#STATUS_CONTROLLABLE},
    *                     {@link EventStatus#STATUS_LOCAL},
-   *                     {@link EventStatus#STATUS_OUTSIDE_ALWAYS_ENABLED},
-   *                     {@link EventStatus#STATUS_OUTSIDE_ONLY_SELFLOOP},
+   *                     {@link EventStatus#STATUS_ALWAYS_ENABLED},
+   *                     {@link EventStatus#STATUS_SELFLOOP_ONLY},
    *                     {@link EventStatus#STATUS_BLOCKED},
    *                     {@link EventStatus#STATUS_FAILING},
    *                     and {@link EventStatus#STATUS_UNUSED}.
@@ -590,8 +590,8 @@ public class EventEncoding
    *                     information about the event. Should be a combination
    *                     of the bits {@link EventStatus#STATUS_CONTROLLABLE},
    *                     {@link EventStatus#STATUS_LOCAL},
-   *                     {@link EventStatus#STATUS_OUTSIDE_ALWAYS_ENABLED},
-   *                     {@link EventStatus#STATUS_OUTSIDE_ONLY_SELFLOOP},
+   *                     {@link EventStatus#STATUS_ALWAYS_ENABLED},
+   *                     {@link EventStatus#STATUS_SELFLOOP_ONLY},
    *                     {@link EventStatus#STATUS_BLOCKED},
    *                     {@link EventStatus#STATUS_FAILING},
    *                     and {@link EventStatus#STATUS_UNUSED}.
@@ -664,8 +664,8 @@ public class EventEncoding
    *                     information about the event. Should be a combination
    *                     of the bits {@link EventStatus#STATUS_CONTROLLABLE},
    *                     {@link EventStatus#STATUS_LOCAL},
-   *                     {@link EventStatus#STATUS_OUTSIDE_ALWAYS_ENABLED},
-   *                     {@link EventStatus#STATUS_OUTSIDE_ONLY_SELFLOOP},
+   *                     {@link EventStatus#STATUS_ALWAYS_ENABLED},
+   *                     {@link EventStatus#STATUS_SELFLOOP_ONLY},
    *                     {@link EventStatus#STATUS_BLOCKED}, {@link EventStatus#STATUS_FAILING},
    *                     and {@link EventStatus#STATUS_UNUSED}.
    * @return The event code that was assigned to the event.
@@ -771,8 +771,8 @@ public class EventEncoding
    * @param  flags  List of flags to define the ordering, represented by
    *                a sequence of the bits or bit combinations
    *                {@link EventStatus#STATUS_CONTROLLABLE}, {@link EventStatus#STATUS_LOCAL},
-   *                {@link EventStatus#STATUS_OUTSIDE_ALWAYS_ENABLED},
-   *                {@link EventStatus#STATUS_OUTSIDE_ONLY_SELFLOOP},
+   *                {@link EventStatus#STATUS_ALWAYS_ENABLED},
+   *                {@link EventStatus#STATUS_SELFLOOP_ONLY},
    *                {@link EventStatus#STATUS_BLOCKED}, {@link EventStatus#STATUS_FAILING}, and
    *                {@link EventStatus#STATUS_UNUSED} or their complements.<BR>
    *                For example, to sort events by controllability first

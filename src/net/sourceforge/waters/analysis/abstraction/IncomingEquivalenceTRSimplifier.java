@@ -422,7 +422,7 @@ public class IncomingEquivalenceTRSimplifier
           if (!hasAlwaysEnabled) {
             final byte status = rel.getProperEventStatus(e);
             hasAlwaysEnabled =
-              EventStatus.isOutsideAlwaysEnabledEvent(status);
+              EventStatus.isAlwaysEnabledEvent(status);
           }
         }
       }

@@ -533,7 +533,7 @@ public class ObservationEquivalenceTRSimplifier
       mOnlySelfLoopEvents = new TIntArrayList(rel.getNumberOfProperEvents());
       for (int e = first; e < numEvents; e++) {
         if ((rel.getProperEventStatus(e) &
-          EventStatus.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0) {
+          EventStatus.STATUS_SELFLOOP_ONLY) != 0) {
           mOnlySelfLoopEvents.add(e);
         }
       }
@@ -821,7 +821,7 @@ public class ObservationEquivalenceTRSimplifier
         }
         checkAbort();
         final boolean selflooped =
-          (status & EventStatus.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0 &&
+          (status & EventStatus.STATUS_SELFLOOP_ONLY) != 0 &&
           doNonTau && e != EventEncoding.TAU;
         final int from0 = iter0.getCurrentFromState();
         final int to0 = iter0.getCurrentToState();
@@ -1246,7 +1246,7 @@ public class ObservationEquivalenceTRSimplifier
         {
           final boolean outsideOnlySelfloop =
             (rel.getProperEventStatus(event) &
-             EventStatus.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0;
+             EventStatus.STATUS_SELFLOOP_ONLY) != 0;
           TIntHashSet visitedStates = null;
           if (outsideOnlySelfloop) {
             if (mEquivalence.respectsTau()) {
@@ -1443,7 +1443,7 @@ public class ObservationEquivalenceTRSimplifier
           final ListBufferTransitionRelation rel = getTransitionRelation();
           final boolean outsideOnlySelfloop =
             (rel.getProperEventStatus(event) &
-             EventStatus.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0;
+             EventStatus.STATUS_SELFLOOP_ONLY) != 0;
           final TransitionIterator transIter =
             getPredecessorIterator(event);
           final TIntHashSet visitedStates = new TIntHashSet();
@@ -1752,7 +1752,7 @@ public class ObservationEquivalenceTRSimplifier
           final ListBufferTransitionRelation rel = getTransitionRelation();
           final boolean outsideOnlySelfloop =
             (rel.getProperEventStatus(event) &
-             EventStatus.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0;
+             EventStatus.STATUS_SELFLOOP_ONLY) != 0;
           final TransitionIterator transIter =
             getPredecessorIterator(event);
           final TIntHashSet visitedStates = new TIntHashSet();

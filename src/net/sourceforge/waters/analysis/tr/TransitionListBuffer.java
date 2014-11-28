@@ -234,7 +234,7 @@ public abstract class TransitionListBuffer
   public boolean addTransition(final int from, final int event, final int to)
   {
     final byte status = mEventStatus.getProperEventStatus(event);
-    if (from == to && EventStatus.isOutsideOnlySelfloopEvent(status)) {
+    if (from == to && EventStatus.isSelfloopOnlyEvent(status)) {
       return false;
     }
     final int newData = (to << mStateShift) | event;
@@ -286,7 +286,7 @@ public abstract class TransitionListBuffer
     }
     final TIntHashSet existing = new TIntHashSet();
     final byte status = mEventStatus.getProperEventStatus(event);
-    if (EventStatus.isOutsideOnlySelfloopEvent(status)) {
+    if (EventStatus.isSelfloopOnlyEvent(status)) {
       existing.add(from);
     }
     int list = createList(from, event);
@@ -507,7 +507,7 @@ public abstract class TransitionListBuffer
       final int state = data >>> mStateShift;
       final int event = data & mEventMask;
       final byte status = mEventStatus.getProperEventStatus(event);
-      if (state == dest && EventStatus.isOutsideOnlySelfloopEvent(status)) {
+      if (state == dest && EventStatus.isSelfloopOnlyEvent(status)) {
         // Suppress tau and outside selfloop-only selfloops
         continue;
       }
@@ -625,7 +625,7 @@ public abstract class TransitionListBuffer
          " (only configured for " + numEvents + " events)!");
     }
     final byte status = mEventStatus.getProperEventStatus(newID);
-    final boolean selfloop = EventStatus.isOutsideOnlySelfloopEvent(status);
+    final boolean selfloop = EventStatus.isSelfloopOnlyEvent(status);
     final TIntHashSet found = new TIntHashSet();
     final TransitionIterator iter1 = createReadOnlyIterator();
     final TransitionIterator iter2 = createModifyingIterator();
@@ -989,7 +989,7 @@ public abstract class TransitionListBuffer
         final StateProxy toState = getToState(trans);
         final byte status = mEventStatus.getProperEventStatus(e);
         if (fromState == toState &&
-            EventStatus.isOutsideOnlySelfloopEvent(status)) {
+            EventStatus.isSelfloopOnlyEvent(status)) {
           // Suppress tau and outside selfloop-only selfloops
           continue;
         }
@@ -1176,7 +1176,7 @@ public abstract class TransitionListBuffer
             final int target = partition.getClassCode(data >>> mStateShift);
             final byte status = mEventStatus.getProperEventStatus(event);
             final boolean selfloop =
-              EventStatus.isOutsideOnlySelfloopEvent(status);
+              EventStatus.isSelfloopOnlyEvent(status);
             if (!selfloop || code != target) {
               // suppress tau-selfloops and only-other selfloops
               final int trans = (event << eventShift) | target;

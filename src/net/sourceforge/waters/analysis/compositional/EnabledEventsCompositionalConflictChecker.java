@@ -489,7 +489,7 @@ public class EnabledEventsCompositionalConflictChecker extends
     final Set<EventProxy> alwaysEnabledEvents =
       new THashSet<>(computedStatus.length);
     for (int e = 0; e < computedStatus.length; e++) {
-      if (EventStatus.isOutsideAlwaysEnabledEvent(computedStatus[e])) {
+      if (EventStatus.isAlwaysEnabledEvent(computedStatus[e])) {
         final EventProxy event = encoding.getProperEvent(e);
         alwaysEnabledEvents.add(event);
       }

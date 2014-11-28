@@ -37,10 +37,12 @@ class PreselectionHeuristicMustL extends PreselectionHeuristic
     final Map<List<TRAutomatonProxy>,TRCandidate> candidates =
       new HashMap<>(numEvents);
     for (final TREventInfo info : events) {
-      final Set<TRAutomatonProxy> set = info.getAutomata();
-      assert set.size() > 1;
-      final List<TRAutomatonProxy> list = new ArrayList<>(set);
-      recordCandidate(list, subsys, candidates);
+      if (!info.isExternal()) {
+        final Set<TRAutomatonProxy> set = info.getAutomata();
+        assert set.size() > 1;
+        final List<TRAutomatonProxy> list = new ArrayList<>(set);
+        recordCandidate(list, subsys, candidates);
+      }
     }
     return candidates.values();
   }

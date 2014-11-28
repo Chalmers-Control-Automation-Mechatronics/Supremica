@@ -66,7 +66,7 @@ public class EFSMEventEncoding extends AbstractEFATransitionLabelEncoding<Constr
       if (!finder.findPrime(update)) {
         final byte status = rel.getProperEventStatus(e);
         rel.setProperEventStatus
-          (e, status | EventStatus.STATUS_OUTSIDE_ONLY_SELFLOOP);
+          (e, status | EventStatus.STATUS_SELFLOOP_ONLY);
       }
     }
   }

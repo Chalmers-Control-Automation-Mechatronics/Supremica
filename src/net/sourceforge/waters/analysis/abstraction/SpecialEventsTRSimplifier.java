@@ -38,7 +38,7 @@ import net.sourceforge.waters.model.analysis.AnalysisAbortException;
  * <DD>All transitions with failing events are redirected to the dump state
  * of the transition relation ({@link
  * ListBufferTransitionRelation#getDumpStateIndex()}).</DD>
- * <DT>{@link EventStatus#STATUS_OUTSIDE_ONLY_SELFLOOP}</DT>
+ * <DT>{@link EventStatus#STATUS_SELFLOOP_ONLY}</DT>
  * <DD>All selfloop transitions with selfloop-only events are removed from
  * the transition relation.</DD>
  * </DL>
@@ -140,7 +140,7 @@ public class SpecialEventsTRSimplifier
               modified = needsReachabilityCheck = true;
             }
           }
-        } else if (EventStatus.isOutsideOnlySelfloopEvent(status)) {
+        } else if (EventStatus.isSelfloopOnlyEvent(status)) {
           if (from == to) {
             iter.remove();
             modified = true;

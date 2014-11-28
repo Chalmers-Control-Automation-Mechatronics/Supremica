@@ -1487,8 +1487,8 @@ public class ListBufferTransitionRelation
    *          bits or bit combinations
    *          {@link EventStatus#STATUS_CONTROLLABLE},
    *          {@link EventStatus#STATUS_LOCAL},
-   *          {@link EventStatus#STATUS_OUTSIDE_ALWAYS_ENABLED},
-   *          {@link EventStatus#STATUS_OUTSIDE_ONLY_SELFLOOP}, and
+   *          {@link EventStatus#STATUS_ALWAYS_ENABLED},
+   *          {@link EventStatus#STATUS_SELFLOOP_ONLY}, and
    *          {@link EventStatus#STATUS_UNUSED} or their complements.<BR>
    *          The flags must appear in the correct ordering, which must
    *          match the ordering of the {@link EventEncoding}. If a flag
@@ -1580,8 +1580,8 @@ public class ListBufferTransitionRelation
    *          bits or bit combinations
    *          {@link EventStatus#STATUS_CONTROLLABLE},
    *          {@link EventStatus#STATUS_LOCAL},
-   *          {@link EventStatus#STATUS_OUTSIDE_ALWAYS_ENABLED},
-   *          {@link EventStatus#STATUS_OUTSIDE_ONLY_SELFLOOP}, and
+   *          {@link EventStatus#STATUS_ALWAYS_ENABLED},
+   *          {@link EventStatus#STATUS_SELFLOOP_ONLY}, and
    *          {@link EventStatus#STATUS_UNUSED} or their complements.<BR>
    *          The flags must appear in the correct ordering, which must
    *          match the ordering of the {@link EventEncoding}. If a flag
@@ -2423,7 +2423,7 @@ public class ListBufferTransitionRelation
     for (int e = 0; e < getNumberOfProperEvents(); e++) {
       final byte status = mEventStatus.getProperEventStatus(e);
       if ((status & EventStatus.STATUS_UNUSED) == 0 &&
-          (status & EventStatus.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0) {
+          (status & EventStatus.STATUS_SELFLOOP_ONLY) != 0) {
         boolean removable = false;
         if (mSuccessorBuffer != null) {
           removable = mSuccessorBuffer.removeTauSelfloops(e);

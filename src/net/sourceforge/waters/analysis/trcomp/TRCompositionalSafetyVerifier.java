@@ -14,19 +14,24 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.SpecialEventsFinder;
+import net.sourceforge.waters.analysis.abstraction.SubsetConstructionTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TRSimplificationListener;
 import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.cpp.analysis.NativeSafetyVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
@@ -81,9 +86,20 @@ public class TRCompositionalSafetyVerifier
     throws AnalysisException
   {
     mPropertyAutomata = new ArrayList<>();
+    mPropertiesHaveInitialState = true;
     super.setUp();
-    if (mPropertyAutomata.isEmpty()) {
-      setSatisfiedResult();
+    final AnalysisResult result = getAnalysisResult();
+    if (!result.isFinished()) {
+      final Logger logger = getLogger();
+      if (mPropertyAutomata.isEmpty()) {
+        logger.debug
+          ("Terminating early as all specifications are trivially satisfied.");
+        result.setSatisfied(true);
+      } else if (!mPropertiesHaveInitialState) {
+        // TODO If the property has no initial state, and the plant has,
+        // then we must return false, with an empty counterexample.
+        result.setSatisfied(false);
+      }
     }
   }
 
@@ -98,29 +114,42 @@ public class TRCompositionalSafetyVerifier
   //#########################################################################
   //# Hooks
   @Override
+  protected boolean isFailingEventsUsed()
+  {
+    return false;
+  }
+
+  @Override
+  protected boolean isAlwaysEnabledEventsUsed()
+  {
+    return false;
+  }
+
+  @Override
   protected ChainTRSimplifier createDefaultAbstractionChain()
   {
-    // TODO
     final ChainTRSimplifier chain = super.createDefaultAbstractionChain();
     final TRSimplificationListener listener = new PartitioningListener();
     final TransitionRelationSimplifier loopRemover =
       new TauLoopRemovalTRSimplifier();
     loopRemover.setSimplificationListener(listener);
     chain.add(loopRemover);
+    final SubsetConstructionTRSimplifier subset =
+      new SubsetConstructionTRSimplifier();
+    chain.add(subset);
+    subset.setStateLimit(getInternalStateLimit());
+    subset.setTransitionLimit(getInternalStateLimit());
+    subset.setSimplificationListener(listener);
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier();
-    bisimulator.setEquivalence(ObservationEquivalenceTRSimplifier.
-                               Equivalence.OBSERVATION_EQUIVALENCE);
-    bisimulator.setTransitionRemovalMode
-      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
-    bisimulator.setMarkingMode
-      (ObservationEquivalenceTRSimplifier.MarkingMode.SATURATE);
-    final int limit = getInternalTransitionLimit();
-    bisimulator.setTransitionLimit(limit);
+    final ObservationEquivalenceTRSimplifier.Equivalence eq =
+      isSelfloopOnlyEventsUsed() ?
+      ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION :
+      ObservationEquivalenceTRSimplifier.Equivalence.DETERMINISTIC_MINSTATE;
+    bisimulator.setEquivalence(eq);
+    bisimulator.setTransitionLimit(getInternalStateLimit());
     bisimulator.setSimplificationListener(listener);
     chain.add(bisimulator);
-    chain.setPreferredOutputConfiguration
-      (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     return chain;
   }
 
@@ -134,14 +163,54 @@ public class TRCompositionalSafetyVerifier
     case PLANT:
       return super.createInitialAutomaton(aut, config);
     case SPEC:
-      // TODO
+      if (!mPropertiesHaveInitialState) {
+        return null;
+      }
       final EventEncoding eventEnc = createInitialEventEncoding(aut);
       final TRAutomatonProxy tr = new TRAutomatonProxy(aut, eventEnc, config);
       if (!hasInitialState(tr)) {
-        // TODO If the property has no initial state, and the plant has,
-        // then we must return false, with an empty counterexample.
-        setSatisfiedResult();
+        mPropertyAutomata.clear();
+        mPropertyAutomata.add(tr);
+        mPropertiesHaveInitialState = false;
         return null;
+      }
+      final ListBufferTransitionRelation rel = tr.getTransitionRelation();
+      final SpecialEventsFinder finder = getSpecialEventsFinder();
+      rel.removeProperSelfLoopEvents();
+      finder.setBlockedEventsDetected(true);
+      finder.setFailingEventsDetected(false);
+      finder.setSelfloopOnlyEventsDetected(isSelfloopOnlyEventsEnabled());
+      finder.setAlwaysEnabledEventsDetected(isAlwaysEnabledEventsEnabled());
+      finder.setTransitionRelation(rel);
+      finder.run();
+      final byte[] status = finder.getComputedEventStatus();
+      final byte controllablePattern = (byte)
+        ((isBlockedEventsEnabled() ? EventStatus.STATUS_BLOCKED : 0) |
+         (isSelfloopOnlyEventsEnabled() ? EventStatus.STATUS_SELFLOOP_ONLY : 0));
+      final byte failingPattern = (byte)
+        ((isFailingEventsEnabled() ? EventStatus.STATUS_FAILING : 0) |
+         (isAlwaysEnabledEventsEnabled() ? EventStatus.STATUS_ALWAYS_ENABLED : 0));
+      boolean trivial = true;
+      for (int e = EventEncoding.NONTAU; e < status.length; e++) {
+        if (!EventStatus.isUsedEvent(status[e])) {
+          // skip
+        } else if (EventStatus.isControllableEvent(status[e])) {
+          status[e] &= controllablePattern;
+        } else if (EventStatus.isBlockedEvent(status[e])) {
+          status[e] = failingPattern;
+          trivial = false;
+        } else {
+          status[e] = 0;  // normal external event
+          trivial &= EventStatus.isAlwaysEnabledEvent(status[e]);
+        }
+      }
+      if (trivial) {
+        final Logger logger = getLogger();
+        logger.debug("Dropping trivial specification " + aut.getName() + ".");
+      } else {
+        mPropertyAutomata.add(tr);
+        final TRSubsystemInfo subsys = getCurrentSubsystem();
+        subsys.registerEvents(tr, status, true);
       }
       return null;
     default:
@@ -164,9 +233,18 @@ public class TRCompositionalSafetyVerifier
     return true;
   }
 
-
-  //#########################################################################
-  //# Auxiliary Methods
+  @Override
+  protected ProductDESProxy createSubsystemDES(final TRSubsystemInfo subsys)
+  {
+    final List<TRAutomatonProxy> plants = subsys.getAutomata();
+    final String name = AutomatonTools.getCompositionName(plants);
+    final int numAutomata = plants.size() + mPropertyAutomata.size();
+    final List<TRAutomatonProxy> automata = new ArrayList<>(numAutomata);
+    automata.addAll(plants);
+    automata.addAll(mPropertyAutomata);
+    final ProductDESProxyFactory factory = getFactory();
+    return AutomatonTools.createProductDESProxy(name, automata, factory);
+  }
 
 
   //#########################################################################
@@ -176,5 +254,6 @@ public class TRCompositionalSafetyVerifier
 
   // Data Structures
   private List<TRAutomatonProxy> mPropertyAutomata;
+  private boolean mPropertiesHaveInitialState;
 
 }

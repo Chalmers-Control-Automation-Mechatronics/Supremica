@@ -157,7 +157,7 @@ public class SpecialEventsFinderTest
     final byte[] computedStatus = finder.getComputedEventStatus();
     final List<EventProxy> events = new ArrayList<>(computedStatus.length);
     for (int e = 0; e < computedStatus.length; e++) {
-      if (EventStatus.isOutsideAlwaysEnabledEvent(computedStatus[e])) {
+      if (EventStatus.isAlwaysEnabledEvent(computedStatus[e])) {
         final EventProxy event = eventEnc.getProperEvent(e);
         events.add(event);
       }

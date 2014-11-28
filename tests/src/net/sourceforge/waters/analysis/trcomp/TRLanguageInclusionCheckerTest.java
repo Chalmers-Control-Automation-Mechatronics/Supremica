@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.trcomp
-//# CLASS:   TRStandardConflictCheckerTest
+//# CLASS:   TRLanguageInclusionCheckerTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -12,13 +12,13 @@ package net.sourceforge.waters.analysis.trcomp;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.model.analysis.AbstractStandardConflictCheckerTest;
-import net.sourceforge.waters.model.analysis.des.ConflictChecker;
+import net.sourceforge.waters.model.analysis.AbstractLanguageInclusionCheckerTest;
+import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class TRStandardConflictCheckerTest
-  extends AbstractStandardConflictCheckerTest
+public class TRLanguageInclusionCheckerTest
+  extends AbstractLanguageInclusionCheckerTest
 {
 
   //#########################################################################
@@ -26,7 +26,7 @@ public class TRStandardConflictCheckerTest
   public static Test suite()
   {
     final TestSuite testSuite =
-      new TestSuite(TRStandardConflictCheckerTest.class);
+      new TestSuite(TRLanguageInclusionCheckerTest.class);
     return testSuite;
   }
 
@@ -40,11 +40,11 @@ public class TRStandardConflictCheckerTest
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
   @Override
-  protected ConflictChecker createModelVerifier
+  protected LanguageInclusionChecker createModelVerifier
     (final ProductDESProxyFactory factory)
   {
-    final TRCompositionalConflictChecker checker =
-      new TRCompositionalConflictChecker(factory);
+    final TRCompositionalLanguageInclusionChecker checker =
+      new TRCompositionalLanguageInclusionChecker(factory);
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);
@@ -52,23 +52,9 @@ public class TRStandardConflictCheckerTest
     checker.setFailingEventsEnabled(true);
     checker.setSelfloopOnlyEventsEnabled(true);
     checker.setAlwaysEnabledEventsEnabled(true);
-    checker.setCounterExampleEnabled(true);
+    checker.setCounterExampleEnabled(false);
     checker.setTraceCheckingEnabled(true);
     return checker;
-  }
-
-
-  //#########################################################################
-  //# Test Cases
-  public void testBigComponent() throws Exception
-  {
-    final TRCompositionalConflictChecker checker =
-      (TRCompositionalConflictChecker) getModelVerifier();
-    checker.setInternalStateLimit(1000);
-    final String group = "tests";
-    final String subdir = "nasty";
-    final String name = "big_component.wmod";
-    runModelVerifier(group, subdir, name, false);
   }
 
 }

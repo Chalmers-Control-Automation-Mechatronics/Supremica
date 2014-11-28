@@ -64,21 +64,13 @@
     <ComponentList>
         <SimpleComponent Kind="PLANT" Name="arrive">
             <Graph>
-                <LabelBlock>
-                    <IndexedIdentifier Name="arrive">
-                        <SimpleIdentifier Name="side"/>
-                    </IndexedIdentifier>
-                    <IndexedIdentifier Name="enter">
-                        <SimpleIdentifier Name="side"/>
-                    </IndexedIdentifier>
-                </LabelBlock>
                 <NodeList>
                     <SimpleNode Name="WAIT">
                         <PointGeometry>
                             <Point X="192" Y="160"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point X="12" Y="6"/>
+                            <Point X="12" Y="-6"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Initial="true" Name="FREE">
@@ -89,7 +81,7 @@
                             <Point X="192" Y="96"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point X="12" Y="5"/>
+                            <Point X="10" Y="-9"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -125,30 +117,6 @@
         </SimpleComponent>
         <SimpleComponent Kind="SPEC" Name="controller">
             <Graph>
-                <LabelBlock>
-                    <IndexedIdentifier Name="arrive">
-                        <SimpleIdentifier Name="side"/>
-                    </IndexedIdentifier>
-                    <IndexedIdentifier Name="green">
-                        <SimpleIdentifier Name="main"/>
-                    </IndexedIdentifier>
-                    <IndexedIdentifier Name="green">
-                        <SimpleIdentifier Name="side"/>
-                    </IndexedIdentifier>
-                    <IndexedIdentifier Name="red">
-                        <SimpleIdentifier Name="main"/>
-                    </IndexedIdentifier>
-                    <IndexedIdentifier Name="red">
-                        <SimpleIdentifier Name="side"/>
-                    </IndexedIdentifier>
-                    <SimpleIdentifier Name="tick"/>
-                    <IndexedIdentifier Name="yellow">
-                        <SimpleIdentifier Name="main"/>
-                    </IndexedIdentifier>
-                    <IndexedIdentifier Name="yellow">
-                        <SimpleIdentifier Name="side"/>
-                    </IndexedIdentifier>
-                </LabelBlock>
                 <NodeList>
                     <SimpleNode Name="s6">
                         <PointGeometry>
@@ -796,20 +764,6 @@
                         <SimpleIdentifier Name="ST"/>
                     </IndexedIdentifier>
                     <Graph>
-                        <LabelBlock>
-                            <IndexedIdentifier Name="enter">
-                                <SimpleIdentifier Name="ST"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="green">
-                                <SimpleIdentifier Name="ST"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="red">
-                                <SimpleIdentifier Name="ST"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="yellow">
-                                <SimpleIdentifier Name="ST"/>
-                            </IndexedIdentifier>
-                        </LabelBlock>
                         <NodeList>
                             <SimpleNode Name="GO">
                                 <EventList>
@@ -903,24 +857,13 @@
         </ForeachComponent>
         <SimpleComponent Kind="SPEC" Name="enterarrive">
             <Graph>
-                <LabelBlock>
-                    <IndexedIdentifier Name="arrive">
-                        <SimpleIdentifier Name="side"/>
-                    </IndexedIdentifier>
-                    <IndexedIdentifier Name="enter">
-                        <SimpleIdentifier Name="side"/>
-                    </IndexedIdentifier>
-                    <IndexedIdentifier Name="red">
-                        <SimpleIdentifier Name="side"/>
-                    </IndexedIdentifier>
-                </LabelBlock>
                 <NodeList>
                     <SimpleNode Name="s1">
                         <PointGeometry>
                             <Point X="240" Y="208"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point X="-8" Y="24"/>
+                            <Point X="-7" Y="13"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Initial="true" Name="s0">
@@ -931,7 +874,7 @@
                             <Point X="240" Y="96"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point X="-8" Y="24"/>
+                            <Point X="-7" Y="8"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -942,7 +885,7 @@
                                 <SimpleIdentifier Name="side"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-66" Y="-37"/>
+                                <Point X="-74" Y="-11"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
@@ -955,7 +898,7 @@
                                 <SimpleIdentifier Name="side"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point X="13" Y="-32"/>
+                                <Point X="10" Y="-18"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
@@ -968,7 +911,7 @@
                                 <SimpleIdentifier Name="side"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-33" Y="-8"/>
+                                <Point X="14" Y="-1"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
@@ -986,22 +929,13 @@
                         <SimpleIdentifier Name="ST"/>
                     </IndexedIdentifier>
                     <Graph>
-                        <LabelBlock>
-                            <IndexedIdentifier Name="enter">
-                                <SimpleIdentifier Name="ST"/>
-                            </IndexedIdentifier>
-                            <IndexedIdentifier Name="leave">
-                                <SimpleIdentifier Name="ST"/>
-                            </IndexedIdentifier>
-                            <SimpleIdentifier Name="tick"/>
-                        </LabelBlock>
                         <NodeList>
                             <SimpleNode Name="CROSS1">
                                 <PointGeometry>
                                     <Point X="128" Y="224"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point X="-66" Y="4"/>
+                                    <Point X="-63" Y="-7"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="CROSS0">
@@ -1009,7 +943,7 @@
                                     <Point X="128" Y="176"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point X="-68" Y="4"/>
+                                    <Point X="-62" Y="-7"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Initial="true" Name="OUT">
@@ -1019,8 +953,11 @@
                                 <PointGeometry>
                                     <Point X="128" Y="112"/>
                                 </PointGeometry>
+                                <InitialArrowGeometry>
+                                    <Point X="0" Y="-21"/>
+                                </InitialArrowGeometry>
                                 <LabelGeometry>
-                                    <Point X="-38" Y="5"/>
+                                    <Point X="-38" Y="-5"/>
                                 </LabelGeometry>
                             </SimpleNode>
                         </NodeList>
@@ -1042,7 +979,7 @@
                                 <LabelBlock>
                                     <SimpleIdentifier Name="tick"/>
                                     <LabelGeometry Anchor="NW">
-                                        <Point X="-20" Y="-15"/>
+                                        <Point X="-31" Y="-19"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <SplineGeometry>
@@ -1066,7 +1003,7 @@
                                 <LabelBlock>
                                     <SimpleIdentifier Name="tick"/>
                                     <LabelGeometry Anchor="NW">
-                                        <Point X="-24" Y="-9"/>
+                                        <Point X="-34" Y="-11"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                             </Edge>
@@ -1076,7 +1013,7 @@
                                         <SimpleIdentifier Name="ST"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point X="-48" Y="3"/>
+                                        <Point X="-68" Y="-10"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <SplineGeometry>
@@ -1090,24 +1027,13 @@
         </ForeachComponent>
         <SimpleComponent Kind="PLANT" Name="lights_main">
             <Graph>
-                <LabelBlock>
-                    <IndexedIdentifier Name="green">
-                        <SimpleIdentifier Name="main"/>
-                    </IndexedIdentifier>
-                    <IndexedIdentifier Name="red">
-                        <SimpleIdentifier Name="main"/>
-                    </IndexedIdentifier>
-                    <IndexedIdentifier Name="yellow">
-                        <SimpleIdentifier Name="main"/>
-                    </IndexedIdentifier>
-                </LabelBlock>
                 <NodeList>
                     <SimpleNode Initial="true" Name="RED">
                         <PointGeometry>
                             <Point X="192" Y="64"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point X="10" Y="2"/>
+                            <Point X="10" Y="-9"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="YELLOW">
@@ -1115,7 +1041,7 @@
                             <Point X="256" Y="160"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point X="-22" Y="23"/>
+                            <Point X="-11" Y="11"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="GREEN">
@@ -1126,7 +1052,7 @@
                             <Point X="128" Y="160"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point X="-25" Y="23"/>
+                            <Point X="-36" Y="9"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -1214,17 +1140,6 @@
         </SimpleComponent>
         <SimpleComponent Kind="PLANT" Name="lights_side">
             <Graph>
-                <LabelBlock>
-                    <IndexedIdentifier Name="green">
-                        <SimpleIdentifier Name="side"/>
-                    </IndexedIdentifier>
-                    <IndexedIdentifier Name="red">
-                        <SimpleIdentifier Name="side"/>
-                    </IndexedIdentifier>
-                    <IndexedIdentifier Name="yellow">
-                        <SimpleIdentifier Name="side"/>
-                    </IndexedIdentifier>
-                </LabelBlock>
                 <NodeList>
                     <SimpleNode Initial="true" Name="RED">
                         <EventList>
@@ -1234,7 +1149,7 @@
                             <Point X="192" Y="64"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point X="11" Y="3"/>
+                            <Point X="9" Y="-10"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="YELLOW">
@@ -1242,7 +1157,7 @@
                             <Point X="256" Y="160"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point X="-18" Y="24"/>
+                            <Point X="-9" Y="8"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="GREEN">
@@ -1250,7 +1165,7 @@
                             <Point X="128" Y="160"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point X="-23" Y="24"/>
+                            <Point X="-32" Y="8"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -1338,27 +1253,13 @@
         </SimpleComponent>
         <SimpleComponent Kind="PROPERTY" Name="prop_nocrash">
             <Graph>
-                <LabelBlock>
-                    <IndexedIdentifier Name="enter">
-                        <SimpleIdentifier Name="main"/>
-                    </IndexedIdentifier>
-                    <IndexedIdentifier Name="enter">
-                        <SimpleIdentifier Name="side"/>
-                    </IndexedIdentifier>
-                    <IndexedIdentifier Name="leave">
-                        <SimpleIdentifier Name="main"/>
-                    </IndexedIdentifier>
-                    <IndexedIdentifier Name="leave">
-                        <SimpleIdentifier Name="side"/>
-                    </IndexedIdentifier>
-                </LabelBlock>
                 <NodeList>
                     <SimpleNode Name="FULL">
                         <PointGeometry>
                             <Point X="192" Y="192"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point X="-8" Y="24"/>
+                            <Point X="4" Y="7"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Initial="true" Name="EMPTY">
@@ -1369,7 +1270,7 @@
                             <Point X="192" Y="96"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point X="-9" Y="-12"/>
+                            <Point X="1" Y="-20"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -1399,7 +1300,7 @@
                                 <SimpleIdentifier Name="side"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-67" Y="-19"/>
+                                <Point X="-84" Y="-19"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>

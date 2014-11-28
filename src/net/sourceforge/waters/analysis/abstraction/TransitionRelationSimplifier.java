@@ -146,7 +146,7 @@ public interface TransitionRelationSimplifier
 
   /**
    * Returns whether this simplifier handles always enabled events
-   * ({@link EventStatus#STATUS_OUTSIDE_ALWAYS_ENABLED} specially.
+   * ({@link EventStatus#STATUS_ALWAYS_ENABLED} specially.
    * This information can be used to avoid the effort to find always
    * enabled events when they are not needed.
    */

@@ -149,7 +149,7 @@ public class TRSynchronousProductBuilder
    * ({@link EventStatus#STATUS_FAILING}) in the event encoding are replaced
    * by transitions to the dump state regardless of their target states.
    * Events marked as <I>failing</I> ({@link EventStatus#STATUS_FAILING}) and
-   * <I>always enabled</I> ({@link EventStatus#STATUS_OUTSIDE_ALWAYS_ENABLED})
+   * <I>always enabled</I> ({@link EventStatus#STATUS_ALWAYS_ENABLED})
    * in addition suppress other transitions from states where they are
    * enabled. This is useful in verification that only seeks to determine
    * whether or not failing events are ever enabled.</P>
@@ -974,7 +974,7 @@ public class TRSynchronousProductBuilder
     private void setForbidden(final byte status)
     {
       mForbidden = EventStatus.isFailingEvent(status);
-      mOutsideAlwaysEnabled = EventStatus.isOutsideAlwaysEnabledEvent(status);
+      mOutsideAlwaysEnabled = EventStatus.isAlwaysEnabledEvent(status);
     }
 
     private void addAutomatonEventInfo(final AutomatonEventInfo info)

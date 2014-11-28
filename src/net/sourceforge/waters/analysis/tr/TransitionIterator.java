@@ -50,8 +50,8 @@ public interface TransitionIterator
    *                a sequence of the bits or bit combinations
    *                {@link EventStatus#STATUS_CONTROLLABLE},
    *                {@link EventStatus#STATUS_LOCAL},
-   *                {@link EventStatus#STATUS_OUTSIDE_ALWAYS_ENABLED},
-   *                {@link EventStatus#STATUS_OUTSIDE_ONLY_SELFLOOP}, and
+   *                {@link EventStatus#STATUS_ALWAYS_ENABLED},
+   *                {@link EventStatus#STATUS_SELFLOOP_ONLY}, and
    *                {@link EventStatus#STATUS_UNUSED} or their complements.<BR>
    *                The flags must appear in the correct ordering, which must
    *                match the ordering of the {@link EventEncoding}. If a flag

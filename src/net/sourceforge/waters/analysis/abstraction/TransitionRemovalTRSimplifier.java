@@ -167,7 +167,7 @@ public class TransitionRemovalTRSimplifier
       final byte status = rel.getProperEventStatus(e);
       final boolean selflooped =
         mUsingSpecialEvents &&
-        EventStatus.isOutsideOnlySelfloopEvent(status);
+        EventStatus.isSelfloopOnlyEvent(status);
       final int from0 = iterCandidate.getCurrentFromState();
       final int to0 = iterCandidate.getCurrentToState();
       boolean remove = false;

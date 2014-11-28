@@ -625,6 +625,19 @@ public abstract class AbstractTRCompositionalVerifier
 
 
   //#########################################################################
+  //# Specific Access
+  protected SpecialEventsFinder getSpecialEventsFinder()
+  {
+    return mSpecialEventsFinder;
+  }
+
+  protected TRSubsystemInfo getCurrentSubsystem()
+  {
+    return mCurrentSubsystem;
+  }
+
+
+  //#########################################################################
   //# Algorithm
   private void analyseCurrentSubsystemCompositionally()
     throws AnalysisException
@@ -1019,6 +1032,9 @@ public abstract class AbstractTRCompositionalVerifier
       final TRAutomatonProxy tr =
         new TRAutomatonProxy(aut, eventEnc, dumpState, config);
       if (!hasInitialState(tr)) {
+        final Logger logger = getLogger();
+        logger.debug("Terminating early as automaton " + aut.getName() +
+                     " has no initial state.");
         setSatisfiedResult();
         return null;
       }

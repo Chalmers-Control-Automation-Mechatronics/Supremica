@@ -39,10 +39,10 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
  *     events whose transitions all take the transition relation to a
  *     deadlock state, i.e., a state with not outgoing transitions that
  *     is not marked by the default marking.</LI>
- * <LI>The status flag {@link EventStatus#STATUS_OUTSIDE_ONLY_SELFLOOP} is
+ * <LI>The status flag {@link EventStatus#STATUS_SELFLOOP_ONLY} is
  *     set for events that only appear on selfloops in the entire transition
  *     relation.</LI>
- * <LI>The status flag {@link EventStatus#STATUS_OUTSIDE_ALWAYS_ENABLED} is
+ * <LI>The status flag {@link EventStatus#STATUS_ALWAYS_ENABLED} is
  *     set for events that are enabled in every state without an outgoing
  *     tau-transitions, except for deadlock states. This algorithm is based
  *     on the assumption that the input automaton is tau-loop free.</LI>
@@ -112,7 +112,7 @@ public class SpecialEventsFinder
 
   /**
    * Sets whether selfloop-only events
-   * ({@link EventStatus#STATUS_OUTSIDE_ONLY_SELFLOOP}) are to be detected.
+   * ({@link EventStatus#STATUS_SELFLOOP_ONLY}) are to be detected.
    */
   public void setSelfloopOnlyEventsDetected(final boolean enable)
   {
@@ -121,7 +121,7 @@ public class SpecialEventsFinder
 
   /**
    * Returns whether selfloop-only events
-   * ({@link EventStatus#STATUS_OUTSIDE_ONLY_SELFLOOP}) are detected.
+   * ({@link EventStatus#STATUS_SELFLOOP_ONLY}) are detected.
    */
   public boolean isSelfloopOnlyEventsDetected()
   {
@@ -130,7 +130,7 @@ public class SpecialEventsFinder
 
   /**
    * Sets whether always enabled events
-   * ({@link EventStatus#STATUS_OUTSIDE_ALWAYS_ENABLED}) are to be detected.
+   * ({@link EventStatus#STATUS_ALWAYS_ENABLED}) are to be detected.
    */
   public void setAlwaysEnabledEventsDetected(final boolean enable)
   {
@@ -139,7 +139,7 @@ public class SpecialEventsFinder
 
   /**
    * Returns whether always enabled events
-   * ({@link EventStatus#STATUS_OUTSIDE_ALWAYS_ENABLED}) are detected.
+   * ({@link EventStatus#STATUS_ALWAYS_ENABLED}) are detected.
    */
   public boolean isAlwaysEnabledEventsDetected()
   {
@@ -208,7 +208,7 @@ public class SpecialEventsFinder
       initialStatus |= EventStatus.STATUS_FAILING;
     }
     if (mSelfloopOnlyEventsDetected) {
-      initialStatus |= EventStatus.STATUS_OUTSIDE_ONLY_SELFLOOP;
+      initialStatus |= EventStatus.STATUS_SELFLOOP_ONLY;
     }
     Arrays.fill(mComputedEventStatus, initialStatus);
 
@@ -270,7 +270,7 @@ public class SpecialEventsFinder
         if (mFailingEventsDetected && dumpInfo[t] == DUMP) {
           mComputedEventStatus[e] &= EventStatus.STATUS_FAILING;
         } else if (s == t) {
-          mComputedEventStatus[e] &= EventStatus.STATUS_OUTSIDE_ONLY_SELFLOOP;
+          mComputedEventStatus[e] &= EventStatus.STATUS_SELFLOOP_ONLY;
         } else {
           mComputedEventStatus[e] = 0;
         }
@@ -311,7 +311,7 @@ public class SpecialEventsFinder
           final byte status = rel.getProperEventStatus(e);
           if (canBeAlwaysEnabledEvent(status) && !disabled[e]) {
             mComputedEventStatus[e] |=
-              EventStatus.STATUS_OUTSIDE_ALWAYS_ENABLED;
+              EventStatus.STATUS_ALWAYS_ENABLED;
           }
         }
       } else {
@@ -344,7 +344,7 @@ public class SpecialEventsFinder
             }
             if (numStatesFound == numStatesChecked) {
               mComputedEventStatus[e] |=
-                EventStatus.STATUS_OUTSIDE_ALWAYS_ENABLED;
+                EventStatus.STATUS_ALWAYS_ENABLED;
             }
           }
         }

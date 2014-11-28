@@ -48,9 +48,9 @@ class PreselectionHeuristicMustSp extends PreselectionHeuristic
       for (final TRAutomatonProxy aut : automata) {
         final byte status = info.getAutomatonStatus(aut);
         final boolean alwaysEnabled =
-          EventStatus.isOutsideAlwaysEnabledEvent(status);
+          EventStatus.isAlwaysEnabledEvent(status);
         final boolean selfloopOnly =
-          EventStatus.isOutsideOnlySelfloopEvent(status);
+          EventStatus.isSelfloopOnlyEvent(status);
         if (notAlwaysEnabled == notSelfloopOnly) {
           if (!alwaysEnabled && !selfloopOnly) {
             notAlwaysEnabled.add(aut);

@@ -180,7 +180,7 @@ public class StateRepresentationSynthesisAbstractionProcedure extends
           final AbstractCompositionalModelAnalyzer.EventInfo info =
             analyzer.getEventInfo(event);
           if (info.isOnlyNonSelfLoopCandidate(candidate)) {
-            status = EventStatus.STATUS_OUTSIDE_ONLY_SELFLOOP;
+            status = EventStatus.STATUS_SELFLOOP_ONLY;
           }
         }
         enc.addEvent(event, translator, status);

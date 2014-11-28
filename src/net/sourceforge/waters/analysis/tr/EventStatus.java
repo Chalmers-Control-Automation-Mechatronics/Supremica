@@ -54,22 +54,22 @@ public class EventStatus
 
   /**
    * Returns whether the given event status bits identify an event as
-   * outside only-selfloop in an event encoding.
-   * @see #STATUS_OUTSIDE_ONLY_SELFLOOP
+   * selfloop-only in an event encoding.
+   * @see #STATUS_SELFLOOP_ONLY
    */
-  public static boolean isOutsideOnlySelfloopEvent(final byte status)
+  public static boolean isSelfloopOnlyEvent(final byte status)
   {
-    return (status & STATUS_OUTSIDE_ONLY_SELFLOOP) != 0;
+    return (status & STATUS_SELFLOOP_ONLY) != 0;
   }
 
   /**
    * Returns whether the given event status bits identify an event as
-   * outside always enabled in an event encoding.
-   * @see #STATUS_OUTSIDE_ALWAYS_ENABLED
+   * always enabled in an event encoding.
+   * @see #STATUS_ALWAYS_ENABLED
    */
-  public static boolean isOutsideAlwaysEnabledEvent(final byte status)
+  public static boolean isAlwaysEnabledEvent(final byte status)
   {
-    return (status & STATUS_OUTSIDE_ALWAYS_ENABLED) != 0;
+    return (status & STATUS_ALWAYS_ENABLED) != 0;
   }
 
   /**
@@ -147,22 +147,22 @@ public class EventStatus
    * A status flags indicating a local event.
    * A local event is assumed not to be used in any other automaton
    * except the current one.
-   * Unlike {@link #STATUS_OUTSIDE_ALWAYS_ENABLED} and
-   * {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}, this flag is purely informational.
+   * Unlike {@link #STATUS_ALWAYS_ENABLED} and
+   * {@link #STATUS_SELFLOOP_ONLY}, this flag is purely informational.
    */
   public static final byte STATUS_LOCAL = 0x02;
   /**
-   * A status flag indicating an event that outside of the current automaton
-   * only appears in selfloop transitions.
+   * A status flag indicating an event only appears in selfloop transitions.
+   * Selfloops by events with this status flag are automatically suppressed
+   * in a {@link ListBufferTransitionRelation} as it is assumed that other
+   * automata use the event only as selfloops, so the event is subject to
+   * selfloop removal.
    */
-  public static final byte STATUS_OUTSIDE_ONLY_SELFLOOP = 0x04;
+  public static final byte STATUS_SELFLOOP_ONLY = 0x04;
   /**
-   * A status flag indicating an event that outside of the current automaton
-   * is always enabled. The only automaton ever disabling this event is the
-   * current automaton. Selfloops by events with this status flag are
-   * automatically suppressed in a {@link ListBufferTransitionRelation}.
+   * A status flag indicating an event is always enabled.
    */
-  public static final byte STATUS_OUTSIDE_ALWAYS_ENABLED = 0x08;
+  public static final byte STATUS_ALWAYS_ENABLED = 0x08;
   /**
    * A status flag indicating an event known to be globally disabled.
    */
@@ -184,29 +184,29 @@ public class EventStatus
   /**
    * Status flags indicating a local event.
    * This is a combination of the bits {@link #STATUS_LOCAL},
-   * {@link #STATUS_OUTSIDE_ALWAYS_ENABLED}, and
-   * {@link #STATUS_OUTSIDE_ONLY_SELFLOOP}.
+   * {@link #STATUS_ALWAYS_ENABLED}, and
+   * {@link #STATUS_SELFLOOP_ONLY}.
    * Although {@link #STATUS_LOCAL} usually implies the other two flags,
    * it is separated from the other two for synthesis and other applications,
    * where the automatic suppression of local selfloops is not desired.
    */
   public static final byte STATUS_FULLY_LOCAL =
-    STATUS_LOCAL | STATUS_OUTSIDE_ONLY_SELFLOOP | STATUS_OUTSIDE_ALWAYS_ENABLED;
+    STATUS_LOCAL | STATUS_SELFLOOP_ONLY | STATUS_ALWAYS_ENABLED;
 
   /**
    * All status flags combined.
    */
   public static final byte STATUS_ALL =
-    STATUS_CONTROLLABLE | STATUS_LOCAL | STATUS_OUTSIDE_ONLY_SELFLOOP |
-    STATUS_OUTSIDE_ALWAYS_ENABLED | STATUS_BLOCKED | STATUS_FAILING |
+    STATUS_CONTROLLABLE | STATUS_LOCAL | STATUS_SELFLOOP_ONLY |
+    STATUS_ALWAYS_ENABLED | STATUS_BLOCKED | STATUS_FAILING |
     STATUS_UNUSED;
   /**
    * Status flags that combine conjunctively. The composition of two
    * or more automata only has this status when all automata have it.
    */
   public static final byte STATUS_BITS_CONJUNCTIVE =
-    STATUS_CONTROLLABLE | STATUS_LOCAL | STATUS_OUTSIDE_ONLY_SELFLOOP |
-    STATUS_OUTSIDE_ALWAYS_ENABLED | STATUS_UNUSED;
+    STATUS_CONTROLLABLE | STATUS_LOCAL | STATUS_SELFLOOP_ONLY |
+    STATUS_ALWAYS_ENABLED | STATUS_UNUSED;
   /**
    * Status flags that combine disjunctively. The composition of two
    * or more automata has this status when at least one automaton has it.

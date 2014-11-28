@@ -67,8 +67,8 @@ public class OrderingInfo
    * @param  flags  List of event status flags, represented by
    *                a sequence of the bits or bit combinations
    *                {@link EventStatus#STATUS_CONTROLLABLE}, {@link EventStatus#STATUS_LOCAL},
-   *                {@link EventStatus#STATUS_OUTSIDE_ALWAYS_ENABLED},
-   *                {@link EventStatus#STATUS_OUTSIDE_ONLY_SELFLOOP},
+   *                {@link EventStatus#STATUS_ALWAYS_ENABLED},
+   *                {@link EventStatus#STATUS_SELFLOOP_ONLY},
    *                {@link EventStatus#STATUS_BLOCKED}, {@link EventStatus#STATUS_FAILING}, and
    *                {@link EventStatus#STATUS_UNUSED} or their complements.<BR>
    *                The flags must appear in the ordering that matches
@@ -91,8 +91,8 @@ public class OrderingInfo
    * @param  flags  List of event status flags, represented by
    *                a sequence of the bits or bit combinations
    *                {@link EventStatus#STATUS_CONTROLLABLE}, {@link EventStatus#STATUS_LOCAL},
-   *                {@link EventStatus#STATUS_OUTSIDE_ALWAYS_ENABLED},
-   *                {@link EventStatus#STATUS_OUTSIDE_ONLY_SELFLOOP},
+   *                {@link EventStatus#STATUS_ALWAYS_ENABLED},
+   *                {@link EventStatus#STATUS_SELFLOOP_ONLY},
    *                {@link EventStatus#STATUS_BLOCKED}, {@link EventStatus#STATUS_FAILING}, and
    *                {@link EventStatus#STATUS_UNUSED} or their complements.<BR>
    *                The flags must appear in the ordering that matches

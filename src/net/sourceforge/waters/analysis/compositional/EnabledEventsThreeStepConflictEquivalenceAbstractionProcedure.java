@@ -448,11 +448,11 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
           final AbstractCompositionalModelAnalyzer.EventInfo info =
             analyzer.getEventInfo(event);
           if (info.isOnlyNonSelfLoopCandidate(candidate)) {
-            status |= EventStatus.STATUS_OUTSIDE_ONLY_SELFLOOP;
+            status |= EventStatus.STATUS_SELFLOOP_ONLY;
           }
         }
         if (e < numAlwaysEnabled) {
-          status |= EventStatus.STATUS_OUTSIDE_ALWAYS_ENABLED;
+          status |= EventStatus.STATUS_ALWAYS_ENABLED;
         }
         enc.addEvent(event, translator, status);
         e++;
@@ -473,7 +473,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
       mAlwaysEnabledEventsFinder.getComputedEventStatus();
     mAlwaysEnabledEvents = new THashSet<>(computedStatus.length);
     for (int e = 0; e < computedStatus.length; e++) {
-      if (EventStatus.isOutsideAlwaysEnabledEvent(computedStatus[e])) {
+      if (EventStatus.isAlwaysEnabledEvent(computedStatus[e])) {
         final EventProxy event = eventEnc.getProperEvent(e);
         mAlwaysEnabledEvents.add(event);
       }
