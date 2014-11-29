@@ -9,24 +9,34 @@
 
 package net.sourceforge.waters.analysis.trcomp;
 
+import java.util.List;
+
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TRSimplificationListener;
 import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
+import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
+import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.analysis.des.TraceChecker;
+import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 import org.apache.log4j.Logger;
 
@@ -42,17 +52,16 @@ public class TRCompositionalConflictChecker
 
   //#########################################################################
   //# Constructors
-  public TRCompositionalConflictChecker(final ProductDESProxyFactory factory)
+  public TRCompositionalConflictChecker()
   {
-    this(null, factory);
+    this(null);
   }
 
-  public TRCompositionalConflictChecker(final ProductDESProxy model,
-                                        final ProductDESProxyFactory factory)
+  public TRCompositionalConflictChecker(final ProductDESProxy model)
   {
-    super(model, factory,
+    super(model,
           ConflictKindTranslator.getInstanceControllable(),
-          new NativeConflictChecker(factory));
+          new NativeConflictChecker(ProductDESElementFactory.getInstance()));
     final TransitionRelationSimplifier chain = createDefaultAbstractionChain();
     setSimplifier(chain);
   }
@@ -104,6 +113,12 @@ public class TRCompositionalConflictChecker
 
   //#########################################################################
   //# Hooks
+  @Override
+  protected boolean isFailingEventsUsed()
+  {
+    return isFailingEventsEnabled() && getUsedPreconditionMarking() == null;
+  }
+
   @Override
   protected ChainTRSimplifier createDefaultAbstractionChain()
   {
@@ -192,9 +207,63 @@ public class TRCompositionalConflictChecker
     return allStatesMarked;
   }
 
+  @Override
+  protected void analyseSubsystemMonolithically(final TRSubsystemInfo subsys)
+    throws AnalysisException
+  {
+    final List<TRAutomatonProxy> automata = subsys.getAutomata();
+    if (!automata.isEmpty()) {
+      final String name = AutomatonTools.getCompositionName(automata);
+      final ProductDESProxyFactory factory = getFactory();
+      final ProductDESProxy des =
+        AutomatonTools.createProductDESProxy(name, automata, factory);
+      recordMonolithicAttempt(automata);
+      final ModelVerifier mono = getMonolithicVerifier();
+      mono.setModel(des);
+      mono.run();
+      final AnalysisResult monolithicResult = mono.getAnalysisResult();
+      final CompositionalAnalysisResult combinedResult = getAnalysisResult();
+      combinedResult.addMonolithicAnalysisResult(monolithicResult);
+      final Logger logger = getLogger();
+      if (monolithicResult.isSatisfied()) {
+        logger.debug("Subsystem is nonblocking.");
+        dropSubsystem(subsys);
+      } else {
+        logger.debug("Subsystem is blocking.");
+        combinedResult.setSatisfied(false);
+        if (isCounterExampleEnabled()) {
+          dropPendingSubsystems();
+          final List<TRAbstractionStep> preds = getAbstractionSteps(automata);
+          final TraceProxy trace = mono.getCounterExample();
+          final TRAbstractionStep step =
+            new TRAbstractionStepMonolithic(name, preds, trace);
+          addAbstractionStep(step);
+        }
+      }
+    }
+  }
 
-  //#########################################################################
-  //# Auxiliary Methods
+  @Override
+  protected TRConflictTraceProxy createEmptyTrace(final ProductDESProxy des)
+  {
+    return new TRConflictTraceProxy(des);
+  }
+
+  @Override
+  protected void checkIntermediateCounterExample(final TRTraceProxy trace)
+    throws AnalysisException
+  {
+    final TRConflictTraceProxy conflictTrace = (TRConflictTraceProxy) trace;
+    final TRConflictTraceProxy cloned =
+      new TRConflictTraceProxy(conflictTrace);
+    cloned.setUpForTraceChecking();
+    final KindTranslator translator = getKindTranslator();
+    TraceChecker.checkConflictCounterExample(cloned,
+                                             getUsedPreconditionMarking(),
+                                             getUsedDefaultMarking(),
+                                             true,
+                                             translator);
+  }
 
 
   //#########################################################################

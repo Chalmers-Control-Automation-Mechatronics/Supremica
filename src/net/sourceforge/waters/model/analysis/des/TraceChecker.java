@@ -28,6 +28,7 @@ import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
@@ -206,6 +207,30 @@ public class TraceChecker
   }
 
   /**
+   * Checks whether the given trace forms a correct safety error trace for
+   * its automata. A safety error trace must be accepted by all its automata
+   * except that at least one of the specifications must reject an
+   * uncontrollable event in the final step.
+   * @param  trace      The counterexample to be checked.
+   * @param  sat        A flag, indicating that the trace is expected to be
+   *                    saturated. If true, any missing step entry for the
+   *                    any of the given automata will also lead to an exception.
+   * @param  translator Kind translator used to distinguish plants and
+   *                    specifications, and controllable and uncontrollable
+   *                    events.
+   * @throws AssertionError to indicate that something is wrong with the
+   *                        trace.
+   */
+  public static void checkSafetyCounterExample
+    (final SafetyTraceProxy trace,
+     final boolean sat,
+     final KindTranslator translator)
+  {
+    checkSafetyCounterExample(trace.getTraceSteps(), trace.getAutomata(),
+                              sat, translator);
+  }
+
+  /**
    * Checks whether the given list of trace steps forms a correct safety
    * error trace for the given automata. A safety error trace must be
    * accepted by all the given automata except that at least one of the
@@ -250,8 +275,8 @@ public class TraceChecker
   }
 
   /**
-   * Checks whether trace forms a correct conflict error trace for its
-   * automata. A conflict error trace must be accepted by all automata and
+   * Checks whether the given trace forms a correct conflict error trace for
+   * its automata. A conflict error trace must be accepted by all automata and
    * end in a state marking by the precondition marking. Furthermore, the end
    * state must be blocking, i.e., it must not be possible to reach a terminal
    * state. The latter condition is verified using a language inclusion check,

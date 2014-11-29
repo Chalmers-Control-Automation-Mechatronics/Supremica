@@ -54,7 +54,7 @@ public class TRSynchronousProductBuilderTest
   protected TRSynchronousProductBuilder
     createAutomatonBuilder(final ProductDESProxyFactory factory)
   {
-    return new TRSynchronousProductBuilder(factory);
+    return new TRSynchronousProductBuilder();
   }
 
   @Override

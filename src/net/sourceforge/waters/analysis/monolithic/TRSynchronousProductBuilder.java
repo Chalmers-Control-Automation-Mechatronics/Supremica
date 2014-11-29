@@ -32,6 +32,7 @@ import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.TRSynchronousProductStateMap;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.AbstractAutomatonBuilder;
@@ -42,7 +43,7 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.apache.log4j.Logger;
@@ -62,25 +63,21 @@ public class TRSynchronousProductBuilder
 
   //#########################################################################
   //# Constructors
-  public TRSynchronousProductBuilder
-    (final ProductDESProxyFactory factory)
+  public TRSynchronousProductBuilder()
   {
-    super(factory);
+    this(null);
+  }
+
+  public TRSynchronousProductBuilder(final ProductDESProxy model)
+  {
+    this(model, IdenticalKindTranslator.getInstance());
   }
 
   public TRSynchronousProductBuilder
     (final ProductDESProxy model,
-     final ProductDESProxyFactory factory)
-  {
-    super(model, factory);
-  }
-
-  public TRSynchronousProductBuilder
-    (final ProductDESProxy model,
-     final ProductDESProxyFactory factory,
      final KindTranslator translator)
   {
-    super(model, factory, translator);
+    super(model, ProductDESElementFactory.getInstance(), translator);
   }
 
 

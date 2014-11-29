@@ -19,6 +19,7 @@ import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
@@ -37,9 +38,11 @@ class TRAbstractionStepMonolithic
 
   //#########################################################################
   //# Constructor
-  TRAbstractionStepMonolithic(final List<TRAbstractionStep> preds,
+  TRAbstractionStepMonolithic(final String name,
+                              final List<TRAbstractionStep> preds,
                               final TraceProxy trace)
   {
+    super(name);
     mPredecessors = preds;
     mMonolithicTrace = trace;
     for (final TRAbstractionStep pred : preds) {
@@ -75,6 +78,7 @@ class TRAbstractionStepMonolithic
       final EventEncoding enc = aut.getEventEncoding();
       final ListBufferTransitionRelation rel = aut.getTransitionRelation();
       rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
       final int[] states = new int[numSteps];
       int stepIndex = 0;
       int current = -1;
@@ -83,14 +87,28 @@ class TRAbstractionStepMonolithic
         if (state != null) {
           current = aut.getStateIndex(state);
         } else if (stepIndex == 0) {
-          current = findInitialState(rel);
-        } else {
+          current = rel.getFirstInitialState();
+          assert current >= 0 || trace instanceof SafetyTraceProxy :
+            "No initial state found in trace for automaton " +
+            rel.getName() + "!";
+        } else if (current >= 0){
           final EventProxy event = step.getEvent();
           final int e = enc.getEventCode(event);
           if (e >= 0) {
             final byte status = enc.getProperEventStatus(e);
             if (EventStatus.isUsedEvent(status)) {
-              current = findSuccessorState(rel, current, e);
+              iter.reset(current, e);
+              if (iter.advance()) {
+                current = iter.getCurrentTargetState();
+                assert !iter.advance() :
+                  "Nondeterministic successor states for trace found " +
+                  "in automaton " + rel.getName() + "!";
+              } else {
+                current = -1;
+                assert trace instanceof SafetyTraceProxy :
+                  "No successor state found in trace for automaton " +
+                  rel.getName() + "!";
+              }
             }
           }
         }
@@ -98,32 +116,6 @@ class TRAbstractionStepMonolithic
       }
       trace.addAutomaton(pred, states);
     }
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Static Methods
-  static int findInitialState(final ListBufferTransitionRelation rel)
-  {
-    final int init = rel.getFirstInitialState();
-    assert init >= 0 : "Initial state for trace not found in automaton " +
-                       rel.getName() + "!";
-    return init;
-  }
-
-  private static int findSuccessorState(final ListBufferTransitionRelation rel,
-                                        final int source,
-                                        final int event)
-  {
-    final TransitionIterator iter =
-      rel.createSuccessorsReadOnlyIterator(source, event);
-    assert iter.advance() :
-      "No successor state for trace found in automaton " + rel.getName() + "!";
-    final int target = iter.getCurrentTargetState();
-    assert !iter.advance() :
-      "Nondeterministic successor states for trace found in automaton " +
-      rel.getName() + "!";
-    return target;
   }
 
 

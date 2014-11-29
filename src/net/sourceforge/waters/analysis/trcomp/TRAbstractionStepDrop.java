@@ -36,6 +36,7 @@ class TRAbstractionStepDrop
   TRAbstractionStepDrop(final TRAbstractionStep pred,
                         final TRAutomatonProxy aut)
   {
+    super(pred.getName());
     mPredecessor = pred;
     final ListBufferTransitionRelation rel = aut.getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
@@ -54,6 +55,7 @@ class TRAbstractionStepDrop
   TRAbstractionStepDrop(final TRAbstractionStep pred,
                         final int initialState)
   {
+    super(pred.getName());
     mPredecessor = pred;
     mInitialState = initialState;
     pred.setSuccessor(this);

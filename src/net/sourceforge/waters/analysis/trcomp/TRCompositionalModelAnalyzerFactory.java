@@ -74,7 +74,14 @@ public class TRCompositionalModelAnalyzerFactory
   public TRCompositionalConflictChecker createConflictChecker
     (final ProductDESProxyFactory factory)
   {
-    return new TRCompositionalConflictChecker(factory);
+    return new TRCompositionalConflictChecker();
+  }
+
+  @Override
+  public TRCompositionalLanguageInclusionChecker createLanguageInclusionChecker
+    (final ProductDESProxyFactory factory)
+  {
+    return new TRCompositionalLanguageInclusionChecker();
   }
 
 

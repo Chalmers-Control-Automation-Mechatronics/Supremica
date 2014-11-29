@@ -123,7 +123,7 @@ class TRAbstractionStepSync
   public void expandTrace(final TRTraceProxy trace)
     throws AnalysisException
   {
-    // Ensure mDumpState and mStateMap are available ...
+    // Ensure mDumpStateIndex and mStateMap are available ...
     getOutputAutomaton(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     assert mStateMap != null;
     // Set up ...
@@ -173,6 +173,13 @@ class TRAbstractionStepSync
       int stepIndex = 1;
       for (final EventProxy event : events) {
         final int e = mEventEncoding.getEventCode(event);
+        final boolean failingEvent;
+        if (e >= 0) {
+          final byte status = mEventEncoding.getProperEventStatus(e);
+          failingEvent = EventStatus.isFailingEvent(status);
+        } else {
+          failingEvent = false;
+        }
         final List<EventProxy> alternatives =
           e == EventEncoding.TAU ? localEvents : Collections.singletonList(event);
         final int state = trace.getState(this, stepIndex);
@@ -182,7 +189,7 @@ class TRAbstractionStepSync
         boolean found = false;
         eventLoop:
         for (final EventProxy alt : alternatives) {
-          found = state != mDumpStateIndex;
+          found = state != mDumpStateIndex || failingEvent;
           for (int autIndex = 0; autIndex < numAutomata; autIndex++) {
             final TransitionFinder finder = finders[autIndex];
             if (state == mDumpStateIndex) {

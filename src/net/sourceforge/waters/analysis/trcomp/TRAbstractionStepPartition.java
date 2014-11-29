@@ -50,13 +50,15 @@ class TRAbstractionStepPartition
                              final int preconditionMarking,
                              final TransitionRelationSimplifier simplifier)
   {
+    super(pred.getName());
     mPredecessor = pred;
     mEventEncoding = eventEncoding;
     mDefaultMarking = defaultMarking;
     mPreconditionMarking = preconditionMarking;
     mSimplificationSteps = new LinkedList<>();
     mSimplificationSteps.add(simplifier);
-    mPartition = simplifier.getResultPartition();
+    mIsPartitioning = simplifier.isPartitioning();
+    mPartition = mIsPartitioning ? simplifier.getResultPartition() : null;
     pred.setSuccessor(this);
   }
 
@@ -76,8 +78,13 @@ class TRAbstractionStepPartition
   void merge(final TransitionRelationSimplifier simplifier)
   {
     mSimplificationSteps.add(simplifier);
-    final TRPartition partition = simplifier.getResultPartition();
-    mPartition = TRPartition.combine(mPartition, partition);
+    mIsPartitioning &= simplifier.isPartitioning();
+    if (mIsPartitioning) {
+      final TRPartition partition = simplifier.getResultPartition();
+      mPartition = TRPartition.combine(mPartition, partition);
+    } else {
+      mPartition = null;
+    }
   }
 
 
@@ -301,6 +308,8 @@ class TRAbstractionStepPartition
     {
       if (record.getNumberOfConsumedEvents() < mEventSequence.size()) {
         return false;
+      } else if (!mIsPartitioning) {
+        return true;
       }
       final int state = record.getState();
       if (mTargetStateClass != null) {
@@ -491,6 +500,7 @@ class TRAbstractionStepPartition
   private final int mDefaultMarking;
   private final int mPreconditionMarking;
   private final List<TransitionRelationSimplifier> mSimplificationSteps;
+  private boolean mIsPartitioning;
   private TRPartition mPartition;
 
 }

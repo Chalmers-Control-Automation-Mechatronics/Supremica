@@ -44,7 +44,7 @@ public class TRStandardConflictCheckerTest
     (final ProductDESProxyFactory factory)
   {
     final TRCompositionalConflictChecker checker =
-      new TRCompositionalConflictChecker(factory);
+      new TRCompositionalConflictChecker();
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);

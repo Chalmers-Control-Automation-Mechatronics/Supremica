@@ -47,7 +47,6 @@ import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
-import net.sourceforge.waters.model.analysis.des.TraceChecker;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -55,6 +54,7 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 import org.apache.log4j.Logger;
 
@@ -71,17 +71,16 @@ public abstract class AbstractTRCompositionalVerifier
   //#########################################################################
   //# Constructors
   public AbstractTRCompositionalVerifier(final ProductDESProxy model,
-                                         final ProductDESProxyFactory factory,
                                          final KindTranslator translator,
                                          final ModelVerifier mono)
   {
-    super(model, factory, translator);
+    super(model, ProductDESElementFactory.getInstance(), translator);
     // TODO Make these configurable
     mPreselectionHeuristic = new PreselectionHeuristicMustL();
     final SelectionHeuristic<TRCandidate> minS = new SelectionHeuristicMinS();
     mSelectionHeuristic = new ChainSelectionHeuristic<TRCandidate>(minS);
     mSpecialEventsListener = new PartitioningListener();
-    mSynchronousProductBuilder = new TRSynchronousProductBuilder(factory);
+    mSynchronousProductBuilder = new TRSynchronousProductBuilder();
     mMonolithicAnalyzer = mono;
   }
 
@@ -486,6 +485,7 @@ public abstract class AbstractTRCompositionalVerifier
       setUp();
       final AnalysisResult result = getAnalysisResult();
       if (result.isFinished()) {
+        computeCounterExample();
         return result.isSatisfied();
       } else {
         do {
@@ -592,7 +592,7 @@ public abstract class AbstractTRCompositionalVerifier
 
   protected boolean isFailingEventsUsed()
   {
-    return isFailingEventsEnabled() && getUsedPreconditionMarking() == null;
+    return isFailingEventsEnabled();
   }
 
   protected boolean isSelfloopOnlyEventsUsed()
@@ -675,7 +675,7 @@ public abstract class AbstractTRCompositionalVerifier
         return;
       }
     }
-    analyseCurrentSubsystemMonolithically();
+    analyseSubsystemMonolithically(mCurrentSubsystem);
   }
 
   private boolean simplifyAllAutomataIndividually()
@@ -908,67 +908,12 @@ public abstract class AbstractTRCompositionalVerifier
     }
   }
 
-  private void analyseCurrentSubsystemMonolithically()
-    throws AnalysisException
-  {
-    final ProductDESProxy des = createSubsystemDES(mCurrentSubsystem);
-    if (des != null) {
-      final Collection<AutomatonProxy> automata = des.getAutomata();
-      final int numAutomata = automata.size();
-      final List<TRAutomatonProxy> trs = new ArrayList<>(numAutomata);
-      for (final AutomatonProxy aut : automata) {
-        final TRAutomatonProxy tr = (TRAutomatonProxy) aut;
-        trs.add(tr);
-      }
-      final Logger logger = getLogger();
-      if (logger.isDebugEnabled()) {
-        double estimate = 1.0;
-        for (final TRAutomatonProxy tr : trs) {
-          final ListBufferTransitionRelation rel = tr.getTransitionRelation();
-          estimate *= rel.getNumberOfReachableStates();
-        }
-        final String msg = String.format("Monolithically composing %d automata, " +
-                                         "estimated %.0f states.",
-                                         automata.size(), estimate);
-        logger.debug(msg);
-      }
-      final ModelVerifier mono = getMonolithicVerifier();
-      mono.setModel(des);
-      mono.run();
-      final AnalysisResult monolithicResult = mono.getAnalysisResult();
-      final CompositionalAnalysisResult combinedResult = getAnalysisResult();
-      combinedResult.addMonolithicAnalysisResult(monolithicResult);
-      if (monolithicResult.isSatisfied()) {
-        logger.debug("Subsystem is nonblocking.");
-        dropSubsystem(mCurrentSubsystem);
-      } else {
-        logger.debug("Subsystem is blocking.");
-        combinedResult.setSatisfied(false);
-        if (isCounterExampleEnabled()) {
-          dropPendingSubsystems();
-          final List<TRAbstractionStep> preds = getAbstractionSteps(trs);
-          final TraceProxy trace = mono.getCounterExample();
-          final TRAbstractionStep step =
-            new TRAbstractionStepMonolithic(preds, trace);
-          mAbstractionSequence.add(step);
-        }
-      }
-    }
-  }
+  abstract protected void analyseSubsystemMonolithically
+    (final TRSubsystemInfo subsys)
+    throws AnalysisException;
 
-  protected ProductDESProxy createSubsystemDES(final TRSubsystemInfo subsys)
-  {
-    final List<TRAutomatonProxy> automata = subsys.getAutomata();
-    if (automata.isEmpty()) {
-      return null;
-    } else {
-      final String name = AutomatonTools.getCompositionName(automata);
-      final ProductDESProxyFactory factory = getFactory();
-      return AutomatonTools.createProductDESProxy(name, automata, factory);
-    }
-  }
 
-  private List<TRAbstractionStep> getAbstractionSteps
+  protected List<TRAbstractionStep> getAbstractionSteps
     (final List<TRAutomatonProxy> automata)
   {
     final List<TRAbstractionStep> preds = new ArrayList<>(automata.size());
@@ -979,20 +924,24 @@ public abstract class AbstractTRCompositionalVerifier
     return preds;
   }
 
-  private void computeCounterExample() throws AnalysisException
+  protected void computeCounterExample() throws AnalysisException
   {
     final VerificationResult result = getAnalysisResult();
     if (!result.isSatisfied() && isCounterExampleEnabled()) {
+      final Logger logger = getLogger();
+      logger.debug("Starting trace expansion ...");
       mSpecialEventsListener.setEnabled(true);
       final ProductDESProxy des = getModel();
-      final TRConflictTraceProxy trace = new TRConflictTraceProxy(des);
+      final TRTraceProxy trace = createEmptyTrace(des);
       final int end = mAbstractionSequence.size();
       final ListIterator<TRAbstractionStep> iter =
         mAbstractionSequence.listIterator(end);
       while (iter.hasPrevious()) {
         final TRAbstractionStep step = iter.previous();
         step.expandTrace(trace);
-        checkIntermediateCounterExample(trace);
+        if (mTraceCheckingEnabled) {
+          checkIntermediateCounterExample(trace);
+        }
         step.dispose();
         iter.remove();
       }
@@ -1000,19 +949,11 @@ public abstract class AbstractTRCompositionalVerifier
     }
   }
 
-  private void checkIntermediateCounterExample(final TRConflictTraceProxy trace)
+  protected abstract TRTraceProxy createEmptyTrace(ProductDESProxy des);
+
+  protected void checkIntermediateCounterExample(final TRTraceProxy trace)
     throws AnalysisException
   {
-    if (mTraceCheckingEnabled) {
-      final TRConflictTraceProxy cloned = new TRConflictTraceProxy(trace);
-      cloned.setUpForTraceChecking();
-      final KindTranslator translator = getKindTranslator();
-      TraceChecker.checkConflictCounterExample(cloned,
-                                               getUsedPreconditionMarking(),
-                                               getUsedDefaultMarking(),
-                                               true,
-                                               translator);
-    }
   }
 
 
@@ -1042,8 +983,7 @@ public abstract class AbstractTRCompositionalVerifier
         final EventEncoding clonedEnc = new EventEncoding(eventEnc);
         final TRAbstractionStepInput step =
           new TRAbstractionStepInput(aut, clonedEnc, dumpState, tr);
-        mAbstractionSequence.add(step);
-        mCurrentAutomataMap.put(tr, step);
+        addAbstractionStep(step, tr);
       }
       return tr;
     default:
@@ -1083,7 +1023,7 @@ public abstract class AbstractTRCompositionalVerifier
   }
 
 
-  private void dropPendingSubsystems()
+  protected void dropPendingSubsystems()
   {
     for (final TRSubsystemInfo subsys : mSubsystemQueue) {
       dropSubsystem(subsys);
@@ -1100,15 +1040,27 @@ public abstract class AbstractTRCompositionalVerifier
     }
   }
 
-  private void dropTrivialAutomaton(final TRAutomatonProxy aut)
+  protected void dropTrivialAutomaton(final TRAutomatonProxy aut)
   {
     if (isCounterExampleEnabled()) {
       final TRAbstractionStep pred = mCurrentAutomataMap.remove(aut);
       final ListBufferTransitionRelation rel = aut.getTransitionRelation();
       final int init = rel.getFirstInitialState();
       final TRAbstractionStep step = new TRAbstractionStepDrop(pred, init);
-      mAbstractionSequence.add(step);
+      addAbstractionStep(step);
     }
+  }
+
+  protected void addAbstractionStep(final TRAbstractionStep step,
+                                    final TRAutomatonProxy outputAut)
+  {
+    addAbstractionStep(step);
+    mCurrentAutomataMap.put(outputAut, step);
+  }
+
+  protected void addAbstractionStep(final TRAbstractionStep step)
+  {
+    mAbstractionSequence.add(step);
   }
 
 
@@ -1137,7 +1089,7 @@ public abstract class AbstractTRCompositionalVerifier
 
 
   //#########################################################################
-  //# Statistics
+  //# Statistics and Logging
   void countSpecialEvents(final EventEncoding enc)
   {
     final CompositionalAnalysisResult stats = getAnalysisResult();
@@ -1169,6 +1121,22 @@ public abstract class AbstractTRCompositionalVerifier
   {
     final CompositionalAnalysisResult result = getAnalysisResult();
     result.addUnsuccessfulComposition();
+  }
+
+  void recordMonolithicAttempt(final List<TRAutomatonProxy> automata)
+  {
+    final Logger logger = getLogger();
+    if (logger.isDebugEnabled()) {
+      double estimate = 1.0;
+      for (final TRAutomatonProxy tr : automata) {
+        final ListBufferTransitionRelation rel = tr.getTransitionRelation();
+        estimate *= rel.getNumberOfReachableStates();
+      }
+      final String msg = String.format("Monolithically composing %d automata, " +
+                                       "estimated %.0f states.",
+                                       automata.size(), estimate);
+      logger.debug(msg);
+    }
   }
 
 

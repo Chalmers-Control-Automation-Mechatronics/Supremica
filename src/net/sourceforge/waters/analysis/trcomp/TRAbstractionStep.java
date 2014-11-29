@@ -13,6 +13,7 @@ import java.util.Collection;
 
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.base.ProxyTools;
 
 
 /**
@@ -32,13 +33,15 @@ abstract class TRAbstractionStep
 
   //#########################################################################
   //# Constructors
-  TRAbstractionStep()
+  TRAbstractionStep(final String name)
   {
-    this (null);
+    mName = name;
+    mOutputAutomaton = null;
   }
 
   TRAbstractionStep(final TRAutomatonProxy outputAut)
   {
+    mName = outputAut.getName();
     mOutputAutomaton = outputAut;
   }
 
@@ -56,6 +59,11 @@ abstract class TRAbstractionStep
 
   //#########################################################################
   //# Access Methods
+  String getName()
+  {
+    return mName;
+  }
+
   TRAutomatonProxy getOutputAutomaton(final int preferredConfig)
     throws AnalysisException
   {
@@ -92,7 +100,17 @@ abstract class TRAbstractionStep
 
 
   //#########################################################################
+  //# Debugging
+  @Override
+  public String toString()
+  {
+    return ProxyTools.getShortClassName(this) + " " + getName();
+  }
+
+
+  //#########################################################################
   //# Data Members
+  private final String mName;
   private TRAutomatonProxy mOutputAutomaton;
   private TRAbstractionStep mSuccessor;
 

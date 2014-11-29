@@ -357,7 +357,9 @@ public abstract class TRTraceProxy
       assert step != null;
       final int[] states = mTraceData.get(step);
       final int s = states[mIndex];
-      if (isInputAutomaton(aut, step)) {
+      if (s < 0) {
+        return null;
+      } else if (isInputAutomaton(aut, step)) {
         final TRAbstractionStepInput inputStep = (TRAbstractionStepInput) step;
         final StateEncoding enc = inputStep.getStateEncoding();
         assert enc.getState(s) != null;
@@ -445,7 +447,9 @@ public abstract class TRTraceProxy
       final TRAbstractionStep step = innerEntry.getValue();
       final int[] states = mTraceData.get(step);
       final int s = states[mIndex];
-      if (isInputAutomaton(aut, step)) {
+      if (s < 0) {
+        return new AbstractMap.SimpleEntry<>(aut, null);
+      } else if (isInputAutomaton(aut, step)) {
         final TRAbstractionStepInput inputStep = (TRAbstractionStepInput) step;
         final StateEncoding enc = inputStep.getStateEncoding();
         final StateProxy state = enc.getState(s);
@@ -483,7 +487,5 @@ public abstract class TRTraceProxy
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 6433743484084272294L;
-
-
 
 }
