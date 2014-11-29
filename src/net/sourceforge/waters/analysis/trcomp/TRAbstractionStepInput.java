@@ -19,6 +19,8 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * An abstraction step representing an input automaton.
@@ -100,6 +102,17 @@ class TRAbstractionStepInput
   public int compareTo(final TRAbstractionStepInput step)
   {
     return mInputAutomaton.compareTo(step.mInputAutomaton);
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  @Override
+  public void report(final Logger logger)
+  {
+    if (logger.isDebugEnabled()) {
+      logger.debug("Linking to input automaton " + getName() + " ...");
+    }
   }
 
 

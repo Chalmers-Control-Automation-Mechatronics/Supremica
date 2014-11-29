@@ -9,6 +9,9 @@
 
 package net.sourceforge.waters.analysis.trcomp;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.util.AbstractList;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
@@ -35,6 +38,7 @@ import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.plain.base.DocumentElement;
 import net.sourceforge.waters.plain.base.Element;
+import net.sourceforge.waters.plain.base.NamedElement;
 
 
 /**
@@ -42,7 +46,7 @@ import net.sourceforge.waters.plain.base.Element;
  */
 
 public abstract class TRTraceProxy
-  extends DocumentElement
+  extends NamedElement
   implements TraceProxy
 {
 
@@ -60,7 +64,9 @@ public abstract class TRTraceProxy
                final String comment,
                final ProductDESProxy des)
   {
-    super(name, comment, null);
+    super(name);
+    mComment = comment;
+    mLocation = null;
     mProductDES = des;
     mEvents = new EventProxy[0];
     mTraceData = new HashMap<>();
@@ -75,6 +81,8 @@ public abstract class TRTraceProxy
   TRTraceProxy(final TRTraceProxy trace)
   {
     super(trace);
+    mComment = trace.getComment();
+    mLocation = null;
     mProductDES = trace.mProductDES;
     mEvents = Arrays.copyOf(trace.mEvents, trace.mEvents.length);
     mTraceData = new HashMap<>(trace.mTraceData.size());
@@ -90,15 +98,61 @@ public abstract class TRTraceProxy
 
   //#########################################################################
   //# Simple Access
+  void setComment(final String comment)
+  {
+    mComment = comment;
+  }
+
   int getNumberOfSteps()
   {
     return mEvents.length + 1;
+  }
+
+  StateProxy getState(final AutomatonProxy aut, final int index)
+  {
+    final TRAbstractionStep step = mAutomataMap.get(aut);
+    final int s = getState(step, index);
+    if (s < 0) {
+      return null;
+    } else {
+      final TRAbstractionStepInput inputStep = (TRAbstractionStepInput) step;
+      final StateEncoding enc = inputStep.getStateEncoding();
+      assert enc.getState(s) != null;
+      return enc.getState(s);
+    }
   }
 
   int getState(final TRAbstractionStep step, final int index)
   {
     final int[] states = mTraceData.get(step);
     return states[index];
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.base.DocumentProxy
+  @Override
+  public String getComment()
+  {
+    return mComment;
+  }
+
+  @Override
+  public URI getLocation()
+  {
+    return mLocation;
+  }
+
+  @Override
+  public File getFileLocation() throws MalformedURLException
+  {
+    return DocumentElement.getFileLocation(mLocation);
+  }
+
+  @Override
+  public void setLocation(final URI location)
+  {
+    mLocation = location;
   }
 
 
@@ -478,6 +532,8 @@ public abstract class TRTraceProxy
 
   //#########################################################################
   //# Data Members
+  private URI mLocation;
+  private String mComment;
   private final ProductDESProxy mProductDES;
   private EventProxy[] mEvents;
   private Map<TRAbstractionStep,int[]> mTraceData;

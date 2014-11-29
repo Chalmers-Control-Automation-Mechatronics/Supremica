@@ -31,6 +31,8 @@ import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.des.EventProxy;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * An abstraction step representing a partitioning abstraction step.
@@ -140,6 +142,17 @@ class TRAbstractionStepPartition
     trace.addStutteringSteps(newEvents, nonStutterEvents);
     final int[] statesArray = states.toArray();
     trace.addAutomaton(mPredecessor, statesArray);
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  @Override
+  public void report(final Logger logger)
+  {
+    if (logger.isDebugEnabled()) {
+      logger.debug("Expanding partition of " + getName() + " ...");
+    }
   }
 
 

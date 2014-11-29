@@ -19,6 +19,8 @@ import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * An abstraction step representing a trivial or nonblocking automaton
@@ -105,6 +107,17 @@ class TRAbstractionStepDrop
     final int[] states = new int[numSteps];
     Arrays.fill(states, mInitialState);
     trace.addAutomaton(mPredecessor, states);
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  @Override
+  public void report(final Logger logger)
+  {
+    if (logger.isDebugEnabled()) {
+      logger.debug("Introducing dropped automaton " + getName() + " ...");
+    }
   }
 
 

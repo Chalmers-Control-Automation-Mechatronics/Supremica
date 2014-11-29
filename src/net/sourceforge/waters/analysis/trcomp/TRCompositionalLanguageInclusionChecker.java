@@ -307,6 +307,17 @@ public class TRCompositionalLanguageInclusionChecker
   }
 
   @Override
+  protected TRTraceProxy computeCounterExample() throws AnalysisException
+  {
+    final TRTraceProxy trace = super.computeCounterExample();
+    if (trace != null) {
+      final TRSafetyTraceProxy safetyTrace = (TRSafetyTraceProxy) trace;
+      safetyTrace.provideComment(mDiagnostics);
+    }
+    return trace;
+  }
+
+  @Override
   protected TRSafetyTraceProxy createEmptyTrace(final ProductDESProxy des)
   {
     return new TRSafetyTraceProxy(des, mDiagnostics);

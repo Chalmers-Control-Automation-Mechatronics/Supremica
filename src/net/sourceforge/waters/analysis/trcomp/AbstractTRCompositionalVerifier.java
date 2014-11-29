@@ -924,7 +924,7 @@ public abstract class AbstractTRCompositionalVerifier
     return preds;
   }
 
-  protected void computeCounterExample() throws AnalysisException
+  protected TRTraceProxy computeCounterExample() throws AnalysisException
   {
     final VerificationResult result = getAnalysisResult();
     if (!result.isSatisfied() && isCounterExampleEnabled()) {
@@ -938,6 +938,7 @@ public abstract class AbstractTRCompositionalVerifier
         mAbstractionSequence.listIterator(end);
       while (iter.hasPrevious()) {
         final TRAbstractionStep step = iter.previous();
+        step.report(logger);
         step.expandTrace(trace);
         if (mTraceCheckingEnabled) {
           checkIntermediateCounterExample(trace);
@@ -946,6 +947,9 @@ public abstract class AbstractTRCompositionalVerifier
         iter.remove();
       }
       result.setCounterExample(trace);
+      return trace;
+    } else {
+      return null;
     }
   }
 

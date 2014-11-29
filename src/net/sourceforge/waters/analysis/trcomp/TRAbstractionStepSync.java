@@ -27,6 +27,8 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * An abstraction step representing synchronous composition.
@@ -68,6 +70,18 @@ class TRAbstractionStepSync
   EventEncoding getEventEncoding()
   {
     return mEventEncoding;
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  @Override
+  public void report(final Logger logger)
+  {
+    if (logger.isDebugEnabled()) {
+      logger.debug("Expanding synchronous composition of " +
+                   getName() + " ...");
+    }
   }
 
 

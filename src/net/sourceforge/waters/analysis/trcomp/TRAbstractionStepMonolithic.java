@@ -24,6 +24,8 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * An abstraction step representing a subsystem that has failed monolithic
@@ -116,6 +118,15 @@ class TRAbstractionStepMonolithic
       }
       trace.addAutomaton(pred, states);
     }
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  @Override
+  public void report(final Logger logger)
+  {
+    logger.debug("Converting monolithic trace ...");
   }
 
 
