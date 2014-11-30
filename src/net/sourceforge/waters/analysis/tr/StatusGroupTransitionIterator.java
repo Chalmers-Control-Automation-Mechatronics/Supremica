@@ -12,7 +12,6 @@ package net.sourceforge.waters.analysis.tr;
 import gnu.trove.list.array.TIntArrayList;
 
 
-
 /**
  * <P>A {@link TransitionIterator} that can iterate over groups of events
  * determined by their status.</P>
@@ -28,6 +27,10 @@ import gnu.trove.list.array.TIntArrayList;
  * cannot be changed after creation of the iterator. The changing of start
  * states and other functionality is supported through the encapsulated
  * iterator, however caching is not supported.</P>
+ *
+ * <P>The iterator does not require a particular order of the events in
+ * the transition relation, however the best performance is achieved if
+ * the events to be iterated over have consecutive numbers.</P>
  *
  * @author Robi Malik
  */
