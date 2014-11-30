@@ -608,54 +608,30 @@ public class SynthesisObservationEquivalenceTRSimplifier
 
     private void splitOn()
     {
-      final ListBufferTransitionRelation rel = getTransitionRelation();
       mIsOpenSplitter = false;
       collect(mTempClass);
 
-      final byte mask =
-        EventStatus.STATUS_LOCAL | EventStatus.STATUS_CONTROLLABLE |
-        EventStatus.STATUS_UNUSED;
-      final byte patternSharedUncontrollable = 0;
-      final byte patternSharedControllable = EventStatus.STATUS_CONTROLLABLE;
-      final byte patternLocalControllable =
-        EventStatus.STATUS_LOCAL | EventStatus.STATUS_CONTROLLABLE;
+      final ListBufferTransitionRelation rel = getTransitionRelation();
       final int numEvents = rel.getNumberOfProperEvents();
-
-      // Uncontrollable shared events
-      for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+      for (int e = EventEncoding.TAU; e < numEvents; e++) {
         final byte status = rel.getProperEventStatus(e);
-        if ((status & mask) == patternSharedUncontrollable) {
+        if (!EventStatus.isUsedEvent(status)) {
+          // skip unused events
+        } else if (e == EventEncoding.TAU) {
+          // special treatment for omega
+          splitOnControllable(e);
+        } else if (EventStatus.isControllableEvent(status)) {
+          // local or shared controllable
+          splitOnControllable(e);
+        } else if (!EventStatus.isLocalEvent(status)) {
+          // shared uncontrollable
           mUncontrollableEventIterator.resetEvent(e);
           splitOn(mUncontrollableEventIterator);
         }
       }
-
-      // Uncontrollable local events
-      final TransitionIterator transIter = mUncontrollableTauIterator;
-      transIter.reset();
-      splitOn(transIter);
-
-      // Controllable shared events
-      for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
-        final byte status = rel.getProperEventStatus(e);
-        if ((status & mask) == patternSharedControllable) {
-          splitOnControllable(e);
-        }
-      }
-      // ... including omega
-      if ((rel.getProperEventStatus(EventEncoding.TAU) &
-           EventStatus.STATUS_UNUSED) == 0) {
-        splitOnControllable(EventEncoding.TAU);
-      }
-
-      // Controllable local events
-      // TODO What if there are none?
-      for (int e = EventEncoding.TAU; e < numEvents; e++) {
-        final byte status = rel.getProperEventStatus(e);
-        if ((status & mask) == patternLocalControllable) {
-          splitOnControllable(e);
-        }
-      }
+      // Finally, all local uncontrollable events together
+      mUncontrollableTauIterator.reset();
+      splitOn(mUncontrollableTauIterator);
 
       mTempClass.clear();
       if (mWeak) {
