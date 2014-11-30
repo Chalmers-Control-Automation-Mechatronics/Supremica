@@ -130,12 +130,6 @@ public class DefaultEventStatusProvider
     return mUsedPropositions;
   }
 
-  @Override
-  public OrderingInfo getOrderingInfo()
-  {
-    return null;
-  }
-
 
   //#########################################################################
   //# Data Members

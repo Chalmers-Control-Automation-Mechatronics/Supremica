@@ -313,9 +313,9 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
     boolean hasAdded = false;
     final BitSet oldBadStates = (BitSet) mBadStates.clone();
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    final TransitionIterator iter = rel.createPredecessorsReadOnlyIterator();
-    iter.resetEventsByStatus(EventStatus.STATUS_LOCAL,
-                             ~EventStatus.STATUS_CONTROLLABLE);
+    final TransitionIterator iter =
+      rel.createPredecessorsReadOnlyIteratorByStatus
+        (EventStatus.STATUS_LOCAL, ~EventStatus.STATUS_CONTROLLABLE);
     final TIntStack unvisited = new TIntArrayStack();
     for (int state = oldBadStates.nextSetBit(0); state >= 0;
          state = oldBadStates.nextSetBit(state + 1)) {

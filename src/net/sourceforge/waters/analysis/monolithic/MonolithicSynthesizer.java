@@ -33,7 +33,6 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntArrayHashingStrategy;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-import net.sourceforge.waters.analysis.tr.OrderingInfo;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.analysis.tr.WatersHashSet;
@@ -399,11 +398,17 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     final int[] sizes = StateTupleEncoding.getAutomataSizes(mAutomata);
     mSTEncoding = new StateTupleEncoding(sizes);
 
-    final OrderingInfo info = mEventEncoding.getOrderingInfo();
-    final int lastUncontrollable =
-      info.getLastEventIndex(~EventStatus.STATUS_CONTROLLABLE);
-    final int firstControllable =
-      info.getFirstEventIndex(EventStatus.STATUS_CONTROLLABLE);
+    // We have sorted the events so all uncontrollables come first.
+    final int numEvents = mEventEncoding.getNumberOfProperEvents();
+    int firstControllable = numEvents;
+    for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+      final byte status = mEventEncoding.getProperEventStatus(e);
+      if (EventStatus.isControllableEvent(status)) {
+        firstControllable = e;
+        break;
+      }
+    }
+    final int lastUncontrollable = firstControllable - 1;
     mCtrlInitialReachabilityExplorer =
       new CtrlInitialReachabilityExplorer(eventAutomata, transitions,
                                           ndTuple1, firstControllable,

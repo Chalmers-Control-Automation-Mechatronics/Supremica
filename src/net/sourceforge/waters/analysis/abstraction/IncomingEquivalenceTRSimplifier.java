@@ -1139,12 +1139,6 @@ public class IncomingEquivalenceTRSimplifier
     }
 
     @Override
-    public void resetEventsByStatus(final int... flags)
-    {
-      throwNonTauException();
-    }
-
-    @Override
     public void resetState(final int from)
     {
       resetState(mStateInfo[from]);
@@ -1373,13 +1367,6 @@ public class IncomingEquivalenceTRSimplifier
     {
       resetClassReadIteration();
       mTransitionIterator.resetEvents(first, last);
-    }
-
-    @Override
-    public void resetEventsByStatus(final int... flags)
-    {
-      resetClassReadIteration();
-      mTransitionIterator.resetEventsByStatus(flags);
     }
 
     @Override
@@ -1614,13 +1601,6 @@ public class IncomingEquivalenceTRSimplifier
     }
 
     @Override
-    public void resetEventsByStatus(final int... flags)
-    {
-      mEventIterator.resetEventsByStatus(flags);
-      reset();
-    }
-
-    @Override
     public void resetState(final int from)
     {
       resetState(mStateInfo[from]);
@@ -1799,13 +1779,6 @@ public class IncomingEquivalenceTRSimplifier
     public void resetEvents(final int first, final int last)
     {
       mEventIterator.resetEvents(first, last);
-      reset();
-    }
-
-    @Override
-    public void resetEventsByStatus(final int... flags)
-    {
-      mEventIterator.resetEventsByStatus(flags);
       reset();
     }
 

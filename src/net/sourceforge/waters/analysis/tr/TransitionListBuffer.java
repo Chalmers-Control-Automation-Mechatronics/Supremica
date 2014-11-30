@@ -768,15 +768,17 @@ public abstract class TransitionListBuffer
    * flags. The iterator returned is not initialised, so the method
    * {@link TransitionIterator#resetState(int)} needs to be called
    * to start iterating from a state.
-   * @param  flags  Event status flags to specify the type of events,
-   *                as passed to the {@link
-   *                OrderingInfo#getFirstEventIndex(int...)
-   *                OrderingInfo.getFirstEventIndex()} method.
+   * @param flags
+   *          Event status flags to specify the type of events,
+   *          as passed to the
+   *          {@link StatusGroupTransitionIterator#StatusGroupTransitionIterator(TransitionIterator, EventStatusProvider, int...)
+   *          StatusGroupTransitionIterator} constructor.
+   * @see StatusGroupTransitionIterator
    */
   public TransitionIterator createReadOnlyIteratorByStatus(final int...flags)
   {
     final TransitionIterator inner = new ReadOnlyIterator();
-    return createTransitionIteratorByStatus(inner, flags);
+    return new StatusGroupTransitionIterator(inner, mEventStatus, flags);
   }
 
   /**
@@ -823,15 +825,17 @@ public abstract class TransitionListBuffer
    * flags. The iterator returned is not initialised, so the method
    * {@link TransitionIterator#resetState(int)} needs to be called
    * to start iterating from a state.
-   * @param  flags  Event status flags to specify the type of events,
-   *                as passed to the {@link
-   *                OrderingInfo#getFirstEventIndex(int...)
-   *                OrderingInfo.getFirstEventIndex()} method.
+   * @param flags
+   *          Event status flags to specify the type of events,
+   *          as passed to the
+   *          {@link StatusGroupTransitionIterator#StatusGroupTransitionIterator(TransitionIterator, EventStatusProvider, int...)
+   *          StatusGroupTransitionIterator} constructor.
+   * @see StatusGroupTransitionIterator
    */
   public TransitionIterator createModifyingIteratorByStatus(final int...flags)
   {
     final TransitionIterator inner = new ModifyingIterator();
-    return createTransitionIteratorByStatus(inner, flags);
+    return new StatusGroupTransitionIterator(inner, mEventStatus, flags);
   }
 
   /**
@@ -875,16 +879,18 @@ public abstract class TransitionListBuffer
    * or {@link TransitionIterator#reset(int,int)}, and
    * being a read-only iterator, it also does not implement the
    * {@link TransitionIterator#remove()} method.
-   * @param  flags  Event status flags to specify the type of events,
-   *                as passed to the {@link
-   *                OrderingInfo#getFirstEventIndex(int...)
-   *                OrderingInfo.getFirstEventIndex()} method.
+   * @param flags
+   *          Event status flags to specify the type of events,
+   *          as passed to the
+   *          {@link StatusGroupTransitionIterator#StatusGroupTransitionIterator(TransitionIterator, EventStatusProvider, int...)
+   *          StatusGroupTransitionIterator} constructor.
+   * @see StatusGroupTransitionIterator
    */
   public TransitionIterator createAllTransitionsReadOnlyIteratorByStatus
     (final int...flags)
   {
     final TransitionIterator inner = createAllTransitionsReadOnlyIterator();
-    return createTransitionIteratorByStatus(inner, flags);
+    return new StatusGroupTransitionIterator(inner, mEventStatus, flags);
   }
 
   /**
@@ -922,16 +928,18 @@ public abstract class TransitionListBuffer
    * this buffer after calling {@link TransitionIterator#advance()}. It does
    * not implement the methods {@link TransitionIterator#resetState(int)}
    * or {@link TransitionIterator#reset(int,int)}.
-   * @param  flags  Event status flags to specify the type of events,
-   *                as passed to the {@link
-   *                OrderingInfo#getFirstEventIndex(int...)
-   *                OrderingInfo.getFirstEventIndex()} method.
+   * @param flags
+   *          Event status flags to specify the type of events,
+   *          as passed to the
+   *          {@link StatusGroupTransitionIterator#StatusGroupTransitionIterator(TransitionIterator, EventStatusProvider, int...)
+   *          StatusGroupTransitionIterator} constructor.
+   * @see StatusGroupTransitionIterator
    */
   public TransitionIterator createAllTransitionsModifyingIteratorByStatus
     (final int...flags)
   {
     final TransitionIterator inner = createAllTransitionsModifyingIterator();
-    return createTransitionIteratorByStatus(inner, flags);
+    return new StatusGroupTransitionIterator(inner, mEventStatus, flags);
   }
 
   /**
@@ -1487,25 +1495,6 @@ public abstract class TransitionListBuffer
 
 
   //#########################################################################
-  //# Iterator Creation
-  private TransitionIterator createTransitionIteratorByStatus
-    (final TransitionIterator iter,
-     final int... flags)
-  {
-    final OrderingInfo info = mEventStatus.getOrderingInfo();
-    if (info == null) {
-      throw new IllegalStateException
-        ("Iteration by event status requested for unordered event encoding!");
-    } else if (info.isSupportedOrdering(flags)) {
-      iter.resetEventsByStatus(flags);
-      return iter;
-    } else {
-      return new StatusGroupTransitionIterator(iter, info, flags);
-    }
-  }
-
-
-  //#########################################################################
   //# Debugging
   @Override
   public String toString()
@@ -1595,19 +1584,6 @@ public abstract class TransitionListBuffer
       final int numEvents = mEventStatus.getNumberOfProperEvents();
       mLastEvent = last >= numEvents ? numEvents - 1 : last;
       reset();
-    }
-
-    @Override
-    public void resetEventsByStatus(final int... flags)
-    {
-      final OrderingInfo info = mEventStatus.getOrderingInfo();
-      if (info == null) {
-        throw new IllegalStateException
-          ("Iteration by event status requested for unordered event encoding!");
-      }
-      final int first = info.getFirstEventIndex(flags);
-      final int last = info.getLastEventIndex(flags);
-      resetEvents(first, last);
     }
 
     @Override
@@ -1860,19 +1836,6 @@ public abstract class TransitionListBuffer
       mInnerIterator.resetState(-1);
       mInnerIterator.resetEvents(first, last);
       reset();
-    }
-
-    @Override
-    public void resetEventsByStatus(final int... flags)
-    {
-      final OrderingInfo info = mEventStatus.getOrderingInfo();
-      if (info == null) {
-        throw new IllegalStateException
-          ("Iteration by event status requested for unordered event encoding!");
-      }
-      final int first = info.getFirstEventIndex(flags);
-      final int last = info.getLastEventIndex(flags);
-      resetEvents(first, last);
     }
 
     @Override

@@ -102,16 +102,6 @@ public interface EventStatusProvider
    */
   public int getUsedPropositions();
 
-  /**
-   * Gets the current ordering information for this event encoding.
-   * If the event encoding has been ordered, the ordering information
-   * can be used to iterate over events more efficiently.
-   * @return Ordering information if available,
-   *         <CODE>null</CODE> otherwise.
-   * @see EventEncoding#sortProperEvents(byte...) EventEncoding.sortProperEvents()
-   */
-  public OrderingInfo getOrderingInfo();
-
 
   //#########################################################################
   //# Class Constants

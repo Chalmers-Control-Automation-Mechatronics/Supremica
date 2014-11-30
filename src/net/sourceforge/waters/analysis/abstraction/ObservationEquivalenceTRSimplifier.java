@@ -635,13 +635,13 @@ public class ObservationEquivalenceTRSimplifier
         final int config = rel.getConfiguration();
         if ((config & ListBufferTransitionRelation.CONFIG_PREDECESSORS) != 0) {
           if (mUsingLocalEvents) {
-            mTauClosure = rel.createPredecessorsTauClosureByStatus(limit, EventStatus.STATUS_LOCAL);
+            mTauClosure = rel.createPredecessorsClosure(limit, EventStatus.STATUS_LOCAL);
           } else {
             mTauClosure = rel.createPredecessorsTauClosure(limit);
           }
         } else {
           if (mUsingLocalEvents) {
-            mTauClosure = rel.createSuccessorsTauClosureByStatus(limit, EventStatus.STATUS_LOCAL);
+            mTauClosure = rel.createSuccessorsClosure(limit, EventStatus.STATUS_LOCAL);
           } else {
             mTauClosure = rel.createSuccessorsTauClosure(limit);
           }

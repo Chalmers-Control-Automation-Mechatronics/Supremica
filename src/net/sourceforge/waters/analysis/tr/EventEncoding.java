@@ -324,7 +324,6 @@ public class EventEncoding
     mProperEventStatus = new TByteArrayList(enc.mProperEventStatus);
     mUsedPropositions = enc.mUsedPropositions;
     mEventCodeMap = new TObjectIntHashMap<>(enc.mEventCodeMap);
-    mOrderingInfo = enc.getOrderingInfo();
   }
 
 
@@ -523,20 +522,6 @@ public class EventEncoding
   public Set<EventProxy> getUsedEvents()
   {
     return new UsedEventList();
-  }
-
-  /**
-   * Gets the current ordering information for this event encoding.
-   * If the event encoding has been ordered, the ordering information
-   * can be used to iterate over events more efficiently.
-   * @return Ordering information if available,
-   *         <CODE>null</CODE> otherwise.
-   * @see #sortProperEvents(byte...) sortProperEvents()
-   */
-  @Override
-  public OrderingInfo getOrderingInfo()
-  {
-    return mOrderingInfo;
   }
 
 
@@ -770,10 +755,12 @@ public class EventEncoding
    * Reorders the proper events in this encoding based on their status.
    * @param  flags  List of flags to define the ordering, represented by
    *                a sequence of the bits or bit combinations
-   *                {@link EventStatus#STATUS_CONTROLLABLE}, {@link EventStatus#STATUS_LOCAL},
+   *                {@link EventStatus#STATUS_CONTROLLABLE},
+   *                {@link EventStatus#STATUS_LOCAL},
    *                {@link EventStatus#STATUS_ALWAYS_ENABLED},
    *                {@link EventStatus#STATUS_SELFLOOP_ONLY},
-   *                {@link EventStatus#STATUS_BLOCKED}, {@link EventStatus#STATUS_FAILING}, and
+   *                {@link EventStatus#STATUS_BLOCKED},
+   *                {@link EventStatus#STATUS_FAILING}, and
    *                {@link EventStatus#STATUS_UNUSED} or their complements.<BR>
    *                For example, to sort events by controllability first
    *                and second by locality, two arguments STATUS_CONTROLLABLE
@@ -782,14 +769,11 @@ public class EventEncoding
    *                controllable events. To consider controllable events as
    *                "smaller", ~STATUS_CONTROLLABLE is used as the first
    *                argument.
-   * @return Ordering information that can be used to iterate over events
-   *         of a certain type based on the new ordering.
    */
-  public OrderingInfo sortProperEvents(final byte... flags)
+  public void sortProperEvents(final int... flags)
   {
     final EventOrdering ordering = new EventOrdering(flags);
     ordering.sortProperEvents();
-    return mOrderingInfo = new OrderingInfo(mProperEventStatus, flags);
   }
 
 
@@ -912,14 +896,14 @@ public class EventEncoding
   {
     //#######################################################################
     //# Constructor
-    private EventOrdering(final byte... flags)
+    private EventOrdering(final int[] flags)
     {
       mMasks = new byte[flags.length];
       mReverse = new boolean[flags.length];
       for (int i = 0; i < flags.length; i++) {
-        final byte flag = flags[i];
+        final int flag = flags[i];
         if ((flag & ~EventStatus.STATUS_ALL) == 0) {
-          mMasks[i] = flag;
+          mMasks[i] = (byte) flag;
         } else {
           mMasks[i] = (byte) ~flag;
           mReverse[i] = true;
@@ -1012,7 +996,6 @@ public class EventEncoding
   private final TObjectIntHashMap<EventProxy> mEventCodeMap;
   private final TByteArrayList mProperEventStatus;
   private int mUsedPropositions;
-  private OrderingInfo mOrderingInfo;
 
 
   //#########################################################################

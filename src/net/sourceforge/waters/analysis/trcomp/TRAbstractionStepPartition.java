@@ -25,6 +25,7 @@ import net.sourceforge.waters.analysis.tr.BFSSearchSpace;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.StatusGroupTransitionIterator;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -214,26 +215,6 @@ class TRAbstractionStepPartition
       } else {
         mHasDeadlockState = false;
       }
-      final int numTREvents = mEventEncoding.getNumberOfProperEvents();
-      mLocalEventRanges = new TIntArrayList(numTREvents);
-      int i = -1;
-      for (int e = EventEncoding.TAU; e < numTREvents; e++) {
-        final byte status = mEventEncoding.getProperEventStatus(e);
-        if (!EventStatus.isUsedEvent(status)) {
-          // skip unused event
-        } else if (!EventStatus.isLocalEvent(status)) {
-          // shared event cancels range
-          i = -1;
-        } else if (i < 0) {
-          // local event starts new range
-          mLocalEventRanges.add(e);
-          mLocalEventRanges.add(e);
-          i = mLocalEventRanges.size() - 1;
-        } else {
-          // local event added to existing range
-          mLocalEventRanges.set(i, e);
-        }
-      }
       mSearchSpace = new BFSSearchSpace<>(rel.getNumberOfStates());
       mStartOfNextLevel = mNonDeadlockTarget = null;
     }
@@ -251,8 +232,12 @@ class TRAbstractionStepPartition
           }
         }
       }
-      final TransitionIterator iter =
+      final TransitionIterator iterEvent =
         mInputTransitionRelation.createSuccessorsReadOnlyIterator();
+      final TransitionIterator inner =
+        mInputTransitionRelation.createSuccessorsReadOnlyIterator();
+      final TransitionIterator iterLocal = new StatusGroupTransitionIterator
+        (inner, mEventEncoding, EventStatus.STATUS_LOCAL);
       while (!mSearchSpace.isEmpty()) {
         final SearchRecord current = mSearchSpace.poll();
         if (current == mStartOfNextLevel) {
@@ -262,30 +247,25 @@ class TRAbstractionStepPartition
           mStartOfNextLevel = null;
         }
         final int s = current.getState();
-        iter.resetState(s);
         final int depth = current.getNumberOfConsumedEvents();
         if (depth < mEventSequence.size()) {
           final int e = mEventSequence.get(depth);
-          iter.resetEvent(e);
-          while (iter.advance()) {
-            final int t = iter.getCurrentTargetState();
+          iterEvent.reset(s, e);
+          while (iterEvent.advance()) {
+            final int t = iterEvent.getCurrentTargetState();
             final SearchRecord next = new SearchRecord(t, current, e, false);
             if (processSearchRecord(next)) {
               return next;
             }
           }
         }
-        for (int i = 0; i < mLocalEventRanges.size(); i += 2) {
-          final int first = mLocalEventRanges.get(i);
-          final int last = mLocalEventRanges.get(i + 1);
-          iter.resetEvents(first, last);
-          while (iter.advance()) {
-            final int l = iter.getCurrentEvent();
-            final int t = iter.getCurrentTargetState();
-            final SearchRecord next = new SearchRecord(t, current, l, true);
-            if (processSearchRecord(next)) {
-              return next;
-            }
+        iterLocal.resetState(s);
+        while (iterLocal.advance()) {
+          final int l = iterLocal.getCurrentEvent();
+          final int t = iterLocal.getCurrentTargetState();
+          final SearchRecord next = new SearchRecord(t, current, l, true);
+          if (processSearchRecord(next)) {
+            return next;
           }
         }
       }
@@ -402,7 +382,6 @@ class TRAbstractionStepPartition
     private final int mTargetState;
     private final TIntHashSet mTargetStateClass;
     private boolean mHasDeadlockState;
-    private final TIntArrayList mLocalEventRanges;
     private final BFSSearchSpace<SearchRecord> mSearchSpace;
     private SearchRecord mStartOfNextLevel;
     private SearchRecord mNonDeadlockTarget;

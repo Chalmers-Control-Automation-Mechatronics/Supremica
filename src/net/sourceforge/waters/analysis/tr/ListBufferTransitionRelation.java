@@ -531,12 +531,6 @@ public class ListBufferTransitionRelation
     return mEventStatus.getUsedPropositions();
   }
 
-  @Override
-  public OrderingInfo getOrderingInfo()
-  {
-    return mEventStatus.getOrderingInfo();
-  }
-
 
   //#########################################################################
   //# Simple Access
@@ -999,10 +993,12 @@ public class ListBufferTransitionRelation
    * the {@link TransitionIterator#resetState(int) resetState()} method.
    * Then it will produce all outgoing transitions from a given state
    * with events of the specified status.
-   * @param  flags  Event status flags to specify the type of events,
-   *                as passed to the {@link
-   *                OrderingInfo#getFirstEventIndex(int...)
-   *                OrderingInfo.getFirstEventIndex()} method.
+   * @param flags
+   *          Event status flags to specify the type of events,
+   *          as passed to the
+   *          {@link StatusGroupTransitionIterator#StatusGroupTransitionIterator(TransitionIterator, EventStatusProvider, int...)
+   *          StatusGroupTransitionIterator} constructor.
+   * @see StatusGroupTransitionIterator
    */
   public TransitionIterator createSuccessorsReadOnlyIteratorByStatus
     (final int...flags)
@@ -1081,10 +1077,12 @@ public class ListBufferTransitionRelation
    * the {@link TransitionIterator#resetState(int) resetState()} method.
    * Then it will produce all incoming transitions to a given state
    * with events of the specified status.
-   * @param  flags  Event status flags to specify the type of events,
-   *                as passed to the {@link
-   *                OrderingInfo#getFirstEventIndex(int...)
-   *                OrderingInfo.getFirstEventIndex()} method.
+   * @param flags
+   *          Event status flags to specify the type of events,
+   *          as passed to the
+   *          {@link StatusGroupTransitionIterator#StatusGroupTransitionIterator(TransitionIterator, EventStatusProvider, int...)
+   *          StatusGroupTransitionIterator} constructor.
+   * @see StatusGroupTransitionIterator
    */
   public TransitionIterator createPredecessorsReadOnlyIteratorByStatus
     (final int...flags)
@@ -1163,10 +1161,12 @@ public class ListBufferTransitionRelation
    * the {@link TransitionIterator#resetState(int) resetState()} method.
    * Then it will produce all outgoing or outgoing (whichever available)
    * transitions of a given state with events of the specified status.
-   * @param  flags  Event status flags to specify the type of events,
-   *                as passed to the {@link
-   *                OrderingInfo#getFirstEventIndex(int...)
-   *                OrderingInfo.getFirstEventIndex()} method.
+   * @param flags
+   *          Event status flags to specify the type of events,
+   *          as passed to the
+   *          {@link StatusGroupTransitionIterator#StatusGroupTransitionIterator(TransitionIterator, EventStatusProvider, int...)
+   *          StatusGroupTransitionIterator} constructor.
+   * @see StatusGroupTransitionIterator
    */
   public TransitionIterator createAnyReadOnlyIteratorByStatus
     (final int...flags)
@@ -1230,10 +1230,12 @@ public class ListBufferTransitionRelation
    * or {@link TransitionIterator#reset(int,int)}, and
    * being a read-only iterator, it also does not implement the
    * {@link TransitionIterator#remove()} method.
-   * @param  flags  Event status flags to specify the type of events,
-   *                as passed to the {@link
-   *                OrderingInfo#getFirstEventIndex(int...)
-   *                OrderingInfo.getFirstEventIndex()} method.
+   * @param flags
+   *          Event status flags to specify the type of events,
+   *          as passed to the
+   *          {@link StatusGroupTransitionIterator#StatusGroupTransitionIterator(TransitionIterator, EventStatusProvider, int...)
+   *          StatusGroupTransitionIterator} constructor.
+   * @see StatusGroupTransitionIterator
    */
   public TransitionIterator createAllTransitionsReadOnlyIteratorByStatus
     (final int...flags)
@@ -1277,10 +1279,12 @@ public class ListBufferTransitionRelation
    * <P><STRONG>Warning.</STRONG> The transition relation should be configured to
    * use only a predecessor buffer. If both buffers are configured, the
    * predecessor buffer will be closed!</P>
-   * @param  flags  Event status flags to specify the type of events,
-   *                as passed to the {@link
-   *                OrderingInfo#getFirstEventIndex(int...)
-   *                OrderingInfo.getFirstEventIndex()} method.
+   * @param flags
+   *          Event status flags to specify the type of events,
+   *          as passed to the
+   *          {@link StatusGroupTransitionIterator#StatusGroupTransitionIterator(TransitionIterator, EventStatusProvider, int...)
+   *          StatusGroupTransitionIterator} constructor.
+   * @see StatusGroupTransitionIterator
    */
   public TransitionIterator createSuccessorsModifyingIteratorByStatus
     (final int...flags)
@@ -1323,10 +1327,12 @@ public class ListBufferTransitionRelation
    * <P><STRONG>Warning.</STRONG> The transition relation should be configured to
    * use only a predecessor buffer. If both buffers are configured, the
    * successor buffer will be closed!</P>
-   * @param  flags  Event status flags to specify the type of events,
-   *                as passed to the {@link
-   *                OrderingInfo#getFirstEventIndex(int...)
-   *                OrderingInfo.getFirstEventIndex()} method.
+   * @param flags
+   *          Event status flags to specify the type of events,
+   *          as passed to the
+   *          {@link StatusGroupTransitionIterator#StatusGroupTransitionIterator(TransitionIterator, EventStatusProvider, int...)
+   *          StatusGroupTransitionIterator} constructor.
+   * @see StatusGroupTransitionIterator
    */
   public TransitionIterator createPredecessorsModifyingIteratorByStatus
     (final int...flags)
@@ -1394,17 +1400,19 @@ public class ListBufferTransitionRelation
   /**
    * <P>Creates a read/write iterator for this transition relation to iterate
    * over transitions associated with events with the given status flags.</P>
-   * <P>The iterator returned is set up to return the first transition in
-   * this buffer after calling {@link TransitionIterator#advance()}. It does
-   * not implement the methods {@link TransitionIterator#resetState(int)}
-   * or {@link TransitionIterator#reset(int,int)}.</P>
+   * <P>The iterator returned is set up to return the first transition in this
+   * buffer after calling {@link TransitionIterator#advance()}. It does not
+   * implement the methods {@link TransitionIterator#resetState(int)} or
+   * {@link TransitionIterator#reset(int,int)}.</P>
    * <P><STRONG>Warning.</STRONG> The transition relation should be configured to
    * use only one transition buffer. If both buffers are configured, the
    * predecessor buffer will be closed!</P>
-   * @param  flags  Event status flags to specify the type of events,
-   *                as passed to the {@link
-   *                OrderingInfo#getFirstEventIndex(int...)
-   *                OrderingInfo.getFirstEventIndex()} method.
+   * @param flags
+   *          Event status flags to specify the type of events,
+   *          as passed to the
+   *          {@link StatusGroupTransitionIterator#StatusGroupTransitionIterator(TransitionIterator, EventStatusProvider, int...)
+   *          StatusGroupTransitionIterator} constructor.
+   * @see StatusGroupTransitionIterator
    */
   public TransitionIterator createAllTransitionsModifyingIteratorByStatus
     (final int...flags)
@@ -1443,37 +1451,6 @@ public class ListBufferTransitionRelation
 
   /**
    * Obtains a local-event closure over successors of this transition
-   * relation.
-   * @param firstLocal
-   *          the event code of the first local event to be included in
-   *          the closure.
-   * @param lastLocal
-   *          the event code of the last local event (inclusive) to be
-   *          included in the closure.
-   * @param limit
-   *          The maximum number of transitions that can be stored. If the
-   *          number of transitions already in the transition relation plus
-   *          the number of computed tau transitions exceeds the limit,
-   *          precomputation is aborted and transitions will be produced on
-   *          the fly by iterators. A limit of&nbsp;0 forces the tau closure
-   *          always to be computed on the fly.
-   * @return A {@link TauClosure} object, which can be used to obtain a
-   *         {@link TransitionIterator} over the tau-closure of the
-   *         successor transition relation.
-   */
-  public TauClosure createSuccessorsTauClosure(final int firstLocal,
-                                               final int lastLocal,
-                                               final int limit)
-  {
-    if (mSuccessorBuffer != null) {
-      return new TauClosure(mSuccessorBuffer, firstLocal, lastLocal, limit);
-    } else {
-      throw createNoBufferException(CONFIG_SUCCESSORS);
-    }
-  }
-
-  /**
-   * Obtains a local-event closure over successors of this transition
    * relation with a specific event type.
    * @param limit
    *          The maximum number of transitions that can be stored. If the
@@ -1483,32 +1460,23 @@ public class ListBufferTransitionRelation
    *          the fly by iterators. It limit of&nbsp;0 forces the tau closure
    *          always to be computed on the fly.
    * @param flags
-   *          List of event status flags, represented by a sequence of the
-   *          bits or bit combinations
-   *          {@link EventStatus#STATUS_CONTROLLABLE},
-   *          {@link EventStatus#STATUS_LOCAL},
-   *          {@link EventStatus#STATUS_ALWAYS_ENABLED},
-   *          {@link EventStatus#STATUS_SELFLOOP_ONLY}, and
-   *          {@link EventStatus#STATUS_UNUSED} or their complements.<BR>
-   *          The flags must appear in the correct ordering, which must
-   *          match the ordering of the {@link EventEncoding}. If a flag
-   *          is complemented, the closure is restricted to events without
-   *          that property, otherwise to events with the property.
+   *          Status flags defining the events considered as local
+   *          (i.e., tau) by this tau-closure. The arguments are specified
+   *          in the same way as as passed to the {@link
+   *          StatusGroupTransitionIterator#StatusGroupTransitionIterator(TransitionIterator, EventStatusProvider, int...)
+   *          StatusGroupTransitionIterator} constructor.
    * @return A {@link TauClosure} object, which can be used to obtain a
    *         {@link TransitionIterator} over the tau-closure of the
    *         successor transition relation.
    */
-  public TauClosure createSuccessorsTauClosureByStatus(final int limit,
-                                                       final int... flags)
+  public TauClosure createSuccessorsClosure(final int limit,
+                                            final int... flags)
   {
-    final OrderingInfo info = mEventStatus.getOrderingInfo();
-    if (info == null) {
-      throw new IllegalStateException
-        ("Iteration by event status requested for unordered event encoding!");
+    if (mSuccessorBuffer != null) {
+      return new TauClosure(mSuccessorBuffer, flags, limit);
+    } else {
+      throw createNoBufferException(CONFIG_SUCCESSORS);
     }
-    final int first = info.getFirstEventIndex(flags);
-    final int last = info.getLastEventIndex(flags);
-    return createSuccessorsTauClosure(first, last, limit);
   }
 
   /**
@@ -1535,38 +1503,6 @@ public class ListBufferTransitionRelation
 
   /**
    * Obtains a local-event closure over predecessors of this transition
-   * relation.
-   * @param firstLocal
-   *          the event code of the first local event to be included in
-   *          the closure.
-   * @param lastLocal
-   *          the event code of the last local event (inclusive) to be
-   *          included in the closure.
-   * @param limit
-   *          The maximum number of transitions that can be stored. If the
-   *          number of transitions already in the transition relation plus
-   *          the number of computed tau transitions exceeds the limit,
-   *          precomputation is aborted and transitions will be produced on
-   *          the fly by iterators. It limit of&nbsp;0 forces the tau closure
-   *          always to be computed on the fly.
-   * @return A {@link TauClosure} object, which can be used to obtain a
-   *         {@link TransitionIterator} over the tau-closure of the
-   *         predecessor transition relation.
-   */
-  public TauClosure createPredecessorsTauClosure(final int firstLocal,
-                                                 final int lastLocal,
-                                                 final int limit)
-  {
-    if (mPredecessorBuffer != null) {
-      return new TauClosure(mPredecessorBuffer, firstLocal, lastLocal, limit);
-    } else {
-      throw createNoBufferException(CONFIG_PREDECESSORS);
-    }
-  }
-
-
-  /**
-   * Obtains a local-event closure over predecessors of this transition
    * relation with a specific event type.
    * @param limit
    *          The maximum number of transitions that can be stored. If the
@@ -1576,32 +1512,23 @@ public class ListBufferTransitionRelation
    *          the fly by iterators. It limit of&nbsp;0 forces the tau closure
    *          always to be computed on the fly.
    * @param flags
-   *          List of event status flags, represented by a sequence of the
-   *          bits or bit combinations
-   *          {@link EventStatus#STATUS_CONTROLLABLE},
-   *          {@link EventStatus#STATUS_LOCAL},
-   *          {@link EventStatus#STATUS_ALWAYS_ENABLED},
-   *          {@link EventStatus#STATUS_SELFLOOP_ONLY}, and
-   *          {@link EventStatus#STATUS_UNUSED} or their complements.<BR>
-   *          The flags must appear in the correct ordering, which must
-   *          match the ordering of the {@link EventEncoding}. If a flag
-   *          is complemented, the closure is restricted to events without
-   *          that property, otherwise to events with the property.
+   *          Status flags defining the events considered as local
+   *          (i.e., tau) by this tau-closure. The arguments are specified
+   *          in the same way as as passed to the {@link
+   *          StatusGroupTransitionIterator#StatusGroupTransitionIterator(TransitionIterator, EventStatusProvider, int...)
+   *          StatusGroupTransitionIterator} constructor.
    * @return A {@link TauClosure} object, which can be used to obtain a
    *         {@link TransitionIterator} over the tau-closure of the
    *         successor transition relation.
    */
-  public TauClosure createPredecessorsTauClosureByStatus(final int limit,
-                                                         final int... flags)
+  public TauClosure createPredecessorsClosure(final int limit,
+                                              final int... flags)
   {
-    final OrderingInfo info = mEventStatus.getOrderingInfo();
-    if (info == null) {
-      throw new IllegalStateException
-        ("Iteration by event status requested for unordered event encoding!");
+    if (mPredecessorBuffer != null) {
+      return new TauClosure(mPredecessorBuffer, flags, limit);
+    } else {
+      throw createNoBufferException(CONFIG_PREDECESSORS);
     }
-    final int first = info.getFirstEventIndex(flags);
-    final int last = info.getLastEventIndex(flags);
-    return createPredecessorsTauClosure(first, last, limit);
   }
 
   /**
@@ -2949,7 +2876,7 @@ public class ListBufferTransitionRelation
   /**
    * Checks whether the transition relation's event status provider
    * is the same object as the argument.
-   * @throws AssertionFailedError to indicate that the transition relation
+   * @throws AssertionError to indicate that the transition relation
    *         does not have the expected event status provider.
    */
   public void checkEventStatusProvider(final EventStatusProvider expected)

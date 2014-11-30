@@ -74,13 +74,6 @@ public class CachingTransitionIterator implements TransitionIterator
   }
 
   @Override
-  public void resetEventsByStatus(final int... flags)
-  {
-    mInnerIterator.resetEventsByStatus(flags);
-    reset();
-  }
-
-  @Override
   public void resetState(final int from)
   {
     mInnerIterator.resetState(from);

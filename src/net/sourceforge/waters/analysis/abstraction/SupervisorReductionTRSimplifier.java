@@ -191,6 +191,7 @@ public class SupervisorReductionTRSimplifier extends
     mSearchingBitSet = null;
   }
 
+
   //#########################################################################
   //# Methods for Supervisor Reduction
   private TRPartition reduceSupervisor(final TIntArrayList restrictedEventList)
@@ -628,8 +629,8 @@ public class SupervisorReductionTRSimplifier extends
     final TIntArrayList[] enabledEventsToStates =
       new TIntArrayList[mNumProperEvents];
     final TransitionIterator iter =
-      rel
-        .createAllTransitionsReadOnlyIteratorByStatus(EventStatus.STATUS_CONTROLLABLE);
+      rel.createAllTransitionsReadOnlyIteratorByStatus
+        (EventStatus.STATUS_CONTROLLABLE);
     while (iter.advance()) {
       // for each controllable event ...
       checkAbort();

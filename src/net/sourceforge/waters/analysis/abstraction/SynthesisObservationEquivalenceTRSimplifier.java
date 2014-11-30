@@ -30,7 +30,6 @@ import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.OneEventCachingTransitionIterator;
-import net.sourceforge.waters.analysis.tr.OrderingInfo;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -176,6 +175,9 @@ public class SynthesisObservationEquivalenceTRSimplifier
     super.reset();
     mLocalUncontrollablePredecessorsTauClosure = null;
     mPredecessorIterator = null;
+    mLocalPredIterator = null;
+    mLocalControllablePredIterator = null;
+    mLocalUncontrollablePredIterator = null;
     mUncontrollableTauIterator = null;
     mUncontrollableEventIterator = null;
   }
@@ -348,11 +350,17 @@ public class SynthesisObservationEquivalenceTRSimplifier
       final ListBufferTransitionRelation rel = getTransitionRelation();
       final int limit = getTransitionLimit();
       mLocalUncontrollablePredecessorsTauClosure =
-        rel.createPredecessorsTauClosureByStatus
+        rel.createPredecessorsClosure
           (limit,
            EventStatus.STATUS_LOCAL,
            ~EventStatus.STATUS_CONTROLLABLE);
       mPredecessorIterator = rel.createPredecessorsReadOnlyIterator();
+      mLocalPredIterator = rel.createPredecessorsReadOnlyIteratorByStatus
+        (EventStatus.STATUS_LOCAL);
+      mLocalUncontrollablePredIterator = rel.createPredecessorsReadOnlyIteratorByStatus
+        (EventStatus.STATUS_LOCAL, ~EventStatus.STATUS_CONTROLLABLE);
+      mLocalControllablePredIterator = rel.createPredecessorsReadOnlyIteratorByStatus
+        (EventStatus.STATUS_LOCAL, EventStatus.STATUS_CONTROLLABLE);
       mUncontrollableTauIterator =
         new OneEventCachingTransitionIterator
           (mLocalUncontrollablePredecessorsTauClosure.createIterator(),
@@ -604,28 +612,21 @@ public class SynthesisObservationEquivalenceTRSimplifier
       mIsOpenSplitter = false;
       collect(mTempClass);
 
-      // Event codes
-      final OrderingInfo info = rel.getOrderingInfo();
-      final int lastLocal =
-        info.getLastEventIndex(EventStatus.STATUS_LOCAL);
-      final int firstShared =
-        info.getFirstEventIndex(~EventStatus.STATUS_LOCAL);
-      final int lastSharedUncont =
-        info.getLastEventIndex(~EventStatus.STATUS_LOCAL,
-                               ~EventStatus.STATUS_CONTROLLABLE);
-      final int firstSharedCont =
-        info.getFirstEventIndex(~EventStatus.STATUS_LOCAL,
-                                EventStatus.STATUS_CONTROLLABLE);
-      final int lastSharedCont =
-        info.getLastEventIndex(~EventStatus.STATUS_LOCAL,
-                               EventStatus.STATUS_CONTROLLABLE);
+      final byte mask =
+        EventStatus.STATUS_LOCAL | EventStatus.STATUS_CONTROLLABLE |
+        EventStatus.STATUS_UNUSED;
+      final byte patternSharedUncontrollable = 0;
+      final byte patternSharedControllable = EventStatus.STATUS_CONTROLLABLE;
+      final byte patternLocalControllable =
+        EventStatus.STATUS_LOCAL | EventStatus.STATUS_CONTROLLABLE;
+      final int numEvents = rel.getNumberOfProperEvents();
 
       // Uncontrollable shared events
-      for (int event = firstShared; event <= lastSharedUncont; event++) {
-        if ((rel.getProperEventStatus(event) & EventStatus.STATUS_UNUSED) == 0) {
-          final TransitionIterator transIter = mUncontrollableEventIterator;
-          transIter.resetEvent(event);
-          splitOn(transIter);
+      for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+        final byte status = rel.getProperEventStatus(e);
+        if ((status & mask) == patternSharedUncontrollable) {
+          mUncontrollableEventIterator.resetEvent(e);
+          splitOn(mUncontrollableEventIterator);
         }
       }
 
@@ -635,9 +636,10 @@ public class SynthesisObservationEquivalenceTRSimplifier
       splitOn(transIter);
 
       // Controllable shared events
-      for (int event = firstSharedCont; event <= lastSharedCont; event++) {
-        if ((rel.getProperEventStatus(event) & EventStatus.STATUS_UNUSED) == 0) {
-          splitOnControllable(event);
+      for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+        final byte status = rel.getProperEventStatus(e);
+        if ((status & mask) == patternSharedControllable) {
+          splitOnControllable(e);
         }
       }
       // ... including omega
@@ -645,9 +647,15 @@ public class SynthesisObservationEquivalenceTRSimplifier
            EventStatus.STATUS_UNUSED) == 0) {
         splitOnControllable(EventEncoding.TAU);
       }
+
       // Controllable local events
       // TODO What if there are none?
-      splitOnControllable(lastLocal);
+      for (int e = EventEncoding.TAU; e < numEvents; e++) {
+        final byte status = rel.getProperEventStatus(e);
+        if ((status & mask) == patternLocalControllable) {
+          splitOnControllable(e);
+        }
+      }
 
       mTempClass.clear();
       if (mWeak) {
@@ -695,7 +703,6 @@ public class SynthesisObservationEquivalenceTRSimplifier
         final SearchRecord record = open.remove();
         final int state = record.getState();
         final EquivalenceClass stateClass = mStateToClass[state];
-        mPredecessorIterator.resetState(state);
         if (record.getHasEvent()) {
           // In first part of path (before the event)
           final EquivalenceClass startingClass = record.getStartingClass();
@@ -712,20 +719,20 @@ public class SynthesisObservationEquivalenceTRSimplifier
             // state's class is or can be made the starting class ...
             final EquivalenceClass controllableStartClass =
               local && stateClass == endClass ? null : stateClass;
-            mPredecessorIterator.resetEventsByStatus
-              (EventStatus.STATUS_LOCAL, EventStatus.STATUS_CONTROLLABLE);
-            while (mPredecessorIterator.advance()) {
-              final int source = mPredecessorIterator.getCurrentSourceState();
+            mLocalControllablePredIterator.resetState(state);
+            while (mLocalControllablePredIterator.advance()) {
+              final int source =
+                mLocalControllablePredIterator.getCurrentSourceState();
               final SearchRecord next =
                 new SearchRecord(source, controllableStartClass, true);
               addSearchRecord(next, open, visited);
             }
           }
           // Visit predecessors for all local uncontrollable transitions ...
-          mPredecessorIterator.resetEventsByStatus
-            (EventStatus.STATUS_LOCAL, ~EventStatus.STATUS_CONTROLLABLE);
-          while (mPredecessorIterator.advance()) {
-            final int source = mPredecessorIterator.getCurrentSourceState();
+          mLocalUncontrollablePredIterator.resetState(state);
+          while (mLocalUncontrollablePredIterator.advance()) {
+            final int source =
+              mLocalUncontrollablePredIterator.getCurrentSourceState();
             final SearchRecord next =
               new SearchRecord(source, startingClass, true);
             addSearchRecord(next, open, visited);
@@ -735,9 +742,9 @@ public class SynthesisObservationEquivalenceTRSimplifier
           if (mWeak) {
             // For weak synthesis observation equivalence,
             // visit predecessors for all local transitions ...
-            mPredecessorIterator.resetEventsByStatus(EventStatus.STATUS_LOCAL);
-            while (mPredecessorIterator.advance()) {
-              final int source = mPredecessorIterator.getCurrentSourceState();
+            mLocalPredIterator.resetState(state);
+            while (mLocalPredIterator.advance()) {
+              final int source = mLocalPredIterator.getCurrentSourceState();
               final EquivalenceClass sourceClass = mStateToClass[source];
               // If the source state is equivalent to the end state,
               // forget about it. It will be explored on its own.
@@ -769,7 +776,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
             addSearchRecord(next, open, visited);
           } else {
             // Or visit predecessors for the shared event ...
-            mPredecessorIterator.resetEvent(event);
+            mPredecessorIterator.reset(state, event);
             while (mPredecessorIterator.advance()){
               final int source = mPredecessorIterator.getCurrentSourceState();
               final SearchRecord next = new SearchRecord(source, null, true);
@@ -1091,10 +1098,11 @@ public class SynthesisObservationEquivalenceTRSimplifier
     private UncontrollableTransitionCache()
     {
       final ListBufferTransitionRelation rel = getTransitionRelation();
-      mEventIterator = rel.createSuccessorsReadOnlyIterator();
+      mEventIterator = rel.createSuccessorsReadOnlyIteratorByStatus
+        (~EventStatus.STATUS_LOCAL, ~EventStatus.STATUS_CONTROLLABLE);
       final int limit = getTransitionLimit();
       mLocalUncontrollableSuccessorsTauClosure =
-        rel.createSuccessorsTauClosureByStatus
+        rel.createSuccessorsClosure
           (limit,
            EventStatus.STATUS_LOCAL,
            ~EventStatus.STATUS_CONTROLLABLE);
@@ -1134,8 +1142,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
         return result;
       }
       final EquivalenceClass stateClass = mStateToClass[state];
-      mEventIterator.resetEventsByStatus(~EventStatus.STATUS_LOCAL,
-                                         ~EventStatus.STATUS_CONTROLLABLE);
+      mEventIterator.reset();
       mTauClosureIterator.resetState(state);
       outer:
       while (mTauClosureIterator.advance()) {
@@ -1309,6 +1316,9 @@ public class SynthesisObservationEquivalenceTRSimplifier
 
   private TauClosure mLocalUncontrollablePredecessorsTauClosure;
   private TransitionIterator mPredecessorIterator;
+  private TransitionIterator mLocalPredIterator;
+  private TransitionIterator mLocalControllablePredIterator;
+  private TransitionIterator mLocalUncontrollablePredIterator;
   private TransitionIterator mUncontrollableTauIterator;
   private TransitionIterator mUncontrollableEventIterator;
   private UncontrollableTransitionCache mUncontrollableTransitionCache;

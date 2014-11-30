@@ -21,7 +21,6 @@ import java.util.ListIterator;
 
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-import net.sourceforge.waters.analysis.tr.OrderingInfo;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -327,18 +326,14 @@ public class CertainUnsupervisabilityTRSimplifier
     throws AnalysisAbortException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    final OrderingInfo info = rel.getOrderingInfo();
-    final int firstLocalUnont = info.getFirstEventIndex
-      (EventStatus.STATUS_LOCAL, ~EventStatus.STATUS_CONTROLLABLE);
-    final int lastLocalUncont = info.getLastEventIndex
-      (EventStatus.STATUS_LOCAL, ~EventStatus.STATUS_CONTROLLABLE);
-    final TauClosure closure = rel.createPredecessorsTauClosure
-      (firstLocalUnont, lastLocalUncont, mTransitionLimit);
+    final TauClosure closure =
+      rel.createPredecessorsClosure(mTransitionLimit,
+                                    EventStatus.STATUS_LOCAL,
+                                    ~EventStatus.STATUS_CONTROLLABLE);
     final TransitionIterator tauIter = closure.createIterator();
     final TransitionIterator tauEventIter =
-      closure.createPreEventClosureIterator();
-    tauEventIter.resetEventsByStatus(~EventStatus.STATUS_LOCAL,
-                                     ~EventStatus.STATUS_CONTROLLABLE);
+      closure.createPreEventClosureIteratorByStatus
+        (~EventStatus.STATUS_LOCAL, ~EventStatus.STATUS_CONTROLLABLE);
     final TransitionIterator eventIter =
       rel.createPredecessorsReadOnlyIterator();
     final TIntStack stack = new TIntArrayStack();
