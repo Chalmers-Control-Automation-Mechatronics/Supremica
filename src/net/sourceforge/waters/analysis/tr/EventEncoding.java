@@ -17,8 +17,6 @@ import gnu.trove.procedure.TObjectIntProcedure;
 import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -772,8 +770,67 @@ public class EventEncoding
    */
   public void sortProperEvents(final int... flags)
   {
-    final EventOrdering ordering = new EventOrdering(flags);
-    ordering.sortProperEvents();
+    // Prepare new lists
+    final int numEvents = mProperEvents.size();
+    final List<EventProxy> newEvents = new ArrayList<>(numEvents);
+    final TByteArrayList newStatus = new TByteArrayList(numEvents);
+    newEvents.add(mProperEvents.get(TAU));
+    newStatus.add(mProperEventStatus.get(TAU));
+
+    // Collect event groups ...
+    final int numPasses = 1 << flags.length;
+    int mask = 0;
+    for (final int flag : flags) {
+      mask |= (flag & ~EventStatus.STATUS_ALL) == 0 ? flag : ~flag;
+    }
+    for (int pass = 0; pass < numPasses; pass++) {
+      int pattern = 0;
+      int bit = 1 << flags.length;
+      for (final int flag : flags) {
+        bit >>= 1;
+        if ((flag & ~EventStatus.STATUS_ALL) == 0) {
+          if ((pass & bit) != 0) {
+            pattern |= flag;
+          }
+        } else {
+          if ((pass & bit) == 0) {
+            pattern |= ~flag;
+          }
+        }
+      }
+      for (int e = NONTAU; e < numEvents; e++) {
+        final byte status = mProperEventStatus.get(e);
+        if ((status & mask) == pattern) {
+          final int newE = newEvents.size();
+          final EventProxy event = mProperEvents.get(e);
+          newEvents.add(event);
+          newStatus.add(status);
+          mEventCodeMap.put(event, newE);
+        }
+      }
+    }
+
+    // Correct aliases in event-code map
+    mEventCodeMap.forEachEntry(new TObjectIntProcedure<EventProxy>() {
+      @Override
+      public boolean execute(final EventProxy event, final int e)
+      {
+        if (e < newEvents.size() && newEvents.get(e) == event) {
+          return true;
+        } else if (e < mPropositions.size() && mPropositions.get(e) == event) {
+          return true;
+        } else {
+          final EventProxy oldEvent = mProperEvents.get(e);
+          final int newE = mEventCodeMap.get(oldEvent);
+          mEventCodeMap.put(event, newE);
+          return true;
+        }
+      }
+    });
+
+    // Install new lists
+    mProperEvents = newEvents;
+    mProperEventStatus = newStatus;
   }
 
 
@@ -890,111 +947,11 @@ public class EventEncoding
 
 
   //#########################################################################
-  //# Inner Class EventOrdering
-  private class EventOrdering
-    implements Comparator<EventProxy>
-  {
-    //#######################################################################
-    //# Constructor
-    private EventOrdering(final int[] flags)
-    {
-      mMasks = new byte[flags.length];
-      mReverse = new boolean[flags.length];
-      for (int i = 0; i < flags.length; i++) {
-        final int flag = flags[i];
-        if ((flag & ~EventStatus.STATUS_ALL) == 0) {
-          mMasks[i] = (byte) flag;
-        } else {
-          mMasks[i] = (byte) ~flag;
-          mReverse[i] = true;
-        }
-      }
-    }
-
-    //#######################################################################
-    //# Invocation
-    private void sortProperEvents()
-    {
-      final List<EventProxy> oldEvents =
-        new ArrayList<EventProxy>(mProperEvents);
-      Collections.sort(mProperEvents, this);
-      final int numEvents = mProperEvents.size();
-      final TByteArrayList oldStatus = new TByteArrayList(mProperEventStatus);
-      for (int e = NONTAU; e < numEvents; e++) {
-        final EventProxy event = mProperEvents.get(e);
-        final int oldCode = mEventCodeMap.get(event);
-        mEventCodeMap.put(event, e);
-        final byte status = oldStatus.get(oldCode);
-        mProperEventStatus.set(e, status);
-      }
-      mEventCodeMap.forEachEntry(new TObjectIntProcedure<EventProxy>() {
-        @Override
-        public boolean execute(final EventProxy event, final int code)
-        {
-          if (code < mProperEvents.size() &&
-              mProperEvents.get(code) == event) {
-            return true;
-          } else if (code < mPropositions.size() &&
-                     mPropositions.get(code) == event) {
-            return true;
-          } else {
-            final EventProxy oldEvent = oldEvents.get(code);
-            final int newCode = mEventCodeMap.get(oldEvent);
-            mEventCodeMap.put(event, newCode);
-            return true;
-          }
-        }
-      });
-    }
-
-    //#######################################################################
-    //# Interface java.util.Comparator<EventProxy>
-    @Override
-    public int compare(final EventProxy event1, final EventProxy event2)
-    {
-      if (event1 == event2) {
-        return 0;
-      } else if (event1 == null) {
-        return -1;
-      } else if (event2 == null) {
-        return 1;
-      }
-      final int e1 = mEventCodeMap.get(event1);
-      final int e2 = mEventCodeMap.get(event2);
-      if (e1 == TAU) {
-        return -1;
-      } else if (e2 == TAU) {
-        return 1;
-      }
-      final byte status1 = mProperEventStatus.get(e1);
-      final byte status2 = mProperEventStatus.get(e2);
-      if (status1 == status2) {
-        return 0;
-      }
-      for (int i = 0; i < mMasks.length; i++) {
-        final boolean bit1 = (status1 & mMasks[i]) != 0;
-        final boolean bit2 = (status2 & mMasks[i]) != 0;
-        final int result = Boolean.compare(bit1, bit2);
-        if (result != 0) {
-          return mReverse[i] ? -result : result;
-        }
-      }
-      return 0;
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final byte[] mMasks;
-    private final boolean[] mReverse;
-  }
-
-
-  //#########################################################################
   //# Data Members
-  private final List<EventProxy> mProperEvents;
+  private List<EventProxy> mProperEvents;
   private final List<EventProxy> mPropositions;
   private final TObjectIntHashMap<EventProxy> mEventCodeMap;
-  private final TByteArrayList mProperEventStatus;
+  private TByteArrayList mProperEventStatus;
   private int mUsedPropositions;
 
 
