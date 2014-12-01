@@ -765,11 +765,11 @@ public abstract class AbstractTRCompositionalVerifier
     if (logger.isDebugEnabled()) {
       logger.debug("Composing " + candidate + " ...");
     }
-    // Set up event encoding ...
     try {
-      // TODO Event ordering ...
+      // Set up event encoding ...
       final EventEncoding candidateEncoding = candidate.getEventEncoding();
       countSpecialEvents(candidateEncoding);
+      sortCandidateEvents(candidateEncoding);
       final Collection<EventProxy> props = getUsedPropositions();
       final EventEncoding syncEncoding = candidate.createSyncEventEncoding(props);
       // Synchronise ...
@@ -831,6 +831,32 @@ public abstract class AbstractTRCompositionalVerifier
     } finally {
       mNeedsSimplification.clearSuppressed();
       mIntermediateAbstractionSequence = null;
+    }
+  }
+
+  private void sortCandidateEvents(final EventEncoding enc)
+  {
+    final byte pattern =
+      EventStatus.STATUS_FAILING | EventStatus.STATUS_ALWAYS_ENABLED;
+    final byte mask = (byte) (pattern | EventStatus.STATUS_UNUSED);
+    final int numEvents = enc.getNumberOfProperEvents();
+    boolean hasStronglyFailingEvent = false;
+    for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+      final byte status = enc.getProperEventStatus(e);
+      if ((status & mask) == pattern) {
+        hasStronglyFailingEvent = true;
+        break;
+      }
+    }
+    if (hasStronglyFailingEvent) {
+      enc.sortProperEvents(~EventStatus.STATUS_ALWAYS_ENABLED,
+                           ~EventStatus.STATUS_FAILING,
+                           ~EventStatus.STATUS_LOCAL,
+                           EventStatus.STATUS_CONTROLLABLE);
+    } else {
+      enc.sortProperEvents(~EventStatus.STATUS_LOCAL,
+                           ~EventStatus.STATUS_ALWAYS_ENABLED,
+                           EventStatus.STATUS_CONTROLLABLE);
     }
   }
 
@@ -1008,6 +1034,7 @@ public abstract class AbstractTRCompositionalVerifier
     for (final EventProxy prop : getUsedPropositions()) {
       enc.addProposition(prop, false);
     }
+    enc.sortProperEvents(EventStatus.STATUS_CONTROLLABLE);
     return enc;
   }
 
