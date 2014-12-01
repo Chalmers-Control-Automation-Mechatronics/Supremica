@@ -11,10 +11,6 @@ package net.sourceforge.waters.analysis.trcomp;
 
 import java.util.List;
 
-import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.TRSimplificationListener;
-import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -23,7 +19,9 @@ import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
+import net.sourceforge.waters.model.analysis.EnumFactory;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.ListedEnumFactory;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
@@ -46,7 +44,7 @@ import org.apache.log4j.Logger;
  */
 
 public class TRCompositionalConflictChecker
-  extends AbstractTRCompositionalVerifier
+  extends AbstractTRCompositionalAnalyzer
   implements ConflictChecker
 {
 
@@ -62,8 +60,6 @@ public class TRCompositionalConflictChecker
     super(model,
           ConflictKindTranslator.getInstanceControllable(),
           new NativeConflictChecker(ProductDESElementFactory.getInstance()));
-    final TransitionRelationSimplifier chain = createDefaultAbstractionChain();
-    setSimplifier(chain);
   }
 
 
@@ -102,6 +98,22 @@ public class TRCompositionalConflictChecker
 
 
   //#########################################################################
+  //# Configuration
+  @Override
+  public EnumFactory<TRToolCreator<TransitionRelationSimplifier>>
+    getTRSimplifierFactory()
+  {
+    return
+      new ListedEnumFactory<TRToolCreator<TransitionRelationSimplifier>>() {
+      {
+        register(OEQ);
+        register(WOEQ);
+      }
+    };
+  }
+
+
+  //#########################################################################
   //# Invocation
   @Override
   protected void tearDown()
@@ -117,33 +129,6 @@ public class TRCompositionalConflictChecker
   protected boolean isFailingEventsUsed()
   {
     return isFailingEventsEnabled() && getUsedPreconditionMarking() == null;
-  }
-
-  @Override
-  protected ChainTRSimplifier createDefaultAbstractionChain()
-  {
-    final ChainTRSimplifier chain = super.createDefaultAbstractionChain();
-    final TRSimplificationListener listener = new PartitioningListener();
-    final TransitionRelationSimplifier loopRemover =
-      new TauLoopRemovalTRSimplifier();
-    loopRemover.setSimplificationListener(listener);
-    chain.add(loopRemover);
-    final ObservationEquivalenceTRSimplifier bisimulator =
-      new ObservationEquivalenceTRSimplifier();
-    bisimulator.setEquivalence(ObservationEquivalenceTRSimplifier.
-                               Equivalence.OBSERVATION_EQUIVALENCE);
-    bisimulator.setTransitionRemovalMode
-      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
-    bisimulator.setMarkingMode
-      (ObservationEquivalenceTRSimplifier.MarkingMode.SATURATE);
-    final int limit = getInternalTransitionLimit();
-    bisimulator.setTransitionLimit(limit);
-    bisimulator.setSimplificationListener(listener);
-    chain.add(bisimulator);
-    chain.setPropositions(PRECONDITION_MARKING, DEFAULT_MARKING);
-    chain.setPreferredOutputConfiguration
-      (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-    return chain;
   }
 
   @Override

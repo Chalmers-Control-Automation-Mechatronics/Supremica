@@ -44,6 +44,16 @@ public abstract class EnumFactory<E>
   }
 
   /**
+   * Gets the default value for this factory. The default implementation
+   * returns the first element of the list of items.
+   */
+  public E getDefaultValue()
+  {
+    final List<? extends E> items = getEnumConstants();
+    return items.get(0);
+  }
+
+  /**
    * Prints a list of the possible values of the underlying enumeration
    * to the given stream so as to provide a listing of possible values
    * for an error message.

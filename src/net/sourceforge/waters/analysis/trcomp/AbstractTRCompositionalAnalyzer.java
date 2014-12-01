@@ -23,9 +23,11 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SpecialEventsFinder;
 import net.sourceforge.waters.analysis.abstraction.SpecialEventsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TRSimplificationListener;
+import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.compositional.ChainSelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult;
@@ -40,6 +42,7 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
+import net.sourceforge.waters.model.analysis.EnumFactory;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
@@ -63,18 +66,19 @@ import org.apache.log4j.Logger;
  * @author Robi Malik
  */
 
-public abstract class AbstractTRCompositionalVerifier
+public abstract class AbstractTRCompositionalAnalyzer
   extends AbstractModelAnalyzer
   implements ModelVerifier
 {
 
   //#########################################################################
   //# Constructors
-  public AbstractTRCompositionalVerifier(final ProductDESProxy model,
+  public AbstractTRCompositionalAnalyzer(final ProductDESProxy model,
                                          final KindTranslator translator,
                                          final ModelVerifier mono)
   {
     super(model, ProductDESElementFactory.getInstance(), translator);
+    mTRSimplifierCreator = getTRSimplifierFactory().getDefaultValue();
     // TODO Make these configurable
     mPreselectionHeuristic = new PreselectionHeuristicMustL();
     final SelectionHeuristic<TRCandidate> minS = new SelectionHeuristicMinS();
@@ -160,6 +164,52 @@ public abstract class AbstractTRCompositionalVerifier
 
   //#########################################################################
   //# Configuration
+  /**
+   * Gets the factory to obtain transition relation simplifiers for
+   * this compositional analyser. The constants returned by this factory
+   * can be passed to the {@link #setSimplifier(TransitionRelationSimplifier)
+   * setSimplifier()} method.
+   */
+  public abstract EnumFactory<TRToolCreator<TransitionRelationSimplifier>>
+    getTRSimplifierFactory();
+
+  /**
+   * Sets the tool that creates the transition relation simplifier that
+   * defines the abstraction chain. Possible arguments for this method
+   * can be obtained from the factory returned by {@link
+   * #getTRSimplifierFactory()}.
+   */
+  public void setSimplifier
+    (final TRToolCreator<TransitionRelationSimplifier> creator)
+  {
+    mTRSimplifierCreator = creator;
+  }
+
+  /**
+   * Gets the tool that creates the transition relation simplifier that
+   * defines the abstraction chain.
+   */
+  public TRToolCreator<TransitionRelationSimplifier> getSimplifier()
+  {
+    return mTRSimplifierCreator;
+  }
+
+  public void setMonolithicAnalyzer(final ModelAnalyzer mono)
+  {
+    mMonolithicAnalyzer = mono;
+  }
+
+  public ModelAnalyzer getMonolithicAnalyzer()
+  {
+    return mMonolithicAnalyzer;
+  }
+
+  public ModelVerifier getMonolithicVerifier()
+  {
+    return (ModelVerifier) getMonolithicAnalyzer();
+  }
+
+
   public int getInternalStateLimit()
   {
     return mInternalStateLimit;
@@ -327,32 +377,6 @@ public abstract class AbstractTRCompositionalVerifier
   }
 
 
-  public void setSimplifier(final TransitionRelationSimplifier simplifier)
-  {
-    mTRSimplifier = simplifier;
-  }
-
-  public TransitionRelationSimplifier getSimplifier()
-  {
-    return mTRSimplifier;
-  }
-
-  public void setMonolithicAnalyzer(final ModelAnalyzer mono)
-  {
-    mMonolithicAnalyzer = mono;
-  }
-
-  public ModelAnalyzer getMonolithicAnalyzer()
-  {
-    return mMonolithicAnalyzer;
-  }
-
-  public ModelVerifier getMonolithicVerifier()
-  {
-    return (ModelVerifier) getMonolithicAnalyzer();
-  }
-
-
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
@@ -400,6 +424,13 @@ public abstract class AbstractTRCompositionalVerifier
   {
     super.setUp();
 
+    mTRSimplifier = mTRSimplifierCreator.create(this);
+    mTRSimplifier.setPreferredOutputConfiguration
+      (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    mSpecialEventsFinder = new SpecialEventsFinder();
+    mSpecialEventsFinder.setAppliesPartitionAutomatically(false);
+    mSpecialEventsFinder.setDefaultMarkingID(DEFAULT_MARKING);
+
     final CompositionalAnalysisResult result = getAnalysisResult();
     if (isBlockedEventsUsed()) {
       result.addBlockedEvents(0);
@@ -413,11 +444,6 @@ public abstract class AbstractTRCompositionalVerifier
     if (isAlwaysEnabledEventsUsed()) {
       result.addAlwaysEnabledEvents(0);
     }
-    mTRSimplifier.setPreferredOutputConfiguration
-      (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-    mSpecialEventsFinder = new SpecialEventsFinder();
-    mSpecialEventsFinder.setAppliesPartitionAutomatically(false);
-    mSpecialEventsFinder.setDefaultMarkingID(DEFAULT_MARKING);
 
     final ProductDESProxy model = getModel();
     final Collection<AutomatonProxy> automata = model.getAutomata();
@@ -521,6 +547,7 @@ public abstract class AbstractTRCompositionalVerifier
   protected void tearDown()
   {
     super.tearDown();
+    mTRSimplifier = null;
     mSpecialEventsFinder = null;
     mUsedPropositions = null;
     mAbstractionSequence = null;
@@ -534,15 +561,6 @@ public abstract class AbstractTRCompositionalVerifier
 
   //#########################################################################
   //# Hooks
-  protected ChainTRSimplifier createDefaultAbstractionChain()
-  {
-    final ChainTRSimplifier chain = new ChainTRSimplifier();
-    final SpecialEventsTRSimplifier special = new SpecialEventsTRSimplifier();
-    special.setSimplificationListener(mSpecialEventsListener);
-    chain.add(special);
-    return chain;
-  }
-
   protected EventProxy getUsedDefaultMarking()
     throws EventNotFoundException
   {
@@ -749,7 +767,7 @@ public abstract class AbstractTRCompositionalVerifier
       }
       return simplified;
     } catch (final OverflowException exception) {
-      recordUnsuccessfulComposition();
+      recordUnsuccessfulComposition(exception);
       return false;
     } finally {
       mNeedsSimplification.clearSuppressed();
@@ -826,7 +844,7 @@ public abstract class AbstractTRCompositionalVerifier
       return sync;
     } catch (final OverflowException exception) {
       // BUG May or may not have been counted by recordStatistics() already?
-      recordUnsuccessfulComposition();
+      recordUnsuccessfulComposition(exception);
       throw exception;
     } finally {
       mNeedsSimplification.clearSuppressed();
@@ -1148,8 +1166,9 @@ public abstract class AbstractTRCompositionalVerifier
     result.updatePeakMemoryUsage();
   }
 
-  void recordUnsuccessfulComposition()
+  void recordUnsuccessfulComposition(final OverflowException exception)
   {
+    getLogger().debug(exception.getMessage());
     final CompositionalAnalysisResult result = getAnalysisResult();
     result.addUnsuccessfulComposition();
   }
@@ -1163,11 +1182,99 @@ public abstract class AbstractTRCompositionalVerifier
         final ListBufferTransitionRelation rel = tr.getTransitionRelation();
         estimate *= rel.getNumberOfReachableStates();
       }
-      final String msg = String.format("Monolithically composing %d automata, " +
-                                       "estimated %.0f states.",
-                                       automata.size(), estimate);
+      final String code = estimate >= 1e7 ? "%e" : "%.0f";
+      final String msg = String.format
+        ("Monolithically composing %d automata, estimated " +
+         code + " states.", automata.size(), estimate);
       logger.debug(msg);
     }
+  }
+
+
+  //#########################################################################
+  //# Abstraction Chains
+  /**
+   * <P>The abstraction sequence that consists of only observation
+   * equivalence. This tool creator produces a transition relation simplifier
+   * consisting of:</P>
+   * <UL>
+   * <LI>Special events removal {@link SpecialEventsTRSimplifier}</LI>
+   * <LI>Tau-loop removal {@link TauLoopRemovalTRSimplifier}</LI>
+   * <LI>Observation equivalence {@link ObservationEquivalenceTRSimplifier}</LI>
+   * </UL>.
+   */
+  public static final TRToolCreator<TransitionRelationSimplifier> OEQ =
+    new TRToolCreator<TransitionRelationSimplifier>("OEQ")
+  {
+    @Override
+    public TransitionRelationSimplifier create
+      (final AbstractTRCompositionalAnalyzer analyzer)
+    {
+      return analyzer.createObservationEquivalenceChain
+        (ObservationEquivalenceTRSimplifier.
+         Equivalence.OBSERVATION_EQUIVALENCE);
+    }
+  };
+
+  /**
+   * <P>The abstraction sequence that consists of only weak observation
+   * equivalence. This tool creator produces a transition relation simplifier
+   * consisting of:</P>
+   * <UL>
+   * <LI>Special events removal {@link SpecialEventsTRSimplifier}</LI>
+   * <LI>Tau-loop removal {@link TauLoopRemovalTRSimplifier}</LI>
+   * <LI>Weak observation equivalence
+   *     {@link ObservationEquivalenceTRSimplifier}</LI>
+   * </UL>.
+   */
+  public static final TRToolCreator<TransitionRelationSimplifier> WOEQ =
+    new TRToolCreator<TransitionRelationSimplifier>("WOEQ")
+  {
+    @Override
+    public TransitionRelationSimplifier create
+      (final AbstractTRCompositionalAnalyzer analyzer)
+    {
+      return analyzer.createObservationEquivalenceChain
+        (ObservationEquivalenceTRSimplifier.
+         Equivalence.WEAK_OBSERVATION_EQUIVALENCE);
+    }
+  };
+
+
+  protected ChainTRSimplifier createObservationEquivalenceChain
+    (final ObservationEquivalenceTRSimplifier.Equivalence equivalence)
+  {
+    final ChainTRSimplifier chain = startAbstractionChain();
+    final TRSimplificationListener listener =
+      new PartitioningListener();
+    final TransitionRelationSimplifier loopRemover =
+      new TauLoopRemovalTRSimplifier();
+    loopRemover.setSimplificationListener(listener);
+    chain.add(loopRemover);
+    final ObservationEquivalenceTRSimplifier bisimulator =
+      new ObservationEquivalenceTRSimplifier();
+    bisimulator.setEquivalence(equivalence);
+    bisimulator.setTransitionRemovalMode
+    (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+    bisimulator.setMarkingMode
+    (ObservationEquivalenceTRSimplifier.MarkingMode.SATURATE);
+    final int limit = getInternalTransitionLimit();
+    bisimulator.setTransitionLimit(limit);
+    bisimulator.setSimplificationListener(listener);
+    chain.add(bisimulator);
+    chain.setPropositions(PRECONDITION_MARKING, DEFAULT_MARKING);
+    chain.setPreferredOutputConfiguration
+    (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    return chain;
+  }
+
+  protected ChainTRSimplifier startAbstractionChain()
+  {
+    final ChainTRSimplifier chain = new ChainTRSimplifier();
+    final SpecialEventsTRSimplifier special = new SpecialEventsTRSimplifier();
+    special.setSimplificationListener(mSpecialEventsListener);
+    chain.add(special);
+    return chain;
   }
 
 
@@ -1365,6 +1472,7 @@ public abstract class AbstractTRCompositionalVerifier
   private final PreselectionHeuristic mPreselectionHeuristic;
   private final SelectionHeuristic<TRCandidate> mSelectionHeuristic;
   private final PartitioningListener mSpecialEventsListener;
+  private TRToolCreator<TransitionRelationSimplifier> mTRSimplifierCreator;
   private TransitionRelationSimplifier mTRSimplifier;
   private final TRSynchronousProductBuilder mSynchronousProductBuilder;
   private SpecialEventsFinder mSpecialEventsFinder;

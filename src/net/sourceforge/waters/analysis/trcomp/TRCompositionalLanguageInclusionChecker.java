@@ -17,6 +17,7 @@ import java.util.List;
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SpecialEventsFinder;
+import net.sourceforge.waters.analysis.abstraction.SpecialEventsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SubsetConstructionTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TRSimplificationListener;
 import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
@@ -29,8 +30,10 @@ import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.cpp.analysis.NativeSafetyVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
+import net.sourceforge.waters.model.analysis.EnumFactory;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.LanguageInclusionKindTranslator;
+import net.sourceforge.waters.model.analysis.ListedEnumFactory;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionDiagnostics;
@@ -54,7 +57,7 @@ import org.apache.log4j.Logger;
  */
 
 public class TRCompositionalLanguageInclusionChecker
-  extends AbstractTRCompositionalVerifier
+  extends AbstractTRCompositionalAnalyzer
   implements LanguageInclusionChecker
 {
 
@@ -81,8 +84,6 @@ public class TRCompositionalLanguageInclusionChecker
           new NativeSafetyVerifier(translator, diag,
                                    ProductDESElementFactory.getInstance()));
     mDiagnostics = diag;
-    final TransitionRelationSimplifier chain = createDefaultAbstractionChain();
-    setSimplifier(chain);
   }
 
 
@@ -99,6 +100,20 @@ public class TRCompositionalLanguageInclusionChecker
   {
     final VerificationResult result = getAnalysisResult();
     return (SafetyTraceProxy) result.getCounterExample();
+  }
+
+  //#########################################################################
+  //# Configuration
+  @Override
+  public EnumFactory<TRToolCreator<TransitionRelationSimplifier>>
+    getTRSimplifierFactory()
+  {
+    return
+      new ListedEnumFactory<TRToolCreator<TransitionRelationSimplifier>>() {
+      {
+        register(PROJ);
+      }
+    };
   }
 
 
@@ -156,35 +171,7 @@ public class TRCompositionalLanguageInclusionChecker
   @Override
   protected boolean isAlwaysEnabledEventsUsed()
   {
-    return false;
-  }
-
-  @Override
-  protected ChainTRSimplifier createDefaultAbstractionChain()
-  {
-    final ChainTRSimplifier chain = super.createDefaultAbstractionChain();
-    final TRSimplificationListener listener = new PartitioningListener();
-    final TransitionRelationSimplifier loopRemover =
-      new TauLoopRemovalTRSimplifier();
-    loopRemover.setSimplificationListener(listener);
-    chain.add(loopRemover);
-    final SubsetConstructionTRSimplifier subset =
-      new SubsetConstructionTRSimplifier();
-    chain.add(subset);
-    subset.setStateLimit(getInternalStateLimit());
-    subset.setTransitionLimit(getInternalStateLimit());
-    subset.setSimplificationListener(listener);
-    final ObservationEquivalenceTRSimplifier bisimulator =
-      new ObservationEquivalenceTRSimplifier();
-    final ObservationEquivalenceTRSimplifier.Equivalence eq =
-      isSelfloopOnlyEventsUsed() ?
-      ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION :
-      ObservationEquivalenceTRSimplifier.Equivalence.DETERMINISTIC_MINSTATE;
-    bisimulator.setEquivalence(eq);
-    bisimulator.setTransitionLimit(getInternalStateLimit());
-    bisimulator.setSimplificationListener(listener);
-    chain.add(bisimulator);
-    return chain;
+    return isFailingEventsEnabled() && isAlwaysEnabledEventsEnabled();
   }
 
   @Override
@@ -333,6 +320,55 @@ public class TRCompositionalLanguageInclusionChecker
     final KindTranslator translator = getKindTranslator();
     TraceChecker.checkSafetyCounterExample(cloned, true, translator);
   }
+
+
+  //#########################################################################
+  //# Abstraction Chains
+  /**
+   * <P>The abstraction sequence that consists of only observation
+   * equivalence. This tool creator produces a transition relation simplifier
+   * consisting of:</P>
+   * <UL>
+   * <LI>Special events removal {@link SpecialEventsTRSimplifier}</LI>
+   * <LI>Tau-loop removal {@link TauLoopRemovalTRSimplifier}</LI>
+   * <LI>Observation equivalence {@link ObservationEquivalenceTRSimplifier}</LI>
+   * </UL>.
+   */
+  public static final TRToolCreator<TransitionRelationSimplifier> PROJ =
+    new TRToolCreator<TransitionRelationSimplifier>("PROJ")
+  {
+    @Override
+    public TransitionRelationSimplifier create
+      (final AbstractTRCompositionalAnalyzer analyzer)
+    {
+      final ChainTRSimplifier chain = analyzer.startAbstractionChain();
+      final int stateLimit = analyzer.getInternalStateLimit();
+      final int transitionLimit = analyzer.getInternalTransitionLimit();
+      final TRSimplificationListener listener =
+        analyzer.new PartitioningListener();
+      final TransitionRelationSimplifier loopRemover =
+        new TauLoopRemovalTRSimplifier();
+      loopRemover.setSimplificationListener(listener);
+      chain.add(loopRemover);
+      final SubsetConstructionTRSimplifier subset =
+        new SubsetConstructionTRSimplifier();
+      chain.add(subset);
+      subset.setStateLimit(stateLimit);
+      subset.setTransitionLimit(transitionLimit);
+      subset.setSimplificationListener(listener);
+      final ObservationEquivalenceTRSimplifier bisimulator =
+        new ObservationEquivalenceTRSimplifier();
+      final ObservationEquivalenceTRSimplifier.Equivalence eq =
+        analyzer.isSelfloopOnlyEventsUsed() ?
+        ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION :
+        ObservationEquivalenceTRSimplifier.Equivalence.DETERMINISTIC_MINSTATE;
+      bisimulator.setEquivalence(eq);
+      bisimulator.setTransitionLimit(stateLimit);
+      bisimulator.setSimplificationListener(listener);
+      chain.add(bisimulator);
+      return chain;
+    }
+  };
 
 
   //#########################################################################
