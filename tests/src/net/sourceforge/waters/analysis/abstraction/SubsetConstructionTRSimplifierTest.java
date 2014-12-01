@@ -9,11 +9,11 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.list.array.TIntArrayList;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -53,7 +53,10 @@ public class SubsetConstructionTRSimplifierTest
   @Override
   protected TransitionRelationSimplifier createTransitionRelationSimplifier()
   {
-    return new SubsetConstructionTRSimplifier();
+    final SubsetConstructionTRSimplifier simplifier =
+      new SubsetConstructionTRSimplifier();
+    simplifier.setFailingEventsAsSelfloops(true);
+    return simplifier;
   }
 
   @Override
@@ -63,28 +66,17 @@ public class SubsetConstructionTRSimplifierTest
   {
     final EventEncoding enc = super.createEventEncoding(des, aut);
     final int numEvents = enc.getNumberOfProperEvents();
-    mForbiddenEvents = new TIntArrayList();
     for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
       final EventProxy event = enc.getProperEvent(e);
       final String name = event.getName();
       if (name.startsWith(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
-        mForbiddenEvents.add(e);
+        byte status = enc.getProperEventStatus(e);
+        status |= EventStatus.STATUS_FAILING;
+        status |= EventStatus.STATUS_ALWAYS_ENABLED;
+        enc.setProperEventStatus(e, status);
       }
     }
     return enc;
-  }
-
-  @Override
-  protected void configureTransitionRelationSimplifier()
-  {
-    super.configureTransitionRelationSimplifier();
-    final SubsetConstructionTRSimplifier simplifier =
-      getTransitionRelationSimplifier();
-    simplifier.clearForbiddenEvents();
-    for (int e = 0; e < mForbiddenEvents.size(); e++) {
-      final int event = mForbiddenEvents.get(e);
-      simplifier.setForbiddenEvent(event, true);
-    }
   }
 
   @Override
@@ -181,11 +173,6 @@ public class SubsetConstructionTRSimplifierTest
     test_determinisation_2();
     test_determinisation_1();
   }
-
-
-  //#########################################################################
-  //# Data Members
-  private TIntArrayList mForbiddenEvents;
 
 }
 

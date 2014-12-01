@@ -2296,7 +2296,8 @@ public class ListBufferTransitionRelation
 
   /**
    * Resets this transition relation to use a different state set.
-   *
+   * This method replaces the state set with the given new state set
+   * and clears all transitions from the transition relation.
    * @param newStates
    *          State buffer containing new states and markings.
    * @param numTrans

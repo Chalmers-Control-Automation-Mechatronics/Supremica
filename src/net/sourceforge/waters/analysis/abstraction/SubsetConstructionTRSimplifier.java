@@ -12,8 +12,6 @@ package net.sourceforge.waters.analysis.abstraction;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.set.hash.TIntHashSet;
 
-import java.util.BitSet;
-
 import net.sourceforge.waters.analysis.tr.DefaultEventStatusProvider;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
@@ -99,43 +97,32 @@ public class SubsetConstructionTRSimplifier
   }
 
   /**
-   * Clears the set of forbidden events.
-   * @see #setForbiddenEvent(int,boolean) setForbiddenEvent()
+   * <P>Sets how failing events are treated by subset construction.</P>
+   *
+   * <P>Events with status {@link EventStatus#STATUS_FAILING}
+   * are understood to cause verification to result in a <CODE>false</CODE>
+   * result if enabled, therefore no further exploration is needed after
+   * such a transition has occurred. If such an event is additionally
+   * always enabled  ({@link EventStatus#STATUS_ALWAYS_ENABLED}), other
+   * transitions outgoing from states with the event can be suppressed.</P>
+   *
+   * <P>This method controls whether failing event transitions should be
+   * replaced by selfloops. The default of this setting is <CODE>false</CODE>,
+   * causing failing event transitions to be redirected to the dump of the
+   * output transition relation.</P>
    */
-  public void clearForbiddenEvents()
+  public void setFailingEventsAsSelfloops(final boolean selfloops)
   {
-    mForbiddenEvents = null;
+    mFailingEventsAsSelfloops = selfloops;
   }
 
   /**
-   * Sets whether the given event is to be considered as forbidden.
-   * Forbidden events are typically selfloop-only events with the property
-   * that state exploration ends as soon as a state with a forbidden event
-   * enabled is encountered. When subset construction encounters a state
-   * with a forbidden event enabled, it suppresses any further outgoing
-   * transitions from that state.
+   * Returns how failing events are treated by subset construction.
+   * @see #setFailingEventsAsSelfloops(boolean) setFailingEventsAsSelfloops()
    */
-  public void setForbiddenEvent(final int event, final boolean forbidden)
+  public boolean getFailingEventsAsSelfloops()
   {
-    if (mForbiddenEvents == null) {
-      final ListBufferTransitionRelation rel = getTransitionRelation();
-      final int numEvents = rel == null ? 0 : rel.getNumberOfProperEvents();
-      mForbiddenEvents = new BitSet(numEvents);
-    }
-    mForbiddenEvents.set(event, forbidden);
-  }
-
-  /**
-   * Returns whether the given event is considered as forbidden.
-   * @see #setForbiddenEvent(int,boolean) setForbiddenEvent()
-   */
-  public boolean isForbiddenEvent(final int event)
-  {
-    if (mForbiddenEvents == null) {
-      return false;
-    } else {
-      return mForbiddenEvents.get(event);
-    }
+    return mFailingEventsAsSelfloops;
   }
 
 
@@ -155,10 +142,15 @@ public class SubsetConstructionTRSimplifier
   }
 
   @Override
+  public boolean isAlwaysEnabledEventsSupported()
+  {
+    return true;
+  }
+
+  @Override
   public void reset()
   {
     super.reset();
-    mForbiddenEvents = null;
     mSetOffsets = null;
     mStateSetBuffer = null;
     mTransitionBuffer = null;
@@ -188,7 +180,7 @@ public class SubsetConstructionTRSimplifier
         rel.createSuccessorsTauClosure(mTransitionLimit);
       mTauIterator = closure.createIterator();
       mEventIterator = closure.createPostEventClosureIterator(-1);
-    } else if (!rel.isDeterministic() || mForbiddenEvents != null) {
+    } else if (!rel.isDeterministic()) {
       mIsDeterministic = false;
       mTauIterator = null;
       final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
@@ -199,38 +191,11 @@ public class SubsetConstructionTRSimplifier
     }
 
     final int numEvents = rel.getNumberOfProperEvents();
-    int normalIndex = 0;
-    int forbiddenIndex = 0;
-    for (int event = EventEncoding.NONTAU; event < numEvents; event++) {
-      if ((rel.getProperEventStatus(event) & EventStatus.STATUS_UNUSED) == 0) {
-        if (isForbiddenEvent(event)) {
-          forbiddenIndex++;
-        } else {
-          normalIndex++;
-        }
-      }
-    }
-    mForbiddenEventIndexes = new int[forbiddenIndex];
-    mNormalEventIndexes = new int[normalIndex];
-    normalIndex = 0;
-    forbiddenIndex = 0;
-    for (int event = EventEncoding.NONTAU; event < numEvents; event++) {
-      if ((rel.getProperEventStatus(event) & EventStatus.STATUS_UNUSED) == 0) {
-        if (isForbiddenEvent(event)) {
-          mForbiddenEventIndexes[forbiddenIndex++] = event;
-        } else {
-          mNormalEventIndexes[normalIndex++] = event;
-        }
-      }
-    }
-    if (forbiddenIndex > 0) {
-      mForbiddenEventIterator = rel.createSuccessorsReadOnlyIterator();
-    }
-
     final int numStates = rel.getNumberOfStates();
     mSetOffsets = new TIntArrayList(numStates);
     mStateSetBuffer = new IntSetBuffer(numStates);
     mTransitionBuffer = new PreTransitionBuffer(numEvents, mTransitionLimit);
+    mDumpStateIndex = -1;
   }
 
   @Override
@@ -268,52 +233,65 @@ public class SubsetConstructionTRSimplifier
       }
 
       // 2. Expand subset states.
+      final int numEvents = rel.getNumberOfProperEvents();
       final IntSetBuffer.IntSetIterator iter = mStateSetBuffer.iterator();
       final TIntArrayList current = new TIntArrayList();
       states:
       for (int source = 0; source < mSetOffsets.size(); source++) {
         final int set = mSetOffsets.get(source);
-        for (final int event : mForbiddenEventIndexes) {
+        for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
           checkAbort();
           iter.reset(set);
-          while (iter.advance()) {
-            final int state = iter.getCurrentData();
-            mForbiddenEventIterator.reset(state, event);
-            if (mForbiddenEventIterator.advance()) {
-              mTransitionBuffer.addTransition(source, event, source);
-              continue states;
-            }
-          }
-        }
-        for (final int event : mNormalEventIndexes) {
-          checkAbort();
-          mEventIterator.resetEvent(event);
-          iter.reset(set);
-          while (iter.advance()) {
-            final int state = iter.getCurrentData();
-            mEventIterator.resume(state);
-            while (mEventIterator.advance()) {
-              final int target = mEventIterator.getCurrentTargetState();
-              current.add(target);
-            }
-          }
-          if (!current.isEmpty()) {
-            current.sort();
-            final int offset = mStateSetBuffer.add(current);
-            current.clear();
-            final int target;
-            if (offset > last) {
-              target = mSetOffsets.size();
-              if (target >= mStateLimit) {
-                throw new OverflowException(OverflowKind.STATE, mStateLimit);
+          mEventIterator.resetEvent(e);
+          final byte status = rel.getProperEventStatus(e);
+          if (EventStatus.isFailingEvent(status)) {
+            while (iter.advance()) {
+              final int state = iter.getCurrentData();
+              mEventIterator.resetState(state);
+              if (mEventIterator.advance()) {
+                if (mFailingEventsAsSelfloops) {
+                  mTransitionBuffer.addTransition(source, e, source);
+                } else {
+                  if (mDumpStateIndex < 0) {
+                    mDumpStateIndex = mSetOffsets.size();
+                    final int offset = mStateSetBuffer.add(current); // empty set
+                    mSetOffsets.add(offset);
+                  }
+                  mTransitionBuffer.addTransition(source, e, mDumpStateIndex);
+                }
+                if (EventStatus.isAlwaysEnabledEvent(status)) {
+                  continue states;
+                } else {
+                  break;
+                }
               }
-              mSetOffsets.add(offset);
-              last = offset;
-            } else {
-              target = mSetOffsets.binarySearch(offset);
             }
-            // TODO Suppress selfloop-only selfloop?
-            mTransitionBuffer.addTransition(source, event, target);
+          } else {
+            while (iter.advance()) {
+              final int state = iter.getCurrentData();
+              mEventIterator.resume(state);
+              while (mEventIterator.advance()) {
+                final int target = mEventIterator.getCurrentTargetState();
+                current.add(target);
+              }
+            }
+            if (!current.isEmpty()) {
+              current.sort();  // duplicates have been suppressed by iterator
+              final int offset = mStateSetBuffer.add(current);
+              current.clear();
+              final int target;
+              if (offset > last) {
+                target = mSetOffsets.size();
+                if (target >= mStateLimit) {
+                  throw new OverflowException(OverflowKind.STATE, mStateLimit);
+                }
+                mSetOffsets.add(offset);
+                last = offset;
+              } else {
+                target = mSetOffsets.binarySearch(offset);
+              }
+              mTransitionBuffer.addTransition(source, e, target);
+            }
           }
         }
       }
@@ -333,8 +311,12 @@ public class SubsetConstructionTRSimplifier
       final int numDetStates = mSetOffsets.size();
       final int numEvents = rel.getNumberOfProperEvents();
       final EventStatusProvider propStatus = new DefaultEventStatusProvider(rel);
-      final IntStateBuffer detStates =
-        new IntStateBuffer(numDetStates, propStatus);
+      final IntStateBuffer detStates;
+      if (mDumpStateIndex < 0) {
+        detStates = new IntStateBuffer(numDetStates, propStatus);
+      } else {
+        detStates = new IntStateBuffer(numDetStates, mDumpStateIndex, propStatus);
+      }
       detStates.setInitial(0, true);
       final IntSetBuffer.IntSetIterator iter = mStateSetBuffer.iterator();
       for (int detstate = 0; detstate < numDetStates; detstate++) {
@@ -357,24 +339,27 @@ public class SubsetConstructionTRSimplifier
       rel.removeEvent(EventEncoding.TAU);
       mTransitionBuffer.addOutgoingTransitions(rel);
       mTransitionBuffer = null;
-      if (mForbiddenEvents == null) {
-        rel.removeProperSelfLoopEvents();
-      } else {
-        final TIntArrayList forbiddenVictims =
-          new TIntArrayList(mForbiddenEventIndexes.length);
-        for (int event = 0; event < numEvents; event++) {
-          if (isSelfloopEventExceptInForbiddenStates(event)) {
-            if (mForbiddenEvents.get(event)) {
-              forbiddenVictims.add(event);
-            } else {
-              rel.removeEvent(event);
-            }
+
+      final TIntArrayList forbiddenVictims =  new TIntArrayList(numEvents);
+      final TransitionIterator eventIter = rel.createSuccessorsReadOnlyIterator();
+      final TransitionIterator failingIter = mFailingEventsAsSelfloops ?
+        rel.createSuccessorsReadOnlyIteratorByStatus
+          (EventStatus.STATUS_FAILING, EventStatus.STATUS_ALWAYS_ENABLED) :
+        null;
+      mDumpStateIndex = rel.getDumpStateIndex();
+      for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+        if (isSelfloopEventExceptInFailingStates(e, eventIter, failingIter)) {
+          final byte status = rel.getProperEventStatus(e);
+          if (EventStatus.isFailingEvent(status)) {
+            forbiddenVictims.add(e);
+          } else {
+            rel.removeEvent(e);
           }
         }
-        for (int e = 0; e < forbiddenVictims.size(); e++) {
-          final int event = forbiddenVictims.get(e);
-          rel.removeEvent(event);
-        }
+      }
+      for (int i = 0; i < forbiddenVictims.size(); i++) {
+        final int e = forbiddenVictims.get(i);
+        rel.removeEvent(e);
       }
     }
   }
@@ -382,40 +367,35 @@ public class SubsetConstructionTRSimplifier
   @Override
   protected void tearDown()
   {
-    mForbiddenEventIndexes = mNormalEventIndexes = null;
-    mTauIterator = mForbiddenEventIterator = mEventIterator = null;
+    mTauIterator = mEventIterator = null;
   }
 
 
   //#########################################################################
   //# Auxiliary Methods
-  private boolean isSelfloopEventExceptInForbiddenStates(final int event)
+  private boolean isSelfloopEventExceptInFailingStates
+    (final int e,
+     final TransitionIterator eventIter,
+     final TransitionIterator failingIter)
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    if ((rel.getProperEventStatus(event) & EventStatus.STATUS_UNUSED) == 0) {
-      final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
+    final byte status = rel.getProperEventStatus(e);
+    if (EventStatus.isUsedEvent(status)) {
       final int numStates = rel.getNumberOfStates();
-      states:
-      for (int state = 0; state < numStates; state++) {
-        if (rel.isReachable(state)) {
-          boolean selfloop = false;
-          iter.reset(state, event);
-          while (iter.advance()) {
-            if (iter.getCurrentTargetState() != state) {
-              return false;
-            } else {
-              selfloop = true;
-            }
+      for (int s = 0; s < numStates; s++) {
+        if (s == mDumpStateIndex) {
+          continue;
+        } else if (mFailingEventsAsSelfloops) {
+          failingIter.resetState(s);
+          if (failingIter.advance()) {
+            continue;
           }
-          if (!selfloop) {
-            for (final int e : mForbiddenEventIndexes) {
-              iter.reset(state, e);
-              if (iter.advance()) {
-                continue states;
-              }
-            }
-            return false;
-          }
+        }
+        eventIter.reset(s, e);
+        if (!eventIter.advance()) {
+          return false;
+        } else if (eventIter.getCurrentTargetState() != s) {
+          return false;
         }
       }
       return true;
@@ -429,17 +409,15 @@ public class SubsetConstructionTRSimplifier
   //# Data Members
   private int mStateLimit = Integer.MAX_VALUE;
   private int mTransitionLimit = Integer.MAX_VALUE;
-  private BitSet mForbiddenEvents = null;
+  private boolean mFailingEventsAsSelfloops = false;
 
   private boolean mIsDeterministic;
-  private int[] mForbiddenEventIndexes;
-  private int[] mNormalEventIndexes;
   private TransitionIterator mTauIterator;
   private TransitionIterator mEventIterator;
-  private TransitionIterator mForbiddenEventIterator;
   private TIntArrayList mSetOffsets;
   private IntSetBuffer mStateSetBuffer;
   private PreTransitionBuffer mTransitionBuffer;
+  private int mDumpStateIndex;
 
 }
 
