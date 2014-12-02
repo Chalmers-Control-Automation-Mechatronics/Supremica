@@ -326,24 +326,10 @@ public class CommandLineTool
 
     } catch (final EvalException | WatersUnmarshalException | IOException
              exception) {
-      System.err.print("FATAL ERROR (");
-      System.err.print(ProxyTools.getShortClassName(exception));
-      System.err.println(")");
-      final String msg = exception.getMessage();
-      if (msg != null) {
-        System.err.println(exception.getMessage());
-      }
+      showSupportedException(exception);
     } catch (final InvocationTargetException exception) {
       final Throwable cause = exception.getCause();
-      final String msg = cause.getMessage();
-      if (msg != null) {
-        System.err.println(msg);
-      } else {
-        System.err.println("FATAL ERROR !!!");
-        System.err.print(ProxyTools.getShortClassName(cause));
-        System.err.println(" caught in main()!");
-        exception.printStackTrace(System.err);
-      }
+      showSupportedException(cause);
     } catch (final Throwable exception) {
       System.err.println("FATAL ERROR !!!");
       System.err.print(ProxyTools.getShortClassName(exception));
@@ -365,6 +351,17 @@ public class CommandLineTool
     System.err.println
       ("USAGE: java CommandLineTool <factory>  [options] <checker> <file> ...");
     System.exit(1);
+  }
+
+  private static void showSupportedException(final Throwable exception)
+  {
+    System.err.print("FATAL ERROR (");
+    System.err.print(ProxyTools.getShortClassName(exception));
+    System.err.println(")");
+    final String msg = exception.getMessage();
+    if (msg != null) {
+      System.err.println(exception.getMessage());
+    }
   }
 
 

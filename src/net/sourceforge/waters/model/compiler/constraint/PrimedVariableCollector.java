@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.model.compiler.efa
-//# CLASS:   EFAVariableCollector
+//# PROJECT: Waters EFSM Compiler
+//# PACKAGE: net.sourceforge.waters.model.compiler.constraint
+//# CLASS:   PrimedVariableCollector
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -22,7 +22,7 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 
 /**
- * A utility class to collect all the primed EFA variables in expressions.
+ * A utility class to collect all the primed EFSM variables in expressions.
  *
  * @author Robi Malik
  */
@@ -30,7 +30,6 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 class PrimedVariableCollector
   extends DescendingModuleProxyVisitor
 {
-
 
   //#########################################################################
   //# Constructor
@@ -46,9 +45,9 @@ class PrimedVariableCollector
   //# Invocation
   /**
    * Collects all primed variables in the given expression.
-   * @param  expr     The expression to be searched.
-   * @param  vars     Found variables will be added in their non-primed form
-   *                  to this collection.
+   * @param  expr        The expression to be searched.
+   * @param  vars        Found variables will be added in their primed form
+   *                     to this set.
    */
   void collectPrimedVariables(final SimpleExpressionProxy expr,
                               final ProxyAccessorSet<UnaryExpressionProxy> vars)
@@ -61,6 +60,12 @@ class PrimedVariableCollector
     }
   }
 
+  /**
+   * Collects all primed variables in the given expressions.
+   * @param  expr        A collection of expressions to be searched.
+   * @param  vars        Found variables will be added in their primed form
+   *                     to this set.
+   */
   void collectPrimedVariables(final Collection<SimpleExpressionProxy> exprs,
                               final ProxyAccessorSet<UnaryExpressionProxy> vars)
   {
