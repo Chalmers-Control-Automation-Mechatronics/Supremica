@@ -284,7 +284,6 @@ public class CompositionalModelAnalyzerFactory
   private static class AbstractionMethodArgument
     extends CommandLineArgumentString
   {
-
     //#######################################################################
     //# Constructors
     private AbstractionMethodArgument()
@@ -310,6 +309,20 @@ public class CompositionalModelAnalyzerFactory
         System.exit(1);
       }
       composer.setAbstractionProcedureCreator(creator);
+    }
+
+    //#######################################################################
+    //# Printing
+    @Override
+    public void dump(final PrintStream stream,
+                     final ModelAnalyzer analyzer)
+    {
+      super.dump(stream, analyzer);
+      final AbstractCompositionalModelAnalyzer composer =
+        (AbstractCompositionalModelAnalyzer) analyzer;
+      final EnumFactory<AbstractionProcedureCreator>
+        factory = composer.getAbstractionProcedureFactory();
+      factory.dumpEnumeration(stream, INDENT);
     }
   }
 
@@ -581,7 +594,6 @@ public class CompositionalModelAnalyzerFactory
   private static class DeadlockPruningArgument
     extends CommandLineArgumentBoolean
   {
-
     //#######################################################################
     //# Constructors
     private DeadlockPruningArgument()
@@ -594,14 +606,13 @@ public class CompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer verifier)
+    public void configure(final ModelAnalyzer analyzer)
     {
       final AbstractCompositionalModelAnalyzer composer =
-        (AbstractCompositionalModelAnalyzer) verifier;
+        (AbstractCompositionalModelAnalyzer) analyzer;
       final boolean enable = getValue();
       composer.setPruningDeadlocks(enable);
     }
-
   }
 
 

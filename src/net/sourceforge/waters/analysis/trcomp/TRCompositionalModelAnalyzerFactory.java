@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.analysis.trcomp;
 
+import java.io.PrintStream;
+
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentBoolean;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentChain;
@@ -120,6 +122,20 @@ public class TRCompositionalModelAnalyzerFactory
         System.exit(1);
       }
       composer.setSimplifier(creator);
+    }
+
+    //#######################################################################
+    //# Printing
+    @Override
+    public void dump(final PrintStream stream,
+                     final ModelAnalyzer analyzer)
+    {
+      super.dump(stream, analyzer);
+      final AbstractTRCompositionalAnalyzer composer =
+        (AbstractTRCompositionalAnalyzer) analyzer;
+      final EnumFactory<TRToolCreator<TransitionRelationSimplifier>>
+        factory = composer.getTRSimplifierFactory();
+      factory.dumpEnumeration(stream, INDENT);
     }
   }
 
@@ -365,7 +381,8 @@ public class TRCompositionalModelAnalyzerFactory
     private SpecialEventsArgument()
     {
       super("-se",
-            "Enable or disable blocked, failing, and selfloop-only events");
+            "Enable or disable blocked, failing, selfloop-only,\n" +
+            "and always enabled events");
     }
 
     //#######################################################################

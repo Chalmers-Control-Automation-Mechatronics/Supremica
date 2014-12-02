@@ -16,6 +16,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
@@ -331,6 +332,17 @@ public class CommandLineTool
       final String msg = exception.getMessage();
       if (msg != null) {
         System.err.println(exception.getMessage());
+      }
+    } catch (final InvocationTargetException exception) {
+      final Throwable cause = exception.getCause();
+      final String msg = cause.getMessage();
+      if (msg != null) {
+        System.err.println(msg);
+      } else {
+        System.err.println("FATAL ERROR !!!");
+        System.err.print(ProxyTools.getShortClassName(cause));
+        System.err.println(" caught in main()!");
+        exception.printStackTrace(System.err);
       }
     } catch (final Throwable exception) {
       System.err.println("FATAL ERROR !!!");
