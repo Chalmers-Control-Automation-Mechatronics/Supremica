@@ -992,7 +992,6 @@ public abstract class AbstractTRCompositionalAnalyzer
         if (mTraceCheckingEnabled) {
           checkIntermediateCounterExample(trace);
         }
-        step.dispose();
         iter.remove();
       }
       result.setCounterExample(trace);
@@ -1405,7 +1404,6 @@ public abstract class AbstractTRCompositionalAnalyzer
         partStep.removeLastSimplifier();
         if (partStep.isEmpty()) {
           mSteps.removeLast();
-          partStep.dispose();
         }
       }
     }

@@ -79,24 +79,6 @@ abstract class TRAbstractionStep
     mOutputAutomaton = null;
   }
 
-  TRAbstractionStep getSuccessor()
-  {
-    return mSuccessor;
-  }
-
-  void setSuccessor(final TRAbstractionStep step)
-  {
-    mSuccessor = step;
-  }
-
-  void dispose()
-  {
-    mOutputAutomaton = null;
-    for (final TRAbstractionStep pred : getPredecessors()) {
-      pred.mSuccessor = null;
-    }
-  }
-
 
   //#########################################################################
   //# Debugging
@@ -118,6 +100,5 @@ abstract class TRAbstractionStep
   //# Data Members
   private final String mName;
   private TRAutomatonProxy mOutputAutomaton;
-  private TRAbstractionStep mSuccessor;
 
 }

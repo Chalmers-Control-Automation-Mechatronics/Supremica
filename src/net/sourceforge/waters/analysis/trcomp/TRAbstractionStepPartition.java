@@ -62,7 +62,6 @@ class TRAbstractionStepPartition
     mUsedSimplifiers.add(simplifier);
     mIsPartitioning = simplifier.isPartitioning();
     mPartition = mIsPartitioning ? simplifier.getResultPartition() : null;
-    pred.setSuccessor(this);
   }
 
 
