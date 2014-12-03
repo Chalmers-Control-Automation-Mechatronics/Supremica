@@ -237,7 +237,7 @@ class UnifiedEFASimplifier extends AbstractEFAAlgorithm
         new ListBufferTransitionRelation(oldRel, config);
       final int numStates = rel.getNumberOfStates();
       final int numTrans = rel.getNumberOfTransitions();
-      final int numMarkings = rel.getNumberOfMarkings();
+      final int numMarkings = rel.getNumberOfMarkings(false);
       mSimplifier.setTransitionRelation(rel);
       final int prop =
         rel.isPropositionUsed(UnifiedEFAEventEncoding.OMEGA) ? 0 : -1;
@@ -247,7 +247,7 @@ class UnifiedEFASimplifier extends AbstractEFAAlgorithm
         final int newNumReachableStates = rel.getNumberOfReachableStates();
         if (newNumReachableStates == numStates &&
             rel.getNumberOfTransitions() == numTrans &&
-            rel.getNumberOfMarkings() == numMarkings &&
+            rel.getNumberOfMarkings(false) == numMarkings &&
             !isAlphabetChanged(oldRel, rel)) {
           return null;
         }

@@ -1319,7 +1319,6 @@ public abstract class AbstractTRCompositionalAnalyzer
         } else {
           final TRAbstractionStep pred = last == null ?
             mIntermediateAbstractionSequence.getPredecessor() : last;
-          pred.setOutputAutomaton(null);
           final EventEncoding enc =
             mIntermediateAbstractionSequence.getCurrentEventEncoding();
           final TRAbstractionStep step =
@@ -1406,6 +1405,7 @@ public abstract class AbstractTRCompositionalAnalyzer
         partStep.removeLastSimplifier();
         if (partStep.isEmpty()) {
           mSteps.removeLast();
+          partStep.dispose();
         }
       }
     }
@@ -1416,7 +1416,10 @@ public abstract class AbstractTRCompositionalAnalyzer
     {
       final TRAbstractionStep last = mSteps.peekLast();
       if (last != null && isCounterExampleEnabled()) {
-        last.setOutputAutomaton(result);
+        if (mPredecessor != null) {
+          mPredecessor.clearOutputAutomaton();
+        }
+        last.provideOutputAutomaton(result);
         mAbstractionSequence.addAll(mSteps);
         mCurrentAutomataMap.put(result, last);
       }

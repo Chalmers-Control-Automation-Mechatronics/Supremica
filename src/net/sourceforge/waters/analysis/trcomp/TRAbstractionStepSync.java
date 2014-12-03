@@ -49,7 +49,7 @@ class TRAbstractionStepSync
                         final TRSynchronousProductBuilder builder,
                         final TRSynchronousProductResult result)
   {
-    super(result.getComputedAutomaton());
+    super(result.getComputedAutomaton().getName());
     mPredecessors = preds;
     mEventEncoding = enc;
     mPropositions = props;
@@ -58,10 +58,6 @@ class TRAbstractionStepSync
     final TRAutomatonProxy outputAut = result.getComputedAutomaton();
     final ListBufferTransitionRelation rel = outputAut.getTransitionRelation();
     mDumpStateIndex = rel.getDumpStateIndex();
-    mStateMap = result.getStateMap();
-    for (final TRAbstractionStep pred : preds) {
-      pred.setSuccessor(this);
-    }
   }
 
 
@@ -121,16 +117,17 @@ class TRAbstractionStepSync
   }
 
   @Override
-  TRAutomatonProxy setOutputAutomaton(final TRAutomatonProxy outputAut)
+  void provideOutputAutomaton(final TRAutomatonProxy outputAut)
   {
-    final TRAutomatonProxy old = super.setOutputAutomaton(outputAut);
-    assert outputAut == null || outputAut == old :
-      "Output automaton of TRAbstractionStepSync must be set through " +
-      "constructor or createOutputAutomaton() method!";
-    if (outputAut == null) {
-      mStateMap = null;
-    }
-    return old;
+    // Can't receive output automaton from outside because of missing state
+    // map. Must use createOutputAutomaton() to rebuild if needed.
+  }
+
+  @Override
+  void clearOutputAutomaton()
+  {
+    super.clearOutputAutomaton();
+    mStateMap = null;
   }
 
   @Override

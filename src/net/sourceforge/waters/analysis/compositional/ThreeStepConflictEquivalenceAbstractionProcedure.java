@@ -223,7 +223,7 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
       analyzer.showDebugLog(rel);
       final int numStates = rel.getNumberOfStates();
       final int numTrans = aut.getTransitions().size();
-      final int numMarkings = rel.getNumberOfMarkings();
+      final int numMarkings = rel.getNumberOfMarkings(false);
       AutomatonProxy lastAut = aut;
       StateEncoding lastStateEnc = inputStateEnc;
       TRPartition partition = null;
@@ -291,7 +291,7 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
         rel = mPostChain.getTransitionRelation();
         if (rel.getNumberOfReachableStates() == numStates &&
             rel.getNumberOfTransitions() == numTrans &&
-            rel.getNumberOfMarkings() == numMarkings) {
+            rel.getNumberOfMarkings(false) == numMarkings) {
           return false;
         } else if (lccStep == null && ccStep == null) {
           lastAut = aut;

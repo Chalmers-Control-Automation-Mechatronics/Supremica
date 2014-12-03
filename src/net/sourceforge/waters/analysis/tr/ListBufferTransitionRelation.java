@@ -627,10 +627,14 @@ public class ListBufferTransitionRelation
   /**
    * Gets the total number of markings in this transition relation. Each
    * instance of a proposition marking a reachable state counts as marking.
+   * @param  countUnused  Whether unused proposition should be counted.
+   *                      If <CODE>true</CODE> unused propositions are counted
+   *                      as marked in all states; if <CODE>false</CODE>,
+   *                      unused propositions are not counted.
    */
-  public int getNumberOfMarkings()
+  public int getNumberOfMarkings(final boolean countUnused)
   {
-    return mStateBuffer.getNumberOfMarkings();
+    return mStateBuffer.getNumberOfMarkings(countUnused);
   }
 
   /**
@@ -2870,7 +2874,7 @@ public class ListBufferTransitionRelation
         (getNumberOfReachableStates() + " states, " +
          getNumberOfTransitions() + " transitions, " +
          numEvents + " proper events, " +
-         getNumberOfMarkings() + "(" + numProps + ") markings.");
+         getNumberOfMarkings(false) + "(" + numProps + ") markings.");
     }
   }
 

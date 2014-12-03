@@ -246,7 +246,7 @@ class EFSMTRSimplifier extends AbstractEFSMAlgorithm
       ListBufferTransitionRelation rel = efsmTR.getTransitionRelation();
       final int numStates = rel.getNumberOfStates();
       final int numTrans = rel.getNumberOfTransitions();
-      final int numMarkings = rel.getNumberOfMarkings();
+      final int numMarkings = rel.getNumberOfMarkings(false);
       mSimplifier.setTransitionRelation(rel);
       final int prop = rel.isPropositionUsed(0) ? 0 : -1;
       mSimplifier.setDefaultMarkingID(prop);
@@ -257,7 +257,7 @@ class EFSMTRSimplifier extends AbstractEFSMAlgorithm
         final int newNumStates = rel.getNumberOfStates();
         if (newNumReachableStates == numStates &&
             rel.getNumberOfTransitions() == numTrans &&
-            rel.getNumberOfMarkings() == numMarkings) {
+            rel.getNumberOfMarkings(false) == numMarkings) {
           return null;
         }
         final int newProp = rel.isPropositionUsed(0) ? 0 : -1;

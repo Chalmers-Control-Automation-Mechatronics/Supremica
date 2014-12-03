@@ -1349,7 +1349,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       logger.debug(rel.getName());
       logger.debug(rel.getNumberOfReachableStates() + " states, " +
                    rel.getNumberOfTransitions() + " transitions, " +
-                   rel.getNumberOfMarkings() + " markings.");
+                   rel.getNumberOfMarkings(false) + " markings.");
     }
   }
 

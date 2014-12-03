@@ -221,7 +221,7 @@ public class TRSimplifierStatistics
       mInputTransitions += rel.getNumberOfTransitions();
     }
     if (mInputMarkings >= 0) {
-      mInputMarkings += rel.getNumberOfMarkings();
+      mInputMarkings += rel.getNumberOfMarkings(false);
     }
   }
 
@@ -253,7 +253,7 @@ public class TRSimplifierStatistics
         mOutputTransitions += rel.getNumberOfTransitions();
       }
       if (mOutputMarkings >= 0) {
-        mOutputMarkings += rel.getNumberOfMarkings();
+        mOutputMarkings += rel.getNumberOfMarkings(false);
       }
     } else {
       if (mUnchangedStates >= 0) {
@@ -263,7 +263,7 @@ public class TRSimplifierStatistics
         mUnchangedTransitions += rel.getNumberOfTransitions();
       }
       if (mUnchangedMarkings >= 0) {
-        mUnchangedMarkings += rel.getNumberOfMarkings();
+        mUnchangedMarkings += rel.getNumberOfMarkings(false);
       }
     }
   }

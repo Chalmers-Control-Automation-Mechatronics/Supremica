@@ -76,13 +76,13 @@ abstract class TRAbstractionProcedure
       getAnalyzer().showDebugLog(rel);
       final int numStates = rel.getNumberOfStates();
       final int numTrans = aut.getTransitions().size();
-      final int numMarkings = rel.getNumberOfMarkings();
+      final int numMarkings = rel.getNumberOfMarkings(false);
       mSimplifier.setTransitionRelation(rel);
       if (mSimplifier.run()) {
         rel = mSimplifier.getTransitionRelation();
         if (rel.getNumberOfReachableStates() == numStates &&
             rel.getNumberOfTransitions() == numTrans &&
-            rel.getNumberOfMarkings() == numMarkings) {
+            rel.getNumberOfMarkings(false) == numMarkings) {
           return false;
         }
         rel.removeRedundantPropositions();

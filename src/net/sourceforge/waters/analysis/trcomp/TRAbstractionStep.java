@@ -41,12 +41,6 @@ abstract class TRAbstractionStep
     mOutputAutomaton = null;
   }
 
-  TRAbstractionStep(final TRAutomatonProxy outputAut)
-  {
-    mName = outputAut.getName();
-    mOutputAutomaton = outputAut;
-  }
-
 
   //#########################################################################
   //# Interface Methods
@@ -75,11 +69,14 @@ abstract class TRAbstractionStep
     return mOutputAutomaton;
   }
 
-  TRAutomatonProxy setOutputAutomaton(final TRAutomatonProxy aut)
+  void provideOutputAutomaton(final TRAutomatonProxy aut)
   {
-    final TRAutomatonProxy old = mOutputAutomaton;
     mOutputAutomaton = aut;
-    return old;
+  }
+
+  void clearOutputAutomaton()
+  {
+    mOutputAutomaton = null;
   }
 
   TRAbstractionStep getSuccessor()

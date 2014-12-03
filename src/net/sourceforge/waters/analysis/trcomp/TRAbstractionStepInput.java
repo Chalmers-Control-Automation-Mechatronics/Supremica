@@ -47,7 +47,7 @@ class TRAbstractionStepInput
                          final StateProxy dumpState,
                          final TRAutomatonProxy outputAut)
   {
-    super(outputAut);
+    super(outputAut.getName());
     mInputAutomaton = inputAut;
     mEventEncoding = enc;
     mDumpState = dumpState;

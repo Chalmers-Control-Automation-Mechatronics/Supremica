@@ -479,7 +479,7 @@ public class TRCompositionalConflictChecker
   {
     final int limit = getInternalTransitionLimit();
     final ChainTRSimplifier chain = startAbstractionChain();
-    final TRSimplificationListener markingListener = new PartitioningListener();
+    final TRSimplificationListener markingListener = new MarkingListener();
     final TRSimplificationListener partitioningListener =
       new PartitioningListener();
     final TauLoopRemovalTRSimplifier loopRemover =
@@ -569,7 +569,7 @@ public class TRCompositionalConflictChecker
             isCounterExampleEnabled()) {
           final ListBufferTransitionRelation rel =
             simplifier.getTransitionRelation();
-          mOldNumberOfMarkings = rel.getNumberOfMarkings();
+          mOldNumberOfMarkings = rel.getNumberOfMarkings(true);
         }
         return true;
       } else {
@@ -589,7 +589,7 @@ public class TRCompositionalConflictChecker
           seq.removeLastPartitionSimplifier();
           final ListBufferTransitionRelation rel =
             simplifier.getTransitionRelation();
-          if (rel.getNumberOfMarkings() == mOldNumberOfMarkings) {
+          if (rel.getNumberOfMarkings(true) == mOldNumberOfMarkings) {
             return;
           }
         }

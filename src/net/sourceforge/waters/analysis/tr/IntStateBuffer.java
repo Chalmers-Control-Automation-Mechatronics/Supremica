@@ -261,8 +261,12 @@ public class IntStateBuffer
    * Gets the total number of markings in this state buffer.
    * Each instance of a proposition marking a reachable state counts
    * as marking.
+   * @param  countUnused  Whether unused proposition should be counted.
+   *                      If <CODE>true</CODE> unused propositions are counted
+   *                      as marked in all states; if <CODE>false</CODE>,
+   *                      unused propositions are not counted.
    */
-  public int getNumberOfMarkings()
+  public int getNumberOfMarkings(final boolean countUnused)
   {
     final int numProps = mPropositionStatus.getNumberOfPropositions();
     int result = 0;
@@ -273,6 +277,8 @@ public class IntStateBuffer
             result++;
           }
         }
+      } else if (countUnused) {
+        result += getNumberOfStates();
       }
     }
     return result;

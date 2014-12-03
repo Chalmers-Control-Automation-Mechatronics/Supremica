@@ -127,7 +127,7 @@ class TRAbstractionStepPartition
       mPredecessor.getOutputAutomaton(inputConfig);
     // We are going to destructively change this automaton,
     // so we need to clear the copy cached on the predecessor.
-    mPredecessor.setOutputAutomaton(null);
+    mPredecessor.clearOutputAutomaton();
     final ListBufferTransitionRelation inputRel =
       inputAut.getTransitionRelation();
     final EventEncoding inputEventEncoding = new EventEncoding(mEventEncoding);

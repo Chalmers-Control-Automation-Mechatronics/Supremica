@@ -426,7 +426,7 @@ public class ObservationEquivalenceTRSimplifier
         }
       }
     }
-    final int numProps = rel.getNumberOfMarkings();
+    final int numProps = rel.getNumberOfPropositions();
     final int size = numProps > 8 ? 256 : 1 << numProps;
     setUpPartition(size);
     final TLongObjectHashMap<EquivalenceClass> prepartition =
