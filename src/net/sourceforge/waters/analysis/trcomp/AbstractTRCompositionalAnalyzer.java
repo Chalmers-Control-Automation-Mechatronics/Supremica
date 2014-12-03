@@ -654,6 +654,11 @@ public abstract class AbstractTRCompositionalAnalyzer
     return mCurrentSubsystem;
   }
 
+  protected IntermediateAbstractionSequence getIntermediateAbstractionSequence()
+  {
+    return mIntermediateAbstractionSequence;
+  }
+
 
   //#########################################################################
   //# Algorithm
@@ -1198,9 +1203,9 @@ public abstract class AbstractTRCompositionalAnalyzer
    * equivalence. This tool creator produces a transition relation simplifier
    * consisting of:</P>
    * <UL>
-   * <LI>Special events removal {@link SpecialEventsTRSimplifier}</LI>
-   * <LI>Tau-loop removal {@link TauLoopRemovalTRSimplifier}</LI>
-   * <LI>Observation equivalence {@link ObservationEquivalenceTRSimplifier}</LI>
+   * <LI>Special events removal ({@link SpecialEventsTRSimplifier})</LI>
+   * <LI>Tau-loop removal ({@link TauLoopRemovalTRSimplifier})</LI>
+   * <LI>Observation equivalence ({@link ObservationEquivalenceTRSimplifier})</LI>
    * </UL>.
    */
   public static final TRToolCreator<TransitionRelationSimplifier> OEQ =
@@ -1221,10 +1226,10 @@ public abstract class AbstractTRCompositionalAnalyzer
    * equivalence. This tool creator produces a transition relation simplifier
    * consisting of:</P>
    * <UL>
-   * <LI>Special events removal {@link SpecialEventsTRSimplifier}</LI>
-   * <LI>Tau-loop removal {@link TauLoopRemovalTRSimplifier}</LI>
+   * <LI>Special events removal ({@link SpecialEventsTRSimplifier})</LI>
+   * <LI>Tau-loop removal ({@link TauLoopRemovalTRSimplifier})</LI>
    * <LI>Weak observation equivalence
-   *     {@link ObservationEquivalenceTRSimplifier}</LI>
+   *     ({@link ObservationEquivalenceTRSimplifier})</LI>
    * </UL>.
    */
   public static final TRToolCreator<TransitionRelationSimplifier> WOEQ =
@@ -1255,16 +1260,16 @@ public abstract class AbstractTRCompositionalAnalyzer
       new ObservationEquivalenceTRSimplifier();
     bisimulator.setEquivalence(equivalence);
     bisimulator.setTransitionRemovalMode
-    (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     bisimulator.setMarkingMode
-    (ObservationEquivalenceTRSimplifier.MarkingMode.SATURATE);
+      (ObservationEquivalenceTRSimplifier.MarkingMode.SATURATE);
     final int limit = getInternalTransitionLimit();
     bisimulator.setTransitionLimit(limit);
     bisimulator.setSimplificationListener(listener);
     chain.add(bisimulator);
     chain.setPropositions(PRECONDITION_MARKING, DEFAULT_MARKING);
     chain.setPreferredOutputConfiguration
-    (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     return chain;
   }
 
@@ -1335,7 +1340,7 @@ public abstract class AbstractTRCompositionalAnalyzer
 
   //#########################################################################
   //# Inner Class IntermediateAbstractionSequence
-  private class IntermediateAbstractionSequence
+  class IntermediateAbstractionSequence
   {
     //#######################################################################
     //# Constructor
@@ -1351,33 +1356,62 @@ public abstract class AbstractTRCompositionalAnalyzer
 
     //#######################################################################
     //# Access
-    private TRAbstractionStep getPredecessor()
+    TRAbstractionStep getPredecessor()
     {
       return mPredecessor;
     }
 
-    private EventEncoding getInputEventEncoding()
+    EventEncoding getInputEventEncoding()
     {
       return mInputEventEncoding;
     }
 
-    private EventEncoding getCurrentEventEncoding()
+    EventEncoding getCurrentEventEncoding()
     {
       return mCurrentEventEncoding;
     }
 
-    private TRAbstractionStep getLastIntermediateStep()
+    TRAbstractionStep getLastIntermediateStep()
     {
       return mSteps.peekLast();
     }
 
-    private void append(final TRAbstractionStep step)
+    void append(final TRAbstractionStep step)
     {
       mSteps.add(step);
       mCurrentEventEncoding =
         new EventEncoding(mInputAutomaton.getEventEncoding());
     }
 
+    TransitionRelationSimplifier getLastPartitionSimplifier()
+    {
+      final TRAbstractionStep step = getLastIntermediateStep();
+      if (step == null) {
+        return null;
+      } else if (step instanceof TRAbstractionStepPartition) {
+        final TRAbstractionStepPartition partStep =
+          (TRAbstractionStepPartition) step;
+        return partStep.getLastSimplifier();
+      } else {
+        return null;
+      }
+    }
+
+    void removeLastPartitionSimplifier()
+    {
+      final TRAbstractionStep step = mSteps.peekLast();
+      if (step != null && step instanceof TRAbstractionStepPartition) {
+        final TRAbstractionStepPartition partStep =
+          (TRAbstractionStepPartition) step;
+        partStep.removeLastSimplifier();
+        if (partStep.isEmpty()) {
+          mSteps.removeLast();
+        }
+      }
+    }
+
+    //#######################################################################
+    //# String Abstraction Steps
     private void commit(final TRAutomatonProxy result)
     {
       final TRAbstractionStep last = mSteps.peekLast();

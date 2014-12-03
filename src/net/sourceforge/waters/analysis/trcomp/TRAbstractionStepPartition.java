@@ -58,8 +58,8 @@ class TRAbstractionStepPartition
     mEventEncoding = eventEncoding;
     mDefaultMarking = defaultMarking;
     mPreconditionMarking = preconditionMarking;
-    mSimplificationSteps = new LinkedList<>();
-    mSimplificationSteps.add(simplifier);
+    mUsedSimplifiers = new LinkedList<>();
+    mUsedSimplifiers.add(simplifier);
     mIsPartitioning = simplifier.isPartitioning();
     mPartition = mIsPartitioning ? simplifier.getResultPartition() : null;
     pred.setSuccessor(this);
@@ -78,9 +78,26 @@ class TRAbstractionStepPartition
     return mPartition;
   }
 
+  boolean isEmpty()
+  {
+    return mUsedSimplifiers.isEmpty();
+  }
+
+  TransitionRelationSimplifier getLastSimplifier()
+  {
+    final int end = mUsedSimplifiers.size() - 1;
+    return mUsedSimplifiers.get(end);
+  }
+
+  TransitionRelationSimplifier removeLastSimplifier()
+  {
+    final int end = mUsedSimplifiers.size() - 1;
+    return mUsedSimplifiers.remove(end);
+  }
+
   void merge(final TransitionRelationSimplifier simplifier)
   {
-    mSimplificationSteps.add(simplifier);
+    mUsedSimplifiers.add(simplifier);
     mIsPartitioning &= simplifier.isPartitioning();
     if (mIsPartitioning) {
       final TRPartition partition = simplifier.getResultPartition();
@@ -103,7 +120,7 @@ class TRAbstractionStepPartition
   public TRAutomatonProxy createOutputAutomaton(final int preferredConfig)
     throws AnalysisException
   {
-    final ChainTRSimplifier chain = new ChainTRSimplifier(mSimplificationSteps);
+    final ChainTRSimplifier chain = new ChainTRSimplifier(mUsedSimplifiers);
     chain.setPreferredOutputConfiguration(preferredConfig);
     final int inputConfig = chain.getPreferredInputConfiguration();
     final TRAutomatonProxy inputAut =
@@ -491,7 +508,7 @@ class TRAbstractionStepPartition
   private final EventEncoding mEventEncoding;
   private final int mDefaultMarking;
   private final int mPreconditionMarking;
-  private final List<TransitionRelationSimplifier> mSimplificationSteps;
+  private final List<TransitionRelationSimplifier> mUsedSimplifiers;
   private boolean mIsPartitioning;
   private TRPartition mPartition;
 

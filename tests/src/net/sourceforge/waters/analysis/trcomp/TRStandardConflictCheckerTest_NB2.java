@@ -17,7 +17,7 @@ import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class TRStandardConflictCheckerTest
+public class TRStandardConflictCheckerTest_NB2
   extends AbstractStandardConflictCheckerTest
 {
 
@@ -26,7 +26,7 @@ public class TRStandardConflictCheckerTest
   public static Test suite()
   {
     final TestSuite testSuite =
-      new TestSuite(TRStandardConflictCheckerTest.class);
+      new TestSuite(TRStandardConflictCheckerTest_NB2.class);
     return testSuite;
   }
 
@@ -45,6 +45,7 @@ public class TRStandardConflictCheckerTest
   {
     final TRCompositionalConflictChecker checker =
       new TRCompositionalConflictChecker();
+    checker.setSimplifier(TRCompositionalConflictChecker.NB2);
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);

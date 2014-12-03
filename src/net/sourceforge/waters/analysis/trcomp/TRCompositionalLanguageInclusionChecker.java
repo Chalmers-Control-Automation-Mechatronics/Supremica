@@ -125,6 +125,7 @@ public class TRCompositionalLanguageInclusionChecker
   {
     mPropertyAutomata = new ArrayList<>();
     mPropertiesHaveInitialState = true;
+    mHasStronglyFailingEvent = false;
     super.setUp();
     final AnalysisResult result = getAnalysisResult();
     if (!result.isFinished()) {
@@ -142,6 +143,9 @@ public class TRCompositionalLanguageInclusionChecker
         for (final TRAutomatonProxy prop : mPropertyAutomata) {
           dropTrivialAutomaton(prop);
         }
+      } else {
+        final SpecialEventsFinder finder = getSpecialEventsFinder();
+        finder.setAlwaysEnabledEventsDetected(mHasStronglyFailingEvent);
       }
     }
   }
@@ -171,7 +175,7 @@ public class TRCompositionalLanguageInclusionChecker
   @Override
   protected boolean isAlwaysEnabledEventsUsed()
   {
-    return isFailingEventsEnabled() && isAlwaysEnabledEventsEnabled();
+    return mHasStronglyFailingEvent;
   }
 
   @Override
@@ -201,19 +205,23 @@ public class TRCompositionalLanguageInclusionChecker
         finder.setTransitionRelation(rel);
         finder.run();
         final byte[] status = finder.getComputedEventStatus();
-        final byte failingPattern = (byte)
-          ((isFailingEventsEnabled() ? EventStatus.STATUS_FAILING : 0) |
-           (isAlwaysEnabledEventsEnabled() ? EventStatus.STATUS_ALWAYS_ENABLED : 0));
         boolean trivial = true;
         for (int e = EventEncoding.NONTAU; e < status.length; e++) {
-          if (!EventStatus.isUsedEvent(status[e])) {
-            // skip
-          } else if (EventStatus.isBlockedEvent(status[e])) {
-            status[e] = failingPattern;
-            trivial = false;
-          } else {
-            status[e] = 0;  // normal external event
-            trivial &= EventStatus.isAlwaysEnabledEvent(status[e]);
+          if (EventStatus.isUsedEvent(status[e])) {
+            status[e] = 0;
+            if (EventStatus.isBlockedEvent(status[e])) {
+              if (isFailingEventsEnabled()) {
+                status[e] |= EventStatus.STATUS_FAILING;
+              }
+              if (isAlwaysEnabledEventsEnabled()) {
+                status[e] |= EventStatus.STATUS_ALWAYS_ENABLED;
+              }
+              trivial = false;
+              mHasStronglyFailingEvent =
+                isFailingEventsEnabled() && isAlwaysEnabledEventsEnabled();
+            } else {
+              trivial &= EventStatus.isAlwaysEnabledEvent(status[e]);
+            }
           }
         }
         if (trivial) {
@@ -366,6 +374,8 @@ public class TRCompositionalLanguageInclusionChecker
       bisimulator.setTransitionLimit(stateLimit);
       bisimulator.setSimplificationListener(listener);
       chain.add(bisimulator);
+      chain.setPreferredOutputConfiguration
+        (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
       return chain;
     }
   };
@@ -379,5 +389,6 @@ public class TRCompositionalLanguageInclusionChecker
   // Data Structures
   private List<TRAutomatonProxy> mPropertyAutomata;
   private boolean mPropertiesHaveInitialState;
+  private boolean mHasStronglyFailingEvent;
 
 }
