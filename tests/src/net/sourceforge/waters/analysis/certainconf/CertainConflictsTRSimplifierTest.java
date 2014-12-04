@@ -5,10 +5,6 @@ import junit.framework.TestSuite;
 
 import net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifierTest;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
-import net.sourceforge.waters.analysis.tr.EventEncoding;
-import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
 
 public class CertainConflictsTRSimplifierTest extends AbstractTRSimplifierTest {
 
@@ -28,14 +24,6 @@ public class CertainConflictsTRSimplifierTest extends AbstractTRSimplifierTest {
   protected TransitionRelationSimplifier createTransitionRelationSimplifier()
   {
     return new CertainConflictsTRSimplifier();
-  }
-
-  @Override
-  protected EventEncoding createEventEncoding(final ProductDESProxy des,
-                                              final AutomatonProxy aut)
-    throws OverflowException
-  {
-    return createEventEncodingWithPropositions(des, aut);
   }
 
   @Override

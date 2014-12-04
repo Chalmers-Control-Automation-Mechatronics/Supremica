@@ -12,11 +12,6 @@ package net.sourceforge.waters.analysis.abstraction;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.analysis.tr.EventEncoding;
-import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
-
 
 /**
  * A test for the <I>Silent Incoming Rule</I>.
@@ -56,14 +51,6 @@ public class RestrictedSilentIncomingTRSimplifierTest
       new SilentIncomingTRSimplifier();
     simplifier.setRestrictsToUnreachableStates(true);
     return simplifier;
-  }
-
-  @Override
-  protected EventEncoding createEventEncoding(final ProductDESProxy des,
-                                              final AutomatonProxy aut)
-    throws OverflowException
-  {
-    return createEventEncodingWithPropositions(des, aut);
   }
 
   @Override

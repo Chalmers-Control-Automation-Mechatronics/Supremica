@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="alwaysEnabledFind01" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <EventDeclList>
-        <EventDecl Kind="CONTROLLABLE" Name="a"/>
+        <EventDecl Kind="CONTROLLABLE" Name="a">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="FAILING"/>
+            </ns2:AttributeMap>
+        </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="e">
             <ns2:AttributeMap>
-                <ns2:Attribute Name="AE"/>
+                <ns2:Attribute Name="ALWAYS_ENABLED"/>
             </ns2:AttributeMap>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Observable="false" Name="tau"/>

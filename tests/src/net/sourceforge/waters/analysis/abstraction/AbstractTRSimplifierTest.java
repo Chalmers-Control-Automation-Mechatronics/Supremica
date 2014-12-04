@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.abstraction;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
@@ -346,35 +347,54 @@ public abstract class AbstractTRSimplifierTest
     throws OverflowException
   {
     final KindTranslator translator = IdenticalKindTranslator.getInstance();
+    final EventEncoding enc = new EventEncoding();
     final EventProxy tau = getEvent(aut, TAU);
-    return new EventEncoding(aut, translator, tau);
+    if (tau != null) {
+      enc.addSilentEvent(tau);
+    }
+    final byte[] statusFromAttribs = getEventStatusReadFromAttributes();
+    for (final EventProxy event : aut.getEvents()) {
+      final Map<String,String> attribs = event.getAttributes();
+      byte status = 0;
+      if (statusFromAttribs != null) {
+        for (final byte flag : statusFromAttribs) {
+          final String name = EventStatus.getStatusName(flag);
+          if (attribs.containsKey(name)) {
+            status |= flag;
+          }
+        }
+      }
+      enc.addEvent(event, translator, status);
+    }
+    final EventProxy alpha = getEvent(des, ALPHA);
+    if (alpha != null) {
+      mAlphaID = enc.addEvent(alpha, translator, EventStatus.STATUS_UNUSED);
+    } else {
+      mAlphaID = -1;
+    }
+    final EventProxy omega = getEvent(des, OMEGA);
+    if (omega != null) {
+      mOmegaID = enc.addEvent(omega, translator, EventStatus.STATUS_UNUSED);
+    } else {
+      mOmegaID = -1;
+    }
+    return enc;
   }
 
   /**
-   * Creates an event encoding for use with the given product DES and
-   * automaton, with alpha and omega propositions added. This method is
-   * provided as a convenience to subclasses needing to override {@link
-   * #createEventEncoding(ProductDESProxy, AutomatonProxy)
-   * createEventEncoding()}.
+   * Returns an array of status bits to be read from event attributes when
+   * creating an event encoding. For any status flag in the returned array,
+   * the {@link #createEventEncoding(ProductDESProxy, AutomatonProxy)
+   * createEventEncoding()} method will check the event's attribute map
+   * for an entry with the name indicated by a call to {@link
+   * EventStatus#getStatusName(byte) EventStatus.getStatusName()}, and
+   * if present, set the corresponding status bit in the event encoding.
+   * @return Array of status flags, or <CODE>null</CODE> to disable
+   *         reading of the attributes.
    */
-  protected EventEncoding createEventEncodingWithPropositions
-    (final ProductDESProxy des, final AutomatonProxy aut)
-    throws OverflowException
+  protected byte[] getEventStatusReadFromAttributes()
   {
-    final KindTranslator translator = IdenticalKindTranslator.getInstance();
-    final EventProxy tau = getEvent(aut, TAU);
-    final EventEncoding enc = new EventEncoding(aut, translator, tau);
-    final EventProxy alpha = getEvent(des, ALPHA);
-    mAlphaID = enc.getEventCode(alpha);
-    if (alpha != null && mAlphaID < 0) {
-      mAlphaID = enc.addEvent(alpha, translator, EventStatus.STATUS_UNUSED);
-    }
-    final EventProxy omega = getEvent(des, OMEGA);
-    mOmegaID = enc.getEventCode(omega);
-    if (omega != null && mOmegaID < 0) {
-      mOmegaID = enc.addEvent(omega, translator, EventStatus.STATUS_UNUSED);
-    }
-    return enc;
+    return STATUS_FROM_ATTRIBUTES;
   }
 
   /**
@@ -434,11 +454,19 @@ public abstract class AbstractTRSimplifierTest
 
   //#########################################################################
   //# Class Constants
-  final String TAU = "tau";
-  final String ALPHA = ":alpha";
-  final String OMEGA = EventDeclProxy.DEFAULT_MARKING_NAME;
+  protected static final String TAU = "tau";
+  protected static final String ALPHA = ":alpha";
+  protected static final String OMEGA = EventDeclProxy.DEFAULT_MARKING_NAME;
 
-  final String BEFORE = "before";
-  final String AFTER = "after";
+  protected static final String BEFORE = "before";
+  protected static final String AFTER = "after";
+
+  private static final byte[] STATUS_FROM_ATTRIBUTES = {
+    EventStatus.STATUS_LOCAL,
+    EventStatus.STATUS_SELFLOOP_ONLY,
+    EventStatus.STATUS_ALWAYS_ENABLED,
+    EventStatus.STATUS_BLOCKED,
+    EventStatus.STATUS_FAILING
+  };
 
 }

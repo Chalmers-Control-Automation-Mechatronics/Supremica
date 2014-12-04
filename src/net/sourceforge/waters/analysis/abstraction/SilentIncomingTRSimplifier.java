@@ -39,21 +39,27 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
  * Rule</I>.</P>
  *
  * <P>The implementation supports both standard and generalised nonblocking
- * variants of the abstraction. If a precondition marking is configured,
- * only transitions leading to states not marked by the precondition marking
- * can be abstracted (as described above). Without a precondition marking, only
- * transitions leading to states with an outgoing silent transition can be
- * abstracted.</P>
+ * variants of the abstraction, including a generalisation that takes
+ * <I>always enabled</I> events into account. If a precondition marking is
+ * configured, only transitions leading to states not marked by the
+ * precondition marking can be abstracted (as described above). Without a
+ * precondition marking, only transitions leading to states with an outgoing
+ * always enabled ({@link EventStatus#STATUS_ALWAYS_ENABLED}) transition
+ * can be abstracted.</P>
  *
  * <P><I>References:</I><BR>
  * Hugo Flordal, Robi Malik. Compositional Verification
  * in Supervisory Control. SIAM Journal of Control and Optimization,
  * 48(3), 1914-1938, 2009.<BR>
  * Robi Malik, Ryan Leduc. A Compositional Approach for Verifying
- * Generalised Nonblocking, Proc. 7th International Conference on Control and
- * Automation, ICCA'09, 448-453, Christchurch, New Zealand, 2009.</P>
+ * Generalised Nonblocking. Proc. 7th International Conference on Control and
+ * Automation, ICCA'09, 448-453, Christchurch, New Zealand, 2009.<BR>
+ * Colin Pilbrow, Robi Malik. Compositional Nonblocking Verification with
+ * Always Enabled Events and Selfloop-only Events. Proc. 2nd International
+ * Workshop on Formal Techniques for Safety-Critical Systems, FTSCS 2013,
+ * 147-162, Queenstown, New Zealand, 2013.</P>
  *
- * @author Rachel Francis, Robi Malik
+ * @author Rachel Francis, Robi Malik, Colin Pilbrow
  */
 
 public class SilentIncomingTRSimplifier
@@ -134,20 +140,35 @@ public class SilentIncomingTRSimplifier
     return true;
   }
 
+  @Override
+  public boolean isAlwaysEnabledEventsSupported()
+  {
+    return true;
+  }
+
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
   @Override
+  public void setUp()
+    throws AnalysisException
+  {
+    super.setUp();
+    if (getPreconditionMarkingID() < 0) {
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      mAlwaysEnabledIterator = rel.createSuccessorsReadOnlyIteratorByStatus
+        (EventStatus.STATUS_ALWAYS_ENABLED);
+    }
+  }
+
+  @Override
   public boolean runSimplifier()
-  throws AnalysisException
+    throws AnalysisException
   {
     final int tauID = EventEncoding.TAU;
     final ListBufferTransitionRelation rel = getTransitionRelation();
     if ((rel.getProperEventStatus(tauID) & EventStatus.STATUS_UNUSED) != 0) {
       return false;
-    } else if (getPreconditionMarkingID() < 0) {
-      mTauTestIterator = rel.createSuccessorsReadOnlyIterator();
-      mTauTestIterator.resetEvent(tauID);
     }
     final int numStates = rel.getNumberOfStates();
     final BitSet keep = new BitSet(numStates);
@@ -224,7 +245,7 @@ public class SilentIncomingTRSimplifier
   @Override
   protected void tearDown()
   {
-    mTauTestIterator = null;
+    mAlwaysEnabledIterator = null;
     super.tearDown();
   }
 
@@ -245,16 +266,17 @@ public class SilentIncomingTRSimplifier
   /**
    * Returns whether the given state may be simplified by the silent
    * continuation rule. A state is reducible if it has an outgoing
-   * tau transition or, in the case of generalised nonblocking, if it
-   * is not marked by the precondition (alpha) marking.
+   * <I>always enabled</I> ({@link EventStatus#STATUS_ALWAYS_ENABLED})
+   * transition or, in the case of generalised nonblocking,
+   * if it is not marked by the precondition (alpha) marking.
    */
   private boolean isReducible(final int state)
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int alphaID = getPreconditionMarkingID();
     if (alphaID < 0) {
-      mTauTestIterator.resetState(state);
-      return mTauTestIterator.advance();
+      mAlwaysEnabledIterator.resetState(state);
+      return mAlwaysEnabledIterator.advance();
     } else {
       return !rel.isMarked(state, alphaID);
     }
@@ -266,7 +288,7 @@ public class SilentIncomingTRSimplifier
   private boolean mRestrictsToUnreachableStates = true;
   private boolean mDumpStateAware = false;
 
-  private TransitionIterator mTauTestIterator;
+  private TransitionIterator mAlwaysEnabledIterator;
 
 }
 

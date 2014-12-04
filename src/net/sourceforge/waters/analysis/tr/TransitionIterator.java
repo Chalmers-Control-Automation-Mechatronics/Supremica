@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.analysis.tr;
 
+import java.util.NoSuchElementException;
+
 /**
  * An iterator to visit transitions in a {@link TransitionListBuffer}.
  * This interface provides a basis for iteration over all or subsets of
@@ -82,9 +84,9 @@ public interface TransitionIterator
    * A transition's <I>source</I> state differs from its <I>from-state</I> in
    * that it always represents the actual source state of the transition, no
    * matter how the transition buffer is organised.
-   * @throws {@link java.util.NoSuchElementException NoSuchElementException}
-   *         if there is no more transition in the iteration, or if the method
-   *         is called without calling {@link #advance()} first.
+   * @throws NoSuchElementException if there is no current transition in
+   *         the iteration, or if the method is called without calling
+   *         {@link #advance()} first.
    * @see #getCurrentFromState()
    */
   public int getCurrentSourceState();
@@ -94,18 +96,18 @@ public interface TransitionIterator
    * Unlike the <I>source</I> state, a transition's <I>from-state</I>
    * depends on the transition buffer's organisation and identifies the
    * state under which the transition is indexed.
-   * @throws {@link java.util.NoSuchElementException NoSuchElementException}
-   *         if there is no more transition in the iteration, or if the method
-   *         is called without calling {@link #advance()} first.
+   * @throws NoSuchElementException if there is no current transition in
+   *         the iteration, or if the method is called without calling
+   *         {@link #advance()} first.
    * @see #getCurrentSourceState()
    */
   public int getCurrentFromState();
 
   /**
    * Gets the ID of the event of the current transition in the iteration.
-   * @throws {@link java.util.NoSuchElementException NoSuchElementException}
-   *         if there is no more transition in the iteration, or if the method
-   *         is called without calling {@link #advance()} first.
+   * @throws NoSuchElementException if there is no current transition in
+   *         the iteration, or if the method is called without calling
+   *         {@link #advance()} first.
    */
   public int getCurrentEvent();
 
@@ -114,9 +116,9 @@ public interface TransitionIterator
    * A transition's <I>target</I> state differs from its <I>to-state</I> in
    * that it always represents the actual target state of the transition, no
    * matter how the transition buffer is organised.
-   * @throws {@link java.util.NoSuchElementException NoSuchElementException}
-   *         if there is no more transition in the iteration, or if the method
-   *         is called without calling {@link #advance()} first.
+   * @throws NoSuchElementException if there is no current transition in
+   *         the iteration, or if the method is called without calling
+   *         {@link #advance()} first.
    * @see #getCurrentToState()
    */
   public int getCurrentTargetState();
@@ -126,9 +128,9 @@ public interface TransitionIterator
    * Unlike the <I>target</I> state, a transition's <I>to-state</I>
    * depends on the transition buffer's organisation and is the state
    * stored with each individual transition, not the one used for indexing.
-   * @throws {@link java.util.NoSuchElementException NoSuchElementException}
-   *         if there is no more transition in the iteration, or if the method
-   *         is called without calling {@link #advance()} first.
+   * @throws NoSuchElementException if there is no current transition in
+   *         the iteration, or if the method is called without calling
+   *         {@link #advance()} first.
    * @see #getCurrentTargetState()
    */
   public int getCurrentToState();
@@ -139,9 +141,9 @@ public interface TransitionIterator
    * transition. No checks for duplicates are performed.
    * @param  state    The state number of the new to-state, which must
    *                  be a valid state number in the transition buffer.
-   * @throws {@link java.util.NoSuchElementException NoSuchElementException}
-   *         if there is no more transition in the iteration, or if the method
-   *         is called without calling {@link #advance()} first.
+   * @throws NoSuchElementException if there is no current transition in
+   *         the iteration, or if the method is called without calling
+   *         {@link #advance()} first.
    * @see #getCurrentToState()
    */
   public void setCurrentToState(int state);
@@ -152,9 +154,9 @@ public interface TransitionIterator
    * After removing, the current transition is undefined, and {@link
    * #advance()} needs to be called to access the transition following the
    * removed transition.
-   * @throws {@link java.util.NoSuchElementException NoSuchElementException}
-   *         if there is no current transition in the iteration, or if the
-   *         method is called without calling {@link #advance()} first.
+   * @throws NoSuchElementException if there is no current transition in
+   *         the iteration, or if the method is called without calling
+   *         {@link #advance()} first.
    */
   public void remove();
 

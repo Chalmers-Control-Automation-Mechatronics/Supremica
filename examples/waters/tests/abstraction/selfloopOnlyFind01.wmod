@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="basic_3" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>A basic test for all abstraction rules to see whether they can handle an automaton with a selfloop transition.</ns2:Comment>
+<Module Name="selfloopOnlyFind01" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>A test to check whether the SpecialEventsFinder can recognise selfloop-only events.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting">
             <ColorGeometry>
@@ -14,12 +14,12 @@
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="b">
             <ns2:AttributeMap>
-                <ns2:Attribute Name="ALWAYS_ENABLED"/>
+                <ns2:Attribute Name="SELFLOOP_ONLY"/>
             </ns2:AttributeMap>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="c">
             <ns2:AttributeMap>
-                <ns2:Attribute Name="ALWAYS_ENABLED"/>
+                <ns2:Attribute Name="SELFLOOP_ONLY"/>
             </ns2:AttributeMap>
         </EventDecl>
     </EventDeclList>
@@ -48,10 +48,8 @@
                     <Edge Source="S0" Target="S1">
                         <LabelBlock>
                             <SimpleIdentifier Name="a"/>
-                            <SimpleIdentifier Name="b"/>
-                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="4" Y="-23"/>
+                                <Point X="6" Y="-9"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>

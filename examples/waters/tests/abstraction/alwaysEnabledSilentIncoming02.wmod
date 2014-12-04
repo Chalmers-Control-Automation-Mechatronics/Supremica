@@ -6,7 +6,11 @@
         <EventDecl Kind="CONTROLLABLE" Name="a"/>
         <EventDecl Kind="CONTROLLABLE" Name="b"/>
         <EventDecl Kind="CONTROLLABLE" Name="tau"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="c"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="c">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="ALWAYS_ENABLED"/>
+            </ns2:AttributeMap>
+        </EventDecl>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="PLANT" Name="before">

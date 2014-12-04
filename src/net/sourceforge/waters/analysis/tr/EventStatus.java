@@ -113,21 +113,32 @@ public class EventStatus
     return (byte) (conj | disj);
   }
 
+  /**
+   * Returns a string representing the given combination of status bits.
+   */
+  public static String getStatusName(final byte status)
+  {
+    final StringBuilder buffer = new StringBuilder();
+    appendStatusInfo(buffer, status);
+    return buffer.toString();
+  }
+
+  /**
+   * Appends a string representing the given combination of status bits
+   * to the given string builder.
+   */
   public static void appendStatusInfo(final StringBuilder buffer,
                                       final byte status)
   {
-    if (status != STATUS_NONE) {
-      char sep = '<';
-      byte bit = 1;
-      for (final String name : STATUS_NAMES) {
-        if ((status & bit) != 0) {
-          buffer.append(sep);
-          sep = ',';
-          buffer.append(name);
-        }
-        bit <<= 1;
+    String sep = "";
+    byte bit = 1;
+    for (final String name : STATUS_NAMES) {
+      if ((status & bit) != 0) {
+        buffer.append(sep);
+        sep = ",";
+        buffer.append(name);
       }
-      buffer.append('>');
+      bit <<= 1;
     }
   }
 
@@ -215,17 +226,8 @@ public class EventStatus
     STATUS_BLOCKED | STATUS_FAILING;
 
   private static final String[] STATUS_NAMES = {
-    "CONTROLLABLE", "LOCAL", "OUTSIDE_ONLY_SELFLOOP",
-    "OUTSIDE_ALWAYS_ENABLED", "BLOCKED", "FAILING", "UNUSED"
+    "CONTROLLABLE", "LOCAL", "SELFLOOP_ONLY", "ALWAYS_ENABLED", "BLOCKED",
+    "FAILING", "UNUSED"
   };
-  /**
-   * Status flags indicating a local event.
-   * This is a combination of the bits {@link STATUS_LOCAL},
-   * {@link STATUS_OUTSIDE_ALWAYS_ENABLED}, and
-   * {@link STATUS_OUTSIDE_ONLY_SELFLOOP}.
-   * Although {@link STATUS_LOCAL} usually implies the other two flags,
-   * it is separated from the other two for synthesis and other applications,
-   * where the automatic suppression of local selfloops is not desired.
-   */
 
 }

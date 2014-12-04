@@ -20,7 +20,6 @@ import java.util.Set;
 
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.EnabledEventsLimitedCertainConflictsTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.EnabledEventsSilentIncomingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.IncomingEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.LimitedCertainConflictsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.MarkingRemovalTRSimplifier;
@@ -28,6 +27,7 @@ import net.sourceforge.waters.analysis.abstraction.MarkingSaturationTRSimplifier
 import net.sourceforge.waters.analysis.abstraction.NonAlphaDeterminisationTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.OnlySilentOutgoingTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.SilentIncomingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SpecialEventsFinder;
 import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRemovalTRSimplifier;
@@ -84,11 +84,11 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     transitionRemover.setTransitionLimit(limit);
     preChain.add(transitionRemover);
 
-    final EnabledEventsSilentIncomingTRSimplifier enabledEventsSilentIncomingSimplifier =
-      new EnabledEventsSilentIncomingTRSimplifier();
-    enabledEventsSilentIncomingSimplifier.setRestrictsToUnreachableStates(true);
-    enabledEventsSilentIncomingSimplifier.setDumpStateAware(true);
-    preChain.add(enabledEventsSilentIncomingSimplifier);
+    final SilentIncomingTRSimplifier silentIncomingSimplifier =
+      new SilentIncomingTRSimplifier();
+    silentIncomingSimplifier.setRestrictsToUnreachableStates(true);
+    silentIncomingSimplifier.setDumpStateAware(true);
+    preChain.add(silentIncomingSimplifier);
 
     final OnlySilentOutgoingTRSimplifier silentOutRemover =
       new OnlySilentOutgoingTRSimplifier();
@@ -145,7 +145,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
       (analyzer, preChain, postChain,
        limitedCertainConflictsRemover,
        enabledEventsLimitedCertainConflictsRemover,
-       enabledEventsSilentIncomingSimplifier, finder);
+       finder);
   }
 
 
@@ -157,14 +157,12 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
      final ChainTRSimplifier postChain,
      final LimitedCertainConflictsTRSimplifier limitedCCSimplifier,
      final EnabledEventsLimitedCertainConflictsTRSimplifier alwaysEnabledLimitedCCSimplifier,
-     final EnabledEventsSilentIncomingTRSimplifier enabledEventsSilentIncomingSimplifier,
      final SpecialEventsFinder finder)
   {
     super(analyzer);
     mPreChain = preChain;
     mEnabledEventsLimitedCertainConflictsSimplifier = alwaysEnabledLimitedCCSimplifier;
     mLimitedCertainConflictsSimplifier = limitedCCSimplifier;
-    mEnabledEventsSilentIncomingSimplifier = enabledEventsSilentIncomingSimplifier;
     mAlwaysEnabledEventsFinder = finder;
     mPostChain = postChain;
     mCompleteChain = new ChainTRSimplifier();
@@ -252,8 +250,6 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
       }
 
       // Tell the simplifiers how many enabled events there are
-      mEnabledEventsSilentIncomingSimplifier.
-        setNumberOfEnabledEvents(numEnabledEvents);
       if (mEnabledEventsLimitedCertainConflictsSimplifier != null) {
         mEnabledEventsLimitedCertainConflictsSimplifier.
           setNumberOfEnabledEvents(numEnabledEvents);
@@ -517,8 +513,6 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     mEnabledEventsLimitedCertainConflictsSimplifier;
   private final LimitedCertainConflictsTRSimplifier
     mLimitedCertainConflictsSimplifier;
-  private final EnabledEventsSilentIncomingTRSimplifier
-    mEnabledEventsSilentIncomingSimplifier;
   private final SpecialEventsFinder mAlwaysEnabledEventsFinder;
   private final ChainTRSimplifier mPostChain;
   private final ChainTRSimplifier mCompleteChain;

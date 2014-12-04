@@ -9,9 +9,6 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import junit.framework.Test;
@@ -21,8 +18,6 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
-import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -84,6 +79,13 @@ public class SpecialEventsFinderTest
     runTransitionRelationSimplifier(des);
   }
 
+  public void testSelfloopOnlyFind1() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "selfloopOnlyFind01.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
 
   //#########################################################################
   //# Overrides for abstract base class
@@ -92,6 +94,9 @@ public class SpecialEventsFinderTest
   protected TransitionRelationSimplifier createTransitionRelationSimplifier()
   {
     final SpecialEventsFinder finder = new SpecialEventsFinder();
+    finder.setBlockedEventsDetected(true);
+    finder.setFailingEventsDetected(true);
+    finder.setSelfloopOnlyEventsDetected(true);
     finder.setAlwaysEnabledEventsDetected(true);
     return finder;
   }
@@ -103,11 +108,9 @@ public class SpecialEventsFinderTest
   }
 
   @Override
-  protected EventEncoding createEventEncoding(final ProductDESProxy des,
-                                              final AutomatonProxy aut)
-   throws OverflowException
+  protected byte[] getEventStatusReadFromAttributes()
   {
-    return createEventEncodingWithPropositions(des, aut);
+    return null;
   }
 
   @Override
@@ -136,50 +139,37 @@ public class SpecialEventsFinderTest
     throws Exception
   {
     final AutomatonProxy before = findAutomaton(des, BEFORE);
-    final Collection<EventProxy> events = applySimplifier(des, before, config);
-    checkResult(des, events);
-  }
-
-  private Collection<EventProxy> applySimplifier(final ProductDESProxy des,
-                                                 final AutomatonProxy aut,
-                                                 final int config)
-    throws AnalysisException
-  {
-    final EventEncoding eventEnc = createEventEncoding(des, aut);
-    final StateEncoding inputStateEnc = new StateEncoding(aut);
+    final EventEncoding enc = createEventEncoding(des, before);
+    final StateEncoding inputStateEnc = new StateEncoding(before);
     final ListBufferTransitionRelation rel =
-      new ListBufferTransitionRelation(aut, eventEnc, inputStateEnc, config);
+      new ListBufferTransitionRelation(before, enc, inputStateEnc, config);
     final SpecialEventsFinder finder = getTransitionRelationSimplifier();
     finder.setTransitionRelation(rel);
     configureTransitionRelationSimplifier();
     final boolean result = finder.run();
     assertFalse("Unexpected 'true' result from SpecialEventsFinder!", result);
     final byte[] computedStatus = finder.getComputedEventStatus();
-    final List<EventProxy> events = new ArrayList<>(computedStatus.length);
-    for (int e = 0; e < computedStatus.length; e++) {
-      if (EventStatus.isAlwaysEnabledEvent(computedStatus[e])) {
-        final EventProxy event = eventEnc.getProperEvent(e);
-        events.add(event);
-      }
-    }
-    return events;
+    checkResult(enc, computedStatus);
   }
 
-  private void checkResult(final ProductDESProxy des,
-                           final Collection<EventProxy> events)
+  private void checkResult(final EventEncoding enc,
+                           final byte[] computedStatus)
   {
-    for (final EventProxy event : events) {
-      final Map<String,String> attribs = event.getAttributes();
-      assertTrue("SpecialEventsFinder incorrectly asserts event '" +
-                 event.getName() + "' to be always enabled!",
-                 attribs.containsKey(KEY));
-    }
-    for (final EventProxy event : des.getEvents()) {
-      final Map<String,String> attribs = event.getAttributes();
-      if (attribs.containsKey(KEY)) {
-        assertTrue("SpecialEventsFinder did not find always enabled event '" +
-                   event.getName() + "'!",
-                   events.contains(event));
+    final int numEvents = enc.getNumberOfProperEvents();
+    assertEquals("Computed status array length does not match event encoding!",
+                 numEvents, computedStatus.length);
+    for (int e = EventEncoding.TAU; e < numEvents; e++) {
+      final EventProxy event = enc.getProperEvent(e);
+      if (event != null) {
+        final Map<String,String> attribs = event.getAttributes();
+        for (final byte flag : STATUS_FROM_ATTRIBUTES) {
+          final String name = EventStatus.getStatusName(flag);
+          final boolean expected = attribs.containsKey(name);
+          final boolean computed = (computedStatus[e] & flag) != 0;
+          assertEquals("Unexpected result for flag " + name +
+                       " of event " + event.getName() + "!",
+                       expected, computed);
+        }
       }
     }
   }
@@ -187,6 +177,11 @@ public class SpecialEventsFinderTest
 
   //#########################################################################
   //# Class Constants
-  private static final String KEY = "AE";
+  private static final byte[] STATUS_FROM_ATTRIBUTES = {
+    EventStatus.STATUS_SELFLOOP_ONLY,
+    EventStatus.STATUS_ALWAYS_ENABLED,
+    EventStatus.STATUS_BLOCKED,
+    EventStatus.STATUS_FAILING
+  };
 
 }

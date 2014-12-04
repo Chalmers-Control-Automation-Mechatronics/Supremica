@@ -41,7 +41,8 @@ import net.sourceforge.waters.model.base.ProxyTools;
  * <I>Active Events Rule</I>.</P>
  *
  * <P>This rule merges states that are incoming equivalent and have
- * at least one outgoing silent or always enabled transition, and states
+ * at least one outgoing <I>always enabled</I> ({@link
+ * EventStatus#STATUS_ALWAYS_ENABLED}) transition, and states
  * that are incoming equivalent and have equal sets of eligible events.</P>
  *
  * <P><I>Algorithm:</I></P>
@@ -96,6 +97,12 @@ public class IncomingEquivalenceTRSimplifier
   public int getPreferredInputConfiguration()
   {
     return ListBufferTransitionRelation.CONFIG_ALL;
+  }
+
+  @Override
+  public boolean isAlwaysEnabledEventsSupported()
+  {
+    return true;
   }
 
 

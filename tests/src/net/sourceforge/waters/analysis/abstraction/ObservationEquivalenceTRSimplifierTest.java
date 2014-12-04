@@ -213,6 +213,61 @@ public class ObservationEquivalenceTRSimplifierTest
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
+  public void test_selfLoopObservationalEquivalence01() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "selfLoopObservationalEquivalence01.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_selfLoopObservationalEquivalence02() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "selfLoopObservationalEquivalence02.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_selfLoopObservationalEquivalence03() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "selfLoopObservationalEquivalence03.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_selfLoopObservationalEquivalence04() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "selfLoopObservationalEquivalence04.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_selfLoopObservationalEquivalence05() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "selfLoopObservationalEquivalence05.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_selfLoopObservationalEquivalence06() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "selfLoopObservationalEquivalence06.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+  public void test_selfLoopObservationalEquivalence07() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "selfLoopObservationalEquivalence07.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
   /**
    * A test to see whether a single transition relation simplifier
    * object can perform multiple abstractions in sequence.

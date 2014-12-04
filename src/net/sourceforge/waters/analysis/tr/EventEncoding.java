@@ -66,7 +66,26 @@ public class EventEncoding
 {
 
   //#########################################################################
-  //# Constructor
+  //# Constructors
+  /**
+   * Creates an empty encoding.
+   * This method creates an event encoding without any events or
+   * propositions. Events can be added using {@link
+   * #addEvent(EventProxy,KindTranslator,int) addEvent()} or {@link
+   * #addSilentEvent(EventProxy) addSilentEvent()}.
+   */
+  public EventEncoding()
+  {
+    mProperEvents = new ArrayList<>();
+    mProperEvents.add(null);
+    mProperEventStatus = new TByteArrayList();
+    mProperEventStatus.add((byte) (EventStatus.STATUS_FULLY_LOCAL |
+                                   EventStatus.STATUS_UNUSED));
+    mPropositions = new ArrayList<>();
+    mUsedPropositions = 0;
+    mEventCodeMap = new TObjectIntHashMap<>(0, 0.5f, -1);
+  }
+
   /**
    * Creates a new event encoding for the given automaton.
    * This method creates an event encoding for all events in the
@@ -152,25 +171,6 @@ public class EventEncoding
     throws OverflowException
   {
     this(aut.getEvents(), translator, tau, filter, filterMode);
-  }
-
-  /**
-   * Creates an empty encoding.
-   * This method creates an event encoding without any events or
-   * propositions. Events can be added using {@link
-   * #addEvent(EventProxy,KindTranslator,int) addEvent()} or {@link
-   * #addSilentEvent(EventProxy) addSilentEvent()}.
-   */
-  public EventEncoding()
-  {
-    mProperEvents = new ArrayList<>();
-    mProperEvents.add(null);
-    mProperEventStatus = new TByteArrayList();
-    mProperEventStatus.add((byte) (EventStatus.STATUS_FULLY_LOCAL |
-                                   EventStatus.STATUS_UNUSED));
-    mPropositions = new ArrayList<>();
-    mUsedPropositions = 0;
-    mEventCodeMap = new TObjectIntHashMap<>(0, 0.5f, -1);
   }
 
   /**
@@ -344,7 +344,11 @@ public class EventEncoding
         buffer.append('=');
         buffer.append(event == null ? "(null)" : event.getName());
         final byte status = mProperEventStatus.get(ecode++);
-        EventStatus.appendStatusInfo(buffer, status);
+        if (status != EventStatus.STATUS_NONE) {
+          buffer.append('<');
+          EventStatus.appendStatusInfo(buffer, status);
+          buffer.append('>');
+        }
       }
     }
     final TObjectIntIterator<EventProxy> iter = mEventCodeMap.iterator();
@@ -526,8 +530,9 @@ public class EventEncoding
   //#########################################################################
   //# Alphabet extension
   /**
-   * Adds an event to this encoding. This method enlarges the event encoding
-   * with a new event, assigning a new code.
+   * Adds an event to this encoding. If the given event is not
+   * in the encoding, this method enlarges it with a new event,
+   * assigning a new code.
    * @param  event       The event to be added, which may be a proper event
    *                     or a proposition.
    * @param  translator  Kind translator to get event kind information.
@@ -540,7 +545,7 @@ public class EventEncoding
    *                     {@link EventStatus#STATUS_BLOCKED},
    *                     {@link EventStatus#STATUS_FAILING},
    *                     and {@link EventStatus#STATUS_UNUSED}.
-   * @return The event (or proposition) code that was assigned to the event.
+   * @return The event (or proposition) code assigned to the event.
    * @throws OverflowException to indicate that the number of propositions
    *                     exceeds the supported maximum
    *                     {@link EventStatusProvider#MAX_PROPOSITIONS}.

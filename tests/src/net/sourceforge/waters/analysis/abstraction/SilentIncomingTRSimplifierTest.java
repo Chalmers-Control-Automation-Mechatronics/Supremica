@@ -9,29 +9,19 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.analysis.tr.EventEncoding;
-import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
-import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
-
 
 /**
- * A test for the <I>Silent Continuation Rule</I>.
+ * A test for the standard <I>Silent Incoming Rule</I>.
+ * This test the version of the rule for standard nonblocking,
+ * possibly with always enabled events, but without precondition markings.
  *
  * @author Robi Malik
  */
 
-public class EnabledEventsSilentIncomingTRSimplifierTest
+public class SilentIncomingTRSimplifierTest
   extends AbstractTRSimplifierTest
 {
 
@@ -40,7 +30,7 @@ public class EnabledEventsSilentIncomingTRSimplifierTest
   public static Test suite()
   {
     final TestSuite testSuite =
-      new TestSuite(EnabledEventsSilentIncomingTRSimplifierTest.class);
+      new TestSuite(SilentIncomingTRSimplifierTest.class);
     return testSuite;
   }
 
@@ -54,52 +44,15 @@ public class EnabledEventsSilentIncomingTRSimplifierTest
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifierTest
   @Override
-  protected EnabledEventsSilentIncomingTRSimplifier createTransitionRelationSimplifier()
+  protected SilentIncomingTRSimplifier createTransitionRelationSimplifier()
   {
-    return new EnabledEventsSilentIncomingTRSimplifier();
+    return new SilentIncomingTRSimplifier();
   }
 
   @Override
-  protected EventEncoding createEventEncoding(final ProductDESProxy des,
-                                              final AutomatonProxy aut)
-    throws OverflowException
+  protected SilentIncomingTRSimplifier getTransitionRelationSimplifier()
   {
-    final KindTranslator translator = IdenticalKindTranslator.getInstance();
-    final EventProxy tau = getEvent(aut, TAU);
-    final int numEvents = aut.getEvents().size();
-    final Collection<EventProxy> events = new ArrayList<>(numEvents);
-    int uncontrollableCount = 0;
-    for (final EventProxy event : aut.getEvents()) {
-      //see if controllable
-      if (event.getKind() == EventKind.UNCONTROLLABLE) {
-        //put in the order you want to encode
-        //don't need to worry about tau because of the constructor
-        events.add(event);
-        if (event != tau) {
-          uncontrollableCount++;
-        }
-      }
-    }
-    for (final EventProxy event : aut.getEvents()) {
-      //see if controllable
-      if (event.getKind() != EventKind.UNCONTROLLABLE) {
-        //put in the order you want to encode
-        events.add(event);
-      }
-    }
-    //returns a list where all uncontrollable events are first
-    final EnabledEventsSilentIncomingTRSimplifier simplifier =
-      getTransitionRelationSimplifier();
-    simplifier.setNumberOfEnabledEvents(uncontrollableCount);
-    return new EventEncoding(events, translator, tau);
-
-  }
-
-  @Override
-  protected EnabledEventsSilentIncomingTRSimplifier getTransitionRelationSimplifier()
-  {
-    return (EnabledEventsSilentIncomingTRSimplifier)
-      super.getTransitionRelationSimplifier();
+    return (SilentIncomingTRSimplifier) super.getTransitionRelationSimplifier();
   }
 
 

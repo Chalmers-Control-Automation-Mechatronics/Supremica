@@ -12,15 +12,12 @@ package net.sourceforge.waters.analysis.abstraction;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.analysis.tr.EventEncoding;
-import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 
 
 /**
- * A test for the combined implementation of the <I>Silent Continuation Rule</I> and
- * <I>Active Events Rule</I>.
+ * A test for the combined implementation of the <I>Silent Continuation Rule</I>
+ * and <I>Active Events Rule</I>.
  *
  * @author Robi Malik
  */
@@ -51,14 +48,6 @@ public class IncomingEquivalenceTRSimplifierTest
   protected TransitionRelationSimplifier createTransitionRelationSimplifier()
   {
     return new IncomingEquivalenceTRSimplifier();
-  }
-
-  @Override
-  protected EventEncoding createEventEncoding(final ProductDESProxy des,
-                                              final AutomatonProxy aut)
-    throws OverflowException
-  {
-    return createEventEncodingWithPropositions(des, aut);
   }
 
   @Override

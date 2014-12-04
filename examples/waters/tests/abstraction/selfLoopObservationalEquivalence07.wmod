@@ -2,7 +2,11 @@
 <Module Name="selfLoopObservationalEquivalence07" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="a"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="e"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="e">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="SELFLOOP_ONLY"/>
+            </ns2:AttributeMap>
+        </EventDecl>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
         <EventDecl Kind="CONTROLLABLE" Name="b"/>
         <EventDecl Kind="CONTROLLABLE" Name="c"/>
