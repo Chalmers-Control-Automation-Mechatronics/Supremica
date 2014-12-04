@@ -13,6 +13,7 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.IncomingEquivalenceTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.LimitedCertainConflictsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.MarkingRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.MarkingSaturationTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.NonAlphaDeterminisationTRSimplifier;
@@ -25,6 +26,7 @@ import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult;
+import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
@@ -196,7 +198,9 @@ public class TRCompositionalConflictChecker
           result.setSatisfied(false);
           getLogger().debug("Subsystem is blocking, because " + aut.getName() +
                             " has no marked states.");
-          dropSubsystem(subsys);
+          dropPendingSubsystems();
+          dropSubsystemExcept(subsys, aut);
+          dropTrivialAutomaton(aut);  // Must be last to pass trace checks.
           return true;
         }
       }
@@ -283,6 +287,7 @@ public class TRCompositionalConflictChecker
    * <LI>Only Silent Outgoing Rule ({@link OnlySilentOutgoingTRSimplifier})</LI>
    * <LI>Incoming equivalence ({@link IncomingEquivalenceTRSimplifier};
    *     Silent Continuation plus Active Events Rules)</LI>
+   * <LI>Certain Conflicts Rule ({@link LimitedCertainConflictsTRSimplifier})</LI>
    * <LI>Observation equivalence ({@link ObservationEquivalenceTRSimplifier})</LI>
    * <LI>Marking saturation ({@link MarkingSaturationTRSimplifier})</LI>
    * </UL>.
@@ -315,6 +320,7 @@ public class TRCompositionalConflictChecker
    * <LI>Only Silent Outgoing Rule ({@link OnlySilentOutgoingTRSimplifier})</LI>
    * <LI>Incoming equivalence ({@link IncomingEquivalenceTRSimplifier};
    *     Silent Continuation plus Active Events Rules)</LI>
+   * <LI>Certain Conflicts Rule ({@link LimitedCertainConflictsTRSimplifier})</LI>
    * <LI>Weak observation equivalence
    *     ({@link ObservationEquivalenceTRSimplifier})</LI>
    * <LI>Marking saturation ({@link MarkingSaturationTRSimplifier})</LI>
@@ -349,6 +355,7 @@ public class TRCompositionalConflictChecker
    * <LI>Only Silent Outgoing Rule ({@link OnlySilentOutgoingTRSimplifier})</LI>
    * <LI>Incoming equivalence ({@link IncomingEquivalenceTRSimplifier};
    *     Silent Continuation plus Active Events Rules)</LI>
+   * <LI>Certain Conflicts Rule ({@link LimitedCertainConflictsTRSimplifier})</LI>
    * <LI>Observation equivalence ({@link ObservationEquivalenceTRSimplifier})</LI>
    * <LI>Marking saturation ({@link MarkingSaturationTRSimplifier})</LI>
    * </UL>.
@@ -382,6 +389,7 @@ public class TRCompositionalConflictChecker
    * <LI>Only Silent Outgoing Rule ({@link OnlySilentOutgoingTRSimplifier})</LI>
    * <LI>Incoming equivalence ({@link IncomingEquivalenceTRSimplifier};
    *     Silent Continuation plus Active Events Rules)</LI>
+   * <LI>Certain Conflicts Rule ({@link LimitedCertainConflictsTRSimplifier})</LI>
    * <LI>Weak observation equivalence
    *     ({@link ObservationEquivalenceTRSimplifier})</LI>
    * <LI>Marking saturation ({@link MarkingSaturationTRSimplifier})</LI>
@@ -416,6 +424,7 @@ public class TRCompositionalConflictChecker
    * <LI>Only Silent Outgoing Rule ({@link OnlySilentOutgoingTRSimplifier})</LI>
    * <LI>Incoming equivalence ({@link IncomingEquivalenceTRSimplifier};
    *     Silent Continuation plus Active Events Rules)</LI>
+   * <LI>Certain Conflicts Rule ({@link LimitedCertainConflictsTRSimplifier})</LI>
    * <LI>Observation equivalence ({@link ObservationEquivalenceTRSimplifier})</LI>
    * <LI>Non-alpha determinisation ({@link NonAlphaDeterminisationTRSimplifier})</LI>
    * <LI>Marking saturation ({@link MarkingSaturationTRSimplifier})</LI>
@@ -450,6 +459,7 @@ public class TRCompositionalConflictChecker
    * <LI>Only Silent Outgoing Rule ({@link OnlySilentOutgoingTRSimplifier})</LI>
    * <LI>Incoming equivalence ({@link IncomingEquivalenceTRSimplifier};
    *     Silent Continuation plus Active Events Rules)</LI>
+   * <LI>Certain Conflicts Rule ({@link LimitedCertainConflictsTRSimplifier})</LI>
    * <LI>Weak observation equivalence
    *     ({@link ObservationEquivalenceTRSimplifier})</LI>
    * <LI>Non-alpha determinisation ({@link NonAlphaDeterminisationTRSimplifier})</LI>
@@ -518,9 +528,12 @@ public class TRCompositionalConflictChecker
     incomingEquivalenceSimplifier.setSimplificationListener(partitioningListener);
     chain.add(incomingEquivalenceSimplifier);
     /*
-    final LimitedCertainConflictsTRSimplifier limitedCertainConflictsRemover;
-    limitedCertainConflictsRemover =
+    final LimitedCertainConflictsTRSimplifier certainConflictsRemover =
       new LimitedCertainConflictsTRSimplifier();
+    final TRSimplificationListener certainConflictsListener =
+      new CertainConflictsListener();
+    certainConflictsRemover.setSimplificationListener(certainConflictsListener);
+    chain.add(certainConflictsRemover);
     */
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier();
@@ -600,6 +613,36 @@ public class TRCompositionalConflictChecker
     //#######################################################################
     //# Data Members
     private int mOldNumberOfMarkings;
+  }
+
+
+  //#########################################################################
+  //# Inner Class CertainConflictsListener
+  class CertainConflictsListener extends PartitioningListener
+  {
+    @Override
+    public void onSimplificationFinish
+      (final TransitionRelationSimplifier simplifier, final boolean result)
+    {
+      final IntermediateAbstractionSequence seq =
+        getIntermediateAbstractionSequence();
+      if (result && isCounterExampleEnabled() && seq != null) {
+        final LimitedCertainConflictsTRSimplifier certainConflictsRemover =
+          (LimitedCertainConflictsTRSimplifier) simplifier;
+        if (certainConflictsRemover.hasCertainConflictTransitions()) {
+          final TRAbstractionStep pred =
+            seq.getLastIntermediateStepOrPredecessor();
+          final EventEncoding enc = seq.getCurrentEventEncoding();
+          final TRAbstractionStep step =
+            new TRAbstractionStepCertainConflicts(pred, enc,
+                                                  DEFAULT_MARKING,
+                                                  certainConflictsRemover);
+          seq.append(step);
+        } else {
+          super.onSimplificationFinish(simplifier, result);
+        }
+      }
+    }
   }
 
 

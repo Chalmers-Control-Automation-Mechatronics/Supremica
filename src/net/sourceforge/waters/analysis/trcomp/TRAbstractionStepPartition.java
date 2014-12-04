@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.trcomp
-//# CLASS:   TRAbstractionStepDrop
+//# CLASS:   TRAbstractionStepPartition
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -120,6 +120,7 @@ class TRAbstractionStepPartition
     throws AnalysisException
   {
     final ChainTRSimplifier chain = new ChainTRSimplifier(mUsedSimplifiers);
+    chain.setPropositions(mPreconditionMarking, mDefaultMarking);
     chain.setPreferredOutputConfiguration(preferredConfig);
     final int inputConfig = chain.getPreferredInputConfiguration();
     final TRAutomatonProxy inputAut =

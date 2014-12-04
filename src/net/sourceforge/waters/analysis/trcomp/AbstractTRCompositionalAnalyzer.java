@@ -1093,6 +1093,18 @@ public abstract class AbstractTRCompositionalAnalyzer
     }
   }
 
+  protected void dropSubsystemExcept(final TRSubsystemInfo subsys,
+                                     final TRAutomatonProxy except)
+  {
+    if (isCounterExampleEnabled()) {
+      for (final TRAutomatonProxy aut : subsys.getAutomata()) {
+        if (aut != except) {
+          dropTrivialAutomaton(aut);
+        }
+      }
+    }
+  }
+
   protected void dropTrivialAutomaton(final TRAutomatonProxy aut)
   {
     if (isCounterExampleEnabled()) {
@@ -1372,6 +1384,16 @@ public abstract class AbstractTRCompositionalAnalyzer
     TRAbstractionStep getLastIntermediateStep()
     {
       return mSteps.peekLast();
+    }
+
+    TRAbstractionStep getLastIntermediateStepOrPredecessor()
+    {
+      final TRAbstractionStep last = getLastIntermediateStep();
+      if (last != null) {
+        return last;
+      } else {
+        return getPredecessor();
+      }
     }
 
     void append(final TRAbstractionStep step)

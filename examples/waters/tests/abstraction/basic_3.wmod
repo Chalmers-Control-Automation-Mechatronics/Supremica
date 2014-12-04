@@ -22,6 +22,7 @@
                 <ns2:Attribute Name="ALWAYS_ENABLED"/>
             </ns2:AttributeMap>
         </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="d"/>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="PLANT" Name="before">
@@ -61,8 +62,9 @@
                     <Edge Source="S1" Target="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="a"/>
+                            <SimpleIdentifier Name="d"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-20" Y="-10"/>
+                                <Point X="-19" Y="-19"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
