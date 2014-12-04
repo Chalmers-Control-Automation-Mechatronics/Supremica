@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="alwaysEnabledLimitedCertainConflicts06" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>A simple test for the Certain Conflicts Rule. This tests whether an all-blocking automaton is correctly created with its blocked events.</ns2:Comment>
+    <ns2:Comment>A test for the Limited Certain Conflicts Rule with always enabled events. This tests whether an all-blocking automaton is correctly created with its blocked events.</ns2:Comment>
     <ConstantAliasList>
         <ConstantAlias Name=":symbols">
             <ConstantAliasExpression>
@@ -11,7 +11,11 @@
         </ConstantAlias>
     </ConstantAliasList>
     <EventDeclList>
-        <EventDecl Kind="UNCONTROLLABLE" Name="c"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="c">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="ALWAYS_ENABLED"/>
+            </ns2:AttributeMap>
+        </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="NoPalletCL"/>
         <EventDecl Kind="CONTROLLABLE" Name="NoPalletEL"/>
         <EventDecl Kind="CONTROLLABLE" Name="PalletArvGCL"/>

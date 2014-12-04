@@ -48,12 +48,13 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
  *
  * <UL>
  * <LI>Every blocking state is a state of certain conflicts.</LI>
- * <LI>Every state with an outgoing silent transition to a state of certain
+ * <LI>Every state with an outgoing always enabled ({@link
+ *     EventStatus#STATUS_ALWAYS_ENABLED})transition to a state of certain
  *     conflicts also is a state of certain conflicts.</LI>
- * <LI>If a state&nbsp;<I>s</I> has an outgoing transition labelled by
+ * <LI>If a state&nbsp;<I>x</I> has an outgoing transition labelled by
  *     event&nbsp;<I>e</I> to a state of certain conflicts, or if such a
- *     transition  is reachable from <I>s</I> via  a sequence of silent
- *     transitions, then all other transitions from&nbsp;<I>s</I>
+ *     transition is reachable from <I>x</I> via  a sequence of silent
+ *     transitions, then all other transitions from&nbsp;<I>x</I>
  *     labelled&nbsp;<I>e</I> can be removed.</LI>
  * </UL>
  *
@@ -62,9 +63,13 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
  *
  * <P><I>Reference:</I> Hugo Flordal, Robi Malik. Compositional Verification
  * in Supervisory Control. SIAM Journal of Control and Optimization,
- * 48(3), 1914-1938, 2009.</P>
+ * <STRONG>48</STRONG>(3), 1914-1938, 2009.<BR>
+ * Colin Pilbrow, Robi Malik. Compositional Nonblocking Verification with
+ * Always Enabled Events and Selfloop-only Events. Proc. 2nd International
+ * Workshop on Formal Techniques for Safety-Critical Systems, FTSCS 2013,
+ * 147-162, Queenstown, New Zealand, 2013.</P>
  *
- * @author Robi Malik
+ * @author Robi Malik, Colin Pilbrow
  */
 
 public class LimitedCertainConflictsTRSimplifier
@@ -91,6 +96,12 @@ public class LimitedCertainConflictsTRSimplifier
   public int getPreferredInputConfiguration()
   {
     return ListBufferTransitionRelation.CONFIG_ALL;
+  }
+
+  @Override
+  public boolean isAlwaysEnabledEventsSupported()
+  {
+    return true;
   }
 
   @Override
@@ -170,6 +181,15 @@ public class LimitedCertainConflictsTRSimplifier
     return mStateInfo[state];
   }
 
+  /**
+   * Returns the array containing the levels of all states.
+   * @see #getLevel(int) getLevel()
+   */
+  public int[] getLevels()
+  {
+    return mStateInfo;
+  }
+
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
@@ -181,6 +201,13 @@ public class LimitedCertainConflictsTRSimplifier
     mStateInfo = null;
     mHasRemovedTransitions = false;
     mHasCertainConflictTransitions = false;
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    mAllEventsBackwardsIterator = rel.createPredecessorsReadOnlyIterator();
+    mAlwaysEnabledBackwardsIterator =
+      rel.createPredecessorsReadOnlyIteratorByStatus
+        (EventStatus.STATUS_ALWAYS_ENABLED);
+    mProperEventsBackwardsIterator =
+      rel.createPredecessorsReadOnlyIterator(~EventStatus.STATUS_LOCAL);
   }
 
   @Override
@@ -191,10 +218,9 @@ public class LimitedCertainConflictsTRSimplifier
     if (defaultID < 0) {
       return false;
     }
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    mPredecessorsIterator = rel.createPredecessorsReadOnlyIterator();
     mMaxLevel = COREACHABLE;
     int level = BLOCKING;
+    final ListBufferTransitionRelation rel = getTransitionRelation();
     int numReachable = rel.getNumberOfReachableStates();
     if (numReachable <= 1) {
       return false;
@@ -204,7 +230,6 @@ public class LimitedCertainConflictsTRSimplifier
       return false;
     }
     mMaxLevel = BLOCKING;
-    final int tauID = EventEncoding.TAU;
     final int numStates = rel.getNumberOfStates();
     final int shift = AutomatonTools.log2(numStates);
     final int mask = (1 << shift) - 1;
@@ -220,16 +245,17 @@ public class LimitedCertainConflictsTRSimplifier
     do {
       int nextlevel = level + 1;
       modified = false;
-      // check for tau-transitions to certain conflicts
+      // check for always enabled transitions to certain conflicts
       for (int state = 0; state < numStates; state++) {
         if (mStateInfo[state] == level && rel.isReachable(state)) {
           checkAbort();
           mUnvisitedStates.push(state);
           while (mUnvisitedStates.size() > 0) {
             final int popped = mUnvisitedStates.pop();
-            mPredecessorsIterator.reset(popped, tauID);
-            while (mPredecessorsIterator.advance()) {
-              final int pred = mPredecessorsIterator.getCurrentSourceState();
+            mAlwaysEnabledBackwardsIterator.resetState(popped);
+            while (mAlwaysEnabledBackwardsIterator.advance()) {
+              final int pred =
+                mAlwaysEnabledBackwardsIterator.getCurrentSourceState();
               if (mStateInfo[pred] == COREACHABLE) {
                 mMaxLevel = nextlevel;
                 mStateInfo[pred] = nextlevel;
@@ -252,18 +278,19 @@ public class LimitedCertainConflictsTRSimplifier
       }
       // check for proper event transitions to certain conflicts
       nextlevel++;
-      mPredecessorsIterator.resetEvents(EventEncoding.NONTAU, numEvents);
       for (int state = 0; state < numStates; state++) {
         if (mStateInfo[state] >= level && rel.isReachable(state)) {
           checkAbort();
-          mPredecessorsIterator.resetState(state);
-          while (mPredecessorsIterator.advance()) {
-            final int pred = mPredecessorsIterator.getCurrentSourceState();
+          mProperEventsBackwardsIterator.resetState(state);
+          while (mProperEventsBackwardsIterator.advance()) {
+            final int pred =
+              mProperEventsBackwardsIterator.getCurrentSourceState();
             if (mStateInfo[pred] == COREACHABLE) {
               closureIter.resetState(pred);
               while (closureIter.advance()) {
                 final int ppred = closureIter.getCurrentSourceState();
-                final int event = mPredecessorsIterator.getCurrentEvent();
+                final int event =
+                  mProperEventsBackwardsIterator.getCurrentEvent();
                 succIter.reset(ppred, event);
                 while (succIter.advance()) {
                   if (ppred != pred) {
@@ -422,7 +449,9 @@ public class LimitedCertainConflictsTRSimplifier
   @Override
   protected void tearDown()
   {
-    mPredecessorsIterator = null;
+    mAllEventsBackwardsIterator = null;
+    mAlwaysEnabledBackwardsIterator = null;
+    mProperEventsBackwardsIterator = null;
     mUnvisitedStates = null;
     super.tearDown();
   }
@@ -605,7 +634,6 @@ public class LimitedCertainConflictsTRSimplifier
         }
       }
     }
-    mPredecessorsIterator.resetEvent(-1);
     int coreachable = 0;
     for (int state = 0; state < numStates; state++) {
       if (rel.isMarked(state, defaultID) &&
@@ -617,9 +645,9 @@ public class LimitedCertainConflictsTRSimplifier
         coreachable++;
         while (mUnvisitedStates.size() > 0) {
           final int popped = mUnvisitedStates.pop();
-          mPredecessorsIterator.resetState(popped);
-          while (mPredecessorsIterator.advance()) {
-            final int pred = mPredecessorsIterator.getCurrentSourceState();
+          mAllEventsBackwardsIterator.resetState(popped);
+          while (mAllEventsBackwardsIterator.advance()) {
+            final int pred = mAllEventsBackwardsIterator.getCurrentSourceState();
             if (rel.isReachable(pred) && mStateInfo[pred] == level) {
               mStateInfo[pred] = COREACHABLE;
               mUnvisitedStates.push(pred);
@@ -641,7 +669,9 @@ public class LimitedCertainConflictsTRSimplifier
   private int mMaxLevel;
   private int[] mStateInfo;
   private TIntStack mUnvisitedStates;
-  private TransitionIterator mPredecessorsIterator;
+  private TransitionIterator mAllEventsBackwardsIterator;
+  private TransitionIterator mAlwaysEnabledBackwardsIterator;
+  private TransitionIterator mProperEventsBackwardsIterator;
 
 
   //#########################################################################
