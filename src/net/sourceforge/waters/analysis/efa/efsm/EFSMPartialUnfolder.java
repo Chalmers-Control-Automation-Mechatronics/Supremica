@@ -715,7 +715,10 @@ public class EFSMPartialUnfolder extends AbstractEFSMAlgorithm
     {
       if (mUnfoldedEventNumber == MISSING_CACHE_ENTRY) {
         mUnfoldedEventNumber = mUnfoldedEventEncoding.createEventId(mUpdate);
-        if (mIsPureGuard) {
+        if (mUpdate.isTrue()) {
+          mUnfoldedTransitionRelation.setProperEventStatus
+           (mUnfoldedEventNumber, EventStatus.STATUS_FULLY_LOCAL);
+        } else if (mIsPureGuard) {
           mUnfoldedTransitionRelation.setProperEventStatus
            (mUnfoldedEventNumber, EventStatus.STATUS_SELFLOOP_ONLY);
         }
