@@ -44,7 +44,6 @@ class TRAbstractionStepSync
   //# Constructor
   TRAbstractionStepSync(final List<TRAbstractionStep> preds,
                         final EventEncoding enc,
-                        final Collection<EventProxy> props,
                         final ProductDESProxyFactory factory,
                         final TRSynchronousProductBuilder builder,
                         final TRSynchronousProductResult result)
@@ -52,7 +51,6 @@ class TRAbstractionStepSync
     super(result.getComputedAutomaton().getName());
     mPredecessors = preds;
     mEventEncoding = enc;
-    mPropositions = props;
     mFactory = factory;
     mSynchronousProductBuilder = builder;
     final TRAutomatonProxy outputAut = result.getComputedAutomaton();
@@ -103,7 +101,7 @@ class TRAbstractionStepSync
     final TRCandidate candidate = new TRCandidate(automata, mEventEncoding);
     final ProductDESProxy des = candidate.createProductDESProxy(mFactory);
     final EventEncoding syncEncoding =
-      candidate.createSyncEventEncoding(mPropositions);
+      candidate.createSyncEventEncoding();
     mSynchronousProductBuilder.setModel(des);
     mSynchronousProductBuilder.setEventEncoding(syncEncoding);
     mSynchronousProductBuilder.run();
@@ -165,7 +163,7 @@ class TRAbstractionStepSync
     }
     if (numSteps > 1) {
       // Find local events ...
-      final int numEvents = mEventEncoding.getNumberOfEvents();
+      final int numEvents = mEventEncoding.getNumberOfProperEvents();
       final List<EventProxy> localEvents = new ArrayList<>(numEvents);
       for (int autIndex = 0; autIndex < numAutomata; autIndex++) {
         final EventProxy event = finders[autIndex].getTauEvent();
@@ -175,7 +173,8 @@ class TRAbstractionStepSync
       }
       for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
         final byte status = mEventEncoding.getProperEventStatus(e);
-        if (EventStatus.isLocalEvent(status)) {
+        if (EventStatus.isUsedEvent(status) &&
+            EventStatus.isLocalEvent(status)) {
           final EventProxy event = mEventEncoding.getProperEvent(e);
           localEvents.add(event);
         }
@@ -382,7 +381,6 @@ class TRAbstractionStepSync
   //# Data Members
   private final List<TRAbstractionStep> mPredecessors;
   private final EventEncoding mEventEncoding;
-  private final Collection<EventProxy> mPropositions;
   private final ProductDESProxyFactory mFactory;
   private final TRSynchronousProductBuilder mSynchronousProductBuilder;
 

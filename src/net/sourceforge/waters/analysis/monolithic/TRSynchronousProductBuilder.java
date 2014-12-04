@@ -232,8 +232,7 @@ public class TRSynchronousProductBuilder
       } else {
         mConfiguredEventEncoding.removeAllPropositions();
         for (final EventProxy prop : props) {
-          mConfiguredEventEncoding.addEvent(prop, translator,
-                                            EventStatus.STATUS_NONE);
+          mConfiguredEventEncoding.addProposition(prop, true);
         }
       }
     }
@@ -348,15 +347,21 @@ public class TRSynchronousProductBuilder
     }
 
     // Add propositions to output event encoding ...
-    if (!mHasConfiguredPropositions) {
-      for (a = 0; a < numAutomata; a++) {
-        final TRAutomatonProxy aut = mInputAutomata[a];
-        final EventEncoding enc = aut.getEventEncoding();
-        for (int p = 0; p < enc.getNumberOfPropositions(); p++) {
-          if (enc.isPropositionUsed(p)) {
-            final EventProxy prop = enc.getProposition(p);
-            mOutputEventEncoding.addEvent(prop, translator,
-                                          EventStatus.STATUS_NONE);
+    for (a = 0; a < numAutomata; a++) {
+      final TRAutomatonProxy aut = mInputAutomata[a];
+      final EventEncoding enc = aut.getEventEncoding();
+      for (int p = 0; p < enc.getNumberOfPropositions(); p++) {
+        if (enc.isPropositionUsed(p)) {
+          final EventProxy prop = enc.getProposition(p);
+          if (mHasConfiguredPropositions) {
+            // If the proposition is configured as unused, mark it as used ...
+            final int configP = mConfiguredEventEncoding.getEventCode(prop);
+            if (configP >= 0) {
+              mOutputEventEncoding.setPropositionUsed(configP, true);
+            }
+          } else {
+            // If no configured propositions, add it ...
+            mOutputEventEncoding.addProposition(prop, true);
           }
         }
       }

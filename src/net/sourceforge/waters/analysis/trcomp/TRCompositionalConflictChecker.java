@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.analysis.trcomp;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
@@ -27,6 +29,7 @@ import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
@@ -42,13 +45,16 @@ import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.TraceChecker;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.apache.log4j.Logger;
 
@@ -132,14 +138,31 @@ public class TRCompositionalConflictChecker
     };
   }
 
+  @Override
+  public ConflictChecker getMonolithicAnalyzer()
+  {
+    return (ConflictChecker) super.getMonolithicAnalyzer();
+  }
+
 
   //#########################################################################
   //# Invocation
+  @Override
+  protected void setUp() throws AnalysisException
+  {
+    mUsingCertainConflicts = false;
+    super.setUp();
+    final ConflictChecker mono = getMonolithicAnalyzer();
+    mono.setConfiguredDefaultMarking(getUsedDefaultMarking());
+    mono.setConfiguredPreconditionMarking(getUsedPreconditionMarking());
+  }
+
   @Override
   protected void tearDown()
   {
     super.tearDown();
     mUsedDefaultMarking = null;
+    mSafetyCheckEvent = null;
   }
 
 
@@ -158,7 +181,8 @@ public class TRCompositionalConflictChecker
     if (mUsedDefaultMarking == null) {
       if (mConfiguredDefaultMarking == null) {
         final ProductDESProxy model = getModel();
-        mUsedDefaultMarking = AbstractConflictChecker.getMarkingProposition(model);
+        mUsedDefaultMarking =
+          AbstractConflictChecker.getMarkingProposition(model);
       } else {
         mUsedDefaultMarking = mConfiguredDefaultMarking;
       }
@@ -171,6 +195,31 @@ public class TRCompositionalConflictChecker
   {
     // TODO Create precondition marking for GNB chain
     return getConfiguredPreconditionMarking();
+  }
+
+  @Override
+  protected void addAdditionalEvents(final EventEncoding enc)
+    throws AnalysisException
+  {
+    final EventProxy defaultMarking = getUsedDefaultMarking();
+    enc.addProposition(defaultMarking, false);
+    final EventProxy preconditionMarking = getUsedPreconditionMarking();
+    if (preconditionMarking != null) {
+      enc.addProposition(preconditionMarking, false);
+    }
+    final EventProxy safetyCheckEvent = getSafetyCheckEvent();
+    if (safetyCheckEvent != null) {
+      enc.addProperEvent(safetyCheckEvent, EventStatus.STATUS_UNUSED);
+    }
+  }
+
+  @Override
+  protected StateProxy findDumpState(final AutomatonProxy aut)
+    throws EventNotFoundException
+  {
+    final EventProxy marking = getUsedDefaultMarking();
+    final Collection<EventProxy> markings = Collections.singletonList(marking);
+    return AutomatonTools.findDumpState(aut, markings);
   }
 
   @Override
@@ -534,6 +583,7 @@ public class TRCompositionalConflictChecker
       new CertainConflictsListener();
     certainConflictsRemover.setSimplificationListener(certainConflictsListener);
     chain.add(certainConflictsRemover);
+    mUsingCertainConflicts = true;
     */
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier();
@@ -563,6 +613,21 @@ public class TRCompositionalConflictChecker
     chain.setPreferredOutputConfiguration
       (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     return chain;
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private EventProxy getSafetyCheckEvent()
+  {
+    if (mSafetyCheckEvent == null) {
+      if (mUsingCertainConflicts || mConfiguredDefaultMarking != null) {
+        final ProductDESProxyFactory factory = getFactory();
+        mSafetyCheckEvent = factory.createEventProxy(SAFETY_CHECK_EVENT_NAME,
+                                                     EventKind.UNCONTROLLABLE);
+      }
+    }
+    return mSafetyCheckEvent;
   }
 
 
@@ -652,6 +717,14 @@ public class TRCompositionalConflictChecker
   private EventProxy mConfiguredDefaultMarking;
   private EventProxy mConfiguredPreconditionMarking;
 
+  // Additional events used during verification
+  private boolean mUsingCertainConflicts;
   private EventProxy mUsedDefaultMarking;
+  private EventProxy mSafetyCheckEvent;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final String SAFETY_CHECK_EVENT_NAME = ":unsafe";
 
 }

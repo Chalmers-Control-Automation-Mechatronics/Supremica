@@ -51,7 +51,6 @@ import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -549,7 +548,6 @@ public abstract class AbstractTRCompositionalAnalyzer
     super.tearDown();
     mTRSimplifier = null;
     mSpecialEventsFinder = null;
-    mUsedPropositions = null;
     mAbstractionSequence = null;
     mIntermediateAbstractionSequence = null;
     mCurrentAutomataMap = null;
@@ -570,25 +568,6 @@ public abstract class AbstractTRCompositionalAnalyzer
   protected EventProxy getUsedPreconditionMarking()
   {
     return null;
-  }
-
-  protected Collection<EventProxy> getUsedPropositions()
-    throws EventNotFoundException
-  {
-    if (mUsedPropositions == null) {
-      final EventProxy defaultMarking = getUsedDefaultMarking();
-      if (defaultMarking == null) {
-        return mUsedPropositions = Collections.emptyList();
-      }
-      final EventProxy preconditionMarking = getUsedPreconditionMarking();
-      if (preconditionMarking == null) {
-        return mUsedPropositions =Collections.singletonList(defaultMarking);
-      }
-      mUsedPropositions = new ArrayList<>(2);
-      mUsedPropositions.add(defaultMarking);
-      mUsedPropositions.add(preconditionMarking);
-    }
-    return mUsedPropositions;
   }
 
   /**
@@ -792,9 +771,9 @@ public abstract class AbstractTRCompositionalAnalyzer
       // Set up event encoding ...
       final EventEncoding candidateEncoding = candidate.getEventEncoding();
       countSpecialEvents(candidateEncoding);
+      addAdditionalEvents(candidateEncoding);
       sortCandidateEvents(candidateEncoding);
-      final Collection<EventProxy> props = getUsedPropositions();
-      final EventEncoding syncEncoding = candidate.createSyncEventEncoding(props);
+      final EventEncoding syncEncoding = candidate.createSyncEventEncoding();
       // Synchronise ...
       final ProductDESProxyFactory factory = getFactory();
       final ProductDESProxy des = candidate.createProductDESProxy(factory);
@@ -815,7 +794,7 @@ public abstract class AbstractTRCompositionalAnalyzer
         final List<TRAbstractionStep> preds = getAbstractionSteps(automata);
         final EventEncoding enc = candidate.getEventEncoding();
         final TRAbstractionStep step =
-          new TRAbstractionStepSync(preds, enc, props, factory,
+          new TRAbstractionStepSync(preds, enc, factory,
                                     mSynchronousProductBuilder, syncResult);
         mIntermediateAbstractionSequence.append(step);
       }
@@ -1011,6 +990,27 @@ public abstract class AbstractTRCompositionalAnalyzer
 
   //#########################################################################
   //# Auxiliary Methods
+  protected EventEncoding createInitialEventEncoding(final AutomatonProxy aut)
+    throws AnalysisException
+  {
+    final EventEncoding enc = new EventEncoding();
+    addAdditionalEvents(enc);
+    final String name = aut.getName();
+    enc.provideTauEvent(name);
+    final KindTranslator translator = getKindTranslator();
+    for (final EventProxy event : aut.getEvents()) {
+      enc.addEvent(event, translator, EventStatus.STATUS_NONE);
+    }
+    enc.sortProperEvents(EventStatus.STATUS_UNUSED,
+                         EventStatus.STATUS_CONTROLLABLE);
+    return enc;
+  }
+
+  protected void addAdditionalEvents(final EventEncoding enc)
+    throws AnalysisException
+  {
+  }
+
   protected TRAutomatonProxy createInitialAutomaton(final AutomatonProxy aut,
                                                     final int config)
     throws AnalysisException
@@ -1020,8 +1020,7 @@ public abstract class AbstractTRCompositionalAnalyzer
     case PLANT:
     case SPEC:
       final EventEncoding eventEnc = createInitialEventEncoding(aut);
-      final Collection<EventProxy> markings = getUsedPropositions();
-      final StateProxy dumpState = AutomatonTools.findDumpState(aut, markings);
+      final StateProxy dumpState = findDumpState(aut);
       final TRAutomatonProxy tr =
         new TRAutomatonProxy(aut, eventEnc, dumpState, config);
       if (!hasInitialState(tr)) {
@@ -1043,21 +1042,10 @@ public abstract class AbstractTRCompositionalAnalyzer
     }
   }
 
-  protected EventEncoding createInitialEventEncoding(final AutomatonProxy aut)
-    throws AnalysisException
+  protected StateProxy findDumpState(final AutomatonProxy aut)
+    throws EventNotFoundException
   {
-    final EventEncoding enc = new EventEncoding();
-    final String name = aut.getName();
-    enc.provideTauEvent(name);
-    final KindTranslator translator = getKindTranslator();
-    for (final EventProxy event : aut.getEvents()) {
-      enc.addEvent(event, translator, EventStatus.STATUS_NONE);
-    }
-    for (final EventProxy prop : getUsedPropositions()) {
-      enc.addProposition(prop, false);
-    }
-    enc.sortProperEvents(EventStatus.STATUS_CONTROLLABLE);
-    return enc;
+    return null;
   }
 
   protected boolean hasInitialState(final TRAutomatonProxy aut)
@@ -1522,8 +1510,6 @@ public abstract class AbstractTRCompositionalAnalyzer
   private boolean mSelfloopOnlyEventsEnabled;
   private boolean mAlwaysEnabledEventsEnabled;
   private boolean mTraceCheckingEnabled;
-
-  private Collection<EventProxy> mUsedPropositions;
 
   // Tools
   private final PreselectionHeuristic mPreselectionHeuristic;

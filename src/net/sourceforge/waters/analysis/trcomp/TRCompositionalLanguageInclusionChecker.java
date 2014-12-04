@@ -10,8 +10,6 @@
 package net.sourceforge.waters.analysis.trcomp;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
@@ -42,7 +40,6 @@ import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.des.TraceChecker;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
-import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
@@ -160,12 +157,6 @@ public class TRCompositionalLanguageInclusionChecker
 
   //#########################################################################
   //# Hooks
-  @Override
-  protected Collection<EventProxy> getUsedPropositions()
-  {
-    return Collections.emptyList();
-  }
-
   @Override
   protected boolean isFailingEventsUsed()
   {

@@ -110,11 +110,13 @@ class TRSubsystemInfo
     for (int e = EventEncoding.NONTAU; e < eventStatus.length; e++) {
       final EventProxy event = enc.getProperEvent(e);
       final byte status = enc.getProperEventStatus(e);
-      final TREventInfo info = createEventInfo(event, status);
-      if (external) {
-        info.addExternalStatus(eventStatus[e]);
-      } else {
-        info.setAutomatonStatus(aut, eventStatus[e]);
+      if (EventStatus.isUsedEvent(status)) {
+        final TREventInfo info = createEventInfo(event, status);
+        if (external) {
+          info.addExternalStatus(eventStatus[e]);
+        } else {
+          info.setAutomatonStatus(aut, eventStatus[e]);
+        }
       }
     }
   }
@@ -127,9 +129,11 @@ class TRSubsystemInfo
     for (int e = EventEncoding.NONTAU; e < eventStatus.length; e++) {
       final EventProxy event = enc.getProperEvent(e);
       final TREventInfo info = getEventInfo(event);
-      info.updateAutomatonStatus(aut, eventStatus[e], needsSimplification);
-      if (info.isEmpty()) {
-        mEvents.remove(event);
+      if (info != null) {
+        info.updateAutomatonStatus(aut, eventStatus[e], needsSimplification);
+        if (info.isEmpty()) {
+          mEvents.remove(event);
+        }
       }
     }
   }
