@@ -129,7 +129,8 @@ class TRAbstractionStepSync
   }
 
   @Override
-  public void expandTrace(final TRTraceProxy trace)
+  public void expandTrace(final TRTraceProxy trace,
+                          final AbstractTRCompositionalAnalyzer analyzer)
     throws AnalysisException
   {
     // Ensure mDumpStateIndex and mStateMap are available ...
@@ -199,6 +200,7 @@ class TRAbstractionStepSync
         boolean found = false;
         eventLoop:
         for (final EventProxy alt : alternatives) {
+          analyzer.checkAbort();
           found = state != mDumpStateIndex || failingEvent;
           for (int autIndex = 0; autIndex < numAutomata; autIndex++) {
             final TransitionFinder finder = finders[autIndex];

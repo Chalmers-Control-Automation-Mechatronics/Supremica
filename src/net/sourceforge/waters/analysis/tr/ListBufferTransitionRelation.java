@@ -428,7 +428,8 @@ public class ListBufferTransitionRelation
    *          The transition relation to be copied.
    * @param eventStatus
    *          The event status provider (event encoding) used for the
-   *          copied transition relation.
+   *          copied transition relation. Must be big enough to contain
+   *          all used events of the transition relation to be copied.
    * @param config
    *          Configuration flags defining which transition buffers are to be
    *          created in the copy. Should be one of {@link #CONFIG_SUCCESSORS},

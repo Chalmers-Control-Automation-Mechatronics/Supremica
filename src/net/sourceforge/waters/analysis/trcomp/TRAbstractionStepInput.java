@@ -90,7 +90,8 @@ class TRAbstractionStepInput
   }
 
   @Override
-  public void expandTrace(final TRTraceProxy trace)
+  public void expandTrace(final TRTraceProxy trace,
+                          final AbstractTRCompositionalAnalyzer analyzer)
   {
     trace.setInputAutomaton(this);
   }

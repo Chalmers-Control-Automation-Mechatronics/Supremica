@@ -9,14 +9,24 @@
 
 package net.sourceforge.waters.analysis.trcomp;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.analysis.abstraction.LimitedCertainConflictsTRSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.des.AutomatonTools;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.apache.log4j.Logger;
 
@@ -54,6 +64,11 @@ class TRAbstractionStepCertainConflicts
     return mPredecessor;
   }
 
+  int[] getLevels()
+  {
+    return mLevels;
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.trcomp.TRAbstractionStep
@@ -86,11 +101,18 @@ class TRAbstractionStepCertainConflicts
   }
 
   @Override
-  public void expandTrace(final TRTraceProxy trace)
+  public void expandTrace(final TRTraceProxy trace,
+                          final AbstractTRCompositionalAnalyzer analyzer)
     throws AnalysisException
   {
-    // TODO
-    assert false : "Certain conflicts trace expansion not yet implemented!";
+    final TRCompositionalConflictChecker checker =
+      (TRCompositionalConflictChecker) analyzer;
+    final TraceExpander expander = new TraceExpander(checker);
+    expander.pruneTrace(trace);
+    expander.createLanguageInclusionAutomata(trace);
+    final TRTraceProxy extension = expander.findTraceExtension();
+    assert extension == null :
+      "Certain conflicts trace expansion not yet implemented!";
   }
 
 
@@ -106,12 +128,279 @@ class TRAbstractionStepCertainConflicts
 
 
   //#########################################################################
+  //# Inner Class TraceExpander
+  private class TraceExpander
+  {
+    //#######################################################################
+    //# Constructor
+    private TraceExpander(final TRCompositionalConflictChecker checker)
+      throws AnalysisException
+    {
+      mLanguageInclusionChecker = checker.getLanguageInclusionChecker();
+      final int config = mLanguageInclusionChecker.getPreferredInputConfiguration();
+      final ProductDESProxyFactory factory = checker.getFactory();
+      mCertainConflictEvent = factory.createEventProxy
+        (CERTAIN_CONFLICT_EVENT_NAME, EventKind.UNCONTROLLABLE);
+      final EventEncoding propertyEnc = new EventEncoding();
+      propertyEnc.addProperEvent(mCertainConflictEvent, EventStatus.STATUS_NONE);
+      final ListBufferTransitionRelation rel = new ListBufferTransitionRelation
+        (PROPERTY_NAME, ComponentKind.PROPERTY, propertyEnc, 1, config);
+      mPropertyAutomaton = new TRAutomatonProxy(propertyEnc, rel);
+    }
+
+    //#######################################################################
+    //# Trace Expansion
+    private void pruneTrace(final TRTraceProxy trace)
+      throws AnalysisException
+    {
+      // Find the last trace step outside of certain conflicts in the
+      // output automaton.
+      int index;
+      for (index = trace.getNumberOfSteps() - 1; index >= 0; index--) {
+        final int s =
+          trace.getState(TRAbstractionStepCertainConflicts.this, index);
+        if (mLevels[s] < 0) {
+          break;
+        }
+      }
+      if (index < 0) {
+        // The entire trace is in certain conflicts. Find an initial state
+        // at the lowest (= most conflicting) level.
+        final int init = findMostConflictingInitialState();
+        trace.setState(TRAbstractionStepCertainConflicts.this, 0, init);
+        index = 0;
+      }
+      trace.prune(index + 1);
+    }
+
+    private void createLanguageInclusionAutomata(final TRTraceProxy trace)
+      throws AnalysisException
+    {
+      mMaxLevel = getLevelOfEndState(trace);
+      if (mMaxLevel < 0) {
+        for (int s = 0; s < mLevels.length; s++) {
+          if (mLevels[s] > mMaxLevel) {
+            mMaxLevel = s;
+          }
+        }
+      } else if (mMaxLevel == 1) {
+        mMaxLevel = 0; // TODO drop this case
+      } else {
+        mMaxLevel = (mMaxLevel | 1) - 2;
+      }
+      if (mMaxLevel >= 0) {
+        final int config =
+          mLanguageInclusionChecker.getPreferredInputConfiguration();
+        mCertainConflictsAutomaton = new LanguageInclusionAutomaton
+          (trace, TRAbstractionStepCertainConflicts.this,
+           config, mCertainConflictEvent, mMaxLevel);
+        final Set<TRAbstractionStep> steps = trace.getCoveredAbstractionSteps();
+        mLanguageInclusionAutomata = new ArrayList<>(steps.size() - 1);
+        for (final TRAbstractionStep step : steps) {
+          if (step != TRAbstractionStepCertainConflicts.this) {
+            final LanguageInclusionAutomaton aut =
+              new LanguageInclusionAutomaton(trace, step, config);
+            mLanguageInclusionAutomata.add(aut);
+          }
+        }
+      }
+    }
+
+    private TRTraceProxy findTraceExtension()
+      throws AnalysisException
+    {
+      if (mMaxLevel < 0) {
+        return null;
+      }
+      final ProductDESProxy des = createLanguageInclusionModel();
+      mLanguageInclusionChecker.setModel(des);
+      if (mLanguageInclusionChecker.run()) {
+        return null;
+      } else {
+        return (TRTraceProxy) mLanguageInclusionChecker.getCounterExample();
+      }
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private int findMostConflictingInitialState()
+      throws AnalysisException
+    {
+      final int config =
+        mLanguageInclusionChecker.getPreferredInputConfiguration();
+      final TRAutomatonProxy inputAut = mPredecessor.getOutputAutomaton(config);
+      final ListBufferTransitionRelation inputRel =
+        inputAut.getTransitionRelation();
+      final int numStates = inputRel.getNumberOfStates();
+      int found = -1;
+      int lowest = Integer.MAX_VALUE;
+      for (int s = 0; s < numStates; s++) {
+        if (inputRel.isInitial(s) && mLevels[s] < lowest) {
+          found = s;
+          lowest = mLevels[s];
+        }
+      }
+      assert found >= 0 : "No initial state in certain conflicts automaton!";
+      return found;
+    }
+
+    private int getLevelOfEndState(final TRTraceProxy trace)
+    {
+      final int last = trace.getNumberOfSteps() - 1;
+      final int end =
+        trace.getState(TRAbstractionStepCertainConflicts.this, last);
+      return mLevels[end];
+    }
+
+    private ProductDESProxy createLanguageInclusionModel()
+    {
+      final int numAutomata = mLanguageInclusionAutomata.size() + 2;
+      final List<TRAutomatonProxy> automata = new ArrayList<>(numAutomata);
+      automata.add(mCertainConflictsAutomaton.getAutomaton());
+      for (final LanguageInclusionAutomaton aut : mLanguageInclusionAutomata) {
+        automata.add(aut.getAutomaton());
+      }
+      automata.add(mPropertyAutomaton);
+      final ProductDESProxyFactory factory =
+        mLanguageInclusionChecker.getFactory();
+      return
+        AutomatonTools.createProductDESProxy(PROPERTY_NAME, automata, factory);
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final TRCompositionalLanguageInclusionChecker mLanguageInclusionChecker;
+    private final EventProxy mCertainConflictEvent;
+    private final TRAutomatonProxy mPropertyAutomaton;
+    private List<LanguageInclusionAutomaton> mLanguageInclusionAutomata;
+    private LanguageInclusionAutomaton mCertainConflictsAutomaton;
+    private int mMaxLevel;
+  }
+
+
+  //#########################################################################
+  //# Inner Class LanguageInclusionAutomaton
+  private static class LanguageInclusionAutomaton
+  {
+    //#######################################################################
+    //# Constructor
+    private LanguageInclusionAutomaton(final TRTraceProxy trace,
+                                       final TRAbstractionStep step,
+                                       final int config)
+      throws AnalysisException
+    {
+      mAbstractionStep = step;
+      final TRAutomatonProxy inputAut = step.getOutputAutomaton(config);
+      mLanguageInclusionAutomaton = new TRAutomatonProxy(inputAut, config);
+      mCurrentState = getCurrentState(trace);
+      final ListBufferTransitionRelation rel =
+        mLanguageInclusionAutomaton.getTransitionRelation();
+      final int numStates = rel.getNumberOfStates();
+      for (int s = 0; s < numStates; s++) {
+        rel.setInitial(s, s == mCurrentState);
+      }
+    }
+
+    private LanguageInclusionAutomaton(final TRTraceProxy trace,
+                                       final TRAbstractionStepCertainConflicts step,
+                                       final int config,
+                                       final EventProxy ccEvent,
+                                       final int maxLevel)
+      throws AnalysisException
+    {
+      mAbstractionStep = step;
+      final TRAutomatonProxy outputAut = step.getOutputAutomaton(config);
+      final EventEncoding outputEnc = outputAut.getEventEncoding();
+      final EventEncoding langEnc = outputEnc.clone();
+      final int cc = langEnc.addProperEvent(ccEvent, EventStatus.STATUS_NONE);
+      final ListBufferTransitionRelation outputRel =
+        outputAut.getTransitionRelation();
+      final ListBufferTransitionRelation langRel =
+        new ListBufferTransitionRelation(outputRel, langEnc, config);
+      mCurrentState = getCurrentState(trace);
+      final int numStates = langRel.getNumberOfStates();
+      final int[] levels = step.getLevels();
+      for (int s = 0; s < numStates; s++) {
+        langRel.setInitial(s, s == mCurrentState);
+        if (levels[s] >= 0 && levels[s] <= maxLevel) {
+          langRel.addTransition(s, cc, s);
+        }
+      }
+      mLanguageInclusionAutomaton = new TRAutomatonProxy(langEnc, langRel);
+    }
+
+    //#######################################################################
+    //# Simple Access
+    private TRAutomatonProxy getAutomaton()
+    {
+      return mLanguageInclusionAutomaton;
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private int getCurrentState(final TRTraceProxy trace)
+    {
+      final int last = trace.getNumberOfSteps() - 1;
+      return trace.getState(mAbstractionStep, last);
+    }
+
+    @SuppressWarnings("unused")
+    private void setCurrentState(final TRTraceProxy trace)
+    {
+      final ListBufferTransitionRelation rel =
+        mLanguageInclusionAutomaton.getTransitionRelation();
+      rel.setInitial(mCurrentState, false);
+      mCurrentState = getCurrentState(trace);
+      rel.setInitial(mCurrentState, true);
+    }
+
+    @SuppressWarnings("unused")
+    private void removeLevels(final TRAbstractionStepCertainConflicts step,
+                              final EventProxy ccEvent,
+                              final int minRemoved,
+                              final int maxRemoved)
+    {
+      final EventEncoding enc = mLanguageInclusionAutomaton.getEventEncoding();
+      final int cc = enc.getEventCode(ccEvent);
+      final ListBufferTransitionRelation rel =
+        mLanguageInclusionAutomaton.getTransitionRelation();
+      final int numStates = rel.getNumberOfStates();
+      final int[] levels = step.getLevels();
+      for (int s = 0; s < numStates; s++) {
+        if (levels[s] >= minRemoved && levels[s] <= maxRemoved) {
+          rel.removeTransition(s, cc, s);
+        }
+      }
+    }
+
+    //#######################################################################
+    //# Debugging
+    @Override
+    public String toString()
+    {
+      return mLanguageInclusionAutomaton.getName();
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final TRAbstractionStep mAbstractionStep;
+    private final TRAutomatonProxy mLanguageInclusionAutomaton;
+    private int mCurrentState;
+  }
+
+
+  //#########################################################################
   //# Data Members
   private final TRAbstractionStep mPredecessor;
   private final EventEncoding mEventEncoding;
   private final int mDefaultMarking;
   private final LimitedCertainConflictsTRSimplifier mSimplifier;
-  @SuppressWarnings("unused")
   private final int[] mLevels;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final String CERTAIN_CONFLICT_EVENT_NAME = ":certainconf";
+  private static final String PROPERTY_NAME = ":never";
 
 }

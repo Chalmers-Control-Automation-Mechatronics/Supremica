@@ -29,7 +29,9 @@ import net.sourceforge.waters.analysis.tr.StatusGroupTransitionIterator;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.EventProxy;
 
 import org.apache.log4j.Logger;
@@ -139,14 +141,15 @@ class TRAbstractionStepPartition
   }
 
   @Override
-  public void expandTrace(final TRTraceProxy trace)
+  public void expandTrace(final TRTraceProxy trace,
+                          final AbstractTRCompositionalAnalyzer analyzer)
     throws AnalysisException
   {
     final TRAutomatonProxy aut = mPredecessor.createOutputAutomaton
       (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final ListBufferTransitionRelation rel = aut.getTransitionRelation();
     rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-    final TraceExpander expander = new TraceExpander(trace, rel);
+    final TraceExpander expander = new TraceExpander(trace, rel, analyzer);
     final SearchRecord found = expander.findTrace();
     final List<SearchRecord> searchRecordTrace = found.getSearchRecordTrace();
     final int maxLength = trace.getNumberOfSteps() + searchRecordTrace.size();
@@ -181,8 +184,10 @@ class TRAbstractionStepPartition
     //#######################################################################
     //# Constructor
     private TraceExpander(final TRTraceProxy trace,
-                          final ListBufferTransitionRelation rel)
+                          final ListBufferTransitionRelation rel,
+                          final AbstractTRCompositionalAnalyzer analyzer)
     {
+      mAnalyzer = analyzer;
       mInputTransitionRelation = rel;
       final List<EventProxy> events = trace.getEvents();
       final int numTraceEvents = events.size();
@@ -239,6 +244,7 @@ class TRAbstractionStepPartition
     //#######################################################################
     //# Trace Search
     private SearchRecord findTrace()
+      throws AnalysisAbortException, OverflowException
     {
       final int numStates = mInputTransitionRelation.getNumberOfStates();
       for (int s = 0; s < numStates; s++) {
@@ -256,6 +262,7 @@ class TRAbstractionStepPartition
       final TransitionIterator iterLocal = new StatusGroupTransitionIterator
         (inner, mEventEncoding, EventStatus.STATUS_LOCAL);
       while (!mSearchSpace.isEmpty()) {
+        mAnalyzer.checkAbort();
         final SearchRecord current = mSearchSpace.poll();
         if (current == mStartOfNextLevel) {
           if (mNonDeadlockTarget != null) {
@@ -394,6 +401,7 @@ class TRAbstractionStepPartition
 
     //#######################################################################
     //# Data Members
+    private final AbstractTRCompositionalAnalyzer mAnalyzer;
     private final ListBufferTransitionRelation mInputTransitionRelation;
     private final TIntArrayList mEventSequence;
     private final int mTargetState;

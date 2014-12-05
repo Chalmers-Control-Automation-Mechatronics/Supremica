@@ -49,7 +49,8 @@ abstract class TRAbstractionStep
   abstract TRAutomatonProxy createOutputAutomaton(int preferredConfig)
     throws AnalysisException;
 
-  abstract void expandTrace(TRTraceProxy trace)
+  abstract void expandTrace(TRTraceProxy trace,
+                            AbstractTRCompositionalAnalyzer analyzer)
     throws AnalysisException;
 
 

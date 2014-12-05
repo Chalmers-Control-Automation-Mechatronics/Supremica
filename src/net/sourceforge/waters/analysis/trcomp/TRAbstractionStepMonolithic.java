@@ -68,7 +68,8 @@ class TRAbstractionStepMonolithic
   }
 
   @Override
-  public void expandTrace(final TRTraceProxy trace)
+  public void expandTrace(final TRTraceProxy trace,
+                          final AbstractTRCompositionalAnalyzer analyzer)
     throws AnalysisException
   {
     final List<EventProxy> events = mMonolithicTrace.getEvents();
@@ -84,6 +85,7 @@ class TRAbstractionStepMonolithic
     }
 
     for (final TRAbstractionStep pred : mPredecessors) {
+      analyzer.checkAbort();
       final String name = pred.getName();
       final TRAutomatonProxy aut = traceAutomataMap.get(name);
       final EventEncoding enc = aut.getEventEncoding();

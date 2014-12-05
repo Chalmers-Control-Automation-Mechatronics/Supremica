@@ -11,6 +11,7 @@ package net.sourceforge.waters.model.analysis.des;
 
 import java.util.Collection;
 
+import net.sourceforge.waters.model.analysis.AbstractAbortable;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
@@ -38,7 +39,9 @@ import org.apache.log4j.Logger;
  * @author Robi Malik
  */
 
-public abstract class AbstractModelAnalyzer implements ModelAnalyzer
+public abstract class AbstractModelAnalyzer
+  extends AbstractAbortable
+  implements ModelAnalyzer
 {
 
   //#########################################################################
@@ -59,7 +62,6 @@ public abstract class AbstractModelAnalyzer implements ModelAnalyzer
     mModel = model;
     mNodeLimit = Integer.MAX_VALUE;
     mTransitionLimit = Integer.MAX_VALUE;
-    mIsAborting = false;
   }
 
   public AbstractModelAnalyzer(final AutomatonProxy aut,
@@ -165,27 +167,6 @@ public abstract class AbstractModelAnalyzer implements ModelAnalyzer
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.Abortable
-  @Override
-  public void requestAbort()
-  {
-    mIsAborting = true;
-  }
-
-  @Override
-  public boolean isAborting()
-  {
-    return mIsAborting;
-  }
-
-  @Override
-  public void resetAbort()
-  {
-    mIsAborting = false;
-  }
-
-
-  //#########################################################################
   //# Auxiliary Methods
   /**
    * Initialises the model analyser for a new run.
@@ -220,12 +201,14 @@ public abstract class AbstractModelAnalyzer implements ModelAnalyzer
    * This method should be called periodically by any model analyser that
    * supports being aborted by user request.
    */
+  @Override
   public void checkAbort()
     throws AnalysisAbortException, OverflowException
   {
-    if (mIsAborting) {
+    try {
+      super.checkAbort();
+    } catch (final AnalysisAbortException | OverflowException exception) {
       getLogger().debug("Abort request received - aborting ...");
-      final AnalysisAbortException exception = new AnalysisAbortException();
       setExceptionResult(exception);
       throw exception;
     }
@@ -367,6 +350,5 @@ public abstract class AbstractModelAnalyzer implements ModelAnalyzer
   private int mNodeLimit;
   private int mTransitionLimit;
   private long mStartTime;
-  private boolean mIsAborting;
 
 }

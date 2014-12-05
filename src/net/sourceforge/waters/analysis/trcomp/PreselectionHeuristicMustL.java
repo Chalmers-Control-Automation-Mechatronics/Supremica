@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
-import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 
 
 /**
@@ -30,7 +30,7 @@ class PreselectionHeuristicMustL extends PreselectionHeuristic
   //# Interface net.sourceforge.waters.analysis.trcomp.PreselectingHeuristic
   @Override
   Collection<TRCandidate> collectCandidates(final TRSubsystemInfo subsys)
-    throws OverflowException
+    throws AnalysisException
   {
     final Collection<TREventInfo> events = subsys.getEvents(); // unordered!
     final int numEvents = events.size();

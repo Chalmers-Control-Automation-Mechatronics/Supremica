@@ -97,39 +97,6 @@ public abstract class TRTraceProxy
 
 
   //#########################################################################
-  //# Simple Access
-  void setComment(final String comment)
-  {
-    mComment = comment;
-  }
-
-  int getNumberOfSteps()
-  {
-    return mEvents.length + 1;
-  }
-
-  StateProxy getState(final AutomatonProxy aut, final int index)
-  {
-    final TRAbstractionStep step = mAutomataMap.get(aut);
-    final int s = getState(step, index);
-    if (s < 0) {
-      return null;
-    } else {
-      final TRAbstractionStepInput inputStep = (TRAbstractionStepInput) step;
-      final StateEncoding enc = inputStep.getStateEncoding();
-      assert enc.getState(s) != null;
-      return enc.getState(s);
-    }
-  }
-
-  int getState(final TRAbstractionStep step, final int index)
-  {
-    final int[] states = mTraceData.get(step);
-    return states[index];
-  }
-
-
-  //#########################################################################
   //# Interface net.sourceforge.waters.model.base.DocumentProxy
   @Override
   public String getComment()
@@ -203,6 +170,50 @@ public abstract class TRTraceProxy
 
 
   //#########################################################################
+  //# Simple Access
+  void setComment(final String comment)
+  {
+    mComment = comment;
+  }
+
+  int getNumberOfSteps()
+  {
+    return mEvents.length + 1;
+  }
+
+  public Set<TRAbstractionStep> getCoveredAbstractionSteps()
+  {
+    return mTraceData.keySet();
+  }
+
+  StateProxy getState(final AutomatonProxy aut, final int index)
+  {
+    final TRAbstractionStep step = mAutomataMap.get(aut);
+    final int s = getState(step, index);
+    if (s < 0) {
+      return null;
+    } else {
+      final TRAbstractionStepInput inputStep = (TRAbstractionStepInput) step;
+      final StateEncoding enc = inputStep.getStateEncoding();
+      assert enc.getState(s) != null;
+      return enc.getState(s);
+    }
+  }
+
+  int getState(final TRAbstractionStep step, final int index)
+  {
+    final int[] states = mTraceData.get(step);
+    return states[index];
+  }
+
+  void setState(final TRAbstractionStep step, final int index, final int state)
+  {
+    final int[] states = mTraceData.get(step);
+    states[index] = state;
+  }
+
+
+  //#########################################################################
   //# Trace Expansion
   public void reset(final List<EventProxy> events)
   {
@@ -264,6 +275,22 @@ public abstract class TRTraceProxy
       entry.setValue(newStates);
     }
     mEvents = newEventsArray;
+  }
+
+  /**
+   * Cuts the trace short by removing steps at the end.
+   * @param numberOfSteps The new number of steps, which should be at least 1
+   *                      to allow for the initial state.
+   */
+  void prune(final int numberOfSteps)
+  {
+    final int numEvents = numberOfSteps - 1;
+    mEvents = Arrays.copyOfRange(mEvents, 0, numEvents);
+    for (final Map.Entry<TRAbstractionStep,int[]> entry : mTraceData.entrySet()) {
+      final int[] oldStates = entry.getValue();
+      final int[] newStates = Arrays.copyOfRange(oldStates, 0, numberOfSteps);
+      entry.setValue(newStates);
+    }
   }
 
 

@@ -174,6 +174,15 @@ public class TRAutomatonProxy
     mStateNames = aut.mStateNames;
   }
 
+  public TRAutomatonProxy(final TRAutomatonProxy aut, final int config)
+  {
+    mEventEncoding = new EventEncoding(aut.mEventEncoding);
+    final ListBufferTransitionRelation rel = aut.mTransitionRelation;
+    mTransitionRelation =
+      new ListBufferTransitionRelation(rel, mEventEncoding, config);
+    mStates = null;
+    mStateNames = aut.mStateNames;
+  }
 
 
   //#########################################################################

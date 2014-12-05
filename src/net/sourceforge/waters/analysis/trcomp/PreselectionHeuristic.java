@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
+import net.sourceforge.waters.model.analysis.AbstractAbortable;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.ProxyTools;
 
 import org.apache.log4j.Logger;
@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
  */
 
 public abstract class PreselectionHeuristic
+  extends AbstractAbortable
 {
 
   //#########################################################################
@@ -43,8 +44,9 @@ public abstract class PreselectionHeuristic
     (final List<TRAutomatonProxy> automata,
      final TRSubsystemInfo subsys,
      final Map<List<TRAutomatonProxy>,TRCandidate> candidates)
-    throws OverflowException
+    throws AnalysisException
   {
+    checkAbort();
     if (automata.size() < subsys.getNumberOfAutomata()) {
       Collections.sort(automata);
       if (!candidates.containsKey(automata)) {

@@ -382,14 +382,17 @@ public abstract class AbstractTRCompositionalAnalyzer
   public void requestAbort()
   {
     super.requestAbort();
-    if (mSynchronousProductBuilder != null) {
-      mSynchronousProductBuilder.requestAbort();
+    if (mPreselectionHeuristic != null) {
+      mPreselectionHeuristic.requestAbort();
     }
     if (mSpecialEventsFinder != null) {
       mSpecialEventsFinder.requestAbort();
     }
     if (mTRSimplifier != null) {
       mTRSimplifier.requestAbort();
+    }
+    if (mSynchronousProductBuilder != null) {
+      mSynchronousProductBuilder.requestAbort();
     }
     if (mMonolithicAnalyzer != null) {
       mMonolithicAnalyzer.requestAbort();
@@ -400,14 +403,17 @@ public abstract class AbstractTRCompositionalAnalyzer
   public void resetAbort()
   {
     super.resetAbort();
-    if (mSynchronousProductBuilder != null) {
-      mSynchronousProductBuilder.resetAbort();
+    if (mPreselectionHeuristic != null) {
+      mPreselectionHeuristic.resetAbort();
     }
     if (mSpecialEventsFinder != null) {
       mSpecialEventsFinder.resetAbort();
     }
     if (mTRSimplifier != null) {
       mTRSimplifier.resetAbort();
+    }
+    if (mSynchronousProductBuilder != null) {
+      mSynchronousProductBuilder.resetAbort();
     }
     if (mMonolithicAnalyzer != null) {
       mMonolithicAnalyzer.resetAbort();
@@ -638,6 +644,17 @@ public abstract class AbstractTRCompositionalAnalyzer
     return mIntermediateAbstractionSequence;
   }
 
+  protected int getPreferredInputConfiguration()
+  {
+    if (mTRSimplifier != null) {
+      return mTRSimplifier.getPreferredInputConfiguration();
+    } else {
+      final TransitionRelationSimplifier simplifier =
+        mTRSimplifierCreator.create(this);
+      return simplifier.getPreferredInputConfiguration();
+    }
+  }
+
 
   //#########################################################################
   //# Algorithm
@@ -771,7 +788,7 @@ public abstract class AbstractTRCompositionalAnalyzer
       // Set up event encoding ...
       final EventEncoding candidateEncoding = candidate.getEventEncoding();
       countSpecialEvents(candidateEncoding);
-      addAdditionalEvents(candidateEncoding);
+      addAuxiliaryEvents(candidateEncoding);
       sortCandidateEvents(candidateEncoding);
       final EventEncoding syncEncoding = candidate.createSyncEventEncoding();
       // Synchronise ...
@@ -965,9 +982,10 @@ public abstract class AbstractTRCompositionalAnalyzer
       final ListIterator<TRAbstractionStep> iter =
         mAbstractionSequence.listIterator(end);
       while (iter.hasPrevious()) {
+        checkAbort();
         final TRAbstractionStep step = iter.previous();
         step.report(logger);
-        step.expandTrace(trace);
+        step.expandTrace(trace, this);
         if (mTraceCheckingEnabled) {
           checkIntermediateCounterExample(trace);
         }
@@ -994,7 +1012,7 @@ public abstract class AbstractTRCompositionalAnalyzer
     throws AnalysisException
   {
     final EventEncoding enc = new EventEncoding();
-    addAdditionalEvents(enc);
+    addAuxiliaryEvents(enc);
     final String name = aut.getName();
     enc.provideTauEvent(name);
     final KindTranslator translator = getKindTranslator();
@@ -1006,7 +1024,7 @@ public abstract class AbstractTRCompositionalAnalyzer
     return enc;
   }
 
-  protected void addAdditionalEvents(final EventEncoding enc)
+  protected void addAuxiliaryEvents(final EventEncoding enc)
     throws AnalysisException
   {
   }
@@ -1516,9 +1534,9 @@ public abstract class AbstractTRCompositionalAnalyzer
   private final SelectionHeuristic<TRCandidate> mSelectionHeuristic;
   private final PartitioningListener mSpecialEventsListener;
   private TRToolCreator<TransitionRelationSimplifier> mTRSimplifierCreator;
+  private SpecialEventsFinder mSpecialEventsFinder;
   private TransitionRelationSimplifier mTRSimplifier;
   private final TRSynchronousProductBuilder mSynchronousProductBuilder;
-  private SpecialEventsFinder mSpecialEventsFinder;
   private ModelAnalyzer mMonolithicAnalyzer;
 
   // Data Structures

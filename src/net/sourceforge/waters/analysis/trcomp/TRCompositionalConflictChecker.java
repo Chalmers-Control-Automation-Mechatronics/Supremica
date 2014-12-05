@@ -29,7 +29,6 @@ import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
-import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
@@ -54,7 +53,6 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.apache.log4j.Logger;
 
@@ -146,11 +144,31 @@ public class TRCompositionalConflictChecker
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
+  public void requestAbort()
+  {
+    super.requestAbort();
+    if (mLanguageInclusionChecker != null) {
+      mLanguageInclusionChecker.requestAbort();
+    }
+  }
+
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    if (mLanguageInclusionChecker != null) {
+      mLanguageInclusionChecker.resetAbort();
+    }
+  }
+
+
+  //#########################################################################
   //# Invocation
   @Override
   protected void setUp() throws AnalysisException
   {
-    mUsingCertainConflicts = false;
     super.setUp();
     final ConflictChecker mono = getMonolithicAnalyzer();
     mono.setConfiguredDefaultMarking(getUsedDefaultMarking());
@@ -162,7 +180,7 @@ public class TRCompositionalConflictChecker
   {
     super.tearDown();
     mUsedDefaultMarking = null;
-    mSafetyCheckEvent = null;
+    mLanguageInclusionChecker = null;
   }
 
 
@@ -198,7 +216,7 @@ public class TRCompositionalConflictChecker
   }
 
   @Override
-  protected void addAdditionalEvents(final EventEncoding enc)
+  protected void addAuxiliaryEvents(final EventEncoding enc)
     throws AnalysisException
   {
     final EventProxy defaultMarking = getUsedDefaultMarking();
@@ -207,19 +225,19 @@ public class TRCompositionalConflictChecker
     if (preconditionMarking != null) {
       enc.addProposition(preconditionMarking, false);
     }
-    final EventProxy safetyCheckEvent = getSafetyCheckEvent();
-    if (safetyCheckEvent != null) {
-      enc.addProperEvent(safetyCheckEvent, EventStatus.STATUS_UNUSED);
-    }
   }
 
   @Override
   protected StateProxy findDumpState(final AutomatonProxy aut)
     throws EventNotFoundException
   {
-    final EventProxy marking = getUsedDefaultMarking();
-    final Collection<EventProxy> markings = Collections.singletonList(marking);
-    return AutomatonTools.findDumpState(aut, markings);
+    if (mConfiguredPreconditionMarking == null) {
+      final EventProxy marking = getUsedDefaultMarking();
+      final Collection<EventProxy> markings = Collections.singletonList(marking);
+      return AutomatonTools.findDumpState(aut, markings);
+    } else {
+      return null;
+    }
   }
 
   @Override
@@ -583,7 +601,6 @@ public class TRCompositionalConflictChecker
       new CertainConflictsListener();
     certainConflictsRemover.setSimplificationListener(certainConflictsListener);
     chain.add(certainConflictsRemover);
-    mUsingCertainConflicts = true;
     */
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier();
@@ -618,16 +635,28 @@ public class TRCompositionalConflictChecker
 
   //#########################################################################
   //# Auxiliary Methods
-  private EventProxy getSafetyCheckEvent()
+  TRCompositionalLanguageInclusionChecker getLanguageInclusionChecker()
   {
-    if (mSafetyCheckEvent == null) {
-      if (mUsingCertainConflicts || mConfiguredDefaultMarking != null) {
-        final ProductDESProxyFactory factory = getFactory();
-        mSafetyCheckEvent = factory.createEventProxy(SAFETY_CHECK_EVENT_NAME,
-                                                     EventKind.UNCONTROLLABLE);
-      }
+    if (mLanguageInclusionChecker == null) {
+      mLanguageInclusionChecker = new TRCompositionalLanguageInclusionChecker();
+      mLanguageInclusionChecker.
+        setInternalStateLimit(getInternalStateLimit());
+      mLanguageInclusionChecker.
+        setInternalTransitionLimit(getInternalTransitionLimit());
+      mLanguageInclusionChecker.
+        setMonolithicStateLimit(getMonolithicStateLimit());
+      mLanguageInclusionChecker.
+        setMonolithicTransitionLimit(getMonolithicTransitionLimit());
+      mLanguageInclusionChecker.
+        setBlockedEventsEnabled(isBlockedEventsEnabled());
+      mLanguageInclusionChecker.
+        setFailingEventsEnabled(isFailingEventsEnabled());
+      mLanguageInclusionChecker.
+        setSelfloopOnlyEventsEnabled(isSelfloopOnlyEventsEnabled());
+      mLanguageInclusionChecker.
+        setAlwaysEnabledEventsEnabled(isAlwaysEnabledEventsEnabled());
     }
-    return mSafetyCheckEvent;
+    return mLanguageInclusionChecker;
   }
 
 
@@ -717,14 +746,8 @@ public class TRCompositionalConflictChecker
   private EventProxy mConfiguredDefaultMarking;
   private EventProxy mConfiguredPreconditionMarking;
 
-  // Additional events used during verification
-  private boolean mUsingCertainConflicts;
+  // Auxiliary events, status, and tools
   private EventProxy mUsedDefaultMarking;
-  private EventProxy mSafetyCheckEvent;
-
-
-  //#########################################################################
-  //# Class Constants
-  private static final String SAFETY_CHECK_EVENT_NAME = ":unsafe";
+  private TRCompositionalLanguageInclusionChecker mLanguageInclusionChecker;
 
 }
