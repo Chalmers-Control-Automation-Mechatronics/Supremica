@@ -164,9 +164,9 @@ public abstract class AbstractTRCompositionalAnalyzer
   //#########################################################################
   //# Configuration
   /**
-   * Gets the factory to obtain transition relation simplifiers for
-   * this compositional analyser. The constants returned by this factory
-   * can be passed to the {@link #setSimplifier(TransitionRelationSimplifier)
+   * Gets the factory to obtain transition relation simplifiers for this
+   * compositional analyser. The constants returned by this factory can be
+   * passed to the {@link #setSimplifierCreator(TransitionRelationSimplifier)
    * setSimplifier()} method.
    */
   public abstract EnumFactory<TRToolCreator<TransitionRelationSimplifier>>
@@ -178,7 +178,7 @@ public abstract class AbstractTRCompositionalAnalyzer
    * can be obtained from the factory returned by {@link
    * #getTRSimplifierFactory()}.
    */
-  public void setSimplifier
+  public void setSimplifierCreator
     (final TRToolCreator<TransitionRelationSimplifier> creator)
   {
     mTRSimplifierCreator = creator;
@@ -188,7 +188,7 @@ public abstract class AbstractTRCompositionalAnalyzer
    * Gets the tool that creates the transition relation simplifier that
    * defines the abstraction chain.
    */
-  public TRToolCreator<TransitionRelationSimplifier> getSimplifier()
+  public TRToolCreator<TransitionRelationSimplifier> getSimplifierCreator()
   {
     return mTRSimplifierCreator;
   }
@@ -459,10 +459,9 @@ public abstract class AbstractTRCompositionalAnalyzer
       mCurrentAutomataMap = new HashMap<>(numAutomata);
     }
     mCurrentSubsystem = new TRSubsystemInfo(numAutomata, numEvents);
-    final int config = mTRSimplifier.getPreferredInputConfiguration();
     final List<TRAutomatonProxy> trs = new ArrayList<>(numAutomata);
     for (final AutomatonProxy aut : automata) {
-      final TRAutomatonProxy tr = createInitialAutomaton(aut, config);
+      final TRAutomatonProxy tr = createInitialAutomaton(aut);
       if (tr != null) {
         trs.add(tr);
       } else if (result.isFinished()) {
@@ -537,7 +536,14 @@ public abstract class AbstractTRCompositionalAnalyzer
           }
           mCurrentSubsystem = mSubsystemQueue.poll();
         } while (mCurrentSubsystem != null);
-        return setSatisfiedResult();
+        if (analyseSubsystemMonolithically(null)) {
+          return setSatisfiedResult();
+        } else {
+          assert result.isFinished() && !result.isSatisfied() :
+            "Failed analysis result not recorded correctly!";
+          computeCounterExample();
+          return false;
+        }
       }
     } catch (final OutOfMemoryError error) {
       throw new OverflowException(error);
@@ -629,6 +635,11 @@ public abstract class AbstractTRCompositionalAnalyzer
 
   //#########################################################################
   //# Specific Access
+  protected TransitionRelationSimplifier getSimplifier()
+  {
+    return mTRSimplifier;
+  }
+
   protected SpecialEventsFinder getSpecialEventsFinder()
   {
     return mSpecialEventsFinder;
@@ -953,7 +964,7 @@ public abstract class AbstractTRCompositionalAnalyzer
     }
   }
 
-  abstract protected void analyseSubsystemMonolithically
+  abstract protected boolean analyseSubsystemMonolithically
     (final TRSubsystemInfo subsys)
     throws AnalysisException;
 
@@ -1029,8 +1040,7 @@ public abstract class AbstractTRCompositionalAnalyzer
   {
   }
 
-  protected TRAutomatonProxy createInitialAutomaton(final AutomatonProxy aut,
-                                                    final int config)
+  protected TRAutomatonProxy createInitialAutomaton(final AutomatonProxy aut)
     throws AnalysisException
   {
     final KindTranslator translator = getKindTranslator();
@@ -1039,6 +1049,7 @@ public abstract class AbstractTRCompositionalAnalyzer
     case SPEC:
       final EventEncoding eventEnc = createInitialEventEncoding(aut);
       final StateProxy dumpState = findDumpState(aut);
+      final int config = mTRSimplifier.getPreferredInputConfiguration();
       final TRAutomatonProxy tr =
         new TRAutomatonProxy(aut, eventEnc, dumpState, config);
       if (!hasInitialState(tr)) {
