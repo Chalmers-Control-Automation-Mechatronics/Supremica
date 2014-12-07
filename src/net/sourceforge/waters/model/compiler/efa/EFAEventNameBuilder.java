@@ -171,7 +171,6 @@ class EFAEventNameBuilder {
   //# Inner Class CountedLiteral
   private class CountedLiteral implements Comparable<CountedLiteral>
   {
-
     //#######################################################################
     //# Constructor
     private CountedLiteral(final SimpleExpressionProxy literal)
@@ -193,13 +192,14 @@ class EFAEventNameBuilder {
       final boolean literal1 = mCollector.isLiteral();
       final IdentifierProxy ident1 = mCollector.getIdentifier();
       final OccurrenceKind kind2 = mCollector.collect(counted.mLiteral);
-      final boolean literal2 = mCollector.isLiteral();
-      final IdentifierProxy ident2 = mCollector.getIdentifier();
       if (kind1 != kind2) {
         return kind1.compareTo(kind2);
-      } else if (literal1 != literal2) {
+      }
+      final boolean literal2 = mCollector.isLiteral();
+      if (literal1 != literal2) {
         return literal1 ? -1 : 1;
       }
+      final IdentifierProxy ident2 = mCollector.getIdentifier();
       final int iresult = mComparator.compare(ident1, ident2);
       if (iresult != 0) {
         return iresult;
@@ -251,7 +251,6 @@ class EFAEventNameBuilder {
     //# Data Members
     private SimpleExpressionProxy mLiteral;
     private int mOccurrences;
-
   }
 
 
@@ -337,7 +336,6 @@ class EFAEventNameBuilder {
   private class VariableCollectVisitor
     extends DefaultModuleProxyVisitor
   {
-
     //#######################################################################
     //# Constructor
     private VariableCollectVisitor(final CompilerOperatorTable optable,
@@ -387,8 +385,8 @@ class EFAEventNameBuilder {
             mOccurrenceKind = OccurrenceKind.BOTH;
           }
         } else {
-          throw new IllegalArgumentException
-            ("Multiple variable identifiers in expression!");
+          mIdentifier = null;
+          mOccurrenceKind = OccurrenceKind.MIXED;
         }
       }
       return true;
@@ -400,9 +398,15 @@ class EFAEventNameBuilder {
     {
       final SimpleExpressionProxy lhs = expr.getLeft();
       lhs.acceptVisitor(this);
-      if (mOccurrenceKind != OccurrenceKind.BOTH) {
+      switch (mOccurrenceKind) {
+      case NONE:
+      case CURRENT:
+      case NEXT:
         final SimpleExpressionProxy rhs = expr.getRight();
         rhs.acceptVisitor(this);
+        break;
+      default:
+        break;
       }
       return false;
     }
@@ -431,8 +435,8 @@ class EFAEventNameBuilder {
             mOccurrenceKind = OccurrenceKind.BOTH;
           }
         } else {
-          throw new IllegalArgumentException
-            ("Multiple variable identifiers in expression!");
+          mIdentifier = null;
+          mOccurrenceKind = OccurrenceKind.MIXED;
         }
         return true;
       } else {
@@ -449,13 +453,13 @@ class EFAEventNameBuilder {
     private OccurrenceKind mOccurrenceKind;
     private boolean mIsLiteral;
     private IdentifierProxy mIdentifier;
-
   }
+
 
   //#########################################################################
   //# Inner Class OccurrenceKind
   private static enum OccurrenceKind {
-    NONE, CURRENT, NEXT, BOTH
+    NONE, CURRENT, NEXT, BOTH, MIXED
   };
 
 

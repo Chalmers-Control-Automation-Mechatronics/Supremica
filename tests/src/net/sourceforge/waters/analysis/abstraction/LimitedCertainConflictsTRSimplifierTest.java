@@ -194,6 +194,14 @@ public class LimitedCertainConflictsTRSimplifierTest
     runTransitionRelationSimplifier(des);
   }
 
+  public void test_limitedCertainConflicts_16()
+  throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "limitedCertainConflicts_16.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
   public void test_certainConflicts_15()
   throws Exception
   {

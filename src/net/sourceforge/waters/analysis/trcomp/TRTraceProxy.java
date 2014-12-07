@@ -233,10 +233,25 @@ public abstract class TRTraceProxy
     mTraceData.remove(step);
   }
 
+  void replaceAutomaton(final TRAbstractionStep oldStep,
+                        final TRAbstractionStep newStep)
+  {
+    final int[] states = mTraceData.remove(oldStep);
+    mTraceData.put(newStep, states);
+  }
+
   void setInputAutomaton(final TRAbstractionStepInput step)
   {
     final AutomatonProxy aut = step.getInputAutomaton();
     mAutomataMap.put(aut, step);
+  }
+
+  void replaceInputAutomaton(final AutomatonProxy aut,
+                             final TRAbstractionStep step)
+  {
+    final TRAbstractionStep oldStep = mAutomataMap.remove(aut);
+    final int[] states = mTraceData.remove(oldStep);
+    mTraceData.put(step, states);
   }
 
   void addStutteringSteps(final List<EventProxy> newEvents,
@@ -275,6 +290,30 @@ public abstract class TRTraceProxy
       entry.setValue(newStates);
     }
     mEvents = newEventsArray;
+  }
+
+  void append(final TRTraceProxy trace, final int numSteps)
+  {
+    assert numSteps <= trace.mEvents.length : "Not enough steps to append!";
+    final int totalEvents = mEvents.length + numSteps;
+    final EventProxy[] newEvents = new EventProxy[totalEvents];
+    System.arraycopy(mEvents, 0, newEvents, 0, mEvents.length);
+    System.arraycopy(trace.mEvents, 0, newEvents, mEvents.length, numSteps);
+    final int totalSteps = totalEvents + 1;
+    final int firstSteps = getNumberOfSteps();
+    mEvents = newEvents;
+    for (final Map.Entry<TRAbstractionStep,int[]> entry : mTraceData.entrySet()) {
+      final int[] firstStates = entry.getValue();
+      final TRAbstractionStep step = entry.getKey();
+      final int[] secondStates = trace.mTraceData.get(step);
+      assert firstStates[firstSteps - 1] == secondStates[0] :
+        "End state in first trace does not match start state " +
+        "in second trace for automaton " + step.getName() + "!";
+      final int[] newStates = new int[totalSteps];
+      System.arraycopy(firstStates, 0, newStates, 0, firstSteps);
+      System.arraycopy(secondStates, 1, newStates, firstSteps, numSteps);
+      entry.setValue(newStates);
+    }
   }
 
   /**

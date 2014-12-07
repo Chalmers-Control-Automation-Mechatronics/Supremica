@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.trcomp;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
@@ -45,6 +46,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.apache.log4j.Logger;
 
@@ -117,41 +119,122 @@ public class TRCompositionalLanguageInclusionChecker
   //#########################################################################
   //# Invocation
   @Override
+  public boolean run()
+    throws AnalysisException
+  {
+    final Logger logger = getLogger();
+    final KindTranslator translator = getKindTranslator();
+    final ProductDESProxy des = getModel();
+    boolean hasProperty = false;
+    AnalysisResult result = null;
+    // Check one property at a time,
+    // using full setUp-run-tearDown cycle each time ...
+    for (final AutomatonProxy aut : des.getAutomata()) {
+      if (translator.getComponentKind(aut) == ComponentKind.SPEC) {
+        try {
+          logger.debug("Checking property " + aut.getName() + " ...");
+          hasProperty = true;
+          mRawProperty = aut;
+          if (!super.run()) {
+            return false;
+          }
+        } finally {
+          final AnalysisResult subResult = getAnalysisResult();
+          if (result == null) {
+            result = subResult;
+          } else if (subResult != null) {
+            result.merge(subResult);
+          }
+          if (result != null) {
+            setAnalysisResult(result);
+          }
+        }
+      }
+    }
+    if (!hasProperty) {
+      logger.debug("Did not find any properties to check, returning TRUE.");
+    }
+    return true;
+  }
+
+  @Override
   protected void setUp()
     throws AnalysisException
   {
-    mPropertyAutomata = new ArrayList<>();
-    mPropertiesHaveInitialState = true;
-    mHasStronglyFailingEvent = false;
+    // Set up plant automata ...
     super.setUp();
     final AnalysisResult result = getAnalysisResult();
-    if (!result.isFinished()) {
-      final Logger logger = getLogger();
-      if (mPropertyAutomata.isEmpty()) {
-        logger.debug
-          ("Terminating early as all properties are trivially satisfied.");
-        result.setSatisfied(true);
-      } else if (!mPropertiesHaveInitialState) {
-        logger.debug
-          ("Terminating early as the properties have no initial state.");
-        result.setSatisfied(false);
-        final TRSubsystemInfo subsys = getCurrentSubsystem();
-        dropSubsystem(subsys);
-        for (final TRAutomatonProxy prop : mPropertyAutomata) {
-          dropTrivialAutomaton(prop);
+    if (result.isFinished()) {
+      return;
+    }
+    // Set up property automaton ...
+    final Logger logger = getLogger();
+    final EventEncoding eventEnc = createInitialEventEncoding(mRawProperty);
+    final TransitionRelationSimplifier simplifier = getSimplifier();
+    final int config = simplifier.getPreferredInputConfiguration();
+    mCurrentProperty = new TRAutomatonProxy(mRawProperty, eventEnc, config);
+    if (isCounterExampleEnabled()) {
+      final EventEncoding clonedEnc = new EventEncoding(eventEnc);
+      final TRAbstractionStepInput step =
+        new TRAbstractionStepInput(mRawProperty, clonedEnc, mCurrentProperty);
+      addAbstractionStep(step, mCurrentProperty);
+    }
+    if (!hasInitialState(mCurrentProperty)) {
+      logger.debug("System fails property " + mRawProperty.getName() +
+                   ", because it has no initial state.");
+      result.setSatisfied(false);
+      final TRSubsystemInfo subsys = getCurrentSubsystem();
+      dropSubsystem(subsys);
+      dropTrivialAutomaton(mCurrentProperty);
+      return;
+    }
+    final ListBufferTransitionRelation rel =
+      mCurrentProperty.getTransitionRelation();
+    mHasStronglyFailingEvent = false;
+    final SpecialEventsFinder finder = getSpecialEventsFinder();
+    rel.removeProperSelfLoopEvents();
+    finder.setBlockedEventsDetected(true);
+    finder.setFailingEventsDetected(false);
+    finder.setSelfloopOnlyEventsDetected(isSelfloopOnlyEventsEnabled());
+    finder.setAlwaysEnabledEventsDetected(isAlwaysEnabledEventsEnabled());
+    finder.setTransitionRelation(rel);
+    finder.run();
+    final byte[] status = finder.getComputedEventStatus();
+    boolean trivial = true;
+    for (int e = EventEncoding.NONTAU; e < status.length; e++) {
+      if (EventStatus.isUsedEvent(status[e])) {
+        status[e] = 0;
+        if (EventStatus.isBlockedEvent(status[e])) {
+          if (isFailingEventsEnabled()) {
+            status[e] |= EventStatus.STATUS_FAILING;
+          }
+          if (isAlwaysEnabledEventsEnabled()) {
+            status[e] |= EventStatus.STATUS_ALWAYS_ENABLED;
+          }
+          trivial = false;
+          mHasStronglyFailingEvent =
+            isFailingEventsEnabled() && isAlwaysEnabledEventsEnabled();
+        } else {
+          trivial &= EventStatus.isAlwaysEnabledEvent(status[e]);
         }
-      } else {
-        final SpecialEventsFinder finder = getSpecialEventsFinder();
-        finder.setAlwaysEnabledEventsDetected(mHasStronglyFailingEvent);
       }
     }
+    if (trivial) {
+      logger.debug("Skipping trivial property " + mRawProperty.getName() + ".");
+      result.setSatisfied(true);
+      return;
+    }
+    finder.setAlwaysEnabledEventsDetected(mHasStronglyFailingEvent);
+    final TRSubsystemInfo subsys = getCurrentSubsystem();
+    subsys.registerEvents(mCurrentProperty, status, true);
   }
 
   @Override
   protected void tearDown()
   {
     super.tearDown();
-    mPropertyAutomata = null;
+    mRawProperty = null;
+    mCurrentProperty = null;
   }
 
 
@@ -170,71 +253,13 @@ public class TRCompositionalLanguageInclusionChecker
   }
 
   @Override
-  protected TRAutomatonProxy createInitialAutomaton(final AutomatonProxy aut,
-                                                    final int config)
+  protected TRAutomatonProxy createInitialAutomaton(final AutomatonProxy aut)
     throws AnalysisException
   {
     final KindTranslator translator = getKindTranslator();
-    switch (translator.getComponentKind(aut)) {
-    case PLANT:
-      return super.createInitialAutomaton(aut, config);
-    case SPEC:
-      if (!mPropertiesHaveInitialState) {
-        return null;
-      }
-      final Logger logger = getLogger();
-      final EventEncoding eventEnc = createInitialEventEncoding(aut);
-      final TRAutomatonProxy tr = new TRAutomatonProxy(aut, eventEnc, config);
-      if (hasInitialState(tr)) {
-        final ListBufferTransitionRelation rel = tr.getTransitionRelation();
-        final SpecialEventsFinder finder = getSpecialEventsFinder();
-        rel.removeProperSelfLoopEvents();
-        finder.setBlockedEventsDetected(true);
-        finder.setFailingEventsDetected(false);
-        finder.setSelfloopOnlyEventsDetected(isSelfloopOnlyEventsEnabled());
-        finder.setAlwaysEnabledEventsDetected(isAlwaysEnabledEventsEnabled());
-        finder.setTransitionRelation(rel);
-        finder.run();
-        final byte[] status = finder.getComputedEventStatus();
-        boolean trivial = true;
-        for (int e = EventEncoding.NONTAU; e < status.length; e++) {
-          if (EventStatus.isUsedEvent(status[e])) {
-            status[e] = 0;
-            if (EventStatus.isBlockedEvent(status[e])) {
-              if (isFailingEventsEnabled()) {
-                status[e] |= EventStatus.STATUS_FAILING;
-              }
-              if (isAlwaysEnabledEventsEnabled()) {
-                status[e] |= EventStatus.STATUS_ALWAYS_ENABLED;
-              }
-              trivial = false;
-              mHasStronglyFailingEvent =
-                isFailingEventsEnabled() && isAlwaysEnabledEventsEnabled();
-            } else {
-              trivial &= EventStatus.isAlwaysEnabledEvent(status[e]);
-            }
-          }
-        }
-        if (trivial) {
-          logger.debug("Dropping trivial property " + aut.getName() + ".");
-          return null;
-        }
-        final TRSubsystemInfo subsys = getCurrentSubsystem();
-        subsys.registerEvents(tr, status, true);
-      } else {
-        logger.debug("Property " + aut.getName() + " has no initial state.");
-        mPropertyAutomata.clear();
-        mPropertiesHaveInitialState = false;
-      }
-      mPropertyAutomata.add(tr);
-      if (isCounterExampleEnabled()) {
-        final EventEncoding clonedEnc = new EventEncoding(eventEnc);
-        final TRAbstractionStepInput step =
-          new TRAbstractionStepInput(aut, clonedEnc, tr);
-        addAbstractionStep(step, tr);
-      }
-      return null;
-    default:
+    if (translator.getComponentKind(aut) == ComponentKind.PLANT) {
+      return super.createInitialAutomaton(aut);
+    } else {
       return null;
     }
   }
@@ -248,22 +273,32 @@ public class TRCompositionalLanguageInclusionChecker
       }
     }
     final Logger logger = getLogger();
-    logger.debug("Subsystem satisfies properties " +
-                 "because it shares no events with property automata.");
+    if (logger.isDebugEnabled()) {
+      logger.debug("Dropping subsystem because it shares no events " +
+                   "with property " + mCurrentProperty.getName() + ".");
+    }
     dropSubsystem(subsys);
     return true;
   }
 
   @Override
-  protected void analyseSubsystemMonolithically(final TRSubsystemInfo subsys)
+  protected boolean analyseSubsystemMonolithically
+    (final TRSubsystemInfo subsys)
     throws AnalysisException
   {
-    final List<TRAutomatonProxy> plants = subsys.getAutomata();
-    final String name = AutomatonTools.getCompositionName(plants);
-    final int numAutomata = plants.size() + mPropertyAutomata.size();
-    final List<TRAutomatonProxy> automata = new ArrayList<>(numAutomata);
-    automata.addAll(plants);
-    automata.addAll(mPropertyAutomata);
+    final String name;
+    final List<TRAutomatonProxy> automata;
+    if (subsys == null || subsys.getNumberOfAutomata() == 0) {
+      name = mCurrentProperty.getName();
+      automata = Collections.singletonList(mCurrentProperty);
+    } else {
+      final List<TRAutomatonProxy> plants = subsys.getAutomata();
+      final int numAutomata = plants.size() + 1;
+      automata = new ArrayList<>(numAutomata);
+      automata.addAll(plants);
+      automata.add(mCurrentProperty);
+      name = AutomatonTools.getCompositionName(plants);
+    }
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des =
       AutomatonTools.createProductDESProxy(name, automata, factory);
@@ -276,10 +311,17 @@ public class TRCompositionalLanguageInclusionChecker
     combinedResult.addMonolithicAnalysisResult(monolithicResult);
     final Logger logger = getLogger();
     if (monolithicResult.isSatisfied()) {
-      logger.debug("Subsystem satisfies properties.");
+      if (logger.isDebugEnabled()) {
+        logger.debug("Subsystem satisfies property " +
+                     mCurrentProperty.getName() + ".");
+      }
       dropSubsystem(subsys);
+      return setSatisfiedResult();
     } else {
-      logger.debug("Subsystem fails properties.");
+      if (logger.isDebugEnabled()) {
+        logger.debug("Subsystem fails property " +
+                     mCurrentProperty.getName() + ".");
+      }
       combinedResult.setSatisfied(false);
       if (isCounterExampleEnabled()) {
         dropPendingSubsystems();
@@ -289,6 +331,7 @@ public class TRCompositionalLanguageInclusionChecker
           new TRAbstractionStepMonolithic(name, preds, trace);
         addAbstractionStep(step);
       }
+      return false;
     }
   }
 
@@ -378,8 +421,8 @@ public class TRCompositionalLanguageInclusionChecker
   private final SafetyDiagnostics mDiagnostics;
 
   // Data Structures
-  private List<TRAutomatonProxy> mPropertyAutomata;
-  private boolean mPropertiesHaveInitialState;
+  private AutomatonProxy mRawProperty;
+  private TRAutomatonProxy mCurrentProperty;
   private boolean mHasStronglyFailingEvent;
 
 }

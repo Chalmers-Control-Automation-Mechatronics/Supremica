@@ -282,11 +282,14 @@ public class TRCompositionalConflictChecker
   }
 
   @Override
-  protected void analyseSubsystemMonolithically(final TRSubsystemInfo subsys)
+  protected boolean analyseSubsystemMonolithically
+    (final TRSubsystemInfo subsys)
     throws AnalysisException
   {
-    final List<TRAutomatonProxy> automata = subsys.getAutomata();
-    if (!automata.isEmpty()) {
+    if (subsys == null || subsys.getNumberOfAutomata() == 0) {
+      return true;
+    } else {
+      final List<TRAutomatonProxy> automata = subsys.getAutomata();
       final String name = AutomatonTools.getCompositionName(automata);
       final ProductDESProxyFactory factory = getFactory();
       final ProductDESProxy des =
@@ -302,6 +305,7 @@ public class TRCompositionalConflictChecker
       if (monolithicResult.isSatisfied()) {
         logger.debug("Subsystem is nonblocking.");
         dropSubsystem(subsys);
+        return true;
       } else {
         logger.debug("Subsystem is blocking.");
         combinedResult.setSatisfied(false);
@@ -313,6 +317,7 @@ public class TRCompositionalConflictChecker
             new TRAbstractionStepMonolithic(name, preds, trace);
           addAbstractionStep(step);
         }
+        return false;
       }
     }
   }

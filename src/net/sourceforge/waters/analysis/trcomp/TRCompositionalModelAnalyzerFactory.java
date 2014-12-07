@@ -121,7 +121,7 @@ public class TRCompositionalModelAnalyzerFactory
         factory.dumpEnumeration(System.err, 0);
         System.exit(1);
       }
-      composer.setSimplifier(creator);
+      composer.setSimplifierCreator(creator);
     }
 
     //#######################################################################

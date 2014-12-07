@@ -109,10 +109,28 @@ class TRAbstractionStepCertainConflicts
       (TRCompositionalConflictChecker) analyzer;
     final TraceExpander expander = new TraceExpander(checker);
     expander.pruneTrace(trace);
-    expander.createLanguageInclusionAutomata(trace);
-    final TRTraceProxy extension = expander.findTraceExtension();
-    assert extension == null :
-      "Certain conflicts trace expansion not yet implemented!";
+    trace.replaceAutomaton(this, mPredecessor);
+    int level = expander.getLevelOfEndState(trace);
+    if (level < 0 || level >= 2) {
+      int nextLevel = level < 0 ? Integer.MAX_VALUE : (level | 1) - 2;
+      expander.createLanguageInclusionAutomata(trace, nextLevel);
+      while (true) {
+        final TRTraceProxy extension = expander.findTraceExtension();
+        if (extension == null) {
+          break;
+        }
+        final int numSteps = extension.getNumberOfSteps() - 2;
+        trace.append(extension, numSteps);
+        level = expander.getLevelOfEndState(trace);
+        if (level < 2) {
+          break;
+        }
+        nextLevel = (level | 1) - 2;
+        expander.setNextLevel(trace, nextLevel);
+      }
+    }
+    assert level < 0 || (level & 1) == 0 :
+      "Certain conflicts trace expansion not yet fully implemented!";
   }
 
 
@@ -145,6 +163,7 @@ class TRAbstractionStepCertainConflicts
       propertyEnc.addProperEvent(mCertainConflictEvent, EventStatus.STATUS_NONE);
       final ListBufferTransitionRelation rel = new ListBufferTransitionRelation
         (PROPERTY_NAME, ComponentKind.PROPERTY, propertyEnc, 1, config);
+      rel.setInitial(0, true);
       mPropertyAutomaton = new TRAutomatonProxy(propertyEnc, rel);
     }
 
@@ -173,51 +192,55 @@ class TRAbstractionStepCertainConflicts
       trace.prune(index + 1);
     }
 
-    private void createLanguageInclusionAutomata(final TRTraceProxy trace)
+    private void createLanguageInclusionAutomata(final TRTraceProxy trace,
+                                                 final int level)
       throws AnalysisException
     {
-      mMaxLevel = getLevelOfEndState(trace);
-      if (mMaxLevel < 0) {
-        for (int s = 0; s < mLevels.length; s++) {
-          if (mLevels[s] > mMaxLevel) {
-            mMaxLevel = s;
-          }
-        }
-      } else if (mMaxLevel == 1) {
-        mMaxLevel = 0; // TODO drop this case
-      } else {
-        mMaxLevel = (mMaxLevel | 1) - 2;
-      }
-      if (mMaxLevel >= 0) {
-        final int config =
-          mLanguageInclusionChecker.getPreferredInputConfiguration();
-        mCertainConflictsAutomaton = new LanguageInclusionAutomaton
-          (trace, TRAbstractionStepCertainConflicts.this,
-           config, mCertainConflictEvent, mMaxLevel);
-        final Set<TRAbstractionStep> steps = trace.getCoveredAbstractionSteps();
-        mLanguageInclusionAutomata = new ArrayList<>(steps.size() - 1);
-        for (final TRAbstractionStep step : steps) {
-          if (step != TRAbstractionStepCertainConflicts.this) {
-            final LanguageInclusionAutomaton aut =
-              new LanguageInclusionAutomaton(trace, step, config);
-            mLanguageInclusionAutomata.add(aut);
-          }
+      mMaxLevel = level;
+      final int config =
+        mLanguageInclusionChecker.getPreferredInputConfiguration();
+      final Set<TRAbstractionStep> steps = trace.getCoveredAbstractionSteps();
+      mLanguageInclusionAutomata = new ArrayList<>(steps.size());
+      mCertainConflictsAutomaton = new LanguageInclusionAutomaton
+        (trace, TRAbstractionStepCertainConflicts.this,
+         config, mCertainConflictEvent, mMaxLevel);
+      mLanguageInclusionAutomata.add(mCertainConflictsAutomaton);
+      for (final TRAbstractionStep step : steps) {
+        if (step != mPredecessor) {
+          final LanguageInclusionAutomaton aut =
+            new LanguageInclusionAutomaton(trace, step, config);
+          mLanguageInclusionAutomata.add(aut);
         }
       }
+    }
+
+    private void setNextLevel(final TRTraceProxy trace, final int level)
+    {
+      mCertainConflictsAutomaton.removeLevels
+        (TRAbstractionStepCertainConflicts.this,
+         mCertainConflictEvent, level + 1, mMaxLevel);
+      for (final LanguageInclusionAutomaton aut : mLanguageInclusionAutomata) {
+        aut.setCurrentState(trace);
+      }
+      mMaxLevel = level;
     }
 
     private TRTraceProxy findTraceExtension()
       throws AnalysisException
     {
-      if (mMaxLevel < 0) {
-        return null;
-      }
       final ProductDESProxy des = createLanguageInclusionModel();
       mLanguageInclusionChecker.setModel(des);
       if (mLanguageInclusionChecker.run()) {
         return null;
       } else {
-        return (TRTraceProxy) mLanguageInclusionChecker.getCounterExample();
+        final TRTraceProxy trace =
+          (TRTraceProxy) mLanguageInclusionChecker.getCounterExample();
+        for (final LanguageInclusionAutomaton laut : mLanguageInclusionAutomata) {
+          final TRAutomatonProxy aut = laut.getAutomaton();
+          final TRAbstractionStep step = laut.getAbstractionStep();
+          trace.replaceInputAutomaton(aut, step);
+        }
+        return trace;
       }
     }
 
@@ -247,16 +270,14 @@ class TRAbstractionStepCertainConflicts
     private int getLevelOfEndState(final TRTraceProxy trace)
     {
       final int last = trace.getNumberOfSteps() - 1;
-      final int end =
-        trace.getState(TRAbstractionStepCertainConflicts.this, last);
+      final int end = trace.getState(mPredecessor, last);
       return mLevels[end];
     }
 
     private ProductDESProxy createLanguageInclusionModel()
     {
-      final int numAutomata = mLanguageInclusionAutomata.size() + 2;
+      final int numAutomata = mLanguageInclusionAutomata.size() + 1;
       final List<TRAutomatonProxy> automata = new ArrayList<>(numAutomata);
-      automata.add(mCertainConflictsAutomaton.getAutomaton());
       for (final LanguageInclusionAutomaton aut : mLanguageInclusionAutomata) {
         automata.add(aut.getAutomaton());
       }
@@ -308,15 +329,16 @@ class TRAbstractionStepCertainConflicts
                                        final int maxLevel)
       throws AnalysisException
     {
-      mAbstractionStep = step;
-      final TRAutomatonProxy outputAut = step.getOutputAutomaton(config);
-      final EventEncoding outputEnc = outputAut.getEventEncoding();
-      final EventEncoding langEnc = outputEnc.clone();
+      mAbstractionStep = step.getPredecessor();
+      final TRAutomatonProxy inputAut =
+        mAbstractionStep.getOutputAutomaton(config);
+      final EventEncoding inputEnc = inputAut.getEventEncoding();
+      final EventEncoding langEnc = inputEnc.clone();
       final int cc = langEnc.addProperEvent(ccEvent, EventStatus.STATUS_NONE);
-      final ListBufferTransitionRelation outputRel =
-        outputAut.getTransitionRelation();
+      final ListBufferTransitionRelation inputRel =
+        inputAut.getTransitionRelation();
       final ListBufferTransitionRelation langRel =
-        new ListBufferTransitionRelation(outputRel, langEnc, config);
+        new ListBufferTransitionRelation(inputRel, langEnc, config);
       mCurrentState = getCurrentState(trace);
       final int numStates = langRel.getNumberOfStates();
       final int[] levels = step.getLevels();
@@ -331,6 +353,11 @@ class TRAbstractionStepCertainConflicts
 
     //#######################################################################
     //# Simple Access
+    private TRAbstractionStep getAbstractionStep()
+    {
+      return mAbstractionStep;
+    }
+
     private TRAutomatonProxy getAutomaton()
     {
       return mLanguageInclusionAutomaton;
@@ -344,7 +371,6 @@ class TRAbstractionStepCertainConflicts
       return trace.getState(mAbstractionStep, last);
     }
 
-    @SuppressWarnings("unused")
     private void setCurrentState(final TRTraceProxy trace)
     {
       final ListBufferTransitionRelation rel =
@@ -354,7 +380,6 @@ class TRAbstractionStepCertainConflicts
       rel.setInitial(mCurrentState, true);
     }
 
-    @SuppressWarnings("unused")
     private void removeLevels(final TRAbstractionStepCertainConflicts step,
                               final EventProxy ccEvent,
                               final int minRemoved,
