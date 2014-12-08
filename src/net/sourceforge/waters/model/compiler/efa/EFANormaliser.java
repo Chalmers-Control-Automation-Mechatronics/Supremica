@@ -1094,12 +1094,12 @@ public class EFANormaliser extends AbortableCompiler
         addComplementaryUpdates();
         return;
       }
-//*
+
       for (final EFAUpdateInfo update : mList) {
         update.initialiseMap();
         determineCatchAll();
         update.makeDisjoint(mEventDecl);
-      }//*/
+      }
     }
 
     /**
