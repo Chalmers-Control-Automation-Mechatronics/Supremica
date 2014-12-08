@@ -35,7 +35,6 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 public class ModuleCompiler extends AbortableCompiler
 {
-
   //##########################################################################
   //# Constructors
   public ModuleCompiler(final DocumentManager manager,
@@ -75,7 +74,7 @@ public class ModuleCompiler extends AbortableCompiler
   }
 
 
-  //#########################################################################
+  //##########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
   public void requestAbort()
@@ -126,6 +125,8 @@ public class ModuleCompiler extends AbortableCompiler
                                                mIsMultiExceptionsEnabled);
       }
       final ModuleProxyFactory modfactory = ModuleElementFactory.getInstance();
+
+      //Resolve instances.
       mInstanceCompiler = new ModuleInstanceCompiler
         (mDocumentManager, modfactory, mCompilationInfo, mInputModule);
       mInstanceCompiler.setOptimizationEnabled(mIsOptimizationEnabled);
@@ -138,6 +139,7 @@ public class ModuleCompiler extends AbortableCompiler
       mInstanceCompiler = null;
       checkAbort();
 
+      //Simplify group nodes.
       mGroupNodeCompiler =
         new GroupNodeCompiler(modfactory, mCompilationInfo, intermediate);
       intermediate = mGroupNodeCompiler.compile();
@@ -145,6 +147,17 @@ public class ModuleCompiler extends AbortableCompiler
       checkAbort();
 
       if (efa && mIsExpandingEFATransitions) {
+        /*/Perform normalisation.
+        mEFANormaliser = new EFANormaliser(modfactory, mCompilationInfo, intermediate);
+        mEFANormaliser.setUsesEventNameBuilder(true);
+        mEFANormaliser.setCreatesGuardAutomaton(true);
+        mEFANormaliser.setMakesGuardsDisjoint(true);
+        intermediate = mEFANormaliser.compile();
+        mEFANormaliser = null;
+
+        //Create variable automata.
+
+        //*/
         mEFACompiler =
           new EFACompiler(modfactory, mCompilationInfo, intermediate);
         checkAbort();
@@ -152,6 +165,7 @@ public class ModuleCompiler extends AbortableCompiler
         mEFACompiler = null;
       }
 
+      //Build Product DES.
       mGraphCompiler =
         new ModuleGraphCompiler(mFactory, mCompilationInfo, intermediate);
       mGraphCompiler.setOptimizationEnabled(mIsOptimizationEnabled);
@@ -159,10 +173,14 @@ public class ModuleCompiler extends AbortableCompiler
       final ProductDESProxy des = mGraphCompiler.compile();
       setLocation(des);
       return des;
-    } catch (final EvalException exception) {
+    }
+
+    catch (final EvalException exception) {
       mCompilationInfo.raise(exception);
       throw mCompilationInfo.getExceptions();
-    } finally {
+    }
+
+    finally {
       tearDown();
     }
   }
@@ -264,7 +282,7 @@ public class ModuleCompiler extends AbortableCompiler
   }
 
 
-  //#########################################################################
+  //##########################################################################
   //# Auxiliary Methods
   private void setUp()
   {
@@ -296,7 +314,7 @@ public class ModuleCompiler extends AbortableCompiler
   }
 
 
-  //#########################################################################
+  //##########################################################################
   //# Data Members
   private final DocumentManager mDocumentManager;
   private final ProductDESProxyFactory mFactory;
@@ -304,8 +322,10 @@ public class ModuleCompiler extends AbortableCompiler
   private ModuleProxy mInputModule;
   private CompilationInfo mCompilationInfo;
   private boolean mCompilationInfoIsDirty;
+
   private ModuleInstanceCompiler mInstanceCompiler;
   private GroupNodeCompiler mGroupNodeCompiler;
+  // private EFANormaliser mEFANormaliser;
   private EFACompiler mEFACompiler;
   private ModuleGraphCompiler mGraphCompiler;
 
