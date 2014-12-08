@@ -268,7 +268,7 @@ public class EFAUnifier extends AbortableCompiler
     final GraphProxy graph =
       mFactory.createGraphProxy(true, null, nodes, edges);
     final IdentifierProxy name =
-      mFactory.createSimpleIdentifierProxy(":updates");
+      mFactory.createSimpleIdentifierProxy(UPDATE_EFSM_NAME);
     return
       mFactory.createSimpleComponentProxy(name, ComponentKind.PLANT, graph);
   }
@@ -1347,5 +1347,7 @@ public class EFAUnifier extends AbortableCompiler
   private EFAEventNameBuilder mEventNameBuilder;
   private ProxyAccessorMap<IdentifierProxy,EFAEventInfo> mEventMap;
   private ProxyAccessorMap<IdentifierProxy,ConstraintList> mEventUpdateMap;
+
+  public static final String UPDATE_EFSM_NAME = ":updates";
 
 }
