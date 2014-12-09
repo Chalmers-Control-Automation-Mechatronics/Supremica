@@ -35,21 +35,29 @@ class TRAbstractionStepInput
 
   //#########################################################################
   //# Constructor
-  TRAbstractionStepInput(final AutomatonProxy inputAut,
-                         final EventEncoding enc,
-                         final TRAutomatonProxy outputAut)
+  TRAbstractionStepInput(final TRAutomatonProxy inputAut)
   {
-    this(inputAut, enc, null, outputAut);
+    super(inputAut.getName());
+    mInputAutomaton = inputAut;
+    mEventEncoding = null;
+    mStateEncoding = null;
+    mDumpState = null;
+  }
+
+  TRAbstractionStepInput(final AutomatonProxy inputAut,
+                         final EventEncoding enc)
+  {
+    this(inputAut, enc, null);
   }
 
   TRAbstractionStepInput(final AutomatonProxy inputAut,
                          final EventEncoding enc,
-                         final StateProxy dumpState,
-                         final TRAutomatonProxy outputAut)
+                         final StateProxy dumpState)
   {
-    super(outputAut.getName());
+    super(inputAut.getName());
     mInputAutomaton = inputAut;
     mEventEncoding = enc;
+    mStateEncoding = new StateEncoding(inputAut);
     mDumpState = dumpState;
   }
 
@@ -61,12 +69,14 @@ class TRAbstractionStepInput
     return mInputAutomaton;
   }
 
-  StateEncoding getStateEncoding()
+  StateProxy getState(final int index)
   {
-    if (mStateEncoding == null) {
-      mStateEncoding = new StateEncoding(mInputAutomaton);
+    if (mEventEncoding == null) {
+      final TRAutomatonProxy tr = (TRAutomatonProxy) mInputAutomaton;
+      return tr.getState(index);
+    } else {
+      return mStateEncoding.getState(index);
     }
-    return mStateEncoding;
   }
 
 
@@ -82,11 +92,17 @@ class TRAbstractionStepInput
   public TRAutomatonProxy createOutputAutomaton(final int preferredConfig)
     throws OverflowException
   {
-    return new TRAutomatonProxy(mInputAutomaton,
-                                mEventEncoding,
-                                getStateEncoding(),
-                                mDumpState,
-                                preferredConfig);
+    if (mEventEncoding == null) {
+      final TRAutomatonProxy tr = (TRAutomatonProxy) mInputAutomaton;
+      return new TRAutomatonProxy(tr);
+    } else {
+      final EventEncoding clonedEnc = new EventEncoding(mEventEncoding);
+      return new TRAutomatonProxy(mInputAutomaton,
+                                  clonedEnc,
+                                  mStateEncoding,
+                                  mDumpState,
+                                  preferredConfig);
+    }
   }
 
   @Override
@@ -109,8 +125,9 @@ class TRAbstractionStepInput
   //#########################################################################
   //# Debugging
   @Override
-  public void report(final Logger logger)
+  public void reportExpansion()
   {
+    final Logger logger = getLogger();
     if (logger.isDebugEnabled()) {
       logger.debug("Linking to input automaton " + getName() + " ...");
     }
@@ -121,8 +138,7 @@ class TRAbstractionStepInput
   //# Data Members
   private final AutomatonProxy mInputAutomaton;
   private final EventEncoding mEventEncoding;
+  private final StateEncoding mStateEncoding;
   private final StateProxy mDumpState;
-
-  private StateEncoding mStateEncoding;
 
 }

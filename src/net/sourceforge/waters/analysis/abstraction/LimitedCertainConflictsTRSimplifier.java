@@ -27,6 +27,7 @@ import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.analysis.tr.TransitionListBuffer;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -120,7 +121,7 @@ public class LimitedCertainConflictsTRSimplifier
   @Override
   public void reset()
   {
-    mStateInfo = null;
+    mLevelInfo = null;
     super.reset();
   }
 
@@ -178,7 +179,7 @@ public class LimitedCertainConflictsTRSimplifier
    */
   public int getLevel(final int state)
   {
-    return mStateInfo[state];
+    return mLevelInfo[state];
   }
 
   /**
@@ -187,7 +188,7 @@ public class LimitedCertainConflictsTRSimplifier
    */
   public int[] getLevels()
   {
-    return mStateInfo;
+    return mLevelInfo;
   }
 
 
@@ -198,8 +199,7 @@ public class LimitedCertainConflictsTRSimplifier
   throws AnalysisException
   {
     super.setUp();
-    mStateInfo = null;
-    mHasRemovedTransitions = false;
+    mLevelInfo = null;
     mHasCertainConflictTransitions = false;
     final ListBufferTransitionRelation rel = getTransitionRelation();
     mAllEventsBackwardsIterator = rel.createPredecessorsReadOnlyIterator();
@@ -247,7 +247,7 @@ public class LimitedCertainConflictsTRSimplifier
       modified = false;
       // check for always enabled transitions to certain conflicts
       for (int state = 0; state < numStates; state++) {
-        if (mStateInfo[state] == level && rel.isReachable(state)) {
+        if (mLevelInfo[state] == level && rel.isReachable(state)) {
           checkAbort();
           mUnvisitedStates.push(state);
           while (mUnvisitedStates.size() > 0) {
@@ -256,17 +256,16 @@ public class LimitedCertainConflictsTRSimplifier
             while (mAlwaysEnabledBackwardsIterator.advance()) {
               final int pred =
                 mAlwaysEnabledBackwardsIterator.getCurrentSourceState();
-              if (mStateInfo[pred] == COREACHABLE) {
+              if (mLevelInfo[pred] == COREACHABLE) {
                 mMaxLevel = nextlevel;
-                mStateInfo[pred] = nextlevel;
+                mLevelInfo[pred] = nextlevel;
                 mUnvisitedStates.push(pred);
                 victims.add(pred);
               }
             }
           }
           if (!victims.isEmpty()) {
-            mHasRemovedTransitions = mHasCertainConflictTransitions =
-              modified = true;
+            mHasCertainConflictTransitions = modified = true;
             for (int index = 0; index < victims.size(); index++) {
               final int victim = victims.get(index);
               rel.removeOutgoingTransitions(victim);
@@ -279,13 +278,13 @@ public class LimitedCertainConflictsTRSimplifier
       // check for proper event transitions to certain conflicts
       nextlevel++;
       for (int state = 0; state < numStates; state++) {
-        if (mStateInfo[state] >= level && rel.isReachable(state)) {
+        if (mLevelInfo[state] >= level && rel.isReachable(state)) {
           checkAbort();
           mProperEventsBackwardsIterator.resetState(state);
           while (mProperEventsBackwardsIterator.advance()) {
             final int pred =
               mProperEventsBackwardsIterator.getCurrentSourceState();
-            if (mStateInfo[pred] == COREACHABLE) {
+            if (mLevelInfo[pred] == COREACHABLE) {
               closureIter.resetState(pred);
               while (closureIter.advance()) {
                 final int ppred = closureIter.getCurrentSourceState();
@@ -307,12 +306,12 @@ public class LimitedCertainConflictsTRSimplifier
             }
           }
           if (!victims.isEmpty()) {
-            mHasRemovedTransitions = modified = true;
+            modified = true;
             for (int index = 0; index < victims.size(); index++) {
               final int victim = victims.get(index);
               final int event = (victim & ~root) >>> shift;
               final int pred = victim & mask;
-              if (!mHasCertainConflictTransitions && mStateInfo[pred] < 0) {
+              if (!mHasCertainConflictTransitions && mLevelInfo[pred] < 0) {
                 // We have certain conflict transitions if we are deleting a
                 // transition from a coreachable state to another coreachable
                 // state.
@@ -320,7 +319,7 @@ public class LimitedCertainConflictsTRSimplifier
                 succIter.reset(pred, event);
                 while (succIter.advance()) {
                   final int target = succIter.getCurrentTargetState();
-                  if (mStateInfo[target] < 0) {
+                  if (mLevelInfo[target] < 0) {
                     mHasCertainConflictTransitions = true;
                     break;
                   }
@@ -348,100 +347,104 @@ public class LimitedCertainConflictsTRSimplifier
       }
     } while (modified);
 
-    rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     numReachable = rel.getNumberOfReachableStates();
+    final int dumpIndex = rel.getDumpStateIndex();
+    assert mLevelInfo[dumpIndex] == BLOCKING : "Dump state not found blocking?";
     int blockingInit = -1;
-    if (numCoreachable < numReachable && numCoreachable > 0) {
+    if (numCoreachable < numReachable) {
       // Some reachable states are blocking. Is one of them initial?
-      for (int state = 0; state < numStates; state++) {
-        if (mStateInfo[state] != COREACHABLE && rel.isInitial(state)) {
-          blockingInit = state;
-          break;
-        }
-      }
-    }
-    if (blockingInit >= 0) {
-      // There is a blocking initial state.
-      // Mark all other states as unreachable.
-      for (int state = 0; state < numStates; state++) {
-        if (state == blockingInit) {
-          rel.removeOutgoingTransitions(state);
-        } else {
-          rel.setReachable(state, false);
-        }
-      }
-      result = true;
-    } else if (numCoreachable == 0) {
-      // No coreachable states. Merge all reachable states into a single
-      // blocking state, and be sure to remove all transitions.
-      if (numReachable > 1) {
-        result = true;
-        final int[] stateToClass = new int[numStates];
-        for (int s = 0; s < numStates; s++) {
-          if (rel.isReachable(s)) {
-            stateToClass[s] = 0;
-            rel.removeOutgoingTransitions(s);
-          } else {
-            stateToClass[s] = -1;
-          }
-        }
-        stateToClass[rel.getDumpStateIndex()] = 0;
-        final TRPartition partition = new TRPartition(stateToClass, 1);
-        setResultPartition(partition);
-        applyResultPartitionAutomatically();
+      if (rel.isInitial(dumpIndex)) {
+        blockingInit = dumpIndex;
       } else {
-        result = mHasRemovedTransitions;
-        for (int state = 0; state < numStates; state++) {
-          if (rel.isReachable(state)) {
-            result |= rel.removeOutgoingTransitions(state);
+        for (int s = 0; s < numStates; s++) {
+          if (mLevelInfo[s] != COREACHABLE && rel.isInitial(s)) {
+            blockingInit = s;
             break;
           }
         }
       }
-    } else if (numCoreachable == numReachable - 1) {
-      // Only one state of certain conflicts. No result partition,
-      // but let us try to add selfloops and remove events.
-      int bstate;
-      for (bstate = 0; bstate < numStates; bstate++) {
-        if (rel.isReachable(bstate) && mStateInfo[bstate] != COREACHABLE) {
-          break;
+    }
+
+    int outputConfig = getPreferredOutputConfiguration();
+    if (outputConfig == 0) {
+      outputConfig = ListBufferTransitionRelation.CONFIG_SUCCESSORS;
+    }
+    if (blockingInit >= 0) {
+      // There is a blocking initial state.
+      // Mark all other states as unreachable, and delete all transitions.
+      rel.reset(0, outputConfig);
+      for (int s = 0; s < numStates; s++) {
+        if (s != blockingInit) {
+          rel.setReachable(s, false);
         }
       }
-      succIter.reset(bstate, -1);
-      result |= succIter.advance();
-      for (int event = EventEncoding.NONTAU; event < numEvents; event++) {
-        if ((rel.getProperEventStatus(event) & EventStatus.STATUS_UNUSED) == 0) {
-          rel.addTransition(bstate, event, bstate);
+      rel.setMarked(blockingInit, defaultID, false);
+      result = true;
+    } else if (numCoreachable == numReachable - 1) {
+      // Only one reachable state of certain conflicts---find it ...
+      int ccState = -1;
+      if (rel.isReachable(dumpIndex)) {
+        ccState = dumpIndex;
+      } else {
+        for (int s = 0; s < numStates; s++) {
+          if (mLevelInfo[s] >= 0) {
+            ccState = s;
+            break;
+          }
+        }
+        assert ccState >= 0 : "Certain conflicts state not found?";
+      }
+      // Try to remove selfloops ...
+      rel.reconfigure(outputConfig);
+      final TransitionListBuffer succ = rel.getSuccessorBuffer();
+      if (succ != null) {
+        result |= succ.removeStateTransitions(ccState);
+      }
+      final TransitionListBuffer pred = rel.getPredecessorBuffer();
+      if (pred != null) {
+        final TransitionIterator iter = pred.createModifyingIterator(ccState);
+        while (iter.advance()) {
+          if (iter.getCurrentSourceState() == ccState) {
+            iter.remove();
+            result = true;
+          }
         }
       }
       result |= removeProperSelfLoopEvents();
-      rel.removeOutgoingTransitions(bstate);
     } else {
-      // More than one state of certain conflicts.
-      // Create a partition that can be applied separately.
-      result = true;
-      final int dumpIndex = rel.getDumpStateIndex();
-      final int numClasses = numCoreachable + 1;
-      final List<int[]> classes = new ArrayList<>(numClasses);
-      int numBlocking = numReachable - numCoreachable;
-      if (!rel.isReachable(dumpIndex)) {
-        numBlocking++;
+      // More than one reachable state of certain conflicts.
+      // TODO CONFIG_PREDECESSORS version?
+      rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      // Create partition to facilitate simple trace expansion ...
+      if (!mHasCertainConflictTransitions) {
+        final int[] stateToClass = new int[numStates];
+        for (int s = 0; s < numStates; s++) {
+          if (!rel.isReachable(s)) {
+            stateToClass[s] = -1;
+          } else if (mLevelInfo[s] >= 0) {
+            stateToClass[s] = dumpIndex;
+          } else {
+            stateToClass[s] = s;
+          }
+        }
+        final TRPartition partition = new TRPartition(stateToClass, numStates);
+        setResultPartition(partition);
       }
-      final int[] bclazz = new int[numBlocking];
-      int bindex = 0;
-      for (int state = 0; state < numStates; state++) {
-        if (mStateInfo[state] == COREACHABLE) {
-          final int[] clazz = new int[1];
-          clazz[0] = state;
-          classes.add(clazz);
-        } else if (rel.isReachable(state) || state == dumpIndex) {
-          bclazz[bindex++] = state;
+      // Replace all certain conflicts states by the dump state ...
+      final TransitionIterator iter = rel.createAllTransitionsModifyingIterator();
+      while (iter.advance()) {
+        final int t = iter.getCurrentTargetState();
+        if (mLevelInfo[t] >= 0 && t != dumpIndex) {
+          iter.setCurrentToState(dumpIndex);
         }
       }
-      classes.add(bclazz);
-      final TRPartition partition = new TRPartition(classes, numStates);
-      setResultPartition(partition);
-      applyResultPartitionAutomatically();
+      for (int s = 0; s < numStates; s++) {
+        if (mLevelInfo[s] >= 0) {
+          rel.setReachable(s, s == dumpIndex);
+        }
+      }
+      removeProperSelfLoopEvents();
+      result = true;
     }
     return result;
   }
@@ -531,7 +534,7 @@ public class LimitedCertainConflictsTRSimplifier
     for (int state = 0; state < numStates; state++) {
       if (rel.isReachable(state)) {
         numReachable++;
-        if (mStateInfo[state] <= level) {
+        if (mLevelInfo[state] <= level) {
           numCritical++;
         }
       }
@@ -549,7 +552,7 @@ public class LimitedCertainConflictsTRSimplifier
         final StateProxy memstate = new MemStateProxy(code++, init);
         states[state] = memstate;
         reachable.add(memstate);
-        final int info = mStateInfo[state];
+        final int info = mLevelInfo[state];
         if (info != COREACHABLE && info <= level) {
           final TransitionProxy trans =
             factory.createTransitionProxy(memstate, prop, memstate);
@@ -581,7 +584,7 @@ public class LimitedCertainConflictsTRSimplifier
   public int findTauReachableState(final int state, int level)
   {
     level++;
-    int info = mStateInfo[state];
+    int info = mLevelInfo[state];
     if (info < level) {
       return state;
     } else if (info == level) {
@@ -597,7 +600,7 @@ public class LimitedCertainConflictsTRSimplifier
         iter.reset(current, tau);
         while (iter.advance()) {
           final int succ = iter.getCurrentTargetState();
-          info = mStateInfo[succ];
+          info = mLevelInfo[succ];
           if (info < level) {
             return succ;
           } else if (info == level && visited.add(succ)) {
@@ -605,7 +608,7 @@ public class LimitedCertainConflictsTRSimplifier
           }
         }
       }
-      assert false : "Could not found state with expected level!";
+      assert false : "Could not find state with expected level!";
       return -1;
     } else {
       return -1;
@@ -621,16 +624,16 @@ public class LimitedCertainConflictsTRSimplifier
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
     final int defaultID = getDefaultMarkingID();
-    if (mStateInfo == null) {
-      mStateInfo = new int[numStates];
+    if (mLevelInfo == null) {
+      mLevelInfo = new int[numStates];
       mUnvisitedStates = new TIntArrayStack();
       if (level != 0) {
-        Arrays.fill(mStateInfo, level);
+        Arrays.fill(mLevelInfo, level);
       }
     } else {
       for (int state = 0; state < numStates; state++) {
-        if (mStateInfo[state] == COREACHABLE) {
-          mStateInfo[state] = level;
+        if (mLevelInfo[state] == COREACHABLE) {
+          mLevelInfo[state] = level;
         }
       }
     }
@@ -638,9 +641,9 @@ public class LimitedCertainConflictsTRSimplifier
     for (int state = 0; state < numStates; state++) {
       if (rel.isMarked(state, defaultID) &&
           rel.isReachable(state) &&
-          mStateInfo[state] == level) {
+          mLevelInfo[state] == level) {
         checkAbort();
-        mStateInfo[state] = COREACHABLE;
+        mLevelInfo[state] = COREACHABLE;
         mUnvisitedStates.push(state);
         coreachable++;
         while (mUnvisitedStates.size() > 0) {
@@ -648,8 +651,8 @@ public class LimitedCertainConflictsTRSimplifier
           mAllEventsBackwardsIterator.resetState(popped);
           while (mAllEventsBackwardsIterator.advance()) {
             final int pred = mAllEventsBackwardsIterator.getCurrentSourceState();
-            if (rel.isReachable(pred) && mStateInfo[pred] == level) {
-              mStateInfo[pred] = COREACHABLE;
+            if (rel.isReachable(pred) && mLevelInfo[pred] == level) {
+              mLevelInfo[pred] = COREACHABLE;
               mUnvisitedStates.push(pred);
               coreachable++;
             }
@@ -663,11 +666,10 @@ public class LimitedCertainConflictsTRSimplifier
 
   //#########################################################################
   //# Data Members
-  private boolean mHasRemovedTransitions;
   private boolean mHasCertainConflictTransitions;
 
   private int mMaxLevel;
-  private int[] mStateInfo;
+  private int[] mLevelInfo;
   private TIntStack mUnvisitedStates;
   private TransitionIterator mAllEventsBackwardsIterator;
   private TransitionIterator mAlwaysEnabledBackwardsIterator;

@@ -14,10 +14,8 @@ import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.AbstractMarkingTRSimplifier;
-import net.sourceforge.waters.analysis.tr.DefaultEventStatusProvider;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
-import net.sourceforge.waters.analysis.tr.EventStatusProvider;
 import net.sourceforge.waters.analysis.tr.IntSetBuffer;
 import net.sourceforge.waters.analysis.tr.IntStateBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -257,30 +255,26 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
   {
     if (mSetOffsets != null) {
       ListBufferTransitionRelation rel = getTransitionRelation();
+      final IntStateBuffer oldStateBuffer = rel.getStateBuffer();
       final int numDetStates = mSetOffsets.size();
-      final EventStatusProvider status = new DefaultEventStatusProvider(rel);
-      final IntStateBuffer detStates = new IntStateBuffer(numDetStates, status);
+      final int numTrans = mTransitionBuffer.size();
+      rel.reset(numDetStates, numTrans,
+                ListBufferTransitionRelation.CONFIG_SUCCESSORS);
       for (int init = 0; init < mNumInitialStates; init++) {
-        detStates.setInitial(init, true);
+        rel.setInitial(init, true);
       }
-
       final IntSetBuffer.IntSetIterator iter = mStateSetBuffer.iterator();
       for (int detstate = 0; detstate < numDetStates; detstate++) {
         final int offset = mSetOffsets.get(detstate);
         iter.reset(offset);
         iter.advance();
         final int state = iter.getCurrentData();
-        final long stateMarkings = rel.getAllMarkings(state);
-        detStates.setAllMarkings(detstate, stateMarkings);
+        final long stateMarkings = oldStateBuffer.getAllMarkings(state);
+        rel.setAllMarkings(detstate, stateMarkings);
       }
-      detStates.removeRedundantPropositions();
-
-      final int numTrans = mTransitionBuffer.size();
-      rel.reset(detStates, numTrans,
-                ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      rel.removeRedundantPropositions();
       mTransitionBuffer.addOutgoingTransitions(rel);
       rel.reconfigure(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
-
       final int dumpstate = findCertainConflicts(rel);
       rel = getTransitionRelation();
       rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);

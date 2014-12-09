@@ -121,6 +121,8 @@ class TRAbstractionStepPartition
   public TRAutomatonProxy createOutputAutomaton(final int preferredConfig)
     throws AnalysisException
   {
+    final Logger logger = getLogger();
+    reportRebuilding();
     final ChainTRSimplifier chain = new ChainTRSimplifier(mUsedSimplifiers);
     chain.setPropositions(mPreconditionMarking, mDefaultMarking);
     chain.setPreferredOutputConfiguration(preferredConfig);
@@ -132,6 +134,7 @@ class TRAbstractionStepPartition
     mPredecessor.clearOutputAutomaton();
     final ListBufferTransitionRelation inputRel =
       inputAut.getTransitionRelation();
+    inputRel.logSizes(logger);
     final EventEncoding inputEventEncoding = new EventEncoding(mEventEncoding);
     final ListBufferTransitionRelation outputRel =
       new ListBufferTransitionRelation(inputRel, inputEventEncoding, inputConfig);
@@ -145,7 +148,7 @@ class TRAbstractionStepPartition
                           final AbstractTRCompositionalAnalyzer analyzer)
     throws AnalysisException
   {
-    final TRAutomatonProxy aut = mPredecessor.createOutputAutomaton
+    final TRAutomatonProxy aut = mPredecessor.getOutputAutomaton
       (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final ListBufferTransitionRelation rel = aut.getTransitionRelation();
     rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
@@ -169,8 +172,9 @@ class TRAbstractionStepPartition
   //#########################################################################
   //# Debugging
   @Override
-  public void report(final Logger logger)
+  public void reportExpansion()
   {
+    final Logger logger = getLogger();
     if (logger.isDebugEnabled()) {
       logger.debug("Expanding partition of " + getName() + " ...");
     }

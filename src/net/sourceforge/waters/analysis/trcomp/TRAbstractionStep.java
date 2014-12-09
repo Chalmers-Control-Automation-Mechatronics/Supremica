@@ -11,6 +11,9 @@ package net.sourceforge.waters.analysis.trcomp;
 
 import java.util.Collection;
 
+import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -80,6 +83,27 @@ abstract class TRAbstractionStep
     mOutputAutomaton = null;
   }
 
+  TRAutomatonProxy getOutputAutomaton(final int preferredConfig,
+                                      final EventEncoding enc)
+    throws AnalysisException
+  {
+    final TRAutomatonProxy aut = getOutputAutomaton(preferredConfig);
+    final ListBufferTransitionRelation rel = aut.getTransitionRelation();
+    final int numEvents = rel.getNumberOfProperEvents();
+    assert numEvents == enc.getNumberOfProperEvents() :
+      "Unexpected number of events in event encoding!";
+    for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+      final byte oldStatus = rel.getProperEventStatus(e);
+      if (EventStatus.isUsedEvent(oldStatus)) {
+        final byte newStatus = enc.getProperEventStatus(e);
+        if (newStatus != oldStatus) {
+          rel.setProperEventStatus(e, newStatus);
+        }
+      }
+    }
+    clearOutputAutomaton();
+    return aut;
+  }
 
   //#########################################################################
   //# Debugging
@@ -89,13 +113,27 @@ abstract class TRAbstractionStep
     return ProxyTools.getShortClassName(this) + " " + getName();
   }
 
-  public void report(final Logger logger)
+  protected void reportExpansion()
   {
+    final Logger logger = getLogger();
     if (logger.isDebugEnabled()) {
       logger.debug("Applying " + getName() + " ...");
     }
   }
 
+  protected void reportRebuilding()
+  {
+    final Logger logger = getLogger();
+    if (logger.isDebugEnabled()) {
+      logger.debug("Rebuilding output automaton " + getName() + " ...");
+    }
+  }
+
+  protected Logger getLogger()
+  {
+    final Class<?> clazz = getClass();
+    return Logger.getLogger(clazz);
+  }
 
   //#########################################################################
   //# Data Members

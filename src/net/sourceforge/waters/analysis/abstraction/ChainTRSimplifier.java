@@ -202,8 +202,16 @@ public class ChainTRSimplifier
   //# Overrides for net.sourceforge.waters.analysis.abstraction.
   //# AbstractTRSimplifier
   @Override
+  protected void setUp()
+    throws AnalysisException
+  {
+    // Overriding this to avoid reconfiguration of TR ahead of time.
+    setResultPartition(null);
+  }
+
+  @Override
   protected boolean runSimplifier()
-  throws AnalysisException
+    throws AnalysisException
   {
     mIsObservationEquivalentAbstraction = true;
     final ListBufferTransitionRelation rel = getTransitionRelation();

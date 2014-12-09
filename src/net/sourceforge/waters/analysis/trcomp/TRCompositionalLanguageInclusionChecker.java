@@ -169,14 +169,18 @@ public class TRCompositionalLanguageInclusionChecker
     }
     // Set up property automaton ...
     final Logger logger = getLogger();
-    final EventEncoding eventEnc = createInitialEventEncoding(mRawProperty);
+    final TRAbstractionStepInput step;
+    if (getPreservingEncodings() && mRawProperty instanceof TRAutomatonProxy) {
+      final TRAutomatonProxy tr = (TRAutomatonProxy) mRawProperty;
+      step = new TRAbstractionStepInput(tr);
+    } else {
+      final EventEncoding eventEnc = createInitialEventEncoding(mRawProperty);
+      step = new TRAbstractionStepInput(mRawProperty, eventEnc);
+    }
     final TransitionRelationSimplifier simplifier = getSimplifier();
     final int config = simplifier.getPreferredInputConfiguration();
-    mCurrentProperty = new TRAutomatonProxy(mRawProperty, eventEnc, config);
+    mCurrentProperty = step.createOutputAutomaton(config);
     if (isCounterExampleEnabled()) {
-      final EventEncoding clonedEnc = new EventEncoding(eventEnc);
-      final TRAbstractionStepInput step =
-        new TRAbstractionStepInput(mRawProperty, clonedEnc, mCurrentProperty);
       addAbstractionStep(step, mCurrentProperty);
     }
     if (!hasInitialState(mCurrentProperty)) {
@@ -356,9 +360,10 @@ public class TRCompositionalLanguageInclusionChecker
   protected void checkIntermediateCounterExample(final TRTraceProxy trace)
     throws AnalysisException
   {
+    final Logger logger = getLogger();
     final TRSafetyTraceProxy safetyTrace = (TRSafetyTraceProxy) trace;
     final TRSafetyTraceProxy cloned = new TRSafetyTraceProxy(safetyTrace);
-    cloned.setUpForTraceChecking();
+    cloned.setUpForTraceChecking(logger);
     final KindTranslator translator = getKindTranslator();
     TraceChecker.checkSafetyCounterExample(cloned, true, translator);
   }

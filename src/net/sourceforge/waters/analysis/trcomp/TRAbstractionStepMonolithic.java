@@ -134,8 +134,9 @@ class TRAbstractionStepMonolithic
   //#########################################################################
   //# Debugging
   @Override
-  public void report(final Logger logger)
+  public void reportExpansion()
   {
+    final Logger logger = getLogger();
     logger.debug("Converting monolithic trace ...");
   }
 

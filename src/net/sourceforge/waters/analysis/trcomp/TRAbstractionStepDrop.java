@@ -112,8 +112,9 @@ class TRAbstractionStepDrop
   //#########################################################################
   //# Debugging
   @Override
-  public void report(final Logger logger)
+  public void reportExpansion()
   {
+    final Logger logger = getLogger();
     if (logger.isDebugEnabled()) {
       logger.debug("Introducing dropped automaton " + getName() + " ...");
     }

@@ -182,6 +182,7 @@ public class ListBufferTransitionRelation
     checkConfig(config);
     mName = aut.getName();
     mKind = aut.getKind();
+    // TODO put events in eventEnc
     final Set<EventProxy> events = new THashSet<>(aut.getEvents());
     if (stateEnc == null) {
       stateEnc = new StateEncoding(aut);
@@ -428,8 +429,9 @@ public class ListBufferTransitionRelation
    *          The transition relation to be copied.
    * @param eventStatus
    *          The event status provider (event encoding) used for the
-   *          copied transition relation. Must be big enough to contain
-   *          all used events of the transition relation to be copied.
+   *          copied transition relation. Transitions with events that are
+   *          not present or marked as unused are not copied, and selfloops
+   *          by events marked as selfloop-only are also suppressed.
    * @param config
    *          Configuration flags defining which transition buffers are to be
    *          created in the copy. Should be one of {@link #CONFIG_SUCCESSORS},
@@ -1615,7 +1617,12 @@ public class ListBufferTransitionRelation
 
 
   //#########################################################################
-  //# Direct Access to Transition Buffers
+  //# Direct Access to State and Transition Buffers
+  public IntStateBuffer getStateBuffer()
+  {
+    return mStateBuffer;
+  }
+
   /**
    * Gets the successor transition buffer of this transition relation,
    * or <CODE>null</CODE> if not configured.
@@ -2301,10 +2308,14 @@ public class ListBufferTransitionRelation
 
   /**
    * Resets this transition relation to use a different state set.
-   * This method replaces the state set with the given new state set
-   * and clears all transitions from the transition relation.
-   * @param newStates
-   *          State buffer containing new states and markings.
+   * This method replaces the state set with a new state set of the
+   * indicated size, and clears all transitions from the transition relation.
+   * @param numStates
+   *          The new number of states. All states will be marked as reachable.
+   * @param dumpIndex
+   *          The index of the dump state in the new transition relation.
+   *          The dump state signifies a unmarked state without outgoing
+   *          transitions.
    * @param numTrans
    *          Estimated number of transitions.
    * @param config
@@ -2313,14 +2324,57 @@ public class ListBufferTransitionRelation
    *          {@link #CONFIG_PREDECESSORS}, or {@link #CONFIG_ALL}.
    * @throws OverflowException
    */
-  public void reset(final IntStateBuffer newStates,
+  public void reset(final int numStates,
+                    final int dumpIndex,
                     final int numTrans,
                     final int config)
     throws OverflowException
   {
+    mStateBuffer = new IntStateBuffer(numStates, dumpIndex, mEventStatus);
+    reset(numTrans, config);
+  }
+
+  /**
+   * Resets this transition relation to use a different state set.
+   * This method replaces the state set with a new state set of the
+   * indicated size, and clears all transitions from the transition relation.
+   * @param numStates
+   *          The new number of states. All states will be marked as reachable
+   *          and an unreachable dump state will be added at the end.
+   * @param numTrans
+   *          Estimated number of transitions.
+   * @param config
+   *          Configuration flags defining which transition buffers are to be
+   *          used from now on. Should be one of {@link #CONFIG_SUCCESSORS},
+   *          {@link #CONFIG_PREDECESSORS}, or {@link #CONFIG_ALL}.
+   * @throws OverflowException
+   */
+  public void reset(final int numStates,
+                    final int numTrans,
+                    final int config)
+    throws OverflowException
+  {
+    mStateBuffer = new IntStateBuffer(numStates, mEventStatus);
+    reset(numTrans, config);
+  }
+
+  /**
+   * Clears all transitions from the transition relation.
+   * This method clears all transition buffers and replaces them by
+   * new empty buffers.
+   * @param numTrans
+   *          Estimated new number of transitions.
+   * @param config
+   *          Configuration flags defining which transition buffers are to be
+   *          used from now on. Should be one of {@link #CONFIG_SUCCESSORS},
+   *          {@link #CONFIG_PREDECESSORS}, or {@link #CONFIG_ALL}.
+   * @throws OverflowException
+   */
+  public void reset(final int numTrans, final int config)
+    throws OverflowException
+  {
     checkConfig(config);
-    final int numStates = newStates.getNumberOfStates();
-    mStateBuffer = newStates;
+    final int numStates = getNumberOfStates();
     if ((config & CONFIG_SUCCESSORS) != 0) {
       mSuccessorBuffer =
         new OutgoingTransitionListBuffer(numStates, mEventStatus, numTrans);

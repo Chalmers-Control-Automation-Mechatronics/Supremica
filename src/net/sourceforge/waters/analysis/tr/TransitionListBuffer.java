@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.tr;
 
 import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.list.array.TLongArrayList;
 import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.set.hash.TIntHashSet;
 
@@ -1054,22 +1055,29 @@ public abstract class TransitionListBuffer
   public abstract StateProxy getToState(TransitionProxy trans);
 
 
-  //#########################################################################
-  //# Automata Conversion Methods
   /**
-   * Initialises this transition buffer with transitions from another
-   * transition list buffer. This can be used to duplicate transition buffers,
+   * <P>Initialises this transition buffer with transitions from another
+   * transition list buffer.</P>
+   *
+   * <P>This can be used to duplicate transition buffers,
    * or to convert from forward to backward indexing and vice versa.
    * This method replaces all transitions in the buffer by given transitions.
    * Transitions are added in a fixed order that is determined from the
-   * given state and event encoding.
-   * The method assumes that this transition buffer is empty when called,
+   * given state and event encoding.</P>
+   *
+   * <P>The method assumes that this transition buffer is empty when called,
    * if this is not the case, transitions will be overwritten without
    * releasing all memory. To correctly replace transitions in a used buffer,
-   * call {@link #clear()} first.
+   * call {@link #clear()} first.</P>
+   *
+   * <P>The event encoding of the two transition buffers must be compatible.
+   * Transitions with events that are not present or marked as unused in the
+   * receiving transition are not copied. Selfloops by events marked as
+   * selfloop-only are also suppressed.</P>
    */
   public void setUpTransitions(final TransitionListBuffer other)
   {
+    final int numEvents = mEventStatus.getNumberOfProperEvents();
     final TransitionIterator iter =
       other.createAllTransitionsReadOnlyIterator();
     if (getClass() == other.getClass()) {
@@ -1079,9 +1087,19 @@ public abstract class TransitionListBuffer
       int event0 = -1;
       int list = NULL;
       while (iter.advance()) {
-        final int from = getOtherIteratorFromState(iter);
         final int event = iter.getCurrentEvent();
+        if (event >= numEvents) {
+          continue;
+        }
+        final byte status = mEventStatus.getProperEventStatus(event);
+        if (!EventStatus.isUsedEvent(status)) {
+          continue;
+        }
+        final int from = getOtherIteratorFromState(iter);
         final int to = getOtherIteratorToState(iter);
+        if (from == to && EventStatus.isSelfloopOnlyEvent(status)) {
+          continue;
+        }
         if (from != from0) {
           mStateTransitions[from] = list = createList();
           from0 = from;
@@ -1099,23 +1117,33 @@ public abstract class TransitionListBuffer
       // If the buffers are of different type, we must bring the transitions
       // in the correct order for this buffer before building the lists.
       final int numTrans = other.getNumberOfTransitions();
-      final long[] transitions = new long[numTrans];
+      final TLongArrayList transitions = new TLongArrayList(numTrans);
       final int eventShift = AutomatonTools.log2(mNumStates);
-      final int numEvents = mEventStatus.getNumberOfProperEvents();
       final int fromShift = eventShift + AutomatonTools.log2(numEvents);
       final int toMask = (1 << eventShift) - 1;
-      int i = 0;
       while (iter.advance()) {
+        final int e = iter.getCurrentEvent();
+        if (e >= numEvents) {
+          continue;
+        }
+        final byte status = mEventStatus.getProperEventStatus(e);
+        if (!EventStatus.isUsedEvent(status)) {
+          continue;
+        }
         final long from = getOtherIteratorFromState(iter);
-        final long event = iter.getCurrentEvent();
         final long to = getOtherIteratorToState(iter);
-        transitions[i++] = (from << fromShift) | (event << eventShift) | to;
+        if (from == to && EventStatus.isSelfloopOnlyEvent(status)) {
+          continue;
+        }
+        final long event = e;
+        transitions.add((from << fromShift) | (event << eventShift) | to);
       }
-      Arrays.sort(transitions);
+      transitions.sort();
       int from0 = -1;
       int event0 = -1;
       int list = NULL;
-      for (final long trans : transitions) {
+      for (int i = 0; i < transitions.size(); i++) {
+        final long trans = transitions.get(i);
         final int from = (int) (trans >>> fromShift);
         final int event = (int) (trans >>> eventShift) & mEventMask;
         final int to = (int) (trans & toMask);

@@ -12,10 +12,8 @@ package net.sourceforge.waters.analysis.abstraction;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.set.hash.TIntHashSet;
 
-import net.sourceforge.waters.analysis.tr.DefaultEventStatusProvider;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
-import net.sourceforge.waters.analysis.tr.EventStatusProvider;
 import net.sourceforge.waters.analysis.tr.IntSetBuffer;
 import net.sourceforge.waters.analysis.tr.IntStateBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -308,34 +306,32 @@ public class SubsetConstructionTRSimplifier
   {
     if (mSetOffsets != null) {
       final ListBufferTransitionRelation rel = getTransitionRelation();
+      final IntStateBuffer oldStateBuffer = rel.getStateBuffer();
       final int numDetStates = mSetOffsets.size();
       final int numEvents = rel.getNumberOfProperEvents();
-      final EventStatusProvider propStatus = new DefaultEventStatusProvider(rel);
-      final IntStateBuffer detStates;
+      final int numTrans = mTransitionBuffer.size();
+      final int config = getPreferredInputConfiguration();
       if (mDumpStateIndex < 0) {
-        detStates = new IntStateBuffer(numDetStates, propStatus);
+        rel.reset(numDetStates, numTrans, config);
       } else {
-        detStates = new IntStateBuffer(numDetStates, mDumpStateIndex, propStatus);
+        rel.reset(numDetStates, mDumpStateIndex, numTrans, config);
       }
-      detStates.setInitial(0, true);
+      rel.setInitial(0, true);
       final IntSetBuffer.IntSetIterator iter = mStateSetBuffer.iterator();
       for (int detstate = 0; detstate < numDetStates; detstate++) {
-        long markings = detStates.createMarkings();
+        long markings = rel.createMarkings();
         final int offset = mSetOffsets.get(detstate);
         iter.reset(offset);
         while (iter.advance()) {
           final int state = iter.getCurrentData();
-          final long stateMarkings = rel.getAllMarkings(state);
-          markings = detStates.mergeMarkings(markings, stateMarkings);
+          final long stateMarkings = oldStateBuffer.getAllMarkings(state);
+          markings = rel.mergeMarkings(markings, stateMarkings);
         }
-        detStates.setAllMarkings(detstate, markings);
+        rel.setAllMarkings(detstate, markings);
       }
-      detStates.removeRedundantPropositions();
+      rel.removeRedundantPropositions();
       mSetOffsets = null;
       mStateSetBuffer = null;
-      final int numTrans = mTransitionBuffer.size();
-      final int config = getPreferredInputConfiguration();
-      rel.reset(detStates, numTrans, config);
       rel.removeEvent(EventEncoding.TAU);
       mTransitionBuffer.addOutgoingTransitions(rel);
       mTransitionBuffer = null;

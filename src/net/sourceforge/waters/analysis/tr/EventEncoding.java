@@ -367,7 +367,11 @@ public class EventEncoding
         buffer.append('=');
         buffer.append(event == null ? "(null)" : event.getName());
         final byte status = mProperEventStatus.get(code);
-        EventStatus.appendStatusInfo(buffer, status);
+        if (status != EventStatus.STATUS_NONE) {
+          buffer.append('<');
+          EventStatus.appendStatusInfo(buffer, status);
+          buffer.append('>');
+        }
       }
     }
     if (mPropositions != null) {

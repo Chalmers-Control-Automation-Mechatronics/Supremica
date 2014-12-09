@@ -375,6 +375,29 @@ public abstract class AbstractTRCompositionalAnalyzer
     return mTraceCheckingEnabled;
   }
 
+  /**
+   * Sets state and event encodings are to be preserved when copying
+   * input automata of type {@link TRAutomatonProxy}. If set, the input
+   * automata will be used with the exact same encoding, which has to
+   * compatible with the expectations of the abstraction procedures.
+   * Otherwise, the encoding may change, resulting in counterexamples
+   * with possibly different encoding.
+   */
+  public void setPreservingEncodings(final boolean preserved)
+  {
+    mPreservingEncodings = preserved;
+  }
+
+  /**
+   * Returns whether state and event encodings are to be preserved when
+   * copying input automata of type {@link TRAutomatonProxy}.
+   * @see #setTraceCheckingEnabled(boolean) setTraceCheckingEnabled()
+   */
+  public boolean getPreservingEncodings()
+  {
+    return mPreservingEncodings;
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
@@ -740,14 +763,13 @@ public abstract class AbstractTRCompositionalAnalyzer
     final int numEvents = enc.getNumberOfProperEvents();
     for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
       checkAbort();
-      byte status = enc.getProperEventStatus(e);
-      if (EventStatus.isUsedEvent(status)) {
+      final byte oldStatus = enc.getProperEventStatus(e);
+      if (EventStatus.isUsedEvent(oldStatus)) {
         final EventProxy event = enc.getProperEvent(e);
         final TREventInfo info = mCurrentSubsystem.getEventInfo(event);
         final byte newStatus = info.getEventStatus(aut);
-        if (newStatus != status) {
-          status = newStatus;
-          enc.setProperEventStatus(e, status);
+        if (newStatus != oldStatus) {
+          enc.setProperEventStatus(e, newStatus);
         }
       }
     }
@@ -995,7 +1017,7 @@ public abstract class AbstractTRCompositionalAnalyzer
       while (iter.hasPrevious()) {
         checkAbort();
         final TRAbstractionStep step = iter.previous();
-        step.report(logger);
+        step.reportExpansion();
         step.expandTrace(trace, this);
         if (mTraceCheckingEnabled) {
           checkIntermediateCounterExample(trace);
@@ -1047,12 +1069,18 @@ public abstract class AbstractTRCompositionalAnalyzer
     switch (translator.getComponentKind(aut)) {
     case PLANT:
     case SPEC:
-      final EventEncoding eventEnc = createInitialEventEncoding(aut);
-      final StateProxy dumpState = findDumpState(aut);
+      final TRAbstractionStepInput step;
+      if (mPreservingEncodings && aut instanceof TRAutomatonProxy) {
+        final TRAutomatonProxy tr = (TRAutomatonProxy) aut;
+        step = new TRAbstractionStepInput(tr);
+      } else {
+        final EventEncoding eventEnc = createInitialEventEncoding(aut);
+        final StateProxy dumpState = findDumpState(aut);
+        step = new TRAbstractionStepInput(aut, eventEnc, dumpState);
+      }
       final int config = mTRSimplifier.getPreferredInputConfiguration();
-      final TRAutomatonProxy tr =
-        new TRAutomatonProxy(aut, eventEnc, dumpState, config);
-      if (!hasInitialState(tr)) {
+      final TRAutomatonProxy created = step.createOutputAutomaton(config);
+      if (!hasInitialState(created)) {
         final Logger logger = getLogger();
         logger.debug("Terminating early as automaton " + aut.getName() +
                      " has no initial state.");
@@ -1060,12 +1088,9 @@ public abstract class AbstractTRCompositionalAnalyzer
         return null;
       }
       if (isCounterExampleEnabled()) {
-        final EventEncoding clonedEnc = new EventEncoding(eventEnc);
-        final TRAbstractionStepInput step =
-          new TRAbstractionStepInput(aut, clonedEnc, dumpState, tr);
-        addAbstractionStep(step, tr);
+        addAbstractionStep(step, created);
       }
-      return tr;
+      return created;
     default:
       return null;
     }
@@ -1534,11 +1559,12 @@ public abstract class AbstractTRCompositionalAnalyzer
   // Configuration
   private int mInternalStateLimit = Integer.MAX_VALUE;
   private int mInternalTransitionLimit = Integer.MAX_VALUE;
-  private boolean mBlockedEventsEnabled;
-  private boolean mFailingEventsEnabled;
-  private boolean mSelfloopOnlyEventsEnabled;
-  private boolean mAlwaysEnabledEventsEnabled;
-  private boolean mTraceCheckingEnabled;
+  private boolean mBlockedEventsEnabled = true;
+  private boolean mFailingEventsEnabled = false;
+  private boolean mSelfloopOnlyEventsEnabled = false;
+  private boolean mAlwaysEnabledEventsEnabled = false;
+  private boolean mTraceCheckingEnabled = false;
+  private boolean mPreservingEncodings = false;
 
   // Tools
   private final PreselectionHeuristic mPreselectionHeuristic;

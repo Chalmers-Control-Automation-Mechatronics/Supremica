@@ -70,8 +70,9 @@ class TRAbstractionStepSync
   //#########################################################################
   //# Debugging
   @Override
-  public void report(final Logger logger)
+  public void reportExpansion()
   {
+    final Logger logger = getLogger();
     if (logger.isDebugEnabled()) {
       logger.debug("Expanding synchronous composition of " +
                    getName() + " ...");
@@ -91,6 +92,7 @@ class TRAbstractionStepSync
   public TRAutomatonProxy createOutputAutomaton(final int preferredConfig)
     throws AnalysisException
   {
+    reportRebuilding();
     final List<TRAutomatonProxy> automata =
       new ArrayList<>(mPredecessors.size());
     for (final TRAbstractionStep pred : mPredecessors) {

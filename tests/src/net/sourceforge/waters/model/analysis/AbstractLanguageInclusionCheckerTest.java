@@ -310,7 +310,7 @@ public abstract class AbstractLanguageInclusionCheckerTest
     final ParameterBindingProxy binding = createBinding("MAXSEQNO", maxseqno);
     final List<ParameterBindingProxy> bindings =
       Collections.singletonList(binding);
-    for (int seqno = 0; seqno <= maxseqno; seqno++) {
+    for (int seqno = 1; seqno <= maxseqno; seqno++) {
       final String propname =
         String.format("slave_sets_fv_after_slave_timeout_3[%d]", seqno);
       runModelVerifier(group, dir, name, bindings, seqno == 0, propname);

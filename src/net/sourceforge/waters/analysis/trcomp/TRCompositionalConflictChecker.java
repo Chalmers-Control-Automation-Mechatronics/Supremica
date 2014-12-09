@@ -332,10 +332,11 @@ public class TRCompositionalConflictChecker
   protected void checkIntermediateCounterExample(final TRTraceProxy trace)
     throws AnalysisException
   {
+    final Logger logger = getLogger();
     final TRConflictTraceProxy conflictTrace = (TRConflictTraceProxy) trace;
     final TRConflictTraceProxy cloned =
       new TRConflictTraceProxy(conflictTrace);
-    cloned.setUpForTraceChecking();
+    cloned.setUpForTraceChecking(logger);
     final KindTranslator translator = getKindTranslator();
     TraceChecker.checkConflictCounterExample(cloned,
                                              getUsedPreconditionMarking(),
@@ -599,14 +600,12 @@ public class TRCompositionalConflictChecker
       new IncomingEquivalenceTRSimplifier();
     incomingEquivalenceSimplifier.setSimplificationListener(partitioningListener);
     chain.add(incomingEquivalenceSimplifier);
-    /*
     final LimitedCertainConflictsTRSimplifier certainConflictsRemover =
       new LimitedCertainConflictsTRSimplifier();
     final TRSimplificationListener certainConflictsListener =
       new CertainConflictsListener();
     certainConflictsRemover.setSimplificationListener(certainConflictsListener);
     chain.add(certainConflictsRemover);
-    */
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier();
     bisimulator.setEquivalence(equivalence);
@@ -660,6 +659,7 @@ public class TRCompositionalConflictChecker
         setSelfloopOnlyEventsEnabled(isSelfloopOnlyEventsEnabled());
       mLanguageInclusionChecker.
         setAlwaysEnabledEventsEnabled(isAlwaysEnabledEventsEnabled());
+      mLanguageInclusionChecker.setPreservingEncodings(true);
     }
     return mLanguageInclusionChecker;
   }

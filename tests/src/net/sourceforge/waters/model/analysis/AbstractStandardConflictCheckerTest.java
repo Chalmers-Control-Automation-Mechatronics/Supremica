@@ -257,6 +257,20 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(des, true);
   }
 
+  public void testCertainConf5() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "certainconf5.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testCertainConf6() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "certainconf6.wmod");
+    runModelVerifier(des, false);
+  }
+
   public void testDisjoint1() throws Exception
   {
     final ProductDESProxy des =

@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.Proxy;
@@ -39,6 +38,8 @@ import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.plain.base.DocumentElement;
 import net.sourceforge.waters.plain.base.Element;
 import net.sourceforge.waters.plain.base.NamedElement;
+
+import org.apache.log4j.Logger;
 
 
 /**
@@ -194,9 +195,7 @@ public abstract class TRTraceProxy
       return null;
     } else {
       final TRAbstractionStepInput inputStep = (TRAbstractionStepInput) step;
-      final StateEncoding enc = inputStep.getStateEncoding();
-      assert enc.getState(s) != null;
-      return enc.getState(s);
+      return inputStep.getState(s);
     }
   }
 
@@ -304,14 +303,19 @@ public abstract class TRTraceProxy
     mEvents = newEvents;
     for (final Map.Entry<TRAbstractionStep,int[]> entry : mTraceData.entrySet()) {
       final int[] firstStates = entry.getValue();
+      final int lastState = firstStates[firstSteps - 1];
       final TRAbstractionStep step = entry.getKey();
-      final int[] secondStates = trace.mTraceData.get(step);
-      assert firstStates[firstSteps - 1] == secondStates[0] :
-        "End state in first trace does not match start state " +
-        "in second trace for automaton " + step.getName() + "!";
       final int[] newStates = new int[totalSteps];
       System.arraycopy(firstStates, 0, newStates, 0, firstSteps);
-      System.arraycopy(secondStates, 1, newStates, firstSteps, numSteps);
+      final int[] secondStates = trace.mTraceData.get(step);
+      if (secondStates != null) {
+        assert lastState == secondStates[0] :
+          "End state in first trace does not match start state " +
+          "in second trace for automaton " + step.getName() + "!";
+        System.arraycopy(secondStates, 1, newStates, firstSteps, numSteps);
+      } else {
+        Arrays.fill(newStates, firstSteps, totalSteps, lastState);
+      }
       entry.setValue(newStates);
     }
   }
@@ -335,7 +339,7 @@ public abstract class TRTraceProxy
 
   //#########################################################################
   //# Debugging
-  void setUpForTraceChecking() throws AnalysisException
+  void setUpForTraceChecking(final Logger logger) throws AnalysisException
   {
     for (final TRAbstractionStep step : mTraceData.keySet()) {
       if (step instanceof TRAbstractionStepInput) {
@@ -345,8 +349,8 @@ public abstract class TRTraceProxy
           continue;
         }
       }
-      final TRAutomatonProxy aut =
-        step.getOutputAutomaton(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      final TRAutomatonProxy aut = step.getOutputAutomaton
+        (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
       mAutomataMap.put(aut, step);
     }
   }
@@ -481,9 +485,7 @@ public abstract class TRTraceProxy
         return null;
       } else if (isInputAutomaton(aut, step)) {
         final TRAbstractionStepInput inputStep = (TRAbstractionStepInput) step;
-        final StateEncoding enc = inputStep.getStateEncoding();
-        assert enc.getState(s) != null;
-        return enc.getState(s);
+        return inputStep.getState(s);
       } else {
         final TRAutomatonProxy tr = (TRAutomatonProxy) aut;
         if (tr.getState(s) == null) {
@@ -571,8 +573,7 @@ public abstract class TRTraceProxy
         return new AbstractMap.SimpleEntry<>(aut, null);
       } else if (isInputAutomaton(aut, step)) {
         final TRAbstractionStepInput inputStep = (TRAbstractionStepInput) step;
-        final StateEncoding enc = inputStep.getStateEncoding();
-        final StateProxy state = enc.getState(s);
+        final StateProxy state = inputStep.getState(s);
         return new AbstractMap.SimpleEntry<>(aut, state);
       } else {
         final TRAutomatonProxy tr = (TRAutomatonProxy) aut;
