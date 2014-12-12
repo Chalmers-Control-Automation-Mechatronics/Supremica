@@ -9,9 +9,13 @@
 
 package net.sourceforge.waters.analysis.trcomp;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.IncomingEquivalenceTRSimplifier;
@@ -29,6 +33,7 @@ import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
@@ -38,6 +43,7 @@ import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
 import net.sourceforge.waters.model.analysis.EnumFactory;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.ListedEnumFactory;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
@@ -53,6 +59,8 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
+import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.apache.log4j.Logger;
 
@@ -173,6 +181,9 @@ public class TRCompositionalConflictChecker
     final ConflictChecker mono = getMonolithicAnalyzer();
     mono.setConfiguredDefaultMarking(getUsedDefaultMarking());
     mono.setConfiguredPreconditionMarking(getUsedPreconditionMarking());
+    if (mConfiguredPreconditionMarking != null) {
+      mNonblockingSubsystems = new LinkedList<>();
+    }
   }
 
   @Override
@@ -181,6 +192,7 @@ public class TRCompositionalConflictChecker
     super.tearDown();
     mUsedDefaultMarking = null;
     mLanguageInclusionChecker = null;
+    mNonblockingSubsystems = null;
   }
 
 
@@ -242,43 +254,68 @@ public class TRCompositionalConflictChecker
 
   @Override
   protected boolean earlyTerminationCheck(final TRSubsystemInfo subsys)
+    throws AnalysisException
   {
-    boolean allStatesMarked = true;
+    final Logger logger = getLogger();
+    boolean allAutomataOmega = true;
+    boolean blockedOmega = false;
     for (final TRAutomatonProxy aut : subsys.getAutomata()) {
       final ListBufferTransitionRelation rel = aut.getTransitionRelation();
-      if (rel.isPropositionUsed(DEFAULT_MARKING)) {
-        boolean noStatesMarked = true;
+      boolean noStatesOmega = rel.isPropositionUsed(DEFAULT_MARKING);
+      boolean noStatesAlpha = rel.isPropositionUsed(PRECONDITION_MARKING);
+      if (noStatesAlpha || noStatesOmega) {
         for (int s = 0; s < rel.getNumberOfStates(); s++) {
           if (rel.isReachable(s)) {
             if (rel.isMarked(s, DEFAULT_MARKING)) {
-              noStatesMarked = false;
+              noStatesOmega = false;
             } else {
-              allStatesMarked = false;
+              allAutomataOmega = false;
             }
-            if (!allStatesMarked && !noStatesMarked) {
-              break;
+            if (rel.isMarked(s, PRECONDITION_MARKING)) {
+              noStatesAlpha = false;
             }
           }
         }
-        if (noStatesMarked) {
-          final AnalysisResult result = getAnalysisResult();
-          result.setSatisfied(false);
-          getLogger().debug("Subsystem is blocking, because " + aut.getName() +
-                            " has no marked states.");
-          dropPendingSubsystems();
-          dropSubsystemExcept(subsys, aut);
-          dropTrivialAutomaton(aut);  // Must be last to pass trace checks.
-          return true;
+        if (noStatesAlpha) {
+          logger.debug("The system is generalised nonblocking, because " +
+                       aut.getName() + " has no precondition-marked states.");
+          return setSatisfiedResult();
+        } else if (noStatesOmega) {
+          if (mConfiguredPreconditionMarking != null) {
+            blockedOmega = true;
+          } else {
+            final AnalysisResult result = getAnalysisResult();
+            result.setSatisfied(false);
+            logger.debug("Subsystem is blocking, because " + aut.getName() +
+                         " has no marked states.");
+            dropPendingSubsystems();
+            dropSubsystemExcept(subsys, aut);
+            dropTrivialAutomaton(aut);  // Must be last to pass trace checks.
+            return true;
+          }
         }
       }
     }
-    // TODO Generalised nonblocking stuff ...
-    if (allStatesMarked) {
-      final Logger logger = getLogger();
+    if (allAutomataOmega) {
       logger.debug("Subsystem is nonblocking, because all states are marked.");
       dropSubsystem(subsys);
+      return true;
+    } else if (blockedOmega) {
+      logger.debug("Subsystem is blocking, because no states are marked.");
+      dropSubsystem(subsys);
+      final ProductDESProxy des = getModel();
+      final TRTraceProxy trace = new TRConflictTraceProxy(des);
+      final boolean extended = extendToPreconditionMarkedState(trace);
+      final AnalysisResult result = getAnalysisResult();
+      result.setSatisfied(!extended);
+      if (extended && isCounterExampleEnabled()) {
+        final TRAbstractionStep step = new TRAbstractionStepMonolithic(trace);
+        addAbstractionStep(step);
+      }
+      return true;
+    } else {
+      return false;
     }
-    return allStatesMarked;
   }
 
   @Override
@@ -306,7 +343,7 @@ public class TRCompositionalConflictChecker
         logger.debug("Subsystem is nonblocking.");
         dropSubsystem(subsys);
         return true;
-      } else {
+      } else if (mConfiguredPreconditionMarking == null) {
         logger.debug("Subsystem is blocking.");
         combinedResult.setSatisfied(false);
         if (isCounterExampleEnabled()) {
@@ -318,6 +355,26 @@ public class TRCompositionalConflictChecker
           addAbstractionStep(step);
         }
         return false;
+      } else {
+        logger.debug("Subsystem is generalised blocking.");
+        final List<TRAbstractionStep> preds = getAbstractionSteps(automata);
+        final TraceProxy monoTrace = mono.getCounterExample();
+        final TRAbstractionStepMonolithic monoStep =
+          new TRAbstractionStepMonolithic(name, preds, monoTrace);
+        final TRTraceProxy trace = new TRConflictTraceProxy(des);
+        monoStep.expandTrace(trace, this);
+        for (final TRAutomatonProxy aut : automata) {
+          final TRAbstractionStep step = getAbstractionStep(aut);
+          trace.setInputAutomaton(aut, step);
+        }
+        final boolean extended = extendToPreconditionMarkedState(trace);
+        combinedResult.setSatisfied(!extended);
+        if (extended && isCounterExampleEnabled()) {
+          final TRAbstractionStep step =
+            new TRAbstractionStepMonolithic(name, trace);
+          addAbstractionStep(step);
+        }
+        return !extended;
       }
     }
   }
@@ -332,17 +389,163 @@ public class TRCompositionalConflictChecker
   protected void checkIntermediateCounterExample(final TRTraceProxy trace)
     throws AnalysisException
   {
-    final Logger logger = getLogger();
     final TRConflictTraceProxy conflictTrace = (TRConflictTraceProxy) trace;
     final TRConflictTraceProxy cloned =
       new TRConflictTraceProxy(conflictTrace);
-    cloned.setUpForTraceChecking(logger);
+    cloned.setUpForTraceChecking();
     final KindTranslator translator = getKindTranslator();
     TraceChecker.checkConflictCounterExample(cloned,
                                              getUsedPreconditionMarking(),
                                              getUsedDefaultMarking(),
                                              true,
                                              translator);
+  }
+
+  @Override
+  protected void dropSubsystem(final TRSubsystemInfo subsys)
+  {
+    if (mNonblockingSubsystems == null) {
+      super.dropSubsystem(subsys);
+    } else {
+      mNonblockingSubsystems.add(subsys);
+    }
+  }
+
+
+  //#########################################################################
+  //# Generalised Nonblocking Trace Extension
+  private boolean extendToPreconditionMarkedState(final TRTraceProxy trace)
+    throws AnalysisException
+  {
+    final Collection<TRSubsystemInfo> pending = getPendingSubsystems();
+    final int size = pending.size() + mNonblockingSubsystems.size();
+    if (size == 0) {
+      return true;
+    }
+    final Logger logger = getLogger();
+    logger.debug("Searching for reachable precondition-marked state ...");
+    final List<TRSubsystemInfo> subsystems = new ArrayList<>(size);
+    subsystems.addAll(pending);
+    subsystems.addAll(mNonblockingSubsystems);
+    Collections.sort(subsystems);
+    for (final TRSubsystemInfo subsys : subsystems) {
+      if (!extendToPreconditionMarkedState(trace, subsys)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private boolean extendToPreconditionMarkedState(final TRTraceProxy trace,
+                                                  final TRSubsystemInfo subsys)
+    throws AnalysisException
+  {
+    final TRCompositionalLanguageInclusionChecker checker =
+      getLanguageInclusionChecker();
+    final TRToolCreator<TransitionRelationSimplifier> creator =
+      checker.getSimplifierCreator();
+    final TransitionRelationSimplifier simplifier =
+      creator.create(mLanguageInclusionChecker);
+    final int config = simplifier.getPreferredInputConfiguration();
+    final int numAutomata = subsys.getNumberOfAutomata();
+    final List<TRAutomatonProxy> langAutomata = new ArrayList<>(numAutomata + 1);
+    final Map<TRAutomatonProxy,TRAutomatonProxy> langMap =
+      new HashMap<>(numAutomata);
+    boolean trivial = true;
+    for (final TRAutomatonProxy aut : subsys.getAutomata()) {
+      final TRAutomatonProxy langAut =
+        createPreconditionCheckAutomaton(aut, config);
+      langAutomata.add(langAut);
+      langMap.put(langAut, aut);
+      trivial &= aut == langAut;
+    }
+    if (trivial) {
+      super.dropSubsystem(subsys);
+      return true;
+    }
+    final TRAutomatonProxy property = getPreconditionPropertyAutomaton(config);
+    langAutomata.add(property);
+    final ProductDESProxyFactory factory = getFactory();
+    final String name = AutomatonTools.getCompositionName(langAutomata);
+    final ProductDESProxy des =
+      AutomatonTools.createProductDESProxy(name, langAutomata, factory);
+    checker.setModel(des);
+    if (checker.run()) {
+      return false;
+    } else {
+      final TRSafetyTraceProxy langTrace = checker.getCounterExample();
+      final TRConflictTraceProxy confTrace = new TRConflictTraceProxy(langTrace);
+      for (final TRAutomatonProxy langAut : langAutomata) {
+        final TRAutomatonProxy aut = langMap.get(langAut);
+        final TRAbstractionStep step = getAbstractionStep(aut);
+        if (step == null) {
+          confTrace.removeInputAutomaton(langAut);
+        } else {
+          confTrace.replaceInputAutomaton(langAut, step);
+          trace.setInputAutomaton(aut, step);
+        }
+      }
+      trace.widenAndAppend(confTrace);
+      return true;
+    }
+  }
+
+  private TRAutomatonProxy createPreconditionCheckAutomaton
+    (final TRAutomatonProxy aut, final int config)
+  {
+    final EventEncoding enc = aut.getEventEncoding();
+    if (enc.isPropositionUsed(PRECONDITION_MARKING)) {
+      final EventEncoding langEnc = new EventEncoding(enc);
+      langEnc.setPropositionUsed(PRECONDITION_MARKING, false);
+      final EventProxy event = getPreconditionEvent();
+      final int e = langEnc.addProperEvent(event, EventStatus.STATUS_NONE);
+      final ListBufferTransitionRelation rel = aut.getTransitionRelation();
+      final ListBufferTransitionRelation langRel =
+        new ListBufferTransitionRelation(rel, langEnc, config);
+      final int numStates = rel.getNumberOfStates();
+      final int dumpIndex = rel.getDumpStateIndex();
+      langRel.setReachable(dumpIndex, true);
+      boolean allMarked = true;
+      for (int s = 0; s < numStates; s++) {
+        if (rel.isReachable(s)) {
+          if (rel.isMarked(s, PRECONDITION_MARKING)) {
+            langRel.addTransition(s, e, dumpIndex);
+          } else {
+            allMarked = false;
+          }
+        }
+      }
+      return allMarked ? aut : new TRAutomatonProxy(langEnc, langRel);
+    } else {
+      return aut;
+    }
+  }
+
+  private EventProxy getPreconditionEvent()
+  {
+    if (mPreconditionEvent == null) {
+      final ProductDESProxyFactory factory = getFactory();
+      final String name = mConfiguredPreconditionMarking.getName();
+      mPreconditionEvent =
+        factory.createEventProxy(name, EventKind.UNCONTROLLABLE);
+    }
+    return mPreconditionEvent;
+  }
+
+  private TRAutomatonProxy getPreconditionPropertyAutomaton(final int config)
+    throws OverflowException
+  {
+    if (mPreconditionPropertyAutomaton == null) {
+      final EventEncoding enc = new EventEncoding();
+      final EventProxy event = getPreconditionEvent();
+      enc.addProperEvent(event, EventStatus.STATUS_NONE);
+      final ListBufferTransitionRelation rel =
+        new ListBufferTransitionRelation(PROPERTY_NAME, ComponentKind.PROPERTY,
+                                         enc, 1, config);
+      rel.setInitial(0, true);
+      mPreconditionPropertyAutomaton = new TRAutomatonProxy(enc, rel);
+    }
+    return mPreconditionPropertyAutomaton;
   }
 
 
@@ -754,5 +957,14 @@ public class TRCompositionalConflictChecker
   // Auxiliary events, status, and tools
   private EventProxy mUsedDefaultMarking;
   private TRCompositionalLanguageInclusionChecker mLanguageInclusionChecker;
+  private List<TRSubsystemInfo> mNonblockingSubsystems;
+
+  private EventProxy mPreconditionEvent;
+  private TRAutomatonProxy mPreconditionPropertyAutomaton;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final String PROPERTY_NAME = ":never";
 
 }

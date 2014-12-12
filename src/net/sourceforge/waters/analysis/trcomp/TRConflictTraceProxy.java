@@ -51,6 +51,19 @@ public class TRConflictTraceProxy
     mKind = trace.mKind;
   }
 
+  /**
+   * Creates a new conflict trace by copying a safety trace.
+   * This copy constructor performs a deep copy of events and state lists,
+   * but only shallow copy of the automata and abstraction steps.
+   * @param  trace  Safety trace to be copied. To conflict trace will
+   *                use all events except the last of the safety trace.
+   */
+  TRConflictTraceProxy(final TRSafetyTraceProxy trace)
+  {
+    super(trace, trace.getNumberOfSteps() - 1);
+    mKind = ConflictKind.CONFLICT;
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.base.Proxy

@@ -651,6 +651,7 @@ public abstract class AbstractTRCompositionalAnalyzer
   }
 
   protected boolean earlyTerminationCheck(final TRSubsystemInfo subsys)
+    throws AnalysisException
   {
     return false;
   }
@@ -671,6 +672,11 @@ public abstract class AbstractTRCompositionalAnalyzer
   protected TRSubsystemInfo getCurrentSubsystem()
   {
     return mCurrentSubsystem;
+  }
+
+  protected Collection<TRSubsystemInfo> getPendingSubsystems()
+  {
+    return mSubsystemQueue;
   }
 
   protected IntermediateAbstractionSequence getIntermediateAbstractionSequence()
@@ -990,6 +996,11 @@ public abstract class AbstractTRCompositionalAnalyzer
     (final TRSubsystemInfo subsys)
     throws AnalysisException;
 
+
+  protected TRAbstractionStep getAbstractionStep(final TRAutomatonProxy aut)
+  {
+    return mCurrentAutomataMap.get(aut);
+  }
 
   protected List<TRAbstractionStep> getAbstractionSteps
     (final List<TRAutomatonProxy> automata)

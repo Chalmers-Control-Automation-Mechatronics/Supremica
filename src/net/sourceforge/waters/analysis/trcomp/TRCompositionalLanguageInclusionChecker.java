@@ -43,7 +43,6 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -95,11 +94,12 @@ public class TRCompositionalLanguageInclusionChecker
   }
 
   @Override
-  public SafetyTraceProxy getCounterExample()
+  public TRSafetyTraceProxy getCounterExample()
   {
     final VerificationResult result = getAnalysisResult();
-    return (SafetyTraceProxy) result.getCounterExample();
+    return (TRSafetyTraceProxy) result.getCounterExample();
   }
+
 
   //#########################################################################
   //# Configuration
@@ -360,10 +360,9 @@ public class TRCompositionalLanguageInclusionChecker
   protected void checkIntermediateCounterExample(final TRTraceProxy trace)
     throws AnalysisException
   {
-    final Logger logger = getLogger();
     final TRSafetyTraceProxy safetyTrace = (TRSafetyTraceProxy) trace;
     final TRSafetyTraceProxy cloned = new TRSafetyTraceProxy(safetyTrace);
-    cloned.setUpForTraceChecking(logger);
+    cloned.setUpForTraceChecking();
     final KindTranslator translator = getKindTranslator();
     TraceChecker.checkSafetyCounterExample(cloned, true, translator);
   }

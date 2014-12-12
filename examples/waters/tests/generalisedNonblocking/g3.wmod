@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="g3" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>A simple test from the paper by Robi Malik and Ryan Leduc, "Generalised Nonblocking", WODES 2008, to see whether generalised nonblocking is checked correctly.
-This model is generalised nonblocking with respect to precondition :alpha.</ns2:Comment>
+This model is not generalised nonblocking with respect to precondition :alpha, because the initial state is marked with the precondition :alpha, but there is no state with the default marking :accepting.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="e1"/>
         <EventDecl Kind="CONTROLLABLE" Name="e2"/>
         <EventDecl Kind="PROPOSITION" Name=":alpha">
             <ColorGeometry>
-                <Color Red="221" Green="202" Blue="202"/>
+                <Color Blue="202" Green="202" Red="221"/>
             </ColorGeometry>
         </EventDecl>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
@@ -18,7 +18,7 @@ This model is generalised nonblocking with respect to precondition :alpha.</ns2:
                 <LabelBlock>
                     <SimpleIdentifier Name=":accepting"/>
                     <LabelGeometry Anchor="NW">
-                        <Point Y="28" X="156"/>
+                        <Point X="156" Y="28"/>
                     </LabelGeometry>
                 </LabelBlock>
                 <NodeList>
@@ -27,78 +27,78 @@ This model is generalised nonblocking with respect to precondition :alpha.</ns2:
                             <SimpleIdentifier Name=":alpha"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="32" X="96"/>
+                            <Point X="96" Y="32"/>
                         </PointGeometry>
                         <InitialArrowGeometry>
-                            <Point Y="-5" X="-5"/>
+                            <Point X="-5" Y="-5"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-8" X="8"/>
+                            <Point X="8" Y="-8"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
                         <PointGeometry>
-                            <Point Y="80" X="48"/>
+                            <Point X="48" Y="80"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-6" X="10"/>
+                            <Point X="10" Y="-6"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S2">
                         <PointGeometry>
-                            <Point Y="80" X="144"/>
+                            <Point X="144" Y="80"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-7" X="-25"/>
+                            <Point X="-25" Y="-7"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S3">
                         <PointGeometry>
-                            <Point Y="144" X="48"/>
+                            <Point X="48" Y="144"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-7" X="8"/>
+                            <Point X="8" Y="-7"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S4">
                         <PointGeometry>
-                            <Point Y="144" X="144"/>
+                            <Point X="144" Y="144"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-8" X="-26"/>
+                            <Point X="-26" Y="-8"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="S1" Source="S0">
+                    <Edge Source="S0" Target="S1">
                         <LabelBlock>
                             <SimpleIdentifier Name="e1"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-15" X="-26"/>
+                                <Point X="-26" Y="-15"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S3" Source="S1">
+                    <Edge Source="S1" Target="S3">
                         <LabelBlock>
                             <SimpleIdentifier Name="e1"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-6" X="-28"/>
+                                <Point X="-28" Y="-6"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S2" Source="S0">
+                    <Edge Source="S0" Target="S2">
                         <LabelBlock>
                             <SimpleIdentifier Name="e2"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-13" X="6"/>
+                                <Point X="6" Y="-13"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S4" Source="S2">
+                    <Edge Source="S2" Target="S4">
                         <LabelBlock>
                             <SimpleIdentifier Name="e2"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-4" X="5"/>
+                                <Point X="5" Y="-4"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>

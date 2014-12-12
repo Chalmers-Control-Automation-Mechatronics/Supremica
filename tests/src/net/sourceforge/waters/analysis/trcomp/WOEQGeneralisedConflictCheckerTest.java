@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.trcomp
-//# CLASS:   NB2StandardConflictCheckerTest
+//# CLASS:   WOEQGeneralisedConflictCheckerTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -12,14 +12,13 @@ package net.sourceforge.waters.analysis.trcomp;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.model.analysis.AbstractStandardConflictCheckerTest;
+import net.sourceforge.waters.model.analysis.AbstractGeneralisedConflictCheckerTest;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
-import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class NB2StandardConflictCheckerTest
-  extends AbstractStandardConflictCheckerTest
+public class WOEQGeneralisedConflictCheckerTest
+  extends AbstractGeneralisedConflictCheckerTest
 {
 
   //#########################################################################
@@ -27,7 +26,7 @@ public class NB2StandardConflictCheckerTest
   public static Test suite()
   {
     final TestSuite testSuite =
-      new TestSuite(NB2StandardConflictCheckerTest.class);
+      new TestSuite(WOEQGeneralisedConflictCheckerTest.class);
     return testSuite;
   }
 
@@ -46,7 +45,7 @@ public class NB2StandardConflictCheckerTest
   {
     final TRCompositionalConflictChecker checker =
       new TRCompositionalConflictChecker();
-    checker.setSimplifierCreator(TRCompositionalConflictChecker.NB2);
+    checker.setSimplifierCreator(TRCompositionalConflictChecker.WOEQ);
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);
@@ -57,19 +56,6 @@ public class NB2StandardConflictCheckerTest
     checker.setCounterExampleEnabled(true);
     checker.setTraceCheckingEnabled(true);
     return checker;
-  }
-
-
-  //#########################################################################
-  //# Test Cases
-  public void testBigComponent() throws Exception
-  {
-    final TRCompositionalConflictChecker checker =
-      (TRCompositionalConflictChecker) getModelVerifier();
-    checker.setInternalStateLimit(1000);
-    final ProductDESProxy des =
-      getCompiledDES("tests", "nasty", "big_component.wmod");
-    runModelVerifier(des, false);
   }
 
 }

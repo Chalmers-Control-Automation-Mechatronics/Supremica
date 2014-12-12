@@ -9,7 +9,11 @@
         </ConstantAlias>
     </ConstantAliasList>
     <EventDeclList>
-        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="PROPOSITION" Name=":accepting">
+            <ColorGeometry>
+                <Color Blue="0" Green="255" Red="0"/>
+            </ColorGeometry>
+        </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="a">
             <RangeList>
                 <BinaryExpression Operator="..">
@@ -42,6 +46,11 @@
                 </BinaryExpression>
             </RangeList>
         </EventDecl>
+        <EventDecl Kind="PROPOSITION" Name=":alpha">
+            <ColorGeometry>
+                <Color Blue="0" Green="0" Red="255"/>
+            </ColorGeometry>
+        </EventDecl>
     </EventDeclList>
     <ComponentList>
         <ForeachComponent Name="i">
@@ -68,6 +77,9 @@
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="S1">
+                                <EventList>
+                                    <SimpleIdentifier Name=":alpha"/>
+                                </EventList>
                                 <PointGeometry>
                                     <Point X="176" Y="48"/>
                                 </PointGeometry>

@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.trcomp
-//# CLASS:   TRStandardConflictCheckerTest
+//# CLASS:   OEQStandardConflictCheckerTest
 //###########################################################################
 //# $Id$
 //###########################################################################

@@ -39,8 +39,6 @@ import net.sourceforge.waters.plain.base.DocumentElement;
 import net.sourceforge.waters.plain.base.Element;
 import net.sourceforge.waters.plain.base.NamedElement;
 
-import org.apache.log4j.Logger;
-
 
 /**
  * @author Robi Malik
@@ -78,20 +76,37 @@ public abstract class TRTraceProxy
    * Creates a new trace by copying another.
    * This copy constructor performs a deep copy of events and state lists,
    * but only shallow copy of the automata and abstraction steps.
+   * @param  trace   The trace to be copied
    */
   TRTraceProxy(final TRTraceProxy trace)
   {
+    this(trace, trace.getNumberOfSteps());
+  }
+
+  /**
+   * Creates a new trace by copying another.
+   * This copy constructor performs a deep copy of events and state lists,
+   * but only shallow copy of the automata and abstraction steps.
+   * @param  trace    The trace to be copied
+   * @param  numSteps The number of steps to be copied from the trace.
+   *                  Only an initial segment with this number of steps
+   *                  will be included in the copy.
+   */
+  TRTraceProxy(final TRTraceProxy trace, final int numSteps)
+  {
     super(trace);
+    assert numSteps <= trace.getNumberOfSteps() :
+      "Not enough steps in source of copy!";
     mComment = trace.getComment();
     mLocation = null;
     mProductDES = trace.mProductDES;
-    mEvents = Arrays.copyOf(trace.mEvents, trace.mEvents.length);
+    mEvents = Arrays.copyOf(trace.mEvents, numSteps - 1);
     mTraceData = new HashMap<>(trace.mTraceData.size());
     for (final Map.Entry<TRAbstractionStep,int[]> entry :
          trace.mTraceData.entrySet()) {
       final TRAbstractionStep step = entry.getKey();
       final int[] states = entry.getValue();
-      mTraceData.put(step, Arrays.copyOf(states, states.length));
+      mTraceData.put(step, Arrays.copyOf(states, numSteps));
     }
     mAutomataMap = new HashMap<>(trace.mAutomataMap);
   }
@@ -242,6 +257,12 @@ public abstract class TRTraceProxy
   void setInputAutomaton(final TRAbstractionStepInput step)
   {
     final AutomatonProxy aut = step.getInputAutomaton();
+    setInputAutomaton(aut, step);
+  }
+
+  void setInputAutomaton(final AutomatonProxy aut,
+                         final TRAbstractionStep step)
+  {
     mAutomataMap.put(aut, step);
   }
 
@@ -251,6 +272,12 @@ public abstract class TRTraceProxy
     final TRAbstractionStep oldStep = mAutomataMap.remove(aut);
     final int[] states = mTraceData.remove(oldStep);
     mTraceData.put(step, states);
+  }
+
+  void removeInputAutomaton(final AutomatonProxy aut)
+  {
+    final TRAbstractionStep step = mAutomataMap.remove(aut);
+    mTraceData.remove(step);
   }
 
   void addStutteringSteps(final List<EventProxy> newEvents,
@@ -291,6 +318,11 @@ public abstract class TRTraceProxy
     mEvents = newEventsArray;
   }
 
+  void append(final TRTraceProxy trace)
+  {
+    append(trace, trace.getNumberOfSteps() - 1);
+  }
+
   void append(final TRTraceProxy trace, final int numSteps)
   {
     assert numSteps <= trace.mEvents.length : "Not enough steps to append!";
@@ -320,6 +352,24 @@ public abstract class TRTraceProxy
     }
   }
 
+  void widenAndAppend(final TRTraceProxy trace)
+  {
+    final int oldNumSteps = getNumberOfSteps();
+    final int extraSteps = trace.getNumberOfSteps() - 1;
+    final int newNumSteps = oldNumSteps + extraSteps;
+    append(trace);
+    for (final Map.Entry<TRAbstractionStep,int[]> entry :
+         trace.mTraceData.entrySet()) {
+      final TRAbstractionStep step = entry.getKey();
+      final int[] oldStates = entry.getValue();
+      final int[] newStates = new int[newNumSteps];
+      Arrays.fill(newStates, 0, oldNumSteps, oldStates[0]);
+      System.arraycopy(oldStates, 1, newStates, oldNumSteps, extraSteps);
+      addAutomaton(step, newStates);
+    }
+  }
+
+
   /**
    * Cuts the trace short by removing steps at the end.
    * @param numberOfSteps The new number of steps, which should be at least 1
@@ -339,7 +389,7 @@ public abstract class TRTraceProxy
 
   //#########################################################################
   //# Debugging
-  void setUpForTraceChecking(final Logger logger) throws AnalysisException
+  void setUpForTraceChecking() throws AnalysisException
   {
     for (final TRAbstractionStep step : mTraceData.keySet()) {
       if (step instanceof TRAbstractionStepInput) {

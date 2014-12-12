@@ -43,8 +43,18 @@ class TRAbstractionStepMonolithic
 
   //#########################################################################
   //# Constructor
+  TRAbstractionStepMonolithic(final TRTraceProxy trace)
+  {
+    this("<monolithic result>", trace);
+  }
+
+  TRAbstractionStepMonolithic(final String name, final TRTraceProxy trace)
+  {
+    this(name, trace.getCoveredAbstractionSteps(), trace);
+  }
+
   TRAbstractionStepMonolithic(final String name,
-                              final List<TRAbstractionStep> preds,
+                              final Collection<TRAbstractionStep> preds,
                               final TraceProxy trace)
   {
     super(name);
@@ -143,7 +153,7 @@ class TRAbstractionStepMonolithic
 
   //#########################################################################
   //# Data Members
-  private final List<TRAbstractionStep> mPredecessors;
+  private final Collection<TRAbstractionStep> mPredecessors;
   private final TraceProxy mMonolithicTrace;
 
 }
