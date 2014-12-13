@@ -313,7 +313,7 @@ public class Candidate implements Comparable<Candidate>
   public static Set<EventProxy> getAllEvents
     (final Collection<? extends AutomatonProxy> automata)
   {
-    final Set<EventProxy> set = new THashSet<EventProxy>();
+    final Set<EventProxy> set = new THashSet<>();
     for (final AutomatonProxy aut : automata) {
       set.addAll(aut.getEvents());
     }
@@ -328,7 +328,7 @@ public class Candidate implements Comparable<Candidate>
     (final Collection<? extends AutomatonProxy> automata)
   {
     final Set<EventProxy> set = getAllEvents(automata);
-    final List<EventProxy> list = new ArrayList<EventProxy>(set);
+    final List<EventProxy> list = new ArrayList<>(set);
     Collections.sort(list);
     return list;
   }

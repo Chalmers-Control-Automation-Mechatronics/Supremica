@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
+import java.util.Collection;
+
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -192,6 +194,35 @@ public abstract class AbstractConflictChecker
   {
     return getMarkingProposition(model, EventDeclProxy.DEFAULT_MARKING_NAME);
   }
+
+  /**
+   * Creates a precondition marking for the given model. This method creates
+   * a proposition event not present in the model, with a new name similar to
+   * the default name {@link EventDeclProxy#DEFAULT_PRECONDITION_NAME}.
+   */
+  public static EventProxy createNewPreconditionMarking
+    (final ProductDESProxy model, final ProductDESProxyFactory factory)
+  {
+    final Collection<EventProxy> events = model.getEvents();
+    int index = 0;
+    String name;
+    boolean found;
+    do {
+      name = EventDeclProxy.DEFAULT_PRECONDITION_NAME;
+      if (index++ > 0) {
+        name += ":" + index;
+      }
+      found = false;
+      for (final EventProxy event : events) {
+        if (event.getName().equals(name)) {
+          found = true;
+          break;
+        }
+      }
+    } while (found);
+    return factory.createEventProxy(name, EventKind.PROPOSITION);
+  }
+
 
   /**
    * Searches the given model for a proposition event with the given

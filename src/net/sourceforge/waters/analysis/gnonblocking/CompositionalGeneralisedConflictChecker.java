@@ -221,14 +221,12 @@ public class CompositionalGeneralisedConflictChecker
   protected EventProxy getUsedPreconditionMarkingProposition()
   {
     if (mUsedPreconditionMarking == null) {
-      if (getConfiguredPreconditionMarking() == null) {
+      mUsedPreconditionMarking = getConfiguredPreconditionMarking();
+      if (mUsedPreconditionMarking == null) {
+        final ProductDESProxy des = getModel();
         final ProductDESProxyFactory factory = getFactory();
-        final EventProxy alpha =
-            factory.createEventProxy(":alpha", EventKind.PROPOSITION);
-
-        mUsedPreconditionMarking = alpha;
-      } else {
-        mUsedPreconditionMarking = getConfiguredPreconditionMarking();
+        mUsedPreconditionMarking =
+          AbstractConflictChecker.createNewPreconditionMarking(des, factory);
       }
     }
     return mUsedPreconditionMarking;
@@ -322,7 +320,7 @@ public class CompositionalGeneralisedConflictChecker
           try {
             syncProduct = composeSynchronousProduct(candidate);
             final AutomatonProxy abstractedAut =
-                hideAndAbstract(syncProduct, candidate.getLocalEvents());
+              hideAndAbstract(syncProduct, candidate.getLocalEvents());
 
             // removes the composed automata for this candidate from the set of
             // remaining automata and adds the newly composed candidate if it
@@ -3326,8 +3324,9 @@ public class CompositionalGeneralisedConflictChecker
     private final SearchRecord mPredecessor;
   }
 
-  // #########################################################################
-  // # Data Members
+
+  //#########################################################################
+  //# Data Members
   private Map<EventProxy,Set<AutomatonProxy>> mEventsToAutomata;
   private Set<EventProxy> mNonAlphaEvents;
   private Set<Candidate> mUnsuccessfulCandidates;

@@ -121,8 +121,8 @@ public interface EventDeclProxy extends IdentifiedProxy {
   /**
    * The name to be used for the default marking proposition.
    * This constant is provided for use by tools that do not support
-   * multiple propositions/marking conditions. It is recommended that
-   * they use proposition events with this default name to label their
+   * multiple propositions/marking conditions. It is recommended to
+   * use proposition events with this default name to label their
    * marked states. In this way it is more likely that the same name
    * is used consistently.
    */
@@ -130,10 +130,16 @@ public interface EventDeclProxy extends IdentifiedProxy {
 
   /**
    * The name to be used for the default forbidden proposition.
-   * It is recommended that they use proposition events with this default
+   * It is recommended to use proposition events with this default
    * name to label their forbidden states. In this way it is more likely
    * that the same name is used consistently.
    */
   public static final String DEFAULT_FORBIDDEN_NAME = ":forbidden";
+
+  /**
+   * The default name to be used for the precondition marking during
+   * a generalised conflict check.
+   */
+  public static final String DEFAULT_PRECONDITION_NAME = ":alpha";
 
 }
