@@ -12,6 +12,8 @@ package net.sourceforge.waters.analysis.abstraction;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import net.sourceforge.waters.model.des.ProductDESProxy;
+
 
 public class OmegaRemovalTRSimplifierTest
   extends AbstractTRSimplifierTest
@@ -79,98 +81,93 @@ public class OmegaRemovalTRSimplifierTest
    */
   public void test_defaultremoval_1() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "defaultremoval_1.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "defaultremoval_1.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_defaultremoval_2() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "defaultremoval_2.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "defaultremoval_2.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_nonDefaultRemovalWithAlphaOnSameState() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "defaultremoval_3.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "defaultremoval_3.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_allStatesImplicitlyMarkedAlpha() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "defaultremoval_4.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "defaultremoval_4.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_allStatesImplicitlyMarkedOmega() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "defaultremoval_5.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "defaultremoval_5.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_nonTauLoop() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "defaultremoval_6.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "defaultremoval_6.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_tauLoop() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "defaultremoval_7.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "defaultremoval_7.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_selfLoops() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "defaultremoval_8a.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "defaultremoval_8a.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_noTransitions() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "defaultremoval_9.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "defaultremoval_9.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_multipleIncomingTransitions() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "defaultremoval_10.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "defaultremoval_10.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_multipleOutgoingTransitions() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "defaultremoval_11.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "defaultremoval_11.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_noncoreachableUnmarkedStates() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "defaultremoval_12.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "defaultremoval_12.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_unreachableStates() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "defaultremoval_13.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   /**
