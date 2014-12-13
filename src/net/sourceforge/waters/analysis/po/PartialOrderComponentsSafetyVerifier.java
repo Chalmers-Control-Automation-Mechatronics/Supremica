@@ -225,7 +225,7 @@ extends PartialOrderComponentsModelVerifier implements SafetyVerifier
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = getModel();
     final List<TraceStepProxy> steps = new LinkedList<TraceStepProxy>();
-    final EventProxy errorEvent = mEventCodingList.get(mErrorEvent);
+    final EventProxy errorEvent = getEvent(mErrorEvent);
     final AutomatonProxy errorAut = mAutomata[mErrorAutomaton];
     final List<StateProxy> states =
       new ArrayList<StateProxy>(errorAut.getStates());
@@ -265,7 +265,7 @@ extends PartialOrderComponentsModelVerifier implements SafetyVerifier
           encode(mSuccessor, mStateTuple);
           if (error.equals(mStateTuple)){
             error = mStateList.get(i);
-            final EventProxy event = mEventCodingList.get(j);
+            final EventProxy event = getEvent(j);
             final TraceStepProxy step = factory.createTraceStepProxy(event);
             steps.add(0, step);
             currentLevel--;

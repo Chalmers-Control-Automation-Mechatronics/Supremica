@@ -31,6 +31,7 @@ import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractModelVerifier;
+import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.NondeterministicDESException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -132,18 +133,25 @@ public abstract class PartialOrderComponentsModelVerifier
         }
       }
 
-      mLocalSet = new TIntHashSet();
-      mPlantTransitionMap = new ArrayList<int[][]>();
-      mSpecTransitionMap = new ArrayList<int[][]>();
-      mIndexList = new ArrayList<Integer>();
-      mStateList = new BlockedArrayList<PartialOrderStateTuple>(PartialOrderStateTuple.class);
-      mEventCodingList = new ArrayList<EventProxy>(model.getEvents());
-      mPlantEventList = new ArrayList<byte[]>();
-      mSpecEventList = new ArrayList<byte[]>();
-      mPlantEventHash = new ArrayList<int[]>();
-      mSpecEventHash = new ArrayList<int[]>();
-
+      final Collection<EventProxy> modelEvents = model.getEvents();
+      mEventCodingList = new ArrayList<>(modelEvents.size());
+      for (final EventProxy event : modelEvents) {
+        if (isSupportedEvent(event)) {
+          mEventCodingList.add(event);
+        }
+      }
       mNumEvents = mEventCodingList.size();
+
+      mLocalSet = new TIntHashSet();
+      mPlantTransitionMap = new ArrayList<>();
+      mSpecTransitionMap = new ArrayList<>();
+      mIndexList = new TIntArrayList();
+      mStateList = new BlockedArrayList<>(PartialOrderStateTuple.class);
+      mPlantEventList = new ArrayList<>();
+      mSpecEventList = new ArrayList<>();
+      mPlantEventHash = new ArrayList<>();
+      mSpecEventHash = new ArrayList<>();
+
       mNumAutomata = automata.size();
       mAutomata = new AutomatonProxy[mNumAutomata];
       if(this instanceof PartialOrderComponentsControllabilityChecker){
@@ -176,10 +184,12 @@ public abstract class PartialOrderComponentsModelVerifier
         i = 0;
         for (final EventProxy evp : ap.getEvents()) {
           final int eventIndex = mEventCodingList.indexOf(evp);
-          events[i] = eventIndex;
-          aneventCodingList[eventIndex] = 1;
-          automataContainingEvents[eventIndex].add(ap);
-          i++;
+          if (eventIndex >= 0) {
+            events[i] = eventIndex;
+            aneventCodingList[eventIndex] = 1;
+            automataContainingEvents[eventIndex].add(ap);
+            i++;
+          }
         }
         // Encoding transitions to binary values
         final int stateSize = codes.size();
@@ -607,11 +617,6 @@ public abstract class PartialOrderComponentsModelVerifier
     return heap;
   }
 
-  @SuppressWarnings("unused")
-  private String getEventName(final int eventCode){
-    return mEventCodingList.get(eventCode).toString();
-  }
-
   protected int[] ample(final PartialOrderStateTuple current){
     final WatersIntHeap enabled = enabled(current);
     if (enabled == null){
@@ -815,18 +820,30 @@ public abstract class PartialOrderComponentsModelVerifier
     }
   }
 
+
   //#########################################################################
   //# Abstract methods
+  protected boolean isSupportedEvent(final EventProxy event)
+    throws EventNotFoundException
+  {
+    final KindTranslator translator = getKindTranslator();
+    return translator.getEventKind(event) != EventKind.PROPOSITION;
+  }
+
   protected abstract boolean isValid(final int[] sState)
-                                                     throws AnalysisException;
+    throws AnalysisException;
+
   protected abstract boolean isErrorState(final PartialOrderStateTuple current);
+
   protected abstract TraceProxy computePOCounterExample()
-                                                throws AnalysisAbortException;
+    throws AnalysisAbortException;
+
   protected abstract int[][] setupTransitions(List<StateProxy> codes,
                                               ComponentKind kind);
 
+
   //#########################################################################
-  //# Encoding
+  //# Encoding and Decoding
   /**
    * Encode the synchronous product into StateTuple
    *
@@ -835,7 +852,7 @@ public abstract class PartialOrderComponentsModelVerifier
    * @param sTuple
    *          The encoded StateTuple
    */
-  protected void encode(final int[] sState, final PartialOrderStateTuple sTuple)
+  void encode(final int[] sState, final PartialOrderStateTuple sTuple)
   {
     int i;
     int k = 0;
@@ -856,8 +873,7 @@ public abstract class PartialOrderComponentsModelVerifier
     }
   }
 
-  //#########################################################################
-  //# Decoding
+
   /**
    * Decode the StateTuple
    *
@@ -866,7 +882,7 @@ public abstract class PartialOrderComponentsModelVerifier
    * @param state
    *          The decoded state
    */
-  protected void decode(final PartialOrderStateTuple sTuple, final int[] state)
+  void decode(final PartialOrderStateTuple sTuple, final int[] state)
   {
     int i;
     int result;
@@ -887,6 +903,12 @@ public abstract class PartialOrderComponentsModelVerifier
         temp >>= mBitLengthList[i];
       }
     }
+  }
+
+
+  EventProxy getEvent(final int e)
+  {
+    return mEventCodingList.get(e);
   }
 
 
@@ -925,7 +947,7 @@ public abstract class PartialOrderComponentsModelVerifier
   protected List<int[][]> mSpecTransitionMap;
 
   // Level states storage
-  protected List<Integer> mIndexList;
+  protected TIntArrayList mIndexList;
   protected List<PartialOrderStateTuple> mStateList;
   private TIntArrayList mEnabledUnionList;
 
@@ -938,7 +960,7 @@ public abstract class PartialOrderComponentsModelVerifier
 
   // For encoding/decoding
   protected AutomatonProxy[] mAutomata;
-  protected List<EventProxy> mEventCodingList;
+  private List<EventProxy> mEventCodingList;
   protected List<byte[]> mPlantEventList;
   protected List<byte[]> mSpecEventList;
   private int[] mBitLengthList;
