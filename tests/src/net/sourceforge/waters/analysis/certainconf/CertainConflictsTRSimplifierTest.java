@@ -5,6 +5,7 @@ import junit.framework.TestSuite;
 
 import net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifierTest;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 
 public class CertainConflictsTRSimplifierTest extends AbstractTRSimplifierTest {
 
@@ -214,6 +215,13 @@ public class CertainConflictsTRSimplifierTest extends AbstractTRSimplifierTest {
     final String subdir = "abstraction";
     final String name = "certainconflicts_tau5.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_certainconflicts_tau6() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "certainconflicts_tau6.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   @Override

@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -17,7 +18,6 @@ import net.sourceforge.waters.analysis.abstraction.AbstractMarkingTRSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntSetBuffer;
-import net.sourceforge.waters.analysis.tr.IntStateBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.MemStateProxy;
 import net.sourceforge.waters.analysis.tr.OneEventCachingTransitionIterator;
@@ -153,8 +153,33 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
       return true;
     }
 
-    // Collect initial state set.
+    // Find marked states (considering tau)
     final int numStates = rel.getNumberOfStates();
+    final int defaultID = getDefaultMarkingID();
+    final TransitionIterator tauPredIter =
+      rel.createPredecessorsReadOnlyIterator();
+    tauPredIter.resetEvent(EventEncoding.TAU);
+    mMarkedStates = new BitSet(numStates);
+    final TIntStack stack = new TIntArrayStack(numStates);
+    for (int state = 0; state < numStates; state++) {
+      if (rel.isMarked(state, defaultID) && !mMarkedStates.get(state)) {
+        mMarkedStates.set(state);
+        stack.push(state);
+        while (stack.size() > 0) {
+          final int current = stack.pop();
+          tauPredIter.resetState(current);
+          while (tauPredIter.advance()) {
+            final int pred = tauPredIter.getCurrentSourceState();
+            if (!mMarkedStates.get(pred)) {
+              mMarkedStates.set(pred);
+              stack.push(pred);
+            }
+          }
+        }
+      }
+    }
+
+    // Collect initial state set.
     final TIntHashSet init = new TIntHashSet();
     for (int state = 0; state < numStates; state++) {
       if (rel.isInitial(state)) {
@@ -255,7 +280,6 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
   {
     if (mSetOffsets != null) {
       ListBufferTransitionRelation rel = getTransitionRelation();
-      final IntStateBuffer oldStateBuffer = rel.getStateBuffer();
       final int numDetStates = mSetOffsets.size();
       final int numTrans = mTransitionBuffer.size();
       rel.reset(numDetStates, numTrans,
@@ -263,16 +287,18 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
       for (int init = 0; init < mNumInitialStates; init++) {
         rel.setInitial(init, true);
       }
+      final int defaultID = getDefaultMarkingID();
+      for (int p = 0; p < rel.getNumberOfPropositions(); p++) {
+        rel.setPropositionUsed(p, p == defaultID);
+      }
       final IntSetBuffer.IntSetIterator iter = mStateSetBuffer.iterator();
       for (int detstate = 0; detstate < numDetStates; detstate++) {
         final int offset = mSetOffsets.get(detstate);
         iter.reset(offset);
         iter.advance();
         final int state = iter.getCurrentData();
-        final long stateMarkings = oldStateBuffer.getAllMarkings(state);
-        rel.setAllMarkings(detstate, stateMarkings);
+        rel.setMarked(detstate, defaultID, mMarkedStates.get(state));
       }
-      rel.removeRedundantPropositions();
       mTransitionBuffer.addOutgoingTransitions(rel);
       rel.reconfigure(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
       final int dumpstate = findCertainConflicts(rel);
@@ -490,7 +516,8 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
     // Creates a hash set of all states which can reach a marked state.
     for (int sourceID = 0; sourceID < numStates; sourceID++) {
       if (rel.isMarked(sourceID, defaultID) &&
-          rel.isReachable(sourceID) && !mBadStates.contains(sourceID) &&
+          rel.isReachable(sourceID) &&
+          !mBadStates.contains(sourceID) &&
           coreachableStates.add(sourceID)) {
         checkAbort();
         unvisitedStates.push(sourceID);
@@ -518,7 +545,7 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
         }
         // remove marking
         if (!intial && mFindingCounterExample) {
-          rel.setMarked(sourceID, getDefaultMarkingID(), false);
+          rel.setMarked(sourceID, defaultID, false);
         }
       }
     }
@@ -684,6 +711,7 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
     private TransitionIterator mTauIterator;
     private TransitionIterator mPostEventIterator;
     private TransitionIterator mFullEventIterator;
+    private BitSet mMarkedStates;
     private TIntArrayList mSetOffsets;
     private TIntHashSet mBadStates;
     private int[] mBadStatesLevels;
