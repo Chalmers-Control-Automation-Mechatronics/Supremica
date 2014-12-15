@@ -460,35 +460,6 @@ public class LimitedCertainConflictsTRSimplifier
   }
 
   @Override
-  protected void applyResultPartition()
-  throws AnalysisException
-  {
-    // 1. Remove all transitions originating from certain conflicts states.
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    final TRPartition partition = getResultPartition();
-    final int end = partition.getNumberOfClasses();
-    final int[] bclass = partition.getClasses().listIterator(end).previous();
-    for (final int state : bclass) {
-      rel.removeOutgoingTransitions(state);
-    }
-    // 2. Apply the partition
-    super.applyResultPartition();
-    // 3. Add selfloops to certain conflicts and try to remove events
-    rel.removeTauSelfLoops();
-    final int bstate = end - 1;
-    if (bstate > 0) {
-      final int numEvents = rel.getNumberOfProperEvents();
-      for (int event = EventEncoding.NONTAU; event < numEvents; event++) {
-        if ((rel.getProperEventStatus(event) & EventStatus.STATUS_UNUSED) == 0) {
-          rel.addTransition(bstate, event, bstate);
-        }
-      }
-      removeProperSelfLoopEvents();
-    }
-    rel.removeOutgoingTransitions(bstate);
-  }
-
-  @Override
   protected void recordFinish(final boolean success)
   {
     super.recordFinish(success);
