@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.analysis.trcomp;
 
+import java.util.List;
+
 import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
@@ -37,6 +39,13 @@ public class TRSafetyTraceProxy
                             final SafetyDiagnostics diag)
   {
     super(diag.getTraceName(des), null, des);
+  }
+
+  public TRSafetyTraceProxy(final ProductDESProxy des,
+                            final List<EventProxy> events,
+                            final SafetyDiagnostics diag)
+  {
+    super(diag.getTraceName(des), null, des, events);
   }
 
   /**

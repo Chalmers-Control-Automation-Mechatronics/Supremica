@@ -9,11 +9,14 @@
 
 package net.sourceforge.waters.analysis.trcomp;
 
+import java.util.List;
+
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import net.sourceforge.waters.xsd.des.ConflictKind;
@@ -30,13 +33,20 @@ public class TRConflictTraceProxy
   //# Constructors
   public TRConflictTraceProxy(final ProductDESProxy des)
   {
-    this(des, ConflictKind.CONFLICT);
+    this(des, null);
   }
 
   public TRConflictTraceProxy(final ProductDESProxy des,
+                              final List<EventProxy> events)
+  {
+    this(des, events, ConflictKind.CONFLICT);
+  }
+
+  public TRConflictTraceProxy(final ProductDESProxy des,
+                              final List<EventProxy> events,
                               final ConflictKind kind)
   {
-    super(AbstractConflictChecker.getTraceName(des), null, des);
+    super(AbstractConflictChecker.getTraceName(des), null, des, events);
     mKind = kind;
   }
 

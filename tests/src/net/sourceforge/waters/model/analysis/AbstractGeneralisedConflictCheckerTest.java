@@ -98,6 +98,20 @@ public abstract class AbstractGeneralisedConflictCheckerTest
 
   //#########################################################################
   //# Test Cases --- Nasty
+  public void testCertainConf7() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "certainconf7.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testCertainConf8() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "certainconf8.wmod");
+    runModelVerifier(des, false);
+  }
+
   public void testDeterminisation26Counter1() throws Exception
   {
     final ProductDESProxy des =

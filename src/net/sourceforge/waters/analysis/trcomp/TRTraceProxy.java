@@ -63,11 +63,33 @@ public abstract class TRTraceProxy
                final String comment,
                final ProductDESProxy des)
   {
+    this(name, comment, des, null);
+  }
+
+  /**
+   * Creates a new trace with a given event sequence, but without automata.
+   * @param  name         The name to be given to the new trace.
+   * @param  comment      A comment describing the new trace,
+   *                      or <CODE>null</CODE>.
+   * @param  des          The product DES for which this trace is
+   *                      generated.
+   * @param  events       Initial sequence of events, or <CODE>null</CODE>.
+   */
+  TRTraceProxy(final String name,
+               final String comment,
+               final ProductDESProxy des,
+               final List<EventProxy> events)
+  {
     super(name);
     mComment = comment;
     mLocation = null;
     mProductDES = des;
-    mEvents = new EventProxy[0];
+    if (events == null) {
+      mEvents = new EventProxy[0];
+    } else {
+      mEvents = new EventProxy[events.size()];
+      events.toArray(mEvents);
+    }
     mTraceData = new HashMap<>();
     mAutomataMap = new HashMap<>();
   }

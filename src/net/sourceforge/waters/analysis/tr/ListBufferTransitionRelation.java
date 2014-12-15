@@ -641,6 +641,20 @@ public class ListBufferTransitionRelation
   }
 
   /**
+   * Gets the number of reachable states marked by the given proposition in
+   * this transition relation.
+   * @param  prop         The proposition number to be checked.
+   * @param  countUnused  Whether unused proposition should be counted.
+   *                      If <CODE>true</CODE> unused propositions are counted
+   *                      as marked in all states; if <CODE>false</CODE>,
+   *                      unused propositions are not counted.
+   */
+  public int getNumberOfMarkings(final int prop, final boolean countUnused)
+  {
+    return mStateBuffer.getNumberOfMarkings(prop, countUnused);
+  }
+
+  /**
    * Gets the initial status of the given state.
    *
    * @return <CODE>true</CODE> if the state is an initial state,

@@ -209,9 +209,10 @@ public abstract class AbstractConflictChecker
     boolean found;
     do {
       name = EventDeclProxy.DEFAULT_PRECONDITION_NAME;
-      if (index++ > 0) {
+      if (index > 0) {
         name += ":" + index;
       }
+      index++;
       found = false;
       for (final EventProxy event : events) {
         if (event.getName().equals(name)) {

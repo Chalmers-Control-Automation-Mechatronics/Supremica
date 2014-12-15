@@ -579,6 +579,7 @@ public class TRSynchronousProductBuilder
         if (rel.isInitial(s)) {
           if (found) {
             nondeterministicIndices.add(a);
+            break;
           } else {
             mDecodedTarget[a] = s;
             found = true;

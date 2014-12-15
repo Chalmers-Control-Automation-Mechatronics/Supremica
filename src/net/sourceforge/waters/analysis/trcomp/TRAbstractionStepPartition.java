@@ -13,6 +13,7 @@ import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -51,19 +52,16 @@ class TRAbstractionStepPartition
   //# Constructor
   TRAbstractionStepPartition(final TRAbstractionStep pred,
                              final EventEncoding eventEncoding,
-                             final int defaultMarking,
-                             final int preconditionMarking,
                              final TransitionRelationSimplifier simplifier)
   {
     super(pred.getName());
     mPredecessor = pred;
     mEventEncoding = eventEncoding;
-    mDefaultMarking = defaultMarking;
-    mPreconditionMarking = preconditionMarking;
     mUsedSimplifiers = new LinkedList<>();
     mUsedSimplifiers.add(simplifier);
     mIsPartitioning = simplifier.isPartitioning();
     mPartition = mIsPartitioning ? simplifier.getResultPartition() : null;
+    mRelevantPreconditionMarkings = null;
   }
 
 
@@ -108,6 +106,11 @@ class TRAbstractionStepPartition
     }
   }
 
+  void setRelevantPreconditionMarkings(final BitSet markings)
+  {
+    mRelevantPreconditionMarkings = markings;
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.trcomp.TRAbstractionStep
@@ -124,7 +127,8 @@ class TRAbstractionStepPartition
     final Logger logger = getLogger();
     reportRebuilding();
     final ChainTRSimplifier chain = new ChainTRSimplifier(mUsedSimplifiers);
-    chain.setPropositions(mPreconditionMarking, mDefaultMarking);
+    chain.setPropositions(TRCompositionalConflictChecker.PRECONDITION_MARKING,
+                          TRCompositionalConflictChecker.DEFAULT_MARKING);
     chain.setPreferredOutputConfiguration(preferredConfig);
     final int inputConfig = chain.getPreferredInputConfiguration();
     final TRAutomatonProxy inputAut =
@@ -153,8 +157,8 @@ class TRAbstractionStepPartition
     final ListBufferTransitionRelation rel = aut.getTransitionRelation();
     rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final TraceExpander expander = new TraceExpander(trace, rel, analyzer);
-    final SearchRecord found = expander.findTrace();
-    final List<SearchRecord> searchRecordTrace = found.getSearchRecordTrace();
+    final TRTraceSearchRecord found = expander.findTrace();
+    final List<TRTraceSearchRecord> searchRecordTrace = found.getSearchRecordTrace();
     final int maxLength = trace.getNumberOfSteps() + searchRecordTrace.size();
     final List<EventProxy> newEvents = new ArrayList<>(maxLength);
     final List<EventProxy> nonStutterEvents =
@@ -221,18 +225,20 @@ class TRAbstractionStepPartition
           trace.getState(TRAbstractionStepPartition.this, numTraceEvents);
         final int[] clazz = mPartition.getStates(mTargetState);
         mTargetStateClass = new TIntHashSet(clazz.length);
-        final boolean usesPreconditionMarking =
-          mPreconditionMarking >= 0 && rel.isPropositionUsed(mPreconditionMarking);
         for (final int s : clazz) {
-          if (!usesPreconditionMarking || rel.isMarked(s, mPreconditionMarking)) {
+          if (rel.isMarked
+               (s, TRCompositionalConflictChecker.PRECONDITION_MARKING) &&
+              (mRelevantPreconditionMarkings == null ||
+               mRelevantPreconditionMarkings.get(s))) {
             mTargetStateClass.add(s);
           }
         }
       }
-      if (rel.isPropositionUsed(mDefaultMarking)) {
+      if (rel.isPropositionUsed(TRCompositionalConflictChecker.DEFAULT_MARKING)) {
         boolean hasDeadlock = false;
         for (int s = 0; s < rel.getNumberOfStates(); s++) {
-          if (rel.isReachable(s) && rel.isDeadlockState(s, mDefaultMarking)) {
+          if (rel.isReachable(s) &&
+              rel.isDeadlockState(s, TRCompositionalConflictChecker.DEFAULT_MARKING)) {
             hasDeadlock = true;
             break;
           }
@@ -247,13 +253,13 @@ class TRAbstractionStepPartition
 
     //#######################################################################
     //# Trace Search
-    private SearchRecord findTrace()
+    private TRTraceSearchRecord findTrace()
       throws AnalysisAbortException, OverflowException
     {
       final int numStates = mInputTransitionRelation.getNumberOfStates();
       for (int s = 0; s < numStates; s++) {
         if (mInputTransitionRelation.isInitial(s)) {
-          final SearchRecord record = new SearchRecord(s);
+          final TRTraceSearchRecord record = new TRTraceSearchRecord(s);
           if (processSearchRecord(record)) {
             return record;
           }
@@ -267,7 +273,7 @@ class TRAbstractionStepPartition
         (inner, mEventEncoding, EventStatus.STATUS_LOCAL);
       while (!mSearchSpace.isEmpty()) {
         mAnalyzer.checkAbort();
-        final SearchRecord current = mSearchSpace.poll();
+        final TRTraceSearchRecord current = mSearchSpace.poll();
         if (current == mStartOfNextLevel) {
           if (mNonDeadlockTarget != null) {
             return mNonDeadlockTarget;
@@ -281,7 +287,7 @@ class TRAbstractionStepPartition
           iterEvent.reset(s, e);
           while (iterEvent.advance()) {
             final int t = iterEvent.getCurrentTargetState();
-            final SearchRecord next = new SearchRecord(t, current, e, false);
+            final TRTraceSearchRecord next = new TRTraceSearchRecord(t, current, e, false);
             if (processSearchRecord(next)) {
               return next;
             }
@@ -291,7 +297,7 @@ class TRAbstractionStepPartition
         while (iterLocal.advance()) {
           final int l = iterLocal.getCurrentEvent();
           final int t = iterLocal.getCurrentTargetState();
-          final SearchRecord next = new SearchRecord(t, current, l, true);
+          final TRTraceSearchRecord next = new TRTraceSearchRecord(t, current, l, true);
           if (processSearchRecord(next)) {
             return next;
           }
@@ -303,14 +309,15 @@ class TRAbstractionStepPartition
       return mNonDeadlockTarget;
     }
 
-    private boolean processSearchRecord(final SearchRecord record)
+    private boolean processSearchRecord(final TRTraceSearchRecord record)
     {
       if (isTargetState(record)) {
         if (!mHasDeadlockState) {
           return true;
         }
         final int state = record.getState();
-        if (mInputTransitionRelation.isDeadlockState(state, mDefaultMarking)) {
+        if (mInputTransitionRelation.isDeadlockState
+              (state, TRCompositionalConflictChecker.DEFAULT_MARKING)) {
           return true;
         }
         if (mNonDeadlockTarget == null) {
@@ -325,7 +332,7 @@ class TRAbstractionStepPartition
       return false;
     }
 
-    private boolean isTargetState(final SearchRecord record)
+    private boolean isTargetState(final TRTraceSearchRecord record)
     {
       if (record.getNumberOfConsumedEvents() < mEventSequence.size()) {
         return false;
@@ -345,14 +352,14 @@ class TRAbstractionStepPartition
     //#######################################################################
     //# Trace Merging
     private void mergeEventTrace(final TRTraceProxy trace,
-                                 final List<SearchRecord> searchRecordTrace,
+                                 final List<TRTraceSearchRecord> searchRecordTrace,
                                  final List<EventProxy> outputEvents,
                                  final List<EventProxy> nonStutterEvents,
                                  final TIntArrayList outputStates)
     {
-      final Iterator<SearchRecord> searchRecordIter =
+      final Iterator<TRTraceSearchRecord> searchRecordIter =
         searchRecordTrace.iterator();
-      SearchRecord nextSearchRecord = searchRecordIter.next();
+      TRTraceSearchRecord nextSearchRecord = searchRecordIter.next();
       int currentState = nextSearchRecord.getState();
       outputStates.add(currentState);
       nextSearchRecord = null;
@@ -411,106 +418,9 @@ class TRAbstractionStepPartition
     private final int mTargetState;
     private final TIntHashSet mTargetStateClass;
     private boolean mHasDeadlockState;
-    private final BFSSearchSpace<SearchRecord> mSearchSpace;
-    private SearchRecord mStartOfNextLevel;
-    private SearchRecord mNonDeadlockTarget;
-  }
-
-
-  //#########################################################################
-  //# Inner Class SearchRecord
-  private static class SearchRecord
-  {
-    //#######################################################################
-    //# Constructor
-    private SearchRecord(final int state)
-    {
-      this(state, 0, -1, null);
-    }
-
-    private SearchRecord(final int state,
-                         final SearchRecord pred,
-                         final int event,
-                         final boolean local)
-    {
-      this(state, pred.mNumConsumedEvents + (local ? 0 : 1), event, pred);
-    }
-
-    private SearchRecord(final int state,
-                         final int numConsumedEvents,
-                         final int event,
-                         final SearchRecord pred)
-    {
-      mState = state;
-      mNumConsumedEvents = numConsumedEvents;
-      mEvent = event;
-      mPredecessor = pred;
-    }
-
-    //#######################################################################
-    //# Simple Access
-    private int getState()
-    {
-      return mState;
-    }
-
-    private int getNumberOfConsumedEvents()
-    {
-      return mNumConsumedEvents;
-    }
-
-    public int getEvent()
-    {
-      return mEvent;
-    }
-
-    //#######################################################################
-    //# Trace Construction
-    private List<SearchRecord> getSearchRecordTrace()
-    {
-      final List<SearchRecord> list = new LinkedList<>();
-      SearchRecord record = this;
-      while (record != null) {
-        list.add(0, record);
-        record = record.mPredecessor;
-      }
-      return list;
-    }
-
-    //#######################################################################
-    //# Overrides for java.lang.Object
-    @Override
-    public boolean equals(final Object other)
-    {
-      if (other != null && getClass() == other.getClass()) {
-        final SearchRecord record = (SearchRecord) other;
-        return mState == record.mState &&
-               mNumConsumedEvents == record.mNumConsumedEvents;
-      } else {
-        return false;
-      }
-    }
-
-    @Override
-    public int hashCode()
-    {
-      return mState + 5 * mNumConsumedEvents;
-    }
-
-    //#######################################################################
-    //# Debugging
-    @Override
-    public String toString()
-    {
-      return mState + "@" + mNumConsumedEvents;
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final int mState;
-    private final int mNumConsumedEvents;
-    private final int mEvent;
-    private final SearchRecord mPredecessor;
+    private final BFSSearchSpace<TRTraceSearchRecord> mSearchSpace;
+    private TRTraceSearchRecord mStartOfNextLevel;
+    private TRTraceSearchRecord mNonDeadlockTarget;
   }
 
 
@@ -518,10 +428,9 @@ class TRAbstractionStepPartition
   //# Data Members
   private final TRAbstractionStep mPredecessor;
   private final EventEncoding mEventEncoding;
-  private final int mDefaultMarking;
-  private final int mPreconditionMarking;
   private final List<TransitionRelationSimplifier> mUsedSimplifiers;
   private boolean mIsPartitioning;
   private TRPartition mPartition;
+  private BitSet mRelevantPreconditionMarkings;
 
 }

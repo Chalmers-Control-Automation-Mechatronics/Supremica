@@ -1061,7 +1061,21 @@ public abstract class AbstractTRCompositionalAnalyzer
     enc.provideTauEvent(name);
     final KindTranslator translator = getKindTranslator();
     for (final EventProxy event : aut.getEvents()) {
-      enc.addEvent(event, translator, EventStatus.STATUS_NONE);
+      switch (translator.getEventKind(event)) {
+      case CONTROLLABLE:
+      case UNCONTROLLABLE:
+        enc.addEvent(event, translator, EventStatus.STATUS_NONE);
+        break;
+      case PROPOSITION:
+        final int p = enc.getEventCode(event);
+        if (p >= 0) {
+          enc.setPropositionUsed(p, true);
+        }
+        break;
+      default:
+        throw new IllegalArgumentException
+          ("Unknown event kind " + translator.getEventKind(event) + "!");
+      }
     }
     enc.sortProperEvents(EventStatus.STATUS_UNUSED,
                          EventStatus.STATUS_CONTROLLABLE);
@@ -1142,18 +1156,6 @@ public abstract class AbstractTRCompositionalAnalyzer
     if (isCounterExampleEnabled()) {
       for (final TRAutomatonProxy aut : subsys.getAutomata()) {
         dropTrivialAutomaton(aut);
-      }
-    }
-  }
-
-  protected void dropSubsystemExcept(final TRSubsystemInfo subsys,
-                                     final TRAutomatonProxy except)
-  {
-    if (isCounterExampleEnabled()) {
-      for (final TRAutomatonProxy aut : subsys.getAutomata()) {
-        if (aut != except) {
-          dropTrivialAutomaton(aut);
-        }
       }
     }
   }
@@ -1386,10 +1388,7 @@ public abstract class AbstractTRCompositionalAnalyzer
           final EventEncoding enc =
             mIntermediateAbstractionSequence.getCurrentEventEncoding();
           final TRAbstractionStep step =
-            new TRAbstractionStepPartition(pred, enc,
-                                           DEFAULT_MARKING,
-                                           PRECONDITION_MARKING,
-                                           simplifier);
+            new TRAbstractionStepPartition(pred, enc, simplifier);
           mIntermediateAbstractionSequence.append(step);
         }
       }

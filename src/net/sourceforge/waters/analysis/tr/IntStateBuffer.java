@@ -271,17 +271,35 @@ public class IntStateBuffer
     final int numProps = mPropositionStatus.getNumberOfPropositions();
     int result = 0;
     for (int prop = 0; prop < numProps; prop++) {
-      if (mPropositionStatus.isPropositionUsed(prop)) {
-        for (int state = 0; state < getNumberOfStates(); state++) {
-          if (isReachable(state) && isMarked(state, prop)) {
-            result++;
-          }
-        }
-      } else if (countUnused) {
-        result += getNumberOfStates();
-      }
+      result += getNumberOfMarkings(prop, countUnused);
     }
     return result;
+  }
+
+  /**
+   * Gets the number of reachable states marked by the given proposition in
+   * this state buffer.
+   * @param  prop         The proposition number to be checked.
+   * @param  countUnused  Whether unused proposition should be counted.
+   *                      If <CODE>true</CODE> unused propositions are counted
+   *                      as marked in all states; if <CODE>false</CODE>,
+   *                      unused propositions considered as not marked.
+   */
+  public int getNumberOfMarkings(final int prop, final boolean countUnused)
+  {
+    if (mPropositionStatus.isPropositionUsed(prop)) {
+      int result = 0;
+      for (int state = 0; state < getNumberOfStates(); state++) {
+        if (isReachable(state) && isMarked(state, prop)) {
+          result++;
+        }
+      }
+      return result;
+    } else if (countUnused) {
+      return getNumberOfStates();
+    } else {
+      return 0;
+    }
   }
 
   /**

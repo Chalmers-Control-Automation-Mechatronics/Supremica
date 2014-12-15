@@ -271,6 +271,20 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(des, false);
   }
 
+  public void testCertainConf7() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "certainconf7.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testCertainConf8() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "certainconf8.wmod");
+    runModelVerifier(des, false);
+  }
+
   public void testDisjoint1() throws Exception
   {
     final ProductDESProxy des =
@@ -660,9 +674,9 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(des, true);
   }
 
-  public void testProfisafeI4SlaveEFA() throws Exception
+  public void testProfisafeI3SlaveEFA() throws Exception
   {
-    final ParameterBindingProxy binding = createBinding("MAXSEQNO", 4);
+    final ParameterBindingProxy binding = createBinding("MAXSEQNO", 3);
     final List<ParameterBindingProxy> bindings =
         Collections.singletonList(binding);
     final ProductDESProxy des =

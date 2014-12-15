@@ -90,7 +90,9 @@ public class TRPartition
   //#########################################################################
   //# Simple Access
   /**
-   * Gets the number of states partitioned by this partitioned.
+   * Gets the number of states covered by this partition.
+   * This is the number of states of the original automaton before it
+   * was partitioned.
    */
   public int getNumberOfStates()
   {

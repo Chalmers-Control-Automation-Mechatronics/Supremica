@@ -163,6 +163,13 @@ class TRSubsystemInfo
     mAutomata.remove(aut);
   }
 
+  void moveToEnd(final TRAutomatonProxy aut)
+  {
+    final boolean removed = mAutomata.remove(aut);
+    assert removed : "Automaton not found in subsystem!";
+    mAutomata.add(aut);
+  }
+
   void removeEvent(final EventProxy event)
   {
     mEvents.remove(event);

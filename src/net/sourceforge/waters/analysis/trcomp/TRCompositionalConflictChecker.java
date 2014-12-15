@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.trcomp;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -17,13 +18,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.waters.analysis.abstraction.AlphaDeterminisationTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.CoreachabilityTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.IncomingEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.LimitedCertainConflictsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.MarkingRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.MarkingSaturationTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.NonAlphaDeterminisationTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.OmegaRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.OnlySilentOutgoingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SilentIncomingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SpecialEventsTRSimplifier;
@@ -36,6 +40,7 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
@@ -140,6 +145,8 @@ public class TRCompositionalConflictChecker
         register(NB1w);
         register(NB2);
         register(NB2w);
+        register(GNB);
+        register(GNBw);
       }
     };
   }
@@ -177,6 +184,7 @@ public class TRCompositionalConflictChecker
   @Override
   protected void setUp() throws AnalysisException
   {
+    mUsedPreconditionMarking = mConfiguredPreconditionMarking;
     super.setUp();
     final ConflictChecker mono = getMonolithicAnalyzer();
     mono.setConfiguredDefaultMarking(getUsedDefaultMarking());
@@ -191,6 +199,7 @@ public class TRCompositionalConflictChecker
   {
     super.tearDown();
     mUsedDefaultMarking = null;
+    mUsedPreconditionMarking = null;
     mLanguageInclusionChecker = null;
     mNonblockingSubsystems = null;
   }
@@ -223,8 +232,7 @@ public class TRCompositionalConflictChecker
   @Override
   protected EventProxy getUsedPreconditionMarking()
   {
-    // TODO Create precondition marking for GNB chain
-    return getConfiguredPreconditionMarking();
+    return mUsedPreconditionMarking;
   }
 
   @Override
@@ -258,7 +266,7 @@ public class TRCompositionalConflictChecker
   {
     final Logger logger = getLogger();
     boolean allAutomataOmega = true;
-    boolean blockedOmega = false;
+    TRAutomatonProxy omegaBlocker = null;
     for (final TRAutomatonProxy aut : subsys.getAutomata()) {
       final ListBufferTransitionRelation rel = aut.getTransitionRelation();
       boolean noStatesOmega = rel.isPropositionUsed(DEFAULT_MARKING);
@@ -281,17 +289,17 @@ public class TRCompositionalConflictChecker
                        aut.getName() + " has no precondition-marked states.");
           return setSatisfiedResult();
         } else if (noStatesOmega) {
-          if (mConfiguredPreconditionMarking != null) {
-            blockedOmega = true;
-          } else {
+          if (mUsedPreconditionMarking == null) {
             final AnalysisResult result = getAnalysisResult();
             result.setSatisfied(false);
             logger.debug("Subsystem is blocking, because " + aut.getName() +
                          " has no marked states.");
             dropPendingSubsystems();
-            dropSubsystemExcept(subsys, aut);
-            dropTrivialAutomaton(aut);  // Must be last to pass trace checks.
+            subsys.moveToEnd(aut);
+            dropSubsystem(subsys);
             return true;
+          } else if (omegaBlocker == null) {
+            omegaBlocker = aut;
           }
         }
       }
@@ -300,15 +308,18 @@ public class TRCompositionalConflictChecker
       logger.debug("Subsystem is nonblocking, because all states are marked.");
       dropSubsystem(subsys);
       return true;
-    } else if (blockedOmega) {
-      logger.debug("Subsystem is blocking, because no states are marked.");
+    } else if (omegaBlocker != null) {
+      logger.debug("Subsystem is blocking, because " +
+                   omegaBlocker.getName() + " has no marked state.");
+      subsys.moveToEnd(omegaBlocker);
       dropSubsystem(subsys);
       final ProductDESProxy des = getModel();
       final TRTraceProxy trace = new TRConflictTraceProxy(des);
       final boolean extended = extendToPreconditionMarkedState(trace);
       final AnalysisResult result = getAnalysisResult();
       result.setSatisfied(!extended);
-      if (extended && isCounterExampleEnabled()) {
+      if (extended && isCounterExampleEnabled() &&
+          !trace.getCoveredAbstractionSteps().isEmpty()) {
         final TRAbstractionStep step = new TRAbstractionStepMonolithic(trace);
         addAbstractionStep(step);
       }
@@ -343,7 +354,7 @@ public class TRCompositionalConflictChecker
         logger.debug("Subsystem is nonblocking.");
         dropSubsystem(subsys);
         return true;
-      } else if (mConfiguredPreconditionMarking == null) {
+      } else if (mUsedPreconditionMarking == null) {
         logger.debug("Subsystem is blocking.");
         combinedResult.setSatisfied(false);
         if (isCounterExampleEnabled()) {
@@ -418,7 +429,9 @@ public class TRCompositionalConflictChecker
     throws AnalysisException
   {
     final Collection<TRSubsystemInfo> pending = getPendingSubsystems();
-    final int size = pending.size() + mNonblockingSubsystems.size();
+    final int nonblockingSize =
+      mNonblockingSubsystems == null ? 0 : mNonblockingSubsystems.size();
+    final int size = pending.size() + nonblockingSize;
     if (size == 0) {
       return true;
     }
@@ -426,7 +439,9 @@ public class TRCompositionalConflictChecker
     logger.debug("Searching for reachable precondition-marked state ...");
     final List<TRSubsystemInfo> subsystems = new ArrayList<>(size);
     subsystems.addAll(pending);
-    subsystems.addAll(mNonblockingSubsystems);
+    if (mNonblockingSubsystems != null) {
+      subsystems.addAll(mNonblockingSubsystems);
+    }
     Collections.sort(subsystems);
     for (final TRSubsystemInfo subsys : subsystems) {
       if (!extendToPreconditionMarkedState(trace, subsys)) {
@@ -758,6 +773,73 @@ public class TRCompositionalConflictChecker
     }
   };
 
+  /**
+   * <P>An abstraction sequence for generalised nonblocking verification.
+   * This tool creator produces a transition relation simplifier
+   * consisting of:</P>
+   * <UL>
+   * <LI>Special events removal ({@link SpecialEventsTRSimplifier})</LI>
+   * <LI>Tau-loop removal ({@link TauLoopRemovalTRSimplifier})</LI>
+   * <LI>Marking removal ({@link MarkingRemovalTRSimplifier})</LI>
+   * <LI>Omega-removal ({@link OmegaRemovalTRSimplifier})</LI>
+   * <LI>Silent Incoming Rule ({@link SilentIncomingTRSimplifier})</LI>
+   * <LI>Only Silent Outgoing Rule ({@link OnlySilentOutgoingTRSimplifier})</LI>
+   * <LI>Observation equivalence ({@link ObservationEquivalenceTRSimplifier})</LI>
+   * <LI>Non-alpha determinisation ({@link NonAlphaDeterminisationTRSimplifier})</LI>
+   * <LI>Alpha determinisation ({@link AlphaDeterminisationTRSimplifier})</LI>
+   * <LI>Marking saturation ({@link MarkingSaturationTRSimplifier})</LI>
+   * </UL>.
+   */
+  public static final TRToolCreator<TransitionRelationSimplifier> GNB =
+    new TRToolCreator<TransitionRelationSimplifier>("GNB")
+  {
+    @Override
+    public TransitionRelationSimplifier create
+      (final AbstractTRCompositionalAnalyzer analyzer)
+    {
+      final TRCompositionalConflictChecker checker =
+        (TRCompositionalConflictChecker) analyzer;
+      return checker.createGeneralisedNonblockingChain
+        (ObservationEquivalenceTRSimplifier.
+         Equivalence.OBSERVATION_EQUIVALENCE,
+         true);
+    }
+  };
+
+  /**
+   * <P>An abstraction sequence for generalised nonblocking verification.
+   * This tool creator produces a transition relation simplifier
+   * consisting of:</P>
+   * <UL>
+   * <LI>Special events removal ({@link SpecialEventsTRSimplifier})</LI>
+   * <LI>Tau-loop removal ({@link TauLoopRemovalTRSimplifier})</LI>
+   * <LI>Marking removal ({@link MarkingRemovalTRSimplifier})</LI>
+   * <LI>Omega-removal ({@link OmegaRemovalTRSimplifier})</LI>
+   * <LI>Silent Incoming Rule ({@link SilentIncomingTRSimplifier})</LI>
+   * <LI>Only Silent Outgoing Rule ({@link OnlySilentOutgoingTRSimplifier})</LI>
+   * <LI>Weak observation equivalence
+   *     ({@link ObservationEquivalenceTRSimplifier})</LI>
+   * <LI>Non-alpha determinisation ({@link NonAlphaDeterminisationTRSimplifier})</LI>
+   * <LI>Alpha determinisation ({@link AlphaDeterminisationTRSimplifier})</LI>
+   * <LI>Marking saturation ({@link MarkingSaturationTRSimplifier})</LI>
+   * </UL>.
+   */
+  public static final TRToolCreator<TransitionRelationSimplifier> GNBw =
+    new TRToolCreator<TransitionRelationSimplifier>("GNBw")
+  {
+    @Override
+    public TransitionRelationSimplifier create
+      (final AbstractTRCompositionalAnalyzer analyzer)
+    {
+      final TRCompositionalConflictChecker checker =
+        (TRCompositionalConflictChecker) analyzer;
+      return checker.createGeneralisedNonblockingChain
+        (ObservationEquivalenceTRSimplifier.
+         Equivalence.WEAK_OBSERVATION_EQUIVALENCE,
+         true);
+    }
+  };
+
 
   protected ChainTRSimplifier createConflictEquivalenceChain
     (final ObservationEquivalenceTRSimplifier.Equivalence equivalence,
@@ -839,6 +921,94 @@ public class TRCompositionalConflictChecker
     return chain;
   }
 
+  protected ChainTRSimplifier createGeneralisedNonblockingChain
+    (final ObservationEquivalenceTRSimplifier.Equivalence equivalence,
+     final boolean earlyTransitionRemoval)
+  {
+    if (mUsedPreconditionMarking == null) {
+      final ProductDESProxy model = getModel();
+      final ProductDESProxyFactory factory = getFactory();
+      mUsedPreconditionMarking =
+        AbstractConflictChecker.createNewPreconditionMarking(model, factory);
+    }
+    final int limit = getInternalTransitionLimit();
+    final ChainTRSimplifier chain = startAbstractionChain();
+    final TRSimplificationListener markingListener = new MarkingListener();
+    final TRSimplificationListener omegaRemovalListener =
+      new OmegaRemovalListener();
+    final TRSimplificationListener partitioningListener =
+      new PartitioningListener();
+    final TauLoopRemovalTRSimplifier loopRemover =
+      new TauLoopRemovalTRSimplifier();
+    loopRemover.setSimplificationListener(partitioningListener);
+    chain.add(loopRemover);
+    final ObservationEquivalenceTRSimplifier.TransitionRemoval trMode;
+    if (earlyTransitionRemoval) {
+      final TransitionRemovalTRSimplifier transitionRemover =
+        new TransitionRemovalTRSimplifier();
+      transitionRemover.setTransitionLimit(limit);
+      transitionRemover.setSimplificationListener(partitioningListener);
+      chain.add(transitionRemover);
+      trMode = ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER;
+    } else {
+      trMode = ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL;
+    }
+    final MarkingRemovalTRSimplifier alphaRemover =
+      new MarkingRemovalTRSimplifier();
+    alphaRemover.setSimplificationListener(markingListener);
+    chain.add(alphaRemover);
+    final OmegaRemovalTRSimplifier omegaRemover =
+      new OmegaRemovalTRSimplifier();
+    omegaRemover.setSimplificationListener(omegaRemovalListener);
+    chain.add(omegaRemover);
+    if (mConfiguredPreconditionMarking != null) {
+      final CoreachabilityTRSimplifier nonCoreachableRemover =
+        new CoreachabilityTRSimplifier();
+      nonCoreachableRemover.setSimplificationListener(partitioningListener);
+      chain.add(nonCoreachableRemover);
+    }
+    final SilentIncomingTRSimplifier silentInRemover =
+      new SilentIncomingTRSimplifier();
+    silentInRemover.setRestrictsToUnreachableStates(true);
+    silentInRemover.setSimplificationListener(partitioningListener);
+    chain.add(silentInRemover);
+    final OnlySilentOutgoingTRSimplifier silentOutRemover =
+      new OnlySilentOutgoingTRSimplifier();
+    silentOutRemover.setSimplificationListener(partitioningListener);
+    chain.add(silentOutRemover);
+    final ObservationEquivalenceTRSimplifier bisimulator =
+      new ObservationEquivalenceTRSimplifier();
+    bisimulator.setEquivalence(equivalence);
+    bisimulator.setTransitionRemovalMode(trMode);
+    bisimulator.setTransitionLimit(limit);
+    bisimulator.setSimplificationListener(partitioningListener);
+    chain.add(bisimulator);
+    final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
+      new NonAlphaDeterminisationTRSimplifier();
+    nonAlphaDeterminiser.setTransitionRemovalMode
+      (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER_IF_CHANGED);
+    nonAlphaDeterminiser.setTransitionLimit(limit);
+    nonAlphaDeterminiser.setSimplificationListener(partitioningListener);
+    chain.add(nonAlphaDeterminiser);
+    if (mConfiguredPreconditionMarking != null) {
+      final AlphaDeterminisationTRSimplifier alphaDeterminiser =
+        new AlphaDeterminisationTRSimplifier();
+      alphaDeterminiser.setTransitionRemovalMode
+        (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER_IF_CHANGED);
+      alphaDeterminiser.setTransitionLimit(limit);
+      alphaDeterminiser.setSimplificationListener(partitioningListener);
+      chain.add(alphaDeterminiser);
+    }
+    final MarkingSaturationTRSimplifier saturator =
+      new MarkingSaturationTRSimplifier();
+    saturator.setSimplificationListener(markingListener);
+    chain.add(saturator);
+    chain.setPropositions(PRECONDITION_MARKING, DEFAULT_MARKING);
+    chain.setPreferredOutputConfiguration
+      (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    return chain;
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods
@@ -880,11 +1050,17 @@ public class TRCompositionalConflictChecker
       (final TransitionRelationSimplifier simplifier)
     {
       if (super.onSimplificationStart(simplifier)) {
+        final ListBufferTransitionRelation rel =
+          simplifier.getTransitionRelation();
         if (simplifier instanceof MarkingRemovalTRSimplifier &&
             isCounterExampleEnabled()) {
-          final ListBufferTransitionRelation rel =
-            simplifier.getTransitionRelation();
-          mOldNumberOfMarkings = rel.getNumberOfMarkings(true);
+          mNumberOfDefaultMarkingsAtStart =
+            rel.getNumberOfMarkings(DEFAULT_MARKING, true);
+          mNumberOfPreconditionMarkingsAtStart =
+            rel.getNumberOfMarkings(PRECONDITION_MARKING, true);
+        } else if (simplifier instanceof MarkingSaturationTRSimplifier) {
+          mNumberOfPreconditionMarkingsBeforeSaturate =
+            rel.getNumberOfMarkings(PRECONDITION_MARKING, true);
         }
         return true;
       } else {
@@ -899,12 +1075,32 @@ public class TRCompositionalConflictChecker
       if (simplifier instanceof MarkingSaturationTRSimplifier) {
         final IntermediateAbstractionSequence seq =
           getIntermediateAbstractionSequence();
-        if (result && isCounterExampleEnabled() && seq != null &&
-            seq.getLastPartitionSimplifier() instanceof MarkingRemovalTRSimplifier) {
-          seq.removeLastPartitionSimplifier();
+        if (result && isCounterExampleEnabled() && seq != null) {
           final ListBufferTransitionRelation rel =
             simplifier.getTransitionRelation();
-          if (rel.getNumberOfMarkings(true) == mOldNumberOfMarkings) {
+          final int numPreconditionMarkings =
+            rel.getNumberOfMarkings(PRECONDITION_MARKING, true);
+          final TransitionRelationSimplifier last =
+            seq.getLastPartitionSimplifier();
+          if (last instanceof MarkingRemovalTRSimplifier) {
+            seq.removeLastPartitionSimplifier();
+            if (mNumberOfPreconditionMarkingsAtStart ==
+                numPreconditionMarkings &&
+                rel.getNumberOfMarkings(DEFAULT_MARKING, true) ==
+                mNumberOfDefaultMarkingsAtStart) {
+              return;
+            }
+            mNumberOfPreconditionMarkingsBeforeSaturate =
+              mNumberOfPreconditionMarkingsAtStart;
+          }
+          if (numPreconditionMarkings >
+              mNumberOfPreconditionMarkingsBeforeSaturate) {
+            final TRAbstractionStep pred =
+              seq.getLastIntermediateStepOrPredecessor();
+            final EventEncoding enc = seq.getCurrentEventEncoding();
+            final TRAbstractionStep step =
+              new TRAbstractionStepPreconditionSaturation(pred, enc, simplifier);
+            seq.append(step);
             return;
           }
         }
@@ -914,7 +1110,9 @@ public class TRCompositionalConflictChecker
 
     //#######################################################################
     //# Data Members
-    private int mOldNumberOfMarkings;
+    private int mNumberOfDefaultMarkingsAtStart;
+    private int mNumberOfPreconditionMarkingsAtStart;
+    private int mNumberOfPreconditionMarkingsBeforeSaturate;
   }
 
 
@@ -949,6 +1147,40 @@ public class TRCompositionalConflictChecker
 
 
   //#########################################################################
+  //# Inner Class OmegaRemovalListener
+  class OmegaRemovalListener extends PartitioningListener
+  {
+    @Override
+    public void onSimplificationFinish
+      (final TransitionRelationSimplifier simplifier, final boolean result)
+    {
+      super.onSimplificationFinish(simplifier, result);
+      final IntermediateAbstractionSequence seq =
+        getIntermediateAbstractionSequence();
+      final ListBufferTransitionRelation rel =
+        simplifier.getTransitionRelation();
+      if (result && isCounterExampleEnabled() && seq != null &&
+          rel.isPropositionUsed(PRECONDITION_MARKING)) {
+        final TransitionRelationSimplifier chain = getSimplifier();
+        final TRPartition partition = chain.getResultPartition();
+        final int numStates = partition == null ?
+          rel.getNumberOfStates() : partition.getNumberOfStates();
+        final BitSet markings = new BitSet(numStates);
+        for (int s = 0; s < numStates; s++) {
+          final int clazz = partition == null ? s : partition.getClassCode(s);
+          if (clazz >= 0 && rel.isMarked(clazz, PRECONDITION_MARKING)) {
+            markings.set(s);
+          }
+        }
+        final TRAbstractionStepPartition step = (TRAbstractionStepPartition)
+          seq.getLastIntermediateStepOrPredecessor();
+        step.setRelevantPreconditionMarkings(markings);
+      }
+    }
+  }
+
+
+  //#########################################################################
   //# Data Members
   // Configuration
   private EventProxy mConfiguredDefaultMarking;
@@ -956,6 +1188,7 @@ public class TRCompositionalConflictChecker
 
   // Auxiliary events, status, and tools
   private EventProxy mUsedDefaultMarking;
+  private EventProxy mUsedPreconditionMarking;
   private TRCompositionalLanguageInclusionChecker mLanguageInclusionChecker;
   private List<TRSubsystemInfo> mNonblockingSubsystems;
 
