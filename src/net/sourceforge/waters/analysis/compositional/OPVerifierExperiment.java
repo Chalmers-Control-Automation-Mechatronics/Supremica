@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -416,10 +417,13 @@ public class OPVerifierExperiment
       return null;
     }
     final int[] stateToClass = new int[numStates];
+    Arrays.fill(stateToClass, -1);
     int c = 0;
     for (final int[] clazz : partition.getClasses()) {
-      for (final int s : clazz) {
-        stateToClass[s] = c;
+      if (clazz != null) {
+        for (final int s : clazz) {
+          stateToClass[s] = c;
+        }
       }
       c++;
     }
@@ -434,25 +438,27 @@ public class OPVerifierExperiment
       final int limit = e == EventEncoding.TAU ? 1 : 2;
       int sourceClass = 0;
       for (final int[] clazz : partition.getClasses()) {
-        for (final int s : clazz) {
-          iter.reset(s, e);
-          while (iter.advance()) {
-            final int t = iter.getCurrentTargetState();
-            final int targetClass = stateToClass[t];
-            if (e != EventEncoding.TAU || sourceClass != targetClass) {
-              if (stateSuccessors.add(targetClass)) {
-                classSuccessors.add(targetClass);
-              } else {
-                iter.remove();
+        if (clazz != null) {
+          for (final int s : clazz) {
+            iter.reset(s, e);
+            while (iter.advance()) {
+              final int t = iter.getCurrentTargetState();
+              final int targetClass = stateToClass[t];
+              if (e != EventEncoding.TAU || sourceClass != targetClass) {
+                if (stateSuccessors.add(targetClass)) {
+                  classSuccessors.add(targetClass);
+                } else {
+                  iter.remove();
+                }
               }
             }
+            stateSuccessors.clear();
           }
-          stateSuccessors.clear();
+          if (classSuccessors.size() >= limit) {
+            splitEvents.add(e);
+          }
+          classSuccessors.clear();
         }
-        if (classSuccessors.size() >= limit) {
-          splitEvents.add(e);
-        }
-        classSuccessors.clear();
         sourceClass++;
       }
     }
