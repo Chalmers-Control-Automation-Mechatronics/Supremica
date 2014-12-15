@@ -92,6 +92,15 @@ public class TRSimplifierStatistics
   }
 
   /**
+   * Gets the number of times this abstraction rule has been unsuccessful
+   * and resulted in an overflow.
+   */
+  public int getOverflowCount()
+  {
+    return mOverflowCount;
+  }
+
+  /**
    * Gets the number of times this abstraction rule reduced the size of the
    * model it was applied to.
    */

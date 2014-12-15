@@ -97,6 +97,7 @@ public class OPVerifierExperiment
     mOEQChain.add(mOEQSimplifier);
     mLogWriter = null;
     mHeaderWritten = false;
+    mExperimentIndex = 0;
   }
 
   public OPVerifierExperiment(final String logFileName)
@@ -181,6 +182,16 @@ public class OPVerifierExperiment
     stats.add(oeqChainStats);
     mOEQChain.collectStatistics(stats);
     writeLog(aut, tau, omega, stats);
+    // 4. Save automata
+    /*
+    if (rel.getNumberOfReachableStates() >= 10000 &&
+        opChainStats.getOverflowCount() == 0 &&
+        oeqChainStats.getOverflowCount() == 0) {
+      mExperimentIndex++;
+      final String filename = FILE_NAME_PREFIX + mExperimentIndex + ".wdes";
+      MarshallingTools.saveProductDES(aut, filename);
+    }
+    */
     return mOPVerifier.getOPResult();
   }
 
@@ -623,6 +634,14 @@ public class OPVerifierExperiment
 
   private PrintWriter mLogWriter;
   private boolean mHeaderWritten;
+  @SuppressWarnings("unused")
+  private final int mExperimentIndex;
+
+
+  //#########################################################################
+  //# Class Constants
+  @SuppressWarnings("unused")
+  private static final String FILE_NAME_PREFIX = "opv";
 
 }
 
