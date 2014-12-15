@@ -26,6 +26,7 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
+import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.cpp.analysis.NativeSafetyVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
@@ -266,6 +267,15 @@ public class TRCompositionalLanguageInclusionChecker
     } else {
       return null;
     }
+  }
+
+  @Override
+  protected int getMonolithicAutomataLimit()
+  {
+    final ListBufferTransitionRelation rel =
+      mCurrentProperty.getTransitionRelation();
+    final TransitionIterator iter = rel.createAllTransitionsReadOnlyIterator();
+    return iter.advance() ? 1 : 2;
   }
 
   @Override
