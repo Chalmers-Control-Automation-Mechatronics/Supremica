@@ -209,6 +209,7 @@ class TRAbstractionStepSync
             if (state == mDumpStateIndex) {
               final int target = finder.storeDumpStateTransition(stepIndex, alt);
               if (target < 0) {
+                found = false;
                 continue eventLoop;
               }
               found |= finder.isDumpState(target);

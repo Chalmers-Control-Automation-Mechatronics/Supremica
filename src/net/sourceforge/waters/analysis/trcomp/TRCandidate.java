@@ -121,13 +121,15 @@ public class TRCandidate
     final String name = getName();
     final EventProxy tau = mEventEncoding.provideTauEvent(name);
     final int numEvents = mEventEncoding.getNumberOfProperEvents();
+    final byte pattern =
+      EventStatus.STATUS_FULLY_LOCAL | EventStatus.STATUS_CONTROLLABLE;
     final EventEncoding syncEncoding = new EventEncoding();
     for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
       final EventProxy event = mEventEncoding.getProperEvent(e);
       final byte status = mEventEncoding.getProperEventStatus(e);
       if (EventStatus.isLocalEvent(status)) {
         syncEncoding.addSilentEvent(tau);
-        syncEncoding.setProperEventStatus(EventEncoding.TAU, status);
+        syncEncoding.setProperEventStatus(EventEncoding.TAU, status & pattern);
         syncEncoding.addSilentEvent(event);
       } else {
         syncEncoding.addProperEvent(event, status);

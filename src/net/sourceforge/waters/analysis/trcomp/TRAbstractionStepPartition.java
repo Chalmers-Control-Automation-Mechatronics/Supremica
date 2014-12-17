@@ -51,17 +51,15 @@ class TRAbstractionStepPartition
   //#########################################################################
   //# Constructor
   TRAbstractionStepPartition(final TRAbstractionStep pred,
-                             final EventEncoding eventEncoding,
-                             final TransitionRelationSimplifier simplifier,
-                             final int precond)
+                             final EventEncoding encBefore,
+                             final TransitionRelationSimplifier simplifier)
   {
     super(pred.getName());
     mPredecessor = pred;
-    mEventEncoding = eventEncoding;
+    mEventEncodingBefore = encBefore;
     mUsedSimplifiers = new LinkedList<>();
     mUsedSimplifiers.add(simplifier);
     mIsPartitioning = simplifier.isPartitioning();
-    mPreconditionMarking = precond;
     mPartition = mIsPartitioning ? simplifier.getResultPartition() : null;
     mRelevantPreconditionMarkings = null;
   }
@@ -129,8 +127,6 @@ class TRAbstractionStepPartition
     final Logger logger = getLogger();
     reportRebuilding();
     final ChainTRSimplifier chain = new ChainTRSimplifier(mUsedSimplifiers);
-    chain.setPropositions(mPreconditionMarking,
-                          TRCompositionalConflictChecker.DEFAULT_MARKING);
     chain.setPreferredOutputConfiguration(preferredConfig);
     final int inputConfig = chain.getPreferredInputConfiguration();
     final TRAutomatonProxy inputAut =
@@ -141,7 +137,7 @@ class TRAbstractionStepPartition
     final ListBufferTransitionRelation inputRel =
       inputAut.getTransitionRelation();
     inputRel.logSizes(logger);
-    final EventEncoding inputEventEncoding = new EventEncoding(mEventEncoding);
+    final EventEncoding inputEventEncoding = new EventEncoding(mEventEncodingBefore);
     final ListBufferTransitionRelation outputRel =
       new ListBufferTransitionRelation(inputRel, inputEventEncoding, inputConfig);
     chain.setTransitionRelation(outputRel);
@@ -199,15 +195,16 @@ class TRAbstractionStepPartition
     {
       mAnalyzer = analyzer;
       mInputTransitionRelation = rel;
+      final byte mask = EventStatus.STATUS_LOCAL | EventStatus.STATUS_UNUSED;
       final List<EventProxy> events = trace.getEvents();
       final int numTraceEvents = events.size();
       mEventSequence = new TIntArrayList(numTraceEvents);
       boolean lastFailing = false;
       for (final EventProxy event : events) {
-        final int e = mEventEncoding.getEventCode(event);
+        final int e = mEventEncodingBefore.getEventCode(event);
         if (e >= 0) {
-          final byte status = mEventEncoding.getProperEventStatus(e);
-          if (!EventStatus.isLocalEvent(status)) {
+          final byte status = mEventEncodingBefore.getProperEventStatus(e);
+          if ((status & mask) == 0) {
             mEventSequence.add(e);
             lastFailing = EventStatus.isFailingEvent(status);
           }
@@ -272,7 +269,7 @@ class TRAbstractionStepPartition
       final TransitionIterator inner =
         mInputTransitionRelation.createSuccessorsReadOnlyIterator();
       final TransitionIterator iterLocal = new StatusGroupTransitionIterator
-        (inner, mEventEncoding, EventStatus.STATUS_LOCAL);
+        (inner, mEventEncodingBefore, EventStatus.STATUS_LOCAL);
       while (!mSearchSpace.isEmpty()) {
         mAnalyzer.checkAbort();
         final TRTraceSearchRecord current = mSearchSpace.poll();
@@ -368,38 +365,40 @@ class TRAbstractionStepPartition
       final List<EventProxy> inputEvents = trace.getEvents();
       final Iterator<EventProxy> inputEventIter = inputEvents.iterator();
       EventProxy nextInputEvent = null;
+      byte nextInputStatus = EventStatus.STATUS_UNUSED;
       while (true) {
         if (nextSearchRecord == null && searchRecordIter.hasNext()) {
           nextSearchRecord = searchRecordIter.next();
         }
         while (nextInputEvent == null && inputEventIter.hasNext()) {
           final EventProxy event = inputEventIter.next();
-          final int e = mEventEncoding.getEventCode(event);
+          final int e = mEventEncodingBefore.getEventCode(event);
           if (e < 0) {
             nextInputEvent = event;
+            nextInputStatus = EventStatus.STATUS_UNUSED;
           } else {
-            final byte status = mEventEncoding.getProperEventStatus(e);
+            final byte status = mEventEncodingBefore.getProperEventStatus(e);
             if (!EventStatus.isLocalEvent(status)) {
               nextInputEvent = event;
+              nextInputStatus = status;
             }
           }
         }
         if (nextSearchRecord == null && nextInputEvent == null) {
           break;
         }
-        if (nextInputEvent != null) {
-          final int e = mEventEncoding.getEventCode(nextInputEvent);
-          if (e < 0) {
-            outputEvents.add(nextInputEvent);
-            nonStutterEvents.add(nextInputEvent);
-            outputStates.add(currentState);
-            nextInputEvent = null;
-            continue;
-          }
+        if (nextInputEvent != null &&
+            !EventStatus.isUsedEvent(nextInputStatus)) {
+          outputEvents.add(nextInputEvent);
+          nonStutterEvents.add(nextInputEvent);
+          outputStates.add(currentState);
+          nextInputEvent = null;
+          continue;
         }
         assert nextSearchRecord != null;
         final int e = nextSearchRecord.getEvent();
-        final EventProxy searchRecordEvent = mEventEncoding.getProperEvent(e);
+        final EventProxy searchRecordEvent =
+          mEventEncodingBefore.getProperEvent(e);
         outputEvents.add(searchRecordEvent);
         currentState = nextSearchRecord.getState();
         outputStates.add(currentState);
@@ -429,10 +428,9 @@ class TRAbstractionStepPartition
   //#########################################################################
   //# Data Members
   private final TRAbstractionStep mPredecessor;
-  private final EventEncoding mEventEncoding;
+  private final EventEncoding mEventEncodingBefore;
   private final List<TransitionRelationSimplifier> mUsedSimplifiers;
   private boolean mIsPartitioning;
-  private final int mPreconditionMarking;
   private TRPartition mPartition;
   private BitSet mRelevantPreconditionMarkings;
 
