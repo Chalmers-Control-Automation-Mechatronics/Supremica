@@ -143,7 +143,7 @@ public class SilentIncomingTRSimplifier
   @Override
   public boolean isAlwaysEnabledEventsSupported()
   {
-    return true;
+    return getPreconditionMarkingID() >= 0;
   }
 
 

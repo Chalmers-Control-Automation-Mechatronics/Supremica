@@ -44,6 +44,7 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.EnumFactory;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.ListedEnumFactory;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzer;
@@ -62,6 +63,29 @@ import org.apache.log4j.Logger;
 
 
 /**
+ * <P>A general compositional model analyser to be subclassed for different
+ * algorithms.</P>
+ *
+ * <P>This model analyser implements compositional minimisation
+ * of the input model, and leaves it to the subclasses to decide what is
+ * to be done with the minimisation result. This implementation is based
+ * on transition relations ({@link TRAutomatonProxy}). It provides full
+ * support for the special event types of <I>blocked</I>, <I>failing</I>,
+ * <I>selfloop-only</I>, and <I>always enabled</I> events. It can be
+ * configured to use different abstraction sequences and candidate selection
+ * heuristics.</P>
+ *
+ * <P><I>References:</I><BR>
+ * Hugo Flordal, Robi Malik. Compositional Verification in Supervisory Control.
+ * SIAM Journal of Control and Optimization, 48(3), 1914-1938, 2009.<BR>
+ * Robi Malik, Ryan Leduc. A Compositional Approach for Verifying Generalised
+ * Nonblocking, Proc. 7th International Conference on Control and Automation,
+ * ICCA'09, 448-453, Christchurch, New Zealand, 2009.<BR>
+ * Colin Pilbrow, Robi Malik. Compositional Nonblocking Verification with
+ * Always Enabled Events and Selfloop-only Events. Proc. 2nd International
+ * Workshop on Formal Techniques for Safety-Critical Systems, FTSCS 2013,
+ * 147-162, Queenstown, New Zealand, 2013.</P>
+ *
  * @author Robi Malik
  */
 
@@ -78,8 +102,8 @@ public abstract class AbstractTRCompositionalAnalyzer
   {
     super(model, ProductDESElementFactory.getInstance(), translator);
     mTRSimplifierCreator = getTRSimplifierFactory().getDefaultValue();
-    // TODO Make these configurable
-    mPreselectionHeuristic = new PreselectionHeuristicMustL();
+    mPreselectionHeuristic = getPreselectionHeuristicFactory().getDefaultValue();
+    // TODO Make this configurable
     final SelectionHeuristic<TRCandidate> minS = new SelectionHeuristicMinS();
     mSelectionHeuristic = new ChainSelectionHeuristic<TRCandidate>(minS);
     mSpecialEventsListener = new PartitioningListener();
@@ -165,7 +189,7 @@ public abstract class AbstractTRCompositionalAnalyzer
   //# Configuration
   /**
    * Gets the factory to obtain transition relation simplifiers for this
-   * compositional analyser. The constants returned by this factory can be
+   * compositional analyser. The objects returned by this factory can be
    * passed to the {@link #setSimplifierCreator(TransitionRelationSimplifier)
    * setSimplifier()} method.
    */
@@ -191,6 +215,42 @@ public abstract class AbstractTRCompositionalAnalyzer
   public TRToolCreator<TransitionRelationSimplifier> getSimplifierCreator()
   {
     return mTRSimplifierCreator;
+  }
+
+  /**
+   * Gets the factory to obtain preselection heuristics for this
+   * compositional analyser. The objects returned by this factory can be
+   * passed to the {@link #setPreselectionHeuristic(TRPreselectionHeuristic)
+   * setPreselectionHeuristic()} method.
+   */
+  public EnumFactory<TRPreselectionHeuristic> getPreselectionHeuristicFactory()
+  {
+    return
+      new ListedEnumFactory<TRPreselectionHeuristic>() {
+      {
+        register(MustL);
+        register(MustSp);
+      }
+    };
+  }
+
+  /**
+   * Sets the preselection heuristic to create the possible candidates for
+   * composition. Possible arguments for this method can be obtained from the
+   * factory returned by {@link #getPreselectionHeuristicFactory()}.
+   */
+  public void setPreselectionHeuristic(final TRPreselectionHeuristic heu)
+  {
+    mPreselectionHeuristic = heu;
+  }
+
+  /**
+   * Gets the preselection heuristic used to create the possible candidates
+   * for composition.
+   */
+  public TRPreselectionHeuristic getPreselectionHeuristic()
+  {
+    return mPreselectionHeuristic;
   }
 
   public void setMonolithicAnalyzer(final ModelAnalyzer mono)
@@ -455,6 +515,8 @@ public abstract class AbstractTRCompositionalAnalyzer
     mTRSimplifier = mTRSimplifierCreator.create(this);
     mTRSimplifier.setPreferredOutputConfiguration
       (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    mPreselectionHeuristic.setContext(this);
+    mSelectionHeuristic.setContext(this);
     mSpecialEventsFinder = new SpecialEventsFinder();
     mSpecialEventsFinder.setAppliesPartitionAutomatically(false);
     mSpecialEventsFinder.setDefaultMarkingID(DEFAULT_MARKING);
@@ -1333,7 +1395,9 @@ public abstract class AbstractTRCompositionalAnalyzer
     bisimulator.setTransitionLimit(limit);
     bisimulator.setSimplificationListener(listener);
     chain.add(bisimulator);
-    chain.setPropositions(PRECONDITION_MARKING, DEFAULT_MARKING);
+    final int precond =
+      getUsedPreconditionMarking() == null ? -1 : PRECONDITION_MARKING;
+    chain.setPropositions(precond, DEFAULT_MARKING);
     chain.setPreferredOutputConfiguration
       (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     return chain;
@@ -1577,7 +1641,7 @@ public abstract class AbstractTRCompositionalAnalyzer
   private boolean mPreservingEncodings = false;
 
   // Tools
-  private final PreselectionHeuristic mPreselectionHeuristic;
+  private TRPreselectionHeuristic mPreselectionHeuristic;
   private final SelectionHeuristic<TRCandidate> mSelectionHeuristic;
   private final PartitioningListener mSpecialEventsListener;
   private TRToolCreator<TransitionRelationSimplifier> mTRSimplifierCreator;
@@ -1599,6 +1663,11 @@ public abstract class AbstractTRCompositionalAnalyzer
 
   //#########################################################################
   //# Class Constants
+  static final TRPreselectionHeuristic MustL =
+    new TRPreselectionHeuristicMustL();
+  static final TRPreselectionHeuristic MustSp =
+    new TRPreselectionHeuristicMustSp();
+
   static final int DEFAULT_MARKING = 0;
   static final int PRECONDITION_MARKING = 1;
 

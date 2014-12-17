@@ -48,7 +48,7 @@ public abstract class SelectionHeuristic<T>
   //# Heuristics
   /**
    * Sets the context in which the heuristic runs.
-   * This method is called when a heuristic is register with a model analyser
+   * This method is called when a heuristic is registered with a model analyser
    * ({@link net.sourceforge.waters.model.analysis.des.ModelAnalyzer
    * ModelAnalyzer} or similar object) to pass that model analyser as a
    * context into the heuristic. The default implementation does nothing,

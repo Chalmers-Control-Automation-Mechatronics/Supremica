@@ -368,35 +368,41 @@ public class TRSynchronousProductBuilder
     }
 
     // Set up deadlock information ...
-    if (mPruningDeadlocks &&
-        mOutputEventEncoding.getNumberOfPropositions() > 0) {
-      deadlock:
-      for (a = 0; a < numAutomata; a++) {
-        final TRAutomatonProxy aut = mInputAutomata[a];
-        final EventEncoding enc = aut.getEventEncoding();
-        final ListBufferTransitionRelation rel = aut.getTransitionRelation();
-        final int numProps = mOutputEventEncoding.getNumberOfPropositions();
-        long pattern = rel.createMarkings();
-        for (int global = 0; global < numProps; global++) {
-          if (mOutputEventEncoding.isPropositionUsed(global)) {
+    final int numProps = mOutputEventEncoding.getNumberOfPropositions();
+    if (mPruningDeadlocks && numProps > 0) {
+      boolean allPropsUsed = true;
+      for (int p = 0; p < numProps; p++) {
+        if (!mOutputEventEncoding.isPropositionUsed(p)) {
+          allPropsUsed = false;
+          break;
+        }
+      }
+      if (allPropsUsed) {
+        deadlock:
+        for (a = 0; a < numAutomata; a++) {
+          final TRAutomatonProxy aut = mInputAutomata[a];
+          final EventEncoding enc = aut.getEventEncoding();
+          final ListBufferTransitionRelation rel = aut.getTransitionRelation();
+          long pattern = rel.createMarkings();
+          for (int global = 0; global < numProps; global++) {
             final EventProxy prop = mOutputEventEncoding.getProposition(global);
             final int local = enc.getEventCode(prop);
-            if (rel.isPropositionUsed(local)) {
+            if (local >= 0 && rel.isPropositionUsed(local)) {
               pattern = rel.addMarking(pattern, local);
             } else {
               continue deadlock;
             }
           }
-        }
-        final DeadlockInfo info = new DeadlockInfo(rel, pattern);
-        final int numStates = rel.getNumberOfStates();
-        for (int s = 0; s < numStates; s++) {
-          if (rel.isReachable(s) && info.isDeadlockState(s)) {
-            if (mDeadlockInfo == null) {
-              mDeadlockInfo = new DeadlockInfo[numAutomata];
+          final DeadlockInfo info = new DeadlockInfo(rel, pattern);
+          final int numStates = rel.getNumberOfStates();
+          for (int s = 0; s < numStates; s++) {
+            if (rel.isReachable(s) && info.isDeadlockState(s)) {
+              if (mDeadlockInfo == null) {
+                mDeadlockInfo = new DeadlockInfo[numAutomata];
+              }
+              mDeadlockInfo[a] = info;
+              break;
             }
-            mDeadlockInfo[a] = info;
-            break;
           }
         }
       }

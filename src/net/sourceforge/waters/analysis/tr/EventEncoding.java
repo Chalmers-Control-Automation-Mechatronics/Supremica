@@ -732,11 +732,13 @@ public class EventEncoding
   public void setTauEvent(final EventProxy newTau)
   {
     final EventProxy oldTau = mProperEvents.get(TAU);
-    if (oldTau != null) {
-      mEventCodeMap.remove(oldTau);
+    if (oldTau != newTau) {
+      if (oldTau != null) {
+        mEventCodeMap.remove(oldTau);
+      }
+      mProperEvents.set(TAU, newTau);
+      mEventCodeMap.put(newTau, TAU);
     }
-    mProperEvents.set(TAU, newTau);
-    mEventCodeMap.put(newTau, TAU);
   }
 
   /**
