@@ -1451,8 +1451,10 @@ public abstract class AbstractTRCompositionalAnalyzer
             mIntermediateAbstractionSequence.getPredecessor() : last;
           final EventEncoding enc =
             mIntermediateAbstractionSequence.getCurrentEventEncoding();
+          final int precond =
+            getUsedPreconditionMarking() == null ? -1 : PRECONDITION_MARKING;
           final TRAbstractionStep step =
-            new TRAbstractionStepPartition(pred, enc, simplifier);
+            new TRAbstractionStepPartition(pred, enc, simplifier, precond);
           mIntermediateAbstractionSequence.append(step);
         }
       }

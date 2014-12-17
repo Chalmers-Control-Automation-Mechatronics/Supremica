@@ -50,7 +50,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
  * <UL>
  * <LI>Every blocking state is a state of certain conflicts.</LI>
  * <LI>Every state with an outgoing always enabled ({@link
- *     EventStatus#STATUS_ALWAYS_ENABLED})transition to a state of certain
+ *     EventStatus#STATUS_ALWAYS_ENABLED}) transition to a state of certain
  *     conflicts also is a state of certain conflicts.</LI>
  * <LI>If a state&nbsp;<I>x</I> has an outgoing transition labelled by
  *     event&nbsp;<I>e</I> to a state of certain conflicts, or if such a
@@ -379,7 +379,7 @@ public class LimitedCertainConflictsTRSimplifier
         }
       }
       rel.setMarked(blockingInit, defaultID, false);
-      result = true;
+      mHasCertainConflictTransitions = result = true;
     } else if (numCoreachable == numReachable - 1) {
       // Only one reachable state of certain conflicts---find it ...
       int ccState = -1;

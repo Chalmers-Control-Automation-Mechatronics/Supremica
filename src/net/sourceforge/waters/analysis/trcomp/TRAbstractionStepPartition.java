@@ -52,7 +52,8 @@ class TRAbstractionStepPartition
   //# Constructor
   TRAbstractionStepPartition(final TRAbstractionStep pred,
                              final EventEncoding eventEncoding,
-                             final TransitionRelationSimplifier simplifier)
+                             final TransitionRelationSimplifier simplifier,
+                             final int precond)
   {
     super(pred.getName());
     mPredecessor = pred;
@@ -60,6 +61,7 @@ class TRAbstractionStepPartition
     mUsedSimplifiers = new LinkedList<>();
     mUsedSimplifiers.add(simplifier);
     mIsPartitioning = simplifier.isPartitioning();
+    mPreconditionMarking = precond;
     mPartition = mIsPartitioning ? simplifier.getResultPartition() : null;
     mRelevantPreconditionMarkings = null;
   }
@@ -127,7 +129,7 @@ class TRAbstractionStepPartition
     final Logger logger = getLogger();
     reportRebuilding();
     final ChainTRSimplifier chain = new ChainTRSimplifier(mUsedSimplifiers);
-    chain.setPropositions(TRCompositionalConflictChecker.PRECONDITION_MARKING,
+    chain.setPropositions(mPreconditionMarking,
                           TRCompositionalConflictChecker.DEFAULT_MARKING);
     chain.setPreferredOutputConfiguration(preferredConfig);
     final int inputConfig = chain.getPreferredInputConfiguration();
@@ -430,6 +432,7 @@ class TRAbstractionStepPartition
   private final EventEncoding mEventEncoding;
   private final List<TransitionRelationSimplifier> mUsedSimplifiers;
   private boolean mIsPartitioning;
+  private final int mPreconditionMarking;
   private TRPartition mPartition;
   private BitSet mRelevantPreconditionMarkings;
 
