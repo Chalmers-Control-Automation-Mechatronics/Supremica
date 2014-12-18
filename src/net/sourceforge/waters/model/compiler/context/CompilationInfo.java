@@ -152,6 +152,21 @@ public class CompilationInfo
   }
 
   /**
+   * Tests whether there is any exception accumulated in
+   * the list {@link #mExceptions}.
+   *
+   * @return <code>true</code> if there is any accumulated exception, or
+   *        <code>false</code> otherwise.
+   */
+  public boolean hasExceptions()
+  {
+    if (mExceptions == null)
+      return false;
+    else
+      return mExceptions.hasException();
+  }
+
+  /**
    * Returns the {@link MultiEvalException} containing all the exceptions that
    * occurred so far.
    *

@@ -1,4 +1,4 @@
-//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//# -*- indenComt-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters EFA Compiler
 //# PACKAGE: net.sourceforge.waters.model.compiler.efa
@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,8 +45,10 @@ import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierExceptio
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfoCloner;
 import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
+import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionComparator;
+import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -75,23 +78,23 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
 /**
  * <P>A preprocessor for EFA modules.</P>
  *
- * <P>The EFA unifier identifies the overall updates associated with
- * each event and produces a module where each event is associated
- * with a unique update formula shared over all automata. Events are
- * renamed as necessary to achieve this condition.</P>
+ * <P>The EFA normaliser identifies the overall updates associated with
+ * each event and produces a module where each event is associated with
+ * a unique update formula shared over all automata. Events are renamed
+ * as necessary to achieve this condition.</P>
  *
  * <P><STRONG>Algorithm</STRONG></P>
  *
- * <P>The EFA unifier proceeds in four passes.</P>
+ * <P>The EFA normaliser proceeds in four passes.</P>
  *
  * <OL>
- * <LI>Compute the range of a variables and initialise the constraint
+ * <LI>Compute the range of variables and initialise the constraint
  *     propagator context.</LI>
  * <LI>Collect information about events and associated updates in each
- *     automaton. This information is stored in the map
- *     {@link #mEventMap}.</LI>
- * <LI>Make updates disjoint, and then combine updates and generate
- *     unique event identifiers.</LI>
+ *     automaton. This information is stored in the map {@link #mEventMap}.
+ *     </LI>
+ * <LI>Make updates disjoint, combine updates and generate unique event
+ *     identifiers.</LI>
  * <LI>Build output module.</LI>
  * </OL>
  *
@@ -100,7 +103,6 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
 
 public class EFANormaliser extends AbortableCompiler
 {
-
   //#########################################################################
   //# Constructors
   public EFANormaliser(final ModuleProxyFactory factory,
@@ -159,12 +161,29 @@ public class EFANormaliser extends AbortableCompiler
           new EFAEventNameBuilder(mFactory, mOperatorTable, mRootContext);
       }
       mEventUpdateMap = new ProxyAccessorHashMap<>(eq, size);
-      for (final EFAEventInfo info : mEventMap.values()) {
-        info.makeDisjoint();
+      for (final Entry<ProxyAccessor<IdentifierProxy>,EFAEventInfo> e : mEventMap.entrySet())
+      {
+        final IdentifierProxy ident = e.getKey().getProxy();
+        final EFAEventInfo info = e.getValue();
+
+        /*/ Old semantics
+        if (mUsesEventAlphabet)
+          info.createExplicitGuards();//*/
+
+        info.makeDisjoint(ident);
         info.combineUpdates();
         info.generateEventNames(mComparator);
       }
       mEventNameBuilder = null;
+
+      //*/ Old semantics
+      if (mUsesEventAlphabet)
+        for (final EFAEventInfo e : mEventMap.values())
+          e.createExplicitGuards(); //*/
+
+      // End of Pass 3: Throw any accumulated exceptions
+      if (mCompilationInfo.hasExceptions())
+        throw mCompilationInfo.getExceptions();
 
       // Pass 4
       final Pass4Visitor pass4 = new Pass4Visitor();
@@ -189,6 +208,11 @@ public class EFANormaliser extends AbortableCompiler
   }
 
 
+  public boolean getCreatesGuardAutomaton()
+  {
+    return mCreatesGuardAutomaton;
+  }
+
   //#########################################################################
   //# Configuration
   public void setCreatesGuardAutomaton(final boolean create)
@@ -196,29 +220,24 @@ public class EFANormaliser extends AbortableCompiler
     mCreatesGuardAutomaton = create;
   }
 
-  public boolean getCreatesGuardAutomaton()
+  public boolean getUsesEventAlphabet()
   {
-    return mCreatesGuardAutomaton;
+    return mUsesEventAlphabet;
   }
 
-  public void setMakesGuardsDisjoint(final boolean make)
+  public void setUsesEventAlphabet(final boolean use)
   {
-    mMakesGuardsDisjoint = make;
-  }
-
-  public boolean getMakesGuardsDisjoint()
-  {
-    return mMakesGuardsDisjoint;
-  }
-
-  public void setUsesEventNameBuilder(final boolean use)
-  {
-    mUsesEventNameBuilder = use;
+    mUsesEventAlphabet = use;
   }
 
   public boolean getUsesEventNameBuilder()
   {
     return mUsesEventNameBuilder;
+  }
+
+  public void setUsesEventNameBuilder(final boolean use)
+  {
+    mUsesEventNameBuilder = use;
   }
 
 
@@ -849,6 +868,19 @@ public class EFANormaliser extends AbortableCompiler
 
     //#######################################################################
     // Auxiliary Method
+    /**
+     * Ensures that an event identifier is declared before adding it to
+     * the final output module.
+     * <p>
+     * New identifiers can be automatically generated during the normalisation
+     * process; in such cases, the new identifiers must not be added to the
+     * output module, or the next step of the compilation will misbehave.
+     *
+     * @param ident The event identifier of interest
+     *
+     * @return <code>true</code> if the identifier given as parameter is not
+     *                           declared
+     */
     private boolean identifierNotDeclared(final IdentifierProxy ident)
     {
       for (final EventDeclProxy decl : mEventDeclarations)
@@ -860,8 +892,12 @@ public class EFANormaliser extends AbortableCompiler
 
     //#######################################################################
     //# Data Members
-    private final ModuleProxyCloner mCloner;
 
+    // Utilities:
+    private final ModuleProxyCloner mCloner;
+    private final ModuleEqualityVisitor mEquality = new ModuleEqualityVisitor(false);
+
+    // Module Information:
     private List<EventDeclProxy> mEventDeclarations;
     private List<ComponentProxy> mComponents;
     private SimpleComponentProxy mCurrentComponent;
@@ -872,9 +908,6 @@ public class EFANormaliser extends AbortableCompiler
     private Map<NodeProxy,NodeProxy> mNodeMap;
     private List<EdgeProxy> mEdgeList;
     private List<IdentifierProxy> mLabelList;
-
-    private final ModuleEqualityVisitor mEquality =
-                                            new ModuleEqualityVisitor(false);
   }
 
 
@@ -961,7 +994,7 @@ public class EFANormaliser extends AbortableCompiler
       if (!isBlocked()) {
         EFAUpdateInfo info = mMap.get(comp);
         if (info == null) {
-          info = new EFAUpdateInfo();
+          info = new EFAUpdateInfo(comp);
           mMap.put(comp, info);
           mList.add(info);
         }
@@ -1003,107 +1036,22 @@ public class EFANormaliser extends AbortableCompiler
     //#######################################################################
     //# Pass 3
     /**
-     * Adds complementary updates.
-     * <p>
-     * For each specification or supervisor automaton associated with an
-     * uncontrollable event, and for each property automaton associated
-     * with a controllable or uncontrollable event, this method records
-     * an update with a guard representing the negation of all other
-     * recorded updates.
-     * <p>
-     * This ensures that attempts to disable an update in
-     * specifications and properties are explicit in the compiled model.
-     */
-    private void addComplementaryUpdates() throws EvalException
-    {
-      final EventKind ekind = mEventDecl.getKind();
-
-      if (ekind != EventKind.PROPOSITION && !isBlocked())
-      {
-        final ConstraintPropagator propagator =
-                      new ConstraintPropagator(mFactory, mCompilationInfo,
-                                               mOperatorTable, mRootContext);
-
-        for (final Entry<SimpleComponentProxy,EFAUpdateInfo> entry :
-                                                             mMap.entrySet())
-        {
-          final SimpleComponentProxy comp = entry.getKey();
-
-          switch (comp.getKind())
-          {
-            case PLANT: break;
-
-            case SPEC:
-
-            case SUPERVISOR: if (ekind == EventKind.CONTROLLABLE) break;
-
-            default:
-              final EFAUpdateInfo info = entry.getValue();
-              info.addComplementaryUpdate(propagator);
-              break;
-          }
-        }
-      }
-    }
-
-    /**
-     * Determines whether the "catchAll" flag should be set to true.
-     * <p>
-     * For each specification or supervisor automaton associated with an
-     * uncontrollable event, and for each property automaton associated
-     * with a controllable or uncontrollable event, the "catchAll" flag is
-     * set to true.
-     * <p>
-     * This ensures that attempts to disable an update in specifications and
-     * properties are explicit in the compiled model.
-     */
-    private void determineCatchAll() throws EvalException
-    {
-      final EventKind ekind = mEventDecl.getKind();
-
-      if (ekind != EventKind.PROPOSITION && !isBlocked())
-      {
-        for (final Entry<SimpleComponentProxy,EFAUpdateInfo> e : mMap.entrySet())
-        {
-          final SimpleComponentProxy comp = e.getKey();
-
-          switch (comp.getKind())
-          {
-            case PLANT: break;
-
-            case SPEC:
-
-            case SUPERVISOR: if (ekind == EventKind.CONTROLLABLE) break;
-
-            default:
-              e.getValue().setCatchAll(true);
-              break;
-          }
-        }
-      }
-    }
-
-    /**
      * Ensures that all guards of one component are disjoint, and this
-     * process is performed separately for different components.
+     * process is performed separately for different automata.
      */
-    private void makeDisjoint() throws EvalException
+    private void makeDisjoint(final IdentifierProxy ident) throws EvalException
     {
-      // Attempt to make guards disjoint only if the flag is set.
-      if (!mMakesGuardsDisjoint) {
-        addComplementaryUpdates();
-        return;
-      }
+      // If the event is blocked, do nothing.
+      if (isBlocked()) return;
 
+      // Perform the disjoint operation for separate automata.
       for (final EFAUpdateInfo update : mList) {
-        update.initialiseMap();
-        determineCatchAll();
-        update.makeDisjoint(mEventDecl);
+        update.makeDisjoint(mEventDecl, ident);
       }
     }
 
     /**
-     * Computes all combinations of the guards in separate components.
+     * Computes all combinations of the guards in different automata.
      * <P>
      * This base method uses another recursive method of the same name.
      */
@@ -1116,10 +1064,63 @@ public class EFANormaliser extends AbortableCompiler
                                                mOperatorTable, mRootContext);
         final EFAUpdateInfo[] second = new EFAUpdateInfo[mList.size()];
         for (int i = 0; i < second.length; i++)
-          second[i] = new EFAUpdateInfo();
+          second[i] = new EFAUpdateInfo(null);
+          /* Because the component reference of each temporary
+           * EFAUpdateInfo in the array 'second' is not used at
+           * all, it is safe to pass 'null' as the parameter.
+           */
         combineUpdates(0, propagator, second);
         for (int i = 0; i < second.length; i++)
           mList.get(i).combineMaps(second[i]);
+      }
+    }
+
+    /**
+     * If the flag {HOW TO LINK TO mUsesEventAlphabet?} is set, then
+     * this means that when a variable is not mentioned in an update,
+     * this particular variable can be changed.
+     * <p>
+     * This method achieves this by explicitly adding extra terms to
+     * the updates.
+     */
+    private void createExplicitGuards()
+    {
+      // The overall set of all prime variables used by an EFAEventInfo.
+      final Set<EFAVariable> allPrimes = new HashSet<>();
+
+      // Ensure that the set of prime variables of every EFAUpdateInfo is
+      // properly initiated, then obtain the global set of prime variables.
+      for (final EFAUpdateInfo update : mList) {
+        update.setPrimeVariables();
+        allPrimes.addAll(update.getPrimeVariables());
+      }
+
+      // Add literals such as (x'=x') if the variable (x') is not mentioned
+      // in the update of an event.
+      for (final EFAIdentifier event : mEventList) {
+        for (final EFAVariable primeVar : allPrimes) {
+          if (!event.collectPrimeVariables().contains(primeVar))
+          {
+            // Prepare the operators.
+            final BinaryOperator equal = mOperatorTable.getEqualsOperator();
+            final UnaryOperator prime = mOperatorTable.getNextOperator();
+
+            // Construct the new term.
+            SimpleExpressionProxy term = primeVar.getVariableName();
+            term = mFactory.createUnaryExpressionProxy(prime, term);
+            term = mFactory.createBinaryExpressionProxy(equal, term, term);
+
+            // Add the new term to the conjunction.
+            final List<SimpleExpressionProxy> oldGuards =
+                                           event.getUpdate().getConstraints();
+            final List<SimpleExpressionProxy> newGuards = new ArrayList<>();
+            for (final SimpleExpressionProxy exp : oldGuards)
+              newGuards.add(exp);
+            newGuards.add(term);
+            mEventUpdateMap.putByProxy(event.getIdentifier(),
+                                       new ConstraintList(newGuards));
+          }
+        }
       }
     }
 
@@ -1186,7 +1187,7 @@ public class EFANormaliser extends AbortableCompiler
     //#######################################################################
     //# Auxiliary Methods
     /**
-     * Computes all combinations of the guards in separate components.
+     * Computes all combinations of the guards in different automata.
      * <p>
      * This is the main recursive part of the algorithm.
      *
@@ -1220,7 +1221,6 @@ public class EFANormaliser extends AbortableCompiler
               if (!identifiers.isEmpty())
               {
                 second[index].addEvents(update, identifiers);
-                //mList.get(index).combineMaps(second);
                 events.addAll(identifiers);
               }
             }
@@ -1231,7 +1231,7 @@ public class EFANormaliser extends AbortableCompiler
 
       else // Base case of the recursion
       {
-        propagator.removeUnchangedVariables();
+        //propagator.removeUnchangedVariables();
         final ConstraintList constraints = propagator.getAllConstraints();
         EFAIdentifier event = mConstraintMap.get(constraints);
         if (event == null)
@@ -1245,7 +1245,7 @@ public class EFANormaliser extends AbortableCompiler
     }
 
     /**
-     * This is the auxiliary method for generating event names.
+     * Auxiliary method for generating event names.
      */
     private String generateEventName(final int index)
     {
@@ -1298,8 +1298,9 @@ public class EFANormaliser extends AbortableCompiler
   {
     //#######################################################################
     //# Constructor
-    private EFAUpdateInfo()
+    private EFAUpdateInfo(final SimpleComponentProxy comp)
     {
+      mComponent = comp;
       mUpdates = new ArrayList<>();
       mMap = new HashMap<>();
     }
@@ -1337,21 +1338,51 @@ public class EFANormaliser extends AbortableCompiler
       return mMap;
     }
 
+    private Set<EFAVariable> getPrimeVariables()
+    {
+      return mPrimeVariables;
+    }
+
     /**
-     * The map is initially empty, so the correct initial entries need to be
-     * added once all the correct updates are recorded in the list.
+     * Makes sure that the field {@link #mPrimeVariables} is properly
+     * initiated.
+     * <p>
+     * The set would be null, if the method {@link #collectPrimeVariables()}
+     * is never called. In this case, it proceeds to collect the prime
+     * variables into the set.
+     * <p>
+     * If the method {@link #collectPrimeVariables()} has already been
+     * called before, then nothing needs to be done because the set is
+     * already initiated.
      */
-    private void initialiseMap()
+    private void setPrimeVariables()
+    {
+      if (mPrimeVariables == null)
+        mPrimeVariables = collectPrimeVariables();
+    }
+
+
+    //#######################################################################
+    //# Auxiliary Methods
+    /**
+     * Initialises the map by putting in pairs of original updates and empty
+     * event lists.
+     */
+    private void initialiseBlankMap()
     {
       for (final ConstraintList update : mUpdates)
         mMap.put(update, new EFAEventList());
     }
 
-    private void setCatchAll(final boolean catchAll)
+    /**
+     * If the disjoint operation is not carried out, then the map should be
+     * set to its primitive state, i.e. each original update maps to itself.
+     */
+    private void initialiseOriginalMap(final EventDeclProxy event)
     {
-      mCatchAll = catchAll;
+      for (final ConstraintList update : mMap.keySet())
+        mMap.get(update).add(new EFAIdentifier(event, update));
     }
-
     //#######################################################################
     //# Interface java.lang.Comparable<EFAUpdateInfo>
     @Override
@@ -1360,115 +1391,23 @@ public class EFANormaliser extends AbortableCompiler
       return mUpdates.size() - info.mUpdates.size();
     }
 
+
     //#######################################################################
     //# Pass 3
     /**
-     * Auxiliary method for EFAEventInfo.addComplementaryUpdate().
-     */
-    private void addComplementaryUpdate(final ConstraintPropagator propagator)
-      throws EvalException
-    {
-      for (final ConstraintList update : mUpdates) {
-        propagator.addNegation(update);
-      }
-      propagator.propagate();
-      if (!propagator.isUnsatisfiable()) {
-        propagator.removeUnchangedVariables();
-        final ConstraintList update = propagator.getAllConstraints();
-        addUpdate(update);
-      }
-      propagator.reset();
-    }
-
-    /**
-     * The base method for making all updates of one single event disjoint.
-     */
-    private void makeDisjoint(final EventDeclProxy event) throws EvalException
-    {
-      final ListIterator<ConstraintList> iter = mUpdates.listIterator();
-
-      final List<ConstraintList> selected = new ArrayList<>(mUpdates.size());
-
-      final List<ConstraintList> result = new LinkedList<>();
-
-      final ConstraintPropagator propagator = new ConstraintPropagator
-                   (mFactory, mCompilationInfo, mOperatorTable, mRootContext);
-
-      makeDisjoint(iter, selected, result, propagator, event, mCatchAll);
-
-      mUpdates = result;
-    }
-
-    /**
-     * Makes the updates of one particular event disjoint by computing all
-     * of their combinations and assigning each of them to the appropriate
-     * original edges.
+     * Collects all the prime variables used by an {@link EFAUpdateInfo}.
      *
-     * @param iter
-     *               The iterator for the list of original updates
-     * @param selected
-     *               The list of updates selected in one specific combination
-     * @param result
-     *               The final list containing all the recently created
-     *               disjoint updates
-     * @param parent
-     *               The constraint propagator
-     * @param event
-     *               The event to which this operation is associated
-     * @param catchAll
-     *               The flag indicating whether the unsatisfiable updates
-     *               should be stored
+     * @return A set of prime variables
      */
-    private void makeDisjoint(final ListIterator<ConstraintList> iter,
-                              final List<ConstraintList> selected,
-                              final List<ConstraintList> result,
-                              final ConstraintPropagator parent,
-                              final EventDeclProxy event,
-                              final boolean catchAll)
-      throws EvalException
+    private Set<EFAVariable> collectPrimeVariables()
     {
-      if (iter.hasNext())
-      {
-        // First handle the positive current literal.
-        final ConstraintList guard = iter.next();
-        ConstraintPropagator propagator = new ConstraintPropagator(parent);
-        propagator.addConstraints(guard);
-        propagator.propagate();
-        if (!propagator.isUnsatisfiable()) {
-          final int end = selected.size();
-          selected.add(guard);
-          makeDisjoint(iter, selected, result, propagator, event, catchAll);
-          selected.remove(end);
-        }
+      final EFAVariableCollector collector =
+                      new EFAVariableCollector(mOperatorTable, mRootContext);
+      final Set<EFAVariable> primeVariables = new HashSet<>();
+      for (final ConstraintList constraint : mUpdates)
+        collector.collectPrimedVariables(constraint, primeVariables);
 
-        // Then handle the negated current literal.
-        propagator = new ConstraintPropagator(parent);
-        propagator.addNegation(guard);
-        propagator.propagate();
-        if (!propagator.isUnsatisfiable()) {
-          makeDisjoint(iter, selected, result, propagator, event, catchAll);
-        }
-        iter.previous();
-      }
-
-      // Base case of the recursion
-      else
-      {
-        final ConstraintList newUpdate = parent.getAllConstraints(false);
-        final EFAIdentifier newId = new EFAIdentifier(event, newUpdate);
-        for (final ConstraintList literal : selected)
-        {
-          final Collection<EFAIdentifier> newIdC = new ArrayList<>(1);
-          newIdC.add(newId);
-          addEvents(literal, newIdC);
-          result.add(newUpdate);
-        }
-
-        if (catchAll && selected.isEmpty()) {
-          result.add(newUpdate);
-          mCaughtGuards.add(newUpdate);
-        }
-      }
+      return primeVariables;
     }
 
     /**
@@ -1515,8 +1454,7 @@ public class EFANormaliser extends AbortableCompiler
         for (final EFAIdentifier y : value0)
         {
           // For each entry 'z' of the other map,
-          for (final Entry<ConstraintList, EFAEventList> z :
-                                                    other.getMap().entrySet())
+          for (final Entry<ConstraintList, EFAEventList> z : other.getMap().entrySet())
           {
             if (z.getKey().equals(y.getUpdate()))
             {
@@ -1538,25 +1476,192 @@ public class EFANormaliser extends AbortableCompiler
       mMap = newMap;
     }
 
+    /**
+     * Decides whether the disjoint operation should be performed, and
+     * manipulate the data structure accordingly.
+     *
+     * @param event The {@link EventDeclProxy} of interest
+     *
+     * @param ident This is required for location identification
+     *              if an exception is thrown
+     */
+    private void makeDisjoint(final EventDeclProxy event,
+                              final IdentifierProxy ident)
+      throws EvalException
+    {
+      initialiseBlankMap();
+
+      // Decide whether the disjoint operation should be performed.
+      if (!shouldMakeDisjoint(event, ident)) {
+        initialiseOriginalMap(event);
+        return;
+      }
+
+      // Carry out the disjoint operation.
+      final ListIterator<ConstraintList> iter = mUpdates.listIterator();
+      final List<ConstraintList> selected = new ArrayList<>(mUpdates.size());
+      final List<ConstraintList> result = new LinkedList<>();
+      final ConstraintPropagator propagator = new ConstraintPropagator
+                   (mFactory, mCompilationInfo, mOperatorTable, mRootContext);
+      makeDisjoint(iter, selected, result, propagator, event);
+      mUpdates = result;
+    }
+
+    /**
+     * Makes the updates of one particular event disjoint by computing all
+     * of their combinations and assigning each of them to the appropriate
+     * original edges.
+     *
+     * @param iter
+     *               The iterator for the list of original updates
+     * @param selected
+     *               The list of updates selected in one specific combination
+     * @param result
+     *               The final list containing all the recently created
+     *               disjoint updates
+     * @param parent
+     *               The constraint propagator
+     * @param event
+     *               The event to which this operation is associated
+     */
+    private void makeDisjoint(final ListIterator<ConstraintList> iter,
+                              final List<ConstraintList> selected,
+                              final List<ConstraintList> result,
+                              final ConstraintPropagator parent,
+                              final EventDeclProxy event)
+      throws EvalException
+    {
+      if (iter.hasNext())
+      {
+        // First handle the positive current literal.
+        final ConstraintList guard = iter.next();
+        ConstraintPropagator propagator = new ConstraintPropagator(parent);
+        propagator.addConstraints(guard);
+        propagator.propagate();
+        if (!propagator.isUnsatisfiable()) {
+          final int end = selected.size();
+          selected.add(guard);
+          makeDisjoint(iter, selected, result, propagator, event);
+          selected.remove(end);
+        }
+
+        // Then handle the negated current literal.
+        propagator = new ConstraintPropagator(parent);
+        propagator.addNegation(guard);
+        propagator.propagate();
+        if (!propagator.isUnsatisfiable()) {
+          makeDisjoint(iter, selected, result, propagator, event);
+        }
+        iter.previous();
+      }
+
+      // Base case of the recursion
+      else
+      {
+        final ConstraintList newUpdate = parent.getAllConstraints(false);
+        final EFAIdentifier newId = new EFAIdentifier(event, newUpdate);
+        for (final ConstraintList literal : selected)
+        {
+          final Collection<EFAIdentifier> newIdC = new ArrayList<>(1);
+          newIdC.add(newId);
+          addEvents(literal, newIdC);
+          result.add(newUpdate);
+        }
+
+        if (selected.isEmpty()) {
+          result.add(newUpdate);
+          mCaughtGuards.add(newUpdate);
+        }
+      }
+    }
+
+    /**
+     * Determines whether the disjoint operation should be carried out in a
+     * particular automaton.
+     * <p>
+     * The disjoint operation should be carried out only in the following cases:
+     * <OL>
+     * <LI><UL><LI>Automaton Type: SPECIFICATION</LI>
+     *         <LI>Event Type: CONTROLLABLE</LI>
+     *         <LI>Condition: No prime variables</LI>
+     *         </UL>
+     * <LI><UL><LI>Automaton Type: SUPERVISOR</LI>
+     *         <LI>Event Type: CONTROLLABLE</LI>
+     *         <LI>Condition: No prime variables</LI>
+     *         </UL>
+     * <LI><UL><LI>Automaton Type: PROPERTY</LI>
+     *         <LI>Event Type: CONTROLLABLE or UNCONTROLLABLE</LI>
+     *         <LI>Condition: No prime variables</LI>
+     *         </UL>
+     * </OL>
+     *
+     * @param event The {@link EventDeclProxy} of interest
+     *
+     * @param ident This is required for location identification
+     *              if an exception is thrown
+     *
+     * @return <code>true</code> if the disjoint operation should be performed;
+     *        <code>false</code> otherwise.
+     */
+    private boolean shouldMakeDisjoint(final EventDeclProxy event,
+                                       final IdentifierProxy ident)
+      throws EvalException
+    {
+      final EventKind eKind = event.getKind();
+      final ComponentKind cKind = mComponent.getKind();
+
+      if (cKind == ComponentKind.PLANT || eKind == EventKind.PROPOSITION)
+        return false;
+
+      if (cKind == ComponentKind.PROPERTY || eKind == EventKind.UNCONTROLLABLE)
+      {
+        mPrimeVariables = collectPrimeVariables();
+        if (!mPrimeVariables.isEmpty())
+        {
+          // Not controllable: Create an exception.
+          for (final EFAVariable var : mPrimeVariables)
+          {
+            final EFSMControllabilityException ex =
+                    new EFSMControllabilityException(mComponent, var, ident);
+            mCompilationInfo.raise(ex);
+          }
+          return false;
+        }
+        else
+          return true;
+      }
+
+      return false;
+    }
+
     //#######################################################################
     //# Data Members
     /**
-     * This list contains the most current updates.
+     * The reference to the component (automata) associated with this
+     * instance of EFAUpdateInfo.
+     */
+    private final SimpleComponentProxy mComponent;
+
+    /**
+     * The list containing the most current updates.
      */
     private List<ConstraintList> mUpdates;
 
     /**
-     * This list that maps the original updates to the new events.
+     * The list that maps the original updates to the new events.
      */
     private Map<ConstraintList,EFAEventList> mMap;
 
-    private boolean mCatchAll = false;
-
     /**
-     * A list that contains the additional guards which are collected when the
-     * 'catchAll' flag is enabled.
+     * A list that contains the additional complementary guards which are not
+     * associated to any transition.
      */
     private final List<ConstraintList> mCaughtGuards = new ArrayList<>();
+
+    /**
+     * A set that contains the prime variables used by this EFAUpdateInfo.
+     */
+    private Set<EFAVariable> mPrimeVariables;
   }
 
 
@@ -1644,6 +1749,22 @@ public class EFANormaliser extends AbortableCompiler
     }
 
     //#######################################################################
+    //# Auxiliary Methods
+    /**
+     * Collects all prime variables used in the field {@link #mUpdate}.
+     *
+     * @return A set of prime variables
+     */
+    private Set<EFAVariable> collectPrimeVariables()
+    {
+      final EFAVariableCollector collector =
+                      new EFAVariableCollector(mOperatorTable, mRootContext);
+      final Set<EFAVariable> primeVariables = new HashSet<>();
+      collector.collectPrimedVariables(mUpdate, primeVariables);
+      return primeVariables;
+    }
+
+    //#######################################################################
     //# Debugging
     @Override
     public String toString()
@@ -1671,7 +1792,7 @@ public class EFANormaliser extends AbortableCompiler
     implements Comparator<EFAIdentifier>
   {
     //#######################################################################
-    //# Constructors
+    //# Constructor
     private EFAIdentifierComparator(final ExpressionComparator inner)
     {
       mExpressionComparator = inner;
@@ -1716,7 +1837,7 @@ public class EFANormaliser extends AbortableCompiler
 
   // Flags:
   private boolean mCreatesGuardAutomaton = false;
-  private boolean mMakesGuardsDisjoint = false;
+  private boolean mUsesEventAlphabet = false; // Old semantics
   private boolean mUsesEventNameBuilder = false;
 
   // Utilities:
@@ -1738,6 +1859,11 @@ public class EFANormaliser extends AbortableCompiler
    * containing information about an event.
    */
   private ProxyAccessorMap<IdentifierProxy,EFAEventInfo> mEventMap;
+
+  /**
+   * A map from a basic event identifier ({@link IdentifierProxy}) to its
+   * associated update ({@link ConstraintList}).
+   */
   private ProxyAccessorMap<IdentifierProxy,ConstraintList> mEventUpdateMap;
 
 }

@@ -46,7 +46,7 @@ public class MultiEvalException extends EvalException
   //# Access
   /**
    * Adds an exception to the exceptions represented by <CODE>this</CODE>.
-   *
+   * <p>
    * The exception is permitted to be <CODE>this</CODE>, in which case the
    * method has no effect.
    *
@@ -57,6 +57,18 @@ public class MultiEvalException extends EvalException
     if (exception != this) {
       mExceptions.add(exception);
     }
+  }
+
+  /**
+   * Tests whether there is any exception accumulated in
+   * the list {@link #mExceptions}.
+   *
+   * @return <code>true</code> if there is any accumulated exception, or
+   *        <code>false</code> otherwise.
+   */
+  public boolean hasException()
+  {
+    return !mExceptions.isEmpty();
   }
 
 

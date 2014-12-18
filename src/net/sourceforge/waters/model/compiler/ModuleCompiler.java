@@ -19,6 +19,7 @@ import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.compiler.context.SourceInfoCloner;
 import net.sourceforge.waters.model.compiler.efa.EFACompiler;
+import net.sourceforge.waters.model.compiler.efa.EFANormaliser;
 import net.sourceforge.waters.model.compiler.graph.ModuleGraphCompiler;
 import net.sourceforge.waters.model.compiler.groupnode.GroupNodeCompiler;
 import net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler;
@@ -126,7 +127,7 @@ public class ModuleCompiler extends AbortableCompiler
       }
       final ModuleProxyFactory modfactory = ModuleElementFactory.getInstance();
 
-      //Resolve instances.
+      // Resolve instances.
       mInstanceCompiler = new ModuleInstanceCompiler
         (mDocumentManager, modfactory, mCompilationInfo, mInputModule);
       mInstanceCompiler.setOptimizationEnabled(mIsOptimizationEnabled);
@@ -139,33 +140,34 @@ public class ModuleCompiler extends AbortableCompiler
       mInstanceCompiler = null;
       checkAbort();
 
-      //Simplify group nodes.
+      // Simplify group nodes.
       mGroupNodeCompiler =
         new GroupNodeCompiler(modfactory, mCompilationInfo, intermediate);
       intermediate = mGroupNodeCompiler.compile();
       mGroupNodeCompiler = null;
       checkAbort();
 
-      if (efa && mIsExpandingEFATransitions) {
-        /*/Perform normalisation.
-        mEFANormaliser = new EFANormaliser(modfactory, mCompilationInfo, intermediate);
-        mEFANormaliser.setUsesEventNameBuilder(true);
-        mEFANormaliser.setCreatesGuardAutomaton(true);
-        mEFANormaliser.setMakesGuardsDisjoint(true);
-        intermediate = mEFANormaliser.compile();
-        mEFANormaliser = null;
+      if (efa && mIsExpandingEFATransitions)
+      {
+        if (mIsNormalizationEnabled)
+        { // Perform normalisation.
+          mEFANormaliser = new EFANormaliser(modfactory, mCompilationInfo, intermediate);
+          mEFANormaliser.setUsesEventNameBuilder(true);
+          mEFANormaliser.setCreatesGuardAutomaton(true);
+          mEFANormaliser.setUsesEventAlphabet(false);
+          intermediate = mEFANormaliser.compile();
+          mEFANormaliser = null;
+        }
 
-        //Create variable automata.
-
-        //*/
+        // Create variable automata.
         mEFACompiler =
-          new EFACompiler(modfactory, mCompilationInfo, intermediate);
+                  new EFACompiler(modfactory, mCompilationInfo, intermediate);
         checkAbort();
         intermediate = mEFACompiler.compile();
         mEFACompiler = null;
       }
 
-      //Build Product DES.
+      // Build Product DES.
       mGraphCompiler =
         new ModuleGraphCompiler(mFactory, mCompilationInfo, intermediate);
       mGraphCompiler.setOptimizationEnabled(mIsOptimizationEnabled);
@@ -201,6 +203,16 @@ public class ModuleCompiler extends AbortableCompiler
   public void setOptimizationEnabled(final boolean enable)
   {
     mIsOptimizationEnabled = enable;
+  }
+
+  public boolean isNormalizationEnabled()
+  {
+    return mIsNormalizationEnabled;
+  }
+
+  public void setNormalizationEnabled(final boolean enable)
+  {
+    mIsNormalizationEnabled = enable;
   }
 
   public boolean isExpandingEFATransitions()
@@ -325,11 +337,12 @@ public class ModuleCompiler extends AbortableCompiler
 
   private ModuleInstanceCompiler mInstanceCompiler;
   private GroupNodeCompiler mGroupNodeCompiler;
-  // private EFANormaliser mEFANormaliser;
+  private EFANormaliser mEFANormaliser;
   private EFACompiler mEFACompiler;
   private ModuleGraphCompiler mGraphCompiler;
 
   private boolean mIsOptimizationEnabled = true;
+  private boolean mIsNormalizationEnabled = false;
   private boolean mIsExpandingEFATransitions = true;
   private boolean mIsUsingEventAlphabet = true;
   private boolean mIsSourceInfoEnabled = false;
