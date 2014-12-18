@@ -103,7 +103,7 @@ public abstract class TRPreselectionHeuristic
   //# Debugging
   public String getName()
   {
-    final String KEY = "PreselectionHeuristic";
+    final String KEY = "TRPreselectionHeuristic";
     final String clazzName = getClass().getName();
     final int pos = clazzName.lastIndexOf(KEY);
     if (pos >= 0 && pos + KEY.length() < clazzName.length()) {

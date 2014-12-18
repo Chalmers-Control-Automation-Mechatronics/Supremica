@@ -208,8 +208,6 @@ class TRAbstractionStepPartition
             mEventSequence.add(e);
             lastFailing = EventStatus.isFailingEvent(status);
           }
-        } else {
-          lastFailing = false;
         }
       }
       if (lastFailing) {
@@ -286,7 +284,8 @@ class TRAbstractionStepPartition
           iterEvent.reset(s, e);
           while (iterEvent.advance()) {
             final int t = iterEvent.getCurrentTargetState();
-            final TRTraceSearchRecord next = new TRTraceSearchRecord(t, current, e, false);
+            final TRTraceSearchRecord next =
+              new TRTraceSearchRecord(t, current, e, false);
             if (processSearchRecord(next)) {
               return next;
             }
@@ -296,7 +295,8 @@ class TRAbstractionStepPartition
         while (iterLocal.advance()) {
           final int l = iterLocal.getCurrentEvent();
           final int t = iterLocal.getCurrentTargetState();
-          final TRTraceSearchRecord next = new TRTraceSearchRecord(t, current, l, true);
+          final TRTraceSearchRecord next =
+            new TRTraceSearchRecord(t, current, l, true);
           if (processSearchRecord(next)) {
             return next;
           }

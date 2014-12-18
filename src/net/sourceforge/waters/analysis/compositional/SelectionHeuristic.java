@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 
+import net.sourceforge.waters.model.analysis.AbstractAbortable;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
@@ -40,7 +41,8 @@ import org.apache.log4j.Logger;
  * @see ChainSelectionHeuristic
  */
 
-public abstract class SelectionHeuristic<T>
+public abstract class SelectionHeuristic<T extends Comparable<? super T>>
+  extends AbstractAbortable
   implements Cloneable, Comparator<T>
 {
 
@@ -76,6 +78,7 @@ public abstract class SelectionHeuristic<T>
       try {
         T result = iter.next();
         while (iter.hasNext()) {
+          checkAbort();
           final T next = iter.next();
           if (compare(result, next) > 0) {
             result = next;
@@ -93,6 +96,26 @@ public abstract class SelectionHeuristic<T>
       }
     } else {
       return null;
+    }
+  }
+
+  /**
+   * Creates a decisive selection heuristic based on this heuristic.
+   * The returned heuristic first compares candidates according to this
+   * selection heuristic. If two candidates are found equal, a sequence of
+   * other heuristics is used to break the tie. The specific sequence is
+   * determined individually by each subclass. The default implementation
+   * return this heuristic if it is decisive, and otherwise creates a
+   * one-step chain that uses standard comparison through the {@link
+   * java.util.Comparable Comparable} interface if this heuristic fails to
+   * distinguish two candidates.
+   */
+  public SelectionHeuristic<T> createDecisiveHeuristic()
+  {
+    if (isDecisive()) {
+      return this;
+    } else {
+      return new ChainSelectionHeuristic<T>(this);
     }
   }
 
@@ -173,6 +196,7 @@ public abstract class SelectionHeuristic<T>
     return getName();
   }
 
+  @Override
   public Logger getLogger()
   {
     final Class<?> clazz = getClass();

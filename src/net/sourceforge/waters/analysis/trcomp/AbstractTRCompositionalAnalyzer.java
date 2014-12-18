@@ -29,7 +29,6 @@ import net.sourceforge.waters.analysis.abstraction.SpecialEventsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TRSimplificationListener;
 import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
-import net.sourceforge.waters.analysis.compositional.ChainSelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult;
 import net.sourceforge.waters.analysis.compositional.CompositionalVerificationResult;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
@@ -103,9 +102,9 @@ public abstract class AbstractTRCompositionalAnalyzer
     super(model, ProductDESElementFactory.getInstance(), translator);
     mTRSimplifierCreator = getTRSimplifierFactory().getDefaultValue();
     mPreselectionHeuristic = getPreselectionHeuristicFactory().getDefaultValue();
-    // TODO Make this configurable
-    final SelectionHeuristic<TRCandidate> minS = new SelectionHeuristicMinS();
-    mSelectionHeuristic = new ChainSelectionHeuristic<TRCandidate>(minS);
+    final SelectionHeuristic<TRCandidate> heu =
+      getSelectionHeuristicFactory().getDefaultValue();
+    mSelectionHeuristic = heu.createDecisiveHeuristic();
     mSpecialEventsListener = new PartitioningListener();
     mSynchronousProductBuilder = new TRSynchronousProductBuilder();
     mMonolithicAnalyzer = mono;
@@ -228,13 +227,54 @@ public abstract class AbstractTRCompositionalAnalyzer
     return
       new ListedEnumFactory<TRPreselectionHeuristic>() {
       {
-        register(MustL);
-        register(MustSp);
-        register(Pairs);
-        register(MaxS);
-        register(MinT);
-        register(MaxT);
-        register(MinS);
+        register(PRESEL_MustL);
+        register(PRESEL_MustSp);
+        register(PRESEL_Pairs);
+        register(PRESEL_MaxS);
+        register(PRESEL_MinT);
+        register(PRESEL_MaxT);
+        register(PRESEL_MinS);
+      }
+    };
+  }
+
+  /**
+   * Sets the selection heuristic to choose a candidates for composition from
+   * the collection returned by the preselection heuristic. Possible arguments
+   * for this method can be obtained from the factory returned by {@link
+   * #getSelectionHeuristicFactory()}.
+   */
+  public void setSelectionHeuristic(final SelectionHeuristic<TRCandidate> heu)
+  {
+    mSelectionHeuristic = heu.createDecisiveHeuristic();
+  }
+
+  /**
+   * Gets the selection heuristic used to choose a candidates for composition
+   * from the collection returned by the preselection heuristic.
+   */
+  public SelectionHeuristic<TRCandidate> getSelectionHeuristic()
+  {
+    return mSelectionHeuristic;
+  }
+
+  /**
+   * Gets the factory to obtain preselection heuristics for this
+   * compositional analyser. The objects returned by this factory can be
+   * passed to the {@link #setPreselectionHeuristic(TRPreselectionHeuristic)
+   * setPreselectionHeuristic()} method.
+   */
+  public EnumFactory<SelectionHeuristic<TRCandidate>> getSelectionHeuristicFactory()
+  {
+    return
+      new ListedEnumFactory<SelectionHeuristic<TRCandidate>>() {
+      {
+        register(SEL_MinS);
+        register(SEL_MinSSp);
+        register(SEL_MaxC);
+        register(SEL_MaxL);
+        register(SEL_MinE);
+        register(SEL_MinF);
       }
     };
   }
@@ -473,6 +513,9 @@ public abstract class AbstractTRCompositionalAnalyzer
     if (mPreselectionHeuristic != null) {
       mPreselectionHeuristic.requestAbort();
     }
+    if (mSelectionHeuristic != null) {
+      mSelectionHeuristic.requestAbort();
+    }
     if (mSpecialEventsFinder != null) {
       mSpecialEventsFinder.requestAbort();
     }
@@ -493,6 +536,9 @@ public abstract class AbstractTRCompositionalAnalyzer
     super.resetAbort();
     if (mPreselectionHeuristic != null) {
       mPreselectionHeuristic.resetAbort();
+    }
+    if (mSelectionHeuristic != null) {
+      mSelectionHeuristic.resetAbort();
     }
     if (mSpecialEventsFinder != null) {
       mSpecialEventsFinder.resetAbort();
@@ -635,10 +681,18 @@ public abstract class AbstractTRCompositionalAnalyzer
           return false;
         }
       }
+    } catch (final AnalysisException exception) {
+      setExceptionResult(exception);
+      throw exception;
     } catch (final OutOfMemoryError error) {
-      throw new OverflowException(error);
+      System.gc();
+      final OverflowException exception = new OverflowException(error);
+      setExceptionResult(exception);
+      throw exception;
     } catch (final StackOverflowError error) {
-      throw new OverflowException(error);
+      final OverflowException exception = new OverflowException(error);
+      setExceptionResult(exception);
+      throw exception;
     } finally {
       tearDown();
     }
@@ -1647,7 +1701,7 @@ public abstract class AbstractTRCompositionalAnalyzer
 
   // Tools
   private TRPreselectionHeuristic mPreselectionHeuristic;
-  private final SelectionHeuristic<TRCandidate> mSelectionHeuristic;
+  private SelectionHeuristic<TRCandidate> mSelectionHeuristic;
   private final PartitioningListener mSpecialEventsListener;
   private TRToolCreator<TransitionRelationSimplifier> mTRSimplifierCreator;
   private SpecialEventsFinder mSpecialEventsFinder;
@@ -1668,20 +1722,33 @@ public abstract class AbstractTRCompositionalAnalyzer
 
   //#########################################################################
   //# Class Constants
-  static final TRPreselectionHeuristic MustL =
+  static final TRPreselectionHeuristic PRESEL_MustL =
     new TRPreselectionHeuristicMustL();
-  static final TRPreselectionHeuristic MustSp =
+  static final TRPreselectionHeuristic PRESEL_MustSp =
     new TRPreselectionHeuristicMustSp();
-  static final TRPreselectionHeuristic Pairs =
+  static final TRPreselectionHeuristic PRESEL_Pairs =
     new TRPreselectionHeuristicPairs();
-  static final TRPreselectionHeuristic MinS =
+  static final TRPreselectionHeuristic PRESEL_MinS =
     new TRPreselectionHeuristicMinS();
-  static final TRPreselectionHeuristic MaxS =
+  static final TRPreselectionHeuristic PRESEL_MaxS =
     new TRPreselectionHeuristicMaxS();
-  static final TRPreselectionHeuristic MinT =
+  static final TRPreselectionHeuristic PRESEL_MinT =
     new TRPreselectionHeuristicMinT();
-  static final TRPreselectionHeuristic MaxT =
+  static final TRPreselectionHeuristic PRESEL_MaxT =
     new TRPreselectionHeuristicMaxT();
+
+  static final SelectionHeuristic<TRCandidate> SEL_MaxC =
+    new SelectionHeuristicMaxC();
+  static final SelectionHeuristic<TRCandidate> SEL_MaxL =
+    new SelectionHeuristicMaxL();
+  static final SelectionHeuristic<TRCandidate> SEL_MinE =
+    new SelectionHeuristicMinE();
+  static final SelectionHeuristic<TRCandidate> SEL_MinF =
+    new SelectionHeuristicMinF();
+  static final SelectionHeuristic<TRCandidate> SEL_MinS =
+    new SelectionHeuristicMinS();
+  static final SelectionHeuristic<TRCandidate> SEL_MinSSp =
+    new SelectionHeuristicMinSSp();
 
   static final int DEFAULT_MARKING = 0;
   static final int PRECONDITION_MARKING = 1;

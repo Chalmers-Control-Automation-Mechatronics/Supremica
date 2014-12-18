@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import org.apache.log4j.Logger;
+
 
 
 /**
@@ -47,21 +49,31 @@ public abstract class AbstractAbortable implements Abortable
   //#########################################################################
   //# Auxiliary Methods
   /**
-   * Checks whether the model analyser has been requested to abort,
-   * and if so, performs the abort by throwing an {@link AnalysisAbortException}.
-   * This method should be called periodically by any model analyser that
+   * Checks whether the abortable has been requested to abort, and if so,
+   * performs the abort by throwing an {@link AnalysisAbortException}.
+   * This method should be called periodically by any algorithm that
    * supports being aborted by user request.
    */
   public void checkAbort()
     throws AnalysisAbortException, OverflowException
   {
     if (mIsAborting) {
+      getLogger().debug("Abort request received - aborting ...");
       throw new AnalysisAbortException();
     }
   }
 
 
   //#########################################################################
+  //# Logging
+  public Logger getLogger()
+  {
+    final Class<?> clazz = getClass();
+    return Logger.getLogger(clazz);
+  }
+
+
+ //#########################################################################
   //# Data Members
   private boolean mIsAborting;
 

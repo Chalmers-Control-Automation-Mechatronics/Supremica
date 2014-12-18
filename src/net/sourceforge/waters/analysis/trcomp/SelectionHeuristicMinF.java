@@ -2,40 +2,37 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.trcomp
-//# CLASS:   SelectionHeuristicMinS
+//# CLASS:   SelectionHeuristicMinF
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.trcomp;
 
+import gnu.trove.set.hash.THashSet;
+
+import java.util.Set;
+
 import net.sourceforge.waters.analysis.compositional.ChainSelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
-import net.sourceforge.waters.analysis.tr.EventStatus;
-import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 
 
 /**
- * <P>The <STRONG>MinS</STRONG> candidate selection heuristic for
+ * <P>The <STRONG>MinF</STRONG> candidate selection heuristic for
  * compositional model analysers of type {@link AbstractTRCompositionalAnalyzer}.</P>
  *
- * <P>The <STRONG>MinS</STRONG>  estimates the number of states of the
- * abstracted synchronous composition of candidates and chooses the candidate
- * with the smallest estimate. The estimate is obtained by multiplying the
- * product of the state numbers of the candidate's automata with its
- * ratio of shared over total events (excluding {@link EventEncoding#TAU}).</P>
- *
- * <P><I>Reference:</I><BR>
- * Hugo Flordal, Robi Malik. Compositional Verification in Supervisory Control.
- * SIAM Journal of Control and Optimization, 48(3), 1914-1938, 2009.</P>
+ * <P>The <STRONG>MinF</STRONG> selection heuristic gives preference to
+ * candidate with the smallest frontier, i.e., the smallest number
+ * of other automata that share events with the candidate's automata.</P>
  *
  * @author Robi Malik
  */
 
-public class SelectionHeuristicMinS
+public class SelectionHeuristicMinF
   extends NumericSelectionHeuristic<TRCandidate>
 {
 
@@ -43,11 +40,18 @@ public class SelectionHeuristicMinS
   //# Interface
   //# net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic
   @Override
+  public void setContext(final Object context)
+  {
+    mAnalyzer = (AbstractTRCompositionalAnalyzer) context;
+  }
+
+  @Override
   public SelectionHeuristic<TRCandidate> createDecisiveHeuristic()
   {
     @SuppressWarnings("unchecked")
     final SelectionHeuristic<TRCandidate>[] chain = new SelectionHeuristic[] {
       this,
+      // AbstractTRCompositionalAnalyzer.SEL_MinSync,
       AbstractTRCompositionalAnalyzer.SEL_MaxL,
       AbstractTRCompositionalAnalyzer.SEL_MaxC,
       AbstractTRCompositionalAnalyzer.SEL_MinE
@@ -58,33 +62,21 @@ public class SelectionHeuristicMinS
   @Override
   protected double getHeuristicValue(final TRCandidate candidate)
   {
-    double numStates = 1.0;
-    for (final TRAutomatonProxy aut : candidate.getAutomata()) {
-      final ListBufferTransitionRelation rel = aut.getTransitionRelation();
-      numStates *= rel.getNumberOfReachableStates();
-    }
-    final byte pattern = EventStatus.STATUS_LOCAL | EventStatus.STATUS_UNUSED;
-    int numEvents = 0;
-    int numSharedEvents = 0;
+    final Set<TRAutomatonProxy> connected = new THashSet<>();
+    final TRSubsystemInfo subsys = mAnalyzer.getCurrentSubsystem();
     final EventEncoding enc = candidate.getEventEncoding();
-    for (int e = EventEncoding.NONTAU; e < enc.getNumberOfProperEvents(); e++) {
-      final byte status = enc.getProperEventStatus(e);
-      switch (status & pattern) {
-      case EventStatus.STATUS_LOCAL:
-        numEvents++;
-        // fall through ...
-      case 0:
-        numSharedEvents++;
-        // fall through ...
-      default:
-        break;
+    for (final EventProxy event : enc.getUsedEvents()) {
+      final TREventInfo info = subsys.getEventInfo(event);
+      if (info != null) {
+        connected.addAll(info.getAutomata());
       }
     }
-    if (numEvents == 0) {
-      return 1.0;
-    } else {
-      return numStates * numSharedEvents / numEvents;
-    }
+    return connected.size() - candidate.getAutomata().size();
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private AbstractTRCompositionalAnalyzer mAnalyzer;
 
 }

@@ -53,6 +53,7 @@ class TRPreselectionHeuristicPairs extends TRPreselectionHeuristic
       int index2 = 0;
       for (final TRAutomatonProxy aut2 : automata) {
         if (index1 < index2) {
+          checkAbort();
           final EventEncoding enc2 = aut2.getEventEncoding();
           final Set<EventProxy> used2 = enc2.getUsedEvents();
           final int numUsed2 = used2.size();
