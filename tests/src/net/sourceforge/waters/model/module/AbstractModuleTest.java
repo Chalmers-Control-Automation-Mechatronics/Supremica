@@ -47,7 +47,7 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
   public void testMarshal_colours()
     throws Exception
   {
-    testMarshal("handwritten", "colours");
+    testMarshal("tests/compiler/graph", "colours");
   }
 
   public void testMarshal_dosingtankEFA()
@@ -77,13 +77,13 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
   public void testMarshal_nodegroup1()
     throws Exception
   {
-    testMarshal("handwritten", "nodegroup1");
+    testMarshal("tests/compiler/groupnode", "nodegroup1");
   }
 
   public void testMarshal_nodegroup2()
     throws Exception
   {
-    testMarshal("handwritten", "nodegroup2");
+    testMarshal("tests/compiler/groupnode", "nodegroup2");
   }
 
   public void testMarshal_parManEg_I_mfb_highlevel()
@@ -173,7 +173,7 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
   public void testParse_colours()
     throws Exception
   {
-    testParse("handwritten", "colours");
+    testParse("tests/compiler/graph", "colours");
   }
 
   public void testParse_machine()
@@ -191,13 +191,13 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
   public void testParse_nodegroup1()
     throws Exception
   {
-    testParse("handwritten", "nodegroup1");
+    testParse("tests/compiler/groupnode", "nodegroup1");
   }
 
   public void testParse_nodegroup2()
     throws Exception
   {
-    testParse("handwritten", "nodegroup2");
+    testParse("tests/compiler/groupnode", "nodegroup2");
   }
 
   public void testParse_small_factory_2()
@@ -230,7 +230,7 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
   public void testClone_colours()
     throws Exception
   {
-    testClone("handwritten", "colours");
+    testClone("tests/compiler/graph", "colours");
   }
 
   public void testClone_machine()
@@ -242,13 +242,13 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
   public void testClone_nodegroup1()
     throws Exception
   {
-    testClone("handwritten", "nodegroup1");
+    testClone("tests/compiler/groupnode", "nodegroup1");
   }
 
   public void testClone_nodegroup2()
     throws Exception
   {
-    testClone("handwritten", "nodegroup2");
+    testClone("tests/compiler/groupnode", "nodegroup2");
   }
 
   public void testClone_small_factory_2()
@@ -287,7 +287,7 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
   public void testCrossClone_colours()
     throws Exception
   {
-    testCrossClone("handwritten", "colours");
+    testCrossClone("tests/compiler/graph", "colours");
   }
 
   public void testCrossClone_machine()
@@ -299,13 +299,13 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
   public void testCrossClone_nodegroup1()
     throws Exception
   {
-    testCrossClone("handwritten", "nodegroup1");
+    testCrossClone("tests/compiler/groupnode", "nodegroup1");
   }
 
   public void testCrossClone_nodegroup2()
     throws Exception
   {
-    testCrossClone("handwritten", "nodegroup2");
+    testCrossClone("tests/compiler/groupnode", "nodegroup2");
   }
 
   public void testCrossClone_parManEg_I_mfb_highlevel()
@@ -599,21 +599,25 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
 
   //#########################################################################
   //# Overrides for Abstract Base Class JAXBTestCase
+  @Override
   protected ProxyMarshaller<ModuleProxy> getProxyMarshaller()
   {
     return mMarshaller;
   }
 
+  @Override
   protected ProxyUnmarshaller<ModuleProxy> getProxyUnmarshaller()
   {
     return mMarshaller;
   }
 
+  @Override
   protected ProxyPrinter getPrinter()
   {
     return mPrinter;
   }
 
+  @Override
   protected ModuleIntegrityChecker getIntegrityChecker()
   {
     return ModuleIntegrityChecker.getModuleIntegrityCheckerInstance();
@@ -622,6 +626,7 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
 
   //#########################################################################
   //# Overrides for junit.framework.TestCase
+  @Override
   protected void setUp()
     throws Exception
   {
@@ -636,6 +641,7 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     mPrinter = new ModuleProxyPrinter(writer);
   }
 
+  @Override
   protected void tearDown()
     throws Exception
   {

@@ -54,7 +54,7 @@ public abstract class AbstractCompilerTest
 {
 
   //#########################################################################
-  //# Handcrafting Test Cases
+  //# Hand-Crafting Test Cases
   public void testCompile_empty_1()
     throws EvalException
   {
@@ -95,14 +95,14 @@ public abstract class AbstractCompilerTest
   public void testCompile_array()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "nasty", "array");
+    final ModuleProxy module = loadModule("tests", "compiler/instance", "array");
     testCompile(module);
   }
 
   public void testCompile_array2d()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "nasty", "array2d");
+    final ModuleProxy module = loadModule("tests", "compiler/instance", "array2d");
     testCompile(module);
   }
 
@@ -123,14 +123,14 @@ public abstract class AbstractCompilerTest
   public void testCompile_colours()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "colours");
+    final ModuleProxy module = loadModule("tests", "compiler/graph", "colours");
     testCompile(module);
   }
 
   public void testCompile_empty_intrange() throws IOException,
     WatersException
   {
-    final ModuleProxy module = loadModule("tests", "nasty", "empty_intrange");
+    final ModuleProxy module = loadModule("tests", "compiler/instance", "empty_intrange");
     testCompile(module);
   }
 
@@ -154,28 +154,28 @@ public abstract class AbstractCompilerTest
 
   public void testCompile_nested_groups() throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "nasty", "nested_groups");
+    final ModuleProxy module = loadModule("tests", "compiler/groupnode", "nested_groups");
     testCompile(module);
   }
 
   public void testCompile_nodegroup1()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "nodegroup1");
+    final ModuleProxy module = loadModule("tests", "compiler/groupnode", "nodegroup1");
     testCompile(module);
   }
 
   public void testCompile_nodegroup2()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "nodegroup2");
+    final ModuleProxy module = loadModule("tests", "compiler/groupnode", "nodegroup2");
     testCompile(module);
   }
 
   public void testCompile_nodegroup4()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "nodegroup4");
+    final ModuleProxy module = loadModule("tests", "compiler/groupnode", "nodegroup4");
     testCompile(module);
   }
 
@@ -189,7 +189,7 @@ public abstract class AbstractCompilerTest
   public void testCompile_markus2()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "markus2");
+    final ModuleProxy module = loadModule("tests", "compiler/graph", "markus2");
     testCompile(module);
   }
 
@@ -224,7 +224,7 @@ public abstract class AbstractCompilerTest
   public void testCompile_spaces()
   throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "nasty", "spaces");
+    final ModuleProxy module = loadModule("tests","compiler/instance", "spaces");
     testCompile(module);
   }
 
@@ -284,7 +284,7 @@ public abstract class AbstractCompilerTest
   public void testCompile_AmbiguousVariableStatus()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "AmbiguousVariableStatus");
+    final ModuleProxy module = loadModule("tests", "compiler/efsm", "AmbiguousVariableStatus");
     testCompile(module);
   }
 
@@ -298,21 +298,21 @@ public abstract class AbstractCompilerTest
   public void testCompile_batch_tank_vout()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "efa", "batch_tank_vout");
+    final ModuleProxy module = loadModule("tests", "compiler/efsm", "batch_tank_vout");
     testCompile(module);
   }
 
   public void testCompile_blocked_efa()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "efa", "blocked_efa");
+    final ModuleProxy module = loadModule("tests", "compiler/efsm", "blocked_efa");
     testCompile(module);
   }
 
   public void testCompile_ControllableTestModelEFA()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "ControllableTestModelEFA");
+    final ModuleProxy module = loadModule("tests", "compiler/efsm", "ControllableTestModelEFA");
     testCompile(module);
   }
 
@@ -347,19 +347,19 @@ public abstract class AbstractCompilerTest
   public void testCompile_EFA0()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "EFA0");
+    final ModuleProxy module = loadModule("tests", "compiler/efsm", "EFA0");
     testCompile(module);
   }
 
   public void testCompile_EFAJournalExample()
-  throws IOException, WatersException
+    throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "EFAJournalExample");
+    final ModuleProxy module = loadModule("tests", "compiler/efsm", "EFAJournalExample");
     testCompile(module);
   }
 
   public void testCompile_EFATransferLine()
-  throws IOException, WatersException
+    throws IOException, WatersException
   {
     final ModuleProxy module = loadModule("efa", "transferline_efa");
     testCompile(module);
@@ -368,49 +368,49 @@ public abstract class AbstractCompilerTest
   public void testCompile_enumvar()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "enumvar");
+    final ModuleProxy module = loadModule("tests", "compiler/efsm", "enumvar");
     testCompile(module);
   }
 
   public void testCompile_forbidden()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "nasty", "forbidden");
+    final ModuleProxy module = loadModule("tests", "compiler/graph", "forbidden");
     testCompile(module);
   }
 
   public void testCompile_funcall_max()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "efa", "funcall_max");
+    final ModuleProxy module = loadModule("tests", "compiler/efsm", "funcall_max");
     testCompile(module);
   }
 
   public void testCompile_funcall_min()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "efa", "funcall_min");
+    final ModuleProxy module = loadModule("tests", "compiler/efsm", "funcall_min");
     testCompile(module);
   }
 
   public void testCompile_GlobalAndLocalVariables()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "GlobalAndLocalVariables");
+    final ModuleProxy module = loadModule("tests", "compiler/efsm", "GlobalAndLocalVariables");
     testCompile(module);
   }
 
   public void testCompile_guard_conflict_1()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "guard_conflict_1");
+    final ModuleProxy module = loadModule("tests", "compiler/groupnode", "guard_conflict_1");
     testCompile(module);
   }
 
   public void testCompile_guard_conflict_2()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "guard_conflict_2");
+    final ModuleProxy module = loadModule("tests", "compiler/groupnode", "guard_conflict_2");
     testCompile(module);
   }
 
@@ -425,21 +425,21 @@ public abstract class AbstractCompilerTest
   public void testCompile_increment()
   throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "efa", "increment");
+    final ModuleProxy module = loadModule("tests", "compiler/efsm", "increment");
     testCompile(module);
   }
 
   public void testCompile_instantiate_efa()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "efa", "instantiate_efa");
+    final ModuleProxy module = loadModule("tests", "compiler/instance", "instantiate_efa");
     testCompile(module);
   }
 
   public void testCompile_io1()
   throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "io1");
+    final ModuleProxy module = loadModule("tests", "compiler/efsm", "io1");
     testCompile(module);
   }
 
@@ -453,102 +453,77 @@ public abstract class AbstractCompilerTest
   public void testCompile_markedvar()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "markedvar");
+    final ModuleProxy module = loadModule("tests", "compiler/efsm", "markedvar");
     testCompile(module);
   }
 
   public void testCompile_nodegroup_efa1()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "nodegroup_efa1");
+    final ModuleProxy module = loadModule("tests", "compiler/groupnode", "nodegroup_efa1");
     testCompile(module);
   }
 
   public void testCompile_nodegroup_efa2()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "nodegroup_efa2");
+    final ModuleProxy module = loadModule("tests", "compiler/groupnode", "nodegroup_efa2");
     testCompile(module);
   }
 
   public void testCompile_nondetvar()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "nondetvar");
+    final ModuleProxy module = loadModule("tests", "compiler/efsm", "nondetvar");
     testCompile(module);
   }
 
   public void testCompile_patrik1()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "efa", "patrik1");
+    final ModuleProxy module = loadModule("tests", "compiler/efsm", "patrik1");
     testCompile(module);
   }
 
   public void testCompile_patrik2()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "efa", "patrik2");
+    final ModuleProxy module = loadModule("tests", "compiler/efsm", "patrik2");
     testCompile(module);
   }
-
-  /*
-  public void testCompile_profisafe_ihost_efa()
-    throws IOException, WatersException
-  {
-    ModuleProxy module = loadModule("tests", "profisafe", "profisafe_ihost_efa");
-    testCompile(module);
-  }
-
-  public void testCompile_profisafe_islave()
-    throws IOException, WatersException
-  {
-    ModuleProxy module = loadModule("tests", "profisafe", "profisafe_islave_efa");
-    testCompile(module);
-  }
-  */
 
   public void testCompile_profisafe_ihost_nonsubsumptions()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "efa", "profisafe_ihost_nonsubsumptions");
+    final ModuleProxy module = loadModule("tests", "compiler/efsm", "profisafe_ihost_nonsubsumptions");
     testCompile(module);
   }
-
-  /*
-  public void testCompile_profisafe_islave_property()
-    throws IOException, WatersException
-  {
-    ModuleProxy module = loadModule("tests", "efa", "profisafe_islave_property");
-    testCompile(module);
-  }
-  */
 
   public void testCompile_profisafe_islave_pfork()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "efa", "profisafe_islave_pfork");
+    final ModuleProxy module = loadModule("tests", "compiler/efsm", "profisafe_islave_pfork");
     testCompile(module);
   }
 
   public void testCompile_randomEFA()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "efa", "random_efa");
+    final ModuleProxy module = loadModule("tests", "compiler/efsm", "random_efa");
     testCompile(module);
   }
 
   public void testCompile_sahar1()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "efa", "sahar1");
+    final ModuleProxy module = loadModule("tests", "compiler/efsm", "sahar1");
     testCompile(module);
   }
 
   public void testCompile_sahar2()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "efa", "sahar2");
+    final ModuleProxy module = loadModule("tests", "compiler/efsm", "sahar2");
     testCompile(module);
   }
 
@@ -583,59 +558,59 @@ public abstract class AbstractCompilerTest
   public void testCompile_unsat_guard()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "nasty", "unsat_guard");
+    final ModuleProxy module = loadModule("tests", "compiler/efsm", "unsat_guard");
     testCompile(module);
   }
 
 
   //#########################################################################
-  //# Test Cases that Expect Exceptions
+  //# Test Cases Expecting Exceptions
   public void testCompile_assignmentInGuard1()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "efa", "assignment_in_guard1");
+    final ModuleProxy module = loadModule("tests", "compiler/efsm", "assignment_in_guard1");
     compileError(module, ActionSyntaxException.class, "Assignment operator =");
   }
 
   public void testCompile_assignmentInGuard2()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "efa", "assignment_in_guard2");
+    final ModuleProxy module = loadModule("tests", "compiler/efsm", "assignment_in_guard2");
     compileError(module, ActionSyntaxException.class, "Assignment operator =");
   }
 
   public void testCompile_edge0()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "edge0");
+    final ModuleProxy module = loadModule("tests", "compiler/graph", "edge0");
     compileError(module, EmptyLabelBlockException.class, "q0");
   }
 
   public void testCompile_error_batch_tank_out()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "nasty", "batch_tank_out");
+    final ModuleProxy module = loadModule("tests", "compiler/efsm", "batch_tank_out");
     compileError(module, DuplicateIdentifierException.class, "'out'");
   }
 
   public void testCompile_error_ims()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "ims", "error_ims");
+    final ModuleProxy module = loadModule("tests", "compiler/instance", "error_ims");
     compileError(module, UndefinedIdentifierException.class, "'finishLathe'");
   }
 
   public void testCompile_error1_small()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "error1_small");
+    final ModuleProxy module = loadModule("tests", "compiler/instance", "error1_small");
     compileError(module, DuplicateIdentifierException.class, "'mach'");
   }
 
   public void testCompile_error2_small()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "error2_small");
+    final ModuleProxy module = loadModule("tests", "compiler/instance", "error2_small");
     final String[] culprit1 = {"required parameter 'break'"};
     final String[] culprit2 = {"required parameter 'repair'"};
     compileError(module, null, InstantiationException.class,
@@ -645,14 +620,14 @@ public abstract class AbstractCompilerTest
   public void testCompile_error3_small()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "error3_small");
+    final ModuleProxy module = loadModule("tests", "compiler/instance", "error3_small");
     compileError(module, InstantiationException.class, "'finish_after'");
   }
 
   public void testCompile_error4_small()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "error4_small");
+    final ModuleProxy module = loadModule("tests", "compiler/instance", "error4_small");
     final String[] culprit1 = {"'start1'"};
     final String[] culprit2 = {"'start2'"};
     compileError(module, null, InstantiationException.class,
@@ -662,63 +637,63 @@ public abstract class AbstractCompilerTest
   public void testCompile_error5_small()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "error5_small");
+    final ModuleProxy module = loadModule("tests", "compiler/instance", "error5_small");
     compileError(module, InstantiationException.class, "'finish_before'");
   }
 
   public void testCompile_error6_small()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "error6_small");
+    final ModuleProxy module = loadModule("tests", "compiler/instance", "error6_small");
     compileError(module, InstantiationException.class, "'start2'");
   }
 
   public void testCompile_error7_small()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "error7_small");
+    final ModuleProxy module = loadModule("tests", "compiler/efsm", "error7_small");
     compileError(module, UndefinedIdentifierException.class, "'buffer.curr'");
   }
 
   public void testCompile_error8_small()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "error8_small");
+    final ModuleProxy module = loadModule("tests", "compiler/graph", "error8_small");
     compileError(module, EventKindException.class, "'repair1'");
   }
 
   public void testCompile_markus1()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "markus1");
+    final ModuleProxy module = loadModule("tests", "compiler/graph", "markus1");
     compileError(module, NondeterministicModuleException.class, "'s0'", "'a'");
   }
 
   public void testCompile_nodegroup3()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "nodegroup3");
+    final ModuleProxy module = loadModule("tests", "compiler/groupnode", "nodegroup3");
     compileError(module, NondeterministicModuleException.class, "'q0'", "'e'");
   }
 
   public void testCompile_twoinit()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "twoinit");
+    final ModuleProxy module = loadModule("tests", "compiler/graph", "twoinit");
     compileError(module, NondeterministicModuleException.class, "'comp'");
   }
 
   public void testCompile_undefvar_01()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "undefvar_01");
+    final ModuleProxy module = loadModule("tests", "compiler/efsm", "undefvar_01");
     compileError(module, UndefinedIdentifierException.class, "'undefvar'");
   }
 
   public void testCompile_undefvar_02()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("handwritten", "undefvar_02");
+    final ModuleProxy module = loadModule("tests", "compiler/efsm", "undefvar_02");
     compileError(module, UndefinedIdentifierException.class, "'undefvar'");
   }
 
@@ -729,7 +704,7 @@ public abstract class AbstractCompilerTest
   {
   }
 
-  abstract String getTestSuffix();
+  abstract String[] getTestSuffices();
 
 
   //#########################################################################
@@ -753,8 +728,8 @@ public abstract class AbstractCompilerTest
   }
 
   private void compileError(final ModuleProxy module,
-                            final Class<? extends WatersException> exclass,
-                            final String... culprit)
+                              final Class<? extends WatersException> exclass,
+                              final String... culprit)
     throws IOException, WatersException
   {
     final String[][] culprits = {culprit};
@@ -772,7 +747,7 @@ public abstract class AbstractCompilerTest
     compileError(module, bindings, exclass, culprits);
   }
 
-  private void compileError(final ModuleProxy module,
+  protected void compileError(final ModuleProxy module,
                             final List<ParameterBindingProxy> bindings,
                             final Class<? extends WatersException> exclass,
                             final String[]... culprits)
@@ -812,17 +787,25 @@ public abstract class AbstractCompilerTest
     final String outextname = buffer.toString();
     final File outfilename = new File(mOutputDirectory, outextname);
     mProductDESMarshaller.marshal(des, outfilename);
-    final String suffix = getTestSuffix();
+    final String[] suffices = getTestSuffices();
     buffer.setLength(pos);
-    buffer.append('-');
-    buffer.append(suffix);
+    String temp = "";
+    if (suffices.length == 2)
+      temp = buffer.toString().concat("-" + suffices[1] + ext);
+    for (final String suffix : suffices) {
+      buffer.append('-');
+      buffer.append(suffix);
+    }
     buffer.append(ext);
     final String suffixedname = buffer.toString();
     final File location = module.getFileLocation();
     final File dir = location.getParentFile();
     final File suffixedfilename = new File(dir, suffixedname);
+    final File suffixedfilename2 = new File(dir, temp);
     if (suffixedfilename.exists()) {
       compare(des, suffixedfilename);
+    } else if (suffices.length == 2 && suffixedfilename2.exists()) {
+      compare(des, suffixedfilename2);
     } else {
       final File compfilename = new File(dir, outextname);
       compare(des, compfilename);

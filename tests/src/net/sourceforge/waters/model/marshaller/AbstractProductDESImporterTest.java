@@ -9,8 +9,8 @@
 
 package net.sourceforge.waters.model.marshaller;
 
-import java.net.URI;
 import java.io.File;
+import java.net.URI;
 
 import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -53,7 +53,7 @@ public abstract class AbstractProductDESImporterTest
   public void testTictactoe()
     throws Exception
   {
-    testImport("handwritten", "tictactoe.wdes");
+    testImport("handwritten", "tictactoe-opt.wdes");
   }
 
   public void testTransferline2()
@@ -151,6 +151,7 @@ public abstract class AbstractProductDESImporterTest
 
   //#########################################################################
   //# Overrides for junit.framework.TestCase
+  @Override
   protected void setUp()
     throws Exception
   {
@@ -172,6 +173,7 @@ public abstract class AbstractProductDESImporterTest
   }
 
 
+  @Override
   protected void tearDown()
     throws Exception
   {
