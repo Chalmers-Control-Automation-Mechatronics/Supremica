@@ -12,6 +12,10 @@ package net.sourceforge.waters.analysis.trcomp;
 import java.io.PrintStream;
 
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
+import net.sourceforge.waters.analysis.compositional.ChainSelectionHeuristic;
+import net.sourceforge.waters.analysis.compositional.CompositionalConflictChecker;
+import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
+import net.sourceforge.waters.analysis.compositional.SelectionHeuristicCreator;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentBoolean;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentChain;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
@@ -61,6 +65,7 @@ public class TRCompositionalModelAnalyzerFactory
     super.addArguments();
     addArgument(new AbstractionMethodArgument());
     addArgument(new PreselectionHeuristicArgument());
+    addArgument(new SelectionHeuristicArgument());
     addArgument(new MonolithicStateLimitArgument());
     addArgument(new InternalStateLimitArgument());
     addArgument(new MonolithicTransitionLimitArgument());
@@ -301,16 +306,15 @@ public class TRCompositionalModelAnalyzerFactory
 
 
   //#########################################################################
-  //# Inner Class SelectingMethodArgument
-  /*
-  private static class SelectingMethodArgument
+  //# Inner Class SelectionHeuristicArgument
+  private static class SelectionHeuristicArgument
     extends CommandLineArgumentString
   {
     //#######################################################################
     //# Constructors
-    private SelectingMethodArgument()
+    private SelectionHeuristicArgument()
     {
-      super("-sel", "Selecting heuristic for candidate selection");
+      super("-sel", "Selection heuristic for candidate selection");
     }
 
     //#######################################################################
@@ -321,35 +325,33 @@ public class TRCompositionalModelAnalyzerFactory
     {
       final AbstractTRCompositionalAnalyzer composer =
         (AbstractTRCompositionalAnalyzer) analyzer;
-      final EnumFactory<SelectionHeuristicCreator> factory =
+      final EnumFactory<SelectionHeuristic<TRCandidate>> factory =
         composer.getSelectionHeuristicFactory();
       final String name = getValue();
-      final String[] parts = name.split(",");
-      final SelectionHeuristic<Candidate> heuristic;
+      final String[] parts = name.split("/");
+      final SelectionHeuristic<TRCandidate> heuristic;
       if (parts.length == 1) {
-        final SelectionHeuristicCreator creator =
-          factory.getEnumValue(name);
-        if (creator == null) {
+        heuristic = factory.getEnumValue(name);
+        if (heuristic == null) {
           System.err.println("Bad value for " + getName() + " option!");
           factory.dumpEnumeration(System.err, 0);
           System.exit(1);
         }
-        heuristic = creator.createChainHeuristic();
       } else {
+        final int last = parts.length - 1;
+        final int len = parts[last].length() == 0 ? last : parts.length;
         @SuppressWarnings("unchecked")
-        final SelectionHeuristic<Candidate>[] heuristics =
-          new SelectionHeuristic[parts.length];
-        for (int i = 0; i < parts.length; i++) {
-          final SelectionHeuristicCreator creator =
-            factory.getEnumValue(parts[i]);
-          if (creator == null) {
+        final SelectionHeuristic<TRCandidate>[] heuristics =
+          new SelectionHeuristic[len];
+        for (int i = 0; i < len; i++) {
+          heuristics[i] = factory.getEnumValue(parts[i]);
+          if (heuristics[i] == null) {
             System.err.println("Bad value for " + getName() + " option!");
             factory.dumpEnumeration(System.err, 0);
             System.exit(1);
           }
-          heuristics[i] = creator.createBaseHeuristic();
         }
-        heuristic = new ChainSelectionHeuristic<Candidate>(heuristics);
+        heuristic = new ChainSelectionHeuristic<>(heuristics);
       }
       composer.setSelectionHeuristic(heuristic);
     }
@@ -369,7 +371,7 @@ public class TRCompositionalModelAnalyzerFactory
       }
     }
   }
-  */
+
 
   //#########################################################################
   //# Inner Class SpecialEventsArgument

@@ -12,13 +12,11 @@ package net.sourceforge.waters.model.analysis.des;
 import java.util.Collection;
 
 import net.sourceforge.waters.model.analysis.AbstractAbortable;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.DefaultAnalysisResult;
 import net.sourceforge.waters.model.analysis.InvalidModelException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
@@ -27,8 +25,6 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
-
-import org.apache.log4j.Logger;
 
 
 /**
@@ -196,25 +192,6 @@ public abstract class AbstractModelAnalyzer
   }
 
   /**
-   * Checks whether the model analyser has been requested to abort,
-   * and if so, performs the abort by throwing an {@link AnalysisAbortException}.
-   * This method should be called periodically by any model analyser that
-   * supports being aborted by user request.
-   */
-  @Override
-  public void checkAbort()
-    throws AnalysisAbortException, OverflowException
-  {
-    try {
-      super.checkAbort();
-    } catch (final AnalysisAbortException | OverflowException exception) {
-      getLogger().debug("Abort request received - aborting ...");
-      setExceptionResult(exception);
-      throw exception;
-    }
-  }
-
-  /**
    * Attempts to retrieve the single input automaton from the input model.
    * This method checks whether the input model contains exactly one
    * automaton, and if this is the case, returns it.
@@ -327,15 +304,6 @@ public abstract class AbstractModelAnalyzer
       final long usage = DefaultAnalysisResult.getCurrentMemoryUsage();
       mAnalysisResult.updatePeakMemoryUsage(usage);
     }
-  }
-
-
-  //#########################################################################
-  //# Logging
-  public Logger getLogger()
-  {
-    final Class<?> clazz = getClass();
-    return Logger.getLogger(clazz);
   }
 
 

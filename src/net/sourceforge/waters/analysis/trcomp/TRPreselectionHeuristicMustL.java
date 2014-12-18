@@ -50,6 +50,7 @@ class TRPreselectionHeuristicMustL extends TRPreselectionHeuristic
       new HashMap<>(numEvents);
     for (final TREventInfo info : events) {
       if (!info.isExternal()) {
+        checkAbort();
         final Set<TRAutomatonProxy> set = info.getAutomata();
         assert set.size() > 1;
         final List<TRAutomatonProxy> list = new ArrayList<>(set);

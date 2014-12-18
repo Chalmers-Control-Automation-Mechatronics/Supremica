@@ -53,6 +53,7 @@ class TRPreselectionHeuristicMustSp extends TRPreselectionHeuristic
     final Map<List<TRAutomatonProxy>,TRCandidate> candidates =
       new HashMap<>(numEvents);
     for (final TREventInfo info : events) {
+      checkAbort();
       final Set<TRAutomatonProxy> automata = info.getAutomata();
       final int numAutomata = automata.size();
       List<TRAutomatonProxy> notAlwaysEnabled = new ArrayList<>(numAutomata);

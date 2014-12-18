@@ -19,7 +19,7 @@ package net.sourceforge.waters.analysis.compositional;
  * @author Robi Malik
  */
 
-public abstract class NumericSelectionHeuristic<T>
+public abstract class NumericSelectionHeuristic<T extends Comparable<? super T>>
   extends SelectionHeuristic<T>
 {
 

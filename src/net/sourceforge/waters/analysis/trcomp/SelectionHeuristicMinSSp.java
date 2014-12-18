@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.trcomp
-//# CLASS:   SelectionHeuristicMinS
+//# CLASS:   SelectionHeuristicMinSSp
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -19,23 +19,21 @@ import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 
 
 /**
- * <P>The <STRONG>MinS</STRONG> candidate selection heuristic for
+ * <P>The <STRONG>MinSSp</STRONG> candidate selection heuristic for
  * compositional model analysers of type {@link AbstractTRCompositionalAnalyzer}.</P>
  *
- * <P>The <STRONG>MinS</STRONG>  estimates the number of states of the
+ * <P>The <STRONG>MinSSp</STRONG>  estimates the number of states of the
  * abstracted synchronous composition of candidates and chooses the candidate
  * with the smallest estimate. The estimate is obtained by multiplying the
  * product of the state numbers of the candidate's automata with its
- * ratio of shared over total events (excluding {@link EventEncoding#TAU}).</P>
- *
- * <P><I>Reference:</I><BR>
- * Hugo Flordal, Robi Malik. Compositional Verification in Supervisory Control.
- * SIAM Journal of Control and Optimization, 48(3), 1914-1938, 2009.</P>
+ * ratio of the shared events minus half the numbers of <I>selfloop-only</I>
+ * and <I>always enabled</I> events over total number of events (excluding
+ * {@link EventEncoding#TAU}).</P>
  *
  * @author Robi Malik
  */
 
-public class SelectionHeuristicMinS
+public class SelectionHeuristicMinSSp
   extends NumericSelectionHeuristic<TRCandidate>
 {
 
@@ -48,6 +46,7 @@ public class SelectionHeuristicMinS
     @SuppressWarnings("unchecked")
     final SelectionHeuristic<TRCandidate>[] chain = new SelectionHeuristic[] {
       this,
+      AbstractTRCompositionalAnalyzer.SEL_MinS,
       AbstractTRCompositionalAnalyzer.SEL_MaxL,
       AbstractTRCompositionalAnalyzer.SEL_MaxC,
       AbstractTRCompositionalAnalyzer.SEL_MinE
@@ -63,27 +62,35 @@ public class SelectionHeuristicMinS
       final ListBufferTransitionRelation rel = aut.getTransitionRelation();
       numStates *= rel.getNumberOfReachableStates();
     }
-    final byte pattern = EventStatus.STATUS_LOCAL | EventStatus.STATUS_UNUSED;
+    final byte pattern =
+      EventStatus.STATUS_FULLY_LOCAL | EventStatus.STATUS_UNUSED;
     int numEvents = 0;
-    int numSharedEvents = 0;
+    int weightOfLocalEvents = 0;
     final EventEncoding enc = candidate.getEventEncoding();
     for (int e = EventEncoding.NONTAU; e < enc.getNumberOfProperEvents(); e++) {
       final byte status = enc.getProperEventStatus(e);
       switch (status & pattern) {
-      case EventStatus.STATUS_LOCAL:
+      case EventStatus.STATUS_FULLY_LOCAL:
         numEvents++;
-        // fall through ...
+        weightOfLocalEvents += 2;
+        break;
+      case EventStatus.STATUS_SELFLOOP_ONLY:
+      case EventStatus.STATUS_ALWAYS_ENABLED:
+        numEvents++;
+        weightOfLocalEvents++;
+        break;
       case 0:
-        numSharedEvents++;
-        // fall through ...
+        numEvents++;
+        break;
       default:
         break;
       }
     }
     if (numEvents == 0) {
-      return 1.0;
+      return 0.0;
     } else {
-      return numStates * numSharedEvents / numEvents;
+      return 0.5 * numStates *
+        (2 * numEvents - weightOfLocalEvents) / numEvents;
     }
   }
 

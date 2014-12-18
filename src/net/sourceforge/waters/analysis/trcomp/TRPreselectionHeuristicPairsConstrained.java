@@ -63,6 +63,7 @@ abstract class TRPreselectionHeuristicPairsConstrained
       final int numUsed1 = used1.size();
       for (final TRAutomatonProxy aut2 : automata) {
         if (aut1 != aut2) {
+          checkAbort();
           final EventEncoding enc2 = aut2.getEventEncoding();
           final Set<EventProxy> used2 = enc2.getUsedEvents();
           final int numUsed2 = used2.size();
