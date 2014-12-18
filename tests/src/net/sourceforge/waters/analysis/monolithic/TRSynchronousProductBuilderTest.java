@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import junit.framework.Test;
@@ -22,6 +23,8 @@ import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
+import net.sourceforge.waters.model.analysis.des.IsomorphismChecker;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -154,6 +157,45 @@ public class TRSynchronousProductBuilderTest
     } finally {
       mPruningDeadlocks = false;
     }
+  }
+
+  public void testUnusedProposition() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "unused_prop2.wmod");
+    final EventProxy eventA = findEvent(des, "a");
+    final EventProxy eventB = findEvent(des, "b");
+    final ProductDESProxyFactory factory = getProductDESProxyFactory();
+    final Collection<EventProxy> events = new ArrayList<>(2);
+    events.add(eventA);
+    events.add(eventB);
+    final AutomatonProxy autA = findAutomaton(des, "A");
+    final AutomatonProxy autB = findAutomaton(des, "B");
+    final Collection<AutomatonProxy> automata = new ArrayList<>(2);
+    automata.add(autA);
+    automata.add(autB);
+    final ProductDESProxy input =
+      factory.createProductDESProxy("unused_prop", events, automata);
+    final TRSynchronousProductBuilder builder = getAutomatonBuilder();
+    builder.setModel(input);
+    final KindTranslator translator = IdenticalKindTranslator.getInstance();
+    final EventEncoding enc = new EventEncoding();
+    enc.addEvent(eventA, translator, EventStatus.STATUS_NONE);
+    enc.addEvent(eventB, translator, EventStatus.STATUS_NONE);
+    final EventProxy omega = factory.createEventProxy
+      (EventDeclProxy.DEFAULT_MARKING_NAME, EventKind.PROPOSITION);
+    enc.addProposition(omega, false);
+    builder.setEventEncoding(enc);
+    builder.setPruningDeadlocks(true);
+    final boolean ok = builder.run();
+    assertTrue("TRSynchronousProductBuilder unexpectedly returned false!", ok);
+    final TRSynchronousProductResult result = builder.getAnalysisResult();
+    final boolean sat = result.isSatisfied();
+    assertTrue("TRSynchronousProductBuilder unexpectedly returned false!", sat);
+    final AutomatonProxy computed = result.getComputedAutomaton();
+    final AutomatonProxy expected = findAutomaton(des, "sync");
+    final IsomorphismChecker checker = getIsomorphismChecker();
+    checker.checkIsomorphism(computed, expected);
   }
 
 

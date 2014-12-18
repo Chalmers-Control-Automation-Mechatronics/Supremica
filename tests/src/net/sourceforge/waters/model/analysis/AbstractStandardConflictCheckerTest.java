@@ -306,6 +306,13 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(des, false);
   }
 
+  public void testDropSelfloopConf() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "drop_selfloop_conf.wmod");
+    runModelVerifier(des, false);
+  }
+
   public void testEmptySpec() throws Exception
   {
     final ProductDESProxy des =

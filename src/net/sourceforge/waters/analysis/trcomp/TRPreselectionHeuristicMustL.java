@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.trcomp
-//# CLASS:   PreselectionHeuristicMustL
+//# CLASS:   TRPreselectionHeuristicMustL
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -21,13 +21,25 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 
 
 /**
+ * <P>The <STRONG>MustL</STRONG> preselection heuristic used by compositional
+ * model analysers of type {@link AbstractTRCompositionalAnalyzer}.</P>
+ *
+ * <P>The <STRONG>MustL</STRONG> preselection heuristic forms one candidate
+ * for each event, which contains all automata using that event.</P>
+
+ * <P><I>Reference:</I><BR>
+ * Hugo Flordal, Robi Malik. Compositional Verification in Supervisory Control.
+ * SIAM Journal of Control and Optimization, <STRONG>48</STRONG>(3),
+ * 1914-1938, 2009.</P>
+ *
  * @author Robi Malik
  */
 
-class PreselectionHeuristicMustL extends PreselectionHeuristic
+class TRPreselectionHeuristicMustL extends TRPreselectionHeuristic
 {
+
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.trcomp.PreselectingHeuristic
+  //# Interface net.sourceforge.waters.analysis.trcomp.TRPreselectingHeuristic
   @Override
   Collection<TRCandidate> collectCandidates(final TRSubsystemInfo subsys)
     throws AnalysisException
@@ -46,4 +58,5 @@ class PreselectionHeuristicMustL extends PreselectionHeuristic
     }
     return candidates.values();
   }
+
 }

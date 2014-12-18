@@ -272,10 +272,15 @@ public class TRCompositionalLanguageInclusionChecker
   @Override
   protected int getMonolithicAutomataLimit()
   {
-    final ListBufferTransitionRelation rel =
-      mCurrentProperty.getTransitionRelation();
-    final TransitionIterator iter = rel.createAllTransitionsReadOnlyIterator();
-    return iter.advance() ? 1 : 2;
+    if (mRawProperty instanceof TRAutomatonProxy) {
+      final TRAutomatonProxy aut = (TRAutomatonProxy) mRawProperty;
+      final ListBufferTransitionRelation rel = aut.getTransitionRelation();
+      final TransitionIterator iter = rel.createAllTransitionsReadOnlyIterator();
+      return iter.advance() ? 1 : 2;
+    } else {
+      final int numTrans = mRawProperty.getTransitions().size();
+      return numTrans > 0 ? 1 : 2;
+    }
   }
 
   @Override

@@ -105,6 +105,13 @@ public abstract class AbstractLanguageInclusionCheckerTest
     runModelVerifier(des, true);
   }
 
+  public void testDropSelfloopLang() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "drop_selfloop_lang.wmod");
+    runModelVerifier(des, false);
+  }
+
   public void testEmptyProp() throws Exception
   {
     final ProductDESProxy des =

@@ -915,7 +915,7 @@ public class TRCompositionalConflictChecker
       new MarkingSaturationTRSimplifier();
     saturator.setSimplificationListener(markingListener);
     chain.add(saturator);
-    chain.setPropositions(PRECONDITION_MARKING, DEFAULT_MARKING);
+    chain.setDefaultMarkingID(DEFAULT_MARKING);
     chain.setPreferredOutputConfiguration
       (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     return chain;

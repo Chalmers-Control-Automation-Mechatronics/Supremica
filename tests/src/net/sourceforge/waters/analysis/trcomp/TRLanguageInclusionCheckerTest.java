@@ -45,6 +45,7 @@ public class TRLanguageInclusionCheckerTest
   {
     final TRCompositionalLanguageInclusionChecker checker =
       new TRCompositionalLanguageInclusionChecker();
+    checker.setPreselectionHeuristic(AbstractTRCompositionalAnalyzer.MustL);
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);

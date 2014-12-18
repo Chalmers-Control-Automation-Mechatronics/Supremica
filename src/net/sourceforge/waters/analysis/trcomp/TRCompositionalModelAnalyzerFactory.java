@@ -60,6 +60,7 @@ public class TRCompositionalModelAnalyzerFactory
   {
     super.addArguments();
     addArgument(new AbstractionMethodArgument());
+    addArgument(new PreselectionHeuristicArgument());
     addArgument(new MonolithicStateLimitArgument());
     addArgument(new InternalStateLimitArgument());
     addArgument(new MonolithicTransitionLimitArgument());
@@ -252,14 +253,13 @@ public class TRCompositionalModelAnalyzerFactory
 
 
   //#########################################################################
-  //# Inner Class PreselectingMethodArgument
-  /*
-  private static class PreselectingMethodArgument
+  //# Inner Class PreselectionHeuristicArgument
+  private static class PreselectionHeuristicArgument
     extends CommandLineArgumentString
   {
     //#######################################################################
     //# Constructors
-    private PreselectingMethodArgument()
+    private PreselectionHeuristicArgument()
     {
       super("-presel", "Preselecting heuristic for candidate selection");
     }
@@ -273,16 +273,15 @@ public class TRCompositionalModelAnalyzerFactory
       final String name = getValue();
       final AbstractTRCompositionalAnalyzer composer =
         (AbstractTRCompositionalAnalyzer) analyzer;
-      final EnumFactory<AbstractTRCompositionalAnalyzer.PreselectingMethod>
-        factory = composer.getPreselectingMethodFactory();
-      final AbstractTRCompositionalAnalyzer.PreselectingMethod method =
-        factory.getEnumValue(name);
-      if (method == null) {
+      final EnumFactory<TRPreselectionHeuristic> factory =
+        composer.getPreselectionHeuristicFactory();
+      final TRPreselectionHeuristic heu = factory.getEnumValue(name);
+      if (heu == null) {
         System.err.println("Bad value for " + getName() + " option!");
         factory.dumpEnumeration(System.err, 0);
         System.exit(1);
       }
-      composer.setPreselectingMethod(method);
+      composer.setPreselectionHeuristic(heu);
     }
 
     //#######################################################################
@@ -294,12 +293,12 @@ public class TRCompositionalModelAnalyzerFactory
       super.dump(stream, analyzer);
       final AbstractTRCompositionalAnalyzer composer =
         (AbstractTRCompositionalAnalyzer) analyzer;
-      final EnumFactory<AbstractTRCompositionalAnalyzer.PreselectingMethod>
-        factory = composer.getPreselectingMethodFactory();
+      final EnumFactory<TRPreselectionHeuristic> factory =
+        composer.getPreselectionHeuristicFactory();
       factory.dumpEnumeration(stream, INDENT);
     }
   }
-  */
+
 
   //#########################################################################
   //# Inner Class SelectingMethodArgument

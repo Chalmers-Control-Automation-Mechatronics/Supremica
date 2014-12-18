@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.trcomp
-//# CLASS:   PreselectionHeuristicMustL
+//# CLASS:   TRPreselectionHeuristicMustSp
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -22,14 +22,28 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 
 
 /**
+ * <P>The <STRONG>MustSp</STRONG> preselection heuristic used by compositional
+ * model analysers of type {@link AbstractTRCompositionalAnalyzer}.</P>
+ *
+ * <P>The <STRONG>MustSp</STRONG> preselection heuristic forms two candidate
+ * for each event: the first contains all automata where the event is not
+ * selfloop-only, and the second contains all automata where the event is
+ * not always enabled..</P>
+
+ * <P><I>Reference:</I><BR>
+ * Colin Pilbrow, Robi Malik. Compositional Nonblocking Verification with
+ * Always Enabled Events and Selfloop-only Events. Proc. 2nd International
+ * Workshop on Formal Techniques for Safety-Critical Systems, FTSCS 2013,
+ * 147-162, Queenstown, New Zealand, 2013.</P>
+ *
  * @author Robi Malik
  */
 
-class PreselectionHeuristicMustSp extends PreselectionHeuristic
+class TRPreselectionHeuristicMustSp extends TRPreselectionHeuristic
 {
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.trcomp.PreselectingHeuristic
+  //# Interface net.sourceforge.waters.analysis.trcomp.TRPreselectingHeuristic
   @Override
   Collection<TRCandidate> collectCandidates(final TRSubsystemInfo subsys)
     throws AnalysisException

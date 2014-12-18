@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.trcomp
-//# CLASS:   PreselectionHeuristic
+//# CLASS:   TRPreselectionHeuristic
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -24,15 +24,45 @@ import org.apache.log4j.Logger;
 
 
 /**
+ * <P>The interface for all preselection heuristics used by compositional
+ * model analysers of type {@link AbstractTRCompositionalAnalyzer}.</P>
+ *
+ * <P>The <I>preselection heuristic</I> implements the first step of candidate
+ * selection, where several groups of automata to be considered for
+ * composition are selected from a subsystem.</P>
+
+ * <P><I>Reference:</I><BR>
+ * Hugo Flordal, Robi Malik. Compositional Verification in Supervisory Control.
+ * SIAM Journal of Control and Optimization, <STRONG>48</STRONG>(3),
+ * 1914-1938, 2009.</P>
+ *
  * @author Robi Malik
  */
 
-public abstract class PreselectionHeuristic
+public abstract class TRPreselectionHeuristic
   extends AbstractAbortable
 {
 
   //#########################################################################
   //# Invocation
+  /**
+   * Sets the context in which the heuristic runs.
+   * This method is called when a heuristic is registered with a model
+   * analyser to pass that model analyser as a context into the heuristic.
+   */
+  public void setContext(final AbstractTRCompositionalAnalyzer analyzer)
+  {
+    mAutomataLimit = analyzer.getMonolithicAutomataLimit();
+  }
+
+  /**
+   * Invokes this heuristic to produce a collection of candidates for
+   * a given subsystem. This method is implemented differently by
+   * subclasses.
+   * @param  subsys    Subsystem containing the current set of automata.
+   * @return Collection of candidates, each representing a group of automata
+   *         from the subsystem to be considered for composition.
+   */
   abstract Collection<TRCandidate> collectCandidates
     (TRSubsystemInfo subsys)
     throws AnalysisException;
@@ -47,7 +77,7 @@ public abstract class PreselectionHeuristic
     throws AnalysisException
   {
     checkAbort();
-    if (automata.size() < subsys.getNumberOfAutomata()) {
+    if (subsys.getNumberOfAutomata() - automata.size() + 1 >= mAutomataLimit) {
       Collections.sort(automata);
       if (!candidates.containsKey(automata)) {
         final TRCandidate candidate = new TRCandidate(automata, subsys);
@@ -100,5 +130,6 @@ public abstract class PreselectionHeuristic
   //# Data Members
   private final Map<List<TRAutomatonProxy>,TRCandidate> mOverflowCandidates =
     new HashMap<>();
+  private int mAutomataLimit = 2;
 
 }
