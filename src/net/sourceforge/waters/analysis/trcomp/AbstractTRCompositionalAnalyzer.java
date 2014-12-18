@@ -230,6 +230,11 @@ public abstract class AbstractTRCompositionalAnalyzer
       {
         register(MustL);
         register(MustSp);
+        register(Pairs);
+        register(MaxS);
+        register(MinT);
+        register(MaxT);
+        register(MinS);
       }
     };
   }
@@ -1667,6 +1672,16 @@ public abstract class AbstractTRCompositionalAnalyzer
     new TRPreselectionHeuristicMustL();
   static final TRPreselectionHeuristic MustSp =
     new TRPreselectionHeuristicMustSp();
+  static final TRPreselectionHeuristic Pairs =
+    new TRPreselectionHeuristicPairs();
+  static final TRPreselectionHeuristic MinS =
+    new TRPreselectionHeuristicMinS();
+  static final TRPreselectionHeuristic MaxS =
+    new TRPreselectionHeuristicMaxS();
+  static final TRPreselectionHeuristic MinT =
+    new TRPreselectionHeuristicMinT();
+  static final TRPreselectionHeuristic MaxT =
+    new TRPreselectionHeuristicMaxT();
 
   static final int DEFAULT_MARKING = 0;
   static final int PRECONDITION_MARKING = 1;

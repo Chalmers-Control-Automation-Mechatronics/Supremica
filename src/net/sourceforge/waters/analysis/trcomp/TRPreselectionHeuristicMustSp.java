@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.trcomp
-//# CLASS:   PreselectionHeuristicMustL
+//# CLASS:   TRPreselectionHeuristicMustSp
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -43,7 +43,7 @@ class TRPreselectionHeuristicMustSp extends TRPreselectionHeuristic
 {
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.trcomp.PreselectingHeuristic
+  //# Interface net.sourceforge.waters.analysis.trcomp.TRPreselectingHeuristic
   @Override
   Collection<TRCandidate> collectCandidates(final TRSubsystemInfo subsys)
     throws AnalysisException
