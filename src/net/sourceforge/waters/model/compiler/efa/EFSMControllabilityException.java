@@ -29,7 +29,6 @@ public class EFSMControllabilityException extends EvalException
    * @param component The component of interest
    * @param variable  The variable that is changed
    * @param event     The event that attempts to change the variable
-   * @param location  The location where the error occurs
    */
   public EFSMControllabilityException(final SimpleComponentProxy component,
                                       final EFAVariable variable,
