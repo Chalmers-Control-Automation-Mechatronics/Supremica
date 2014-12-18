@@ -984,6 +984,9 @@ public class EFACompiler extends AbortableCompiler
       throws VisitorException
     {
       try {
+        // If the component is the ':updates' automata, then do nothing.
+        if (comp.getName().equals(":updates")) return null;
+
         mCurrentComponent = comp;
         final IdentifierProxy ident0 = comp.getIdentifier();
         final IdentifierProxy ident1 =
@@ -997,7 +1000,8 @@ public class EFACompiler extends AbortableCompiler
         mCompilationInfo.add(result, comp);
         mComponents.add(result);
         return result;
-      } finally {
+      }
+      finally {
         mCurrentComponent = null;
       }
     }
