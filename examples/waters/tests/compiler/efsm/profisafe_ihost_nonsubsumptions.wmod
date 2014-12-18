@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="profisafe_ihost_nonsubsumptions" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment></ns2:Comment>
+    <ConstantAliasList>
+        <ConstantAlias Scope="REQUIRED_PARAMETER" Name="MAXSEQNO">
+            <ConstantAliasExpression>
+                <IntConstant Value="4"/>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+    </ConstantAliasList>
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Name="restart_host_timer"/>
+        <EventDecl Kind="CONTROLLABLE" Name="yield"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="host_timeout"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="SPEC" Name="main">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="s3">
+                        <PointGeometry>
+                            <Point Y="272" X="240"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-7" X="13"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s2">
+                        <PointGeometry>
+                            <Point Y="192" X="240"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-13" X="6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="s1">
+                        <PointGeometry>
+                            <Point Y="112" X="240"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point Y="-6" X="8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="s0">
+                        <PointGeometry>
+                            <Point Y="32" X="240"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry>
+                            <Point Y="-19" X="8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="s3" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="restart_host_timer"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-23" X="11"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="in_cons_num==0 &amp; !got_host_timeout">
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="in_cons_num"/>
+                                        <IntConstant Value="0"/>
+                                    </BinaryExpression>
+                                    <UnaryExpression Operator="!">
+                                        <SimpleIdentifier Name="got_host_timeout"/>
+                                    </UnaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-5" X="12"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="yield"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-13" X="9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s1" Source="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="restart_host_timer"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-13" X="7"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="s2" Source="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="yield"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-30" X="-191"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="187" X="193"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="!got_host_timeout &amp; in_cons_num!=0">
+                                    <UnaryExpression Operator="!">
+                                        <SimpleIdentifier Name="got_host_timeout"/>
+                                    </UnaryExpression>
+                                    <BinaryExpression Operator="!=">
+                                        <SimpleIdentifier Name="in_cons_num"/>
+                                        <IntConstant Value="0"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-12" X="-193"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="timers">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="OFF">
+                        <PointGeometry>
+                            <Point Y="64" X="144"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-18" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="HOST">
+                        <PointGeometry>
+                            <Point Y="144" X="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-9" X="12"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <GroupNode Name="G0">
+                        <NodeRef Name="HOST"/>
+                        <NodeRef Name="OFF"/>
+                        <BoxGeometry>
+                            <Box Y="32" X="32" Width="192" Height="192"/>
+                        </BoxGeometry>
+                    </GroupNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="HOST" Source="G0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="restart_host_timer"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="14" X="-36"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="144" X="32"/>
+                        </StartPointGeometry>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="got_host_timeout"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="33" X="-35"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="OFF" Source="HOST">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="host_timeout"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-23" X="-86"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="got_host_timeout"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-6" X="-87"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <VariableComponent Name="in_cons_num">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <SimpleIdentifier Name="MAXSEQNO"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="in_cons_num"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <VariableComponent Name="got_host_timeout">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="got_host_timeout"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+    </ComponentList>
+</Module>

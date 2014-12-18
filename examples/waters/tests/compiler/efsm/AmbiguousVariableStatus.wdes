@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:ProductDES Name="AmbiguousVariableStatus" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
+    <Comment></Comment>
+    <ns2:EventList>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="a"/>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="b.{!x}"/>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="b.{x}"/>
+    </ns2:EventList>
+    <ns2:AutomataList>
+        <ns2:Automaton Kind="PLANT" Name="x">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="a"/>
+                <ns2:EventRef Name="b.{!x}"/>
+                <ns2:EventRef Name="b.{x}"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="0"/>
+                <ns2:State Name="1"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="b.{!x}" Source="0" Target="1"/>
+                <ns2:Transition Event="a" Source="1" Target="0"/>
+                <ns2:Transition Event="b.{x}" Source="1" Target="1"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="PLANT" Name="Plant">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="a"/>
+                <ns2:EventRef Name="b.{!x}"/>
+                <ns2:EventRef Name="b.{x}"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="G0"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="a" Source="G0" Target="G0"/>
+                <ns2:Transition Event="b.{!x}" Source="G0" Target="G0"/>
+                <ns2:Transition Event="b.{x}" Source="G0" Target="G0"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="SPEC" Name="Spec">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="a"/>
+                <ns2:EventRef Name="b.{!x}"/>
+                <ns2:EventRef Name="b.{x}"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="K0"/>
+                <ns2:State Name="K1"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="b.{!x}" Source="K0" Target="K1"/>
+                <ns2:Transition Event="a" Source="K1" Target="K0"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+    </ns2:AutomataList>
+</ns2:ProductDES>

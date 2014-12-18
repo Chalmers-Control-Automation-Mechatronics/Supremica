@@ -50,6 +50,33 @@
 <Transition Target="D" Source="E" Event="move_left.{sensor2'}"/>
 </TransitionList>
 </Automaton>
+<Automaton Kind="PLANT" Name="Direction">
+<EventRefList>
+<EventRef Name="change_direction"/>
+<EventRef Name="move_left.{!sensor1'}"/>
+<EventRef Name="move_left.{sensor1'}"/>
+<EventRef Name="move_left.{!sensor2'}"/>
+<EventRef Name="move_left.{sensor2'}"/>
+<EventRef Name="move_right.{sensor1'}"/>
+<EventRef Name="move_right.{!sensor1'}"/>
+<EventRef Name="move_right.{sensor2'}"/>
+<EventRef Name="move_right.{!sensor2'}"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="DIR"/>
+</StateList>
+<TransitionList>
+<Transition Target="DIR" Source="DIR" Event="change_direction"/>
+<Transition Target="DIR" Source="DIR" Event="move_left.{!sensor1'}"/>
+<Transition Target="DIR" Source="DIR" Event="move_left.{sensor1'}"/>
+<Transition Target="DIR" Source="DIR" Event="move_left.{!sensor2'}"/>
+<Transition Target="DIR" Source="DIR" Event="move_left.{sensor2'}"/>
+<Transition Target="DIR" Source="DIR" Event="move_right.{!sensor1'}"/>
+<Transition Target="DIR" Source="DIR" Event="move_right.{sensor1'}"/>
+<Transition Target="DIR" Source="DIR" Event="move_right.{!sensor2'}"/>
+<Transition Target="DIR" Source="DIR" Event="move_right.{sensor2'}"/>
+</TransitionList>
+</Automaton>
 <Automaton Kind="PLANT" Name="forward">
 <EventRefList>
 <EventRef Name="change_direction"/>

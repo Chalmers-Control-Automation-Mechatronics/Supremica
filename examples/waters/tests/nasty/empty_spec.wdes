@@ -33,6 +33,10 @@ Since automaton empty has no initial state, this model should have no reachable 
 <ns2:State Initial="true" Name="S0"/>
 </ns2:StateList>
 </ns2:Automaton>
-<ns2:Automaton Kind="SPEC" Name="empty"/>
+<ns2:Automaton Kind="SPEC" Name="empty">
+<ns2:EventRefList>
+<ns2:EventRef Name="c"/>
+</ns2:EventRefList>
+</ns2:Automaton>
 </ns2:AutomataList>
 </ns2:ProductDES>

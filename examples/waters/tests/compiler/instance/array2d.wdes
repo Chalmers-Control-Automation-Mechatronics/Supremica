@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:ProductDES Name="array2d" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
+    <Comment>A test case for 2-dimensional event arrays. A 2-dimensional event array 'ar' is declared indirectly, by specifying the events for each index pair individually as opposed to an array event declaration. Nevertheless, the name 'ar' used on a transition needs to be expanded into all array elements.</Comment>
+    <ns2:EventList>
+        <ns2:Event Kind="CONTROLLABLE" Name="ar[1][1]"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="ar[1][2]"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="ar[2][1]"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="ar[2][2]"/>
+    </ns2:EventList>
+    <ns2:AutomataList>
+        <ns2:Automaton Kind="SPEC" Name="test">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="ar[1][1]"/>
+                <ns2:EventRef Name="ar[1][2]"/>
+                <ns2:EventRef Name="ar[2][1]"/>
+                <ns2:EventRef Name="ar[2][2]"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="S0"/>
+                <ns2:State Name="S1"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="ar[1][1]" Source="S0" Target="S1"/>
+                <ns2:Transition Event="ar[1][2]" Source="S0" Target="S1"/>
+                <ns2:Transition Event="ar[2][1]" Source="S0" Target="S1"/>
+                <ns2:Transition Event="ar[2][2]" Source="S0" Target="S1"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+    </ns2:AutomataList>
+</ns2:ProductDES>

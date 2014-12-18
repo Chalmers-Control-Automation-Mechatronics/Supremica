@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:ProductDES Name="colours" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
+    <Comment>A simple test to see whether coloured markings are displayed and compiled correctly.</Comment>
+    <ns2:EventList>
+        <ns2:Event Kind="PROPOSITION" Name="blue"/>
+        <ns2:Event Kind="PROPOSITION" Name="cyan"/>
+        <ns2:Event Kind="PROPOSITION" Name="default"/>
+        <ns2:Event Kind="PROPOSITION" Name="green"/>
+        <ns2:Event Kind="PROPOSITION" Name="red"/>
+        <ns2:Event Kind="PROPOSITION" Name="yellow"/>
+    </ns2:EventList>
+    <ns2:AutomataList>
+        <ns2:Automaton Kind="SPEC" Name="colourful">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="blue"/>
+                <ns2:EventRef Name="cyan"/>
+                <ns2:EventRef Name="default"/>
+                <ns2:EventRef Name="green"/>
+                <ns2:EventRef Name="red"/>
+                <ns2:EventRef Name="yellow"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="red">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name="red"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Initial="true" Name="red_green">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name="red"/>
+                        <ns2:EventRef Name="green"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Initial="true" Name="red_green_blue">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name="red"/>
+                        <ns2:EventRef Name="green"/>
+                        <ns2:EventRef Name="blue"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Initial="true" Name="red_green_blue_default">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name="red"/>
+                        <ns2:EventRef Name="green"/>
+                        <ns2:EventRef Name="blue"/>
+                        <ns2:EventRef Name="default"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Initial="true" Name="default">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name="default"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Initial="true" Name="more_than_four">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name="red"/>
+                        <ns2:EventRef Name="green"/>
+                        <ns2:EventRef Name="blue"/>
+                        <ns2:EventRef Name="cyan"/>
+                        <ns2:EventRef Name="yellow"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+            </ns2:StateList>
+        </ns2:Automaton>
+    </ns2:AutomataList>
+</ns2:ProductDES>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:ProductDES Name="nodegroup_efa1" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
+    <Comment>A test that involves some nodegroups in combination with EFA actions.</Comment>
+    <ns2:EventList>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="delay_timeout"/>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="host_timeout"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="restart_delay_timer"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="restart_host_timer"/>
+    </ns2:EventList>
+    <ns2:AutomataList>
+        <ns2:Automaton Kind="PLANT" Name="timers">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="delay_timeout"/>
+                <ns2:EventRef Name="host_timeout"/>
+                <ns2:EventRef Name="restart_delay_timer"/>
+                <ns2:EventRef Name="restart_host_timer"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="OFF"/>
+                <ns2:State Name="HOST"/>
+                <ns2:State Name="DELAY"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="delay_timeout" Source="DELAY" Target="OFF"/>
+                <ns2:Transition Event="restart_delay_timer" Source="DELAY" Target="DELAY"/>
+                <ns2:Transition Event="restart_host_timer" Source="DELAY" Target="HOST"/>
+                <ns2:Transition Event="host_timeout" Source="HOST" Target="OFF"/>
+                <ns2:Transition Event="restart_delay_timer" Source="HOST" Target="DELAY"/>
+                <ns2:Transition Event="restart_host_timer" Source="HOST" Target="HOST"/>
+                <ns2:Transition Event="restart_delay_timer" Source="OFF" Target="DELAY"/>
+                <ns2:Transition Event="restart_host_timer" Source="OFF" Target="HOST"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="PLANT" Name="got_host_timeout">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="host_timeout"/>
+                <ns2:EventRef Name="restart_delay_timer"/>
+                <ns2:EventRef Name="restart_host_timer"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="0"/>
+                <ns2:State Name="1"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="host_timeout" Source="0" Target="1"/>
+                <ns2:Transition Event="restart_delay_timer" Source="0" Target="0"/>
+                <ns2:Transition Event="restart_host_timer" Source="0" Target="0"/>
+                <ns2:Transition Event="host_timeout" Source="1" Target="1"/>
+                <ns2:Transition Event="restart_delay_timer" Source="1" Target="0"/>
+                <ns2:Transition Event="restart_host_timer" Source="1" Target="0"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="PLANT" Name="got_delay_timeout">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="delay_timeout"/>
+                <ns2:EventRef Name="restart_delay_timer"/>
+                <ns2:EventRef Name="restart_host_timer"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="0"/>
+                <ns2:State Name="1"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="delay_timeout" Source="0" Target="1"/>
+                <ns2:Transition Event="restart_delay_timer" Source="0" Target="0"/>
+                <ns2:Transition Event="restart_host_timer" Source="0" Target="0"/>
+                <ns2:Transition Event="delay_timeout" Source="1" Target="1"/>
+                <ns2:Transition Event="restart_delay_timer" Source="1" Target="0"/>
+                <ns2:Transition Event="restart_host_timer" Source="1" Target="0"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+    </ns2:AutomataList>
+</ns2:ProductDES>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:ProductDES Name="blocked_efa" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
+    <Comment>An EFA compiler test that involves a blocked events list with :accepting proposition.</Comment>
+    <ns2:EventList>
+        <ns2:Event Kind="PROPOSITION" Name=":accepting"/>
+    </ns2:EventList>
+    <ns2:AutomataList>
+        <ns2:Automaton Kind="PLANT" Name="A">
+            <ns2:EventRefList>
+                <ns2:EventRef Name=":accepting"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="S0"/>
+            </ns2:StateList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="PLANT" Name="x">
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="0"/>
+                <ns2:State Name="1"/>
+            </ns2:StateList>
+        </ns2:Automaton>
+    </ns2:AutomataList>
+</ns2:ProductDES>

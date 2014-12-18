@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:ProductDES Name="random_efa" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
+    <Comment>A test for EFA compilers.
+This tests whether it is possible to perform an undefined assignment to a variable, resulting in nondeterministic transitions for all possible values.</Comment>
+    <ns2:EventList>
+        <ns2:Event Kind="CONTROLLABLE" Name="tau"/>
+    </ns2:EventList>
+    <ns2:AutomataList>
+        <ns2:Automaton Kind="PLANT" Name="v">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="tau"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="0"/>
+                <ns2:State Initial="true" Name="1"/>
+                <ns2:State Initial="true" Name="2"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="tau" Source="0" Target="0"/>
+                <ns2:Transition Event="tau" Source="0" Target="1"/>
+                <ns2:Transition Event="tau" Source="0" Target="2"/>
+                <ns2:Transition Event="tau" Source="1" Target="0"/>
+                <ns2:Transition Event="tau" Source="1" Target="1"/>
+                <ns2:Transition Event="tau" Source="1" Target="2"/>
+                <ns2:Transition Event="tau" Source="2" Target="0"/>
+                <ns2:Transition Event="tau" Source="2" Target="1"/>
+                <ns2:Transition Event="tau" Source="2" Target="2"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="PLANT" Name="random">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="tau"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="S0"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="tau" Source="S0" Target="S0"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+    </ns2:AutomataList>
+</ns2:ProductDES>

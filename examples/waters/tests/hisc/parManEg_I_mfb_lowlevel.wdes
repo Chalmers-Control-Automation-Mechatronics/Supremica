@@ -165,6 +165,28 @@ Should pass all HISC property checks for the low level.
 <ns2:Transition Target="s0" Source="s4" Event="ret_pt"/>
 </ns2:TransitionList>
 </ns2:Automaton>
+<ns2:Automaton Kind="PLANT" Name="lDefNewEvnts_I">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+<ns2:EventRef Name="attch_ptA"/>
+<ns2:EventRef Name="attch_ptB"/>
+<ns2:EventRef Name="finA_attch"/>
+<ns2:EventRef Name="finB_attch"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="s0">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+</ns2:EventRefList>
+</ns2:State>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Target="s0" Source="s0" Event="attch_ptA"/>
+<ns2:Transition Target="s0" Source="s0" Event="attch_ptB"/>
+<ns2:Transition Target="s0" Source="s0" Event="finA_attch"/>
+<ns2:Transition Target="s0" Source="s0" Event="finB_attch"/>
+</ns2:TransitionList>
+</ns2:Automaton>
 <ns2:Automaton Kind="SPEC" Name="lDoPolishSeq_I">
 <ns2:EventRefList>
 <ns2:EventRef Name=":accepting"/>

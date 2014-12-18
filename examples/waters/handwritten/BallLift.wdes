@@ -296,6 +296,63 @@
 <Transition Target="1" Source="1" Event="controller.{!c_iBallUp,iBallDn,iBallUp,iLiftDn}"/>
 </TransitionList>
 </Automaton>
+<Automaton Kind="SPEC" Name="controller">
+<EventRefList>
+<EventRef Name="controller.{!c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,!iBallDn,iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,!iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,!iBallUp,iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,iBallUp,!iLiftDn}"/>
+<EventRef Name="controller.{!c_iBallUp,iBallDn,iBallUp,iLiftDn}"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="q0"/>
+</StateList>
+<TransitionList>
+<Transition Target="q0" Source="q0" Event="controller.{!c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="q0" Source="q0" Event="controller.{!c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="q0" Source="q0" Event="controller.{!c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="q0" Source="q0" Event="controller.{!c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="q0" Source="q0" Event="controller.{!c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="q0" Source="q0" Event="controller.{!c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="q0" Source="q0" Event="controller.{!c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="q0" Source="q0" Event="controller.{!c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="q0" Source="q0" Event="controller.{c_iBallDn,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="q0" Source="q0" Event="controller.{c_iBallDn,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="q0" Source="q0" Event="controller.{c_iBallDn,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="q0" Source="q0" Event="controller.{c_iBallDn,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="q0" Source="q0" Event="controller.{c_iBallDn,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="q0" Source="q0" Event="controller.{c_iBallDn,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="q0" Source="q0" Event="controller.{c_iBallDn,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="q0" Source="q0" Event="controller.{c_iBallDn,iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="q0" Source="q0" Event="controller.{!c_iBallUp,!iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="q0" Source="q0" Event="controller.{!c_iBallUp,!iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="q0" Source="q0" Event="controller.{!c_iBallUp,!iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="q0" Source="q0" Event="controller.{!c_iBallUp,!iBallDn,iBallUp,iLiftDn}"/>
+<Transition Target="q0" Source="q0" Event="controller.{!c_iBallUp,iBallDn,!iBallUp,!iLiftDn}"/>
+<Transition Target="q0" Source="q0" Event="controller.{!c_iBallUp,iBallDn,!iBallUp,iLiftDn}"/>
+<Transition Target="q0" Source="q0" Event="controller.{!c_iBallUp,iBallDn,iBallUp,!iLiftDn}"/>
+<Transition Target="q0" Source="q0" Event="controller.{!c_iBallUp,iBallDn,iBallUp,iLiftDn}"/>
+</TransitionList>
+</Automaton>
 <Automaton Kind="PLANT" Name="iBallDn">
 <EventRefList>
 <EventRef Name="ball_down[1].{!qUp}"/>

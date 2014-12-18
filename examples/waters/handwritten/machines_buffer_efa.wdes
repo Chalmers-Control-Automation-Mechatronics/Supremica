@@ -49,6 +49,24 @@
 <Transition Source="S1" Target="S0" Event="finish2"/>
 </TransitionList>
 </Automaton>
+<Automaton Kind="SPEC" Name="BufferSize">
+<EventRefList>
+<EventRef Name=":accepting"/>
+<EventRef Name="finish1"/>
+<EventRef Name="start2"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Target="S0" Event="finish1"/>
+<Transition Source="S0" Target="S0" Event="start2"/>
+</TransitionList>
+</Automaton>
 <Automaton Kind="PLANT" Name="items">
 <EventRefList>
 <EventRef Name=":accepting"/>
