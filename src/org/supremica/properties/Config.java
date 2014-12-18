@@ -74,9 +74,12 @@ import org.supremica.util.BDD.Options;
 
 
 /**
- * Configurable options. All of these are automatically added to a GUI for editing.
- * The current configuration is saved in the file SupremicaProperties.cfg which per default
- * is loaded on startup.
+ * <STRONG>Configurable Options</STRONG>
+ * <p>
+ * All of these are automatically added to a GUI for editing.
+ * <p>
+ * The current configuration is saved in the file SupremicaProperties.cfg
+ * which per default is loaded on startup.
  */
 public final class Config
 {
@@ -182,9 +185,12 @@ public final class Config
       new BooleanProperty(PropertyType.GUI, "optimizingCompiler", false,
 			  "Remove redundant events, transitions, and components " +
               "when compiling");
+    public static final BooleanProperty NORMALIZING_COMPILER =
+      new BooleanProperty(PropertyType.GUI, "normalizingCompiler", false,
+              "Use normalising EFSM compiler");
     public static final BooleanProperty USE_EVENT_ALPHABET =
       new BooleanProperty(PropertyType.GUI, "useEventAlphabet", true,
-			  "Use per-event alphabet when compiling EFA");
+			  "Use per-event alphabet when compiling EFSM");
     public static final BooleanProperty INCLUDE_RAS_SUPPORT =
       new BooleanProperty(PropertyType.GUI, "includeRASSupport", false,
               "Include RAS support");
@@ -378,4 +384,3 @@ public final class Config
         return instance;
     }
 }
-
