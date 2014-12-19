@@ -20,6 +20,7 @@ import java.util.Set;
 import net.sourceforge.waters.analysis.abstraction.LimitedCertainConflictsTRSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
+import net.sourceforge.waters.analysis.tr.IntStateBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -297,7 +298,7 @@ class TRAbstractionStepCertainConflicts
         return null;
       } else {
         final TRTraceProxy trace =
-          (TRTraceProxy) mLanguageInclusionChecker.getCounterExample();
+          mLanguageInclusionChecker.getCounterExample();
         for (final LanguageInclusionAutomaton laut : mLanguageInclusionAutomata) {
           final TRAutomatonProxy aut = laut.getAutomaton();
           final TRAbstractionStep step = laut.getAbstractionStep();
@@ -442,17 +443,22 @@ class TRAbstractionStepCertainConflicts
       final int cc = langEnc.addProperEvent(ccEvent, EventStatus.STATUS_NONE);
       final ListBufferTransitionRelation inputRel =
         inputAut.getTransitionRelation();
+      final int numStates = inputRel.getNumberOfStates();
+      final IntStateBuffer langStateBuffer =
+        new IntStateBuffer(numStates, langEnc); // Making new dump state!
       final ListBufferTransitionRelation langRel =
-        new ListBufferTransitionRelation(inputRel, langEnc, config);
+        new ListBufferTransitionRelation(inputRel, langEnc,
+                                         langStateBuffer, config);
       mCurrentState = getCurrentState(trace);
-      final int numStates = langRel.getNumberOfStates();
       final int[] levels = step.getLevels();
       for (int s = 0; s < numStates; s++) {
-        if (langRel.isReachable(s)) {
+        if (inputRel.isReachable(s)) {
           langRel.setInitial(s, s == mCurrentState);
           if (levels[s] >= 0 && levels[s] <= maxLevel) {
             langRel.addTransition(s, cc, s);
           }
+        } else {
+          langRel.setReachable(s, false);
         }
       }
       mLanguageInclusionAutomaton = new TRAutomatonProxy(langEnc, langRel);

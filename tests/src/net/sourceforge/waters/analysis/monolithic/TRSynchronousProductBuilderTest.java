@@ -110,9 +110,14 @@ public class TRSynchronousProductBuilderTest
 
   //#########################################################################
   //# Selfloop Removal Test Cases
-  public void testSyncSelfloop() throws Exception
+  public void testSyncSelfloop01() throws Exception
   {
-    runAutomatonBuilder("tests", "nasty", "syncselfloop.wmod");
+    runAutomatonBuilder("tests", "nasty", "syncselfloop_01.wmod");
+  }
+
+  public void testSyncSelfloop02() throws Exception
+  {
+    runAutomatonBuilder("tests", "nasty", "syncselfloop_02.wmod");
   }
 
 

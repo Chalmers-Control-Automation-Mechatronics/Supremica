@@ -189,8 +189,8 @@ public abstract class AbstractTRCompositionalAnalyzer
   /**
    * Gets the factory to obtain transition relation simplifiers for this
    * compositional analyser. The objects returned by this factory can be
-   * passed to the {@link #setSimplifierCreator(TransitionRelationSimplifier)
-   * setSimplifier()} method.
+   * passed to the {@link #setSimplifierCreator(TRToolCreator)
+   * setSimplifierCreator()} method.
    */
   public abstract EnumFactory<TRToolCreator<TransitionRelationSimplifier>>
     getTRSimplifierFactory();
@@ -996,9 +996,7 @@ public abstract class AbstractTRCompositionalAnalyzer
       } else {
         mCurrentSubsystem.addAutomaton(sync);
       }
-      final EventEncoding oldEncoding =
-        mIntermediateAbstractionSequence.getInputEventEncoding();
-      updateEventStatus(sync, oldEncoding);
+      updateEventStatus(sync, syncEncoding);
       for (final TRAutomatonProxy aut : candidate.getAutomata()) {
         mCurrentSubsystem.removeAutomaton(aut, mNeedsSimplification);
       }

@@ -821,11 +821,12 @@ public class TRSynchronousProductBuilder
     if (list.isEmpty() && getRemovingSelfloops()) {
       return;
     }
-    boolean allMarked = true;
+    boolean allMarked = mDeadlockState < 0;
     final int numStates = outputRel.getNumberOfStates();
+    final int dumpIndex = outputRel.getDumpStateIndex();
     states:
     for (int globalS = 0; globalS < numStates; globalS++) {
-      if (globalS != mDeadlockState) {
+      if (globalS != dumpIndex) {
         mStateSpace.getContents(globalS, mEncodedSource);
         for (final MarkingInfo info : list) {
           a = info.getAutomatonIndex();
@@ -838,8 +839,8 @@ public class TRSynchronousProductBuilder
         outputRel.setMarked(globalS, globalP, true);
       }
     }
-    if (!allMarked || !getRemovingSelfloops()) {
-      outputRel.setPropositionUsed(globalP, true);
+    if (allMarked && getRemovingSelfloops()) {
+      outputRel.setPropositionUsed(globalP, false);
     }
   }
 

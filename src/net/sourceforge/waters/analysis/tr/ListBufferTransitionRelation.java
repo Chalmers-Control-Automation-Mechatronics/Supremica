@@ -441,11 +441,45 @@ public class ListBufferTransitionRelation
                                       final EventStatusProvider eventStatus,
                                       final int config)
   {
+    this(rel,
+         eventStatus,
+         new IntStateBuffer(rel.mStateBuffer, eventStatus),
+         config);
+  }
+
+  /**
+   * Creates a new transition relation that contains the same states and
+   * transitions as the given transition relation. This copy constructor
+   * constructs a deep copy that does not share any data structures with the
+   * given transition relation.
+   *
+   * @param rel
+   *          The transition relation to be copied.
+   * @param eventStatus
+   *          The event status provider (event encoding) used for the
+   *          copied transition relation. Transitions with events that are
+   *          not present or marked as unused are not copied, and selfloops
+   *          by events marked as selfloop-only are also suppressed.
+   * @param stateBuffer
+   *          The state buffer representing the state space for the new
+   *          transition relation, which is used instead of the state buffer
+   *          of the transition relation to be copied. It must contain at
+   *          least as many states as the transition relation to be copied.
+   * @param config
+   *          Configuration flags defining which transition buffers are to be
+   *          created in the copy. Should be one of {@link #CONFIG_SUCCESSORS},
+   *          {@link #CONFIG_PREDECESSORS}, or {@link #CONFIG_ALL}.
+   */
+  public ListBufferTransitionRelation(final ListBufferTransitionRelation rel,
+                                      final EventStatusProvider eventStatus,
+                                      final IntStateBuffer stateBuffer,
+                                      final int config)
+  {
     checkConfig(config);
     mName = rel.getName();
     mKind = rel.getKind();
     mEventStatus = eventStatus;
-    mStateBuffer = new IntStateBuffer(rel.mStateBuffer, mEventStatus);
+    mStateBuffer = stateBuffer;
     final int numStates = mStateBuffer.getNumberOfStates();
     try {
       if ((config & CONFIG_SUCCESSORS) != 0) {

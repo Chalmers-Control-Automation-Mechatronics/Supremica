@@ -209,10 +209,10 @@ class TREventInfo
 
   //#########################################################################
   //# Advanced Access
-  byte getEventStatus(final TRAutomatonProxy candidate)
+  byte getEventStatus(final TRAutomatonProxy aut)
   {
-    final Set<TRAutomatonProxy> set = Collections.singleton(candidate);
-    return getEventStatus(set);
+    final Set<TRAutomatonProxy> candidate = Collections.singleton(aut);
+    return getEventStatus(candidate);
   }
 
   byte getEventStatus(final Set<TRAutomatonProxy> candidate)

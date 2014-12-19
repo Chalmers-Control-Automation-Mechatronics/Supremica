@@ -13,8 +13,8 @@ package net.sourceforge.waters.analysis.compositional;
 /**
  * A selection heuristic based on the computation of a numeric heuristic
  * value. A new heuristic is created by creating a subclass of this class
- * and implementing the {@link #getHeuristicValue(Object) getHeuristicValue()}
- * method.
+ * and implementing the {@link #getHeuristicValue(Comparable)
+ * getHeuristicValue()} method.
  *
  * @author Robi Malik
  */

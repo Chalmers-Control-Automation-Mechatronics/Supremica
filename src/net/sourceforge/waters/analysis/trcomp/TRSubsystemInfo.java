@@ -153,8 +153,8 @@ class TRSubsystemInfo
       if (EventStatus.isUsedEvent(status)) {
         final EventProxy event = enc.getProperEvent(e);
         final TREventInfo info = getEventInfo(event);
-          info.updateAutomatonStatus
-        (aut, EventStatus.STATUS_UNUSED, needsSimplification);
+        info.updateAutomatonStatus
+          (aut, EventStatus.STATUS_UNUSED, needsSimplification);
         if (info.isEmpty()) {
           mEvents.remove(event);
         }
