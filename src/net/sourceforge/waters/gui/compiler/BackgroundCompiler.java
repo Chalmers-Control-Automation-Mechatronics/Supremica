@@ -145,6 +145,10 @@ public class BackgroundCompiler
   {
     Config.OPTIMIZING_COMPILER.removePropertyChangeListener
       (mCompilerPropertyChangeListener);
+    Config.NORMALIZING_COMPILER.removePropertyChangeListener
+      (mCompilerPropertyChangeListener);
+    Config.USE_EVENT_ALPHABET.removePropertyChangeListener
+      (mCompilerPropertyChangeListener);
     mTimer.stop();
     mWorker.terminate();
   }
