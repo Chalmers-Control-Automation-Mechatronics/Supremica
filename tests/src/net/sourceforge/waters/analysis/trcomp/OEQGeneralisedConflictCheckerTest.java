@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.trcomp
-//# CLASS:   WOEQGeneralisedConflictCheckerTest
+//# CLASS:   OEQGeneralisedConflictCheckerTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -17,7 +17,7 @@ import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class WOEQGeneralisedConflictCheckerTest
+public class OEQGeneralisedConflictCheckerTest
   extends AbstractGeneralisedConflictCheckerTest
 {
 
@@ -26,7 +26,7 @@ public class WOEQGeneralisedConflictCheckerTest
   public static Test suite()
   {
     final TestSuite testSuite =
-      new TestSuite(WOEQGeneralisedConflictCheckerTest.class);
+      new TestSuite(OEQGeneralisedConflictCheckerTest.class);
     return testSuite;
   }
 
@@ -45,9 +45,9 @@ public class WOEQGeneralisedConflictCheckerTest
   {
     final TRCompositionalConflictChecker checker =
       new TRCompositionalConflictChecker();
-    checker.setSimplifierCreator(TRCompositionalConflictChecker.WOEQ);
-    checker.setPreselectionHeuristic(AbstractTRCompositionalAnalyzer.PRESEL_MustL);
-    checker.setSelectionHeuristic(AbstractTRCompositionalAnalyzer.SEL_MaxL);
+    checker.setSimplifierCreator(TRCompositionalConflictChecker.OEQ);
+    checker.setPreselectionHeuristic(AbstractTRCompositionalAnalyzer.PRESEL_Pairs);
+    checker.setSelectionHeuristic(AbstractTRCompositionalAnalyzer.SEL_MinS);
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);

@@ -1072,18 +1072,22 @@ public class TRCompositionalConflictChecker
     public void onSimplificationFinish
       (final TransitionRelationSimplifier simplifier, final boolean result)
     {
-      if (simplifier instanceof MarkingSaturationTRSimplifier) {
-        final IntermediateAbstractionSequence seq =
-          getIntermediateAbstractionSequence();
-        if (result && isCounterExampleEnabled() && seq != null) {
+      final IntermediateAbstractionSequence seq =
+        getIntermediateAbstractionSequence();
+      if (result && isCounterExampleEnabled() && seq != null) {
+        if (simplifier instanceof MarkingRemovalTRSimplifier) {
+          mEventEncodingAtStart = seq.getCurrentEventEncoding();
+        } else if (simplifier instanceof MarkingSaturationTRSimplifier) {
           final ListBufferTransitionRelation rel =
             simplifier.getTransitionRelation();
           final int numPreconditionMarkings =
             rel.getNumberOfMarkings(PRECONDITION_MARKING, true);
           final TransitionRelationSimplifier last =
             seq.getLastPartitionSimplifier();
+          EventEncoding enc = mEventEncodingAtStart;
+          mEventEncodingAtStart = null;
           if (last instanceof MarkingRemovalTRSimplifier) {
-            seq.removeLastPartitionSimplifier();
+            seq.removeLastPartitionSimplifier(enc);
             if (mNumberOfPreconditionMarkingsAtStart ==
                 numPreconditionMarkings &&
                 rel.getNumberOfMarkings(DEFAULT_MARKING, true) ==
@@ -1095,21 +1099,26 @@ public class TRCompositionalConflictChecker
           }
           if (numPreconditionMarkings >
               mNumberOfPreconditionMarkingsBeforeSaturate) {
+            if (enc == null) {
+              enc = seq.getCurrentEventEncoding();
+            }
             final TRAbstractionStep pred =
               seq.getLastIntermediateStepOrPredecessor();
-            final EventEncoding enc = seq.getCurrentEventEncoding();
             final TRAbstractionStep step =
               new TRAbstractionStepPreconditionSaturation(pred, enc, simplifier);
             seq.append(step);
             return;
           }
         }
+      } else {
+        mEventEncodingAtStart = null;
       }
       super.onSimplificationFinish(simplifier, result);
     }
 
     //#######################################################################
     //# Data Members
+    private EventEncoding mEventEncodingAtStart;
     private int mNumberOfDefaultMarkingsAtStart;
     private int mNumberOfPreconditionMarkingsAtStart;
     private int mNumberOfPreconditionMarkingsBeforeSaturate;

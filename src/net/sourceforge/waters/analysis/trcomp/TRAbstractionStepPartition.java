@@ -137,7 +137,8 @@ class TRAbstractionStepPartition
     final ListBufferTransitionRelation inputRel =
       inputAut.getTransitionRelation();
     inputRel.logSizes(logger);
-    final EventEncoding inputEventEncoding = new EventEncoding(mEventEncodingBefore);
+    final EventEncoding inputEventEncoding =
+      new EventEncoding(mEventEncodingBefore);
     final ListBufferTransitionRelation outputRel =
       new ListBufferTransitionRelation(inputRel, inputEventEncoding, inputConfig);
     chain.setTransitionRelation(outputRel);

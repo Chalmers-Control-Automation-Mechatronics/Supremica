@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="syncselfloop_02" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>A test for synchronous product builders. This tests whether the event 'drop' that after synchronous composition is selflooped in all states , and the proposition :accepting that appears in all states, are removed from the alphabet.</ns2:Comment>
+    <ns2:Comment>A test for synchronous product builders. This tests whether the event 'drop' that after synchronous composition is selflooped in all states, and the proposition :accepting that appears in all states, are removed from the alphabet.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="a"/>
         <EventDecl Kind="CONTROLLABLE" Name="drop"/>

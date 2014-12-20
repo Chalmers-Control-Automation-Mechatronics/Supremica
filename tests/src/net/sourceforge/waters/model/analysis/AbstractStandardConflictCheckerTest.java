@@ -362,6 +362,27 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(des, false);
   }
 
+  public void testOmegaSat01() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "omega_sat_01.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testOmegaSat02() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "omega_sat_02.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testOmegaSat03() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "omega_sat_03.wmod");
+    runModelVerifier(des, false);
+  }
+
   public void testOneState() throws Exception
   {
     final ProductDESProxy des =

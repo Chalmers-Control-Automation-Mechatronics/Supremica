@@ -1590,7 +1590,7 @@ public abstract class AbstractTRCompositionalAnalyzer
       }
     }
 
-    void removeLastPartitionSimplifier()
+    void removeLastPartitionSimplifier(final EventEncoding enc)
     {
       final TRAbstractionStep step = mSteps.peekLast();
       if (step != null && step instanceof TRAbstractionStepPartition) {
@@ -1601,6 +1601,7 @@ public abstract class AbstractTRCompositionalAnalyzer
           mSteps.removeLast();
         }
       }
+      mCurrentEventEncoding = enc;
     }
 
     //#######################################################################
