@@ -91,8 +91,6 @@ class TRAbstractionStepCertainConflicts
   public TRAutomatonProxy createOutputAutomaton(final int preferredConfig)
     throws AnalysisException
   {
-    final Logger logger = getLogger();
-    reportRebuilding();
     mSimplifier.setDefaultMarkingID(mDefaultMarking);
     mSimplifier.setPreferredOutputConfiguration(preferredConfig);
     final int inputConfig = mSimplifier.getPreferredInputConfiguration();
@@ -101,6 +99,8 @@ class TRAbstractionStepCertainConflicts
     // We are going to destructively change this automaton,
     // so we need to clear the copy cached on the predecessor.
     mPredecessor.clearOutputAutomaton();
+    final Logger logger = getLogger();
+    reportRebuilding();
     final ListBufferTransitionRelation inputRel =
       inputAut.getTransitionRelation();
     inputRel.logSizes(logger);

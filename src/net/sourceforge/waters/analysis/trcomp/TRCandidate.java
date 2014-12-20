@@ -93,8 +93,9 @@ public class TRCandidate
   {
     final String name = getName();
     final int numEvents = mEventEncoding.getNumberOfProperEvents();
+    final int numProps = mEventEncoding.getNumberOfPropositions();
     final List<EventProxy> events =
-      new ArrayList<>(numEvents + mAutomata.size());
+      new ArrayList<>(numEvents + numProps + mAutomata.size());
     for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
       final byte status = mEventEncoding.getProperEventStatus(e);
       if (EventStatus.isUsedEvent(status)) {
@@ -111,6 +112,10 @@ public class TRCandidate
           events.add(tau);
         }
       }
+    }
+    for (int p = 0; p < numProps; p++) {
+      final EventProxy prop = mEventEncoding.getProposition(p);
+      events.add(prop);
     }
     return factory.createProductDESProxy(name, events, mAutomata);
   }

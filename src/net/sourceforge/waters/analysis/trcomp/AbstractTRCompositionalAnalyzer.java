@@ -914,7 +914,7 @@ public abstract class AbstractTRCompositionalAnalyzer
         aut.resetStateNames();
       }
       // Record steps and update event status ...
-      mIntermediateAbstractionSequence.commit(aut);
+      mIntermediateAbstractionSequence.commit();
       mNeedsSimplification.setSuppressed(aut);
       if (simplified || !mAlwaysEnabledDetectedInitially) {
         final EventEncoding oldEncoding =
@@ -986,7 +986,7 @@ public abstract class AbstractTRCompositionalAnalyzer
         for (final TRAutomatonProxy aut : candidate.getAutomata()) {
           mCurrentAutomataMap.remove(aut);
         }
-        mIntermediateAbstractionSequence.commit(sync);
+        mIntermediateAbstractionSequence.commit();
       }
       // Update event status ...
       mNeedsSimplification.setSuppressed(candidate, sync);
@@ -1531,7 +1531,7 @@ public abstract class AbstractTRCompositionalAnalyzer
     {
       mPredecessor =
         mCurrentAutomataMap == null ? null : mCurrentAutomataMap.get(aut);
-      mInputAutomaton = aut;
+      mCurrentAutomaton = aut;
       mInputEventEncoding = mCurrentEventEncoding =
         new EventEncoding(aut.getEventEncoding());
       mSteps = new LinkedList<>();
@@ -1573,7 +1573,7 @@ public abstract class AbstractTRCompositionalAnalyzer
     {
       mSteps.add(step);
       mCurrentEventEncoding =
-        new EventEncoding(mInputAutomaton.getEventEncoding());
+        new EventEncoding(mCurrentAutomaton.getEventEncoding());
     }
 
     TransitionRelationSimplifier getLastPartitionSimplifier()
@@ -1606,23 +1606,23 @@ public abstract class AbstractTRCompositionalAnalyzer
 
     //#######################################################################
     //# String Abstraction Steps
-    private void commit(final TRAutomatonProxy result)
+    private void commit()
     {
       final TRAbstractionStep last = mSteps.peekLast();
       if (last != null && isCounterExampleEnabled()) {
         if (mPredecessor != null) {
           mPredecessor.clearOutputAutomaton();
         }
-        last.provideOutputAutomaton(result);
+        last.provideOutputAutomaton(mCurrentAutomaton);
         mAbstractionSequence.addAll(mSteps);
-        mCurrentAutomataMap.put(result, last);
+        mCurrentAutomataMap.put(mCurrentAutomaton, last);
       }
     }
 
     //#######################################################################
     //# Data Members
     private final TRAbstractionStep mPredecessor;
-    private final TRAutomatonProxy mInputAutomaton;
+    private final TRAutomatonProxy mCurrentAutomaton;
     private final EventEncoding mInputEventEncoding;
     private EventEncoding mCurrentEventEncoding;
     private final LinkedList<TRAbstractionStep> mSteps;

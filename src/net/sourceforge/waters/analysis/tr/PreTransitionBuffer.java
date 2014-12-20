@@ -130,6 +130,7 @@ public class PreTransitionBuffer
       } while ((state & TAG_END) == 0);
       final int from = key >>> mStateShift;
       final int event = key & mEventMask;
+      states.sort();
       rel.addTransitions(from, event, states);
       pos += 1 + states.size();
       states.clear();

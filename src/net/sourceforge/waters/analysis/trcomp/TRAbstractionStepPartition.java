@@ -124,8 +124,6 @@ class TRAbstractionStepPartition
   public TRAutomatonProxy createOutputAutomaton(final int preferredConfig)
     throws AnalysisException
   {
-    final Logger logger = getLogger();
-    reportRebuilding();
     final ChainTRSimplifier chain = new ChainTRSimplifier(mUsedSimplifiers);
     chain.setPreferredOutputConfiguration(preferredConfig);
     final int inputConfig = chain.getPreferredInputConfiguration();
@@ -134,6 +132,8 @@ class TRAbstractionStepPartition
     // We are going to destructively change this automaton,
     // so we need to clear the copy cached on the predecessor.
     mPredecessor.clearOutputAutomaton();
+    final Logger logger = getLogger();
+    reportRebuilding();
     final ListBufferTransitionRelation inputRel =
       inputAut.getTransitionRelation();
     inputRel.logSizes(logger);
