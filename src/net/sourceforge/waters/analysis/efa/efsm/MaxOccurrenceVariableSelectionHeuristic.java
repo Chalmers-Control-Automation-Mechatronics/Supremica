@@ -32,7 +32,7 @@ public class MaxOccurrenceVariableSelectionHeuristic
   //# Overrides for
   //# net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic
   @Override
-  protected double getHeuristicValue(final EFSMVariable var)
+  public double getHeuristicValue(final EFSMVariable var)
   {
     final EFSMTransitionRelation efsmTR = var.getTransitionRelation();
     if (efsmTR == null) {

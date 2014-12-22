@@ -35,7 +35,7 @@ public class CompositionSelectionHeuristicMinS
   //# Overrides for
   //# net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic
   @Override
-  protected double getHeuristicValue(final UnifiedEFACandidate candidate)
+  public double getHeuristicValue(final UnifiedEFACandidate candidate)
   {
     Set<AbstractEFAEvent> eventSet = new THashSet<>();
     double numStates = 1.0;

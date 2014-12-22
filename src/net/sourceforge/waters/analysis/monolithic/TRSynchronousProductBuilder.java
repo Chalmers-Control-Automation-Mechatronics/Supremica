@@ -805,19 +805,7 @@ public class TRSynchronousProductBuilder
     if (globalP < 0) {
       return;
     }
-    final List<MarkingInfo> list = new ArrayList<>(mInputAutomata.length);
-    int a = 0;
-    for (final TRAutomatonProxy localAut : mInputAutomata) {
-      final EventEncoding enc = localAut.getEventEncoding();
-      final int localP = enc.getEventCode(prop);
-      if (localP >= 0) {
-        final ListBufferTransitionRelation localRel =
-          localAut.getTransitionRelation();
-        final MarkingInfo info = new MarkingInfo(a, localRel, localP);
-        list.add(info);
-      }
-      a++;
-    }
+    final List<MarkingInfo> list = createMarkingInfo(prop);
     if (list.isEmpty() && getRemovingSelfloops()) {
       return;
     }
@@ -829,7 +817,7 @@ public class TRSynchronousProductBuilder
       if (globalS != dumpIndex) {
         mStateSpace.getContents(globalS, mEncodedSource);
         for (final MarkingInfo info : list) {
-          a = info.getAutomatonIndex();
+          final int a = info.getAutomatonIndex();
           final int localS = mStateTupleEncoding.get(mEncodedSource, a);
           if (!info.isMarked(localS)) {
             allMarked = false;
@@ -915,6 +903,43 @@ public class TRSynchronousProductBuilder
 
 
   //#########################################################################
+  //# Callback Support
+  public List<MarkingInfo> createMarkingInfo(final EventProxy prop)
+  {
+    final int globalP = mOutputEventEncoding.getEventCode(prop);
+    if (globalP < 0) {
+      return Collections.emptyList();
+    }
+    final List<MarkingInfo> list = new ArrayList<>(mInputAutomata.length);
+    int a = 0;
+    for (final TRAutomatonProxy localAut : mInputAutomata) {
+      final EventEncoding enc = localAut.getEventEncoding();
+      final int localP = enc.getEventCode(prop);
+      if (localP >= 0) {
+        final ListBufferTransitionRelation localRel =
+          localAut.getTransitionRelation();
+        final MarkingInfo info = new MarkingInfo(a, localRel, localP);
+        list.add(info);
+      }
+      a++;
+    }
+    return list;
+  }
+
+  public boolean isMarked(final List<MarkingInfo> infoList, final int[] decoded)
+  {
+    for (final MarkingInfo info : infoList) {
+      final int a = info.getAutomatonIndex();
+      final int s = decoded[a];
+      if (!info.isMarked(s)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+
+  //#########################################################################
   //# Local Interface StateCallback
   /**
    * A callback interface to enable the user to perform custom actions
@@ -932,6 +957,41 @@ public class TRSynchronousProductBuilder
      *         suppressed.
      */
     public boolean newState(int[] tuple) throws OverflowException;
+  }
+
+
+  //#########################################################################
+  //# Inner Class MarkingInfo
+  public static class MarkingInfo
+  {
+    //#######################################################################
+    //# Constructor
+    private MarkingInfo(final int autIndex,
+                        final ListBufferTransitionRelation rel,
+                        final int prop)
+    {
+      mAutomatonIndex = autIndex;
+      mTransitionRelation = rel;
+      mProposition = prop;
+    }
+
+    //#######################################################################
+    //# Access
+    private int getAutomatonIndex()
+    {
+      return mAutomatonIndex;
+    }
+
+    private boolean isMarked(final int state)
+    {
+      return mTransitionRelation.isMarked(state, mProposition);
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final int mAutomatonIndex;
+    private final ListBufferTransitionRelation mTransitionRelation;
+    private final int mProposition;
   }
 
 
@@ -1269,41 +1329,6 @@ public class TRSynchronousProductBuilder
     private float mProbability;
     private final TransitionIterator mTransitionIterator;
     private AutomatonEventInfo mNextUpdate;
-  }
-
-
-  //#########################################################################
-  //# Inner Class MarkingInfo
-  private static class MarkingInfo
-  {
-    //#######################################################################
-    //# Constructor
-    private MarkingInfo(final int autIndex,
-                        final ListBufferTransitionRelation rel,
-                        final int prop)
-    {
-      mAutomatonIndex = autIndex;
-      mTransitionRelation = rel;
-      mProposition = prop;
-    }
-
-    //#######################################################################
-    //# Access
-    private int getAutomatonIndex()
-    {
-      return mAutomatonIndex;
-    }
-
-    private boolean isMarked(final int state)
-    {
-      return mTransitionRelation.isMarked(state, mProposition);
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final int mAutomatonIndex;
-    private final ListBufferTransitionRelation mTransitionRelation;
-    private final int mProposition;
   }
 
 

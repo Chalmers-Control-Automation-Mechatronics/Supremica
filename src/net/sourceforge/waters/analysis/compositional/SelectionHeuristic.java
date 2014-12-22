@@ -56,7 +56,9 @@ public abstract class SelectionHeuristic<T extends Comparable<? super T>>
    * context into the heuristic. The default implementation does nothing,
    * but it can be overridden by specific heuristics that require access
    * to their model analyser.
-   * @param  context  The context to be used by the selection heuristic.
+   * @param  context  The context to be used by the selection heuristic,
+   *                  or <CODE>null</CODE> to indicate that analysis has
+   *                  completed and the context becomes invalid.
    * @throws ClassCastException to indicate that the given context is not
    *         of a type supported by this selection heuristic.
    */

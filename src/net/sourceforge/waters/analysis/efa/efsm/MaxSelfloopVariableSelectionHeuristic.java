@@ -28,7 +28,7 @@ public class MaxSelfloopVariableSelectionHeuristic
   //# Overrides for
   //# net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic
   @Override
-  protected double getHeuristicValue(final EFSMVariable var)
+  public double getHeuristicValue(final EFSMVariable var)
   {
     return -var.getSelfloops().size();
   }

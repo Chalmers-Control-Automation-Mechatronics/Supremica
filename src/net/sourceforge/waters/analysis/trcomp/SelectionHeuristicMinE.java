@@ -49,7 +49,7 @@ public class SelectionHeuristicMinE
   }
 
   @Override
-  protected double getHeuristicValue(final TRCandidate candidate)
+  public double getHeuristicValue(final TRCandidate candidate)
   {
     final byte pattern = EventStatus.STATUS_LOCAL | EventStatus.STATUS_UNUSED;
     final EventEncoding enc = candidate.getEventEncoding();

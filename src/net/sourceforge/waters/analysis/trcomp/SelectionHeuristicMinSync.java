@@ -1,0 +1,164 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters Analysis
+//# PACKAGE: net.sourceforge.waters.analysis.trcomp
+//# CLASS:   SelectionHeuristicMinSync
+//###########################################################################
+//# $Id$
+//###########################################################################
+
+package net.sourceforge.waters.analysis.trcomp;
+
+import net.sourceforge.waters.analysis.compositional.ChainSelectionHeuristic;
+import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult;
+import net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic;
+import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
+import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
+import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.AnalysisResult;
+import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+
+import org.apache.log4j.Logger;
+
+
+/**
+ * <P>The <STRONG>MinSync</STRONG> candidate selection heuristic for
+ * compositional model analysers of type {@link
+ * AbstractTRCompositionalAnalyzer}.</P>
+ *
+ * <P>The <STRONG>MinSync</STRONG> heuristic computes the number of states
+ * of the synchronous composition of each candidate and gives preference to
+ * the candidate with the fewest state in the synchronous composition.</P>
+ *
+ * <P>The implementation attempts to improve performance using state limits,
+ * aborting the synchronous product computation as soon as the number of
+ * states encountered exceeds the running minimum.</P>
+ *
+ * <P><I>Reference:</I><BR>
+ * Robi Malik, Ryan Leduc. Compositional Nonblocking Verification Using
+ * Generalised Nonblocking Abstractions, IEEE Transactions on Automatic
+ * Control <STRONG>58</STRONG>(8), 1-13, 2013.</P>
+ *
+ * @author Robi Malik
+ */
+
+public class SelectionHeuristicMinSync
+extends NumericSelectionHeuristic<TRCandidate>
+{
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
+  public void requestAbort()
+  {
+    super.requestAbort();
+    if (mSynchronousProductBuilder != null) {
+      mSynchronousProductBuilder.requestAbort();
+    }
+  }
+
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    if (mSynchronousProductBuilder != null) {
+      mSynchronousProductBuilder.resetAbort();
+    }
+  }
+
+
+  //#########################################################################
+  //# Overrides for NumericSelectionHeuristic<TRCandidate>
+  @Override
+  public void setContext(final Object context)
+  {
+    mAnalyzer = (AbstractTRCompositionalAnalyzer) context;
+    if (context != null) {
+      final KindTranslator translator = mAnalyzer.getKindTranslator();
+      mSynchronousProductBuilder =
+        new TRSynchronousProductBuilder(null, translator);
+      mSynchronousProductBuilder.setPruningDeadlocks
+        (mAnalyzer.isPruningDeadlocks());
+      mSynchronousProductBuilder.setTransitionLimit
+        (mAnalyzer.getInternalTransitionLimit());
+      mSynchronousProductBuilder.setDetailedOutputEnabled(false);
+      mSynchronousProductBuilder.setRemovingSelfloops(true);
+      mStateLimit = mAnalyzer.getInternalStateLimit();
+    } else {
+      mSynchronousProductBuilder = null;
+    }
+  }
+
+  @Override
+  public SelectionHeuristic<TRCandidate> createDecisiveHeuristic()
+  {
+    @SuppressWarnings("unchecked")
+    final SelectionHeuristic<TRCandidate>[] array = new SelectionHeuristic[] {
+      this,
+      AbstractTRCompositionalAnalyzer.SEL_MaxL,
+      AbstractTRCompositionalAnalyzer.SEL_MaxC,
+      AbstractTRCompositionalAnalyzer.SEL_MinE,
+      AbstractTRCompositionalAnalyzer.SEL_MinS
+    };
+    final ChainSelectionHeuristic<TRCandidate> chain =
+      new ChainSelectionHeuristic<TRCandidate>(array);
+    chain.setPreOrder(AbstractTRCompositionalAnalyzer.SEL_MinS0);
+    return chain;
+  }
+
+  @Override
+  public double getHeuristicValue(final TRCandidate candidate)
+  {
+    try {
+      final ProductDESProxyFactory factory = mAnalyzer.getFactory();
+      final ProductDESProxy des = candidate.createProductDESProxy(factory);
+      final EventEncoding syncEncoding =
+        candidate.createSyncEventEncoding();
+      mSynchronousProductBuilder.setModel(des);
+      mSynchronousProductBuilder.setEventEncoding(syncEncoding);
+      mSynchronousProductBuilder.setNodeLimit(mStateLimit);
+      mSynchronousProductBuilder.run();
+      final AnalysisResult result =
+        mSynchronousProductBuilder.getAnalysisResult();
+      final double dsize = result.getTotalNumberOfStates();
+      final int size = (int) Math.round(dsize);
+      if (size < mStateLimit) {
+        mStateLimit = size;
+      }
+      return dsize;
+    } catch (final OutOfMemoryError error) {
+      final Logger logger = mAnalyzer.getLogger();
+      logger.debug("<out of memory>");
+      return Double.POSITIVE_INFINITY;
+    } catch (final OverflowException overflow) {
+      return Double.POSITIVE_INFINITY;
+    } catch (final AnalysisException exception) {
+      throw exception.getRuntimeException();
+    } finally {
+      final CompositionalAnalysisResult stats = mAnalyzer.getAnalysisResult();
+      final SynchronousProductResult result =
+        mSynchronousProductBuilder.getAnalysisResult();
+      stats.addSynchronousProductAnalysisResult(result);
+    }
+  }
+
+  @Override
+  protected void reset()
+  {
+    super.reset();
+    mStateLimit = mAnalyzer.getInternalStateLimit();
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private AbstractTRCompositionalAnalyzer mAnalyzer;
+  private TRSynchronousProductBuilder mSynchronousProductBuilder;
+  private int mStateLimit;
+
+}

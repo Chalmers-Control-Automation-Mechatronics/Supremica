@@ -34,7 +34,7 @@ public class MaxLocalVariablesCompositionSelectionHeuristic
   //# Overrides for
   //# net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic
   @Override
-  protected double getHeuristicValue(final EFSMPair candidate)
+  public double getHeuristicValue(final EFSMPair candidate)
   {
     final Set<EFSMVariable> vars = new THashSet<EFSMVariable>();
     for (final EFSMTransitionRelation efsmTR : candidate.asArray()) {

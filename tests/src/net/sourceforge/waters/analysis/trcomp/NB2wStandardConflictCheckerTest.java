@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.trcomp
-//# CLASS:   NB2StandardConflictCheckerTest
+//# CLASS:   NB2wStandardConflictCheckerTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -18,7 +18,7 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class NB2StandardConflictCheckerTest
+public class NB2wStandardConflictCheckerTest
   extends AbstractStandardConflictCheckerTest
 {
 
@@ -27,7 +27,7 @@ public class NB2StandardConflictCheckerTest
   public static Test suite()
   {
     final TestSuite testSuite =
-      new TestSuite(NB2StandardConflictCheckerTest.class);
+      new TestSuite(NB2wStandardConflictCheckerTest.class);
     return testSuite;
   }
 
@@ -46,9 +46,9 @@ public class NB2StandardConflictCheckerTest
   {
     final TRCompositionalConflictChecker checker =
       new TRCompositionalConflictChecker();
-    checker.setSimplifierCreator(TRCompositionalConflictChecker.NB2);
+    checker.setSimplifierCreator(TRCompositionalConflictChecker.NB2w);
     checker.setPreselectionHeuristic(AbstractTRCompositionalAnalyzer.PRESEL_MustL);
-    checker.setSelectionHeuristic(AbstractTRCompositionalAnalyzer.SEL_MinSync);
+    checker.setSelectionHeuristic(AbstractTRCompositionalAnalyzer.SEL_MinE);
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);

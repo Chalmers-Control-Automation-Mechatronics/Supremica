@@ -265,7 +265,7 @@ public class CompositionalSelectionHeuristicFactory
     //#######################################################################
     //# Overrides for NumericSelectionHeuristic<Candidate>
     @Override
-    protected double getHeuristicValue(final Candidate candidate)
+    public double getHeuristicValue(final Candidate candidate)
     {
       return - (double) candidate.getCommonEventCount() /
                candidate.getNumberOfEvents();
@@ -281,7 +281,7 @@ public class CompositionalSelectionHeuristicFactory
     //#######################################################################
     //# Overrides for NumericSelectionHeuristic<Candidate>
     @Override
-    protected double getHeuristicValue(final Candidate candidate)
+    public double getHeuristicValue(final Candidate candidate)
     {
       return - (double) candidate.getLocalEventCount() /
                candidate.getNumberOfEvents();
@@ -297,7 +297,7 @@ public class CompositionalSelectionHeuristicFactory
     //#######################################################################
     //# Overrides for NumericSelectionHeuristic<Candidate>
     @Override
-    protected double getHeuristicValue(final Candidate candidate)
+    public double getHeuristicValue(final Candidate candidate)
     {
       final int unionAlphabetSize = candidate.getNumberOfEvents();
       int largestAlphabetSize = 0;
@@ -326,7 +326,7 @@ public class CompositionalSelectionHeuristicFactory
     }
 
     @Override
-    protected double getHeuristicValue(final Candidate candidate)
+    public double getHeuristicValue(final Candidate candidate)
     {
       final Collection<AutomatonProxy> automata = candidate.getAutomata();
       final Collection<AutomatonProxy> frontier = new THashSet<AutomatonProxy>();
@@ -362,7 +362,7 @@ public class CompositionalSelectionHeuristicFactory
     //#######################################################################
     //# Overrides for NumericSelectionHeuristic<Candidate>
     @Override
-    protected double getHeuristicValue(final Candidate candidate)
+    public double getHeuristicValue(final Candidate candidate)
     {
       double product = 1.0;
       for (final AutomatonProxy aut : candidate.getAutomata()) {
@@ -390,7 +390,7 @@ public class CompositionalSelectionHeuristicFactory
     }
 
     @Override
-    protected double getHeuristicValue(final Candidate candidate)
+    public double getHeuristicValue(final Candidate candidate)
     {
       final MonolithicSynchronousProductBuilder syncBuilder =
         mAnalyzer.getSynchronousProductBuilder();

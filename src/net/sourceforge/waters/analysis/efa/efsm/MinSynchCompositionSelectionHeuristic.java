@@ -31,7 +31,7 @@ public class MinSynchCompositionSelectionHeuristic
   //# Overrides for
   //# net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic
   @Override
-  protected double getHeuristicValue(final EFSMPair candidate)
+  public double getHeuristicValue(final EFSMPair candidate)
   {
     final ListBufferTransitionRelation rel1 =
       candidate.getFirst().getTransitionRelation();

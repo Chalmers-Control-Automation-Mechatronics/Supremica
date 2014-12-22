@@ -55,7 +55,7 @@ public class SelectionHeuristicMaxC
   }
 
   @Override
-  protected double getHeuristicValue(final TRCandidate candidate)
+  public double getHeuristicValue(final TRCandidate candidate)
   {
     final EventEncoding enc = candidate.getEventEncoding();
     int numCommon = 0;

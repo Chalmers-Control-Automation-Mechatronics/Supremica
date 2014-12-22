@@ -14,13 +14,12 @@ import net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
-import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 
 
 /**
- * <P>The <STRONG>MinS</STRONG> candidate selection heuristic for
- * compositional model analysers of type {@link AbstractTRCompositionalAnalyzer}.</P>
+ * <P>The <STRONG>MinS</STRONG> and <STRONG>MinS</STRONG><SUP>&alpha;</SUP>
+ * candidate selection heuristics for compositional model analysers of type
+ * {@link AbstractTRCompositionalAnalyzer}.</P>
  *
  * <P>The <STRONG>MinS</STRONG> heuristic estimates the number of states of the
  * abstracted synchronous composition of candidates and chooses the candidate
@@ -28,9 +27,23 @@ import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
  * product of the state numbers of the candidate's automata with its
  * ratio of shared over total events (excluding {@link EventEncoding#TAU}).</P>
  *
- * <P><I>Reference:</I><BR>
+ * <P>The <STRONG>MinS</STRONG><SUP>&alpha;</SUP> heuristic is of interest
+ * when verifying the generalised nonblocking property. It estimates the
+ * number of states of the abstracted synchronous composition of candidates
+ * and chooses the candidate with the smallest estimate. The estimate is
+ * obtained by multiplying the product of the numbers of precondition-marked
+ * states of the candidate's automata with its ratio of shared over total
+ * events (excluding {@link EventEncoding#TAU}).</P>
+ *
+ * <P>An argument to the constructor determines which of the above heuristics
+ * is implemented by an instance of this class.</P>
+ *
+ * <P><I>References:</I><BR>
  * Hugo Flordal, Robi Malik. Compositional Verification in Supervisory Control.
- * SIAM Journal of Control and Optimization, 48(3), 1914-1938, 2009.</P>
+ * SIAM Journal of Control and Optimization, 48(3), 1914-1938, 2009.<BR>
+ * Robi Malik, Ryan Leduc. Compositional Nonblocking Verification Using
+ * Generalised Nonblocking Abstractions, IEEE Transactions on Automatic
+ * Control <STRONG>58</STRONG>(8), 1-13, 2013.</P>
  *
  * @author Robi Malik
  */
@@ -38,6 +51,25 @@ import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 public class SelectionHeuristicMinS
   extends NumericSelectionHeuristic<TRCandidate>
 {
+
+  //#########################################################################
+  //# Constructor
+  /**
+   * Creates a new instance of this heuristic.
+   * @param stateEstimator The heuristic used to estimate the state number of
+   *                       the synchronous product. The <STRONG>MinS</STRONG>
+   *                       heuristic is obtained by passing an instance of
+   *                       {@link SelectionHeuristicMinS0}, and the
+   *                       <STRONG>MinS</STRONG><SUP>&alpha;</SUP> heuristic
+   *                       is obtained by passing an instance of {@link
+   *                       SelectionHeuristicMinS0a} to this argument.
+   */
+  public SelectionHeuristicMinS
+    (final NumericSelectionHeuristic<TRCandidate> stateEstimator)
+  {
+    mStateEstimator = stateEstimator;
+  }
+
 
   //#########################################################################
   //# Interface
@@ -56,13 +88,9 @@ public class SelectionHeuristicMinS
   }
 
   @Override
-  protected double getHeuristicValue(final TRCandidate candidate)
+  public double getHeuristicValue(final TRCandidate candidate)
   {
-    double numStates = 1.0;
-    for (final TRAutomatonProxy aut : candidate.getAutomata()) {
-      final ListBufferTransitionRelation rel = aut.getTransitionRelation();
-      numStates *= rel.getNumberOfReachableStates();
-    }
+    final double numStates = mStateEstimator.getHeuristicValue(candidate);
     final byte pattern = EventStatus.STATUS_LOCAL | EventStatus.STATUS_UNUSED;
     int numEvents = 0;
     int numSharedEvents = 0;
@@ -86,5 +114,10 @@ public class SelectionHeuristicMinS
       return numStates * numSharedEvents / numEvents;
     }
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private final NumericSelectionHeuristic<TRCandidate> mStateEstimator;
 
 }

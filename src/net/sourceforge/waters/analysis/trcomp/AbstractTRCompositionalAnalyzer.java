@@ -31,6 +31,7 @@ import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult;
 import net.sourceforge.waters.analysis.compositional.CompositionalVerificationResult;
+import net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductResult;
@@ -270,8 +271,12 @@ public abstract class AbstractTRCompositionalAnalyzer
       new ListedEnumFactory<SelectionHeuristic<TRCandidate>>() {
       {
         register(SEL_MinS);
-        register(SEL_MinSSp);
         register(SEL_MinSa);
+        register(SEL_MinSSp);
+        register(SEL_MinS0);
+        register(SEL_MinS0a);
+        register(SEL_MinSync);
+        register(SEL_MinSyncA);
         register(SEL_MaxC);
         register(SEL_MaxL);
         register(SEL_MinE);
@@ -624,7 +629,6 @@ public abstract class AbstractTRCompositionalAnalyzer
     final KindTranslator translator = getKindTranslator();
     mSynchronousProductBuilder.setDetailedOutputEnabled(true);
     mSynchronousProductBuilder.setKindTranslator(translator);
-    mSynchronousProductBuilder.setPruningDeadlocks(true);
     mSynchronousProductBuilder.setRemovingSelfloops(true);
     mSynchronousProductBuilder.setNodeLimit(mInternalStateLimit);
     mSynchronousProductBuilder.setTransitionLimit(mInternalTransitionLimit);
@@ -703,6 +707,7 @@ public abstract class AbstractTRCompositionalAnalyzer
   protected void tearDown()
   {
     super.tearDown();
+    mSelectionHeuristic.setContext(null);
     mTRSimplifier = null;
     mSpecialEventsFinder = null;
     mAbstractionSequence = null;
@@ -1745,12 +1750,20 @@ public abstract class AbstractTRCompositionalAnalyzer
     new SelectionHeuristicMinE();
   static final SelectionHeuristic<TRCandidate> SEL_MinF =
     new SelectionHeuristicMinF();
+  static final NumericSelectionHeuristic<TRCandidate> SEL_MinS0 =
+    new SelectionHeuristicMinS0();
+  static final NumericSelectionHeuristic<TRCandidate> SEL_MinS0a =
+    new SelectionHeuristicMinS0a();
   static final SelectionHeuristic<TRCandidate> SEL_MinS =
-    new SelectionHeuristicMinS();
+    new SelectionHeuristicMinS(SEL_MinS0);
   static final SelectionHeuristic<TRCandidate> SEL_MinSa =
-    new SelectionHeuristicMinSa();
+    new SelectionHeuristicMinS(SEL_MinS0a);
   static final SelectionHeuristic<TRCandidate> SEL_MinSSp =
-    new SelectionHeuristicMinSSp();
+    new SelectionHeuristicMinSSp(SEL_MinS0);
+  static final SelectionHeuristic<TRCandidate> SEL_MinSync =
+    new SelectionHeuristicMinSync();
+  static final SelectionHeuristic<TRCandidate> SEL_MinSyncA =
+    new SelectionHeuristicMinSyncA();
 
   static final int DEFAULT_MARKING = 0;
   static final int PRECONDITION_MARKING = 1;

@@ -104,6 +104,33 @@ public class ChainSelectionHeuristic<T extends Comparable<? super T>>
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
+  public void requestAbort()
+  {
+    super.requestAbort();
+    for (final SelectionHeuristic<T> step : mSteps) {
+      step.requestAbort();
+    }
+    if (mPreOrder != null) {
+      mPreOrder.requestAbort();
+    }
+  }
+
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    for (final SelectionHeuristic<T> step : mSteps) {
+      step.resetAbort();
+    }
+    if (mPreOrder != null) {
+      mPreOrder.resetAbort();
+    }
+  }
+
+
+  //#########################################################################
   //# Overrides for Abstract Base Class
   //# net.sourceforge.waters.analysis.compositional.SelectionHeuristic
   @Override

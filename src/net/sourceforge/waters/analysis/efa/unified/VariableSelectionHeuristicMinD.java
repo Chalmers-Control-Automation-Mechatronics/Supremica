@@ -28,7 +28,7 @@ public class VariableSelectionHeuristicMinD
   //# Overrides for
   //# net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic
   @Override
-  protected double getHeuristicValue(final UnifiedEFAVariable var)
+  public double getHeuristicValue(final UnifiedEFAVariable var)
   {
     return var.getRange().size();
   }

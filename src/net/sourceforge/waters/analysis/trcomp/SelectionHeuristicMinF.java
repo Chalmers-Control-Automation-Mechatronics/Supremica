@@ -51,7 +51,7 @@ public class SelectionHeuristicMinF
     @SuppressWarnings("unchecked")
     final SelectionHeuristic<TRCandidate>[] chain = new SelectionHeuristic[] {
       this,
-      // AbstractTRCompositionalAnalyzer.SEL_MinSync,
+      AbstractTRCompositionalAnalyzer.SEL_MinSync,
       AbstractTRCompositionalAnalyzer.SEL_MaxL,
       AbstractTRCompositionalAnalyzer.SEL_MaxC,
       AbstractTRCompositionalAnalyzer.SEL_MinE
@@ -60,7 +60,7 @@ public class SelectionHeuristicMinF
   }
 
   @Override
-  protected double getHeuristicValue(final TRCandidate candidate)
+  public double getHeuristicValue(final TRCandidate candidate)
   {
     final Set<TRAutomatonProxy> connected = new THashSet<>();
     final TRSubsystemInfo subsys = mAnalyzer.getCurrentSubsystem();

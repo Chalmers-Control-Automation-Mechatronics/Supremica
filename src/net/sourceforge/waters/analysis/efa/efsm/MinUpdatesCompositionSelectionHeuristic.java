@@ -35,7 +35,7 @@ public class MinUpdatesCompositionSelectionHeuristic
   //# Overrides for
   //# net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic
   @Override
-  protected double getHeuristicValue(final EFSMPair candidate)
+  public double getHeuristicValue(final EFSMPair candidate)
   {
     final Set<ConstraintList> updates = new THashSet<ConstraintList>();
     final EFSMEventEncoding encoding1 =

@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.trcomp
-//# CLASS:   SelectionHeuristicMaxL
+//# CLASS:   SelectionHeuristicMinS0
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -12,26 +12,23 @@ package net.sourceforge.waters.analysis.trcomp;
 import net.sourceforge.waters.analysis.compositional.ChainSelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
-import net.sourceforge.waters.analysis.tr.EventEncoding;
-import net.sourceforge.waters.analysis.tr.EventStatus;
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 
 
 /**
- * <P>The <STRONG>MaxL</STRONG> candidate selection heuristic for
+ * <P>The <STRONG>MinS</STRONG><SUB>0</SUB> candidate selection heuristic for
  * compositional model analysers of type {@link AbstractTRCompositionalAnalyzer}.</P>
  *
- * <P>The <STRONG>MaxL</STRONG> selection heuristic gives preference to
- * candidate with the highest proportion of local events over its total
- * number of events (excluding {@link EventEncoding#TAU}).</P>
- *
- * <P><I>Reference:</I><BR>
- * Hugo Flordal, Robi Malik. Compositional Verification in Supervisory Control.
- * SIAM Journal of Control and Optimization, 48(3), 1914-1938, 2009.</P>
+ * <P>The <STRONG>MinS</STRONG> heuristic estimates the number of states of the
+ * abstracted synchronous composition of candidates and chooses the candidate
+ * with the smallest estimate. The estimate is obtained by multiplying the
+ * product of the state numbers of the candidate's automata.</P>
  *
  * @author Robi Malik
  */
 
-public class SelectionHeuristicMaxL
+public class SelectionHeuristicMinS0
   extends NumericSelectionHeuristic<TRCandidate>
 {
 
@@ -44,9 +41,10 @@ public class SelectionHeuristicMaxL
     @SuppressWarnings("unchecked")
     final SelectionHeuristic<TRCandidate>[] chain = new SelectionHeuristic[] {
       this,
+      AbstractTRCompositionalAnalyzer.SEL_MinS,
+      AbstractTRCompositionalAnalyzer.SEL_MaxL,
       AbstractTRCompositionalAnalyzer.SEL_MaxC,
-      AbstractTRCompositionalAnalyzer.SEL_MinE,
-      AbstractTRCompositionalAnalyzer.SEL_MinS
+      AbstractTRCompositionalAnalyzer.SEL_MinE
     };
     return new ChainSelectionHeuristic<TRCandidate>(chain);
   }
@@ -54,28 +52,12 @@ public class SelectionHeuristicMaxL
   @Override
   public double getHeuristicValue(final TRCandidate candidate)
   {
-    final EventEncoding enc = candidate.getEventEncoding();
-    int numLocal = 0;
-    int numEvents = 0;
-    final byte pattern = EventStatus.STATUS_LOCAL | EventStatus.STATUS_UNUSED;
-    for (int e = EventEncoding.NONTAU; e < enc.getNumberOfProperEvents(); e++) {
-      final byte status = enc.getProperEventStatus(e);
-      switch (status & pattern) {
-      case EventStatus.STATUS_LOCAL:
-        numLocal++;
-        // fall through ...
-      case 0:
-        numEvents++;
-        // fall through ...
-      default:
-        break;
-      }
+    double numStates = 1.0;
+    for (final TRAutomatonProxy aut : candidate.getAutomata()) {
+      final ListBufferTransitionRelation rel = aut.getTransitionRelation();
+      numStates *= rel.getNumberOfReachableStates();
     }
-    if (numEvents == 0) {
-      return -1.0;
-    } else {
-      return - (double) numLocal / numEvents;
-    }
+    return numStates;
   }
 
 }

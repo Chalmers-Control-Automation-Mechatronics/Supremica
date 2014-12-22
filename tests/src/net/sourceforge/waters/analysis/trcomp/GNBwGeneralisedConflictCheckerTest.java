@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.trcomp
-//# CLASS:   GNBwStandardConflictCheckerTest
+//# CLASS:   GNBwGeneralisedConflictCheckerTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -12,14 +12,13 @@ package net.sourceforge.waters.analysis.trcomp;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.model.analysis.AbstractStandardConflictCheckerTest;
+import net.sourceforge.waters.model.analysis.AbstractGeneralisedConflictCheckerTest;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
-import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class GNBwStandardConflictCheckerTest
-  extends AbstractStandardConflictCheckerTest
+public class GNBwGeneralisedConflictCheckerTest
+  extends AbstractGeneralisedConflictCheckerTest
 {
 
   //#########################################################################
@@ -27,7 +26,7 @@ public class GNBwStandardConflictCheckerTest
   public static Test suite()
   {
     final TestSuite testSuite =
-      new TestSuite(GNBwStandardConflictCheckerTest.class);
+      new TestSuite(GNBwGeneralisedConflictCheckerTest.class);
     return testSuite;
   }
 
@@ -47,8 +46,8 @@ public class GNBwStandardConflictCheckerTest
     final TRCompositionalConflictChecker checker =
       new TRCompositionalConflictChecker();
     checker.setSimplifierCreator(TRCompositionalConflictChecker.GNBw);
-    checker.setPreselectionHeuristic(AbstractTRCompositionalAnalyzer.PRESEL_MustL);
-    checker.setSelectionHeuristic(AbstractTRCompositionalAnalyzer.SEL_MinE);
+    checker.setPreselectionHeuristic(AbstractTRCompositionalAnalyzer.PRESEL_Pairs);
+    checker.setSelectionHeuristic(AbstractTRCompositionalAnalyzer.SEL_MinSyncA);
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);
@@ -59,19 +58,6 @@ public class GNBwStandardConflictCheckerTest
     checker.setCounterExampleEnabled(true);
     checker.setTraceCheckingEnabled(true);
     return checker;
-  }
-
-
-  //#########################################################################
-  //# Test Cases
-  public void testBigComponent() throws Exception
-  {
-    final TRCompositionalConflictChecker checker =
-      (TRCompositionalConflictChecker) getModelVerifier();
-    checker.setInternalStateLimit(1000);
-    final ProductDESProxy des =
-      getCompiledDES("tests", "nasty", "big_component.wmod");
-    runModelVerifier(des, false);
   }
 
 }

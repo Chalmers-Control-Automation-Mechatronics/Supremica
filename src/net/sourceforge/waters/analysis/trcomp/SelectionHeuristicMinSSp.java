@@ -14,8 +14,6 @@ import net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
-import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 
 
 /**
@@ -38,6 +36,19 @@ public class SelectionHeuristicMinSSp
 {
 
   //#########################################################################
+  //# Constructor
+  /**
+   * Creates a new instance of this heuristic.
+   * @param stateEstimator The heuristic used to estimate the state number of
+   *                       the synchronous product.
+   */
+  public SelectionHeuristicMinSSp
+    (final NumericSelectionHeuristic<TRCandidate> stateEstimator)
+  {
+    mStateEstimator = stateEstimator;
+  }
+
+  //#########################################################################
   //# Interface
   //# net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic
   @Override
@@ -55,13 +66,9 @@ public class SelectionHeuristicMinSSp
   }
 
   @Override
-  protected double getHeuristicValue(final TRCandidate candidate)
+  public double getHeuristicValue(final TRCandidate candidate)
   {
-    double numStates = 1.0;
-    for (final TRAutomatonProxy aut : candidate.getAutomata()) {
-      final ListBufferTransitionRelation rel = aut.getTransitionRelation();
-      numStates *= rel.getNumberOfReachableStates();
-    }
+    final double numStates = mStateEstimator.getHeuristicValue(candidate);
     final byte pattern =
       EventStatus.STATUS_FULLY_LOCAL | EventStatus.STATUS_UNUSED;
     int numEvents = 0;
@@ -93,5 +100,10 @@ public class SelectionHeuristicMinSSp
         (2 * numEvents - weightOfLocalEvents) / numEvents;
     }
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private final NumericSelectionHeuristic<TRCandidate> mStateEstimator;
 
 }

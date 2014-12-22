@@ -35,7 +35,7 @@ public class MinVariablesCompositionSelectionHeuristic
   //# Overrides for
   //# net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic
   @Override
-  protected double getHeuristicValue(final EFSMPair candidate)
+  public double getHeuristicValue(final EFSMPair candidate)
   {
     final Collection<EFSMVariable> vars1 = candidate.getFirst().getVariables();
     final Set<EFSMVariable> variables = new THashSet<EFSMVariable>(vars1);

@@ -41,7 +41,7 @@ public class CompositionSelectionHeuristicMinF
   }
 
   @Override
-  protected double getHeuristicValue(final UnifiedEFACandidate candidate)
+  public double getHeuristicValue(final UnifiedEFACandidate candidate)
   {
     // Set to contain variables and transition relations of the candidate
     // plus its frontier
