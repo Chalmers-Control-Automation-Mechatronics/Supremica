@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="special_events_failing_03" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>A test for failing events redirection. This tests whether the default marking is introduced when redirecting failing events in automaton that does not use the default marking.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="UNCONTROLLABLE" Name="f">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="FAILING"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="before">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="S0">
+                        <PointGeometry>
+                            <Point X="80" Y="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-13" Y="11"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S1">
+                        <PointGeometry>
+                            <Point X="176" Y="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-1" Y="8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="S0" Target="S1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="f"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-4" Y="-25"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="128" Y="64"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S1" Target="S0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="f"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-3" Y="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="128" Y="96"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="after">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="S0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="80" Y="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="9" Y="-10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S1">
+                        <PointGeometry>
+                            <Point X="80" Y="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="9" Y="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="S0" Target="S1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="f"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="6" Y="-10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

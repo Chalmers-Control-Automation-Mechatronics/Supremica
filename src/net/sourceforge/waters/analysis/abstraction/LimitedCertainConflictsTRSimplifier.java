@@ -379,6 +379,9 @@ public class LimitedCertainConflictsTRSimplifier
         }
       }
       rel.setMarked(blockingInit, defaultID, false);
+      final byte status = rel.getProperEventStatus(EventEncoding.TAU);
+      rel.setProperEventStatus(EventEncoding.TAU,
+                               status | EventStatus.STATUS_UNUSED);
       mHasCertainConflictTransitions = result = true;
     } else if (numCoreachable == numReachable - 1) {
       // Only one reachable state of certain conflicts---find it ...
@@ -411,6 +414,7 @@ public class LimitedCertainConflictsTRSimplifier
         }
       }
       result |= removeProperSelfLoopEvents();
+      result |= rel.removeTauSelfLoops();
     } else {
       // More than one reachable state of certain conflicts.
       // TODO CONFIG_PREDECESSORS version?
@@ -444,6 +448,7 @@ public class LimitedCertainConflictsTRSimplifier
         }
       }
       removeProperSelfLoopEvents();
+      rel.removeTauSelfLoops();
       result = true;
     }
     return result;

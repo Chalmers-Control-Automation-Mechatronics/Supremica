@@ -137,14 +137,18 @@ public interface TransitionIterator
 
   /**
    * Sets the ID of the to-state of the current transition in the iteration.
-   * This method changes the data in the transition buffer for the current
-   * transition. No checks for duplicates are performed.
+   * This method directly changes the data in the transition buffer for the
+   * current transition. This may violate the ordering of nondeterministic
+   * successor states or introduce duplicate transitions. It is the caller's
+   * responsibility to return the transition relation to an ordered
+   * duplicate-free state.
    * @param  state    The state number of the new to-state, which must
    *                  be a valid state number in the transition buffer.
    * @throws NoSuchElementException if there is no current transition in
    *         the iteration, or if the method is called without calling
    *         {@link #advance()} first.
    * @see #getCurrentToState()
+   * @see TransitionListBuffer
    */
   public void setCurrentToState(int state);
 

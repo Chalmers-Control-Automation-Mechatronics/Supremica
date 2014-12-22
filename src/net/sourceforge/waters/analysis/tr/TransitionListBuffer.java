@@ -34,42 +34,48 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 
 
 /**
- * A data structure that stores ordered lists of transitions in a compact
- * way.
+ * <P>A data structure that stores ordered lists of transitions in a compact
+ * way.</P>
  *
- * The transition list buffer uses linked lists of integers stored in
+ * <P>The transition list buffer uses linked lists of integers stored in
  * pre-allocated arrays to store lists of transitions in a memory efficient
  * way. Each transition is stored in a list under its from-state, with the
  * event and to-state stored packed together in a single integer. This limits
  * the size to automata whose states and events numbers together can be packed
- * in 32&nbsp;bits.
+ * in 32&nbsp;bits.</P>
  *
- * In addition, a single hash map is used to map pairs of from-state and
+ * <P>In addition, a single hash map is used to map pairs of from-state and
  * event to their list of transitions. This leads to a memory requirement
  * of approximately 24 byte per transition in the worst case where there are
- * only deterministic transitions.
+ * only deterministic transitions.</P>
  *
- * Iterators are provided to access transitions indexed by their from-state
- * and/or their event. Individual transitions can be added efficiently.
- * The test for existence of a particular transition or the removal of
- * a transition requires a search of all transitions with the corresponding
- * from-state and event and therefore may be of linear complexity.
+ * <P>Iterators ({@link TransitionIterator}) are provided to access transitions
+ * indexed by their from-state and/or their event. Individual transitions can
+ * be added efficiently. The test for existence of a particular transition or
+ * the removal of a transition requires a search of all transitions with the
+ * corresponding from-state and event and therefore may be of linear
+ * complexity.</P>
  *
- * The list construction methods ensure that transitions are added in a defined
- * ordering, which depends on the contents and encoding of input transition
- * lists, or on the ordering of other transition lists when they are merged.
- * All iterators obey the defined ordering.
+ * <P>If a nondeterministic transition relation has several to-states
+ * associated with the same from-state and event, the successor states are
+ * ordered. Most methods ensure that this ordering is maintained, with
+ * {@link TransitionIterator#setCurrentToState(int)} being one of a few
+ * exceptions. If the order is violated by such a method, the user is
+ * expected to ensure the transition list buffer is returned to an ordered
+ * form. This may be necessary to ensure that algorithms behave
+ * deterministically. All iterators obey the ordering of the transitions in
+ * the buffer.</P>
  *
- * The transition list buffer recognises the silent event code
- * {@link EventEncoding#TAU} and automatically suppresses all selfloops using
- * this event.
+ * <P>The transition list buffer recognises the<I>selfloop-only</I> event
+ * status ({@link EventStatus#STATUS_SELFLOOP_ONLY}) and automatically
+ * suppresses all selfloops using events with this status.</P>
  *
- * This implementation is a shared superclass for buffers of incoming and
+ * <P>This class is a shared superclass for buffers of incoming and
  * outgoing transitions in a {@link ListBufferTransitionRelation}. The 'from'
  * states used for indexing can be either actual source or target states.
  * Two subclasses {@link OutgoingTransitionListBuffer} and {@link
  * IncomingTransitionListBuffer} are used to adjust the access to
- * source and target states for these two types from user's point of view.
+ * source and target states for these two types from user's point of view.</P>
  *
  * @author Robi Malik
  */
@@ -219,12 +225,13 @@ public abstract class TransitionListBuffer
 
 /**
    * <P>Adds a transition to this buffer.</P>
-   * <P>The new transition is appended after any other transitions with the
-   * same from-state and event.</P>
+   * <P>If the transition list is ordered, the new transition is inserted
+   * in such a way that the order of nondeterministic to-states is maintained,
+   * otherwise it is inserted at an unspecified location.</P>
    * <P><I>Note.</I> This method checks whether the requested transition
-   * already is present in the buffer using a list search. Its worst-case
-   * complexity is linear in the number of to-states for the given from-state
-   * and event.</P>
+   * already is present in the buffer using a list search, which works even
+   * if the list is not ordered by to-states. Its worst-case complexity is
+   * linear in the number of to-states for the given from-state and event.</P>
    * @param  from   The ID of the from-state of the new transition.
    * @param  event  The ID of the event of the new transition.
    * @param  to     The ID of the to-state of the new transition.
@@ -239,8 +246,9 @@ public abstract class TransitionListBuffer
       return false;
     }
     final int newData = (to << mStateShift) | event;
-    int list = createList(from, event);
-    int next = getNext(list);
+    int current = createList(from, event);
+    int inspos = current;
+    int next = getNext(current);
     while (next != NULL) {
       final int[] block = mBlocks.get(next >>> mBlockShift);
       final int offset = next & mBlockMask;
@@ -249,17 +257,19 @@ public abstract class TransitionListBuffer
         return false;
       } else if ((data & mEventMask) != event) {
         break;
+      } else if (data < newData) {
+        inspos = next;
       }
-      list = next;
+      current = next;
       next = block[offset + OFFSET_NEXT];
     }
-    list = prepend(list, newData);
-    next = getNext(list);
+    current = prepend(inspos, newData);
+    next = getNext(current);
     if (next != NULL) {
       final int nextEvent = getEvent(next);
       if (nextEvent != event) {
         final int key = (from << mStateShift) | nextEvent;
-        mStateEventTransitions.put(key, list);
+        mStateEventTransitions.put(key, current);
       }
     }
     return true;
@@ -268,13 +278,15 @@ public abstract class TransitionListBuffer
   /**
    * Adds several transition to this buffer. New transitions for the given
    * from-state and event are inserted after existing transitions with the
-   * same from-state and event. This method checks whether transitions are
-   * already present and suppresses any duplicates. Its worst-case complexity
-   * is linear in the number of transitions for the given from-state and event
-   * <I>after</I> the operation.
+   * same from-state and event. Insertion is performed by list merging,
+   * so duplicate transitions are only avoided if the transition relation
+   * and the given states are ordered. The worst-case complexity is linear in
+   * the number of transitions for the given from-state and event <I>after</I>
+   * the operation.
    * @param  from     The ID of the from-state of the new transitions.
    * @param  event    The ID of the event of the new transitions.
    * @param  toStates List of target states of the new transitions.
+   *                  Must be ordered.
    * @return <CODE>true</CODE> if at least one transition was added;
    *         <CODE>false</CODE> otherwise.
    */
@@ -285,13 +297,21 @@ public abstract class TransitionListBuffer
     if (toStates.size() == 0) {
       return false;
     }
-    final TIntHashSet existing = new TIntHashSet();
     final byte status = mEventStatus.getProperEventStatus(event);
-    if (EventStatus.isSelfloopOnlyEvent(status)) {
-      existing.add(from);
+    final boolean selfloopOnly = EventStatus.isSelfloopOnlyEvent(status);
+    int rpos = 0;
+    int rstate = toStates.get(rpos);
+    if (selfloopOnly) {
+      while (rstate == from) {
+        if (++rpos == toStates.size()) {
+          return true;
+        }
+        rstate = toStates.get(rpos);
+      }
     }
     int list = createList(from, event);
     int next = getNext(list);
+    boolean added = false;
     while (next != NULL) {
       final int[] block = mBlocks.get(next >>> mBlockShift);
       final int offset = next & mBlockMask;
@@ -299,28 +319,55 @@ public abstract class TransitionListBuffer
       if ((data & mEventMask) != event) {
         break;
       }
-      existing.add(data >>> mStateShift);
+      final int state = data >>> mStateShift;
+      while (rstate < state) {
+        final int newData = (rstate << mStateShift) | event;
+        list = prepend(list, newData);
+        added = true;
+        if (++rpos == toStates.size()) {
+          return true;
+        }
+        int nstate = toStates.get(rpos);
+        while (nstate == rstate || selfloopOnly && nstate == from) {
+          if (++rpos == toStates.size()) {
+            return true;
+          }
+          nstate = toStates.get(rpos);
+        }
+        rstate = nstate;
+      }
+      while (rstate == state) {
+        if (++rpos == toStates.size()) {
+          return added;
+        }
+        rstate = toStates.get(rpos);
+      }
       list = next;
       next = block[offset + OFFSET_NEXT];
     }
-    boolean added = false;
-    for (int i = 0; i < toStates.size(); i++) {
-      final int to = toStates.get(i);
-      if (existing.add(to)) {
-        final int data = (to << mStateShift) | event;
-        list = prepend(list, data);
-        added = true;
+    postfix:
+    while (true) {
+      final int newData = (rstate << mStateShift) | event;
+      list = prepend(list, newData);
+      if (++rpos == toStates.size()) {
+        break;
       }
-    }
-    if (added) {
-      next = getNext(list);
-      if (next != NULL) {
-        final int nextEvent = getEvent(next);
-        final int key = (from << mStateShift) | nextEvent;
-        mStateEventTransitions.put(key, list);
+      int nstate = toStates.get(rpos);
+      while (nstate == rstate || selfloopOnly && nstate == from) {
+        if (++rpos == toStates.size()) {
+          break postfix;
+        }
+        nstate = toStates.get(rpos);
       }
+      rstate = nstate;
     }
-    return added;
+    next = getNext(list);
+    if (next != NULL) {
+      final int nextEvent = getEvent(next);
+      final int key = (from << mStateShift) | nextEvent;
+      mStateEventTransitions.put(key, list);
+    }
+    return true;
   }
 
   /**
@@ -425,7 +472,8 @@ public abstract class TransitionListBuffer
    * Duplicates are suppressed, and ordering is preserved such that
    * transitions originally associated with the source state appear
    * earlier in the resultant list. The operation is implemented as a
-   * merge operation using a priority queue.
+   * merge operation using a priority queue, and assumes that all transition
+   * list are ordered by nondeterministic to-states.
    * @param  sources  List of from-states containing transitions to be copied.
    * @param  dest     From-state to receive transitions.
    * @param  reverse  Another transition list buffer containing the reverse
@@ -1315,6 +1363,7 @@ public abstract class TransitionListBuffer
         checkList(list);
         int prev = list;
         int prevEvent = -1;
+        int prevTo = -1;
         list = getNext(list);
         checkList(list);
         if (list == NULL) {
@@ -1338,7 +1387,25 @@ public abstract class TransitionListBuffer
                                        "!");
             }
             prevEvent = event;
-          } else if (event < prevEvent) {
+            prevTo = to;
+          } else if (event == prevEvent) {
+            if (to < prevTo) {
+              throw new AssertionError("Nondeterministic states for key " +
+                                       from + "/" + event +
+                                       " not ordered in " +
+                                       ProxyTools.getShortClassName(this) +
+                                       ": found " + prevTo + " followed by " +
+                                       to + "!");
+            } else if (to == prevTo) {
+              throw new AssertionError("To-state " + to +
+                                       " encountered twice for key " +
+                                       from + "/" + event + " in " +
+                                       ProxyTools.getShortClassName(this) +
+                                       "!");
+            } else {
+              prevTo = to;
+            }
+          } else {
             throw new AssertionError("Event number " + event +
                                      " out of sequence, after " + prevEvent +
                                      ", in list for " + from + " in " +
@@ -1387,6 +1454,18 @@ public abstract class TransitionListBuffer
     return list;
   }
 
+  /**
+   * Inserts data as the second element of a given transition list.
+   * This method creates a new list node and inserts it into a given list
+   * as the first item after the head node (which is identified by list).
+   * This results in the data becoming the first list node. The new list
+   * node is returned and can be used as the tail of the list. To construct
+   * a list from start to end, the prepend method is called repeatedly, each
+   * time using the result of the previous call as the list.
+   * @param  list  The transition list to be modified.
+   * @param  data  The data (event/state pair) to be inserted.
+   * @return The index of the new list node.
+   */
   private int prepend(final int list, final int data)
   {
     final int tail = getNext(list);

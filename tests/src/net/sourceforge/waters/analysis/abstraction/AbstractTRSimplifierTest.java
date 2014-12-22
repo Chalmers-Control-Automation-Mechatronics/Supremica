@@ -29,6 +29,7 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESIntegrityChecker;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
@@ -268,8 +269,12 @@ public abstract class AbstractTRSimplifierTest
   {
     getLogger().info("Checking " + des.getName() + " ...");
     final AutomatonProxy before = findAutomaton(des, BEFORE);
-    final AutomatonProxy result = applySimplifier(des, before);
-    checkResult(des, result);
+    final AutomatonProxy resultSucc = applySimplifier
+      (des, before, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    checkResult(des, resultSucc);
+    final AutomatonProxy resultPred = applySimplifier
+      (des, before, ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+    checkResult(des, resultPred);
     getLogger().info("Done " + des.getName());
   }
 
@@ -277,24 +282,31 @@ public abstract class AbstractTRSimplifierTest
   //#########################################################################
   //# Auxiliary Methods
   private AutomatonProxy applySimplifier(final ProductDESProxy des,
-                                         final AutomatonProxy aut)
+                                         final AutomatonProxy aut,
+                                         final int config)
   throws Exception
   {
     final EventEncoding eventEnc = createEventEncoding(des, aut);
     final StateEncoding inputStateEnc = new StateEncoding(aut);
-    final int config = ListBufferTransitionRelation.CONFIG_SUCCESSORS;
-    ListBufferTransitionRelation rel =
-      new ListBufferTransitionRelation(aut, eventEnc, inputStateEnc, config);
+    final StateProxy dumpState = getState(aut, DUMP);
+    ListBufferTransitionRelation rel;
+    if (dumpState == null) {
+      rel = new ListBufferTransitionRelation
+        (aut, eventEnc, inputStateEnc,
+         ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    } else {
+      rel = new ListBufferTransitionRelation
+        (aut, eventEnc, inputStateEnc, dumpState,
+         ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    }
     rel.checkReachability();
+    rel.reconfigure(config);
     mSimplifier.setTransitionRelation(rel);
     configureTransitionRelationSimplifier();
     if (mSimplifier.run()) {
       rel = mSimplifier.getTransitionRelation();
-      rel.checkIntegrity();
       rel.setName("result");
-      rel.removeTauSelfLoops();
-      rel.removeProperSelfLoopEvents();
-      rel.removeRedundantPropositions();
+      rel.checkIntegrity();
       final ProductDESProxyFactory factory = getProductDESProxyFactory();
       return rel.createAutomaton(factory, eventEnc, null);
     } else {
@@ -348,9 +360,14 @@ public abstract class AbstractTRSimplifierTest
   {
     final KindTranslator translator = IdenticalKindTranslator.getInstance();
     final EventEncoding enc = new EventEncoding();
-    final EventProxy tau = getEvent(aut, TAU);
+    EventProxy tau = getEvent(aut, TAU);
     if (tau != null) {
       enc.addSilentEvent(tau);
+    } else {
+      tau = getEvent(des, TAU);
+      if (tau != null) {
+        enc.setTauEvent(tau);
+      }
     }
     final byte[] statusFromAttribs = getEventStatusReadFromAttributes();
     for (final EventProxy event : aut.getEvents()) {
@@ -457,6 +474,7 @@ public abstract class AbstractTRSimplifierTest
   protected static final String TAU = "tau";
   protected static final String ALPHA = ":alpha";
   protected static final String OMEGA = EventDeclProxy.DEFAULT_MARKING_NAME;
+  protected static final String DUMP = ":dump";
 
   protected static final String BEFORE = "before";
   protected static final String AFTER = "after";

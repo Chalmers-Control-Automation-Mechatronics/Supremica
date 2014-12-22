@@ -124,6 +124,12 @@ public abstract class AbstractSynchronousProductBuilderTest
   }
 
 
+  public void testOrder() throws Exception
+  {
+    runAutomatonBuilder("tests", "nasty", "order.wmod");
+  }
+
+
   //#########################################################################
   //# Test Cases -- Parameterised
   public void testTransferline__1() throws Exception

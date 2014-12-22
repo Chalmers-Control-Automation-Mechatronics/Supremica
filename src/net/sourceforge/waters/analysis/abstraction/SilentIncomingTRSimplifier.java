@@ -258,6 +258,7 @@ public class SilentIncomingTRSimplifier
     rel.checkReachability();
     rel.removeTauSelfLoops();
     removeProperSelfLoopEvents();
+    rel.removeRedundantPropositions();
   }
 
 

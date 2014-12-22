@@ -292,9 +292,11 @@ public class SynthesisObservationEquivalenceTRSimplifier
       super.applyResultPartition();
       rel.removeTauSelfLoops();
       rel.removeProperSelfLoopEvents();
+      rel.removeRedundantPropositions();
     } else {
       if (mHasModifications) {
         rel.removeProperSelfLoopEvents();
+        rel.removeRedundantPropositions();
       }
     }
   }

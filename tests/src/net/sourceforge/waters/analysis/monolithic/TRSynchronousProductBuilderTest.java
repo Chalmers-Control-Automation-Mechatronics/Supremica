@@ -17,6 +17,8 @@ import junit.framework.TestSuite;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.model.analysis.AbstractSynchronousProductBuilderTest;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
@@ -105,6 +107,18 @@ public class TRSynchronousProductBuilderTest
       }
       builder.setEventEncoding(enc);
     }
+  }
+
+  @Override
+  protected void checkResult(final ProductDESProxy des,
+                             final AutomatonProxy result,
+                             final ProductDESProxy expectedDES)
+    throws Exception
+  {
+    final TRAutomatonProxy aut = (TRAutomatonProxy) result;
+    final ListBufferTransitionRelation rel = aut.getTransitionRelation();
+    rel.checkIntegrity();
+    super.checkResult(des, result, expectedDES);
   }
 
 

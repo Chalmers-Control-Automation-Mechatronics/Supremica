@@ -235,6 +235,7 @@ public class ChainTRSimplifier
           mReducedMarkings[prop] |= step.isReducedMarking(prop);
         }
       }
+      // rel.checkIntegrity();
       if (isPartitioning()) {
         final TRPartition currentPartition = getResultPartition();
         final TRPartition newPartition = step.getResultPartition();

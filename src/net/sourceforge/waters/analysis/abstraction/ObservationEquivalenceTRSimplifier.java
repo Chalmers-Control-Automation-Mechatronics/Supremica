@@ -762,10 +762,12 @@ public class ObservationEquivalenceTRSimplifier
       removeRedundantTransitions(TransitionRemovalTime.AFTER_NONTRIVIAL);
       rel.removeTauSelfLoops();
       removeProperSelfLoopEvents();
+      rel.removeRedundantPropositions();
     } else {
       removeRedundantTransitions(TransitionRemovalTime.AFTER_TRIVIAL);
       if (mHasModifications) {
         removeProperSelfLoopEvents();
+        rel.removeRedundantPropositions();
       }
     }
   }
@@ -787,10 +789,12 @@ public class ObservationEquivalenceTRSimplifier
       removeRedundantTransitions(TransitionRemovalTime.AFTER_NONTRIVIAL);
       rel.removeTauSelfLoops();
       removeProperSelfLoopEvents();
+      rel.removeRedundantPropositions();
     } else {
       removeRedundantTransitions(TransitionRemovalTime.AFTER_TRIVIAL);
       if (mHasModifications) {
         removeProperSelfLoopEvents();
+        rel.removeRedundantPropositions();
       }
     }
   }

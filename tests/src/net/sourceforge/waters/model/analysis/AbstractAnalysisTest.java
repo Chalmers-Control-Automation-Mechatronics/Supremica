@@ -29,6 +29,7 @@ import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
@@ -269,6 +270,28 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
     for (final AutomatonProxy automaton : des.getAutomata()) {
       if (automaton.getName().equals(name)) {
         return automaton;
+      }
+    }
+    return null;
+  }
+
+  protected StateProxy findState(final AutomatonProxy aut, final String name)
+    throws NameNotFoundException
+  {
+    final StateProxy state = getState(aut, name);
+    if (state == null) {
+      throw new NameNotFoundException
+        ("Automaton '" + aut.getName() +
+         "' does not have any state named '" + name + "'!");
+    }
+    return state;
+  }
+
+  protected StateProxy getState(final AutomatonProxy aut, final String name)
+  {
+    for (final StateProxy state : aut.getStates()) {
+      if (state.getName().equals(name)) {
+        return state;
       }
     }
     return null;

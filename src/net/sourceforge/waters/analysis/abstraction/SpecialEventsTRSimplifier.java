@@ -120,11 +120,16 @@ public class SpecialEventsTRSimplifier
           numReachable++;
         }
         iter.resetState(from);
+        int prevE = -1;
+        boolean dumped = false;
         while (iter.advance()) {
           checkAbort();
           final int e = iter.getCurrentEvent();
           if (e == EventEncoding.TAU) {
             continue;
+          } else if (e != prevE) {
+            prevE = e;
+            dumped = false;
           }
           final int to = iter.getCurrentToState();
           if (from != to) {
@@ -145,14 +150,21 @@ public class SpecialEventsTRSimplifier
             needsReachabilityCheck |= from != to;
           } else if (EventStatus.isFailingEvent(status)) {
             if (forward) {
-              if (to != dump) {
-                iter.setCurrentToState(dump);
+              if (dumped) {
+                iter.remove();
                 modified = needsReachabilityCheck = true;
+              } else {
+                if (to != dump) {
+                  iter.setCurrentToState(dump);
+                  addDefaultMarking();
+                  modified = needsReachabilityCheck = dumped = true;
+                }
               }
             } else {
               if (from != dump) {
                 iter.remove();
                 rel.addTransition(to, e, dump);
+                addDefaultMarking();
                 modified = needsReachabilityCheck = true;
               }
             }
@@ -164,6 +176,7 @@ public class SpecialEventsTRSimplifier
           }
         }
         if (!tauTargets.isEmpty()) {
+          tauTargets.sort();
           if (forward) {
             rel.addTransitions(from, EventEncoding.TAU, tauTargets);
           } else {
@@ -208,6 +221,21 @@ public class SpecialEventsTRSimplifier
     }
 
     return modified;
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private void addDefaultMarking()
+  {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final int defaultID = getDefaultMarkingID();
+    if (defaultID >= 0 && !rel.isPropositionUsed(defaultID)) {
+      rel.setPropositionUsed(defaultID, true);
+      for (int s = 0; s < rel.getNumberOfStates(); s++) {
+        rel.setMarked(s, defaultID, rel.isReachable(s));
+      }
+    }
   }
 
 }

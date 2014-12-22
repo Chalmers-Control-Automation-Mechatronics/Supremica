@@ -9,7 +9,6 @@
 
 package net.sourceforge.waters.model.analysis;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
@@ -20,8 +19,6 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.marshaller.WatersMarshalException;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
 
@@ -168,11 +165,10 @@ public abstract class AbstractAutomatonBuilderTest
     getLogger().info("Done " + des.getName());
   }
 
-  private void checkResult(final ProductDESProxy des,
-                           final AutomatonProxy result,
-                           final ProductDESProxy expectedDES)
-    throws WatersMarshalException, IOException,
-           AnalysisException, ParseException
+  protected void checkResult(final ProductDESProxy des,
+                             final AutomatonProxy result,
+                             final ProductDESProxy expectedDES)
+    throws Exception
   {
     final String name = des.getName();
     final String basename = appendSuffixes(name, mBindings);

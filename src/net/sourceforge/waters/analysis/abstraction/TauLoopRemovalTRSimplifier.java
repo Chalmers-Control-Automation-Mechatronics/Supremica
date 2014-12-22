@@ -194,6 +194,7 @@ public class TauLoopRemovalTRSimplifier
     } else {
       rel.removeProperSelfLoopEvents();
     }
+    rel.removeRedundantPropositions();
   }
 
 

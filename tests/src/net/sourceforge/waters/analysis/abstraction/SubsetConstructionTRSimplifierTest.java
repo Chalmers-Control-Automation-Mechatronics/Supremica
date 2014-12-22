@@ -92,64 +92,65 @@ public class SubsetConstructionTRSimplifierTest
   public void test_determinisation_1()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "determinisation_1.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "determinisation_1.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_determinisation_2()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "determinisation_2.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "determinisation_2.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_determinisation_3()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "determinisation_3.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "determinisation_3.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_determinisation_4()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "determinisation_4.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "determinisation_4.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_determinisation_5()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "determinisation_5.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "determinisation_5.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_determinisation_6()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "determinisation_6.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "determinisation_6.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_determinisation_7()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "determinisation_7.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "determinisation_7.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_determinisation_8()
+  throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "determinisation_8.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   /**

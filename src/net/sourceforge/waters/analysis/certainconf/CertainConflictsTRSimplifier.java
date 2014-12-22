@@ -309,6 +309,7 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
       }
       rel.checkReachability();
       removeProperSelfLoopEvents();
+      rel.removeTauSelfLoops();
     }
   }
 
