@@ -284,38 +284,42 @@ public class TRCompositionalConflictChecker
     TRAutomatonProxy omegaBlocker = null;
     for (final TRAutomatonProxy aut : subsys.getAutomata()) {
       final ListBufferTransitionRelation rel = aut.getTransitionRelation();
+      boolean noStatesReachable = true;
       boolean noStatesOmega = rel.isPropositionUsed(DEFAULT_MARKING);
       boolean noStatesAlpha = rel.isPropositionUsed(PRECONDITION_MARKING);
-      if (noStatesAlpha || noStatesOmega) {
-        for (int s = 0; s < rel.getNumberOfStates(); s++) {
-          if (rel.isReachable(s)) {
-            if (rel.isMarked(s, DEFAULT_MARKING)) {
-              noStatesOmega = false;
-            } else {
-              allAutomataOmega = false;
-            }
-            if (rel.isMarked(s, PRECONDITION_MARKING)) {
-              noStatesAlpha = false;
-            }
+      for (int s = 0; s < rel.getNumberOfStates(); s++) {
+        if (rel.isReachable(s)) {
+          noStatesReachable = false;
+          if (rel.isMarked(s, DEFAULT_MARKING)) {
+            noStatesOmega = false;
+          } else {
+            allAutomataOmega = false;
+          }
+          if (rel.isMarked(s, PRECONDITION_MARKING)) {
+            noStatesAlpha = false;
           }
         }
-        if (noStatesAlpha) {
-          logger.debug("The system is generalised nonblocking, because " +
-                       aut.getName() + " has no precondition-marked states.");
-          return setSatisfiedResult();
-        } else if (noStatesOmega) {
-          if (mUsedPreconditionMarking == null) {
-            final AnalysisResult result = getAnalysisResult();
-            result.setSatisfied(false);
-            logger.debug("Subsystem is blocking, because " + aut.getName() +
-                         " has no marked states.");
-            dropPendingSubsystems();
-            subsys.moveToEnd(aut);
-            dropSubsystem(subsys);
-            return true;
-          } else if (omegaBlocker == null) {
-            omegaBlocker = aut;
-          }
+      }
+      if (noStatesReachable) {
+        logger.debug("The system is generalised nonblocking, because " +
+                     aut.getName() + " has no reachable states.");
+        return setSatisfiedResult();
+      } else if (noStatesAlpha) {
+        logger.debug("The system is generalised nonblocking, because " +
+                     aut.getName() + " has no precondition-marked states.");
+        return setSatisfiedResult();
+      } else if (noStatesOmega) {
+        if (mUsedPreconditionMarking == null) {
+          final AnalysisResult result = getAnalysisResult();
+          result.setSatisfied(false);
+          logger.debug("Subsystem is blocking, because " + aut.getName() +
+                       " has no marked states.");
+          dropPendingSubsystems();
+          subsys.moveToEnd(aut);
+          dropSubsystem(subsys);
+          return true;
+        } else if (omegaBlocker == null) {
+          omegaBlocker = aut;
         }
       }
     }

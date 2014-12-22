@@ -861,6 +861,7 @@ public abstract class AbstractTRCompositionalAnalyzer
         return;
       }
     }
+    mNeedsSimplification.clear();
     analyseSubsystemMonolithically(mCurrentSubsystem);
   }
 
@@ -1053,6 +1054,7 @@ public abstract class AbstractTRCompositionalAnalyzer
         return false;
       }
     }
+    boolean hasReachableState = false;
     for (int s = 0; s < rel.getNumberOfStates(); s++) {
       if (rel.isReachable(s)) {
         if (!rel.isInitial(s)) {
@@ -1064,9 +1066,10 @@ public abstract class AbstractTRCompositionalAnalyzer
                    !rel.isMarked(s, PRECONDITION_MARKING)) {
           return false;
         }
+        hasReachableState = true;
       }
     }
-    return true;
+    return hasReachableState;
   }
 
   private void updateEventStatus(final TRAutomatonProxy aut,
