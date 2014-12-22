@@ -71,9 +71,24 @@ import org.apache.log4j.Logger;
 
 
 /**
+ * <P>A compositional conflict checker based on {@link TRAutomatonProxy}
+ * that can be configured to use different abstraction sequences for its
+ * simplification steps.</P>
+ *
+ * <P><I>References:</I><BR>
+ * Hugo Flordal, Robi Malik. Compositional Verification in Supervisory Control.
+ * SIAM Journal of Control and Optimization, <STRONG>48</STRONG>(3),
+ * 1914-1938, 2009.<BR>
+ * Robi Malik, Ryan Leduc. Compositional Nonblocking Verification Using
+ * Generalised Nonblocking Abstractions, IEEE Transactions on Automatic
+ * Control <STRONG>58</STRONG>(8), 1-13, 2013.<BR>
+ * Colin Pilbrow, Robi Malik. Compositional Nonblocking Verification with
+ * Always Enabled Events and Selfloop-only Events. Proc. 2nd International
+ * Workshop on Formal Techniques for Safety-Critical Systems, FTSCS 2013,
+ * 147-162, Queenstown, New Zealand, 2013.</P>
+ *
  * @author Robi Malik
  */
-
 public class TRCompositionalConflictChecker
   extends AbstractTRCompositionalAnalyzer
   implements ConflictChecker

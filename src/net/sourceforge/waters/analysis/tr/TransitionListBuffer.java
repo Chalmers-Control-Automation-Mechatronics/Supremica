@@ -66,7 +66,7 @@ import net.sourceforge.waters.model.des.TransitionProxy;
  * deterministically. All iterators obey the ordering of the transitions in
  * the buffer.</P>
  *
- * <P>The transition list buffer recognises the<I>selfloop-only</I> event
+ * <P>The transition list buffer recognises the <I>selfloop-only</I> event
  * status ({@link EventStatus#STATUS_SELFLOOP_ONLY}) and automatically
  * suppresses all selfloops using events with this status.</P>
  *

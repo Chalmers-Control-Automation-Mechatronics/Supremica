@@ -70,9 +70,9 @@ import org.apache.log4j.Logger;
  * <P><I>References:</I><BR>
  * Hugo Flordal, Robi Malik. Compositional Verification in Supervisory Control.
  * SIAM Journal of Control and Optimization, 48(3), 1914-1938, 2009.<BR>
- * Robi Malik, Ryan Leduc. A Compositional Approach for Verifying Generalised
- * Nonblocking, Proc. 7th International Conference on Control and Automation,
- * ICCA'09, 448-453, Christchurch, New Zealand, 2009.</P>
+ * Robi Malik, Ryan Leduc. Compositional Nonblocking Verification Using
+ * Generalised Nonblocking Abstractions, IEEE Transactions on Automatic
+ * Control <STRONG>58</STRONG>(8), 1-13, 2013.</P>
  *
  * @author Robi Malik
  */

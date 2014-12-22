@@ -47,7 +47,7 @@ public class OEQGeneralisedConflictCheckerTest
       new TRCompositionalConflictChecker();
     checker.setSimplifierCreator(TRCompositionalConflictChecker.OEQ);
     checker.setPreselectionHeuristic(AbstractTRCompositionalAnalyzer.PRESEL_Pairs);
-    checker.setSelectionHeuristic(AbstractTRCompositionalAnalyzer.SEL_MinS);
+    checker.setSelectionHeuristic(AbstractTRCompositionalAnalyzer.SEL_MaxL);
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);

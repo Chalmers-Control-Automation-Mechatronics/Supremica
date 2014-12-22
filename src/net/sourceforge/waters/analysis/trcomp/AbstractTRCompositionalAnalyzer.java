@@ -77,9 +77,9 @@ import org.apache.log4j.Logger;
  * <P><I>References:</I><BR>
  * Hugo Flordal, Robi Malik. Compositional Verification in Supervisory Control.
  * SIAM Journal of Control and Optimization, 48(3), 1914-1938, 2009.<BR>
- * Robi Malik, Ryan Leduc. A Compositional Approach for Verifying Generalised
- * Nonblocking, Proc. 7th International Conference on Control and Automation,
- * ICCA'09, 448-453, Christchurch, New Zealand, 2009.<BR>
+ * Robi Malik, Ryan Leduc. Compositional Nonblocking Verification Using
+ * Generalised Nonblocking Abstractions, IEEE Transactions on Automatic
+ * Control <STRONG>58</STRONG>(8), 1-13, 2013.<BR>
  * Colin Pilbrow, Robi Malik. Compositional Nonblocking Verification with
  * Always Enabled Events and Selfloop-only Events. Proc. 2nd International
  * Workshop on Formal Techniques for Safety-Critical Systems, FTSCS 2013,
@@ -271,6 +271,7 @@ public abstract class AbstractTRCompositionalAnalyzer
       {
         register(SEL_MinS);
         register(SEL_MinSSp);
+        register(SEL_MinSa);
         register(SEL_MaxC);
         register(SEL_MaxL);
         register(SEL_MinE);
@@ -1746,6 +1747,8 @@ public abstract class AbstractTRCompositionalAnalyzer
     new SelectionHeuristicMinF();
   static final SelectionHeuristic<TRCandidate> SEL_MinS =
     new SelectionHeuristicMinS();
+  static final SelectionHeuristic<TRCandidate> SEL_MinSa =
+    new SelectionHeuristicMinSa();
   static final SelectionHeuristic<TRCandidate> SEL_MinSSp =
     new SelectionHeuristicMinSSp();
 

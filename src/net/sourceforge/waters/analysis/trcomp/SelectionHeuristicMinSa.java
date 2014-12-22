@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.trcomp
-//# CLASS:   SelectionHeuristicMinS
+//# CLASS:   SelectionHeuristicMinSa
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -19,23 +19,27 @@ import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 
 
 /**
- * <P>The <STRONG>MinS</STRONG> candidate selection heuristic for
- * compositional model analysers of type {@link AbstractTRCompositionalAnalyzer}.</P>
+ * <P>The <STRONG>MinS</STRONG><SUP>&alpha;</SUP> candidate selection
+ * heuristic for compositional model analysers of type {@link
+ * AbstractTRCompositionalAnalyzer}.</P>
  *
- * <P>The <STRONG>MinS</STRONG> heuristic estimates the number of states of the
- * abstracted synchronous composition of candidates and chooses the candidate
- * with the smallest estimate. The estimate is obtained by multiplying the
- * product of the state numbers of the candidate's automata with its
- * ratio of shared over total events (excluding {@link EventEncoding#TAU}).</P>
+ * <P>The <STRONG>MinS</STRONG><SUP>&alpha;</SUP> heuristic is of interest
+ * when verifying the generalised nonblocking property. It estimates the
+ * number of states of the abstracted synchronous composition of candidates
+ * and chooses the candidate with the smallest estimate. The estimate is
+ * obtained by multiplying the product of the numbers of precondition-marked
+ * states of the candidate's automata with its ratio of shared over total
+ * events (excluding {@link EventEncoding#TAU}).</P>
  *
  * <P><I>Reference:</I><BR>
- * Hugo Flordal, Robi Malik. Compositional Verification in Supervisory Control.
- * SIAM Journal of Control and Optimization, 48(3), 1914-1938, 2009.</P>
+ * Robi Malik, Ryan Leduc. Compositional Nonblocking Verification Using
+ * Generalised Nonblocking Abstractions, IEEE Transactions on Automatic
+ * Control <STRONG>58</STRONG>(8), 1-13, 2013.</P>
  *
  * @author Robi Malik
  */
 
-public class SelectionHeuristicMinS
+public class SelectionHeuristicMinSa
   extends NumericSelectionHeuristic<TRCandidate>
 {
 
@@ -48,6 +52,7 @@ public class SelectionHeuristicMinS
     @SuppressWarnings("unchecked")
     final SelectionHeuristic<TRCandidate>[] chain = new SelectionHeuristic[] {
       this,
+      AbstractTRCompositionalAnalyzer.SEL_MinS,
       AbstractTRCompositionalAnalyzer.SEL_MaxL,
       AbstractTRCompositionalAnalyzer.SEL_MaxC,
       AbstractTRCompositionalAnalyzer.SEL_MinE
@@ -58,10 +63,15 @@ public class SelectionHeuristicMinS
   @Override
   protected double getHeuristicValue(final TRCandidate candidate)
   {
+    final int alpha = AbstractTRCompositionalAnalyzer.PRECONDITION_MARKING;
     double numStates = 1.0;
     for (final TRAutomatonProxy aut : candidate.getAutomata()) {
       final ListBufferTransitionRelation rel = aut.getTransitionRelation();
-      numStates *= rel.getNumberOfReachableStates();
+      if (rel.isPropositionUsed(alpha)) {
+        numStates *= rel.getNumberOfMarkings(alpha, false);
+      } else {
+        numStates *= rel.getNumberOfReachableStates();
+      }
     }
     final byte pattern = EventStatus.STATUS_LOCAL | EventStatus.STATUS_UNUSED;
     int numEvents = 0;
