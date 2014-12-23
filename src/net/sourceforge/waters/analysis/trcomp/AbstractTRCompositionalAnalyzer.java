@@ -1758,42 +1758,42 @@ public abstract class AbstractTRCompositionalAnalyzer
 
   //#########################################################################
   //# Class Constants
-  static final TRPreselectionHeuristic PRESEL_MustL =
+  public static final TRPreselectionHeuristic PRESEL_MustL =
     new TRPreselectionHeuristicMustL();
-  static final TRPreselectionHeuristic PRESEL_MustSp =
+  public static final TRPreselectionHeuristic PRESEL_MustSp =
     new TRPreselectionHeuristicMustSp();
-  static final TRPreselectionHeuristic PRESEL_Pairs =
+  public static final TRPreselectionHeuristic PRESEL_Pairs =
     new TRPreselectionHeuristicPairs();
-  static final TRPreselectionHeuristic PRESEL_MinS =
+  public static final TRPreselectionHeuristic PRESEL_MinS =
     new TRPreselectionHeuristicMinS();
-  static final TRPreselectionHeuristic PRESEL_MaxS =
+  public static final TRPreselectionHeuristic PRESEL_MaxS =
     new TRPreselectionHeuristicMaxS();
-  static final TRPreselectionHeuristic PRESEL_MinT =
+  public static final TRPreselectionHeuristic PRESEL_MinT =
     new TRPreselectionHeuristicMinT();
-  static final TRPreselectionHeuristic PRESEL_MaxT =
+  public static final TRPreselectionHeuristic PRESEL_MaxT =
     new TRPreselectionHeuristicMaxT();
 
-  static final SelectionHeuristic<TRCandidate> SEL_MaxC =
+  public static final SelectionHeuristic<TRCandidate> SEL_MaxC =
     new SelectionHeuristicMaxC();
-  static final SelectionHeuristic<TRCandidate> SEL_MaxL =
+  public static final SelectionHeuristic<TRCandidate> SEL_MaxL =
     new SelectionHeuristicMaxL();
-  static final SelectionHeuristic<TRCandidate> SEL_MinE =
+  public static final SelectionHeuristic<TRCandidate> SEL_MinE =
     new SelectionHeuristicMinE();
-  static final SelectionHeuristic<TRCandidate> SEL_MinF =
+  public static final SelectionHeuristic<TRCandidate> SEL_MinF =
     new SelectionHeuristicMinF();
-  static final NumericSelectionHeuristic<TRCandidate> SEL_MinS0 =
+  public static final NumericSelectionHeuristic<TRCandidate> SEL_MinS0 =
     new SelectionHeuristicMinS0();
-  static final NumericSelectionHeuristic<TRCandidate> SEL_MinS0a =
+  public static final NumericSelectionHeuristic<TRCandidate> SEL_MinS0a =
     new SelectionHeuristicMinS0a();
-  static final SelectionHeuristic<TRCandidate> SEL_MinS =
+  public static final SelectionHeuristic<TRCandidate> SEL_MinS =
     new SelectionHeuristicMinS(SEL_MinS0);
-  static final SelectionHeuristic<TRCandidate> SEL_MinSa =
+  public static final SelectionHeuristic<TRCandidate> SEL_MinSa =
     new SelectionHeuristicMinS(SEL_MinS0a);
-  static final SelectionHeuristic<TRCandidate> SEL_MinSSp =
+  public static final SelectionHeuristic<TRCandidate> SEL_MinSSp =
     new SelectionHeuristicMinSSp(SEL_MinS0);
-  static final SelectionHeuristic<TRCandidate> SEL_MinSync =
+  public static final SelectionHeuristic<TRCandidate> SEL_MinSync =
     new SelectionHeuristicMinSync();
-  static final SelectionHeuristic<TRCandidate> SEL_MinSyncA =
+  public static final SelectionHeuristic<TRCandidate> SEL_MinSyncA =
     new SelectionHeuristicMinSyncA();
 
   static final int DEFAULT_MARKING = 0;
