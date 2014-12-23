@@ -484,7 +484,8 @@ public abstract class AbstractTRSimplifierTest
     EventStatus.STATUS_SELFLOOP_ONLY,
     EventStatus.STATUS_ALWAYS_ENABLED,
     EventStatus.STATUS_BLOCKED,
-    EventStatus.STATUS_FAILING
+    EventStatus.STATUS_FAILING,
+    EventStatus.STATUS_UNUSED
   };
 
 }

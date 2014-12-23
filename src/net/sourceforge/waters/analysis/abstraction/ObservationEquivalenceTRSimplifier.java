@@ -529,11 +529,13 @@ public class ObservationEquivalenceTRSimplifier
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int first = mEquivalence.getFirstSplitEvent();
     if (mEquivalence != Equivalence.DETERMINISTIC_MINSTATE) {
+      final byte pattern =
+        EventStatus.STATUS_SELFLOOP_ONLY | EventStatus.STATUS_UNUSED;
       final int numEvents = rel.getNumberOfProperEvents();
       mOnlySelfLoopEvents = new TIntArrayList(rel.getNumberOfProperEvents());
       for (int e = first; e < numEvents; e++) {
-        if ((rel.getProperEventStatus(e) &
-          EventStatus.STATUS_SELFLOOP_ONLY) != 0) {
+        if ((rel.getProperEventStatus(e) & pattern) ==
+            EventStatus.STATUS_SELFLOOP_ONLY) {
           mOnlySelfLoopEvents.add(e);
         }
       }
