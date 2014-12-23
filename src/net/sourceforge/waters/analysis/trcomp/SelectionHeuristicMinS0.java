@@ -23,7 +23,8 @@ import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
  * <P>The <STRONG>MinS</STRONG> heuristic estimates the number of states of the
  * abstracted synchronous composition of candidates and chooses the candidate
  * with the smallest estimate. The estimate is obtained by multiplying the
- * product of the state numbers of the candidate's automata.</P>
+ * product of the reachable state numbers of the candidate's automata
+ * (excluding dump states).</P>
  *
  * @author Robi Malik
  */
@@ -52,12 +53,17 @@ public class SelectionHeuristicMinS0
   @Override
   public double getHeuristicValue(final TRCandidate candidate)
   {
-    double numStates = 1.0;
+    double result = 1.0;
     for (final TRAutomatonProxy aut : candidate.getAutomata()) {
       final ListBufferTransitionRelation rel = aut.getTransitionRelation();
-      numStates *= rel.getNumberOfReachableStates();
+      int numStates = rel.getNumberOfReachableStates();
+      final int dump = rel.getDumpStateIndex();
+      if (rel.isReachable(dump)) {
+        numStates--;
+      }
+      result *= numStates;
     }
-    return numStates;
+    return result;
   }
 
 }

@@ -290,13 +290,16 @@ public class TRCompositionalConflictChecker
       for (int s = 0; s < rel.getNumberOfStates(); s++) {
         if (rel.isReachable(s)) {
           noStatesReachable = false;
-          if (rel.isMarked(s, DEFAULT_MARKING)) {
-            noStatesOmega = false;
-          } else {
-            allAutomataOmega = false;
-          }
-          if (rel.isMarked(s, PRECONDITION_MARKING)) {
+          final boolean alpha = rel.isMarked(s, PRECONDITION_MARKING);
+          final boolean omega = rel.isMarked(s, DEFAULT_MARKING);
+          if (alpha) {
             noStatesAlpha = false;
+            if (!omega) {
+              allAutomataOmega = false;
+            }
+          }
+          if (omega) {
+            noStatesOmega = false;
           }
         }
       }
@@ -324,7 +327,12 @@ public class TRCompositionalConflictChecker
       }
     }
     if (allAutomataOmega) {
-      logger.debug("Subsystem is nonblocking, because all states are marked.");
+      if (mConfiguredPreconditionMarking == null) {
+        logger.debug("Subsystem is nonblocking, because all states are marked.");
+      } else {
+        logger.debug("Subsystem is generalised nonblocking, because all " +
+                     "precondition-marked states have the default marking.");
+      }
       dropSubsystem(subsys);
       return true;
     } else if (omegaBlocker != null) {

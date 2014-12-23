@@ -25,8 +25,9 @@ import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
  * when verifying the generalised nonblocking property. It estimates the
  * number of states of the abstracted synchronous composition of candidates
  * and chooses the candidate with the smallest estimate. The estimate is
- * obtained by multiplying the product of the numbers of precondition-marked
- * states of the candidate's automata.</P>
+ * obtained by multiplying the product of the numbers of reachable
+ * precondition-marked states of the candidate's automata (excluding dump
+ * states).</P>
  *
  * @author Robi Malik
  */
@@ -56,16 +57,23 @@ public class SelectionHeuristicMinS0a
   public double getHeuristicValue(final TRCandidate candidate)
   {
     final int alpha = AbstractTRCompositionalAnalyzer.PRECONDITION_MARKING;
-    double numStates = 1.0;
+    double result = 1.0;
     for (final TRAutomatonProxy aut : candidate.getAutomata()) {
       final ListBufferTransitionRelation rel = aut.getTransitionRelation();
+      int numStates;
       if (rel.isPropositionUsed(alpha)) {
-        numStates *= rel.getNumberOfMarkings(alpha, false);
+        numStates = rel.getNumberOfMarkings(alpha, false);
       } else {
-        numStates *= rel.getNumberOfReachableStates();
+        numStates = rel.getNumberOfReachableStates();
       }
+      final int dump = rel.getDumpStateIndex();
+      if (rel.isReachable(dump) && rel.isMarked(dump, alpha)) {
+        numStates--;
+      }
+      result *= numStates;
+
     }
-    return numStates;
+    return result;
   }
 
 }

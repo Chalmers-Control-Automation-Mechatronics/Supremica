@@ -98,11 +98,11 @@ public class SelectionHeuristicMinS
     for (int e = EventEncoding.NONTAU; e < enc.getNumberOfProperEvents(); e++) {
       final byte status = enc.getProperEventStatus(e);
       switch (status & pattern) {
-      case EventStatus.STATUS_LOCAL:
-        numEvents++;
-        // fall through ...
       case 0:
         numSharedEvents++;
+        // fall through ...
+      case EventStatus.STATUS_LOCAL:
+        numEvents++;
         // fall through ...
       default:
         break;
