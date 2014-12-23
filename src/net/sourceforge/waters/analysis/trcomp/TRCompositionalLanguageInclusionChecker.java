@@ -346,8 +346,10 @@ public class TRCompositionalLanguageInclusionChecker
         dropPendingSubsystems();
         final List<TRAbstractionStep> preds = getAbstractionSteps(automata);
         final TraceProxy trace = mono.getCounterExample();
+        final TRTraceProxy extension =
+          TRAbstractionStepMonolithic.createTraceExtension(trace, preds, this);
         final TRAbstractionStep step =
-          new TRAbstractionStepMonolithic(name, preds, trace);
+          new TRAbstractionStepMonolithic(name, extension);
         addAbstractionStep(step);
       }
       return false;

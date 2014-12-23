@@ -1346,7 +1346,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   {
     final Logger logger = getLogger();
     if (logger.isDebugEnabled()) {
-      logger.debug(rel.getName());
+      logger.debug("Simplifying " + rel.getName() + " ...");
       logger.debug(rel.getNumberOfReachableStates() + " states, " +
                    rel.getNumberOfTransitions() + " transitions, " +
                    rel.getNumberOfMarkings(false) + " markings.");

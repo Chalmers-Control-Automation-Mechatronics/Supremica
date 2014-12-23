@@ -1291,12 +1291,33 @@ public abstract class AbstractTRCompositionalAnalyzer
   protected void dropTrivialAutomaton(final TRAutomatonProxy aut)
   {
     if (isCounterExampleEnabled()) {
-      final TRAbstractionStep pred = mCurrentAutomataMap.remove(aut);
-      final ListBufferTransitionRelation rel = aut.getTransitionRelation();
-      final int init = rel.getFirstInitialState();
-      final TRAbstractionStep step = new TRAbstractionStepDrop(pred, init);
+      final TRAbstractionStep step = createDropStep(aut);
       addAbstractionStep(step);
     }
+  }
+
+  protected List<TRAbstractionStep> createDropSteps
+    (final TRSubsystemInfo subsys)
+  {
+    if (isCounterExampleEnabled()) {
+      final List<TRAutomatonProxy> automata = subsys.getAutomata();
+      final List<TRAbstractionStep> steps = new ArrayList<>(automata.size());
+      for (final TRAutomatonProxy aut : subsys.getAutomata()) {
+        final TRAbstractionStep step = createDropStep(aut);
+        steps.add(step);
+      }
+      return steps;
+    } else {
+      return Collections.emptyList();
+    }
+  }
+
+  protected TRAbstractionStep createDropStep(final TRAutomatonProxy aut)
+  {
+    final TRAbstractionStep pred = mCurrentAutomataMap.remove(aut);
+    final ListBufferTransitionRelation rel = aut.getTransitionRelation();
+    final int init = rel.getFirstInitialState();
+    return new TRAbstractionStepDrop(pred, init);
   }
 
   protected void addAbstractionStep(final TRAbstractionStep step,
@@ -1309,6 +1330,13 @@ public abstract class AbstractTRCompositionalAnalyzer
   protected void addAbstractionStep(final TRAbstractionStep step)
   {
     mAbstractionSequence.add(step);
+  }
+
+  protected void addAbstractionSteps(final List<TRAbstractionStep> steps)
+  {
+    if (steps != null) {
+      mAbstractionSequence.addAll(steps);
+    }
   }
 
 

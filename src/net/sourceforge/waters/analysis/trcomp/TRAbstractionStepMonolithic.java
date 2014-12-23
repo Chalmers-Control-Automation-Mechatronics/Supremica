@@ -22,6 +22,7 @@ import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
@@ -43,23 +44,16 @@ class TRAbstractionStepMonolithic
 
   //#########################################################################
   //# Constructor
-  TRAbstractionStepMonolithic(final TRTraceProxy trace)
+  TRAbstractionStepMonolithic(final TRTraceProxy extension)
   {
-    this("<monolithic result>", trace);
+    this("<monolithic result>", extension);
   }
 
-  TRAbstractionStepMonolithic(final String name, final TRTraceProxy trace)
-  {
-    this(name, trace.getCoveredAbstractionSteps(), trace);
-  }
-
-  TRAbstractionStepMonolithic(final String name,
-                              final Collection<TRAbstractionStep> preds,
-                              final TraceProxy trace)
+  TRAbstractionStepMonolithic(final String name, final TRTraceProxy extension)
   {
     super(name);
-    mPredecessors = preds;
-    mMonolithicTrace = trace;
+    mPredecessors = extension.getCoveredAbstractionSteps();
+    mTraceExtension = extension;
   }
 
 
@@ -80,21 +74,33 @@ class TRAbstractionStepMonolithic
   @Override
   public void expandTrace(final TRTraceProxy trace,
                           final AbstractTRCompositionalAnalyzer analyzer)
+  {
+    trace.widenAndAppend(mTraceExtension);
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  static TRTraceProxy createTraceExtension
+    (final TraceProxy trace,
+     final Collection<TRAbstractionStep> preds,
+     final AbstractTRCompositionalAnalyzer analyzer)
     throws AnalysisException
   {
-    final List<EventProxy> events = mMonolithicTrace.getEvents();
-    trace.reset(events);
-    final int numSteps = trace.getNumberOfSteps();
+    final ProductDESProxy des = trace.getProductDES();
+    final List<EventProxy> events = trace.getEvents();
+    final int numSteps = events.size() + 1;
+    final TRTraceProxy extension = new TRConflictTraceProxy(des, events);
 
     final Map<String,TRAutomatonProxy> traceAutomataMap =
-      new HashMap<>(mPredecessors.size());
-    for (final AutomatonProxy aut : mMonolithicTrace.getAutomata()) {
+      new HashMap<>(preds.size());
+    for (final AutomatonProxy aut : trace.getAutomata()) {
       final String name = aut.getName();
       final TRAutomatonProxy tr = (TRAutomatonProxy) aut;
       traceAutomataMap.put(name, tr);
     }
 
-    for (final TRAbstractionStep pred : mPredecessors) {
+    for (final TRAbstractionStep pred : preds) {
       analyzer.checkAbort();
       final String name = pred.getName();
       final TRAutomatonProxy aut = traceAutomataMap.get(name);
@@ -105,7 +111,7 @@ class TRAbstractionStepMonolithic
       final int[] states = new int[numSteps];
       int stepIndex = 0;
       int current = -1;
-      for (final TraceStepProxy step : mMonolithicTrace.getTraceSteps()) {
+      for (final TraceStepProxy step : trace.getTraceSteps()) {
         final StateProxy state = step.getStateMap().get(aut);
         if (state != null) {
           current = aut.getStateIndex(state);
@@ -136,8 +142,10 @@ class TRAbstractionStepMonolithic
         }
         states[stepIndex++] = current;
       }
-      trace.addAutomaton(pred, states);
+      extension.addAutomaton(pred, states);
     }
+
+    return extension;
   }
 
 
@@ -154,6 +162,6 @@ class TRAbstractionStepMonolithic
   //#########################################################################
   //# Data Members
   private final Collection<TRAbstractionStep> mPredecessors;
-  private final TraceProxy mMonolithicTrace;
+  private final TRTraceProxy mTraceExtension;
 
 }

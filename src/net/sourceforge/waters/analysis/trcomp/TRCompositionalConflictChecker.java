@@ -14,7 +14,6 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -204,9 +203,6 @@ public class TRCompositionalConflictChecker
     final ConflictChecker mono = getMonolithicAnalyzer();
     mono.setConfiguredDefaultMarking(getUsedDefaultMarking());
     mono.setConfiguredPreconditionMarking(getUsedPreconditionMarking());
-    if (mConfiguredPreconditionMarking != null) {
-      mNonblockingSubsystems = new LinkedList<>();
-    }
   }
 
   @Override
@@ -216,7 +212,6 @@ public class TRCompositionalConflictChecker
     mUsedDefaultMarking = null;
     mUsedPreconditionMarking = null;
     mLanguageInclusionChecker = null;
-    mNonblockingSubsystems = null;
   }
 
 
@@ -313,8 +308,7 @@ public class TRCompositionalConflictChecker
         return setSatisfiedResult();
       } else if (noStatesOmega) {
         if (mUsedPreconditionMarking == null) {
-          final AnalysisResult result = getAnalysisResult();
-          result.setSatisfied(false);
+          setBooleanResult(false);
           logger.debug("Subsystem is blocking, because " + aut.getName() +
                        " has no marked states.");
           dropPendingSubsystems();
@@ -333,22 +327,23 @@ public class TRCompositionalConflictChecker
         logger.debug("Subsystem is generalised nonblocking, because all " +
                      "precondition-marked states have the default marking.");
       }
-      dropSubsystem(subsys);
+      if (!getPendingSubsystems().isEmpty()) {
+        final List<TRAbstractionStep> steps =
+          checkForReachablePreconditionMarkedState(subsys);
+        addAbstractionSteps(steps);
+      }
       return true;
     } else if (omegaBlocker != null) {
-      logger.debug("Subsystem is blocking, because " +
+      logger.debug("Subsystem is generalised blocking, because " +
                    omegaBlocker.getName() + " has no marked state.");
       subsys.moveToEnd(omegaBlocker);
-      dropSubsystem(subsys);
-      final ProductDESProxy des = getModel();
-      final TRTraceProxy trace = new TRConflictTraceProxy(des);
-      final boolean extended = extendToPreconditionMarkedState(trace);
-      final AnalysisResult result = getAnalysisResult();
-      result.setSatisfied(!extended);
-      if (extended && isCounterExampleEnabled() &&
-          !trace.getCoveredAbstractionSteps().isEmpty()) {
-        final TRAbstractionStep step = new TRAbstractionStepMonolithic(trace);
-        addAbstractionStep(step);
+      final List<TRAbstractionStep> steps =
+        checkForReachablePreconditionMarkedState(subsys);
+      if (steps == null) {
+        setBooleanResult(true);
+      } else if (checkPendingSubsystemsForReachablePreconditionMarkedState()) {
+        addAbstractionSteps(steps);
+        setBooleanResult(false);
       }
       return true;
     } else {
@@ -378,41 +373,39 @@ public class TRCompositionalConflictChecker
       combinedResult.addMonolithicAnalysisResult(monolithicResult);
       final Logger logger = getLogger();
       if (monolithicResult.isSatisfied()) {
-        logger.debug("Subsystem is nonblocking.");
-        dropSubsystem(subsys);
+        if (mConfiguredPreconditionMarking == null) {
+          logger.debug("Subsystem is nonblocking.");
+          dropSubsystem(subsys);
+        } else {
+          logger.debug("Subsystem is generalised nonblocking.");
+          if (!getPendingSubsystems().isEmpty()) {
+            final List<TRAbstractionStep> steps =
+              checkForReachablePreconditionMarkedState(subsys);
+            addAbstractionSteps(steps);
+          }
+        }
         return true;
-      } else if (mUsedPreconditionMarking == null) {
-        logger.debug("Subsystem is blocking.");
+      } else {
+        if (mConfiguredPreconditionMarking == null) {
+          logger.debug("Subsystem is blocking.");
+          dropPendingSubsystems();
+        } else {
+          logger.debug("Subsystem is generalised blocking.");
+          if (!checkPendingSubsystemsForReachablePreconditionMarkedState()) {
+            return true;
+          }
+        }
         combinedResult.setSatisfied(false);
         if (isCounterExampleEnabled()) {
-          dropPendingSubsystems();
           final List<TRAbstractionStep> preds = getAbstractionSteps(automata);
           final TraceProxy trace = mono.getCounterExample();
+          final TRTraceProxy extension =
+            TRAbstractionStepMonolithic.createTraceExtension(trace, preds, this);
           final TRAbstractionStep step =
-            new TRAbstractionStepMonolithic(name, preds, trace);
+            new TRAbstractionStepMonolithic(name, extension);
           addAbstractionStep(step);
         }
         return false;
-      } else {
-        logger.debug("Subsystem is generalised blocking.");
-        final List<TRAbstractionStep> preds = getAbstractionSteps(automata);
-        final TraceProxy monoTrace = mono.getCounterExample();
-        final TRAbstractionStepMonolithic monoStep =
-          new TRAbstractionStepMonolithic(name, preds, monoTrace);
-        final TRTraceProxy trace = new TRConflictTraceProxy(des);
-        monoStep.expandTrace(trace, this);
-        for (final TRAutomatonProxy aut : automata) {
-          final TRAbstractionStep step = getAbstractionStep(aut);
-          trace.setInputAutomaton(aut, step);
-        }
-        final boolean extended = extendToPreconditionMarkedState(trace);
-        combinedResult.setSatisfied(!extended);
-        if (extended && isCounterExampleEnabled()) {
-          final TRAbstractionStep step =
-            new TRAbstractionStepMonolithic(name, trace);
-          addAbstractionStep(step);
-        }
-        return !extended;
       }
     }
   }
@@ -439,49 +432,93 @@ public class TRCompositionalConflictChecker
                                              translator);
   }
 
-  @Override
-  protected void dropSubsystem(final TRSubsystemInfo subsys)
-  {
-    if (mNonblockingSubsystems == null) {
-      super.dropSubsystem(subsys);
-    } else {
-      mNonblockingSubsystems.add(subsys);
-    }
-  }
-
 
   //#########################################################################
   //# Generalised Nonblocking Trace Extension
-  private boolean extendToPreconditionMarkedState(final TRTraceProxy trace)
+  /**
+   * <P>Checks whether a precondition-marked state is reachable in all
+   * pending subsystems.</P>
+   *
+   * <P>This method is invoked in a generalised nonblocking check when a
+   * subsystem has been found to be generalised blocking. In this case, if
+   * the system has been split into event-disjoint subsystems, it still needs
+   * to be checked whether a precondition-marked state is reachable.</P>
+   *
+   * <P>This method checks each pending subsystem for the reachability of
+   * a precondition-marked state, if necessary by means of time-consuming
+   * language inclusion checks. If a subsystem has such a state, the
+   * counterexample is recorded and appropriate abstraction steps are filed.
+   * If a subsystem does not have such a state, the global analysis result is
+   * set to <CODE>true</CODE>, indicating that the system is generalised
+   * nonblocking, and the checking is stopped.</P>
+   *
+   * @return <CODE>true</CODE> if all pending subsystems have been found
+   *         to have a reachable precondition-marked state,
+   *         <CODE>false</CODE> otherwise.
+   */
+  private boolean checkPendingSubsystemsForReachablePreconditionMarkedState()
     throws AnalysisException
   {
-    final Collection<TRSubsystemInfo> pending = getPendingSubsystems();
-    final int nonblockingSize =
-      mNonblockingSubsystems == null ? 0 : mNonblockingSubsystems.size();
-    final int size = pending.size() + nonblockingSize;
-    if (size == 0) {
-      return true;
-    }
-    final Logger logger = getLogger();
-    logger.debug("Searching for reachable precondition-marked state ...");
-    final List<TRSubsystemInfo> subsystems = new ArrayList<>(size);
-    subsystems.addAll(pending);
-    if (mNonblockingSubsystems != null) {
-      subsystems.addAll(mNonblockingSubsystems);
-    }
-    Collections.sort(subsystems);
-    for (final TRSubsystemInfo subsys : subsystems) {
-      if (!extendToPreconditionMarkedState(trace, subsys)) {
+    for (final TRSubsystemInfo subsys : getPendingSubsystems()) {
+      final List<TRAbstractionStep> steps =
+        checkForReachablePreconditionMarkedState(subsys);
+      if (steps == null) {
         return false;
       }
+      addAbstractionSteps(steps);
     }
     return true;
   }
 
-  private boolean extendToPreconditionMarkedState(final TRTraceProxy trace,
-                                                  final TRSubsystemInfo subsys)
+  /**
+   * <P>Checks whether the given subsystem has a reachable precondition-marked
+   * state.</P>
+   *
+   * <P>This method is used in generalised nonblocking verification when
+   * the model splits into event-disjoint subsystems. Then a system is
+   * generalised nonblocking, if each subsystem is generalised nonblocking,
+   * or if one subsystem has no reachable precondition-marked state.</P>
+   *
+   * <P>This method may need to invoke a time-consuming language inclusion
+   * check. Depending on the subsystem, it performs one of the following
+   * actions.</P>
+   * <UL>
+   * <LI>If no precondition marking is configured, or none of the automata in
+   *     the subsystem uses the precondition marking, a list of abstraction
+   *     steps of type {@link TRAbstractionStepDrop} is returned, indicating
+   *     to trace expansion that every initial state is a valid end state for
+   *     a counterexample.</LI>
+   * <LI>If a reachable precondition-marked state can be found by the
+   *     language inclusion check, an abstraction step of type {@link
+   *     TRAbstractionStepMonolithic} containing the counterexample is
+   *     returned.</LI>
+   * <LI>If the language inclusion check determines that the subsystem has
+   *     no reachable precondition-marked state, the global analysis
+   *     result is set to <CODE>true</CODE> indicating that the complete
+   *     system is generalised nonblocking. In this case, the method
+   *     returns <CODE>null</CODE>.</LI>
+   * </UL>
+   *
+   * @param  subsys  The subsystem to be analysed.
+   * @return List of abstraction steps for trace expansion. The steps
+   *         are returned separately, because the trace expansion steps
+   *         for the blocking subsystem must be recorded last for sound
+   *         trace checking. If there are pending subsystem to be checked
+   *         for reachable alpha-marked states, the trace steps have to be
+   *         recorded later. The returned list may be empty if counterexample
+   *         computation is disabled. A return value of <CODE>null</CODE>
+   *         indicates that the subsystem has no reachable
+   *         precondition-marked state.
+   */
+  private List<TRAbstractionStep> checkForReachablePreconditionMarkedState
+    (final TRSubsystemInfo subsys)
     throws AnalysisException
   {
+    if (mConfiguredPreconditionMarking == null) {
+      return createDropSteps(subsys);
+    }
+    final Logger logger = getLogger();
+    logger.debug("Checking subsystem for reachable precondition-marked state ...");
     final TRCompositionalLanguageInclusionChecker checker =
       getLanguageInclusionChecker();
     final TRToolCreator<TransitionRelationSimplifier> creator =
@@ -502,8 +539,7 @@ public class TRCompositionalConflictChecker
       trivial &= aut == langAut;
     }
     if (trivial) {
-      super.dropSubsystem(subsys);
-      return true;
+      return createDropSteps(subsys);
     }
     final TRAutomatonProxy property = getPreconditionPropertyAutomaton(config);
     langAutomata.add(property);
@@ -513,10 +549,15 @@ public class TRCompositionalConflictChecker
       AutomatonTools.createProductDESProxy(name, langAutomata, factory);
     checker.setModel(des);
     if (checker.run()) {
-      return false;
+      logger.debug("The global system is generalised nonblocking, because " +
+                   "this subsystem has no reachable precondition-marked state.");
+      final AnalysisResult result = getAnalysisResult();
+      result.setSatisfied(true);
+      return null;
     } else {
       final TRSafetyTraceProxy langTrace = checker.getCounterExample();
-      final TRConflictTraceProxy confTrace = new TRConflictTraceProxy(langTrace);
+      final TRConflictTraceProxy confTrace =
+        new TRConflictTraceProxy(langTrace);
       for (final TRAutomatonProxy langAut : langAutomata) {
         final TRAutomatonProxy aut = langMap.get(langAut);
         final TRAbstractionStep step = getAbstractionStep(aut);
@@ -524,11 +565,11 @@ public class TRCompositionalConflictChecker
           confTrace.removeInputAutomaton(langAut);
         } else {
           confTrace.replaceInputAutomaton(langAut, step);
-          trace.setInputAutomaton(aut, step);
         }
       }
-      trace.widenAndAppend(confTrace);
-      return true;
+      final TRAbstractionStep step =
+        new TRAbstractionStepMonolithic(des.getName(), confTrace);
+      return Collections.singletonList(step);
     }
   }
 
@@ -1226,7 +1267,6 @@ public class TRCompositionalConflictChecker
   private EventProxy mUsedDefaultMarking;
   private EventProxy mUsedPreconditionMarking;
   private TRCompositionalLanguageInclusionChecker mLanguageInclusionChecker;
-  private List<TRSubsystemInfo> mNonblockingSubsystems;
 
   private EventProxy mPreconditionEvent;
   private TRAutomatonProxy mPreconditionPropertyAutomaton;
