@@ -949,10 +949,6 @@ public class TRCompositionalConflictChecker
     silentOutRemover.setDumpStateAware(true);
     silentOutRemover.setSimplificationListener(partitioningListener);
     chain.add(silentOutRemover);
-    final IncomingEquivalenceTRSimplifier incomingEquivalenceSimplifier =
-      new IncomingEquivalenceTRSimplifier();
-    incomingEquivalenceSimplifier.setSimplificationListener(partitioningListener);
-    chain.add(incomingEquivalenceSimplifier);
     final LimitedCertainConflictsTRSimplifier certainConflictsRemover =
       new LimitedCertainConflictsTRSimplifier();
     final TRSimplificationListener certainConflictsListener =
@@ -969,6 +965,10 @@ public class TRCompositionalConflictChecker
     bisimulator.setDumpStateAware(true);
     bisimulator.setSimplificationListener(partitioningListener);
     chain.add(bisimulator);
+    final IncomingEquivalenceTRSimplifier incomingEquivalenceSimplifier =
+      new IncomingEquivalenceTRSimplifier();
+    incomingEquivalenceSimplifier.setSimplificationListener(partitioningListener);
+    chain.add(incomingEquivalenceSimplifier);
     if (nonAlphaDeterminisation) {
       final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
         new NonAlphaDeterminisationTRSimplifier();
