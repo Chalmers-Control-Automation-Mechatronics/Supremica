@@ -389,7 +389,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
         }
       } else {
         byte status = 0;
-        if (analyzer.isUsingSpecialEvents()) {
+        if (analyzer.isSelfloopOnlyEventsEnabled()) {
           final AbstractCompositionalModelAnalyzer.EventInfo info =
             analyzer.getEventInfo(event);
           if (info.isOnlyNonSelfLoopCandidate(candidate)) {

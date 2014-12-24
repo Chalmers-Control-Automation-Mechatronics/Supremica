@@ -149,8 +149,10 @@ public class StateRepresentationSynthesisAbstractionProcedure extends
     }
     EventProxy tauC = null;
     EventProxy tauU = null;
-    final byte tauStatus = analyzer.isUsingSpecialEvents() ?
-      EventStatus.STATUS_FULLY_LOCAL : EventStatus.STATUS_LOCAL;
+    byte tauStatus = EventStatus.STATUS_LOCAL;
+    if (analyzer.isSelfloopOnlyEventsEnabled()) {
+      tauStatus |= EventStatus.STATUS_SELFLOOP_ONLY;
+    }
     final EventEncoding enc = new EventEncoding();
     for (final EventProxy event : events) {
       if (translator.getEventKind(event) == EventKind.PROPOSITION) {

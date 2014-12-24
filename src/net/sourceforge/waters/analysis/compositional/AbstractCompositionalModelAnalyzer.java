@@ -370,7 +370,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   public boolean isUsingSpecialEvents()
   {
     return
-      mBlockedEventsEnabled && mFailingEventsEnabled && mBlockedEventsEnabled;
+      mBlockedEventsEnabled && mFailingEventsEnabled && mSelfloopOnlyEventsEnabled;
   }
 
   /**
