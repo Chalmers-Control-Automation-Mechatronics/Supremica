@@ -432,6 +432,20 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(des, true);
   }
 
+  public void testSelfloopRemoval01() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "selfloop_removal_01.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testSelfloopRemoval02() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "selfloop_removal_02.wmod");
+    runModelVerifier(des, true);
+  }
+
   public void testSilentContinuation() throws Exception
   {
     final ProductDESProxy des =

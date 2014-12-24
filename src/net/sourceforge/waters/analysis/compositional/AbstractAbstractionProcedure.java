@@ -111,7 +111,7 @@ abstract class AbstractAbstractionProcedure implements AbstractionProcedure
         }
       } else {
         byte status = 0;
-        if (mAnalyzer.isUsingSpecialEvents()) {
+        if (mAnalyzer.isSelfloopOnlyEventsEnabled()) {
           final AbstractCompositionalModelAnalyzer.EventInfo info =
             mAnalyzer.getEventInfo(event);
           if (info.isOnlyNonSelfLoopCandidate(candidate)) {
