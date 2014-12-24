@@ -12,7 +12,6 @@ package net.sourceforge.waters.analysis.trcomp;
 import java.util.Collection;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
-import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -83,8 +82,8 @@ abstract class TRAbstractionStep
     mOutputAutomaton = null;
   }
 
-  TRAutomatonProxy getOutputAutomaton(final int preferredConfig,
-                                      final EventEncoding enc)
+  TRAutomatonProxy getClonedOutputAutomaton(final EventEncoding enc,
+                                            final int preferredConfig)
     throws AnalysisException
   {
     final TRAutomatonProxy aut = getOutputAutomaton(preferredConfig);
@@ -92,18 +91,11 @@ abstract class TRAbstractionStep
     final int numEvents = rel.getNumberOfProperEvents();
     assert numEvents == enc.getNumberOfProperEvents() :
       "Unexpected number of events in event encoding!";
-    for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
-      final byte oldStatus = rel.getProperEventStatus(e);
-      if (EventStatus.isUsedEvent(oldStatus)) {
-        final byte newStatus = enc.getProperEventStatus(e);
-        if (newStatus != oldStatus) {
-          rel.setProperEventStatus(e, newStatus);
-        }
-      }
-    }
-    clearOutputAutomaton();
-    return aut;
+    final ListBufferTransitionRelation clonedRel =
+      new ListBufferTransitionRelation(rel, enc, preferredConfig);
+    return new TRAutomatonProxy(enc, clonedRel);
   }
+
 
   //#########################################################################
   //# Debugging
@@ -134,6 +126,7 @@ abstract class TRAbstractionStep
     final Class<?> clazz = getClass();
     return Logger.getLogger(clazz);
   }
+
 
   //#########################################################################
   //# Data Members

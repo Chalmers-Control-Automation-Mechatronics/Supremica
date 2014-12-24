@@ -127,18 +127,15 @@ class TRAbstractionStepPartition
     final ChainTRSimplifier chain = new ChainTRSimplifier(mUsedSimplifiers);
     chain.setPreferredOutputConfiguration(preferredConfig);
     final int inputConfig = chain.getPreferredInputConfiguration();
-    final TRAutomatonProxy inputAut =
-      mPredecessor.getOutputAutomaton(inputConfig);
-    // We are going to destructively change this automaton,
-    // so we need to clear the copy cached on the predecessor.
-    mPredecessor.clearOutputAutomaton();
-    final Logger logger = getLogger();
-    reportRebuilding();
-    final ListBufferTransitionRelation inputRel =
-      inputAut.getTransitionRelation();
-    inputRel.logSizes(logger);
     final EventEncoding inputEventEncoding =
       new EventEncoding(mEventEncodingBefore);
+    final TRAutomatonProxy inputAut =
+      mPredecessor.getClonedOutputAutomaton(inputEventEncoding, inputConfig);
+    final ListBufferTransitionRelation inputRel =
+      inputAut.getTransitionRelation();
+    final Logger logger = getLogger();
+    reportRebuilding();
+    inputRel.logSizes(logger);
     final ListBufferTransitionRelation outputRel =
       new ListBufferTransitionRelation(inputRel, inputEventEncoding, inputConfig);
     chain.setTransitionRelation(outputRel);

@@ -1212,7 +1212,6 @@ public class TRCompositionalConflictChecker
           final EventEncoding enc = seq.getCurrentEventEncoding();
           final TRAbstractionStep step =
             new TRAbstractionStepCertainConflicts(pred, enc,
-                                                  DEFAULT_MARKING,
                                                   certainConflictsRemover);
           seq.append(step);
         } else {

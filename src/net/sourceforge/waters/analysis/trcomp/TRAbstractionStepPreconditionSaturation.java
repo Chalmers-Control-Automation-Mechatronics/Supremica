@@ -74,22 +74,19 @@ class TRAbstractionStepPreconditionSaturation
   public TRAutomatonProxy createOutputAutomaton(final int preferredConfig)
     throws AnalysisException
   {
-    mSimplifier.setPropositions(TRCompositionalConflictChecker.PRECONDITION_MARKING,
-                                TRCompositionalConflictChecker.DEFAULT_MARKING);
     mSimplifier.setPreferredOutputConfiguration(preferredConfig);
     final int inputConfig = mSimplifier.getPreferredInputConfiguration();
-    final TRAutomatonProxy aut =
-      mPredecessor.getOutputAutomaton(inputConfig);
-    // We are going to destructively change this automaton,
-    // so we need to clear the copy cached on the predecessor.
-    mPredecessor.clearOutputAutomaton();
+    final EventEncoding inputEventEncoding = new EventEncoding(mEventEncoding);
+    final TRAutomatonProxy inputAut =
+      mPredecessor.getClonedOutputAutomaton(inputEventEncoding, inputConfig);
+    final ListBufferTransitionRelation inputRel =
+      inputAut.getTransitionRelation();
     reportRebuilding();
     final Logger logger = getLogger();
-    final ListBufferTransitionRelation rel = aut.getTransitionRelation();
-    rel.logSizes(logger);
-    mSimplifier.setTransitionRelation(rel);
+    inputRel.logSizes(logger);
+    mSimplifier.setTransitionRelation(inputRel);
     mSimplifier.run();
-    return aut;
+    return inputAut;
   }
 
   @Override

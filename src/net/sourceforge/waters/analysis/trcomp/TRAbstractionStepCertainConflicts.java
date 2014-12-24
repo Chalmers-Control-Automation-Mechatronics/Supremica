@@ -49,13 +49,11 @@ class TRAbstractionStepCertainConflicts
   //# Constructor
   TRAbstractionStepCertainConflicts(final TRAbstractionStep pred,
                                     final EventEncoding eventEncoding,
-                                    final int defaultMarking,
                                     final LimitedCertainConflictsTRSimplifier simplifier)
   {
     super(pred.getName());
     mPredecessor = pred;
     mEventEncoding = eventEncoding;
-    mDefaultMarking = defaultMarking;
     mSimplifier = simplifier;
     mLevels = simplifier.getLevels();
   }
@@ -91,20 +89,16 @@ class TRAbstractionStepCertainConflicts
   public TRAutomatonProxy createOutputAutomaton(final int preferredConfig)
     throws AnalysisException
   {
-    mSimplifier.setDefaultMarkingID(mDefaultMarking);
     mSimplifier.setPreferredOutputConfiguration(preferredConfig);
     final int inputConfig = mSimplifier.getPreferredInputConfiguration();
+    final EventEncoding inputEventEncoding = new EventEncoding(mEventEncoding);
     final TRAutomatonProxy inputAut =
-      mPredecessor.getOutputAutomaton(inputConfig);
-    // We are going to destructively change this automaton,
-    // so we need to clear the copy cached on the predecessor.
-    mPredecessor.clearOutputAutomaton();
-    final Logger logger = getLogger();
-    reportRebuilding();
+      mPredecessor.getClonedOutputAutomaton(inputEventEncoding, inputConfig);
     final ListBufferTransitionRelation inputRel =
       inputAut.getTransitionRelation();
+    final Logger logger = getLogger();
+    reportRebuilding();
     inputRel.logSizes(logger);
-    final EventEncoding inputEventEncoding = new EventEncoding(mEventEncoding);
     final ListBufferTransitionRelation outputRel =
       new ListBufferTransitionRelation(inputRel, inputEventEncoding, inputConfig);
     mSimplifier.setTransitionRelation(outputRel);
@@ -610,7 +604,6 @@ class TRAbstractionStepCertainConflicts
   //# Data Members
   private final TRAbstractionStep mPredecessor;
   private final EventEncoding mEventEncoding;
-  private final int mDefaultMarking;
   private final LimitedCertainConflictsTRSimplifier mSimplifier;
   private final int[] mLevels;
 
