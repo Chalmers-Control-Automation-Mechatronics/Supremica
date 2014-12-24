@@ -832,14 +832,14 @@ public abstract class AbstractTRCompositionalAnalyzer
       return;
     }
     final int limit = getMonolithicAutomataLimit();
-    while (mCurrentSubsystem.getNumberOfAutomata() >= limit) {
+    while (true) {
       checkAbort();
       final boolean simplified = simplifyAllAutomataIndividually();
       if (simplified && earlyTerminationCheck(mCurrentSubsystem)) {
         return;
       } else if (disjointSubsystemsCheck()) {
         return;
-      } else if (mCurrentSubsystem.getNumberOfAutomata() == limit) {
+      } else if (mCurrentSubsystem.getNumberOfAutomata() <= limit) {
         break;
       }
       final Collection<TRCandidate> candidates =
@@ -861,23 +861,26 @@ public abstract class AbstractTRCompositionalAnalyzer
         return;
       }
     }
-    mNeedsSimplification.clear();
+    assert mNeedsSimplification.isEmpty();
     analyseSubsystemMonolithically(mCurrentSubsystem);
   }
 
   private boolean simplifyAllAutomataIndividually()
     throws AnalysisException
   {
+    final int limit = getMonolithicAutomataLimit();
     boolean simplified = false;
     int remaining =
       mAlwaysEnabledDetectedInitially ? 0 : mNeedsSimplification.size();
-    while (!mNeedsSimplification.isEmpty()) {
+    while (!mNeedsSimplification.isEmpty() &&
+           mCurrentSubsystem.getNumberOfAutomata() >= limit) {
       final TRAutomatonProxy aut = mNeedsSimplification.poll();
       simplified |= simplifyAutomatonIndividually(aut);
       if (remaining > 0) {
         mAlwaysEnabledDetectedInitially = (--remaining == 0);
       }
     }
+    mNeedsSimplification.clear();  // in case of early exit from loop
     return simplified;
   }
 
