@@ -30,6 +30,7 @@ import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.cpp.analysis.NativeSafetyVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
+import net.sourceforge.waters.model.analysis.DefaultAnalysisResult;
 import net.sourceforge.waters.model.analysis.EnumFactory;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.LanguageInclusionKindTranslator;
@@ -124,6 +125,7 @@ public class TRCompositionalLanguageInclusionChecker
     throws AnalysisException
   {
     final Logger logger = getLogger();
+    final long start = System.currentTimeMillis();
     final KindTranslator translator = getKindTranslator();
     final ProductDESProxy des = getModel();
     boolean hasProperty = false;
@@ -143,18 +145,30 @@ public class TRCompositionalLanguageInclusionChecker
           final AnalysisResult subResult = getAnalysisResult();
           if (result == null) {
             result = subResult;
+            setAnalysisResult(result);
           } else if (subResult != null) {
             result.merge(subResult);
           }
-          if (result != null) {
-            setAnalysisResult(result);
+          if (result != null && !result.isSatisfied()) {
+            final long stop = System.currentTimeMillis();
+            result.setRuntime(stop - start);
           }
         }
       }
     }
     if (!hasProperty) {
       logger.debug("Did not find any properties to check, returning TRUE.");
+      result = createAnalysisResult();
+      result.setSatisfied(true);
+      result.setNumberOfAutomata(0);
+      result.setNumberOfStates(0);
+      result.setNumberOfTransitions(0);
+      final long usage = DefaultAnalysisResult.getCurrentMemoryUsage();
+      result.updatePeakMemoryUsage(usage);
+      setAnalysisResult(result);
     }
+    final long stop = System.currentTimeMillis();
+    result.setRuntime(stop - start);
     return true;
   }
 

@@ -410,6 +410,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
       assertEquals("Wrong result from model checker: got " + result +
                    " but should have been " + expect + "!", expect, result);
       final VerificationResult stats = mModelVerifier.getAnalysisResult();
+      assertNotNull("No verification result!", stats);
       assertEquals("Wrong result from model checker: got " +
                    stats.isSatisfied() + " but should have been " +
                    expect + "!", expect, stats.isSatisfied());
