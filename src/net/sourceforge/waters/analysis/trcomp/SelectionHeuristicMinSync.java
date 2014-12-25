@@ -11,13 +11,11 @@ package net.sourceforge.waters.analysis.trcomp;
 
 import net.sourceforge.waters.analysis.compositional.ChainSelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult;
-import net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
-import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -48,49 +46,17 @@ import org.apache.log4j.Logger;
  */
 
 public class SelectionHeuristicMinSync
-extends NumericSelectionHeuristic<TRCandidate>
+  extends SelectionHeuristicMinSync0
 {
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.Abortable
-  @Override
-  public void requestAbort()
-  {
-    super.requestAbort();
-    if (mSynchronousProductBuilder != null) {
-      mSynchronousProductBuilder.requestAbort();
-    }
-  }
-
-  @Override
-  public void resetAbort()
-  {
-    super.resetAbort();
-    if (mSynchronousProductBuilder != null) {
-      mSynchronousProductBuilder.resetAbort();
-    }
-  }
-
 
   //#########################################################################
   //# Overrides for NumericSelectionHeuristic<TRCandidate>
   @Override
   public void setContext(final Object context)
   {
-    mAnalyzer = (AbstractTRCompositionalAnalyzer) context;
+    super.setContext(context);
     if (context != null) {
-      final KindTranslator translator = mAnalyzer.getKindTranslator();
-      mSynchronousProductBuilder =
-        new TRSynchronousProductBuilder(null, translator);
-      mSynchronousProductBuilder.setPruningDeadlocks
-        (mAnalyzer.isPruningDeadlocks());
-      mSynchronousProductBuilder.setTransitionLimit
-        (mAnalyzer.getInternalTransitionLimit());
-      mSynchronousProductBuilder.setDetailedOutputEnabled(false);
-      mSynchronousProductBuilder.setRemovingSelfloops(true);
-      mStateLimit = mAnalyzer.getInternalStateLimit();
-    } else {
-      mSynchronousProductBuilder = null;
+      reset();
     }
   }
 
@@ -114,17 +80,23 @@ extends NumericSelectionHeuristic<TRCandidate>
   @Override
   public double getHeuristicValue(final TRCandidate candidate)
   {
+    if (isOverflowCandidate(candidate)) {
+      return Double.POSITIVE_INFINITY;
+    }
+    final AbstractTRCompositionalAnalyzer analyzer = getAnalyzer();
+    final TRSynchronousProductBuilder syncBuilder =
+      getSynchronousProductBuilder();
     try {
-      final ProductDESProxyFactory factory = mAnalyzer.getFactory();
+      final ProductDESProxyFactory factory = analyzer.getFactory();
       final ProductDESProxy des = candidate.createProductDESProxy(factory);
       final EventEncoding syncEncoding =
         candidate.createSyncEventEncoding();
-      mSynchronousProductBuilder.setModel(des);
-      mSynchronousProductBuilder.setEventEncoding(syncEncoding);
-      mSynchronousProductBuilder.setNodeLimit(mStateLimit);
-      mSynchronousProductBuilder.run();
+      syncBuilder.setModel(des);
+      syncBuilder.setEventEncoding(syncEncoding);
+      syncBuilder.setNodeLimit(mStateLimit);
+      syncBuilder.run();
       final AnalysisResult result =
-        mSynchronousProductBuilder.getAnalysisResult();
+        syncBuilder.getAnalysisResult();
       final double dsize = result.getTotalNumberOfStates();
       final int size = (int) Math.round(dsize);
       if (size < mStateLimit) {
@@ -132,17 +104,20 @@ extends NumericSelectionHeuristic<TRCandidate>
       }
       return dsize;
     } catch (final OutOfMemoryError error) {
-      final Logger logger = mAnalyzer.getLogger();
+      final Logger logger = analyzer.getLogger();
       logger.debug("<out of memory>");
+      addOverflowCandidate(candidate);
       return Double.POSITIVE_INFINITY;
     } catch (final OverflowException overflow) {
+      if (mStateLimit == analyzer.getInternalStateLimit()) {
+        addOverflowCandidate(candidate);
+      }
       return Double.POSITIVE_INFINITY;
     } catch (final AnalysisException exception) {
       throw exception.getRuntimeException();
     } finally {
-      final CompositionalAnalysisResult stats = mAnalyzer.getAnalysisResult();
-      final SynchronousProductResult result =
-        mSynchronousProductBuilder.getAnalysisResult();
+      final CompositionalAnalysisResult stats = analyzer.getAnalysisResult();
+      final SynchronousProductResult result = syncBuilder.getAnalysisResult();
       stats.addSynchronousProductAnalysisResult(result);
     }
   }
@@ -151,14 +126,13 @@ extends NumericSelectionHeuristic<TRCandidate>
   protected void reset()
   {
     super.reset();
-    mStateLimit = mAnalyzer.getInternalStateLimit();
+    final AbstractTRCompositionalAnalyzer analyzer = getAnalyzer();
+    mStateLimit = analyzer.getInternalStateLimit();
   }
 
 
   //#########################################################################
   //# Data Members
-  private AbstractTRCompositionalAnalyzer mAnalyzer;
-  private TRSynchronousProductBuilder mSynchronousProductBuilder;
   private int mStateLimit;
 
 }

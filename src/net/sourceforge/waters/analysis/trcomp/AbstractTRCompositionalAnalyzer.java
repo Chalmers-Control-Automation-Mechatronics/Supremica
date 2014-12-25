@@ -241,27 +241,26 @@ public abstract class AbstractTRCompositionalAnalyzer
   }
 
   /**
-   * Sets the selection heuristic to choose a candidates for composition from
-   * the collection returned by the preselection heuristic. Possible arguments
-   * for this method can be obtained from the factory returned by {@link
-   * #getSelectionHeuristicFactory()}.
+   * Sets the preselection heuristic to create the possible candidates for
+   * composition. Possible arguments for this method can be obtained from the
+   * factory returned by {@link #getPreselectionHeuristicFactory()}.
    */
-  public void setSelectionHeuristic(final SelectionHeuristic<TRCandidate> heu)
+  public void setPreselectionHeuristic(final TRPreselectionHeuristic heu)
   {
-    mSelectionHeuristic = heu.createDecisiveHeuristic();
+    mPreselectionHeuristic = heu;
   }
 
   /**
-   * Gets the selection heuristic used to choose a candidates for composition
-   * from the collection returned by the preselection heuristic.
+   * Gets the preselection heuristic used to create the possible candidates
+   * for composition.
    */
-  public SelectionHeuristic<TRCandidate> getSelectionHeuristic()
+  public TRPreselectionHeuristic getPreselectionHeuristic()
   {
-    return mSelectionHeuristic;
+    return mPreselectionHeuristic;
   }
 
   /**
-   * Gets the factory to obtain preselection heuristics for this
+   * Gets the factory to obtain selection heuristics for this
    * compositional analyser. The objects returned by this factory can be
    * passed to the {@link #setPreselectionHeuristic(TRPreselectionHeuristic)
    * setPreselectionHeuristic()} method.
@@ -287,22 +286,23 @@ public abstract class AbstractTRCompositionalAnalyzer
   }
 
   /**
-   * Sets the preselection heuristic to create the possible candidates for
-   * composition. Possible arguments for this method can be obtained from the
-   * factory returned by {@link #getPreselectionHeuristicFactory()}.
+   * Sets the selection heuristic to choose a candidates for composition from
+   * the collection returned by the preselection heuristic. Possible arguments
+   * for this method can be obtained from the factory returned by {@link
+   * #getSelectionHeuristicFactory()}.
    */
-  public void setPreselectionHeuristic(final TRPreselectionHeuristic heu)
+  public void setSelectionHeuristic(final SelectionHeuristic<TRCandidate> heu)
   {
-    mPreselectionHeuristic = heu;
+    mSelectionHeuristic = heu.createDecisiveHeuristic();
   }
 
   /**
-   * Gets the preselection heuristic used to create the possible candidates
-   * for composition.
+   * Gets the selection heuristic used to choose a candidates for composition
+   * from the collection returned by the preselection heuristic.
    */
-  public TRPreselectionHeuristic getPreselectionHeuristic()
+  public SelectionHeuristic<TRCandidate> getSelectionHeuristic()
   {
-    return mPreselectionHeuristic;
+    return mSelectionHeuristic;
   }
 
   public void setMonolithicAnalyzer(final ModelAnalyzer mono)
@@ -612,6 +612,7 @@ public abstract class AbstractTRCompositionalAnalyzer
       }
     }
     mCurrentSubsystem.addAutomata(trs);
+    result.setNumberOfAutomata(trs.size());
 
     mSpecialEventsFinder.setBlockedEventsDetected(isBlockedEventsUsed());
     mSpecialEventsFinder.setFailingEventsDetected(isFailingEventsUsed());
@@ -850,6 +851,7 @@ public abstract class AbstractTRCompositionalAnalyzer
       while (candidate != null) {
         try {
           computeSynchronousProduct(candidate);
+          mPreselectionHeuristic.removeOverflowCandidatesContaining(candidate);
           break;
         } catch (final OverflowException exception) {
           mPreselectionHeuristic.addOverflowCandidate(candidate);
@@ -922,8 +924,11 @@ public abstract class AbstractTRCompositionalAnalyzer
       mSpecialEventsListener.setEnabled(true);
       mTRSimplifier.setTransitionRelation(rel);
       final boolean simplified = mTRSimplifier.run();
-      if (rel.getNumberOfStates() != oldNumStates) {
-        aut.resetStateNames();
+      if (simplified) {
+        mPreselectionHeuristic.removeOverflowCandidatesContaining(aut);
+        if (rel.getNumberOfStates() != oldNumStates) {
+          aut.resetStateNames();
+        }
       }
       // Record steps and update event status ...
       mIntermediateAbstractionSequence.commit();

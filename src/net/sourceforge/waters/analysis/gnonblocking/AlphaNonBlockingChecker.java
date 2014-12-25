@@ -53,9 +53,6 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
-
 
 /**
  * The canonicalising generalised conflict check algorithm.
@@ -65,7 +62,6 @@ import org.supremica.log.LoggerFactory;
 
 public class AlphaNonBlockingChecker
   extends AbstractConflictChecker
-  implements ConflictChecker
 {
 
   // #########################################################################
@@ -108,82 +104,56 @@ public class AlphaNonBlockingChecker
     return newmodel;
   }
 
-  // #########################################################################
-  // # Invocation
+
+  //#########################################################################
+  //# Invocation
   @Override
   public boolean run() throws AnalysisException
   {
-    clearStats();
-    setUp();
-    new AllSame(getModel()); // TODO Is this used?
-    mTime -= System.currentTimeMillis();
-    boolean result = false;
+    try {
+      setUp();
+      new AllSame(getModel()); // TODO Is this used?
+      mTime -= System.currentTimeMillis();
+      boolean result = false;
 
-    final ProjectionList list = project(getModel());
-    mMinAutMap.clear();
-    if (list == null) {
-      return true;
-    }
-    final ConflictChecker checker =
-      new NativeConflictChecker(list.getModel(),
-                                getUsedDefaultMarking(),
-                                getFactory());
-    checker.setConfiguredPreconditionMarking(mAlpha);
-    checker.setNodeLimit(getNodeLimit());
-    result = checker.run();
-    mFinalStates = checker.getAnalysisResult().getTotalNumberOfStates();
-    mFinalTrans = checker.getAnalysisResult().getTotalNumberOfTransitions();
+      final ProjectionList list = project(getModel());
+      mMinAutMap.clear();
+      if (list == null) {
+        return true;
+      }
+      final ConflictChecker checker =
+        new NativeConflictChecker(list.getModel(),
+                                  getUsedDefaultMarking(),
+                                  getFactory());
+      checker.setConfiguredPreconditionMarking(mAlpha);
+      checker.setNodeLimit(getNodeLimit());
+      result = checker.run();
+      mFinalStates = checker.getAnalysisResult().getTotalNumberOfStates();
+      mFinalTrans = checker.getAnalysisResult().getTotalNumberOfTransitions();
 
-    if (!result) {
-      final List<EventProxy> e = new ArrayList<>();
-      final TraceProxy counter =
-        getFactory().createSafetyTraceProxy(getModel().getName(), getModel(), e);
-      setFailedResult(counter);
-    } else {
-      setSatisfiedResult();
+      if (!result) {
+        final List<EventProxy> e = new ArrayList<>();
+        final TraceProxy counter =
+          getFactory().createSafetyTraceProxy(getModel().getName(), getModel(), e);
+        setFailedResult(counter);
+      } else {
+        setSatisfiedResult();
+      }
+      mTime += System.currentTimeMillis();
+      return result;
+    } catch (final AnalysisException exception) {
+      throw setExceptionResult(exception);
+    } catch (final OutOfMemoryError error) {
+      System.gc();
+      final OverflowException overflow = new OverflowException(error);
+      throw setExceptionResult(overflow);
     }
-    mTime += System.currentTimeMillis();
-    clearStats();
-    return result;
   }
 
   @Override
   public ConflictTraceProxy getCounterExample()
   {
     return null;
-  }
-
-  private void clearStats()
-  {
-    /*mLargestComposition = 0;
-    AnnotateGraph.clearStats();
-    CertainConflict.clearStats();
-    EquivalentIncoming.clearStats();
-    RemoveFollowOnTau.clearStats();
-    TauLoopRemoval.clearStats();
-    RedundantTransitions.clearStats();
-    AddRedundantTransitions.clearStats();
-    UnAnnotateGraph.clearStats();
-    BiSimulatorRedundant.clearStats();
-    RemoveImpossibleTransitions.clearStats();
-    RemoveAnnotations.clearStats();
-    MergeEvents.clearStats();
-    ConfRevBiSimulator.clearStats();
-    // IncomingEquivalent.clearStats();
-    TransBiSimulator.clearStats();
-    SilentOutGoing.clearStats();
-    mAnnotatedBISIMulation = 0;
-    mBISIMulation = 0;
-    mCompTime = 0;
-    mAnnBITIME = 0;
-    mBITIME = 0;
-    mSmallestDiff = Integer.MAX_VALUE;
-    mLargestDiff = Integer.MIN_VALUE;
-    mAggDiff = 0;
-    mTime = 0;
-    mLargestTransitions = 0;
-    mAggComposition = 0;
-    mAggTransitions = 0;*/
   }
 
   public String getStats()
@@ -198,6 +168,7 @@ public class AlphaNonBlockingChecker
     stats += "Time: " + mTime + "\n";
     return stats;
   }
+
 
   //#########################################################################
   //# Overrides for Abstract Base Class
@@ -606,7 +577,7 @@ public class AlphaNonBlockingChecker
     throws AnalysisException
     {
       mParent = null;// parent;
-      mCompautomata = new TreeSet<AutomatonProxy>(new AutomatonComparator());
+      mCompautomata = new TreeSet<AutomatonProxy>();
       mCompautomata.addAll(compAutomata);
       mAutomata = new TreeSet<>(automata);
       final Set<EventProxy> events = new TreeSet<>();
@@ -900,16 +871,6 @@ public class AlphaNonBlockingChecker
     }
   }
 
-  private static class AutomatonComparator
-    implements Comparator<AutomatonProxy>
-  {
-    @Override
-    public int compare(final AutomatonProxy a1, final AutomatonProxy a2)
-    {
-      return a1.getName().compareTo(a2.getName());
-    }
-  }
-
 
   private static class AutomataHidden
   {
@@ -1013,13 +974,6 @@ public class AlphaNonBlockingChecker
 
   private final EventProxy mAlpha;
   private final EventProxy mCont;
-
-
-  //#########################################################################
-  //# Class Constants
-  @SuppressWarnings("unused")
-  private static final Logger LOGGER =
-      LoggerFactory.createLogger(AlphaNonBlockingChecker.class);
 
 }
 

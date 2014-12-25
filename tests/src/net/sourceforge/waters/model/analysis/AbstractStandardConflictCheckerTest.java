@@ -86,7 +86,13 @@ public abstract class AbstractStandardConflictCheckerTest
       testCell();
       fail("Expected overflow not caught!");
     } catch (final OverflowException exception) {
-      // O.K.
+      final ModelVerifier verifier = getModelVerifier();
+      final AnalysisResult result = verifier.getAnalysisResult();
+      assertNotNull("Got NULL analysis result after exception!", result);
+      assertNotNull("No exception in analysis result after caught exception!",
+                    result.getException());
+      assertSame("Unexpected exception in analysis result!",
+                 exception, result.getException());
     }
   }
 

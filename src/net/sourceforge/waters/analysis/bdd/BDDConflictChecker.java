@@ -169,9 +169,16 @@ public class BDDConflictChecker
           computeCounterExample(bad, ConflictKind.LIVELOCK);
         return setFailedResult(counterexample);
       }
+    } catch (final AnalysisException exception) {
+      throw setExceptionResult(exception);
+    } catch (final OutOfMemoryError error) {
+      System.gc();
+      final OverflowException overflow = new OverflowException(error);
+      throw setExceptionResult(overflow);
     } catch (final WatersRuntimeException exception) {
       if (exception.getCause() instanceof AnalysisException) {
-        throw (AnalysisException) exception.getCause();
+        final AnalysisException cause = (AnalysisException) exception.getCause();
+        throw setExceptionResult(cause);
       } else {
         throw exception;
       }

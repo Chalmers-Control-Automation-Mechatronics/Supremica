@@ -9,11 +9,15 @@
 
 package net.sourceforge.waters.analysis.trcomp;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.model.analysis.AbstractAbortable;
@@ -98,6 +102,50 @@ public abstract class TRPreselectionHeuristic
     mOverflowCandidates.put(automata, candidate);
   }
 
+  boolean isOverflowCandidate(final TRCandidate candidate)
+  {
+    final List<TRAutomatonProxy> automata = candidate.getAutomata();
+    final TRCandidate overflow = mOverflowCandidates.get(automata);
+    if (overflow == null) {
+      return false;
+    } else if (overflow == candidate) {
+      return true;
+    } else {
+      return candidate.hasSameEventStatus(overflow);
+    }
+  }
+
+  void removeOverflowCandidatesContaining(final TRAutomatonProxy aut)
+  {
+    if (!mOverflowCandidates.isEmpty()) {
+      final Set<TRAutomatonProxy> set = Collections.singleton(aut);
+      removeOverflowCandidatesContaining(set);
+    }
+  }
+
+  void removeOverflowCandidatesContaining(final TRCandidate candidate)
+  {
+    if (!mOverflowCandidates.isEmpty()) {
+      final Set<TRAutomatonProxy> set = new THashSet<>(candidate.getAutomata());
+      removeOverflowCandidatesContaining(set);
+    }
+  }
+
+  void removeOverflowCandidatesContaining(final Set<TRAutomatonProxy> set)
+  {
+    final Iterator<List<TRAutomatonProxy>> iter =
+      mOverflowCandidates.keySet().iterator();
+    while (iter.hasNext()) {
+      final List<TRAutomatonProxy> key = iter.next();
+      for (final TRAutomatonProxy aut : key) {
+        if (set.contains(aut)) {
+          iter.remove();
+          break;
+        }
+      }
+    }
+  }
+
 
   //#########################################################################
   //# Debugging
@@ -119,6 +167,7 @@ public abstract class TRPreselectionHeuristic
     return getName();
   }
 
+  @Override
   public Logger getLogger()
   {
     final Class<?> clazz = getClass();

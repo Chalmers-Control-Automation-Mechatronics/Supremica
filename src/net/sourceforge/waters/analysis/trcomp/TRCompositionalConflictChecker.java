@@ -368,10 +368,14 @@ public class TRCompositionalConflictChecker
       recordMonolithicAttempt(automata);
       final ModelVerifier mono = getMonolithicVerifier();
       mono.setModel(des);
-      mono.run();
-      final AnalysisResult monolithicResult = mono.getAnalysisResult();
       final CompositionalAnalysisResult combinedResult = getAnalysisResult();
-      combinedResult.addMonolithicAnalysisResult(monolithicResult);
+      final AnalysisResult monolithicResult;
+      try {
+        mono.run();
+      } finally {
+        monolithicResult = mono.getAnalysisResult();
+        combinedResult.addMonolithicAnalysisResult(monolithicResult);
+      }
       final Logger logger = getLogger();
       if (monolithicResult.isSatisfied()) {
         if (mConfiguredPreconditionMarking == null) {

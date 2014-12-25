@@ -60,15 +60,15 @@ import org.apache.log4j.Logger;
 
 
 /**
- * The compositional generalised nonblocking verification algorithm.
+ * <P>The compositional generalised nonblocking verification algorithm.</P>
  *
- * <I>References:</I><BR>
+ * <P><I>References:</I><BR>
  * Rachel Francis. An implementation of a compositional approach for verifying
  * generalised nonblocking. Working paper series, No. 04/2011; Department of
  * Computer Science, University of Waikato, Hamilton, New Zealand, 2011.<BR>
  * Robi Malik, Ryan Leduc. A Compositional Approach for Verifying
  * Generalised Nonblocking, Proc. 7th International Conference on Control and
- * Automation, ICCA'09, 448-453, Christchurch, New Zealand, 2009.
+ * Automation, ICCA'09, 448-453, Christchurch, New Zealand, 2009.</P>
  *
  * @author Rachel Francis
  */
@@ -384,6 +384,12 @@ public class CompositionalGeneralisedConflictChecker
         setFailedResult(convertedTrace);
       }
       return result;
+    } catch (final AnalysisException exception) {
+      throw setExceptionResult(exception);
+    } catch (final OutOfMemoryError error) {
+      System.gc();
+      final OverflowException overflow = new OverflowException(error);
+      throw setExceptionResult(overflow);
     } finally {
       tearDown();
     }

@@ -13,12 +13,10 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.compositional.ChainSelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult;
-import net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
@@ -52,54 +50,12 @@ import org.apache.log4j.Logger;
  */
 
 public class SelectionHeuristicMinSyncA
-  extends NumericSelectionHeuristic<TRCandidate>
+  extends SelectionHeuristicMinSync0
   implements TRSynchronousProductBuilder.StateCallback
 {
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.Abortable
-  @Override
-  public void requestAbort()
-  {
-    super.requestAbort();
-    if (mSynchronousProductBuilder != null) {
-      mSynchronousProductBuilder.requestAbort();
-    }
-  }
-
-  @Override
-  public void resetAbort()
-  {
-    super.resetAbort();
-    if (mSynchronousProductBuilder != null) {
-      mSynchronousProductBuilder.resetAbort();
-    }
-  }
-
-
-  //#########################################################################
   //# Overrides for NumericSelectionHeuristic<TRCandidate>
-  @Override
-  public void setContext(final Object context)
-  {
-    mAnalyzer = (AbstractTRCompositionalAnalyzer) context;
-    if (context != null) {
-      final KindTranslator translator = mAnalyzer.getKindTranslator();
-      mSynchronousProductBuilder =
-        new TRSynchronousProductBuilder(null, translator);
-      mSynchronousProductBuilder.setPruningDeadlocks
-        (mAnalyzer.isPruningDeadlocks());
-      mSynchronousProductBuilder.setNodeLimit
-        (mAnalyzer.getInternalStateLimit());
-      mSynchronousProductBuilder.setTransitionLimit
-        (mAnalyzer.getInternalTransitionLimit());
-      mSynchronousProductBuilder.setDetailedOutputEnabled(false);
-      mSynchronousProductBuilder.setRemovingSelfloops(true);
-    } else {
-      mSynchronousProductBuilder = null;
-    }
-  }
-
   @Override
   public SelectionHeuristic<TRCandidate> createDecisiveHeuristic()
   {
@@ -120,32 +76,41 @@ public class SelectionHeuristicMinSyncA
   @Override
   public double getHeuristicValue(final TRCandidate candidate)
   {
+    if (isOverflowCandidate(candidate)) {
+      return Double.POSITIVE_INFINITY;
+    }
+    final AbstractTRCompositionalAnalyzer analyzer = getAnalyzer();
+    final TRSynchronousProductBuilder syncBuilder =
+      getSynchronousProductBuilder();
     try {
       mCount = 0;
-      final ProductDESProxyFactory factory = mAnalyzer.getFactory();
+      final ProductDESProxyFactory factory = analyzer.getFactory();
       final ProductDESProxy des = candidate.createProductDESProxy(factory);
       final EventEncoding syncEncoding =
         candidate.createSyncEventEncoding();
-      mSynchronousProductBuilder.setModel(des);
-      mSynchronousProductBuilder.setEventEncoding(syncEncoding);
-      mSynchronousProductBuilder.run();
+      syncBuilder.setModel(des);
+      syncBuilder.setEventEncoding(syncEncoding);
+      syncBuilder.run();
       if (mCount < mCurrentMinimum) {
         mCurrentMinimum = mCount;
       }
       return mCount;
     } catch (final OutOfMemoryError error) {
-      final Logger logger = mAnalyzer.getLogger();
+      final Logger logger = analyzer.getLogger();
       logger.debug("<out of memory>");
+      addOverflowCandidate(candidate);
       return Double.POSITIVE_INFINITY;
     } catch (final OverflowException overflow) {
+      if (mCurrentMinimum == Integer.MAX_VALUE) {
+        addOverflowCandidate(candidate);
+      }
       return Double.POSITIVE_INFINITY;
     } catch (final AnalysisException exception) {
       throw exception.getRuntimeException();
     } finally {
       mMarkingInfo = null;
-      final CompositionalAnalysisResult stats = mAnalyzer.getAnalysisResult();
-      final SynchronousProductResult result =
-        mSynchronousProductBuilder.getAnalysisResult();
+      final CompositionalAnalysisResult stats = analyzer.getAnalysisResult();
+      final SynchronousProductResult result = syncBuilder.getAnalysisResult();
       stats.addSynchronousProductAnalysisResult(result);
     }
   }
@@ -165,13 +130,15 @@ public class SelectionHeuristicMinSyncA
   public boolean newState(final int[] decoded)
     throws OverflowException
   {
+    final TRSynchronousProductBuilder syncBuilder =
+      getSynchronousProductBuilder();
     if (mMarkingInfo == null) {
-      final EventEncoding enc = mSynchronousProductBuilder.getEventEncoding();
+      final EventEncoding enc = syncBuilder.getEventEncoding();
       final EventProxy prop = enc.getProposition
         (AbstractTRCompositionalAnalyzer.PRECONDITION_MARKING);
-      mMarkingInfo = mSynchronousProductBuilder.createMarkingInfo(prop);
+      mMarkingInfo = syncBuilder.createMarkingInfo(prop);
     }
-    if (mSynchronousProductBuilder.isMarked(mMarkingInfo, decoded)) {
+    if (syncBuilder.isMarked(mMarkingInfo, decoded)) {
       mCount += mAlphaWeight;
     } else {
       mCount += mNonAlphaWeight;
@@ -187,8 +154,6 @@ public class SelectionHeuristicMinSyncA
   //# Data Members
   private final int mAlphaWeight = 1;
   private final int mNonAlphaWeight = 0;
-  private AbstractTRCompositionalAnalyzer mAnalyzer;
-  private TRSynchronousProductBuilder mSynchronousProductBuilder;
   private List<TRSynchronousProductBuilder.MarkingInfo> mMarkingInfo;
   private int mCurrentMinimum = Integer.MAX_VALUE;
   private int mCount = 0;
