@@ -11,6 +11,7 @@
 package net.sourceforge.waters.gui.actions;
 
 import net.sourceforge.waters.analysis.sd.SDActivityLoopChecker;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.ControlLoopChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
@@ -46,7 +47,7 @@ public class AnalyzeSDActivityLoopAction extends WatersAnalyzeAction
 
   @Override
   protected ModelVerifier getModelVerifier(final ModelAnalyzerFactory factory,
-                                           final ProductDESProxyFactory desFactory)
+                                           final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
   {
     final ControlLoopChecker checker =
       factory.createControlLoopChecker(desFactory);

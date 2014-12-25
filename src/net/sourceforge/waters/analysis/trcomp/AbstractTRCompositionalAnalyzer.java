@@ -40,6 +40,7 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.EnumFactory;
@@ -812,6 +813,7 @@ public abstract class AbstractTRCompositionalAnalyzer
   }
 
   protected int getPreferredInputConfiguration()
+    throws AnalysisConfigurationException
   {
     if (mTRSimplifier != null) {
       return mTRSimplifier.getPreferredInputConfiguration();

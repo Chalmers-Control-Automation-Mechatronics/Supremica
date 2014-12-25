@@ -13,6 +13,7 @@ package net.sourceforge.waters.gui.actions;
 import net.sourceforge.waters.analysis.compositional.CompositionalSimplifier;
 import net.sourceforge.waters.analysis.compositional.ConflictAbstractionProcedureFactory;
 import net.sourceforge.waters.analysis.hisc.HISCCPInterfaceConsistencyChecker;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
@@ -57,7 +58,7 @@ public class AnalyzeHISCCPInterfaceConsistencyAction
   @Override
   protected ModelVerifier getModelVerifier
     (final ModelAnalyzerFactory factory,
-     final ProductDESProxyFactory desFactory)
+     final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
   {
     final ConflictChecker checker = factory.createConflictChecker(desFactory);
     if (checker == null) {

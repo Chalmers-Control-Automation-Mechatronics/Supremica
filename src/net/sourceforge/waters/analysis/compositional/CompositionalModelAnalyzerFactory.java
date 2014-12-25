@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.compositional;
 
 import java.io.PrintStream;
 
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentBoolean;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentChain;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
@@ -632,6 +633,7 @@ public class CompositionalModelAnalyzerFactory
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
     public void configure(final ModelAnalyzer analyzer)
+      throws AnalysisConfigurationException
     {
       final ModelAnalyzer secondaryAnalyzer =
         createSecondaryAnalyzer(analyzer);

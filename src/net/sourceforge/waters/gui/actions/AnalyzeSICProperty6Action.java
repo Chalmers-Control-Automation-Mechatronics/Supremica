@@ -11,6 +11,7 @@
 package net.sourceforge.waters.gui.actions;
 
 import net.sourceforge.waters.analysis.hisc.SICProperty6Verifier;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
@@ -56,7 +57,7 @@ public class AnalyzeSICProperty6Action
   @Override
   protected ModelVerifier getModelVerifier
     (final ModelAnalyzerFactory factory,
-     final ProductDESProxyFactory desFactory)
+     final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
   {
     final ConflictChecker conflictChecker =
         factory.createConflictChecker(desFactory);

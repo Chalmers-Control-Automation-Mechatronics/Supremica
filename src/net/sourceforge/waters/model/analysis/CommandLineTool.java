@@ -324,8 +324,8 @@ public class CommandLineTool
         first = false;
       }
 
-    } catch (final EvalException | WatersUnmarshalException | IOException
-             exception) {
+    } catch (final EvalException | AnalysisException |
+                   WatersUnmarshalException | IOException exception) {
       showSupportedException(exception);
     } catch (final InvocationTargetException exception) {
       final Throwable cause = exception.getCause();

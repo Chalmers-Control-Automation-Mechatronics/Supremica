@@ -16,6 +16,7 @@ import net.sourceforge.waters.analysis.compositional.ChainSelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.CompositionalConflictChecker;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristicCreator;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentBoolean;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentChain;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
@@ -552,6 +553,7 @@ public class TRCompositionalModelAnalyzerFactory
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
     public void configure(final ModelAnalyzer analyzer)
+      throws AnalysisConfigurationException
     {
       final ModelAnalyzer secondaryAnalyzer =
         createSecondaryAnalyzer(analyzer);

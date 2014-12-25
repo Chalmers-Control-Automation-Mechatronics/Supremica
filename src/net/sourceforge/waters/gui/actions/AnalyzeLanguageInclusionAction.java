@@ -15,6 +15,7 @@ import java.util.Map;
 import javax.swing.Action;
 
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.des.AbstractLanguageInclusionKindTranslator;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
@@ -99,7 +100,7 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
   @Override
   protected ModelVerifier getModelVerifier
     (final ModelAnalyzerFactory vfactory,
-     final ProductDESProxyFactory desfactory)
+     final ProductDESProxyFactory desfactory) throws AnalysisConfigurationException
   {
     final LanguageInclusionChecker checker =
       vfactory.createLanguageInclusionChecker(desfactory);

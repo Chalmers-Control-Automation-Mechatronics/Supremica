@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.trcomp;
 
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.ListedEnumFactory;
 
 
@@ -63,7 +64,8 @@ public abstract class TRToolCreator<T>
   /**
    * Creates a tool to be used by the given model analyser.
    */
-  public abstract T create(AbstractTRCompositionalAnalyzer analyzer);
+  public abstract T create(AbstractTRCompositionalAnalyzer analyzer)
+    throws AnalysisConfigurationException;
 
 
   //#########################################################################

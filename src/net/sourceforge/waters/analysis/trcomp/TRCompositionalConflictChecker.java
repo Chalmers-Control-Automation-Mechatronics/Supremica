@@ -41,6 +41,7 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
@@ -657,6 +658,7 @@ public class TRCompositionalConflictChecker
     @Override
     public TransitionRelationSimplifier create
       (final AbstractTRCompositionalAnalyzer analyzer)
+      throws AnalysisConfigurationException
     {
       final TRCompositionalConflictChecker checker =
         (TRCompositionalConflictChecker) analyzer;
@@ -691,6 +693,7 @@ public class TRCompositionalConflictChecker
     @Override
     public TransitionRelationSimplifier create
       (final AbstractTRCompositionalAnalyzer analyzer)
+      throws AnalysisConfigurationException
     {
       final TRCompositionalConflictChecker checker =
         (TRCompositionalConflictChecker) analyzer;
@@ -725,6 +728,7 @@ public class TRCompositionalConflictChecker
     @Override
     public TransitionRelationSimplifier create
       (final AbstractTRCompositionalAnalyzer analyzer)
+      throws AnalysisConfigurationException
     {
       final TRCompositionalConflictChecker checker =
         (TRCompositionalConflictChecker) analyzer;
@@ -760,6 +764,7 @@ public class TRCompositionalConflictChecker
     @Override
     public TransitionRelationSimplifier create
       (final AbstractTRCompositionalAnalyzer analyzer)
+      throws AnalysisConfigurationException
     {
       final TRCompositionalConflictChecker checker =
         (TRCompositionalConflictChecker) analyzer;
@@ -795,6 +800,7 @@ public class TRCompositionalConflictChecker
     @Override
     public TransitionRelationSimplifier create
       (final AbstractTRCompositionalAnalyzer analyzer)
+      throws AnalysisConfigurationException
     {
       final TRCompositionalConflictChecker checker =
         (TRCompositionalConflictChecker) analyzer;
@@ -831,6 +837,7 @@ public class TRCompositionalConflictChecker
     @Override
     public TransitionRelationSimplifier create
       (final AbstractTRCompositionalAnalyzer analyzer)
+      throws AnalysisConfigurationException
     {
       final TRCompositionalConflictChecker checker =
         (TRCompositionalConflictChecker) analyzer;
@@ -911,8 +918,11 @@ public class TRCompositionalConflictChecker
 
   protected ChainTRSimplifier createConflictEquivalenceChain
     (final ObservationEquivalenceTRSimplifier.Equivalence equivalence,
-     final boolean earlyTransitionRemoval, final boolean nonAlphaDeterminisation)
+     final boolean earlyTransitionRemoval,
+     final boolean nonAlphaDeterminisation)
+    throws AnalysisConfigurationException
   {
+    checkForStandardNonblocking();
     final int limit = getInternalTransitionLimit();
     final ChainTRSimplifier chain = startAbstractionChain();
     final TRSimplificationListener markingListener = new MarkingListener();
@@ -1103,6 +1113,20 @@ public class TRCompositionalConflictChecker
       mLanguageInclusionChecker.setPreservingEncodings(true);
     }
     return mLanguageInclusionChecker;
+  }
+
+
+  //#########################################################################
+  //# Error Handling
+  private void checkForStandardNonblocking()
+    throws AnalysisConfigurationException
+  {
+    if (mConfiguredPreconditionMarking != null) {
+      final TRToolCreator<?> creator = getSimplifierCreator();
+      throw new AnalysisConfigurationException
+        (creator.getName() +
+         " abstraction chain does not support generalised nonblocking!");
+    }
   }
 
 

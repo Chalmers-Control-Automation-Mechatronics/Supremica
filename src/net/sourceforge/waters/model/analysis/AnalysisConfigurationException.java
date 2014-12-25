@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.model.analysis
-//# CLASS:   AnalysisAbortException
+//# CLASS:   AnalysisConfigurationException
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -11,28 +11,20 @@ package net.sourceforge.waters.model.analysis;
 
 
 /**
- * An exception indicating that an analysis algorithm has been aborted
- * in response to a user request or timeout.
+ * An exception indicating that an analysis algorithm has been unable to
+ * start because of invalid arguments.
  *
  * @author Robi Malik
  */
 
-public class AnalysisAbortException extends AnalysisException {
+public class AnalysisConfigurationException extends AnalysisException {
 
   //#########################################################################
   //# Constructors
   /**
-   * Constructs a new overflow exception with a default message.
-   */
-  public AnalysisAbortException()
-  {
-    this("Analysis aborted!");
-  }
-
-  /**
    * Constructs a new overflow exception with a given message.
    */
-  public AnalysisAbortException(final String msg)
+  public AnalysisConfigurationException(final String msg)
   {
     super(msg);
   }
@@ -40,6 +32,6 @@ public class AnalysisAbortException extends AnalysisException {
 
   //#########################################################################
   //# Static Class Variables
-  private static final long serialVersionUID = -2601097829012752986L;
+  private static final long serialVersionUID = -3131107766968296988L;
 
 }

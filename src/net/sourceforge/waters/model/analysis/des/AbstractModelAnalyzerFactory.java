@@ -23,6 +23,7 @@ import java.util.ListIterator;
 import java.util.Map;
 
 import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.CommandLineArgument;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
@@ -98,6 +99,7 @@ public abstract class AbstractModelAnalyzerFactory
   @Override
   public ConflictChecker createConflictChecker
     (final ProductDESProxyFactory factory)
+    throws AnalysisConfigurationException
   {
     throw createUnsupportedOperationException("conflict check");
   }
@@ -105,6 +107,7 @@ public abstract class AbstractModelAnalyzerFactory
   @Override
   public ControllabilityChecker createControllabilityChecker
     (final ProductDESProxyFactory factory)
+    throws AnalysisConfigurationException
   {
     throw createUnsupportedOperationException("controllability check");
   }
@@ -112,6 +115,7 @@ public abstract class AbstractModelAnalyzerFactory
   @Override
   public ControlLoopChecker createControlLoopChecker
     (final ProductDESProxyFactory factory)
+    throws AnalysisConfigurationException
   {
     throw createUnsupportedOperationException("control-loop check");
   }
@@ -119,6 +123,7 @@ public abstract class AbstractModelAnalyzerFactory
   @Override
   public LanguageInclusionChecker createLanguageInclusionChecker
     (final ProductDESProxyFactory factory)
+    throws AnalysisConfigurationException
   {
     throw createUnsupportedOperationException("language inclusion check");
   }
@@ -126,6 +131,7 @@ public abstract class AbstractModelAnalyzerFactory
   @Override
   public SupervisorSynthesizer createSupervisorSynthesizer
     (final ProductDESProxyFactory factory)
+    throws AnalysisConfigurationException
   {
     throw createUnsupportedOperationException("synthesis");
   }
@@ -153,6 +159,7 @@ public abstract class AbstractModelAnalyzerFactory
 
   @Override
   public void configure(final ModelAnalyzer analyzer)
+    throws AnalysisConfigurationException
   {
     for (final CommandLineArgument arg : mArgumentList) {
       if (arg.isUsed()) {
@@ -185,14 +192,14 @@ public abstract class AbstractModelAnalyzerFactory
 
   //#########################################################################
   //# Auxiliary Methods
-  private UnsupportedOperationException createUnsupportedOperationException
+  private AnalysisConfigurationException createUnsupportedOperationException
     (final String opname)
   {
     final String clsname = getClass().getName();
     final int dotpos = clsname.lastIndexOf('.');
     final String msg =
       clsname.substring(dotpos + 1) + " does not support " + opname + "!";
-    return new UnsupportedOperationException(msg);
+    return new AnalysisConfigurationException(msg);
   }
 
   private void checkRequiredArguments()

@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.modular;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSCCControlLoopChecker;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentChain;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
@@ -116,6 +117,7 @@ public class ModularModelVerifierFactory
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
     public void configure(final ModelAnalyzer analyzer)
+      throws AnalysisConfigurationException
     {
       if (analyzer instanceof AbstractModularSafetyVerifier) {
         final ModelVerifier verifier = (ModelVerifier) analyzer;

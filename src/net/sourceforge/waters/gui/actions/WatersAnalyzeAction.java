@@ -28,10 +28,11 @@ import net.sourceforge.waters.gui.compiler.CompilationObserver;
 import net.sourceforge.waters.gui.dialog.MultilineLabel;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
+import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.TraceProxy;
@@ -142,13 +143,11 @@ public abstract class WatersAnalyzeAction
         ProductDESElementFactory.getInstance();
       final ModelAnalyzerFactory vfactory = getModelVerifierFactory();
       return getModelVerifier(vfactory, desfactory);
-    } catch (final NoClassDefFoundError error) {
-      return null;
-    } catch (final ClassNotFoundException exception) {
-      return null;
-    } catch (final UnsupportedOperationException exception) {
-      return null;
-    } catch (final UnsatisfiedLinkError exception) {
+    } catch (final NoClassDefFoundError |
+                   ClassNotFoundException |
+                   UnsupportedOperationException |
+                   UnsatisfiedLinkError |
+                   AnalysisConfigurationException exception) {
       return null;
     }
   }
@@ -160,7 +159,7 @@ public abstract class WatersAnalyzeAction
   protected abstract String getFailureDescription();
   protected abstract String getSuccessDescription();
   protected abstract ModelVerifier getModelVerifier
-    (ModelAnalyzerFactory factory, ProductDESProxyFactory desFactory);
+    (ModelAnalyzerFactory factory, ProductDESProxyFactory desFactory) throws AnalysisConfigurationException;
 
 
   //#########################################################################

@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import net.sourceforge.waters.analysis.monolithic.MonolithicModelAnalyzerFactory;
 import net.sourceforge.waters.cpp.analysis.NativeModelVerifierFactory;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
@@ -40,8 +41,8 @@ public final class AnalysisTools
       ProductDESElementFactory.getInstance();
     final ProductDESProxy des =
       AutomatonTools.createProductDESProxy(aut, factory);
-    final ConflictChecker checker = getDefaultConflictChecker(des);
     try {
+      final ConflictChecker checker = getDefaultConflictChecker(des);
       return checker.run();
     } catch (final EventNotFoundException exception) {
       return true;
@@ -55,6 +56,7 @@ public final class AnalysisTools
   //# Auxiliary Methods
   private static ConflictChecker getDefaultConflictChecker
     (final ProductDESProxy des)
+    throws AnalysisConfigurationException
   {
     final ProductDESProxyFactory desFactory =
       ProductDESElementFactory.getInstance();
@@ -63,9 +65,9 @@ public final class AnalysisTools
       final ModelAnalyzerFactory vFactory =
         NativeModelVerifierFactory.getInstance();
       checker = vFactory.createConflictChecker(desFactory);
-    } catch (final UnsatisfiedLinkError error) {
+    } catch (final UnsatisfiedLinkError | AnalysisConfigurationException error) {
       final ModelAnalyzerFactory vFactory =
-        NativeModelVerifierFactory.getInstance();
+        MonolithicModelAnalyzerFactory.getInstance();
       checker = vFactory.createConflictChecker(desFactory);
     }
     checker.setModel(des);

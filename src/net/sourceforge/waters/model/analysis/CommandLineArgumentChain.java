@@ -67,6 +67,7 @@ public abstract class CommandLineArgumentChain
   //#######################################################################
   //# Configuring the Secondary Verifier
   protected ModelAnalyzer createSecondaryAnalyzer(final ModelAnalyzer analyzer)
+    throws AnalysisConfigurationException
   {
     final ProductDESProxyFactory desFactory = analyzer.getFactory();
     final ModelVerifier secondaryAnalyzer;

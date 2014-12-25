@@ -11,6 +11,7 @@ package net.sourceforge.waters.model.analysis.des;
 
 import java.util.ListIterator;
 
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -30,31 +31,38 @@ public interface ModelAnalyzerFactory
   /**
    * Creates a conflict checker.
    */
-  public ConflictChecker createConflictChecker(ProductDESProxyFactory factory);
+  public ConflictChecker createConflictChecker
+    (ProductDESProxyFactory factory)
+    throws AnalysisConfigurationException;
 
   /**
    * Creates a controllability checker.
    */
   public ControllabilityChecker createControllabilityChecker
-    (ProductDESProxyFactory factory);
+    (ProductDESProxyFactory factory)
+    throws AnalysisConfigurationException;
 
   /**
    * Creates a control-loop checker.
    */
   public ControlLoopChecker createControlLoopChecker
-    (ProductDESProxyFactory factory);
+    (ProductDESProxyFactory factory)
+    throws AnalysisConfigurationException;
+
 
   /**
    * Creates a language inclusion checker.
    */
   public LanguageInclusionChecker createLanguageInclusionChecker
-    (ProductDESProxyFactory factory);
+    (ProductDESProxyFactory factory)
+    throws AnalysisConfigurationException;
 
   /**
    * Creates a supervisor synthesiser.
    */
   public SupervisorSynthesizer createSupervisorSynthesizer
-    (ProductDESProxyFactory factory);
+    (ProductDESProxyFactory factory)
+    throws AnalysisConfigurationException;
 
 
   //#########################################################################
@@ -67,7 +75,8 @@ public interface ModelAnalyzerFactory
    * command line arguments, before loading of any models. Hence, the model
    * analyser does not yet have its input model when this method is called.
    */
-  public void configure(ModelAnalyzer analyzer);
+  public void configure(ModelAnalyzer analyzer)
+    throws AnalysisConfigurationException;
 
   /**
    * Configures the given compiler according to any command line arguments

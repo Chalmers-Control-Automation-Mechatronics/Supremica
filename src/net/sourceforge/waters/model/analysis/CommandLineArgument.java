@@ -126,6 +126,7 @@ public abstract class CommandLineArgument
   public abstract void parse(ListIterator<String> iter);
 
   public void configure(final ModelAnalyzer analyzer)
+    throws AnalysisConfigurationException
   {
   }
 
