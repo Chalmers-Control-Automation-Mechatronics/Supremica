@@ -1742,8 +1742,8 @@ public abstract class AbstractTRCompositionalAnalyzer
   private TRPreselectionHeuristic mPreselectionHeuristic;
   private SelectionHeuristic<TRCandidate> mSelectionHeuristic;
   private final PartitioningListener mSpecialEventsListener;
-  private TRToolCreator<TransitionRelationSimplifier> mTRSimplifierCreator;
   private SpecialEventsFinder mSpecialEventsFinder;
+  private TRToolCreator<TransitionRelationSimplifier> mTRSimplifierCreator;
   private TransitionRelationSimplifier mTRSimplifier;
   private final TRSynchronousProductBuilder mSynchronousProductBuilder;
   private ModelAnalyzer mMonolithicAnalyzer;

@@ -1126,9 +1126,6 @@ public class TRCompositionalConflictChecker
             rel.getNumberOfMarkings(DEFAULT_MARKING, true);
           mNumberOfPreconditionMarkingsAtStart =
             rel.getNumberOfMarkings(PRECONDITION_MARKING, true);
-        } else if (simplifier instanceof MarkingSaturationTRSimplifier) {
-          mNumberOfPreconditionMarkingsBeforeSaturate =
-            rel.getNumberOfMarkings(PRECONDITION_MARKING, true);
         }
         return true;
       } else {
@@ -1152,7 +1149,7 @@ public class TRCompositionalConflictChecker
             rel.getNumberOfMarkings(PRECONDITION_MARKING, true);
           final TransitionRelationSimplifier last =
             seq.getLastPartitionSimplifier();
-          EventEncoding enc = mEventEncodingAtStart;
+          final EventEncoding enc = mEventEncodingAtStart;
           mEventEncodingAtStart = null;
           if (last instanceof MarkingRemovalTRSimplifier) {
             seq.removeLastPartitionSimplifier(enc);
@@ -1162,20 +1159,6 @@ public class TRCompositionalConflictChecker
                 mNumberOfDefaultMarkingsAtStart) {
               return;
             }
-            mNumberOfPreconditionMarkingsBeforeSaturate =
-              mNumberOfPreconditionMarkingsAtStart;
-          }
-          if (numPreconditionMarkings >
-              mNumberOfPreconditionMarkingsBeforeSaturate) {
-            if (enc == null) {
-              enc = seq.getCurrentEventEncoding();
-            }
-            final TRAbstractionStep pred =
-              seq.getLastIntermediateStepOrPredecessor();
-            final TRAbstractionStep step =
-              new TRAbstractionStepPreconditionSaturation(pred, enc, simplifier);
-            seq.append(step);
-            return;
           }
         }
       } else {
@@ -1189,7 +1172,6 @@ public class TRCompositionalConflictChecker
     private EventEncoding mEventEncodingAtStart;
     private int mNumberOfDefaultMarkingsAtStart;
     private int mNumberOfPreconditionMarkingsAtStart;
-    private int mNumberOfPreconditionMarkingsBeforeSaturate;
   }
 
 
@@ -1267,6 +1249,7 @@ public class TRCompositionalConflictChecker
   private EventProxy mUsedPreconditionMarking;
   private TRCompositionalLanguageInclusionChecker mLanguageInclusionChecker;
 
+  // For language inclusion check for generalised nonblocking
   private EventProxy mPreconditionEvent;
   private TRAutomatonProxy mPreconditionPropertyAutomaton;
 

@@ -208,7 +208,7 @@ class TRAbstractionStepPartition
           }
         }
       }
-      if (lastFailing) {
+      if (!mIsPartitioning || lastFailing) {
         mTargetState = -1;
         mTargetStateClass = null;
       } else if (mPartition == null) {
@@ -219,15 +219,7 @@ class TRAbstractionStepPartition
         mTargetState =
           trace.getState(TRAbstractionStepPartition.this, numTraceEvents);
         final int[] clazz = mPartition.getStates(mTargetState);
-        mTargetStateClass = new TIntHashSet(clazz.length);
-        for (final int s : clazz) {
-          if (rel.isMarked
-               (s, TRCompositionalConflictChecker.PRECONDITION_MARKING) &&
-              (mRelevantPreconditionMarkings == null ||
-               mRelevantPreconditionMarkings.get(s))) {
-            mTargetStateClass.add(s);
-          }
-        }
+        mTargetStateClass = new TIntHashSet(clazz);
       }
       if (rel.isPropositionUsed(TRCompositionalConflictChecker.DEFAULT_MARKING)) {
         boolean hasDeadlock = false;
@@ -254,7 +246,7 @@ class TRAbstractionStepPartition
       final int numStates = mInputTransitionRelation.getNumberOfStates();
       for (int s = 0; s < numStates; s++) {
         if (mInputTransitionRelation.isInitial(s)) {
-          final TRTraceSearchRecord record = new TRTraceSearchRecord(s);
+          final TRTraceSearchRecord record = createInitialRecord(s);
           if (processSearchRecord(record)) {
             return record;
           }
@@ -282,8 +274,7 @@ class TRAbstractionStepPartition
           iterEvent.reset(s, e);
           while (iterEvent.advance()) {
             final int t = iterEvent.getCurrentTargetState();
-            final TRTraceSearchRecord next =
-              new TRTraceSearchRecord(t, current, e, false);
+            final TRTraceSearchRecord next = createNextRecord(t, e, current);
             if (processSearchRecord(next)) {
               return next;
             }
@@ -293,8 +284,7 @@ class TRAbstractionStepPartition
         while (iterLocal.advance()) {
           final int l = iterLocal.getCurrentEvent();
           final int t = iterLocal.getCurrentTargetState();
-          final TRTraceSearchRecord next =
-            new TRTraceSearchRecord(t, current, l, true);
+          final TRTraceSearchRecord next = createNextRecord(t, l, current);
           if (processSearchRecord(next)) {
             return next;
           }
@@ -304,6 +294,35 @@ class TRAbstractionStepPartition
         "Failed to expand trace for input automaton " +
         mInputTransitionRelation.getName() + "!";
       return mNonDeadlockTarget;
+    }
+
+    private TRTraceSearchRecord createInitialRecord(final int state)
+    {
+      return createNextRecord(state, -1, null);
+    }
+
+    private TRTraceSearchRecord createNextRecord(final int state,
+                                                 final int event,
+                                                 final TRTraceSearchRecord pred)
+    {
+      // Trick! Search records contain the number of consumed events,
+      // or the number of consumed events plus one, if the all events
+      // in the input trace have been consumed and a state equivalent
+      // to the end state of the input trace has been reached.
+      // For generalised nonblocking, the search has to continue towards
+      // precondition-marked state not equivalent to the trace end state.
+      int consumed = 0;
+      if (pred != null) {
+        consumed = pred.getNumberOfConsumedEvents();
+        final byte status = mEventEncodingBefore.getProperEventStatus(event);
+        if (!EventStatus.isLocalEvent(status)) {
+          consumed++;
+        }
+      }
+      if (consumed == mEventSequence.size() && isTraceEndState(state)) {
+        consumed++;
+      }
+      return new TRTraceSearchRecord(state, consumed, event, pred);
     }
 
     private boolean processSearchRecord(final TRTraceSearchRecord record)
@@ -329,14 +348,8 @@ class TRAbstractionStepPartition
       return false;
     }
 
-    private boolean isTargetState(final TRTraceSearchRecord record)
+    private boolean isTraceEndState(final int state)
     {
-      if (record.getNumberOfConsumedEvents() < mEventSequence.size()) {
-        return false;
-      } else if (!mIsPartitioning) {
-        return true;
-      }
-      final int state = record.getState();
       if (mTargetStateClass != null) {
         return mTargetStateClass.contains(state);
       } else if (mTargetState >= 0) {
@@ -345,6 +358,21 @@ class TRAbstractionStepPartition
         return true;
       }
     }
+
+    private boolean isTargetState(final TRTraceSearchRecord record)
+    {
+      if (record.getNumberOfConsumedEvents() <= mEventSequence.size()) {
+        return false;
+      } else if (mRelevantPreconditionMarkings != null) {
+        final int state = record.getState();
+        return mRelevantPreconditionMarkings.get(state);
+      } else {
+        final int state = record.getState();
+        return mInputTransitionRelation.isMarked
+          (state, AbstractTRCompositionalAnalyzer.PRECONDITION_MARKING);
+      }
+    }
+
 
     //#######################################################################
     //# Trace Merging

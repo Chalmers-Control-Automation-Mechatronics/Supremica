@@ -46,7 +46,7 @@ public class CompositionalSICProperty5VerifierTest
   {
     final TRCompositionalConflictChecker checker =
       new TRCompositionalConflictChecker();
-    checker.setSimplifierCreator(TRCompositionalConflictChecker.NB1w);
+    checker.setSimplifierCreator(TRCompositionalConflictChecker.GNBw);
     checker.setPreselectionHeuristic(AbstractTRCompositionalAnalyzer.PRESEL_MinT);
     checker.setSelectionHeuristic(AbstractTRCompositionalAnalyzer.SEL_MaxL);
     checker.setInternalStateLimit(5000);

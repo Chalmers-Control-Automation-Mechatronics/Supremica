@@ -34,9 +34,9 @@ class TRTraceSearchRecord
   TRTraceSearchRecord(final int state,
                       final TRTraceSearchRecord pred,
                       final int event,
-                      final boolean local)
-                      {
-    this(state, pred.mNumConsumedEvents + (local ? 0 : 1), event, pred);
+                      final int moreConsumed)
+  {
+    this(state, pred.mNumConsumedEvents + moreConsumed, event, pred);
   }
 
   TRTraceSearchRecord(final int state,
