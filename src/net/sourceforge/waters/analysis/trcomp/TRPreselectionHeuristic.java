@@ -24,8 +24,6 @@ import net.sourceforge.waters.model.analysis.AbstractAbortable;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.ProxyTools;
 
-import org.apache.log4j.Logger;
-
 
 /**
  * <P>The interface for all preselection heuristics used by compositional
@@ -165,13 +163,6 @@ public abstract class TRPreselectionHeuristic
   public String toString()
   {
     return getName();
-  }
-
-  @Override
-  public Logger getLogger()
-  {
-    final Class<?> clazz = getClass();
-    return Logger.getLogger(clazz);
   }
 
 

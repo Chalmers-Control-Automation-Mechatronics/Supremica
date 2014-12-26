@@ -14,6 +14,7 @@ import net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
+import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 
 
 /**
@@ -25,7 +26,7 @@ import net.sourceforge.waters.analysis.tr.EventStatus;
  * abstracted synchronous composition of candidates and chooses the candidate
  * with the smallest estimate. The estimate is obtained by multiplying the
  * product of the state numbers of the candidate's automata with its
- * ratio of shared over total events (excluding {@link EventEncoding#TAU}).</P>
+ * ratio of shared over total events (including {@link EventEncoding#TAU}).</P>
  *
  * <P>The <STRONG>MinS</STRONG><SUP>&alpha;</SUP> heuristic is of interest
  * when verifying the generalised nonblocking property. It estimates the
@@ -33,7 +34,7 @@ import net.sourceforge.waters.analysis.tr.EventStatus;
  * and chooses the candidate with the smallest estimate. The estimate is
  * obtained by multiplying the product of the numbers of precondition-marked
  * states of the candidate's automata with its ratio of shared over total
- * events (excluding {@link EventEncoding#TAU}).</P>
+ * events (including {@link EventEncoding#TAU}).</P>
  *
  * <P>An argument to the constructor determines which of the above heuristics
  * is implemented by an instance of this class.</P>
@@ -108,12 +109,20 @@ public class SelectionHeuristicMinS
         break;
       }
     }
+    for (final TRAutomatonProxy aut : candidate.getAutomata()) {
+      final EventEncoding autEnc = aut.getEventEncoding();
+      final byte tauStatus = autEnc.getProperEventStatus(EventEncoding.TAU);
+      if (EventStatus.isUsedEvent(tauStatus)) {
+        numEvents++;
+      }
+    }
     if (numEvents == 0) {
       return 1.0;
     } else {
       return numStates * numSharedEvents / numEvents;
     }
   }
+
 
 
   //#########################################################################
