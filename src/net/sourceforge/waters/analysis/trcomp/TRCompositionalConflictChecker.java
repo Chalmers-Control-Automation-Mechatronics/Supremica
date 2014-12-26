@@ -106,6 +106,7 @@ public class TRCompositionalConflictChecker
     super(model,
           ConflictKindTranslator.getInstanceControllable(),
           new NativeConflictChecker(ProductDESElementFactory.getInstance()));
+    setPruningDeadlocks(true);
   }
 
 
