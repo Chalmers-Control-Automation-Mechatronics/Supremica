@@ -179,6 +179,20 @@ public abstract class AbstractCompilerTest
     testCompile(module);
   }
 
+  public void testCompile_normalise1()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "compiler/efsm", "normalise1");
+    testCompile(module);
+  }
+
+  public void testCompile_normalise2()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "compiler/efsm", "normalise2");
+    testCompile(module);
+  }
+
   public void testCompile_manwolfgoatcabbage()
     throws IOException, WatersException
   {
@@ -773,7 +787,13 @@ public abstract class AbstractCompilerTest
     throws IOException, WatersException
   {
     final ProductDESProxy des = compile(module, bindings);
+
+    // Obtain components of the final file name.
     final String name = module.getName();
+    final String[] suffices = getTestSuffices();
+    final String ext = mProductDESMarshaller.getDefaultExtension();
+
+    // Manipulate bindings.
     final StringBuilder buffer = new StringBuilder(name);
     if (bindings != null && appendToName) {
       for (final ParameterBindingProxy binding : bindings) {
@@ -781,34 +801,29 @@ public abstract class AbstractCompilerTest
         buffer.append(binding.getExpression().toString());
       }
     }
-    final String ext = mProductDESMarshaller.getDefaultExtension();
-    final int pos = buffer.length();
-    buffer.append(ext);
-    final String outextname = buffer.toString();
-    final File outfilename = new File(mOutputDirectory, outextname);
-    mProductDESMarshaller.marshal(des, outfilename);
-    final String[] suffices = getTestSuffices();
-    buffer.setLength(pos);
-    String temp = "";
-    if (suffices.length == 2)
-      temp = buffer.toString().concat("-" + suffices[1] + ext);
-    for (final String suffix : suffices) {
-      buffer.append('-');
-      buffer.append(suffix);
-    }
-    buffer.append(ext);
-    final String suffixedname = buffer.toString();
-    final File location = module.getFileLocation();
-    final File dir = location.getParentFile();
-    final File suffixedfilename = new File(dir, suffixedname);
-    final File suffixedfilename2 = new File(dir, temp);
-    if (suffixedfilename.exists()) {
-      compare(des, suffixedfilename);
-    } else if (suffices.length == 2 && suffixedfilename2.exists()) {
-      compare(des, suffixedfilename2);
-    } else {
-      final File compfilename = new File(dir, outextname);
-      compare(des, compfilename);
+    final String stem = buffer.toString();
+
+    // Generate file names with suffices.
+    final String[] fileNames = {stem + suffices[0] + suffices[1],
+                                stem + suffices[1], stem + suffices[0], stem};
+
+    // Append the file extension.
+    for (int i = 0; i < fileNames.length; i++)
+      fileNames[i] = fileNames[i] + ext;
+
+    // Write the output file.
+    final File producedFileName = new File(mOutputDirectory, stem + ext);
+    mProductDESMarshaller.marshal(des, producedFileName);
+
+    // Find the expected file, and compare.
+    final File location = module.getFileLocation().getParentFile();
+    for (int i = 0; i < fileNames.length; i++) {
+      final File expectedFileName = new File(location, fileNames[i]);
+      if (expectedFileName.exists() || i == 3) {
+        compare(des, expectedFileName);
+        break;
+      } else
+        continue;
     }
   }
 

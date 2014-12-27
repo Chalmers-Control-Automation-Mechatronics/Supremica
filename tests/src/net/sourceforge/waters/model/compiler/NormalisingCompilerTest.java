@@ -42,6 +42,7 @@ public class NormalisingCompilerTest extends AbstractCompilerTest
   {
     compiler.setNormalizationEnabled(true);
     compiler.setOptimizationEnabled(false);
+    compiler.setUsingEventAlphabet(false);
     compiler.setSourceInfoEnabled(true);
     compiler.setMultiExceptionsEnabled(true);
   }
@@ -61,7 +62,7 @@ public class NormalisingCompilerTest extends AbstractCompilerTest
   @Override
   String[] getTestSuffices()
   {
-    final String[] array = {"norm"};
+    final String[] array = {"-norm", ""};
     return array;
   }
 }

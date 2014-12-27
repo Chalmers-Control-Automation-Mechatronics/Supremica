@@ -43,7 +43,7 @@ public class OldOptimisingCompilerTest extends AbstractCompilerTest
   @Override
   String[] getTestSuffices()
   {
-    final String[] array = {"opt"};
+    final String[] array = {"-opt", ""};
     return array;
   }
 }
