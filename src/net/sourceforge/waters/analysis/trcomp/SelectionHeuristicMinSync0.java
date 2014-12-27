@@ -87,8 +87,10 @@ abstract class SelectionHeuristicMinSync0
         (mAnalyzer.getInternalStateLimit());
       mSynchronousProductBuilder.setTransitionLimit
         (mAnalyzer.getInternalTransitionLimit());
-      mSynchronousProductBuilder.setDetailedOutputEnabled(false);
       mSynchronousProductBuilder.setRemovingSelfloops(true);
+      mSynchronousProductBuilder.setPruningDeadlocks
+        (mAnalyzer.isPruningDeadlocks());
+      mSynchronousProductBuilder.setDetailedOutputEnabled(false);
     } else {
       mSynchronousProductBuilder = null;
     }

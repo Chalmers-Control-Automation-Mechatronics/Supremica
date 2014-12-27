@@ -71,7 +71,9 @@ public class SelectionHeuristicMinF
         connected.addAll(info.getAutomata());
       }
     }
-    return connected.size() - candidate.getAutomata().size();
+    final double value = connected.size() - candidate.getAutomata().size();
+    //getLogger().debug(getName() + "(" + candidate.getName() + ") = " + value);
+    return value;
   }
 
 

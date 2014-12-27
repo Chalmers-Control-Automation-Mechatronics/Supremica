@@ -14,6 +14,7 @@ import net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
+import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 
 
 /**
@@ -25,7 +26,7 @@ import net.sourceforge.waters.analysis.tr.EventStatus;
  * with the smallest estimate. The estimate is obtained by multiplying the
  * product of the state numbers of the candidate's automata with its
  * ratio of the shared events minus half the numbers of <I>selfloop-only</I>
- * and <I>always enabled</I> events over total number of events (excluding
+ * and <I>always enabled</I> events over total number of events (including
  * {@link EventEncoding#TAU}).</P>
  *
  * @author Robi Malik
@@ -91,6 +92,14 @@ public class SelectionHeuristicMinSSp
         break;
       default:
         break;
+      }
+    }
+    for (final TRAutomatonProxy aut : candidate.getAutomata()) {
+      final EventEncoding autEnc = aut.getEventEncoding();
+      final byte tauStatus = autEnc.getProperEventStatus(EventEncoding.TAU);
+      if (EventStatus.isUsedEvent(tauStatus)) {
+        numEvents++;
+        weightOfLocalEvents += 2;
       }
     }
     if (numEvents == 0) {
