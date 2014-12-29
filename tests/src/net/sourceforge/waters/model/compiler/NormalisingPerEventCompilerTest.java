@@ -40,11 +40,11 @@ public class NormalisingPerEventCompilerTest extends AbstractCompilerTest
   @Override
   void configure(final ModuleCompiler compiler)
   {
+    compiler.setMultiExceptionsEnabled(true);
     compiler.setNormalizationEnabled(true);
-    compiler.setUsingEventAlphabet(true);
     compiler.setOptimizationEnabled(false);
     compiler.setSourceInfoEnabled(true);
-    compiler.setMultiExceptionsEnabled(true);
+    compiler.setUsingEventAlphabet(true);
   }
 
   @Override
@@ -57,6 +57,14 @@ public class NormalisingPerEventCompilerTest extends AbstractCompilerTest
     final String[] culprit3 = {"'bufferB[1].c'", "'finishM[1]'"};
     compileError(module, null, EFSMControllabilityException.class,
                  culprit1, culprit2, culprit3);
+  }
+
+  @Override
+  public void testCompile_normalise1()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "compiler/efsm", "normalise1");
+    testCompile(module);
   }
 
   @Override

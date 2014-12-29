@@ -179,20 +179,6 @@ public abstract class AbstractCompilerTest
     testCompile(module);
   }
 
-  public void testCompile_normalise1()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module = loadModule("tests", "compiler/efsm", "normalise1");
-    testCompile(module);
-  }
-
-  public void testCompile_normalise2()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module = loadModule("tests", "compiler/efsm", "normalise2");
-    testCompile(module);
-  }
-
   public void testCompile_manwolfgoatcabbage()
     throws IOException, WatersException
   {
@@ -485,6 +471,12 @@ public abstract class AbstractCompilerTest
     testCompile(module);
   }
 
+  public void testCompile_normalise1()
+    throws IOException, WatersException
+  {
+    // Overridden in NormalisingCompilerTest and NormalisingPerEventCompilerTest.
+  }
+
   public void testCompile_nondetvar()
     throws IOException, WatersException
   {
@@ -775,7 +767,7 @@ public abstract class AbstractCompilerTest
     }
   }
 
-  private void testCompile(final ModuleProxy module)
+  protected void testCompile(final ModuleProxy module)
     throws IOException, WatersException
   {
     testCompile(module, null, false);
