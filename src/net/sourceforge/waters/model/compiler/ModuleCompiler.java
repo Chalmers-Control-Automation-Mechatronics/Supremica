@@ -154,7 +154,7 @@ public class ModuleCompiler extends AbortableCompiler
           mEFANormaliser = new EFANormaliser(modfactory, mCompilationInfo, intermediate);
           mEFANormaliser.setUsesEventNameBuilder(true);
           mEFANormaliser.setCreatesGuardAutomaton(true);
-          mEFANormaliser.setUsesEventAlphabet(false);
+          mEFANormaliser.setUsesEventAlphabet(mIsUsingEventAlphabet);
           intermediate = mEFANormaliser.compile();
           mEFANormaliser = null;
         }
