@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.compiler
-//# CLASS:   NormalisingOptimisingCompilerTest
+//# CLASS:   NormalisingPerEventCompilerTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -19,13 +19,13 @@ import net.sourceforge.waters.model.compiler.efa.EFSMControllabilityException;
 import net.sourceforge.waters.model.module.ModuleProxy;
 
 
-public class NormalisingOptimisingCompilerTest extends AbstractCompilerTest
+public class NormalisingPerEventCompilerTest extends AbstractCompilerTest
 {
   //#########################################################################
   //# Entry points in junit.framework.TestCase
   public static Test suite()
   {
-    return new TestSuite(NormalisingOptimisingCompilerTest.class);
+    return new TestSuite(NormalisingPerEventCompilerTest.class);
   }
 
   public static void main(final String[] args)
@@ -37,6 +37,16 @@ public class NormalisingOptimisingCompilerTest extends AbstractCompilerTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.model.compiler.AbstractCompilerTest
+  @Override
+  void configure(final ModuleCompiler compiler)
+  {
+    compiler.setMultiExceptionsEnabled(true);
+    compiler.setNormalizationEnabled(true);
+    compiler.setOptimizationEnabled(false);
+    compiler.setSourceInfoEnabled(true);
+    compiler.setUsingEventAlphabet(true);
+  }
+
   @Override
   public void testCompile_EFATransferLine()
     throws IOException, WatersException
@@ -50,19 +60,17 @@ public class NormalisingOptimisingCompilerTest extends AbstractCompilerTest
   }
 
   @Override
-  void configure(final ModuleCompiler compiler)
+  public void testCompile_normalise1()
+    throws IOException, WatersException
   {
-    compiler.setNormalizationEnabled(true);
-    compiler.setOptimizationEnabled(true);
-    compiler.setUsingEventAlphabet(false);
-    compiler.setSourceInfoEnabled(true);
-    compiler.setMultiExceptionsEnabled(true);
+    final ModuleProxy module = loadModule("tests", "compiler/efsm", "normalise1");
+    testCompile(module);
   }
 
   @Override
   String[] getTestSuffices()
   {
-    final String[] array = {"-norm", "-opt"};
+    final String[] array = {"-norm", "-pea"};
     return array;
   }
 }

@@ -43,7 +43,7 @@ public class OldCompilerTest extends AbstractCompilerTest
   @Override
   String[] getTestSuffices()
   {
-    final String[] array = { };
+    final String[] array = {"", ""};
     return array;
   }
 }

@@ -166,20 +166,16 @@ public class EFANormaliser extends AbortableCompiler
         final IdentifierProxy ident = e.getKey().getProxy();
         final EFAEventInfo info = e.getValue();
 
-        /*/ Old semantics
-        if (mUsesEventAlphabet)
-          info.createExplicitGuards();//*/
-
         info.makeDisjoint(ident);
         info.combineUpdates();
         info.generateEventNames(mComparator);
       }
       mEventNameBuilder = null;
 
-      //*/ Old semantics
+      // Old semantics
       if (mUsesEventAlphabet)
         for (final EFAEventInfo e : mEventMap.values())
-          e.createExplicitGuards(); //*/
+          e.createExplicitGuards();
 
       // End of Pass 3: Throw any accumulated exceptions
       if (mCompilationInfo.hasExceptions())
@@ -463,17 +459,18 @@ public class EFANormaliser extends AbortableCompiler
       throws VisitorException
     {
       try {
-        final GuardActionBlockProxy ga = edge.getGuardActionBlock();
-        if (ga == null) {
+        mCurrentGABlock = edge.getGuardActionBlock();
+        if (mCurrentGABlock == null) {
           mCurrentUpdate = ConstraintList.TRUE;
         } else {
-          visitGuardActionBlockProxy(ga);
+          visitGuardActionBlockProxy(mCurrentGABlock);
         }
         final LabelBlockProxy block = edge.getLabelBlock();
         visitLabelBlockProxy(block);
         return null;
       } finally {
         mCurrentUpdate = null;
+        mCurrentGABlock = null;
       }
     }
 
@@ -529,7 +526,7 @@ public class EFANormaliser extends AbortableCompiler
         if (mCurrentUpdate == null) {
           edecl.setBlocked(mCurrentComponent);
         } else {
-          edecl.addUpdate(mCurrentComponent, mCurrentUpdate);
+          edecl.addUpdate(mCurrentComponent, mCurrentUpdate, mCurrentGABlock);
         }
         return edecl;
       } catch (final UndefinedIdentifierException exception) {
@@ -577,9 +574,11 @@ public class EFANormaliser extends AbortableCompiler
       return null;
     }
 
+
     //#######################################################################
     //# Data Members
     private SimpleComponentProxy mCurrentComponent;
+    private GuardActionBlockProxy mCurrentGABlock;
     private ConstraintList mCurrentUpdate;
   }
 
@@ -989,7 +988,8 @@ public class EFANormaliser extends AbortableCompiler
      * @param  update     The update associated with the transition.
      */
     private void addUpdate(final SimpleComponentProxy comp,
-                           final ConstraintList update)
+                           final ConstraintList update,
+                           final GuardActionBlockProxy block)
     {
       if (!isBlocked()) {
         EFAUpdateInfo info = mMap.get(comp);
@@ -998,7 +998,7 @@ public class EFANormaliser extends AbortableCompiler
           mMap.put(comp, info);
           mList.add(info);
         }
-        info.addUpdate(update);
+        info.addUpdate(update, block);
       }
     }
 
@@ -1028,7 +1028,7 @@ public class EFANormaliser extends AbortableCompiler
             comp.getKind() == ComponentKind.PLANT) {
           setBlocked();
         } else {
-          addUpdate(comp, ConstraintList.TRUE);
+          addUpdate(comp, ConstraintList.TRUE, null);
         }
       }
     }
@@ -1302,14 +1302,17 @@ public class EFANormaliser extends AbortableCompiler
     {
       mComponent = comp;
       mUpdates = new ArrayList<>();
-      mMap = new HashMap<>();
+      mUpdateMap = new HashMap<>();
+      mGABlockMap = new HashMap<>();
     }
 
     //#######################################################################
     //# Simple Access
-    private void addUpdate(final ConstraintList update)
+    private void addUpdate(final ConstraintList update,
+                           final GuardActionBlockProxy gaBlock)
     {
       mUpdates.add(update);
+      mGABlockMap.put(update, gaBlock);
     }
 
     private List<ConstraintList> getUpdates()
@@ -1320,22 +1323,22 @@ public class EFANormaliser extends AbortableCompiler
     private void addEvents(final ConstraintList update,
                            final Collection<EFAIdentifier> events)
     {
-      EFAEventList list = mMap.get(update);
+      EFAEventList list = mUpdateMap.get(update);
       if (list == null) {
         list = new EFAEventList();
-        mMap.put(update, list);
+        mUpdateMap.put(update, list);
       }
       list.addAll(events);
     }
 
     private List<EFAIdentifier> getEvents(final ConstraintList update)
     {
-      return mMap.get(update);
+      return mUpdateMap.get(update);
     }
 
     private Map<ConstraintList,EFAEventList> getMap()
     {
-      return mMap;
+      return mUpdateMap;
     }
 
     private Set<EFAVariable> getPrimeVariables()
@@ -1371,7 +1374,7 @@ public class EFANormaliser extends AbortableCompiler
     private void initialiseBlankMap()
     {
       for (final ConstraintList update : mUpdates)
-        mMap.put(update, new EFAEventList());
+        mUpdateMap.put(update, new EFAEventList());
     }
 
     /**
@@ -1380,8 +1383,8 @@ public class EFANormaliser extends AbortableCompiler
      */
     private void initialiseOriginalMap(final EventDeclProxy event)
     {
-      for (final ConstraintList update : mMap.keySet())
-        mMap.get(update).add(new EFAIdentifier(event, update));
+      for (final ConstraintList update : mUpdateMap.keySet())
+        mUpdateMap.get(update).add(new EFAIdentifier(event, update));
     }
     //#######################################################################
     //# Interface java.lang.Comparable<EFAUpdateInfo>
@@ -1442,7 +1445,7 @@ public class EFANormaliser extends AbortableCompiler
       final Map<ConstraintList, EFAEventList> newMap = new HashMap<>();
 
       // For each entry 'x' of the original EFAUpdateInfo,
-      for (final Entry<ConstraintList, EFAEventList> x : mMap.entrySet())
+      for (final Entry<ConstraintList, EFAEventList> x : mUpdateMap.entrySet())
       {
         final ConstraintList key = x.getKey();
         final EFAEventList value0 = x.getValue();
@@ -1473,7 +1476,7 @@ public class EFANormaliser extends AbortableCompiler
       mUpdates.addAll(mCaughtGuards);
 
       // Reset the map.
-      mMap = newMap;
+      mUpdateMap = newMap;
     }
 
     /**
@@ -1622,7 +1625,7 @@ public class EFANormaliser extends AbortableCompiler
           for (final EFAVariable var : mPrimeVariables)
           {
             final EFSMControllabilityException ex =
-                    new EFSMControllabilityException(mComponent, var, ident);
+               new EFSMControllabilityException(mComponent, var, ident, null);
             mCompilationInfo.raise(ex);
           }
           return false;
@@ -1648,9 +1651,9 @@ public class EFANormaliser extends AbortableCompiler
     private List<ConstraintList> mUpdates;
 
     /**
-     * The list that maps the original updates to the new events.
+     * A map from the original updates to the new events.
      */
-    private Map<ConstraintList,EFAEventList> mMap;
+    private Map<ConstraintList,EFAEventList> mUpdateMap;
 
     /**
      * A list that contains the additional complementary guards which are not
@@ -1662,6 +1665,12 @@ public class EFANormaliser extends AbortableCompiler
      * A set that contains the prime variables used by this EFAUpdateInfo.
      */
     private Set<EFAVariable> mPrimeVariables;
+
+    /**
+     * A map from each original update to the guard action block from which
+     * the update originates.
+     */
+    private final Map<ConstraintList, GuardActionBlockProxy> mGABlockMap;
   }
 
 
