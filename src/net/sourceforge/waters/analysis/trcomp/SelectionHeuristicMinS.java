@@ -116,11 +116,10 @@ public class SelectionHeuristicMinS
         numEvents++;
       }
     }
-    if (numEvents == 0) {
-      return 1.0;
-    } else {
-      return numStates * numSharedEvents / numEvents;
-    }
+    final double value =
+      numEvents == 0 ? 1.0 : numStates * numSharedEvents / numEvents;
+    //getLogger().debug(getName() + "(" + candidate.getName() + ") = " + value);
+    return value;
   }
 
 
