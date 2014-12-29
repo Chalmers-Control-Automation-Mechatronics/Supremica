@@ -9,15 +9,7 @@
 
 package net.sourceforge.waters.model.analysis;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.LinkedList;
-import java.util.List;
-
 import net.sourceforge.waters.model.analysis.des.AutomatonBuilder;
-import net.sourceforge.waters.model.base.WatersRuntimeException;
-import net.sourceforge.waters.model.module.ParameterBindingProxy;
-import net.sourceforge.waters.model.printer.ModuleProxyPrinter;
 
 
 public abstract class AbstractSynchronousProductBuilderTest
@@ -40,34 +32,9 @@ public abstract class AbstractSynchronousProductBuilderTest
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractAutomatonBuilderTest
   @Override
-  protected String getExpectedName(final String desname,
-                                   final List<ParameterBindingProxy> bindings)
+  protected String getExpectedAutomatonName()
   {
-    try {
-      final String name;
-      final String ext;
-      final int dotpos = desname.indexOf('.');
-      if (dotpos >= 0) {
-        name = desname.substring(0, dotpos);
-        ext = desname.substring(dotpos);
-      } else {
-        name = desname;
-        ext = "";
-      }
-      final StringWriter writer = new StringWriter();
-      writer.write(name);
-      if (bindings != null) {
-        for (final ParameterBindingProxy binding : bindings) {
-          writer.write('-');
-          ModuleProxyPrinter.printProxy(writer, binding.getExpression());
-        }
-      }
-      writer.write("-sync");
-      writer.write(ext);
-      return writer.toString();
-    } catch (final IOException exception) {
-      throw new WatersRuntimeException(exception);
-    }
+    return EXPECTED_NAME;
   }
 
 
@@ -77,73 +44,88 @@ public abstract class AbstractSynchronousProductBuilderTest
     throws Exception
   {
     testSmallFactory2();
-    testTransferline__1();
-    testTransferline__1();
+    testTransferline1();
+    testTransferline1();
     testSmallFactory2u();
   }
 
   public void testStateOverflowException()
     throws Exception
   {
+    final AutomatonBuilder builder = getAutomatonBuilder();
     try {
-      final AutomatonBuilder builder = getAutomatonBuilder();
       builder.setNodeLimit(2);
-      testTransferline__1();
+      testTransferline1();
       fail("Expected overflow not caught!");
     } catch (final OverflowException exception) {
       assertEquals("Unexpected overflow kind!",
                    OverflowKind.STATE, exception.getOverflowKind());
+      final AnalysisResult result = builder.getAnalysisResult();
+      assertNotNull("Got NULL analysis result after exception!", result);
+      assertNotNull("No exception in analysis result after caught exception!",
+                    result.getException());
+      assertSame("Unexpected exception in analysis result!",
+                 exception, result.getException());
     }
   }
 
   public void testTransitionOverflowException()
     throws Exception
   {
+    final AutomatonBuilder builder = getAutomatonBuilder();
     try {
-      final AutomatonBuilder builder = getAutomatonBuilder();
       builder.setTransitionLimit(3);
-      testTransferline__1();
+      testTransferline1();
       fail("Expected overflow not caught!");
     } catch (final OverflowException exception) {
       assertEquals("Unexpected overflow kind!",
                    OverflowKind.TRANSITION, exception.getOverflowKind());
+      final AnalysisResult result = builder.getAnalysisResult();
+      assertNotNull("Got NULL analysis result after exception!", result);
+      assertNotNull("No exception in analysis result after caught exception!",
+                    result.getException());
+      assertSame("Unexpected exception in analysis result!",
+                 exception, result.getException());
     }
   }
 
 
   //#########################################################################
   //# Test Cases
+  public void testNondeterministicCombinations() throws Exception
+  {
+    runAutomatonBuilder("tests", "syncprod",
+                        "nondeterministic_combinations.wmod");
+  }
+
+  public void testOneEvent() throws Exception
+  {
+    runAutomatonBuilder("tests", "syncprod", "one_event.wmod");
+  }
+
+  public void testOrder() throws Exception
+  {
+    runAutomatonBuilder("tests", "syncprod", "order.wmod");
+  }
+
   public void testSmallFactory2() throws Exception
   {
-    runAutomatonBuilder("handwritten", "small_factory_2.wmod");
+    runAutomatonBuilder("tests", "syncprod", "small_factory_2.wmod");
   }
 
   public void testSmallFactory2u() throws Exception
   {
-    runAutomatonBuilder("handwritten", "small_factory_2u.wmod");
+    runAutomatonBuilder("tests", "syncprod", "small_factory_2u.wmod");
   }
 
-
-  public void testOrder() throws Exception
+  public void testTransferline1() throws Exception
   {
-    runAutomatonBuilder("tests", "nasty", "order.wmod");
+    runAutomatonBuilder("tests", "syncprod", "transferline_1.wmod");
   }
 
 
   //#########################################################################
-  //# Test Cases -- Parameterised
-  public void testTransferline__1() throws Exception
-  {
-    checkTransferline(1);
-  }
-
-  public void checkTransferline(final int n) throws Exception
-  {
-    final List<ParameterBindingProxy> bindings =
-      new LinkedList<ParameterBindingProxy>();
-    final ParameterBindingProxy binding = createBinding("N", n);
-    bindings.add(binding);
-    runAutomatonBuilder(bindings, "handwritten", "transferline.wmod");
-  }
+  //# Class Constants
+  private static final String EXPECTED_NAME = "sync";
 
 }

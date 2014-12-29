@@ -635,14 +635,12 @@ public class TRSynchronousProductBuilder
               break;
             }
           } else if (mStateCallback == null) {
-            for (int w = 0; w < mEncodedSource.length; w++) {
-              mEncodedTarget[w] = mEncodedSource[w];
-            }
+            System.arraycopy(mEncodedSource, 0, mEncodedTarget, 0,
+                             mEncodedSource.length);
             event.createSuccessorStatesEncoded(mEncodedTarget, this);
           } else {
-            for (int a = 0; a < mDecodedSource.length; a++) {
-              mDecodedTarget[a] = mDecodedSource[a];
-            }
+            System.arraycopy(mDecodedSource, 0, mDecodedTarget, 0,
+                             mDecodedSource.length);
             event.createSuccessorStatesDecoded(mDecodedTarget, this);
           }
         }
@@ -689,16 +687,21 @@ public class TRSynchronousProductBuilder
   private void createTransition(final int event, final int target)
     throws OverflowException
   {
-    if (target >= 0 &&
-        (event != EventEncoding.TAU || target != mCurrentSource)) {
-      if (event != mCurrentEvent) {
-        mCurrentEvent = event;
-        mCurrentTargets.clear();
-        mCurrentTargets.add(target);
-        mPreTransitionBuffer.addTransition(mCurrentSource, event, target);
-      } else if (mCurrentTargets.add(target)) {
-        mPreTransitionBuffer.addTransition(mCurrentSource, event, target);
+    if (target < 0) {
+      return;
+    } else if (target == mCurrentSource) {
+      final byte status = mOutputEventEncoding.getProperEventStatus(event);
+      if (EventStatus.isSelfloopOnlyEvent(status)) {
+        return;
       }
+    }
+    if (event != mCurrentEvent) {
+      mCurrentEvent = event;
+      mCurrentTargets.clear();
+      mCurrentTargets.add(target);
+      mPreTransitionBuffer.addTransition(mCurrentSource, event, target);
+    } else if (mCurrentTargets.add(target)) {
+      mPreTransitionBuffer.addTransition(mCurrentSource, event, target);
     }
   }
 

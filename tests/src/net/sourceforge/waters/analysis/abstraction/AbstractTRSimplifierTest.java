@@ -11,7 +11,6 @@ package net.sourceforge.waters.analysis.abstraction;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
@@ -369,18 +368,8 @@ public abstract class AbstractTRSimplifierTest
         enc.setTauEvent(tau);
       }
     }
-    final byte[] statusFromAttribs = getEventStatusReadFromAttributes();
     for (final EventProxy event : aut.getEvents()) {
-      final Map<String,String> attribs = event.getAttributes();
-      byte status = 0;
-      if (statusFromAttribs != null) {
-        for (final byte flag : statusFromAttribs) {
-          final String name = EventStatus.getStatusName(flag);
-          if (attribs.containsKey(name)) {
-            status |= flag;
-          }
-        }
-      }
+      final byte status = getEventStatusFromAttributes(event);
       enc.addEvent(event, translator, status);
     }
     final EventProxy alpha = getEvent(des, ALPHA);
@@ -396,22 +385,6 @@ public abstract class AbstractTRSimplifierTest
       mOmegaID = -1;
     }
     return enc;
-  }
-
-  /**
-   * Returns an array of status bits to be read from event attributes when
-   * creating an event encoding. For any status flag in the returned array,
-   * the {@link #createEventEncoding(ProductDESProxy, AutomatonProxy)
-   * createEventEncoding()} method will check the event's attribute map
-   * for an entry with the name indicated by a call to {@link
-   * EventStatus#getStatusName(byte) EventStatus.getStatusName()}, and
-   * if present, set the corresponding status bit in the event encoding.
-   * @return Array of status flags, or <CODE>null</CODE> to disable
-   *         reading of the attributes.
-   */
-  protected byte[] getEventStatusReadFromAttributes()
-  {
-    return STATUS_FROM_ATTRIBUTES;
   }
 
   /**
@@ -478,14 +451,5 @@ public abstract class AbstractTRSimplifierTest
 
   protected static final String BEFORE = "before";
   protected static final String AFTER = "after";
-
-  private static final byte[] STATUS_FROM_ATTRIBUTES = {
-    EventStatus.STATUS_LOCAL,
-    EventStatus.STATUS_SELFLOOP_ONLY,
-    EventStatus.STATUS_ALWAYS_ENABLED,
-    EventStatus.STATUS_BLOCKED,
-    EventStatus.STATUS_FAILING,
-    EventStatus.STATUS_UNUSED
-  };
 
 }

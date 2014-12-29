@@ -16,7 +16,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.NameNotFoundException;
@@ -43,6 +45,7 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
 public abstract class AbstractAnalysisTest extends AbstractWatersTest
@@ -251,6 +254,32 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
     return result;
   }
 
+  /**
+   * Returns a combination of states bits read from event attributes in order
+   * to create an event encoding. This method checks the event's
+   * controllability based on the event kind and the names of known status
+   * flags in the event's attribute map, and if present, sets the
+   * corresponding status bits.
+   * @return Status byte with relevant status bits set.
+   */
+  protected byte getEventStatusFromAttributes(final EventProxy event)
+  {
+    byte status;
+    if (event.getKind() == EventKind.CONTROLLABLE) {
+      status = EventStatus.STATUS_CONTROLLABLE;
+    } else {
+      status = EventStatus.STATUS_NONE;
+    }
+    final Map<String,String> attribs = event.getAttributes();
+    for (final byte flag : STATUS_FROM_ATTRIBUTES) {
+      final String name = EventStatus.getStatusName(flag);
+      if (attribs.containsKey(name)) {
+        status |= flag;
+      }
+    }
+    return status;
+  }
+
   protected AutomatonProxy findAutomaton(final ProductDESProxy des,
                                          final String name)
     throws NameNotFoundException
@@ -377,5 +406,17 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
   private ProductDESImporter mProductDESImporter;
 
   private boolean mProductDESIsDeterministic;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final byte[] STATUS_FROM_ATTRIBUTES = {
+    EventStatus.STATUS_LOCAL,
+    EventStatus.STATUS_SELFLOOP_ONLY,
+    EventStatus.STATUS_ALWAYS_ENABLED,
+    EventStatus.STATUS_BLOCKED,
+    EventStatus.STATUS_FAILING,
+    EventStatus.STATUS_UNUSED
+  };
 
 }

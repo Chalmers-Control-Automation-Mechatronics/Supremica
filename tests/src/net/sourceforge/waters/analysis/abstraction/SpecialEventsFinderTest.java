@@ -108,9 +108,9 @@ public class SpecialEventsFinderTest
   }
 
   @Override
-  protected byte[] getEventStatusReadFromAttributes()
+  protected byte getEventStatusFromAttributes(final EventProxy event)
   {
-    return null;
+    return EventStatus.STATUS_NONE;
   }
 
   @Override
@@ -162,7 +162,7 @@ public class SpecialEventsFinderTest
       final EventProxy event = enc.getProperEvent(e);
       if (event != null) {
         final Map<String,String> attribs = event.getAttributes();
-        for (final byte flag : STATUS_FROM_ATTRIBUTES) {
+        for (final byte flag : CHECKED_ATTRIBUTES) {
           final String name = EventStatus.getStatusName(flag);
           final boolean expected = attribs.containsKey(name);
           final boolean computed = (computedStatus[e] & flag) != 0;
@@ -177,7 +177,7 @@ public class SpecialEventsFinderTest
 
   //#########################################################################
   //# Class Constants
-  private static final byte[] STATUS_FROM_ATTRIBUTES = {
+  private static final byte[] CHECKED_ATTRIBUTES = {
     EventStatus.STATUS_SELFLOOP_ONLY,
     EventStatus.STATUS_ALWAYS_ENABLED,
     EventStatus.STATUS_BLOCKED,

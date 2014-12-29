@@ -80,7 +80,7 @@ public class MonolithicSynchronousProductBuilderTest
   //# Forbidden Events Test Cases
   public void testForbid() throws Exception
   {
-    runAutomatonBuilder("tests", "abstraction", "forbid1.wmod");
+    runAutomatonBuilder("tests", "syncprod", "forbid1.wmod");
   }
 
 
@@ -90,7 +90,7 @@ public class MonolithicSynchronousProductBuilderTest
   {
     try {
       mPruningDeadlocks = true;
-      runAutomatonBuilder("tests", "abstraction", "deadlockPruning.wmod");
+      runAutomatonBuilder("tests", "syncprod", "deadlockPruning.wmod");
     } finally {
       mPruningDeadlocks = false;
     }
@@ -100,7 +100,7 @@ public class MonolithicSynchronousProductBuilderTest
   {
     try {
       mPruningDeadlocks = true;
-      runAutomatonBuilder("tests", "nasty", "tip3pruning.wmod");
+      runAutomatonBuilder("tests", "syncprod", "tip3pruning.wmod");
     } finally {
       mPruningDeadlocks = false;
     }

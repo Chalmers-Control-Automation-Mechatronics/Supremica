@@ -23,8 +23,6 @@ import net.sourceforge.waters.model.analysis.AbstractSynchronousProductBuilderTe
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
-import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.IsomorphismChecker;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -80,45 +78,32 @@ public class TRSynchronousProductBuilderTest
     final EventEncoding enc = new EventEncoding();
     EventProxy tau = null;
     for (final EventProxy event : events) {
-      final EventKind kind = event.getKind();
-      final String name = event.getName();
-      if (kind != EventKind.PROPOSITION &&
-          name.startsWith(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
-        enc.addEvent(event, translator,
-                     EventStatus.STATUS_FAILING |
-                     EventStatus.STATUS_ALWAYS_ENABLED);
-      } else if (!event.isObservable()) {
+      final byte status = getEventStatusFromAttributes(event);
+      if (EventStatus.isLocalEvent(status)) {
         if (tau == null) {
           final ProductDESProxyFactory factory = getProductDESProxyFactory();
           tau = factory.createEventProxy
             (":tau", EventKind.UNCONTROLLABLE, false);
           enc.addSilentEvent(tau);
         }
-        enc.addEventAlias(event, tau, translator, EventStatus.STATUS_NONE);
+        enc.addEventAlias(event, tau, translator, status);
+      } else {
+        enc.addEvent(event, translator, status);
       }
     }
-    if (enc.getNumberOfProperEvents() > 1 || tau != null) {
-      try {
-        final EventProxy marking =
-          AbstractConflictChecker.getMarkingProposition(des);
-        enc.addEvent(marking, translator, EventStatus.STATUS_NONE);
-      } catch (final EventNotFoundException e) {
-        // No marking---never mind!
-      }
-      builder.setEventEncoding(enc);
-    }
+    builder.setEventEncoding(enc);
   }
 
   @Override
   protected void checkResult(final ProductDESProxy des,
                              final AutomatonProxy result,
-                             final ProductDESProxy expectedDES)
+                             final AutomatonProxy expected)
     throws Exception
   {
     final TRAutomatonProxy aut = (TRAutomatonProxy) result;
     final ListBufferTransitionRelation rel = aut.getTransitionRelation();
     rel.checkIntegrity();
-    super.checkResult(des, result, expectedDES);
+    super.checkResult(des, result, expected);
   }
 
 
@@ -126,12 +111,17 @@ public class TRSynchronousProductBuilderTest
   //# Selfloop Removal Test Cases
   public void testSyncSelfloop01() throws Exception
   {
-    runAutomatonBuilder("tests", "nasty", "syncselfloop_01.wmod");
+    runAutomatonBuilder("tests", "syncprod", "syncselfloop_01.wmod");
   }
 
   public void testSyncSelfloop02() throws Exception
   {
-    runAutomatonBuilder("tests", "nasty", "syncselfloop_02.wmod");
+    runAutomatonBuilder("tests", "syncprod", "syncselfloop_02.wmod");
+  }
+
+  public void testSyncSelfloop03() throws Exception
+  {
+    runAutomatonBuilder("tests", "syncprod", "syncselfloop_03.wmod");
   }
 
 
@@ -139,17 +129,17 @@ public class TRSynchronousProductBuilderTest
   //# Hiding Test Cases
   public void testHiding01() throws Exception
   {
-    runAutomatonBuilder("tests", "abstraction", "hiding01.wmod");
+    runAutomatonBuilder("tests", "syncprod", "hiding01.wmod");
   }
 
 
   //#########################################################################
   //# Forbidden Events Test Cases
-  public void testForbid() throws Exception
+  public void testForbid2() throws Exception
   {
     try {
       mPruningDeadlocks = true;
-      runAutomatonBuilder("tests", "abstraction", "forbid2.wmod");
+      runAutomatonBuilder("tests", "syncprod", "forbid2.wmod");
     } finally {
       mPruningDeadlocks = false;
     }
@@ -162,7 +152,7 @@ public class TRSynchronousProductBuilderTest
   {
     try {
       mPruningDeadlocks = true;
-      runAutomatonBuilder("tests", "abstraction", "deadlockPruning.wmod");
+      runAutomatonBuilder("tests", "syncprod", "deadlockPruning.wmod");
     } finally {
       mPruningDeadlocks = false;
     }
@@ -172,7 +162,7 @@ public class TRSynchronousProductBuilderTest
   {
     try {
       mPruningDeadlocks = true;
-      runAutomatonBuilder("tests", "nasty", "tip3pruning.wmod");
+      runAutomatonBuilder("tests", "syncprod", "tip3pruning.wmod");
     } finally {
       mPruningDeadlocks = false;
     }

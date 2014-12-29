@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -17,6 +18,7 @@ import net.sourceforge.waters.model.analysis.des.IsomorphismChecker;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
@@ -71,10 +73,26 @@ public abstract class AbstractAutomatonBuilderTest
     throws Exception
   {
     final ProductDESProxy des = getCompiledDES(bindings, path);
-    final int last = path.length - 1;
-    path[last] = getExpectedName(path[last], bindings);
-    final ProductDESProxy expect = getCompiledDES(bindings, path);
-    runAutomatonBuilderWithBindings(des, expect);
+    final Collection<AutomatonProxy> allAutomata = des.getAutomata();
+    final int numAutomata = allAutomata.size();
+    final String expectedName = getExpectedAutomatonName();
+    final Collection<AutomatonProxy> inputAutomata = new ArrayList<>(numAutomata - 1);
+    AutomatonProxy expectedAut = null;
+    for (final AutomatonProxy aut : allAutomata) {
+      if (aut.getName().equals(expectedName)) {
+        expectedAut = aut;
+      } else {
+        inputAutomata.add(aut);
+      }
+    }
+    assertNotNull("Expected result automaton with name '" + expectedName +
+                  "' not found in input DES!", expectedAut);
+    final ProductDESProxyFactory factory = getProductDESProxyFactory();
+    final String name = des.getName();
+    final Collection<EventProxy> events = des.getEvents();
+    final ProductDESProxy inputDES =
+      factory.createProductDESProxy(name, events, inputAutomata);
+    runAutomatonBuilderWithBindings(inputDES, expectedAut);
   }
 
 
@@ -128,19 +146,12 @@ public abstract class AbstractAutomatonBuilderTest
   }
 
   /**
-   * Returns the name of the file that contains the expected result
-   * for a given test.
-   * @param  desname
-   *           The name of the file containing the test data,
-   *           with or without path.
-   * @param  bindings
-   *           Parameter bindings used to instantiate the module.
-   * @return The base name of the file containing the expected result
-   *         for the test, without path and extension.
+   * Returns the name of the automaton that contains the expected test
+   * result. Any automata named something else are assumed to represent
+   * the input for the automaton builder under test, and the result is
+   * compared to the automaton with this name.
    */
-  protected abstract String getExpectedName
-    (final String desname,
-     final List<ParameterBindingProxy> bindings);
+  protected abstract String getExpectedAutomatonName();
 
   /**
    * Returns the extension used for all test files
@@ -154,20 +165,20 @@ public abstract class AbstractAutomatonBuilderTest
   //#########################################################################
   //# Auxiliary Methods
   protected void runAutomatonBuilderWithBindings(final ProductDESProxy des,
-                                                 final ProductDESProxy expect)
+                                                 final AutomatonProxy expected)
       throws Exception
   {
     getLogger().info("Checking " + des.getName() + " ...");
     configureAutomatonBuilder(des);
     mAutomatonBuilder.run();
     final AutomatonProxy result = mAutomatonBuilder.getComputedAutomaton();
-    checkResult(des, result, expect);
+    checkResult(des, result, expected);
     getLogger().info("Done " + des.getName());
   }
 
   protected void checkResult(final ProductDESProxy des,
                              final AutomatonProxy result,
-                             final ProductDESProxy expectedDES)
+                             final AutomatonProxy expected)
     throws Exception
   {
     final String name = des.getName();
@@ -175,9 +186,6 @@ public abstract class AbstractAutomatonBuilderTest
     final String comment = "Test output from " +
       ProxyTools.getShortClassName(mAutomatonBuilder) + '.';
     saveAutomaton(result, basename, comment);
-    final Collection<AutomatonProxy> expectedAutomata =
-      expectedDES.getAutomata();
-    final AutomatonProxy expected = expectedAutomata.iterator().next();
     mIsomorphismChecker.checkIsomorphism(result, expected);
   }
 
