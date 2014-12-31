@@ -970,10 +970,12 @@ public class TRSynchronousProductBuilder
       }
       a++;
     }
+    Collections.sort(list);
     return list;
   }
 
-  public boolean isMarked(final List<MarkingInfo> infoList, final int[] decoded)
+  public boolean isMarked(final List<MarkingInfo> infoList,
+                          final int[] decoded)
   {
     for (final MarkingInfo info : infoList) {
       final int a = info.getAutomatonIndex();
@@ -1010,6 +1012,7 @@ public class TRSynchronousProductBuilder
   //#########################################################################
   //# Inner Class MarkingInfo
   public static class MarkingInfo
+    implements Comparable<MarkingInfo>
   {
     //#######################################################################
     //# Constructor
@@ -1020,6 +1023,8 @@ public class TRSynchronousProductBuilder
       mAutomatonIndex = autIndex;
       mTransitionRelation = rel;
       mProposition = prop;
+      mProbability = (float) rel.getNumberOfMarkings(prop, true) /
+                     (float) rel.getNumberOfReachableStates();
     }
 
     //#######################################################################
@@ -1035,10 +1040,25 @@ public class TRSynchronousProductBuilder
     }
 
     //#######################################################################
+    //# Interface java.util.Comparable<MarkingInfo>
+    @Override
+    public int compareTo(final MarkingInfo info)
+    {
+      if (mProbability < info.mProbability) {
+        return -1;
+      } else if (mProbability > info.mProbability) {
+        return 1;
+      } else {
+        return mAutomatonIndex - info.mAutomatonIndex;
+      }
+    }
+
+    //#######################################################################
     //# Data Members
     private final int mAutomatonIndex;
     private final ListBufferTransitionRelation mTransitionRelation;
     private final int mProposition;
+    private final float mProbability;
   }
 
 
