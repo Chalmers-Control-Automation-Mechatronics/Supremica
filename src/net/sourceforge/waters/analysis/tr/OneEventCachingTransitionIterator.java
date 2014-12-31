@@ -100,6 +100,18 @@ public class OneEventCachingTransitionIterator implements TransitionIterator
   }
 
   @Override
+  public int getFirstEvent()
+  {
+    return mEvent;
+  }
+
+  @Override
+  public int getLastEvent()
+  {
+    return mEvent;
+  }
+
+  @Override
   public boolean advance()
   {
     while (mInnerIterator.advance()) {

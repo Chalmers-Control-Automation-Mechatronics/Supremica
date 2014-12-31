@@ -132,6 +132,11 @@ public class TRSynchronousProductBuilderTest
     runAutomatonBuilder("tests", "syncprod", "hiding01.wmod");
   }
 
+  public void testHiding02() throws Exception
+  {
+    runAutomatonBuilder("tests", "syncprod", "hiding02.wmod");
+  }
+
 
   //#########################################################################
   //# Forbidden Events Test Cases

@@ -69,6 +69,18 @@ public interface TransitionIterator
   public void resume(int from);
 
   /**
+   * Returns the number of the first event considered by this iterator,
+   * as passed to the {@link #resetEvents(int, int)} method.
+   */
+  public int getFirstEvent();
+
+  /**
+   * Returns the number of the last event considered by this iterator,
+   * as passed to the {@link #resetEvents(int, int)} method.
+   */
+  public int getLastEvent();
+
+  /**
    * Advances iteration. This method advances the iterator to next transition.
    * It needs to be called before trying to access the first transition in the
    * iteration.

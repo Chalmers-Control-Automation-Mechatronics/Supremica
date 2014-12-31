@@ -94,6 +94,18 @@ public class CachingTransitionIterator implements TransitionIterator
   }
 
   @Override
+  public int getFirstEvent()
+  {
+    return mInnerIterator.getFirstEvent();
+  }
+
+  @Override
+  public int getLastEvent()
+  {
+    return mInnerIterator.getLastEvent();
+  }
+
+  @Override
   public boolean advance()
   {
     while (mInnerIterator.advance()) {

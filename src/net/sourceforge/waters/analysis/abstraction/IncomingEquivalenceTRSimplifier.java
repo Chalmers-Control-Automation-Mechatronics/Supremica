@@ -1168,6 +1168,18 @@ public class IncomingEquivalenceTRSimplifier
     }
 
     @Override
+    public int getFirstEvent()
+    {
+      return EventEncoding.TAU;
+    }
+
+    @Override
+    public int getLastEvent()
+    {
+      return EventEncoding.TAU;
+    }
+
+    @Override
     public boolean advance()
     {
       int s;
@@ -1395,6 +1407,18 @@ public class IncomingEquivalenceTRSimplifier
     {
       final StateInfo info = mStateInfo[from];
       resumeClassReadIteration(info);
+    }
+
+    @Override
+    public int getFirstEvent()
+    {
+      return mTransitionIterator.getFirstEvent();
+    }
+
+    @Override
+    public int getLastEvent()
+    {
+      return mTransitionIterator.getLastEvent();
     }
 
     @Override
@@ -1627,6 +1651,19 @@ public class IncomingEquivalenceTRSimplifier
     }
 
     @Override
+    public int getFirstEvent()
+    {
+      return mEventIterator.getFirstEvent();
+    }
+
+    @Override
+    public int getLastEvent()
+    {
+      return mEventIterator.getLastEvent();
+    }
+
+
+    @Override
     public boolean advance()
     {
       int state;
@@ -1806,6 +1843,18 @@ public class IncomingEquivalenceTRSimplifier
     {
       mFromState = mStateInfo[from];
       resume();
+    }
+
+    @Override
+    public int getFirstEvent()
+    {
+      return mEventIterator.getFirstEvent();
+    }
+
+    @Override
+    public int getLastEvent()
+    {
+      return mEventIterator.getLastEvent();
     }
 
     @Override

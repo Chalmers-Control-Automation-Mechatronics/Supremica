@@ -535,6 +535,18 @@ public class TauClosure
     }
 
     @Override
+    public int getFirstEvent()
+    {
+      return EventEncoding.TAU;
+    }
+
+    @Override
+    public int getLastEvent()
+    {
+      return EventEncoding.TAU;
+    }
+
+    @Override
     public int getCurrentEvent()
     {
       return EventEncoding.TAU;
@@ -617,6 +629,18 @@ public class TauClosure
         mVisited.clear();
       }
       mCurrentState = -1;
+    }
+
+    @Override
+    public int getFirstEvent()
+    {
+      return mInner.getFirstEvent();
+    }
+
+    @Override
+    public int getLastEvent()
+    {
+      return mInner.getLastEvent();
     }
 
     @Override
@@ -830,6 +854,18 @@ public class TauClosure
     }
 
     @Override
+    public int getFirstEvent()
+    {
+      return mEventIterator.getFirstEvent();
+    }
+
+    @Override
+    public int getLastEvent()
+    {
+      return mEventIterator.getLastEvent();
+    }
+
+    @Override
     public boolean advance()
     {
       if (mEventIterator.advance()) {
@@ -962,6 +998,18 @@ public class TauClosure
     }
 
     @Override
+    public int getFirstEvent()
+    {
+      return mEventIterator.getFirstEvent();
+    }
+
+    @Override
+    public int getLastEvent()
+    {
+      return mEventIterator.getLastEvent();
+    }
+
+    @Override
     public boolean advance()
     {
       if (mStart) {
@@ -1091,6 +1139,18 @@ public class TauClosure
     public void resume(final int state)
     {
       resetState(state);
+    }
+
+    @Override
+    public int getFirstEvent()
+    {
+      return mEventIterator.getFirstEvent();
+    }
+
+    @Override
+    public int getLastEvent()
+    {
+      return mEventIterator.getLastEvent();
     }
 
     @Override

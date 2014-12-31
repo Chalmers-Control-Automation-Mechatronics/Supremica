@@ -23,11 +23,14 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
+import net.sourceforge.waters.analysis.tr.DefaultEventStatusProvider;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
+import net.sourceforge.waters.analysis.tr.EventStatusProvider;
 import net.sourceforge.waters.analysis.tr.IntArrayBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.PreTransitionBuffer;
+import net.sourceforge.waters.analysis.tr.StatusGroupTransitionIterator;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.TRSynchronousProductStateMap;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -488,8 +491,28 @@ public class TRSynchronousProductBuilder
         eventInfoList.add(info);
       }
     }
+
+    // Sort event info and merge local events
     Collections.sort(eventInfoList);
-    mEventInfo = eventInfoList;
+    mEventInfo = new ArrayList<>(eventInfoList.size());
+    final List<EventInfo> group = new ArrayList<>();
+    EventInfo current = null;
+    for (final EventInfo info : eventInfoList) {
+      if (current == null) {
+        current = info;
+        group.add(info);
+      } else if (current.isMergible(info)) {
+        group.add(info);
+      } else {
+        addMergedEventInfo(group);
+        group.clear();
+        current = info;
+        group.add(info);
+      }
+    }
+    addMergedEventInfo(group);
+
+    // Set up transition buffer
     final int numOutputEvents = mOutputEventEncoding.getNumberOfProperEvents();
     final int transitionLimit = getTransitionLimit();
     mPreTransitionBuffer =
@@ -572,6 +595,27 @@ public class TRSynchronousProductBuilder
 
   //#########################################################################
   //# Auxiliary Methods
+  private void addMergedEventInfo(final List<EventInfo> group)
+    throws OverflowException
+  {
+    switch (group.size()) {
+    case 0:
+      break;
+    case 1:
+      mEventInfo.addAll(group);
+      break;
+    default:
+      final EventInfo first = group.get(0);
+      final int a = first.getLocalAutomatonIndex();
+      final TRAutomatonProxy aut = mInputAutomata[a];
+      final DeadlockInfo deadlockInfo =
+        mDeadlockInfo == null ? null : mDeadlockInfo[a];
+      final EventInfo merged = new EventInfo(group, aut, deadlockInfo);
+      mEventInfo.add(merged);
+      break;
+    }
+  }
+
   private void storeInitialStates()
     throws OverflowException
   {
@@ -1015,6 +1059,33 @@ public class TRSynchronousProductBuilder
       mUpdateSequence = null;
     }
 
+    private EventInfo(final Collection<EventInfo> parts,
+                      final TRAutomatonProxy aut,
+                      final DeadlockInfo deadlockInfo)
+      throws OverflowException
+    {
+      mEvent = null;
+      mForbidden = mBlocked = mOutsideAlwaysEnabled = false;
+      final Collection<AutomatonEventInfo> autParts =
+        new ArrayList<>(parts.size());
+      for (final EventInfo part : parts) {
+        mOutputCode = part.mOutputCode;
+        assert part.mDisablingAutomata.size() == 1;
+        final AutomatonEventInfo autPart = part.mDisablingAutomata.get(0);
+        autParts.add(autPart);
+      }
+      final AutomatonEventInfo merged =
+        new AutomatonEventInfo(autParts, aut, deadlockInfo);
+      mDisablingAutomata = Collections.singletonList(merged);
+      if (merged.isSelfloopOnly()) {
+        mUpdatingAutomata = Collections.emptyList();
+        mUpdateSequence = null;
+      } else {
+        mUpdatingAutomata = mDisablingAutomata;
+        mUpdateSequence = merged;
+      }
+    }
+
     //#######################################################################
     //# Simple Access
     private int getOutputCode()
@@ -1035,6 +1106,29 @@ public class TRSynchronousProductBuilder
     private boolean isOutsideAlwaysEnabled()
     {
       return mOutsideAlwaysEnabled;
+    }
+
+    //#######################################################################
+    //# Merging of Local Events
+    private int getLocalAutomatonIndex()
+    {
+      if (mDisablingAutomata.size() == 1) {
+        final AutomatonEventInfo info = mDisablingAutomata.get(0);
+        return info.getAutomatonIndex();
+      } else {
+        return -1;
+      }
+    }
+
+    private boolean isMergible(final EventInfo info)
+    {
+      final int index = getLocalAutomatonIndex();
+      if (index >= 0) {
+        return index == info.getLocalAutomatonIndex() &&
+               mOutputCode == info.mOutputCode;
+      } else {
+        return false;
+      }
     }
 
     //#######################################################################
@@ -1137,9 +1231,19 @@ public class TRSynchronousProductBuilder
         info.mForbidden && info.mOutsideAlwaysEnabled;
       if (stronglyForbidden1 != stronglyForbidden2) {
         return stronglyForbidden1 ? -1 : 1;
-      } else {
-        return mOutputCode - info.mOutputCode;
       }
+      final int local1 = getLocalAutomatonIndex();
+      final int local2 = info.getLocalAutomatonIndex();
+      if (local1 != local2) {
+        if (local1 < 0) {
+          return 1;
+        } else if (local2 < 0) {
+          return -1;
+        } else {
+          return local1 - local2;
+        }
+      }
+      return mOutputCode - info.mOutputCode;
     }
 
     //#######################################################################
@@ -1184,12 +1288,46 @@ public class TRSynchronousProductBuilder
     {
       mAutomatonIndex = autIndex;
       final ListBufferTransitionRelation rel = aut.getTransitionRelation();
-      final int numStates = rel.getNumberOfStates();
+      mTransitionIterator = rel.createSuccessorsReadOnlyIterator();
+      mTransitionIterator.resetEvent(e);
+      countTransitions(rel, deadlockInfo);
+    }
+
+    private AutomatonEventInfo(final Collection<AutomatonEventInfo> parts,
+                               final TRAutomatonProxy aut,
+                               final DeadlockInfo deadlockInfo)
+      throws OverflowException
+    {
+      assert !parts.isEmpty();
+      final AutomatonEventInfo first = parts.iterator().next();
+      mAutomatonIndex = first.mAutomatonIndex;
+      final ListBufferTransitionRelation rel = aut.getTransitionRelation();
+      final int numEvents = rel.getNumberOfProperEvents();
+      final EventStatusProvider provider =
+        new DefaultEventStatusProvider(numEvents, 0);
+      for (int e = EventEncoding.TAU; e < numEvents; e++) {
+        final byte status = rel.getProperEventStatus(e);
+        if (!EventStatus.isUsedEvent(status)) {
+          provider.setProperEventStatus(e, status);
+        }
+      }
+      for (final AutomatonEventInfo part : parts) {
+        final int e = part.mTransitionIterator.getFirstEvent();
+        provider.setProperEventStatus(e, EventStatus.STATUS_LOCAL);
+      }
+      final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
+      mTransitionIterator = new StatusGroupTransitionIterator
+        (iter, provider, EventStatus.STATUS_LOCAL);
+      countTransitions(rel, deadlockInfo);
+    }
+
+    private void countTransitions(final ListBufferTransitionRelation rel,
+                                  final DeadlockInfo deadlockInfo)
+    {
       mDeterministic = true;
       mSelfloopOnly = true;
       mBlocked = true;
-      mTransitionIterator = rel.createSuccessorsReadOnlyIterator();
-      mTransitionIterator.resetEvent(e);
+      final int numStates = rel.getNumberOfStates();
       int numReachable = 0;
       int numEnabled = 0;
       for (int s = 0; s < numStates; s++) {
@@ -1217,6 +1355,11 @@ public class TRSynchronousProductBuilder
 
     //#######################################################################
     //# Simple Access
+    private int getAutomatonIndex()
+    {
+      return mAutomatonIndex;
+    }
+
     private boolean isDetermistic()
     {
       return mDeterministic;
@@ -1236,6 +1379,7 @@ public class TRSynchronousProductBuilder
     {
       mNextUpdate = next;
     }
+
 
     //#######################################################################
     //# State Expansion

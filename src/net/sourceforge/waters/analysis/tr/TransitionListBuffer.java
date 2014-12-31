@@ -1713,6 +1713,19 @@ public abstract class TransitionListBuffer
       resetState(state);
     }
 
+
+    @Override
+    public int getFirstEvent()
+    {
+      return mFirstEvent;
+    }
+
+    @Override
+    public int getLastEvent()
+    {
+      return mLastEvent;
+    }
+
     @Override
     public boolean advance()
     {
@@ -1963,6 +1976,18 @@ public abstract class TransitionListBuffer
     public void resume(final int state)
     {
       resetState(state);
+    }
+
+    @Override
+    public int getFirstEvent()
+    {
+      return mInnerIterator.getFirstEvent();
+    }
+
+    @Override
+    public int getLastEvent()
+    {
+      return mInnerIterator.getLastEvent();
     }
 
     @Override

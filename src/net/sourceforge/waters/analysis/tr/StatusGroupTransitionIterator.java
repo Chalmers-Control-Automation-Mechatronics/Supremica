@@ -128,6 +128,18 @@ public class StatusGroupTransitionIterator implements TransitionIterator
   }
 
   @Override
+  public int getFirstEvent()
+  {
+    return mFirstEvent;
+  }
+
+  @Override
+  public int getLastEvent()
+  {
+    return mLastEvent;
+  }
+
+  @Override
   public boolean advance()
   {
     if (mIndex >= mBoundaries.length) {
