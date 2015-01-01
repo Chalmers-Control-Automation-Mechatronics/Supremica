@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters EFA Compiler
 //# PACKAGE: net.sourceforge.waters.model.compiler.efa
-//# CLASS:   EFAUnifier
+//# CLASS:   EFANormaliser
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -76,12 +76,10 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
 
 
 /**
- * <P>A preprocessor for EFA modules.</P>
- *
  * <P>The EFA normaliser identifies the overall updates associated with
  * each event and produces a module where each event is associated with
- * a unique update formula shared over all automata. Events are renamed
- * as necessary to achieve this condition.</P>
+ * a unique update formula shared over all automata. If necessary, events
+ * are renamed in order to achieve this condition.</P>
  *
  * <P><STRONG>Algorithm</STRONG></P>
  *
@@ -95,7 +93,7 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
  *     </LI>
  * <LI>Make updates disjoint, combine updates and generate unique event
  *     identifiers.</LI>
- * <LI>Build output module.</LI>
+ * <LI>Build the output module.</LI>
  * </OL>
  *
  * @author Sahar Mohajerani, Robi Malik, Roger Su
@@ -104,7 +102,7 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
 public class EFANormaliser extends AbortableCompiler
 {
   //#########################################################################
-  //# Constructors
+  //# Constructor
   public EFANormaliser(final ModuleProxyFactory factory,
                     final CompilationInfo compilationInfo,
                     final ModuleProxy module)
@@ -203,14 +201,13 @@ public class EFANormaliser extends AbortableCompiler
     }
   }
 
-
+  //#########################################################################
+  //# Configuration
   public boolean getCreatesGuardAutomaton()
   {
     return mCreatesGuardAutomaton;
   }
 
-  //#########################################################################
-  //# Configuration
   public void setCreatesGuardAutomaton(final boolean create)
   {
     mCreatesGuardAutomaton = create;
@@ -990,7 +987,7 @@ public class EFANormaliser extends AbortableCompiler
     private void addUpdate(final SimpleComponentProxy comp,
                            final ConstraintList update,
                            final GuardActionBlockProxy block)
-    {
+    { //TODO
       if (!isBlocked()) {
         EFAUpdateInfo info = mMap.get(comp);
         if (info == null) {
@@ -1312,7 +1309,7 @@ public class EFANormaliser extends AbortableCompiler
                            final GuardActionBlockProxy gaBlock)
     {
       mUpdates.add(update);
-      mGABlockMap.put(update, gaBlock);
+      mGABlockMap.put(update, gaBlock); //TODO
     }
 
     private List<ConstraintList> getUpdates()
@@ -1347,7 +1344,7 @@ public class EFANormaliser extends AbortableCompiler
     }
 
     /**
-     * Makes sure that the field {@link #mPrimeVariables} is properly
+     * Ensures that the field {@link #mPrimeVariables} is properly
      * initiated.
      * <p>
      * The set would be null, if the method {@link #collectPrimeVariables()}
@@ -1386,6 +1383,8 @@ public class EFANormaliser extends AbortableCompiler
       for (final ConstraintList update : mUpdateMap.keySet())
         mUpdateMap.get(update).add(new EFAIdentifier(event, update));
     }
+
+
     //#######################################################################
     //# Interface java.lang.Comparable<EFAUpdateInfo>
     @Override
@@ -1396,7 +1395,7 @@ public class EFANormaliser extends AbortableCompiler
 
 
     //#######################################################################
-    //# Pass 3
+    //# Pass 3 //TODO
     /**
      * Collects all the prime variables used by an {@link EFAUpdateInfo}.
      *
@@ -1405,11 +1404,10 @@ public class EFANormaliser extends AbortableCompiler
     private Set<EFAVariable> collectPrimeVariables()
     {
       final EFAVariableCollector collector =
-                      new EFAVariableCollector(mOperatorTable, mRootContext);
+                       new EFAVariableCollector(mOperatorTable, mRootContext);
       final Set<EFAVariable> primeVariables = new HashSet<>();
       for (final ConstraintList constraint : mUpdates)
         collector.collectPrimedVariables(constraint, primeVariables);
-
       return primeVariables;
     }
 
@@ -1597,6 +1595,9 @@ public class EFANormaliser extends AbortableCompiler
      *         <LI>Condition: No prime variables</LI>
      *         </UL>
      * </OL>
+     * If the type of automaton and event matches one of the above conditions,
+     * but the associated updates contain prime variables, then exceptions
+     * would be thrown.<p>
      *
      * @param event The {@link EventDeclProxy} of interest
      *
@@ -1618,20 +1619,33 @@ public class EFANormaliser extends AbortableCompiler
 
       if (cKind == ComponentKind.PROPERTY || eKind == EventKind.UNCONTROLLABLE)
       {
-        mPrimeVariables = collectPrimeVariables();
-        if (!mPrimeVariables.isEmpty())
+        final EFAVariableCollector collector =
+                       new EFAVariableCollector(mOperatorTable, mRootContext);
+        Set<EFAVariable> primeVariables;
+
+        for (final Entry<ConstraintList, GuardActionBlockProxy> entry :
+                                                       mGABlockMap.entrySet())
         {
-          // Not controllable: Create an exception.
-          for (final EFAVariable var : mPrimeVariables)
+          final ConstraintList update = entry.getKey();
+          final GuardActionBlockProxy gaBlock = entry.getValue();
+
+          primeVariables = new HashSet<>();
+          collector.collectPrimedVariables(update, primeVariables);
+
+          if (!primeVariables.isEmpty())
           {
-            final EFSMControllabilityException ex =
-               new EFSMControllabilityException(mComponent, var, ident, null);
-            mCompilationInfo.raise(ex);
+            // Not controllable: Create an exception.
+            for (final EFAVariable var : primeVariables)
+            {
+              final EFSMControllabilityException ex =
+                             new EFSMControllabilityException(mComponent, var,
+                                                              ident, gaBlock);
+              mCompilationInfo.raise(ex);
+            }
+            return false;
           }
-          return false;
         }
-        else
-          return true;
+        return true;
       }
 
       return false;
@@ -1656,6 +1670,12 @@ public class EFANormaliser extends AbortableCompiler
     private Map<ConstraintList,EFAEventList> mUpdateMap;
 
     /**
+     * A map from each original update to the guard action block from which
+     * the update originates.
+     */
+    private final Map<ConstraintList, GuardActionBlockProxy> mGABlockMap;
+
+    /**
      * A list that contains the additional complementary guards which are not
      * associated to any transition.
      */
@@ -1665,12 +1685,6 @@ public class EFANormaliser extends AbortableCompiler
      * A set that contains the prime variables used by this EFAUpdateInfo.
      */
     private Set<EFAVariable> mPrimeVariables;
-
-    /**
-     * A map from each original update to the guard action block from which
-     * the update originates.
-     */
-    private final Map<ConstraintList, GuardActionBlockProxy> mGABlockMap;
   }
 
 
