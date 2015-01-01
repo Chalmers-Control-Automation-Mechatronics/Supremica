@@ -42,7 +42,7 @@ public class EFSMControllabilityException extends EvalException
           variable.getVariableName().toString() + "' on the " +
           isUncontrollable(component.getKind()) + "event '" +
           event.toString() + "'!",
-          location); // The location is the event identifier.
+          location); // The location is the guard action block.
   }
 
   //#########################################################################
