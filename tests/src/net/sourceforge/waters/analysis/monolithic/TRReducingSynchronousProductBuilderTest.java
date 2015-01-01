@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
-//# CLASS:   TRSynchronousProductBuilderTest
+//# CLASS:   TRReducingSynchronousProductBuilderTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -15,7 +15,7 @@ import junit.framework.TestSuite;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class TRSynchronousProductBuilderTest
+public class TRReducingSynchronousProductBuilderTest
   extends AbstractTRSynchronousProductBuilderTest
 {
 
@@ -23,7 +23,7 @@ public class TRSynchronousProductBuilderTest
   //# Entry points in junit.framework.TestCase
   public static Test suite() {
     final TestSuite testSuite =
-      new TestSuite(TRSynchronousProductBuilderTest.class);
+      new TestSuite(TRReducingSynchronousProductBuilderTest.class);
     return testSuite;
   }
 
@@ -37,10 +37,33 @@ public class TRSynchronousProductBuilderTest
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractAutomatonBuilderTest
   @Override
-  protected TRSynchronousProductBuilder
+  protected TRReducingSynchronousProductBuilder
     createAutomatonBuilder(final ProductDESProxyFactory factory)
   {
-    return new TRSynchronousProductBuilder();
+    return new TRReducingSynchronousProductBuilder();
+  }
+
+
+  //#########################################################################
+  //# Reducing Test Cases
+  public void testReducing01() throws Exception
+  {
+    runAutomatonBuilder("tests", "syncprod", "reducing_01.wmod");
+  }
+
+  public void testReducing02() throws Exception
+  {
+    runAutomatonBuilder("tests", "syncprod", "reducing_02.wmod");
+  }
+
+  public void testReducing03() throws Exception
+  {
+    runAutomatonBuilder("tests", "syncprod", "reducing_03.wmod");
+  }
+
+  public void testReducing04() throws Exception
+  {
+    runAutomatonBuilder("tests", "syncprod", "reducing_04.wmod");
   }
 
 }

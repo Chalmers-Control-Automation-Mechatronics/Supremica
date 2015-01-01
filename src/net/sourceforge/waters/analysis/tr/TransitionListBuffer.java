@@ -27,6 +27,7 @@ import java.util.Set;
 
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.ProxyTools;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
@@ -1651,6 +1652,16 @@ public abstract class TransitionListBuffer
     //#######################################################################
     //# Interface net.sourceforge.waters.tr.TransitionIterator
     @Override
+    public ReadOnlyIterator clone()
+    {
+      try {
+        return (ReadOnlyIterator) super.clone();
+      } catch (final CloneNotSupportedException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    }
+
+    @Override
     public void reset()
     {
       if (mFromState >= 0 && mFirstEvent <= mLastEvent) {
@@ -1839,6 +1850,12 @@ public abstract class TransitionListBuffer
     //#######################################################################
     //# Interface net.sourceforge.waters.tr.TransitionIterator
     @Override
+    public ModifyingIterator clone()
+    {
+      return (ModifyingIterator) super.clone();
+    }
+
+    @Override
     public boolean advance()
     {
       mPrevious = getCurrent();
@@ -1937,6 +1954,19 @@ public abstract class TransitionListBuffer
 
     //#########################################################################
     //# Interface net.sourceforge.waters.tr.TransitionIterator
+    @Override
+    public AllTransitionsIterator clone()
+    {
+      try {
+        final AllTransitionsIterator cloned =
+          (AllTransitionsIterator) super.clone();
+        cloned.mInnerIterator = mInnerIterator.clone();
+        return cloned;
+      } catch (final CloneNotSupportedException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    }
+
     @Override
     public void reset()
     {
@@ -2058,7 +2088,7 @@ public abstract class TransitionListBuffer
 
     //#########################################################################
     //# Data Members
-    private final TransitionIterator mInnerIterator;
+    private TransitionIterator mInnerIterator;
     private int mCurrentFromState;
 
   }

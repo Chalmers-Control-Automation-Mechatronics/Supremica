@@ -23,7 +23,15 @@ import java.util.NoSuchElementException;
  */
 
 public interface TransitionIterator
+  extends Cloneable
 {
+
+  /**
+   * Creates a copy of this transition iterator. The cloned iterator
+   * becomes an independent new iterator with the same capabilities as this
+   * transition iterator, and starts off in the same state.
+   */
+  public TransitionIterator clone();
 
   /**
    * Restarts this iterator to iterate over the same set of transitions

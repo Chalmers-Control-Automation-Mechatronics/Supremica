@@ -1528,7 +1528,9 @@ public class ListBufferTransitionRelation
                                             final int... flags)
   {
     if (mSuccessorBuffer != null) {
-      return new TauClosure(mSuccessorBuffer, flags, limit);
+      final TransitionIterator iter =
+        mSuccessorBuffer.createReadOnlyIteratorByStatus(flags);
+      return new TauClosure(mSuccessorBuffer, iter, limit);
     } else {
       throw createNoBufferException(CONFIG_SUCCESSORS);
     }
@@ -1580,7 +1582,9 @@ public class ListBufferTransitionRelation
                                               final int... flags)
   {
     if (mPredecessorBuffer != null) {
-      return new TauClosure(mPredecessorBuffer, flags, limit);
+      final TransitionIterator iter =
+        mPredecessorBuffer.createReadOnlyIteratorByStatus(flags);
+      return new TauClosure(mPredecessorBuffer, iter, limit);
     } else {
       throw createNoBufferException(CONFIG_PREDECESSORS);
     }

@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.tr;
 import gnu.trove.set.hash.TIntHashSet;
 
 import net.sourceforge.waters.model.base.ProxyTools;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 
 
 /**
@@ -49,6 +50,20 @@ public class OneEventCachingTransitionIterator implements TransitionIterator
 
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.tr.TransitionIterator
+  @Override
+  public OneEventCachingTransitionIterator clone()
+  {
+    try {
+      final OneEventCachingTransitionIterator cloned =
+        (OneEventCachingTransitionIterator) super.clone();
+      cloned.mInnerIterator = mInnerIterator.clone();
+      cloned.mVisited = new TIntHashSet(mVisited);
+      return cloned;
+    } catch (final CloneNotSupportedException exception) {
+      throw new WatersRuntimeException(exception);
+    }
+  }
+
   @Override
   public void reset()
   {
@@ -193,7 +208,7 @@ public class OneEventCachingTransitionIterator implements TransitionIterator
 
   //#########################################################################
   //# Data Members
-  private final TransitionIterator mInnerIterator;
+  private TransitionIterator mInnerIterator;
   private TIntHashSet mVisited;
   private int mEvent;
 

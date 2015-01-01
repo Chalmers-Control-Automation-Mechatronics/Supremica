@@ -17,6 +17,7 @@ import gnu.trove.stack.array.TIntArrayStack;
 import java.util.NoSuchElementException;
 
 import net.sourceforge.waters.model.base.ProxyTools;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 
 
 /**
@@ -74,13 +75,11 @@ public class TauClosure
    * does not update automatically when the transition relation changes.
    * @param  buffer     The transition list buffer containing the transitions
    *                    for which tau-closure is computed.
-   * @param  flags      Status flags defining the events considered as local
-   *                    (i.e., tau) by this tau-closure, or <CODE>null</CODE>
-   *                    to use only the standard {@link EventEncoding#TAU}
-   *                    event. The arguments are used in the same way as
-   *                    as passed to the {@link
-   *                    StatusGroupTransitionIterator#StatusGroupTransitionIterator(TransitionIterator, EventStatusProvider, int...)
-   *                    StatusGroupTransitionIterator} constructor.
+   * @param  iter       A transition iterator that defines the transitions
+   *                    to be considered in the tau closure. A value of
+   *                    <CODE>null</CODE> requests a tau closure over the
+   *                    standard silent transitions with code
+   *                    {@link EventEncoding#TAU}.
    * @param  limit      The maximum number of transitions that can be stored
    *                    in the tau-closure. If the number of computed
    *                    tau-transitions exceeds the limit, precomputation is
@@ -89,27 +88,27 @@ public class TauClosure
    *                    always to be computed on the fly.
    */
   public TauClosure(final TransitionListBuffer buffer,
-                    final int[] flags,
+                    final TransitionIterator iter,
                     int limit)
   {
     mTransitionBuffer = buffer;
-    mStatusFlags = flags;
+    mIteratorTemplate = iter;
     if (limit > 0) {
       final int numStates = mTransitionBuffer.getNumberOfStates();
       final int[][] trans = new int[numStates][];
       final TransitionIterator inner = createInnerIterator();
-      final TransitionIterator iter =
+      final TransitionIterator onTheFly =
         new OnTheFlyTauClosureIterator(mTransitionBuffer, inner);
       final TIntArrayList list = new TIntArrayList();
       for (int state = 0; state < numStates; state++) {
-        iter.resetState(state);
-        iter.advance();
-        while (iter.advance()) {
+        onTheFly.resetState(state);
+        onTheFly.advance();
+        while (onTheFly.advance()) {
           if (--limit == 0) {
             mStoredTransitions = null;
             return;
           }
-          final int succ = iter.getCurrentToState();
+          final int succ = onTheFly.getCurrentToState();
           list.add(succ);
         }
         if (list.isEmpty()) {
@@ -469,12 +468,12 @@ public class TauClosure
   //# Auxiliary Methods
   private TransitionIterator createInnerIterator()
   {
-    if (mStatusFlags == null) {
+    if (mIteratorTemplate == null) {
       final TransitionIterator inner = mTransitionBuffer.createReadOnlyIterator();
       inner.resetEvent(EventEncoding.TAU);
       return inner;
     } else {
-      return mTransitionBuffer.createReadOnlyIteratorByStatus(mStatusFlags);
+      return mIteratorTemplate.clone();
     }
   }
 
@@ -494,6 +493,16 @@ public class TauClosure
 
     //#######################################################################
     //# Interface net.sourceforge.waters.analysis.tr.TransitionIterator
+    @Override
+    public AbstractTauClosureIterator clone()
+    {
+      try {
+        return (AbstractTauClosureIterator) super.clone();
+      } catch (final CloneNotSupportedException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    }
+
     @Override
     public void resetEvent(final int event)
     {
@@ -619,6 +628,17 @@ public class TauClosure
     //#######################################################################
     //# Interface net.sourceforge.waters.analysis.tr.TransitionIterator
     @Override
+    public OnTheFlyTauClosureIterator clone()
+    {
+      final OnTheFlyTauClosureIterator cloned =
+        (OnTheFlyTauClosureIterator) super.clone();
+      cloned.mStack = new TIntArrayStack(mStack);
+      cloned.mInner = mInner.clone();
+      cloned.mVisited = new TIntHashSet(mVisited);
+      return cloned;
+    }
+
+    @Override
     public void reset()
     {
       mStack.clear();
@@ -705,8 +725,8 @@ public class TauClosure
     //#######################################################################
     //# Data Members
     private final TransitionListBuffer mTransitionBuffer;
-    private final TIntStack mStack;
-    private final TransitionIterator mInner;
+    private TIntStack mStack;
+    private TransitionIterator mInner;
 
     private TIntHashSet mVisited;
     private int mCurrentState;
@@ -804,6 +824,20 @@ public class TauClosure
 
     //#######################################################################
     //# Interface net.sourceforge.waters.analysis.tr.TransitionIterator
+    @Override
+    public PreEventClosureTransitionIterator clone()
+    {
+      try {
+        final PreEventClosureTransitionIterator cloned =
+          (PreEventClosureTransitionIterator) super.clone();
+        cloned.mTauIterator = mTauIterator.clone();
+        cloned.mEventIterator = mEventIterator.clone();
+        return cloned;
+      } catch (final CloneNotSupportedException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    }
+
     @Override
     public void reset()
     {
@@ -932,8 +966,8 @@ public class TauClosure
     //# Data Members
     private int mFromState;
 
-    private final TransitionIterator mTauIterator;
-    private final TransitionIterator mEventIterator;
+    private TransitionIterator mTauIterator;
+    private TransitionIterator mEventIterator;
 
   }
 
@@ -956,6 +990,20 @@ public class TauClosure
 
     //#######################################################################
     //# Interface net.sourceforge.waters.analysis.tr.TransitionIterator
+    @Override
+    public PostEventClosureTransitionIterator clone()
+    {
+      try {
+        final PostEventClosureTransitionIterator cloned =
+          (PostEventClosureTransitionIterator) super.clone();
+        cloned.mTauIterator = mTauIterator.clone();
+        cloned.mEventIterator = mEventIterator.clone();
+        return cloned;
+      } catch (final CloneNotSupportedException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    }
+
     @Override
     public void reset()
     {
@@ -1077,8 +1125,8 @@ public class TauClosure
     private int mFromState;
     private boolean mStart = true;
 
-    private final TransitionIterator mEventIterator;
-    private final TransitionIterator mTauIterator;
+    private TransitionIterator mEventIterator;
+    private TransitionIterator mTauIterator;
 
   }
 
@@ -1100,6 +1148,21 @@ public class TauClosure
 
     //#######################################################################
     //# Interface net.sourceforge.waters.analysis.tr.TransitionIterator
+    @Override
+    public FullEventClosureTransitionIterator clone()
+    {
+      try {
+        final FullEventClosureTransitionIterator cloned =
+          (FullEventClosureTransitionIterator) super.clone();
+        cloned.mTauIterator1 = mTauIterator1.clone();
+        cloned.mEventIterator = mEventIterator.clone();
+        cloned.mTauIterator2 = mTauIterator2.clone();
+        return cloned;
+      } catch (final CloneNotSupportedException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    }
+
     @Override
     public void reset()
     {
@@ -1233,9 +1296,9 @@ public class TauClosure
     private int mFromState;
     private boolean mStart;
 
-    private final TransitionIterator mTauIterator1;
-    private final TransitionIterator mEventIterator;
-    private final TransitionIterator mTauIterator2;
+    private TransitionIterator mTauIterator1;
+    private TransitionIterator mEventIterator;
+    private TransitionIterator mTauIterator2;
 
   }
 
@@ -1247,11 +1310,12 @@ public class TauClosure
    */
   private final TransitionListBuffer mTransitionBuffer;
   /**
-   * Sequence of status flags defining the events to be considered as local
-   * and included in the closure. A value of <CODE>null</CODE> indicates
-   * the only the standard {@link EventEncoding#TAU} event is used.
+   * A template iterator that defines what transitions are covered in the
+   * tau closure. This iterator is not used directly, it is copied using
+   * {@link TransitionIterator#clone()} when creating iterators over the
+   * tau closure.
    */
-  private int[] mStatusFlags;
+  private TransitionIterator mIteratorTemplate;
   /**
    * Arrays of stored tau-successors for each state.
    * The state itself is never explicitly stored, although it is returned

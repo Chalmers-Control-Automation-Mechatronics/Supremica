@@ -9,8 +9,6 @@
 
 package net.sourceforge.waters.analysis.trcomp;
 
-import java.util.List;
-
 import net.sourceforge.waters.analysis.compositional.ChainSelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
@@ -136,9 +134,9 @@ public class SelectionHeuristicMinSyncA
       final EventEncoding enc = syncBuilder.getEventEncoding();
       final EventProxy prop = enc.getProposition
         (AbstractTRCompositionalAnalyzer.PRECONDITION_MARKING);
-      mMarkingInfo = syncBuilder.createMarkingInfo(prop);
+      mMarkingInfo = syncBuilder.getMarkingInfo(prop);
     }
-    if (syncBuilder.isMarked(mMarkingInfo, decoded)) {
+    if (mMarkingInfo.isMarkedStateDecoded(decoded)) {
       mCount += mAlphaWeight;
     } else {
       mCount += mNonAlphaWeight;
@@ -154,7 +152,7 @@ public class SelectionHeuristicMinSyncA
   //# Data Members
   private final int mAlphaWeight = 1;
   private final int mNonAlphaWeight = 0;
-  private List<TRSynchronousProductBuilder.MarkingInfo> mMarkingInfo;
+  private TRSynchronousProductBuilder.MarkingInfo mMarkingInfo;
   private int mCurrentMinimum = Integer.MAX_VALUE;
   private int mCount = 0;
 

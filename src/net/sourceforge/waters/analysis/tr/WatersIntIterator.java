@@ -25,7 +25,14 @@ package net.sourceforge.waters.analysis.tr;
  */
 
 public interface WatersIntIterator
+  extends Cloneable
 {
+  /**
+   * Creates a copy of this iterator. The cloned iterator becomes an
+   * independent new iterator with the same capabilities as this iterator,
+   * and starts off in the same state.
+   */
+  public WatersIntIterator clone();
 
   /**
    * Resets the iteration to start iterating over the underlying collection

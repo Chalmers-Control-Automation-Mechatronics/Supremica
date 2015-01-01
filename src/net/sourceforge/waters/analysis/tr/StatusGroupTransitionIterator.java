@@ -11,6 +11,8 @@ package net.sourceforge.waters.analysis.tr;
 
 import gnu.trove.list.array.TIntArrayList;
 
+import net.sourceforge.waters.model.base.WatersRuntimeException;
+
 
 /**
  * <P>A {@link TransitionIterator} that can iterate over groups of events
@@ -80,6 +82,19 @@ public class StatusGroupTransitionIterator implements TransitionIterator
 
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.tr.TransitionIterator
+  @Override
+  public StatusGroupTransitionIterator clone()
+  {
+    try {
+      final StatusGroupTransitionIterator cloned =
+        (StatusGroupTransitionIterator) super.clone();
+      cloned.mInnerIterator = mInnerIterator.clone();
+      return cloned;
+    } catch (final CloneNotSupportedException exception) {
+      throw new WatersRuntimeException(exception);
+    }
+  }
+
   @Override
   public void reset()
   {
@@ -273,7 +288,7 @@ public class StatusGroupTransitionIterator implements TransitionIterator
 
   //#########################################################################
   //# Data Members
-  private final TransitionIterator mInnerIterator;
+  private TransitionIterator mInnerIterator;
   private int[] mBoundaries;
   private int mFirstEvent;
   private int mLastEvent;

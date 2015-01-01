@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import net.sourceforge.waters.model.base.ProxyTools;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 
 
 /**
@@ -622,6 +623,13 @@ public class IntListBuffer
    */
   public interface Iterator extends WatersIntIterator
   {
+    /**
+     * Creates a copy of this iterator. The cloned iterator becomes an
+     * independent new iterator with the same capabilities as this iterator,
+     * and starts off in the same state.
+     */
+    @Override
+    public Iterator clone();
 
     /**
      * Resets iteration to the start of the given list.
@@ -647,6 +655,7 @@ public class IntListBuffer
      * iterator.
      */
     public void setCurrentData(int data);
+
   }
 
 
@@ -668,6 +677,16 @@ public class IntListBuffer
 
     //#########################################################################
     //# Interface WatersIntIterator
+    @Override
+    public ReadOnlyIterator clone()
+    {
+      try {
+        return (ReadOnlyIterator) super.clone();
+      } catch (final CloneNotSupportedException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    }
+
     @Override
     public void reset()
     {
@@ -766,6 +785,16 @@ public class IntListBuffer
 
     //#########################################################################
     //# Interface WatersIntIterator
+    @Override
+    public ModifyingIterator clone()
+    {
+      try {
+        return (ModifyingIterator) super.clone();
+      } catch (final CloneNotSupportedException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    }
+
     @Override
     public void reset()
     {

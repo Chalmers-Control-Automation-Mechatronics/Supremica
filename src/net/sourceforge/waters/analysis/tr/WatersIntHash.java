@@ -317,6 +317,16 @@ abstract public class WatersIntHash
     //######################################################################
     //# Interface net.sourceforge.waters.analysis.tr.WatersIntIterator
     @Override
+    public HashIterator clone()
+    {
+      try {
+        return (HashIterator) super.clone();
+      } catch (final CloneNotSupportedException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    }
+
+    @Override
     public void reset()
     {
       mIndex = -1;
