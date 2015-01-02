@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ns2:ProductDES Name="normalise1" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
+	<Comment>This system demonstrates the difference in the output DES when normalisation is enabled.</Comment>
 	<ns2:EventList>
 		<ns2:Event Kind="CONTROLLABLE" Name="e.{1&lt;=x,x'==1}"/>
 		<ns2:Event Kind="CONTROLLABLE" Name="e.{1&lt;=y,x'==1}"/>
