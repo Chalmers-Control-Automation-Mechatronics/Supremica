@@ -585,6 +585,12 @@ public abstract class AbstractCompilerTest
     compileError(module, ActionSyntaxException.class, "Assignment operator =");
   }
 
+  public void testCompile_controllability()
+    throws IOException, WatersException
+  {
+    // Overridden in NormalisingCompilerTest only.
+  }
+
   public void testCompile_edge0()
     throws IOException, WatersException
   {
@@ -814,8 +820,7 @@ public abstract class AbstractCompilerTest
       if (expectedFileName.exists() || i == 3) {
         compare(des, expectedFileName);
         break;
-      } else
-        continue;
+      } else continue;
     }
   }
 

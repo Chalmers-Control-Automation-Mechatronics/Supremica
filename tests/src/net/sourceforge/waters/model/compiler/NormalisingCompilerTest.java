@@ -33,7 +33,6 @@ public class NormalisingCompilerTest extends AbstractCompilerTest
     junit.textui.TestRunner.run(suite());
   }
 
-
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.model.compiler.AbstractCompilerTest
@@ -48,8 +47,15 @@ public class NormalisingCompilerTest extends AbstractCompilerTest
   }
 
   @Override
-  public void testCompile_EFATransferLine()
-    throws IOException, WatersException
+  public void testCompile_normalise1() throws IOException, WatersException
+  {
+    final ModuleProxy module =
+                          loadModule("tests", "compiler/efsm", "normalise1");
+    testCompile(module);
+  }
+
+  @Override
+  public void testCompile_EFATransferLine() throws IOException, WatersException
   {
     final ModuleProxy module = loadModule("efa", "transferline_efa");
     final String[] culprit1 = {"'bufferA[1].c'", "'acceptT[0]'"};
@@ -60,11 +66,12 @@ public class NormalisingCompilerTest extends AbstractCompilerTest
   }
 
   @Override
-  public void testCompile_normalise1()
-    throws IOException, WatersException
+  public void testCompile_controllability() throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "compiler/efsm", "normalise1");
-    testCompile(module);
+    final ModuleProxy module = loadModule("tests/compiler/efsm",
+                                          "controllability");
+    final String[] culprit = {"'x'", "'event'"};
+    compileError(module, null, EFSMControllabilityException.class, culprit);
   }
 
   @Override
