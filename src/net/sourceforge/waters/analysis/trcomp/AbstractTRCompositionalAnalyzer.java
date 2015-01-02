@@ -33,6 +33,7 @@ import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult
 import net.sourceforge.waters.analysis.compositional.CompositionalVerificationResult;
 import net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
+import net.sourceforge.waters.analysis.monolithic.TRAbstractSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductResult;
 import net.sourceforge.waters.analysis.tr.DuplicateFreeQueue;
@@ -108,7 +109,6 @@ public abstract class AbstractTRCompositionalAnalyzer
       getSelectionHeuristicFactory().getDefaultValue();
     mSelectionHeuristic = heu.createDecisiveHeuristic();
     mSpecialEventsListener = new PartitioningListener();
-    mSynchronousProductBuilder = new TRSynchronousProductBuilder();
     mMonolithicAnalyzer = mono;
   }
 
@@ -449,24 +449,6 @@ public abstract class AbstractTRCompositionalAnalyzer
   }
 
   /**
-   * Sets whether deadlock states are pruned in synchronous products.
-   * @see TRSynchronousProductBuilder#setPruningDeadlocks(boolean)
-   */
-  public void setPruningDeadlocks(final boolean pruning)
-  {
-    mSynchronousProductBuilder.setPruningDeadlocks(pruning);
-  }
-
-  /**
-   * Returns whether deadlock states are pruned.
-   * @see #setPruningDeadlocks(boolean) setPruningDeadlocks()
-   */
-  public boolean isPruningDeadlocks()
-  {
-    return mSynchronousProductBuilder.getPruningDeadlocks();
-  }
-
-  /**
    * Sets whether counterexample checking is enabled.
    * If enabled, the generated counterexample is checked for correctness
    * after each step during counterexample. This is a very slow process,
@@ -629,11 +611,8 @@ public abstract class AbstractTRCompositionalAnalyzer
     mSpecialEventsFinder.setAlwaysEnabledEventsDetected(isAlwaysEnabledEventsUsed());
 
     final KindTranslator translator = getKindTranslator();
+    mSynchronousProductBuilder = createSynchronousProductBuilder();
     mSynchronousProductBuilder.setDetailedOutputEnabled(true);
-    mSynchronousProductBuilder.setKindTranslator(translator);
-    mSynchronousProductBuilder.setRemovingSelfloops(true);
-    mSynchronousProductBuilder.setNodeLimit(mInternalStateLimit);
-    mSynchronousProductBuilder.setTransitionLimit(mInternalTransitionLimit);
 
     final ModelVerifier mono = getMonolithicVerifier();
     mono.setKindTranslator(translator);
@@ -711,6 +690,7 @@ public abstract class AbstractTRCompositionalAnalyzer
     super.tearDown();
     mSelectionHeuristic.setContext(null);
     mTRSimplifier = null;
+    mSynchronousProductBuilder = null;
     mSpecialEventsFinder = null;
     mAbstractionSequence = null;
     mIntermediateAbstractionSequence = null;
@@ -783,6 +763,19 @@ public abstract class AbstractTRCompositionalAnalyzer
     throws AnalysisException
   {
     return false;
+  }
+
+  protected TRAbstractSynchronousProductBuilder createSynchronousProductBuilder()
+  {
+    final KindTranslator translator = getKindTranslator();
+    final TRAbstractSynchronousProductBuilder builder =
+      new TRSynchronousProductBuilder();
+    builder.setDetailedOutputEnabled(true);
+    builder.setKindTranslator(translator);
+    builder.setRemovingSelfloops(true);
+    builder.setNodeLimit(mInternalStateLimit);
+    builder.setTransitionLimit(mInternalTransitionLimit);
+    return builder;
   }
 
 
@@ -987,9 +980,8 @@ public abstract class AbstractTRCompositionalAnalyzer
         final List<TRAutomatonProxy> automata = candidate.getAutomata();
         final List<TRAbstractionStep> preds = getAbstractionSteps(automata);
         final EventEncoding enc = candidate.getEventEncoding();
-        final TRAbstractionStep step =
-          new TRAbstractionStepSync(preds, enc, factory,
-                                    mSynchronousProductBuilder, syncResult);
+        final TRAbstractionStep step = new TRAbstractionStepSync
+            (preds, enc, factory, mSynchronousProductBuilder, syncResult);
         mIntermediateAbstractionSequence.append(step);
       }
       // Simplify ...
@@ -1752,7 +1744,7 @@ public abstract class AbstractTRCompositionalAnalyzer
   private SpecialEventsFinder mSpecialEventsFinder;
   private TRToolCreator<TransitionRelationSimplifier> mTRSimplifierCreator;
   private TransitionRelationSimplifier mTRSimplifier;
-  private final TRSynchronousProductBuilder mSynchronousProductBuilder;
+  private TRAbstractSynchronousProductBuilder mSynchronousProductBuilder;
   private ModelAnalyzer mMonolithicAnalyzer;
 
   // Data Structures

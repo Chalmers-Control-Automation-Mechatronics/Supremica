@@ -35,6 +35,8 @@ import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult;
+import net.sourceforge.waters.analysis.monolithic.TRAbstractSynchronousProductBuilder;
+import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -106,7 +108,6 @@ public class TRCompositionalConflictChecker
     super(model,
           ConflictKindTranslator.getInstanceControllable(),
           new NativeConflictChecker(ProductDESElementFactory.getInstance()));
-    setPruningDeadlocks(true);
   }
 
 
@@ -141,6 +142,24 @@ public class TRCompositionalConflictChecker
   {
     final VerificationResult result = getAnalysisResult();
     return (ConflictTraceProxy) result.getCounterExample();
+  }
+
+  /**
+   * Sets whether deadlock states are pruned in synchronous products.
+   * @see TRSynchronousProductBuilder#setPruningDeadlocks(boolean)
+   */
+  public void setPruningDeadlocks(final boolean pruning)
+  {
+    mPruningDeadlocks = pruning;
+  }
+
+  /**
+   * Returns whether deadlock states are pruned.
+   * @see #setPruningDeadlocks(boolean) setPruningDeadlocks()
+   */
+  public boolean isPruningDeadlocks()
+  {
+    return mPruningDeadlocks;
   }
 
 
@@ -351,6 +370,21 @@ public class TRCompositionalConflictChecker
     } else {
       return false;
     }
+  }
+
+  @Override
+  protected TRAbstractSynchronousProductBuilder createSynchronousProductBuilder()
+  {
+    final KindTranslator translator = getKindTranslator();
+    final TRAbstractSynchronousProductBuilder builder =
+      new TRSynchronousProductBuilder();
+    builder.setDetailedOutputEnabled(true);
+    builder.setKindTranslator(translator);
+    builder.setRemovingSelfloops(true);
+    builder.setNodeLimit(getInternalStateLimit());
+    builder.setTransitionLimit(getInternalTransitionLimit());
+    builder.setPruningDeadlocks(mPruningDeadlocks);
+    return builder;
   }
 
   @Override
@@ -1272,6 +1306,7 @@ public class TRCompositionalConflictChecker
   // Configuration
   private EventProxy mConfiguredDefaultMarking;
   private EventProxy mConfiguredPreconditionMarking;
+  private boolean mPruningDeadlocks = true;
 
   // Auxiliary events, status, and tools
   private EventProxy mUsedDefaultMarking;

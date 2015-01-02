@@ -24,6 +24,7 @@ import net.sourceforge.waters.model.analysis.CommandLineArgumentString;
 import net.sourceforge.waters.model.analysis.EnumFactory;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -527,12 +528,19 @@ public class TRCompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer verifier)
+    public void configure(final ModelAnalyzer analyzer)
+      throws AnalysisConfigurationException
     {
-      final AbstractTRCompositionalAnalyzer composer =
-        (AbstractTRCompositionalAnalyzer) verifier;
-      final boolean enable = getValue();
-      composer.setPruningDeadlocks(enable);
+      if (analyzer instanceof TRCompositionalConflictChecker) {
+        final TRCompositionalConflictChecker verifier =
+          (TRCompositionalConflictChecker) analyzer;
+        final boolean enable = getValue();
+        verifier.setPruningDeadlocks(enable);
+      } else {
+        throw new AnalysisConfigurationException
+          (ProxyTools.getShortClassName(analyzer) +
+           " does not support deadlock pruning!");
+      }
     }
   }
 

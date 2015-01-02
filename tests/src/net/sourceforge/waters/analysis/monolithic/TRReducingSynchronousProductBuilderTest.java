@@ -66,4 +66,14 @@ public class TRReducingSynchronousProductBuilderTest
     runAutomatonBuilder("tests", "syncprod", "reducing_04.wmod");
   }
 
+  public void testReducing05() throws Exception
+  {
+    runAutomatonBuilder("tests", "syncprod", "reducing_05.wmod");
+  }
+
+  public void testReducing06() throws Exception
+  {
+    runAutomatonBuilder("tests", "syncprod", "reducing_06.wmod");
+  }
+
 }

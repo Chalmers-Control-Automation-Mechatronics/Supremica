@@ -12,9 +12,8 @@ package net.sourceforge.waters.analysis.trcomp;
 import java.util.Collection;
 
 import net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic;
-import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
+import net.sourceforge.waters.analysis.monolithic.TRAbstractSynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.KindTranslator;
 
 
 /**
@@ -78,18 +77,8 @@ abstract class SelectionHeuristicMinSync0
     super.setContext(context);
     mAnalyzer = (AbstractTRCompositionalAnalyzer) context;
     if (context != null) {
-      final KindTranslator translator = mAnalyzer.getKindTranslator();
       mSynchronousProductBuilder =
-        new TRSynchronousProductBuilder(null, translator);
-      mSynchronousProductBuilder.setPruningDeadlocks
-        (mAnalyzer.isPruningDeadlocks());
-      mSynchronousProductBuilder.setNodeLimit
-        (mAnalyzer.getInternalStateLimit());
-      mSynchronousProductBuilder.setTransitionLimit
-        (mAnalyzer.getInternalTransitionLimit());
-      mSynchronousProductBuilder.setRemovingSelfloops(true);
-      mSynchronousProductBuilder.setPruningDeadlocks
-        (mAnalyzer.isPruningDeadlocks());
+        mAnalyzer.createSynchronousProductBuilder();
       mSynchronousProductBuilder.setDetailedOutputEnabled(false);
     } else {
       mSynchronousProductBuilder = null;
@@ -104,7 +93,7 @@ abstract class SelectionHeuristicMinSync0
     return mAnalyzer;
   }
 
-  TRSynchronousProductBuilder getSynchronousProductBuilder()
+  TRAbstractSynchronousProductBuilder getSynchronousProductBuilder()
   {
     return mSynchronousProductBuilder;
   }
@@ -128,6 +117,6 @@ abstract class SelectionHeuristicMinSync0
   //#########################################################################
   //# Data Members
   private AbstractTRCompositionalAnalyzer mAnalyzer;
-  private TRSynchronousProductBuilder mSynchronousProductBuilder;
+  private TRAbstractSynchronousProductBuilder mSynchronousProductBuilder;
 
 }

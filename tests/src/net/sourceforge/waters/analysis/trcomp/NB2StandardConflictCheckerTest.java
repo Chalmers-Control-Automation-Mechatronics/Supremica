@@ -56,7 +56,7 @@ public class NB2StandardConflictCheckerTest
     checker.setFailingEventsEnabled(true);
     checker.setSelfloopOnlyEventsEnabled(true);
     checker.setAlwaysEnabledEventsEnabled(true);
-    checker.setPruningDeadlocks(false);
+    checker.setPruningDeadlocks(true);
     checker.setCounterExampleEnabled(true);
     checker.setTraceCheckingEnabled(true);
     return checker;

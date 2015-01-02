@@ -109,8 +109,8 @@ public class TRReducingSynchronousProductBuilder
       final StateTupleEncoding stateEnc = getStateTupleEncoding();
       mIntermediateEncoded = new int[stateEnc.getNumberOfWords()];
       mIntermediateDecoded = new int[numAutomata];
-      mWeaklyLocalEvents = new ArrayList<>(numWeaklyLocal);
       mStronglyForbiddenEvents = new ArrayList<>(numStronglyForbidden);
+      mWeaklyLocalEvents = new ArrayList<>(numWeaklyLocal);
       mSharedEvents = new ArrayList<>(numShared);
       for (final EventInfo event : eventInfo) {
         if (!event.isLocal()) {
@@ -134,6 +134,8 @@ public class TRReducingSynchronousProductBuilder
         }
       }
     }
+    final TRSynchronousProductResult result = getAnalysisResult();
+    result.setReducedDiamondsCount(0);
   }
 
   @Override
@@ -143,8 +145,9 @@ public class TRReducingSynchronousProductBuilder
     mStronglyLocalEvents = null;
     mIntermediateEncoded = null;
     mIntermediateDecoded = null;
-    mSharedEvents = null;
+    mStronglyForbiddenEvents = null;
     mWeaklyLocalEvents = null;
+    mSharedEvents = null;
     mEnabledLocalEvents = null;
     mOnTheFlyMarkingInfo = null;
     mStoredMarkingInfo = null;
@@ -178,6 +181,8 @@ public class TRReducingSynchronousProductBuilder
           }
         }
       } else {
+        final TRSynchronousProductResult result = getAnalysisResult();
+        result.addReducedDiamond();
         System.arraycopy(encoded, 0, mIntermediateEncoded, 0, encoded.length);
         System.arraycopy(decoded, 0, mIntermediateDecoded, 0, decoded.length);
         // If this is a dump state, then stop
@@ -189,7 +194,7 @@ public class TRReducingSynchronousProductBuilder
         // Otherwise first expand tau transitions
         expandIntermediateStates(decoded, 0, null, true);
         for (final EventInfo event : mWeaklyLocalEvents) {
-          expandState(encoded, decoded, event);
+          expandIntermediateStates(decoded, 0, event, true);
         }
         // Then regular transitions, event by event
         for (final EventInfo event : mSharedEvents) {

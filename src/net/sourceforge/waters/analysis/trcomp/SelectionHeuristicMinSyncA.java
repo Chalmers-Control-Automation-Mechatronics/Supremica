@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.trcomp;
 import net.sourceforge.waters.analysis.compositional.ChainSelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
+import net.sourceforge.waters.analysis.monolithic.TRAbstractSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -78,7 +79,7 @@ public class SelectionHeuristicMinSyncA
       return Double.POSITIVE_INFINITY;
     }
     final AbstractTRCompositionalAnalyzer analyzer = getAnalyzer();
-    final TRSynchronousProductBuilder syncBuilder =
+    final TRAbstractSynchronousProductBuilder syncBuilder =
       getSynchronousProductBuilder();
     try {
       mCount = 0;
@@ -128,7 +129,7 @@ public class SelectionHeuristicMinSyncA
   public boolean newState(final int[] decoded)
     throws OverflowException
   {
-    final TRSynchronousProductBuilder syncBuilder =
+    final TRAbstractSynchronousProductBuilder syncBuilder =
       getSynchronousProductBuilder();
     if (mMarkingInfo == null) {
       final EventEncoding enc = syncBuilder.getEventEncoding();
