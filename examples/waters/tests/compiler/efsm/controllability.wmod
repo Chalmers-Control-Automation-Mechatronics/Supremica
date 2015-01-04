@@ -41,7 +41,7 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-10" Y="3"/>
+                                <Point X="-15" Y="-1"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
