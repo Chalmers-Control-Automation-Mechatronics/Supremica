@@ -28,6 +28,7 @@ import net.sourceforge.waters.analysis.abstraction.NonAlphaDeterminisationTRSimp
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.OmegaRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.OnlySilentOutgoingTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.SelfloopSubsumptionTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SilentIncomingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SpecialEventsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TRSimplificationListener;
@@ -180,6 +181,8 @@ public class TRCompositionalConflictChecker
         register(NB1w);
         register(NB2);
         register(NB2w);
+        register(NB3);
+        register(NB3w);
         register(GNB);
         register(GNBw);
       }
@@ -704,7 +707,7 @@ public class TRCompositionalConflictChecker
       return checker.createConflictEquivalenceChain
         (ObservationEquivalenceTRSimplifier.
          Equivalence.OBSERVATION_EQUIVALENCE,
-         false, false);
+         false, false, false);
     }
   };
 
@@ -739,7 +742,7 @@ public class TRCompositionalConflictChecker
       return checker.createConflictEquivalenceChain
         (ObservationEquivalenceTRSimplifier.
          Equivalence.WEAK_OBSERVATION_EQUIVALENCE,
-         false, false);
+         false, false, false);
     }
   };
 
@@ -774,7 +777,7 @@ public class TRCompositionalConflictChecker
       return checker.createConflictEquivalenceChain
         (ObservationEquivalenceTRSimplifier.
          Equivalence.OBSERVATION_EQUIVALENCE,
-         true, false);
+         true, false, false);
     }
   };
 
@@ -810,7 +813,7 @@ public class TRCompositionalConflictChecker
       return checker.createConflictEquivalenceChain
         (ObservationEquivalenceTRSimplifier.
          Equivalence.WEAK_OBSERVATION_EQUIVALENCE,
-         true, false);
+         true, false, false);
     }
   };
 
@@ -846,7 +849,7 @@ public class TRCompositionalConflictChecker
       return checker.createConflictEquivalenceChain
         (ObservationEquivalenceTRSimplifier.
          Equivalence.OBSERVATION_EQUIVALENCE,
-         true, true);
+         true, false, true);
     }
   };
 
@@ -883,7 +886,82 @@ public class TRCompositionalConflictChecker
       return checker.createConflictEquivalenceChain
         (ObservationEquivalenceTRSimplifier.
          Equivalence.WEAK_OBSERVATION_EQUIVALENCE,
-         true, true);
+         true, false, true);
+    }
+  };
+
+  /**
+   * <P>An abstraction sequence for standard nonblocking verification.
+   * This tool creator produces a transition relation simplifier
+   * consisting of:</P>
+   * <UL>
+   * <LI>Special events removal ({@link SpecialEventsTRSimplifier})</LI>
+   * <LI>Tau-loop removal ({@link TauLoopRemovalTRSimplifier})</LI>
+   * <LI>Transition removal ({@link TransitionRemovalTRSimplifier})</LI>
+   * <LI>Selfloop subsumption ({@link SelfloopSubsumptionTRSimplifier})</LI>
+   * <LI>Marking removal ({@link MarkingRemovalTRSimplifier})</LI>
+   * <LI>Silent Incoming Rule ({@link SilentIncomingTRSimplifier})</LI>
+   * <LI>Only Silent Outgoing Rule ({@link OnlySilentOutgoingTRSimplifier})</LI>
+   * <LI>Incoming equivalence ({@link IncomingEquivalenceTRSimplifier};
+   *     Silent Continuation plus Active Events Rules)</LI>
+   * <LI>Certain Conflicts Rule ({@link LimitedCertainConflictsTRSimplifier})</LI>
+   * <LI>Observation equivalence ({@link ObservationEquivalenceTRSimplifier})</LI>
+   * <LI>Non-alpha determinisation ({@link NonAlphaDeterminisationTRSimplifier})</LI>
+   * <LI>Marking saturation ({@link MarkingSaturationTRSimplifier})</LI>
+   * </UL>.
+   */
+  public static final TRToolCreator<TransitionRelationSimplifier> NB3 =
+    new TRToolCreator<TransitionRelationSimplifier>("NB3")
+  {
+    @Override
+    public TransitionRelationSimplifier create
+      (final AbstractTRCompositionalAnalyzer analyzer)
+      throws AnalysisConfigurationException
+    {
+      final TRCompositionalConflictChecker checker =
+        (TRCompositionalConflictChecker) analyzer;
+      return checker.createConflictEquivalenceChain
+        (ObservationEquivalenceTRSimplifier.
+         Equivalence.OBSERVATION_EQUIVALENCE,
+         true, true, true);
+    }
+  };
+
+  /**
+   * <P>An abstraction sequence for standard nonblocking verification.
+   * This tool creator produces a transition relation simplifier
+   * consisting of:</P>
+   * <UL>
+   * <LI>Special events removal ({@link SpecialEventsTRSimplifier})</LI>
+   * <LI>Tau-loop removal ({@link TauLoopRemovalTRSimplifier})</LI>
+   * <LI>Transition removal ({@link TransitionRemovalTRSimplifier})</LI>
+   * <LI>Selfloop subsumption ({@link SelfloopSubsumptionTRSimplifier})</LI>
+   * <LI>Marking removal ({@link MarkingRemovalTRSimplifier})</LI>
+   * <LI>Silent Incoming Rule ({@link SilentIncomingTRSimplifier})</LI>
+   * <LI>Only Silent Outgoing Rule ({@link OnlySilentOutgoingTRSimplifier})</LI>
+   * <LI>Incoming equivalence ({@link IncomingEquivalenceTRSimplifier};
+   *     Silent Continuation plus Active Events Rules)</LI>
+   * <LI>Certain Conflicts Rule ({@link LimitedCertainConflictsTRSimplifier})</LI>
+   * <LI>Weak observation equivalence
+   *     ({@link ObservationEquivalenceTRSimplifier})</LI>
+   * <LI>Non-alpha determinisation ({@link NonAlphaDeterminisationTRSimplifier})</LI>
+   * <LI>Marking saturation ({@link MarkingSaturationTRSimplifier})</LI>
+   * </UL>.
+   */
+  public static final TRToolCreator<TransitionRelationSimplifier> NB3w =
+    new TRToolCreator<TransitionRelationSimplifier>("NB3w")
+  {
+    @Override
+    public TransitionRelationSimplifier create
+      (final AbstractTRCompositionalAnalyzer analyzer)
+      throws AnalysisConfigurationException
+    {
+      final TRCompositionalConflictChecker checker =
+        (TRCompositionalConflictChecker) analyzer;
+      return checker.createConflictEquivalenceChain
+        (ObservationEquivalenceTRSimplifier.
+         Equivalence.WEAK_OBSERVATION_EQUIVALENCE,
+         true, true, true);
     }
   };
 
@@ -958,6 +1036,7 @@ public class TRCompositionalConflictChecker
   protected ChainTRSimplifier createConflictEquivalenceChain
     (final ObservationEquivalenceTRSimplifier.Equivalence equivalence,
      final boolean earlyTransitionRemoval,
+     final boolean selfloopSubsumption,
      final boolean nonAlphaDeterminisation)
     throws AnalysisConfigurationException
   {
@@ -982,6 +1061,12 @@ public class TRCompositionalConflictChecker
       trMode = ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER;
     } else {
       trMode = ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL;
+    }
+    if (selfloopSubsumption) {
+      final SelfloopSubsumptionTRSimplifier selfloopRemover =
+        new SelfloopSubsumptionTRSimplifier();
+      selfloopRemover.setSimplificationListener(partitioningListener);
+      chain.add(selfloopRemover);
     }
     final MarkingRemovalTRSimplifier markingRemover =
       new MarkingRemovalTRSimplifier();

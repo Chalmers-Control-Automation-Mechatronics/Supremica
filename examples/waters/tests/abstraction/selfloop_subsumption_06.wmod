@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="selfloop_subsumption_06" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>A test for the selfloop subsumption rule. None of the selflloops on state S1 can be removed, because there is no b-selfloop in the tau-predecessors, and the a-selfloop cannot be removed alone.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Name="a"/>
+        <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="tau">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="LOCAL"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="b"/>
+        <EventDecl Kind="CONTROLLABLE" Name="c"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="before">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="S0">
+                        <PointGeometry>
+                            <Point X="96" Y="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-26" Y="-6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S1">
+                        <PointGeometry>
+                            <Point X="96" Y="128"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-26" Y="-6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S2">
+                        <PointGeometry>
+                            <Point X="96" Y="192"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-26" Y="-6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="S0" Target="S1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="4" Y="-10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S1" Target="S2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="5" Y="-7"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S0" Target="S0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="a"/>
+                            <SimpleIdentifier Name="c"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="5" Y="-20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="138" Y="64"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S1" Target="S1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="a"/>
+                            <SimpleIdentifier Name="b"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="2" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="142" Y="128"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

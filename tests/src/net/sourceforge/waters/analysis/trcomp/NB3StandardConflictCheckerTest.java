@@ -18,7 +18,7 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class NB2StandardConflictCheckerTest
+public class NB3StandardConflictCheckerTest
   extends AbstractStandardConflictCheckerTest
 {
 
@@ -27,7 +27,7 @@ public class NB2StandardConflictCheckerTest
   public static Test suite()
   {
     final TestSuite testSuite =
-      new TestSuite(NB2StandardConflictCheckerTest.class);
+      new TestSuite(NB3StandardConflictCheckerTest.class);
     return testSuite;
   }
 
@@ -46,9 +46,9 @@ public class NB2StandardConflictCheckerTest
   {
     final TRCompositionalConflictChecker checker =
       new TRCompositionalConflictChecker();
-    checker.setSimplifierCreator(TRCompositionalConflictChecker.NB2);
+    checker.setSimplifierCreator(TRCompositionalConflictChecker.NB3w);
     checker.setPreselectionHeuristic(AbstractTRCompositionalAnalyzer.PRESEL_MustL);
-    checker.setSelectionHeuristic(AbstractTRCompositionalAnalyzer.SEL_MinSync);
+    checker.setSelectionHeuristic(AbstractTRCompositionalAnalyzer.SEL_MinE);
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);
@@ -56,7 +56,7 @@ public class NB2StandardConflictCheckerTest
     checker.setFailingEventsEnabled(true);
     checker.setSelfloopOnlyEventsEnabled(true);
     checker.setAlwaysEnabledEventsEnabled(true);
-    checker.setPruningDeadlocks(false);
+    checker.setPruningDeadlocks(true);
     checker.setCounterExampleEnabled(true);
     checker.setTraceCheckingEnabled(true);
     return checker;
