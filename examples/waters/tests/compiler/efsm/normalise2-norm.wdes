@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:ProductDES Name="normalise2" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
+	<ns2:EventList>
+		<ns2:Event Kind="CONTROLLABLE" Name="e.{x==1}"/>
+		<ns2:Event Kind="CONTROLLABLE" Name="e.{1&lt;=y}"/>
+		<ns2:Event Kind="CONTROLLABLE" Name="e.{x==1,y'==2}"/>
+		<ns2:Event Kind="CONTROLLABLE" Name="e.{x'==1+x}"/>
+		<ns2:Event Kind="CONTROLLABLE" Name="e.{y'==1+y}"/>
+		<ns2:Event Kind="CONTROLLABLE" Name="e.{y==1,x'==2}"/>
+		<ns2:Event Kind="CONTROLLABLE" Name="e.{1&lt;=x}"/>
+		<ns2:Event Kind="CONTROLLABLE" Name="e.{y==1,y'==2}"/>
+	</ns2:EventList>
+	<ns2:AutomataList>
+		<ns2:Automaton Kind="PLANT" Name="A">
+			<ns2:EventRefList>
+				<ns2:EventRef Name="e.{x==1}"/>
+				<ns2:EventRef Name="e.{1&lt;=y}"/>
+				<ns2:EventRef Name="e.{x==1,y'==2}"/>
+				<ns2:EventRef Name="e.{x'==1+x}"/>
+				<ns2:EventRef Name="e.{y'==1+y}"/>
+				<ns2:EventRef Name="e.{y==1,x'==2}"/>
+				<ns2:EventRef Name="e.{1&lt;=x}"/>
+				<ns2:EventRef Name="e.{y==1,y'==2}"/>
+			</ns2:EventRefList>
+			<ns2:StateList>
+				<ns2:State Initial="true" Name="A0"/>
+				<ns2:State Name="A1"/>
+			</ns2:StateList>
+			<ns2:TransitionList>
+				<ns2:Transition Event="e.{x==1}" Source="A0" Target="A1"/>
+				<ns2:Transition Event="e.{1&lt;=y}" Source="A0" Target="A1"/>
+				<ns2:Transition Event="e.{x==1,y'==2}" Source="A0" Target="A1"/>
+				<ns2:Transition Event="e.{x'==1+x}" Source="A0" Target="A1"/>
+				<ns2:Transition Event="e.{y'==1+y}" Source="A1" Target="A0"/>
+				<ns2:Transition Event="e.{y==1,x'==2}" Source="A1" Target="A0"/>
+				<ns2:Transition Event="e.{1&lt;=x}" Source="A1" Target="A0"/>
+				<ns2:Transition Event="e.{y==1,y'==2}" Source="A1" Target="A0"/>
+			</ns2:TransitionList>
+		</ns2:Automaton>
+		<ns2:Automaton Kind="PLANT" Name="B">
+			<ns2:EventRefList>
+				<ns2:EventRef Name="e.{x==1}"/>
+				<ns2:EventRef Name="e.{1&lt;=y}"/>
+				<ns2:EventRef Name="e.{x==1,y'==2}"/>
+				<ns2:EventRef Name="e.{x'==1+x}"/>
+				<ns2:EventRef Name="e.{y'==1+y}"/>
+				<ns2:EventRef Name="e.{y==1,x'==2}"/>
+				<ns2:EventRef Name="e.{1&lt;=x}"/>
+				<ns2:EventRef Name="e.{y==1,y'==2}"/>
+			</ns2:EventRefList>
+			<ns2:StateList>
+				<ns2:State Initial="true" Name="B0"/>
+				<ns2:State Name="B1"/>
+			</ns2:StateList>
+			<ns2:TransitionList>
+				<ns2:Transition Event="e.{x==1}" Source="B0" Target="B1"/>
+				<ns2:Transition Event="e.{1&lt;=y}" Source="B0" Target="B1"/>
+				<ns2:Transition Event="e.{x==1,y'==2}" Source="B1" Target="B0"/>
+				<ns2:Transition Event="e.{x'==1+x}" Source="B1" Target="B0"/>
+				<ns2:Transition Event="e.{y'==1+y}" Source="B0" Target="B1"/>
+				<ns2:Transition Event="e.{y==1,x'==2}" Source="B0" Target="B1"/>
+				<ns2:Transition Event="e.{1&lt;=x}" Source="B1" Target="B0"/>
+				<ns2:Transition Event="e.{y==1,y'==2}" Source="B1" Target="B0"/>
+			</ns2:TransitionList>
+		</ns2:Automaton>
+		<ns2:Automaton Kind="PLANT" Name="C">
+			<ns2:EventRefList>
+				<ns2:EventRef Name="e.{x==1}"/>
+				<ns2:EventRef Name="e.{1&lt;=y}"/>
+				<ns2:EventRef Name="e.{x==1,y'==2}"/>
+				<ns2:EventRef Name="e.{x'==1+x}"/>
+				<ns2:EventRef Name="e.{y'==1+y}"/>
+				<ns2:EventRef Name="e.{y==1,x'==2}"/>
+				<ns2:EventRef Name="e.{1&lt;=x}"/>
+				<ns2:EventRef Name="e.{y==1,y'==2}"/>
+			</ns2:EventRefList>
+			<ns2:StateList>
+				<ns2:State Initial="true" Name="C0"/>
+				<ns2:State Name="C1"/>
+			</ns2:StateList>
+			<ns2:TransitionList>
+				<ns2:Transition Event="e.{x==1}" Source="C0" Target="C1"/>
+				<ns2:Transition Event="e.{1&lt;=y}" Source="C1" Target="C0"/>
+				<ns2:Transition Event="e.{x==1,y'==2}" Source="C0" Target="C1"/>
+				<ns2:Transition Event="e.{x'==1+x}" Source="C1" Target="C0"/>
+				<ns2:Transition Event="e.{y'==1+y}" Source="C0" Target="C1"/>
+				<ns2:Transition Event="e.{y==1,x'==2}" Source="C1" Target="C0"/>
+				<ns2:Transition Event="e.{1&lt;=x}" Source="C0" Target="C1"/>
+				<ns2:Transition Event="e.{y==1,y'==2}" Source="C1" Target="C0"/>
+			</ns2:TransitionList>
+		</ns2:Automaton>
+		<ns2:Automaton Kind="PLANT" Name="x">
+			<ns2:EventRefList>
+				<ns2:EventRef Name="e.{x==1}"/>
+				<ns2:EventRef Name="e.{1&lt;=y}"/>
+				<ns2:EventRef Name="e.{x==1,y'==2}"/>
+				<ns2:EventRef Name="e.{x'==1+x}"/>
+				<ns2:EventRef Name="e.{y'==1+y}"/>
+				<ns2:EventRef Name="e.{y==1,x'==2}"/>
+				<ns2:EventRef Name="e.{1&lt;=x}"/>
+			</ns2:EventRefList>
+			<ns2:StateList>
+        <ns2:State Initial="true" Name="0"/>
+        <ns2:State Name="1"/>
+	      <ns2:State Name="2"/>
+			</ns2:StateList>
+			<ns2:TransitionList>
+				<ns2:Transition Event="e.{x'==1+x}" Source="0" Target="1"/>
+				<ns2:Transition Event="e.{y==1,x'==2}" Source="0" Target="2"/>
+				<ns2:Transition Event="e.{1&lt;=x}" Source="1" Target="1"/>
+				<ns2:Transition Event="e.{x==1}" Source="1" Target="2"/>
+				<ns2:Transition Event="e.{1&lt;=y}" Source="1" Target="2"/>
+				<ns2:Transition Event="e.{x==1,y'==2}" Source="1" Target="2"/>
+				<ns2:Transition Event="e.{x'==1+x}" Source="1" Target="2"/>
+				<ns2:Transition Event="e.{y'==1+y}" Source="1" Target="2"/>
+				<ns2:Transition Event="e.{y==1,x'==2}" Source="1" Target="2"/>
+				<ns2:Transition Event="e.{y'==1+y}" Source="2" Target="2"/>
+				<ns2:Transition Event="e.{y==1,x'==2}" Source="2" Target="2"/>
+				<ns2:Transition Event="e.{1&lt;=x}" Source="2" Target="2"/>
+			</ns2:TransitionList>
+		</ns2:Automaton>
+		<ns2:Automaton Kind="PLANT" Name="y">
+			<ns2:EventRefList>
+				<ns2:EventRef Name="e.{1&lt;=y}"/>
+				<ns2:EventRef Name="e.{x==1,y'==2}"/>
+				<ns2:EventRef Name="e.{x'==1+x}"/>
+				<ns2:EventRef Name="e.{y'==1+y}"/>
+				<ns2:EventRef Name="e.{y==1,x'==2}"/>
+				<ns2:EventRef Name="e.{1&lt;=x}"/>
+				<ns2:EventRef Name="e.{y==1,y'==2}"/>
+			</ns2:EventRefList>
+			<ns2:StateList>
+				<ns2:State Initial="true" Name="0"/>
+        <ns2:State Name="1"/>
+        <ns2:State Name="2"/>
+			</ns2:StateList>
+			<ns2:TransitionList>
+				<ns2:Transition Event="e.{y'==1+y}" Source="0" Target="1"/>
+				<ns2:Transition Event="e.{x==1,y'==2}" Source="0" Target="2"/>
+				<ns2:Transition Event="e.{1&lt;=y}" Source="1" Target="1"/>
+				<ns2:Transition Event="e.{x==1,y'==2}" Source="1" Target="2"/>
+				<ns2:Transition Event="e.{x'==1+x}" Source="1" Target="2"/>
+				<ns2:Transition Event="e.{y'==1+y}" Source="1" Target="2"/>
+				<ns2:Transition Event="e.{y==1,x'==2}" Source="1" Target="2"/>
+				<ns2:Transition Event="e.{1&lt;=x}" Source="1" Target="2"/>
+				<ns2:Transition Event="e.{y==1,y'==2}" Source="1" Target="2"/>
+				<ns2:Transition Event="e.{1&lt;=y}" Source="2" Target="2"/>
+				<ns2:Transition Event="e.{x==1,y'==2}" Source="2" Target="2"/>
+				<ns2:Transition Event="e.{x'==1+x}" Source="2" Target="2"/>
+			</ns2:TransitionList>
+		</ns2:Automaton>
+	</ns2:AutomataList>
+</ns2:ProductDES>

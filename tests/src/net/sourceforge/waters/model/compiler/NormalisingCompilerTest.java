@@ -55,6 +55,14 @@ public class NormalisingCompilerTest extends AbstractCompilerTest
   }
 
   @Override
+  public void testCompile_normalise2() throws IOException, WatersException
+  {
+    final ModuleProxy module =
+                          loadModule("tests", "compiler/efsm", "normalise2");
+    testCompile(module);
+  }
+
+  @Override
   public void testCompile_EFATransferLine() throws IOException, WatersException
   {
     final ModuleProxy module = loadModule("efa", "transferline_efa");
