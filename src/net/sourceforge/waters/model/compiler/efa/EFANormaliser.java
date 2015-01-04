@@ -49,6 +49,7 @@ import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionComparator;
 import net.sourceforge.waters.model.expr.UnaryOperator;
+import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -987,7 +988,7 @@ public class EFANormaliser extends AbortableCompiler
     private void addUpdate(final SimpleComponentProxy comp,
                            final ConstraintList update,
                            final GuardActionBlockProxy block)
-    { //TODO
+    {
       if (!isBlocked()) {
         EFAUpdateInfo info = mMap.get(comp);
         if (info == null) {
@@ -1309,7 +1310,7 @@ public class EFANormaliser extends AbortableCompiler
                            final GuardActionBlockProxy gaBlock)
     {
       mUpdates.add(update);
-      mGABlockMap.put(update, gaBlock); //TODO
+      mGABlockMap.put(update, gaBlock);
     }
 
     private List<ConstraintList> getUpdates()
@@ -1395,7 +1396,7 @@ public class EFANormaliser extends AbortableCompiler
 
 
     //#######################################################################
-    //# Pass 3 //TODO
+    //# Pass 3
     /**
      * Collects all the prime variables used by an {@link EFAUpdateInfo}.
      *
@@ -1637,10 +1638,13 @@ public class EFANormaliser extends AbortableCompiler
             // Not controllable: Create an exception.
             for (final EFAVariable var : primeVariables)
             {
-              final EFSMControllabilityException ex =
+              for (final BinaryExpressionProxy action : gaBlock.getActions())
+              {
+                final EFSMControllabilityException ex =
                              new EFSMControllabilityException(mComponent, var,
-                                                              ident, gaBlock);
-              mCompilationInfo.raise(ex);
+                                                              ident, action);
+                mCompilationInfo.raise(ex);
+              }
             }
             return false;
           }

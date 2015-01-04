@@ -1,7 +1,7 @@
 package net.sourceforge.waters.model.compiler.efa;
 
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.module.GuardActionBlockProxy;
+import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -35,14 +35,14 @@ public class EFSMControllabilityException extends EvalException
   public EFSMControllabilityException(final SimpleComponentProxy component,
                                       final EFAVariable variable,
                                       final IdentifierProxy event,
-                                      final GuardActionBlockProxy location)
+                                      final BinaryExpressionProxy location)
   {
     super(component.getKind().toString() + " '" + component.getName() +
           "' attempts to modify the variable '" +
           variable.getVariableName().toString() + "' on the " +
           isUncontrollable(component.getKind()) + "event '" +
           event.toString() + "'!",
-          location); // The location is the guard action block.
+          location); // The location is the action of the guard action block.
   }
 
   //#########################################################################
