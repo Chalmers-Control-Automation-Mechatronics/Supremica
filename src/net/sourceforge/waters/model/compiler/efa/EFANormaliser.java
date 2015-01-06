@@ -1651,7 +1651,6 @@ public class EFANormaliser extends AbortableCompiler
         }
         return true;
       }
-
       return false;
     }
 
