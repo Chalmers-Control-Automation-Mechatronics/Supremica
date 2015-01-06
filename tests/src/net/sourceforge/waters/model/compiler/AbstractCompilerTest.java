@@ -49,10 +49,8 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
-public abstract class AbstractCompilerTest
-  extends AbstractWatersTest
+public abstract class AbstractCompilerTest extends AbstractWatersTest
 {
-
   //#########################################################################
   //# Hand-Crafting Test Cases
   public void testCompile_empty_1()
@@ -1079,5 +1077,4 @@ public abstract class AbstractCompilerTest
   private DocumentManager mDocumentManager;
   private ModuleCompiler mCompiler;
   private DescendantCheckVisitor mDescendantCheckVisitor;
-
 }
