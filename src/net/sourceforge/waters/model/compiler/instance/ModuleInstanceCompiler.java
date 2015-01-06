@@ -102,7 +102,7 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
  * <LI>{@link VariableComponentProxy}.</LI>
  * </UL>
  *
- * @author Robi Malik
+ * @author Robi Malik, Roger Su
  */
 
 public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
@@ -574,24 +574,32 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     (final GuardActionBlockProxy ga)
     throws VisitorException
   {
-    try {
+    try
+    {
       final List<SimpleExpressionProxy> oldguards = ga.getGuards();
       final int numguards = oldguards.size();
       final List<SimpleExpressionProxy> newguards =
-        new ArrayList<SimpleExpressionProxy>(numguards);
-      for (final SimpleExpressionProxy oldguard : oldguards) {
+                             new ArrayList<SimpleExpressionProxy>(numguards);
+
+      for (final SimpleExpressionProxy oldguard : oldguards)
+      {
         checkAbort();
-        if (mPrimeSearcher.containsPrime(oldguard)) {
+
+        if (mPrimeSearcher.containsPrime(oldguard))
+        {
           // Don't simplify guards with primes because they are needed
           // to determine the variable alphabet!
           final SimpleExpressionProxy newguard =
-            (SimpleExpressionProxy) mCloner.getClone(oldguard);
+                          (SimpleExpressionProxy) mCloner.getClone(oldguard);
           addSourceInfo(newguard, oldguard);
           newguards.add(newguard);
-        } else {
+        }
+
+        else
+        {
           final SimpleExpressionProxy newguard =
-            mSimpleExpressionCompiler.simplify
-            (oldguard, mNameSpaceVariablesContext);
+                                    mSimpleExpressionCompiler.simplify
+                                      (oldguard, mNameSpaceVariablesContext);
           if (!mSimpleExpressionCompiler.isAtomicValue(newguard, mContext)) {
             newguards.add(newguard);
           } else if (mSimpleExpressionCompiler.getBooleanValue(newguard)) {
@@ -604,29 +612,43 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
           }
         }
       }
+
       final List<BinaryExpressionProxy> oldactions = ga.getActions();
       final int numactions = oldactions.size();
       final List<BinaryExpressionProxy> newactions =
-        new ArrayList<BinaryExpressionProxy>(numactions);
-      for (final BinaryExpressionProxy oldaction : oldactions) {
+                            new ArrayList<BinaryExpressionProxy>(numactions);
+
+      for (final BinaryExpressionProxy oldaction : oldactions)
+      {
         checkAbort();
         final SimpleExpressionProxy newaction =
-          mSimpleExpressionCompiler.simplify
-          (oldaction, mNameSpaceVariablesContext);
-        if (newaction instanceof BinaryExpressionProxy) {
+                                  mSimpleExpressionCompiler.simplify
+                                    (oldaction, mNameSpaceVariablesContext);
+
+        if (newaction instanceof BinaryExpressionProxy)
+        {
           final BinaryExpressionProxy newbinary =
-            (BinaryExpressionProxy) newaction;
+                                            (BinaryExpressionProxy) newaction;
           newactions.add(newbinary);
         } else {
           throw new TypeMismatchException(oldaction, "ACTION");
         }
       }
 
-      //TODO
-      addInstatiationSource(newactions);
+      /* If the current GuardActionBlock is an instantiation,
+       * then the source information of the guards and actions
+       * should be the InstanceProxy of the base module.
+       */
+      if (!mCompilationInfo.stackIsEmpty()) {
+        final InstanceProxy source = mCompilationInfo.getStackBase();
+        for (final SimpleExpressionProxy guard : newguards)
+          mCompilationInfo.add(guard, source);
+        for (final BinaryExpressionProxy action: newactions)
+          mCompilationInfo.add(action, source);
+      }
 
       final GuardActionBlockProxy newga =
-        mFactory.createGuardActionBlockProxy(newguards, newactions, null);
+          mFactory.createGuardActionBlockProxy(newguards, newactions, null);
       addSourceInfo(newga, ga);
       return newga;
     } catch (final EvalException exception) {
@@ -717,7 +739,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       mContext = new ModuleBindingContext(module, fullname, info);
       mNameSpace = new CompiledNameSpace(suffix, mNameSpace);
       mCompilationInfo.setExceptions(new MultiEvalException());
-      mCompilationInfo.addCurrentInstance(inst); //TODO
+      mCompilationInfo.addCurrentInstance(inst);
       return visitModuleProxy(module);
     }
 
@@ -1096,14 +1118,6 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
   private void addSourceInfo(final Proxy target, final Proxy source)
   {
     mCompilationInfo.add(target, source, mContext);
-  }
-
-  private void addInstatiationSource(final List<BinaryExpressionProxy> list)
-  {
-    //TODO
-    if (!mCompilationInfo.stackIsEmpty())
-      for (final Proxy x : list)
-        mCompilationInfo.add(x, mCompilationInfo.getStackBase());
   }
 
   private boolean isDisabledProposition(final CompiledEvent event)
