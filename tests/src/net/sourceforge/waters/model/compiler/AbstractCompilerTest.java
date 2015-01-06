@@ -412,14 +412,6 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     testCompile(module);
   }
 
-  /*
-  public void testCompile_host_sets_fv_after_host_crc_fault_notinit()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module = loadModule("tests", "profisafe", "host_sets_fv_after_host_crc_fault_notinit");
-    testCompile(module);
-  }//*/
-
   public void testCompile_increment()
   throws IOException, WatersException
   {
