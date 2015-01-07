@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="instantiate_graph" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>A compiler test to check whether an error within an instance detected during graph compilation is handled correctly.</ns2:Comment>
+    <ComponentList>
+        <Instance ModuleName="../graph/markus1" Name="nondet_error"/>
+    </ComponentList>
+</Module>

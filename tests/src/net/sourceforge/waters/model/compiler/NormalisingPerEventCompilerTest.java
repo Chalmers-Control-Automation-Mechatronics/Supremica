@@ -60,25 +60,28 @@ public class NormalisingPerEventCompilerTest extends AbstractCompilerTest
   }
 
   @Override
-  public void testCompile_normalise1()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module = loadModule("tests", "compiler/efsm", "normalise1");
-    testCompile(module);
-  }
-
-  @Override
-  public void testCompile_normalise2() throws IOException, WatersException
-  {
-    final ModuleProxy module =
-                          loadModule("tests", "compiler/efsm", "normalise2");
-    testCompile(module);
-  }
-
-  @Override
   String[] getTestSuffices()
   {
     final String[] array = {"-norm", "-pea"};
     return array;
   }
+
+
+  //#########################################################################
+  //# Specific Test Cases
+  public void testCompile_normalise1()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "normalise1");
+    testCompile(module);
+  }
+
+  public void testCompile_normalise2() throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "normalise2");
+    testCompile(module);
+  }
+
 }

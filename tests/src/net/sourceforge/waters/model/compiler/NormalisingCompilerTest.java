@@ -47,21 +47,15 @@ public class NormalisingCompilerTest extends AbstractCompilerTest
   }
 
   @Override
-  public void testCompile_normalise1() throws IOException, WatersException
+  String[] getTestSuffices()
   {
-    final ModuleProxy module =
-                          loadModule("tests", "compiler/efsm", "normalise1");
-    testCompile(module);
+    final String[] array = {"-norm", ""};
+    return array;
   }
 
-  @Override
-  public void testCompile_normalise2() throws IOException, WatersException
-  {
-    final ModuleProxy module =
-                          loadModule("tests", "compiler/efsm", "normalise2");
-    testCompile(module);
-  }
 
+  //#########################################################################
+  //# Specific Test Cases
   @Override
   public void testCompile_EFATransferLine() throws IOException, WatersException
   {
@@ -73,19 +67,26 @@ public class NormalisingCompilerTest extends AbstractCompilerTest
                  culprit1, culprit2, culprit3);
   }
 
-  @Override
   public void testCompile_controllability() throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests/compiler/efsm",
-                                          "controllability");
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "controllability");
     final String[] culprit = {"'x'", "'event'"};
     compileError(module, null, EFSMControllabilityException.class, culprit);
   }
 
-  @Override
-  String[] getTestSuffices()
+  public void testCompile_normalise1() throws IOException, WatersException
   {
-    final String[] array = {"-norm", ""};
-    return array;
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "normalise1");
+    testCompile(module);
   }
+
+  public void testCompile_normalise2() throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler" ,"efsm", "normalise2");
+    testCompile(module);
+  }
+
 }
