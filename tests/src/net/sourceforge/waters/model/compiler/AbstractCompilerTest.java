@@ -363,6 +363,13 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     testCompile(module);
   }
 
+  public void testCompile_EFATransferLineNorm()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("efa", "transferline_norm");
+    testCompile(module);
+  }
+
   public void testCompile_enumvar()
     throws IOException, WatersException
   {

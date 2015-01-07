@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:ProductDES Name="transferline_norm" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
+<Comment>EFSM model with instantiation of Wonham's tranferline. 
+Parametrised by:
+A - size of buffers A
+B - size of buffers B
+N - number of serially connected cells.
+This is the uncontrollable version using normalisable buffers. Use for synthesis with the normalising EFSM compiler.</Comment>
+<ns2:EventList>
+<ns2:Event Kind="PROPOSITION" Name=":accepting"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="acceptT[0].{bufferA[1].c&lt;=2}"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="acceptT[0].{bufferA[1].c==3}"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="acceptT[1]"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="finishM[1].{bufferB[1].c}"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="finishM[1].{!bufferB[1].c}"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="rejectT[1].{bufferA[1].c==3}"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="rejectT[1].{bufferA[1].c&lt;=2}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="startM[1]"/>
+<ns2:Event Kind="CONTROLLABLE" Name="startT[0]"/>
+<ns2:Event Kind="CONTROLLABLE" Name="startT[1]"/>
+</ns2:EventList>
+<ns2:AutomataList>
+<ns2:Automaton Kind="PLANT" Name="init">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+<ns2:EventRef Name="acceptT[0].{bufferA[1].c==3}"/>
+<ns2:EventRef Name="acceptT[0].{bufferA[1].c&lt;=2}"/>
+<ns2:EventRef Name="startT[0]"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Name="WORKING"/>
+<ns2:State Initial="true" Name="IDLE">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+</ns2:EventRefList>
+</ns2:State>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Target="WORKING" Source="IDLE" Event="startT[0]"/>
+<ns2:Transition Target="IDLE" Source="WORKING" Event="acceptT[0].{bufferA[1].c==3}"/>
+<ns2:Transition Target="IDLE" Source="WORKING" Event="acceptT[0].{bufferA[1].c&lt;=2}"/>
+</ns2:TransitionList>
+</ns2:Automaton>
+<ns2:Automaton Kind="PLANT" Name="machine[1]">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+<ns2:EventRef Name="finishM[1].{bufferB[1].c}"/>
+<ns2:EventRef Name="finishM[1].{!bufferB[1].c}"/>
+<ns2:EventRef Name="startM[1]"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Name="WORKING"/>
+<ns2:State Initial="true" Name="IDLE">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+</ns2:EventRefList>
+</ns2:State>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Target="WORKING" Source="IDLE" Event="startM[1]"/>
+<ns2:Transition Target="IDLE" Source="WORKING" Event="finishM[1].{!bufferB[1].c}"/>
+<ns2:Transition Target="IDLE" Source="WORKING" Event="finishM[1].{bufferB[1].c}"/>
+</ns2:TransitionList>
+</ns2:Automaton>
+<ns2:Automaton Kind="PLANT" Name="testunit[1]">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+<ns2:EventRef Name="rejectT[1].{bufferA[1].c==3}"/>
+<ns2:EventRef Name="rejectT[1].{bufferA[1].c&lt;=2}"/>
+<ns2:EventRef Name="acceptT[1]"/>
+<ns2:EventRef Name="startT[1]"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Name="WORKING"/>
+<ns2:State Initial="true" Name="IDLE">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+</ns2:EventRefList>
+</ns2:State>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Target="WORKING" Source="IDLE" Event="startT[1]"/>
+<ns2:Transition Target="IDLE" Source="WORKING" Event="acceptT[1]"/>
+<ns2:Transition Target="IDLE" Source="WORKING" Event="rejectT[1].{bufferA[1].c==3}"/>
+<ns2:Transition Target="IDLE" Source="WORKING" Event="rejectT[1].{bufferA[1].c&lt;=2}"/>
+</ns2:TransitionList>
+</ns2:Automaton>
+<ns2:Automaton Kind="PLANT" Name="bufferA[1].c">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+<ns2:EventRef Name="acceptT[0].{bufferA[1].c==3}"/>
+<ns2:EventRef Name="rejectT[1].{bufferA[1].c==3}"/>
+<ns2:EventRef Name="acceptT[0].{bufferA[1].c&lt;=2}"/>
+<ns2:EventRef Name="rejectT[1].{bufferA[1].c&lt;=2}"/>
+<ns2:EventRef Name="startM[1]"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="0">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+</ns2:EventRefList>
+</ns2:State>
+<ns2:State Name="1"/>
+<ns2:State Name="2"/>
+<ns2:State Name="3"/>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Source="3" Target="3" Event="acceptT[0].{bufferA[1].c==3}"/>
+<ns2:Transition Source="0" Target="1" Event="acceptT[0].{bufferA[1].c&lt;=2}"/>
+<ns2:Transition Source="3" Target="3" Event="rejectT[1].{bufferA[1].c==3}"/>
+<ns2:Transition Source="0" Target="1" Event="rejectT[1].{bufferA[1].c&lt;=2}"/>
+<ns2:Transition Source="1" Target="2" Event="acceptT[0].{bufferA[1].c&lt;=2}"/>
+<ns2:Transition Source="1" Target="2" Event="rejectT[1].{bufferA[1].c&lt;=2}"/>
+<ns2:Transition Source="1" Target="0" Event="startM[1]"/>
+<ns2:Transition Source="2" Target="3" Event="acceptT[0].{bufferA[1].c&lt;=2}"/>
+<ns2:Transition Source="2" Target="3" Event="rejectT[1].{bufferA[1].c&lt;=2}"/>
+<ns2:Transition Source="2" Target="1" Event="startM[1]"/>
+<ns2:Transition Source="3" Target="2" Event="startM[1]"/>
+</ns2:TransitionList>
+</ns2:Automaton>
+<ns2:Automaton Kind="SPEC" Name="bufferA[1].spec">
+<ns2:EventRefList>
+<ns2:EventRef Name="acceptT[0].{bufferA[1].c==3}"/>
+<ns2:EventRef Name="rejectT[1].{bufferA[1].c==3}"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="S0"/>
+</ns2:StateList>
+</ns2:Automaton>
+<ns2:Automaton Kind="PLANT" Name="bufferB[1].c">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+<ns2:EventRef Name="finishM[1].{bufferB[1].c}"/>
+<ns2:EventRef Name="finishM[1].{!bufferB[1].c}"/>
+<ns2:EventRef Name="startT[1]"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="0">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+</ns2:EventRefList>
+</ns2:State>
+<ns2:State Name="1"/>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Source="0" Target="1" Event="finishM[1].{!bufferB[1].c}"/>
+<ns2:Transition Source="1" Target="1" Event="finishM[1].{bufferB[1].c}"/>
+<ns2:Transition Source="1" Target="0" Event="startT[1]"/>
+</ns2:TransitionList>
+</ns2:Automaton>
+<ns2:Automaton Kind="SPEC" Name="bufferB[1].spec">
+<ns2:EventRefList>
+<ns2:EventRef Name="finishM[1].{bufferB[1].c}"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="S0"/>
+</ns2:StateList>
+</ns2:Automaton>
+</ns2:AutomataList>
+</ns2:ProductDES>
