@@ -29,8 +29,12 @@ import net.sourceforge.waters.model.compiler.graph.NondeterministicModuleExcepti
 import net.sourceforge.waters.model.compiler.instance.EmptyLabelBlockException;
 import net.sourceforge.waters.model.compiler.instance.EventKindException;
 import net.sourceforge.waters.model.compiler.instance.InstantiationException;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.MultiEvalException;
 import net.sourceforge.waters.model.expr.OperatorTable;
@@ -39,12 +43,17 @@ import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.DescendingModuleProxyVisitor;
+import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
@@ -816,6 +825,12 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
         break;
       } else continue;
     }
+
+    // Test source information.
+    if (mCompiler.isSourceInfoEnabled()) {
+      mSourceInfoChecker = new SourceInfoCheckVisitor(mCompiler, module, des);
+      mSourceInfoChecker.checkSourceInfo();
+    }
   }
 
   private ProductDESProxy compile(final ModuleProxy module)
@@ -1058,6 +1073,165 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
 
 
   //#########################################################################
+  //# Inner Class: SourceInfoCheckVisitor
+  private static class SourceInfoCheckVisitor
+    extends DescendingModuleProxyVisitor
+  {
+    //#######################################################################
+    //# Constructor
+    private SourceInfoCheckVisitor(final ModuleCompiler compiler,
+                                   final ModuleProxy input,
+                                   final ProductDESProxy output)
+    {
+      mCompiler = compiler;
+      mInputModule = input;
+      mOutputDES = output;
+      mDescendantChecker = new DescendantCheckVisitor();
+    }
+
+    //#######################################################################
+    //# Invocation
+    private void checkSourceInfo()
+    {
+      try {
+        for (final EventProxy event : mOutputDES.getEvents())
+          visitEventProxy(event);
+        for (final AutomatonProxy automaton : mOutputDES.getAutomata())
+          visitAutomatonProxy(automaton);
+      } catch(final WatersException ex) { }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    public Object visitEventProxy(final EventProxy event)
+      throws WatersException
+    {
+      final Proxy source = mCompiler.getSourceInfoMap().get(event).getSourceObject();
+      final boolean inModule = mDescendantChecker.isDescendant(source, mInputModule);
+      final boolean correctType = (source instanceof EventDeclProxy) ||
+                                  (source instanceof InstanceProxy);
+      String errorMessage = null;
+
+      if (!inModule && !correctType)
+        errorMessage = "The source of the EventProxy '" + event.getName() +
+                   "' is not in the module, and is not of the correct type!";
+
+      else if (!inModule && correctType)
+        errorMessage = "The source of the EventProxy '" + event.getName() +
+                       "' is of the correct type, but is not in the module!";
+
+      else if (inModule && !correctType)
+        errorMessage = "The source of the EventProxy '" + event.getName() +
+                       "' is in the module, but is not of the correct type!";
+
+      if (errorMessage != null)
+        assertTrue(errorMessage, false);
+
+      return null;
+    }
+
+    public Object visitAutomatonProxy(final AutomatonProxy automaton)
+      throws WatersException
+    {
+      final Proxy source = mCompiler.getSourceInfoMap().get(automaton).getSourceObject();
+      final boolean inModule = mDescendantChecker.isDescendant(source, mInputModule);
+      boolean correctType = true;
+      String errorMessage = null;
+
+      if (source instanceof SimpleComponentProxy) {
+        correctType = true;
+        mCurrentComponent= (SimpleComponentProxy) source;
+        for (final StateProxy state : automaton.getStates())
+          visitStateProxy(state);
+        for (final TransitionProxy transition : automaton.getTransitions())
+          visitTransitionProxy(transition);
+      } else if (!((source instanceof InstanceProxy) ||
+                   (source instanceof VariableComponentProxy)))
+        correctType = false;
+
+      if (!inModule && !correctType)
+        errorMessage = "The source of the AutomatonProxy '" + automaton.getName()
+                 + "' is not in the module, and is not of the correct type!";
+
+      else if (!inModule && correctType)
+        errorMessage = "The source of the AutomatonProxy '" + automaton.getName()
+                     + "' is of the correct type, but is not in the module!";
+
+      else if (inModule && !correctType)
+        errorMessage = "The source of the AutomatonProxy '" + automaton.getName()
+                     + "' is in the module, but is not of the correct type!";
+
+      if (errorMessage != null)
+        assertTrue(errorMessage, false);
+
+      return null;
+    }
+
+    public Object visitStateProxy(final StateProxy state)
+      throws WatersException
+    {
+      final Proxy source = mCompiler.getSourceInfoMap().get(state).getSourceObject();
+      final boolean inModule = mDescendantChecker.isDescendant(source, mCurrentComponent);
+      final boolean correctType = (source instanceof SimpleNodeProxy) ||
+                                  (source instanceof InstanceProxy);
+      String errorMessage = null;
+
+      if (!inModule && !correctType)
+        errorMessage = "The source of the StateProxy '" + state.getName() +
+                    "' is not in the module, and is not of the correct type!";
+
+      else if (!inModule && correctType)
+        errorMessage = "The source of the StateProxy '" + state.getName() +
+                       "' is of the correct type, but is not in the module!";
+
+      else if (inModule && !correctType)
+        errorMessage = "The source of the StateProxy '" + state.getName() +
+                       "' is in the module, but is not of the correct type!";
+
+      if (errorMessage != null)
+        assertTrue(errorMessage, false);
+
+      return null;
+    }
+
+    public Object visitTransitionProxy(final TransitionProxy transition)
+      throws WatersException
+    {
+      final Proxy source = mCompiler.getSourceInfoMap().get(transition).getSourceObject();
+      final boolean inModule = mDescendantChecker.isDescendant(source, mCurrentComponent);
+      final boolean correctType = (source instanceof IdentifierProxy) ||
+                                  (source instanceof InstanceProxy);
+      String errorMessage = null;
+
+      if (!inModule && !correctType)
+        errorMessage = "The source of the TransitionProxy '" + transition.getEvent().getName() +
+                    "' is not in the module, and is not of the correct type!";
+
+      else if (!inModule && correctType)
+        errorMessage = "The source of the TransitionProxy '" + transition.getEvent().getName() +
+                       "' is of the correct type, but is not in the module!";
+
+      else if (inModule && !correctType)
+        errorMessage = "The source of the TransitionProxy '" + transition.getEvent().getName() +
+                       "' is in the module, but is not of the correct type!";
+
+      if (errorMessage != null)
+        assertTrue(errorMessage, false);
+
+      return null;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final ModuleCompiler mCompiler;
+    private final ModuleProxy mInputModule;
+    private final ProductDESProxy mOutputDES;
+    private final DescendantCheckVisitor mDescendantChecker;
+    private SimpleComponentProxy mCurrentComponent;
+  }
+
+
+  //#########################################################################
   //# Data Members
   private File mOutputDirectory;
   private ModuleProxyFactory mModuleFactory;
@@ -1067,4 +1241,5 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   private DocumentManager mDocumentManager;
   private ModuleCompiler mCompiler;
   private DescendantCheckVisitor mDescendantCheckVisitor;
+  private SourceInfoCheckVisitor mSourceInfoChecker;
 }
