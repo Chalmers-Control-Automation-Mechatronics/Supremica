@@ -137,73 +137,16 @@ public class GroupNodeCompiler
     }
   }
 
-
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
-  @Override
-  public ModuleProxy visitModuleProxy(final ModuleProxy inputModule)
-    throws VisitorException
-  {
-    mComponents = new ArrayList<>();
-    visitCollection(inputModule.getComponentList());
-
-    return mFactory.createModuleProxy(inputModule.getName(),
-                                      inputModule.getComment(),
-                                      inputModule.getLocation(),
-                                      inputModule.getConstantAliasList(),
-                                      inputModule.getEventDeclList(),
-                                      inputModule.getEventAliasList(),
-                                      mComponents);
-  }
-
   /**
-   * Visits a {@link SimpleComponentProxy} of a {@link ModuleProxy}.
-   * <p>
-   * If the graph of a component contains group nodes, a new graph would be
-   * created, and it will be added to the result list of components.
-   * <p>
-   * Otherwise, if the group contains no group nodes, it will not be changed,
-   * and the original graph will be added to the list of components.
-   *
-   * @param oldComponent
-   *          A component of the original module
-   * @return Unimportant
+   * Adds an edge from the raw collection to the list of edges.
    */
   @Override
-  public Object visitSimpleComponentProxy
-            (final SimpleComponentProxy oldComponent) throws VisitorException
+  public Object visitEdgeProxy(final EdgeProxy edge) throws VisitorException
   {
     checkAbort();
-
-    final GraphProxy oldGraph = oldComponent.getGraph();
-    final GraphProxy newGraph = visitGraphProxy(oldGraph);
-
-    if (newGraph != oldGraph) {
-      final SimpleComponentProxy newComponent =
-        mFactory.createSimpleComponentProxy(oldComponent.getIdentifier(),
-                                            oldComponent.getKind(), newGraph,
-                                            oldComponent.getAttributes());
-      mCompilationInfo.add(newComponent, oldComponent);
-      mComponents.add(newComponent);
-    } else {
-      mComponents.add(oldComponent);
-    }
-
-    return null;
-  }
-
-  /**
-   * Visits a {@link VariableComponentProxy} of a {@link ModuleProxy}.
-   * <p>
-   * Adds it to the list of components without performing any modification,
-   * as variables are not relevant to this part of the compiler.
-   */
-  @Override
-  public Object visitVariableComponentProxy
-                (final VariableComponentProxy oldVar) throws VisitorException
-  {
-    checkAbort();
-    mComponents.add(oldVar);
+    mOldEdges.add(edge);
     return null;
   }
 
@@ -311,6 +254,22 @@ public class GroupNodeCompiler
                                      resultNodes, mNewEdges);
   }
 
+  @Override
+  public ModuleProxy visitModuleProxy(final ModuleProxy inputModule)
+    throws VisitorException
+  {
+    mComponents = new ArrayList<>();
+    visitCollection(inputModule.getComponentList());
+
+    return mFactory.createModuleProxy(inputModule.getName(),
+                                      inputModule.getComment(),
+                                      inputModule.getLocation(),
+                                      inputModule.getConstantAliasList(),
+                                      inputModule.getEventDeclList(),
+                                      inputModule.getEventAliasList(),
+                                      mComponents);
+  }
+
   /**
    * Processes a raw node and adds it to the list of CompiledNodes.
    */
@@ -323,13 +282,53 @@ public class GroupNodeCompiler
   }
 
   /**
-   * Adds an edge from the raw collection to the list of edges.
+   * Visits a {@link SimpleComponentProxy} of a {@link ModuleProxy}.
+   * <p>
+   * If the graph of a component contains group nodes, a new graph would be
+   * created, and it will be added to the result list of components.
+   * <p>
+   * Otherwise, if the group contains no group nodes, it will not be changed,
+   * and the original graph will be added to the list of components.
+   *
+   * @param oldComponent
+   *          A component of the original module
+   * @return Unimportant
    */
   @Override
-  public Object visitEdgeProxy(final EdgeProxy edge) throws VisitorException
+  public Object visitSimpleComponentProxy
+            (final SimpleComponentProxy oldComponent) throws VisitorException
   {
     checkAbort();
-    mOldEdges.add(edge);
+
+    final GraphProxy oldGraph = oldComponent.getGraph();
+    final GraphProxy newGraph = visitGraphProxy(oldGraph);
+
+    if (newGraph != oldGraph) {
+      final SimpleComponentProxy newComponent =
+        mFactory.createSimpleComponentProxy(oldComponent.getIdentifier(),
+                                            oldComponent.getKind(), newGraph,
+                                            oldComponent.getAttributes());
+      mCompilationInfo.add(newComponent, oldComponent);
+      mComponents.add(newComponent);
+    } else {
+      mComponents.add(oldComponent);
+    }
+
+    return null;
+  }
+
+  /**
+   * Visits a {@link VariableComponentProxy} of a {@link ModuleProxy}.
+   * <p>
+   * Adds it to the list of components without performing any modification,
+   * as variables are not relevant to this part of the compiler.
+   */
+  @Override
+  public Object visitVariableComponentProxy
+                (final VariableComponentProxy oldVar) throws VisitorException
+  {
+    checkAbort();
+    mComponents.add(oldVar);
     return null;
   }
 
