@@ -71,15 +71,16 @@ public class CompilationInfo
   {
     if (isSourceInfoEnabled())
     {
-      SourceInfo info = getSourceInfo(source);
+      SourceInfo info;
+      if (!stackIsEmpty())
+        info = new SourceInfo(getStackBase(), context);
+      else
+        info = getSourceInfo(source);
 
-      if (info == null)
-      {
+      if (info == null) {
         info = new SourceInfo(source, context);
         add(target, info);
-      }
-      else
-      {
+      } else {
         if (context != null)
           info = new SourceInfo(info.getSourceObject(), context);
         add(target, info);
@@ -89,8 +90,7 @@ public class CompilationInfo
 
   public void add(final Object target, final SourceInfo info)
   {
-    if (isSourceInfoEnabled())
-      mResultMap.put(target, info);
+    mResultMap.put(target, info);
   }
 
   public Map<Object,SourceInfo> getResultMap()

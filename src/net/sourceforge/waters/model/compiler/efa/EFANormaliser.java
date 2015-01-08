@@ -55,7 +55,6 @@ import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
-import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
@@ -630,24 +629,23 @@ public class EFANormaliser extends AbortableCompiler
     public EdgeProxy visitEdgeProxy(final EdgeProxy edge)
       throws VisitorException
     {
-      try{
+      try {
         final NodeProxy source0 = edge.getSource();
         final NodeProxy source1 = mNodeMap.get(source0);
         final NodeProxy target0 = edge.getTarget();
         final NodeProxy target1 = mNodeMap.get(target0);
 
         final GuardActionBlockProxy ga = edge.getGuardActionBlock();
-        if (ga == null) {
+        if (ga == null)
           mCurrentUpdate = ConstraintList.TRUE;
-        } else {
+        else
           visitGuardActionBlockProxy(ga);
-        }
 
         final LabelBlockProxy block0 = edge.getLabelBlock();
         final LabelBlockProxy block1 = visitLabelBlockProxy(block0);
 
         final EdgeProxy result = mFactory.createEdgeProxy
-          (source1, target1, block1, null, null, null, null);
+                          (source1, target1, block1, null, null, null, null);
         mEdgeList.add(result);
         return result;
       } finally {
@@ -665,31 +663,31 @@ public class EFANormaliser extends AbortableCompiler
         mNodeList = new ArrayList<>(numnodes);
         mNodeMap = new HashMap<>(numnodes);
         visitCollection(nodes);
+
         final Collection<EdgeProxy> edges = graph.getEdges();
         final int numedges = edges.size();
         mEdgeList = new ArrayList<>(numedges);
         mCurrentEvents = new THashSet<>();
         mCurrentIdentifiers = new THashSet<>();
         visitCollection(edges);
+
         final LabelBlockProxy blocked = graph.getBlockedEvents();
-        if (blocked != null) {
+        if (blocked != null)
           visitLabelBlockProxy(blocked);
-        }
+
         final List<EFAEventInfo> events = new ArrayList<>(mCurrentEvents);
         Collections.sort(events);
         final List<IdentifierProxy> blockedList = new LinkedList<>();
-        for (final EFAEventInfo event : events) {
-          for (final EFAIdentifier ident : event.getEvents()) {
-            if (!mCurrentIdentifiers.contains(ident)) {
+        for (final EFAEventInfo event : events)
+          for (final EFAIdentifier ident : event.getEvents())
+            if (!mCurrentIdentifiers.contains(ident))
               blockedList.add(ident.getIdentifier());
-            }
-          }
-        }
-        final LabelBlockProxy newBlocked = blockedList.isEmpty() ? null :
-          mFactory.createLabelBlockProxy(blockedList, null);
+        final LabelBlockProxy newBlocked =blockedList.isEmpty() ? null :
+                           mFactory.createLabelBlockProxy(blockedList, null);
+
         final boolean deterministic = graph.isDeterministic();
         return mFactory.createGraphProxy
-          (deterministic, newBlocked, mNodeList, mEdgeList);
+                           (deterministic, newBlocked, mNodeList, mEdgeList);
       } finally {
         mNodeList = null;
         mNodeMap = null;
@@ -697,32 +695,6 @@ public class EFANormaliser extends AbortableCompiler
         mCurrentEvents = null;
         mCurrentIdentifiers = null;
       }
-    }
-
-    @Override
-    public GroupNodeProxy visitGroupNodeProxy(final GroupNodeProxy group)
-      throws VisitorException
-    {
-      final String name = group.getName();
-      final PlainEventListProxy props0 = group.getPropositions();
-      final PlainEventListProxy props1 =
-        (PlainEventListProxy) mCloner.getClone(props0);
-      final Map<String,String> attribs0 = group.getAttributes();
-      final Map<String,String> attribs1 = new HashMap<>(attribs0);
-      final Collection<NodeProxy> children0 = group.getImmediateChildNodes();
-      final int numchildren = children0.size();
-      final Collection<NodeProxy> children1 =
-        new ArrayList<NodeProxy>(numchildren);
-      for (final NodeProxy child0 : children0) {
-        final NodeProxy child1 = mNodeMap.get(child0);
-        children1.add(child1);
-      }
-      final GroupNodeProxy result =
-        mFactory.createGroupNodeProxy(name, props1, attribs1, children1, null);
-      mNodeList.add(result);
-      mNodeMap.put(group, result);
-      mCompilationInfo.add(result, group);
-      return result;
     }
 
     @Override
@@ -743,23 +715,31 @@ public class EFANormaliser extends AbortableCompiler
     public Object visitIdentifierProxy(final IdentifierProxy ident)
       throws VisitorException
     {
-      try {
+      try
+      {
         checkAbortInVisitor();
+
         final EFAEventInfo info = findEventInfo(ident);
         mCurrentEvents.add(info);
-        if (mCurrentUpdate != null) {
+        if (mCurrentUpdate != null)
+        {
           final List<EFAIdentifier> events =
-            info.getEvents(mCurrentComponent, mCurrentUpdate);
-          for (final EFAIdentifier event : events) {
-            final IdentifierProxy subident = event.getIdentifier();
-            if (!identifierNotDeclared(subident))
-              mLabelList.add(subident);
+                           info.getEvents(mCurrentComponent, mCurrentUpdate);
+
+          for (final EFAIdentifier event : events)
+          {
+            IdentifierProxy subIdent = event.getIdentifier();
+            subIdent = (IdentifierProxy) mCloner.getClone(subIdent);
+            if (!identifierNotDeclared(subIdent))
+              mLabelList.add(subIdent);
             mCurrentIdentifiers.add(event);
-            mCompilationInfo.add(subident, ident);
+            mCompilationInfo.add(subIdent, ident);
           }
         }
         return null;
-      } catch(final UndefinedIdentifierException exception) {
+      }
+
+      catch(final UndefinedIdentifierException exception) {
         throw wrap(exception);
       }
     }
