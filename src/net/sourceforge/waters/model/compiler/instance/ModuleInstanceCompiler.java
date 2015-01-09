@@ -635,18 +635,6 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
         }
       }
 
-      /* If the current GuardActionBlock is an instantiation,
-       * then the source information of the guards and actions
-       * should be the InstanceProxy of the base module.
-       */
-      if (!mCompilationInfo.stackIsEmpty()) {
-        final InstanceProxy source = mCompilationInfo.getStackBase();
-        for (final SimpleExpressionProxy guard : newguards)
-          mCompilationInfo.add(guard, source);
-        for (final BinaryExpressionProxy action: newactions)
-          mCompilationInfo.add(action, source);
-      }
-
       final GuardActionBlockProxy newga =
           mFactory.createGuardActionBlockProxy(newguards, newactions, null);
       addSourceInfo(newga, ga);
@@ -1115,9 +1103,9 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     mCurrentBlockedEvents.addEvent(event);
   }
 
-  private void addSourceInfo(final Proxy target, final Proxy source)
+  private void addSourceInfo(final Proxy object, final Proxy source)
   {
-    mCompilationInfo.add(target, source, mContext);
+    mCompilationInfo.add(object, source);
   }
 
   private boolean isDisabledProposition(final CompiledEvent event)

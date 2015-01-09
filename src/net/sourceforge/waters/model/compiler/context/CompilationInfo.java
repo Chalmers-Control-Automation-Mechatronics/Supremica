@@ -63,34 +63,36 @@ public class CompilationInfo
 
   public void add(final Object target, final Proxy source)
   {
-    add(target, source, null);
+    if (isSourceInfoEnabled())
+    {
+      if (!stackIsEmpty()) {
+        add(target, getStackBase(), null);
+      } else {
+        add(target, source, null);
+      }
+    }
   }
 
-  public void add(final Object target, final Proxy source,
-                  final BindingContext context)
+  private void add(final Object target, final Proxy source,
+                   final BindingContext context)
   {
     if (isSourceInfoEnabled())
     {
-      SourceInfo info;
-      if (!stackIsEmpty())
-        info = new SourceInfo(getStackBase(), context);
-      else
-        info = getSourceInfo(source);
-
+      SourceInfo info = getSourceInfo(source);
       if (info == null) {
         info = new SourceInfo(source, context);
-        add(target, info);
       } else {
         if (context != null)
           info = new SourceInfo(info.getSourceObject(), context);
-        add(target, info);
       }
+      add(target, info);
     }
   }
 
   public void add(final Object target, final SourceInfo info)
   {
-    mResultMap.put(target, info);
+    if (isSourceInfoEnabled())
+      mResultMap.put(target, info);
   }
 
   public Map<Object,SourceInfo> getResultMap()
