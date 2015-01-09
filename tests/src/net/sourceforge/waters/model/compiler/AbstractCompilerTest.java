@@ -715,9 +715,7 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
 
   //#########################################################################
   //# Customisation
-  void configure(final ModuleCompiler compiler)
-  {
-  }
+  void configure(final ModuleCompiler compiler) { }
 
   abstract String[] getTestSuffices();
 
@@ -843,8 +841,7 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
                                   final List<ParameterBindingProxy> bindings)
     throws EvalException
   {
-    mCompiler =
-      new ModuleCompiler(mDocumentManager, mProductDESFactory, module);
+    mCompiler = new ModuleCompiler(mDocumentManager, mProductDESFactory, module);
     configure(mCompiler);
     return mCompiler.compile(bindings);
   }

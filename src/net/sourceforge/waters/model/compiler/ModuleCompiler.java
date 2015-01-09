@@ -37,7 +37,7 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
 public class ModuleCompiler extends AbortableCompiler
 {
   //##########################################################################
-  //# Constructors
+  //# Constructor
   public ModuleCompiler(final DocumentManager manager,
                         final ProductDESProxyFactory factory,
                         final ModuleProxy module)
@@ -46,6 +46,7 @@ public class ModuleCompiler extends AbortableCompiler
     mFactory = factory;
     mInputModule = module;
     mCompilationInfoIsDirty = true;
+    mCompilationInfo = new CompilationInfo();
   }
 
 
@@ -59,8 +60,7 @@ public class ModuleCompiler extends AbortableCompiler
   public void setInputModule(final ModuleProxy module, final boolean clone)
   {
     if (clone) {
-      mCompilationInfo =
-        new CompilationInfo(mIsSourceInfoEnabled, mIsMultiExceptionsEnabled);
+      mCompilationInfo = new CompilationInfo();
       mCompilationInfoIsDirty = false;
       final ModuleProxyFactory modfactory =
         ModuleElementFactory.getInstance();
@@ -119,8 +119,8 @@ public class ModuleCompiler extends AbortableCompiler
   public ProductDESProxy compile(final List<ParameterBindingProxy> bindings)
     throws EvalException
   {
-    try {
-      setUp();
+    try
+    {
       if (mCompilationInfoIsDirty) {
         mCompilationInfo = new CompilationInfo(mIsSourceInfoEnabled,
                                                mIsMultiExceptionsEnabled);
@@ -243,6 +243,7 @@ public class ModuleCompiler extends AbortableCompiler
   public void setSourceInfoEnabled(final boolean enable)
   {
     mIsSourceInfoEnabled = enable;
+    mCompilationInfo.setSourceInfoEnabled(enable);
   }
 
   public boolean isMultiExceptionsEnabled()
@@ -253,6 +254,7 @@ public class ModuleCompiler extends AbortableCompiler
   public void setMultiExceptionsEnabled(final boolean enable)
   {
     mIsMultiExceptionsEnabled = enable;
+    mCompilationInfo.setMultiExceptionsEnabled(enable);
   }
 
   public Collection<String> getEnabledPropertyNames()
@@ -296,10 +298,6 @@ public class ModuleCompiler extends AbortableCompiler
 
   //##########################################################################
   //# Auxiliary Methods
-  private void setUp()
-  {
-  }
-
   private void tearDown()
   {
     mCompilationInfoIsDirty = true;
@@ -319,9 +317,7 @@ public class ModuleCompiler extends AbortableCompiler
         final String name = mInputModule.getName();
         final URI desLocation = moduleLocation.resolve(name + ext);
         des.setLocation(desLocation);
-      } catch (final IllegalArgumentException exception) {
-        // No marshaller --- O.K.
-      }
+      } catch (final IllegalArgumentException exception) { }
     }
   }
 

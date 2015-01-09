@@ -36,21 +36,25 @@ public class CompilationInfo
   //# Constructor
   /**
    * Creates compilation information.
-   *
-   * @param sourceInfoEnabled       If source information should be enabled.
-   * @param multiExceptionsEnabled  If multiple exceptions should be enabled.
    */
-  public CompilationInfo(final boolean sourceInfoEnabled,
-                         final boolean multiExceptionsEnabled)
+  public CompilationInfo()
   {
-    mExceptions = multiExceptionsEnabled ? new MultiEvalException() : null;
-    mInstanceStack = new LinkedList<>();
-    mResultMap = sourceInfoEnabled ? new HashMap<Object,SourceInfo>() : null;
+    mExceptions = new MultiEvalException();
+    mInstanceStack = new LinkedList<InstanceProxy>();
+    mResultMap = new HashMap<Object,SourceInfo>();
+  }
+
+  public CompilationInfo(final boolean sourceInfoEnabled,
+                         final boolean multiExceptionEnabled)
+  {
+    mExceptions = multiExceptionEnabled ? new MultiEvalException() : null;
+    mInstanceStack = sourceInfoEnabled ? new LinkedList<InstanceProxy>() : null;
+    mResultMap = sourceInfoEnabled? new HashMap<Object,SourceInfo>() : null;
   }
 
 
   //#########################################################################
-  //# Access
+  //# Configuation
   public boolean isSourceInfoEnabled()
   {
     return mResultMap != null;
@@ -61,6 +65,28 @@ public class CompilationInfo
     return mExceptions != null;
   }
 
+  public void setSourceInfoEnabled(final boolean enabled)
+  {
+    if (enabled) {
+      if (mResultMap == null)
+        mResultMap = new HashMap<Object,SourceInfo>();
+    }
+    else
+      mResultMap = null;
+  }
+
+  public void setMultiExceptionsEnabled(final boolean enabled)
+  {
+    if (enabled) {
+      if (mExceptions == null)
+        mExceptions = new MultiEvalException();
+    }
+    else
+      mExceptions = null;
+  }
+
+  //#########################################################################
+  //# Access
   public void add(final Object target, final Proxy source)
   {
     if (isSourceInfoEnabled())
@@ -281,5 +307,5 @@ public class CompilationInfo
   /**
    * A map from target objects to their sources.
    */
-  private final Map<Object,SourceInfo> mResultMap;
+  private Map<Object,SourceInfo> mResultMap;
 }
