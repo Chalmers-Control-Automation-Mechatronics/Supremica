@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="instantiate_edge" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ComponentList>
+        <Instance ModuleName="/Scratch/rcs14/waters/examples/waters/tests/compiler/graph/edge0" Name="EdgeError"/>
+    </ComponentList>
+</Module>

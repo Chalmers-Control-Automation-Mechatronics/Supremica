@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="instantiate_guard2" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ComponentList>
+        <Instance ModuleName="../../efa/assignment_in_guard2" Name="GuardError2">
+            <ParameterBinding Name="size">
+                <IntConstant Value="1"/>
+            </ParameterBinding>
+            <ParameterBinding Name="get">
+                <EventListExpression/>
+            </ParameterBinding>
+            <ParameterBinding Name="put">
+                <EventListExpression/>
+            </ParameterBinding>
+            <ParameterBinding Name=":accepting">
+                <EventListExpression/>
+            </ParameterBinding>
+        </Instance>
+    </ComponentList>
+</Module>
