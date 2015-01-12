@@ -104,6 +104,7 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
  *
  * @author Robi Malik, Roger Su
  */
+
 public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
                                     implements Abortable
 {
@@ -312,8 +313,10 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
         ga1 = visitGuardActionBlockProxy(ga0);
         final List<SimpleExpressionProxy> guards = ga1.getGuards();
         final List<BinaryExpressionProxy> actions = ga1.getActions();
-        if (guards.isEmpty() && actions.isEmpty()) {
+        if (guards.isEmpty()) {
+          if (actions.isEmpty()) {
             ga1 = null;
+          }
         } else {
           final Iterator<SimpleExpressionProxy> iter = guards.iterator();
           final SimpleExpressionProxy guard = iter.next();
@@ -575,7 +578,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     {
       final List<SimpleExpressionProxy> oldguards = ga.getGuards();
       final int numguards = oldguards.size();
-      final List<SimpleExpressionProxy> newGuards =
+      final List<SimpleExpressionProxy> newguards =
                              new ArrayList<SimpleExpressionProxy>(numguards);
 
       for (final SimpleExpressionProxy oldguard : oldguards)
@@ -589,7 +592,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
           final SimpleExpressionProxy newguard =
                           (SimpleExpressionProxy) mCloner.getClone(oldguard);
           addSourceInfo(newguard, oldguard);
-          newGuards.add(newguard);
+          newguards.add(newguard);
         }
 
         else
@@ -598,13 +601,13 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
                                     mSimpleExpressionCompiler.simplify
                                       (oldguard, mNameSpaceVariablesContext);
           if (!mSimpleExpressionCompiler.isAtomicValue(newguard, mContext)) {
-            newGuards.add(newguard);
+            newguards.add(newguard);
           } else if (mSimpleExpressionCompiler.getBooleanValue(newguard)) {
             // Don't bother to add true guards.
           } else {
             // If a guard is false, no need for any other guards.
-            newGuards.clear();
-            newGuards.add(newguard);
+            newguards.clear();
+            newguards.add(newguard);
             break;
           }
         }
@@ -612,7 +615,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
 
       final List<BinaryExpressionProxy> oldactions = ga.getActions();
       final int numactions = oldactions.size();
-      final List<BinaryExpressionProxy> newActions =
+      final List<BinaryExpressionProxy> newactions =
                             new ArrayList<BinaryExpressionProxy>(numactions);
 
       for (final BinaryExpressionProxy oldaction : oldactions)
@@ -626,14 +629,14 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
         {
           final BinaryExpressionProxy newbinary =
                                             (BinaryExpressionProxy) newaction;
-          newActions.add(newbinary);
+          newactions.add(newbinary);
         } else {
           throw new TypeMismatchException(oldaction, "ACTION");
         }
       }
 
       final GuardActionBlockProxy newga =
-          mFactory.createGuardActionBlockProxy(newGuards, newActions, null);
+          mFactory.createGuardActionBlockProxy(newguards, newactions, null);
       addSourceInfo(newga, ga);
       return newga;
     } catch (final EvalException exception) {
