@@ -104,8 +104,8 @@ public class EFANormaliser extends AbortableCompiler
   //#########################################################################
   //# Constructor
   public EFANormaliser(final ModuleProxyFactory factory,
-                    final CompilationInfo compilationInfo,
-                    final ModuleProxy module)
+                       final CompilationInfo compilationInfo,
+                       final ModuleProxy module)
   {
     mFactory = factory;
     mOperatorTable = CompilerOperatorTable.getInstance();
@@ -1054,12 +1054,12 @@ public class EFANormaliser extends AbortableCompiler
     }
 
     /**
-     * If the flag {HOW TO LINK TO mUsesEventAlphabet?} is set, then
+     * If the flag {@link #mUsesEventAlphabet} is set, then
      * this means that when a variable is not mentioned in an update,
      * this particular variable can be changed.
      * <p>
-     * This method achieves this by explicitly adding extra terms to
-     * the updates.
+     * This method achieves this by explicitly adding extra terms in the
+     * form of (x'= x') to the updates.
      */
     private void createExplicitGuards()
     {
@@ -1843,7 +1843,7 @@ public class EFANormaliser extends AbortableCompiler
 
   // Flags:
   private boolean mCreatesGuardAutomaton = false;
-  private boolean mUsesEventAlphabet = false; // Old semantics
+  private boolean mUsesEventAlphabet = false; // Defalt: New semantics
   private boolean mUsesEventNameBuilder = false;
 
   // Utilities:
@@ -1871,5 +1871,4 @@ public class EFANormaliser extends AbortableCompiler
    * associated update ({@link ConstraintList}).
    */
   private ProxyAccessorMap<IdentifierProxy,ConstraintList> mEventUpdateMap;
-
 }

@@ -346,5 +346,4 @@ public class ModuleCompiler extends AbortableCompiler
   private Collection<String> mEnabledPropertyNames = null;
   private Collection<String> mEnabledPropositionNames = null;
   private HISCCompileMode mHISCCompileMode = HISCCompileMode.NOT_HISC;
-
 }

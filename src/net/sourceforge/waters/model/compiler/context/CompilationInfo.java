@@ -1,3 +1,4 @@
+
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
@@ -145,7 +146,8 @@ public class CompilationInfo
    */
   public void addCurrentInstance(final InstanceProxy inst)
   {
-    mInstanceStack.add(inst);
+    if (mInstanceStack != null)
+      mInstanceStack.add(inst);
   }
 
   /**
@@ -155,7 +157,7 @@ public class CompilationInfo
    */
   public void removeCurrentInstance()
   {
-    if (mInstanceStack.size() > 0)
+    if (mInstanceStack != null && mInstanceStack.size() > 0)
       mInstanceStack.remove(mInstanceStack.size()-1);
   }
 
