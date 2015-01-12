@@ -668,6 +668,38 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     compileError(module, EventKindException.class, "'repair1'");
   }
 
+  public void testCompile_instantiate_batch_tank_out()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "instance", "instantiate_batch_tank_out");
+    compileError(module, UndefinedIdentifierException.class, "'out'");
+  }
+
+  public void testCompile_instantiate_edge()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "compiler", "instance",
+                                          "instantiate_edge");
+    compileError(module, InstantiationException.class, "q0");
+  }
+
+  public void testCompile_instantiate_error7()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "compiler", "instance",
+                                          "instantiate_error7");
+    compileError(module, UndefinedIdentifierException.class, "'buffer.curr");
+  }
+
+  public void testCompile_instantiate_error8()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "compiler", "instance",
+                                          "instantiate_error8");
+    compileError(module, InstantiationException.class, "'repair1'");
+  }
+
   public void testCompile_instantiate_graph()
     throws IOException, WatersException
   {
@@ -675,6 +707,55 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
       loadModule("tests", "compiler", "instance", "instantiate_graph");
     compileError(module, NondeterministicModuleException.class,
                  "'s0'", "'nondet_error.a'");
+  }
+
+  public void testCompile_instantiate_group()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "instance", "instantiate_group");
+    compileError(module, NondeterministicModuleException.class,
+                 "'q0'", "'nodegroup3.nodegroup3'");
+  }
+
+  public void testCompile_instantiate_guard1()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "instance", "instantiate_guard1");
+    compileError(module, ActionSyntaxException.class, "Assignment operator =");
+  }
+
+  public void testCompile_instantiate_guard2()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "instance", "instantiate_guard2");
+    compileError(module, ActionSyntaxException.class, "Assignment operator =");
+  }
+
+  public void testCompile_instantiate_twoinit()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "instance", "instantiate_twoinit");
+    compileError(module, NondeterministicModuleException.class, "'Two_Initials.comp'");
+  }
+
+  public void testCompile_instantiate_undefvar1()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "instance", "instantiate_undefvar1");
+    compileError(module, UndefinedIdentifierException.class, "'undefvar'");
+  }
+
+  public void testCompile_instantiate_undefvar2()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "instance", "instantiate_undefvar2");
+    compileError(module, UndefinedIdentifierException.class, "'undefvar'");
   }
 
   public void testCompile_markus1()
