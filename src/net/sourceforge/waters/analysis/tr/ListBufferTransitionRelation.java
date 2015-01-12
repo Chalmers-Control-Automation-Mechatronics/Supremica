@@ -46,32 +46,32 @@ import org.apache.log4j.Logger;
 
 /**
  * A more convenient means to store and retrieve transitions of an automaton.
- *
+ * <p>
  * The list buffer transition relation is created from an automaton to index
  * its transitions, making it easier to associate states with transitions, and
  * to modify the transition structure.
- *
+ * <p>
  * Transitions are stored in a {@link TransitionListBuffer} in bit-packed form
  * in blocked linked lists. The user may choose to create a buffer for
  * outgoing transitions, which enables quick access to transitions given their
  * source state, or a buffer for incoming transitions, which enables quick
  * access to transitions given their target state, or both.
- *
+ * <p>
  * Reconfiguration of the buffer selection is possible, but time-consuming.
  * Some methods require the presence or absence of the incoming or outgoing
  * buffer, see details with each method.
- *
+ * <p>
  * The encoding of states and events is defined by the user upon creation of
  * the transition relation, using a {@link StateEncoding} and an
  * {@link EventEncoding}. After construction, the encoding can no longer be
  * changed, except that events can be removed (marked as unused) and states
  * can be marked as unreachable. These removals will be respected when
  * creating an automaton from the transition relation.
- *
+ * <p>
  * The transition buffers recognise the silent event code
  * {@link EventEncoding#TAU} and automatically suppress all selfloops using
  * this event.
- *
+ * <p>
  * The transition relation also associates with each state its initial status
  * and its propositions in a bit set, using an {@link IntStateBuffer}.
  *
@@ -82,11 +82,8 @@ import org.apache.log4j.Logger;
  *
  * @author Robi Malik
  */
-
-public class ListBufferTransitionRelation
-  implements EventStatusProvider
+public class ListBufferTransitionRelation implements EventStatusProvider
 {
-
   //#########################################################################
   //# Constructors
   /**
@@ -727,7 +724,6 @@ public class ListBufferTransitionRelation
     }
     return -1;
   }
-
 
   /**
    * Gets the reachability status of the given state. Each state has a
@@ -3119,5 +3115,4 @@ public class ListBufferTransitionRelation
    */
   public static final int CONFIG_ALL = CONFIG_SUCCESSORS
                                        | CONFIG_PREDECESSORS;
-
 }
