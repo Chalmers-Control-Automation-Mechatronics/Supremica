@@ -18,7 +18,7 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.context.CompilationInfo;
-import net.sourceforge.waters.model.compiler.efa.EFAUnifier;
+import net.sourceforge.waters.model.compiler.efa.EFANormaliser;
 import net.sourceforge.waters.model.compiler.groupnode.GroupNodeCompiler;
 import net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
@@ -37,12 +37,10 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
  *
  * @author Robi Malik, Sahar Mohajerani
  */
-
 class UnifiedEFACompiler extends AbstractEFAAlgorithm
 {
-
   //##########################################################################
-  //# Constructors
+  //# Constructor
   UnifiedEFACompiler(final DocumentManager manager,
                      final ModuleProxy module)
   {
@@ -60,8 +58,8 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
     if (mModuleInstanceCompiler != null) {
       mModuleInstanceCompiler.requestAbort();
     }
-    if (mEFAUnifier != null) {
-      mEFAUnifier.requestAbort();
+    if (mEFANormaliser != null) {
+      mEFANormaliser.requestAbort();
     }
   }
 
@@ -72,8 +70,8 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
     if (mModuleInstanceCompiler != null) {
       mModuleInstanceCompiler.resetAbort();
     }
-    if (mEFAUnifier != null) {
-      mEFAUnifier.resetAbort();
+    if (mEFANormaliser != null) {
+      mEFANormaliser.resetAbort();
     }
   }
 
@@ -85,7 +83,7 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
   {
     super.tearDown();
     mModuleInstanceCompiler = null;
-    mEFAUnifier = null;
+    mEFANormaliser = null;
     mSystemBuilder = null;
   }
 
@@ -132,12 +130,12 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
       mGroupNodeCompiler = null;
 
       //Normalisation
-      mEFAUnifier =
-        new EFAUnifier(modfactory, mCompilationInfo, instantiated);
-      final ModuleProxy unified = mEFAUnifier.compile();
+      mEFANormaliser =
+        new EFANormaliser(modfactory, mCompilationInfo, instantiated);
+      final ModuleProxy unified = mEFANormaliser.compile();
       final ProxyAccessorMap<IdentifierProxy, ConstraintList> map =
-        mEFAUnifier.getEventUpdateMap();
-      mEFAUnifier = null;
+        mEFANormaliser.getEventUpdateMap();
+      mEFANormaliser = null;
 
       //Create UnifiedEFASystem
       mSystemBuilder = new UnifiedEFASystemBuilder
@@ -221,7 +219,7 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
 
   private ModuleInstanceCompiler mModuleInstanceCompiler;
   private GroupNodeCompiler mGroupNodeCompiler;
-  private EFAUnifier mEFAUnifier;
+  private EFANormaliser mEFANormaliser;
   private UnifiedEFASystemBuilder mSystemBuilder;
   private CompilationInfo mCompilationInfo;
 
@@ -230,5 +228,4 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
   private boolean mIsMultiExceptionsEnabled = false;
   private Collection<String> mEnabledPropertyNames = null;
   private IdentifierProxy mMarking;
-
 }

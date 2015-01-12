@@ -28,16 +28,8 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
 
-/**
- * A test for the {@link UnifiedEFAConflictChecker}.
- *
- * @author Sahar Mohajerani, Robi Malik
- */
-
-public class UnifiedEFAConflictCheckerTest
-  extends AbstractAnalysisTest
+public class UnifiedEFAConflictCheckerTest extends AbstractAnalysisTest
 {
-
   //#########################################################################
   //# Entry points in junit.framework.TestCase
   public static Test suite()
@@ -192,7 +184,7 @@ public class UnifiedEFAConflictCheckerTest
     checkPhilosophers("dining_philosophers", 5, false);
   }
 
-  /*---------------------------- EFA ---------------------------------------*/
+  /*---------------------------- EFA --------------------------------------*/
 
   public void testCaseStudy()
     throws IOException, WatersException
@@ -243,36 +235,36 @@ public class UnifiedEFAConflictCheckerTest
   }
 
 
-  /*--------------------------- Goran --------------------------------------*/
+  /*--------------------------- Goran -------------------------------------*/
+  /*
+  public void testGoranSimpleTestSystem()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "goran", "goran-SimpleTestSystem");
+    checkConflict(module, true);
+  }
 
-//  public void testGoranSimpleTestSystem()
-//    throws IOException, WatersException
-//  {
-//    final ModuleProxy module =
-//      loadModule("tests", "goran", "goran-SimpleTestSystem");
-//    checkConflict(module, true);
-//  }
-//
-//  public void testGoranSMB()
-//    throws IOException, WatersException
-//  {
-//    final ModuleProxy module = loadModule("tests", "goran", "goran-sm-b");
-//    checkConflict(module, false);
-//  }
-//
-//  public void testGoranKulbanaNB()
-//    throws IOException, WatersException
-//  {
-//    final ModuleProxy module = loadModule("tests", "goran", "goran-Kulbana");
-//    checkConflict(module, true);
-//  }
+  public void testGoranSMB()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "goran", "goran-sm-b");
+    checkConflict(module, false);
+  }
 
-  /*--------------------------- Transfer Line ------------------------------*/
+  public void testGoranKulbanaNB()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "goran", "goran-Kulbana");
+    checkConflict(module, true);
+  }
+
+  /*-------------------------- Transfer Line ------------------------------*/
 
   public void testTransferLineEFA131()
     throws IOException, WatersException
   {
-    checkTransferLineEFA("transferline_efa", 1, 3, 1, true);
+    checkTransferLineEFA("transferline_norm", 1, 3, 1, true);
   }
 
   public void testTransferLineEFA131Block()
@@ -287,7 +279,7 @@ public class UnifiedEFAConflictCheckerTest
     checkTransferLineEFA("transferline_efa_block", 3, 10, 10, false);
   }
 
-  // TODO Argh! This one is much too slow ...
+  // TODO Argh! This one is much too slow!
   public void testTransferLineEFA20Block()
     throws IOException, WatersException
   {
@@ -324,7 +316,7 @@ public class UnifiedEFAConflictCheckerTest
     checkTransferLineEFSM("transferline_efsm_block", 2, 2, false);
   }
 
-  /*---------------------------- PROFIsafe ---------------------------------*/
+  /*---------------------------- PROFIsafe --------------------------------*/
 
   public void testProfisafeISlaveEFSM1()
     throws IOException, WatersException
@@ -374,7 +366,7 @@ public class UnifiedEFAConflictCheckerTest
     checkProfisafe("profisafe_ihost_efsm", 4 ,true);
   }
 
-  /*--------------------------- Prime Sieve --------------------------------*/
+  /*--------------------------- Prime Sieve -------------------------------*/
 
   public void testPrimeSieve2a()
     throws IOException, WatersException
@@ -425,7 +417,7 @@ public class UnifiedEFAConflictCheckerTest
     checkConflict(module, true);
   }
 
-  /*--------------------------- Dynamic Sieve ------------------------------*/
+  /*--------------------------- Dynamic Sieve -----------------------------*/
 
   public void testDynamicPrimeSieve2()
     throws IOException, WatersException
@@ -465,7 +457,7 @@ public class UnifiedEFAConflictCheckerTest
   }
   */
 
-  /*----------------------------- PSL --------------------------------------*/
+  /*----------------------------- PSL -------------------------------------*/
   public void testPslVerySmallNonblocking()
     throws IOException, WatersException
   {
@@ -723,7 +715,7 @@ public class UnifiedEFAConflictCheckerTest
   //# Customisation
   void configure(final UnifiedEFAConflictChecker checker)
   {
-    // TODO Configure here ...
+    // TODO Configuration:
     final DocumentManager manager = getDocumentManager();
     checker.setDocumentManager(manager);
     checker.setUsesLocalVariable(true);
@@ -753,5 +745,4 @@ public class UnifiedEFAConflictCheckerTest
     assertEquals("Unexpected result from conflict check!", expected, result);
     return result;
   }
-
 }
