@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="instantiate_groupnode" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>A compiler test to check whether an error within an instance detected during group node compilation is handled correctly.</ns2:Comment>
-    <ComponentList>
-        <Instance ModuleName="../groupnode/nodegroup3" Name="nodegroup3"/>
-    </ComponentList>
-</Module>
