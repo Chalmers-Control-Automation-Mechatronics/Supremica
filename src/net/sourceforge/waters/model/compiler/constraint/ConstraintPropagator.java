@@ -74,10 +74,8 @@ import org.apache.log4j.Logger;
  *
  * @author Robi Malik
  */
-
 public class ConstraintPropagator
 {
-
   //#########################################################################
   //# Constructors
   /**
@@ -87,10 +85,9 @@ public class ConstraintPropagator
    * @param root     Context providing values of bound symbols and
    *                 ranges of EFA variables.
    */
-  public ConstraintPropagator
-    (final ModuleProxyFactory factory,
-     final CompilerOperatorTable optable,
-     final VariableContext root)
+  public ConstraintPropagator(final ModuleProxyFactory factory,
+                              final CompilerOperatorTable optable,
+                              final VariableContext root)
   {
     this(factory, new CompilationInfo(false, false), optable, root);
   }
@@ -102,11 +99,10 @@ public class ConstraintPropagator
    * @param root     Context providing values of bound symbols and
    *                 ranges of EFA variables.
    */
-  public ConstraintPropagator
-    (final ModuleProxyFactory factory,
-     final CompilationInfo compilationInfo,
-     final CompilerOperatorTable optable,
-     final VariableContext root)
+  public ConstraintPropagator(final ModuleProxyFactory factory,
+                              final CompilationInfo compilationInfo,
+                              final CompilerOperatorTable optable,
+                              final VariableContext root)
   {
     mFactory = factory;
     mOperatorTable = optable;
@@ -256,8 +252,7 @@ public class ConstraintPropagator
    * To simplify, {@link #propagate()} should be called.</P>
    * @param constraints  List of constraints to be added.
    */
-  public void addConstraints
-    (final Collection<SimpleExpressionProxy> constraints)
+  public void addConstraints(final Collection<SimpleExpressionProxy> constraints)
   {
     for (final SimpleExpressionProxy constraint : constraints) {
       addConstraint(constraint);
@@ -414,30 +409,19 @@ public class ConstraintPropagator
    * {@link #isUnsatisfiable()}, {@link #getAllConstraints()}, and
    * {@link #getContext()}.
    */
-  public void propagate()
-    throws EvalException
+  public void propagate() throws EvalException
   {
-    /*
-    getLogger().debug("ConstraintPropagator IN: " +
-                      mUnprocessedConstraints + " " +
-                      getAllConstraints() + " " +
-                      mNumberOfInvocations);
-    */
     mNumberOfInvocations++;
     outer:
     while (!mIsUnsatisfiable) {
       if (!mUnprocessedConstraints.isEmpty()) {
-        // normalise unprocessed constraints first ...
-        // System.err.println("UNPROC: " + mUnprocessedConstraints);
+        // Normalise unprocessed constraints first.
         final SimpleExpressionProxy constraint =
           mUnprocessedConstraints.remove(0);
         final SimpleExpressionProxy simplified =
           mSimpleExpressionCompiler.simplify(constraint, mContext);
         for (final SimplificationRule rule : mNormalizationRules) {
           if (rule.match(simplified, this)) {
-            // System.err.println("NORM: " +
-            //                    ProxyTools.getShortClassName(rule) +
-            //                    " " + simplified);
             rule.execute(this);
             continue outer;
           }
@@ -450,17 +434,13 @@ public class ConstraintPropagator
           }
         }
       } else {
-        // all constraints normalised ...
-        // System.err.println("NORM: " + mNormalizedConstraints);
+        // Now all constraints are normalised.
         final Iterator<SimpleExpressionProxy> iter =
           mNormalizedConstraints.iterator();
         while (iter.hasNext()) {
           final SimpleExpressionProxy constraint = iter.next();
           for (final SimplificationRule rule : mRewriteRules) {
             if (rule.match(constraint, this)) {
-              // System.err.println("MATCH: " +
-              //                    ProxyTools.getShortClassName(rule) + " " +
-              //                    constraint);
               if (rule.isMakingReplacement()) {
                 iter.remove();
               }
@@ -472,9 +452,6 @@ public class ConstraintPropagator
         break;
       }
     }
-    /*
-    getLogger().debug("ConstraintPropagator OUT: " + getAllConstraints());
-    */
   }
 
 
@@ -733,12 +710,11 @@ public class ConstraintPropagator
 
 
   //#########################################################################
-  //# Inner Class ConstraintContext
+  //# Inner Class: ConstraintContext
   private class ConstraintContext implements VariableContext
   {
-
     //#######################################################################
-    //# Constructor
+    //# Constructors
     ConstraintContext(final ConstraintContext context)
     {
       mRootContext = context.mRootContext;
@@ -973,12 +949,11 @@ public class ConstraintPropagator
 
 
   //#########################################################################
-  //# Inner Class AbstractBinding
+  //# Inner Class: AbstractBinding
   private abstract class AbstractBinding
   {
-
     //#######################################################################
-    //# Constructor
+    //# Constructors
     AbstractBinding(final SimpleExpressionProxy varname,
                     final CompiledRange range,
                     final SimpleExpressionProxy expr)
@@ -1186,17 +1161,15 @@ public class ConstraintPropagator
     private boolean mIsAtomic;
     private SimpleExpressionProxy mBoundExpression;
     private CompiledRange mConstrainedRange;
-
   }
 
 
   //#########################################################################
-  //# Inner Class IntBinding
+  //# Inner Class: IntBinding
   private class IntBinding extends AbstractBinding
   {
-
     //#######################################################################
-    //# Constructor
+    //# Constructors
     IntBinding(final SimpleExpressionProxy varname,
                final CompiledIntRange range)
     {
@@ -1283,17 +1256,15 @@ public class ConstraintPropagator
         result.add(constraint);
       }
     }
-
   }
 
 
   //#########################################################################
-  //# Inner Class EnumBinding
+  //# Inner Class: EnumBinding
   private class EnumBinding extends AbstractBinding
   {
-
     //#######################################################################
-    //# Constructor
+    //# Constructors
     EnumBinding(final SimpleExpressionProxy varname,
                 final CompiledEnumRange range)
     {
@@ -1356,7 +1327,6 @@ public class ConstraintPropagator
         }
       }
     }
-
   }
 
 
@@ -1379,5 +1349,4 @@ public class ConstraintPropagator
   private final ProxyAccessorSet<UnaryExpressionProxy> mPrimedVariables;
   private boolean mIsUnsatisfiable;
   private int mNumberOfInvocations;
-
 }
