@@ -1,4 +1,3 @@
-
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
@@ -35,9 +34,6 @@ public class CompilationInfo
 {
   //#########################################################################
   //# Constructor
-  /**
-   * Creates compilation information.
-   */
   public CompilationInfo()
   {
     mExceptions = new MultiEvalException();
@@ -173,7 +169,7 @@ public class CompilationInfo
 
   /**
    * Tests whether the stack is empty.
-   * <br>
+   * <p>
    * In other words, this tests whether the module of interest is an
    * instantiation or not.
    *
