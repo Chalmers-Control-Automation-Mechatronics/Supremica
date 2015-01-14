@@ -153,12 +153,14 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     testCompile(module);
   }
 
-  public void testCompile_order()
+  public void testCompile_instantiate_duplicate_identifiers()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "compiler/instance", "order");
+    final ModuleProxy module = loadModule("tests", "compiler", "instance",
+                                          "instantiate_duplicate_identifiers");
     testCompile(module);
   }
+
 
   public void testCompile_instantiate_order()
     throws IOException, WatersException
@@ -211,6 +213,13 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     throws IOException, WatersException
   {
     final ModuleProxy module = loadModule("tests", "compiler/groupnode", "nodegroup4");
+    testCompile(module);
+  }
+
+  public void testCompile_order()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "compiler/instance", "order");
     testCompile(module);
   }
 
@@ -599,6 +608,13 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     compileError(module, ActionSyntaxException.class, "Assignment operator =");
   }
 
+  public void testCompile_duplicate_identifier()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "compiler", "efsm", "duplicate_identifier");
+    compileError(module, DuplicateIdentifierException.class, "'x'");
+  }
+
   public void testCompile_edge0()
     throws IOException, WatersException
   {
@@ -680,14 +696,6 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   {
     final ModuleProxy module = loadModule("tests", "compiler", "graph", "error8_small");
     compileError(module, EventKindException.class, "'repair1'");
-  }
-
-  public void testCompile_instantiate_batch_tank_out()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module =
-      loadModule("tests", "compiler", "instance", "instantiate_batch_tank_out");
-    compileError(module, UndefinedIdentifierException.class, "'out'");
   }
 
   public void testCompile_instantiate_edge()

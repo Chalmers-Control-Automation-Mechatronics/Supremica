@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ns2:ProductDES Name="order" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
+	<Comment>This module is used in an instantiation to test whether the component declarations are processed in the correct order. The variable components should always be processed first.</Comment>
     <ns2:EventList>
         <ns2:Event Kind="CONTROLLABLE" Name="e"/>
     </ns2:EventList>

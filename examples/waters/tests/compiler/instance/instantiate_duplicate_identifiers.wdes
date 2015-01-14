@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:ProductDES Name="instantiate_duplicate_identifiers" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
+    <Comment>The module 'duplicate_identifier' would throw a DuplicateIdentifierException, but when it is instantiated, no exception would be thrown because the variable is renamed.</Comment>
+    <ns2:EventList>
+        <ns2:Event Kind="CONTROLLABLE" Name="instance.e"/>
+    </ns2:EventList>
+    <ns2:AutomataList>
+        <ns2:Automaton Kind="PLANT" Name="instance.x">
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="0"/>
+                <ns2:State Name="1"/>
+                <ns2:State Name="2"/>
+            </ns2:StateList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="PLANT" Name="instance.plant">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="instance.e"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="x"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="instance.e" Source="x" Target="x"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+    </ns2:AutomataList>
+</ns2:ProductDES>

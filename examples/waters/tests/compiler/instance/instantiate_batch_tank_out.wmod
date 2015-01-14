@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="instantiate_batch_tank_out" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ComponentList>
-        <Instance ModuleName="../../nasty/batch_tank_out" Name="Tank"/>
-    </ComponentList>
-</Module>

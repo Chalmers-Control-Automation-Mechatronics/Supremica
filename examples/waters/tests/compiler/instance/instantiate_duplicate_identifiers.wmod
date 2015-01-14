@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="instantiate_duplicate_identifiers" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>The module 'duplicate_identifier' would throw a DuplicateIdentifierException, but when it is instantiated, no exception would be thrown because the variable is renamed.</ns2:Comment>
+    <ComponentList>
+        <Instance ModuleName="../efsm/duplicate_identifier" Name="instance"/>
+    </ComponentList>
+</Module>
