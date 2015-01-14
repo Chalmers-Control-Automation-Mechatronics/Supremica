@@ -385,7 +385,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       final List<SimpleExpressionProxy> declRanges = decl.getRanges();
       CompiledEvent event = binding == null ? null : binding.getEventValue();
       if (event == null) {
-        // Declare new event
+        // Declare a new event.
         final int numranges = declRanges.size();
         final List<CompiledRange> ranges =
           new ArrayList<CompiledRange>(numranges);
@@ -408,7 +408,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
           }
         }
       } else {
-        // Use event through parameter binding
+        // Use the event through parameter binding.
         final EventKind kind = decl.getKind();
         final int mask = event.getKindMask();
         if (!EventKindMask.isAssignable(kind, mask) ||
@@ -587,8 +587,10 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
 
         if (mPrimeSearcher.containsPrime(oldguard))
         {
-          // Don't simplify guards with primes because they are needed
-          // to determine the variable alphabet!
+          /* Guards with primes are not simplified
+           * because they are needed to determine
+           * the variable alphabet.
+           */
           final SimpleExpressionProxy newguard =
                           (SimpleExpressionProxy) mCloner.getClone(oldguard);
           addSourceInfo(newguard, oldguard);
@@ -603,7 +605,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
           if (!mSimpleExpressionCompiler.isAtomicValue(newguard, mContext)) {
             newguards.add(newguard);
           } else if (mSimpleExpressionCompiler.getBooleanValue(newguard)) {
-            // Don't bother to add true guards.
+            // True guards are not added.
           } else {
             // If a guard is false, no need for any other guards.
             newguards.clear();
@@ -690,6 +692,9 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
   public Object visitInstanceProxy(final InstanceProxy inst)
     throws VisitorException
   {
+    // Instance components are only processed in the second pass.
+    if (m1stPass) return null;
+
     checkAbort();
     final BindingContext oldContext = mContext;
     final CompiledNameSpace oldNameSpace = mNameSpace;
@@ -830,7 +835,14 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     final List<Proxy> aliases = module.getEventAliasList();
     visitCollection(aliases);
 
+    /* All of the variable components are processed before the
+     * simple components and instances. Since a 'foreach' component
+     * can be of either type, its order is not important.
+     */
     final List<Proxy> components = module.getComponentList();
+    m1stPass = true;
+    visitCollection(components);
+    m1stPass = false;
     visitCollection(components);
 
     return null;
@@ -855,6 +867,9 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     (final SimpleComponentProxy comp)
     throws VisitorException
   {
+    // Simple components are only processed in the second pass.
+    if (m1stPass) return null;
+
     try {
       mCurrentComponent = comp;
       final IdentifierProxy ident = comp.getIdentifier();
@@ -929,6 +944,9 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     (final VariableComponentProxy var)
     throws VisitorException
   {
+    // Variable components are processed in the first pass.
+    if (!m1stPass) return null;
+
     try {
       checkAbort();
       if (mHISCCompileMode == HISCCompileMode.HISC_LOW) {
@@ -1470,6 +1488,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
 
   //  Module Information:
   private boolean mHasEFAElements;
+  private boolean m1stPass; // Used in the method visitModuleProxy().
 
   private BindingContext mContext;
   private CompiledNameSpace mNameSpace;

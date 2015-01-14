@@ -23,13 +23,13 @@ import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.MultiEvalException;
 import net.sourceforge.waters.model.module.InstanceProxy;
 
+
 /**
  * A utility class that helps to collect source information records and
  * compilation errors while compiling a module.
  *
  * @author Robi Malik, Tom Levy, Roger Su
  */
-
 public class CompilationInfo
 {
   //#########################################################################
@@ -81,6 +81,7 @@ public class CompilationInfo
     else
       mExceptions = null;
   }
+
 
   //#########################################################################
   //# Access
@@ -275,7 +276,7 @@ public class CompilationInfo
    * Adjusts the location of a given {@link EvalException} according to the
    * information in {@link #mResultMap}.
    *
-   * @param e The exception to be modified
+   * @param ex The exception to be modified
    */
   private void adjustLocation(final EvalException ex)
   {

@@ -412,6 +412,7 @@ public class EFANormaliser extends AbortableCompiler
         mCurrentRange.add(ident);
         return ident;
       } catch (final DuplicateIdentifierException exception) {
+        exception.replaceLocation(node);
         throw wrap(exception);
       }
     }
@@ -1066,15 +1067,17 @@ public class EFANormaliser extends AbortableCompiler
       // The overall set of all prime variables used by an EFAEventInfo.
       final Set<EFAVariable> allPrimes = new HashSet<>();
 
-      // Ensure that the set of prime variables of every EFAUpdateInfo is
-      // properly initiated, then obtain the global set of prime variables.
+      /* Ensure that the set of prime variables of every EFAUpdateInfo is
+       * properly initiated, then obtain the global set of prime variables.
+       */
       for (final EFAUpdateInfo update : mList) {
         update.setPrimeVariables();
         allPrimes.addAll(update.getPrimeVariables());
       }
 
-      // Add literals such as (x'=x') if the variable (x') is not mentioned
-      // in the update of an event.
+      /* Add literals such as (x'=x') if the variable (x') is not mentioned
+       * in the update of an event.
+       */
       for (final EFAIdentifier event : mEventList) {
         for (final EFAVariable primeVar : allPrimes) {
           if (!event.collectPrimeVariables().contains(primeVar))
