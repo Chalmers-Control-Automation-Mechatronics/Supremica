@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="instantiate_twoinit" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ComponentList>
-        <Instance ModuleName="/Scratch/rcs14/waters/examples/waters/tests/compiler/graph/twoinit" Name="Two_Initials"/>
+        <Instance ModuleName="../graph/twoinit" Name="Two_Initials"/>
     </ComponentList>
 </Module>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="instantiate_guard1" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ComponentList>
-        <Instance ModuleName="/Scratch/rcs14/waters/examples/waters/tests/efa/assignment_in_guard1" Name="GuardError1"/>
+        <Instance ModuleName="../../efa/assignment_in_guard1" Name="GuardError1"/>
     </ComponentList>
 </Module>
