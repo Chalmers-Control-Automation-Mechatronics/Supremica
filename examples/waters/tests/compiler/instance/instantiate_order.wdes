@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:ProductDES Name="instantiate_order" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
+    <ns2:EventList>
+        <ns2:Event Kind="CONTROLLABLE" Name="order.e"/>
+    </ns2:EventList>
+    <ns2:AutomataList>
+        <ns2:Automaton Kind="PLANT" Name="order.x">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="order.e"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="0"/>
+                <ns2:State Name="1"/>
+                <ns2:State Name="2"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="order.e" Source="0" Target="1"/>
+                <ns2:Transition Event="order.e" Source="1" Target="2"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="PLANT" Name="order.plant">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="order.e"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="S0"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="order.e" Source="S0" Target="S0"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+    </ns2:AutomataList>
+</ns2:ProductDES>

@@ -153,9 +153,37 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     testCompile(module);
   }
 
+  public void testCompile_order()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "compiler/instance", "order");
+    testCompile(module);
+  }
+
+  public void testCompile_instantiate_order()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "compiler/instance", "instantiate_order");
+    testCompile(module);
+  }
+
   public void testCompile_machine() throws IOException, WatersException
   {
     final ModuleProxy module = loadModule("handwritten", "machine");
+    testCompile(module);
+  }
+
+  public void testCompile_manwolfgoatcabbage()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("handwritten", "manwolfgoatcabbage");
+    testCompile(module);
+  }
+
+  public void testCompile_markus2()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "compiler/graph", "markus2");
     testCompile(module);
   }
 
@@ -183,20 +211,6 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     throws IOException, WatersException
   {
     final ModuleProxy module = loadModule("tests", "compiler/groupnode", "nodegroup4");
-    testCompile(module);
-  }
-
-  public void testCompile_manwolfgoatcabbage()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module = loadModule("handwritten", "manwolfgoatcabbage");
-    testCompile(module);
-  }
-
-  public void testCompile_markus2()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module = loadModule("tests", "compiler/graph", "markus2");
     testCompile(module);
   }
 
