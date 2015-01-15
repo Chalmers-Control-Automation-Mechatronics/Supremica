@@ -76,15 +76,18 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
 
 
 /**
- * <P>The EFA normaliser identifies the overall updates associated with
- * each event and produces a module where each event is associated with
- * a unique update formula shared over all automata. If necessary, events
- * are renamed in order to achieve this condition.</P>
+ * A processor of EFA modules.
+ * <P>
+ * The normaliser identifies the overall updates associated with
+ * each event and produces a module where each event is associated
+ * with a unique update formula shared over all automata.
+ * <p>
+ * If necessary, events are renamed in order to achieve this condition.
  *
  * <P><STRONG>Algorithm</STRONG></P>
  *
- * <P>The EFA normaliser proceeds in four passes.</P>
- *
+ * The EFA normaliser proceeds in four passes:
+ * <p>
  * <OL>
  * <LI>Compute the range of variables and initialise the constraint
  *     propagator context.</LI>
@@ -98,7 +101,6 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
  *
  * @author Sahar Mohajerani, Robi Malik, Roger Su
  */
-
 public class EFANormaliser extends AbortableCompiler
 {
   //#########################################################################

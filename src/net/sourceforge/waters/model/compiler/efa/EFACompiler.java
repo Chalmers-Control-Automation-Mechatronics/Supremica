@@ -45,7 +45,6 @@ import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
-import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
@@ -66,19 +65,19 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
 
 
 /**
- * <P>The third pass of the compiler.</P>
- *
- * <P>This compiler accepts a module ({@link ModuleProxy}) as input and
- * produces another module as output. It expands all guard/action blocks by
- * partitioning the events, and replaces all variables by simple
+ * The third pass of the compiler.
+ * <P>
+ * This compiler accepts a module ({@link ModuleProxy}) as input and
+ * produces another module as output. It expands all guard/action blocks
+ * by partitioning the events, and replaces all variables by simple
  * components. Event arrays, aliases, foreach constructs, and
  * instantiations are not allowed in the input; these should be expanded by
  * a previous call the the module instance compiler ({@link
  * net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler
- * ModuleInstanceCompiler}).</P>
- *
- * <P>The EFA compiler ensures that the resultant module only contains
- * nodes of the following types.</P>
+ * ModuleInstanceCompiler}).
+ * <P>
+ * The EFA compiler ensures that the resultant module only contains
+ * nodes of the following types:
  * <UL>
  * <LI>{@link EventDeclProxy}, where only simple events are defined,
  *     i.e., the list of ranges is guaranteed to be empty;</LI>
@@ -87,8 +86,8 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
  *
  * <P><STRONG>Algorithm</STRONG></P>
  *
- * <P>The EFA compiler proceeds in four passes.</P>
- *
+ * The EFA compiler proceeds in four passes:
+ * <P>
  * <OL>
  * <LI>Identify all components (simple or variable) and their state
  *     space.</LI>
@@ -107,14 +106,12 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
  * <LI>Build output automata.</LI>
  * </OL>
  *
- * @author Robi Malik
+ * @author Robi Malik, Roger Su
  */
-
 public class EFACompiler extends AbortableCompiler
 {
-
   //#########################################################################
-  //# Constructors
+  //# Constructor
   public EFACompiler(final ModuleProxyFactory factory,
                      final CompilationInfo compilationInfo,
                      final ModuleProxy module)
@@ -157,8 +154,7 @@ public class EFACompiler extends AbortableCompiler
 
   //#########################################################################
   //# Invocation
-  public ModuleProxy compile()
-    throws EvalException
+  public ModuleProxy compile() throws EvalException
   {
     try {
       mRootContext = new EFAModuleContext(mInputModule);
@@ -172,25 +168,29 @@ public class EFACompiler extends AbortableCompiler
         new EFAVariableAutomatonBuilder(mFactory,
                                         mSimpleExpressionCompiler,
                                         mRootContext);
-      // Pass 1 ...
+      // Pass 1
       final Pass1Visitor pass1 = new Pass1Visitor();
       mInputModule.acceptVisitor(pass1);
-      // Pass 2 ...
+      // Pass 2
       final Pass2Visitor pass2 = new Pass2Visitor();
       mInputModule.acceptVisitor(pass2);
-      // Pass 3 ...
+      // Pass 3
       computeEventPartitions();
-      // Pass 4 ...
+      // Pass 4
       final Pass4Visitor pass4 = new Pass4Visitor();
       return pass4.visitModuleProxy(mInputModule);
-    } catch (final VisitorException exception) {
+    }
+
+    catch (final VisitorException exception) {
       final Throwable cause = exception.getCause();
       if (cause instanceof EvalException) {
         throw (EvalException) cause;
       } else {
         throw exception.getRuntimeException();
       }
-    } finally {
+    }
+
+    finally {
       mRootContext = null;
       mSplitComputer = null;
       mTransitionRelationBuilder = null;
@@ -396,17 +396,17 @@ public class EFACompiler extends AbortableCompiler
 
 
   //#########################################################################
-  //# Inner Class Pass1Visitor
+  //# Inner Class: Pass1Visitor
   /**
-   * The visitor implementing the first pass of EFA compilation. It
-   * initialises the variables map {@link #mRootContext} and associates
+   * The visitor implementing the first pass of EFA compilation.
+   * <p>
+   * It initialises the variables map {@link #mRootContext} and associates
    * the identifier of each simple or variable component with a {@link
    * EFAVariable} object that contains the range of possible state values
    * of that component.
    */
   private class Pass1Visitor extends DefaultModuleProxyVisitor
   {
-
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     @Override
@@ -492,19 +492,18 @@ public class EFACompiler extends AbortableCompiler
     }
 
     //#######################################################################
-    //# Data Members
+    //# Data Member
     private List<SimpleIdentifierProxy> mCurrentRange;
   }
 
 
   //#########################################################################
-  //# Inner Class Pass2Visitor
+  //# Inner Class: Pass2Visitor
   /**
    * The visitor implementing the second pass of EFA compilation.
    */
   private class Pass2Visitor extends DefaultModuleProxyVisitor
   {
-
     //#######################################################################
     //# Constructor
     private Pass2Visitor()
@@ -663,8 +662,6 @@ public class EFACompiler extends AbortableCompiler
             makeDisjoint(group, true);
           } else if (group.isEmpty()) {
             edecl.setBlocked();
-          } else if (graph.isDeterministic()) {
-            // makeDisjoint(group, false);
           }
         }
         return null;
@@ -703,8 +700,9 @@ public class EFACompiler extends AbortableCompiler
         catchAll ? group.getSimpleComponent() : null;
       makeDisjoint(iter, selected, everSelected, result, propagator, comp);
       if (everSelected.size() < size) {
-        // Create an explicit transition with FALSE guard for those
-        // transitions that have been dropped.
+        /* Create an explicit transition with FALSE guard for those
+         * transitions that have been dropped.
+         */
         final SimpleExpressionProxy falseExpr =
           mFactory.createIntConstantProxy(0);
         final List<SimpleExpressionProxy> falseList =
@@ -780,13 +778,12 @@ public class EFACompiler extends AbortableCompiler
 
 
   //#########################################################################
-  //# Inner Class Pass4Visitor
+  //# Inner Class: Pass4Visitor
   /**
    * The visitor implementing the fourth pass of EFA compilation.
    */
   private class Pass4Visitor extends DefaultModuleProxyVisitor
   {
-
     //#######################################################################
     //# Constructor
     private Pass4Visitor()
@@ -884,32 +881,6 @@ public class EFACompiler extends AbortableCompiler
         mLabelList = null;
         mInBlockedEventsList = false;
       }
-    }
-
-    @Override
-    public GroupNodeProxy visitGroupNodeProxy(final GroupNodeProxy group)
-      throws VisitorException
-    {
-      final String name = group.getName();
-      final PlainEventListProxy props0 = group.getPropositions();
-      final PlainEventListProxy props1 =
-        (PlainEventListProxy) mCloner.getClone(props0);
-      final Map<String,String> attribs0 = group.getAttributes();
-      final Map<String,String> attribs1 = new HashMap<String,String>(attribs0);
-      final Collection<NodeProxy> children0 = group.getImmediateChildNodes();
-      final int numchildren = children0.size();
-      final Collection<NodeProxy> children1 =
-        new ArrayList<NodeProxy>(numchildren);
-      for (final NodeProxy child0 : children0) {
-        final NodeProxy child1 = mNodeMap.get(child0);
-        children1.add(child1);
-      }
-      final GroupNodeProxy result =
-        mFactory.createGroupNodeProxy(name, props1, attribs1, children1, null);
-      mNodeList.add(result);
-      mNodeMap.put(group, result);
-      mCompilationInfo.add(result, group);
-      return result;
     }
 
     @Override
@@ -1045,7 +1016,6 @@ public class EFACompiler extends AbortableCompiler
       }
     }
 
-
     //#######################################################################
     //# Data Members
     private final ModuleProxyCloner mCloner;
@@ -1059,7 +1029,6 @@ public class EFACompiler extends AbortableCompiler
     private List<EdgeProxy> mEdgeList;
     private List<IdentifierProxy> mLabelList;
     private boolean mInBlockedEventsList;
-
   }
 
 

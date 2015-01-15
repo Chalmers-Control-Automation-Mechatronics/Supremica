@@ -84,17 +84,17 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
 
 
 /**
- * <P>The first pass of the compiler.</P>
- *
- * <P>This compiler accepts a module ({@link ModuleProxy}) as input and
+ * The first pass of the compiler.
+ * <P>
+ * This compiler accepts a module ({@link ModuleProxy}) as input and
  * produces another module as output. It expands all aliases, foreach
  * constructs, and instantiations. Event arrays as well as component and
  * variable arrays are enumerated explicitly. Variable components are
  * preserved in the output, but all guards and actions are simplified by
- * substituting values obtained from aliasing or instantiation.</P>
- *
- * <P>It is ensured that the resultant module only contains
- * nodes of the following types.</P>
+ * substituting values obtained from aliasing or instantiation.
+ * <P>
+ * It is ensured that the resultant module only contains
+ * objects of the following types:
  * <UL>
  * <LI>{@link EventDeclProxy}, where only simple events are defined,
  *     i.e., the list of ranges is guaranteed to be empty;</LI>

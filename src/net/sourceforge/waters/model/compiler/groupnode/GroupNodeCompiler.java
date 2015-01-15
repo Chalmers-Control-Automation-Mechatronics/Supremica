@@ -21,6 +21,7 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.EvalAbortException;
+import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.context.SourceInfoCloner;
 import net.sourceforge.waters.model.expr.BinaryOperator;
@@ -48,22 +49,17 @@ import net.sourceforge.waters.model.module.VariableComponentProxy;
 
 
 /**
- * <P>
  * The second pass of the compiler.
- * </P>
- *
  * <P>
  * This pass of the compiler accepts a module ({@link ModuleProxy}) as the
  * input and produces another module as the output. It assumes that the input
- * module already has all the foreach blocks instantiated, and it removes the
- * group nodes by explicitly creating new edges between simple child nodes
- * ({@link SimpleNodeProxy}). This compiler also explicitly expands guards
- * and pass them to the next pass (EFA Compiler).
- * </P>
- *
+ * module has neither foreach blocks nor instantiations, and it removes the
+ * group nodes by explicitly creating new edges between their simple child
+ * nodes ({@link SimpleNodeProxy}). This compiler also explicitly expands
+ * guards and pass them to the next pass of the {@link ModuleCompiler}.
  * <P>
  * It is ensured that the resultant module only contains objects of the
- * following types.</P>
+ * following types:
  * <UI>
  * <LI>{@link EventDeclProxy}, where only simple events are defined,
  *     i.e. the list of ranges is guaranteed to be empty;</LI>
@@ -73,9 +69,8 @@ import net.sourceforge.waters.model.module.VariableComponentProxy;
  *
  * @author Roger Su
  */
-public class GroupNodeCompiler
-  extends DefaultModuleProxyVisitor
-  implements Abortable
+public class GroupNodeCompiler extends DefaultModuleProxyVisitor
+                               implements Abortable
 {
   //#########################################################################
   //# Constructor
@@ -161,24 +156,24 @@ public class GroupNodeCompiler
   public GraphProxy visitGraphProxy(final GraphProxy oldGraph)
     throws VisitorException
   {
-    //Prepare a list that will contain the edges of the new graph.
+    // Prepare a list that will contain the edges of the new graph.
     mNewEdges = new ArrayList<>();
 
-    //Obtain the list of all edges in the graph.
+    // Obtain the list of all edges in the graph.
     mOldEdges = new ArrayList<>();
     visitCollection(oldGraph.getEdges());
 
-    //Obtain the list of all nodes (both simple and group) in the graph.
+    // Obtain the list of all nodes (both simple and group) in the graph.
     mCompiledNodes = new ArrayList<>();
     visitCollection(oldGraph.getNodes());
 
-    //For every compiled node 'x' of this graph.
+    // For every compiled node 'x' of this graph.
     for (final CompiledNode x : mCompiledNodes)
     {
-      //For every compiled node 'y' that is a simple child of 'x'.
+      // For every compiled node 'y' that is a simple child of 'x'.
       for (final CompiledNode y : x.getChildren())
       {
-        //For every edge 'e' whose source is 'x'.
+        // For every edge 'e' whose source is 'x'.
         for (final EdgeProxy e : x.getEdges())
         {
           SimpleExpressionProxy currentGuard = null;
@@ -186,11 +181,11 @@ public class GroupNodeCompiler
                           !e.getGuardActionBlock().getGuards().isEmpty())
             currentGuard = e.getGuardActionBlock().getGuards().get(0);
 
-          //Obtain the identifiers of 'e'.
+          // Obtain the identifiers of 'e'.
           final List<Proxy> oldIdentifiers =
                                    e.getLabelBlock().getEventIdentifierList();
 
-          //For every identifier 'i' of 'e'.
+          // For every identifier 'i' of 'e'.
           for (final Proxy i : oldIdentifiers)
           {
             SimpleExpressionProxy newGuard = null;
@@ -214,19 +209,20 @@ public class GroupNodeCompiler
               newIdentifiers.add(newI);
               y.addCause(i, x.getNodeProxy(), currentGuard);
 
-              //Create a new LabelBlock using the new identifier list.
+              // Create a new LabelBlock using the new identifier list.
               final LabelBlockProxy lbBlock =
                          mFactory.createLabelBlockProxy(newIdentifiers, null);
 
-              //If a new guard has been created, make a new GuardActionBlock
-              //with the new guard and the other original fields.
+              /* If a new guard has been created, make a new GuardActionBlock
+               * with the new guard and the other original fields.
+               */
               final GuardActionBlockProxy gaBlock;
               if (newGuard != null)
                 gaBlock = createNewGABlock(newGuard, e);
               else
                 gaBlock = e.getGuardActionBlock();
 
-              //Create new edges to target simple nodes.
+              // Create new edges to target simple nodes.
               for (final SimpleNodeProxy t : returnSimpleNodes(e.getTarget()))
               {
                 checkAbort();
@@ -244,7 +240,7 @@ public class GroupNodeCompiler
       }
     }
 
-    //After simplifying the group nodes, create and return the new graph.
+    // After simplifying the group nodes, create and return the new graph.
     final List<SimpleNodeProxy> resultNodes = new ArrayList<>();
     for (final CompiledNode cNode : mCompiledNodes)
       if (cNode.getNodeProxy() instanceof SimpleNodeProxy)
@@ -418,14 +414,15 @@ public class GroupNodeCompiler
     final UnaryOperator not = table.getNotOperator();
     final BinaryOperator and = table.getAndOperator();
 
-    //First attempt to test whether there exists an element in 'existing'
-    //that is exactly identical to 'a'.
+    /* First attempt to test whether there exists an element in 'existing'
+     * that is exactly identical to 'a'.
+     */
     for (final SimpleExpressionProxy b : existing)
     {
       if (mEquality.equals(a, b))
         return null;
     }
-    //Compute the conjunction of all the negated elements of 'existing'.
+    // Compute the conjunction of all the negated elements of 'existing'.
     SimpleExpressionProxy result =
                    mFactory.createUnaryExpressionProxy(not, existing.get(0));
     for (int i=1; i < existing.size(); i++)
@@ -434,7 +431,7 @@ public class GroupNodeCompiler
                    mFactory.createUnaryExpressionProxy(not, existing.get(i)));
     }
 
-    //If 'a' is not null, add it to the conjunction.
+    // If 'a' is not null, add it to the conjunction.
     if (a != null)
       result = mFactory.createBinaryExpressionProxy(and, a, result);
 
@@ -448,18 +445,19 @@ public class GroupNodeCompiler
   private GuardActionBlockProxy createNewGABlock
                     (final SimpleExpressionProxy guard, final EdgeProxy edge)
   {
-    //Prepare the list that has the guard as its sole element.
+    // Prepare the list that has the guard as its sole element.
     final List<SimpleExpressionProxy> gList = new ArrayList<>(1);
     gList.add(guard);
 
-    //Prepare the list of actions, initialized as an empty list.
+    // Prepare the list of actions, initialized as an empty list.
     List<BinaryExpressionProxy> aList = new ArrayList<>();
 
-    //Prepare the geometry information, initialized as 'null'.
+    // Prepare the geometry information, initialized as 'null'.
     LabelGeometryProxy geo = null;
 
-    //If the edge already has a GuardActionBlock, then use its actions and
-    //geometry information.
+    /* If the edge already has a GuardActionBlock, then use its actions and
+     * geometry information.
+     */
     if (edge.getGuardActionBlock() != null) {
       aList = edge.getGuardActionBlock().getActions();
       geo = edge.getGuardActionBlock().getGeometry();
@@ -573,7 +571,6 @@ public class GroupNodeCompiler
     //Ordered pairs of the form: (Identifier, CauseInfo)
     private final ProxyAccessorMap<Proxy, Collection<CauseInfo>>
                          mmUsedEvents = new ProxyAccessorHashMap<>(mEquality);
-
   }
 
 
@@ -617,16 +614,16 @@ public class GroupNodeCompiler
   //#########################################################################
   //# Data Members
 
-  //These two variables are related to the entire instance of this class.
-  private final ModuleProxy mInputModule;   //The original input module
-  private List<ComponentProxy> mComponents; //The final list of components
+  // These two variables are related to the entire instance of this class.
+  private final ModuleProxy mInputModule;   // The original input module
+  private List<ComponentProxy> mComponents; // The final list of components
 
-  //These variables are related to only parts of the instance.
-  private List<CompiledNode> mCompiledNodes; //All the nodes of a graph
-  private List<EdgeProxy> mOldEdges; //All the edges of the original graph
-  private List<EdgeProxy> mNewEdges; //All the edges of the new graph
+  // These variables are related to only parts of the instance.
+  private List<CompiledNode> mCompiledNodes; // All the nodes of a graph
+  private List<EdgeProxy> mOldEdges; // All the edges of the original graph
+  private List<EdgeProxy> mNewEdges; // All the edges of the new graph
 
-  //These variables are utilities used by the compiler.
+  // These variables are utilities used by the compiler.
   private final ModuleProxyFactory mFactory;
   private final CompilationInfo mCompilationInfo;
   private final ModuleEqualityVisitor mEquality;

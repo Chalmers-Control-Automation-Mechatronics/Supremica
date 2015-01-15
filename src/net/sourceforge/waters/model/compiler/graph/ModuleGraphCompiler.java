@@ -57,25 +57,20 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 /**
- * <p>
  * The fourth and final pass of the compiler.
- * </p>
- *
  * <p>
- * This compiler accepts a {@link ModuleProxy} as the input and
- * returns a {@link ProductDESProxy} as the output. It assumes that the input
- * module only contains nodes of the type {@link SimpleNodeProxy} and that
- * its edges have neither guards nor actions.
- * </p>
+ * This compiler accepts a {@link ModuleProxy} as the input and returns
+ * a {@link ProductDESProxy} as the output. It assumes that the input
+ * module only contains nodes of the type {@link SimpleNodeProxy}, and
+ * that its edges have neither guards nor actions.
  *
- * @author Roger Su
+ * @author Robi Malik
  */
-public class ModuleGraphCompiler
-  extends DefaultModuleProxyVisitor
-  implements Abortable
+public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
+                                 implements Abortable
 {
   //##########################################################################
-  //# Constructors
+  //# Constructor
   public ModuleGraphCompiler(final ProductDESProxyFactory factory,
                              final CompilationInfo compilationInfo,
                              final ModuleProxy module)
@@ -163,14 +158,14 @@ public class ModuleGraphCompiler
       final String name = mInputModule.getName();
       final String comment = mInputModule.getComment();
 
-      //Process event declarations.
+      // Process event declarations.
       final List<EventDeclProxy> decls = mInputModule.getEventDeclList();
       final int numevents = decls.size();
       mGlobalEventsMap = new ProxyAccessorHashMap<>(eq, numevents);
       mGlobalEventsList = new ArrayList<>(numevents);
       visitCollection(decls);
 
-      //Process components.
+      // Process components.
       final List<Proxy> components = mInputModule.getComponentList();
       final int numaut = components.size();
       mAutomataMap = new ProxyAccessorHashMap<>(eq, numaut);
@@ -218,7 +213,7 @@ public class ModuleGraphCompiler
     try {
       mCurrentComponent = comp;
 
-      //Prepare alphabet
+      // Prepare alphabet
       mLocalEventsMap = new HashMap<EventProxy,SelfloopInfo>();
       final GraphProxy graph = comp.getGraph();
       final EventListExpressionProxy blocked = graph.getBlockedEvents();
@@ -226,7 +221,7 @@ public class ModuleGraphCompiler
         visitEventListExpressionProxy(blocked);
       }
 
-      //Pre-compile states
+      // Pre-compile states
       mCurrentComponentIsDetermistic = graph.isDeterministic();
       mMaxInitialStates = mCurrentComponentIsDetermistic ? 1 : -1;
       final Collection<NodeProxy> nodes = graph.getNodes();
@@ -236,13 +231,13 @@ public class ModuleGraphCompiler
       mLocalTransitionsList = new LinkedList<CompiledTransition>();
       visitCollection(nodes);
 
-      //Pre-compile transitions
+      // Pre-compile transitions
       final Collection<EdgeProxy> edges = graph.getEdges();
       visitCollection(edges);
       final Collection<EventProxy> keys = mLocalEventsMap.keySet();
       final List<EventProxy> alphabet = new ArrayList<EventProxy>(keys);
 
-      //Optimization
+      // Optimization
       if (mIsOptimizationEnabled) {
         mNumReachableStates = 0;
         mNumReachableTransitions = 0;
@@ -276,7 +271,7 @@ public class ModuleGraphCompiler
         mNumReachableTransitions = mLocalTransitionsList.size();
       }
 
-      //Build alphabet, states, and transitions
+      // Build alphabet, states, and transitions
       final List<StateProxy> states =
         new ArrayList<StateProxy>(mNumReachableStates);
       for (final NodeProxy node : nodes) {
@@ -297,7 +292,7 @@ public class ModuleGraphCompiler
         }
       }
 
-      //Create automaton
+      // Create automaton
       final IdentifierProxy ident = comp.getIdentifier();
       final String name = ident.toString();
       final ComponentKind kind = comp.getKind();
@@ -395,12 +390,12 @@ public class ModuleGraphCompiler
       final EventProxy event = findGlobalEvent(ident);
       addLocalEvent(event);
       if (mCurrentSource == null) {
-        //Do nothing for blocked events
+        // Do nothing for blocked events
       } else if (mCurrentTarget == null) {
-        //Propositions of a state
+        // Propositions of a state
         mCurrentSource.addProposition(event);
       } else {
-        //Label block of an edge
+        // Label block of an edge
         mCurrentTarget.addTransitionFrom(mCurrentSource, event,
                                          mCurrentSource, ident);
       }
@@ -463,8 +458,9 @@ public class ModuleGraphCompiler
     if (!mLocalEventsMap.containsKey(event)) {
       final SelfloopInfo info = new SelfloopInfo();
       mLocalEventsMap.put(event, info);
-      //Special treatment of forbidden proposition:
-      //exclude this from compiler optimization.
+      /* Special treatment of forbidden proposition:
+       * exclude this from compiler optimization.
+       */
       final String name = event.getName();
       if (name.equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
         info.addTransition(false);
@@ -626,7 +622,7 @@ public class ModuleGraphCompiler
 
 
   //#########################################################################
-  //# Inner Class CompiledTransition
+  //# Inner Class: CompiledTransition
   private class CompiledTransition
   {
     //#######################################################################
@@ -722,6 +718,7 @@ public class ModuleGraphCompiler
     //# Data Members
     private int mNumSelfloops;
   }
+
 
   //#########################################################################
   //# Data Members
