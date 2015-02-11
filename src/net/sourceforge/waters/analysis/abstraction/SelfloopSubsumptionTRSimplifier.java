@@ -27,6 +27,10 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
  * <P>A transition relation simplifier to remove selfloops that are
  * redundant by conflict equivalence.</P>
  *
+ * <P>Removes selfloops from states&nbsp;<I>t</I>, if every branch
+ * of tau-predecessors of&nbsp;<I>t</I> contains a state with all the
+ * selfloops being removed.</P>
+ *
  * @author Robi Malik
  */
 
