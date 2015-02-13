@@ -130,6 +130,7 @@ public class ActiveEventsTRSimplifier
     super.setUp();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numEvents = rel.getNumberOfProperEvents();
+    final int numStates = rel.getNumberOfStates();
     mTauClosure = rel.createSuccessorsTauClosure(mTransitionLimit);
     mSetBuffer = new IntSetBuffer(numEvents + 1);
     mSetReadIterator = mSetBuffer.iterator();
@@ -137,6 +138,7 @@ public class ActiveEventsTRSimplifier
     mListBuffer = new IntListBuffer();
     mListReadIterator = mListBuffer.createReadOnlyIterator();
     mListWriteIterator = mListBuffer.createModifyingIterator();
+    mStateToClass = new EquivalenceClass[numStates];
   }
 
   @Override
@@ -228,8 +230,8 @@ public class ActiveEventsTRSimplifier
   private void createInitialEquivalenceClasses()
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    final int numStates = rel.getNumberOfReachableStates();
-    final int numEvents = rel.getNumberOfReachableStates();
+    final int numStates = rel.getNumberOfStates();
+    final int numEvents = rel.getNumberOfProperEvents();
     final int INITIAL = numEvents;
     final TransitionIterator tauIter = mTauClosure.createIterator();
     final TIntHashSet initialStates = new TIntHashSet();
@@ -298,6 +300,7 @@ public class ActiveEventsTRSimplifier
             final int active = getReducedActiveEventsSet(set, init, buffer);
             clazz = new EquivalenceClass(active);
             mActiveEventSets[s] = active;
+            classMap.put(set, clazz);
           } else {
             mActiveEventSets[s] = clazz.getActiveEvents();
           }
@@ -323,7 +326,7 @@ public class ActiveEventsTRSimplifier
       }
     }
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    final int numEvents = rel.getNumberOfReachableStates();
+    final int numEvents = rel.getNumberOfProperEvents();
     mSetReadIterator.reset(set);
     while (mSetReadIterator.advance()) {
       final int event = mSetReadIterator.getCurrentData();
