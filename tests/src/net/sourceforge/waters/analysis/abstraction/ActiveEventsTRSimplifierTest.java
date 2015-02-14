@@ -170,6 +170,14 @@ public class ActiveEventsTRSimplifierTest
     runTransitionRelationSimplifier(des);
   }
 
+  public void test_activeEvents_15()
+  throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents15.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
 
   /**
    * A test to see whether a single abstraction rule object can perform multiple

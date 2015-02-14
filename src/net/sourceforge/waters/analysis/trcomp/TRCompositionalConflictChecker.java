@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.waters.analysis.abstraction.ActiveEventsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.AlphaDeterminisationTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.CoreachabilityTRSimplifier;
@@ -1103,6 +1104,12 @@ public class TRCompositionalConflictChecker
       new IncomingEquivalenceTRSimplifier();
     incomingEquivalenceSimplifier.setSimplificationListener(partitioningListener);
     chain.add(incomingEquivalenceSimplifier);
+    if (selfloopSubsumption) {
+      final ActiveEventsTRSimplifier activeEventsSimplifier =
+        new ActiveEventsTRSimplifier();
+      activeEventsSimplifier.setSimplificationListener(partitioningListener);
+      chain.add(activeEventsSimplifier);
+    }
     if (nonAlphaDeterminisation) {
       final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
         new NonAlphaDeterminisationTRSimplifier();

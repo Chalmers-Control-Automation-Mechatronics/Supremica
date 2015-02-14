@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.abstraction;
 
 import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TIntHashSet;
@@ -17,7 +18,6 @@ import gnu.trove.set.hash.TIntHashSet;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -130,7 +130,6 @@ public class ActiveEventsTRSimplifier
     super.setUp();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numEvents = rel.getNumberOfProperEvents();
-    final int numStates = rel.getNumberOfStates();
     mTauClosure = rel.createSuccessorsTauClosure(mTransitionLimit);
     mSetBuffer = new IntSetBuffer(numEvents + 1);
     mSetReadIterator = mSetBuffer.iterator();
@@ -138,7 +137,6 @@ public class ActiveEventsTRSimplifier
     mListBuffer = new IntListBuffer();
     mListReadIterator = mListBuffer.createReadOnlyIterator();
     mListWriteIterator = mListBuffer.createModifyingIterator();
-    mStateToClass = new EquivalenceClass[numStates];
   }
 
   @Override
@@ -242,18 +240,22 @@ public class ActiveEventsTRSimplifier
     final int numEvents = rel.getNumberOfProperEvents();
     final int INITIAL = numEvents;
     final TransitionIterator tauIter = mTauClosure.createIterator();
+    int numReachable = 0;
     mInitialStates = new TIntHashSet();
     for (int s = 0; s < numStates; s++) {
-      if (rel.isInitial(s) && mInitialStates.add(s)) {
-        tauIter.resetState(s);
-        while (tauIter.advance()) {
-          final int t = tauIter.getCurrentTargetState();
-          mInitialStates.add(t);
+      if (rel.isReachable(s)) {
+        numReachable++;
+        if (rel.isInitial(s) && mInitialStates.add(s)) {
+          tauIter.resetState(s);
+          while (tauIter.advance()) {
+            final int t = tauIter.getCurrentTargetState();
+            mInitialStates.add(t);
+          }
         }
       }
     }
     mActiveEventSets = new int[numStates];
-    mActiveEventCounts = new int[numStates];
+    mActiveEventCounts = new TIntIntHashMap(numReachable);
     final TransitionIterator eventIter = rel.createSuccessorsReadOnlyIterator();
     eventIter.resetEvents(EventEncoding.NONTAU, numEvents - 1);
     int defaultID = getDefaultMarkingID();
@@ -281,7 +283,7 @@ public class ActiveEventsTRSimplifier
         }
         final int set = mSetBuffer.add(events);
         mActiveEventSets[s] = set;
-        if (mActiveEventCounts[set]++ == 1) {
+        if (mActiveEventCounts.adjustOrPutValue(set, 1, 1) == 2) {
           mNumProperCandidates++;
         }
         events.clear();
@@ -302,7 +304,7 @@ public class ActiveEventsTRSimplifier
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
     final int[] activeEventSets = new int[numStates];
-    Arrays.fill(mActiveEventCounts, 0);
+    mActiveEventCounts.clear();
     mNumProperCandidates = 0;
     int clazzNo = 0;
     for (final int[] clazz : partition.getClasses()) {
@@ -310,7 +312,7 @@ public class ActiveEventsTRSimplifier
         final int state = clazz[0];
         final int set = mActiveEventSets[state];
         activeEventSets[clazzNo] = set;
-        if (mActiveEventCounts[set]++ == 1) {
+        if (mActiveEventCounts.adjustOrPutValue(set, 1, 1) == 2) {
           mNumProperCandidates++;
         }
       } else {
@@ -333,22 +335,23 @@ public class ActiveEventsTRSimplifier
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numEvents = rel.getNumberOfProperEvents();
     final int numStates = rel.getNumberOfStates();
+    mStateToClass = new EquivalenceClass[numStates];
     final TIntArrayList buffer = new TIntArrayList(numEvents);
     final TIntObjectHashMap<EquivalenceClass> classMap =
       new TIntObjectHashMap<>(mNumProperCandidates);
-      for (int s = 0; s < numStates; s++) {
-        final int set = mActiveEventSets[s];
-        if (set >= 0 && mActiveEventCounts[set] > 1) {
-          EquivalenceClass clazz = classMap.get(set);
-          if (clazz == null) {
-            final boolean init = mInitialStates.contains(s);
-            final int active = getReducedActiveEventsSet(set, init, buffer);
-            clazz = new EquivalenceClass(active);
-            classMap.put(set, clazz);
-          }
-          clazz.addState(s);
+    for (int s = 0; s < numStates; s++) {
+      final int set = mActiveEventSets[s];
+      if (set >= 0 && mActiveEventCounts.get(set) > 1) {
+        EquivalenceClass clazz = classMap.get(set);
+        if (clazz == null) {
+          final boolean init = mInitialStates.contains(s);
+          final int active = getReducedActiveEventsSet(set, init, buffer);
+          clazz = new EquivalenceClass(active);
+          classMap.put(set, clazz);
         }
+        clazz.addState(s);
       }
+    }
   }
 
   /**
@@ -851,7 +854,7 @@ public class ActiveEventsTRSimplifier
    * Maps each set index that appears in {@link #mActiveEventSets} to
    * the number of times it is appears.
    */
-  private int[] mActiveEventCounts;
+  private TIntIntHashMap mActiveEventCounts;
 
   // Equivalence Classes
   /**
