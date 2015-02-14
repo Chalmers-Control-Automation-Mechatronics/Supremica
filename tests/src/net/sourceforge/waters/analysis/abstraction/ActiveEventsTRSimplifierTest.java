@@ -130,6 +130,14 @@ public class ActiveEventsTRSimplifierTest
     runTransitionRelationSimplifier(des);
   }
 
+  public void test_activeEvents_10()
+  throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents10plus.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
   public void test_activeEvents_11()
   throws Exception
   {
@@ -151,6 +159,14 @@ public class ActiveEventsTRSimplifierTest
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "abstraction", "activeEvents13.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_activeEvents_14()
+  throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents14.wmod");
     runTransitionRelationSimplifier(des);
   }
 

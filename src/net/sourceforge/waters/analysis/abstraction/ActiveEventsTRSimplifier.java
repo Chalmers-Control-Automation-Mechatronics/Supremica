@@ -10,7 +10,6 @@
 package net.sourceforge.waters.analysis.abstraction;
 
 import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TIntHashSet;
@@ -18,6 +17,7 @@ import gnu.trove.set.hash.TIntHashSet;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -146,74 +146,83 @@ public class ActiveEventsTRSimplifier
     throws AnalysisException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    final int numStates = rel.getNumberOfStates();
-    if (numStates <= 1) {
+    if (rel.getNumberOfReachableStates() <= 1) {
       return false;
     }
 
-    // 1. Create initial partition based on active events and initial states
-    createInitialEquivalenceClasses();
+    // 1. Create active sets and set up initial states
+    createInitialActiveEventSets();
     if (mNumProperCandidates == 0) {
       return false;
     }
 
-    // 2. Refine partition based on incoming equivalence
     mExternalSplittters = new PriorityQueue<>(mNumProperCandidates);
-    mPredecessors = new int[numStates];
-    for (int s = 0; s < numStates; s++) {
-      final EquivalenceClass clazz = mStateToClass[s];
-      if (clazz == null) {
-        splitOtherClasses(s);
-        if (mNumProperCandidates == 0) {
-          return false;
-        }
-      } else {
-        clazz.enqueueExternal();
-      }
-    }
     mInternalSplittters = new PriorityQueue<>(mNumProperCandidates);
-    while (!mExternalSplittters.isEmpty() || !mInternalSplittters.isEmpty()) {
-      if (!mExternalSplittters.isEmpty()) {
-        final EquivalenceClass splitter = mExternalSplittters.poll();
-        splitter.splitOtherClasses();
-      } else {
-        final EquivalenceClass splitter = mInternalSplittters.poll();
-        splitter.splitSameClass();
+    main:
+    do {
+      // 2. Create initial partition based on active events and initial states
+      createEquivalenceClasses();
+      final int numStates = rel.getNumberOfStates();
+      mPredecessors = new int[numStates];
+      // 3. Refine partition based on incoming equivalence
+      for (int s = 0; s < numStates; s++) {
+        final EquivalenceClass clazz = mStateToClass[s];
+        if (clazz == null) {
+          splitOtherClasses(s);
+          if (mNumProperCandidates == 0) {
+            break main;
+          }
+        } else {
+          clazz.enqueueExternal();
+        }
       }
-      if (mNumProperCandidates == 0) {
-        return false;
+      while (!mExternalSplittters.isEmpty() || !mInternalSplittters.isEmpty()) {
+        if (!mExternalSplittters.isEmpty()) {
+          final EquivalenceClass splitter = mExternalSplittters.poll();
+          splitter.splitOtherClasses();
+        } else {
+          final EquivalenceClass splitter = mInternalSplittters.poll();
+          splitter.splitSameClass();
+        }
+        if (mNumProperCandidates == 0) {
+          break main;
+        }
       }
-    }
+      // 4. Create and apply partition
+      final TRPartition partition = createPartition();
+      applyPartition(partition);
+      updateActiveEventsSets(partition);
+    } while (mNumProperCandidates > 0);
 
-    // 3. Apply result partition.
-    buildResultPartition();
-    applyResultPartitionAutomatically();
-    return true;
+    // 5. Remove selfloops and return result
+    final TRPartition partition = getResultPartition();
+    if (partition != null) {
+      rel.removeTauSelfLoops();
+      removeProperSelfLoopEvents();
+      return true;
+    } else {
+      return false;
+    }
   }
 
   @Override
   protected void tearDown()
   {
     super.tearDown();
-    mListBuffer = null;
-    mListReadIterator = null;
-    mListWriteIterator = null;
-    mSetReadIterator = null;
+    mInitialStates = null;
     mSetBuffer = null;
+    mActiveEventSets = null;
+    mActiveEventCounts = null;
     mStateToClass = null;
     mPredecessors = null;
     mExternalSplittters = null;
     mInternalSplittters = null;
-  }
-
-  @Override
-  protected void applyResultPartition()
-    throws AnalysisException
-  {
-    super.applyResultPartition();
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    rel.removeTauSelfLoops();
-    removeProperSelfLoopEvents();
+    mTauClosure = null;
+    mFullEventClosureIterator = null;
+    mListBuffer = null;
+    mListReadIterator = null;
+    mListWriteIterator = null;
+    mSetReadIterator = null;
   }
 
 
@@ -222,30 +231,29 @@ public class ActiveEventsTRSimplifier
   /**
    * Creates active event sets and adds to {@link #mSetBuffer},
    * and stores them for each state in {@link #mActiveEventSets}.
-   * Creates equivalence classes for groups of two more states that
-   * have the same active event sets.
-   * Sets {@link #mNumProperCandidates} to the number of equivalence
-   * classes created.
+   * Also initialises {@link #mInitialStates} and {@link #mActiveEventCounts},
+   * and stores the number of active events sets that are used more than
+   * once in {@link #mNumProperCandidates}.
    */
-  private void createInitialEquivalenceClasses()
+  private void createInitialActiveEventSets()
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
     final int numEvents = rel.getNumberOfProperEvents();
     final int INITIAL = numEvents;
     final TransitionIterator tauIter = mTauClosure.createIterator();
-    final TIntHashSet initialStates = new TIntHashSet();
+    mInitialStates = new TIntHashSet();
     for (int s = 0; s < numStates; s++) {
-      if (rel.isInitial(s) && initialStates.add(s)) {
+      if (rel.isInitial(s) && mInitialStates.add(s)) {
         tauIter.resetState(s);
         while (tauIter.advance()) {
           final int t = tauIter.getCurrentTargetState();
-          initialStates.add(t);
+          mInitialStates.add(t);
         }
       }
     }
     mActiveEventSets = new int[numStates];
-    final TIntIntHashMap counts = new TIntIntHashMap(numStates);
+    mActiveEventCounts = new int[numStates];
     final TransitionIterator eventIter = rel.createSuccessorsReadOnlyIterator();
     eventIter.resetEvents(EventEncoding.NONTAU, numEvents - 1);
     int defaultID = getDefaultMarkingID();
@@ -254,10 +262,8 @@ public class ActiveEventsTRSimplifier
     }
     mNumProperCandidates = 0;
     final TIntHashSet events = new TIntHashSet();
-    int maxSize = 0;
     for (int s = 0; s < numStates; s++) {
       if (rel.isReachable(s)) {
-        int size = 0;
         tauIter.resetState(s);
         while (tauIter.advance()) {
           final int t = tauIter.getCurrentTargetState();
@@ -268,46 +274,81 @@ public class ActiveEventsTRSimplifier
           while (eventIter.advance()) {
             final int e = eventIter.getCurrentEvent();
             events.add(e);
-            size++;
           }
         }
-        if (initialStates.contains(s)) {
+        if (mInitialStates.contains(s)) {
           events.add(INITIAL);
         }
         final int set = mSetBuffer.add(events);
         mActiveEventSets[s] = set;
-        if (counts.adjustOrPutValue(set, 1, 1) == 2) {
+        if (mActiveEventCounts[set]++ == 1) {
           mNumProperCandidates++;
         }
         events.clear();
-        if (size > maxSize) {
-          maxSize = size;
-        }
       } else {
         mActiveEventSets[s] = -1;
       }
     }
-    if (mNumProperCandidates > 0) {
-      final TIntArrayList buffer = new TIntArrayList(maxSize);
-      final TIntObjectHashMap<EquivalenceClass> classMap =
-        new TIntObjectHashMap<>(mNumProperCandidates);
+  }
+
+  /**
+   * Updates {@link #mActiveEventSets} and {@link #mActiveEventCounts} after
+   * a partition has been applied.
+   * Stores the new number of active events sets that are used more than
+   * once in {@link #mNumProperCandidates}.
+   */
+  private void updateActiveEventsSets(final TRPartition partition)
+  {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final int numStates = rel.getNumberOfStates();
+    final int[] activeEventSets = new int[numStates];
+    Arrays.fill(mActiveEventCounts, 0);
+    mNumProperCandidates = 0;
+    int clazzNo = 0;
+    for (final int[] clazz : partition.getClasses()) {
+      if (clazz != null) {
+        final int state = clazz[0];
+        final int set = mActiveEventSets[state];
+        activeEventSets[clazzNo] = set;
+        if (mActiveEventCounts[set]++ == 1) {
+          mNumProperCandidates++;
+        }
+      } else {
+        activeEventSets[clazzNo] = -1;
+      }
+      clazzNo++;
+    }
+    mActiveEventSets = activeEventSets;
+  }
+
+  /**
+   * Creates equivalence classes for groups of two more states that
+   * have the same active event sets.
+   * Assumes that {@link #mInitialStates} and {@link #mActiveEventCounts}
+   * are set up, and that {@link #mNumProperCandidates} is nonzero and
+   * contains the number of equivalence classes that need to be created.
+   */
+  private void createEquivalenceClasses()
+  {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final int numEvents = rel.getNumberOfProperEvents();
+    final int numStates = rel.getNumberOfStates();
+    final TIntArrayList buffer = new TIntArrayList(numEvents);
+    final TIntObjectHashMap<EquivalenceClass> classMap =
+      new TIntObjectHashMap<>(mNumProperCandidates);
       for (int s = 0; s < numStates; s++) {
         final int set = mActiveEventSets[s];
-        if (set >= 0 && counts.get(set) > 1) {
+        if (set >= 0 && mActiveEventCounts[set] > 1) {
           EquivalenceClass clazz = classMap.get(set);
           if (clazz == null) {
-            final boolean init = initialStates.contains(s);
+            final boolean init = mInitialStates.contains(s);
             final int active = getReducedActiveEventsSet(set, init, buffer);
             clazz = new EquivalenceClass(active);
-            mActiveEventSets[s] = active;
             classMap.put(set, clazz);
-          } else {
-            mActiveEventSets[s] = clazz.getActiveEvents();
           }
           clazz.addState(s);
         }
       }
-    }
   }
 
   /**
@@ -341,14 +382,24 @@ public class ActiveEventsTRSimplifier
 
   private void splitOtherClasses(final int source)
   {
-    final int active = mActiveEventSets[source];
-    if (active >= 0) {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    if (rel.isReachable(source)) {
+      final int numEvents = rel.getNumberOfProperEvents();
+      final int active;
+      final EquivalenceClass clazz = mStateToClass[source];
+      if (clazz != null) {
+        active = clazz.getActiveEvents();
+      } else {
+        active = mActiveEventSets[source];
+      }
       mSetReadIterator.reset(active);
       while (mSetReadIterator.advance()) {
         final int event = mSetReadIterator.getCurrentData();
-        splitOtherClasses(source, event);
-        if (mNumProperCandidates == 0) {
-          return;
+        if (event >= EventEncoding.NONTAU && event < numEvents) {
+          splitOtherClasses(source, event);
+          if (mNumProperCandidates == 0) {
+            return;
+          }
         }
       }
     }
@@ -378,7 +429,7 @@ public class ActiveEventsTRSimplifier
     return internal;
   }
 
-  private void buildResultPartition()
+  private TRPartition createPartition()
   {
     if (mNumProperCandidates > 0) {
       final ListBufferTransitionRelation rel = getTransitionRelation();
@@ -401,11 +452,20 @@ public class ActiveEventsTRSimplifier
       if (!rel.isReachable(dumpIndex)) {
         classes.add(null);
       }
-      final TRPartition partition = new TRPartition(classes, numStates);
-      setResultPartition(partition);
+      return new TRPartition(classes, numStates);
     } else {
-      setResultPartition(null);
+      return null;
     }
+  }
+
+  private void applyPartition(final TRPartition newPartition)
+  {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    rel.merge(newPartition);
+    final TRPartition oldPartition = getResultPartition();
+    final TRPartition combinedPartition =
+      TRPartition.combine(oldPartition, newPartition);
+    setResultPartition(combinedPartition);
   }
 
 
@@ -768,6 +828,13 @@ public class ActiveEventsTRSimplifier
   // Configuration
   private int mTransitionLimit;
 
+  // Initial States
+  /**
+   * Hash set containing state numbers of initial states or states reached
+   * silently from initial states.
+   */
+  private TIntHashSet mInitialStates;
+
   // Active Events
   /**
    * Set buffer containing active event sets. Each computed active event
@@ -780,6 +847,11 @@ public class ActiveEventsTRSimplifier
    * marked states.
    */
   private int[] mActiveEventSets;
+  /**
+   * Maps each set index that appears in {@link #mActiveEventSets} to
+   * the number of times it is appears.
+   */
+  private int[] mActiveEventCounts;
 
   // Equivalence Classes
   /**
