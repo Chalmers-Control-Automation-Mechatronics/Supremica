@@ -33,12 +33,18 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 
 
 /**
- * <P>An implementation of the <I>Active Events Rule</I>.</P>
+ * <P>An implementation of the <I>Active Events Rule</I> with relaxed
+ * incoming equivalence.</P>
  *
- * <P>This rule merges all states that are incoming equivalent and have
- * equal sets of eligible events.</P>
+ * <P>This rule merges all states that are weakly incoming equivalent and have
+ * equal sets of eligible events. Am equivalence relation between states is a
+ * weak incoming equivalence relation if for any two equivalent states,
+ * either both or none are silently reachable from an initial states,
+ * both states are reachable by the same events from state outside of their
+ * equivalence class, and both states are reachable by the same events from
+ * within their equivalence class.</P>
  *
- * <P><STRONG>Proposed algorithm:</STRONG></P>
+ * <P><STRONG>Algorithm:</STRONG></P>
  * <OL>
  * <LI>Create initial partition based on active events and initial state
  *     property.</LI>
@@ -51,6 +57,8 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
  *     with a given event from within their own equivalence class.</LI>
  * <LI>Repeat steps 2. and&nbsp;3. for any equivalence classes that have been
  *     split according to step&nbsp;3.</LI>
+ * <LI>Merge states that are still equivalent. If any states have been merged,
+ *     update data structures and try to merge again starting from step&nbsp;1.
  * </OL>
  *
  * <P><I>Reference:</I> Hugo Flordal, Robi Malik. Compositional Verification
@@ -207,7 +215,6 @@ public class ActiveEventsTRSimplifier
   protected void tearDown()
   {
     super.tearDown();
-    mInitialStates = null;
     mSetBuffer = null;
     mActiveEventSets = null;
     mActiveEventCounts = null;
@@ -229,7 +236,7 @@ public class ActiveEventsTRSimplifier
   /**
    * Creates active event sets and adds to {@link #mSetBuffer},
    * and stores them for each state in {@link #mActiveEventSets}.
-   * Also initialises {@link #mInitialStates} and {@link #mActiveEventCounts},
+   * Also initialises {@link #mActiveEventCounts},
    * and stores the number of active events sets that are used more than
    * once in {@link #mNumProperCandidates}.
    */
@@ -240,16 +247,16 @@ public class ActiveEventsTRSimplifier
     final int numEvents = rel.getNumberOfProperEvents();
     final int INITIAL = numEvents;
     final TransitionIterator tauIter = mTauClosure.createIterator();
+    final TIntHashSet initialStates = new TIntHashSet();
     int numReachable = 0;
-    mInitialStates = new TIntHashSet();
     for (int s = 0; s < numStates; s++) {
       if (rel.isReachable(s)) {
         numReachable++;
-        if (rel.isInitial(s) && mInitialStates.add(s)) {
+        if (rel.isInitial(s) && initialStates.add(s)) {
           tauIter.resetState(s);
           while (tauIter.advance()) {
             final int t = tauIter.getCurrentTargetState();
-            mInitialStates.add(t);
+            initialStates.add(t);
           }
         }
       }
@@ -278,7 +285,7 @@ public class ActiveEventsTRSimplifier
             events.add(e);
           }
         }
-        if (mInitialStates.contains(s)) {
+        if (initialStates.contains(s)) {
           events.add(INITIAL);
         }
         final int set = mSetBuffer.add(events);
@@ -325,18 +332,15 @@ public class ActiveEventsTRSimplifier
 
   /**
    * Creates equivalence classes for groups of two more states that
-   * have the same active event sets.
-   * Assumes that {@link #mInitialStates} and {@link #mActiveEventCounts}
-   * are set up, and that {@link #mNumProperCandidates} is nonzero and
+   * have the same active event sets. Assumes that {@link #mActiveEventCounts}
+   * is set up, and that {@link #mNumProperCandidates} is nonzero and
    * contains the number of equivalence classes that need to be created.
    */
   private void createEquivalenceClasses()
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    final int numEvents = rel.getNumberOfProperEvents();
     final int numStates = rel.getNumberOfStates();
     mStateToClass = new EquivalenceClass[numStates];
-    final TIntArrayList buffer = new TIntArrayList(numEvents);
     final TIntObjectHashMap<EquivalenceClass> classMap =
       new TIntObjectHashMap<>(mNumProperCandidates);
     for (int s = 0; s < numStates; s++) {
@@ -344,9 +348,7 @@ public class ActiveEventsTRSimplifier
       if (set >= 0 && mActiveEventCounts.get(set) > 1) {
         EquivalenceClass clazz = classMap.get(set);
         if (clazz == null) {
-          final boolean init = mInitialStates.contains(s);
-          final int active = getReducedActiveEventsSet(set, init, buffer);
-          clazz = new EquivalenceClass(active);
+          clazz = new EquivalenceClass(set);
           classMap.put(set, clazz);
         }
         clazz.addState(s);
@@ -354,47 +356,12 @@ public class ActiveEventsTRSimplifier
     }
   }
 
-  /**
-   * Returns a reduced active event set that does not contain the
-   * special codes for initial or marked states.
-   */
-  private int getReducedActiveEventsSet(final int set,
-                                        final boolean init,
-                                        final TIntArrayList buffer)
-  {
-    if (!init) {
-      mSetReadIterator.reset(set);
-      if (!mSetReadIterator.advance() ||
-          mSetReadIterator.getCurrentData() != OMEGA) {
-        return set;
-      }
-    }
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    final int numEvents = rel.getNumberOfProperEvents();
-    mSetReadIterator.reset(set);
-    while (mSetReadIterator.advance()) {
-      final int event = mSetReadIterator.getCurrentData();
-      if (event > EventEncoding.TAU && event < numEvents) {
-        buffer.add(event);
-      }
-    }
-    final int reduced = mSetBuffer.add(buffer);
-    buffer.clear();
-    return reduced;
-  }
-
   private void splitOtherClasses(final int source)
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     if (rel.isReachable(source)) {
       final int numEvents = rel.getNumberOfProperEvents();
-      final int active;
-      final EquivalenceClass clazz = mStateToClass[source];
-      if (clazz != null) {
-        active = clazz.getActiveEvents();
-      } else {
-        active = mActiveEventSets[source];
-      }
+      final int active = mActiveEventSets[source];
       mSetReadIterator.reset(active);
       while (mSetReadIterator.advance()) {
         final int event = mSetReadIterator.getCurrentData();
@@ -568,11 +535,6 @@ public class ActiveEventsTRSimplifier
       return mListBuffer.toArray(mList);
     }
 
-    private int getActiveEvents()
-    {
-      return mOpenEvents;
-    }
-
     //#######################################################################
     //# Interface java.util.Comparable<EquivalenceClass>
     @Override
@@ -630,14 +592,18 @@ public class ActiveEventsTRSimplifier
 
     private void splitOtherClasses()
     {
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      final int numEvents = rel.getNumberOfProperEvents();
       mSetReadIterator.reset(mOpenEvents);
       if (mSize == 1) {
         final int state = getFirstState();
         while (mSetReadIterator.advance()) {
           final int event = mSetReadIterator.getCurrentData();
-          ActiveEventsTRSimplifier.this.splitOtherClasses(state, event);
-          if (mNumProperCandidates == 0) {
-            return;
+          if (event > EventEncoding.TAU && event < numEvents) {
+            ActiveEventsTRSimplifier.this.splitOtherClasses(state, event);
+            if (mNumProperCandidates == 0) {
+              return;
+            }
           }
         }
         dispose();
@@ -646,13 +612,15 @@ public class ActiveEventsTRSimplifier
         final TIntArrayList buffer = new TIntArrayList(numInternal);
         while (mSetReadIterator.advance()) {
           final int event = mSetReadIterator.getCurrentData();
-          mListReadIterator.reset(mList);
-          while (mListReadIterator.advance()) {
-            final int state = mListReadIterator.getCurrentData();
-            final boolean internal =
-              ActiveEventsTRSimplifier.this.splitOtherClasses(state, event);
-            if (internal) {
-              buffer.add(event);
+          if (event > EventEncoding.TAU && event < numEvents) {
+            mListReadIterator.reset(mList);
+            while (mListReadIterator.advance()) {
+              final int state = mListReadIterator.getCurrentData();
+              final boolean internal =
+                ActiveEventsTRSimplifier.this.splitOtherClasses(state, event);
+              if (internal) {
+                buffer.add(event);
+              }
             }
           }
         }
@@ -830,13 +798,6 @@ public class ActiveEventsTRSimplifier
   //# Data Members
   // Configuration
   private int mTransitionLimit;
-
-  // Initial States
-  /**
-   * Hash set containing state numbers of initial states or states reached
-   * silently from initial states.
-   */
-  private TIntHashSet mInitialStates;
 
   // Active Events
   /**
