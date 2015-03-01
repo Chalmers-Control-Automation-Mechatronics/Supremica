@@ -221,6 +221,13 @@ public abstract class AbstractStandardConflictCheckerTest
 
   //#########################################################################
   //# Test Cases --- nasty
+  public void testActiveEvents16() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "activeEvents16.wmod");
+    runModelVerifier(des, false);
+  }
+
   public void testAgvbPart1() throws Exception
   {
     final ProductDESProxy des =
