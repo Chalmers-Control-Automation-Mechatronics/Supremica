@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Set;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
@@ -54,11 +55,15 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
  *     to a different equivalence class.</LI>
  * <LI>Refine partition based on incoming equivalence within equivalence
  *     classes. Separate states that do or do not have incoming transitions
- *     with a given event from within their own equivalence class.</LI>
+ *     with a given event from within their own equivalence class, and
+ *     separate states with an outgoing transition to a different equivalent
+ *     class by an active events from states that stay within the same class
+ *     by that event.</LI>
  * <LI>Repeat steps 2. and&nbsp;3. for any equivalence classes that have been
  *     split according to step&nbsp;3.</LI>
  * <LI>Merge states that are still equivalent. If any states have been merged,
- *     update data structures and try to merge again starting from step&nbsp;1.
+ *     update data structures and try to merge again starting from
+ *     step&nbsp;1.</LI>
  * </OL>
  *
  * <P><I>Reference:</I> Hugo Flordal, Robi Malik. Compositional Verification
@@ -164,6 +169,7 @@ public class ActiveEventsTRSimplifier
 
     mExternalSplittters = new PriorityQueue<>(mNumProperCandidates);
     mInternalSplittters = new PriorityQueue<>(mNumProperCandidates);
+    mActiveExitSplittters = new PriorityQueue<>(mNumProperCandidates);
     main:
     do {
       // 2. Create initial partition based on active events and initial states
@@ -182,13 +188,18 @@ public class ActiveEventsTRSimplifier
           clazz.enqueueExternal();
         }
       }
-      while (!mExternalSplittters.isEmpty() || !mInternalSplittters.isEmpty()) {
+      while (!mExternalSplittters.isEmpty() ||
+             !mInternalSplittters.isEmpty() ||
+             !mActiveExitSplittters.isEmpty()) {
         if (!mExternalSplittters.isEmpty()) {
           final EquivalenceClass splitter = mExternalSplittters.poll();
           splitter.splitOtherClasses();
-        } else {
+        } else if (!mInternalSplittters.isEmpty()) {
           final EquivalenceClass splitter = mInternalSplittters.poll();
           splitter.splitSameClass();
+        } else {
+          final EquivalenceClass splitter = mActiveExitSplittters.poll();
+          splitter.splitOnActiveExits();
         }
         if (mNumProperCandidates == 0) {
           break main;
@@ -222,6 +233,7 @@ public class ActiveEventsTRSimplifier
     mPredecessors = null;
     mExternalSplittters = null;
     mInternalSplittters = null;
+    mActiveExitSplittters = null;
     mTauClosure = null;
     mFullEventClosureIterator = null;
     mListBuffer = null;
@@ -331,7 +343,7 @@ public class ActiveEventsTRSimplifier
   }
 
   /**
-   * Creates equivalence classes for groups of two more states that
+   * Creates equivalence classes for groups of two or more states that
    * have the same active event sets. Assumes that {@link #mActiveEventCounts}
    * is set up, and that {@link #mNumProperCandidates} is nonzero and
    * contains the number of equivalence classes that need to be created.
@@ -375,28 +387,33 @@ public class ActiveEventsTRSimplifier
     }
   }
 
-  private boolean splitOtherClasses(final int source, final int event)
+  private byte splitOtherClasses(final int source, final int event)
   {
-    final THashSet<EquivalenceClass> splitClasses = new THashSet<>();
+    final Set<EquivalenceClass> splitClasses = new THashSet<>();
     final EquivalenceClass sourceClass = mStateToClass[source];
-    boolean internal = false;
+    byte result = 0;
     mFullEventClosureIterator.reset(source, event);
     while (mFullEventClosureIterator.advance()) {
       final int target = mFullEventClosureIterator.getCurrentTargetState();
       final EquivalenceClass targetClass = mStateToClass[target];
-      if (targetClass != null) {
-        if (targetClass != sourceClass) {
+      if (targetClass == null) {
+        if (source != target) {
+          result |= EXIT;
+        }
+      } else {
+        if (targetClass == sourceClass) {
+          result |= INTERNAL;
+        } else {
           targetClass.moveToSplitList(target);
           splitClasses.add(targetClass);
-        } else {
-          internal = true;
+          result |= EXIT;
         }
       }
     }
     for (final EquivalenceClass splitClass : splitClasses) {
       splitClass.splitUsingSplitList();
     }
-    return internal;
+    return result;
   }
 
   private TRPartition createPartition()
@@ -590,6 +607,14 @@ public class ActiveEventsTRSimplifier
       }
     }
 
+    private void enqueueActiveExits()
+    {
+      if (!mIsActiveExitSplitter && mSetBuffer.size(mActiveExits) > 0 && mSize > 1) {
+        mActiveExitSplittters.add(this);
+        mIsActiveExitSplitter = true;
+      }
+    }
+
     private void splitOtherClasses()
     {
       final ListBufferTransitionRelation rel = getTransitionRelation();
@@ -609,31 +634,43 @@ public class ActiveEventsTRSimplifier
         dispose();
       } else {
         final int numInternal = mSetBuffer.size(mOpenEvents);
-        final TIntArrayList buffer = new TIntArrayList(numInternal);
+        final TIntArrayList open = new TIntArrayList(numInternal);
+        final TIntArrayList ambiguous = new TIntArrayList(numInternal);
         while (mSetReadIterator.advance()) {
           final int event = mSetReadIterator.getCurrentData();
+          boolean exit = false;
+          boolean nonexit = false;
           if (event > EventEncoding.TAU && event < numEvents) {
             mListReadIterator.reset(mList);
             while (mListReadIterator.advance()) {
               final int state = mListReadIterator.getCurrentData();
-              final boolean internal =
+              final byte status =
                 ActiveEventsTRSimplifier.this.splitOtherClasses(state, event);
-              if (internal) {
-                buffer.add(event);
+              if ((status & INTERNAL) != 0) {
+                open.add(event);
               }
+              if ((status & EXIT) == 0) {
+                nonexit = true;
+              } else {
+                exit = true;
+              }
+            }
+            if (exit && nonexit) {
+              ambiguous.add(event);
             }
           }
         }
-        mOpenEvents = mSetBuffer.add(buffer);
+        mOpenEvents = mSetBuffer.add(open);
+        mActiveExits = mSetBuffer.add(ambiguous);
         enqueueInternal();
       }
       mIsExternalSplitter = false;
     }
 
-    private void splitSameClass()
+    private boolean splitSameClass()
     {
       mIsInternalSplitter = false;
-      if (mSize > 1) {
+      if (mSize > 1 && mSetBuffer.size(mOpenEvents) > 0) {
         mSetReadIterator.reset(mOpenEvents);
         final int[] states = mListBuffer.toArray(mList);
         while (mSetReadIterator.advance()) {
@@ -650,10 +687,40 @@ public class ActiveEventsTRSimplifier
             }
           }
           if (splitUsingSplitList()) {
-            return;
+            return true;
           }
         }
       }
+      enqueueActiveExits();
+      return false;
+    }
+
+    private boolean splitOnActiveExits()
+    {
+      mIsActiveExitSplitter = false;
+      if (mSize > 1 && mSetBuffer.size(mActiveExits) > 0) {
+        mSetReadIterator.reset(mActiveExits);
+        final int[] states = mListBuffer.toArray(mList);
+        while (mSetReadIterator.advance()) {
+          final int event = mSetReadIterator.getCurrentData();
+          mFullEventClosureIterator.resetEvent(event);
+          for (final int source : states) {
+            mFullEventClosureIterator.resetState(source);
+            while (mFullEventClosureIterator.advance()) {
+              final int target =
+                mFullEventClosureIterator.getCurrentTargetState();
+              if (mStateToClass[target] != this) {
+                moveToSplitList(source);
+                break;
+              }
+            }
+          }
+          if (splitUsingSplitList()) {
+            return true;
+          }
+        }
+      }
+      return false;
     }
 
     private void moveToSplitList(final int state)
@@ -782,6 +849,13 @@ public class ActiveEventsTRSimplifier
      */
     private int mOpenEvents;
     /**
+     * A set of events originating from this class, where it is known that
+     * some states in this class can reach another class via these events,
+     * while other states cannot. Splitting may be required to ensure the
+     * condition of equal sets of active events leading to a different class.
+     */
+    private int mActiveExits;
+    /**
      * Whether the this equivalence class is in the queue
      * {@link #mExternalSplittters}.
      */
@@ -791,6 +865,11 @@ public class ActiveEventsTRSimplifier
      * {@link #mInternalSplittters}.
      */
     private boolean mIsInternalSplitter;
+    /**
+     * Whether the this equivalence class is in the queue
+     * {@link #mActiveExitSplittters}.
+     */
+    private boolean mIsActiveExitSplitter;
   }
 
 
@@ -846,6 +925,12 @@ public class ActiveEventsTRSimplifier
    * to split themselves.
    */
   private Queue<EquivalenceClass> mInternalSplittters;
+  /**
+   * Queue of equivalence classes that are yet to be processed
+   * for splitting into states with and without outgoing active events to
+   * a different class.
+   */
+  private Queue<EquivalenceClass> mActiveExitSplittters;
 
   // Tools
   private TauClosure mTauClosure;
@@ -859,5 +944,8 @@ public class ActiveEventsTRSimplifier
   //#########################################################################
   //# Class Constants
   private static final int OMEGA = EventEncoding.TAU;
+
+  private static final byte EXIT = 0x01;
+  private static final byte INTERNAL = 0x02;
 
 }
