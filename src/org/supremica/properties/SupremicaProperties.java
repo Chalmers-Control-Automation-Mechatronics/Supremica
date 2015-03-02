@@ -102,7 +102,7 @@ public final class SupremicaProperties
     public static void loadProperties(File theFile)
         throws FileNotFoundException, IOException
     {
-        propertyFile = theFile;
+        propertyFile = theFile;	// this is the file we load properties from, it should also be the one to save to
         updateProperties(propertyFile);
     }
 
@@ -160,7 +160,7 @@ public final class SupremicaProperties
         }
         else
         {
-            System.err.println("Could not write to configuration file, unknown file name.");
+            System.err.println("No configuration file to write to, was not specified (by -p) on startup");
         }
     }
 
@@ -302,7 +302,7 @@ public final class SupremicaProperties
     private static SupremicaProperties supremicaProperties;
     @SuppressWarnings("unused")
 	private static Config config = Config.getInstance();
-    private static File propertyFile = null;
+    private static File propertyFile = null;	// Set by loadProperties
 
     static
     {

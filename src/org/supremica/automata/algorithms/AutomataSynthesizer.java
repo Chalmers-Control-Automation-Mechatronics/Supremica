@@ -941,10 +941,8 @@ public class AutomataSynthesizer
             progress++;
 
             // Prepare a verifier for verifying the need for this supervisor
-            VerificationOptions verificationOptions;
-            SynchronizationOptions synchronizationOptions;
-            verificationOptions = VerificationOptions.getDefaultControllabilityOptions();
-            synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
+	    final VerificationOptions verificationOptions = VerificationOptions.getDefaultControllabilityOptions();
+            final SynchronizationOptions synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
             final AutomataVerifier verifier = new AutomataVerifier(currAutomata, verificationOptions,
                 synchronizationOptions, null);
 
