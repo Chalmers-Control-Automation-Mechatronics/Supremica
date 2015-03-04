@@ -94,6 +94,13 @@ public class SelfloopSubsumptionTRSimplifierTest
     runTransitionRelationSimplifier(des);
   }
 
+  public void testSelfloopSubsumption7() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "selfloop_subsumption_07.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
   /**
    * A test to see whether a single transition relation simplifier
    * object can perform multiple abstractions in sequence.

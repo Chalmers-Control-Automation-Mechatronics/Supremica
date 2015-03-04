@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="selfloop_subsumption_06" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>A test for the selfloop subsumption rule. None of the selflloops on state S1 can be removed, because there is no b-selfloop in the tau-predecessors, and the a-selfloop cannot be removed alone.</ns2:Comment>
+    <ns2:Comment>A test for the selfloop subsumption rule. None of the selflloops on state S0 can be removed, because there is no c-selfloop in the tau-successors, and the a-selfloop cannot be removed alone.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="a"/>
         <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="tau">
@@ -66,7 +66,7 @@
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="138" Y="64"/>
+                            <Point X="141" Y="64"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Source="S1" Target="S1">

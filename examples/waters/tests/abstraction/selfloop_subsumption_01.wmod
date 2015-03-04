@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="selfloop_subsumption_01" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>A test for the selfloop subsumption rule. The selflloops S1-e-&gt;S1 and S2-e-&gt;S2 are both redundant because of the loop S0-tau-&gt;S1-tau-&gt;S2-e-&gt;S0 on the tau-predecessor state S0.</ns2:Comment>
+    <ns2:Comment>A test for the selfloop subsumption rule. The selflloop S1-e-&gt;S1 is redundant because of the loop S2-e-&gt;S0-tau-&gt;S1-tau-&gt;S2 on the tau-successor state S2.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Observable="false" Name="tau">
             <ns2:AttributeMap>
@@ -108,7 +108,7 @@
             </Graph>
         </SimpleComponent>
         <SimpleComponent Kind="PLANT" Name="after">
-            <Graph>
+            <Graph Deterministic="false">
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
                         <PointGeometry>
@@ -178,6 +178,17 @@
                                 <Point X="3" Y="-8"/>
                             </LabelGeometry>
                         </LabelBlock>
+                    </Edge>
+                    <Edge Source="S2" Target="S2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-17" Y="-10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="143" Y="224"/>
+                        </SplineGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>

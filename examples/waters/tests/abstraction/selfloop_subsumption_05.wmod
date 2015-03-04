@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="selfloop_subsumption_05" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>A test for the selfloop subsumption rule. The selflloops S1-e-&gt;S1 and S2-e-&gt;S2 are redundant because of the loop S0-tau-&gt;S1-tau-&gt;S2-e-&gt;S0 on the tau-predecessor state S0, with state S2 being eligible for selfloop removal because of the outgoiung always enabled transition S2-e-&gt;S0.</ns2:Comment>
+    <ns2:Comment>A test for the selfloop subsumption rule. The selflloops S0-e-&gt;S0 and S1-e-&gt;S1 are redundant because of the loop S2-e-&gt;S0-tau-&gt;S1-tau-&gt;S2 on the tau-successor state S2.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Observable="false" Name="tau">
             <ns2:AttributeMap>
@@ -70,16 +70,22 @@
                             <Point X="36" Y="144"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Source="S2" Target="S2">
+                    <Edge Source="S0" Target="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="e"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="4" Y="-10"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <StartPointGeometry>
+                            <Point X="96" Y="64"/>
+                        </StartPointGeometry>
                         <SplineGeometry>
-                            <Point X="141" Y="224"/>
+                            <Point X="141" Y="64"/>
                         </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point X="96" Y="64"/>
+                        </EndPointGeometry>
                     </Edge>
                     <Edge Source="S1" Target="S1">
                         <LabelBlock>

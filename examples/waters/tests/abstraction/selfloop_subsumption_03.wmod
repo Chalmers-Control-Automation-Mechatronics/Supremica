@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="selfloop_subsumption_03" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>A test for the selfloop subsumption rule. The selflloops S2-a-&gt;S2 and S2-b-&gt;S2 are redundant because of the loop S1-a-&gt;S0-tau-&gt;S1 and S1-tau-&gt;S2-b-&gt;S0-tau-&gt;S1 on the tau-predecessor state S0.</ns2:Comment>
+    <ns2:Comment>A test for the selfloop subsumption rule. The selflloops S0-a-&gt;S0 and S0-b-&gt;S0 are redundant because of the loop S1-a-&gt;S0-tau-&gt;S1 and S1-tau-&gt;S2-b-&gt;S0-tau-&gt;S1 on the tau-successor state S1.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Observable="false" Name="tau">
             <ns2:AttributeMap>
@@ -23,7 +23,7 @@
                             <Point X="96" Y="64"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="8" Y="-10"/>
+                            <Point X="-27" Y="-6"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
@@ -93,17 +93,23 @@
                             <Point X="36" Y="144"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Source="S2" Target="S2">
+                    <Edge Source="S0" Target="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="a"/>
                             <SimpleIdentifier Name="b"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="4" Y="-17"/>
+                                <Point X="6" Y="-17"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <StartPointGeometry>
+                            <Point X="96" Y="64"/>
+                        </StartPointGeometry>
                         <SplineGeometry>
-                            <Point X="141" Y="224"/>
+                            <Point X="143" Y="67"/>
                         </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point X="96" Y="64"/>
+                        </EndPointGeometry>
                     </Edge>
                     <Edge Source="S2" Target="S3">
                         <LabelBlock>

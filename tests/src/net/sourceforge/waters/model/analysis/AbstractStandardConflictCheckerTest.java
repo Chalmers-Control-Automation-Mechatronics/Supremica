@@ -473,6 +473,20 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(des, false);
   }
 
+  public void testSelfloopSubsumption02() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "selfloop_subsumption_02.wmod");
+    runModelVerifier(des, true);
+  }
+
+  public void testSelfloopSubsumption03() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "selfloop_subsumption_03.wmod");
+    runModelVerifier(des, true);
+  }
+
   public void testSilentContinuation() throws Exception
   {
     final ProductDESProxy des =
