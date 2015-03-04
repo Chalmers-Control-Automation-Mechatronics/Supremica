@@ -49,6 +49,12 @@ public class SelfloopSubsumptionTRSimplifierTest
     return new SelfloopSubsumptionTRSimplifier();
   }
 
+  @Override
+  protected void configureTransitionRelationSimplifier()
+  {
+    configureTransitionRelationSimplifierWithPropositions();
+  }
+
 
   //#########################################################################
   //# Test Cases
@@ -98,6 +104,20 @@ public class SelfloopSubsumptionTRSimplifierTest
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "abstraction", "selfloop_subsumption_07.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void testSelfloopSubsumption8() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "selfloop_subsumption_08.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void testSelfloopSubsumption9() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "selfloop_subsumption_09.wmod");
     runTransitionRelationSimplifier(des);
   }
 

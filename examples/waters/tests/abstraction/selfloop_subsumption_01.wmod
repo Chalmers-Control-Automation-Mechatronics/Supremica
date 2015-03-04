@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="selfloop_subsumption_01" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>A test for the selfloop subsumption rule. The selflloop S1-e-&gt;S1 is redundant because of the loop S2-e-&gt;S0-tau-&gt;S1-tau-&gt;S2 on the tau-successor state S2.</ns2:Comment>
+    <ns2:Comment>A test for the selfloop subsumption rule. The selfloop S1-e-&gt;S1 is redundant because of the loop S2-e-&gt;S0-tau-&gt;S1-tau-&gt;S2 on the tau-successor state S2.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Observable="false" Name="tau">
             <ns2:AttributeMap>

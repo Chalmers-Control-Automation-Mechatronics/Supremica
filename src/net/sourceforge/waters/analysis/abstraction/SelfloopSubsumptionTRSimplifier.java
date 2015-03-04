@@ -35,7 +35,7 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
  */
 
 public class SelfloopSubsumptionTRSimplifier
-  extends AbstractTRSimplifier
+  extends AbstractMarkingTRSimplifier
 {
 
   //#########################################################################
@@ -127,100 +127,114 @@ public class SelfloopSubsumptionTRSimplifier
   private boolean removeSelfloops(final int source)
   {
     boolean removed = false;
-    if (!mProcessedStates.get(source)) {
-      mProcessedStates.set(source);
+    if (mProcessedStates.get(source)) {
+      return false;
+    }
+    mProcessedStates.set(source);
 
-      // 1. Process tau-successors
-      boolean hasTauSuccessor = false;
-      mTauIterator.resetState(source);
-      while (mTauIterator.advance()) {
-        final int t = mTauIterator.getCurrentTargetState();
-        removed |= removeSelfloops(t);
-        hasTauSuccessor = true;
-      }
+    // 1. Process tau-successors
+    boolean hasTauSuccessor = false;
+    mTauIterator.resetState(source);
+    while (mTauIterator.advance()) {
+      final int t = mTauIterator.getCurrentTargetState();
+      removed |= removeSelfloops(t);
+      hasTauSuccessor = true;
+    }
+    if (!hasTauSuccessor) {
+      return removed;
+    }
 
-      if (hasTauSuccessor) {
-        // 2. Collect selfloops
-        mEventIterator.resetState(source);
-        while (mEventIterator.advance()) {
-          if (mEventIterator.getCurrentTargetState() == source) {
-            final int e = mEventIterator.getCurrentEvent();
-            mSelfloopEvents.add(e);
-          }
-        }
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final int defaultID = getDefaultMarkingID();
+    if (defaultID >= 0 && rel.isMarked(source, defaultID)) {
+      return removed;
+    }
 
-        if (!mSelfloopEvents.isEmpty()) {
-          // 3. Explore tau-successors
-          boolean found = false;
-          final TIntHashSet selfloops = new TIntHashSet(mSelfloopEvents);
-          final TIntHashSet visited = new TIntHashSet();
-          mTauIterator.resetState(source);
-          while (mTauIterator.advance()) {
-            final int s = mTauIterator.getCurrentTargetState();
-            visited.add(s);
-            mStack.push(s);
-          }
-          search:
-          while (mStack.size() > 0) {
-            // Visit each state ...
-            final int s = mStack.pop();
-            found = true;
-            // If the state has all the selfloops, then done with this state
-            mClosureIterator.resetState(s);
-            for (int i = 0; i < mSelfloopEvents.size() && found; i++) {
-              final int e = mSelfloopEvents.get(i);
-              mClosureIterator.resetEvent(e);
-              found = false;
-              while (mClosureIterator.advance()) {
-                if (mClosureIterator.getCurrentTargetState() == s) {
-                  found = true;
-                  break;
-                }
-              }
-            }
-            if (found) {
-              continue search;
-            }
-            // Otherwise if the state has an outgoing proper event, then fail
-            mEventIterator.resetState(s);
-            while (mEventIterator.advance()) {
-              if (mEventIterator.getCurrentTargetState() != s) {
-                break search;
-              }
-              final int e = mEventIterator.getCurrentEvent();
-              if (!selfloops.contains(e)) {
-                break search;
-              }
-            }
-            // Otherwise enqueue tau-successors
-            mTauIterator.resetState(s);
-            while (mTauIterator.advance()) {
-              final int t = mTauIterator.getCurrentTargetState();
-              mClosureIterator.resetState(t);
-              if (visited.add(t)) {
-                mStack.push(t);
-              }
-              found = true;
-            }
-            // If no tau-successors, then fail
-            if (!found) {
-              break search;
-            }
-          }
-          // 4. If the search was successful, then remove all the selfloops
-          if (found) {
-            final ListBufferTransitionRelation rel = getTransitionRelation();
-            for (int i = 0; i < mSelfloopEvents.size(); i++) {
-              final int e = mSelfloopEvents.get(i);
-              rel.removeTransition(source, e, source);
-            }
-            removed = true;
-          }
-          mStack.clear();
-          mSelfloopEvents.clear();
-        }
+    // 2. Collect selfloops
+    mEventIterator.resetState(source);
+    while (mEventIterator.advance()) {
+      if (mEventIterator.getCurrentTargetState() == source) {
+        final int e = mEventIterator.getCurrentEvent();
+        mSelfloopEvents.add(e);
+      } else {
+        mSelfloopEvents.clear();
+        return removed;
       }
     }
+    if (mSelfloopEvents.isEmpty()) {
+      return removed;
+    }
+
+    // 3. Explore tau-successors
+    boolean found = false;
+    final TIntHashSet selfloops = new TIntHashSet(mSelfloopEvents);
+    final TIntHashSet visited = new TIntHashSet();
+    mTauIterator.resetState(source);
+    while (mTauIterator.advance()) {
+      final int s = mTauIterator.getCurrentTargetState();
+      visited.add(s);
+      mStack.push(s);
+    }
+    search:
+    while (mStack.size() > 0) {
+      // Visit each state ...
+      final int s = mStack.pop();
+      found = true;
+      // If the state has all the selfloops, then done with this state
+      mClosureIterator.resetState(s);
+      for (int i = 0; i < mSelfloopEvents.size() && found; i++) {
+        final int e = mSelfloopEvents.get(i);
+        mClosureIterator.resetEvent(e);
+        found = false;
+        while (mClosureIterator.advance()) {
+          if (mClosureIterator.getCurrentTargetState() == s) {
+            found = true;
+            break;
+          }
+        }
+      }
+      if (found) {
+        continue search;
+      }
+      // Otherwise if the state has an outgoing proper event, then fail
+      if (defaultID >= 0 && rel.isMarked(s, defaultID)) {
+        break search;
+      }
+      mEventIterator.resetState(s);
+      while (mEventIterator.advance()) {
+        if (mEventIterator.getCurrentTargetState() != s) {
+          break search;
+        }
+        final int e = mEventIterator.getCurrentEvent();
+        if (!selfloops.contains(e)) {
+          break search;
+        }
+      }
+      // Otherwise enqueue tau-successors
+      mTauIterator.resetState(s);
+      while (mTauIterator.advance()) {
+        final int t = mTauIterator.getCurrentTargetState();
+        mClosureIterator.resetState(t);
+        if (visited.add(t)) {
+          mStack.push(t);
+        }
+        found = true;
+      }
+      // If no tau-successors, then fail
+      if (!found) {
+        break search;
+      }
+    }
+    // 4. If the search was successful, then remove all the selfloops
+    if (found) {
+      for (int i = 0; i < mSelfloopEvents.size(); i++) {
+        final int e = mSelfloopEvents.get(i);
+        rel.removeTransition(source, e, source);
+      }
+      removed = true;
+    }
+    mStack.clear();
+    mSelfloopEvents.clear();
     return removed;
   }
 
