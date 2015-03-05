@@ -186,7 +186,6 @@ public class ActiveEventsTRSimplifier
           }
         } else {
           clazz.enqueueExternal();
-          clazz.getFirstState();
         }
       }
       while (!mExternalSplittters.isEmpty() ||
@@ -535,6 +534,7 @@ public class ActiveEventsTRSimplifier
     {
       mSize = 0;
       mList = mListBuffer.createList();
+      mFirstState = Integer.MAX_VALUE;
       mSplitList = IntListBuffer.NULL;
       mSplitSize = -1;
       mOpenEvents = active;
@@ -565,15 +565,7 @@ public class ActiveEventsTRSimplifier
 
     private int getFirstState()
     {
-      assert mSize > 0;
-      mListReadIterator.reset(mList);
-      if (mListReadIterator.advance()) {
-        return mListReadIterator.getCurrentData();
-      } else {
-        mListReadIterator.reset(mSplitList);
-        mListReadIterator.advance();
-        return mListReadIterator.getCurrentData();
-      }
+      return mFirstState;
     }
 
     private int[] getStates()
@@ -602,6 +594,9 @@ public class ActiveEventsTRSimplifier
       mListBuffer.append(mList, state);
       mSize++;
       mStateToClass[state] = this;
+      if (state < mFirstState) {
+        mFirstState = state;
+      }
     }
 
     private void setUpStateToClass()
@@ -610,11 +605,16 @@ public class ActiveEventsTRSimplifier
       if (mSize == 1) {
         mListReadIterator.advance();
         final int state = mListReadIterator.getCurrentData();
+        mFirstState = state;
         mStateToClass[state] = null;
       } else {
+        mFirstState = Integer.MAX_VALUE;
         while (mListReadIterator.advance()) {
           final int state = mListReadIterator.getCurrentData();
           mStateToClass[state] = this;
+          if (state < mFirstState) {
+            mFirstState = state;
+          }
         }
       }
     }
@@ -649,6 +649,22 @@ public class ActiveEventsTRSimplifier
       if (!mIsActiveExitSplitter && mSetBuffer.size(mActiveExits) > 0 && mSize > 1) {
         mActiveExitSplittters.add(this);
         mIsActiveExitSplitter = true;
+      }
+    }
+
+    private void dequeue()
+    {
+      if (mIsExternalSplitter) {
+        mExternalSplittters.remove(this);
+        mIsExternalSplitter = false;
+      }
+      if (mIsInternalSplitter) {
+        mInternalSplittters.remove(this);
+        mIsInternalSplitter = false;
+      }
+      if (mIsActiveExitSplitter) {
+        mActiveExitSplittters.remove(this);
+        mIsActiveExitSplitter = false;
       }
     }
 
@@ -809,14 +825,15 @@ public class ActiveEventsTRSimplifier
                                final int splitSize,
                                final boolean preds)
     {
+      dequeue();
       final int newSize = mSize - splitSize;
       final EquivalenceClass splitClass =
         new EquivalenceClass(splitList, splitSize, preds, mOpenEvents);
       mSize = newSize;
       if (mSize == 1) {
-        setUpStateToClass();
         mNumProperCandidates--;
       }
+      setUpStateToClass();
       if (mSplitSize > 1) {
         mNumProperCandidates++;
       }
@@ -861,6 +878,7 @@ public class ActiveEventsTRSimplifier
     private void checkIntegrity()
     {
       assert mSize == mListBuffer.getLength(mList);
+      assert mListBuffer.contains(mList, mFirstState);
     }
 
     //#######################################################################
@@ -875,6 +893,10 @@ public class ActiveEventsTRSimplifier
      * ActiveEvents'TRSimplifier#mListBuffer}.
      */
     private int mList;
+    /**
+     * The smallest state number that belongs to this class.
+     */
+    private int mFirstState;
     /**
      * A list of states to be split off from this class,
      * represented as list identifier in {@link
