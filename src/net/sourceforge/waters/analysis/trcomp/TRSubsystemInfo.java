@@ -28,6 +28,7 @@ import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.marshaller.MarshallingTools;
 
 
 /**
@@ -292,6 +293,11 @@ class TRSubsystemInfo
   public String toString()
   {
     return AutomatonTools.getCompositionName(mAutomata);
+  }
+
+  public void saveModule(final String filename)
+  {
+    MarshallingTools.saveModule(mAutomata, filename);
   }
 
 

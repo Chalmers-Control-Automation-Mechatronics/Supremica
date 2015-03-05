@@ -1063,16 +1063,16 @@ public class TRCompositionalConflictChecker
     } else {
       trMode = ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL;
     }
+    final MarkingRemovalTRSimplifier markingRemover =
+      new MarkingRemovalTRSimplifier();
+    markingRemover.setSimplificationListener(markingListener);
+    chain.add(markingRemover);
     if (selfloopSubsumption) {
       final SelfloopSubsumptionTRSimplifier selfloopRemover =
         new SelfloopSubsumptionTRSimplifier();
       selfloopRemover.setSimplificationListener(partitioningListener);
       chain.add(selfloopRemover);
     }
-    final MarkingRemovalTRSimplifier markingRemover =
-      new MarkingRemovalTRSimplifier();
-    markingRemover.setSimplificationListener(markingListener);
-    chain.add(markingRemover);
     final SilentIncomingTRSimplifier silentInRemover =
       new SilentIncomingTRSimplifier();
     silentInRemover.setRestrictsToUnreachableStates(true);

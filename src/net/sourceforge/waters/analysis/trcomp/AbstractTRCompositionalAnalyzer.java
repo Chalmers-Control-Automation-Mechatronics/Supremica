@@ -624,6 +624,7 @@ public abstract class AbstractTRCompositionalAnalyzer
     mNeedsSimplification = new SimplificationQueue(trs);
     mNeedsDisjointSubsystemsCheck = true;
     mAlwaysEnabledDetectedInitially = !isAlwaysEnabledEventsUsed();
+    mStepNo = 0;
 
     result.addSimplifierStatistics(mSpecialEventsFinder);
     result.addSimplifierStatistics(mTRSimplifier);
@@ -952,7 +953,9 @@ public abstract class AbstractTRCompositionalAnalyzer
   {
     final Logger logger = getLogger();
     if (logger.isDebugEnabled()) {
-      logger.debug("Composing " + candidate + " ...");
+      mStepNo++;
+      logger.debug("Composing " + candidate + " (step " + mStepNo +") ...");
+      // mCurrentSubsystem.saveModule("before" + mStepNo + ".wmod");
     }
     try {
       // Set up event encoding ...
@@ -1009,6 +1012,7 @@ public abstract class AbstractTRCompositionalAnalyzer
       for (final TRAutomatonProxy aut : candidate.getAutomata()) {
         mCurrentSubsystem.removeAutomaton(aut, mNeedsSimplification);
       }
+      // mCurrentSubsystem.saveModule("after" + mStepNo + ".wmod");
       return sync;
     } catch (final OverflowException exception) {
       // BUG May or may not have been counted by recordStatistics() already?
@@ -1756,6 +1760,7 @@ public abstract class AbstractTRCompositionalAnalyzer
   private SimplificationQueue mNeedsSimplification;
   private boolean mNeedsDisjointSubsystemsCheck;
   private boolean mAlwaysEnabledDetectedInitially;
+  private int mStepNo;
 
 
   //#########################################################################

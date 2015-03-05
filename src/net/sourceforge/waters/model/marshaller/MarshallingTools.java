@@ -103,7 +103,7 @@ public class MarshallingTools
    * @param  filename  The name of the output file,
    *                   should have <CODE>.wdes</CODE> extension.
    */
-  public static void saveProductDES(final Collection<AutomatonProxy> automata,
+  public static void saveProductDES(final Collection<? extends AutomatonProxy> automata,
                                     final String filename)
   {
     final int dotpos = filename.lastIndexOf(".");
@@ -189,7 +189,7 @@ public class MarshallingTools
    * @param  filename  The name of the output file,
    *                   should have <CODE>.wmod</CODE> extension.
    */
-  public static void saveModule(final Collection<AutomatonProxy> automata,
+  public static void saveModule(final Collection<? extends AutomatonProxy> automata,
                                 final String filename)
   {
     final int dotpos = filename.lastIndexOf(".");

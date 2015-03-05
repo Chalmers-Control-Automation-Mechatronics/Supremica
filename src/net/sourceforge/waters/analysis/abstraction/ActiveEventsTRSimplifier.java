@@ -186,6 +186,7 @@ public class ActiveEventsTRSimplifier
           }
         } else {
           clazz.enqueueExternal();
+          clazz.getFirstState();
         }
       }
       while (!mExternalSplittters.isEmpty() ||
@@ -483,6 +484,28 @@ public class ActiveEventsTRSimplifier
     }
   }
 
+  @SuppressWarnings("unused")
+  private void checkIntegrity()
+  {
+    if (mStateToClass != null) {
+      for (int s = 0; s < mStateToClass.length; s++) {
+        final EquivalenceClass clazz = mStateToClass[s];
+        if (clazz != null) {
+          clazz.checkIntegrity();
+        }
+      }
+    }
+    for (final EquivalenceClass splitter : mExternalSplittters) {
+      splitter.checkIntegrity();
+    }
+    for (final EquivalenceClass splitter : mInternalSplittters) {
+      splitter.checkIntegrity();
+    }
+    for (final EquivalenceClass splitter : mActiveExitSplittters) {
+      splitter.checkIntegrity();
+    }
+  }
+
 
   //#########################################################################
   //# Inner Class EquivalenceClass
@@ -542,9 +565,15 @@ public class ActiveEventsTRSimplifier
 
     private int getFirstState()
     {
+      assert mSize > 0;
       mListReadIterator.reset(mList);
-      mListReadIterator.advance();
-      return mListReadIterator.getCurrentData();
+      if (mListReadIterator.advance()) {
+        return mListReadIterator.getCurrentData();
+      } else {
+        mListReadIterator.reset(mSplitList);
+        mListReadIterator.advance();
+        return mListReadIterator.getCurrentData();
+      }
     }
 
     private int[] getStates()
@@ -557,7 +586,13 @@ public class ActiveEventsTRSimplifier
     @Override
     public int compareTo(final EquivalenceClass clazz)
     {
-      return mSize - clazz.mSize;
+      if (mSize != clazz.mSize) {
+        return mSize - clazz.mSize;
+      } else if (mSize == 0) {
+        return 0;
+      } else {
+        return getFirstState() - clazz.getFirstState();
+      }
     }
 
     //#######################################################################
@@ -586,6 +621,8 @@ public class ActiveEventsTRSimplifier
 
     private void dispose()
     {
+      mSize = 0;
+      mList = IntListBuffer.NULL;
       mListBuffer.dispose(mList);
     }
 
@@ -819,6 +856,11 @@ public class ActiveEventsTRSimplifier
         printer.write('+');
         mListBuffer.dumpList(printer, mSplitList);
       }
+    }
+
+    private void checkIntegrity()
+    {
+      assert mSize == mListBuffer.getLength(mList);
     }
 
     //#######################################################################
