@@ -143,13 +143,12 @@ public class ActiveEventsTRSimplifier
     super.setUp();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numEvents = rel.getNumberOfProperEvents();
-    mTauClosure = rel.createSuccessorsTauClosure(mTransitionLimit);
     mSetBuffer = new IntSetBuffer(numEvents + 1);
     mSetReadIterator = mSetBuffer.iterator();
-    mFullEventClosureIterator = mTauClosure.createFullEventClosureIterator();
     mListBuffer = new IntListBuffer();
     mListReadIterator = mListBuffer.createReadOnlyIterator();
     mListWriteIterator = mListBuffer.createModifyingIterator();
+    createTauClosure();
   }
 
   @Override
@@ -174,6 +173,7 @@ public class ActiveEventsTRSimplifier
     do {
       // 2. Create initial partition based on active events and initial states
       createEquivalenceClasses();
+      createTauClosure();
       final int numStates = rel.getNumberOfStates();
       mPredecessors = new int[numStates];
       // 3. Refine partition based on incoming equivalence
@@ -245,6 +245,16 @@ public class ActiveEventsTRSimplifier
 
   //#########################################################################
   //# Auxiliary Methods
+  private void createTauClosure()
+  {
+    if (mTauClosure == null) {
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      mTauClosure = rel.createSuccessorsTauClosure(mTransitionLimit);
+      mFullEventClosureIterator = mTauClosure.createFullEventClosureIterator();
+    }
+  }
+
+
   /**
    * Creates active event sets and adds to {@link #mSetBuffer},
    * and stores them for each state in {@link #mActiveEventSets}.
@@ -254,6 +264,7 @@ public class ActiveEventsTRSimplifier
    */
   private void createInitialActiveEventSets()
   {
+    createTauClosure();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
     final int numEvents = rel.getNumberOfProperEvents();
@@ -453,6 +464,8 @@ public class ActiveEventsTRSimplifier
     final TRPartition combinedPartition =
       TRPartition.combine(oldPartition, newPartition);
     setResultPartition(combinedPartition);
+    mTauClosure = null;
+    mFullEventClosureIterator = null;
   }
 
 
@@ -940,7 +953,7 @@ public class ActiveEventsTRSimplifier
   //#########################################################################
   //# Data Members
   // Configuration
-  private int mTransitionLimit;
+  private int mTransitionLimit = Integer.MAX_VALUE;
 
   // Active Events
   /**

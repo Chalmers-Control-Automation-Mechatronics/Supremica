@@ -1070,6 +1070,7 @@ public class TRCompositionalConflictChecker
     if (selfloopSubsumption) {
       final SelfloopSubsumptionTRSimplifier selfloopRemover =
         new SelfloopSubsumptionTRSimplifier();
+      selfloopRemover.setTransitionLimit(limit);
       selfloopRemover.setSimplificationListener(partitioningListener);
       chain.add(selfloopRemover);
     }
@@ -1107,6 +1108,7 @@ public class TRCompositionalConflictChecker
     if (selfloopSubsumption) {
       final ActiveEventsTRSimplifier activeEventsSimplifier =
         new ActiveEventsTRSimplifier();
+      activeEventsSimplifier.setTransitionLimit(limit);
       activeEventsSimplifier.setSimplificationListener(partitioningListener);
       chain.add(activeEventsSimplifier);
     }

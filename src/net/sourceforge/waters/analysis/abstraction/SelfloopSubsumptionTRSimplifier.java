@@ -51,6 +51,31 @@ public class SelfloopSubsumptionTRSimplifier
 
 
   //#########################################################################
+  //# Configuration
+  /**
+   * Sets the transition limit. The transition limit specifies the maximum
+   * number of transitions (including stored silent transitions of the
+   * transitive closure) that will be stored.
+   * @param limit
+   *          The new transition limit, or {@link Integer#MAX_VALUE} to allow
+   *          an unlimited number of transitions.
+   */
+  public void setTransitionLimit(final int limit)
+  {
+    mTransitionLimit = limit;
+  }
+
+  /**
+   * Gets the transition limit.
+   * @see #setTransitionLimit(int) setTransitionLimit()
+   */
+  public int getTransitionLimit()
+  {
+    return mTransitionLimit;
+  }
+
+
+  //#########################################################################
   //# Interface net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
   @Override
   public int getPreferredInputConfiguration()
@@ -88,7 +113,7 @@ public class SelfloopSubsumptionTRSimplifier
     mTauIterator.resetEvent(EventEncoding.TAU);
     mEventIterator = rel.createSuccessorsReadOnlyIterator();
     mEventIterator.resetEvents(EventEncoding.NONTAU, numEvents - 1);
-    final TauClosure closure = rel.createSuccessorsTauClosure(0);
+    final TauClosure closure = rel.createSuccessorsTauClosure(mTransitionLimit);
     mClosureIterator = closure.createFullEventClosureIterator();
     mSelfloopEvents = new TIntArrayList(numEvents - 1);
     mStack = new TIntArrayStack();
@@ -201,7 +226,7 @@ public class SelfloopSubsumptionTRSimplifier
         break search;
       }
       mEventIterator.resetState(s);
-      while (mEventIterator.advance()) {
+      if (mEventIterator.advance()) {
         if (mEventIterator.getCurrentTargetState() != s) {
           break search;
         }
@@ -218,11 +243,6 @@ public class SelfloopSubsumptionTRSimplifier
         if (visited.add(t)) {
           mStack.push(t);
         }
-        found = true;
-      }
-      // If no tau-successors, then fail
-      if (!found) {
-        break search;
       }
     }
     // 4. If the search was successful, then remove all the selfloops
@@ -241,6 +261,10 @@ public class SelfloopSubsumptionTRSimplifier
 
   //#########################################################################
   //# Data Members
+  // Configuration
+  private int mTransitionLimit = Integer.MAX_VALUE;
+
+  // Tools
   private BitSet mProcessedStates;
   private TransitionIterator mTauIterator;
   private TransitionIterator mEventIterator;
