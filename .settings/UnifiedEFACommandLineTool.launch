@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/waters/src/net/sourceforge/waters/analysis/efa/unified/UnifiedEFACommandLineTool.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.ui.favoriteGroups">
+<listEntry value="org.eclipse.debug.ui.launchGroup.debug"/>
+<listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
+</listAttribute>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="net.sourceforge.waters.analysis.efa.unified.UnifiedEFACommandLineTool"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-DN=10&#10;-DC=10&#10;-method NB&#10;-varsel MaxE,MaxS,MinD&#10;-compsel MinF,MinS&#10;${workspace_loc:waters}/examples/waters/efa/pml3.wmod"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="waters"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx512m&#13;&#10;-Djava.library.path=&quot;${workspace_loc:waters}/dist&quot;&#10;-ea"/>
+</launchConfiguration>

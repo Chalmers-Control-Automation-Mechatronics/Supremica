@@ -122,7 +122,7 @@ public class CompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final int limit = getValue();
       final AbstractCompositionalModelAnalyzer composer =
@@ -151,7 +151,7 @@ public class CompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final int limit = getValue();
       final AbstractCompositionalModelAnalyzer composer =
@@ -180,7 +180,7 @@ public class CompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final int limit = getValue();
       final AbstractCompositionalModelAnalyzer composer =
@@ -209,7 +209,7 @@ public class CompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final int limit = getValue();
       final AbstractCompositionalModelAnalyzer composer =
@@ -239,7 +239,7 @@ public class CompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final int limit = getValue();
       final AbstractCompositionalModelAnalyzer composer =
@@ -269,7 +269,7 @@ public class CompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final int limit = getValue();
       final AbstractCompositionalModelAnalyzer composer =
@@ -296,7 +296,7 @@ public class CompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final String name = getValue();
       final AbstractCompositionalModelAnalyzer composer =
@@ -315,8 +315,7 @@ public class CompositionalModelAnalyzerFactory
     //#######################################################################
     //# Printing
     @Override
-    public void dump(final PrintStream stream,
-                     final ModelAnalyzer analyzer)
+    public void dump(final PrintStream stream, final Object analyzer)
     {
       super.dump(stream, analyzer);
       final AbstractCompositionalModelAnalyzer composer =
@@ -345,7 +344,7 @@ public class CompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final String name = getValue();
       final AbstractCompositionalModelAnalyzer composer =
@@ -365,8 +364,7 @@ public class CompositionalModelAnalyzerFactory
     //#######################################################################
     //# Printing
     @Override
-    public void dump(final PrintStream stream,
-                     final ModelAnalyzer analyzer)
+    public void dump(final PrintStream stream, final Object analyzer)
     {
       super.dump(stream, analyzer);
       final AbstractCompositionalModelAnalyzer composer =
@@ -396,7 +394,7 @@ public class CompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final AbstractCompositionalModelAnalyzer composer =
         (AbstractCompositionalModelAnalyzer) analyzer;
@@ -436,7 +434,7 @@ public class CompositionalModelAnalyzerFactory
     //#######################################################################
     //# Printing
     @Override
-    public void dump(final PrintStream stream, final ModelAnalyzer analyzer)
+    public void dump(final PrintStream stream, final Object analyzer)
     {
       if (analyzer instanceof CompositionalConflictChecker) {
         super.dump(stream, analyzer);
@@ -467,7 +465,7 @@ public class CompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final AbstractCompositionalModelAnalyzer composer =
         (AbstractCompositionalModelAnalyzer) analyzer;
@@ -494,7 +492,7 @@ public class CompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final AbstractCompositionalModelAnalyzer composer =
         (AbstractCompositionalModelAnalyzer) analyzer;
@@ -522,7 +520,7 @@ public class CompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final AbstractCompositionalModelAnalyzer composer =
         (AbstractCompositionalModelAnalyzer) analyzer;
@@ -550,7 +548,7 @@ public class CompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final AbstractCompositionalModelAnalyzer composer =
         (AbstractCompositionalModelAnalyzer) analyzer;
@@ -579,7 +577,7 @@ public class CompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final AbstractCompositionalModelAnalyzer composer =
         (AbstractCompositionalModelAnalyzer) analyzer;
@@ -607,7 +605,7 @@ public class CompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final AbstractCompositionalModelAnalyzer composer =
         (AbstractCompositionalModelAnalyzer) analyzer;
@@ -632,11 +630,12 @@ public class CompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
       throws AnalysisConfigurationException
     {
+      final ModelAnalyzer modelAnalyzer = (ModelAnalyzer) analyzer;
       final ModelAnalyzer secondaryAnalyzer =
-        createSecondaryAnalyzer(analyzer);
+        createSecondaryAnalyzer(modelAnalyzer);
       final AbstractCompositionalModelAnalyzer composer =
         (AbstractCompositionalModelAnalyzer) analyzer;
       composer.setMonolithicAnalyzer(secondaryAnalyzer);

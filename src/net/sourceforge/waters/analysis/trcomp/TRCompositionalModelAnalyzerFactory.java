@@ -115,7 +115,7 @@ public class TRCompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final String name = getValue();
       final AbstractTRCompositionalAnalyzer composer =
@@ -135,8 +135,7 @@ public class TRCompositionalModelAnalyzerFactory
     //#######################################################################
     //# Printing
     @Override
-    public void dump(final PrintStream stream,
-                     final ModelAnalyzer analyzer)
+    public void dump(final PrintStream stream, final Object analyzer)
     {
       super.dump(stream, analyzer);
       final AbstractTRCompositionalAnalyzer composer =
@@ -166,7 +165,7 @@ public class TRCompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final int limit = getValue();
       final AbstractTRCompositionalAnalyzer composer =
@@ -193,7 +192,7 @@ public class TRCompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final int limit = getValue();
       final AbstractTRCompositionalAnalyzer composer =
@@ -221,7 +220,7 @@ public class TRCompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final int limit = getValue();
       final AbstractTRCompositionalAnalyzer composer =
@@ -249,7 +248,7 @@ public class TRCompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final int limit = getValue();
       final AbstractTRCompositionalAnalyzer composer =
@@ -275,7 +274,7 @@ public class TRCompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final String name = getValue();
       final AbstractTRCompositionalAnalyzer composer =
@@ -294,8 +293,7 @@ public class TRCompositionalModelAnalyzerFactory
     //#######################################################################
     //# Printing
     @Override
-    public void dump(final PrintStream stream,
-                     final ModelAnalyzer analyzer)
+    public void dump(final PrintStream stream, final Object analyzer)
     {
       super.dump(stream, analyzer);
       final AbstractTRCompositionalAnalyzer composer =
@@ -323,7 +321,7 @@ public class TRCompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final AbstractTRCompositionalAnalyzer composer =
         (AbstractTRCompositionalAnalyzer) analyzer;
@@ -361,7 +359,7 @@ public class TRCompositionalModelAnalyzerFactory
     //#######################################################################
     //# Printing
     @Override
-    public void dump(final PrintStream stream, final ModelAnalyzer analyzer)
+    public void dump(final PrintStream stream, final Object analyzer)
     {
       if (analyzer instanceof CompositionalConflictChecker) {
         super.dump(stream, analyzer);
@@ -392,7 +390,7 @@ public class TRCompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final AbstractTRCompositionalAnalyzer composer =
         (AbstractTRCompositionalAnalyzer) analyzer;
@@ -421,7 +419,7 @@ public class TRCompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final AbstractTRCompositionalAnalyzer composer =
         (AbstractTRCompositionalAnalyzer) analyzer;
@@ -447,7 +445,7 @@ public class TRCompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final AbstractTRCompositionalAnalyzer composer =
         (AbstractTRCompositionalAnalyzer) analyzer;
@@ -474,7 +472,7 @@ public class TRCompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final AbstractTRCompositionalAnalyzer composer =
         (AbstractTRCompositionalAnalyzer) analyzer;
@@ -501,7 +499,7 @@ public class TRCompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final AbstractTRCompositionalAnalyzer composer =
         (AbstractTRCompositionalAnalyzer) analyzer;
@@ -528,7 +526,7 @@ public class TRCompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
       throws AnalysisConfigurationException
     {
       if (analyzer instanceof TRCompositionalConflictChecker) {
@@ -560,11 +558,12 @@ public class TRCompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
       throws AnalysisConfigurationException
     {
+      final ModelAnalyzer modelAnalyzer = (ModelAnalyzer) analyzer;
       final ModelAnalyzer secondaryAnalyzer =
-        createSecondaryAnalyzer(analyzer);
+        createSecondaryAnalyzer(modelAnalyzer);
       final AbstractTRCompositionalAnalyzer composer =
         (AbstractTRCompositionalAnalyzer) analyzer;
       composer.setMonolithicAnalyzer(secondaryAnalyzer);

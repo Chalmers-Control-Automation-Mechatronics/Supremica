@@ -155,7 +155,7 @@ public class DistributedModelVerifierFactory
     }
 
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) analyzer;
       final String value = getValue();
@@ -173,7 +173,7 @@ public class DistributedModelVerifierFactory
     }
 
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) analyzer;
       final String value = getValue();
@@ -197,7 +197,7 @@ public class DistributedModelVerifierFactory
     }
 
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) analyzer;
       final int value = getValue();
@@ -220,7 +220,7 @@ public class DistributedModelVerifierFactory
     }
 
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) analyzer;
       final int value = getValue();
@@ -238,7 +238,7 @@ public class DistributedModelVerifierFactory
     }
 
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) analyzer;
       dsv.setShutdownAfter(true);
@@ -255,7 +255,7 @@ public class DistributedModelVerifierFactory
     }
 
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) analyzer;
       dsv.setWalltimeLimit(getValue());
@@ -273,7 +273,7 @@ public class DistributedModelVerifierFactory
     }
 
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) analyzer;
       dsv.setProcessingThreadCount(getValue());
@@ -291,7 +291,7 @@ public class DistributedModelVerifierFactory
     }
 
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) analyzer;
       dsv.setStateDistribution(getValue());

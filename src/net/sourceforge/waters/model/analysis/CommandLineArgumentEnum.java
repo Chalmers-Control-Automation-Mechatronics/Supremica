@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 
 
@@ -119,7 +118,7 @@ public abstract class CommandLineArgumentEnum<E extends Enum<E>>
   //#########################################################################
   //# Printing
   @Override
-  public void dump(final PrintStream stream, final ModelAnalyzer analyzer)
+  public void dump(final PrintStream stream, final Object analyzer)
   {
     super.dump(stream, analyzer);
     mEnumFactory.dumpEnumeration(stream, INDENT);

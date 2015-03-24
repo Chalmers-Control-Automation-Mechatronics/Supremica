@@ -91,7 +91,7 @@ public abstract class CommandLineArgumentChain
     return secondaryAnalyzer;
   }
 
-  protected void failUnsupportedAnalyzerClass(final ModelAnalyzer analyzer)
+  protected void failUnsupportedAnalyzerClass(final Object analyzer)
   {
     fail(ProxyTools.getShortClassName(analyzer) +
          " does not support secondary verifier!");
@@ -115,7 +115,7 @@ public abstract class CommandLineArgumentChain
   }
 
   @Override
-  public void configure(final ModuleCompiler compiler)
+  public void configureCompiler(final ModuleCompiler compiler)
   {
     mSecondaryFactory.configure(compiler);
   }

@@ -76,10 +76,8 @@ public class CommandLineTool
   //# Main Method for Testing
   /**
    * Main method.
-   * This is a main method to check a set of files for control loop free.
-   * Please refer to the class documentation ({@link CommandLineTool})
-   * for more detailed information.
-   * @param  args    Array of file names from the command line.
+   * This is the main method to parse the command line, create a model
+   * analyser, and run one or more analysis/verification attempts.
    */
   public static void main(final String[] args)
   {

@@ -125,12 +125,12 @@ public abstract class CommandLineArgument
   //# Parsing
   public abstract void parse(ListIterator<String> iter);
 
-  public void configure(final ModelAnalyzer analyzer)
+  public void configureAnalyzer(final Object analyzer)
     throws AnalysisConfigurationException
   {
   }
 
-  public void configure(final ModuleCompiler compiler)
+  public void configureCompiler(final ModuleCompiler compiler)
   {
   }
 
@@ -142,7 +142,7 @@ public abstract class CommandLineArgument
 
   //#########################################################################
   //# Printing
-  public void dump(final PrintStream stream, final ModelAnalyzer analyzer)
+  public void dump(final PrintStream stream, final Object analyzer)
   {
     final String name = getName();
     final String template = getArgumentTemplate();

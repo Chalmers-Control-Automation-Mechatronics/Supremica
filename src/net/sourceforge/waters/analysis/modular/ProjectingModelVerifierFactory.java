@@ -110,10 +110,11 @@ public class ProjectingModelVerifierFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
+      final ModelAnalyzer modelAnalyzer = (ModelAnalyzer) analyzer;
       final int limit = getValue();
-      analyzer.setNodeLimit(limit);
+      modelAnalyzer.setNodeLimit(limit);
     }
 
   }
@@ -137,10 +138,11 @@ public class ProjectingModelVerifierFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
+      final ModelAnalyzer modelAnalyzer = (ModelAnalyzer) analyzer;
       final int limit = getValue();
-      analyzer.setNodeLimit(limit);
+      modelAnalyzer.setNodeLimit(limit);
     }
 
   }
@@ -164,10 +166,11 @@ public class ProjectingModelVerifierFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
+      final ModelAnalyzer modelAnalyzer = (ModelAnalyzer) analyzer;
       final int limit = getValue();
-      analyzer.setTransitionLimit(limit);
+      modelAnalyzer.setTransitionLimit(limit);
     }
 
   }
@@ -191,10 +194,11 @@ public class ProjectingModelVerifierFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
+      final ModelAnalyzer modelAnalyzer = (ModelAnalyzer) analyzer;
       final int limit = getValue();
-      analyzer.setTransitionLimit(limit);
+      modelAnalyzer.setTransitionLimit(limit);
     }
 
   }
