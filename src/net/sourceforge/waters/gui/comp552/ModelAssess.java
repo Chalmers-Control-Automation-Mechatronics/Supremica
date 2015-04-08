@@ -303,9 +303,10 @@ public class ModelAssess
         if (line == null) {
           break;
         }
-        final String[] words = line.split("\t");
-        if (words.length >= 3) {
-          final Student student = new Student(words[0], words[1], words[2]);
+        final String[] words = line.split(",");
+        if (words.length >= 4) {
+          final Student student =
+            new Student(words[0], words[1], words[2], words[3]);
           mStudents.add(student);
         }
       }
@@ -320,7 +321,12 @@ public class ModelAssess
   private void processModule(final File file)
   {
     mOutput.print("\\subsection*{Module {\\tt ");
-    printLaTeXString(file.getName(), false);
+    String moodleName = file.getName();
+    final int pos = moodleName.indexOf(MOODLE_FILE_PATTERN);
+    if (pos >= 0) {
+      moodleName = moodleName.substring(pos + MOODLE_FILE_PATTERN.length());
+    }
+    printLaTeXString(moodleName, false);
     mOutput.println("}}");
     mOutput.println();
     mSkip = false;
@@ -561,9 +567,20 @@ public class ModelAssess
         }
         break;
       case '-':
-        if (space && isSpace(text, i + 1)) {
+        int count = 1;
+        for (int j = i + 1; j < len && text.charAt(j) == '-'; j++) {
+          count++;
+        }
+        if (count == 1 && space && isSpace(text, i + 1)) {
           mOutput.print("---");
-        } else {
+        } else if (count > 1 && count <= 10) {
+          mOutput.print("---");
+          i += count - 1;
+        } else if (count > 10) {
+          mOutput.println("\\par\\smallskip");
+          mOutput.println("\\hrule\\smallskip");
+          i += count - 1;
+       } else {
           mOutput.print(ch);
         }
         blank = space = false;
@@ -1537,6 +1554,17 @@ public class ModelAssess
       // mPattern = Pattern.compile("^[^0-9_]+_" + mStudentID + "_.*$");
     }
 
+    private Student(final String studid, final String uid,
+                    final String last, final String first)
+    {
+      mStudentID = studid;
+      mUserID = uid;
+      mLastName = last;
+      mFirstName = first;
+      mPattern = Pattern.compile("^" + mFirstName + " " + mLastName + "_[0-9]+.*$");
+      // mPattern = Pattern.compile("^[^0-9_]+_" + mStudentID + "_.*$");
+    }
+
     //#######################################################################
     //# Interface java.io.FilenameFilter
     @Override
@@ -1591,6 +1619,11 @@ public class ModelAssess
   private PrintStream mOutput;
   private boolean mSkip;
   private int mAutomatonIndex;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final String MOODLE_FILE_PATTERN = "_assignsubmission_file_";
 
 }
 

@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.sourceforge.waters.model.base.ProxyTools;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.AutomatonTools;
 
 
@@ -487,6 +488,16 @@ public class IntSetBuffer implements WatersIntHashingStrategy
     //#######################################################################
     //# Interface net.sourceforge.waters.analysis.tr.WatersIntIterator
     @Override
+    public GlobalIterator clone()
+    {
+      try {
+        return (GlobalIterator) super.clone();
+      } catch (final CloneNotSupportedException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    }
+
+    @Override
     public void reset()
     {
       mCurrentOffset = -1;
@@ -563,6 +574,16 @@ public class IntSetBuffer implements WatersIntHashingStrategy
 
     //#######################################################################
     //# Interface net.sourceforge.waters.analysis.tr.WatersIntIterator
+    @Override
+    public IntSetIterator clone()
+    {
+      try {
+        return (IntSetIterator) super.clone();
+      } catch (final CloneNotSupportedException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    }
+
     @Override
     public void reset()
     {

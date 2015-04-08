@@ -1,5 +1,6 @@
 package net.sourceforge.waters.gui.actions;
 
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -24,7 +25,7 @@ public class AnalyzeControllabilityAction extends WatersAnalyzeAction
   }
 
   protected ModelVerifier getModelVerifier(final ModelAnalyzerFactory factory,
-                                           final ProductDESProxyFactory desFactory)
+                                           final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
   {
     return factory.createControllabilityChecker(desFactory);
   }

@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.abstraction;
 
 import java.util.List;
 
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.model.analysis.Abortable;
@@ -100,6 +101,15 @@ public interface TransitionRelationSimplifier
   public boolean getAppliesPartitionAutomatically();
 
   /**
+   * Sets a listener to be called before this simplifier starts executing
+   * on a transition relation and after it finishes. This can be used
+   * to execute custom code before and after simplification, and to
+   * cancel simplification on user-specific conditions.
+   * @see TRSimplificationListener
+   */
+  public void setSimplificationListener(TRSimplificationListener listener);
+
+  /**
    * Runs this simplifier.
    * When run, the simplifier may destructively modify its transition
    * relation by modifying markings or transitions.
@@ -133,6 +143,14 @@ public interface TransitionRelationSimplifier
    * is used to enable more efficient trace computation.
    */
   public boolean isObservationEquivalentAbstraction();
+
+  /**
+   * Returns whether this simplifier handles always enabled events
+   * ({@link EventStatus#STATUS_ALWAYS_ENABLED} specially.
+   * This information can be used to avoid the effort to find always
+   * enabled events when they are not needed.
+   */
+  public boolean isAlwaysEnabledEventsSupported();
 
   /**
    * Returns whether the last call to {@link #run()} has removed any

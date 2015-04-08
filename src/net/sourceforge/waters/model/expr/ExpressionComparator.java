@@ -101,6 +101,11 @@ public class ExpressionComparator
   public int compare(final SimpleExpressionProxy expr1,
                      final SimpleExpressionProxy expr2)
   {
+    if (expr1 == null) {
+      return expr2 == null ? 0 : -1;
+    } else if (expr2 == null) {
+      return 1;
+    }
     final Class<? extends Proxy> clazz1 = expr1.getProxyInterface();
     final Class<? extends Proxy> clazz2 = expr2.getProxyInterface();
     if (clazz1 != clazz2) {

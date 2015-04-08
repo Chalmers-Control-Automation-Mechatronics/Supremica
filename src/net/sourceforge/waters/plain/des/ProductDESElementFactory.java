@@ -16,13 +16,15 @@ import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.LoopTraceProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.des.ConflictKind;
@@ -48,7 +50,8 @@ public class ProductDESElementFactory
 
   //#########################################################################
   //# Factory Methods
-  public AutomatonElement createAutomatonProxy
+  @Override
+  public AutomatonProxy createAutomatonProxy
     (final String name,
      final ComponentKind kind,
      final Collection<? extends EventProxy> events,
@@ -60,7 +63,8 @@ public class ProductDESElementFactory
                                 states, transitions, attribs);
   }
 
-  public AutomatonElement createAutomatonProxy
+  @Override
+  public AutomatonProxy createAutomatonProxy
   (final String name,
    final ComponentKind kind,
    final Collection<? extends EventProxy> events,
@@ -70,14 +74,16 @@ public class ProductDESElementFactory
   return new AutomatonElement(name, kind, events, states, transitions);
 }
 
-  public AutomatonElement createAutomatonProxy
+  @Override
+  public AutomatonProxy createAutomatonProxy
     (final String name,
      final ComponentKind kind)
   {
     return new AutomatonElement(name, kind);
   }
 
-  public ConflictTraceElement createConflictTraceProxy
+  @Override
+  public ConflictTraceProxy createConflictTraceProxy
     (final String name,
      final String comment,
      final URI location,
@@ -90,7 +96,8 @@ public class ProductDESElementFactory
                                     automata, steps, kind);
   }
 
-  public ConflictTraceElement createConflictTraceProxy
+  @Override
+  public ConflictTraceProxy createConflictTraceProxy
     (final String name,
      final ProductDESProxy des,
      final List<? extends EventProxy> events,
@@ -99,7 +106,8 @@ public class ProductDESElementFactory
     return new ConflictTraceElement(name, des, events, kind);
   }
 
-  public EventElement createEventProxy
+  @Override
+  public EventProxy createEventProxy
     (final String name,
      final EventKind kind,
      final boolean observable,
@@ -108,7 +116,8 @@ public class ProductDESElementFactory
     return new EventElement(name, kind, observable, attribs);
   }
 
-  public EventElement createEventProxy
+  @Override
+  public EventProxy createEventProxy
     (final String name,
      final EventKind kind,
      final boolean observable)
@@ -116,12 +125,14 @@ public class ProductDESElementFactory
   return new EventElement(name, kind, observable);
 }
 
-  public EventElement createEventProxy(final String name, final EventKind kind)
+  @Override
+  public EventProxy createEventProxy(final String name, final EventKind kind)
   {
     return new EventElement(name, kind);
   }
 
-  public LoopTraceElement createLoopTraceProxy
+  @Override
+  public LoopTraceProxy createLoopTraceProxy
     (final String name,
      final String comment,
      final URI location,
@@ -134,7 +145,8 @@ public class ProductDESElementFactory
                                 automata, steps, index);
   }
 
-  public LoopTraceElement createLoopTraceProxy
+  @Override
+  public LoopTraceProxy createLoopTraceProxy
     (final String name,
      final ProductDESProxy des,
      final List<? extends EventProxy> events,
@@ -143,7 +155,8 @@ public class ProductDESElementFactory
     return new LoopTraceElement(name, des, events, index);
   }
 
-  public ProductDESElement createProductDESProxy
+  @Override
+  public ProductDESProxy createProductDESProxy
     (final String name,
      final String comment,
      final URI location,
@@ -153,7 +166,8 @@ public class ProductDESElementFactory
     return new ProductDESElement(name, comment, location, events, automata);
   }
 
-  public ProductDESElement createProductDESProxy
+  @Override
+  public ProductDESProxy createProductDESProxy
       (final String name,
        final Collection<? extends EventProxy> events,
        final Collection<? extends AutomatonProxy> automata)
@@ -161,12 +175,14 @@ public class ProductDESElementFactory
     return new ProductDESElement(name, events, automata);
   }
 
-  public ProductDESElement createProductDESProxy(final String name)
+  @Override
+  public ProductDESProxy createProductDESProxy(final String name)
   {
     return new ProductDESElement(name);
   }
 
-  public SafetyTraceElement createSafetyTraceProxy
+  @Override
+  public SafetyTraceProxy createSafetyTraceProxy
     (final String name,
      final String comment,
      final URI location,
@@ -178,7 +194,8 @@ public class ProductDESElementFactory
                                   automata, steps);
   }
 
-  public SafetyTraceElement createSafetyTraceProxy
+  @Override
+  public SafetyTraceProxy createSafetyTraceProxy
     (final String name,
      final ProductDESProxy des,
      final List<? extends EventProxy> events)
@@ -186,14 +203,16 @@ public class ProductDESElementFactory
     return new SafetyTraceElement(name, des, events);
   }
 
-  public SafetyTraceElement createSafetyTraceProxy
+  @Override
+  public SafetyTraceProxy createSafetyTraceProxy
     (final ProductDESProxy des,
      final List<? extends EventProxy> events)
   {
     return new SafetyTraceElement(des, events);
   }
 
-  public StateElement createStateProxy
+  @Override
+  public StateProxy createStateProxy
     (final String name,
      final boolean initial,
      final Collection<? extends EventProxy> propositions)
@@ -201,24 +220,28 @@ public class ProductDESElementFactory
     return new StateElement(name, initial, propositions);
   }
 
-  public StateElement createStateProxy(final String name)
+  @Override
+  public StateProxy createStateProxy(final String name)
   {
     return new StateElement(name);
   }
 
-  public TraceStepElement createTraceStepProxy
+  @Override
+  public TraceStepProxy createTraceStepProxy
     (final EventProxy event,
      final Map<AutomatonProxy,StateProxy> statemap)
   {
     return new TraceStepElement(event, statemap);
   }
 
-  public TraceStepElement createTraceStepProxy(final EventProxy event)
+  @Override
+  public TraceStepProxy createTraceStepProxy(final EventProxy event)
   {
     return new TraceStepElement(event);
   }
 
-  public TransitionElement createTransitionProxy
+  @Override
+  public TransitionProxy createTransitionProxy
     (final StateProxy source,
      final EventProxy event,
      final StateProxy target)

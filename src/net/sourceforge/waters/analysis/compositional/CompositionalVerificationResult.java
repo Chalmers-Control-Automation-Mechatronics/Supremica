@@ -21,7 +21,7 @@ import net.sourceforge.waters.model.des.TraceProxy;
  * @author Rachel Francis, Robi Malik
  */
 
-class CompositionalVerificationResult
+public class CompositionalVerificationResult
   extends CompositionalAnalysisResult
   implements VerificationResult
 {

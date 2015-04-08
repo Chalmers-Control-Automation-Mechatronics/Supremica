@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:ProductDES Name="io1" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
+    <ns2:EventList>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="input"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="step.{in==1}"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="step.{in==3}"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="step.{in==5}"/>
+    </ns2:EventList>
+    <ns2:AutomataList>
+        <ns2:Automaton Kind="SPEC" Name="a">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="step.{in==1}"/>
+                <ns2:EventRef Name="step.{in==3}"/>
+                <ns2:EventRef Name="step.{in==5}"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="S0"/>
+                <ns2:State Name="S1"/>
+                <ns2:State Name="S2"/>
+                <ns2:State Name="S3"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="step.{in==1}" Source="S0" Target="S1"/>
+                <ns2:Transition Event="step.{in==5}" Source="S1" Target="S2"/>
+                <ns2:Transition Event="step.{in==3}" Source="S2" Target="S3"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="PLANT" Name="in">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="input"/>
+                <ns2:EventRef Name="step.{in==1}"/>
+                <ns2:EventRef Name="step.{in==3}"/>
+                <ns2:EventRef Name="step.{in==5}"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="0"/>
+                <ns2:State Initial="true" Name="1"/>
+                <ns2:State Initial="true" Name="2"/>
+                <ns2:State Initial="true" Name="3"/>
+                <ns2:State Initial="true" Name="4"/>
+                <ns2:State Initial="true" Name="5"/>
+                <ns2:State Initial="true" Name="6"/>
+                <ns2:State Initial="true" Name="7"/>
+                <ns2:State Initial="true" Name="8"/>
+                <ns2:State Initial="true" Name="9"/>
+                <ns2:State Initial="true" Name="10"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="input" Source="0" Target="0"/>
+                <ns2:Transition Event="input" Source="0" Target="1"/>
+                <ns2:Transition Event="input" Source="0" Target="10"/>
+                <ns2:Transition Event="input" Source="0" Target="2"/>
+                <ns2:Transition Event="input" Source="0" Target="3"/>
+                <ns2:Transition Event="input" Source="0" Target="4"/>
+                <ns2:Transition Event="input" Source="0" Target="5"/>
+                <ns2:Transition Event="input" Source="0" Target="6"/>
+                <ns2:Transition Event="input" Source="0" Target="7"/>
+                <ns2:Transition Event="input" Source="0" Target="8"/>
+                <ns2:Transition Event="input" Source="0" Target="9"/>
+                <ns2:Transition Event="input" Source="1" Target="0"/>
+                <ns2:Transition Event="input" Source="1" Target="1"/>
+                <ns2:Transition Event="input" Source="1" Target="10"/>
+                <ns2:Transition Event="input" Source="1" Target="2"/>
+                <ns2:Transition Event="input" Source="1" Target="3"/>
+                <ns2:Transition Event="input" Source="1" Target="4"/>
+                <ns2:Transition Event="input" Source="1" Target="5"/>
+                <ns2:Transition Event="input" Source="1" Target="6"/>
+                <ns2:Transition Event="input" Source="1" Target="7"/>
+                <ns2:Transition Event="input" Source="1" Target="8"/>
+                <ns2:Transition Event="input" Source="1" Target="9"/>
+                <ns2:Transition Event="step.{in==1}" Source="1" Target="1"/>
+                <ns2:Transition Event="input" Source="10" Target="0"/>
+                <ns2:Transition Event="input" Source="10" Target="1"/>
+                <ns2:Transition Event="input" Source="10" Target="10"/>
+                <ns2:Transition Event="input" Source="10" Target="2"/>
+                <ns2:Transition Event="input" Source="10" Target="3"/>
+                <ns2:Transition Event="input" Source="10" Target="4"/>
+                <ns2:Transition Event="input" Source="10" Target="5"/>
+                <ns2:Transition Event="input" Source="10" Target="6"/>
+                <ns2:Transition Event="input" Source="10" Target="7"/>
+                <ns2:Transition Event="input" Source="10" Target="8"/>
+                <ns2:Transition Event="input" Source="10" Target="9"/>
+                <ns2:Transition Event="input" Source="2" Target="0"/>
+                <ns2:Transition Event="input" Source="2" Target="1"/>
+                <ns2:Transition Event="input" Source="2" Target="10"/>
+                <ns2:Transition Event="input" Source="2" Target="2"/>
+                <ns2:Transition Event="input" Source="2" Target="3"/>
+                <ns2:Transition Event="input" Source="2" Target="4"/>
+                <ns2:Transition Event="input" Source="2" Target="5"/>
+                <ns2:Transition Event="input" Source="2" Target="6"/>
+                <ns2:Transition Event="input" Source="2" Target="7"/>
+                <ns2:Transition Event="input" Source="2" Target="8"/>
+                <ns2:Transition Event="input" Source="2" Target="9"/>
+                <ns2:Transition Event="input" Source="3" Target="0"/>
+                <ns2:Transition Event="input" Source="3" Target="1"/>
+                <ns2:Transition Event="input" Source="3" Target="10"/>
+                <ns2:Transition Event="input" Source="3" Target="2"/>
+                <ns2:Transition Event="input" Source="3" Target="3"/>
+                <ns2:Transition Event="input" Source="3" Target="4"/>
+                <ns2:Transition Event="input" Source="3" Target="5"/>
+                <ns2:Transition Event="input" Source="3" Target="6"/>
+                <ns2:Transition Event="input" Source="3" Target="7"/>
+                <ns2:Transition Event="input" Source="3" Target="8"/>
+                <ns2:Transition Event="input" Source="3" Target="9"/>
+                <ns2:Transition Event="step.{in==3}" Source="3" Target="3"/>
+                <ns2:Transition Event="input" Source="4" Target="0"/>
+                <ns2:Transition Event="input" Source="4" Target="1"/>
+                <ns2:Transition Event="input" Source="4" Target="10"/>
+                <ns2:Transition Event="input" Source="4" Target="2"/>
+                <ns2:Transition Event="input" Source="4" Target="3"/>
+                <ns2:Transition Event="input" Source="4" Target="4"/>
+                <ns2:Transition Event="input" Source="4" Target="5"/>
+                <ns2:Transition Event="input" Source="4" Target="6"/>
+                <ns2:Transition Event="input" Source="4" Target="7"/>
+                <ns2:Transition Event="input" Source="4" Target="8"/>
+                <ns2:Transition Event="input" Source="4" Target="9"/>
+                <ns2:Transition Event="input" Source="5" Target="0"/>
+                <ns2:Transition Event="input" Source="5" Target="1"/>
+                <ns2:Transition Event="input" Source="5" Target="10"/>
+                <ns2:Transition Event="input" Source="5" Target="2"/>
+                <ns2:Transition Event="input" Source="5" Target="3"/>
+                <ns2:Transition Event="input" Source="5" Target="4"/>
+                <ns2:Transition Event="input" Source="5" Target="5"/>
+                <ns2:Transition Event="input" Source="5" Target="6"/>
+                <ns2:Transition Event="input" Source="5" Target="7"/>
+                <ns2:Transition Event="input" Source="5" Target="8"/>
+                <ns2:Transition Event="input" Source="5" Target="9"/>
+                <ns2:Transition Event="step.{in==5}" Source="5" Target="5"/>
+                <ns2:Transition Event="input" Source="6" Target="0"/>
+                <ns2:Transition Event="input" Source="6" Target="1"/>
+                <ns2:Transition Event="input" Source="6" Target="10"/>
+                <ns2:Transition Event="input" Source="6" Target="2"/>
+                <ns2:Transition Event="input" Source="6" Target="3"/>
+                <ns2:Transition Event="input" Source="6" Target="4"/>
+                <ns2:Transition Event="input" Source="6" Target="5"/>
+                <ns2:Transition Event="input" Source="6" Target="6"/>
+                <ns2:Transition Event="input" Source="6" Target="7"/>
+                <ns2:Transition Event="input" Source="6" Target="8"/>
+                <ns2:Transition Event="input" Source="6" Target="9"/>
+                <ns2:Transition Event="input" Source="7" Target="0"/>
+                <ns2:Transition Event="input" Source="7" Target="1"/>
+                <ns2:Transition Event="input" Source="7" Target="10"/>
+                <ns2:Transition Event="input" Source="7" Target="2"/>
+                <ns2:Transition Event="input" Source="7" Target="3"/>
+                <ns2:Transition Event="input" Source="7" Target="4"/>
+                <ns2:Transition Event="input" Source="7" Target="5"/>
+                <ns2:Transition Event="input" Source="7" Target="6"/>
+                <ns2:Transition Event="input" Source="7" Target="7"/>
+                <ns2:Transition Event="input" Source="7" Target="8"/>
+                <ns2:Transition Event="input" Source="7" Target="9"/>
+                <ns2:Transition Event="input" Source="8" Target="0"/>
+                <ns2:Transition Event="input" Source="8" Target="1"/>
+                <ns2:Transition Event="input" Source="8" Target="10"/>
+                <ns2:Transition Event="input" Source="8" Target="2"/>
+                <ns2:Transition Event="input" Source="8" Target="3"/>
+                <ns2:Transition Event="input" Source="8" Target="4"/>
+                <ns2:Transition Event="input" Source="8" Target="5"/>
+                <ns2:Transition Event="input" Source="8" Target="6"/>
+                <ns2:Transition Event="input" Source="8" Target="7"/>
+                <ns2:Transition Event="input" Source="8" Target="8"/>
+                <ns2:Transition Event="input" Source="8" Target="9"/>
+                <ns2:Transition Event="input" Source="9" Target="0"/>
+                <ns2:Transition Event="input" Source="9" Target="1"/>
+                <ns2:Transition Event="input" Source="9" Target="10"/>
+                <ns2:Transition Event="input" Source="9" Target="2"/>
+                <ns2:Transition Event="input" Source="9" Target="3"/>
+                <ns2:Transition Event="input" Source="9" Target="4"/>
+                <ns2:Transition Event="input" Source="9" Target="5"/>
+                <ns2:Transition Event="input" Source="9" Target="6"/>
+                <ns2:Transition Event="input" Source="9" Target="7"/>
+                <ns2:Transition Event="input" Source="9" Target="8"/>
+                <ns2:Transition Event="input" Source="9" Target="9"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="PLANT" Name="out">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="step.{in==1}"/>
+                <ns2:EventRef Name="step.{in==3}"/>
+                <ns2:EventRef Name="step.{in==5}"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="0"/>
+                <ns2:State Initial="true" Name="1"/>
+                <ns2:State Initial="true" Name="2"/>
+                <ns2:State Initial="true" Name="3"/>
+                <ns2:State Initial="true" Name="4"/>
+                <ns2:State Initial="true" Name="5"/>
+                <ns2:State Initial="true" Name="6"/>
+                <ns2:State Initial="true" Name="7"/>
+                <ns2:State Initial="true" Name="8"/>
+                <ns2:State Initial="true" Name="9"/>
+                <ns2:State Initial="true" Name="10"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="step.{in==1}" Source="0" Target="5"/>
+                <ns2:Transition Event="step.{in==3}" Source="0" Target="2"/>
+                <ns2:Transition Event="step.{in==5}" Source="0" Target="7"/>
+                <ns2:Transition Event="step.{in==1}" Source="1" Target="5"/>
+                <ns2:Transition Event="step.{in==3}" Source="1" Target="2"/>
+                <ns2:Transition Event="step.{in==5}" Source="1" Target="7"/>
+                <ns2:Transition Event="step.{in==1}" Source="10" Target="5"/>
+                <ns2:Transition Event="step.{in==3}" Source="10" Target="2"/>
+                <ns2:Transition Event="step.{in==5}" Source="10" Target="7"/>
+                <ns2:Transition Event="step.{in==1}" Source="2" Target="5"/>
+                <ns2:Transition Event="step.{in==3}" Source="2" Target="2"/>
+                <ns2:Transition Event="step.{in==5}" Source="2" Target="7"/>
+                <ns2:Transition Event="step.{in==1}" Source="3" Target="5"/>
+                <ns2:Transition Event="step.{in==3}" Source="3" Target="2"/>
+                <ns2:Transition Event="step.{in==5}" Source="3" Target="7"/>
+                <ns2:Transition Event="step.{in==1}" Source="4" Target="5"/>
+                <ns2:Transition Event="step.{in==3}" Source="4" Target="2"/>
+                <ns2:Transition Event="step.{in==5}" Source="4" Target="7"/>
+                <ns2:Transition Event="step.{in==1}" Source="5" Target="5"/>
+                <ns2:Transition Event="step.{in==3}" Source="5" Target="2"/>
+                <ns2:Transition Event="step.{in==5}" Source="5" Target="7"/>
+                <ns2:Transition Event="step.{in==1}" Source="6" Target="5"/>
+                <ns2:Transition Event="step.{in==3}" Source="6" Target="2"/>
+                <ns2:Transition Event="step.{in==5}" Source="6" Target="7"/>
+                <ns2:Transition Event="step.{in==1}" Source="7" Target="5"/>
+                <ns2:Transition Event="step.{in==3}" Source="7" Target="2"/>
+                <ns2:Transition Event="step.{in==5}" Source="7" Target="7"/>
+                <ns2:Transition Event="step.{in==1}" Source="8" Target="5"/>
+                <ns2:Transition Event="step.{in==3}" Source="8" Target="2"/>
+                <ns2:Transition Event="step.{in==5}" Source="8" Target="7"/>
+                <ns2:Transition Event="step.{in==1}" Source="9" Target="5"/>
+                <ns2:Transition Event="step.{in==3}" Source="9" Target="2"/>
+                <ns2:Transition Event="step.{in==5}" Source="9" Target="7"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="PLANT" Name="change_input">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="input"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="S0"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="input" Source="S0" Target="S0"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+    </ns2:AutomataList>
+</ns2:ProductDES>

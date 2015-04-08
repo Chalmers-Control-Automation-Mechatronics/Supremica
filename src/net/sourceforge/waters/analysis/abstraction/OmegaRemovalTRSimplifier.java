@@ -30,6 +30,7 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 public class OmegaRemovalTRSimplifier
   extends AbstractMarkingTRSimplifier
 {
+
   //#########################################################################
   //# Constructors
   public OmegaRemovalTRSimplifier()
@@ -43,7 +44,8 @@ public class OmegaRemovalTRSimplifier
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
+  //# Interface
+  //# net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
   @Override
   public int getPreferredInputConfiguration()
   {
@@ -58,7 +60,8 @@ public class OmegaRemovalTRSimplifier
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
+  //# Overrides for
+  //# net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
   @Override
   protected boolean runSimplifier()
   throws AnalysisException
@@ -89,13 +92,13 @@ public class OmegaRemovalTRSimplifier
         }
       }
     }
-    // Remove default marking from all states which were found to be
-    // not reachable ...
+    // Remove default marking from all reachable states that were found to be
+    // not reachable from alpha-marked states ...
     final int defaultID = getDefaultMarkingID();
     boolean modified = false;
     int sourceID = reachableStates.nextClearBit(0);
     while (sourceID < numStates) {
-      if (rel.isMarked(sourceID, defaultID)) {
+      if (rel.isReachable(sourceID) && rel.isMarked(sourceID, defaultID)) {
         checkAbort();
         rel.setMarked(sourceID, defaultID, false);
         modified = true;
@@ -114,4 +117,3 @@ public class OmegaRemovalTRSimplifier
   }
 
 }
-

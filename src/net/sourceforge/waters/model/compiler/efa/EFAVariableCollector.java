@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters EFSM Compiler
 //# PACKAGE: net.sourceforge.waters.model.compiler.efa
 //# CLASS:   EFAVariableCollector
 //###########################################################################
@@ -13,6 +13,7 @@ import java.util.Collection;
 
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.DescendingModuleProxyVisitor;
 import net.sourceforge.waters.model.module.IdentifierProxy;
@@ -21,8 +22,8 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 
 /**
- * A utility class to collect all the EFA variables (primed or not) in
- * an expression.
+ * A utility class to collect all the EFSM variables (primed or not) in
+ * an expression or constraint list.
  *
  * @author Robi Malik
  */
@@ -45,8 +46,8 @@ class EFAVariableCollector
   //# Invocation
   /**
    * Collects all unprimed variables in the given expression.
-   * @param  expr     The expression to be searched.
-   * @param  vars     Found variables will be added to this collection.
+   * @param  expr        The expression to be searched.
+   * @param  vars        Found variables will be added to this collection.
    */
   void collectUnprimedVariables(final SimpleExpressionProxy expr,
                                 final Collection<EFAVariable> vars)
@@ -61,9 +62,9 @@ class EFAVariableCollector
 
   /**
    * Collects all primed variables in the given expression.
-   * @param  expr     The expression to be searched.
-   * @param  vars     Found variables will be added in their non-primed form
-   *                  to this collection.
+   * @param  expr        The expression to be searched.
+   * @param  vars        Found variables will be added in their non-primed
+   *                     form to this collection.
    */
   void collectPrimedVariables(final SimpleExpressionProxy expr,
                               final Collection<EFAVariable> vars)
@@ -78,10 +79,10 @@ class EFAVariableCollector
 
   /**
    * Collects all variables in the given expression.
-   * @param  expr     The expression to be searched.
-   * @param  unprimed Unprimed variables will be added to this collection.
-   * @param  primed   Primed variables will be added in their non-primed form
-   *                  to this collection.
+   * @param  expr        The expression to be searched.
+   * @param  unprimed    Unprimed variables will be added to this collection.
+   * @param  primed      Primed variables will be added in their non-primed
+   *                     form to this collection.
    */
   void collectAllVariables(final SimpleExpressionProxy expr,
                            final Collection<EFAVariable> unprimed,
@@ -91,6 +92,66 @@ class EFAVariableCollector
       mUnprimedVariables = unprimed;
       mPrimedVariables = primed;
       collect(expr);
+    } finally {
+      mUnprimedVariables = null;
+      mPrimedVariables = null;
+    }
+  }
+
+  /**
+   * Collects all unprimed variables in the given constraint list.
+   * @param  constraints Constraint list containing expression to be searched.
+   * @param  vars        Found variables will be added to this collection.
+   */
+  void collectUnprimedVariables(final ConstraintList constraints,
+                                final Collection<EFAVariable> vars)
+  {
+    try {
+      mUnprimedVariables = vars;
+      for (final SimpleExpressionProxy expr : constraints.getConstraints()) {
+        collect(expr);
+      }
+    } finally {
+      mUnprimedVariables = null;
+    }
+  }
+
+  /**
+   * Collects all primed variables in the given constraint list.
+   * @param  constraints Constraint list containing expression to be searched.
+   * @param  vars        Found variables will be added in their non-primed
+   *                     form to this collection.
+   */
+  void collectPrimedVariables(final ConstraintList constraints,
+                              final Collection<EFAVariable> vars)
+  {
+    try {
+      mPrimedVariables = vars;
+      for (final SimpleExpressionProxy expr : constraints.getConstraints()) {
+        collect(expr);
+      }
+    } finally {
+      mPrimedVariables = null;
+    }
+  }
+
+  /**
+   * Collects all variables in the given constraint list.
+   * @param  constraints Constraint list containing expression to be searched.
+   * @param  unprimed    Unprimed variables will be added to this collection.
+   * @param  primed      Primed variables will be added in their non-primed
+   *                     form to this collection.
+   */
+  void collectAllVariables(final ConstraintList constraints,
+                           final Collection<EFAVariable> unprimed,
+                           final Collection<EFAVariable> primed)
+  {
+    try {
+      mUnprimedVariables = unprimed;
+      mPrimedVariables = primed;
+      for (final SimpleExpressionProxy expr : constraints.getConstraints()) {
+        collect(expr);
+      }
     } finally {
       mUnprimedVariables = null;
       mPrimedVariables = null;

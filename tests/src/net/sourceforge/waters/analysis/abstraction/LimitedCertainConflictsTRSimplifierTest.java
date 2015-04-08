@@ -12,8 +12,6 @@ package net.sourceforge.waters.analysis.abstraction;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.analysis.tr.EventEncoding;
-import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 
 
@@ -52,13 +50,6 @@ public class LimitedCertainConflictsTRSimplifierTest
   }
 
   @Override
-  protected EventEncoding createEventEncoding(final ProductDESProxy des,
-                                              final AutomatonProxy aut)
-  {
-    return createEventEncodingWithPropositions(des, aut);
-  }
-
-  @Override
   protected void configureTransitionRelationSimplifier()
   {
     configureTransitionRelationSimplifierWithPropositions();
@@ -70,181 +61,217 @@ public class LimitedCertainConflictsTRSimplifierTest
   @Override
   public void test_basic_7() throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "limitedCertainConflicts_basic_7.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "limitedCertainConflicts_basic_7.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_nonblocking()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "nonalphadet_10.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "nonalphadet_10.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_limitedCertainConflicts_1()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "limitedCertainConflicts_1.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "limitedCertainConflicts_1.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_limitedCertainConflicts_2()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "limitedCertainConflicts_2.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "limitedCertainConflicts_2.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_limitedCertainConflicts_3()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "limitedCertainConflicts_3.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "limitedCertainConflicts_3.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_limitedCertainConflicts_4()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "limitedCertainConflicts_4.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "limitedCertainConflicts_4.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_limitedCertainConflicts_5()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "limitedCertainConflicts_5.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "limitedCertainConflicts_5.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_limitedCertainConflicts_6()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "limitedCertainConflicts_6.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "limitedCertainConflicts_6.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_limitedCertainConflicts_7()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "limitedCertainConflicts_7.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "limitedCertainConflicts_7.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_limitedCertainConflicts_8()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "limitedCertainConflicts_8.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "limitedCertainConflicts_8.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_limitedCertainConflicts_9()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "limitedCertainConflicts_9.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "limitedCertainConflicts_9.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_limitedCertainConflicts_10()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "limitedCertainConflicts_10.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "limitedCertainConflicts_10.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_limitedCertainConflicts_11()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "limitedCertainConflicts_11.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "limitedCertainConflicts_11.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_limitedCertainConflicts_12()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "limitedCertainConflicts_12.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "limitedCertainConflicts_12.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_limitedCertainConflicts_13()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "limitedCertainConflicts_13.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "limitedCertainConflicts_13.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_limitedCertainConflicts_14()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "limitedCertainConflicts_14.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "limitedCertainConflicts_14.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_limitedCertainConflicts_15()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "limitedCertainConflicts_15.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "limitedCertainConflicts_15.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_limitedCertainConflicts_16()
+  throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "limitedCertainConflicts_16.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_certainConflicts_15()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "certainconflicts_15.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "certainconflicts_15.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_certainconflicts_17()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "certainconflicts_17.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "certainconflicts_17.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_certainconflicts_18()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "certainconflicts_18.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "certainconflicts_18.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_alwaysEnabledLimitedCertainConflicts01()
+  throws Exception
+  {
+    final ProductDESProxy des = getCompiledDES
+      ("tests", "abstraction", "alwaysEnabledLimitedCertainConflicts01.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_alwaysEnabledLimitedCertainConflicts02()
+  throws Exception
+  {
+    final ProductDESProxy des = getCompiledDES
+      ("tests", "abstraction", "alwaysEnabledLimitedCertainConflicts02.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_alwaysEnabledLimitedCertainConflicts03()
+  throws Exception
+  {
+    final ProductDESProxy des = getCompiledDES
+      ("tests", "abstraction", "alwaysEnabledLimitedCertainConflicts03.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_alwaysEnabledLimitedCertainConflicts04()
+  throws Exception
+  {
+    final ProductDESProxy des = getCompiledDES
+      ("tests", "abstraction", "alwaysEnabledLimitedCertainConflicts04.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_alwaysEnabledLimitedCertainConflicts05()
+  throws Exception
+  {
+    final ProductDESProxy des = getCompiledDES
+      ("tests", "abstraction", "alwaysEnabledLimitedCertainConflicts05.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_alwaysEnabledLimitedCertainConflicts06()
+  throws Exception
+  {
+    final ProductDESProxy des = getCompiledDES
+      ("tests", "abstraction", "alwaysEnabledLimitedCertainConflicts06.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   /**

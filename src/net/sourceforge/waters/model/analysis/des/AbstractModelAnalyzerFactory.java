@@ -16,13 +16,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.CommandLineArgument;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
@@ -57,8 +57,7 @@ public abstract class AbstractModelAnalyzerFactory
   //# Constructors
   protected AbstractModelAnalyzerFactory()
   {
-    mArgumentMap = new HashMap<String,CommandLineArgument>(64);
-    mArgumentList = new LinkedList<CommandLineArgument>();
+    mArgumentMap = new LinkedHashMap<String,CommandLineArgument>(64);
   }
 
 
@@ -80,15 +79,14 @@ public abstract class AbstractModelAnalyzerFactory
 
   protected void addArgument(final CommandLineArgument argument)
   {
-    final String name = argument.getName();
-    mArgumentMap.put(name, argument);
-    mArgumentList.add(argument);
+    for (final String name : argument.getNames()) {
+      mArgumentMap.put(name, argument);
+    }
   }
 
   protected void removeArgument(final String name)
   {
-    final CommandLineArgument argument = mArgumentMap.remove(name);
-    mArgumentList.remove(argument);
+    mArgumentMap.remove(name);
   }
 
 
@@ -97,6 +95,7 @@ public abstract class AbstractModelAnalyzerFactory
   @Override
   public ConflictChecker createConflictChecker
     (final ProductDESProxyFactory factory)
+    throws AnalysisConfigurationException
   {
     throw createUnsupportedOperationException("conflict check");
   }
@@ -104,6 +103,7 @@ public abstract class AbstractModelAnalyzerFactory
   @Override
   public ControllabilityChecker createControllabilityChecker
     (final ProductDESProxyFactory factory)
+    throws AnalysisConfigurationException
   {
     throw createUnsupportedOperationException("controllability check");
   }
@@ -111,6 +111,7 @@ public abstract class AbstractModelAnalyzerFactory
   @Override
   public ControlLoopChecker createControlLoopChecker
     (final ProductDESProxyFactory factory)
+    throws AnalysisConfigurationException
   {
     throw createUnsupportedOperationException("control-loop check");
   }
@@ -118,6 +119,7 @@ public abstract class AbstractModelAnalyzerFactory
   @Override
   public LanguageInclusionChecker createLanguageInclusionChecker
     (final ProductDESProxyFactory factory)
+    throws AnalysisConfigurationException
   {
     throw createUnsupportedOperationException("language inclusion check");
   }
@@ -125,22 +127,21 @@ public abstract class AbstractModelAnalyzerFactory
   @Override
   public SupervisorSynthesizer createSupervisorSynthesizer
     (final ProductDESProxyFactory factory)
+    throws AnalysisConfigurationException
   {
     throw createUnsupportedOperationException("synthesis");
   }
 
 
   @Override
-  public void parse(final Iterator<String> iter)
+  public void parse(final ListIterator<String> iter)
   {
     mArgumentMap.clear();
-    mArgumentList.clear();
     addArguments();
     while (iter.hasNext()) {
       final String name = iter.next();
       final CommandLineArgument arg = mArgumentMap.get(name);
       if (arg != null) {
-        iter.remove();
         arg.parse(iter);
       } else if (name.startsWith("-")) {
         System.err.println("Unsupported option " + name +
@@ -153,10 +154,11 @@ public abstract class AbstractModelAnalyzerFactory
 
   @Override
   public void configure(final ModelAnalyzer analyzer)
+    throws AnalysisConfigurationException
   {
-    for (final CommandLineArgument arg : mArgumentList) {
+    for (final CommandLineArgument arg : mArgumentMap.values()) {
       if (arg.isUsed()) {
-        arg.configure(analyzer);
+        arg.configureAnalyzer(analyzer);
       }
     }
   }
@@ -164,9 +166,9 @@ public abstract class AbstractModelAnalyzerFactory
   @Override
   public void configure(final ModuleCompiler compiler)
   {
-    for (final CommandLineArgument arg : mArgumentList) {
+    for (final CommandLineArgument arg : mArgumentMap.values()) {
       if (arg.isUsed()) {
-        arg.configure(compiler);
+        arg.configureCompiler(compiler);
       }
     }
   }
@@ -175,7 +177,7 @@ public abstract class AbstractModelAnalyzerFactory
   public void postConfigure(final ModelAnalyzer analyzer)
   throws AnalysisException
   {
-    for (final CommandLineArgument arg : mArgumentList) {
+    for (final CommandLineArgument arg : mArgumentMap.values()) {
       if (arg.isUsed()) {
         arg.postConfigure(analyzer);
       }
@@ -185,19 +187,19 @@ public abstract class AbstractModelAnalyzerFactory
 
   //#########################################################################
   //# Auxiliary Methods
-  private UnsupportedOperationException createUnsupportedOperationException
+  private AnalysisConfigurationException createUnsupportedOperationException
     (final String opname)
   {
     final String clsname = getClass().getName();
     final int dotpos = clsname.lastIndexOf('.');
     final String msg =
       clsname.substring(dotpos + 1) + " does not support " + opname + "!";
-    return new UnsupportedOperationException(msg);
+    return new AnalysisConfigurationException(msg);
   }
 
   private void checkRequiredArguments()
   {
-    for (final CommandLineArgument arg : mArgumentList) {
+    for (final CommandLineArgument arg : mArgumentMap.values()) {
       if (arg.isRequired() && !arg.isUsed()) {
         final String clsname = getClass().getName();
         final int dotpos = clsname.lastIndexOf('.');
@@ -225,8 +227,9 @@ public abstract class AbstractModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void parse(final Iterator<String> iter)
+    public void parse(final ListIterator<String> iter)
     {
+      iter.remove();
       while (iter.hasNext()) {
         iter.next();
       }
@@ -249,18 +252,20 @@ public abstract class AbstractModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       if (getValue()) {
         final String name =
           ProxyTools.getShortClassName(AbstractModelAnalyzerFactory.this);
         System.err.println
           (name + " supports the following command line options:");
-        final List<CommandLineArgument> args =
-          new ArrayList<CommandLineArgument>(mArgumentMap.values());
-        Collections.sort(args);
-        for (final CommandLineArgument arg : args) {
-          arg.dump(System.err, analyzer);
+        final List<String> keys = new ArrayList<>(mArgumentMap.keySet());
+        Collections.sort(keys);
+        for (final String key : keys) {
+          final CommandLineArgument arg = mArgumentMap.get(key);
+          if (arg.getName().startsWith(key)) {
+            arg.dump(System.err, analyzer);
+          }
         }
         System.exit(0);
       }
@@ -278,14 +283,14 @@ public abstract class AbstractModelAnalyzerFactory
     private HISCArgument()
     {
       super("-hisc",
-            "Compile as HISC module, only including interfaces of low levels");
+            "Compile as HISC module, only including interfaces\nof low levels");
     }
 
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModuleCompiler compiler)
+    public void configureCompiler(final ModuleCompiler compiler)
     {
       if (getValue()) {
         compiler.setHISCCompileMode(HISCCompileMode.HISC_HIGH);
@@ -311,10 +316,11 @@ public abstract class AbstractModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer verifier)
+    public void configureAnalyzer(final Object analyzer)
     {
+      final ModelAnalyzer modelAnalyzer = (ModelAnalyzer) analyzer;
       final int limit = getValue();
-      verifier.setNodeLimit(limit);
+      modelAnalyzer.setNodeLimit(limit);
     }
 
   }
@@ -337,7 +343,7 @@ public abstract class AbstractModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer verifier)
+    public void configureAnalyzer(final Object verifier)
     {
       if (!(verifier instanceof ConflictChecker)) {
         fail("Command line option " + getName() +
@@ -346,7 +352,7 @@ public abstract class AbstractModelAnalyzerFactory
     }
 
     @Override
-    public void configure(final ModuleCompiler compiler)
+    public void configureCompiler(final ModuleCompiler compiler)
     {
       final String name = getValue();
       final Collection<String> current = compiler.getEnabledPropertyNames();
@@ -407,7 +413,7 @@ public abstract class AbstractModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModuleCompiler compiler)
+    public void configureCompiler(final ModuleCompiler compiler)
     {
       final boolean opt = !getValue();
       compiler.setOptimizationEnabled(opt);
@@ -431,10 +437,11 @@ public abstract class AbstractModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
+      final ModelAnalyzer modelAnalyzer = (ModelAnalyzer) analyzer;
       final boolean enable = !getValue();
-      analyzer.setDetailedOutputEnabled(enable);
+      modelAnalyzer.setDetailedOutputEnabled(enable);
     }
   }
 
@@ -457,7 +464,7 @@ public abstract class AbstractModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer verifier)
+    public void configureAnalyzer(final Object verifier)
     {
       if (!(verifier instanceof ConflictChecker)) {
         fail("Command line option " + getName() +
@@ -466,7 +473,7 @@ public abstract class AbstractModelAnalyzerFactory
     }
 
     @Override
-    public void configure(final ModuleCompiler compiler)
+    public void configureCompiler(final ModuleCompiler compiler)
     {
       final String name = getValue();
       final Collection<String> current = compiler.getEnabledPropertyNames();
@@ -518,7 +525,7 @@ public abstract class AbstractModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer verifier)
+    public void configureAnalyzer(final Object verifier)
     {
       final Collection<String> props = getValues();
       if (verifier instanceof LanguageInclusionChecker) {
@@ -541,7 +548,7 @@ public abstract class AbstractModelAnalyzerFactory
     }
 
     @Override
-    public void configure(final ModuleCompiler compiler)
+    public void configureCompiler(final ModuleCompiler compiler)
     {
       final Collection<String> props = getValues();
       compiler.setEnabledPropertyNames(props);
@@ -551,8 +558,7 @@ public abstract class AbstractModelAnalyzerFactory
     //#######################################################################
     //# Printing
     @Override
-    public void dump(final PrintStream stream,
-                     final ModelAnalyzer analyzer)
+    public void dump(final PrintStream stream, final Object analyzer)
     {
       if (analyzer instanceof LanguageInclusionChecker) {
         super.dump(stream, analyzer);
@@ -578,10 +584,11 @@ public abstract class AbstractModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer verifier)
+    public void configureAnalyzer(final Object analyzer)
     {
+      final ModelAnalyzer modelAnalyzer = (ModelAnalyzer) analyzer;
       final int limit = getValue();
-      verifier.setTransitionLimit(limit);
+      modelAnalyzer.setTransitionLimit(limit);
     }
   }
 
@@ -646,7 +653,6 @@ public abstract class AbstractModelAnalyzerFactory
   //#########################################################################
   //# Data Members
   private final Map<String,CommandLineArgument> mArgumentMap;
-  private final List<CommandLineArgument> mArgumentList;
 
 }
 

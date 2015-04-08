@@ -26,6 +26,7 @@ import net.sourceforge.waters.analysis.efa.base.AbstractEFATransitionRelation;
 import net.sourceforge.waters.analysis.efa.base.EFASimplifierStatistics;
 import net.sourceforge.waters.analysis.efa.base.UnfoldingVariableContext;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -160,12 +161,17 @@ public class EFSMPartialUnfolder extends AbstractEFSMAlgorithm
         mReducedRangeSize = mRangeValues.size();
       } else {
         mClassToValue = new int[partition.getNumberOfClasses()];
+        mReducedRangeSize = 0;
         int clazzNum = 0;
         for (final int[] clazz : partition.getClasses()) {
-          mClassToValue[clazzNum] = clazz[0];
+          if (clazz == null) {
+            mClassToValue[clazzNum] = -1;
+          } else {
+            mClassToValue[clazzNum] = clazz[0];
+            mReducedRangeSize++;
+          }
           clazzNum++;
         }
-        mReducedRangeSize = partition.getNumberOfClasses();
       }
       checkAbort();
       mUnfoldingVariableContext =
@@ -709,9 +715,12 @@ public class EFSMPartialUnfolder extends AbstractEFSMAlgorithm
     {
       if (mUnfoldedEventNumber == MISSING_CACHE_ENTRY) {
         mUnfoldedEventNumber = mUnfoldedEventEncoding.createEventId(mUpdate);
-        if (mIsPureGuard) {
+        if (mUpdate.isTrue()) {
           mUnfoldedTransitionRelation.setProperEventStatus
-           (mUnfoldedEventNumber, EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP);
+           (mUnfoldedEventNumber, EventStatus.STATUS_FULLY_LOCAL);
+        } else if (mIsPureGuard) {
+          mUnfoldedTransitionRelation.setProperEventStatus
+           (mUnfoldedEventNumber, EventStatus.STATUS_SELFLOOP_ONLY);
         }
       }
       return mUnfoldedEventNumber;

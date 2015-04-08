@@ -36,7 +36,9 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
 import net.sourceforge.waters.model.analysis.des.AbstractAutomatonBuilder;
 import net.sourceforge.waters.model.analysis.des.AutomatonResult;
+import net.sourceforge.waters.model.analysis.des.DefaultSynchronousProductResult;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
@@ -227,12 +229,9 @@ public class MonolithicSynchronousProductBuilder
   }
 
   @Override
-  public SynchronousProductStateMap getStateMap()
+  public SynchronousProductResult getAnalysisResult()
   {
-    final ProductDESProxy model = getModel();
-    final Collection<AutomatonProxy> automata = model.getAutomata();
-    final MemStateMap stateMap = new MemStateMap(automata, mDeadlockState);
-    return stateMap;
+    return (SynchronousProductResult) super.getAnalysisResult();
   }
 
 
@@ -300,6 +299,12 @@ public class MonolithicSynchronousProductBuilder
   //#########################################################################
   //# Overrides for Base Class
   //# net.sourceforge.waters.model.analysis.AbstractModelAnalyser
+  @Override
+  public SynchronousProductResult createAnalysisResult()
+  {
+    return new DefaultSynchronousProductResult();
+  }
+
   @Override
   protected void setUp()
   throws AnalysisException
@@ -827,6 +832,17 @@ public class MonolithicSynchronousProductBuilder
     }
   }
 
+  @Override
+  protected boolean setAutomatonResult(final AutomatonProxy aut)
+  {
+    final SynchronousProductResult result = getAnalysisResult();
+    final ProductDESProxy model = getModel();
+    final Collection<AutomatonProxy> automata = model.getAutomata();
+    final MemStateMap stateMap = new MemStateMap(automata, mDeadlockState);
+    result.setStateMap(stateMap);
+    return super.setAutomatonResult(aut);
+  }
+
 
   //#########################################################################
   //# Local Interface StateCallback
@@ -924,6 +940,7 @@ public class MonolithicSynchronousProductBuilder
       }
       mDumpState = dumpState;
     }
+
 
     //#######################################################################
     //# Interface

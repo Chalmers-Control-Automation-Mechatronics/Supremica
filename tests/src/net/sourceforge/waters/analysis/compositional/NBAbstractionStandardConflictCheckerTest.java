@@ -13,6 +13,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.model.analysis.AbstractStandardConflictCheckerTest;
+import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -46,12 +47,35 @@ public class NBAbstractionStandardConflictCheckerTest
     final CompositionalConflictChecker checker =
       new CompositionalConflictChecker(factory,
                                        ConflictAbstractionProcedureFactory.NB);
-    // checker.setSelectingMethod(AbstractCompositionalModelAnalyzer.MinF);
+    checker.setPreselectingMethod(AbstractCompositionalModelAnalyzer.MustL);
+    checker.setSelectionHeuristic(CompositionalSelectionHeuristicFactory.MinS);
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);
+    checker.setBlockedEventsEnabled(true);
+    checker.setFailingEventsEnabled(true);
+    checker.setSelfloopOnlyEventsEnabled(false);
     checker.setTraceCheckingEnabled(true);
     return checker;
+  }
+
+  @Override
+  protected CompositionalConflictChecker getModelVerifier()
+  {
+    return (CompositionalConflictChecker) super.getModelVerifier();
+  }
+
+  @Override
+  protected void checkStatistics(final VerificationResult stats)
+  {
+    final CompositionalConflictChecker checker = getModelVerifier();
+    if (!checker.isSelfloopOnlyEventsEnabled()) {
+      final CompositionalVerificationResult compositionalStats =
+        (CompositionalVerificationResult) stats;
+      assertEquals("Compositional model verifier reports selfloop-only events " +
+                   "although they are disabled!",
+                   -1, compositionalStats.getSelfloopOnlyEventsCount());
+    }
   }
 
 
@@ -60,7 +84,7 @@ public class NBAbstractionStandardConflictCheckerTest
   public void testBigComponent() throws Exception
   {
     final CompositionalConflictChecker checker =
-      (CompositionalConflictChecker) getModelVerifier();
+      getModelVerifier();
     checker.setInternalStateLimit(1000);
     final String group = "tests";
     final String subdir = "nasty";

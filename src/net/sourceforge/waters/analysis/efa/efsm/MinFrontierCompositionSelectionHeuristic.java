@@ -33,7 +33,7 @@ public class MinFrontierCompositionSelectionHeuristic
   //# Overrides for
   //# net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic
   @Override
-  protected double getHeuristicValue(final EFSMPair candidate)
+  public double getHeuristicValue(final EFSMPair candidate)
   {
     final Set<EFSMTransitionRelation> frontier = new THashSet<>();
     for (final EFSMTransitionRelation efsmTR : candidate.asArray()) {

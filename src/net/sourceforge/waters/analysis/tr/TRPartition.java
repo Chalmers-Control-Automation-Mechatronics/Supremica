@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.tr;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -89,7 +90,9 @@ public class TRPartition
   //#########################################################################
   //# Simple Access
   /**
-   * Gets the number of states partitioned by this partitioned.
+   * Gets the number of states covered by this partition.
+   * This is the number of states of the original automaton before it
+   * was partitioned.
    */
   public int getNumberOfStates()
   {
@@ -211,6 +214,27 @@ public class TRPartition
         }
       }
       return count > mNumberOfClasses;
+    }
+  }
+
+  /**
+   * Returns the smallest unused class number on the range of used
+   * classes (<CODE>null</CODE> class), or -1 if the partition contains
+   * no unused classes.
+   */
+  public int getUnusedClass()
+  {
+    if (mClasses != null) {
+      return mClasses.indexOf(null);
+    } else {
+      final BitSet used = new BitSet(mNumberOfClasses);
+      for (final int clazz : mStateToClass) {
+        if (clazz >= 0) {
+          used.set(clazz);
+        }
+      }
+      final int unused = used.nextClearBit(0);
+      return unused < mNumberOfClasses ? unused : -1;
     }
   }
 

@@ -11,6 +11,7 @@
 package net.sourceforge.waters.gui.actions;
 
 import net.sourceforge.waters.analysis.sd.SDThreeOneVerifier;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
@@ -39,7 +40,7 @@ public class AnalyzeSDCThree_one_propertyAction extends WatersAnalyzeAction
 
   protected ModelVerifier getModelVerifier
     (final ModelAnalyzerFactory factory,
-     final ProductDESProxyFactory desFactory)
+     final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
   {
     final LanguageInclusionChecker Checker =
         factory.createLanguageInclusionChecker(desFactory);

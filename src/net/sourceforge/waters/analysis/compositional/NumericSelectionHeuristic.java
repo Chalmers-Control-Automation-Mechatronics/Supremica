@@ -10,16 +10,17 @@
 package net.sourceforge.waters.analysis.compositional;
 
 
+
 /**
  * A selection heuristic based on the computation of a numeric heuristic
  * value. A new heuristic is created by creating a subclass of this class
- * and implementing the {@link #getHeuristicValue(Object) getHeuristicValue()}
- * method.
+ * and implementing the {@link #getHeuristicValue(Comparable)
+ * getHeuristicValue()} method.
  *
  * @author Robi Malik
  */
 
-public abstract class NumericSelectionHeuristic<T>
+public abstract class NumericSelectionHeuristic<T extends Comparable<? super T>>
   extends SelectionHeuristic<T>
 {
 
@@ -40,18 +41,14 @@ public abstract class NumericSelectionHeuristic<T>
     } else {
       value2 = getHeuristicValue(candidate2);
     }
-    if (value1 < value2) {
+    if (value1 <= value2) {
       mBestCandidate = candidate1;
       mBestValue = value1;
-      return -1;
-    } else if (value2 < value1) {
+      return value1 < value2 ? -1 : 0;
+    } else {
       mBestCandidate = candidate2;
       mBestValue = value2;
       return 1;
-    } else {
-      mBestCandidate = candidate1;
-      mBestValue = value1;
-      return 0;
     }
   }
 
@@ -80,7 +77,7 @@ public abstract class NumericSelectionHeuristic<T>
    * The numeric heuristic gives preference to the candidate with the
    * smallest heuristic value.
    */
-  protected abstract double getHeuristicValue(T candidate);
+  public abstract double getHeuristicValue(T candidate);
 
 
   //#########################################################################

@@ -12,8 +12,6 @@ package net.sourceforge.waters.analysis.abstraction;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.analysis.tr.EventEncoding;
-import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 
 
@@ -39,18 +37,12 @@ public class OnlySilentOutgoingTRSimplifierTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifierTest
+  @Override
   protected TransitionRelationSimplifier createTransitionRelationSimplifier()
   {
     final OnlySilentOutgoingTRSimplifier simplifier =
       new OnlySilentOutgoingTRSimplifier();
     return simplifier;
-  }
-
-  @Override
-  protected EventEncoding createEventEncoding(final ProductDESProxy des,
-                                              final AutomatonProxy aut)
-  {
-    return createEventEncodingWithPropositions(des, aut);
   }
 
   @Override
@@ -65,100 +57,97 @@ public class OnlySilentOutgoingTRSimplifierTest
   public void test_tauTransRemovalFromNonAlpha_StateUnreachable()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "tauTransRemovalFromNonAlpha_1.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "tauTransRemovalFromNonAlpha_1.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_tauTransRemovalFromNonAlpha_NoFurther()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "tauTransRemovalFromNonAlpha_2.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "tauTransRemovalFromNonAlpha_2.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_tauTransRemovalFromNonAlpha_tauAndNonTauOutgoingTransitions()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "tauTransRemovalFromNonAlpha_3.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
-  }
-
-  public void test_allStatesImplicitlyMarkedAlpha()
-  throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "tauTransRemovalFromNonAlpha_8.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
-  }
-
-  public void test_allStatesImplicitlyMarkedOmega()
-  throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "tauTransRemovalFromNonAlpha_9.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
-  }
-
-  public void test_tauTransRemovalFromNonAlpha_TwoConsecutiveTauUnreachable()
-  throws Exception
-  {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "tauTransRemovalFromNonAlpha_7.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "tauTransRemovalFromNonAlpha_3.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_tauTransRemovalFromNonAlpha_TwoTauOutgoing()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "tauTransRemovalFromNonAlpha_4.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "tauTransRemovalFromNonAlpha_4.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_tauTransRemovalFromNonAlpha_multipleIncomingTransitions()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "tauTransRemovalFromNonAlpha_5.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "tauTransRemovalFromNonAlpha_5.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_tauTransRemovalFromNonAlpha_TwoConsecutiveTauUnreachable()
+  throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "tauTransRemovalFromNonAlpha_7.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_allStatesImplicitlyMarkedAlpha()
+  throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "tauTransRemovalFromNonAlpha_8.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_allStatesImplicitlyMarkedOmega()
+  throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "tauTransRemovalFromNonAlpha_9.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_tauTransRemovalFromNonAlpha_tauLoopNoMarking()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "tauTransRemovalFromNonAlpha_10.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "tauTransRemovalFromNonAlpha_10.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_tauTransRemovalFromNonAlpha_removalOfInitialState()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "tauTransRemovalFromNonAlpha_11.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "tauTransRemovalFromNonAlpha_11.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_tauTransRemovalFromNonAlpha_nonRemovalOfStateWithNoOutgoingTransitions()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "tauTransRemovalFromNonAlpha_12.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "tauTransRemovalFromNonAlpha_12.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_tauTransRemovalFromNonAlpha_transitionOrder()
+  throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "tauTransRemovalFromNonAlpha_13.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   /**

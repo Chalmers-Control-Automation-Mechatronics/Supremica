@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:ProductDES Name="EFAJournalExample" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
+    <Comment></Comment>
+    <ns2:EventList>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="a.{v&lt;=1}"/>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="a.{v==2}"/>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="b"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="c"/>
+    </ns2:EventList>
+    <ns2:AutomataList>
+        <ns2:Automaton Kind="PLANT" Name="v">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="a.{v&lt;=1}"/>
+                <ns2:EventRef Name="a.{v==2}"/>
+                <ns2:EventRef Name="b"/>
+                <ns2:EventRef Name="c"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="0"/>
+                <ns2:State Name="1"/>
+                <ns2:State Name="2"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="a.{v&lt;=1}" Source="0" Target="1"/>
+                <ns2:Transition Event="b" Source="0" Target="0"/>
+                <ns2:Transition Event="c" Source="0" Target="2"/>
+                <ns2:Transition Event="a.{v&lt;=1}" Source="1" Target="1"/>
+                <ns2:Transition Event="c" Source="1" Target="2"/>
+                <ns2:Transition Event="a.{v==2}" Source="2" Target="1"/>
+                <ns2:Transition Event="c" Source="2" Target="2"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="SPEC" Name="K">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="a.{v&lt;=1}"/>
+                <ns2:EventRef Name="a.{v==2}"/>
+                <ns2:EventRef Name="c"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="S0"/>
+                <ns2:State Name="S1"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="a.{v&lt;=1}" Source="S0" Target="S1"/>
+                <ns2:Transition Event="a.{v==2}" Source="S0" Target="S1"/>
+                <ns2:Transition Event="c" Source="S0" Target="S1"/>
+                <ns2:Transition Event="a.{v&lt;=1}" Source="S1" Target="S0"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="PLANT" Name="G">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="a.{v&lt;=1}"/>
+                <ns2:EventRef Name="a.{v==2}"/>
+                <ns2:EventRef Name="b"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="S0"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="a.{v&lt;=1}" Source="S0" Target="S0"/>
+                <ns2:Transition Event="a.{v==2}" Source="S0" Target="S0"/>
+                <ns2:Transition Event="b" Source="S0" Target="S0"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+    </ns2:AutomataList>
+</ns2:ProductDES>

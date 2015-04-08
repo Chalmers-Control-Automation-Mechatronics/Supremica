@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:ProductDES Name="array" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
+    <Comment>A simple test case for event array aliasing. An event array 'ar' is declared, and the name 'ar' used on a transition needs to be expanded into all array elements.</Comment>
+    <ns2:EventList>
+        <ns2:Event Kind="CONTROLLABLE" Name="ar[0]"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="ar[1]"/>
+    </ns2:EventList>
+    <ns2:AutomataList>
+        <ns2:Automaton Kind="SPEC" Name="test">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="ar[0]"/>
+                <ns2:EventRef Name="ar[1]"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="S0"/>
+                <ns2:State Name="S1"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="ar[0]" Source="S0" Target="S1"/>
+                <ns2:Transition Event="ar[1]" Source="S0" Target="S1"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+    </ns2:AutomataList>
+</ns2:ProductDES>

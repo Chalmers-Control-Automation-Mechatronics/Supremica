@@ -73,7 +73,7 @@ public class PreTransitionBuffer
    *         by its transition limit.
    */
   public void addTransition(final int from, final int event, final int to)
-  throws OverflowException
+    throws OverflowException
   {
     if (mNumTransitions < mTransitionLimit) {
       if (mCurrentState != from || mCurrentEvent != event) {
@@ -130,6 +130,7 @@ public class PreTransitionBuffer
       } while ((state & TAG_END) == 0);
       final int from = key >>> mStateShift;
       final int event = key & mEventMask;
+      states.sort();
       rel.addTransitions(from, event, states);
       pos += 1 + states.size();
       states.clear();
@@ -161,6 +162,7 @@ public class PreTransitionBuffer
         mMaxFanout = mCurrentFanout;
       }
     }
+    mCurrentState = -1;
   }
 
 

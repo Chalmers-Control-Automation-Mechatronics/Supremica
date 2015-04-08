@@ -9,12 +9,10 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import net.sourceforge.waters.analysis.tr.EventEncoding;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
+
+import net.sourceforge.waters.model.des.ProductDESProxy;
 
 
 /**
@@ -45,16 +43,10 @@ public class ActiveEventsTRSimplifierTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifierTest
+  @Override
   protected TransitionRelationSimplifier createTransitionRelationSimplifier()
   {
     return new ActiveEventsTRSimplifier();
-  }
-
-  @Override
-  protected EventEncoding createEventEncoding(final ProductDESProxy des,
-                                              final AutomatonProxy aut)
-  {
-    return createEventEncodingWithPropositions(des, aut);
   }
 
   @Override
@@ -69,83 +61,139 @@ public class ActiveEventsTRSimplifierTest
   public void test_activeEvents_1()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "activeEvents_1.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents01.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_activeEvents_2()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "activeEvents_2.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents02.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_activeEvents_3()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "activeEvents_3.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents03.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_activeEvents_4()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "activeEvents_4.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents04.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_activeEvents_5()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "activeEvents_5.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents05.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_activeEvents_6()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "activeEvents_6.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents06.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_activeEvents_7()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "activeEvents_7.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents07.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_activeEvents_8()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "activeEvents_8.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents08.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_activeEvents_9()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "activeEvents_9.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents09.wmod");
+    runTransitionRelationSimplifier(des);
   }
+
+  public void test_activeEvents_10()
+  throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents10plus.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_activeEvents_11()
+  throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents11.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_activeEvents_12()
+  throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents12.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_activeEvents_13()
+  throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents13.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_activeEvents_14()
+  throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents14.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_activeEvents_15()
+  throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents15.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_activeEvents_16()
+  throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents16.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_activeEvents_17()
+  throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents17.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
 
   /**
    * A test to see whether a single abstraction rule object can perform multiple

@@ -82,11 +82,17 @@ public abstract class AbstractStandardConflictCheckerTest
   {
     try {
       final ModelVerifier verifier = getModelVerifier();
-      verifier.setNodeLimit(2);
-      testBigFactory();
+      verifier.setNodeLimit(4);
+      testCell();
       fail("Expected overflow not caught!");
     } catch (final OverflowException exception) {
-      // O.K.
+      final ModelVerifier verifier = getModelVerifier();
+      final AnalysisResult result = verifier.getAnalysisResult();
+      assertNotNull("Got NULL analysis result after exception!", result);
+      assertNotNull("No exception in analysis result after caught exception!",
+                    result.getException());
+      assertSame("Unexpected exception in analysis result!",
+                 exception, result.getException());
     }
   }
 
@@ -215,6 +221,13 @@ public abstract class AbstractStandardConflictCheckerTest
 
   //#########################################################################
   //# Test Cases --- nasty
+  public void testActiveEvents16() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "activeEvents16.wmod");
+    runModelVerifier(des, false);
+  }
+
   public void testAgvbPart1() throws Exception
   {
     final ProductDESProxy des =
@@ -257,6 +270,34 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(des, true);
   }
 
+  public void testCertainConf5() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "certainconf5.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testCertainConf6() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "certainconf6.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testCertainConf7() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "certainconf7.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testCertainConf8() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "certainconf8.wmod");
+    runModelVerifier(des, false);
+  }
+
   public void testDisjoint1() throws Exception
   {
     final ProductDESProxy des =
@@ -269,6 +310,34 @@ public abstract class AbstractStandardConflictCheckerTest
     final ProductDESProxy des =
       getCompiledDES("tests", "nasty", "disjoint2.wmod");
     runModelVerifier(des, false);
+  }
+
+  public void testDisjoint3() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "disjoint3.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testDisjoint4() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "disjoint4.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testDropSelfloopConf01() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "drop_selfloop_conf_01.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testDropSelfloopConf02() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "drop_selfloop_conf_02.wmod");
+    runModelVerifier(des, true);
   }
 
   public void testEmptySpec() throws Exception
@@ -313,6 +382,27 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(des, false);
   }
 
+  public void testOmegaSat01() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "omega_sat_01.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testOmegaSat02() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "omega_sat_02.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testOmegaSat03() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "omega_sat_03.wmod");
+    runModelVerifier(des, false);
+  }
+
   public void testOneState() throws Exception
   {
     final ProductDESProxy des =
@@ -320,14 +410,14 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(des, true);
   }
 
-  public void test_onlySelfLoop01() throws Exception
+  public void testOnlySelfLoop01() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "nasty", "onlySelfLoop01.wmod");
     runModelVerifier(des, true);
   }
 
-  public void test_onlySelfLoop02() throws Exception
+  public void testOnlySelfLoop02() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "nasty", "onlySelfLoop02.wmod");
@@ -352,6 +442,62 @@ public abstract class AbstractStandardConflictCheckerTest
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "nasty", "rhone_tu34.wmod");
+    runModelVerifier(des, true);
+  }
+
+  public void testSelfloopRemoval01() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "selfloop_removal_01.wmod");
+    runModelVerifier(des, true);
+  }
+
+  public void testSelfloopRemoval02() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "selfloop_removal_02.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testSelfloopRemoval03() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "selfloop_removal_03.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testSelfloopSubsumption01() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "selfloop_subsumption_01.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testSelfloopSubsumption02() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "selfloop_subsumption_02.wmod");
+    runModelVerifier(des, true);
+  }
+
+  public void testSelfloopSubsumption03() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "selfloop_subsumption_03.wmod");
+    runModelVerifier(des, true);
+  }
+
+  public void testSelfloopSubsumption04() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "selfloop_subsumption_04.wmod");
+    runModelVerifier(des, true);
+  }
+
+  public void testSelfloopSubsumption05() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "selfloop_subsumption_05.wmod");
     runModelVerifier(des, true);
   }
 
@@ -401,14 +547,14 @@ public abstract class AbstractStandardConflictCheckerTest
 
   //#########################################################################
   //# Test Cases --- efa
-  public void test_CaseStudyNonblocking() throws Exception
+  public void testCaseStudyNonblocking() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("efa", "caseStudy-nonblocking.wmod");
     runModelVerifier(des, true);
   }
 
-  public void test_CaseStudyOriginal() throws Exception
+  public void testCaseStudyOriginal() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("efa", "caseStudy-original.wmod");
@@ -418,203 +564,203 @@ public abstract class AbstractStandardConflictCheckerTest
 
   //#########################################################################
   //# Test Cases --- tests
-  public void test_BallTimer() throws Exception
+  public void testBallTimer() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "ball_sorter", "ball_timer.wmod");
     runModelVerifier(des, true);
   }
 
-  public void test_BallTimerUncont() throws Exception
+  public void testBallTimerUncont() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "ball_sorter", "ball_timer_uncont.wmod");
     runModelVerifier(des, true);
   }
 
-  public void test_BallTSorter1() throws Exception
+  public void testBallTSorter1() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "ball_sorter", "robis_ball_sorter_attempt1.wmod");
     runModelVerifier(des, false);
   }
 
-  public void test_Batchtank2005_amk14() throws Exception
+  public void testBatchtank2005_amk14() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "batchtank2005", "amk14.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_Batchtank2005_cjn5() throws Exception
+  public void testBatchtank2005_cjn5() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "batchtank2005", "cjn5.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_Batchtank2005_cs37() throws Exception
+  public void testBatchtank2005_cs37() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "batchtank2005", "cs37.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_Batchtank2005_ez1() throws Exception
+  public void testBatchtank2005_ez1() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "batchtank2005", "ez1.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_Batchtank2005_gb20() throws Exception
+  public void testBatchtank2005_gb20() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "batchtank2005", "gb20.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_Batchtank2005_gb21() throws Exception
+  public void testBatchtank2005_gb21() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "batchtank2005", "gb21.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_Batchtank2005_gjr5() throws Exception
+  public void testBatchtank2005_gjr5() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "batchtank2005", "gjr5.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_Batchtank2005_grj3() throws Exception
+  public void testBatchtank2005_grj3() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "batchtank2005", "grj3.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_Batchtank2005_imr1() throws Exception
+  public void testBatchtank2005_imr1() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "batchtank2005", "imr1.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_Batchtank2005_jbr2() throws Exception
+  public void testBatchtank2005_jbr2() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "batchtank2005", "jbr2.wdes");
     runModelVerifier(des, false);
   }
 
-  public void test_Batchtank2005_jmr30() throws Exception
+  public void testBatchtank2005_jmr30() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "batchtank2005", "jmr30.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_Batchtank2005_jpt10() throws Exception
+  public void testBatchtank2005_jpt10() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "batchtank2005", "jpt10.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_Batchtank2005_kah18() throws Exception
+  public void testBatchtank2005_kah18() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "batchtank2005", "kah18.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_Batchtank2005_lsr1_1() throws Exception
+  public void testBatchtank2005_lsr1_1() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "batchtank2005", "lsr1_1.wdes");
     runModelVerifier(des, false);
   }
 
-  public void test_Batchtank2005_lsr1_2() throws Exception
+  public void testBatchtank2005_lsr1_2() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "batchtank2005", "lsr1_2.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_Batchtank2005_lz136_1() throws Exception
+  public void testBatchtank2005_lz136_1() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "batchtank2005", "lz136_1.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_Batchtank2005_lz136_2() throws Exception
+  public void testBatchtank2005_lz136_2() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "batchtank2005", "lz136_2.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_Batchtank2005_rch11() throws Exception
+  public void testBatchtank2005_rch11() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "batchtank2005", "rch11.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_Batchtank2005_ry27() throws Exception
+  public void testBatchtank2005_ry27() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "batchtank2005", "ry27.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_Batchtank2005_scs10() throws Exception
+  public void testBatchtank2005_scs10() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "batchtank2005", "scs10.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_Batchtank2005_sjw41() throws Exception
+  public void testBatchtank2005_sjw41() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "batchtank2005", "sjw41.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_Batchtank2005_smr26() throws Exception
+  public void testBatchtank2005_smr26() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "batchtank2005", "smr26.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_Batchtank2005_tk27() throws Exception
+  public void testBatchtank2005_tk27() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "batchtank2005", "tk27.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_Batchtank2005_tp20() throws Exception
+  public void testBatchtank2005_tp20() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "batchtank2005", "tp20.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_Batchtank2005_vl6() throws Exception
+  public void testBatchtank2005_vl6() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "batchtank2005", "vl6.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_IMS_ims() throws Exception
+  public void testIMS_ims() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "ims", "ims.wmod");
@@ -639,9 +785,9 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(des, true);
   }
 
-  public void testProfisafeI4SlaveEFA() throws Exception
+  public void testProfisafeI3SlaveEFA() throws Exception
   {
-    final ParameterBindingProxy binding = createBinding("MAXSEQNO", 4);
+    final ParameterBindingProxy binding = createBinding("MAXSEQNO", 3);
     final List<ParameterBindingProxy> bindings =
         Collections.singletonList(binding);
     final ProductDESProxy des =
@@ -650,175 +796,175 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(des, bindings, true);
   }
 
-  public void test_TrafficLights2006_plants() throws Exception
+  public void testTrafficLights2006_plants() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "trafficlights2006", "plants.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_TrafficLights2006_ac61() throws Exception
+  public void testTrafficLights2006_ac61() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "trafficlights2006", "ac61.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_TrafficLights2006_al29() throws Exception
+  public void testTrafficLights2006_al29() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "trafficlights2006", "al29.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_TrafficLights2006_asjc1() throws Exception
+  public void testTrafficLights2006_asjc1() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "trafficlights2006", "asjc1.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_TrafficLights2006_dal9() throws Exception
+  public void testTrafficLights2006_dal9() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "trafficlights2006", "dal9.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_TrafficLights2006_dmt10() throws Exception
+  public void testTrafficLights2006_dmt10() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "trafficlights2006", "dmt10.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_TrafficLights2006_ejtrw1() throws Exception
+  public void testTrafficLights2006_ejtrw1() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "trafficlights2006", "ejtrw1.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_TrafficLights2006_ekb2() throws Exception
+  public void testTrafficLights2006_ekb2() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "trafficlights2006", "ekb2.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_TrafficLights2006_gat7() throws Exception
+  public void testTrafficLights2006_gat7() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "trafficlights2006", "gat7.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_TrafficLights2006_jdm18() throws Exception
+  public void testTrafficLights2006_jdm18() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "trafficlights2006", "jdm18.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_TrafficLights2006_jlm39() throws Exception
+  public void testTrafficLights2006_jlm39() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "trafficlights2006", "jlm39.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_TrafficLights2006_jpg7() throws Exception
+  public void testTrafficLights2006_jpg7() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "trafficlights2006", "jpg7.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_TrafficLights2006_jpm22() throws Exception
+  public void testTrafficLights2006_jpm22() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "trafficlights2006", "jpm22.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_TrafficLights2006_jrv2() throws Exception
+  public void testTrafficLights2006_jrv2() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "trafficlights2006", "jrv2.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_TrafficLights2006_js173() throws Exception
+  public void testTrafficLights2006_js173() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "trafficlights2006", "js173.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_TrafficLights2006_lz173() throws Exception
+  public void testTrafficLights2006_lz173() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "trafficlights2006", "lz173.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_TrafficLights2006_meb16() throws Exception
+  public void testTrafficLights2006_meb16() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "trafficlights2006", "meb16.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_TrafficLights2006_mjd29() throws Exception
+  public void testTrafficLights2006_mjd29() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "trafficlights2006", "mjd29.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_TrafficLights2006_ncj3() throws Exception
+  public void testTrafficLights2006_ncj3() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "trafficlights2006", "ncj3.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_TrafficLights2006_rjo6() throws Exception
+  public void testTrafficLights2006_rjo6() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "trafficlights2006", "rjo6.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_TrafficLights2006_rms33() throws Exception
+  public void testTrafficLights2006_rms33() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "trafficlights2006", "rms33.wdes");
     runModelVerifier(des, false);
   }
 
-  public void test_TrafficLights2006_sdh7() throws Exception
+  public void testTrafficLights2006_sdh7() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "trafficlights2006", "sdh7.wdes");
     runModelVerifier(des, false);
   }
 
-  public void test_TrafficLights2006_sgc9_1() throws Exception
+  public void testTrafficLights2006_sgc9_1() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "trafficlights2006", "sgc9_1.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_TrafficLights2006_sgc9_2() throws Exception
+  public void testTrafficLights2006_sgc9_2() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "trafficlights2006", "sgc9_2.wdes");
     runModelVerifier(des, true);
   }
 
-  public void test_TrafficLights2006_yip1() throws Exception
+  public void testTrafficLights2006_yip1() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "trafficlights2006", "yip1.wdes");

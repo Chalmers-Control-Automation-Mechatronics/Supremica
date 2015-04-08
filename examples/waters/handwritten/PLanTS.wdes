@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ProductDES Name="Passenger Land-Transportation System" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/des">
-<ns2:Comment>Adapted from 'Supervising Passenger Land-Transportation Systems' by K.T. Seow and M. Pasquier. The system is controllable and nonblocking. This is a model of a traffic system where a number of vehicles are serving a number of travelers. The parameters n and m represent the number of vehicles and travellers respectively. The parametrisation does not work here however, since the models 'FleetServiceDiligence' and 'VehicleAssignmentQueueCapacity' (maybe others too?) needs to have a parametrisable number of states which is currently not supported. So n is fixed at 3 and m is fixed at 4. Plant size: 559872 states, specification size: 9720000 states, plant||specification size: 4907968 states.</ns2:Comment>
+<ProductDES Name="PLanTS" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/des">
+<ns2:Comment>Passenger Land-Transportation System. Adapted from 'Supervising Passenger Land-Transportation Systems' by K.T. Seow and M. Pasquier. The system is controllable and nonblocking. This is a model of a traffic system where a number of vehicles are serving a number of travelers. The parameters n and m represent the number of vehicles and travellers respectively. The parametrisation does not work here however, since the models 'FleetServiceDiligence' and 'VehicleAssignmentQueueCapacity' (maybe others too?) needs to have a parametrisable number of states which is currently not supported. So n is fixed at 3 and m is fixed at 4. Plant size: 559872 states, specification size: 9720000 states, plant||specification size: 4907968 states.</ns2:Comment>
 <EventList>
 <Event Kind="CONTROLLABLE" Name="ad[1]"/>
 <Event Kind="CONTROLLABLE" Name="ad[2]"/>
@@ -104,11 +104,20 @@
 <EventRef Name="ecall[2][1]"/>
 <EventRef Name="ecall[3][1]"/>
 <EventRef Name="ecall[4][1]"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="st[1]"/>
 </EventRefList>
 <StateList>
-<State Initial="true" Name="j0"/>
-<State Name="j1"/>
+<State Initial="true" Name="j0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="j1">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
 </StateList>
 <TransitionList>
 <Transition Event="dwn[1]" Source="j0" Target="j1"/>
@@ -127,11 +136,20 @@
 <EventRef Name="ecall[2][2]"/>
 <EventRef Name="ecall[3][2]"/>
 <EventRef Name="ecall[4][2]"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="st[2]"/>
 </EventRefList>
 <StateList>
-<State Initial="true" Name="j0"/>
-<State Name="j1"/>
+<State Initial="true" Name="j0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="j1">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
 </StateList>
 <TransitionList>
 <Transition Event="dwn[2]" Source="j0" Target="j1"/>
@@ -150,11 +168,20 @@
 <EventRef Name="ecall[2][3]"/>
 <EventRef Name="ecall[3][3]"/>
 <EventRef Name="ecall[4][3]"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="st[3]"/>
 </EventRefList>
 <StateList>
-<State Initial="true" Name="j0"/>
-<State Name="j1"/>
+<State Initial="true" Name="j0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="j1">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
 </StateList>
 <TransitionList>
 <Transition Event="dwn[3]" Source="j0" Target="j1"/>
@@ -1436,6 +1463,7 @@
 <EventRef Name="enter[2][1]"/>
 <EventRef Name="enter[3][1]"/>
 <EventRef Name="enter[4][1]"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="ras[1][1]"/>
 <EventRef Name="ras[2][1]"/>
 <EventRef Name="ras[3][1]"/>
@@ -1443,8 +1471,16 @@
 <EventRef Name="st[1]"/>
 </EventRefList>
 <StateList>
-<State Initial="true" Name="k0"/>
-<State Name="k1"/>
+<State Initial="true" Name="k0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="k1">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
 </StateList>
 <TransitionList>
 <Transition Event="as[1][1]" Source="k0" Target="k0"/>
@@ -1475,6 +1511,7 @@
 <EventRef Name="enter[2][2]"/>
 <EventRef Name="enter[3][2]"/>
 <EventRef Name="enter[4][2]"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="ras[1][2]"/>
 <EventRef Name="ras[2][2]"/>
 <EventRef Name="ras[3][2]"/>
@@ -1482,8 +1519,16 @@
 <EventRef Name="st[2]"/>
 </EventRefList>
 <StateList>
-<State Initial="true" Name="k0"/>
-<State Name="k1"/>
+<State Initial="true" Name="k0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="k1">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
 </StateList>
 <TransitionList>
 <Transition Event="as[1][2]" Source="k0" Target="k0"/>
@@ -1514,6 +1559,7 @@
 <EventRef Name="enter[2][3]"/>
 <EventRef Name="enter[3][3]"/>
 <EventRef Name="enter[4][3]"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="ras[1][3]"/>
 <EventRef Name="ras[2][3]"/>
 <EventRef Name="ras[3][3]"/>
@@ -1521,8 +1567,16 @@
 <EventRef Name="st[3]"/>
 </EventRefList>
 <StateList>
-<State Initial="true" Name="k0"/>
-<State Name="k1"/>
+<State Initial="true" Name="k0">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
+<State Name="k1">
+<EventRefList>
+<EventRef Name=":accepting"/>
+</EventRefList>
+</State>
 </StateList>
 <TransitionList>
 <Transition Event="as[1][3]" Source="k0" Target="k0"/>

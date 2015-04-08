@@ -35,7 +35,6 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
 public class BackgroundCompiler
   implements ModelObserver, ActionListener
 {
-
   //#########################################################################
   //# Constructors
   public BackgroundCompiler(final ModuleContainer container)
@@ -61,6 +60,10 @@ public class BackgroundCompiler
       }
     };
     Config.OPTIMIZING_COMPILER.addPropertyChangeListener
+      (mCompilerPropertyChangeListener);
+    Config.NORMALIZING_COMPILER.addPropertyChangeListener
+      (mCompilerPropertyChangeListener);
+    Config.USE_EVENT_ALPHABET.addPropertyChangeListener
       (mCompilerPropertyChangeListener);
 
     mRemoveObserverAction = new ActionListener() {
@@ -120,6 +123,8 @@ public class BackgroundCompiler
       mModuleChanged = false;
       mRunning = true;
       mCompiler.setOptimizationEnabled(Config.OPTIMIZING_COMPILER.isTrue());
+      mCompiler.setNormalizationEnabled(Config.NORMALIZING_COMPILER.isTrue());
+      mCompiler.setUsingEventAlphabet(Config.USE_EVENT_ALPHABET.isTrue());
       mCompiler.setInputModule(mModuleContainer.getModule(), true);
       mWorker.compile();
     } else if (mModuleChanged && mRunning) {
@@ -139,6 +144,10 @@ public class BackgroundCompiler
   public void terminate()
   {
     Config.OPTIMIZING_COMPILER.removePropertyChangeListener
+      (mCompilerPropertyChangeListener);
+    Config.NORMALIZING_COMPILER.removePropertyChangeListener
+      (mCompilerPropertyChangeListener);
+    Config.USE_EVENT_ALPHABET.removePropertyChangeListener
       (mCompilerPropertyChangeListener);
     mTimer.stop();
     mWorker.terminate();

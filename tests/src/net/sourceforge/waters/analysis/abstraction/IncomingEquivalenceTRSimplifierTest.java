@@ -12,14 +12,12 @@ package net.sourceforge.waters.analysis.abstraction;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.analysis.tr.EventEncoding;
-import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 
 
 /**
- * A test for the combined implementation of the <I>Silent Continuation Rule</I> and
- * <I>Active Events Rule</I>.
+ * A test for the combined implementation of the <I>Silent Continuation Rule</I>
+ * and <I>Active Events Rule</I>.
  *
  * @author Robi Malik
  */
@@ -53,13 +51,6 @@ public class IncomingEquivalenceTRSimplifierTest
   }
 
   @Override
-  protected EventEncoding createEventEncoding(final ProductDESProxy des,
-                                              final AutomatonProxy aut)
-  {
-    return createEventEncodingWithPropositions(des, aut);
-  }
-
-  @Override
   protected void configureTransitionRelationSimplifier()
   {
     configureTransitionRelationSimplifierWithPropositions();
@@ -71,100 +62,97 @@ public class IncomingEquivalenceTRSimplifierTest
   public void test_activeEvents_1()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "activeEvents_1.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents01.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_activeEvents_2()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "activeEvents_2.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents02.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_activeEvents_3()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "activeEvents_3.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents03.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_activeEvents_4()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "activeEvents_4.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents04.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_activeEvents_5()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "activeEvents_5.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents05.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_activeEvents_6()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "activeEvents_6.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents06.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_activeEvents_7()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "activeEvents_7.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents07.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_activeEvents_8()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "activeEvents_8.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents08.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_activeEvents_9()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "activeEvents_9.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents09.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_activeEvents_10()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "activeEvents_10.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents10.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_activeEvents_11()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "activeEvents_11.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents11.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_activeEvents_16()
+  throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents16.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
 
@@ -173,19 +161,17 @@ public class IncomingEquivalenceTRSimplifierTest
   public void test_silentContinuation_1()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "silentContinuation_1.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "silentContinuation_1.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_silentContinuation_2()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "silentContinuation_2.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "silentContinuation_2.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
 
@@ -194,64 +180,57 @@ public class IncomingEquivalenceTRSimplifierTest
   public void test_incomingEquivalence01()
     throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "incomingEquivalence01.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "incomingEquivalence01.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_incomingEquivalence02()
     throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "incomingEquivalence02.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "incomingEquivalence02.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_incomingEquivalence03()
     throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "incomingEquivalence03.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "incomingEquivalence03.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_incomingEquivalence04()
     throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "incomingEquivalence04.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "incomingEquivalence04.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_incomingEquivalence05()
     throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "incomingEquivalence05.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "incomingEquivalence05.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_incomingEquivalence06()
     throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "incomingEquivalence06.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "incomingEquivalence06.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_incomingEquivalence07()
     throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "incomingEquivalence07.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "incomingEquivalence07.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
 
@@ -270,8 +249,8 @@ public class IncomingEquivalenceTRSimplifierTest
     test_activeEvents_5();
     test_activeEvents_5();
     test_activeEvents_4();
-    test_activeEvents_3();
-    test_activeEvents_2();
+    test_activeEvents_8();
+    test_activeEvents_8();
     test_activeEvents_1();
   }
 

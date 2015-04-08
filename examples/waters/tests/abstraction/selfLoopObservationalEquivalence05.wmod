@@ -7,7 +7,11 @@
             </ColorGeometry>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="a"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="b"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="b">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="SELFLOOP_ONLY"/>
+            </ns2:AttributeMap>
+        </EventDecl>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="SPEC" Name="before">

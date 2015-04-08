@@ -160,6 +160,10 @@ public class TauLoopRemovalTRSimplifier
           mLowLink[s] = recoding[lowLink - 1];
         }
       }
+      final int dumpIndex = rel.getDumpStateIndex();
+      if (mLowLink[dumpIndex] < 0) {
+        nextComponent++;
+      }
       final TRPartition partition = new TRPartition(mLowLink, nextComponent);
       setResultPartition(partition);
       applyResultPartitionAutomatically();
@@ -190,6 +194,7 @@ public class TauLoopRemovalTRSimplifier
     } else {
       rel.removeProperSelfLoopEvents();
     }
+    rel.removeRedundantPropositions();
   }
 
 

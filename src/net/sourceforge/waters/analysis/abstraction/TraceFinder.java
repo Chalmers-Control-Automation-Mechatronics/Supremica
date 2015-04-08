@@ -54,8 +54,8 @@ public class TraceFinder
                                          EventEncoding.FILTER_PROPOSITIONS);
       final StateEncoding enc = new StateEncoding(aut);
       mTransitionRelation = new ListBufferTransitionRelation
-      (aut, mEventEncoding, enc,
-       ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+        (aut, mEventEncoding.clone(), enc,
+         ListBufferTransitionRelation.CONFIG_SUCCESSORS);
       mInitialStates = new ArrayList<SearchRecord>();
       final int numStates = mTransitionRelation.getNumberOfStates();
       for (int state = 0; state < numStates; state++) {

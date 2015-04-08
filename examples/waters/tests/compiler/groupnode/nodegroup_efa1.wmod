@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="nodegroup_efa1" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>A test that involves some nodegroups in combination with EFA actions.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Name="restart_host_timer"/>
+        <EventDecl Kind="CONTROLLABLE" Name="restart_delay_timer"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="host_timeout"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="delay_timeout"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="timers">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="OFF">
+                        <PointGeometry>
+                            <Point X="176" Y="64"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point X="-5" Y="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="-18"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="HOST">
+                        <PointGeometry>
+                            <Point X="96" Y="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="12" Y="-9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="DELAY">
+                        <PointGeometry>
+                            <Point X="256" Y="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-49" Y="-5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <GroupNode Name="G0">
+                        <NodeRef Name="OFF"/>
+                        <NodeRef Name="DELAY"/>
+                        <NodeRef Name="HOST"/>
+                        <BoxGeometry>
+                            <Box Height="224" Width="288" X="32" Y="32"/>
+                        </BoxGeometry>
+                    </GroupNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="G0" Target="HOST">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="restart_host_timer"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-54" Y="-22"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point X="97" Y="256"/>
+                        </StartPointGeometry>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="got_host_timeout"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="got_delay_timeout"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-53" Y="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="HOST" Target="OFF">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="host_timeout"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-93" Y="-38"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="got_host_timeout"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-94" Y="-24"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="G0" Target="DELAY">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="restart_delay_timer"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-69" Y="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point X="256" Y="256"/>
+                        </StartPointGeometry>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="got_host_timeout"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="got_delay_timeout"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-70" Y="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="DELAY" Target="OFF">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="delay_timeout"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-33" Y="-38"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="got_delay_timeout"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-33" Y="-24"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <VariableComponent Name="got_host_timeout">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="got_host_timeout"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <VariableComponent Name="got_delay_timeout">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="got_delay_timeout"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+    </ComponentList>
+</Module>

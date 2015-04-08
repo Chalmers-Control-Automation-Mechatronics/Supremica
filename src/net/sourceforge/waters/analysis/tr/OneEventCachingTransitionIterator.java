@@ -12,6 +12,7 @@ package net.sourceforge.waters.analysis.tr;
 import gnu.trove.set.hash.TIntHashSet;
 
 import net.sourceforge.waters.model.base.ProxyTools;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 
 
 /**
@@ -50,6 +51,20 @@ public class OneEventCachingTransitionIterator implements TransitionIterator
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.tr.TransitionIterator
   @Override
+  public OneEventCachingTransitionIterator clone()
+  {
+    try {
+      final OneEventCachingTransitionIterator cloned =
+        (OneEventCachingTransitionIterator) super.clone();
+      cloned.mInnerIterator = mInnerIterator.clone();
+      cloned.mVisited = new TIntHashSet(mVisited);
+      return cloned;
+    } catch (final CloneNotSupportedException exception) {
+      throw new WatersRuntimeException(exception);
+    }
+  }
+
+  @Override
   public void reset()
   {
     assert mEvent >= 0;
@@ -78,14 +93,6 @@ public class OneEventCachingTransitionIterator implements TransitionIterator
   }
 
   @Override
-  public void resetEventsByStatus(final int... flags)
-  {
-    throw new UnsupportedOperationException
-      (ProxyTools.getShortClassName(this) +
-       " does not support multiple events!");
-  }
-
-  @Override
   public void resetState(final int from)
   {
     mInnerIterator.resetState(from);
@@ -105,6 +112,18 @@ public class OneEventCachingTransitionIterator implements TransitionIterator
   {
     assert mEvent >= 0;
     mInnerIterator.resetState(from);
+  }
+
+  @Override
+  public int getFirstEvent()
+  {
+    return mEvent;
+  }
+
+  @Override
+  public int getLastEvent()
+  {
+    return mEvent;
   }
 
   @Override
@@ -189,7 +208,7 @@ public class OneEventCachingTransitionIterator implements TransitionIterator
 
   //#########################################################################
   //# Data Members
-  private final TransitionIterator mInnerIterator;
+  private TransitionIterator mInnerIterator;
   private TIntHashSet mVisited;
   private int mEvent;
 

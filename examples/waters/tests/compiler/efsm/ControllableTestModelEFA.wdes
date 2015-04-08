@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:ProductDES Name="ControllableTestModelEFA" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
+    <Comment>Strange EFA model. The guard (x &lt;= 3) in Spec1 is always true due to the range of variable x.</Comment>
+    <ns2:EventList>
+        <ns2:Event Kind="CONTROLLABLE" Name="a"/>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="u"/>
+    </ns2:EventList>
+    <ns2:AutomataList>
+        <ns2:Automaton Kind="PLANT" Name="x">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="a"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="0"/>
+                <ns2:State Name="1"/>
+                <ns2:State Name="2"/>
+                <ns2:State Name="3"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="a" Source="0" Target="1"/>
+                <ns2:Transition Event="a" Source="1" Target="2"/>
+                <ns2:Transition Event="a" Source="2" Target="3"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="PLANT" Name="Plant1">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="u"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="S0"/>
+                <ns2:State Name="S1"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="u" Source="S0" Target="S1"/>
+                <ns2:Transition Event="u" Source="S1" Target="S0"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="PLANT" Name="Plant2">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="a"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="S0"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="a" Source="S0" Target="S0"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="SPEC" Name="Spec1">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="a"/>
+                <ns2:EventRef Name="u"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="S0"/>
+                <ns2:State Name="S1"/>
+                <ns2:State Name="S2"/>
+                <ns2:State Name="S3"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="u" Source="S0" Target="S1"/>
+                <ns2:Transition Event="a" Source="S1" Target="S2"/>
+                <ns2:Transition Event="u" Source="S1" Target="S0"/>
+                <ns2:Transition Event="u" Source="S2" Target="S3"/>
+                <ns2:Transition Event="u" Source="S3" Target="S0"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+    </ns2:AutomataList>
+</ns2:ProductDES>

@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.IntSetBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -33,6 +34,7 @@ import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.analysis.tr.TransitionListBuffer;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.ProxyTools;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 
 
 /**
@@ -40,7 +42,8 @@ import net.sourceforge.waters.model.base.ProxyTools;
  * <I>Active Events Rule</I>.</P>
  *
  * <P>This rule merges states that are incoming equivalent and have
- * at least one outgoing silent or always enabled transition, and states
+ * at least one outgoing <I>always enabled</I> ({@link
+ * EventStatus#STATUS_ALWAYS_ENABLED}) transition, and states
  * that are incoming equivalent and have equal sets of eligible events.</P>
  *
  * <P><I>Algorithm:</I></P>
@@ -95,6 +98,12 @@ public class IncomingEquivalenceTRSimplifier
   public int getPreferredInputConfiguration()
   {
     return ListBufferTransitionRelation.CONFIG_ALL;
+  }
+
+  @Override
+  public boolean isAlwaysEnabledEventsSupported()
+  {
+    return true;
   }
 
 
@@ -199,6 +208,9 @@ public class IncomingEquivalenceTRSimplifier
         } else if (info.getFirstState() == s) {
           info.setClassNumber(stateToClass, classNo++);
         }
+      }
+      if (mStateInfo[rel.getDumpStateIndex()] == null) {
+        classNo++;
       }
       final TRPartition partition = new TRPartition(stateToClass, classNo);
       setResultPartition(partition);
@@ -418,7 +430,7 @@ public class IncomingEquivalenceTRSimplifier
           if (!hasAlwaysEnabled) {
             final byte status = rel.getProperEventStatus(e);
             hasAlwaysEnabled =
-              EventEncoding.isOutsideAlwaysEnabledEvent(status);
+              EventStatus.isAlwaysEnabledEvent(status);
           }
         }
       }
@@ -1109,6 +1121,22 @@ public class IncomingEquivalenceTRSimplifier
     //#######################################################################
     //# Interface net.sourceforge.waters.analysis.tr.TransitionIterator
     @Override
+    public TauClosureIterator clone()
+    {
+      try {
+        final TauClosureIterator cloned =
+          (TauClosureIterator) super.clone();
+        cloned.mStack = new TIntArrayStack(mStack);
+        cloned.mTransitionIterator = mTransitionIterator.clone();
+        cloned.mPushIterator = mPushIterator.clone();
+        cloned.mVisited = new TIntHashSet(mVisited);
+        return cloned;
+      } catch (final CloneNotSupportedException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    }
+
+    @Override
     public void reset()
     {
       resetState(mCurrentSourceState);
@@ -1135,12 +1163,6 @@ public class IncomingEquivalenceTRSimplifier
     }
 
     @Override
-    public void resetEventsByStatus(final int... flags)
-    {
-      throwNonTauException();
-    }
-
-    @Override
     public void resetState(final int from)
     {
       resetState(mStateInfo[from]);
@@ -1160,6 +1182,18 @@ public class IncomingEquivalenceTRSimplifier
     public void resume(final int from)
     {
       resumeState(mStateInfo[from]);
+    }
+
+    @Override
+    public int getFirstEvent()
+    {
+      return EventEncoding.TAU;
+    }
+
+    @Override
+    public int getLastEvent()
+    {
+      return EventEncoding.TAU;
     }
 
     @Override
@@ -1315,9 +1349,9 @@ public class IncomingEquivalenceTRSimplifier
     //#######################################################################
     //# Data Members
     private final TransitionListBuffer mTransitionListBuffer;
-    private final TIntStack mStack;
-    private final TransitionIterator mTransitionIterator;
-    private final IntListBuffer.Iterator mPushIterator;
+    private TIntStack mStack;
+    private TransitionIterator mTransitionIterator;
+    private IntListBuffer.Iterator mPushIterator;
     private TIntHashSet mVisited;
     private IteratorState mIteratorState;
     private StateInfo mCurrentSourceState;
@@ -1351,6 +1385,19 @@ public class IncomingEquivalenceTRSimplifier
     //#######################################################################
     //# Interface net.sourceforge.waters.analysis.tr.TransitionIterator
     @Override
+    public EventIterator clone()
+    {
+      try {
+        final EventIterator cloned = (EventIterator) super.clone();
+        cloned.mClassReadIterator = mClassReadIterator.clone();
+        cloned.mTransitionIterator = mTransitionIterator.clone();
+        return cloned;
+      } catch (final CloneNotSupportedException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    }
+
+    @Override
     public void reset()
     {
       resetClassReadIteration();
@@ -1372,13 +1419,6 @@ public class IncomingEquivalenceTRSimplifier
     }
 
     @Override
-    public void resetEventsByStatus(final int... flags)
-    {
-      resetClassReadIteration();
-      mTransitionIterator.resetEventsByStatus(flags);
-    }
-
-    @Override
     public void resetState(final int from)
     {
       resetState(mStateInfo[from]);
@@ -1397,6 +1437,18 @@ public class IncomingEquivalenceTRSimplifier
     {
       final StateInfo info = mStateInfo[from];
       resumeClassReadIteration(info);
+    }
+
+    @Override
+    public int getFirstEvent()
+    {
+      return mTransitionIterator.getFirstEvent();
+    }
+
+    @Override
+    public int getLastEvent()
+    {
+      return mTransitionIterator.getLastEvent();
     }
 
     @Override
@@ -1551,8 +1603,8 @@ public class IncomingEquivalenceTRSimplifier
 
     //#######################################################################
     //# Data Members
-    private final IntListBuffer.ReadOnlyIterator mClassReadIterator;
-    private final TransitionIterator mTransitionIterator;
+    private IntListBuffer.ReadOnlyIterator mClassReadIterator;
+    private TransitionIterator mTransitionIterator;
     private StateInfo mCurrentState;
     private int mDummyIteration = -1;
     private int mLevel = 1;
@@ -1588,6 +1640,20 @@ public class IncomingEquivalenceTRSimplifier
     //#######################################################################
     //# Interface net.sourceforge.waters.analysis.tr.TransitionIterator
     @Override
+    public PostEventClosureIterator clone()
+    {
+      try {
+        final PostEventClosureIterator cloned =
+          (PostEventClosureIterator) super.clone();
+        cloned.mEventIterator = mEventIterator.clone();
+        cloned.mTauIterator = mTauIterator.clone();
+        return cloned;
+      } catch (final CloneNotSupportedException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    }
+
+    @Override
     public void reset()
     {
       mEventIterator.resetState(mFromState);
@@ -1610,13 +1676,6 @@ public class IncomingEquivalenceTRSimplifier
     }
 
     @Override
-    public void resetEventsByStatus(final int... flags)
-    {
-      mEventIterator.resetEventsByStatus(flags);
-      reset();
-    }
-
-    @Override
     public void resetState(final int from)
     {
       resetState(mStateInfo[from]);
@@ -1634,6 +1693,19 @@ public class IncomingEquivalenceTRSimplifier
       mFromState = mStateInfo[from];
       resume();
     }
+
+    @Override
+    public int getFirstEvent()
+    {
+      return mEventIterator.getFirstEvent();
+    }
+
+    @Override
+    public int getLastEvent()
+    {
+      return mEventIterator.getLastEvent();
+    }
+
 
     @Override
     public boolean advance()
@@ -1741,8 +1813,8 @@ public class IncomingEquivalenceTRSimplifier
     private StateInfo mFromState;
     private int mLevel;
 
-    private final EventIterator mEventIterator;
-    private final TauClosureIterator mTauIterator;
+    private EventIterator mEventIterator;
+    private TauClosureIterator mTauIterator;
   }
 
 
@@ -1776,6 +1848,21 @@ public class IncomingEquivalenceTRSimplifier
     //#######################################################################
     //# Interface net.sourceforge.waters.analysis.tr.TransitionIterator
     @Override
+    public FullEventClosureIterator clone()
+    {
+      try {
+        final FullEventClosureIterator cloned =
+          (FullEventClosureIterator) super.clone();
+        cloned.mTauIterator1 = mTauIterator2.clone();
+        cloned.mEventIterator = mEventIterator.clone();
+        cloned.mTauIterator2 = mTauIterator2.clone();
+        return cloned;
+      } catch (final CloneNotSupportedException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    }
+
+    @Override
     public void reset()
     {
       mTauIterator1.resetState(mFromState);
@@ -1799,13 +1886,6 @@ public class IncomingEquivalenceTRSimplifier
     }
 
     @Override
-    public void resetEventsByStatus(final int... flags)
-    {
-      mEventIterator.resetEventsByStatus(flags);
-      reset();
-    }
-
-    @Override
     public void resetState(final int from)
     {
       resetState(mStateInfo[from]);
@@ -1822,6 +1902,18 @@ public class IncomingEquivalenceTRSimplifier
     {
       mFromState = mStateInfo[from];
       resume();
+    }
+
+    @Override
+    public int getFirstEvent()
+    {
+      return mEventIterator.getFirstEvent();
+    }
+
+    @Override
+    public int getLastEvent()
+    {
+      return mEventIterator.getLastEvent();
     }
 
     @Override
@@ -1943,9 +2035,9 @@ public class IncomingEquivalenceTRSimplifier
     private int mLevel;
 
     private final TransitionListBuffer mTransitionListBuffer;
-    private final TauClosureIterator mTauIterator1;
-    private final EventIterator mEventIterator;
-    private final TauClosureIterator mTauIterator2;
+    private TauClosureIterator mTauIterator1;
+    private EventIterator mEventIterator;
+    private TauClosureIterator mTauIterator2;
   }
 
 

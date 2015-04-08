@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.monolithic;
 
 import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.custom_hash.TObjectByteCustomHashMap;
 import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.set.hash.THashSet;
@@ -25,10 +26,14 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
+import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionTRSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntArrayHashingStrategy;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.analysis.tr.WatersHashSet;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
@@ -88,7 +93,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     super(model, factory, translator);
   }
 
-
   //#########################################################################
   //# Configuration
   public void setNonblockingSupported(final boolean support)
@@ -102,8 +106,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   }
 
   /**
-   * Sets the preferred name (or name prefix) for any supervisors produced
-   * as output.
+   * Sets the preferred name (or name prefix) for any supervisors produced as
+   * output.
    */
   @Override
   public void setOutputName(final String name)
@@ -113,6 +117,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
 
   /**
    * Gets the preferred name of supervisors produced as output.
+   *
    * @see #setOutputName(String) setOutputName()
    */
   @Override
@@ -120,7 +125,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   {
     return mOutputName;
   }
-
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
@@ -141,7 +145,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       mSupervisorSimplifier.resetAbort();
     }
   }
-
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.SupervisorSynthesizer
@@ -212,7 +215,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     mEventEncoding =
       new EventEncoding(events, translator, filter,
                         EventEncoding.FILTER_PROPOSITIONS);
-    mEventEncoding.sortProperEvents(EventEncoding.STATUS_CONTROLLABLE);
+    mEventEncoding.sortProperEvents(EventStatus.STATUS_CONTROLLABLE);
     mNumProperEvents = mEventEncoding.getNumberOfProperEvents();
 
     ArrayList<AutomatonProxy> plants = new ArrayList<AutomatonProxy>();
@@ -320,7 +323,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       new ArrayList<AutomatonEventInfo>(mNumAutomata);
     for (int e = EventEncoding.NONTAU; e < mNumProperEvents; e++) {
       final byte status = mEventEncoding.getProperEventStatus(e);
-      final boolean controllable = EventEncoding.isControllableEvent(status);
+      final boolean controllable = EventStatus.isControllableEvent(status);
       for (a = 0; a < mNumAutomata; a++) {
         if (transitions[a][e] != null) {
           final int numStates = transitions[a][e].length;
@@ -381,6 +384,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     final IntArrayHashingStrategy strategy = new IntArrayHashingStrategy();
     mGlobalVisited =
       new TObjectIntCustomHashMap<int[]>(strategy, tableSize, 0.5f, -1);
+    mStatusMap =
+      new TObjectByteCustomHashMap<int[]>(strategy, tableSize, 0.5f, (byte) 0);
     mLocalVisited = new WatersHashSet<int[]>(strategy);
     mGlobalStack = new ArrayDeque<int[]>();
     mLocalStack = new ArrayDeque<int[]>();
@@ -390,47 +395,20 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     mUnvisited = new ArrayDeque<int[]>(100);
     mNumStates = 0;
 
-    // get encoding information
-    mNumBits = new int[mNumAutomata];
-    mNumBitsMasks = new int[mNumAutomata];
+    final int[] sizes = StateTupleEncoding.getAutomataSizes(mAutomata);
+    mSTEncoding = new StateTupleEncoding(sizes);
 
-    // get mNumBits
-    mNumInts = 1;
-    int totalBits = SIZE_INT;
-    int counter = 0;
-    for (int aut = 0; aut < mNumAutomata; aut++) {
-      final int bits = AutomatonTools.log2(mOriginalStates[aut].length);
-      mNumBits[counter] = bits;
-      mNumBitsMasks[counter] = (1 << bits) - 1;
-      if (totalBits >= bits) { // if current buffer can store this automaton
-        totalBits -= bits;
-      } else {
-        mNumInts++;
-        totalBits = SIZE_INT - bits;
-      }
-      counter++;
-    }
-
-    // get index
-    counter = 0;
-    totalBits = SIZE_INT;
-    mIndexAutomata = new int[mNumInts + 1];
-    mIndexAutomata[0] = counter++;
-    for (int i = 0; i < mNumAutomata; i++) {
-      if (totalBits >= mNumBits[i]) {
-        totalBits -= mNumBits[i];
-      } else {
-        mIndexAutomata[counter++] = i;
-        totalBits = SIZE_INT - mNumBits[i];
+    // We have sorted the events so all uncontrollables come first.
+    final int numEvents = mEventEncoding.getNumberOfProperEvents();
+    int firstControllable = numEvents;
+    for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+      final byte status = mEventEncoding.getProperEventStatus(e);
+      if (EventStatus.isControllableEvent(status)) {
+        firstControllable = e;
+        break;
       }
     }
-    mIndexAutomata[mNumInts] = mNumAutomata;
-
-    final EventEncoding.OrderingInfo info = mEventEncoding.getOrderingInfo();
-    final int lastUncontrollable =
-      info.getLastEventIndex(~EventEncoding.STATUS_CONTROLLABLE);
-    final int firstControllable =
-      info.getFirstEventIndex(EventEncoding.STATUS_CONTROLLABLE);
+    final int lastUncontrollable = firstControllable - 1;
     mCtrlInitialReachabilityExplorer =
       new CtrlInitialReachabilityExplorer(eventAutomata, transitions,
                                           ndTuple1, firstControllable,
@@ -496,7 +474,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     mTransitionBuffer = null;
     mTargetTuple = null;
   }
-
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
@@ -567,7 +544,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             if (!mBadStates.get(t)) {
               final int[] tuple = new int[mNumAutomata];
               final int[] encodedTuple = mStateTuples.get(t);
-              decode(encodedTuple, tuple);
+              mSTEncoding.decode(encodedTuple, tuple);
               if (isMarkedState(tuple)) {
                 mUnvisited.add(encodedTuple);
                 mNonCoreachableStates.set(t, false);
@@ -624,11 +601,10 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       // re-encode states (make only one bad state)
       final int markingID = 0;
       mTransitionRelation =
-        new ListBufferTransitionRelation(
-                                         "supervisor",
+        new ListBufferTransitionRelation("supervisor",
                                          ComponentKind.SUPERVISOR,
                                          mEventEncoding,
-                                         mNumGoodStates + 1,
+                                         mNumGoodStates,
                                          ListBufferTransitionRelation.CONFIG_SUCCESSORS);
       mStateMap = new int[mNumStates];
       int index = 0;
@@ -636,7 +612,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       for (int i = 0; i < mNumStates; i++) {
         if (mReachableStates.get(i)) {
           mStateMap[i] = index++;
-          decode(mStateTuples.get(i), tuple);
+          mSTEncoding.decode(mStateTuples.get(i), tuple);
           if (isMarkedState(tuple)) {
             mTransitionRelation.setMarked(index - 1, markingID, true);
           }
@@ -651,7 +627,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       // final search (add transitions)
       mUnvisited.clear();
       mGoodStates = new BitSet();
-      mFinalStateExplorer.setBadStateIndex();
       mFinalStateExplorer.permutations(mNumAutomata, null, -1);
       while (!mUnvisited.isEmpty()) {
         final int[] s = mUnvisited.remove();
@@ -660,8 +635,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
         }
       }
 
-      mStateTuples = null;
-      mGlobalVisited = null;
       mNonCoreachableStates = null;
       mBadStates = null;
       mSafeStates = null;
@@ -672,10 +645,22 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
         ProductDESProxy des = null;
         if (mSupervisorReductionEnabled) {
           // Supervisor Reduction Enabled
-          mSupervisorSimplifier.setDefaultMarkingID(marking);
-          mSupervisorSimplifier.setTransitionRelation(mTransitionRelation);//set TR
-          mSupervisorSimplifier.setRestrictedEvent(-1);//set event
-          mSupervisorSimplifier.run();
+          final ChainTRSimplifier chain = new ChainTRSimplifier();
+          final ObservationEquivalenceTRSimplifier bisimulator =
+            new ObservationEquivalenceTRSimplifier();
+          bisimulator.setEquivalence
+            (ObservationEquivalenceTRSimplifier.Equivalence.
+             DETERMINISTIC_MINSTATE);
+          bisimulator.setTransitionLimit(getTransitionLimit());
+          chain.add(bisimulator);
+
+          mSupervisorSimplifier.setRestrictedEvent(-1);
+
+          chain.add(mSupervisorSimplifier);
+          chain.setTransitionRelation(mTransitionRelation);
+          chain.setDefaultMarkingID(marking);
+          chain.run();
+
           mTransitionRelation = mSupervisorSimplifier.getTransitionRelation();
           if (!mSupervisorLocalizationEnabled) {
             mTransitionRelation.removeDeadlockStateTransitions(marking);
@@ -771,17 +756,170 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       autList.add(mTransitionRelation.createAutomaton(getFactory(),
                                                       mEventEncoding));
     } else {
+      ArrayList<int[]> stateTuples = null;
+      if (!mSupervisorReductionEnabled) {
+        // copy mStateTuples into stateTuples without copying bad states
+        stateTuples = new ArrayList<int[]>();
+        for (int s = 0; s < mNumStates; s++) {
+          if (mStateMap[s] != mNumGoodStates) {
+            stateTuples.add(mStateTuples.get(s));
+          }
+        }
+        mNumGoodStates = stateTuples.size();
+        mStateTuples = null;
+      }
+
       for (int i = 0; i < enabDisabEvents.size(); i++) {
         final int e = enabDisabEvents.get(i);
-        //System.out.println("[------" + e + "------]");
+        if (!mSupervisorReductionEnabled) {
+          // make copies
+          List<int[]> stateTuplesCopy = new ArrayList<>(stateTuples);
+          mNumGoodStates = stateTuplesCopy.size();
+          List<AutomatonProxy> originalAutomata = new ArrayList<>(mAutomata);
+          StateTupleEncoding stEncodingCopy = mSTEncoding;
+          final ListBufferTransitionRelation transitionRelationCopy =
+            new ListBufferTransitionRelation(
+                                             mTransitionRelation,
+                                             ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+          automata:
+          for (int a = mAutomata.size() - 1; a >= 0; a--) {
+            final List<int[]> tuples = new ArrayList<>();
+            // create reducedEncoding
+            final List<AutomatonProxy> reducedAutomata =
+              new ArrayList<>(originalAutomata.size() - 1);
+            for (int l = 0; l < originalAutomata.size(); l++) {
+              if (l != a) {
+                final AutomatonProxy aut = originalAutomata.get(l);
+                reducedAutomata.add(aut);
+              }
+            }
+            final int[] sizes =
+              StateTupleEncoding.getAutomataSizes(reducedAutomata);
+            final StateTupleEncoding reducedEncoding =
+              new StateTupleEncoding(sizes);
+            // create statusMap
+            final int tableSize = Math.min(getNodeLimit(), MAX_TABLE_SIZE);
+            final IntArrayHashingStrategy strategy =
+              new IntArrayHashingStrategy();
+            mStatusMap =
+              new TObjectByteCustomHashMap<int[]>(strategy, tableSize, 0.5f,
+                                                  STATE_STATUS_INITIAL);
+            // check whether Ai is redundant (using loop)
+            boolean merging = false;
+            final TObjectIntCustomHashMap<int[]> newTupMap =
+              new TObjectIntCustomHashMap<int[]>(strategy, tableSize, 0.5f,
+                                                 -1);
+            final int[] stateToClass = new int[mNumGoodStates + 1];
+            final int[] newTupEncoded =
+              new int[reducedEncoding.getNumberOfWords()];
+            int count = 0;
+            for (int s = 0; s < mNumGoodStates; s++) {
+              final int[] tup = new int[mNumAutomata];
+              final int[] encoded = stateTuplesCopy.get(s);
+              stEncodingCopy.decode(encoded, tup);
+              final int[] newTup = createReducedTuple(tup, a);
+              reducedEncoding.encode(newTup, newTupEncoded);
+              if (!newTupMap.containsKey(newTupEncoded)) {
+                stateToClass[s] = count;
+                newTupMap.put(newTupEncoded, count++);
+                tuples.add(newTupEncoded);
+              } else {
+                stateToClass[s] = newTupMap.get(newTupEncoded);
+              }
+              final TransitionIterator iter =
+                transitionRelationCopy.createSuccessorsReadOnlyIterator();
+              iter.reset(s, e);
+              if (iter.advance()) {
+                if (!transitionRelationCopy.isDeadlockState(iter
+                  .getCurrentTargetState(), marking)) {
+                  // (x1 ... xn) is enabled ...
+                  switch (mStatusMap.get(newTupEncoded)) {
+                  case STATE_STATUS_INITIAL:
+                    mStatusMap.put(newTupEncoded, STATE_STATUS_ENABLED);
+                    break;
+                  case STATE_STATUS_NEUTRAL:
+                    mStatusMap.put(newTupEncoded, STATE_STATUS_ENABLED);
+                    merging = true;
+                    break;
+                  case STATE_STATUS_ENABLED:
+                    merging = true;
+                    break;
+                  case STATE_STATUS_DISABLED:
+                    continue automata;
+                  default:
+                    throw new IllegalStateException(
+                                                    "Unsupport state status "
+                                                      + mStatusMap
+                                                        .get(newTupEncoded)
+                                                      + "!");
+                  }
+                } else {
+                  // (x1 ... xn) is disabled ...
+                  switch (mStatusMap.get(newTupEncoded)) {
+                  case STATE_STATUS_INITIAL:
+                    mStatusMap.put(newTupEncoded, STATE_STATUS_DISABLED);
+                    break;
+                  case STATE_STATUS_NEUTRAL:
+                    mStatusMap.put(newTupEncoded, STATE_STATUS_DISABLED);
+                    merging = true;
+                    break;
+                  case STATE_STATUS_ENABLED:
+                    continue automata;
+                  case STATE_STATUS_DISABLED:
+                    merging = true;
+                    break;
+                  default:
+                    throw new IllegalStateException(
+                                                    "Unsupport state status "
+                                                      + mStatusMap
+                                                        .get(newTupEncoded)
+                                                      + "!");
+                  }
+                }
+              } else {
+                // (x1 ... xn) is don't care...
+                if (mStatusMap.get(newTupEncoded) == STATE_STATUS_INITIAL) {
+                  mStatusMap.put(newTupEncoded, STATE_STATUS_NEUTRAL);
+                } else {
+                  merging = true;
+                }
+              }
+            }
+            if (merging) {
+              //update mOriginalStates
+              stateToClass[mNumGoodStates] = count;
+              final TRPartition partition =
+                new TRPartition(stateToClass, count + 1);
+              transitionRelationCopy.merge(partition);
+              stEncodingCopy = reducedEncoding;
+              stateTuplesCopy = tuples;
+              mNumGoodStates = stateTuplesCopy.size();
+              originalAutomata = reducedAutomata;
+            }
+          }
+        }
+
         ListBufferTransitionRelation copy =
           new ListBufferTransitionRelation(
                                            mTransitionRelation,
                                            ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-        mSupervisorSimplifier.setTransitionRelation(copy);
+
+        final ChainTRSimplifier chain = new ChainTRSimplifier();
+        final ObservationEquivalenceTRSimplifier bisimulator =
+          new ObservationEquivalenceTRSimplifier();
+        bisimulator.setEquivalence
+          (ObservationEquivalenceTRSimplifier.Equivalence.
+           DETERMINISTIC_MINSTATE);
+        bisimulator.setTransitionLimit(getTransitionLimit());
+        chain.add(bisimulator);
+
         mSupervisorSimplifier.setRestrictedEvent(e);
-        // run reduction algorithm ...
-        simplified &= mSupervisorSimplifier.run();
+
+        chain.add(mSupervisorSimplifier);
+        chain.setTransitionRelation(copy);
+        chain.setDefaultMarkingID(marking);
+        simplified &= chain.run();
+
         if (!simplified) {
           mTransitionRelation.removeDeadlockStateTransitions(marking);
           autList.clear();
@@ -793,7 +931,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
         copy.removeDeadlockStateTransitions(marking);
         copy.removeProperSelfLoopEvents(marking);
         final EventProxy event = mEventEncoding.getProperEvent(e);
-        copy.setName("sup:" + event.getName()+ "[event" + e + "]");
+        copy.setName("sup:" + event.getName() + "[event" + e + "]");
         autList.add(copy.createAutomaton(getFactory(), mEventEncoding));
         //System.out.println("sup:" + event.getName() + "(event" + e + ")_END.");
       }
@@ -806,8 +944,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   {
     return true;
   }
-
-
 
   //#########################################################################
   //# Auxiliary Methods
@@ -852,52 +988,11 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     return true;
   }
 
-  /**
-   * It will take a single state tuple as a parameter and encode it.
-   *
-   * @param stateCodes
-   *          state tuple that will be encoded
-   * @return encoded state tuple
-   */
-  private int[] encode(final int[] stateCodes)
-  {
-    final int encoded[] = new int[mNumInts];
-    int i, j;
-    for (i = 0; i < mNumInts; i++) {
-      for (j = mIndexAutomata[i]; j < mIndexAutomata[i + 1]; j++) {
-        encoded[i] <<= mNumBits[j];
-        encoded[i] |= stateCodes[j];
-      }
-    }
-    return encoded;
-  }
-
-  /**
-   * It will take an encoded state tuple as a parameter and decode it. Decoded
-   * result will be contained in the second parameter
-   *
-   * @param encodedStateCodes
-   *          state tuple that will be decoded
-   * @param currTuple
-   *          the decoded state tuple will be stored here
-   */
-  private void decode(final int[] encodedStateCodes, final int[] currTuple)
-  {
-    int tmp, mask, i, j;
-    for (i = 0; i < mNumInts; i++) {
-      tmp = encodedStateCodes[i];
-      for (j = mIndexAutomata[i + 1] - 1; j >= mIndexAutomata[i]; j--) {
-        mask = mNumBitsMasks[j];
-        currTuple[j] = tmp & mask;
-        tmp = tmp >>> mNumBits[j];
-      }
-    }
-  }
-
   private int addDecodedNewState(final int[] decodedTuple)
     throws OverflowException
   {
-    final int[] encoded = encode(decodedTuple);
+    final int[] encoded = new int[mSTEncoding.getNumberOfWords()];
+    mSTEncoding.encode(decodedTuple, encoded);
     return addEncodedNewState(encoded);
   }
 
@@ -921,7 +1016,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   private void removeDumpStateTransitions(final ListBufferTransitionRelation rel,
                                           final int dump)
   {
-    final TransitionIterator iter = rel.createAllTransitionsModifyingIterator();
+    final TransitionIterator iter =
+      rel.createAllTransitionsModifyingIterator();
     while (iter.advance()) {
       if (iter.getCurrentTargetState() == dump) {
         iter.remove();
@@ -937,6 +1033,19 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     final AutomatonProxy aut =
       rel.createAutomaton(getFactory(), mEventEncoding);
     return AutomatonTools.createProductDESProxy(aut, getFactory());
+  }
+
+  private int[] createReducedTuple(final int[] tuple, final int removeIndex)
+  {
+    final int[] newTuple = new int[tuple.length - 1];
+    for (int l = 0; l < newTuple.length; l++) {
+      if (l < removeIndex) {
+        newTuple[l] = tuple[l];
+      } else {
+        newTuple[l] = tuple[l + 1];
+      }
+    }
+    return newTuple;
   }
 
 
@@ -1042,7 +1151,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       throws OverflowException, AnalysisAbortException
     {
       checkAbort();
-      decode(encodedTuple, mmDecodedTuple);
+      mSTEncoding.decode(encodedTuple, mmDecodedTuple);
       events: for (int e = mmFirstEvent; e <= mmLastEvent; e++) {
         Arrays.fill(mmNDTuple, null);
         for (final int a : mmEventAutomata[e]) {
@@ -1150,9 +1259,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       throws OverflowException, AnalysisAbortException
     {
       checkAbort();
-      decode(encodedTuple, mmDecodedTuple);
-      events:
-      for (int e = mmFirstEvent; e <= mmLastEvent; e++) {
+      mSTEncoding.decode(encodedTuple, mmDecodedTuple);
+      events: for (int e = mmFirstEvent; e <= mmLastEvent; e++) {
         Arrays.fill(mmNDTuple, null);
         for (final int a : mmEventAutomata[e]) {
           if (mmTransitions[a][e] != null) {
@@ -1179,7 +1287,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
                                    final int event, final boolean isInitial)
       throws OverflowException
     {
-      final int[] encoded = encode(mTargetTuple);
+      final int[] encoded = new int[mSTEncoding.getNumberOfWords()];
+      mSTEncoding.encode(mTargetTuple, encoded);
       if (mLocalVisited.contains(encoded)) {
         return true;
       } else {
@@ -1197,7 +1306,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       return true;
     }
   }
-
 
 
   //#########################################################################
@@ -1223,7 +1331,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     public boolean processNewState(final int[] decodedSource,
                                    final int event, final boolean isInitial)
     {
-      final int[] encoded = encode(mTargetTuple);
+      final int[] encoded = new int[mSTEncoding.getNumberOfWords()];
+      mSTEncoding.encode(mTargetTuple, encoded);
       if (mGlobalVisited.containsKey(encoded)) {
         final int s = mGlobalVisited.get(encoded);
         if (!mBadStates.get(s) && mNonCoreachableStates.get(s)) {
@@ -1253,7 +1362,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     public boolean processNewState(final int[] decodedSource,
                                    final int event, final boolean isInitial)
     {
-      final int[] encoded = encode(mTargetTuple);
+      final int[] encoded = new int[mSTEncoding.getNumberOfWords()];
+      mSTEncoding.encode(mTargetTuple, encoded);
       if (mGlobalVisited.containsKey(encoded)) {
         final int s = mGlobalVisited.get(encoded);
         if (!mBadStates.get(s)) {
@@ -1284,7 +1394,9 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
                                    final int event, final boolean isInitial)
       throws OverflowException
     {
-      final int target = mGlobalVisited.get(encode(mTargetTuple));
+      final int[] encoded = new int[mSTEncoding.getNumberOfWords()];
+      mSTEncoding.encode(mTargetTuple, encoded);
+      final int target = mGlobalVisited.get(encoded);
       if (!mBadStates.get(target) && !mReachableStates.get(target)) {
         mReachableStates.set(target);
         mUnvisited.offer(mStateTuples.get(target));
@@ -1311,26 +1423,21 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     }
 
     //#######################################################################
-    //# Set Up
-    private void setBadStateIndex()
-    {
-      mBadStateIndex = mTransitionRelation.getNumberOfStates() - 1;
-      mTransitionRelation.setReachable(mBadStateIndex, false);
-    }
-
-    //#######################################################################
     //# State Exploration
     @Override
-    public boolean processNewState(final int[] decodedSource,
-                                   final int e, final boolean isInitial)
+    public boolean processNewState(final int[] decodedSource, final int e,
+                                   final boolean isInitial)
       throws OverflowException
     {
+      final int[] encoded = new int[mSTEncoding.getNumberOfWords()];
       int source = 0;
       if (!isInitial) {
-        source = mGlobalVisited.get(encode(decodedSource));
+        mSTEncoding.encode(decodedSource, encoded);
+        source = mGlobalVisited.get(encoded);
         source = mStateMap[source];
       }
-      int target = mGlobalVisited.get(encode(mTargetTuple));
+      mSTEncoding.encode(mTargetTuple, encoded);
+      int target = mGlobalVisited.get(encoded);
       if (mReachableStates.get(target) && !mGoodStates.get(target)) {
         mGoodStates.set(target);
         mUnvisited.offer(mStateTuples.get(target));
@@ -1338,7 +1445,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       target = mStateMap[target];
       if (!isInitial) {
         mTransitionRelation.addTransition(source, e, target);
-        if (target == mBadStateIndex) {
+        if (target == mTransitionRelation.getDumpStateIndex()) {
           mTransitionRelation.setReachable(target, true);
           final EventProxy event = mEventEncoding.getProperEvent(e);
           mDisabledEvents.add(event);
@@ -1346,11 +1453,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       }
       return true;
     }
-
-    //#######################################################################
-    //# Data Members
-    private int mBadStateIndex;
   }
+
 
   //#########################################################################
   //# Debugging
@@ -1358,7 +1462,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   private int[] showTuple(final int[] encodedTuple)
   {
     final int[] tuple = new int[mNumAutomata];
-    decode(encodedTuple, tuple);
+    mSTEncoding.decode(encodedTuple, tuple);
     return tuple;
   }
 
@@ -1387,16 +1491,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   private String mOutputName = "supervisor";
   private Collection<EventProxy> mDisabledEvents;
 
-  //# Variables used for encoding/decoding
-  /** a list contains number of bits needed for each automaton */
-  private int mNumBits[];
-  /** a list contains masks needed for each automaton */
-  private int mNumBitsMasks[];
-  /** a number of integers used to encode synchronised state */
-  private int mNumInts;
-  /** an index of first automaton in each integer buffer */
-  private int mIndexAutomata[];
-
   private List<AutomatonProxy> mAutomata;
   private EventEncoding mEventEncoding;
   private TIntArrayList mTransitionBuffer;
@@ -1410,6 +1504,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   private StateProxy[][] mOriginalStates;
   private boolean[][] mStateMarkings;
 
+  private StateTupleEncoding mSTEncoding;
+  private TObjectByteCustomHashMap<int[]> mStatusMap;
   private List<int[]> mStateTuples;
   private TObjectIntCustomHashMap<int[]> mGlobalVisited;
   private Deque<int[]> mGlobalStack;
@@ -1444,7 +1540,9 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   //#########################################################################
   //# Class Constants
   private static final int MAX_TABLE_SIZE = 500000;
-  private static final int SIZE_INT = 32;
-
+  private static final byte STATE_STATUS_INITIAL = 0;
+  private static final byte STATE_STATUS_NEUTRAL = 1;
+  private static final byte STATE_STATUS_ENABLED = 2;
+  private static final byte STATE_STATUS_DISABLED = 3;
 
 }

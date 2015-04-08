@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -96,6 +97,7 @@ public class OPVerifierExperiment
     mOEQChain.add(mOEQSimplifier);
     mLogWriter = null;
     mHeaderWritten = false;
+    mExperimentIndex = 0;
   }
 
   public OPVerifierExperiment(final String logFileName)
@@ -131,6 +133,7 @@ public class OPVerifierExperiment
   public void runExperiment(final AutomatonProxy aut,
                             final EventProxy tau,
                             final EventProxy omega)
+    throws OverflowException
   {
     // 1. Check OP for determinised automaton
     final AutomatonProxy detAut = makeDeterministic(aut, tau);
@@ -179,6 +182,16 @@ public class OPVerifierExperiment
     stats.add(oeqChainStats);
     mOEQChain.collectStatistics(stats);
     writeLog(aut, tau, omega, stats);
+    // 4. Save automata
+    /*
+    if (rel.getNumberOfReachableStates() >= 10000 &&
+        opChainStats.getOverflowCount() == 0 &&
+        oeqChainStats.getOverflowCount() == 0) {
+      mExperimentIndex++;
+      final String filename = FILE_NAME_PREFIX + mExperimentIndex + ".wdes";
+      MarshallingTools.saveProductDES(aut, filename);
+    }
+    */
     return mOPVerifier.getOPResult();
   }
 
@@ -379,6 +392,7 @@ public class OPVerifierExperiment
   private AutomatonProxy findOPAbstraction(final AutomatonProxy aut,
                                            final EventProxy tau,
                                            final EventProxy omega)
+    throws OverflowException
   {
     final Collection<StateProxy> states = aut.getStates();
     boolean hasInit = false;
@@ -398,7 +412,8 @@ public class OPVerifierExperiment
     final int config = mOEQSimplifier.getPreferredInputConfiguration();
     final ListBufferTransitionRelation rel;
     try {
-      rel = new ListBufferTransitionRelation(aut, eventEnc, stateEnc, config);
+      rel = new ListBufferTransitionRelation(aut, eventEnc.clone(),
+                                             stateEnc, config);
       mOEQSimplifier.setTransitionRelation(rel);
       final int omegaID = eventEnc.getEventCode(omega);
       mOEQSimplifier.setDefaultMarkingID(omegaID);
@@ -413,10 +428,13 @@ public class OPVerifierExperiment
       return null;
     }
     final int[] stateToClass = new int[numStates];
+    Arrays.fill(stateToClass, -1);
     int c = 0;
     for (final int[] clazz : partition.getClasses()) {
-      for (final int s : clazz) {
-        stateToClass[s] = c;
+      if (clazz != null) {
+        for (final int s : clazz) {
+          stateToClass[s] = c;
+        }
       }
       c++;
     }
@@ -431,25 +449,27 @@ public class OPVerifierExperiment
       final int limit = e == EventEncoding.TAU ? 1 : 2;
       int sourceClass = 0;
       for (final int[] clazz : partition.getClasses()) {
-        for (final int s : clazz) {
-          iter.reset(s, e);
-          while (iter.advance()) {
-            final int t = iter.getCurrentTargetState();
-            final int targetClass = stateToClass[t];
-            if (e != EventEncoding.TAU || sourceClass != targetClass) {
-              if (stateSuccessors.add(targetClass)) {
-                classSuccessors.add(targetClass);
-              } else {
-                iter.remove();
+        if (clazz != null) {
+          for (final int s : clazz) {
+            iter.reset(s, e);
+            while (iter.advance()) {
+              final int t = iter.getCurrentTargetState();
+              final int targetClass = stateToClass[t];
+              if (e != EventEncoding.TAU || sourceClass != targetClass) {
+                if (stateSuccessors.add(targetClass)) {
+                  classSuccessors.add(targetClass);
+                } else {
+                  iter.remove();
+                }
               }
             }
+            stateSuccessors.clear();
           }
-          stateSuccessors.clear();
+          if (classSuccessors.size() >= limit) {
+            splitEvents.add(e);
+          }
+          classSuccessors.clear();
         }
-        if (classSuccessors.size() >= limit) {
-          splitEvents.add(e);
-        }
-        classSuccessors.clear();
         sourceClass++;
       }
     }
@@ -614,6 +634,14 @@ public class OPVerifierExperiment
 
   private PrintWriter mLogWriter;
   private boolean mHeaderWritten;
+  @SuppressWarnings("unused")
+  private final int mExperimentIndex;
+
+
+  //#########################################################################
+  //# Class Constants
+  @SuppressWarnings("unused")
+  private static final String FILE_NAME_PREFIX = "opv";
 
 }
 

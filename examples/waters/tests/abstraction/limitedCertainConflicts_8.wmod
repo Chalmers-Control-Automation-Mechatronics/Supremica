@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="limitedCertainConflicts_8" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>A simple test for the Certain Conflicts Rule. This tests whether transitions labelled by an event that leads certain conflict when preceded by tau-transitions are also subject to removal.</ns2:Comment>
+    <ns2:Comment>A simple test for the Certain Conflicts Rule. This tests whether transitions labelled by an event that leads to certain conflict when preceded by tau-transitions are also subject to removal.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
         <EventDecl Kind="CONTROLLABLE" Name="a"/>

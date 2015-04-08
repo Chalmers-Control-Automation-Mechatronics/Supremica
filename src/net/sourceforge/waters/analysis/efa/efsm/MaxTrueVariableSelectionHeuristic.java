@@ -34,7 +34,7 @@ public class MaxTrueVariableSelectionHeuristic
   }
 
   @Override
-  protected double getHeuristicValue(final EFSMVariable var)
+  public double getHeuristicValue(final EFSMVariable var)
   {
     final EFSMTransitionRelation unfoldTR = mCache.unfold(var);
     if (unfoldTR == null) {

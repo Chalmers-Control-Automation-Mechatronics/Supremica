@@ -43,14 +43,15 @@ public class CompositionalSynthesizerMustLMinETest
     (final ProductDESProxyFactory factory)
   {
     final CompositionalAutomataSynthesizer synthesizer =
-      new CompositionalAutomataSynthesizer(factory,
-                                   AutomataSynthesisAbstractionProcedureFactory.SOE_ONLY);
+      new CompositionalAutomataSynthesizer
+        (factory, AutomataSynthesisAbstractionProcedureFactory.SOE_ONLY);
     synthesizer.setInternalStateLimit(5000);
     synthesizer.setMonolithicStateLimit(100000);
     synthesizer.setInternalTransitionLimit(500000);
     synthesizer.setPreselectingMethod(AbstractCompositionalModelAnalyzer.MustL);
     synthesizer.setSelectionHeuristic
       (CompositionalSelectionHeuristicFactory.MinE);
+    synthesizer.setFailingEventsEnabled(true);
     return synthesizer;
   }
 

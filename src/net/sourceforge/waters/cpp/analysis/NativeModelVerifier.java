@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.cpp.analysis;
 
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
@@ -87,7 +88,7 @@ public abstract class NativeModelVerifier
     throws AnalysisException
   {
     if (getModel() == null) {
-      throw new NullPointerException("No model given!");
+      throw new AnalysisConfigurationException("Input model is NULL!");
     } else {
       clearAnalysisResult();
       final long start = System.currentTimeMillis();
@@ -102,6 +103,7 @@ public abstract class NativeModelVerifier
         final AnalysisResult result = createAnalysisResult();
         result.setException(exception);
         result.setRuntime(stop - start);
+        setAnalysisResult(result);
         throw exception;
       }
     }

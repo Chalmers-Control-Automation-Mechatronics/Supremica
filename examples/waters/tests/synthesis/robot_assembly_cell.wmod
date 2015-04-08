@@ -3,7 +3,6 @@
     <ns2:Comment>The 'Luisa example', adapted from 'An Architecture for Flexible Manufacturing Systems Applied to an Assembly Cell' by M. Losito.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
-        <EventDecl Kind="PROPOSITION" Name=":forbidden"/>
         <EventDecl Kind="CONTROLLABLE" Name="e_1_41"/>
         <EventDecl Kind="CONTROLLABLE" Name="e_1_42"/>
         <EventDecl Kind="CONTROLLABLE" Name="e_1_56"/>

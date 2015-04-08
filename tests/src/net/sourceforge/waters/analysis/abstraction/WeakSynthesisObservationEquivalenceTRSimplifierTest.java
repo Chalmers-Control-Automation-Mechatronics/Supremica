@@ -13,9 +13,10 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
-import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -61,6 +62,7 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
   @Override
   protected EventEncoding createEventEncoding(final ProductDESProxy des,
                                               final AutomatonProxy aut)
+    throws OverflowException
   {
     final KindTranslator translator = IdenticalKindTranslator.getInstance();
     final EventEncoding encoding = new EventEncoding(aut, translator);
@@ -69,7 +71,7 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
       final EventProxy event = encoding.getProperEvent(e);
       if (!event.isObservable()) {
         final byte status = encoding.getProperEventStatus(e);
-        encoding.setProperEventStatus(e, status | EventEncoding.STATUS_LOCAL);
+        encoding.setProperEventStatus(e, status | EventStatus.STATUS_LOCAL);
       }
     }
     mDefaultMarkingID = -1;
@@ -81,16 +83,8 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
         break;
       }
     }
-    encoding.sortProperEvents((byte) ~EventEncoding.STATUS_LOCAL,
-                              EventEncoding.STATUS_CONTROLLABLE);
-    return encoding;
-  }
-
-  @Override
-  protected StateEncoding createStateEncoding(final AutomatonProxy aut)
-  {
-    final StateEncoding encoding = new StateEncoding(aut);
-    encoding.setNumberOfExtraStates(1);
+    encoding.sortProperEvents((byte) ~EventStatus.STATUS_LOCAL,
+                              EventStatus.STATUS_CONTROLLABLE);
     return encoding;
   }
 
@@ -398,6 +392,22 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "wsoe35.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_synthesisAbstraction_36() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "soe36.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_synthesisAbstraction_37() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "soe37.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 

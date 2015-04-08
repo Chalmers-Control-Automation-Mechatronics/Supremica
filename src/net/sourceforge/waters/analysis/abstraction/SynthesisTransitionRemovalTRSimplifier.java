@@ -11,7 +11,7 @@ package net.sourceforge.waters.analysis.abstraction;
 
 import net.sourceforge.waters.analysis.tr.DFSIntSearchSpace;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
-import net.sourceforge.waters.analysis.tr.EventEncoding.OrderingInfo;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -123,26 +123,22 @@ public class SynthesisTransitionRemovalTRSimplifier
     throws AnalysisException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    final OrderingInfo info = rel.getOrderingInfo();
-    final int firstLocalUnont = info.getFirstEventIndex
-      (EventEncoding.STATUS_LOCAL, ~EventEncoding.STATUS_CONTROLLABLE);
-    final int lastLocalUncont = info.getLastEventIndex
-      (EventEncoding.STATUS_LOCAL, ~EventEncoding.STATUS_CONTROLLABLE);
-    final TauClosure tauClosure = rel.createSuccessorsTauClosure
-      (firstLocalUnont, lastLocalUncont, mTransitionLimit);
-
+    final TauClosure tauClosure =
+      rel.createSuccessorsClosure(mTransitionLimit,
+                                  EventStatus.STATUS_LOCAL,
+                                  ~EventStatus.STATUS_CONTROLLABLE);
     final TransitionIterator iterCandidate =
       rel.createAllTransitionsModifyingIterator();
     final TransitionIterator iterFrom = rel.createSuccessorsReadOnlyIteratorByStatus
-      (EventEncoding.STATUS_LOCAL, ~EventEncoding.STATUS_CONTROLLABLE);
+      (EventStatus.STATUS_LOCAL, ~EventStatus.STATUS_CONTROLLABLE);
     final TransitionIterator iterEvent = rel.createAnyReadOnlyIterator();
     final TransitionIterator iterUncontrollableTo = tauClosure.createIterator();
     mIteratorUncontrollableClosure =
       tauClosure.createFullEventClosureIterator();
     mIteratorControllableTo = rel.createSuccessorsReadOnlyIteratorByStatus
-      (EventEncoding.STATUS_LOCAL, EventEncoding.STATUS_CONTROLLABLE);
+      (EventStatus.STATUS_LOCAL, EventStatus.STATUS_CONTROLLABLE);
     mIteratorUncontrollableTo = rel.createSuccessorsReadOnlyIteratorByStatus
-      (~EventEncoding.STATUS_CONTROLLABLE);
+      (~EventStatus.STATUS_CONTROLLABLE);
     boolean removedSome = false;
     trans:
     while (iterCandidate.advance()) {
@@ -151,10 +147,10 @@ public class SynthesisTransitionRemovalTRSimplifier
       final int e = iterCandidate.getCurrentEvent();
       final byte status = rel.getProperEventStatus(e);
       final boolean selflooped =
-        (status & EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0 &&
+        (status & EventStatus.STATUS_SELFLOOP_ONLY) != 0 &&
         mUsingSpecialEvents && e != EventEncoding.TAU;
-      final boolean controllable = EventEncoding.isControllableEvent(status);
-      final boolean local = EventEncoding.isLocalEvent(status);
+      final boolean controllable = EventStatus.isControllableEvent(status);
+      final boolean local = EventStatus.isLocalEvent(status);
       final int from0 = iterCandidate.getCurrentFromState();
       final int to0 = iterCandidate.getCurrentToState();
       searchSpace.offer(from0);
@@ -249,7 +245,7 @@ public class SynthesisTransitionRemovalTRSimplifier
         final int target = mIteratorUncontrollableTo.getCurrentTargetState();
         final int event = mIteratorUncontrollableTo.getCurrentEvent();
         final byte status = rel.getProperEventStatus(event);
-        if (EventEncoding.isLocalEvent(status)) {
+        if (EventStatus.isLocalEvent(status)) {
           if (target == current) {
             // nothing
           } else if (target == target0) {

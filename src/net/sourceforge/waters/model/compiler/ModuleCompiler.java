@@ -19,7 +19,9 @@ import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.compiler.context.SourceInfoCloner;
 import net.sourceforge.waters.model.compiler.efa.EFACompiler;
+import net.sourceforge.waters.model.compiler.efa.EFANormaliser;
 import net.sourceforge.waters.model.compiler.graph.ModuleGraphCompiler;
+import net.sourceforge.waters.model.compiler.groupnode.GroupNodeCompiler;
 import net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -34,9 +36,8 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 public class ModuleCompiler extends AbortableCompiler
 {
-
   //##########################################################################
-  //# Constructors
+  //# Constructor
   public ModuleCompiler(final DocumentManager manager,
                         final ProductDESProxyFactory factory,
                         final ModuleProxy module)
@@ -45,6 +46,7 @@ public class ModuleCompiler extends AbortableCompiler
     mFactory = factory;
     mInputModule = module;
     mCompilationInfoIsDirty = true;
+    mCompilationInfo = new CompilationInfo();
   }
 
 
@@ -58,8 +60,7 @@ public class ModuleCompiler extends AbortableCompiler
   public void setInputModule(final ModuleProxy module, final boolean clone)
   {
     if (clone) {
-      mCompilationInfo =
-        new CompilationInfo(mIsSourceInfoEnabled, mIsMultiExceptionsEnabled);
+      mCompilationInfo = new CompilationInfo();
       mCompilationInfoIsDirty = false;
       final ModuleProxyFactory modfactory =
         ModuleElementFactory.getInstance();
@@ -74,7 +75,7 @@ public class ModuleCompiler extends AbortableCompiler
   }
 
 
-  //#########################################################################
+  //##########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
   public void requestAbort()
@@ -118,13 +119,15 @@ public class ModuleCompiler extends AbortableCompiler
   public ProductDESProxy compile(final List<ParameterBindingProxy> bindings)
     throws EvalException
   {
-    try {
-      setUp();
+    try
+    {
       if (mCompilationInfoIsDirty) {
         mCompilationInfo = new CompilationInfo(mIsSourceInfoEnabled,
                                                mIsMultiExceptionsEnabled);
       }
       final ModuleProxyFactory modfactory = ModuleElementFactory.getInstance();
+
+      // Resolve instances.
       mInstanceCompiler = new ModuleInstanceCompiler
         (mDocumentManager, modfactory, mCompilationInfo, mInputModule);
       mInstanceCompiler.setOptimizationEnabled(mIsOptimizationEnabled);
@@ -135,15 +138,36 @@ public class ModuleCompiler extends AbortableCompiler
       ModuleProxy intermediate = mInstanceCompiler.compile(bindings);
       final boolean efa = mInstanceCompiler.getHasEFAElements();
       mInstanceCompiler = null;
-      if (efa && mIsExpandingEFATransitions) {
-        mCompilationInfo.shift();
+      checkAbort();
+
+      // Simplify group nodes.
+      mGroupNodeCompiler =
+        new GroupNodeCompiler(modfactory, mCompilationInfo, intermediate);
+      intermediate = mGroupNodeCompiler.compile();
+      mGroupNodeCompiler = null;
+      checkAbort();
+
+      if (efa && mIsExpandingEFATransitions)
+      {
+        if (mIsNormalizationEnabled)
+        { // Perform normalisation.
+          mEFANormaliser = new EFANormaliser(modfactory, mCompilationInfo, intermediate);
+          mEFANormaliser.setUsesEventNameBuilder(true);
+          mEFANormaliser.setCreatesGuardAutomaton(true);
+          mEFANormaliser.setUsesEventAlphabet(mIsUsingEventAlphabet);
+          intermediate = mEFANormaliser.compile();
+          mEFANormaliser = null;
+        }
+
+        // Create variable automata.
         mEFACompiler =
-          new EFACompiler(modfactory, mCompilationInfo, intermediate);
+                  new EFACompiler(modfactory, mCompilationInfo, intermediate);
         checkAbort();
         intermediate = mEFACompiler.compile();
         mEFACompiler = null;
       }
-      mCompilationInfo.shift();
+
+      // Build Product DES.
       mGraphCompiler =
         new ModuleGraphCompiler(mFactory, mCompilationInfo, intermediate);
       mGraphCompiler.setOptimizationEnabled(mIsOptimizationEnabled);
@@ -151,10 +175,14 @@ public class ModuleCompiler extends AbortableCompiler
       final ProductDESProxy des = mGraphCompiler.compile();
       setLocation(des);
       return des;
-    } catch (final EvalException exception) {
+    }
+
+    catch (final EvalException exception) {
       mCompilationInfo.raise(exception);
       throw mCompilationInfo.getExceptions();
-    } finally {
+    }
+
+    finally {
       tearDown();
     }
   }
@@ -175,6 +203,16 @@ public class ModuleCompiler extends AbortableCompiler
   public void setOptimizationEnabled(final boolean enable)
   {
     mIsOptimizationEnabled = enable;
+  }
+
+  public boolean isNormalizationEnabled()
+  {
+    return mIsNormalizationEnabled;
+  }
+
+  public void setNormalizationEnabled(final boolean enable)
+  {
+    mIsNormalizationEnabled = enable;
   }
 
   public boolean isExpandingEFATransitions()
@@ -205,6 +243,7 @@ public class ModuleCompiler extends AbortableCompiler
   public void setSourceInfoEnabled(final boolean enable)
   {
     mIsSourceInfoEnabled = enable;
+    mCompilationInfo.setSourceInfoEnabled(enable);
   }
 
   public boolean isMultiExceptionsEnabled()
@@ -215,6 +254,7 @@ public class ModuleCompiler extends AbortableCompiler
   public void setMultiExceptionsEnabled(final boolean enable)
   {
     mIsMultiExceptionsEnabled = enable;
+    mCompilationInfo.setMultiExceptionsEnabled(enable);
   }
 
   public Collection<String> getEnabledPropertyNames()
@@ -256,12 +296,8 @@ public class ModuleCompiler extends AbortableCompiler
   }
 
 
-  //#########################################################################
+  //##########################################################################
   //# Auxiliary Methods
-  private void setUp()
-  {
-  }
-
   private void tearDown()
   {
     mCompilationInfoIsDirty = true;
@@ -281,14 +317,12 @@ public class ModuleCompiler extends AbortableCompiler
         final String name = mInputModule.getName();
         final URI desLocation = moduleLocation.resolve(name + ext);
         des.setLocation(desLocation);
-      } catch (final IllegalArgumentException exception) {
-        // No marshaller --- O.K.
-      }
+      } catch (final IllegalArgumentException exception) { }
     }
   }
 
 
-  //#########################################################################
+  //##########################################################################
   //# Data Members
   private final DocumentManager mDocumentManager;
   private final ProductDESProxyFactory mFactory;
@@ -296,11 +330,15 @@ public class ModuleCompiler extends AbortableCompiler
   private ModuleProxy mInputModule;
   private CompilationInfo mCompilationInfo;
   private boolean mCompilationInfoIsDirty;
+
   private ModuleInstanceCompiler mInstanceCompiler;
+  private GroupNodeCompiler mGroupNodeCompiler;
+  private EFANormaliser mEFANormaliser;
   private EFACompiler mEFACompiler;
   private ModuleGraphCompiler mGraphCompiler;
 
   private boolean mIsOptimizationEnabled = true;
+  private boolean mIsNormalizationEnabled = false;
   private boolean mIsExpandingEFATransitions = true;
   private boolean mIsUsingEventAlphabet = true;
   private boolean mIsSourceInfoEnabled = false;
@@ -308,5 +346,4 @@ public class ModuleCompiler extends AbortableCompiler
   private Collection<String> mEnabledPropertyNames = null;
   private Collection<String> mEnabledPropositionNames = null;
   private HISCCompileMode mHISCCompileMode = HISCCompileMode.NOT_HISC;
-
 }

@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Queue;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.IntListBuffer.ReadOnlyIterator;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -157,7 +158,7 @@ public class SupervisorReductionTRSimplifier extends
     for (int e = EventEncoding.NONTAU; e < mNumProperEvents; e++) {
       checkAbort();
       final byte status = rel.getProperEventStatus(e);
-      if (!EventEncoding.isControllableEvent(status)) {
+      if (!EventStatus.isControllableEvent(status)) {
         iter.resetEvent(e);
         boolean selfloopOnly = true;
         while (iter.advance()) {
@@ -413,39 +414,37 @@ public class SupervisorReductionTRSimplifier extends
       }
     }
 
-    // reduce
-    for (int i = 0; i < numStates - 1; i++) {
-      if (!rel.isReachable(mStateMap[i])
-          || rel.isDeadlockState(mStateMap[i], marking)
-          || mStateMap[i] > getMinimumExperimental(mStateMap[i])) {
-        continue;
-      }
-      for (int j = i + 1; j < numStates; j++) {
-        if (!rel.isReachable(mStateMap[j])
-            || rel.isDeadlockState(mStateMap[j], marking)
-            || mStateMap[j] > getMinimumExperimental(mStateMap[j])) {
-          continue;
+    for (int sum = 1; sum < 2 * (numStates - 1); sum++) {
+      final int hi = (sum - 1) / 2;
+      final int lo = Math.max(0, sum - numStates + 1);
+      for (int b = hi; b >= lo; b--) {
+        final int a = sum - b;
+        if (rel.isReachable(a) && !rel.isDeadlockState(a, marking)
+            && rel.isReachable(b) && !rel.isDeadlockState(b, marking)) {
+          if (mStateMap[a] > getMinimumExperimental(mStateMap[a])
+              || mStateMap[b] > getMinimumExperimental(mStateMap[b])) {
+            continue;
+          }
+          checkAbort();
+          TLongHashSet statePairs = new TLongHashSet();
+          mShadowClasses = new IntListBuffer();
+          mShadowStateToClass = new int[numStates];
+          for (int s = 0; s < numStates; s++) {
+            mShadowStateToClass[s] = IntListBuffer.NULL;
+          }
+          if (checkMergibilityExperimental(mStateMap[a], mStateMap[b],
+                                           statePairs, restrictedEventList)) {
+            mergeExperimental(statePairs);
+            mMerged = true;
+          }
+          statePairs = null;
+          mShadowClasses = null;
+          mShadowStateToClass = null;
         }
-        checkAbort();
-        TLongHashSet statePairs = new TLongHashSet();
-        mShadowClasses = new IntListBuffer();
-        mShadowStateToClass = new int[numStates];
-        for (int s = 0; s < numStates; s++) {
-          mShadowStateToClass[s] = IntListBuffer.NULL;
-        }
-        if (checkMergibilityExperimental(mStateMap[i], mStateMap[j],
-                                         statePairs, restrictedEventList)) {
-          mergeExperimental(statePairs);
-          mMerged = true;
-        }
-        statePairs = null;
-        mShadowClasses = null;
-        mShadowStateToClass = null;
       }
     }
 
     if (mMerged) {
-      //PrintStateToClassToConsole(restrictedEventList.get(0));
       return createResultPartition();
     } else {
       return null;
@@ -460,8 +459,7 @@ public class SupervisorReductionTRSimplifier extends
   {
     final Deque<Long> pairStack = new ArrayDeque<Long>();
     pairStack.push(constructLong(x0, y0));
-    final long initialPairPositions =
-      constructLong(mInverseMap[x0], mInverseMap[y0]);
+    final long initialPair = constructLong(mInverseMap[x0], mInverseMap[y0]);
 
     while (!pairStack.isEmpty()) {
       checkAbort();
@@ -479,9 +477,9 @@ public class SupervisorReductionTRSimplifier extends
         continue;
       }
 
-      final long minPairPositions =
+      final long minPair =
         constructLong(mInverseMap[minX], mInverseMap[minY]);
-      if (compare(minPairPositions, initialPairPositions) < 0) {
+      if (compareOrder(minPair, initialPair) < 0) {
         return false;
       }
 
@@ -631,8 +629,8 @@ public class SupervisorReductionTRSimplifier extends
     final TIntArrayList[] enabledEventsToStates =
       new TIntArrayList[mNumProperEvents];
     final TransitionIterator iter =
-      rel
-        .createAllTransitionsReadOnlyIteratorByStatus(EventEncoding.STATUS_CONTROLLABLE);
+      rel.createAllTransitionsReadOnlyIteratorByStatus
+        (EventStatus.STATUS_CONTROLLABLE);
     while (iter.advance()) {
       // for each controllable event ...
       checkAbort();
@@ -667,7 +665,7 @@ public class SupervisorReductionTRSimplifier extends
     }
     for (int e = EventEncoding.NONTAU; e < mNumProperEvents; e++) {
       final byte status = rel.getProperEventStatus(e);
-      if (EventEncoding.isControllableEvent(status)) {
+      if (EventStatus.isControllableEvent(status)) {
         if (disabledEventsToStates[e] != null) {
           if (enabledEventsToStates[e] != null) {
             enabDisabEvents.add(e);
@@ -884,25 +882,32 @@ public class SupervisorReductionTRSimplifier extends
     throws OverflowException, AnalysisAbortException
   {
     final ListBufferTransitionRelation oldRel = getTransitionRelation();
-    // create a one-state automaton if the disabled event set is empty
-    // otherwise create a two-state automaton
-    final int numStates = disabEvents.isEmpty() ? 1 : 2;
     final ListBufferTransitionRelation rel =
       new ListBufferTransitionRelation("OneStateSup",
                                        ComponentKind.SUPERVISOR,
                                        mNumProperEvents,
                                        oldRel.getNumberOfPropositions(),
-                                       numStates,
+                                       2, 1,
                                        ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     rel.setInitial(0, true);
     // set all events in disabEvents USED
     for (int e = EventEncoding.TAU; e < rel.getNumberOfProperEvents(); e++) {
       if (!disabEvents.contains(e)) {
         final byte status = rel.getProperEventStatus(e);
-        rel.setProperEventStatus(e, status | EventEncoding.STATUS_UNUSED);
+        rel.setProperEventStatus(e, status | EventStatus.STATUS_UNUSED);
       }
     }
-    if (numStates == 2) {
+    // Create a one-reachable-state automaton if the disabled event set is
+    // empty, otherwise create a two-reachable-state automaton.
+    if (disabEvents.isEmpty()) {
+      // set initial state markings
+      final int numProps = rel.getNumberOfPropositions();
+      for (int p = 0; p < numProps; p++) {
+        rel.setPropositionUsed(p, false);
+      }
+      // dump state not reachable
+      rel.setReachable(1, false);
+    } else {
       // add transitions from state 0 to dump state
       for (int i = 0; i < disabEvents.size(); i++) {
         rel.addTransition(0, disabEvents.get(i), 1);
@@ -912,10 +917,6 @@ public class SupervisorReductionTRSimplifier extends
       for (int p = 0; p < numProps; p++) {
         rel.setMarked(0, p, true);
       }
-    } else if (numStates == 1) {
-      // set initial state markings
-      final long markings = rel.createMarkings();
-      rel.setUsedPropositions(markings);
     }
     final int marking = getDefaultMarkingID();
     final int oldNumStates = oldRel.getNumberOfStates();
@@ -929,7 +930,7 @@ public class SupervisorReductionTRSimplifier extends
         stateToClass[s] = 1;
       }
     }
-    return new TRPartition(stateToClass, numStates);
+    return new TRPartition(stateToClass, 2);
   }
 
   private int getSuccessorState(final int source, final int event)
@@ -944,6 +945,21 @@ public class SupervisorReductionTRSimplifier extends
     }
   }
 
+  private int compareOrder(final long pair1, final long pair2)
+  {
+    final int pair1a = getState(0, pair1);
+    final int pair1b = getState(1, pair1);
+    final int pair2a = getState(0, pair2);
+    final int pair2b = getState(1, pair2);
+    if (pair1a + pair1b < pair2a + pair2b) {
+      return -1;
+    } else if (pair1a + pair1b > pair2a + pair2b) {
+      return 1;
+    } else {
+      return pair2a - pair1a;
+    }
+  }
+
   //#########################################################################
   //# For Debugging
   public int[] showClassList(final IntListBuffer classes, final int list)
@@ -952,12 +968,14 @@ public class SupervisorReductionTRSimplifier extends
     return array;
   }
 
-  public void PrintStateToClassToConsole(final int event) {
+  public void PrintStateToClassToConsole(final int event)
+  {
     System.out.println("[------" + event + "------]");
     for (int i = 0; i < mStateToClass.length; i++) {
       System.out.println(mStateToClass[i]);
     }
   }
+
   //#########################################################################
   //# Data Members
   private int mNumProperEvents;

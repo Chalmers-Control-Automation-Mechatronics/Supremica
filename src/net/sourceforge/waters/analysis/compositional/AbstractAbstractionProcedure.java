@@ -13,7 +13,9 @@ import java.util.Collection;
 import java.util.Collections;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -83,6 +85,7 @@ abstract class AbstractAbstractionProcedure implements AbstractionProcedure
   protected EventEncoding createEventEncoding(final AutomatonProxy aut,
                                               final Collection<EventProxy> local,
                                               final Candidate candidate)
+    throws OverflowException
   {
     final Collection<EventProxy> events = aut.getEvents();
     return createEventEncoding(events, local, candidate);
@@ -91,6 +94,7 @@ abstract class AbstractAbstractionProcedure implements AbstractionProcedure
   protected EventEncoding createEventEncoding(final Collection<EventProxy> events,
                                               final Collection<EventProxy> local,
                                               final Candidate candidate)
+    throws OverflowException
   {
     final KindTranslator translator = getKindTranslator();
     Collection<EventProxy> filter = getPropositions();
@@ -107,11 +111,11 @@ abstract class AbstractAbstractionProcedure implements AbstractionProcedure
         }
       } else {
         byte status = 0;
-        if (mAnalyzer.isUsingSpecialEvents()) {
+        if (mAnalyzer.isSelfloopOnlyEventsEnabled()) {
           final AbstractCompositionalModelAnalyzer.EventInfo info =
             mAnalyzer.getEventInfo(event);
           if (info.isOnlyNonSelfLoopCandidate(candidate)) {
-            status = EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP;
+            status = EventStatus.STATUS_SELFLOOP_ONLY;
           }
         }
         enc.addEvent(event, translator, status);

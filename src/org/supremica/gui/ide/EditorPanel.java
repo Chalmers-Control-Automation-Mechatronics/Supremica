@@ -68,7 +68,7 @@ public class EditorPanel
         mModuleContainer = moduleContainer;
         mTabMap = new HashMap<SelectionOwner,Tab>();
 
-        mTabbedPane = new JTabbedPane(JTabbedPane.BOTTOM);
+        mTabbedPane = new JTabbedPane();
         mTabbedPane.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
         mTabbedPane.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
         mTabbedPane.addChangeListener(this);

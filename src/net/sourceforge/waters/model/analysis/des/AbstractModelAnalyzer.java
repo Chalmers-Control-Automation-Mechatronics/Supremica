@@ -11,22 +11,20 @@ package net.sourceforge.waters.model.analysis.des;
 
 import java.util.Collection;
 
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.AbstractAbortable;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.DefaultAnalysisResult;
 import net.sourceforge.waters.model.analysis.InvalidModelException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
-
-import org.apache.log4j.Logger;
 
 
 /**
@@ -37,7 +35,9 @@ import org.apache.log4j.Logger;
  * @author Robi Malik
  */
 
-public abstract class AbstractModelAnalyzer implements ModelAnalyzer
+public abstract class AbstractModelAnalyzer
+  extends AbstractAbortable
+  implements ModelAnalyzer
 {
 
   //#########################################################################
@@ -58,7 +58,6 @@ public abstract class AbstractModelAnalyzer implements ModelAnalyzer
     mModel = model;
     mNodeLimit = Integer.MAX_VALUE;
     mTransitionLimit = Integer.MAX_VALUE;
-    mIsAborting = false;
   }
 
   public AbstractModelAnalyzer(final AutomatonProxy aut,
@@ -164,27 +163,6 @@ public abstract class AbstractModelAnalyzer implements ModelAnalyzer
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.Abortable
-  @Override
-  public void requestAbort()
-  {
-    mIsAborting = true;
-  }
-
-  @Override
-  public boolean isAborting()
-  {
-    return mIsAborting;
-  }
-
-  @Override
-  public void resetAbort()
-  {
-    mIsAborting = false;
-  }
-
-
-  //#########################################################################
   //# Auxiliary Methods
   /**
    * Initialises the model analyser for a new run.
@@ -211,23 +189,6 @@ public abstract class AbstractModelAnalyzer implements ModelAnalyzer
   protected void tearDown()
   {
     addStatistics();
-  }
-
-  /**
-   * Checks whether the model analyser has been requested to abort,
-   * and if so, performs the abort by throwing an {@link AnalysisAbortException}.
-   * This method should be called periodically by any model analyser that
-   * supports being aborted by user request.
-   */
-  public void checkAbort()
-    throws AnalysisAbortException, OverflowException
-  {
-    if (mIsAborting) {
-      getLogger().debug("Abort request received - aborting ...");
-      final AnalysisAbortException exception = new AnalysisAbortException();
-      setExceptionResult(exception);
-      throw exception;
-    }
   }
 
   /**
@@ -264,6 +225,21 @@ public abstract class AbstractModelAnalyzer implements ModelAnalyzer
     final KindTranslator translator = getKindTranslator();
     final EventKind kind = translator.getEventKind(event);
     return kind == EventKind.CONTROLLABLE || kind == EventKind.UNCONTROLLABLE;
+  }
+
+  /**
+   * Returns whether the given automaton should be included in the
+   * analysis. This default implementation returns <CODE>true</CODE> if
+   * the given automaton is a plant or specification under the current
+   * {@link KindTranslator}.
+   * @see #getKindTranslator()
+   * @see ComponentKind
+   */
+  protected boolean isProperAutomaton(final AutomatonProxy aut)
+  {
+    final KindTranslator translator = getKindTranslator();
+    final ComponentKind kind = translator.getComponentKind(aut);
+    return kind == ComponentKind.PLANT || kind == ComponentKind.SPEC;
   }
 
   /**
@@ -332,15 +308,6 @@ public abstract class AbstractModelAnalyzer implements ModelAnalyzer
 
 
   //#########################################################################
-  //# Logging
-  public Logger getLogger()
-  {
-    final Class<?> clazz = getClass();
-    return Logger.getLogger(clazz);
-  }
-
-
-  //#########################################################################
   //# Data Members
   private final ProductDESProxyFactory mFactory;
   private ProductDESProxy mModel;
@@ -351,6 +318,5 @@ public abstract class AbstractModelAnalyzer implements ModelAnalyzer
   private int mNodeLimit;
   private int mTransitionLimit;
   private long mStartTime;
-  private boolean mIsAborting;
 
 }

@@ -92,6 +92,15 @@ public class TRSimplifierStatistics
   }
 
   /**
+   * Gets the number of times this abstraction rule has been unsuccessful
+   * and resulted in an overflow.
+   */
+  public int getOverflowCount()
+  {
+    return mOverflowCount;
+  }
+
+  /**
    * Gets the number of times this abstraction rule reduced the size of the
    * model it was applied to.
    */
@@ -221,7 +230,7 @@ public class TRSimplifierStatistics
       mInputTransitions += rel.getNumberOfTransitions();
     }
     if (mInputMarkings >= 0) {
-      mInputMarkings += rel.getNumberOfMarkings();
+      mInputMarkings += rel.getNumberOfMarkings(false);
     }
   }
 
@@ -253,7 +262,7 @@ public class TRSimplifierStatistics
         mOutputTransitions += rel.getNumberOfTransitions();
       }
       if (mOutputMarkings >= 0) {
-        mOutputMarkings += rel.getNumberOfMarkings();
+        mOutputMarkings += rel.getNumberOfMarkings(false);
       }
     } else {
       if (mUnchangedStates >= 0) {
@@ -263,7 +272,7 @@ public class TRSimplifierStatistics
         mUnchangedTransitions += rel.getNumberOfTransitions();
       }
       if (mUnchangedMarkings >= 0) {
-        mUnchangedMarkings += rel.getNumberOfMarkings();
+        mUnchangedMarkings += rel.getNumberOfMarkings(false);
       }
     }
   }

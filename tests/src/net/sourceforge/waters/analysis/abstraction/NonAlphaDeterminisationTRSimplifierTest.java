@@ -12,10 +12,6 @@ package net.sourceforge.waters.analysis.abstraction;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.analysis.tr.EventEncoding;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
-
 
 /**
  * A test for the nonalphadet of non alpha states rule
@@ -58,13 +54,6 @@ public class NonAlphaDeterminisationTRSimplifierTest
   protected TransitionRelationSimplifier createTransitionRelationSimplifier()
   {
     return new NonAlphaDeterminisationTRSimplifier();
-  }
-
-  @Override
-  protected EventEncoding createEventEncoding(final ProductDESProxy des,
-                                              final AutomatonProxy aut)
-  {
-    return createEventEncodingWithPropositions(des, aut);
   }
 
   @Override

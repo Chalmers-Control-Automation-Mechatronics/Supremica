@@ -822,80 +822,81 @@ public class AutomataSynchronizerHelper
   //public void setCoExecuter(AutomataOnlineSynchronizer coExecuter)
   public void setCoExecuter(final AutomataSynchronizerExecuter coExecuter)
   {
-    this.coExecuter = coExecuter;
+	this.coExecuter = coExecuter;
   }
 
-  //public AutomataOnlineSynchronizer getCoExecuter()
-  public AutomataSynchronizerExecuter getCoExecuter()
-  {
-    return coExecuter;
-  }
+	//public AutomataOnlineSynchronizer getCoExecuter()
+	public AutomataSynchronizerExecuter getCoExecuter()
+	{
+		return coExecuter;
+	}
 
-  public void printUncontrollableStates()
-   throws Exception
-  {
-    final int[] automataIndices = new int[theAutomata.size()];
+    public void printUncontrollableStates()
+	    throws Exception
+    {
+		final int[] automataIndices = new int[theAutomata.size()];
 
-    for (int i = 0; i < theAutomata.size(); i++) {
-      automataIndices[i] = i;
+		for(int i = 0; i < theAutomata.size(); i++)
+		{
+			automataIndices[i] = i;
+		}
+
+		printUncontrollableStates(automataIndices);
     }
 
-    printUncontrollableStates(automataIndices);
-  }
+    public void printUncontrollableStates(final int[] automataIndices)
+	    throws Exception
+    {
+		// int problemPlant;
+		// int problemEvent;
+		// Automaton problemAutomaton;
+		// int[] currState = new int[automataIndices.length]; // this value is never used
+		final State[][] stateTable = getIndexFormStateTable();
+		final AutomataIndexMap indexMap = theAutomataIndexForm.getIndexMap();
 
-  public void printUncontrollableStates(final int[] automataIndices)
-   throws Exception
-  {
-    int problemPlant;
-    int problemEvent;
-    Automaton problemAutomaton;
-    int[] currState = new int[automataIndices.length];
-    final State[][] stateTable = getIndexFormStateTable();
-    final AutomataIndexMap indexMap = theAutomataIndexForm.getIndexMap();
+		final Iterator<?> stateHolderIterator = stateMemorizer.iterator(automataIndices);
+		while(stateHolderIterator.hasNext())
+		{
+			final StateHolder stateHolder = (StateHolder) stateHolderIterator.next();
 
-    for (final Iterator<?> stateHolderIterator = stateMemorizer.iterator(
-     automataIndices);
-         stateHolderIterator.hasNext();) {
-      final StateHolder stateHolder = (StateHolder) stateHolderIterator.next();
+			final int[] currState = stateHolder.getArray();
+			final int problemPlant = stateHolder.getProblemPlant();
+			final int problemEvent = stateHolder.getProblemEvent();
+			final Automaton problemAutomaton = indexMap.getAutomatonAt(problemPlant);
 
-      currState = stateHolder.getArray();
-      problemPlant = stateHolder.getProblemPlant();
-      problemEvent = stateHolder.getProblemEvent();
-      problemAutomaton = indexMap.getAutomatonAt(problemPlant);
+			final StringBuilder state = new StringBuilder();
+			boolean firstEntry = true;
 
-      final StringBuilder state = new StringBuilder();
-      boolean firstEntry = true;
+			for(int i = 0; i < currState.length; i++)
+			{
+				// Only print states that are not initial if we are looking at a full state
+				if(!stateTable[automataIndices[i]][currState[i]].isInitial()
+					|| (automataIndices.length < theAutomata.size()))
+				{
+					if(firstEntry)
+					firstEntry = false;
+					else
+					state.append(", ");
 
-      for (int i = 0; i < currState.length; i++) {
-        // Only print states that are not initial if we are looking at a full state
-        if (!stateTable[automataIndices[i]][currState[i]].isInitial()
-         || (automataIndices.length < theAutomata.size())) {
-          if (firstEntry) {
-            firstEntry = false;
-          } else {
-            state.append(", ");
-          }
+					state.append(indexMap.getAutomatonAt(automataIndices[i]).getName());
+					state.append(":");
+					state.append(stateTable[automataIndices[i]][currState[i]].getName());
+				}
+			}
 
-          state.append(indexMap.getAutomatonAt(automataIndices[i]).getName());
-          state.append(": ");
-          state.append(stateTable[automataIndices[i]][currState[i]].getName());
-        }
-      }
+			//String reason = "the event " + theAutomata.getAlphabet().getEventWithIndex(problemEvent) +
+			final String reason = "the event " + theAutomataIndexForm
+				.getAutomataIndexMap().getEventAt(problemEvent) + " is enabled in "
+				+ problemAutomaton;
 
-      //String reason = "the event " + theAutomata.getAlphabet().getEventWithIndex(problemEvent) +
-      final String reason = "the event " + theAutomataIndexForm
-       .getAutomataIndexMap().getEventAt(problemEvent) + " is enabled in "
-       + problemAutomaton;
+			// Log the message
+			if(!state.toString().equals(""))
+				logger.info("The state " + state + " is uncontrollable since " + reason	+ ".");
+			else
+				logger.info("The initial state is uncontrollable since " + reason + ".");
 
-      // Log the message
-      if (!state.toString().equals("")) {
-        logger.info("The state " + state + " is uncontrollable since " + reason
-         + ".");
-      } else {
-        logger.info("The initial state is uncontrollable since " + reason + ".");
-      }
+		}
     }
-  }
 
   public boolean isAllAutomataPlants()
   {

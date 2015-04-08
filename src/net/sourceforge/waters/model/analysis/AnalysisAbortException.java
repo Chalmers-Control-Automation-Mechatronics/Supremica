@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.model.analysis
-//# CLASS:   AbortException
+//# CLASS:   AnalysisAbortException
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -40,6 +40,6 @@ public class AnalysisAbortException extends AnalysisException {
 
   //#########################################################################
   //# Static Class Variables
-  public static final long serialVersionUID = 1;
+  private static final long serialVersionUID = -2601097829012752986L;
 
 }

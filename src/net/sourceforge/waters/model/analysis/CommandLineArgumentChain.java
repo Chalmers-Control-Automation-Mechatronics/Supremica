@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.model.analysis;
 
-import java.util.Iterator;
+import java.util.ListIterator;
 
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ControlLoopChecker;
@@ -67,6 +67,7 @@ public abstract class CommandLineArgumentChain
   //#######################################################################
   //# Configuring the Secondary Verifier
   protected ModelAnalyzer createSecondaryAnalyzer(final ModelAnalyzer analyzer)
+    throws AnalysisConfigurationException
   {
     final ProductDESProxyFactory desFactory = analyzer.getFactory();
     final ModelVerifier secondaryAnalyzer;
@@ -90,7 +91,7 @@ public abstract class CommandLineArgumentChain
     return secondaryAnalyzer;
   }
 
-  protected void failUnsupportedAnalyzerClass(final ModelAnalyzer analyzer)
+  protected void failUnsupportedAnalyzerClass(final Object analyzer)
   {
     fail(ProxyTools.getShortClassName(analyzer) +
          " does not support secondary verifier!");
@@ -100,7 +101,7 @@ public abstract class CommandLineArgumentChain
   //#######################################################################
   //# Parsing
   @Override
-  public void parse(final Iterator<String> iter)
+  public void parse(final ListIterator<String> iter)
   {
     super.parse(iter);
     final ModelAnalyzerFactoryLoader loader = getValue();
@@ -114,7 +115,7 @@ public abstract class CommandLineArgumentChain
   }
 
   @Override
-  public void configure(final ModuleCompiler compiler)
+  public void configureCompiler(final ModuleCompiler compiler)
   {
     mSecondaryFactory.configure(compiler);
   }

@@ -11,7 +11,6 @@ package net.sourceforge.waters.cpp.analysis;
 
 import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -93,7 +92,7 @@ public class NativeModelVerifierFactory
     }
 
     @Override
-    public void configure(final ModelAnalyzer verifier)
+    public void configureAnalyzer(final Object verifier)
     {
       final NativeModelVerifier nverifier = (NativeModelVerifier) verifier;
       nverifier.setExplorerMode(ExplorerMode.BROAD);
@@ -112,7 +111,7 @@ public class NativeModelVerifierFactory
     }
 
     @Override
-    public void configure(final ModelAnalyzer verifier)
+    public void configureAnalyzer(final Object verifier)
     {
       if (verifier instanceof NativeConflictChecker) {
         final NativeConflictChecker nverifier = (NativeConflictChecker) verifier;
@@ -133,7 +132,7 @@ public class NativeModelVerifierFactory
     }
 
     @Override
-    public void configure(final ModelAnalyzer verifier)
+    public void configureAnalyzer(final Object verifier)
     {
       final NativeModelVerifier nverifier = (NativeModelVerifier) verifier;
       nverifier.setExplorerMode(ExplorerMode.NARROW);

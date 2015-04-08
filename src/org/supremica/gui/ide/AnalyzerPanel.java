@@ -16,7 +16,6 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
-import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -37,7 +36,6 @@ public class AnalyzerPanel
 {
     private static final long serialVersionUID = 1L;
 
-    private final JTabbedPane tabPanel;
     private final JComponent automatonViewerPanel;
     private final AnalyzerAutomataPanel automataPanel;
 
@@ -51,19 +49,12 @@ public class AnalyzerPanel
 
         mDocumentContainer = moduleContainer;
 
-        tabPanel = new JTabbedPane(JTabbedPane.BOTTOM);
-        tabPanel.setPreferredSize(IDEDimensions.leftAnalyzerPreferredSize);
-        tabPanel.setMinimumSize(IDEDimensions.leftAnalyzerMinimumSize);
-
-        automataPanel = new AnalyzerAutomataPanel(this, moduleContainer, "All");
+        automataPanel = new AnalyzerAutomataPanel(this, moduleContainer);
         automataPanel.setPreferredSize(IDEDimensions.leftAnalyzerPreferredSize);
         automataPanel.setMinimumSize(IDEDimensions.leftAnalyzerMinimumSize);
-        tabPanel.add(automataPanel);
-
-        tabPanel.setSelectedComponent(automataPanel);
 
         automatonViewerPanel = getEmptyRightPanel();
-		setLeftComponent(tabPanel);
+		setLeftComponent(automataPanel);
 		setRightComponent(automatonViewerPanel);
 
         // Add CTRL-A as a "Select All" action

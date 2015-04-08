@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="woeq07" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>A test for weak observation equivalence. This test constructs a transition with an unused selfloop-only event: such an event should have no effect on the result.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="tau"/>
+        <EventDecl Kind="CONTROLLABLE" Name="LS_on"/>
+        <EventDecl Kind="CONTROLLABLE" Name="LS_off"/>
+        <EventDecl Kind="CONTROLLABLE" Name="unused">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="SELFLOOP_ONLY"/>
+                <ns2:Attribute Name="UNUSED"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="SPEC" Name="before">
+            <Graph Deterministic="false">
+                <LabelBlock>
+                    <SimpleIdentifier Name="unused"/>
+                    <LabelGeometry Anchor="NW">
+                        <Point X="61" Y="65"/>
+                    </LabelGeometry>
+                </LabelBlock>
+                <NodeList>
+                    <SimpleNode Name="part_dropped">
+                        <PointGeometry>
+                            <Point X="256" Y="176"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="-44" Y="11"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="station_empty">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="112" Y="224"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="-69" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="station_occupied">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="400" Y="224"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="-18" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="part_pickedup">
+                        <PointGeometry>
+                            <Point X="256" Y="272"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="-43" Y="-29"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="start">
+                        <PointGeometry>
+                            <Point X="256" Y="80"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="8" Y="-9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="part_pickedup" Target="part_pickedup">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LS_on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-20" Y="-2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="255" Y="308"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="part_pickedup" Target="station_empty">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LS_off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-34" Y="1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="station_occupied" Target="part_pickedup">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-9" Y="6"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="station_occupied" Target="station_occupied">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LS_on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="9" Y="-1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="427" Y="197"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="station_empty" Target="station_empty">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LS_off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-48" Y="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="85" Y="194"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="station_empty" Target="part_dropped">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-25" Y="-21"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="start" Target="station_occupied">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LS_on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-6" Y="-21"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="341" Y="139"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="start" Target="station_empty">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LS_off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-42" Y="-21"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="168" Y="139"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="part_dropped" Target="station_occupied">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LS_on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-23" Y="-24"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="part_dropped" Target="part_dropped">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LS_off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-23" Y="-16"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="255" Y="139"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="after">
+            <Graph Deterministic="false">
+                <NodeList>
+                    <SimpleNode Name="part_dropped">
+                        <PointGeometry>
+                            <Point X="240" Y="64"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="1" Y="6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="station">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="80" Y="224"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="-58" Y="-18"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="part_pickedup">
+                        <PointGeometry>
+                            <Point X="240" Y="224"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="-2" Y="-24"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="start">
+                        <PointGeometry>
+                            <Point X="80" Y="64"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="-44" Y="-10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="part_pickedup" Target="part_pickedup">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LS_on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="7" Y="-22"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="270" Y="254"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="part_pickedup" Target="station">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LS_off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-24" Y="3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="160" Y="246"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="station" Target="part_pickedup">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LS_on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-13" Y="1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point X="111" Y="300"/>
+                        </StartPointGeometry>
+                    </Edge>
+                    <Edge Source="station" Target="part_dropped">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LS_off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-54" Y="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="150" Y="133"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="start" Target="station">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LS_on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="-41"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <EndPointGeometry>
+                            <Point X="111" Y="300"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Source="start" Target="station">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LS_off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-44" Y="-25"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="61" Y="144"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="part_dropped" Target="station">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LS_on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-31" Y="7"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="167" Y="151"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point X="111" Y="300"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Source="part_dropped" Target="part_dropped">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LS_off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="11" Y="-3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="271" Y="32"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="start" Target="part_dropped">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LS_off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-21" Y="-24"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="part_pickedup" Target="part_dropped">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LS_off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-25" Y="6"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="start" Target="part_pickedup">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LS_on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="19" Y="39"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="168" Y="130"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="part_dropped" Target="part_pickedup">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LS_on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="9" Y="-15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="261" Y="144"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="station" Target="station">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="LS_on"/>
+                            <SimpleIdentifier Name="LS_off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-7" Y="3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="48" Y="256"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

@@ -13,11 +13,13 @@ import java.io.File;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.IsomorphismChecker;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
@@ -26,6 +28,7 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESIntegrityChecker;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
@@ -265,38 +268,44 @@ public abstract class AbstractTRSimplifierTest
   {
     getLogger().info("Checking " + des.getName() + " ...");
     final AutomatonProxy before = findAutomaton(des, BEFORE);
-    final AutomatonProxy result = applySimplifier(des, before);
-    checkResult(des, result);
+    final AutomatonProxy resultSucc = applySimplifier
+      (des, before, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    checkResult(des, resultSucc);
+    final AutomatonProxy resultPred = applySimplifier
+      (des, before, ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+    checkResult(des, resultPred);
     getLogger().info("Done " + des.getName());
-  }
-
-  protected TransitionRelationSimplifier getSimplifier()
-  {
-    return mSimplifier;
   }
 
 
   //#########################################################################
   //# Auxiliary Methods
   private AutomatonProxy applySimplifier(final ProductDESProxy des,
-                                         final AutomatonProxy aut)
+                                         final AutomatonProxy aut,
+                                         final int config)
   throws Exception
   {
     final EventEncoding eventEnc = createEventEncoding(des, aut);
-    final StateEncoding inputStateEnc = createStateEncoding(aut);
-    final int config = ListBufferTransitionRelation.CONFIG_SUCCESSORS;
-    ListBufferTransitionRelation rel =
-      new ListBufferTransitionRelation(aut, eventEnc, inputStateEnc, config);
+    final StateEncoding inputStateEnc = new StateEncoding(aut);
+    final StateProxy dumpState = getState(aut, DUMP);
+    ListBufferTransitionRelation rel;
+    if (dumpState == null) {
+      rel = new ListBufferTransitionRelation
+        (aut, eventEnc, inputStateEnc,
+         ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    } else {
+      rel = new ListBufferTransitionRelation
+        (aut, eventEnc, inputStateEnc, dumpState,
+         ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    }
     rel.checkReachability();
+    rel.reconfigure(config);
     mSimplifier.setTransitionRelation(rel);
     configureTransitionRelationSimplifier();
     if (mSimplifier.run()) {
       rel = mSimplifier.getTransitionRelation();
-      rel.checkIntegrity();
       rel.setName("result");
-      rel.removeTauSelfLoops();
-      rel.removeProperSelfLoopEvents();
-      rel.removeRedundantPropositions();
+      rel.checkIntegrity();
       final ProductDESProxyFactory factory = getProductDESProxyFactory();
       return rel.createAutomaton(factory, eventEnc, null);
     } else {
@@ -346,44 +355,34 @@ public abstract class AbstractTRSimplifierTest
    */
   protected EventEncoding createEventEncoding(final ProductDESProxy des,
                                               final AutomatonProxy aut)
+    throws OverflowException
   {
     final KindTranslator translator = IdenticalKindTranslator.getInstance();
-    final EventProxy tau = getEvent(aut, TAU);
-    return new EventEncoding(aut, translator, tau);
-  }
-
-  /**
-   * Creates a state encoding for use with the given automaton.
-   * This method is called automatically and should be overridden
-   * by subclasses that need a more specific implementation.
-   */
-  protected StateEncoding createStateEncoding(final AutomatonProxy aut)
-  {
-    return new StateEncoding(aut);
-  }
-
-  /**
-   * Creates an event encoding for use with the given product DES and
-   * automaton, with alpha and omega propositions added. This method is
-   * provided as a convenience to subclasses needing to override {@link
-   * #createEventEncoding(ProductDESProxy, AutomatonProxy)
-   * createEventEncoding()}.
-   */
-  protected EventEncoding createEventEncodingWithPropositions
-    (final ProductDESProxy des, final AutomatonProxy aut)
-  {
-    final KindTranslator translator = IdenticalKindTranslator.getInstance();
-    final EventProxy tau = getEvent(aut, TAU);
-    final EventEncoding enc = new EventEncoding(aut, translator, tau);
+    final EventEncoding enc = new EventEncoding();
+    EventProxy tau = getEvent(aut, TAU);
+    if (tau != null) {
+      enc.addSilentEvent(tau);
+    } else {
+      tau = getEvent(des, TAU);
+      if (tau != null) {
+        enc.setTauEvent(tau);
+      }
+    }
+    for (final EventProxy event : aut.getEvents()) {
+      final byte status = getEventStatusFromAttributes(event);
+      enc.addEvent(event, translator, status);
+    }
     final EventProxy alpha = getEvent(des, ALPHA);
-    mAlphaID = enc.getEventCode(alpha);
-    if (alpha != null && mAlphaID < 0) {
-      mAlphaID = enc.addEvent(alpha, translator, EventEncoding.STATUS_UNUSED);
+    if (alpha != null) {
+      mAlphaID = enc.addEvent(alpha, translator, EventStatus.STATUS_UNUSED);
+    } else {
+      mAlphaID = -1;
     }
     final EventProxy omega = getEvent(des, OMEGA);
-    mOmegaID = enc.getEventCode(omega);
-    if (omega != null && mOmegaID < 0) {
-      mOmegaID = enc.addEvent(omega, translator, EventEncoding.STATUS_UNUSED);
+    if (omega != null) {
+      mOmegaID = enc.addEvent(omega, translator, EventStatus.STATUS_UNUSED);
+    } else {
+      mOmegaID = -1;
     }
     return enc;
   }
@@ -445,11 +444,12 @@ public abstract class AbstractTRSimplifierTest
 
   //#########################################################################
   //# Class Constants
-  final String TAU = "tau";
-  final String ALPHA = ":alpha";
-  final String OMEGA = EventDeclProxy.DEFAULT_MARKING_NAME;
+  protected static final String TAU = "tau";
+  protected static final String ALPHA = ":alpha";
+  protected static final String OMEGA = EventDeclProxy.DEFAULT_MARKING_NAME;
+  protected static final String DUMP = ":dump";
 
-  final String BEFORE = "before";
-  final String AFTER = "after";
+  protected static final String BEFORE = "before";
+  protected static final String AFTER = "after";
 
 }

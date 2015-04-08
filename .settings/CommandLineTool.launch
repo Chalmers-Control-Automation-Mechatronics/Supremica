@@ -11,7 +11,7 @@
 <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="net.sourceforge.waters.model.analysis.CommandLineTool"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="net.sourceforge.waters.analysis.compositional.CompositionalModelVerifierFactory Conflict -method NB -stats &quot;${workspace_loc:waters}/examples/waters/tests/incremental_suite/aip0alps.wmod&quot;"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="TRCompositional ConflictChecker -method NB3 -islimit 100000 -presel MustL -sel MinSync -noout examples/waters/tests/profisafe/profisafe_i6.wmod"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="waters"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx512m&#13;&#10;-Djava.library.path=&quot;${workspace_loc:waters}/dist&quot;&#10;-ea"/>
 </launchConfiguration>

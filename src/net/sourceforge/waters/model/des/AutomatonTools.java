@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
+import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.WatersHashSet;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
@@ -119,7 +120,7 @@ public final class AutomatonTools
    */
   public static ProductDESProxy createProductDESProxy
     (final String name,
-     final Collection<AutomatonProxy> automata,
+     final Collection<? extends AutomatonProxy> automata,
      final ProductDESProxyFactory factory)
   {
     int numEvents = 0;
@@ -201,6 +202,84 @@ public final class AutomatonTools
       }
     }
     return true;
+  }
+
+  /**
+   * Finds a first dump state in the given automaton.
+   * A dump state is an unmarked state without any outgoing transitions.
+   * @param  aut       The automaton to be searched.
+   * @param  markings  The set of marking propositions to be considered.
+   *                   An automaton can only have dump states, if all the
+   *                   relevant markings are in its event set; otherwise
+   *                   all states are implicitly marked by some marking
+   *                   and there is no dump state.
+   * @return The first dump state found in the automaton,
+   *         or <CODE>null</CODE>.
+   */
+  public static StateProxy findDumpState(final AutomatonProxy aut,
+                                         final Collection<EventProxy> markings)
+  {
+    if (aut.getEvents().containsAll(markings)) {
+      final Set<StateProxy> states = aut.getStates();
+      final int numStates = states.size();
+      final Set<StateProxy> nonDumpStates = new THashSet<>(numStates);
+      for (final TransitionProxy trans : aut.getTransitions()) {
+        if (nonDumpStates.add(trans.getSource()) &&
+            nonDumpStates.size() == numStates) {
+          return null;
+        }
+      }
+      for (final StateProxy state : aut.getStates()) {
+        if (state.getPropositions().isEmpty() &&
+            !nonDumpStates.contains(state)) {
+          return state;
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Calculates a name that can be given to a synchronous product automaton.
+   *
+   * @param automata
+   *          List of automata constituting synchronous product.
+   * @return A string consisting of the names of the given automata, with
+   *         appropriate separators between them.
+   */
+  public static String getCompositionName
+    (final Collection<TRAutomatonProxy> automata)
+  {
+    return getCompositionName("", automata);
+  }
+
+  /**
+   * Calculates a name that can be given to a synchronous product automaton.
+   *
+   * @param prefix
+   *          A string to be prepended to the result.
+   * @param automata
+   *          List of automata constituting synchronous product.
+   * @return A string consisting of the prefix followed by the names of the
+   *         given automata, with appropriate separators between them.
+   */
+  public static String getCompositionName
+    (final String prefix,
+     final Collection<? extends AutomatonProxy> automata)
+  {
+    final StringBuilder buffer = new StringBuilder(prefix);
+    buffer.append('{');
+    boolean first = true;
+    for (final AutomatonProxy aut : automata) {
+      if (first) {
+        first = false;
+      } else {
+        buffer.append(',');
+      }
+      buffer.append(aut.getName());
+    }
+    buffer.append('}');
+    return buffer.toString();
   }
 
 

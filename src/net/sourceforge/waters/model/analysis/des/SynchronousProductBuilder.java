@@ -11,6 +11,7 @@ package net.sourceforge.waters.model.analysis.des;
 
 import java.util.Collection;
 
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.EventProxy;
 
 
@@ -29,6 +30,12 @@ public interface SynchronousProductBuilder
 {
 
   //#########################################################################
+  //# More Specific Access to the Results
+  @Override
+  public SynchronousProductResult getAnalysisResult();
+
+
+  //#########################################################################
   //# Parameterisation
   /**
    * Defines the set of propositions to be retained in the synchronous
@@ -36,8 +43,12 @@ public interface SynchronousProductBuilder
    * will be copied to the output automaton, all others will be ignored.
    * @param  props       The set of propositions to be retained,
    *                     or <CODE>null</CODE> to keep all propositions.
+   * @throws OverflowException to indicate that the number of propositions
+   *                     exceeds the maximum supported by the underlying
+   *                     data structures.
    */
-  public void setPropositions(final Collection<EventProxy> props);
+  public void setPropositions(final Collection<EventProxy> props)
+    throws OverflowException;
 
   /**
    * Gets the set of propositions retained in the synchronous product.
@@ -55,9 +66,12 @@ public interface SynchronousProductBuilder
    * @param  hidden      A set of events to be replaced.
    * @param  replacement An event to be used instead of any of the hidden
    *                     events.
+   * @throws OverflowException to indicate that the number of propositions
+   *                     exceeds the maximum supported by the underlying
+   *                     data structures.
    */
   public void addMask(final Collection<EventProxy> hidden,
-                      final EventProxy replacement);
+                      final EventProxy replacement) throws OverflowException;
 
   /**
    * Resets all event masks. This method clears any masks set by the
@@ -65,15 +79,5 @@ public interface SynchronousProductBuilder
    * so any further computation is done without hiding.
    */
   public void clearMask();
-
-
-  //#########################################################################
-  //# More Specific Access to the Results
-  /**
-   * Gets a state map that can be used to decompose the states of the
-   * computed synchronous product automaton and map them to the states
-   * of the automata in the original model.
-   */
-  public SynchronousProductStateMap getStateMap();
 
 }

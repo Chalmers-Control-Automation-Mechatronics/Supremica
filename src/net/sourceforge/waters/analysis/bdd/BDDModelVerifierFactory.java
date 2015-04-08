@@ -13,7 +13,6 @@ import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -103,7 +102,7 @@ public class BDDModelVerifierFactory
     //# Overrides for
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final BDDModelVerifier bddVerifier = (BDDModelVerifier) analyzer;
       final BDDPackage pack = getValue();
@@ -129,7 +128,7 @@ public class BDDModelVerifierFactory
     //# Overrides for
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final BDDModelVerifier bddVerifier = (BDDModelVerifier) analyzer;
       final VariableOrdering ordering = getValue();
@@ -154,7 +153,7 @@ public class BDDModelVerifierFactory
     //# Overrides for
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final BDDModelVerifier bddVerifier = (BDDModelVerifier) analyzer;
       final boolean enable = getValue();
@@ -179,7 +178,7 @@ public class BDDModelVerifierFactory
     //# Overrides for
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final BDDModelVerifier bddVerifier = (BDDModelVerifier) analyzer;
       final int size = getValue();
@@ -205,7 +204,7 @@ public class BDDModelVerifierFactory
     //# Overrides for
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final BDDModelVerifier bddVerifier = (BDDModelVerifier) analyzer;
       final TransitionPartitioningStrategy strategy = getValue();
@@ -230,7 +229,7 @@ public class BDDModelVerifierFactory
     //# Overrides for
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final BDDModelVerifier bddVerifier = (BDDModelVerifier) analyzer;
       final int limit = getValue();

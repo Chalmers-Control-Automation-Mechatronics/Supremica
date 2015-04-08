@@ -27,6 +27,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.OneEventCachingTransitionIterator;
@@ -193,27 +194,6 @@ public class ObservationEquivalenceTRSimplifier
     return mDumpStateAware;
   }
 
-  /**
-   * Sets whether special events are to be considered in abstraction.
-   * If enabled, events marked as selfloop-only in all other automata
-   * will be treated specially. For such events, it is possible to assume
-   * implicit selfloops on all states of the automaton being simplified,
-   * potentially giving better state reduction.
-   */
-  public void setUsingSpecialEvents(final boolean enable)
-  {
-    mUsingSpecialEvents = enable;
-  }
-
-  /**
-   * Returns whether special events are considered in abstraction.
-   * @see #setUsingSpecialEvents(boolean)
-   */
-  public boolean isUsingSpecialEvents()
-  {
-    return mUsingSpecialEvents;
-  }
-
   public void setUsingLocalEvents(final boolean enable)
   {
     mUsingLocalEvents = enable;
@@ -358,12 +338,14 @@ public class ObservationEquivalenceTRSimplifier
     final int size = partition.getNumberOfClasses();
     setUpPartition(size);
     for (final int[] clazz : partition.getClasses()) {
-      final EquivalenceClass sec =
-        mEquivalence.createEquivalenceClass(this, clazz);
-      sec.enqueue(true);
-      if (clazz.length > 1) {
-        for (final int state : clazz) {
-          mStateToClass[state] = sec;
+      if (clazz != null) {
+        final EquivalenceClass sec =
+          mEquivalence.createEquivalenceClass(this, clazz);
+        sec.enqueue(true);
+        if (clazz.length > 1) {
+          for (final int state : clazz) {
+            mStateToClass[state] = sec;
+          }
         }
       }
     }
@@ -444,7 +426,7 @@ public class ObservationEquivalenceTRSimplifier
         }
       }
     }
-    final int numProps = rel.getNumberOfMarkings();
+    final int numProps = rel.getNumberOfPropositions();
     final int size = numProps > 8 ? 256 : 1 << numProps;
     setUpPartition(size);
     final TLongObjectHashMap<EquivalenceClass> prepartition =
@@ -546,20 +528,17 @@ public class ObservationEquivalenceTRSimplifier
     super.setUp();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int first = mEquivalence.getFirstSplitEvent();
-    if (mUsingSpecialEvents) {
-      assert mEquivalence != Equivalence.DETERMINISTIC_MINSTATE :
-        "Can't use deterministic-minstate with selfloop-only events!";
+    if (mEquivalence != Equivalence.DETERMINISTIC_MINSTATE) {
+      final byte pattern =
+        EventStatus.STATUS_SELFLOOP_ONLY | EventStatus.STATUS_UNUSED;
       final int numEvents = rel.getNumberOfProperEvents();
       mOnlySelfLoopEvents = new TIntArrayList(rel.getNumberOfProperEvents());
       for (int e = first; e < numEvents; e++) {
-        if ((rel.getProperEventStatus(e) &
-          EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0) {
+        if ((rel.getProperEventStatus(e) & pattern) ==
+            EventStatus.STATUS_SELFLOOP_ONLY) {
           mOnlySelfLoopEvents.add(e);
         }
       }
-    } else if (first == EventEncoding.TAU) {
-      mOnlySelfLoopEvents = new TIntArrayList(1);
-      mOnlySelfLoopEvents.add(first);
     } else {
       mOnlySelfLoopEvents = null;
     }
@@ -658,13 +637,13 @@ public class ObservationEquivalenceTRSimplifier
         final int config = rel.getConfiguration();
         if ((config & ListBufferTransitionRelation.CONFIG_PREDECESSORS) != 0) {
           if (mUsingLocalEvents) {
-            mTauClosure = rel.createPredecessorsTauClosureByStatus(limit, EventEncoding.STATUS_LOCAL);
+            mTauClosure = rel.createPredecessorsClosure(limit, EventStatus.STATUS_LOCAL);
           } else {
             mTauClosure = rel.createPredecessorsTauClosure(limit);
           }
         } else {
           if (mUsingLocalEvents) {
-            mTauClosure = rel.createSuccessorsTauClosureByStatus(limit, EventEncoding.STATUS_LOCAL);
+            mTauClosure = rel.createSuccessorsClosure(limit, EventStatus.STATUS_LOCAL);
           } else {
             mTauClosure = rel.createSuccessorsTauClosure(limit);
           }
@@ -684,7 +663,7 @@ public class ObservationEquivalenceTRSimplifier
       tau = false;
     } else if (mUsingLocalEvents) {
       final byte status = getTransitionRelation().getProperEventStatus(event);
-      tau = EventEncoding.isLocalEvent(status);
+      tau = EventStatus.isLocalEvent(status);
     } else {
       tau = (event == EventEncoding.TAU);
     }
@@ -747,8 +726,7 @@ public class ObservationEquivalenceTRSimplifier
   {
     if (mNumClasses < mNumReachableStates) {
       final ListBufferTransitionRelation rel = getTransitionRelation();
-      final int numStates =
-        rel.getNumberOfStates() - rel.getNumberOfExtraStates();
+      final int numStates = rel.getNumberOfStates();
       final List<int[]> classes = new ArrayList<int[]>(mNumClasses);
       for (int state = 0; state < numStates; state++) {
         if (rel.isReachable(state)) {
@@ -764,6 +742,10 @@ public class ObservationEquivalenceTRSimplifier
             }
           }
         }
+      }
+      final int dumpIndex = rel.getDumpStateIndex();
+      if (!rel.isReachable(dumpIndex)) {
+        classes.add(null);
       }
       final TRPartition partition = new TRPartition(classes, numStates);
       setResultPartition(partition);
@@ -782,10 +764,12 @@ public class ObservationEquivalenceTRSimplifier
       removeRedundantTransitions(TransitionRemovalTime.AFTER_NONTRIVIAL);
       rel.removeTauSelfLoops();
       removeProperSelfLoopEvents();
+      rel.removeRedundantPropositions();
     } else {
       removeRedundantTransitions(TransitionRemovalTime.AFTER_TRIVIAL);
       if (mHasModifications) {
         removeProperSelfLoopEvents();
+        rel.removeRedundantPropositions();
       }
     }
   }
@@ -807,10 +791,12 @@ public class ObservationEquivalenceTRSimplifier
       removeRedundantTransitions(TransitionRemovalTime.AFTER_NONTRIVIAL);
       rel.removeTauSelfLoops();
       removeProperSelfLoopEvents();
+      rel.removeRedundantPropositions();
     } else {
       removeRedundantTransitions(TransitionRemovalTime.AFTER_TRIVIAL);
       if (mHasModifications) {
         removeProperSelfLoopEvents();
+        rel.removeRedundantPropositions();
       }
     }
   }
@@ -836,13 +822,13 @@ public class ObservationEquivalenceTRSimplifier
       while (iter0.advance()) {
         final int e = iter0.getCurrentEvent();
         final byte status = rel.getProperEventStatus(e);
-        if ((status & EventEncoding.STATUS_UNUSED) != 0 || e == skipped) {
+        if ((status & EventStatus.STATUS_UNUSED) != 0 || e == skipped) {
           continue;
         }
         checkAbort();
         final boolean selflooped =
-          (status & EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0 &&
-          mUsingSpecialEvents && doNonTau && e != EventEncoding.TAU;
+          (status & EventStatus.STATUS_SELFLOOP_ONLY) != 0 &&
+          doNonTau && e != EventEncoding.TAU;
         final int from0 = iter0.getCurrentFromState();
         final int to0 = iter0.getCurrentToState();
         iter1.resetState(from0);
@@ -1264,9 +1250,9 @@ public class ObservationEquivalenceTRSimplifier
         @Override
         public boolean execute(final int event)
         {
-          final boolean outsideOnlySelfloop = mUsingSpecialEvents &&
+          final boolean outsideOnlySelfloop =
             (rel.getProperEventStatus(event) &
-             EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0;
+             EventStatus.STATUS_SELFLOOP_ONLY) != 0;
           TIntHashSet visitedStates = null;
           if (outsideOnlySelfloop) {
             if (mEquivalence.respectsTau()) {
@@ -1461,9 +1447,9 @@ public class ObservationEquivalenceTRSimplifier
         public boolean execute(final int event)
         {
           final ListBufferTransitionRelation rel = getTransitionRelation();
-          final boolean outsideOnlySelfloop = mUsingSpecialEvents &&
+          final boolean outsideOnlySelfloop =
             (rel.getProperEventStatus(event) &
-             EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0;
+             EventStatus.STATUS_SELFLOOP_ONLY) != 0;
           final TransitionIterator transIter =
             getPredecessorIterator(event);
           final TIntHashSet visitedStates = new TIntHashSet();
@@ -1770,9 +1756,9 @@ public class ObservationEquivalenceTRSimplifier
         public boolean execute(final int event)
         {
           final ListBufferTransitionRelation rel = getTransitionRelation();
-          final boolean outsideOnlySelfloop = mUsingSpecialEvents &&
+          final boolean outsideOnlySelfloop =
             (rel.getProperEventStatus(event) &
-             EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP) != 0;
+             EventStatus.STATUS_SELFLOOP_ONLY) != 0;
           final TransitionIterator transIter =
             getPredecessorIterator(event);
           final TIntHashSet visitedStates = new TIntHashSet();
@@ -2342,7 +2328,6 @@ public class ObservationEquivalenceTRSimplifier
   private long mPropositionMask = ~0;
   private int mDefaultMarkingID = -1;
   private boolean mDumpStateAware = false;
-  private boolean mUsingSpecialEvents = true;
   private boolean mUsingLocalEvents = false;
   private int mTransitionLimit = Integer.MAX_VALUE;
   private int mInitialInfoSize = -1;

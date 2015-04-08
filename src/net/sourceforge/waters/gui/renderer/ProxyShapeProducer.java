@@ -16,6 +16,7 @@ import java.awt.font.TextLayout;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -246,6 +247,32 @@ public class ProxyShapeProducer
 
 
   //#########################################################################
+  //# Static Methods
+  /**
+   * Gets the list of the guards in a {@link GuardActionBlockProxy}
+   * that are actually displayed. Only one or two guards are displayed,
+   * in an attempt to support 'seamless synthesis'.
+   */
+  public static List<SimpleExpressionProxy>
+    getDisplayedGuards(final GuardActionBlockProxy block)
+  {
+    final List<SimpleExpressionProxy> guards = block.getGuards();
+    switch (guards.size()) {
+    case 0:
+      return Collections.emptyList();
+    case 1:
+    case 2:
+      return Collections.singletonList(guards.get(0));
+    default:
+      final List<SimpleExpressionProxy> list = new ArrayList<>(2);
+      list.add(guards.get(1));
+      list.add(guards.get(2));
+      return list;
+    }
+  }
+
+
+  //#########################################################################
   //# Auxiliary Access
   ProxyShape lookup(final Proxy proxy)
   {
@@ -431,10 +458,11 @@ public class ProxyShapeProducer
       double height = 2.0;
 
       //Create a rectangle for only those guards that will be displayed ultimately.
-      final List<SimpleExpressionProxy> guards = block.getGuards();
-      if (guards.size() == 3) {
-        for (int i = 1; i < guards.size(); i++) {
-          final SimpleExpressionProxy guard = guards.get(i);
+      final List<SimpleExpressionProxy> guards = getDisplayedGuards(block);
+      if (guards.isEmpty()) {
+        height += 2;
+      } else {
+        for (final SimpleExpressionProxy guard : guards) {
           final int ly = (int) Math.round(y + height);
           final LabelShape lshape =
             createEdgeLabelShape(guard, lx, ly, EditorColor.DEFAULT_FONT);
@@ -445,20 +473,6 @@ public class ProxyShapeProducer
             width = lrect.getWidth();
           }
         }
-      } else if (guards.size() == 1 || guards.size() == 2) {
-        final SimpleExpressionProxy guard = guards.get(0);
-        final int ly = (int) Math.round(y + height);
-        final LabelShape lshape =
-          createEdgeLabelShape(guard, lx, ly, EditorColor.DEFAULT_FONT);
-        mMap.put(guard, lshape);
-        final RoundRectangle2D lrect = lshape.getShape();
-        height += lrect.getHeight();
-        if (width < lrect.getWidth()) {
-          width = lrect.getWidth();
-        }
-      }
-      if (!guards.isEmpty()) {
-        height += 2;
       }
       final List<BinaryExpressionProxy> actions = block.getActions();
       for (final BinaryExpressionProxy action : actions) {
@@ -481,7 +495,6 @@ public class ProxyShapeProducer
     }
     return shape;
   }
-
 
   private LabelShape createEdgeLabelShape(final Proxy label,
                                           final int x, final int y,

@@ -1,0 +1,909 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="activeEvents15" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>A test to see whether the active events rule can be correctly applied three times in sequence (using relaxed incoming equivalence in the first step).</ns2:Comment>
+    <ConstantAliasList>
+        <ConstantAlias Name=":symbols">
+            <ConstantAliasExpression>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="TUER"/>
+                </EnumSetExpression>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+    </ConstantAliasList>
+    <EventDeclList>
+        <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="tau"/>
+        <EventDecl Kind="CONTROLLABLE" Name="soft_CS"/>
+        <EventDecl Kind="CONTROLLABLE" Name="reset"/>
+        <EventDecl Kind="CONTROLLABLE" Name="start_ER"/>
+        <EventDecl Kind="CONTROLLABLE" Name="start_VR"/>
+        <EventDecl Kind="CONTROLLABLE" Name="start_ZS"/>
+        <EventDecl Kind="CONTROLLABLE" Name="stop_ER"/>
+        <EventDecl Kind="CONTROLLABLE" Name="stop_VR"/>
+        <EventDecl Kind="CONTROLLABLE" Name="stop_ZS"/>
+        <EventDecl Kind="CONTROLLABLE" Name="time_W"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="timeout"/>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="before">
+            <Graph Deterministic="false">
+                <NodeList>
+                    <SimpleNode Initial="true" Name=":0">
+                        <PointGeometry>
+                            <Point X="400" Y="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name=":1">
+                        <PointGeometry>
+                            <Point X="544" Y="480"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-24" Y="-12"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name=":2">
+                        <PointGeometry>
+                            <Point X="576" Y="592"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-8" Y="8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name=":3">
+                        <PointGeometry>
+                            <Point X="304" Y="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="10" Y="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name=":4">
+                        <PointGeometry>
+                            <Point X="400" Y="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-24" Y="-11"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name=":5">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="352" Y="592"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-20" Y="4"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name=":6">
+                        <PointGeometry>
+                            <Point X="464" Y="592"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-10" Y="7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name=":7">
+                        <PointGeometry>
+                            <Point X="304" Y="240"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="8" Y="-9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name=":8">
+                        <PointGeometry>
+                            <Point X="400" Y="240"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="9" Y="-9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name=":9">
+                        <PointGeometry>
+                            <Point X="304" Y="400"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name=":10">
+                        <PointGeometry>
+                            <Point X="400" Y="400"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name=":11">
+                        <PointGeometry>
+                            <Point X="304" Y="320"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name=":12">
+                        <PointGeometry>
+                            <Point X="400" Y="320"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-16" Y="6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name=":13">
+                        <PointGeometry>
+                            <Point X="304" Y="480"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="6" Y="-9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name=":14">
+                        <PointGeometry>
+                            <Point X="400" Y="480"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="8" Y="-6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name=":15">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="176" Y="288"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-34" Y="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name=":16">
+                        <PointGeometry>
+                            <Point X="496" Y="320"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-24" Y="8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name=":17">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="672" Y="288"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-23" Y="-19"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <GroupNode Name="G0">
+                        <NodeRef Name=":4"/>
+                        <NodeRef Name=":7"/>
+                        <NodeRef Name=":0"/>
+                        <NodeRef Name=":1"/>
+                        <NodeRef Name=":11"/>
+                        <NodeRef Name=":14"/>
+                        <NodeRef Name=":16"/>
+                        <NodeRef Name=":8"/>
+                        <NodeRef Name=":10"/>
+                        <NodeRef Name=":3"/>
+                        <NodeRef Name=":12"/>
+                        <NodeRef Name=":9"/>
+                        <NodeRef Name=":13"/>
+                        <BoxGeometry>
+                            <Box Height="496" Width="416" X="208" Y="48"/>
+                        </BoxGeometry>
+                    </GroupNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source=":0" Target=":1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_ER"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-43" Y="-35"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="546" Y="183"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source=":0" Target=":3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_ER"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-47" Y="6"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source=":0" Target=":4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_ER"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-27" Y="-3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source=":1" Target=":1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="reset"/>
+                            <SimpleIdentifier Name="timeout"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-25" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="579" Y="513"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="G0" Target=":2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="soft_CS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="3" Y="-5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point X="578" Y="544"/>
+                        </StartPointGeometry>
+                    </Edge>
+                    <Edge Source=":1" Target=":5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop_ER"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="29" Y="-22"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source=":10" Target=":14">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_ZS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-26" Y="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source=":11" Target=":9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="timeout"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-52" Y="-3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source=":12" Target=":10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="timeout"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-32" Y="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source=":13" Target=":13">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="reset"/>
+                            <SimpleIdentifier Name="timeout"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-37" Y="-24"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="306" Y="525"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source=":13" Target=":15">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop_VR"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-19" Y="-28"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="236" Y="343"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source=":14" Target=":14">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="reset"/>
+                            <SimpleIdentifier Name="timeout"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-11" Y="-32"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="403" Y="527"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source=":14" Target=":16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="7" Y="-13"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source=":14" Target=":17">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop_ZS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-21" Y="8"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="588" Y="397"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source=":15" Target=":0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-57" Y="26"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="232" Y="150"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source=":15" Target=":14">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_ZS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-90" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="239" Y="411"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source=":16" Target=":0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop_ZS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-12" Y="61"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="479" Y="159"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source=":16" Target=":16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="reset"/>
+                            <SimpleIdentifier Name="timeout"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-39" Y="-49"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="544" Y="323"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source=":17" Target=":0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-17" Y="-24"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="574" Y="128"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source=":2" Target=":2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="reset"/>
+                            <SimpleIdentifier Name="timeout"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-61" Y="-28"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="578" Y="638"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source=":2" Target=":6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_ER"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-25" Y="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source=":3" Target=":3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="reset"/>
+                            <SimpleIdentifier Name="timeout"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-22" Y="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="260" Y="160"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source=":3" Target=":7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop_ER"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-53" Y="3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source=":4" Target=":4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="reset"/>
+                            <SimpleIdentifier Name="timeout"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-36" Y="-3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="449" Y="159"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source=":4" Target=":8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop_ER"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="2" Y="3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source=":5" Target=":10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-5" Y="20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="361" Y="493"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source=":5" Target=":9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-5" Y="35"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="256" Y="532"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source=":6" Target=":5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop_ER"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-25" Y="-21"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source=":6" Target=":6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="timeout"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-66" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="463" Y="639"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source=":7" Target=":11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="time_W"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-54" Y="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source=":8" Target=":12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="time_W"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="2" Y="-21"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source=":9" Target=":13">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_VR"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-3" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="after">
+            <Graph Deterministic="false">
+                <NodeList>
+                    <SimpleNode Initial="true" Name=":0">
+                        <PointGeometry>
+                            <Point X="192" Y="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name=":2">
+                        <PointGeometry>
+                            <Point X="128" Y="656"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-8" Y="8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name=":1_3_4">
+                        <PointGeometry>
+                            <Point X="192" Y="224"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="10" Y="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name=":5">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="320" Y="656"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-20" Y="4"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name=":6">
+                        <PointGeometry>
+                            <Point X="224" Y="656"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-10" Y="7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name=":7_8">
+                        <PointGeometry>
+                            <Point X="192" Y="304"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="8" Y="-9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name=":9">
+                        <PointGeometry>
+                            <Point X="192" Y="464"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name=":10">
+                        <PointGeometry>
+                            <Point X="288" Y="464"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name=":11_12">
+                        <PointGeometry>
+                            <Point X="192" Y="384"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name=":13">
+                        <PointGeometry>
+                            <Point X="192" Y="544"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="6" Y="-9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name=":14_16">
+                        <PointGeometry>
+                            <Point X="288" Y="544"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="8" Y="-6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name=":15">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="64" Y="352"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-34" Y="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name=":17">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="400" Y="368"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-23" Y="-19"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <GroupNode Name="G0">
+                        <NodeRef Name=":9"/>
+                        <NodeRef Name=":10"/>
+                        <NodeRef Name=":14_16"/>
+                        <NodeRef Name=":7_8"/>
+                        <NodeRef Name=":1_3_4"/>
+                        <NodeRef Name=":0"/>
+                        <NodeRef Name=":11_12"/>
+                        <NodeRef Name=":13"/>
+                        <BoxGeometry>
+                            <Box Height="496" Width="272" X="96" Y="112"/>
+                        </BoxGeometry>
+                    </GroupNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source=":0" Target=":1_3_4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_ER"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-47" Y="6"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="G0" Target=":2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="soft_CS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-51" Y="-8"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point X="127" Y="608"/>
+                        </StartPointGeometry>
+                    </Edge>
+                    <Edge Source=":1_3_4" Target=":5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop_ER"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-69" Y="-47"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point X="192" Y="224"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point X="311" Y="357"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source=":10" Target=":14_16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_ZS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-26" Y="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source=":11_12" Target=":9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="timeout"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-24" Y="3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source=":11_12" Target=":10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="timeout"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="1" Y="-15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point X="192" Y="384"/>
+                        </StartPointGeometry>
+                    </Edge>
+                    <Edge Source=":13" Target=":13">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="reset"/>
+                            <SimpleIdentifier Name="timeout"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-37" Y="-24"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="194" Y="589"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source=":13" Target=":15">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop_VR"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-17" Y="-35"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="124" Y="407"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source=":14_16" Target=":14_16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="reset"/>
+                            <SimpleIdentifier Name="timeout"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-11" Y="-32"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="291" Y="591"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source=":14_16" Target=":17">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop_ZS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="12" Y="-12"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="373" Y="456"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source=":15" Target=":0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-39" Y="6"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="91" Y="255"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source=":15" Target=":14_16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_ZS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-103" Y="-60"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="127" Y="475"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source=":14_16" Target=":0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop_ZS"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-67" Y="-89"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point X="288" Y="544"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point X="330" Y="325"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source=":17" Target=":0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-2" Y="-21"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="325" Y="216"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source=":2" Target=":2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="reset"/>
+                            <SimpleIdentifier Name="timeout"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-50" Y="-41"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="130" Y="702"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source=":2" Target=":6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_ER"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-25" Y="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source=":1_3_4" Target=":1_3_4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="reset"/>
+                            <SimpleIdentifier Name="timeout"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-22" Y="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="148" Y="224"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source=":1_3_4" Target=":7_8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop_ER"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-53" Y="3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source=":5" Target=":10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-5" Y="20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="394" Y="565"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source=":5" Target=":9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-14" Y="17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="243" Y="562"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source=":6" Target=":5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="stop_ER"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-25" Y="-21"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source=":6" Target=":6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="timeout"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="8" Y="-26"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="223" Y="703"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source=":7_8" Target=":11_12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="time_W"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-54" Y="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source=":9" Target=":13">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_VR"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-3" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

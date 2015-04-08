@@ -19,6 +19,7 @@ import java.rmi.server.UnicastRemoteObject;
 import net.sourceforge.waters.analysis.distributed.application.DistributedNode;
 import net.sourceforge.waters.analysis.distributed.application.DistributedServer;
 import net.sourceforge.waters.analysis.distributed.application.Server;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentString;
@@ -87,6 +88,7 @@ public class DistributedModelVerifierFactory
 
   @Override
   public void configure(final ModelAnalyzer analyzer)
+    throws AnalysisConfigurationException
   {
     super.configure(analyzer);
     launchLocalServers();
@@ -153,7 +155,7 @@ public class DistributedModelVerifierFactory
     }
 
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) analyzer;
       final String value = getValue();
@@ -171,7 +173,7 @@ public class DistributedModelVerifierFactory
     }
 
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) analyzer;
       final String value = getValue();
@@ -195,7 +197,7 @@ public class DistributedModelVerifierFactory
     }
 
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) analyzer;
       final int value = getValue();
@@ -218,7 +220,7 @@ public class DistributedModelVerifierFactory
     }
 
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) analyzer;
       final int value = getValue();
@@ -236,7 +238,7 @@ public class DistributedModelVerifierFactory
     }
 
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) analyzer;
       dsv.setShutdownAfter(true);
@@ -253,7 +255,7 @@ public class DistributedModelVerifierFactory
     }
 
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) analyzer;
       dsv.setWalltimeLimit(getValue());
@@ -271,7 +273,7 @@ public class DistributedModelVerifierFactory
     }
 
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) analyzer;
       dsv.setProcessingThreadCount(getValue());
@@ -289,7 +291,7 @@ public class DistributedModelVerifierFactory
     }
 
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final DistributedSafetyVerifier dsv = (DistributedSafetyVerifier) analyzer;
       dsv.setStateDistribution(getValue());

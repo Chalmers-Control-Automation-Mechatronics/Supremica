@@ -1,0 +1,24 @@
+#!/bin/sh
+
+THIS=`readlink -f $0`
+DIR=`dirname $THIS`
+
+export LD_LIBRARY_PATH=$DIR
+
+WPACK="net.sourceforge.waters"
+MEM="-Xmx1024m"
+ARGS=
+
+for F in "$@"; do
+    case $F in
+    -Xmx*)
+        MEM="$F"
+        ;;
+    *)
+        ARGS="$ARGS \"$F\""
+        ;;
+    esac
+done
+
+eval java -cp "$DIR/Supremica.jar" -enableassertions $MEM \
+    $WPACK.analysis.efa.unified.UnifiedEFACommandLineTool "$ARGS"

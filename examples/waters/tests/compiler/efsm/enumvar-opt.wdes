@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:ProductDES Name="enumvar" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
+    <Comment>A simple test involving an EFA variable of enumerated type.</Comment>
+    <ns2:EventList>
+        <ns2:Event Kind="CONTROLLABLE" Name="e.{enumvar==a}"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="e.{enumvar==b}"/>
+    </ns2:EventList>
+    <ns2:AutomataList>
+        <ns2:Automaton Kind="PLANT" Name="enumvar">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="e.{enumvar==a}"/>
+                <ns2:EventRef Name="e.{enumvar==b}"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="a"/>
+                <ns2:State Name="b"/>
+                <ns2:State Name="c"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="e.{enumvar==a}" Source="a" Target="b"/>
+                <ns2:Transition Event="e.{enumvar==b}" Source="b" Target="c"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+    </ns2:AutomataList>
+</ns2:ProductDES>

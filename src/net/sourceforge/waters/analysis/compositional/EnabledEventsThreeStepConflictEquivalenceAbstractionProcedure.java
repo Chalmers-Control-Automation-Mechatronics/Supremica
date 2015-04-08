@@ -2,14 +2,13 @@
 //###########################################################################
 //# PROJECT: Waters Analysis
 //# PACKAGE: net.sourceforge.waters.analysis.compositional
-//# CLASS:   ThreeStepConflictEquivalenceAbstractionProcedure
+//# CLASS:   EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
@@ -19,10 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import net.sourceforge.waters.analysis.abstraction.AlwaysEnabledEventsFinder;
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.EnabledEventsLimitedCertainConflictsTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.EnabledEventsSilentIncomingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.IncomingEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.LimitedCertainConflictsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.MarkingRemovalTRSimplifier;
@@ -30,14 +26,18 @@ import net.sourceforge.waters.analysis.abstraction.MarkingSaturationTRSimplifier
 import net.sourceforge.waters.analysis.abstraction.NonAlphaDeterminisationTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.OnlySilentOutgoingTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.SilentIncomingTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.SpecialEventsFinder;
 import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -46,12 +46,12 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 /**
  * A specialised abstraction procedure used by the compositional conflict
- * check algorithm. This abstraction procedure splits the abstraction
- * process into three stages. Abstraction steps before and after certain
- * conflicts are separated from certain conflicts computation to facilitate
- * counterexample expansion.
+ * check algorithm with always enabled events. This abstraction procedure
+ * splits the abstraction process into three stages. Abstraction steps before
+ * and after certain conflicts are separated from certain conflicts
+ * computation to facilitate counterexample expansion.
  *
- * @author Robi Malik
+ * @author Robi Malik, Colin Pilbrow
  */
 
 class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
@@ -65,8 +65,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
       (final AbstractCompositionalModelAnalyzer analyzer,
        final ObservationEquivalenceTRSimplifier.Equivalence equivalence,
        final boolean includeNonAlphaDeterminisation,
-       final boolean useLimitedCertainConflicts,
-       final boolean useAlwaysEnabledLimitedCertainConflicts)
+       final boolean useLimitedCertainConflicts)
   {
     final int limit = analyzer.getInternalTransitionLimit();
     final ChainTRSimplifier preChain = new ChainTRSimplifier();
@@ -83,30 +82,22 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     transitionRemover.setTransitionLimit(limit);
     preChain.add(transitionRemover);
 
-    final EnabledEventsSilentIncomingTRSimplifier enabledEventsSilentIncomingSimplifier =
-      new EnabledEventsSilentIncomingTRSimplifier();
-    enabledEventsSilentIncomingSimplifier.setRestrictsToUnreachableStates(true);
-    enabledEventsSilentIncomingSimplifier.setDumpStateAware(true);
-    preChain.add(enabledEventsSilentIncomingSimplifier);
+    final SilentIncomingTRSimplifier silentIncomingSimplifier =
+      new SilentIncomingTRSimplifier();
+    silentIncomingSimplifier.setRestrictsToUnreachableStates(true);
+    silentIncomingSimplifier.setDumpStateAware(true);
+    preChain.add(silentIncomingSimplifier);
 
     final OnlySilentOutgoingTRSimplifier silentOutRemover =
       new OnlySilentOutgoingTRSimplifier();
     silentOutRemover.setDumpStateAware(true);
     preChain.add(silentOutRemover);
 
-    final LimitedCertainConflictsTRSimplifier limitedCertainConflictsRemover;
+    final LimitedCertainConflictsTRSimplifier certainConflictsRemover;
     if (useLimitedCertainConflicts) {
-      limitedCertainConflictsRemover =
-        new LimitedCertainConflictsTRSimplifier();
+      certainConflictsRemover = new LimitedCertainConflictsTRSimplifier();
     } else {
-      limitedCertainConflictsRemover = null;
-    }
-
-    final EnabledEventsLimitedCertainConflictsTRSimplifier enabledEventsLimitedCertainConflictsRemover;
-    if (useAlwaysEnabledLimitedCertainConflicts) {
-      enabledEventsLimitedCertainConflictsRemover = new EnabledEventsLimitedCertainConflictsTRSimplifier();
-    } else {
-      enabledEventsLimitedCertainConflictsRemover = null;
+      certainConflictsRemover = null;
     }
 
     final ObservationEquivalenceTRSimplifier slBisimulator =
@@ -136,14 +127,12 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
       new MarkingSaturationTRSimplifier();
     postChain.add(saturator);
 
-    final AlwaysEnabledEventsFinder finder = new AlwaysEnabledEventsFinder();
+    final SpecialEventsFinder finder = new SpecialEventsFinder();
+    finder.setAlwaysEnabledEventsDetected(true);
     postChain.add(finder);
 
     return new EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
-      (analyzer, preChain, postChain,
-       limitedCertainConflictsRemover,
-       enabledEventsLimitedCertainConflictsRemover,
-       enabledEventsSilentIncomingSimplifier, finder);
+      (analyzer, preChain, postChain, certainConflictsRemover, finder);
   }
 
 
@@ -153,25 +142,18 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     (final AbstractCompositionalModelAnalyzer analyzer,
      final ChainTRSimplifier preChain,
      final ChainTRSimplifier postChain,
-     final LimitedCertainConflictsTRSimplifier limitedCCSimplifier,
-     final EnabledEventsLimitedCertainConflictsTRSimplifier alwaysEnabledLimitedCCSimplifier,
-     final EnabledEventsSilentIncomingTRSimplifier enabledEventsSilentIncomingSimplifier,
-     final AlwaysEnabledEventsFinder finder)
+     final LimitedCertainConflictsTRSimplifier certainConflictsRemover,
+     final SpecialEventsFinder finder)
   {
     super(analyzer);
     mPreChain = preChain;
-    mEnabledEventsLimitedCertainConflictsSimplifier = alwaysEnabledLimitedCCSimplifier;
-    mLimitedCertainConflictsSimplifier = limitedCCSimplifier;
-    mEnabledEventsSilentIncomingSimplifier = enabledEventsSilentIncomingSimplifier;
+    mCertainConflictsSimplifier = certainConflictsRemover;
     mAlwaysEnabledEventsFinder = finder;
     mPostChain = postChain;
     mCompleteChain = new ChainTRSimplifier();
     mCompleteChain.add(preChain);
-    if (limitedCCSimplifier != null) {
-      mCompleteChain.add(limitedCCSimplifier);
-    }
-    if (alwaysEnabledLimitedCCSimplifier != null) {
-      mCompleteChain.add(alwaysEnabledLimitedCCSimplifier);
+    if (certainConflictsRemover != null) {
+      mCompleteChain.add(certainConflictsRemover);
     }
     mCompleteChain.add(postChain);
   }
@@ -249,13 +231,6 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
         }
       }
 
-      // Tell the simplifiers how many enabled events there are
-      mEnabledEventsSilentIncomingSimplifier.
-        setNumberOfEnabledEvents(numEnabledEvents);
-      if (mEnabledEventsLimitedCertainConflictsSimplifier != null) {
-        mEnabledEventsLimitedCertainConflictsSimplifier.
-          setNumberOfEnabledEvents(numEnabledEvents);
-      }
       // Create Event Encoding in right order with all enabled events at front of list
       final EventEncoding eventEnc =
         createEventEncoding(eventsList, local, numEnabledEvents, candidate);
@@ -266,7 +241,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
       analyzer.showDebugLog(rel);
       final int numStates = rel.getNumberOfStates();
       final int numTrans = aut.getTransitions().size();
-      final int numMarkings = rel.getNumberOfMarkings();
+      final int numMarkings = rel.getNumberOfMarkings(false);
       AutomatonProxy lastAut = aut;
       StateEncoding lastStateEnc = inputStateEnc;
       TRPartition partition = null;
@@ -287,47 +262,21 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
         lastAut = outputAut;
         lastStateEnc = outputStateEnc;
       }
-      boolean maybeBlocking = true;
-      AbstractionStep lccStep = null;
-      if (mLimitedCertainConflictsSimplifier != null) {
-        mLimitedCertainConflictsSimplifier.setTransitionRelation(rel);
-        if (mLimitedCertainConflictsSimplifier.run()) {
-          rel = mLimitedCertainConflictsSimplifier.getTransitionRelation();
-          final StateEncoding outputStateEnc = new StateEncoding();
-          final AutomatonProxy outputAut =
-            rel.createAutomaton(factory, eventEnc, outputStateEnc);
-          if (mLimitedCertainConflictsSimplifier.hasCertainConflictTransitions()) {
-            lccStep = new LimitedCertainConflictsStep
-              (analyzer, mLimitedCertainConflictsSimplifier, outputAut,
-               lastAut, tau, lastStateEnc, outputStateEnc);
-          } else {
-            final TRPartition ccPart =
-              mLimitedCertainConflictsSimplifier.getResultPartition();
-            partition = TRPartition.combine(partition, ccPart);
-            preStep = createStep(aut, inputStateEnc,
-                                 outputAut, outputStateEnc, tau,
-                                 partition, oeq, false);
-          }
-          lastAut = outputAut;
-          lastStateEnc = outputStateEnc;
-        }
-        maybeBlocking =  mLimitedCertainConflictsSimplifier.getMaxLevel() >= 0;
-      }
-      AbstractionStep eelccStep = null;
-      if (maybeBlocking && mEnabledEventsLimitedCertainConflictsSimplifier != null) {
-        mEnabledEventsLimitedCertainConflictsSimplifier.setTransitionRelation(rel);
-        if (mEnabledEventsLimitedCertainConflictsSimplifier.run()) {
-          rel = mEnabledEventsLimitedCertainConflictsSimplifier.getTransitionRelation();
+      final boolean maybeBlocking = true;
+      AbstractionStep ccStep = null;
+      if (maybeBlocking && mCertainConflictsSimplifier != null) {
+        mCertainConflictsSimplifier.setTransitionRelation(rel);
+        if (mCertainConflictsSimplifier.run()) {
+          rel = mCertainConflictsSimplifier.getTransitionRelation();
           final StateEncoding outputStateEnc = new StateEncoding();
           final AutomatonProxy outputAut =
             rel.createAutomaton(factory, eventEnc, outputStateEnc);
           final TRPartition ccPart =
-            mEnabledEventsLimitedCertainConflictsSimplifier.getResultPartition();
-          if (mEnabledEventsLimitedCertainConflictsSimplifier.hasCertainConflictTransitions() ||
-              lccStep != null) {
+            mCertainConflictsSimplifier.getResultPartition();
+          if (mCertainConflictsSimplifier.hasCertainConflictTransitions()) {
             final int[] levels =
-              mEnabledEventsLimitedCertainConflictsSimplifier.getLevels();
-            eelccStep = new EnabledEventsLimitedCertainConflictsStep
+              mCertainConflictsSimplifier.getLevels();
+            ccStep = new EnabledEventsLimitedCertainConflictsStep
               (analyzer, outputAut, lastAut, tau, lastStateEnc,
                outputStateEnc, ccPart, levels);
           } else {
@@ -346,9 +295,9 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
         rel = mPostChain.getTransitionRelation();
         if (rel.getNumberOfReachableStates() == numStates &&
             rel.getNumberOfTransitions() == numTrans &&
-            rel.getNumberOfMarkings() == numMarkings) {
+            rel.getNumberOfMarkings(false) == numMarkings) {
           return false;
-        } else if (lccStep == null && eelccStep == null) {
+        } else if (ccStep == null) {
           lastAut = aut;
           lastStateEnc = inputStateEnc;
           final TRPartition postPart = mPostChain.getResultPartition();
@@ -356,8 +305,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
           oeq &= mPostChain.isObservationEquivalentAbstraction();
         } else {
           recordStep(steps, preStep);
-          recordStep(steps, lccStep);
-          recordStep(steps, eelccStep);
+          recordStep(steps, ccStep);
           partition = mPostChain.getResultPartition();
           oeq = mPostChain.isObservationEquivalentAbstraction();
           reduced = false;
@@ -371,8 +319,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
         recordStep(steps, postStep);
       } else {
         recordStep(steps, preStep);
-        recordStep(steps, lccStep);
-        recordStep(steps, eelccStep);
+        recordStep(steps, ccStep);
       }
       collectAlwaysEnabledEvents(eventEnc);
       return !steps.isEmpty();
@@ -385,7 +332,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
   public void storeStatistics()
   {
     final CompositionalAnalysisResult result = getAnalysisResult();
-    result.setSimplifierStatistics(mCompleteChain);
+    result.addSimplifierStatistics(mCompleteChain);
   }
 
   @Override
@@ -422,6 +369,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
                                             final Collection<EventProxy> local,
                                             final int numAlwaysEnabled,
                                             final Candidate candidate)
+    throws OverflowException
   {
     final EnabledEventsCompositionalConflictChecker analyzer =
       (EnabledEventsCompositionalConflictChecker) getAnalyzer();
@@ -441,15 +389,15 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
         }
       } else {
         byte status = 0;
-        if (analyzer.isUsingSpecialEvents()) {
+        if (analyzer.isSelfloopOnlyEventsEnabled()) {
           final AbstractCompositionalModelAnalyzer.EventInfo info =
             analyzer.getEventInfo(event);
           if (info.isOnlyNonSelfLoopCandidate(candidate)) {
-            status |= EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP;
+            status |= EventStatus.STATUS_SELFLOOP_ONLY;
           }
         }
         if (e < numAlwaysEnabled) {
-          status |= EventEncoding.STATUS_OUTSIDE_ALWAYS_ENABLED;
+          status |= EventStatus.STATUS_ALWAYS_ENABLED;
         }
         enc.addEvent(event, translator, status);
         e++;
@@ -458,7 +406,7 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
     final EventProxy defaultMarking = getUsedDefaultMarking();
     final int defaultMarkingID = enc.getEventCode(defaultMarking);
     if (defaultMarkingID < 0) {
-      enc.addEvent(defaultMarking, translator, EventEncoding.STATUS_UNUSED);
+      enc.addEvent(defaultMarking, translator, EventStatus.STATUS_UNUSED);
     }
     mCompleteChain.setDefaultMarkingID(defaultMarkingID);
     return enc;
@@ -466,13 +414,14 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
 
   private void collectAlwaysEnabledEvents(final EventEncoding eventEnc)
   {
-    final TIntArrayList codes =
-      mAlwaysEnabledEventsFinder.getAlwaysEnabledEvents();
-    mAlwaysEnabledEvents = new THashSet<>(codes.size());
-    for (int i = 0; i < codes.size(); i++) {
-      final int e = codes.get(i);
-      final EventProxy event = eventEnc.getProperEvent(e);
-      mAlwaysEnabledEvents.add(event);
+    final byte[] computedStatus =
+      mAlwaysEnabledEventsFinder.getComputedEventStatus();
+    mAlwaysEnabledEvents = new THashSet<>(computedStatus.length);
+    for (int e = 0; e < computedStatus.length; e++) {
+      if (EventStatus.isAlwaysEnabledEvent(computedStatus[e])) {
+        final EventProxy event = eventEnc.getProperEvent(e);
+        mAlwaysEnabledEvents.add(event);
+      }
     }
   }
 
@@ -509,13 +458,9 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
   //#########################################################################
   //# Data Members
   private final ChainTRSimplifier mPreChain;
-  private final EnabledEventsLimitedCertainConflictsTRSimplifier
-    mEnabledEventsLimitedCertainConflictsSimplifier;
   private final LimitedCertainConflictsTRSimplifier
-    mLimitedCertainConflictsSimplifier;
-  private final EnabledEventsSilentIncomingTRSimplifier
-    mEnabledEventsSilentIncomingSimplifier;
-  private final AlwaysEnabledEventsFinder mAlwaysEnabledEventsFinder;
+    mCertainConflictsSimplifier;
+  private final SpecialEventsFinder mAlwaysEnabledEventsFinder;
   private final ChainTRSimplifier mPostChain;
   private final ChainTRSimplifier mCompleteChain;
 

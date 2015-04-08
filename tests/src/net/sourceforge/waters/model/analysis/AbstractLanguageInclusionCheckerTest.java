@@ -57,10 +57,11 @@ public abstract class AbstractLanguageInclusionCheckerTest
   public void testReentrant()
     throws Exception
   {
-    testEmpty();
+    testTrafficLightac61();
+    testDisjointProp2();
     testSmallFactory2();
-    testEmpty();
-    testSmallFactory2();
+    testTrafficLightac61();
+    testHISC8nd();
   }
 
 
@@ -68,55 +69,81 @@ public abstract class AbstractLanguageInclusionCheckerTest
   //# Test Cases --- no properties
   public void testSmallFactory2() throws Exception
   {
-    final String group = "handwritten";
-    final String name = "small_factory_2.wdes";
-    runModelVerifier(group, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("handwritten", "small_factory_2.wdes");
+    runModelVerifier(des, true);
   }
 
   public void testTictactoe() throws Exception
   {
-    final String group = "handwritten";
-    final String name = "tictactoe.wdes";
-    runModelVerifier(group, name, true);
+    final ProductDESProxy des =
+      getCompiledDES("handwritten", "tictactoe.wdes");
+    runModelVerifier(des, true);
   }
 
 
   //#########################################################################
   //# Test Cases --- nasty
+  public void testAgvCounter() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "agv_certainconf.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testDisjointProp1() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "disjoint_prop1.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testDisjointProp2() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "disjoint_prop2.wmod");
+    runModelVerifier(des, true);
+  }
+
+  public void testDropSelfloopLang() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "drop_selfloop_lang.wmod");
+    runModelVerifier(des, false);
+  }
+
   public void testEmptyProp() throws Exception
   {
-    final String group = "tests";
-    final String dir = "nasty";
-    final String name = "empty_prop.wmod";
-    runModelVerifier(group, dir, name, false);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "empty_prop.wmod");
+    runModelVerifier(des, false);
   }
 
   public void testVerriegel4Counter1() throws Exception
   {
-    final String group = "tests";
-    final String dir = "nasty";
-    final String name = "verriegel4counter1.wmod";
-    runModelVerifier(group, dir, name, false);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "verriegel4counter1.wmod");
+    runModelVerifier(des, false);
   }
+
 
   //#########################################################################
   //# Test Cases -- traffic light language inclusion
   public void testTrafficLightac61() throws Exception
   {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "ac61lang.wmod";
-    runModelVerifier(group, dir, name, false);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "trafficlights2006", "ac61lang.wmod");
+    runModelVerifier(des, false);
   }
+
 
   //#########################################################################
   //# Test Cases --- nondeterministic
   public void testHISC8nd() throws Exception
   {
-    final String group = "tests";
-    final String dir = "nondeterministic";
-    final String name = "hisc8nd.wmod";
-    runModelVerifier(group, dir, name, false);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nondeterministic", "hisc8nd.wmod");
+    runModelVerifier(des, false);
   }
 
 
@@ -290,7 +317,7 @@ public abstract class AbstractLanguageInclusionCheckerTest
     final ParameterBindingProxy binding = createBinding("MAXSEQNO", maxseqno);
     final List<ParameterBindingProxy> bindings =
       Collections.singletonList(binding);
-    for (int seqno = 0; seqno <= maxseqno; seqno++) {
+    for (int seqno = 1; seqno <= maxseqno; seqno++) {
       final String propname =
         String.format("slave_sets_fv_after_slave_timeout_3[%d]", seqno);
       runModelVerifier(group, dir, name, bindings, seqno == 0, propname);

@@ -9,10 +9,6 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import net.sourceforge.waters.analysis.tr.EventEncoding;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -43,13 +39,6 @@ public class MarkingRemovalTRSimplifierTest
   protected TransitionRelationSimplifier createTransitionRelationSimplifier()
   {
     return new MarkingRemovalTRSimplifier();
-  }
-
-  @Override
-  protected EventEncoding createEventEncoding(final ProductDESProxy des,
-                                              final AutomatonProxy aut)
-  {
-    return createEventEncodingWithPropositions(des, aut);
   }
 
 

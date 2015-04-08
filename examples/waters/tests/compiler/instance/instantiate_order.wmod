@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="instantiate_order" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ComponentList>
+        <Instance ModuleName="order" Name="order"/>
+    </ComponentList>
+</Module>

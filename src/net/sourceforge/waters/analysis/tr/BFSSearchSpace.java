@@ -135,6 +135,23 @@ public class BFSSearchSpace<E>
   }
 
   /**
+   * Adds the given item to the queue. This method is the same as the
+   * {@link #add(Object) add()} and {@link #offer(Object) offer()} methods
+   * except for the return value.
+   * @param   item   The item to be added.
+   * @return  <CODE>true</CODE> if the item was not already visited and
+   *          has been added to the queue, <CODE>false</CODE> otherwise.
+   */
+  public boolean addIfUnvisited(final E item)
+  {
+    if (mVisited.add(item)) {
+      mQueue.add(item);
+      return true;
+    } else {
+      return false;
+    }
+  }
+  /**
    * Returns all the visited items in the search space.
    */
   public Set<E> getVisitedSet()

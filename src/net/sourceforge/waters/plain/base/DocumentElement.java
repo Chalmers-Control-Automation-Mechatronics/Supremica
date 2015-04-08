@@ -74,6 +74,7 @@ public abstract class DocumentElement
 
   //#########################################################################
   //# Cloning
+  @Override
   public DocumentElement clone()
   {
     final DocumentElement cloned = (DocumentElement) super.clone();
@@ -85,35 +86,47 @@ public abstract class DocumentElement
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.base.DocumentProxy
+  @Override
   public String getComment()
   {
     return mComment;
   }
 
+  @Override
   public URI getLocation()
   {
     return mLocation;
   }
 
+  @Override
   public File getFileLocation() throws MalformedURLException
   {
-    if (mLocation == null) {
+    return getFileLocation(mLocation);
+  }
+
+  @Override
+  public void setLocation(final URI location)
+  {
+    mLocation = location;
+  }
+
+
+  //#########################################################################
+  //# Static Methods
+  public static File getFileLocation(final URI uri) throws MalformedURLException
+  {
+    if (uri == null) {
       return null;
     }
-    final URL url = mLocation.toURL();
+    final URL url = uri.toURL();
     final String proto = url.getProtocol();
     if (proto.equals("file")) {
-      final String path = mLocation.getPath();
+      final String path = uri.getPath();
       return new File(path);
     } else {
       throw new MalformedURLException
         ("Location '" + url + "' does not represent a writable file!");
     }
-  }
-
-  public void setLocation(final URI location)
-  {
-    mLocation = location;
   }
 
 

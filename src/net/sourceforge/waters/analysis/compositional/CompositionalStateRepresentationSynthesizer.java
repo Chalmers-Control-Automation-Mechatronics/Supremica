@@ -21,6 +21,7 @@ import net.sourceforge.waters.analysis.abstraction.HalfWaySynthesisTRSimplifier;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.AbstractSynchronisationEncoding;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TRPartition;
@@ -30,6 +31,7 @@ import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -448,7 +450,8 @@ public class CompositionalStateRepresentationSynthesizer extends
      final EventProxy tau)
   {
     final SynchronousProductBuilder builder = getSynchronousProductBuilder();
-    final SynchronousProductStateMap stateMap =  builder.getStateMap();
+    final SynchronousProductResult result = builder.getAnalysisResult();
+    final SynchronousProductStateMap stateMap = result.getStateMap();
     return new HidingStep(this, sync, hidden, tau, stateMap);
   }
 
@@ -486,7 +489,8 @@ public class CompositionalStateRepresentationSynthesizer extends
       syncBuilder.run();
       automaton = syncBuilder.getComputedAutomaton();
       final Collection<EventProxy> localEvents = Collections.emptyList();
-      final SynchronousProductStateMap stateMap = syncBuilder.getStateMap();
+      final SynchronousProductResult result = syncBuilder.getAnalysisResult();
+      final SynchronousProductStateMap stateMap = result.getStateMap();
       final HidingStep step =
         new HidingStep(this, automaton, localEvents, null, stateMap);
       recordAbstractionStep(step);
@@ -504,6 +508,7 @@ public class CompositionalStateRepresentationSynthesizer extends
   //#########################################################################
   //# Synthesis
   private EventEncoding createSynthesisEventEncoding(final AutomatonProxy aut)
+    throws OverflowException
   {
     final KindTranslator translator = getKindTranslator();
     final Collection<EventProxy> props = getPropositions();
@@ -518,10 +523,10 @@ public class CompositionalStateRepresentationSynthesizer extends
                         EventEncoding.FILTER_PROPOSITIONS);
     for (int e = EventEncoding.NONTAU; e < encoding.getNumberOfProperEvents(); e++) {
       final byte status = encoding.getProperEventStatus(e);
-      encoding.setProperEventStatus(e, status | EventEncoding.STATUS_LOCAL);
+      encoding.setProperEventStatus(e, status | EventStatus.STATUS_LOCAL);
     }
-    encoding.sortProperEvents((byte) ~EventEncoding.STATUS_LOCAL,
-                              EventEncoding.STATUS_CONTROLLABLE);
+    encoding.sortProperEvents((byte) ~EventStatus.STATUS_LOCAL,
+                              EventStatus.STATUS_CONTROLLABLE);
     return encoding;
   }
 

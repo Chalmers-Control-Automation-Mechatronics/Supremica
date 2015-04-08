@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:ProductDES Name="sensoractuator_nondet" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
+    <Comment>Original version of sensor-actuator example. Has nondeterministic variable automata under new EFA semantics.</Comment>
+    <ns2:EventList>
+        <ns2:Event Kind="PROPOSITION" Name=":accepting"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="change_direction.{forward}"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="change_direction.{!forward}"/>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="move_left.{!sensor1'}"/>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="move_left.{sensor1'}"/>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="move_left.{!sensor2'}"/>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="move_left.{sensor2'}"/>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="move_right.{sensor1'}"/>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="move_right.{!sensor1'}"/>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="move_right.{sensor2'}"/>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="move_right.{!sensor2'}"/>
+    </ns2:EventList>
+    <ns2:AutomataList>
+        <ns2:Automaton Kind="PLANT" Name="forward">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="change_direction.{!forward}"/>
+                <ns2:EventRef Name="change_direction.{forward}"/>
+                <ns2:EventRef Name="move_left.{!sensor1'}"/>
+                <ns2:EventRef Name="move_left.{!sensor2'}"/>
+                <ns2:EventRef Name="move_left.{sensor1'}"/>
+                <ns2:EventRef Name="move_left.{sensor2'}"/>
+                <ns2:EventRef Name="move_right.{!sensor1'}"/>
+                <ns2:EventRef Name="move_right.{!sensor2'}"/>
+                <ns2:EventRef Name="move_right.{sensor1'}"/>
+                <ns2:EventRef Name="move_right.{sensor2'}"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="0"/>
+                <ns2:State Name="1"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="change_direction.{!forward}" Source="0" Target="1"/>
+                <ns2:Transition Event="move_left.{!sensor1'}" Source="0" Target="0"/>
+                <ns2:Transition Event="move_left.{!sensor2'}" Source="0" Target="0"/>
+                <ns2:Transition Event="move_left.{sensor1'}" Source="0" Target="0"/>
+                <ns2:Transition Event="move_left.{sensor2'}" Source="0" Target="0"/>
+                <ns2:Transition Event="change_direction.{forward}" Source="1" Target="0"/>
+                <ns2:Transition Event="move_right.{!sensor1'}" Source="1" Target="1"/>
+                <ns2:Transition Event="move_right.{!sensor2'}" Source="1" Target="1"/>
+                <ns2:Transition Event="move_right.{sensor1'}" Source="1" Target="1"/>
+                <ns2:Transition Event="move_right.{sensor2'}" Source="1" Target="1"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="PLANT" Name="sensor1">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="move_left.{!sensor1'}"/>
+                <ns2:EventRef Name="move_left.{sensor1'}"/>
+                <ns2:EventRef Name="move_right.{!sensor1'}"/>
+                <ns2:EventRef Name="move_right.{sensor1'}"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="0"/>
+                <ns2:State Name="1"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="move_left.{!sensor1'}" Source="0" Target="0"/>
+                <ns2:Transition Event="move_left.{sensor1'}" Source="0" Target="1"/>
+                <ns2:Transition Event="move_right.{!sensor1'}" Source="0" Target="0"/>
+                <ns2:Transition Event="move_right.{sensor1'}" Source="0" Target="1"/>
+                <ns2:Transition Event="move_left.{!sensor1'}" Source="1" Target="0"/>
+                <ns2:Transition Event="move_left.{sensor1'}" Source="1" Target="1"/>
+                <ns2:Transition Event="move_right.{!sensor1'}" Source="1" Target="0"/>
+                <ns2:Transition Event="move_right.{sensor1'}" Source="1" Target="1"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="PLANT" Name="sensor2">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="move_left.{!sensor2'}"/>
+                <ns2:EventRef Name="move_left.{sensor2'}"/>
+                <ns2:EventRef Name="move_right.{!sensor2'}"/>
+                <ns2:EventRef Name="move_right.{sensor2'}"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="0"/>
+                <ns2:State Name="1"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="move_left.{!sensor2'}" Source="0" Target="0"/>
+                <ns2:Transition Event="move_left.{sensor2'}" Source="0" Target="1"/>
+                <ns2:Transition Event="move_right.{!sensor2'}" Source="0" Target="0"/>
+                <ns2:Transition Event="move_right.{sensor2'}" Source="0" Target="1"/>
+                <ns2:Transition Event="move_left.{!sensor2'}" Source="1" Target="0"/>
+                <ns2:Transition Event="move_left.{sensor2'}" Source="1" Target="1"/>
+                <ns2:Transition Event="move_right.{!sensor2'}" Source="1" Target="0"/>
+                <ns2:Transition Event="move_right.{sensor2'}" Source="1" Target="1"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="PLANT" Name="SensorActuator">
+            <ns2:EventRefList>
+                <ns2:EventRef Name=":accepting"/>
+                <ns2:EventRef Name="change_direction.{!forward}"/>
+                <ns2:EventRef Name="change_direction.{forward}"/>
+                <ns2:EventRef Name="move_left.{!sensor1'}"/>
+                <ns2:EventRef Name="move_left.{!sensor2'}"/>
+                <ns2:EventRef Name="move_left.{sensor1'}"/>
+                <ns2:EventRef Name="move_left.{sensor2'}"/>
+                <ns2:EventRef Name="move_right.{!sensor1'}"/>
+                <ns2:EventRef Name="move_right.{!sensor2'}"/>
+                <ns2:EventRef Name="move_right.{sensor1'}"/>
+                <ns2:EventRef Name="move_right.{sensor2'}"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="A">
+                    <ns2:EventRefList>
+                        <ns2:EventRef Name=":accepting"/>
+                    </ns2:EventRefList>
+                </ns2:State>
+                <ns2:State Name="B"/>
+                <ns2:State Name="C"/>
+                <ns2:State Name="D"/>
+                <ns2:State Name="E"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="change_direction.{!forward}" Source="A" Target="A"/>
+                <ns2:Transition Event="change_direction.{forward}" Source="A" Target="A"/>
+                <ns2:Transition Event="move_right.{sensor1'}" Source="A" Target="B"/>
+                <ns2:Transition Event="change_direction.{!forward}" Source="B" Target="B"/>
+                <ns2:Transition Event="change_direction.{forward}" Source="B" Target="B"/>
+                <ns2:Transition Event="move_left.{!sensor1'}" Source="B" Target="A"/>
+                <ns2:Transition Event="move_right.{!sensor1'}" Source="B" Target="C"/>
+                <ns2:Transition Event="change_direction.{!forward}" Source="C" Target="C"/>
+                <ns2:Transition Event="change_direction.{forward}" Source="C" Target="C"/>
+                <ns2:Transition Event="move_left.{sensor1'}" Source="C" Target="B"/>
+                <ns2:Transition Event="move_right.{sensor2'}" Source="C" Target="D"/>
+                <ns2:Transition Event="change_direction.{!forward}" Source="D" Target="D"/>
+                <ns2:Transition Event="change_direction.{forward}" Source="D" Target="D"/>
+                <ns2:Transition Event="move_left.{!sensor2'}" Source="D" Target="C"/>
+                <ns2:Transition Event="move_right.{!sensor2'}" Source="D" Target="E"/>
+                <ns2:Transition Event="change_direction.{!forward}" Source="E" Target="E"/>
+                <ns2:Transition Event="change_direction.{forward}" Source="E" Target="E"/>
+                <ns2:Transition Event="move_left.{sensor2'}" Source="E" Target="D"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+    </ns2:AutomataList>
+</ns2:ProductDES>

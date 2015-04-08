@@ -584,7 +584,7 @@ public class EFSMSystemBuilder extends AbstractEFSMAlgorithm
         final boolean hasRemovableEvents = removeRedundantEvents(rel);
         // 3. Check for redundant propositions
         if (rel.removeRedundantPropositions()) {
-          mUsesMarking = rel.isUsedProposition(0);
+          mUsesMarking = rel.isPropositionUsed(0);
         }
         return hasUnreachableStates || hasRemovableEvents;
       } else {

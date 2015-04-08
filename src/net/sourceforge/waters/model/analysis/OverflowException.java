@@ -101,7 +101,21 @@ public class OverflowException extends AnalysisException {
 
 
   //#########################################################################
+  //# Simple Access
+  public OverflowKind getOverflowKind()
+  {
+    return mKind;
+  }
+
+  public int getLimit()
+  {
+    return mLimit;
+  }
+
+
+  //#########################################################################
   //# Overrides for Base Class java.lang.Exception
+  @Override
   public String getMessage()
   {
     if (mKind != null) {

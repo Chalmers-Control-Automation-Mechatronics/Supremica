@@ -9,10 +9,6 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import net.sourceforge.waters.analysis.tr.EventEncoding;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -48,19 +44,13 @@ public class RestrictedSilentIncomingTRSimplifierTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifierTest
+  @Override
   protected TransitionRelationSimplifier createTransitionRelationSimplifier()
   {
     final SilentIncomingTRSimplifier simplifier =
       new SilentIncomingTRSimplifier();
     simplifier.setRestrictsToUnreachableStates(true);
     return simplifier;
-  }
-
-  @Override
-  protected EventEncoding createEventEncoding(final ProductDESProxy des,
-                                              final AutomatonProxy aut)
-  {
-    return createEventEncodingWithPropositions(des, aut);
   }
 
   @Override

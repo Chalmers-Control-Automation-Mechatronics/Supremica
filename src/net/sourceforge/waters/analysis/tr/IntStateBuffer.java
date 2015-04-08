@@ -16,13 +16,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.BitSet;
 import java.util.Collection;
-import java.util.Set;
 
-import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.base.ProxyTools;
-import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 
@@ -52,60 +47,87 @@ public class IntStateBuffer
   //#########################################################################
   //# Constructors
   /**
+   * Creates a new state buffer. This constructor creates a new state buffer
+   * with the states in the given encoding. If the state encoding contains
+   * a <CODE>null</CODE> state, it is used as a reachable dump state,
+   * otherwise an additional unreachable dump state is added to the end of
+   * the state space.
+   * @param  eventEnc        Event encoding that defines event codes for
+   *                         proposition events used as markings of the states.
+   * @param  stateEnc        State encoding that defines the assignment of
+   *                         state codes for the states in the buffer.
+   */
+  public IntStateBuffer(final EventEncoding eventEnc,
+                        final StateEncoding stateEnc)
+  {
+    this(eventEnc, stateEnc, null);
+  }
+
+  /**
    * Creates a new state buffer.
-   * @param  eventEnc   Event encoding that defines event codes for proposition
-   *                    events used as markings of the states.
-   * @param  stateEnc   State encoding that defines the assignment of state
-   *                    codes for the states in the buffer.
-   * @param  events     Set of events used in automaton, or <CODE>null</CODE>.
-   *                    If the event encoding defines propositions as extra
-   *                    selfloops, all states will be marked by extra-selfloop
-   *                    propositions not in the set of events.
-   * @throws OverflowException if the event encoding map has more than 30
-   *                    propositions.
+   * @param  eventEnc        Event encoding that defines event codes for
+   *                         proposition events used as markings of the states.
+   * @param  stateEnc        State encoding that defines the assignment of
+   *                         state codes for the states in the buffer.
+   * @param  dumpState       Dump state to be used, or <CODE>null</CODE>.
+   *                         If the state encoding contains the indicated
+   *                         state, it is used as a reachable dump state,
+   *                         otherwise an additional unreachable dump state
+   *                         is added to the end of the state space.
    */
   public IntStateBuffer(final EventEncoding eventEnc,
                         final StateEncoding stateEnc,
-                        final Set<EventProxy> events)
-    throws OverflowException
+                        final StateProxy dumpState)
   {
-    this(stateEnc.getNumberOfStatesIncludingExtra(),
-         eventEnc.getNumberOfPropositions());
-    final int numStates = stateEnc.getNumberOfStatesIncludingExtra();
-    final int extraStates = stateEnc.getNumberOfExtraStates();
-    for (int state = numStates - extraStates; state < numStates; state++) {
-      setReachable(state, false);
-    }
-    int tags0 = TAG_REACHABLE;
-    for (int p = 0; p < eventEnc.getNumberOfPropositions(); p++) {
-      final byte status = eventEnc.getPropositionStatus(p);
-      if ((status & EventEncoding.STATUS_UNUSED) != 0) {
-        final EventProxy event = eventEnc.getProposition(p);
-        if (events == null || !events.contains(event)) {
-          tags0 |= (1 << p);
-        }
+    mPropositionStatus = eventEnc;
+    final int numStates = stateEnc.getNumberOfStates();
+    mDumpStateIndex = -1;
+    for (int s = 0; s < numStates; s++) {
+      if (stateEnc.getState(s) == dumpState) {
+        mDumpStateIndex = s;
+        break;
       }
     }
-
-    int i = 0;
-    for (final StateProxy state : stateEnc.getStates()) {
-      int tags;
-      if (state == null) {
-        tags = 0;
-      } else {
-        tags = tags0;
+    if (mDumpStateIndex >= 0) {
+      mStateInfo = new int[numStates];
+    } else {
+      mDumpStateIndex = numStates;
+      mStateInfo = new int[numStates + 1];
+    }
+    for (int s = 0; s < numStates; s++) {
+      final StateProxy state = stateEnc.getState(s);
+      if (state != null) {
+        int info = TAG_REACHABLE;
         if (state.isInitial()) {
-          tags |= TAG_INITIAL;
+          info |= TAG_INITIAL;
         }
-        for (final EventProxy event : state.getPropositions()) {
-          final int code = eventEnc.getEventCode(event);
-          if (code >= 0) {
-            tags |= 1 << code;
+        for (final EventProxy prop : state.getPropositions()) {
+          final int p = eventEnc.getEventCode(prop);
+          if (p >= 0 && eventEnc.isPropositionUsed(p)) {
+            info |= (1 << p);
           }
         }
+        mStateInfo[s] = info;
       }
-      mStateInfo[i++] = tags;
     }
+  }
+
+  /**
+   * Creates a new empty state buffer.
+   * This constructor allocates a new state buffer with the given number
+   * of states. States are initially marked as reachable, while all other
+   * attributes and markings of the states are initialised to be
+   * <CODE>false</CODE>. An additional unreachable dump state is added
+   * at the end.
+   * @param  size       The number of states in the new buffer.
+   * @param  propStatus Event status provider to determine the number of
+   *                    propositions and which propositions are used.
+   */
+  public IntStateBuffer(final int size,
+                        final EventStatusProvider propStatus)
+  {
+    this(size + 1, size, propStatus);
+    mStateInfo[mDumpStateIndex] = 0;
   }
 
   /**
@@ -115,38 +137,20 @@ public class IntStateBuffer
    * attributes and markings of the states are initialised to be
    * <CODE>false</CODE>.
    * @param  size       The number of states in the new buffer.
-   * @param  numProps   The number of propositions in the new buffer.
-   * @throws OverflowException
+   * @param  dumpIndex  The index of the dump state in the new buffer.
+   *                    The dump state signifies a unmarked state without
+   *                    outgoing transitions. It must be specified for
+   *                    every state buffer to provide for algorithms that
+   *                    redirect transitions to such a state.
+   * @param  propStatus Event status provider to determine the number of
+   *                    propositions and which propositions are used.
    */
-  public IntStateBuffer(final int size, final int numProps)
-    throws OverflowException
+  public IntStateBuffer(final int size,
+                        final int dumpIndex,
+                        final EventStatusProvider propStatus)
   {
-    this(size, numProps, (1 << numProps) - 1);
-  }
-
-  /**
-   * Creates a new empty state buffer.
-   * This constructor allocates a new state buffer with the given number
-   * of states. States are initially marked as reachable, while all other
-   * attributes and markings of the states are initialised to be
-   * <CODE>false</CODE>.
-   * @param  size       The number of states in the new buffer.
-   * @param  numProps   The number of propositions in the new buffer.
-   * @param  used       Marking pattern identifying propositions to be
-   *                    marked as used.
-   * @throws OverflowException
-   */
-  public IntStateBuffer(final int size, final int numProps, final long used)
-    throws OverflowException
-  {
-    mNumPropositions = numProps;
-    if (numProps > MAX_PROPOSITIONS) {
-      throw new OverflowException
-        ("Encoding has " + numProps + " propositions, but " +
-         ProxyTools.getShortClassName(this) + " can only handle up to " +
-         MAX_PROPOSITIONS + " different propositions!");
-    }
-    mUsedPropositions = (int) used;
+    mPropositionStatus = propStatus;
+    mDumpStateIndex = dumpIndex;
     mStateInfo = new int[size];
     Arrays.fill(mStateInfo, TAG_REACHABLE);
   }
@@ -155,11 +159,15 @@ public class IntStateBuffer
    * Creates a new state buffer that is an identical copy of the given
    * state buffer. This copy constructor constructs a deep copy that does
    * not share any data structures with the given state buffer.
-   */
-  public IntStateBuffer(final IntStateBuffer buffer)
+   * @param  buffer     The state buffer to be copied from.
+   * @param  propStatus Event status provider to determine the number of
+   *                    propositions and which propositions are used.
+  */
+  public IntStateBuffer(final IntStateBuffer buffer,
+                        final EventStatusProvider propStatus)
   {
-    mNumPropositions = buffer.getNumberOfPropositions();
-    mUsedPropositions = (int) buffer.getUsedPropositions();
+    mPropositionStatus = propStatus;
+    mDumpStateIndex = buffer.mDumpStateIndex;
     final int size = buffer.getNumberOfStates();
     mStateInfo = Arrays.copyOf(buffer.mStateInfo, size);
   }
@@ -173,6 +181,17 @@ public class IntStateBuffer
   public int getNumberOfStates()
   {
     return mStateInfo.length;
+  }
+
+  /**
+   * Gets the index of the dump state in this state buffer. The dump state
+   * signifies a unmarked state without outgoing transitions. It is set
+   * for every state buffer to provide for algorithms that redirect
+   * transitions to such a state.
+   */
+  public int getDumpStateIndex()
+  {
+    return mDumpStateIndex;
   }
 
   /**
@@ -220,53 +239,6 @@ public class IntStateBuffer
   }
 
   /**
-   * Gets the total number of propositions known to this state buffer.
-   * @return Number of propositions, including propositions marked as unused.
-   * @see #isUsedProposition(int) isUsedProposition()
-   */
-  public int getNumberOfPropositions()
-  {
-    return mNumPropositions;
-  }
-
-  /**
-   * Checks whether the given proposition is marked as used.
-   * Propositions can be marked as unused to indicate that all states are
-   * marked, so the proposition does not need to be included in the alphabet
-   * when constructing an automaton.
-   * @param  prop    ID of the marking proposition to be tested.
-   * @see #removeRedundantPropositions()
-   */
-  public boolean isUsedProposition(final int prop)
-  {
-    final int code = 1 << prop;
-    return (mUsedPropositions & code) != 0;
-  }
-
-  /**
-   * Gets a marking pattern containing all propositions currently marked
-   * as used.
-   */
-  public long getUsedPropositions()
-  {
-    return mUsedPropositions;
-  }
-
-  /**
-   * Sets a new pattern of used propositions.
-   * @param markings
-   *          Pattern containing all propositions to be considered as used.
-   *          This pattern can be obtained through the methods {@link
-   *          #getAllMarkings(int) getAllMarkings()}, {@link
-   *          #createMarkings(TIntArrayList) createMarkings()}, or
-   *          {@link #mergeMarkings(long,long) mergeMarkings()}.
-   */
-  public void setUsedPropositions(final long markings)
-  {
-    mUsedPropositions = (int) markings;
-  }
-
-  /**
    * Checks whether a state is marked.
    * This method reports a state as marked if the indicated proposition is
    * not marked as used (marked by default for proposition not in the
@@ -277,9 +249,9 @@ public class IntStateBuffer
    */
   public boolean isMarked(final int state, final int prop)
   {
-    final int code = 1 << prop;
-    if ((mUsedPropositions & code) != 0) {
-      return (mStateInfo[state] & code) != 0;
+    if (mPropositionStatus.isPropositionUsed(prop)) {
+      final int pattern = 1 << prop;
+      return (mStateInfo[state] & pattern) != 0;
     } else {
       return true;
     }
@@ -289,20 +261,45 @@ public class IntStateBuffer
    * Gets the total number of markings in this state buffer.
    * Each instance of a proposition marking a reachable state counts
    * as marking.
+   * @param  countUnused  Whether unused proposition should be counted.
+   *                      If <CODE>true</CODE> unused propositions are counted
+   *                      as marked in all states; if <CODE>false</CODE>,
+   *                      unused propositions are not counted.
    */
-  public int getNumberOfMarkings()
+  public int getNumberOfMarkings(final boolean countUnused)
   {
+    final int numProps = mPropositionStatus.getNumberOfPropositions();
     int result = 0;
-    for (int prop = 0; prop < getNumberOfPropositions(); prop++) {
-      if (isUsedProposition(prop)) {
-        for (int state = 0; state < getNumberOfStates(); state++) {
-          if (isReachable(state) && isMarked(state, prop)) {
-            result++;
-          }
-        }
-      }
+    for (int prop = 0; prop < numProps; prop++) {
+      result += getNumberOfMarkings(prop, countUnused);
     }
     return result;
+  }
+
+  /**
+   * Gets the number of reachable states marked by the given proposition in
+   * this state buffer.
+   * @param  prop         The proposition number to be checked.
+   * @param  countUnused  Whether unused proposition should be counted.
+   *                      If <CODE>true</CODE> unused propositions are counted
+   *                      as marked in all states; if <CODE>false</CODE>,
+   *                      unused propositions considered as not marked.
+   */
+  public int getNumberOfMarkings(final int prop, final boolean countUnused)
+  {
+    if (mPropositionStatus.isPropositionUsed(prop)) {
+      int result = 0;
+      for (int state = 0; state < getNumberOfStates(); state++) {
+        if (isReachable(state) && isMarked(state, prop)) {
+          result++;
+        }
+      }
+      return result;
+    } else if (countUnused) {
+      return getNumberOfStates();
+    } else {
+      return 0;
+    }
   }
 
   /**
@@ -315,7 +312,6 @@ public class IntStateBuffer
    *         different sets of markings will always have different marking
    *         patterns. Only propositions marked as used are considered.
    * @see #setAllMarkings(int,long) setAllMarkings()
-   * @see #isUsedProposition(int) isUsedProposition()
    */
   public long getAllMarkings(final int state)
   {
@@ -331,10 +327,17 @@ public class IntStateBuffer
    */
   public void setMarked(final int state, final int prop, final boolean value)
   {
+    final int pattern = 1 << prop;
     if (value) {
-      mStateInfo[state] |= 1 << prop;
+      mStateInfo[state] |= pattern;
     } else {
-      mStateInfo[state] &= ~(1 << prop);
+      if (!mPropositionStatus.isPropositionUsed(prop)) {
+        mPropositionStatus.setPropositionUsed(prop, true);
+        for (int s = 0; s < mStateInfo.length; s++) {
+          mStateInfo[s] |= pattern;
+        }
+      }
+      mStateInfo[state] &= ~pattern;
     }
   }
 
@@ -477,41 +480,58 @@ public class IntStateBuffer
   }
 
   /**
+   * Ensures all propositions are marked as used. All propositions marked
+   * as unused are marked as used and added to all states by this method.
+   * @return <CODE>true</CODE> if at least one proposition was changed,
+   *         <CODE>false</CODE> otherwise.
+   */
+  public boolean addRedundantPropositions()
+  {
+    final int numProps = mPropositionStatus.getNumberOfPropositions();
+    int pattern = 0;
+    for (int p = 0; p < numProps; p++) {
+      if (!mPropositionStatus.isPropositionUsed(p)) {
+        mPropositionStatus.setPropositionUsed(p, true);
+        pattern |= (1 << p);
+      }
+    }
+    if (pattern == 0) {
+      return false;
+    } else {
+      for (int state = 0; state < mStateInfo.length; state++) {
+        mStateInfo[state] |= pattern;
+      }
+      return true;
+    }
+  }
+
+  /**
    * Checks for each proposition whether is appears on all reachable states,
    * and if so, removes the proposition by marking it as unused.
    * @return <CODE>true</CODE> if at least one proposition was removed,
    *         <CODE>false</CODE> otherwise.
-   * @see #isUsedProposition(int) isUsedProposition()
    */
   public boolean removeRedundantPropositions()
   {
-    int used = mUsedPropositions;
-    for (int p = 0; p < mNumPropositions; p++) {
-      int code = 1 << p;
-      if ((used & code) != 0) {
-        code |= TAG_REACHABLE;
+    final int numProps = mPropositionStatus.getNumberOfPropositions();
+    boolean removed = false;
+    for (int p = 0; p < numProps; p++) {
+      if (mPropositionStatus.isPropositionUsed(p)) {
+        final int pattern = (1 << p) | TAG_REACHABLE;
         boolean redundant = true;
         for (int state = 0; state < mStateInfo.length; state++) {
-          if ((mStateInfo[state] & code) == TAG_REACHABLE) {
+          if ((mStateInfo[state] & pattern) == TAG_REACHABLE) {
             redundant = false;
             break;
           }
         }
         if (redundant) {
-          used &= ~code;
+          mPropositionStatus.setPropositionUsed(p, false);
+          removed = true;
         }
       }
     }
-    if (mUsedPropositions != used) {
-      mUsedPropositions = used;
-      used |= TAG_ALL;
-      for (int state = 0; state < mStateInfo.length; state++) {
-        mStateInfo[state] &= used;
-      }
-      return true;
-    } else {
-      return false;
-    }
+    return removed;
   }
 
 
@@ -545,33 +565,6 @@ public class IntStateBuffer
       }
     }
     return count;
-  }
-
-  /**
-   * Check for any states in the given state encoding that are not
-   * present in the given automaton, and sets any such states unreachable.
-   * @return <CODE>true</CODE> if at least one state was set unreachable.
-   */
-  public boolean setMissingStatesUnreachable(final AutomatonProxy aut,
-                                             final StateEncoding stateEnc)
-  {
-    final Collection<StateProxy> states = aut.getStates();
-    final int numStates = states.size();
-    if (numStates < stateEnc.getNumberOfStates()) {
-      final BitSet reachable = new BitSet(numStates);
-      for (final StateProxy state : states) {
-        final int s = stateEnc.getStateCode(state);
-        reachable.set(s);
-      }
-      final int last = stateEnc.getNumberOfStates() - 1;
-      for (int s = reachable.previousClearBit(last); s >= 0;
-           s = reachable.previousClearBit(s - 1)) {
-        setReachable(s, false);
-      }
-      return true;
-    } else {
-      return false;
-    }
   }
 
   /**
@@ -628,6 +621,7 @@ public class IntStateBuffer
 
   public void dump(final PrintWriter printer)
   {
+    final int used = mPropositionStatus.getUsedPropositions();
     printer.print('{');
     int last = -1;
     for (int s = 0; s < mStateInfo.length; s++) {
@@ -641,14 +635,15 @@ public class IntStateBuffer
           printer.print("->");
         }
         printer.print(s);
-        if ((info & mUsedPropositions) != 0) {
-          if (mNumPropositions == 1) {
+        if ((info & used) != 0) {
+          final int numProps = mPropositionStatus.getNumberOfPropositions();
+          if (numProps == 1) {
             printer.print('*');
           } else {
             printer.print('<');
             boolean first = true;
-            for (int p = 0; p < mNumPropositions; p++) {
-              if ((info & (1 << p) & mUsedPropositions) != 0) {
+            for (int p = 0; p < numProps; p++) {
+              if ((info & (1 << p) & used) != 0) {
                 if (first) {
                   first = false;
                 } else {
@@ -675,9 +670,9 @@ public class IntStateBuffer
 
   //#########################################################################
   //# Data Members
-  private final int mNumPropositions;
+  private final EventStatusProvider mPropositionStatus;
   private final int[] mStateInfo;
-  private int mUsedPropositions;
+  private int mDumpStateIndex;
 
 
   //#########################################################################
@@ -685,7 +680,6 @@ public class IntStateBuffer
   private static final int TAG_INITIAL = 0x80000000;
   private static final int TAG_REACHABLE = 0x40000000;
   private static final int TAG_ALL = TAG_INITIAL | TAG_REACHABLE;
-  private static final int MAX_PROPOSITIONS = 30;
 
 }
 

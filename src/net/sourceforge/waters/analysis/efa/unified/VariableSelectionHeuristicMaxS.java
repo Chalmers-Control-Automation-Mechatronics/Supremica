@@ -36,7 +36,7 @@ public class VariableSelectionHeuristicMaxS
   }
 
   @Override
-  protected double getHeuristicValue(final UnifiedEFAVariable var)
+  public double getHeuristicValue(final UnifiedEFAVariable var)
   {
     final UnifiedEFAConflictChecker.VariableInfo info =
       mConflictChecker.getVariableInfo(var);

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:ProductDES Name="instantiate_efa" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
+    <Comment>An EFA compiler test involving variable substitution in guards and actions</Comment>
+    <ns2:EventList>
+        <ns2:Event Kind="CONTROLLABLE" Name="a[0]"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="a[1]"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="a[2]"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="b[0]"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="b[1]"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="b[2]"/>
+    </ns2:EventList>
+    <ns2:AutomataList>
+        <ns2:Automaton Kind="PLANT" Name="x">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="a[0]"/>
+                <ns2:EventRef Name="a[1]"/>
+                <ns2:EventRef Name="a[2]"/>
+                <ns2:EventRef Name="b[0]"/>
+                <ns2:EventRef Name="b[1]"/>
+                <ns2:EventRef Name="b[2]"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="0"/>
+                <ns2:State Name="1"/>
+                <ns2:State Name="2"/>
+                <ns2:State Name="3"/>
+                <ns2:State Name="4"/>
+                <ns2:State Name="5"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="a[0]" Source="0" Target="0"/>
+                <ns2:Transition Event="b[0]" Source="0" Target="0"/>
+                <ns2:Transition Event="b[1]" Source="0" Target="1"/>
+                <ns2:Transition Event="b[2]" Source="0" Target="2"/>
+                <ns2:Transition Event="a[1]" Source="1" Target="1"/>
+                <ns2:Transition Event="b[0]" Source="1" Target="0"/>
+                <ns2:Transition Event="b[1]" Source="1" Target="1"/>
+                <ns2:Transition Event="b[2]" Source="1" Target="2"/>
+                <ns2:Transition Event="a[2]" Source="2" Target="2"/>
+                <ns2:Transition Event="b[0]" Source="2" Target="0"/>
+                <ns2:Transition Event="b[1]" Source="2" Target="1"/>
+                <ns2:Transition Event="b[2]" Source="2" Target="2"/>
+                <ns2:Transition Event="b[0]" Source="3" Target="0"/>
+                <ns2:Transition Event="b[1]" Source="3" Target="1"/>
+                <ns2:Transition Event="b[2]" Source="3" Target="2"/>
+                <ns2:Transition Event="b[0]" Source="4" Target="0"/>
+                <ns2:Transition Event="b[1]" Source="4" Target="1"/>
+                <ns2:Transition Event="b[2]" Source="4" Target="2"/>
+                <ns2:Transition Event="b[0]" Source="5" Target="0"/>
+                <ns2:Transition Event="b[1]" Source="5" Target="1"/>
+                <ns2:Transition Event="b[2]" Source="5" Target="2"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="PLANT" Name="aut[0]">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="a[0]"/>
+                <ns2:EventRef Name="b[0]"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="S0"/>
+                <ns2:State Name="S1"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="a[0]" Source="S0" Target="S1"/>
+                <ns2:Transition Event="b[0]" Source="S1" Target="S0"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="PLANT" Name="aut[1]">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="a[1]"/>
+                <ns2:EventRef Name="b[1]"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="S0"/>
+                <ns2:State Name="S1"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="a[1]" Source="S0" Target="S1"/>
+                <ns2:Transition Event="b[1]" Source="S1" Target="S0"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="PLANT" Name="aut[2]">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="a[2]"/>
+                <ns2:EventRef Name="b[2]"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="S0"/>
+                <ns2:State Name="S1"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="a[2]" Source="S0" Target="S1"/>
+                <ns2:Transition Event="b[2]" Source="S1" Target="S0"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+    </ns2:AutomataList>
+</ns2:ProductDES>

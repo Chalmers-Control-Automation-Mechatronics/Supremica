@@ -21,9 +21,11 @@ import net.sourceforge.waters.analysis.abstraction.SynthesisObservationEquivalen
 import net.sourceforge.waters.analysis.abstraction.SynthesisTransitionRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -136,6 +138,7 @@ public class StateRepresentationSynthesisAbstractionProcedure extends
   protected EventEncoding createEventEncoding(final Collection<EventProxy> events,
                                               final Collection<EventProxy> local,
                                               final Candidate candidate)
+    throws OverflowException
   {
     final KindTranslator translator = getKindTranslator();
     final ProductDESProxyFactory factory = getFactory();
@@ -146,8 +149,10 @@ public class StateRepresentationSynthesisAbstractionProcedure extends
     }
     EventProxy tauC = null;
     EventProxy tauU = null;
-    final byte tauStatus = analyzer.isUsingSpecialEvents() ?
-      EventEncoding.STATUS_FULLY_LOCAL : EventEncoding.STATUS_LOCAL;
+    byte tauStatus = EventStatus.STATUS_LOCAL;
+    if (analyzer.isSelfloopOnlyEventsEnabled()) {
+      tauStatus |= EventStatus.STATUS_SELFLOOP_ONLY;
+    }
     final EventEncoding enc = new EventEncoding();
     for (final EventProxy event : events) {
       if (translator.getEventKind(event) == EventKind.PROPOSITION) {
@@ -177,14 +182,14 @@ public class StateRepresentationSynthesisAbstractionProcedure extends
           final AbstractCompositionalModelAnalyzer.EventInfo info =
             analyzer.getEventInfo(event);
           if (info.isOnlyNonSelfLoopCandidate(candidate)) {
-            status = EventEncoding.STATUS_OUTSIDE_ONLY_SELFLOOP;
+            status = EventStatus.STATUS_SELFLOOP_ONLY;
           }
         }
         enc.addEvent(event, translator, status);
       }
     }
-    enc.sortProperEvents((byte) ~EventEncoding.STATUS_LOCAL,
-                         EventEncoding.STATUS_CONTROLLABLE);
+    enc.sortProperEvents((byte) ~EventStatus.STATUS_LOCAL,
+                         EventStatus.STATUS_CONTROLLABLE);
     final EventProxy defaultMarking = getUsedDefaultMarking();
     int defaultMarkingID = -1;
     if (defaultMarking != null) {
@@ -193,14 +198,6 @@ public class StateRepresentationSynthesisAbstractionProcedure extends
     final TransitionRelationSimplifier simplifier = getSimplifier();
     simplifier.setDefaultMarkingID(defaultMarkingID);
     return enc;
-  }
-
-  @Override
-  protected StateEncoding createStateEncoding(final AutomatonProxy automaton)
-  {
-    final StateEncoding encoding = new StateEncoding(automaton);
-    encoding.setNumberOfExtraStates(1);
-    return encoding;
   }
 
   @Override
@@ -215,6 +212,7 @@ public class StateRepresentationSynthesisAbstractionProcedure extends
     return new MergeStep(analyzer, output, input, tau, inputStateEnc,
                          partition, false, outputStateEnc);
   }
+
 
   //#########################################################################
   //# Class Constants

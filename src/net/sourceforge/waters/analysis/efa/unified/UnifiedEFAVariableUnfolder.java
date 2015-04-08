@@ -21,6 +21,7 @@ import java.util.Map;
 import net.sourceforge.waters.analysis.efa.base.AbstractEFAAlgorithm;
 import net.sourceforge.waters.analysis.efa.base.UnfoldingVariableContext;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -334,8 +335,8 @@ public class UnifiedEFAVariableUnfolder extends AbstractEFAAlgorithm
        numberOfEvents, numberOfMarkings, numberOfStates,
        ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     rel.setProperEventStatus(EventEncoding.TAU,
-                             EventEncoding.STATUS_FULLY_LOCAL |
-                             EventEncoding.STATUS_UNUSED);
+                             EventStatus.STATUS_FULLY_LOCAL |
+                             EventStatus.STATUS_UNUSED);
     final SimpleExpressionProxy init =
       mUnfoldedVariable.getInitialStatePredicate();
     final SimpleExpressionProxy marked =

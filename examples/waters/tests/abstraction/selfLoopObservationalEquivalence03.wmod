@@ -7,7 +7,11 @@
                 <Color Blue="0" Green="0" Red="0"/>
             </ColorGeometry>
         </EventDecl>
-        <EventDecl Kind="UNCONTROLLABLE" Name="a"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="a">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="SELFLOOP_ONLY"/>
+            </ns2:AttributeMap>
+        </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="b"/>
         <EventDecl Kind="CONTROLLABLE" Observable="false" Name="tau"/>
     </EventDeclList>

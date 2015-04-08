@@ -26,6 +26,7 @@ import java.util.Set;
 
 import net.sourceforge.waters.analysis.gnonblocking.FindBlockingStates;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -501,7 +502,7 @@ public class CompareLessConflicting
                                 ConflictKindTranslator.getInstanceUncontrollable(), tauproxy);
       if (!lprox.getEvents().contains(mproxy)) {
         ee.addEvent(mproxy, ConflictKindTranslator.getInstanceUncontrollable(),
-                    EventEncoding.STATUS_UNUSED);
+                    EventStatus.STATUS_UNUSED);
       }
       final ListBufferTransitionRelation lessbuff =
         new ListBufferTransitionRelation(lprox, ee,

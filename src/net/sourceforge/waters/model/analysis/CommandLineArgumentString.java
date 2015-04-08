@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.model.analysis;
 
-import java.util.Iterator;
+import java.util.ListIterator;
 
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 
@@ -77,8 +77,9 @@ public abstract class CommandLineArgumentString
   //#######################################################################
   //# Parsing
   @Override
-  public void parse(final Iterator<String> iter)
+  public void parse(final ListIterator<String> iter)
   {
+    iter.remove();
     if (iter.hasNext()) {
       mValue = iter.next();
       iter.remove();

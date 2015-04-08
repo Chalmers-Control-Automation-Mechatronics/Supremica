@@ -22,11 +22,11 @@ import org.apache.log4j.Logger;
 
 
 public abstract class AbstractTRSimplifier
-  implements TransitionRelationSimplifier
+  implements TransitionRelationSimplifier, TRSimplificationListener
 {
 
   //#########################################################################
-  //# Constructor
+  //# Constructors
   public AbstractTRSimplifier()
   {
     this(null);
@@ -36,6 +36,7 @@ public abstract class AbstractTRSimplifier
   {
     mIsAborting = false;
     mAppliesPartitionAutomatically = true;
+    mListener = this;
     mPreferredOutputConfiguration = 0;
     mTransitionRelation = rel;
     createStatistics();
@@ -43,7 +44,8 @@ public abstract class AbstractTRSimplifier
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
+  //# Interface
+  //# net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
   @Override
   public int getPreferredInputConfiguration()
   {
@@ -114,10 +116,19 @@ public abstract class AbstractTRSimplifier
   }
 
   @Override
+  public void setSimplificationListener(final TRSimplificationListener listener)
+  {
+    mListener = listener;
+  }
+
+  @Override
   public boolean run()
   throws AnalysisException
   {
     final long start = System.currentTimeMillis();
+    if (!mListener.onSimplificationStart(this)) {
+      return false;
+    }
     boolean completed = false;
     try {
       logStart();
@@ -126,6 +137,7 @@ public abstract class AbstractTRSimplifier
       final boolean success = runSimplifier();
       recordFinish(success);
       logFinish(success);
+      mListener.onSimplificationFinish(this, success);
       completed = true;
       return success;
     } catch (final OutOfMemoryError error) {
@@ -158,6 +170,12 @@ public abstract class AbstractTRSimplifier
   }
 
   @Override
+  public boolean isAlwaysEnabledEventsSupported()
+  {
+    return false;
+  }
+
+  @Override
   public boolean isReducedMarking(final int propID)
   {
     return false;
@@ -181,6 +199,22 @@ public abstract class AbstractTRSimplifier
   {
     mTransitionRelation = null;
     mResultPartition = null;
+  }
+
+
+  //#########################################################################
+  //# Interface
+  //# net.sourceforge.waters.analysis.abstraction.TRSimplificationListener
+  @Override
+  public boolean onSimplificationStart(final TransitionRelationSimplifier simplifier)
+  {
+    return true;
+  }
+
+  @Override
+  public void onSimplificationFinish(final TransitionRelationSimplifier simplifier,
+                                     final boolean result)
+  {
   }
 
 
@@ -352,19 +386,7 @@ public abstract class AbstractTRSimplifier
   {
     if (success && mAppliesPartitionAutomatically) {
       final Logger logger = getLogger();
-      if (logger.isDebugEnabled()) {
-        int numberOfProposition = 0;
-        for (int p=0; p< mTransitionRelation.getNumberOfPropositions(); p++) {
-          if (mTransitionRelation.isUsedProposition(p)) {
-            numberOfProposition++;
-          }
-        }
-        logger.debug
-          (mTransitionRelation.getNumberOfReachableStates() + " states, " +
-           mTransitionRelation.getNumberOfTransitions() + " transitions, " +
-           mTransitionRelation.getNumberOfMarkings() + "(" +
-           numberOfProposition + ") markings.");
-      }
+      mTransitionRelation.logSizes(logger);
     }
   }
 
@@ -397,6 +419,7 @@ public abstract class AbstractTRSimplifier
   //# Data Members
   private boolean mIsAborting;
   private boolean mAppliesPartitionAutomatically;
+  private TRSimplificationListener mListener;
   private int mPreferredOutputConfiguration;
   private TRSimplifierStatistics mStatistics;
   private ListBufferTransitionRelation mTransitionRelation;

@@ -36,51 +36,39 @@ public class IncomingTransitionListBuffer extends TransitionListBuffer
    * Creates a new incoming transition list buffer.
    * The transition buffer is set up for a fixed number of states and events,
    * which defines an encoding and can no more be changed.
-   * @param  numEvents    The number of events that can be encoded in
-   *                      transitions.
    * @param  numStates    The number of states that can be encoded in
    *                      transitions.
    * @param  eventStatus  Status flags of events, based on constants defined
-   *                      in {@link EventEncoding}.
-   * @param  orderingInfo Ordering information to to describe event ordering,
-   *                      or <CODE>null</CODE>
+   *                      in {@link EventStatus}.
    * @throws OverflowException if the encoding for states and events does
    *         not fit in the 32 bits available.
    */
-  public IncomingTransitionListBuffer(final int numEvents,
-                                      final int numStates,
-                                      final byte[] eventStatus,
-                                      final EventEncoding.OrderingInfo orderingInfo)
+  public IncomingTransitionListBuffer(final int numStates,
+                                      final EventStatusProvider eventStatus)
     throws OverflowException
   {
-    super(numEvents, numStates, eventStatus, orderingInfo);
+    super(numStates, eventStatus);
   }
 
   /**
    * Creates a new incoming transition list buffer.
    * The transition buffer is set up for a fixed number of states and events,
    * which defines an encoding and can no more be changed.
-   * @param  numEvents    The number of events that can be encoded in
-   *                      transitions.
    * @param  numStates    The number of states that can be encoded in
    *                      transitions.
    * @param  eventStatus  Status flags of events, based on constants defined
-   *                      in {@link EventEncoding}.
-   * @param  orderingInfo Ordering information to to describe event ordering,
-   *                      or <CODE>null</CODE>
+   *                      in {@link EventStatus}.
    * @param  numTrans     Estimated number of transitions, used to determine
    *                      buffer size.
    * @throws OverflowException if the encoding for states and events does
    *         not fit in the 32 bits available.
    */
-  public IncomingTransitionListBuffer(final int numEvents,
-                                      final int numStates,
-                                      final byte[] eventStatus,
-                                      final EventEncoding.OrderingInfo orderingInfo,
+  public IncomingTransitionListBuffer(final int numStates,
+                                      final EventStatusProvider eventStatus,
                                       final int numTrans)
     throws OverflowException
   {
-    super(numEvents, numStates, eventStatus, orderingInfo, numTrans);
+    super(numStates, eventStatus, numTrans);
   }
 
   /**

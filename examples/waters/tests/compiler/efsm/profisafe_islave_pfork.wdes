@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:ProductDES Name="profisafe_islave_pfork" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
+    <Comment></Comment>
+    <ns2:EventList>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="resume.{!in_cons_num}"/>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="resume.{in_cons_num}"/>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="resume.{in_CRC==nok}"/>
+    </ns2:EventList>
+    <ns2:AutomataList>
+        <ns2:Automaton Kind="PLANT" Name="in_cons_num">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="resume.{!in_cons_num}"/>
+                <ns2:EventRef Name="resume.{in_cons_num}"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="0"/>
+                <ns2:State Name="1"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="resume.{!in_cons_num}" Source="0" Target="0"/>
+                <ns2:Transition Event="resume.{in_cons_num}" Source="1" Target="1"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="PLANT" Name="in_CRC">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="resume.{!in_cons_num}"/>
+                <ns2:EventRef Name="resume.{in_cons_num}"/>
+                <ns2:EventRef Name="resume.{in_CRC==nok}"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Name="ok"/>
+                <ns2:State Initial="true" Name="nok"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="resume.{in_CRC==nok}" Source="nok" Target="nok"/>
+                <ns2:Transition Event="resume.{!in_cons_num}" Source="ok" Target="ok"/>
+                <ns2:Transition Event="resume.{in_cons_num}" Source="ok" Target="ok"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="PROPERTY" Name="slave_sets_fv_after_slave_crc_fault[0]">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="resume.{!in_cons_num}"/>
+                <ns2:EventRef Name="resume.{in_cons_num}"/>
+                <ns2:EventRef Name="resume.{in_CRC==nok}"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="init"/>
+                <ns2:State Name="q1"/>
+                <ns2:State Name="q0"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Event="resume.{!in_cons_num}" Source="init" Target="q0"/>
+                <ns2:Transition Event="resume.{in_cons_num}" Source="init" Target="q1"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+    </ns2:AutomataList>
+</ns2:ProductDES>

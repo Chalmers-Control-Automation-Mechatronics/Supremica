@@ -101,7 +101,7 @@ public class ConflictAbstractionProcedureFactory
       return EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure.
         createThreeStepConflictEquivalenceAbstractionProcedure
           (analyzer, ObservationEquivalenceTRSimplifier.Equivalence.
-           WEAK_OBSERVATION_EQUIVALENCE, true, false, true);
+           WEAK_OBSERVATION_EQUIVALENCE, true, true);
     }
   };
 
@@ -109,10 +109,10 @@ public class ConflictAbstractionProcedureFactory
    * <P>Minimisation is performed according to a sequence of abstraction
    * rules for generalised nonblocking proposed, but using weak observation
    * equivalence instead of observation equivalence.</P>
-   * <P><I>Reference:</I> Robi Malik, Ryan Leduc. A Compositional Approach
-   * for Verifying Generalised Nonblocking, Proc. 7th International
-   * Conference on Control and Automation, ICCA'09, 448-453, Christchurch,
-   * New Zealand, 2009.</P>
+   * <P><I>Reference:</I><BR>
+   * Robi Malik, Ryan Leduc. Compositional Nonblocking Verification Using
+   * Generalised Nonblocking Abstractions, IEEE Transactions on Automatic
+   * Control <STRONG>58</STRONG>(8), 1-13, 2013.</P>
    */
   public static final AbstractionProcedureCreator GNB =
     new AbstractionProcedureCreator("GNB")

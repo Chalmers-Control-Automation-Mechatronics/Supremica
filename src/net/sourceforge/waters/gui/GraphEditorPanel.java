@@ -109,6 +109,7 @@ import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.plain.module.SimpleIdentifierElement;
@@ -1498,8 +1499,9 @@ public class GraphEditorPanel
     } else if (item instanceof GuardActionBlockSubject && !ifSelected) {
       final GuardActionBlockSubject block = (GuardActionBlockSubject) item;
       final Point point = event.getPoint();
-      ProxySubject label =
-        getLabelToBeSelected(block.getGuardsModifiable(), point);
+      final List<SimpleExpressionProxy> guards =
+        ProxyShapeProducer.getDisplayedGuards(block);
+      ProxySubject label = getLabelToBeSelected(guards, point);
       if (label == null) {
         label = getLabelToBeSelected(block.getActionsModifiable(), point);
       }
@@ -1510,19 +1512,19 @@ public class GraphEditorPanel
   }
 
   private ProxySubject getLabelToBeSelected
-      (final ListSubject<? extends AbstractSubject> list, final Point point)
+      (final List<? extends Proxy> list, final Point point)
   {
-    for (final ProxySubject sub : list) {
-      final ProxyShape shape = getShapeProducer().getShape(sub);
+    for (final Proxy proxy : list) {
+      final ProxyShape shape = getShapeProducer().getShape(proxy);
       if (shape.getShape().contains(point)) {
-        return sub;
+        return (ProxySubject) proxy;
       }
-      if (sub instanceof ForeachSubject) {
-        final ForeachSubject foreach = (ForeachSubject) sub;
-        final ProxySubject proxy =
+      if (proxy instanceof ForeachSubject) {
+        final ForeachSubject foreach = (ForeachSubject) proxy;
+        final ProxySubject sub =
           getLabelToBeSelected(foreach.getBodyModifiable(), point);
-        if (proxy != null) {
-          return proxy;
+        if (sub != null) {
+          return sub;
         }
       }
     }

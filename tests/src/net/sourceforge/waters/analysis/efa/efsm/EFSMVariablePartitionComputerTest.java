@@ -226,15 +226,17 @@ public class EFSMVariablePartitionComputerTest
         mRange.getValues();
       int classno = 0;
       for (final int[] clazz : computedPartition.getClasses()) {
-        for (final int s : clazz) {
-          final SimpleExpressionProxy expr = rangeValues.get(s);
-          final int expected = mStateToClass.getByProxy(expr);
-          assertNotNull("Computed value '" + expr +
-                        "' not found in partition!",
-                        expected);
-          assertEquals("Unexpected class number for value '" + expr + "'!",
-                       expected, classno);
-          unaccounted.removeProxy(expr);
+        if (clazz != null) {
+          for (final int s : clazz) {
+            final SimpleExpressionProxy expr = rangeValues.get(s);
+            final int expected = mStateToClass.getByProxy(expr);
+            assertNotNull("Computed value '" + expr +
+                          "' not found in partition!",
+                          expected);
+            assertEquals("Unexpected class number for value '" + expr + "'!",
+                         expected, classno);
+            unaccounted.removeProxy(expr);
+          }
         }
         classno++;
       }

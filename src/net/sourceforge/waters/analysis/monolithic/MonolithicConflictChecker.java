@@ -227,6 +227,12 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
         return setFailedResult(counterexample);
       }
 
+    } catch (final AnalysisException exception) {
+      throw setExceptionResult(exception);
+    } catch (final OutOfMemoryError error) {
+      System.gc();
+      final OverflowException overflow = new OverflowException(error);
+      throw setExceptionResult(overflow);
     } finally {
       tearDown();
     }

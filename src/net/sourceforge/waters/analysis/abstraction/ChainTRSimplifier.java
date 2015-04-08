@@ -85,7 +85,7 @@ public class ChainTRSimplifier
         return result;
       }
     }
-    return 0;
+    return getPreferredOutputConfiguration();
   }
 
   @Override
@@ -117,6 +117,17 @@ public class ChainTRSimplifier
   public boolean isObservationEquivalentAbstraction()
   {
     return mIsObservationEquivalentAbstraction;
+  }
+
+  @Override
+  public boolean isAlwaysEnabledEventsSupported()
+  {
+    for (final TransitionRelationSimplifier step : mSteps) {
+      if (step.isAlwaysEnabledEventsSupported()) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override
@@ -191,8 +202,16 @@ public class ChainTRSimplifier
   //# Overrides for net.sourceforge.waters.analysis.abstraction.
   //# AbstractTRSimplifier
   @Override
+  protected void setUp()
+    throws AnalysisException
+  {
+    // Overriding this to avoid reconfiguration of TR ahead of time.
+    setResultPartition(null);
+  }
+
+  @Override
   protected boolean runSimplifier()
-  throws AnalysisException
+    throws AnalysisException
   {
     mIsObservationEquivalentAbstraction = true;
     final ListBufferTransitionRelation rel = getTransitionRelation();
@@ -216,6 +235,7 @@ public class ChainTRSimplifier
           mReducedMarkings[prop] |= step.isReducedMarking(prop);
         }
       }
+      // rel.checkIntegrity();
       if (isPartitioning()) {
         final TRPartition currentPartition = getResultPartition();
         final TRPartition newPartition = step.getResultPartition();

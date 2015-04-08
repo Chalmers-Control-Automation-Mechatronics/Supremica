@@ -32,7 +32,8 @@ public enum ModelAnalyzerFactoryLoader
   Monolithic("net.sourceforge.waters.analysis.monolithic.MonolithicModelAnalyzerFactory"),
   Native("net.sourceforge.waters.cpp.analysis.NativeModelVerifierFactory"),
   PartialOrder("net.sourceforge.waters.analysis.po.PartialOrderModelVerifierFactory"),
-  Projecting("net.sourceforge.waters.analysis.modular.ProjectingModelVerifierFactory");
+  Projecting("net.sourceforge.waters.analysis.modular.ProjectingModelVerifierFactory"),
+  TRCompositional("net.sourceforge.waters.analysis.trcomp.TRCompositionalModelAnalyzerFactory");
 
 
   //#########################################################################

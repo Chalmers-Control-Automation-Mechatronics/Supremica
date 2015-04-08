@@ -84,7 +84,6 @@ public abstract class AbstractCompositionalSynthesizer
     super(model, factory, translator, abstractionFactory,
           preselectingMethodFactory);
     setPruningDeadlocks(true);
-    setFailingEventsEnabled(true);
   }
 
 
@@ -156,12 +155,11 @@ public abstract class AbstractCompositionalSynthesizer
       new EventEncoding(uncontrollables, translator);
     final StateEncoding stateEnc = new StateEncoding(spec);
     final ListBufferTransitionRelation rel =
-      new ListBufferTransitionRelation(
-                                       spec,
+      new ListBufferTransitionRelation(spec,
                                        eventEnc,
                                        stateEnc,
                                        ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-    final int numStates = rel.getNumberOfStates();
+    final int numStates = stateEnc.getNumberOfStates();
     final Collection<StateProxy> states =
       new ArrayList<StateProxy>(numStates + 1);
     states.addAll(spec.getStates());

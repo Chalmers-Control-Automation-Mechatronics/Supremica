@@ -30,6 +30,7 @@ import java.util.Set;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -40,9 +41,9 @@ import net.sourceforge.waters.model.analysis.ListedEnumFactory;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzer;
-import net.sourceforge.waters.model.analysis.des.AutomatonResult;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -69,9 +70,9 @@ import org.apache.log4j.Logger;
  * <P><I>References:</I><BR>
  * Hugo Flordal, Robi Malik. Compositional Verification in Supervisory Control.
  * SIAM Journal of Control and Optimization, 48(3), 1914-1938, 2009.<BR>
- * Robi Malik, Ryan Leduc. A Compositional Approach for Verifying Generalised
- * Nonblocking, Proc. 7th International Conference on Control and Automation,
- * ICCA'09, 448-453, Christchurch, New Zealand, 2009.</P>
+ * Robi Malik, Ryan Leduc. Compositional Nonblocking Verification Using
+ * Generalised Nonblocking Abstractions, IEEE Transactions on Automatic
+ * Control <STRONG>58</STRONG>(8), 1-13, 2013.</P>
  *
  * @author Robi Malik
  */
@@ -172,7 +173,6 @@ public abstract class AbstractCompositionalModelAnalyzer
     mSelectionHeuristic =
       CompositionalSelectionHeuristicFactory.MinS.createChainHeuristic();
     mSubsumptionEnabled = false;
-    mUsingSpecialEvents = true;
     mLowerInternalStateLimit = mUpperInternalStateLimit =
       super.getNodeLimit();
     mInternalTransitionLimit = super.getTransitionLimit();
@@ -348,23 +348,50 @@ public abstract class AbstractCompositionalModelAnalyzer
 
   /**
    * Sets whether special events are to be considered in abstraction.
-   * If enabled, compositional minimisation will not only exploit local
-   * events (used only in the subsystem being simplified), but also
-   * selfloop-only events (used only as selfloops outside of the subsystem
-   * being simplified.
+   * This method enables or disables blocked events, selfloop-only events,
+   * and failing events.
+   * @see #setBlockedEventsEnabled(boolean) setBlockedEventsEnabled()
+   * @see #setFailingEventsEnabled(boolean) setFailingEventsEnabled()
+   * @see #setSelfloopOnlyEventsEnabled(boolean) setSelfloopOnlyEventsEnabled()
    */
   public void setUsingSpecialEvents(final boolean enable)
   {
-    mUsingSpecialEvents = enable;
+    mBlockedEventsEnabled = mFailingEventsEnabled =
+      mSelfloopOnlyEventsEnabled = enable;
   }
 
   /**
-   * Returns whether special events are considered in abstraction.
+   * Returns whether all kinds of special events are considered in abstraction.
    * @see #setUsingSpecialEvents(boolean)
+   * @see #isBlockedEventsEnabled()
+   * @see #isFailingEventsEnabled()
+   * @see #isSelfloopOnlyEventsEnabled()
    */
   public boolean isUsingSpecialEvents()
   {
-    return mUsingSpecialEvents;
+    return
+      mBlockedEventsEnabled && mFailingEventsEnabled && mSelfloopOnlyEventsEnabled;
+  }
+
+  /**
+   * Sets whether blocked events are to be considered in abstraction.
+   * @see #isBlockedEventsEnabled()
+   */
+  public void setBlockedEventsEnabled(final boolean enable)
+  {
+    mBlockedEventsEnabled = enable;
+  }
+
+  /**
+   * Returns whether blocked events are considered in abstraction.
+   * Blocked events are events that are disabled in all reachable states of
+   * some automaton. If enabled, this will remove all transitions with blocked
+   * events from the model.
+   * @see #setBlockedEventsEnabled(boolean) setBlockedEventsEnabled()
+   */
+  public boolean isBlockedEventsEnabled()
+  {
+    return mBlockedEventsEnabled;
   }
 
   /**
@@ -377,15 +404,38 @@ public abstract class AbstractCompositionalModelAnalyzer
   }
 
   /**
-   * Returns whether failure events are considered in abstraction.
-   * Failure Events are events that always lead to a dump state in some
-   * automaton. If enabled, this will redirect failure events in other
+   * Returns whether failing events are considered in abstraction.
+   * Failing events are events that always lead to a dump state in some
+   * automaton. If enabled, this will redirect failing events in other
    * automata to dump states.
    * @see #setFailingEventsEnabled(boolean) setFailingEventsEnabled()
    */
   public boolean isFailingEventsEnabled()
   {
     return mFailingEventsEnabled;
+  }
+
+  /**
+   * Sets whether selfloop-only events are to be considered in abstraction.
+   * @see #isSelfloopOnlyEventsEnabled()
+   */
+  public void setSelfloopOnlyEventsEnabled(final boolean enable)
+  {
+    mSelfloopOnlyEventsEnabled = enable;
+  }
+
+  /**
+   * Returns whether selfloop-only events are considered in abstraction.
+   * Selfloop-only events are events that appear only as selfloops in the
+   * entire model or in all but one automaton in the model. Events that
+   * are selfloop-only in the entire model can be removed, while events
+   * that are selfloop-only in all but one automaton can be used to
+   * simplify that automaton.
+   * @see #setSelfloopOnlyEventsEnabled(boolean) setSelfloopOnlyEventsEnabled()
+   */
+  public boolean isSelfloopOnlyEventsEnabled()
+  {
+    return mSelfloopOnlyEventsEnabled;
   }
 
   /**
@@ -931,7 +981,7 @@ public abstract class AbstractCompositionalModelAnalyzer
 
   /**
    * Returns whether failure events are considered in abstraction.
-   * Failure Events are events that always lead to a dump state in some
+   * Failing Events are events that always lead to a dump state in some
    * automaton. If enabled, this will redirect failure events in other
    * automata to dump states.
    * @return <CODE>false</CODE>. Failure events are disabled by default
@@ -1001,7 +1051,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       }
       final CompositionalAnalysisResult stats = getAnalysisResult();
       final int numRemoved = removed.size();
-      stats.addRedundantEvents(numRemoved);
+      stats.addBlockedEvents(numRemoved);
       final int numFailing = failing.size();
       stats.addFailingEvents(numFailing);
       return
@@ -1113,7 +1163,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     }
     mRedundantEvents = new LinkedList<EventProxy>();
     for (final EventInfo info : mEventInfoMap.values()) {
-      if (info.isRemovable(mUsingSpecialEvents) || info.isFailing()) {
+      if (info.isRemovable(mSelfloopOnlyEventsEnabled) || info.isFailing()) {
         final EventProxy event = info.getEvent();
         mRedundantEvents.add(event);
       }
@@ -1217,25 +1267,28 @@ public abstract class AbstractCompositionalModelAnalyzer
     }
     final int numEvents = events.size();
     final TObjectByteHashMap<EventProxy> statusMap =
-      new TObjectByteHashMap<EventProxy>(numEvents);
-    for (final TransitionProxy trans : aut.getTransitions()) {
-      final EventProxy event = trans.getEvent();
-      final byte status = statusMap.get(event);
-      if (trans.getSource() == trans.getTarget()) {
-        if (status == UNKNOWN_SELFLOOP) {
-          statusMap.put(event, ONLY_SELFLOOP);
-        } else if (status == FAILING) {
+      new TObjectByteHashMap<>(numEvents);
+    if (mBlockedEventsEnabled || isUsingFailingEvents() ||
+        mSelfloopOnlyEventsEnabled) {
+      for (final TransitionProxy trans : aut.getTransitions()) {
+        final EventProxy event = trans.getEvent();
+        final byte status = statusMap.get(event);
+        if (trans.getSource() == trans.getTarget()) {
+          if (status == UNKNOWN_SELFLOOP) {
+            statusMap.put(event, ONLY_SELFLOOP);
+          } else if (status == FAILING) {
+            statusMap.put(event, NOT_ONLY_SELFLOOP);
+          }
+        } else if (nonDumpStates != null &&
+                   !nonDumpStates.contains(trans.getTarget())) {
+          if (status == UNKNOWN_SELFLOOP) {
+            statusMap.put(event, FAILING);
+          } else if (status == ONLY_SELFLOOP) {
+            statusMap.put(event, NOT_ONLY_SELFLOOP);
+          }
+        } else {
           statusMap.put(event, NOT_ONLY_SELFLOOP);
         }
-      } else if (nonDumpStates != null &&
-                 !nonDumpStates.contains(trans.getTarget())) {
-        if (status == UNKNOWN_SELFLOOP) {
-          statusMap.put(event, FAILING);
-        } else if (status == ONLY_SELFLOOP) {
-          statusMap.put(event, NOT_ONLY_SELFLOOP);
-        }
-      } else {
-        statusMap.put(event, NOT_ONLY_SELFLOOP);
       }
     }
     final KindTranslator translator = getKindTranslator();
@@ -1246,8 +1299,10 @@ public abstract class AbstractCompositionalModelAnalyzer
           info = createEventInfo(event);
           mEventInfoMap.put(event, info);
         }
-        final byte lookup = statusMap.get(event);
-        final byte status = lookup == UNKNOWN_SELFLOOP ? BLOCKED : lookup;
+        byte status = statusMap.get(event);
+        if (status == UNKNOWN_SELFLOOP) {
+          status = mBlockedEventsEnabled ? BLOCKED : NOT_ONLY_SELFLOOP;
+        }
         info.addAutomaton(aut, status);
       }
     }
@@ -1277,7 +1332,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       info.removeAutomata(victims);
       if (info.isEmpty()) {
         iter.remove();
-      } else if (info.isRemovable(mUsingSpecialEvents) || info.isFailing()) {
+      } else if (info.isRemovable(mSelfloopOnlyEventsEnabled) || info.isFailing()) {
         final EventProxy event = entry.getKey();
         mRedundantEvents.add(event);
       }
@@ -1291,10 +1346,10 @@ public abstract class AbstractCompositionalModelAnalyzer
   {
     final Logger logger = getLogger();
     if (logger.isDebugEnabled()) {
-      logger.debug(rel.getName());
+      logger.debug("Simplifying " + rel.getName() + " ...");
       logger.debug(rel.getNumberOfReachableStates() + " states, " +
                    rel.getNumberOfTransitions() + " transitions, " +
-                   rel.getNumberOfMarkings() + " markings.");
+                   rel.getNumberOfMarkings(false) + " markings.");
     }
   }
 
@@ -1383,7 +1438,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         info.setReduced();
       }
       mRedundantEvents.clear();
-      mMayBeSplit = true;
+      mMayBeSplit = true; // TODO bug ???
       return true;
     } else {
       return false;
@@ -1957,7 +2012,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         eventEnc.addSilentEvent(event);
       } else if (translator.getEventKind(event) != EventKind.PROPOSITION ||
                  (mPropositions != null && mPropositions.contains(event))) {
-        eventEnc.addEvent(event, translator, EventEncoding.STATUS_NONE);
+        eventEnc.addEvent(event, translator, EventStatus.STATUS_NONE);
       }
     }
     final StateEncoding stateEnc = new StateEncoding(aut);
@@ -2014,7 +2069,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       return createSynchronousProductStep(automata, sync, hidden, tau);
     } finally {
       final CompositionalAnalysisResult stats = getAnalysisResult();
-      final AutomatonResult result =
+      final SynchronousProductResult result =
         mSynchronousProductBuilder.getAnalysisResult();
       stats.addSynchronousProductAnalysisResult(result);
       mSynchronousProductBuilder.clearMask();
@@ -2466,7 +2521,7 @@ public abstract class AbstractCompositionalModelAnalyzer
      */
     protected boolean isFailing()
     {
-      return mFailingStatus == FAILING;
+      return mFailingStatus == FAILING && !mIsBlocked;
     }
 
    /**
@@ -2654,7 +2709,9 @@ public abstract class AbstractCompositionalModelAnalyzer
     @Override
     public String toString()
     {
-      final StringBuilder buffer = new StringBuilder("[");
+      final String name = mEvent.getName();
+      final StringBuilder buffer = new StringBuilder(name);
+      buffer.append(" [");
       boolean first = true;
       for (final AutomatonProxy aut : getSortedAutomataList()) {
         if (first) {
@@ -2997,8 +3054,9 @@ public abstract class AbstractCompositionalModelAnalyzer
   private PreselectingMethod mPreselectingMethod;
   private SelectionHeuristic<Candidate> mSelectionHeuristic;
   private boolean mSubsumptionEnabled;
-  private boolean mUsingSpecialEvents;
+  private boolean mBlockedEventsEnabled = true;
   private boolean mFailingEventsEnabled = false;
+  private boolean mSelfloopOnlyEventsEnabled = false;
   private int mLowerInternalStateLimit;
   private int mUpperInternalStateLimit;
   private int mInternalTransitionLimit;

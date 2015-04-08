@@ -9,8 +9,7 @@
 
 package net.sourceforge.waters.model.analysis;
 
-import java.io.File;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -19,10 +18,9 @@ import net.sourceforge.waters.model.analysis.des.IsomorphismChecker;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.marshaller.WatersMarshalException;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
 
@@ -41,6 +39,7 @@ public abstract class AbstractAutomatonBuilderTest
     super(name);
   }
 
+  @Override
   protected void setUp() throws Exception
   {
     super.setUp();
@@ -50,6 +49,7 @@ public abstract class AbstractAutomatonBuilderTest
     setNodeLimit();
   }
 
+  @Override
   protected void tearDown()
     throws Exception
   {
@@ -61,125 +61,43 @@ public abstract class AbstractAutomatonBuilderTest
 
 
   //#########################################################################
-  //# Instantiating and Checking Modules
-  protected void runAutomatonBuilder(final String group, final String name,
-                                     final List<ParameterBindingProxy> bindings)
+  //# Invocation
+  protected void runAutomatonBuilder(final String... path)
     throws Exception
   {
-    final File rootdir = getWatersInputRoot();
-    final File groupdir = new File(rootdir, group);
-    runAutomatonBuilder(groupdir, name, bindings);
+    runAutomatonBuilder(null, path);
   }
 
-  protected void runAutomatonBuilder(final String group, final String subdir,
-                                     final String name,
-                                     final List<ParameterBindingProxy> bindings)
+  protected void runAutomatonBuilder(final List<ParameterBindingProxy> bindings,
+                                     final String... path)
     throws Exception
   {
-    final File rootdir = getWatersInputRoot();
-    final File groupdir = new File(rootdir, group);
-    runAutomatonBuilder(groupdir, subdir, name, bindings);
-  }
-
-  protected void runAutomatonBuilder(final File groupdir, final String subdir,
-                                     final String name,
-                                     final List<ParameterBindingProxy> bindings)
-    throws Exception
-  {
-    final File dir = new File(groupdir, subdir);
-    runAutomatonBuilder(dir, name, bindings);
-  }
-
-  protected void runAutomatonBuilder(final File dir, final String name,
-                                     final List<ParameterBindingProxy> bindings)
-    throws Exception
-  {
-    final String ext = getTestExtension();
-    final File filename = new File(dir, name + ext);
-    final String suffixed = appendSuffixes(name, bindings);
-    final String expectedName = getExpectedName(suffixed);
-    final File expectedFile = new File(dir, expectedName + ext);
-    runAutomatonBuilder(filename, bindings, expectedFile);
+    final ProductDESProxy des = getCompiledDES(bindings, path);
+    final Collection<AutomatonProxy> allAutomata = des.getAutomata();
+    final int numAutomata = allAutomata.size();
+    final String expectedName = getExpectedAutomatonName();
+    final Collection<AutomatonProxy> inputAutomata = new ArrayList<>(numAutomata - 1);
+    AutomatonProxy expectedAut = null;
+    for (final AutomatonProxy aut : allAutomata) {
+      if (aut.getName().equals(expectedName)) {
+        expectedAut = aut;
+      } else {
+        inputAutomata.add(aut);
+      }
+    }
+    assertNotNull("Expected result automaton with name '" + expectedName +
+                  "' not found in input DES!", expectedAut);
+    final ProductDESProxyFactory factory = getProductDESProxyFactory();
+    final String name = des.getName();
+    final Collection<EventProxy> events = des.getEvents();
+    final ProductDESProxy inputDES =
+      factory.createProductDESProxy(name, events, inputAutomata);
+    runAutomatonBuilderWithBindings(inputDES, expectedAut);
   }
 
 
   //#########################################################################
-  //# Checking Instantiated Product DES problems
-  protected void runAutomatonBuilder(final String group,
-                                     final String name)
-    throws Exception
-  {
-    final File rootdir = getWatersInputRoot();
-    final File groupdir = new File(rootdir, group);
-    runAutomatonBuilder(groupdir, name);
-  }
-
-  protected void runAutomatonBuilder(final String group,
-                                     final String subdir,
-                                     final String name)
-      throws Exception
-  {
-    final File rootdir = getWatersInputRoot();
-    final File groupdir = new File(rootdir, group);
-    runAutomatonBuilder(groupdir, subdir, name);
-  }
-
-  protected void runAutomatonBuilder(final File groupdir,
-                                     final String subdir,
-                                     final String name)
-      throws Exception
-  {
-    final File dir = new File(groupdir, subdir);
-    runAutomatonBuilder(dir, name);
-  }
-
-  protected void runAutomatonBuilder(final File dir,
-                                     final String name)
-    throws Exception
-  {
-    final String ext = getTestExtension();
-    final File filename = new File(dir, name + ext);
-    final String expectedName = getExpectedName(name);
-    final File expectedFile = new File(dir, expectedName + ext);
-    runAutomatonBuilder(filename, expectedFile);
-  }
-
-  protected void runAutomatonBuilder(final File filename,
-                                     final File expectedFile)
-    throws Exception
-  {
-    runAutomatonBuilder(filename,
-                        (List<ParameterBindingProxy>) null,
-                        expectedFile);
-  }
-
-  protected void runAutomatonBuilder(final File filename,
-                                     final List<ParameterBindingProxy> bindings,
-                                     final File expectedFile)
-    throws Exception
-  {
-    mBindings = bindings;
-    final ProductDESProxy des = getCompiledDES(filename, bindings);
-    final ProductDESProxy expect = getCompiledDES(expectedFile);
-    runAutomatonBuilderWithBindings(des, expect);
-  }
-
-  protected void runAutomatonBuilder(final ProductDESProxy des,
-                                     final ProductDESProxy expect)
-    throws Exception
-  {
-    runAutomatonBuilder(des, null, expect);
-  }
-
-  protected void runAutomatonBuilder(final ProductDESProxy des,
-                                     final List<ParameterBindingProxy> bindings,
-                                     final ProductDESProxy expect)
-    throws Exception
-  {
-    mBindings = bindings;
-    runAutomatonBuilderWithBindings(des, expect);
-  }
-
+  //# Hooks
   protected AutomatonBuilder getAutomatonBuilder()
   {
     return mAutomatonBuilder;
@@ -191,6 +109,7 @@ public abstract class AbstractAutomatonBuilderTest
   }
 
   protected void configureAutomatonBuilder(final AutomatonProxy aut)
+    throws AnalysisException
   {
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     final ProductDESProxy des =
@@ -221,20 +140,18 @@ public abstract class AbstractAutomatonBuilderTest
    *          The model to be analysed for the current test case.
    */
   protected void configureAutomatonBuilder(final ProductDESProxy des)
+    throws AnalysisException
   {
     mAutomatonBuilder.setModel(des);
   }
 
   /**
-   * Returns the name of the file that contains the expected result
-   * for a given test.
-   * @param desname
-   *          The base bane of the file containing the test data,
-   *          without path and extension.
-   * @return  The base name of the file containing the expected result
-   *          for the test, without path and extension.
+   * Returns the name of the automaton that contains the expected test
+   * result. Any automata named something else are assumed to represent
+   * the input for the automaton builder under test, and the result is
+   * compared to the automaton with this name.
    */
-  protected abstract String getExpectedName(final String desname);
+  protected abstract String getExpectedAutomatonName();
 
   /**
    * Returns the extension used for all test files
@@ -248,31 +165,27 @@ public abstract class AbstractAutomatonBuilderTest
   //#########################################################################
   //# Auxiliary Methods
   protected void runAutomatonBuilderWithBindings(final ProductDESProxy des,
-                                                 final ProductDESProxy expect)
+                                                 final AutomatonProxy expected)
       throws Exception
   {
     getLogger().info("Checking " + des.getName() + " ...");
     configureAutomatonBuilder(des);
     mAutomatonBuilder.run();
     final AutomatonProxy result = mAutomatonBuilder.getComputedAutomaton();
-    checkResult(des, result, expect);
+    checkResult(des, result, expected);
     getLogger().info("Done " + des.getName());
   }
 
-  private void checkResult(final ProductDESProxy des,
-                           final AutomatonProxy result,
-                           final ProductDESProxy expectedDES)
-    throws WatersMarshalException, IOException,
-           AnalysisException, ParseException
+  protected void checkResult(final ProductDESProxy des,
+                             final AutomatonProxy result,
+                             final AutomatonProxy expected)
+    throws Exception
   {
     final String name = des.getName();
     final String basename = appendSuffixes(name, mBindings);
     final String comment = "Test output from " +
       ProxyTools.getShortClassName(mAutomatonBuilder) + '.';
     saveAutomaton(result, basename, comment);
-    final Collection<AutomatonProxy> expectedAutomata =
-      expectedDES.getAutomata();
-    final AutomatonProxy expected = expectedAutomata.iterator().next();
     mIsomorphismChecker.checkIsomorphism(result, expected);
   }
 

@@ -15,11 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sourceforge.waters.analysis.efa.efsm.EFSMPartialUnfolder;
-import net.sourceforge.waters.analysis.efa.efsm.EFSMSystem;
-import net.sourceforge.waters.analysis.efa.efsm.EFSMTransitionRelation;
-import net.sourceforge.waters.analysis.efa.efsm.EFSMVariable;
-import net.sourceforge.waters.analysis.efa.efsm.EFSMVariablePartitionComputer;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -267,8 +262,10 @@ public class EFSMPartialUnfolderTest
     final int[] codeMap = new int[range.size()];
     int classno = 0;
     for (final int[] clazz : partition.getClasses()) {
-      for (final int s : clazz) {
-        codeMap[s] = classno;
+      if (clazz != null) {
+        for (final int s : clazz) {
+          codeMap[s] = classno;
+        }
       }
       classno++;
     }

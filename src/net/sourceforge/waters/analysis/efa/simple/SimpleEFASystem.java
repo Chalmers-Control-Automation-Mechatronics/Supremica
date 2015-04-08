@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.efa.base.AbstractEFASystem;
-import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -143,12 +143,12 @@ public class SimpleEFASystem
        comp.getTransitionLabelEncoding();
       for (int id = 0; id < trEncoding.size(); id++) {
         final int label = trEncoding.getTransitionLabel(id);
-        byte status = EventEncoding.STATUS_NONE;
+        byte status = EventStatus.STATUS_NONE;
         if (trEncoding.getEventDecl(label).getKind() == EventKind.CONTROLLABLE) {
-          status |= EventEncoding.STATUS_CONTROLLABLE;
+          status |= EventStatus.STATUS_CONTROLLABLE;
         }
         if (trEncoding.getEventDecl(label).isLocalIn(comp)) {
-          status |= EventEncoding.STATUS_LOCAL;
+          status |= EventStatus.STATUS_LOCAL;
         }
         tr.setProperEventStatus(id, status);
       }

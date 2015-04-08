@@ -10,7 +10,6 @@
 package net.sourceforge.waters.analysis.compositional;
 
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -84,7 +83,7 @@ public class EnabledEventsCompositionalModelVerifierFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final EnabledEventsCompositionalConflictChecker checker =
         (EnabledEventsCompositionalConflictChecker) analyzer;

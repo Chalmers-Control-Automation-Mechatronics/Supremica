@@ -19,6 +19,7 @@ import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -77,6 +78,7 @@ class ObserverProjectionAbstractionProcedure
   protected EventEncoding createEventEncoding(final AutomatonProxy aut,
                                               final Collection<EventProxy> local,
                                               final Candidate candidate)
+    throws OverflowException
   {
     final EventEncoding eventEnc =
       super.createEventEncoding(aut, local, candidate);

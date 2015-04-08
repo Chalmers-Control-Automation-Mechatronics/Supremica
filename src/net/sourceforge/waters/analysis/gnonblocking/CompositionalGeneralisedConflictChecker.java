@@ -41,6 +41,7 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -59,15 +60,15 @@ import org.apache.log4j.Logger;
 
 
 /**
- * The compositional generalised nonblocking verification algorithm.
+ * <P>The compositional generalised nonblocking verification algorithm.</P>
  *
- * <I>References:</I><BR>
+ * <P><I>References:</I><BR>
  * Rachel Francis. An implementation of a compositional approach for verifying
  * generalised nonblocking. Working paper series, No. 04/2011; Department of
  * Computer Science, University of Waikato, Hamilton, New Zealand, 2011.<BR>
  * Robi Malik, Ryan Leduc. A Compositional Approach for Verifying
  * Generalised Nonblocking, Proc. 7th International Conference on Control and
- * Automation, ICCA'09, 448-453, Christchurch, New Zealand, 2009.
+ * Automation, ICCA'09, 448-453, Christchurch, New Zealand, 2009.</P>
  *
  * @author Rachel Francis
  */
@@ -220,14 +221,12 @@ public class CompositionalGeneralisedConflictChecker
   protected EventProxy getUsedPreconditionMarkingProposition()
   {
     if (mUsedPreconditionMarking == null) {
-      if (getConfiguredPreconditionMarking() == null) {
+      mUsedPreconditionMarking = getConfiguredPreconditionMarking();
+      if (mUsedPreconditionMarking == null) {
+        final ProductDESProxy des = getModel();
         final ProductDESProxyFactory factory = getFactory();
-        final EventProxy alpha =
-            factory.createEventProxy(":alpha", EventKind.PROPOSITION);
-
-        mUsedPreconditionMarking = alpha;
-      } else {
-        mUsedPreconditionMarking = getConfiguredPreconditionMarking();
+        mUsedPreconditionMarking =
+          AbstractConflictChecker.createNewPreconditionMarking(des, factory);
       }
     }
     return mUsedPreconditionMarking;
@@ -321,7 +320,7 @@ public class CompositionalGeneralisedConflictChecker
           try {
             syncProduct = composeSynchronousProduct(candidate);
             final AutomatonProxy abstractedAut =
-                hideAndAbstract(syncProduct, candidate.getLocalEvents());
+              hideAndAbstract(syncProduct, candidate.getLocalEvents());
 
             // removes the composed automata for this candidate from the set of
             // remaining automata and adds the newly composed candidate if it
@@ -385,6 +384,12 @@ public class CompositionalGeneralisedConflictChecker
         setFailedResult(convertedTrace);
       }
       return result;
+    } catch (final AnalysisException exception) {
+      throw setExceptionResult(exception);
+    } catch (final OutOfMemoryError error) {
+      System.gc();
+      final OverflowException overflow = new OverflowException(error);
+      throw setExceptionResult(overflow);
     } finally {
       tearDown();
     }
@@ -795,9 +800,9 @@ public class CompositionalGeneralisedConflictChecker
     if (numberOfTransitions > mPeakNumberOfTransitions) {
       mPeakNumberOfTransitions = numberOfTransitions;
     }
-
-    final CompositionStep step =
-        new CompositionStep(syncProduct, composer.getStateMap());
+    final SynchronousProductResult result = composer.getAnalysisResult();
+    final SynchronousProductStateMap stateMap = result.getStateMap();
+    final CompositionStep step = new CompositionStep(syncProduct, stateMap);
     mTemporaryModifyingSteps.add(step);
     return syncProduct;
   }
@@ -3325,8 +3330,9 @@ public class CompositionalGeneralisedConflictChecker
     private final SearchRecord mPredecessor;
   }
 
-  // #########################################################################
-  // # Data Members
+
+  //#########################################################################
+  //# Data Members
   private Map<EventProxy,Set<AutomatonProxy>> mEventsToAutomata;
   private Set<EventProxy> mNonAlphaEvents;
   private Set<Candidate> mUnsuccessfulCandidates;

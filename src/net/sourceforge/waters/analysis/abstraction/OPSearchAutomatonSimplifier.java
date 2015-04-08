@@ -1231,9 +1231,16 @@ public class OPSearchAutomatonSimplifier
       Arrays.fill(cls, -1);
       for (int toClass = 0; toClass < numClasses; toClass++) {
         if (partition == null) {
-          current[0] = toClass;
+          if (rel.isReachable(toClass)) {
+            current[0] = toClass;
+          } else {
+            continue;
+          }
         } else {
           current = partition.getStates(toClass);
+          if (current == null) {
+            continue;
+          }
         }
         for (final int t : current) {
           iter.reset(t, e);
@@ -1263,8 +1270,7 @@ public class OPSearchAutomatonSimplifier
         outputFanout = maxFanout[c];
       }
     }
-    final List<StateProxy> states =
-      new ArrayList<StateProxy>(numOutputStates);
+    final List<StateProxy> states = new ArrayList<>(numOutputStates);
     final int[] cindex = new int[numClasses];
     final int numProps = mEventEncoding.getNumberOfPropositions();
     final TLongObjectHashMap<Collection<EventProxy>> markingsMap =
@@ -1276,9 +1282,16 @@ public class OPSearchAutomatonSimplifier
     int code = 0;
     for (int c = 0; c < numClasses; c++) {
       if (partition == null) {
-        current[0] = c;
+        if (rel.isReachable(c)) {
+          current[0] = c;
+        } else {
+          continue;
+        }
       } else {
         current = partition.getStates(c);
+        if (current == null) {
+          continue;
+        }
       }
       boolean init = false;
       long markings = 0;
@@ -1359,9 +1372,16 @@ public class OPSearchAutomatonSimplifier
         classes:
         for (int toClass = 0; toClass < numClasses; toClass++) {
           if (partition == null) {
-            current[0] = toClass;
+            if (rel.isReachable(toClass)) {
+              current[0] = toClass;
+            } else {
+              continue;
+            }
           } else {
             current = partition.getStates(toClass);
+            if (current == null) {
+              continue;
+            }
           }
           selfloop = false;
           for (final int t : current) {
@@ -1392,9 +1412,16 @@ public class OPSearchAutomatonSimplifier
       for (int toClass = 0; toClass < numClasses; toClass++) {
         final StateProxy target = states.get(cindex[toClass]);
         if (partition == null) {
-          current[0] = toClass;
+          if (rel.isReachable(toClass)) {
+            current[0] = toClass;
+          } else {
+            continue;
+          }
         } else {
           current = partition.getStates(toClass);
+          if (current == null) {
+            continue;
+          }
         }
         for (final int t : current) {
           iter.reset(t, e);

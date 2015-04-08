@@ -84,17 +84,17 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
 
 
 /**
- * <P>The first pass of the compiler.</P>
- *
- * <P>This compiler accepts a module ({@link ModuleProxy}) as input and
+ * The first pass of the compiler.
+ * <P>
+ * This compiler accepts a module ({@link ModuleProxy}) as input and
  * produces another module as output. It expands all aliases, foreach
  * constructs, and instantiations. Event arrays as well as component and
  * variable arrays are enumerated explicitly. Variable components are
  * preserved in the output, but all guards and actions are simplified by
- * substituting values obtained from aliasing or instantiation.</P>
- *
- * <P>It is ensured that the resultant module only contains
- * nodes of the following types.</P>
+ * substituting values obtained from aliasing or instantiation.
+ * <P>
+ * It is ensured that the resultant module only contains
+ * objects of the following types:
  * <UL>
  * <LI>{@link EventDeclProxy}, where only simple events are defined,
  *     i.e., the list of ranges is guaranteed to be empty;</LI>
@@ -102,16 +102,14 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
  * <LI>{@link VariableComponentProxy}.</LI>
  * </UL>
  *
- * @author Robi Malik
+ * @author Robi Malik, Roger Su
  */
 
-public class ModuleInstanceCompiler
-  extends DefaultModuleProxyVisitor
-  implements Abortable
+public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
+                                    implements Abortable
 {
-
   //#########################################################################
-  //# Constructors
+  //# Constructor
   public ModuleInstanceCompiler(final DocumentManager manager,
                                 final ModuleProxyFactory factory,
                                 final CompilationInfo compilationInfo,
@@ -160,7 +158,8 @@ public class ModuleInstanceCompiler
   public ModuleProxy compile(final List<ParameterBindingProxy> bindings)
     throws EvalException
   {
-    try {
+    try
+    {
       mHasEFAElements = false;
       mContext = new ModuleBindingContext(mInputModule);
       mNameSpace = new CompiledNameSpace();
@@ -173,17 +172,21 @@ public class ModuleInstanceCompiler
       visitModuleProxy(mInputModule);
       final String name = mInputModule.getName();
       final String comment = mInputModule.getComment();
-      return mFactory.createModuleProxy
-        (name, comment, null,
-         null, mCompiledEvents, null, mCompiledComponents);
-    } catch (final VisitorException exception) {
+      return mFactory.createModuleProxy(name, comment, null, null,
+                                  mCompiledEvents, null, mCompiledComponents);
+    }
+
+    catch (final VisitorException exception)
+    {
       final Throwable cause = exception.getCause();
-      if (cause instanceof EvalException) {
+      if (cause instanceof EvalException)
         throw (EvalException) cause;
-      } else {
+      else
         throw exception.getRuntimeException();
-      }
-    } finally {
+    }
+
+    finally
+    {
       mContext = null;
       mNameSpace = null;
       mCompiledEvents = null;
@@ -382,7 +385,7 @@ public class ModuleInstanceCompiler
       final List<SimpleExpressionProxy> declRanges = decl.getRanges();
       CompiledEvent event = binding == null ? null : binding.getEventValue();
       if (event == null) {
-        // Declare new event ...
+        // Declare a new event.
         final int numranges = declRanges.size();
         final List<CompiledRange> ranges =
           new ArrayList<CompiledRange>(numranges);
@@ -405,7 +408,7 @@ public class ModuleInstanceCompiler
           }
         }
       } else {
-        // Use event through parameter binding ...
+        // Use the event through parameter binding.
         final EventKind kind = decl.getKind();
         final int mask = event.getKindMask();
         if (!EventKindMask.isAssignable(kind, mask) ||
@@ -571,55 +574,71 @@ public class ModuleInstanceCompiler
     (final GuardActionBlockProxy ga)
     throws VisitorException
   {
-    try {
+    try
+    {
       final List<SimpleExpressionProxy> oldguards = ga.getGuards();
       final int numguards = oldguards.size();
       final List<SimpleExpressionProxy> newguards =
-        new ArrayList<SimpleExpressionProxy>(numguards);
-      for (final SimpleExpressionProxy oldguard : oldguards) {
+                             new ArrayList<SimpleExpressionProxy>(numguards);
+
+      for (final SimpleExpressionProxy oldguard : oldguards)
+      {
         checkAbort();
-        if (mPrimeSearcher.containsPrime(oldguard)) {
-          // Don't simplify guards with primes ---
-          // they are needed to determine the variable alphabet!
+
+        if (mPrimeSearcher.containsPrime(oldguard))
+        {
+          /* Guards with primes are not simplified
+           * because they are needed to determine
+           * the variable alphabet.
+           */
           final SimpleExpressionProxy newguard =
-            (SimpleExpressionProxy) mCloner.getClone(oldguard);
+                          (SimpleExpressionProxy) mCloner.getClone(oldguard);
           addSourceInfo(newguard, oldguard);
           newguards.add(newguard);
-        } else {
+        }
+
+        else
+        {
           final SimpleExpressionProxy newguard =
-            mSimpleExpressionCompiler.simplify
-            (oldguard, mNameSpaceVariablesContext);
+                                    mSimpleExpressionCompiler.simplify
+                                      (oldguard, mNameSpaceVariablesContext);
           if (!mSimpleExpressionCompiler.isAtomicValue(newguard, mContext)) {
             newguards.add(newguard);
           } else if (mSimpleExpressionCompiler.getBooleanValue(newguard)) {
-            // Don't bother to add true guards ...
+            // True guards are not added.
           } else {
-            // If a guard is false, no need for any other guards ...
+            // If a guard is false, no need for any other guards.
             newguards.clear();
             newguards.add(newguard);
             break;
           }
         }
       }
+
       final List<BinaryExpressionProxy> oldactions = ga.getActions();
       final int numactions = oldactions.size();
       final List<BinaryExpressionProxy> newactions =
-        new ArrayList<BinaryExpressionProxy>(numactions);
-      for (final BinaryExpressionProxy oldaction : oldactions) {
+                            new ArrayList<BinaryExpressionProxy>(numactions);
+
+      for (final BinaryExpressionProxy oldaction : oldactions)
+      {
         checkAbort();
         final SimpleExpressionProxy newaction =
-          mSimpleExpressionCompiler.simplify
-          (oldaction, mNameSpaceVariablesContext);
-        if (newaction instanceof BinaryExpressionProxy) {
+                                  mSimpleExpressionCompiler.simplify
+                                    (oldaction, mNameSpaceVariablesContext);
+
+        if (newaction instanceof BinaryExpressionProxy)
+        {
           final BinaryExpressionProxy newbinary =
-            (BinaryExpressionProxy) newaction;
+                                            (BinaryExpressionProxy) newaction;
           newactions.add(newbinary);
         } else {
           throw new TypeMismatchException(oldaction, "ACTION");
         }
       }
+
       final GuardActionBlockProxy newga =
-        mFactory.createGuardActionBlockProxy(newguards, newactions, null);
+          mFactory.createGuardActionBlockProxy(newguards, newactions, null);
       addSourceInfo(newga, ga);
       return newga;
     } catch (final EvalException exception) {
@@ -633,9 +652,9 @@ public class ModuleInstanceCompiler
   {
     try {
       checkAbort();
-      // First evaluate all indexes ...
+      // First evaluate all indices,
       final IdentifierProxy newident = mNameCompiler.compileName(ident, false);
-      // Second do a lookup ... Where? Depends on context ...
+      // Then perform a search. The location depends on the context.
       final CompiledEvent event;
       if (mCurrentEventList == null) {
         final SimpleExpressionProxy value =
@@ -673,65 +692,81 @@ public class ModuleInstanceCompiler
   public Object visitInstanceProxy(final InstanceProxy inst)
     throws VisitorException
   {
+    // Instance components are only processed in the second pass.
+    if (m1stPass) return null;
+
     checkAbort();
     final BindingContext oldContext = mContext;
     final CompiledNameSpace oldNameSpace = mNameSpace;
     final MultiEvalException oldExceptions = mCompilationInfo.getExceptions();
-    switch (mHISCCompileMode) {
-    case HISC_LOW:
-      return null;
-    case HISC_HIGH:
-      mHISCCompileMode = HISCCompileMode.HISC_LOW;
-      break;
-    default:
-      break;
+
+    switch (mHISCCompileMode)
+    {
+      case HISC_LOW:
+        return null;
+
+      case HISC_HIGH:
+        mHISCCompileMode = HISCCompileMode.HISC_LOW;
+        break;
+
+      default:
+        break;
     }
+
     final IdentifierProxy ident = inst.getIdentifier();
     final IdentifierProxy suffix = mNameCompiler.compileName(ident);
-    final IdentifierProxy fullname =
-      mNameSpace.getPrefixedIdentifier(suffix, mFactory);
+    final IdentifierProxy fullname = mNameSpace.getPrefixedIdentifier(suffix, mFactory);
     addSourceInfo(fullname, ident);
+
     final List<ParameterBindingProxy> bindings = inst.getBindingList();
     mParameterMap = new TreeMap<String,CompiledParameterBinding>();
     visitCollection(bindings);
-    try {
+
+    try
+    {
       final ModuleBindingContext root = mContext.getModuleBindingContext();
       final URI uri = root.getModule().getLocation();
       final String filename = inst.getModuleName();
-      final ModuleProxy module =
-        mDocumentManager.load(uri, filename, ModuleProxy.class);
+      final ModuleProxy module = mDocumentManager.load(uri, filename, ModuleProxy.class);
       final SourceInfo info = new SourceInfo(inst, mContext);
       mContext = new ModuleBindingContext(module, fullname, info);
       mNameSpace = new CompiledNameSpace(suffix, mNameSpace);
       mCompilationInfo.setExceptions(new MultiEvalException());
+      mCompilationInfo.addCurrentInstance(inst);
       return visitModuleProxy(module);
-    } catch (final VisitorException exception) {
+    }
+
+    catch (final VisitorException exception)
+    {
       final Throwable cause = exception.getCause();
-      if (cause instanceof EvalException
-          && !(cause instanceof EvalAbortException)) {
+      if (cause instanceof EvalException && !(cause instanceof EvalAbortException))
+      {
         mCompilationInfo.setExceptions(oldExceptions);
         final EvalException evalCause = (EvalException) cause;
         for (final EvalException ex : evalCause.getAll()) {
-          final InstantiationException next =
-            new InstantiationException(ex, inst);
+          final InstantiationException next = new InstantiationException(ex, inst);
           mCompilationInfo.raiseInVisitor(next);
         }
         throw wrap(mCompilationInfo.getExceptions());
-      } else {
-        throw exception;
       }
-    } catch (final IOException | WatersUnmarshalException exception) {
-      final InstantiationException next =
-        new InstantiationException(exception, inst);
+      else throw exception;
+    }
+
+    catch (final IOException | WatersUnmarshalException exception)
+    {
+      final InstantiationException next = new InstantiationException(exception, inst);
       throw wrap(next);
-    } finally {
+    }
+
+    finally
+    {
       mContext = oldContext;
       mNameSpace = oldNameSpace;
       mCompilationInfo.setExceptions(oldExceptions);
+      mCompilationInfo.removeCurrentInstance();
       mParameterMap = null;
-      if (mHISCCompileMode == HISCCompileMode.HISC_LOW) {
+      if (mHISCCompileMode == HISCCompileMode.HISC_LOW)
         mHISCCompileMode = HISCCompileMode.HISC_HIGH;
-      }
     }
   }
 
@@ -762,38 +797,54 @@ public class ModuleInstanceCompiler
   {
     final List<Proxy> parameters = new LinkedList<Proxy>();
     final List<Proxy> nonparameters = new LinkedList<Proxy>();
-    for (final ConstantAliasProxy alias : module.getConstantAliasList()) {
-      if (alias.getScope() == ScopeKind.LOCAL) {
+
+    for (final ConstantAliasProxy alias : module.getConstantAliasList())
+    {
+      if (alias.getScope() == ScopeKind.LOCAL)
         nonparameters.add(alias);
-      } else {
+      else
         parameters.add(alias);
-      }
     }
-    for (final EventDeclProxy decl : module.getEventDeclList()) {
-      if (decl.getScope() == ScopeKind.LOCAL) {
+
+    for (final EventDeclProxy decl : module.getEventDeclList())
+    {
+      if (decl.getScope() == ScopeKind.LOCAL)
         nonparameters.add(decl);
-      } else {
+      else
         parameters.add(decl);
-      }
     }
+
     visitCollection(parameters);
-    if (mParameterMap != null && !mParameterMap.isEmpty()) {
-      // Throw exception when not all paremeters passed into the module
-      // have been consumed---unless compiling in top-level context.
+
+    if (mParameterMap != null && !mParameterMap.isEmpty())
+    {
+      // Throw an exception when not all paremeters passed into the module
+      // have been consumed, unless compiling in top-level context.
       final CompiledParameterBinding entry =
-        mParameterMap.values().iterator().next();
+                                    mParameterMap.values().iterator().next();
       final ParameterBindingProxy binding = entry.getBinding();
       final String name = binding.getName();
       final UndefinedIdentifierException exception =
-        new UndefinedIdentifierException(name, "parameter", binding);
+                new UndefinedIdentifierException(name, "parameter", binding);
       throw wrap(exception);
     }
     mParameterMap = null;
+
     visitCollection(nonparameters);
+
     final List<Proxy> aliases = module.getEventAliasList();
     visitCollection(aliases);
+
+    /* All of the variable components are processed before the
+     * simple components and instances. Since a 'foreach' component
+     * can be of either type, its order is not important.
+     */
     final List<Proxy> components = module.getComponentList();
+    m1stPass = true;
     visitCollection(components);
+    m1stPass = false;
+    visitCollection(components);
+
     return null;
   }
 
@@ -816,6 +867,9 @@ public class ModuleInstanceCompiler
     (final SimpleComponentProxy comp)
     throws VisitorException
   {
+    // Simple components are only processed in the second pass.
+    if (m1stPass) return null;
+
     try {
       mCurrentComponent = comp;
       final IdentifierProxy ident = comp.getIdentifier();
@@ -890,6 +944,9 @@ public class ModuleInstanceCompiler
     (final VariableComponentProxy var)
     throws VisitorException
   {
+    // Variable components are processed in the first pass.
+    if (!m1stPass) return null;
+
     try {
       checkAbort();
       if (mHISCCompileMode == HISCCompileMode.HISC_LOW) {
@@ -944,7 +1001,7 @@ public class ModuleInstanceCompiler
       addSourceInfo(newvar, var);
       return newvar;
     } catch (final EvalException exception) {
-      exception.provideLocation(var); // ???
+      exception.provideLocation(var);
       throw wrap(exception);
     }
   }
@@ -952,8 +1009,7 @@ public class ModuleInstanceCompiler
 
   //#########################################################################
   //# Aborting
-  private void checkAbort()
-    throws VisitorException
+  private void checkAbort() throws VisitorException
   {
     if (mIsAborting) {
       final EvalAbortException exception = new EvalAbortException();
@@ -1032,8 +1088,8 @@ public class ModuleInstanceCompiler
     final CompiledEventDecl cdecl = event.getCompiledEventDecl();
     final EventDeclProxy edecl = cdecl.getEventDeclProxy();
     final IdentifierProxy base = edecl.getIdentifier();
-    final List<SimpleExpressionProxy> indexes = event.getIndexes();
-    final IdentifierProxy suffix = mIndexAdder.addIndexes(base, indexes);
+    final List<SimpleExpressionProxy> indices = event.getIndexes();
+    final IdentifierProxy suffix = mIndexAdder.addIndexes(base, indices);
     final CompiledNameSpace namespace = cdecl.getNameSpace();
     final IdentifierProxy ident =
       namespace.getPrefixedIdentifier(suffix, mFactory);
@@ -1065,9 +1121,9 @@ public class ModuleInstanceCompiler
     mCurrentBlockedEvents.addEvent(event);
   }
 
-  private void addSourceInfo(final Proxy target, final Proxy source)
+  private void addSourceInfo(final Proxy object, final Proxy source)
   {
-    mCompilationInfo.add(target, source, mContext);
+    mCompilationInfo.add(object, source);
   }
 
   private boolean isDisabledProposition(final CompiledEvent event)
@@ -1099,9 +1155,9 @@ public class ModuleInstanceCompiler
 
 
   //#########################################################################
-  //# Inner Class PrimeSearcher
-  private class PrimeSearcher extends DefaultModuleProxyVisitor {
-
+  //# Inner Class: PrimeSearcher
+  private class PrimeSearcher extends DefaultModuleProxyVisitor
+  {
     //#######################################################################
     //# Invocation
     private boolean containsPrime(final SimpleExpressionProxy expr)
@@ -1126,8 +1182,8 @@ public class ModuleInstanceCompiler
       (final IndexedIdentifierProxy ident)
       throws VisitorException
     {
-      final List<SimpleExpressionProxy> indexes = ident.getIndexes();
-      for (final SimpleExpressionProxy index : indexes) {
+      final List<SimpleExpressionProxy> indices = ident.getIndexes();
+      for (final SimpleExpressionProxy index : indices) {
         if (containsPrime(index)) {
           return true;
         }
@@ -1163,14 +1219,13 @@ public class ModuleInstanceCompiler
         return containsPrime(subterm);
       }
     }
-
   }
 
 
   //#########################################################################
-  //# Inner Class NameCompiler
-  private class NameCompiler extends DefaultModuleProxyVisitor {
-
+  //# Inner Class: NameCompiler
+  private class NameCompiler extends DefaultModuleProxyVisitor
+  {
     //#######################################################################
     //# Invocation
     private IdentifierProxy compileName(final IdentifierProxy ident)
@@ -1196,11 +1251,11 @@ public class ModuleInstanceCompiler
     {
       try {
         final String name = ident.getName();
-        final List<SimpleExpressionProxy> indexes = ident.getIndexes();
+        final List<SimpleExpressionProxy> indices = ident.getIndexes();
         final List<SimpleExpressionProxy> values =
-          new ArrayList<SimpleExpressionProxy>(indexes.size());
+          new ArrayList<SimpleExpressionProxy>(indices.size());
         boolean cloning = mIsCloning;
-        for (final SimpleExpressionProxy index : indexes) {
+        for (final SimpleExpressionProxy index : indices) {
           final SimpleExpressionProxy value =
             mSimpleExpressionCompiler.eval(index, mContext);
           values.add(value);
@@ -1257,25 +1312,24 @@ public class ModuleInstanceCompiler
     //#######################################################################
     //# Data Members
     private boolean mIsCloning;
-
   }
 
 
   //#########################################################################
-  //# Inner Class IndexAdder
-  private class IndexAdder extends DefaultModuleProxyVisitor {
-
+  //# Inner Class: IndexAdder
+  private class IndexAdder extends DefaultModuleProxyVisitor
+  {
     //#######################################################################
     //# Invocation
     private IdentifierProxy addIndexes
       (final IdentifierProxy ident,
-       final List<SimpleExpressionProxy> indexes)
+       final List<SimpleExpressionProxy> indices)
     {
       try {
-        if (indexes.isEmpty()) {
+        if (indices.isEmpty()) {
           return ident;
         } else {
-          mIndexes = indexes;
+          mIndexes = indices;
           return (IdentifierProxy) ident.acceptVisitor(this);
         }
       } catch (final VisitorException exception) {
@@ -1326,10 +1380,9 @@ public class ModuleInstanceCompiler
 
 
   //#########################################################################
-  //# Inner Class NameSpaceVariablesContext
+  //# Inner Class: NameSpaceVariablesContext
   private class NameSpaceVariablesContext implements BindingContext
   {
-
     //#######################################################################
     //# Interface net.sourceforge.waters.model.compiler.context.BindingContext
     @Override
@@ -1365,7 +1418,7 @@ public class ModuleInstanceCompiler
 
 
   //#########################################################################
-  //# Inner Class SinglePrefixingContext
+  //# Inner Class: SinglePrefixingContext
   private class SinglePrefixingContext implements BindingContext
   {
     //#######################################################################
@@ -1405,13 +1458,15 @@ public class ModuleInstanceCompiler
     }
 
     //#######################################################################
-    //# Data Members
+    //# Data Member
     private final IdentifierProxy mSuffix;
   }
 
 
   //#########################################################################
   //# Data Members
+
+  //  Utilities:
   private final DocumentManager mDocumentManager;
   private final ModuleProxyFactory mFactory;
   private final CompilationInfo mCompilationInfo;
@@ -1425,12 +1480,15 @@ public class ModuleInstanceCompiler
   private final NameSpaceVariablesContext mNameSpaceVariablesContext;
   private final ModuleProxy mInputModule;
 
+  //  Configurations:
   private boolean mIsOptimizationEnabled = true;
   private Collection<String> mEnabledPropertyNames = null;
   private Collection<String> mEnabledPropositionNames = null;
   private HISCCompileMode mHISCCompileMode = HISCCompileMode.NOT_HISC;
 
+  //  Module Information:
   private boolean mHasEFAElements;
+  private boolean m1stPass; // Used in the method visitModuleProxy().
 
   private BindingContext mContext;
   private CompiledNameSpace mNameSpace;
@@ -1448,6 +1506,6 @@ public class ModuleInstanceCompiler
   private EdgeProxy mCurrentEdge;
   private CompiledEventList mCurrentEventList;
 
+  //  Aborting:
   private boolean mIsAborting;
-
 }

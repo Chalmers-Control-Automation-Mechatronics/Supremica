@@ -207,8 +207,10 @@ public class ObserverProjectionTRSimplifier
     final int[] pmap = new int[numStates];
     int code = 0;
     for (final int[] array : partition.getClasses()) {
-      for (final int state : array) {
-        pmap[state] = code;
+      if (array != null) {
+        for (final int state : array) {
+          pmap[state] = code;
+        }
       }
       code++;
     }

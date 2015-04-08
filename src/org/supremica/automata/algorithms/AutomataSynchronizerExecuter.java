@@ -249,10 +249,11 @@ public final class AutomataSynchronizerExecuter
 
         int i = 0;
 
-        for (final Iterator<Automaton> autIt = automataToBeSelected.iterator();
-        autIt.hasNext(); )
+        final Iterator<Automaton> autIt = automataToBeSelected.iterator();
+        while(autIt.hasNext())
         {
-            automataIndices[i++] = indexForm.getAutomataIndexMap().getAutomatonIndex(autIt.next());
+	    final Automaton automaton = autIt.next();
+            automataIndices[i++] = indexForm.getAutomataIndexMap().getAutomatonIndex(automaton);
         }
 
         helper.selectAutomata(automataIndices);

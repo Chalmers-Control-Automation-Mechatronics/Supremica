@@ -15,10 +15,12 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -67,21 +69,20 @@ abstract class TRAbstractionProcedure
       final Iterator<EventProxy> iter = local.iterator();
       final EventProxy tau = iter.hasNext() ? iter.next() : null;
       final EventEncoding eventEnc = createEventEncoding(aut, local, candidate);
-      final StateEncoding inputStateEnc = createStateEncoding(aut);
+      final StateEncoding inputStateEnc = new StateEncoding(aut);
       final int config = mSimplifier.getPreferredInputConfiguration();
       ListBufferTransitionRelation rel =
-        new ListBufferTransitionRelation(aut, eventEnc,
-                                         inputStateEnc, config);
+        new ListBufferTransitionRelation(aut, eventEnc, inputStateEnc, config);
       getAnalyzer().showDebugLog(rel);
       final int numStates = rel.getNumberOfStates();
       final int numTrans = aut.getTransitions().size();
-      final int numMarkings = rel.getNumberOfMarkings();
+      final int numMarkings = rel.getNumberOfMarkings(false);
       mSimplifier.setTransitionRelation(rel);
       if (mSimplifier.run()) {
         rel = mSimplifier.getTransitionRelation();
         if (rel.getNumberOfReachableStates() == numStates &&
             rel.getNumberOfTransitions() == numTrans &&
-            rel.getNumberOfMarkings() == numMarkings) {
+            rel.getNumberOfMarkings(false) == numMarkings) {
           return false;
         }
         rel.removeRedundantPropositions();
@@ -105,7 +106,7 @@ abstract class TRAbstractionProcedure
   public void storeStatistics()
   {
     final CompositionalAnalysisResult result = getAnalysisResult();
-    result.setSimplifierStatistics(mSimplifier);
+    result.addSimplifierStatistics(mSimplifier);
   }
 
   @Override
@@ -150,16 +151,18 @@ abstract class TRAbstractionProcedure
   protected EventEncoding createEventEncoding(final Collection<EventProxy> events,
                                               final Collection<EventProxy> local,
                                               final Candidate candidate)
+    throws OverflowException
   {
     final KindTranslator translator = getKindTranslator();
-    final EventEncoding enc = super.createEventEncoding(events, local, candidate);
+    final EventEncoding enc =
+      super.createEventEncoding(events, local, candidate);
     final EventProxy defaultMarking = getUsedDefaultMarking();
     int defaultMarkingID = -1;
     if (defaultMarking != null) {
       defaultMarkingID = enc.getEventCode(defaultMarking);
       if (defaultMarkingID < 0 && mForceMarkings) {
         defaultMarkingID =
-          enc.addEvent(defaultMarking, translator, EventEncoding.STATUS_UNUSED);
+          enc.addEvent(defaultMarking, translator, EventStatus.STATUS_UNUSED);
       }
     }
     final EventProxy preconditionMarking = getUsedPreconditionMarking();
@@ -169,17 +172,13 @@ abstract class TRAbstractionProcedure
       if (preconditionMarkingID < 0 && mForceMarkings) {
         preconditionMarkingID =
           enc.addEvent(preconditionMarking, translator,
-                       EventEncoding.STATUS_UNUSED);
+                       EventStatus.STATUS_UNUSED);
       }
     }
     mSimplifier.setPropositions(preconditionMarkingID, defaultMarkingID);
     return enc;
   }
 
-  protected StateEncoding createStateEncoding(final AutomatonProxy automaton)
-  {
-    return new StateEncoding(automaton);
-  }
 
   //#########################################################################
   //# Auxiliary Methods

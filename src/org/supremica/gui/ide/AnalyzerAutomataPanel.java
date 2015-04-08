@@ -41,39 +41,32 @@ public class AnalyzerAutomataPanel
     implements TableModelListener
 {
     private static final long serialVersionUID = 1L;
-    
+
     private static Logger logger = LoggerFactory.createLogger(AnalyzerAutomataPanel.class);
-    
-    private AnalyzerPanel analyzerPanel;
-    private DocumentContainer moduleContainer;
-    private String name;
+
+    private final AnalyzerPanel analyzerPanel;
+    private final DocumentContainer moduleContainer;
     private JTable theAutomatonTable;
     private TableSorter theTableSorter;
     private TableModel analyzerTableModel;
-    
+
     public static int TABLE_NAME_COLUMN = 0;
     public static int TABLE_TYPE_COLUMN = 1;
     public static int TABLE_STATES_COLUMN = 2;
     public static int TABLE_EVENTS_COLUMN = 3;
     public static int TABLE_TRANSITIONS_COLUMN = 4;
-    
-    AnalyzerAutomataPanel(AnalyzerPanel analyzerPanel, DocumentContainer moduleContainer, String name)
+
+    AnalyzerAutomataPanel(final AnalyzerPanel analyzerPanel, final DocumentContainer moduleContainer)
     {
         this.analyzerPanel = analyzerPanel;
         this.moduleContainer = moduleContainer;
-        this.name = name;
-        
+
         setPreferredSize(IDEDimensions.leftAnalyzerPreferredSize);
         setMinimumSize(IDEDimensions.leftAnalyzerMinimumSize);
         initialize();
         //validate();
     }
-    
-    public String getName()
-    {
-        return name;
-    }
-    
+
     private void initialize()
     {
         analyzerTableModel = getActiveProject().getAnalyzerTableModel();
@@ -83,9 +76,10 @@ public class AnalyzerAutomataPanel
         {
 			private static final long serialVersionUID = 1L;
 
-			public String getToolTipText(MouseEvent e)
+			@Override
+      public String getToolTipText(final MouseEvent e)
             {
-                int i = columnAtPoint(e.getPoint());
+                final int i = columnAtPoint(e.getPoint());
                 if (i == TABLE_NAME_COLUMN)
                 {
                     return "Sort on name";
@@ -112,41 +106,44 @@ public class AnalyzerAutomataPanel
                 }
             }
         });
-                
+
         theAutomatonTable.getTableHeader().setReorderingAllowed(false);
-        
+
         getViewport().add(theAutomatonTable);
-                
+
         theTableSorter.addMouseListenerToHeaderInTable(theAutomatonTable);
-        
+
         analyzerTableModel.addTableModelListener(this);
         theAutomatonTable.addKeyListener(new KeyAdapter()
         {
-            public void keyPressed(KeyEvent e)
+            @Override
+            public void keyPressed(final KeyEvent e)
             {
                 if (e.getKeyCode() == KeyEvent.VK_DELETE)
                 {
 //					ActionMan.automataDelete_actionPerformed(getGui());
                 }
             }
-            
-            public void keyReleased(KeyEvent e)
+
+            @Override
+            public void keyReleased(final KeyEvent e)
             {}
-            
-            public void keyTyped(KeyEvent e)
+
+            @Override
+            public void keyTyped(final KeyEvent e)
             {}
         });
-        
+
         // Set the preferred column width of the automaton table
         //int tableWidth = theAutomatonTable.getWidth();
-        int tableWidth = getWidth()+220; // getWidth() returns 0?
-        int tableWidthUnit = tableWidth / 11;
-        TableColumnModel theTableColumnModel = theAutomatonTable.getColumnModel();
+        final int tableWidth = getWidth()+220; // getWidth() returns 0?
+        final int tableWidthUnit = tableWidth / 11;
+        final TableColumnModel theTableColumnModel = theAutomatonTable.getColumnModel();
         for (int i = 0; i < theAutomatonTable.getColumnCount(); i++)
         {
             //System.out.println(tableWidth + " " + i);
-            TableColumn currColumn = theTableColumnModel.getColumn(i);
-            
+            final TableColumn currColumn = theTableColumnModel.getColumn(i);
+
             if (i == TABLE_NAME_COLUMN)
             {
                 currColumn.setPreferredWidth(tableWidthUnit * 5);
@@ -160,40 +157,41 @@ public class AnalyzerAutomataPanel
                 currColumn.setPreferredWidth(tableWidthUnit * 1);
             }
         }
-        
+
         // This code used to be in the popup menu -------------
         theAutomatonTable.addMouseListener(new MouseAdapter()
         {
-            public void mouseClicked(MouseEvent e)
+            @Override
+            public void mouseClicked(final MouseEvent e)
             {
                 if (e.getClickCount() == 2)
                 {
-                    int col = theAutomatonTable.columnAtPoint(e.getPoint());
-                    int row = theAutomatonTable.rowAtPoint(e.getPoint());
-                    
+                    final int col = theAutomatonTable.columnAtPoint(e.getPoint());
+                    final int row = theAutomatonTable.rowAtPoint(e.getPoint());
+
                     if (row < 0)
                     {
                         return;
                     }
-                    
+
                     // Show automaton in the panel
                     if (col == TABLE_NAME_COLUMN)
                     {
-                        Automata selectedAutomata = getSelectedAutomata();
-                        
+                        final Automata selectedAutomata = getSelectedAutomata();
+
                         if (selectedAutomata.size() >= 2)
                         {
                             //moduleContainer.getVisualProject();
-                            
-                            for (Iterator<Automaton> autIt = selectedAutomata.iterator(); autIt.hasNext();)
+
+                            for (final Iterator<Automaton> autIt = selectedAutomata.iterator(); autIt.hasNext();)
                             {
-                                Automaton currAutomaton = (Automaton) autIt.next();
-                                
+                                final Automaton currAutomaton = autIt.next();
+
                                 try
                                 {
                                     analyzerPanel.getVisualProject().getAutomatonViewer(currAutomaton.getName());
                                 }
-                                catch (Exception ex)
+                                catch (final Exception ex)
                                 {
                                     logger.error("Exception in AutomatonViewer. Automaton: " + currAutomaton, ex);
                                     return;
@@ -204,8 +202,8 @@ public class AnalyzerAutomataPanel
                         {
                             if (!Config.GUI_ANALYZER_AUTOMATONVIEWER_USE_CONTROLLED_SURFACE.isTrue())
                             {
-                                Automaton selectedAutomaton = selectedAutomata.getFirstAutomaton();
-                                AnalyzerAutomatonViewerPanel automatonPanel = new AnalyzerAutomatonViewerPanel("Dot View", selectedAutomaton);
+                                final Automaton selectedAutomaton = selectedAutomata.getFirstAutomaton();
+                                final AnalyzerAutomatonViewerPanel automatonPanel = new AnalyzerAutomatonViewerPanel("Dot View", selectedAutomaton);
                                 analyzerPanel.setRightComponent(automatonPanel);
                             }
                             /*
@@ -213,7 +211,7 @@ public class AnalyzerAutomataPanel
                             {
                                 Automaton selectedAutomaton = selectedAutomata.getFirstAutomaton();
                                 ModuleContainer flatModuleContainer = moduleContainer.getFlatModuleContainer();
-                                
+
                                 //GraphProxy currGraphProxy = moduleContainer.getFlatGraphProxy(selectedAutomaton.getName());
                                 //ModuleProxy currModuleProxy = moduleContainer.getFlatModuleProxy();
 //                                                                if (currGraphProxy == null)
@@ -226,19 +224,19 @@ public class AnalyzerAutomataPanel
 //                                                                        logger.error("AnalyzerAutomataPanel.currModuleProxy == null");
 //                                                                        return;
 //                                                                }
-                                
+
                                 //boolean isSubject = currGraphProxy instanceof GraphSubject;
                                 //logger.info("isGraphSubject: " + isSubject);
                                 //isSubject = currModuleProxy instanceof ModuleSubject;
                                 //logger.info("isModuleSubject: " + isSubject);
-                                
+
                                 try
                                 {
                                     //EditorSurface surface = new EditorSurface((GraphSubject)currGraphProxy, (ModuleSubject)currModuleProxy, new SubjectShapeProducer((GraphSubject)currGraphProxy, currModuleProxy));
                                     //ControlledSurface surface = new ControlledSurface((GraphSubject)currGraphProxy, (ModuleSubject)currModuleProxy);
-                                    
+
                                     ComponentViewPanel componentView = flatModuleContainer.getComponentViewPanel(selectedAutomaton.getName());
-                                    
+
                                     analyzerPanel.setRightComponent(componentView);
                                 }
                                 catch (Exception ex)
@@ -246,7 +244,7 @@ public class AnalyzerAutomataPanel
                                     logger.error(ex);
                                     return;
                                 }
-                                
+
                             }
                              */
                         }
@@ -254,37 +252,39 @@ public class AnalyzerAutomataPanel
                         {
                             return;
                         }
-                        
+
 //						ActionMan.automatonView_actionPerformed(getGui());
 //						getGui().repaint();
                     }
                 }
             }
-            
-            public void mousePressed(MouseEvent e)
+
+            @Override
+            public void mousePressed(final MouseEvent e)
             {
                 // This is needed for the Linux platform
                 // where isPopupTrigger is true only on mousePressed.
                 maybeShowPopup(e);
             }
-            
-            public void mouseReleased(MouseEvent e)
+
+            @Override
+            public void mouseReleased(final MouseEvent e)
             {
                 // This is for triggering the popup on Windows platforms
                 maybeShowPopup(e);
             }
-            
-            private void maybeShowPopup(MouseEvent e)
+
+            private void maybeShowPopup(final MouseEvent e)
             {
                 if (e.isPopupTrigger())
                 {
-                    int currRow = theAutomatonTable.rowAtPoint(e.getPoint());
-                    
+                    final int currRow = theAutomatonTable.rowAtPoint(e.getPoint());
+
                     if (currRow < 0)
                     {
                         return;
                     }
-                    
+
                     if (!theAutomatonTable.isRowSelected(currRow))
                     {
                         theAutomatonTable.clearSelection();
@@ -298,51 +298,52 @@ public class AnalyzerAutomataPanel
                 }
             }
         });
-        
+
         // --------------------------------------//
     }
-    
+
     private VisualProject getActiveProject()
     {
         return analyzerPanel.getVisualProject();
     }
-    
-    public void valueChanged(ListSelectionEvent e)
+
+    public void valueChanged(final ListSelectionEvent e)
     {
         if (!e.getValueIsAdjusting())
         {}
     }
-    
-    public void tableChanged(TableModelEvent e)
+
+    @Override
+    public void tableChanged(final TableModelEvent e)
     {
         //theAutomatonTable.revalidate();
     }
-    
+
     public Automata getSelectedAutomata()
     {
-        int[] selectedRowIndices = theAutomatonTable.getSelectedRows();
-        Automata selectedAutomata = new Automata();
-        
+        final int[] selectedRowIndices = theAutomatonTable.getSelectedRows();
+        final Automata selectedAutomata = new Automata();
+
         for (int i = 0; i < selectedRowIndices.length; i++)
         {
             try
             {
-                int currIndex = selectedRowIndices[i];
-                int orgIndex = theTableSorter.getOriginalRowIndex(currIndex);
-                Automaton currAutomaton = getActiveProject().getAutomatonAt(orgIndex);
-                
+                final int currIndex = selectedRowIndices[i];
+                final int orgIndex = theTableSorter.getOriginalRowIndex(currIndex);
+                final Automaton currAutomaton = getActiveProject().getAutomatonAt(orgIndex);
+
                 selectedAutomata.addAutomaton(currAutomaton);
             }
-            catch (Exception ex)
+            catch (final Exception ex)
             {
                 logger.error("Trying to get an automaton that does not exist. Index: " + i);
                 logger.debug(ex.getStackTrace());
             }
         }
-        
+
         return selectedAutomata;
     }
-    
+
     /**
      * Same as getSelectedAutomata but include execution information
      */
@@ -351,7 +352,7 @@ public class AnalyzerAutomataPanel
     {
         int[] selectedRowIndices = theAutomatonTable.getSelectedRows();
         Project selectedProject = new Project();
-      
+
         for (int i = 0; i < selectedRowIndices.length; i++)
         {
             try
@@ -359,7 +360,7 @@ public class AnalyzerAutomataPanel
                 int currIndex = selectedRowIndices[i];
                 int orgIndex = theTableSorter.getOriginalRowIndex(currIndex);
                 Automaton currAutomaton = getActiveProject().getAutomatonAt(orgIndex);
-      
+
                 selectedProject.addAutomaton(currAutomaton);
             }
             catch (Exception ex)
@@ -368,27 +369,27 @@ public class AnalyzerAutomataPanel
                 logger.debug(ex.getStackTrace());
             }
         }
-      
+
         Project activeProject = getActiveProject();
-      
+
         if (activeProject != null)
         {
             selectedProject.addAttributes(activeProject);
-      
+
             //selectedProject.addActions(activeProject.getActions());
             //selectedProject.addControls(activeProject.getControls());
             //selectedProject.setAnimationURL(activeProject.getAnimationURL());
         }
-      
+
         return selectedProject;
     }*/
-    
+
     public Automata getAllAutomata()
     {
         return getActiveProject();
     }
-    
-    
+
+
     public Automata getUnselectedAutomata()
     {
                 /* Simple... but flickery!
@@ -397,23 +398,23 @@ public class AnalyzerAutomataPanel
                    invertSelection();
                    return unSelectedAutomata;
                  */
-        int[] selectedRowIndices = theAutomatonTable.getSelectedRows();
-        Automata unselectedAutomata = new Automata();
+        final int[] selectedRowIndices = theAutomatonTable.getSelectedRows();
+        final Automata unselectedAutomata = new Automata();
         int j = 0;
-        
+
         for (int i = 0; i < theAutomatonTable.getRowCount(); i++)
         {
             if ((j >= selectedRowIndices.length) || (i != selectedRowIndices[j]))
             {
                 try
                 {
-                    int currIndex = i;
-                    int orgIndex = theTableSorter.getOriginalRowIndex(currIndex);
-                    Automaton currAutomaton = getActiveProject().getAutomatonAt(orgIndex);
-                    
+                    final int currIndex = i;
+                    final int orgIndex = theTableSorter.getOriginalRowIndex(currIndex);
+                    final Automaton currAutomaton = getActiveProject().getAutomatonAt(orgIndex);
+
                     unselectedAutomata.addAutomaton(currAutomaton);
                 }
-                catch (Exception ex)
+                catch (final Exception ex)
                 {
                     logger.error("Trying to get an automaton that does not exist. Index: " + i);
                     logger.debug(ex.getStackTrace());
@@ -424,15 +425,15 @@ public class AnalyzerAutomataPanel
                 j++;
             }
         }
-        
+
         return unselectedAutomata;
     }
-    
+
     public void selectAllAutomata()
     {
         theAutomatonTable.selectAll();
     }
-    
+
     public void sortAutomataByName()
     {
         theTableSorter.sortByColumn(TABLE_NAME_COLUMN);

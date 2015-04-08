@@ -9,16 +9,16 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.list.array.TIntArrayList;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 
 /**
@@ -53,37 +53,30 @@ public class SubsetConstructionTRSimplifierTest
   @Override
   protected TransitionRelationSimplifier createTransitionRelationSimplifier()
   {
-    return new SubsetConstructionTRSimplifier();
+    final SubsetConstructionTRSimplifier simplifier =
+      new SubsetConstructionTRSimplifier();
+    simplifier.setFailingEventsAsSelfloops(true);
+    return simplifier;
   }
 
   @Override
   protected EventEncoding createEventEncoding(final ProductDESProxy des,
                                               final AutomatonProxy aut)
+    throws OverflowException
   {
     final EventEncoding enc = super.createEventEncoding(des, aut);
     final int numEvents = enc.getNumberOfProperEvents();
-    mForbiddenEvents = new TIntArrayList();
     for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
       final EventProxy event = enc.getProperEvent(e);
       final String name = event.getName();
       if (name.startsWith(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
-        mForbiddenEvents.add(e);
+        byte status = enc.getProperEventStatus(e);
+        status |= EventStatus.STATUS_FAILING;
+        status |= EventStatus.STATUS_ALWAYS_ENABLED;
+        enc.setProperEventStatus(e, status);
       }
     }
     return enc;
-  }
-
-  @Override
-  protected void configureTransitionRelationSimplifier()
-  {
-    super.configureTransitionRelationSimplifier();
-    final SubsetConstructionTRSimplifier simplifier =
-      getTransitionRelationSimplifier();
-    simplifier.clearForbiddenEvents();
-    for (int e = 0; e < mForbiddenEvents.size(); e++) {
-      final int event = mForbiddenEvents.get(e);
-      simplifier.setForbiddenEvent(event, true);
-    }
   }
 
   @Override
@@ -99,64 +92,65 @@ public class SubsetConstructionTRSimplifierTest
   public void test_determinisation_1()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "determinisation_1.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "determinisation_1.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_determinisation_2()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "determinisation_2.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "determinisation_2.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_determinisation_3()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "determinisation_3.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "determinisation_3.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_determinisation_4()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "determinisation_4.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "determinisation_4.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_determinisation_5()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "determinisation_5.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "determinisation_5.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_determinisation_6()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "determinisation_6.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "determinisation_6.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   public void test_determinisation_7()
   throws Exception
   {
-    final String group = "tests";
-    final String subdir = "abstraction";
-    final String name = "determinisation_7.wmod";
-    runTransitionRelationSimplifier(group, subdir, name);
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "determinisation_7.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_determinisation_8()
+  throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "determinisation_8.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
   /**
@@ -180,11 +174,6 @@ public class SubsetConstructionTRSimplifierTest
     test_determinisation_2();
     test_determinisation_1();
   }
-
-
-  //#########################################################################
-  //# Data Members
-  private TIntArrayList mForbiddenEvents;
 
 }
 

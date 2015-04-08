@@ -19,6 +19,7 @@ import net.sourceforge.waters.analysis.abstraction.SubsetConstructionTRSimplifie
 import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -56,22 +57,21 @@ class ProjectionAbstractionProcedure extends TRAbstractionProcedure
     chain.add(subset);
     subset.setStateLimit(slimit);
     subset.setTransitionLimit(tlimit);
+    subset.setFailingEventsAsSelfloops(true);
     final ObservationEquivalenceTRSimplifier bisimulator1 =
       new ObservationEquivalenceTRSimplifier();
     bisimulator1.setEquivalence
       (ObservationEquivalenceTRSimplifier.Equivalence.DETERMINISTIC_MINSTATE);
-    bisimulator1.setUsingSpecialEvents(false);
-    if (verifier.isUsingSpecialEvents()) {
+    if (verifier.isSelfloopOnlyEventsEnabled()) {
       // Selfloop-only events must be handled through bisimulation.
       final ObservationEquivalenceTRSimplifier bisimulator2 =
         new ObservationEquivalenceTRSimplifier();
       bisimulator2.setEquivalence
-      (ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION);
-      bisimulator2.setUsingSpecialEvents(true);
+        (ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION);
       bisimulator2.setInfoEnabled(true);
     }
     chain.add(bisimulator1);
-    return new ProjectionAbstractionProcedure(verifier, chain, subset);
+    return new ProjectionAbstractionProcedure(verifier, chain);
   }
 
 
@@ -79,11 +79,9 @@ class ProjectionAbstractionProcedure extends TRAbstractionProcedure
   //# Constructor
   private ProjectionAbstractionProcedure
     (final CompositionalSafetyVerifier verifier,
-     final TransitionRelationSimplifier simplifier,
-     final SubsetConstructionTRSimplifier subset)
+     final TransitionRelationSimplifier simplifier)
   {
     super(verifier, simplifier, false);
-    mSubsetConstructionTRSimplifier = subset;
   }
 
 
@@ -120,19 +118,24 @@ class ProjectionAbstractionProcedure extends TRAbstractionProcedure
       final Collection<EventProxy> taus = Collections.singletonList(tau);
       final EventEncoding eventEnc = createEventEncoding(aut, taus, candidate);
       final StateEncoding inputStateEnc = new StateEncoding(aut);
-      final int config = simplifier.getPreferredInputConfiguration();
-      final ListBufferTransitionRelation rel =
-        new ListBufferTransitionRelation(aut, eventEnc,
-                                         inputStateEnc, config);
       for (final EventProxy event : local) {
         if (verifier.getPropertyStatus(event) ==
             CompositionalSafetyVerifier.FORBIDDEN) {
           final int e = eventEnc.getEventCode(event);
           if (e >= 0) {
-            mSubsetConstructionTRSimplifier.setForbiddenEvent(e, true);
+            byte status = eventEnc.getProperEventStatus(e);
+            status |= EventStatus.STATUS_FAILING;
+            status |= EventStatus.STATUS_ALWAYS_ENABLED;
+            eventEnc.setProperEventStatus(e, status);
           }
         }
       }
+      eventEnc.sortProperEvents(~EventStatus.STATUS_FAILING,
+                                ~EventStatus.STATUS_ALWAYS_ENABLED);
+      final int config = simplifier.getPreferredInputConfiguration();
+      final ListBufferTransitionRelation rel =
+        new ListBufferTransitionRelation(aut, eventEnc,
+                                         inputStateEnc, config);
       verifier.showDebugLog(rel);
       simplifier.setTransitionRelation(rel);
       simplifier.run();
@@ -163,11 +166,5 @@ class ProjectionAbstractionProcedure extends TRAbstractionProcedure
     final CompositionalSafetyVerifier verifier = getAnalyzer();
     return new ProjectionStep(verifier, output, input, tau);
   }
-
-
-  //#########################################################################
-  //# Data Members
-  private final SubsetConstructionTRSimplifier
-    mSubsetConstructionTRSimplifier;
 
 }

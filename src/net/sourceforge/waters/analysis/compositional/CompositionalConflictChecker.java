@@ -30,6 +30,7 @@ import net.sourceforge.waters.model.analysis.des.LanguageInclusionDiagnostics;
 import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.analysis.des.TraceChecker;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -51,10 +52,11 @@ import net.sourceforge.waters.xsd.des.ConflictKind;
  *
  * <P><I>References:</I><BR>
  * Hugo Flordal, Robi Malik. Compositional Verification in Supervisory Control.
- * SIAM Journal of Control and Optimization, 48(3), 1914-1938, 2009.<BR>
- * Robi Malik, Ryan Leduc. A Compositional Approach for Verifying Generalised
- * Nonblocking, Proc. 7th International Conference on Control and Automation,
- * ICCA'09, 448-453, Christchurch, New Zealand, 2009.</P>
+ * SIAM Journal of Control and Optimization, <STRONG>48</STRONG>(3),
+ * 1914-1938, 2009.<BR>
+ * Robi Malik, Ryan Leduc. Compositional Nonblocking Verification Using
+ * Generalised Nonblocking Abstractions, IEEE Transactions on Automatic
+ * Control <STRONG>58</STRONG>(8), 1-13, 2013.</P>
  *
  * @author Robi Malik, Rachel Francis
  */
@@ -451,11 +453,7 @@ public class CompositionalConflictChecker
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
-  /**
-   * Initialises required variables to default values if the user has not
-   * configured them.
-   */
+  //# Overrides for net.sourceforge.waters.model.analysis.des.AbstractModelAnalyser
   @Override
   protected void setUp()
     throws AnalysisException
@@ -494,7 +492,8 @@ public class CompositionalConflictChecker
      final EventProxy tau)
   {
     final SynchronousProductBuilder builder = getSynchronousProductBuilder();
-    final SynchronousProductStateMap stateMap =  builder.getStateMap();
+    final SynchronousProductResult result = builder.getAnalysisResult();
+    final SynchronousProductStateMap stateMap = result.getStateMap();
     return new ConflictHidingStep(this, sync, hidden, tau, stateMap);
   }
 

@@ -356,6 +356,11 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     return filename;
   }
 
+  protected void checkStatistics(final VerificationResult stats)
+  {
+  }
+
+
   //#########################################################################
   //# To be Provided by Subclasses
   /**
@@ -395,7 +400,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
       configureModelVerifier(des);
       final boolean result = mModelVerifier.run();
       TraceProxy counterexample = null;
-      if (!result) {
+      if (!result && mModelVerifier.isCounterExampleEnabled()) {
         counterexample = mModelVerifier.getCounterExample();
         precheckCounterExample(counterexample);
         if (counterexample != null) {
@@ -404,9 +409,15 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
       }
       assertEquals("Wrong result from model checker: got " + result +
                    " but should have been " + expect + "!", expect, result);
-      if (!expect) {
+      final VerificationResult stats = mModelVerifier.getAnalysisResult();
+      assertNotNull("No verification result!", stats);
+      assertEquals("Wrong result from model checker: got " +
+                   stats.isSatisfied() + " but should have been " +
+                   expect + "!", expect, stats.isSatisfied());
+      if (!expect && mModelVerifier.isCounterExampleEnabled()) {
         checkCounterExample(des, counterexample);
       }
+      checkStatistics(stats);
     } catch (final NondeterministicDESException exception) {
       if (mModelVerifier.supportsNondeterminism() ||
           isProductDESDeterministic()) {

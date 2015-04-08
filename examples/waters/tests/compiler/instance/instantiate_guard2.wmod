@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="instantiate_guard2" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Name="get"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="put"/>
+    </EventDeclList>
+    <ComponentList>
+        <Instance ModuleName="../../efa/assignment_in_guard2" Name="GuardError2">
+            <ParameterBinding Name="get">
+                <EventListExpression>
+                    <EventList>
+                        <SimpleIdentifier Name="get"/>
+                    </EventList>
+                </EventListExpression>
+            </ParameterBinding>
+            <ParameterBinding Name="put">
+                <EventListExpression>
+                    <EventList>
+                        <SimpleIdentifier Name="put"/>
+                    </EventList>
+                </EventListExpression>
+            </ParameterBinding>
+            <ParameterBinding Name="size">
+                <IntConstant Value="1"/>
+            </ParameterBinding>
+        </Instance>
+    </ComponentList>
+</Module>

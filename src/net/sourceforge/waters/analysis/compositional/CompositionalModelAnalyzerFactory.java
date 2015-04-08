@@ -11,6 +11,8 @@ package net.sourceforge.waters.analysis.compositional;
 
 import java.io.PrintStream;
 
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
+import net.sourceforge.waters.model.analysis.CommandLineArgumentBoolean;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentChain;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
@@ -68,10 +70,11 @@ public class CompositionalModelAnalyzerFactory
     addArgument(new PreselectingMethodArgument());
     addArgument(new SelectingMethodArgument());
     addArgument(new SubsumptionArgument());
-    addArgument(new NoSpecialEventsArgument());
-    addArgument(new NoSelfloopEventsArgument());
-    addArgument(new NoFailingEventsArgument());
-    addArgument(new NoDeadlockPruningArgument());
+    addArgument(new SpecialEventsArgument());
+    addArgument(new BlockedEventsArgument());
+    addArgument(new FailingEventsArgument());
+    addArgument(new SelfloopOnlyEventsArgument());
+    addArgument(new DeadlockPruningArgument());
     addArgument(new SecondaryFactoryArgument());
   }
 
@@ -119,7 +122,7 @@ public class CompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final int limit = getValue();
       final AbstractCompositionalModelAnalyzer composer =
@@ -148,7 +151,7 @@ public class CompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final int limit = getValue();
       final AbstractCompositionalModelAnalyzer composer =
@@ -177,7 +180,7 @@ public class CompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final int limit = getValue();
       final AbstractCompositionalModelAnalyzer composer =
@@ -206,7 +209,7 @@ public class CompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final int limit = getValue();
       final AbstractCompositionalModelAnalyzer composer =
@@ -236,7 +239,7 @@ public class CompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final int limit = getValue();
       final AbstractCompositionalModelAnalyzer composer =
@@ -266,7 +269,7 @@ public class CompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final int limit = getValue();
       final AbstractCompositionalModelAnalyzer composer =
@@ -282,7 +285,6 @@ public class CompositionalModelAnalyzerFactory
   private static class AbstractionMethodArgument
     extends CommandLineArgumentString
   {
-
     //#######################################################################
     //# Constructors
     private AbstractionMethodArgument()
@@ -294,7 +296,7 @@ public class CompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final String name = getValue();
       final AbstractCompositionalModelAnalyzer composer =
@@ -308,6 +310,19 @@ public class CompositionalModelAnalyzerFactory
         System.exit(1);
       }
       composer.setAbstractionProcedureCreator(creator);
+    }
+
+    //#######################################################################
+    //# Printing
+    @Override
+    public void dump(final PrintStream stream, final Object analyzer)
+    {
+      super.dump(stream, analyzer);
+      final AbstractCompositionalModelAnalyzer composer =
+        (AbstractCompositionalModelAnalyzer) analyzer;
+      final EnumFactory<AbstractionProcedureCreator>
+        factory = composer.getAbstractionProcedureFactory();
+      factory.dumpEnumeration(stream, INDENT);
     }
   }
 
@@ -329,7 +344,7 @@ public class CompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final String name = getValue();
       final AbstractCompositionalModelAnalyzer composer =
@@ -349,8 +364,7 @@ public class CompositionalModelAnalyzerFactory
     //#######################################################################
     //# Printing
     @Override
-    public void dump(final PrintStream stream,
-                     final ModelAnalyzer analyzer)
+    public void dump(final PrintStream stream, final Object analyzer)
     {
       super.dump(stream, analyzer);
       final AbstractCompositionalModelAnalyzer composer =
@@ -380,7 +394,7 @@ public class CompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final AbstractCompositionalModelAnalyzer composer =
         (AbstractCompositionalModelAnalyzer) analyzer;
@@ -420,7 +434,7 @@ public class CompositionalModelAnalyzerFactory
     //#######################################################################
     //# Printing
     @Override
-    public void dump(final PrintStream stream, final ModelAnalyzer analyzer)
+    public void dump(final PrintStream stream, final Object analyzer)
     {
       if (analyzer instanceof CompositionalConflictChecker) {
         super.dump(stream, analyzer);
@@ -451,7 +465,7 @@ public class CompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final AbstractCompositionalModelAnalyzer composer =
         (AbstractCompositionalModelAnalyzer) analyzer;
@@ -462,107 +476,142 @@ public class CompositionalModelAnalyzerFactory
 
 
   //#########################################################################
-  //# Inner Class NoSpecialEventsArgument
-  private static class NoSpecialEventsArgument extends CommandLineArgumentFlag
+  //# Inner Class SpecialEventsArgument
+  private static class SpecialEventsArgument extends CommandLineArgumentBoolean
   {
 
     //#######################################################################
     //# Constructors
-    private NoSpecialEventsArgument()
+    private SpecialEventsArgument()
     {
-      super("-nse", "Disable special events");
+      super("-se",
+            "Enable or disable blocked, failing, and selfloop-only events");
     }
 
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final AbstractCompositionalModelAnalyzer composer =
         (AbstractCompositionalModelAnalyzer) analyzer;
-      composer.setUsingSpecialEvents(false);
-      composer.setFailingEventsEnabled(false);
+      final boolean enable = getValue();
+      composer.setUsingSpecialEvents(enable);
     }
 
   }
 
 
   //#########################################################################
-  //# Inner Class NoSelfloopEventsArgument
-  private static class NoSelfloopEventsArgument extends CommandLineArgumentFlag
+  //# Inner Class BlockedEventsArgument
+  private static class BlockedEventsArgument
+    extends CommandLineArgumentBoolean
   {
 
     //#######################################################################
     //# Constructors
-    private NoSelfloopEventsArgument()
+    private BlockedEventsArgument()
     {
-      super("-nsl", "Disable selfloop removal");
+      super("-be", "Enable or disable blocked events removal");
     }
 
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final AbstractCompositionalModelAnalyzer composer =
         (AbstractCompositionalModelAnalyzer) analyzer;
-      composer.setUsingSpecialEvents(false);
+      final boolean enable = getValue();
+      composer.setBlockedEventsEnabled(enable);
     }
 
   }
 
 
   //#########################################################################
-  //# Inner Class NoFailingEventsArgument
-  private static class NoFailingEventsArgument extends CommandLineArgumentFlag
+  //# Inner Class FailingEventsArgument
+  private static class FailingEventsArgument
+    extends CommandLineArgumentBoolean
   {
 
     //#######################################################################
     //# Constructors
-    private NoFailingEventsArgument()
+    private FailingEventsArgument()
     {
-      super("-nfe", "Disable failing events removal");
+      super("-fe", "Enable or disable failing events redirection");
     }
 
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
     {
       final AbstractCompositionalModelAnalyzer composer =
         (AbstractCompositionalModelAnalyzer) analyzer;
-      composer.setFailingEventsEnabled(false);
+      final boolean enable = getValue();
+      composer.setFailingEventsEnabled(enable);
     }
 
   }
 
 
   //#########################################################################
-  //# Inner Class NoDeadlockPruning
-  private static class NoDeadlockPruningArgument extends CommandLineArgumentFlag
+  //# Inner Class SelfloopOnlyEventsArgument
+  private static class SelfloopOnlyEventsArgument
+    extends CommandLineArgumentBoolean
   {
 
     //#######################################################################
     //# Constructors
-    private NoDeadlockPruningArgument()
+    private SelfloopOnlyEventsArgument()
     {
-      super("-ndp", "Disable deadlock pruning in synchronous composition");
+      super("-sl",
+            "Enable or disable selfloop-only events and selfloop removal");
     }
 
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer verifier)
+    public void configureAnalyzer(final Object analyzer)
     {
       final AbstractCompositionalModelAnalyzer composer =
-        (AbstractCompositionalModelAnalyzer) verifier;
-      composer.setPruningDeadlocks(false);
+        (AbstractCompositionalModelAnalyzer) analyzer;
+      final boolean enable = getValue();
+      composer.setSelfloopOnlyEventsEnabled(enable);
     }
 
+  }
+
+
+  //#########################################################################
+  //# Inner Class DeadlockPruningArgument
+  private static class DeadlockPruningArgument
+    extends CommandLineArgumentBoolean
+  {
+    //#######################################################################
+    //# Constructors
+    private DeadlockPruningArgument()
+    {
+      super("-dp",
+            "Enable or disable deadlock pruning in synchronous product");
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    @Override
+    public void configureAnalyzer(final Object analyzer)
+    {
+      final AbstractCompositionalModelAnalyzer composer =
+        (AbstractCompositionalModelAnalyzer) analyzer;
+      final boolean enable = getValue();
+      composer.setPruningDeadlocks(enable);
+    }
   }
 
 
@@ -581,10 +630,12 @@ public class CompositionalModelAnalyzerFactory
     //# Overrides for Abstract Base Class
     //# net.sourceforge.waters.model.analysis.CommandLineArgument
     @Override
-    public void configure(final ModelAnalyzer analyzer)
+    public void configureAnalyzer(final Object analyzer)
+      throws AnalysisConfigurationException
     {
+      final ModelAnalyzer modelAnalyzer = (ModelAnalyzer) analyzer;
       final ModelAnalyzer secondaryAnalyzer =
-        createSecondaryAnalyzer(analyzer);
+        createSecondaryAnalyzer(modelAnalyzer);
       final AbstractCompositionalModelAnalyzer composer =
         (AbstractCompositionalModelAnalyzer) analyzer;
       composer.setMonolithicAnalyzer(secondaryAnalyzer);

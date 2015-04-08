@@ -16,6 +16,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
@@ -23,6 +24,7 @@ import java.util.Formatter;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
@@ -74,10 +76,8 @@ public class CommandLineTool
   //# Main Method for Testing
   /**
    * Main method.
-   * This is a main method to check a set of files for control loop free.
-   * Please refer to the class documentation ({@link CommandLineTool})
-   * for more detailed information.
-   * @param  args    Array of file names from the command line.
+   * This is the main method to parse the command line, create a model
+   * analyser, and run one or more analysis/verification attempts.
    */
   public static void main(final String[] args)
   {
@@ -210,7 +210,7 @@ public class CommandLineTool
         keepPropositions = true;
       }
       final Collection<String> empty = Collections.emptyList();
-      final Iterator<String> argIter = argList.iterator();
+      final ListIterator<String> argIter = argList.listIterator();
       factory.parse(argIter);
       factory.configure(analyzer);
       final Watchdog watchdog = new Watchdog(wrapper, timeout);
@@ -322,15 +322,12 @@ public class CommandLineTool
         first = false;
       }
 
-    } catch (final EvalException | WatersUnmarshalException | IOException
-             exception) {
-      System.err.print("FATAL ERROR (");
-      System.err.print(ProxyTools.getShortClassName(exception));
-      System.err.println(")");
-      final String msg = exception.getMessage();
-      if (msg != null) {
-        System.err.println(exception.getMessage());
-      }
+    } catch (final EvalException | AnalysisException |
+                   WatersUnmarshalException | IOException exception) {
+      showSupportedException(exception);
+    } catch (final InvocationTargetException exception) {
+      final Throwable cause = exception.getCause();
+      showSupportedException(cause);
     } catch (final Throwable exception) {
       System.err.println("FATAL ERROR !!!");
       System.err.print(ProxyTools.getShortClassName(exception));
@@ -352,6 +349,17 @@ public class CommandLineTool
     System.err.println
       ("USAGE: java CommandLineTool <factory>  [options] <checker> <file> ...");
     System.exit(1);
+  }
+
+  private static void showSupportedException(final Throwable exception)
+  {
+    System.err.print("FATAL ERROR (");
+    System.err.print(ProxyTools.getShortClassName(exception));
+    System.err.println(")");
+    final String msg = exception.getMessage();
+    if (msg != null) {
+      System.err.println(exception.getMessage());
+    }
   }
 
 

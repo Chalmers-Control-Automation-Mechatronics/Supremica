@@ -12,7 +12,7 @@ package net.sourceforge.waters.analysis.compositional;
 
 /**
  * A factory class to obtain {@link SelectionHeuristic} objects.
- * The selection heuristic creator is obtain from a
+ * The selection heuristic creator is obtained from a
  * {@link CompositionalSelectionHeuristicFactory} and produces the actual
  * selection heuristics through its {@link #createBaseHeuristic()} and
  * {@link #createChainHeuristic()} methods.
@@ -54,8 +54,8 @@ public abstract class SelectionHeuristicCreator
    * selection heuristic. If two candidates are found equal, a sequence of
    * other heuristics is used to break the tie. The specific sequence is
    * determined individually by each subclass. The default implementation
-   * merely uses a one-step chain that used standard name-based comparison
-   * of the base heuristic fails to distinguish two candidates.
+   * merely uses a one-step chain that uses standard name-based comparison
+   * if the base heuristic fails to distinguish two candidates.
    */
   SelectionHeuristic<Candidate> createChainHeuristic()
   {

@@ -16,7 +16,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.NameNotFoundException;
@@ -29,6 +31,7 @@ import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
@@ -42,6 +45,7 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
 public abstract class AbstractAnalysisTest extends AbstractWatersTest
@@ -250,6 +254,32 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
     return result;
   }
 
+  /**
+   * Returns a combination of states bits read from event attributes in order
+   * to create an event encoding. This method checks the event's
+   * controllability based on the event kind and the names of known status
+   * flags in the event's attribute map, and if present, sets the
+   * corresponding status bits.
+   * @return Status byte with relevant status bits set.
+   */
+  protected byte getEventStatusFromAttributes(final EventProxy event)
+  {
+    byte status;
+    if (event.getKind() == EventKind.CONTROLLABLE) {
+      status = EventStatus.STATUS_CONTROLLABLE;
+    } else {
+      status = EventStatus.STATUS_NONE;
+    }
+    final Map<String,String> attribs = event.getAttributes();
+    for (final byte flag : STATUS_FROM_ATTRIBUTES) {
+      final String name = EventStatus.getStatusName(flag);
+      if (attribs.containsKey(name)) {
+        status |= flag;
+      }
+    }
+    return status;
+  }
+
   protected AutomatonProxy findAutomaton(final ProductDESProxy des,
                                          final String name)
     throws NameNotFoundException
@@ -269,6 +299,28 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
     for (final AutomatonProxy automaton : des.getAutomata()) {
       if (automaton.getName().equals(name)) {
         return automaton;
+      }
+    }
+    return null;
+  }
+
+  protected StateProxy findState(final AutomatonProxy aut, final String name)
+    throws NameNotFoundException
+  {
+    final StateProxy state = getState(aut, name);
+    if (state == null) {
+      throw new NameNotFoundException
+        ("Automaton '" + aut.getName() +
+         "' does not have any state named '" + name + "'!");
+    }
+    return state;
+  }
+
+  protected StateProxy getState(final AutomatonProxy aut, final String name)
+  {
+    for (final StateProxy state : aut.getStates()) {
+      if (state.getName().equals(name)) {
+        return state;
       }
     }
     return null;
@@ -354,5 +406,17 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
   private ProductDESImporter mProductDESImporter;
 
   private boolean mProductDESIsDeterministic;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final byte[] STATUS_FROM_ATTRIBUTES = {
+    EventStatus.STATUS_LOCAL,
+    EventStatus.STATUS_SELFLOOP_ONLY,
+    EventStatus.STATUS_ALWAYS_ENABLED,
+    EventStatus.STATUS_BLOCKED,
+    EventStatus.STATUS_FAILING,
+    EventStatus.STATUS_UNUSED
+  };
 
 }

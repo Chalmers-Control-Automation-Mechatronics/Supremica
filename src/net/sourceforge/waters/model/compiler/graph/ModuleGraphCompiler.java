@@ -45,7 +45,6 @@ import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
-import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
@@ -57,14 +56,21 @@ import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
-
-public class ModuleGraphCompiler
-  extends DefaultModuleProxyVisitor
-  implements Abortable
+/**
+ * The fourth and final pass of the compiler.
+ * <p>
+ * This compiler accepts a {@link ModuleProxy} as the input and returns
+ * a {@link ProductDESProxy} as the output. It assumes that the input
+ * module only contains nodes of the type {@link SimpleNodeProxy}, and
+ * that its edges have neither guards nor actions.
+ *
+ * @author Robi Malik
+ */
+public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
+                                 implements Abortable
 {
-
   //##########################################################################
-  //# Constructors
+  //# Constructor
   public ModuleGraphCompiler(final ProductDESProxyFactory factory,
                              final CompilationInfo compilationInfo,
                              final ModuleProxy module)
@@ -96,10 +102,33 @@ public class ModuleGraphCompiler
   }
 
 
+  //#########################################################################
+  //# Aborting
+  private void checkAbort() throws VisitorException
+  {
+    if (mIsAborting) {
+      final EvalAbortException exception = new EvalAbortException();
+      throw new VisitorException(exception);
+    }
+  }
+
+
+  //##########################################################################
+  //# Optimization Configuration
+  public boolean isOptimizationEnabled()
+  {
+    return mIsOptimizationEnabled;
+  }
+
+  public void setOptimizationEnabled(final boolean enable)
+  {
+    mIsOptimizationEnabled = enable;
+  }
+
+
   //##########################################################################
   //# Invocation
-  public ProductDESProxy compile()
-    throws EvalException
+  public ProductDESProxy compile() throws EvalException
   {
     try {
       return visitModuleProxy(mInputModule);
@@ -115,59 +144,48 @@ public class ModuleGraphCompiler
 
 
   //##########################################################################
-  //# Configuration
-  public boolean isOptimizationEnabled()
-  {
-    return mIsOptimizationEnabled;
-  }
-
-  public void setOptimizationEnabled(final boolean enable)
-  {
-    mIsOptimizationEnabled = enable;
-  }
-
-
-  //#########################################################################
-  //# Aborting
-  private void checkAbort()
-    throws VisitorException
-  {
-    if (mIsAborting) {
-      final EvalAbortException exception = new EvalAbortException();
-      throw new VisitorException(exception);
-    }
-  }
-
-
-  //##########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+  /**
+   * Converts a {@link ModuleProxy} to a {@link ProductDESProxy}.
+   */
   @Override
-  public Object visitEdgeProxy(final EdgeProxy edge)
-  {
-    // Edges must be processed in the proper order:
-    // innermost source nodes in group node hierarchy first.
-    // Therefore, this following two-pass process ...
-    final NodeProxy source = edge.getSource();
-    final CompiledNode csource = mPrecompiledNodesMap.get(source);
-    csource.addEdge(edge);
-    return null;
-  }
-
-  private void visitEdgeProxy(final EdgeProxy edge, final CompiledNode source)
+  public ProductDESProxy visitModuleProxy(final ModuleProxy module)
     throws VisitorException
   {
-    try {
-      final NodeProxy target = edge.getTarget();
-      final LabelBlockProxy block = edge.getLabelBlock();
-      mCurrentSource = source;
-      mCurrentTarget = mPrecompiledNodesMap.get(target);
-      visitLabelBlockProxy(block);
+    try
+    {
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
+      final String name = mInputModule.getName();
+      final String comment = mInputModule.getComment();
+
+      // Process event declarations.
+      final List<EventDeclProxy> decls = mInputModule.getEventDeclList();
+      final int numevents = decls.size();
+      mGlobalEventsMap = new ProxyAccessorHashMap<>(eq, numevents);
+      mGlobalEventsList = new ArrayList<>(numevents);
+      visitCollection(decls);
+
+      // Process components.
+      final List<Proxy> components = mInputModule.getComponentList();
+      final int numaut = components.size();
+      mAutomataMap = new ProxyAccessorHashMap<>(eq, numaut);
+      mAutomataList = new ArrayList<>(numaut);
+      visitCollection(components);
+
+      return mFactory.createProductDESProxy(name, comment, null,
+                                            mGlobalEventsList, mAutomataList);
     } finally {
-      mCurrentSource = null;
-      mCurrentTarget = null;
+      mGlobalEventsMap = null;
+      mGlobalEventsList = null;
+      mAutomataMap = null;
+      mAutomataList = null;
     }
   }
 
+  /**
+   * Adds an event declaration ({@link EventDeclProxy}) to the global list of
+   * events ({@link EventProxy}).
+   */
   @Override
   public EventProxy visitEventDeclProxy(final EventDeclProxy decl)
     throws VisitorException
@@ -185,106 +203,25 @@ public class ModuleGraphCompiler
     return event;
   }
 
+  /**
+   * Converts a {@link SimpleComponentProxy} to an {@link AutomatonProxy}.
+   */
   @Override
-  public Object visitEventListExpressionProxy
-    (final EventListExpressionProxy elist)
-    throws VisitorException
-  {
-    final List<Proxy> list = elist.getEventIdentifierList();
-    visitCollection(list);
-    return null;
-  }
-
-  @Override
-  public CompiledNode visitGroupNodeProxy(final GroupNodeProxy group)
-    throws VisitorException
-  {
-    try {
-      checkAbort();
-      final CompiledGroupNode cgroup = new CompiledGroupNode(group);
-      mPrecompiledNodesMap.put(group, cgroup);
-      for (final NodeProxy child : group.getImmediateChildNodes()) {
-        final CompiledNode cchild = mPrecompiledNodesMap.get(child);
-        cgroup.addImmediateChildNode(cchild);
-      }
-      final PlainEventListProxy elist = group.getPropositions();
-      mCurrentSource = cgroup;
-      visitPlainEventListProxy(elist);
-      return mCurrentSource;
-    } finally {
-      mCurrentSource = null;
-    }
-  }
-
-  @Override
-  public EventProxy visitIdentifierProxy(final IdentifierProxy ident)
-    throws VisitorException
-  {
-    try {
-      checkAbort();
-      final EventProxy event = findGlobalEvent(ident);
-      addLocalEvent(event);
-      if (mCurrentSource == null) {
-        // nothing --- blocked events list
-      } else if (mCurrentTarget == null) {
-        // propositions of a state
-        mCurrentSource.addProposition(event);
-      } else {
-        // label block of an edge
-        mCurrentTarget.addTransitionFrom(mCurrentSource,
-                                         event,
-                                         mCurrentSource,
-                                         ident);
-      }
-      return event;
-    } catch (final NondeterministicModuleException exception) {
-      throw wrap(exception);
-    }
-  }
-
-  @Override
-  public ProductDESProxy visitModuleProxy(final ModuleProxy module)
-    throws VisitorException
-  {
-    try {
-      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
-      final String name = mInputModule.getName();
-      final String comment = mInputModule.getComment();
-      final List<EventDeclProxy> decls = mInputModule.getEventDeclList();
-      final int numevents = decls.size();
-      mGlobalEventsMap = new ProxyAccessorHashMap<>(eq, numevents);
-      mGlobalEventsList = new ArrayList<>(numevents);
-      visitCollection(decls);
-      final List<Proxy> components = mInputModule.getComponentList();
-      final int numaut = components.size();
-      mAutomataMap = new ProxyAccessorHashMap<>(eq, numaut);
-      mAutomataList = new ArrayList<>(numaut);
-      visitCollection(components);
-      return mFactory.createProductDESProxy
-        (name, comment, null, mGlobalEventsList, mAutomataList);
-    } finally {
-      mGlobalEventsMap = null;
-      mGlobalEventsList = null;
-      mAutomataMap = null;
-      mAutomataList = null;
-    }
-  }
-
-  @Override
-  public AutomatonProxy visitSimpleComponentProxy
-    (final SimpleComponentProxy comp)
+  public AutomatonProxy visitSimpleComponentProxy(final SimpleComponentProxy comp)
     throws VisitorException
   {
     try {
       mCurrentComponent = comp;
-      // Prepare alphabet ...
+
+      // Prepare alphabet
       mLocalEventsMap = new HashMap<EventProxy,SelfloopInfo>();
       final GraphProxy graph = comp.getGraph();
       final EventListExpressionProxy blocked = graph.getBlockedEvents();
       if (blocked != null) {
         visitEventListExpressionProxy(blocked);
       }
-      // Precompile states ...
+
+      // Pre-compile states
       mCurrentComponentIsDetermistic = graph.isDeterministic();
       mMaxInitialStates = mCurrentComponentIsDetermistic ? 1 : -1;
       final Collection<NodeProxy> nodes = graph.getNodes();
@@ -293,18 +230,14 @@ public class ModuleGraphCompiler
       mLocalStateNames = new HashSet<String>(numNodes);
       mLocalTransitionsList = new LinkedList<CompiledTransition>();
       visitCollection(nodes);
-      // Precompile transitions ...
+
+      // Pre-compile transitions
       final Collection<EdgeProxy> edges = graph.getEdges();
       visitCollection(edges);
-      for (final NodeProxy node : nodes) {
-        final CompiledNode cnode = mPrecompiledNodesMap.get(node);
-        for (final EdgeProxy edge : cnode.getEdges()) {
-          visitEdgeProxy(edge, cnode);
-        }
-      }
       final Collection<EventProxy> keys = mLocalEventsMap.keySet();
       final List<EventProxy> alphabet = new ArrayList<EventProxy>(keys);
-      // Reachability ...
+
+      // Optimization
       if (mIsOptimizationEnabled) {
         mNumReachableStates = 0;
         mNumReachableTransitions = 0;
@@ -315,8 +248,8 @@ public class ModuleGraphCompiler
             queue.add(node);
             while (!queue.isEmpty()) {
               final CompiledNode current = queue.remove();
-              for (final List<CompiledTransition> list :
-                   current.getOutgoingTransitions()) {
+              for (final List<CompiledTransition> list : current
+                .getOutgoingTransitions()) {
                 for (final CompiledTransition trans : list) {
                   checkAbort();
                   trans.setReachable();
@@ -337,7 +270,8 @@ public class ModuleGraphCompiler
         mNumReachableStates = nodes.size();
         mNumReachableTransitions = mLocalTransitionsList.size();
       }
-      // Build alphabet, states, and transitions ...
+
+      // Build alphabet, states, and transitions
       final List<StateProxy> states =
         new ArrayList<StateProxy>(mNumReachableStates);
       for (final NodeProxy node : nodes) {
@@ -357,19 +291,23 @@ public class ModuleGraphCompiler
           transitions.add(trans);
         }
       }
-      // Create automaton ...
+
+      // Create automaton
       final IdentifierProxy ident = comp.getIdentifier();
       final String name = ident.toString();
       final ComponentKind kind = comp.getKind();
       final Map<String,String> attribs = comp.getAttributes();
       Collections.sort(alphabet);
       final AutomatonProxy aut =
-        mFactory.createAutomatonProxy(name, kind, alphabet,
-                                      states, transitions, attribs);
+        mFactory.createAutomatonProxy(name, kind, alphabet, states,
+                                      transitions, attribs);
       addAutomaton(ident, aut);
       mCompilationInfo.add(aut, comp);
       return aut;
-    } finally {
+    }
+
+    finally
+    {
       mCurrentComponent = null;
       mLocalEventsMap = null;
       mPrecompiledNodesMap = null;
@@ -385,7 +323,8 @@ public class ModuleGraphCompiler
   public CompiledNode visitSimpleNodeProxy(final SimpleNodeProxy node)
     throws VisitorException
   {
-    try {
+    try
+    {
       checkAbort();
       final String name = node.getName();
       if (!mLocalStateNames.add(name)) {
@@ -402,15 +341,67 @@ public class ModuleGraphCompiler
           break;
         }
       }
-      mCurrentSource = new CompiledSimpleNode(node);
+      mCurrentSource = new CompiledNode(node);
       mPrecompiledNodesMap.put(node, mCurrentSource);
       final PlainEventListProxy elist = node.getPropositions();
       visitPlainEventListProxy(elist);
       return mCurrentSource;
-    } catch (final EvalException exception) {
+    }
+
+    catch (final EvalException exception) {
       throw wrap(exception);
+    }
+
+    finally {
+      mCurrentSource = null;
+    }
+  }
+
+  @Override
+  public Object visitEdgeProxy(final EdgeProxy edge) throws VisitorException
+  {
+    try {
+      final NodeProxy target = edge.getTarget();
+      final LabelBlockProxy block = edge.getLabelBlock();
+      mCurrentSource = mPrecompiledNodesMap.get(edge.getSource());
+      mCurrentTarget = mPrecompiledNodesMap.get(target);
+      return visitLabelBlockProxy(block);
     } finally {
       mCurrentSource = null;
+      mCurrentTarget = null;
+    }
+  }
+
+  @Override
+  public Object visitEventListExpressionProxy(final EventListExpressionProxy elist)
+    throws VisitorException
+  {
+    final List<Proxy> list = elist.getEventIdentifierList();
+    visitCollection(list);
+    return null;
+  }
+
+  @Override
+  public EventProxy visitIdentifierProxy(final IdentifierProxy ident)
+    throws VisitorException
+  {
+    try {
+      checkAbort();
+      final EventProxy event = findGlobalEvent(ident);
+      addLocalEvent(event);
+      if (mCurrentSource == null) {
+        // Do nothing for blocked events
+      } else if (mCurrentTarget == null) {
+        // Propositions of a state
+        mCurrentSource.addProposition(event);
+      } else {
+        // Label block of an edge
+        mCurrentTarget.addTransitionFrom(mCurrentSource, event,
+                                         mCurrentSource, ident);
+      }
+      return event;
+    } catch (final NondeterministicModuleException exception) {
+      throw wrap(exception);
     }
   }
 
@@ -418,8 +409,7 @@ public class ModuleGraphCompiler
   //#########################################################################
   //# Auxiliary Methods
   private void addGlobalEvent(final IdentifierProxy ident,
-                              final EventProxy event)
-    throws VisitorException
+                              final EventProxy event) throws VisitorException
   {
     final ProxyAccessor<IdentifierProxy> accessor =
       mGlobalEventsMap.createAccessor(ident);
@@ -449,8 +439,7 @@ public class ModuleGraphCompiler
   }
 
   private void addAutomaton(final IdentifierProxy ident,
-                            final AutomatonProxy aut)
-    throws VisitorException
+                            final AutomatonProxy aut) throws VisitorException
   {
     final ProxyAccessor<IdentifierProxy> accessor =
       mAutomataMap.createAccessor(ident);
@@ -469,8 +458,9 @@ public class ModuleGraphCompiler
     if (!mLocalEventsMap.containsKey(event)) {
       final SelfloopInfo info = new SelfloopInfo();
       mLocalEventsMap.put(event, info);
-      // Special treatment of :forbidden proposition ---
-      // exclude this from compiler optimisation.
+      /* Special treatment of forbidden proposition:
+       * exclude this from compiler optimization.
+       */
       final String name = event.getName();
       if (name.equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
         info.addTransition(false);
@@ -499,181 +489,98 @@ public class ModuleGraphCompiler
 
 
   //#########################################################################
-  //# Inner Class CompiledNode
-  private abstract class CompiledNode {
-
+  //# Inner Class: CompiledNode
+  private class CompiledNode
+  {
     //#######################################################################
-    //# Constructors
-    CompiledNode(final NodeProxy node)
+    //# Constructor
+    CompiledNode(final SimpleNodeProxy node)
     {
-      mNode = node;
-      mEdges = new LinkedList<EdgeProxy>();
+      mmNode = node;
+      mmPropositions = null;
+      mmOutTransitions = new HashMap<EventProxy, List<CompiledTransition>>();
+      mmState = null;
     }
 
     //#######################################################################
     //# Simple Access
-    NodeProxy getNode()
-    {
-      return mNode;
-    }
-
-    void addEdge(final EdgeProxy edge)
-    {
-      mEdges.add(edge);
-    }
-
-    List<EdgeProxy> getEdges()
-    {
-      return mEdges;
-    }
-
-    abstract boolean isInitial();
-
-    abstract boolean isReachable();
-
-    //#######################################################################
-    //# Algorithms
-    abstract void addProposition(EventProxy event);
-
-    abstract void addTransitionFrom(CompiledNode source,
-                                    EventProxy event,
-                                    CompiledNode cause,
-                                    Proxy orig)
-      throws NondeterministicModuleException;
-
-    abstract void addTransitionTo(CompiledSimpleNode target,
-                                  EventProxy event,
-                                  CompiledNode cause,
-                                  Proxy orig)
-      throws NondeterministicModuleException;
-
-    abstract boolean hasProperChildNode(CompiledNode node);
-
-    abstract boolean setReachable();
-
-    abstract Collection<List<CompiledTransition>> getOutgoingTransitions();
-
-    abstract StateProxy createStateProxy();
-
-    //#######################################################################
-    //# Data Members
-    private final NodeProxy mNode;
-    private final List<EdgeProxy> mEdges;
-
-  }
-
-
-  //#########################################################################
-  //# Inner Class CompiledSimpleNode
-  private class CompiledSimpleNode extends CompiledNode {
-
-    //#######################################################################
-    //# Constructors
-    CompiledSimpleNode(final SimpleNodeProxy node)
-    {
-      super(node);
-      mPropositions = null;
-      mOutgoingTransitions =
-        new HashMap<EventProxy,List<CompiledTransition>>();
-      mState = null;
-    }
-
-    //#######################################################################
-    //# Simple Access
-    @Override
+    @SuppressWarnings("unused")
     SimpleNodeProxy getNode()
     {
-      return (SimpleNodeProxy) super.getNode();
+      return mmNode;
     }
 
-    @Override
-    boolean isInitial()
-    {
-      return getNode().isInitial();
-    }
-
-    @Override
-    boolean isReachable()
-    {
-      return mIsReachable;
-    }
-
-    //#######################################################################
-    //# Specific Access
     StateProxy getState()
     {
-      return mState;
+      return mmState;
+    }
+
+    boolean isInitial()
+    {
+      return mmNode.isInitial();
+    }
+
+    boolean isReachable()
+    {
+      return mmIsReachable;
     }
 
     //#######################################################################
     //# Algorithms
-    @Override
     void addProposition(final EventProxy event)
     {
-      if (mPropositions == null) {
-        mPropositions = new LinkedList<EventProxy>();
-      }
-      if (!mPropositions.contains(event)) {
-        mPropositions.add(event);
-      }
+      if (mmPropositions == null)
+        mmPropositions = new LinkedList<EventProxy>();
+      if (!mmPropositions.contains(event))
+        mmPropositions.add(event);
     }
 
-    @Override
-    void addTransitionFrom(final CompiledNode source,
-                           final EventProxy event,
-                           final CompiledNode cause,
-                           final Proxy loc)
+    void addTransitionFrom(final CompiledNode source, final EventProxy event,
+                           final CompiledNode cause,  final Proxy orig)
       throws NondeterministicModuleException
     {
-      source.addTransitionTo(this, event, cause, loc);
+      source.addTransitionTo(this, event, cause, orig);
     }
 
-    @Override
-    void addTransitionTo(final CompiledSimpleNode target,
-                         final EventProxy event,
-                         final CompiledNode cause,
-                         final Proxy loc)
+    void addTransitionTo(final CompiledNode target, final EventProxy event,
+                         final CompiledNode cause,  final Proxy orig)
       throws NondeterministicModuleException
     {
-      List<CompiledTransition> transitions = mOutgoingTransitions.get(event);
-      if (transitions == null) {
+      List<CompiledTransition> transitions = mmOutTransitions.get(event);
+
+      if (transitions == null)
+      {
         transitions = new LinkedList<CompiledTransition>();
-        mOutgoingTransitions.put(event, transitions);
-      } else {
-        for (final CompiledTransition trans : transitions) {
-          if (trans.getTarget() == target) {
+        mmOutTransitions.put(event, transitions);
+      }
+
+      else
+      {
+        for (final CompiledTransition trans : transitions)
+        {
+          if (trans.getTarget() == target)
             return;
-          } else if (mCurrentComponentIsDetermistic) {
-            final CompiledNode othercause = trans.getCause();
-            if (cause.hasProperChildNode(othercause)) {
-              return;
-            } else {
-              throw new NondeterministicModuleException
-                (mCurrentComponent, getNode(), event);
-            }
+          else if (mCurrentComponentIsDetermistic)
+          {
+            throw new NondeterministicModuleException
+                                          (mCurrentComponent, mmNode, event);
           }
         }
       }
+
       final CompiledTransition trans =
-        new CompiledTransition(this, event, target, cause, loc);
+                     new CompiledTransition(this, event, target, cause, orig);
       transitions.add(trans);
       mLocalTransitionsList.add(trans);
     }
 
-    @Override
-    boolean hasProperChildNode(final CompiledNode node)
-    {
-      return false;
-    }
-
-    @Override
     boolean setReachable()
     {
-      if (!mIsReachable) {
-        mIsReachable = true;
+      if (!mmIsReachable) {
+        mmIsReachable = true;
         mNumReachableStates++;
-        if (mPropositions != null) {
-          for (final EventProxy prop : mPropositions) {
+        if (mmPropositions != null) {
+          for (final EventProxy prop : mmPropositions) {
             final SelfloopInfo info = getSelfloopInfo(prop);
             info.addSelfloop();
           }
@@ -684,179 +591,58 @@ public class ModuleGraphCompiler
       }
     }
 
-    @Override
     Collection<List<CompiledTransition>> getOutgoingTransitions()
     {
-      return mOutgoingTransitions.values();
+      return mmOutTransitions.values();
     }
 
-    //#######################################################################
-    //# Specific Algorithms
-    @Override
     StateProxy createStateProxy()
     {
-      if (mState == null) {
-        if (!mIsOptimizationEnabled || mIsReachable) {
-          final SimpleNodeProxy node = getNode();
+      if (mmState == null) {
+        if (!mIsOptimizationEnabled || mmIsReachable) {
+          final SimpleNodeProxy node = mmNode;
           final String name = node.getName();
           final boolean initial = node.isInitial();
-          removeSelfloopedEvents(mPropositions);
-          mState = mFactory.createStateProxy(name, initial, mPropositions);
-          mCompilationInfo.add(mState, node);
+          removeSelfloopedEvents(mmPropositions);
+          mmState = mFactory.createStateProxy(name, initial, mmPropositions);
+          mCompilationInfo.add(mmState, node);
         }
       }
-      return mState;
+      return mmState;
     }
 
     //#######################################################################
     //# Data Members
-    private List<EventProxy> mPropositions;
-    private final Map<EventProxy,List<CompiledTransition>> mOutgoingTransitions;
-    private boolean mIsReachable;
-    private StateProxy mState;
-
+    private final SimpleNodeProxy mmNode;
+    private List<EventProxy> mmPropositions;
+    private final Map<EventProxy,List<CompiledTransition>> mmOutTransitions;
+    private boolean mmIsReachable;
+    private StateProxy mmState;
   }
 
 
   //#########################################################################
-  //# Inner Class CompiledGroupNode
-  private class CompiledGroupNode extends CompiledNode {
-
-    //#######################################################################
-    //# Constructors
-    CompiledGroupNode(final GroupNodeProxy group)
-    {
-      super(group);
-      final int numchildren = group.getImmediateChildNodes().size();
-      mImmediateChildNodes = new ArrayList<CompiledNode>(numchildren);
-    }
-
-    //#######################################################################
-    //# Simple Access
-    @Override
-    GroupNodeProxy getNode()
-    {
-      return (GroupNodeProxy) super.getNode();
-    }
-
-    @Override
-    boolean isInitial()
-    {
-      return false;
-    }
-
-    @Override
-    boolean isReachable()
-    {
-      return false;
-    }
-
-    //#######################################################################
-    //# Specific Access
-    void addImmediateChildNode(final CompiledNode child)
-    {
-      mImmediateChildNodes.add(child);
-    }
-
-    //#######################################################################
-    //# Algorithms
-    @Override
-    void addProposition(final EventProxy event)
-    {
-      for (final CompiledNode child : mImmediateChildNodes) {
-        child.addProposition(event);
-      }
-    }
-
-    @Override
-    void addTransitionFrom(final CompiledNode source,
-                           final EventProxy event,
-                           final CompiledNode cause,
-                           final Proxy loc)
-      throws NondeterministicModuleException
-    {
-      for (final CompiledNode child : mImmediateChildNodes) {
-        child.addTransitionFrom(source, event, cause, loc);
-      }
-    }
-
-    @Override
-    void addTransitionTo(final CompiledSimpleNode target,
-                         final EventProxy event,
-                         final CompiledNode cause,
-                         final Proxy loc)
-      throws NondeterministicModuleException
-    {
-      for (final CompiledNode child : mImmediateChildNodes) {
-        child.addTransitionTo(target, event, cause, loc);
-      }
-    }
-
-    @Override
-    boolean hasProperChildNode(final CompiledNode node)
-    {
-      for (final CompiledNode child : mImmediateChildNodes) {
-        if (child == node || child.hasProperChildNode(node)) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    @Override
-    boolean setReachable()
-    {
-      return false;
-    }
-
-    @Override
-    Collection<List<CompiledTransition>> getOutgoingTransitions()
-    {
-      return Collections.emptyList();
-    }
-
-    @Override
-    StateProxy createStateProxy()
-    {
-      return null;
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final List<CompiledNode> mImmediateChildNodes;
-
-  }
-
-
-  //#########################################################################
-  //# Inner Class CompiledTransition
-  private class CompiledTransition {
-
+  //# Inner Class: CompiledTransition
+  private class CompiledTransition
+  {
     //#######################################################################
     //# Constructor
-    CompiledTransition(final CompiledSimpleNode source,
+    CompiledTransition(final CompiledNode source,
                        final EventProxy event,
-                       final CompiledSimpleNode target,
-                       final CompiledNode cause,
-                       final Proxy loc)
+                       final CompiledNode target,
+                       final CompiledNode cause, final Proxy loc)
     {
       mSource = source;
       mEvent = event;
       mTarget = target;
-      mCause = cause;
       mLocation = loc;
     }
 
     //#######################################################################
     //# Simple Access
-    CompiledSimpleNode getTarget()
+    CompiledNode getTarget()
     {
       return mTarget;
-    }
-
-    CompiledNode getCause()
-    {
-      return mCause;
     }
 
     //#######################################################################
@@ -871,8 +657,8 @@ public class ModuleGraphCompiler
     TransitionProxy createTransitionProxy()
     {
       final SelfloopInfo info = getSelfloopInfo(mEvent);
-      if (mIsOptimizationEnabled &&
-          (info.isAllSelfloops() || !mSource.isReachable())) {
+      if (mIsOptimizationEnabled
+          && (info.isAllSelfloops() || !mSource.isReachable())) {
         return null;
       } else {
         final StateProxy sourcestate = mSource.getState();
@@ -884,21 +670,20 @@ public class ModuleGraphCompiler
       }
     }
 
+
     //#######################################################################
     //# Data Members
-    private final CompiledSimpleNode mSource;
+    private final CompiledNode mSource;
     private final EventProxy mEvent;
-    private final CompiledSimpleNode mTarget;
-    private final CompiledNode mCause;
+    private final CompiledNode mTarget;
     private final Proxy mLocation;
-
   }
 
 
   //#########################################################################
-  //# Inner Class SelfloopInfo
-  private class SelfloopInfo {
-
+  //# Inner Class: SelfloopInfo
+  private class SelfloopInfo
+  {
     //#######################################################################
     //# Constructor
     private SelfloopInfo()
@@ -932,7 +717,6 @@ public class ModuleGraphCompiler
     //#######################################################################
     //# Data Members
     private int mNumSelfloops;
-
   }
 
 
@@ -963,5 +747,4 @@ public class ModuleGraphCompiler
   private CompiledNode mCurrentTarget;
 
   private boolean mIsAborting;
-
 }

@@ -9,11 +9,20 @@
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="a">
             <ns2:AttributeMap>
-                <ns2:Attribute Name="AE"/>
+                <ns2:Attribute Name="ALWAYS_ENABLED"/>
             </ns2:AttributeMap>
         </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="b"/>
-        <EventDecl Kind="CONTROLLABLE" Name="c"/>
+        <EventDecl Kind="CONTROLLABLE" Name="b">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="ALWAYS_ENABLED"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="c">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="ALWAYS_ENABLED"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="d"/>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="PLANT" Name="before">
@@ -40,8 +49,10 @@
                     <Edge Source="S0" Target="S1">
                         <LabelBlock>
                             <SimpleIdentifier Name="a"/>
+                            <SimpleIdentifier Name="b"/>
+                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="6" Y="-10"/>
+                                <Point X="4" Y="-23"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
@@ -51,8 +62,9 @@
                     <Edge Source="S1" Target="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="a"/>
+                            <SimpleIdentifier Name="d"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-19" Y="-7"/>
+                                <Point X="-19" Y="-19"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>

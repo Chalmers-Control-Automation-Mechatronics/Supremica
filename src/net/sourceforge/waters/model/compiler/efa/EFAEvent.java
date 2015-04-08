@@ -15,6 +15,7 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
+import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
 /**
@@ -91,6 +92,22 @@ class EFAEvent {
       return factory.createQualifiedIdentifierProxy(base, comp);
     } else {
       return (IdentifierProxy) cloner.getClone(ident);
+    }
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  @Override
+  public String toString()
+  {
+    if (mSuffix == null) {
+      final EventDeclProxy decl = mEFAEventDecl.getEventDecl();
+      return decl.getName() + ".*";
+    } else {
+      final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
+      final IdentifierProxy ident = createIdentifier(factory);
+      return ident.toString();
     }
   }
 

@@ -20,7 +20,6 @@ import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelA
 import net.sourceforge.waters.analysis.modular.ModularControllabilitySynthesizer;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -29,6 +28,7 @@ import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.AbstractProductDESBuilder;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -291,7 +291,7 @@ public class ModularAndCompositionalSynthesizer
     proc.storeStatistics(result);
     final MonolithicSynchronousProductBuilder synch =
       mCompositionalSynthesizer.getSynchronousProductBuilder();
-    final AnalysisResult synchResult = synch.createAnalysisResult();
+    final SynchronousProductResult synchResult = synch.createAnalysisResult();
     result.addSynchronousProductAnalysisResult(synchResult);
     return result;
   }

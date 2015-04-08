@@ -10,6 +10,7 @@
 package net.sourceforge.waters.analysis.abstraction;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -111,16 +112,16 @@ public class TransitionRemovalTRSimplifier
     throws AnalysisException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    final int config = rel.getConfiguration();
     boolean removedSome = false;
 
     // 1. Check tau transitions
     final int tau = EventEncoding.TAU;
+    int config = rel.getConfiguration();
     final TauClosure exploredClosure;
-    if ((config & ListBufferTransitionRelation.CONFIG_PREDECESSORS) != 0) {
-      exploredClosure = rel.createPredecessorsTauClosure(0);
-    } else {
+    if ((config & ListBufferTransitionRelation.CONFIG_SUCCESSORS) != 0) {
       exploredClosure = rel.createSuccessorsTauClosure(0);
+    } else {
+      exploredClosure = rel.createPredecessorsTauClosure(0);
     }
     final TransitionIterator iterExplore = exploredClosure.createIterator();
     final TransitionIterator iterCandidate =
@@ -149,11 +150,12 @@ public class TransitionRemovalTRSimplifier
     }
 
     // 2. Check proper event transitions
+    config = rel.getConfiguration();
     final TauClosure cachedClosure;
-    if ((config & ListBufferTransitionRelation.CONFIG_PREDECESSORS) != 0) {
-      cachedClosure = rel.createPredecessorsTauClosure(mTransitionLimit);
+    if ((config & ListBufferTransitionRelation.CONFIG_SUCCESSORS) != 0) {
+      cachedClosure = rel.createSuccessorsTauClosure(mTransitionLimit);
     } else {
-      cachedClosure = rel.createSuccessorsTauClosure(0);
+      cachedClosure = rel.createPredecessorsTauClosure(mTransitionLimit);
     }
     final TransitionIterator iterPrefix = cachedClosure.createIterator();
     final TransitionIterator iterEvent = rel.createAnyReadOnlyIterator();
@@ -166,7 +168,7 @@ public class TransitionRemovalTRSimplifier
       final byte status = rel.getProperEventStatus(e);
       final boolean selflooped =
         mUsingSpecialEvents &&
-        EventEncoding.isOutsideOnlySelfloopEvent(status);
+        EventStatus.isSelfloopOnlyEvent(status);
       final int from0 = iterCandidate.getCurrentFromState();
       final int to0 = iterCandidate.getCurrentToState();
       boolean remove = false;

@@ -73,7 +73,6 @@ public class SimpleEFACompiler
       mModuleInstanceCompiler.setEnabledPropositionNames(mEnabledPropositionNames);
       checkAbort();
       final ModuleProxy intermediate = mModuleInstanceCompiler.compile(bindings);
-      mCompilationInfo.shift();
       mEFASystemBuilder = new SimpleEFASystemBuilder(modfactory, mCompilationInfo, intermediate);
       mEFASystemBuilder.setOptimizationEnabled(mIsOptimizationEnabled);
       mEFASystemBuilder.setMarkingVariablEFAEnable(mIsMarkingVariablEFAEnable);

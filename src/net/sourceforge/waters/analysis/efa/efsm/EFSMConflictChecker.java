@@ -506,7 +506,7 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
     boolean allMarked = true;
     for (final EFSMTransitionRelation efsmTR : efsmTRList) {
       final ListBufferTransitionRelation rel = efsmTR.getTransitionRelation();
-      if (rel.isUsedProposition(0)) {
+      if (rel.isPropositionUsed(0)) {
         boolean someMarked = false;
         for (int s = 0; s < rel.getNumberOfStates(); s++) {
           if (rel.isMarked(s, 0)) {

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -129,27 +130,6 @@ public class NonAlphaDeterminisationTRSimplifier
     return mDumpStateAware;
   }
 
-  /**
-   * Sets whether special events are to be considered in abstraction.
-   * If enabled, events marked as selfloop-only in all other automata
-   * will be treated specially. For such events, it is possible to assume
-   * implicit selfloops on all states of the automaton being simplified,
-   * potentially giving better state reduction.
-   */
-  public void setUsingSpecialEvents(final boolean enable)
-  {
-    mBisimulator.setUsingSpecialEvents(enable);
-  }
-
-  /**
-   * Returns whether special events are considered in abstraction.
-   * @see #setUsingSpecialEvents(boolean)
-   */
-  public boolean isUsingSpecialEvents()
-  {
-    return mBisimulator.isUsingSpecialEvents();
-  }
-
 
   //#########################################################################
   //# Interface
@@ -234,7 +214,7 @@ public class NonAlphaDeterminisationTRSimplifier
     final ListBufferTransitionRelation rel = getTransitionRelation();
     if (getPreconditionMarkingID() < 0 &&
         (rel.getProperEventStatus(EventEncoding.TAU) &
-         EventEncoding.STATUS_UNUSED) != 0) {
+         EventStatus.STATUS_UNUSED) != 0) {
       return false;
     }
     final int numStates = rel.getNumberOfStates();
@@ -261,18 +241,18 @@ public class NonAlphaDeterminisationTRSimplifier
     final List<int[]> initialPartition = new ArrayList<int[]>();
     final TIntArrayList remainingStates = new TIntArrayList();
     for (int state = 0; state < numStates; state++) {
-      if (isAlphaMarked(state)) {
+      if (!rel.isReachable(state)) {
+        continue;
+      } else if (isAlphaMarked(state)) {
         // create a separate equivalence class for every state marked alpha
         final int[] alphaClass = new int[1];
         alphaClass[0] = state;
         initialPartition.add(alphaClass);
       } else {
-        // create an equivalence class for all states which don't fit into the
-        // above two categories
+        // create an equivalence class for all other states
         remainingStates.add(state);
       }
     }
-    assert remainingStates.size() > 1;
     final int[] remainingStatesArray = remainingStates.toArray();
     initialPartition.add(remainingStatesArray);
     return new TRPartition(initialPartition, numStates);

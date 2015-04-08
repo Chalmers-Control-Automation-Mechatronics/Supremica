@@ -15,6 +15,7 @@ import gnu.trove.set.hash.TIntHashSet;
 import java.util.Collection;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -82,11 +83,11 @@ public class CanonizeAbstractionRule
     }
     if (!autToAbstract.getEvents().contains(mAlphaMarking)) {
       ee.addEvent(mAlphaMarking, getKindTranslator(),
-                  EventEncoding.STATUS_UNUSED);
+                  EventStatus.STATUS_UNUSED);
     }
     if (!autToAbstract.getEvents().contains(mOmegaMarking)) {
       ee.addEvent(mOmegaMarking, getKindTranslator(),
-                  EventEncoding.STATUS_UNUSED);
+                  EventStatus.STATUS_UNUSED);
     }
     final ListBufferTransitionRelation tr =
       new ListBufferTransitionRelation(autToAbstract, ee,

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="profisafe_ihost_efa_1" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>PROFIsafe host model for input-slave configuration.
-This EFA model is a direct conversion from the original VALID models.</ns2:Comment>
+This EFA model is a direct conversion from the original VALID models.
+The only change is the removal of the group node in automaton timers.</ns2:Comment>
     <ConstantAliasList>
         <ConstantAlias Scope="REQUIRED_PARAMETER" Name="MAXSEQNO">
             <ConstantAliasExpression>
@@ -3306,10 +3307,10 @@ This EFA model is a direct conversion from the original VALID models.</ns2:Comme
                         </LabelGeometry>
                     </SimpleNode>
                     <GroupNode Name="G0">
-                        <NodeRef Name="init0ok"/>
                         <NodeRef Name="init_nok"/>
-                        <NodeRef Name="init_ok"/>
                         <NodeRef Name="init0nok"/>
+                        <NodeRef Name="init_ok"/>
+                        <NodeRef Name="init0ok"/>
                         <BoxGeometry>
                             <Box Height="80" Width="416" X="112" Y="160"/>
                         </BoxGeometry>
@@ -3322,9 +3323,9 @@ This EFA model is a direct conversion from the original VALID models.</ns2:Comme
                     </GroupNode>
                     <GroupNode Name="G2">
                         <NodeRef Name="pre_nok"/>
-                        <NodeRef Name="pre_ok"/>
                         <NodeRef Name="pre0nok"/>
                         <NodeRef Name="pre0ok"/>
+                        <NodeRef Name="pre_ok"/>
                         <BoxGeometry>
                             <Box Height="80" Width="416" X="112" Y="32"/>
                         </BoxGeometry>
@@ -4181,8 +4182,8 @@ This EFA model is a direct conversion from the original VALID models.</ns2:Comme
                         </LabelGeometry>
                     </SimpleNode>
                     <GroupNode Name="G0">
-                        <NodeRef Name="ok"/>
                         <NodeRef Name="seqfault"/>
+                        <NodeRef Name="ok"/>
                         <BoxGeometry>
                             <Box Height="80" Width="288" X="128" Y="400"/>
                         </BoxGeometry>
@@ -4220,15 +4221,15 @@ This EFA model is a direct conversion from the original VALID models.</ns2:Comme
                         </BoxGeometry>
                     </GroupNode>
                     <GroupNode Name="G6">
-                        <NodeRef Name="pre_0"/>
                         <NodeRef Name="pre_other"/>
+                        <NodeRef Name="pre_0"/>
                         <BoxGeometry>
                             <Box Height="80" Width="288" X="128" Y="32"/>
                         </BoxGeometry>
                     </GroupNode>
                     <GroupNode Name="G7">
-                        <NodeRef Name="init_other"/>
                         <NodeRef Name="init_0"/>
+                        <NodeRef Name="init_other"/>
                         <BoxGeometry>
                             <Box Height="80" Width="288" X="128" Y="160"/>
                         </BoxGeometry>
@@ -5081,16 +5082,16 @@ This EFA model is a direct conversion from the original VALID models.</ns2:Comme
                                 </BoxGeometry>
                             </GroupNode>
                             <GroupNode Name="G6">
-                                <NodeRef Name="pre_other"/>
                                 <NodeRef Name="pre_0"/>
+                                <NodeRef Name="pre_other"/>
                                 <BoxGeometry>
                                     <Box Height="80" Width="288" X="128" Y="32"/>
                                 </BoxGeometry>
                             </GroupNode>
                             <GroupNode Name="G7">
                                 <NodeRef Name="init_other"/>
-                                <NodeRef Name="init_fault"/>
                                 <NodeRef Name="init_0"/>
+                                <NodeRef Name="init_fault"/>
                                 <BoxGeometry>
                                     <Box Height="80" Width="400" X="128" Y="160"/>
                                 </BoxGeometry>

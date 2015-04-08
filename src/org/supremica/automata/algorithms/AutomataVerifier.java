@@ -448,7 +448,7 @@ public class AutomataVerifier
         final AutomataIndexMap indexMap = synchHelper.getIndexMap();
 
         // Iterate over supervisors/specifications
-        loop: for (final Automaton supervisor: theAutomata)
+        loop: for (final Automaton supervisor : theAutomata)
         {
             // To enable the overriding the AutomatonType of automata we use typeIsSupSpecTable!
             // if ((supervisor.getType() == AutomatonType.Supervisor) || (supervisor.getType() == AutomatonType.SPECIFICATION))
@@ -593,25 +593,38 @@ public class AutomataVerifier
             currExec.start();
         }
 
-        try {
-			for (final AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters) {
-			 	synchExecuter.join();
+	try
+	{
+	    for(final AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters)
+	    {
+		synchExecuter.join();
+	    }
+	}
+	catch(final InterruptedException e)
+	{
+	    // Current thread has been interrupted, perhaps
+	    // due to an exception in one of the executers.
+	    // Stop all tasks and throw the original exception
+	    for(final AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters)
+	    {
+			synchExecuter.requestStop();
+	    }
+	    for(final AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters)
+		{
+			final Throwable cause = synchExecuter.getCauseOfInterrupt();
+			if(cause != null)
+			{
+				if(cause instanceof RuntimeException)
+				{
+					throw (RuntimeException) cause;
+				}
+				else
+				{
+					throw new RuntimeException(cause);
+				}
 			}
-		} catch (final InterruptedException e) {
-			// Current thread has been interrupted, perhaps
-			// due to an exception in one of the executers.
-			// Stop all tasks and throw the original exception
-			for (final AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters) {
-	            synchExecuter.requestStop();
-	        }
-			for (final AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters) {
-			 	final Throwable cause = synchExecuter.getCauseOfInterrupt();
-			 	if (cause != null) {
-			 		if (cause instanceof RuntimeException) throw (RuntimeException) cause;
-			 		else throw new RuntimeException(cause);
-			 	}
-			}
-		}
+	    }
+	}
 
         if (abortRequested)
         {
@@ -849,7 +862,7 @@ public class AutomataVerifier
         {
             currAutomaton = autIt.next();
 
-            // Is this automaton interesting?
+            // Is this automaton interesting? If it is already included, then no.
             if (selectedAutomata.containsAutomaton(currAutomaton))
             {
                 continue;
@@ -973,7 +986,7 @@ public class AutomataVerifier
     throws Exception
     {
         final AutomataIndexMap indexMap = synchHelper.getIndexMap();
-        String addedAutomata = "";
+        StringBuilder addedAutomata = new StringBuilder();
         final int start = selectedAutomata.size() - automataIndices.length;
 
         if (attempt == 1)
@@ -991,7 +1004,8 @@ public class AutomataVerifier
             // Been here before, already added some automata
             for (int i = 0; i < start; i++)
             {
-                addedAutomata = addedAutomata + " " + indexMap.getAutomatonAt(similarAutomata[i]);
+				addedAutomata.append(" ").append(indexMap.getAutomatonAt(similarAutomata[i]));
+                // addedAutomata = addedAutomata + " " + indexMap.getAutomatonAt(similarAutomata[i]);
             }
 
             // Increase the limit each time
@@ -1008,13 +1022,14 @@ public class AutomataVerifier
             // Add automaton
             selectedAutomata.addAutomaton(indexMap.getAutomatonAt(similarAutomata[i]));
 
-            addedAutomata = addedAutomata + " " + indexMap.getAutomatonAt(similarAutomata[i]);
+	    	addedAutomata.append(" ").append(indexMap.getAutomatonAt(similarAutomata[i]));
+            // addedAutomata = addedAutomata + " " + indexMap.getAutomatonAt(similarAutomata[i]);
             stateAmount = stateAmount * indexMap.getAutomatonAt(similarAutomata[i]).nbrOfStates();
 
             if ((stateAmount > stateAmountLimit) || (i == similarAutomata.length - 1))
             {
                 // Synchronize...
-                // synchHelper.clear(); // This is done while analyzing the result se *** below
+                // synchHelper.clear(); // This is done while analyzing the result see *** below
                 synchHelper.initialize();
 
                 if (abortRequested)
@@ -1065,24 +1080,24 @@ public class AutomataVerifier
 
                     stateCount++;
                 }
-                                /*
-                                int[][] currStateTable = synchHelper.getStateTable();
-                                int stateCount = 0;
+		/*
+		int[][] currStateTable = synchHelper.getStateTable();
+		int stateCount = 0;
 
-                                for (int j = 0; j < currStateTable.length; j++)
-                                {
-                                        if (currStateTable[j] != null)
-                                        {
-                                                // Look for the state among the potentially uncontrollable states
-                                                potentiallyUncontrollableStates.find(automataIndices, currStateTable[j]);
+		for (int j = 0; j < currStateTable.length; j++)
+		{
+			if (currStateTable[j] != null)
+			{
+				// Look for the state among the potentially uncontrollable states
+				potentiallyUncontrollableStates.find(automataIndices, currStateTable[j]);
 
-                                                // Instead of using clear()... se *** above
-                                                currStateTable[j] = null;
+				// Instead of using clear()... se *** above
+				currStateTable[j] = null;
 
-                                                stateCount++;
-                                        }
-                                }
-                                 */
+				stateCount++;
+			}
+		}
+		 */
 
                 logger.verbose("Worst-case state amount: " + stateAmount + ", real state amount: " + stateCount + ".");
 
@@ -1097,11 +1112,10 @@ public class AutomataVerifier
                 final int statesLeft = potentiallyUncontrollableStates.size(automataIndices);
                 if (Config.VERBOSE_MODE.isTrue())
                 {
-                    String message = "";
+                    String message;
 
                     switch (statesLeft)
                     {
-
                         case 0 :
                             message = "No uncontrollable states ";
                             break;
