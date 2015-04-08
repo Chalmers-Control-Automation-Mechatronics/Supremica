@@ -71,6 +71,9 @@ import javax.swing.JTextArea;
 import org.supremica.automata.algorithms.SynthesisAlgorithm;
 import org.supremica.automata.algorithms.SynthesisType;
 import org.supremica.automata.algorithms.SynthesizerOptions;
+import org.supremica.automata.algorithms.minimization.MinimizationOptions;
+import org.supremica.automata.algorithms.minimization.MinimizationPreselectingHeuristic;
+import org.supremica.automata.algorithms.minimization.MinimizationSelectingHeuristic;
 
 
 abstract class SynthesizerPanel extends JPanel
@@ -91,6 +94,9 @@ public class SynthesizerDialog implements ActionListener
   SynthesizerDialogStandardPanel standardPanel;
   SynthesizerDialogAdvancedPanel advancedPanel;
 
+  MinimizationOptions mMinimizationOptions;
+  SynthesizerDialogHeuristicPanel mHeuristicPanel;
+  JTabbedPane mTabbedPane;
   private final JDialog dialog;
   private final Frame parentFrame;
 
@@ -111,13 +117,16 @@ public class SynthesizerDialog implements ActionListener
 
     standardPanel = new SynthesizerDialogStandardPanel(numSelected);
     advancedPanel = new SynthesizerDialogAdvancedPanel();
+    mHeuristicPanel = new SynthesizerDialogHeuristicPanel();
 
-    final JTabbedPane tabbedPane = new JTabbedPane();
+    mTabbedPane = new JTabbedPane();
+    mMinimizationOptions = new MinimizationOptions();
 
-    tabbedPane.addTab("Standard options", null, standardPanel,
+    mTabbedPane.addTab("Standard options", null, standardPanel,
                       "Standard options");
-    tabbedPane.addTab("Advanced options", null, advancedPanel,
+    mTabbedPane.addTab("Advanced options", null, advancedPanel,
                       "Advanced options");
+    mTabbedPane.addTab("Heuristic options", null, mHeuristicPanel, "Heuristic options");
     //        tabbedPane.addTab("Guard options", null, guardPanel, "Guard options");
 
     // buttonPanel
@@ -126,7 +135,7 @@ public class SynthesizerDialog implements ActionListener
     okButton = addButton(buttonPanel, "OK");
     cancelButton = addButton(buttonPanel, "Cancel");
 
-    contentPane.add("Center", tabbedPane);
+    contentPane.add("Center", mTabbedPane);
     contentPane.add("South", buttonPanel);
     Utility.setDefaultButton(dialog, okButton);
 
@@ -155,6 +164,7 @@ public class SynthesizerDialog implements ActionListener
   {
     standardPanel.update(synthesizerOptions);
     advancedPanel.update(synthesizerOptions);
+    mHeuristicPanel.update(mMinimizationOptions);
   }
 
   private JButton addButton(final Container container, final String name)
@@ -180,9 +190,11 @@ public class SynthesizerDialog implements ActionListener
     if (source == okButton) {
       standardPanel.regain(synthesizerOptions);
       advancedPanel.regain(synthesizerOptions);
+      mHeuristicPanel.regain(mMinimizationOptions);
 
       if (synthesizerOptions.isValid()) {
         synthesizerOptions.saveOptions();
+        mMinimizationOptions.saveOptions();
         synthesizerOptions.setDialogOK(true);
 
         dialog.setVisible(false);
@@ -291,7 +303,7 @@ public class SynthesizerDialog implements ActionListener
       // Add components
       this.add(mainBox);
 
-      updatePanel();
+//      updatePanel();
     }
 
     @Override
@@ -303,10 +315,22 @@ public class SynthesizerDialog implements ActionListener
       purgeBox.setSelected(synthesizerOptions.doPurge());
       removeUnecessarySupBox.setSelected(synthesizerOptions
         .getRemoveUnecessarySupervisors());
+
+
+      updatePanel();
     }
 
     public void updatePanel()
     {
+
+      final int heuristicTabIndex = 2;
+      mTabbedPane .setComponentAt(heuristicTabIndex, mHeuristicPanel);
+      if (algorithmSelector.getAlgorithm() == SynthesisAlgorithm.COMPOSITIONAL_WATERS)
+      {
+        mTabbedPane.setEnabledAt(heuristicTabIndex,true);
+      } else {
+        mTabbedPane.setEnabledAt(heuristicTabIndex,false);
+      }
       // Which algorithms should be enabled?
       // Remember current selection
       final SynthesisAlgorithm selected = algorithmSelector.getAlgorithm();
@@ -319,7 +343,7 @@ public class SynthesizerDialog implements ActionListener
         algorithmSelector.addItem(SynthesisAlgorithm.MODULAR);
         algorithmSelector.addItem(SynthesisAlgorithm.COMPOSITIONAL);
         algorithmSelector.addItem(SynthesisAlgorithm.BDD);
-        algorithmSelector.addItem(SynthesisAlgorithm.SYNTHESISA);
+//        algorithmSelector.addItem(SynthesisAlgorithm.SYNTHESISA);
         algorithmSelector.addItem(SynthesisAlgorithm.COMPOSITIONAL_WATERS);
       } else if (typeSelector.getType() == SynthesisType.NONBLOCKING) {
         algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHIC);
@@ -327,14 +351,14 @@ public class SynthesizerDialog implements ActionListener
         algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHICBDD);
         algorithmSelector.addItem(SynthesisAlgorithm.COMPOSITIONAL);
         algorithmSelector.addItem(SynthesisAlgorithm.BDD);
-        algorithmSelector.addItem(SynthesisAlgorithm.SYNTHESISA);
+//        algorithmSelector.addItem(SynthesisAlgorithm.SYNTHESISA);
         algorithmSelector.addItem(SynthesisAlgorithm.COMPOSITIONAL_WATERS);
       } else if (typeSelector.getType() == SynthesisType.NONBLOCKINGCONTROLLABLE) {
         algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHIC);
         algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHIC_WATERS);
         algorithmSelector.addItem(SynthesisAlgorithm.COMPOSITIONAL);
         algorithmSelector.addItem(SynthesisAlgorithm.BDD);
-        algorithmSelector.addItem(SynthesisAlgorithm.SYNTHESISA);
+//        algorithmSelector.addItem(SynthesisAlgorithm.SYNTHESISA);
         algorithmSelector.addItem(SynthesisAlgorithm.COMPOSITIONAL_WATERS);
       } else if (typeSelector.getType() == SynthesisType.NONBLOCKINGCONTROLLABLEOBSERVABLE) {
         algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHIC);
@@ -380,8 +404,7 @@ public class SynthesizerDialog implements ActionListener
 
       if (algorithmSelector.getAlgorithm() == SynthesisAlgorithm.MONOLITHIC) {
         removeUnecessarySupBox.setVisible(false); //X
-      } else if (algorithmSelector.getAlgorithm() == SynthesisAlgorithm.COMPOSITIONAL
-                 || algorithmSelector.getAlgorithm() == SynthesisAlgorithm.SYNTHESISA) {
+      } else if (algorithmSelector.getAlgorithm() == SynthesisAlgorithm.COMPOSITIONAL) {
         removeUnecessarySupBox.setVisible(false); //X
         purgeBox.setVisible(true); //X
       } else if (algorithmSelector.getAlgorithm() == SynthesisAlgorithm.MODULAR) {
@@ -545,6 +568,64 @@ public class SynthesizerDialog implements ActionListener
   }
 
 
+
+
+
+
+
+  //# Inner class SynthesizerDialogHeuristicPanel
+  class SynthesizerDialogHeuristicPanel extends JPanel
+  {
+    private static final long serialVersionUID = 1L;
+    JComboBox<Object> minimizationPreselectingHeuristic;
+    JComboBox<Object> minimizationSelectingHeuristic;
+
+    public SynthesizerDialogHeuristicPanel()
+    {
+        minimizationPreselectingHeuristic = new JComboBox<Object>(MinimizationPreselectingHeuristic.values());
+        minimizationSelectingHeuristic = new JComboBox<Object>(MinimizationSelectingHeuristic.values());
+
+        // Create layout!
+        final Box mainBox = Box.createVerticalBox();
+
+        JPanel panel = new JPanel();
+        final Box strategyBox = Box.createHorizontalBox();
+        strategyBox.add(new JLabel("Minimization strategy: "));
+        strategyBox.add(minimizationPreselectingHeuristic);
+        panel.add(strategyBox);
+        mainBox.add(panel);
+
+        panel = new JPanel();
+        final Box heuristicBox = Box.createHorizontalBox();
+        heuristicBox.add(new JLabel("Minimization heuristic: "));
+        heuristicBox.add(minimizationSelectingHeuristic);
+        panel.add(heuristicBox);
+        mainBox.add(panel);
+
+        // Add components
+        this.add(mainBox);
+    }
+
+    public void update(final MinimizationOptions options)
+    {
+        minimizationPreselectingHeuristic.setSelectedItem(options.getMinimizationPreselctingHeuristic());
+        minimizationSelectingHeuristic.setSelectedItem(options.getMinimizationSelctingHeuristic());
+    }
+
+    public void regain(final MinimizationOptions options)
+    {
+       options.setMinimizationPreselctingHeuristic((MinimizationPreselectingHeuristic) minimizationPreselectingHeuristic.getSelectedItem());
+       options.setMinimizationSelctingHeuristic((MinimizationSelectingHeuristic) minimizationSelectingHeuristic.getSelectedItem());
+    }
+  }
+
+
+
+
+
+
+
+
   //# Inner class AlgorithmSelector
   static class AlgorithmSelector extends JComboBox<SynthesisAlgorithm>
   {
@@ -616,4 +697,5 @@ public class SynthesizerDialog implements ActionListener
       return new SynthesisSelector();
     }
   }
+
 }

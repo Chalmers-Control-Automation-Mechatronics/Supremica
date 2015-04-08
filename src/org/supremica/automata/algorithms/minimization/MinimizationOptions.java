@@ -103,6 +103,10 @@ public final class MinimizationOptions
      * Which heuristic should be used to evaluate the automata sets chosen by the minimizationStrategy?
      */
     private MinimizationHeuristic minimizationHeuristic;
+
+    private MinimizationSelectingHeuristic mMinimizationSelectingHeuristic;
+
+    private MinimizationPreselectingHeuristic mMinimizationPreselectingHeuristic;
     /**
      * The target alphabet, the events that are not in this alphabet will be hidden in the
      * final result.
@@ -130,6 +134,8 @@ public final class MinimizationOptions
         ignoreMarking = Config.MINIMIZATION_IGNORE_MARKING.get();
         minimizationStrategy = Config.MINIMIZATION_STRATEGY.get();
         minimizationHeuristic = Config.MINIMIZATION_HEURISTIC.get();
+        mMinimizationSelectingHeuristic = Config.MINIMIZATION_SELECTINGHEURISTIC.get();
+        mMinimizationPreselectingHeuristic = Config.MINIMIZATION_PRESELECTINGHEURISTIC.get();
         componentSizeLimit = Integer.MAX_VALUE;
     }
 
@@ -265,6 +271,27 @@ public final class MinimizationOptions
         return minimizationHeuristic;
     }
 
+
+    public void setMinimizationPreselctingHeuristic(final MinimizationPreselectingHeuristic heuristic)
+    {
+        mMinimizationPreselectingHeuristic = heuristic;
+    }
+    public MinimizationPreselectingHeuristic getMinimizationPreselctingHeuristic()
+    {
+        return mMinimizationPreselectingHeuristic;
+    }
+
+
+
+    public void setMinimizationSelctingHeuristic(final MinimizationSelectingHeuristic heuristic)
+    {
+        mMinimizationSelectingHeuristic = heuristic;
+    }
+    public MinimizationSelectingHeuristic getMinimizationSelctingHeuristic()
+    {
+        return mMinimizationSelectingHeuristic;
+    }
+
     public void setSkipLast(final boolean bool)
     {
         skipLast = bool;
@@ -336,6 +363,8 @@ public final class MinimizationOptions
         Config.MINIMIZATION_IGNORE_MARKING.set(ignoreMarking);
         Config.MINIMIZATION_STRATEGY.setValue(minimizationStrategy);
         Config.MINIMIZATION_HEURISTIC.setValue(minimizationHeuristic);
+        Config.MINIMIZATION_PRESELECTINGHEURISTIC.setValue(mMinimizationPreselectingHeuristic);
+        Config.MINIMIZATION_SELECTINGHEURISTIC.setValue(mMinimizationSelectingHeuristic);
     }
 
     /**

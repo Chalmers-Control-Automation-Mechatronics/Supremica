@@ -69,6 +69,8 @@ import org.supremica.automata.algorithms.SynthesisType;
 import org.supremica.automata.algorithms.VerificationAlgorithm;
 import org.supremica.automata.algorithms.VerificationType;
 import org.supremica.automata.algorithms.minimization.MinimizationHeuristic;
+import org.supremica.automata.algorithms.minimization.MinimizationPreselectingHeuristic;
+import org.supremica.automata.algorithms.minimization.MinimizationSelectingHeuristic;
 import org.supremica.automata.algorithms.minimization.MinimizationStrategy;
 import org.supremica.util.BDD.Options;
 
@@ -311,6 +313,14 @@ public final class Config
     public static final BooleanProperty MINIMIZATION_IGNORE_MARKING = new BooleanProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationIgnoreMarking", false, "Ignore marking");
     public static final ObjectProperty<MinimizationStrategy> MINIMIZATION_STRATEGY = new ObjectProperty<MinimizationStrategy>(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationStrategy", MinimizationStrategy.FewestTransitionsFirst, "Minimization strategy", MinimizationStrategy.values());
     public static final ObjectProperty<MinimizationHeuristic> MINIMIZATION_HEURISTIC = new ObjectProperty<MinimizationHeuristic>(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationHeuristic", MinimizationHeuristic.MostLocal, "Minimization heuristics", MinimizationHeuristic.values());
+    public static final ObjectProperty<MinimizationPreselectingHeuristic> MINIMIZATION_PRESELECTINGHEURISTIC =
+      new ObjectProperty<MinimizationPreselectingHeuristic>(PropertyType.ALGORITHMS_MINIMIZATION,
+        "minimizationPreselecting", MinimizationPreselectingHeuristic.AtLeastOneLocalEvent,
+        "Minimization Preselecting Heuristics", MinimizationPreselectingHeuristic.values());
+    public static final ObjectProperty<MinimizationSelectingHeuristic> MINIMIZATION_SELECTINGHEURISTIC =
+      new ObjectProperty<MinimizationSelectingHeuristic>(PropertyType.ALGORITHMS_MINIMIZATION,
+        "minimizationSelectingHeuristic", MinimizationSelectingHeuristic.MinimumActualStates,
+        "Minimization Selecting Heuristics", MinimizationSelectingHeuristic.values());
     public static final ObjectProperty<String> MINIMIZATION_SILENT_EVENT_NAME = new ObjectProperty<String>(PropertyType.ALGORITHMS_MINIMIZATION, "generalSilentEventName", "tau", "Silent event name");
     public static final ObjectProperty<String> MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME = new ObjectProperty<String>(PropertyType.ALGORITHMS_MINIMIZATION, "generalSilentControllableEventName", "tau_c", "Silent controllable event name");
     public static final ObjectProperty<String> MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME = new ObjectProperty<String>(PropertyType.ALGORITHMS_MINIMIZATION, "generalSilentUnontrollableEventName", "tau_u", "Silent uncontrollable event name");

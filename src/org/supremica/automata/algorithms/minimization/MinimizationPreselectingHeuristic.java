@@ -47,42 +47,30 @@
  *
  * Supremica is owned and represented by KA.
  */
-package org.supremica.automata.algorithms;
+package org.supremica.automata.algorithms.minimization;
 
-public enum SynthesisAlgorithm
+public enum MinimizationPreselectingHeuristic
 {
-    MONOLITHIC("Monolithic (explicit)", false),
-    MONOLITHIC_WATERS("Monolithic (Waters)", false),
-    MONOLITHICBDD("Monolithic (symbolic)", false),
+    AtLeastOneLocalEvent("At least one local", "MustL"),
+    FewestTransitionsFirst("Pair with fewest transition automaton", "MinT"),
+    MostStatesFirst("Pair with most states automaton", "MaxS"),
+    Pairs("Every pair of automata", "Pairs");
 
-    PARTITIONBDD("Partitioning (symbolic)", false),
-    CLOCKPARTITION("Clock partitioning", false),
-    MINIMALITY_C("Minimality approach (classic)", false),
-    MINIMALITY_M("Minimality approach (monolithic)", false),
-    MINIMALITY_P("Minimality approach (partition)", false),
-
-    MODULAR("Modular"),
-    COMPOSITIONAL("Compositional"),
-//    SYNTHESISA("Compositional (SynthesisA)"),
-    COMPOSITIONAL_WATERS("Compositional (Waters)"),
-    //IDD("IDD"),
-    //MonolithicSingleFixpoint("MONOLITHIC (single fixpoint)", false),    // works, but is very slow [due to lame implementation :s ]
-    BDD("BDD");    // works, but we cant handle the results yet
 
     /** Textual description. */
     private final String description;
-    /** True if this algo prefers working on modular systems. */
-    private final boolean preferModular;
+    /** Textual description abbreviated. */
+    private final String abbreviation;
 
-    private SynthesisAlgorithm(final String description)
+    private MinimizationPreselectingHeuristic(final String description)
     {
-        this(description, true);
+        this(description, description);
     }
 
-    private SynthesisAlgorithm(final String description, final boolean preferModular)
+    private MinimizationPreselectingHeuristic(final String description, final String abbreviation)
     {
         this.description = description;
-        this.preferModular = preferModular;
+        this.abbreviation = abbreviation;
     }
 
     @Override
@@ -91,20 +79,21 @@ public enum SynthesisAlgorithm
         return description;
     }
 
-    public boolean prefersModular()
+    public String toStringAbbreviated()
     {
-        return preferModular;
+        return abbreviation;
     }
 
-    public static SynthesisAlgorithm fromDescription(final String description)
+    public static MinimizationPreselectingHeuristic toStrategy(final String description)
     {
-        for (final SynthesisAlgorithm value: values())
+        for (final MinimizationPreselectingHeuristic strategy: values())
         {
-            if (value.description.equals(description))
+            if (strategy.description.equals(description))
             {
-                return value;
+                return strategy;
             }
         }
         return null;
     }
+
 }

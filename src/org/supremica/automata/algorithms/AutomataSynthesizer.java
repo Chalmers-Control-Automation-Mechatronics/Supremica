@@ -83,7 +83,6 @@ import org.supremica.automata.BDD.BDDSynthesizer;
 import org.supremica.automata.IO.AutomataToWaters;
 import org.supremica.automata.IO.ProjectBuildFromWaters;
 import org.supremica.automata.algorithms.minimization.AutomataMinimizer;
-import org.supremica.automata.algorithms.minimization.AutomatonMinimizer;
 import org.supremica.automata.algorithms.minimization.MinimizationHelper;
 import org.supremica.automata.algorithms.minimization.MinimizationOptions;
 import org.supremica.gui.ExecutionDialog;
@@ -247,105 +246,105 @@ public class AutomataSynthesizer
 
         // Compositional synthesis by using synthesis abstraction (DCDS 2011).
 
-         else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.SYNTHESISA)
-        {
-
-            // Use synthesis Abstraction minimization!
-
-            // Prepare for synthesis
-            // Make a copy
-
-            theAutomata = new Automata(theAutomata);
-            // Make preparations based on synthesis type
-            final SynthesisType type = synthesizerOptions.getSynthesisType();
-
-            if (type == SynthesisType.NONBLOCKING)
-            {
-                // Only nonblocking? Then everything should be considered controllable!
-                for (final Automaton automaton : theAutomata)
-                {
-                    for (final LabeledEvent event : automaton.getAlphabet())
-                    {
-                        event.setControllable(true);
-                    }
-                }
-            }
-            else if (type == SynthesisType.CONTROLLABLE)
-            {
-
-                // Only controllable? Then everything should be considered marked...
-                // and AFTER that, the specs must be plantified!
-                for (final Automaton automaton : theAutomata)
-                {
-                    automaton.setAllStatesAccepting();
-                }
-                // Plantify specs
-                MinimizationHelper.plantify(theAutomata);
-            }
-
-            else if (type == SynthesisType.NONBLOCKINGCONTROLLABLE)
-            {
-
-
-                // NONBLOCKING and controllable. Plantify the specifications and supervisors!
-            	// if no plants in model, just set everything to type 'plant'
-                if (theAutomata.plantIterator().hasNext()) MinimizationHelper.plantify(theAutomata);
-                else {
-                	for (final Automaton a : theAutomata) {
-                		a.setComment("plant(" + a.getName() + ")");
-                        a.setType(AutomatonType.PLANT);
-                	}
-                }
-            }
-
-            // Do the stuff!
-            final AutomataMinimizer minimizer = new AutomataMinimizer(theAutomata);
-            minimizer.setExecutionDialog(executionDialog);
-            synthesis=true;
-
-            final MinimizationOptions options = MinimizationOptions.getDefaultSynthesisOptionsSynthesisA();
-
-//          //Abstract the automata by using synthesis Abstraction
-            final Automata min = minimizer.getCompositionalMinimization(options, synthesis);
-
-            // get the halfwaysynthesis automata.
-            final Automata halfwaySynthesisResult = new Automata();
-            for(final Automaton aut:min){
-                if(aut.getName().contains("HalfWaySynthesisResult")){
-                    halfwaySynthesisResult.addAutomaton(aut);
-                }
-            }
-            // remove the halfway synthesis result from min.
-            if(halfwaySynthesisResult.size()>0){
-                min.removeAutomata(halfwaySynthesisResult);
-            }
-
-//            Automaton cloneAutomaton=min.getFirstAutomaton();
+//         else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.SYNTHESISA)
+//        {
 //
-            //rename back the tau events to the original events.
-
-            AutomatonMinimizer.renameBackToOriginalEvents(min);
-
-//            min.addAutomaton(cloneAutomaton);
-
+//            // Use synthesis Abstraction minimization!
 //
-            // Applying monolithic synthesis on the abstract automaton.
-            final MonolithicAutomataSynthesizer synthesizer = new MonolithicAutomataSynthesizer();
-            mThreadToAbort = synthesizer;
-            final MonolithicReturnValue retval = synthesizer.synthesizeSupervisor(min, synthesizerOptions, synchronizationOptions, executionDialog, helperStatistics, false);
-
-            if (mAbortRequested)
-                return new Automata();
-            retval.automaton.setName("sup(Untitled)");
-            result.addAutomaton(retval.automaton);
-
-            // add the result of halfway synthesis to the final synthesis result.
-            if(halfwaySynthesisResult.size()>0){
-                result.addAutomata(halfwaySynthesisResult);
-            }
+//            // Prepare for synthesis
+//            // Make a copy
 //
-
-        }
+//            theAutomata = new Automata(theAutomata);
+//            // Make preparations based on synthesis type
+//            final SynthesisType type = synthesizerOptions.getSynthesisType();
+//
+//            if (type == SynthesisType.NONBLOCKING)
+//            {
+//                // Only nonblocking? Then everything should be considered controllable!
+//                for (final Automaton automaton : theAutomata)
+//                {
+//                    for (final LabeledEvent event : automaton.getAlphabet())
+//                    {
+//                        event.setControllable(true);
+//                    }
+//                }
+//            }
+//            else if (type == SynthesisType.CONTROLLABLE)
+//            {
+//
+//                // Only controllable? Then everything should be considered marked...
+//                // and AFTER that, the specs must be plantified!
+//                for (final Automaton automaton : theAutomata)
+//                {
+//                    automaton.setAllStatesAccepting();
+//                }
+//                // Plantify specs
+//                MinimizationHelper.plantify(theAutomata);
+//            }
+//
+//            else if (type == SynthesisType.NONBLOCKINGCONTROLLABLE)
+//            {
+//
+//
+//                // NONBLOCKING and controllable. Plantify the specifications and supervisors!
+//            	// if no plants in model, just set everything to type 'plant'
+//                if (theAutomata.plantIterator().hasNext()) MinimizationHelper.plantify(theAutomata);
+//                else {
+//                	for (final Automaton a : theAutomata) {
+//                		a.setComment("plant(" + a.getName() + ")");
+//                        a.setType(AutomatonType.PLANT);
+//                	}
+//                }
+//            }
+//
+//            // Do the stuff!
+//            final AutomataMinimizer minimizer = new AutomataMinimizer(theAutomata);
+//            minimizer.setExecutionDialog(executionDialog);
+//            synthesis=true;
+//
+//            final MinimizationOptions options = MinimizationOptions.getDefaultSynthesisOptionsSynthesisA();
+//
+////          //Abstract the automata by using synthesis Abstraction
+//            final Automata min = minimizer.getCompositionalMinimization(options, synthesis);
+//
+//            // get the halfwaysynthesis automata.
+//            final Automata halfwaySynthesisResult = new Automata();
+//            for(final Automaton aut:min){
+//                if(aut.getName().contains("HalfWaySynthesisResult")){
+//                    halfwaySynthesisResult.addAutomaton(aut);
+//                }
+//            }
+//            // remove the halfway synthesis result from min.
+//            if(halfwaySynthesisResult.size()>0){
+//                min.removeAutomata(halfwaySynthesisResult);
+//            }
+//
+////            Automaton cloneAutomaton=min.getFirstAutomaton();
+////
+//            //rename back the tau events to the original events.
+//
+//            AutomatonMinimizer.renameBackToOriginalEvents(min);
+//
+////            min.addAutomaton(cloneAutomaton);
+//
+////
+//            // Applying monolithic synthesis on the abstract automaton.
+//            final MonolithicAutomataSynthesizer synthesizer = new MonolithicAutomataSynthesizer();
+//            mThreadToAbort = synthesizer;
+//            final MonolithicReturnValue retval = synthesizer.synthesizeSupervisor(min, synthesizerOptions, synchronizationOptions, executionDialog, helperStatistics, false);
+//
+//            if (mAbortRequested)
+//                return new Automata();
+//            retval.automaton.setName("sup(Untitled)");
+//            result.addAutomaton(retval.automaton);
+//
+//            // add the result of halfway synthesis to the final synthesis result.
+//            if(halfwaySynthesisResult.size()>0){
+//                result.addAutomata(halfwaySynthesisResult);
+//            }
+////
+//
+//        }
       //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
          else if (synthesizerOptions.getSynthesisAlgorithm() ==
@@ -454,12 +453,48 @@ public class AutomataSynthesizer
           synthesizer.setConfiguredDefaultMarking(marking);
           final boolean supervisorReduction =
             synthesizerOptions.getReduceSupervisors();
+          final MinimizationOptions mOptions = new MinimizationOptions();
+
           synthesizer.setSupervisorReductionEnabled(supervisorReduction);
           synthesizer.setInternalStateLimit(5000);
-          synthesizer.setPreselectingMethod
+          final String preselectingHeuristic = mOptions.getMinimizationPreselctingHeuristic().toStringAbbreviated();
+          final String selectingHeuristic =  mOptions.getMinimizationSelctingHeuristic().toStringAbbreviated();
+          if (preselectingHeuristic.equals("Pairs")) {
+            synthesizer.setPreselectingMethod
+            (AbstractCompositionalModelAnalyzer.Pairs);
+          } else if (preselectingHeuristic.equals("MinT")) {
+            synthesizer.setPreselectingMethod
+            (AbstractCompositionalModelAnalyzer.MinT);
+          } else if (preselectingHeuristic.equals("MaxS")) {
+            synthesizer.setPreselectingMethod
+            (AbstractCompositionalModelAnalyzer.MaxS);
+          } else if (preselectingHeuristic.equals( "MustL")) {
+            synthesizer.setPreselectingMethod
             (AbstractCompositionalModelAnalyzer.MustL);
-          synthesizer.setSelectionHeuristic
+          }
+
+          if (selectingHeuristic.equals("MinSync")) {
+            synthesizer.setSelectionHeuristic
             (CompositionalSelectionHeuristicFactory.MinSync);
+          } else if (selectingHeuristic.equals("MaxL")) {
+            synthesizer.setSelectionHeuristic
+            (CompositionalSelectionHeuristicFactory.MaxL);
+          } else if (selectingHeuristic.equals("MinS")) {
+            synthesizer.setSelectionHeuristic
+            (CompositionalSelectionHeuristicFactory.MinS);
+          } else if (selectingHeuristic.equals("MinE")) {
+            synthesizer.setSelectionHeuristic
+            (CompositionalSelectionHeuristicFactory.MinE);
+          } else if (selectingHeuristic.equals("MinF")) {
+            synthesizer.setSelectionHeuristic
+            (CompositionalSelectionHeuristicFactory.MinF);
+          } else if (selectingHeuristic.equals("MaxC")) {
+            synthesizer.setSelectionHeuristic
+            (CompositionalSelectionHeuristicFactory.MaxC);
+          }
+
+          logger.info("The heuristic is " + preselectingHeuristic +"/"+
+            selectingHeuristic);
           synthesizer.run();
           final ProductDESResult watersResult =
             synthesizer.getAnalysisResult();
@@ -1021,7 +1056,7 @@ public class AutomataSynthesizer
     {
         final SynchronizationOptions synchOptions = SynchronizationOptions.getDefaultSynthesisOptions();
         final SynthesizerOptions synthOptions = SynthesizerOptions.getDefaultMonolithicCNBSynthesizerOptions();
-        final AutomataSynthesizer synthesizer = new AutomataSynthesizer(model, synchOptions, synthOptions);
+        final AutomataSynthesizer synthesizer = new AutomataSynthesizer(model, synchOptions, synthOptions );
         final Automata result = synthesizer.execute();
 
         return new ModularSupervisor(result);

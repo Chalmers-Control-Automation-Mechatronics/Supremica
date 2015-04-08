@@ -213,7 +213,7 @@ public class AutomatonMinimizer
         // Make accessible
         {
 
-            final SynthesizerOptions synthOptions = SynthesizerOptions.getDefaultSynthesizerOptionsS();
+//            final SynthesizerOptions synthOptions = SynthesizerOptions.getDefaultSynthesizerOptionsS();
 //            StateSet st= theAutomaton.getStateSet();
 //            StateSet st1=(StateSet)st.clone();
 //            StateSet st2=new StateSet();
@@ -224,8 +224,8 @@ public class AutomatonMinimizer
 //                }
 //            }
 //            logger.info("Accepting states "+st2+" the automaton name is "+theAutomaton.getName());
-            final AutomatonSynthesizer synth = new AutomatonSynthesizer(theAutomaton, synthOptions);
-            synth.doReachable(true);
+//            final AutomatonSynthesizer synth = new AutomatonSynthesizer(theAutomaton, synthOptions);
+//            synth.doReachable(true);
             final LinkedList<State> toBeRemoved = new LinkedList<State>();
             for (final Iterator<State> it = theAutomaton.stateIterator(); it.hasNext(); )
             {

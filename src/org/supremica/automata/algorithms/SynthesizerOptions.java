@@ -285,7 +285,6 @@ public final class SynthesizerOptions
         Config.SYNTHESIS_LOCALIZE_SUPERVISORS.set(localizeSupervisors);
 		Config.SYNTHESIS_SUP_AS_PLANT.set(supervisorsAsPlants);
         Config.BDD_SYNTHESIS_EXTRACT_AUTOMATON.set(bddExtractSupervisor);
-
     }
 
     /**
@@ -297,12 +296,12 @@ public final class SynthesizerOptions
                                       true, true, true, true, true, true, false, false);
     }
 
-    public static SynthesizerOptions getDefaultSynthesizerOptionsS()
-    {
-
-        return new SynthesizerOptions(SynthesisType.NONBLOCKINGCONTROLLABLE, SynthesisAlgorithm.SYNTHESISA,
-                                      true, true, true, false, false, true, false, false);
-    }
+//    public static SynthesizerOptions getDefaultSynthesizerOptionsS()
+//    {
+//
+//        return new SynthesizerOptions(SynthesisType.NONBLOCKINGCONTROLLABLE, SynthesisAlgorithm.SYNTHESISA,
+//                                      true, true, true, false, false, true, false, false);
+//    }
     /**
      * Returns the default options for synthesis.
      */
