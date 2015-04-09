@@ -229,6 +229,14 @@ public class HalfWaySynthesisTRSimplifierTest
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
+  public void test_HalfwaySynthesis_14() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "HalfwaySynthesis_14.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
   @Override
   public void test_basic_7() throws Exception
   {

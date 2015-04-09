@@ -177,10 +177,17 @@ public abstract class AbstractSupervisorSynthesizerTest
     runSynthesizer(des, false);
   }
 
-  public void testBigFactory() throws Exception
+  public void testBigFactory1() throws Exception
   {
     final ProductDESProxy des =
-      getCompiledDES("tests", "synthesis", "big_factory.wmod");
+      getCompiledDES("tests", "synthesis", "big_factory_1.wmod");
+    runSynthesizer(des, true);
+  }
+
+  public void testBigFactory2() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "big_factory_2.wmod");
     runSynthesizer(des, true);
   }
 

@@ -249,6 +249,8 @@ public class CertainUnsupervisabilityTRSimplifier
       //  Delete controllable transitions to bad state.
       //  Redirect other bad state transitions to dump state.
       final int dumpState = mBadStates.nextSetBit(0);
+      final int defaultID = getDefaultMarkingID();
+      rel.setMarked(dumpState, defaultID, false);
       final TransitionIterator iterAllTrans =
         rel.createAllTransitionsModifyingIterator();
       while (iterAllTrans.advance()) {
@@ -313,7 +315,6 @@ public class CertainUnsupervisabilityTRSimplifier
           }
         }
       }
-      final int defaultID = getDefaultMarkingID();
       rel.removeProperSelfLoopEvents(defaultID);
       rel.removeRedundantPropositions();
     }

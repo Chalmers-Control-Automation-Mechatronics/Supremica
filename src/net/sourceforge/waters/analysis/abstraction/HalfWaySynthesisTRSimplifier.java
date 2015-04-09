@@ -220,6 +220,8 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
       //  Delete controllable transitions to bad state.
       //  Redirect other bad state transitions to dump state.
       final int dumpState = mBadStates.nextSetBit(0);
+      final int defaultID = getDefaultMarkingID();
+      rel.setMarked(dumpState, defaultID, false);
 //      boolean dumpReachable = rel.isInitial(dumpState);
       final TransitionIterator iter =
         rel.createAllTransitionsModifyingIterator();
@@ -266,7 +268,6 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
           }
         }
       }
-      final int defaultID = getDefaultMarkingID();
       rel.removeProperSelfLoopEvents(defaultID);
       rel.removeRedundantPropositions();
     }
