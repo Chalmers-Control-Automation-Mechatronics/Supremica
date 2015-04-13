@@ -217,8 +217,7 @@ public class UnifiedEFAConflictCheckerTest extends AbstractAnalysisTest
   public void testProductionCell()
     throws IOException, WatersException
   {
-    final ModuleProxy module =
-      loadModule("tests", "efa", "Production_cell ");
+    final ModuleProxy module = loadModule("tests", "efa", "production_cell");
     checkConflict(module, false);
   }
 

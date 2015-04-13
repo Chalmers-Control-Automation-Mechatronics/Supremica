@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="Production_cell_complete" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="production_cell" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment></ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="FB_S"/>
@@ -65,26 +65,26 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="96" X="128"/>
+                            <Point X="128" Y="96"/>
                         </PointGeometry>
                         <InitialArrowGeometry>
-                            <Point Y="-5" X="-5"/>
+                            <Point X="-5" Y="-5"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-7" X="-39"/>
+                            <Point X="-39" Y="-7"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="ST_I" Source="ST_I">
+                    <Edge Source="ST_I" Target="ST_I">
                         <LabelBlock>
                             <SimpleIdentifier Name="blank_add"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-13" X="6"/>
+                                <Point X="6" Y="-13"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="93" X="193"/>
+                            <Point X="193" Y="93"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
@@ -94,7 +94,7 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="0" X="8"/>
+                                <Point X="8" Y="0"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -109,66 +109,66 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="96" X="144"/>
+                            <Point X="144" Y="96"/>
                         </PointGeometry>
                         <InitialArrowGeometry>
-                            <Point Y="-5" X="-5"/>
+                            <Point X="-5" Y="-5"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-5" X="-52"/>
+                            <Point X="-52" Y="-5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="Cr_H_m_FB">
                         <PointGeometry>
-                            <Point Y="142" X="311"/>
+                            <Point X="311" Y="142"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-2" X="9"/>
+                            <Point X="9" Y="-2"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="Cr_H_r_FB">
                         <PointGeometry>
-                            <Point Y="238" X="286"/>
+                            <Point X="286" Y="238"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-5" X="7"/>
+                            <Point X="7" Y="-5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="Cr_H_m_DB">
                         <PointGeometry>
-                            <Point Y="192" X="119"/>
+                            <Point X="119" Y="192"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="0" X="-81"/>
+                            <Point X="-81" Y="0"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="Cr_H_h">
                         <PointGeometry>
-                            <Point Y="71" X="240"/>
+                            <Point X="240" Y="71"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="11" X="-25"/>
+                            <Point X="-25" Y="11"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="Cr_H_uh">
                         <PointGeometry>
-                            <Point Y="263" X="190"/>
+                            <Point X="190" Y="263"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-32" X="-2"/>
+                            <Point X="-2" Y="-32"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="Cr_H_m_FB" Source="Cr_H_h">
+                    <Edge Source="Cr_H_h" Target="Cr_H_m_FB">
                         <LabelBlock>
                             <SimpleIdentifier Name="Cr_2FB"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-21" X="30"/>
+                                <Point X="30" Y="-21"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="100" X="281"/>
+                            <Point X="281" Y="100"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
@@ -178,19 +178,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-4" X="17"/>
+                                <Point X="17" Y="-4"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="Cr_H_r_FB" Source="Cr_H_m_FB">
+                    <Edge Source="Cr_H_m_FB" Target="Cr_H_r_FB">
                         <LabelBlock>
                             <SimpleIdentifier Name="Cr_FB"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-29" X="20"/>
+                                <Point X="20" Y="-29"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="192" X="307"/>
+                            <Point X="307" Y="192"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -210,19 +210,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-16" X="8"/>
+                                <Point X="8" Y="-16"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="Cr_H_m_DB" Source="Cr_H_uh">
+                    <Edge Source="Cr_H_uh" Target="Cr_H_m_DB">
                         <LabelBlock>
                             <SimpleIdentifier Name="Cr_2DB"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-4" X="-65"/>
+                                <Point X="-65" Y="-4"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="233" X="149"/>
+                            <Point X="149" Y="233"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
@@ -232,19 +232,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="9" X="-76"/>
+                                <Point X="-76" Y="9"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="Cr_H_I" Source="Cr_H_m_DB">
+                    <Edge Source="Cr_H_m_DB" Target="Cr_H_I">
                         <LabelBlock>
                             <SimpleIdentifier Name="Cr_DB"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-26" X="-63"/>
+                                <Point X="-63" Y="-26"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="142" X="123"/>
+                            <Point X="123" Y="142"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -264,19 +264,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-13" X="-81"/>
+                                <Point X="-81" Y="-13"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="Cr_H_h" Source="Cr_H_I">
+                    <Edge Source="Cr_H_I" Target="Cr_H_h">
                         <LabelBlock>
                             <SimpleIdentifier Name="Cr_mOn"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-36" X="-33"/>
+                                <Point X="-33" Y="-36"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="75" X="189"/>
+                            <Point X="189" Y="75"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
@@ -286,19 +286,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-22" X="-52"/>
+                                <Point X="-52" Y="-22"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="Cr_H_uh" Source="Cr_H_r_FB">
+                    <Edge Source="Cr_H_r_FB" Target="Cr_H_uh">
                         <LabelBlock>
                             <SimpleIdentifier Name="Cr_mOff"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="3" X="-14"/>
+                                <Point X="-14" Y="3"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="258" X="240"/>
+                            <Point X="240" Y="258"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
@@ -308,7 +308,7 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="13" X="-24"/>
+                                <Point X="-24" Y="13"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -323,66 +323,66 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="176" X="224"/>
+                            <Point X="224" Y="176"/>
                         </PointGeometry>
                         <InitialArrowGeometry>
-                            <Point Y="-5" X="-5"/>
+                            <Point X="-5" Y="-5"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="6" X="-50"/>
+                            <Point X="-50" Y="6"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="Cr_V_mu">
                         <PointGeometry>
-                            <Point Y="222" X="391"/>
+                            <Point X="391" Y="222"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="6" X="7"/>
+                            <Point X="7" Y="6"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="Cr_V_ru">
                         <PointGeometry>
-                            <Point Y="318" X="367"/>
+                            <Point X="367" Y="318"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="2" X="14"/>
+                            <Point X="14" Y="2"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="Cr_V_md">
                         <PointGeometry>
-                            <Point Y="273" X="200"/>
+                            <Point X="200" Y="273"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-2" X="-67"/>
+                            <Point X="-67" Y="-2"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="Cr_V_h">
                         <PointGeometry>
-                            <Point Y="152" X="320"/>
+                            <Point X="320" Y="152"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="-22"/>
+                            <Point X="-22" Y="10"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="Cr_V_uh">
                         <PointGeometry>
-                            <Point Y="343" X="271"/>
+                            <Point X="271" Y="343"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-25" X="-21"/>
+                            <Point X="-21" Y="-25"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="Cr_V_mu" Source="Cr_V_h">
+                    <Edge Source="Cr_V_h" Target="Cr_V_mu">
                         <LabelBlock>
                             <SimpleIdentifier Name="Cr_U"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-38" X="10"/>
+                                <Point X="10" Y="-38"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="181" X="362"/>
+                            <Point X="362" Y="181"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
@@ -392,19 +392,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-23" X="-5"/>
+                                <Point X="-5" Y="-23"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="Cr_V_ru" Source="Cr_V_mu">
+                    <Edge Source="Cr_V_mu" Target="Cr_V_ru">
                         <LabelBlock>
                             <SimpleIdentifier Name="Cr_66"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-23" X="29"/>
+                                <Point X="29" Y="-23"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="272" X="387"/>
+                            <Point X="387" Y="272"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -424,19 +424,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-11" X="10"/>
+                                <Point X="10" Y="-11"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="Cr_V_md" Source="Cr_V_uh">
+                    <Edge Source="Cr_V_uh" Target="Cr_V_md">
                         <LabelBlock>
                             <SimpleIdentifier Name="Cr_D"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="6" X="-83"/>
+                                <Point X="-83" Y="6"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="314" X="229"/>
+                            <Point X="229" Y="314"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
@@ -446,19 +446,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="20" X="-107"/>
+                                <Point X="-107" Y="20"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="Cr_V_I" Source="Cr_V_md">
+                    <Edge Source="Cr_V_md" Target="Cr_V_I">
                         <LabelBlock>
                             <SimpleIdentifier Name="Cr_95"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-22" X="-70"/>
+                                <Point X="-70" Y="-22"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="222" X="204"/>
+                            <Point X="204" Y="222"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -478,19 +478,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-7" X="-89"/>
+                                <Point X="-89" Y="-7"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="Cr_V_h" Source="Cr_V_I">
+                    <Edge Source="Cr_V_I" Target="Cr_V_h">
                         <LabelBlock>
                             <SimpleIdentifier Name="Cr_mOn"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-36" X="-42"/>
+                                <Point X="-42" Y="-36"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="156" X="270"/>
+                            <Point X="270" Y="156"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
@@ -500,19 +500,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-22" X="-56"/>
+                                <Point X="-56" Y="-22"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="Cr_V_uh" Source="Cr_V_ru">
+                    <Edge Source="Cr_V_ru" Target="Cr_V_uh">
                         <LabelBlock>
                             <SimpleIdentifier Name="Cr_mOff"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="4" X="-18"/>
+                                <Point X="-18" Y="4"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="339" X="321"/>
+                            <Point X="321" Y="339"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
@@ -522,7 +522,7 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="16" X="-27"/>
+                                <Point X="-27" Y="16"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -621,23 +621,23 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="256" X="192"/>
+                            <Point X="192" Y="256"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-6" X="-65"/>
+                            <Point X="-65" Y="-6"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="C_Cr_FB" Source="C_Cr_FB">
+                    <Edge Source="C_Cr_FB" Target="C_Cr_FB">
                         <LabelBlock>
                             <SimpleIdentifier Name="Cr_mOff"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-10" X="21"/>
+                                <Point X="21" Y="-10"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="190" X="239"/>
+                            <Point X="239" Y="190"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -657,19 +657,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="4" X="15"/>
+                                <Point X="15" Y="4"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="C_Cr_FB" Source="C_Cr_FB">
+                    <Edge Source="C_Cr_FB" Target="C_Cr_FB">
                         <LabelBlock>
                             <SimpleIdentifier Name="Cr_mOff"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="1" X="-22"/>
+                                <Point X="-22" Y="1"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="335" X="194"/>
+                            <Point X="194" Y="335"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -679,7 +679,7 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="14" X="-34"/>
+                                <Point X="-34" Y="14"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -694,24 +694,24 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="208" X="160"/>
+                            <Point X="160" Y="208"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-5" X="-61"/>
+                            <Point X="-61" Y="-5"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="Cr_Sp_I" Source="Cr_Sp_I">
+                    <Edge Source="Cr_Sp_I" Target="Cr_Sp_I">
                         <LabelBlock>
                             <SimpleIdentifier Name="Cr_2FB"/>
                             <SimpleIdentifier Name="Cr_U"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-53" X="-32"/>
+                                <Point X="-32" Y="-53"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="136" X="162"/>
+                            <Point X="162" Y="136"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -721,20 +721,20 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-20" X="-46"/>
+                                <Point X="-46" Y="-20"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="Cr_Sp_I" Source="Cr_Sp_I">
+                    <Edge Source="Cr_Sp_I" Target="Cr_Sp_I">
                         <LabelBlock>
                             <SimpleIdentifier Name="Cr_2DB"/>
                             <SimpleIdentifier Name="Cr_D"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="4" X="-25"/>
+                                <Point X="-25" Y="4"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="282" X="164"/>
+                            <Point X="164" Y="282"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -744,19 +744,19 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="35" X="-43"/>
+                                <Point X="-43" Y="35"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="Cr_Sp_I" Source="Cr_Sp_I">
+                    <Edge Source="Cr_Sp_I" Target="Cr_Sp_I">
                         <LabelBlock>
                             <SimpleIdentifier Name="Cr_mOff"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-25" X="2"/>
+                                <Point X="2" Y="-25"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="207" X="227"/>
+                            <Point X="227" Y="207"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -766,7 +766,7 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-10" X="3"/>
+                                <Point X="3" Y="-10"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -781,50 +781,50 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="176" X="112"/>
+                            <Point X="112" Y="176"/>
                         </PointGeometry>
                         <InitialArrowGeometry>
-                            <Point Y="-5" X="-5"/>
+                            <Point X="-5" Y="-5"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="24" X="-64"/>
+                            <Point X="-64" Y="24"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="FB_mOn_sOff">
                         <PointGeometry>
-                            <Point Y="176" X="288"/>
+                            <Point X="288" Y="176"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="25" X="-40"/>
+                            <Point X="-40" Y="25"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="FB_mOn_sOn">
                         <PointGeometry>
-                            <Point Y="176" X="464"/>
+                            <Point X="464" Y="176"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="24" X="-38"/>
+                            <Point X="-38" Y="24"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="FB_mOff_sOn">
                         <PointGeometry>
-                            <Point Y="176" X="640"/>
+                            <Point X="640" Y="176"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="21" X="-15"/>
+                            <Point X="-15" Y="21"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="FB_mOn_sOff" Source="FB_mOff_sOff">
+                    <Edge Source="FB_mOff_sOff" Target="FB_mOn_sOff">
                         <LabelBlock>
                             <SimpleIdentifier Name="FB_F"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="3" X="-15"/>
+                                <Point X="-15" Y="3"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="208" X="201"/>
+                            <Point X="201" Y="208"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
@@ -834,19 +834,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="17" X="-37"/>
+                                <Point X="-37" Y="17"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="FB_mOff_sOff" Source="FB_mOn_sOff">
+                    <Edge Source="FB_mOn_sOff" Target="FB_mOff_sOff">
                         <LabelBlock>
                             <SimpleIdentifier Name="FB_S"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-38" X="-15"/>
+                                <Point X="-15" Y="-38"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="136" X="196"/>
+                            <Point X="196" Y="136"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
@@ -856,19 +856,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-22" X="-37"/>
+                                <Point X="-37" Y="-22"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="FB_mOn_sOn" Source="FB_mOn_sOff">
+                    <Edge Source="FB_mOn_sOff" Target="FB_mOn_sOn">
                         <LabelBlock>
                             <SimpleIdentifier Name="FB_S1On"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="3" X="-20"/>
+                                <Point X="-20" Y="3"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="208" X="375"/>
+                            <Point X="375" Y="208"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -896,19 +896,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="15" X="-105"/>
+                                <Point X="-105" Y="15"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="FB_mOn_sOff" Source="FB_mOn_sOn">
+                    <Edge Source="FB_mOn_sOn" Target="FB_mOn_sOff">
                         <LabelBlock>
                             <SimpleIdentifier Name="FB_S1Off"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-52" X="-26"/>
+                                <Point X="-26" Y="-52"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="135" X="370"/>
+                            <Point X="370" Y="135"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -936,19 +936,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-33" X="-103"/>
+                                <Point X="-103" Y="-33"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="FB_mOff_sOn" Source="FB_mOn_sOn">
+                    <Edge Source="FB_mOn_sOn" Target="FB_mOff_sOn">
                         <LabelBlock>
                             <SimpleIdentifier Name="FB_S"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="3" X="-16"/>
+                                <Point X="-16" Y="3"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="207" X="553"/>
+                            <Point X="553" Y="207"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
@@ -958,19 +958,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="14" X="-29"/>
+                                <Point X="-29" Y="14"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="FB_mOn_sOn" Source="FB_mOff_sOn">
+                    <Edge Source="FB_mOff_sOn" Target="FB_mOn_sOn">
                         <LabelBlock>
                             <SimpleIdentifier Name="FB_F"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-37" X="-13"/>
+                                <Point X="-13" Y="-37"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="134" X="549"/>
+                            <Point X="549" Y="134"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
@@ -980,7 +980,7 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-22" X="-32"/>
+                                <Point X="-32" Y="-22"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -1037,23 +1037,23 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="176" X="160"/>
+                            <Point X="160" Y="176"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-8" X="-66"/>
+                            <Point X="-66" Y="-8"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="C_FB_Ta" Source="C_FB_Ta">
+                    <Edge Source="C_FB_Ta" Target="C_FB_Ta">
                         <LabelBlock>
                             <SimpleIdentifier Name="FB_S1Off"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-28" X="153"/>
+                                <Point X="153" Y="-28"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="115" X="206"/>
+                            <Point X="206" Y="115"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -1091,19 +1091,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-13" X="14"/>
+                                <Point X="14" Y="-13"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="C_FB_Ta" Source="C_FB_Ta">
+                    <Edge Source="C_FB_Ta" Target="C_FB_Ta">
                         <LabelBlock>
                             <SimpleIdentifier Name="FB_S1Off"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-45" X="187"/>
+                                <Point X="187" Y="-45"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="250" X="164"/>
+                            <Point X="164" Y="250"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -1137,7 +1137,7 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-27" X="44"/>
+                                <Point X="44" Y="-27"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -1152,27 +1152,27 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="240" X="368"/>
+                            <Point X="368" Y="240"/>
                         </PointGeometry>
                         <InitialArrowGeometry>
-                            <Point Y="-5" X="-5"/>
+                            <Point X="-5" Y="-5"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-15" X="-72"/>
+                            <Point X="-72" Y="-15"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="FB_Sp_I" Source="FB_Sp_I">
+                    <Edge Source="FB_Sp_I" Target="FB_Sp_I">
                         <LabelBlock>
                             <SimpleIdentifier Name="Cr_mOff"/>
                             <SimpleIdentifier Name="blank_add"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-40" X="15"/>
+                                <Point X="15" Y="-40"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="178" X="410"/>
+                            <Point X="410" Y="178"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -1194,19 +1194,19 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-8" X="13"/>
+                                <Point X="13" Y="-8"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="FB_Sp_I" Source="FB_Sp_I">
+                    <Edge Source="FB_Sp_I" Target="FB_Sp_I">
                         <LabelBlock>
                             <SimpleIdentifier Name="FB_S1Off"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="3" X="-26"/>
+                                <Point X="-26" Y="3"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="313" X="370"/>
+                            <Point X="370" Y="313"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -1240,7 +1240,7 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="18" X="-162"/>
+                                <Point X="-162" Y="18"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -1255,50 +1255,50 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="208" X="448"/>
+                            <Point X="448" Y="208"/>
                         </PointGeometry>
                         <InitialArrowGeometry>
-                            <Point Y="-5" X="-5"/>
+                            <Point X="-5" Y="-5"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-5" X="-57"/>
+                            <Point X="-57" Y="-5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="Ta_H_tr">
                         <PointGeometry>
-                            <Point Y="208" X="543"/>
+                            <Point X="543" Y="208"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-10" X="8"/>
+                            <Point X="8" Y="-10"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="Ta_H_r50">
                         <PointGeometry>
-                            <Point Y="303" X="543"/>
+                            <Point X="543" Y="303"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-1" X="10"/>
+                            <Point X="10" Y="-1"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="Ta_H_tl">
                         <PointGeometry>
-                            <Point Y="303" X="449"/>
+                            <Point X="449" Y="303"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-1" X="-57"/>
+                            <Point X="-57" Y="-1"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="Ta_H_tr" Source="Ta_H_I">
+                    <Edge Source="Ta_H_I" Target="Ta_H_tr">
                         <LabelBlock>
                             <SimpleIdentifier Name="Ta_R"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-39" X="-18"/>
+                                <Point X="-18" Y="-39"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="198" X="495"/>
+                            <Point X="495" Y="198"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
@@ -1308,19 +1308,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-23" X="-39"/>
+                                <Point X="-39" Y="-23"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="Ta_H_r50" Source="Ta_H_tr">
+                    <Edge Source="Ta_H_tr" Target="Ta_H_r50">
                         <LabelBlock>
                             <SimpleIdentifier Name="Ta_50"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-34" X="20"/>
+                                <Point X="20" Y="-34"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="255" X="553"/>
+                            <Point X="553" Y="255"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -1340,19 +1340,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-18" X="8"/>
+                                <Point X="8" Y="-18"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="Ta_H_tl" Source="Ta_H_r50">
+                    <Edge Source="Ta_H_r50" Target="Ta_H_tl">
                         <LabelBlock>
                             <SimpleIdentifier Name="Ta_L"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="3" X="-22"/>
+                                <Point X="-22" Y="3"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="313" X="496"/>
+                            <Point X="496" Y="313"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
@@ -1362,19 +1362,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="17" X="-39"/>
+                                <Point X="-39" Y="17"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="Ta_H_I" Source="Ta_H_tl">
+                    <Edge Source="Ta_H_tl" Target="Ta_H_I">
                         <LabelBlock>
                             <SimpleIdentifier Name="Ta_0"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-37" X="-61"/>
+                                <Point X="-61" Y="-37"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="256" X="438"/>
+                            <Point X="438" Y="256"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -1394,7 +1394,7 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-20" X="-89"/>
+                                <Point X="-89" Y="-20"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -1409,50 +1409,50 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="208" X="432"/>
+                            <Point X="432" Y="208"/>
                         </PointGeometry>
                         <InitialArrowGeometry>
-                            <Point Y="-5" X="-5"/>
+                            <Point X="-5" Y="-5"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="2" X="-54"/>
+                            <Point X="-54" Y="2"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="Ta_V_md">
                         <PointGeometry>
-                            <Point Y="304" X="433"/>
+                            <Point X="433" Y="304"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="-46"/>
+                            <Point X="-46" Y="10"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="Ta_V_rt">
                         <PointGeometry>
-                            <Point Y="303" X="528"/>
+                            <Point X="528" Y="303"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-1" X="11"/>
+                            <Point X="11" Y="-1"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="Ta_V_mu">
                         <PointGeometry>
-                            <Point Y="208" X="528"/>
+                            <Point X="528" Y="208"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="0" X="11"/>
+                            <Point X="11" Y="0"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="Ta_V_rt" Source="Ta_V_mu">
+                    <Edge Source="Ta_V_mu" Target="Ta_V_rt">
                         <LabelBlock>
                             <SimpleIdentifier Name="Ta_T"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-29" X="23"/>
+                                <Point X="23" Y="-29"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="256" X="537"/>
+                            <Point X="537" Y="256"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -1472,19 +1472,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-16" X="8"/>
+                                <Point X="8" Y="-16"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="Ta_V_I" Source="Ta_V_md">
+                    <Edge Source="Ta_V_md" Target="Ta_V_I">
                         <LabelBlock>
                             <SimpleIdentifier Name="Ta_B"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-32" X="-71"/>
+                                <Point X="-71" Y="-32"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="256" X="423"/>
+                            <Point X="423" Y="256"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -1504,19 +1504,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-18" X="-87"/>
+                                <Point X="-87" Y="-18"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="Ta_V_mu" Source="Ta_V_I">
+                    <Edge Source="Ta_V_I" Target="Ta_V_mu">
                         <LabelBlock>
                             <SimpleIdentifier Name="Ta_U"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-43" X="-24"/>
+                                <Point X="-24" Y="-43"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="199" X="480"/>
+                            <Point X="480" Y="199"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
@@ -1526,19 +1526,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-24" X="-44"/>
+                                <Point X="-44" Y="-24"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="Ta_V_md" Source="Ta_V_rt">
+                    <Edge Source="Ta_V_rt" Target="Ta_V_md">
                         <LabelBlock>
                             <SimpleIdentifier Name="Ta_D"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="5" X="-22"/>
+                                <Point X="-22" Y="5"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="313" X="481"/>
+                            <Point X="481" Y="313"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
@@ -1548,7 +1548,7 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="21" X="-38"/>
+                                <Point X="-38" Y="21"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -1633,23 +1633,23 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="272" X="432"/>
+                            <Point X="432" Y="272"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-8" X="14"/>
+                            <Point X="14" Y="-8"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="C_Ta_Robot" Source="C_Ta_Robot">
+                    <Edge Source="C_Ta_Robot" Target="C_Ta_Robot">
                         <LabelBlock>
                             <SimpleIdentifier Name="A1_mOn"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-40" X="-39"/>
+                                <Point X="-39" Y="-40"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="200" X="434"/>
+                            <Point X="434" Y="200"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -1693,19 +1693,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-21" X="-239"/>
+                                <Point X="-239" Y="-21"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="C_Ta_Robot" Source="C_Ta_Robot">
+                    <Edge Source="C_Ta_Robot" Target="C_Ta_Robot">
                         <LabelBlock>
                             <SimpleIdentifier Name="A1_mOn"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="5" X="-28"/>
+                                <Point X="-28" Y="5"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="344" X="436"/>
+                            <Point X="436" Y="344"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -1747,7 +1747,7 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="18" X="-246"/>
+                                <Point X="-246" Y="18"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -1762,24 +1762,24 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="208" X="496"/>
+                            <Point X="496" Y="208"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-19" X="16"/>
+                            <Point X="16" Y="-19"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="Ta_Sp_I" Source="Ta_Sp_I">
+                    <Edge Source="Ta_Sp_I" Target="Ta_Sp_I">
                         <LabelBlock>
                             <SimpleIdentifier Name="Ta_R"/>
                             <SimpleIdentifier Name="Ta_U"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-37" X="-17"/>
+                                <Point X="-17" Y="-37"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="132" X="493"/>
+                            <Point X="493" Y="132"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -1789,20 +1789,20 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-53" X="-33"/>
+                                <Point X="-33" Y="-53"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="Ta_Sp_I" Source="Ta_Sp_I">
+                    <Edge Source="Ta_Sp_I" Target="Ta_Sp_I">
                         <LabelBlock>
                             <SimpleIdentifier Name="Ta_D"/>
                             <SimpleIdentifier Name="Ta_L"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="20" X="-19"/>
+                                <Point X="-19" Y="20"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="289" X="495"/>
+                            <Point X="495" Y="289"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -1812,19 +1812,19 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="2" X="-35"/>
+                                <Point X="-35" Y="2"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="Ta_Sp_I" Source="Ta_Sp_I">
+                    <Edge Source="Ta_Sp_I" Target="Ta_Sp_I">
                         <LabelBlock>
                             <SimpleIdentifier Name="A1_mOn"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-7" X="-67"/>
+                                <Point X="-67" Y="-7"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="206" X="417"/>
+                            <Point X="417" Y="206"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -1858,7 +1858,7 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="30" X="-304"/>
+                                <Point X="-304" Y="30"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -1873,62 +1873,62 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="176" X="160"/>
+                            <Point X="160" Y="176"/>
                         </PointGeometry>
                         <InitialArrowGeometry>
-                            <Point Y="-5" X="-5"/>
+                            <Point X="-5" Y="-5"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="15" X="6"/>
+                            <Point X="6" Y="15"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="RB_turning_left">
                         <PointGeometry>
-                            <Point Y="176" X="752"/>
+                            <Point X="752" Y="176"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-4" X="9"/>
+                            <Point X="9" Y="-4"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="RB_arm2_press">
                         <PointGeometry>
-                            <Point Y="384" X="752"/>
+                            <Point X="752" Y="384"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="2" X="11"/>
+                            <Point X="11" Y="2"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="RB_turing_left_con">
                         <PointGeometry>
-                            <Point Y="384" X="304"/>
+                            <Point X="304" Y="384"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="7" X="5"/>
+                            <Point X="5" Y="7"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="RB_a1Pr_a2DB">
                         <PointGeometry>
-                            <Point Y="384" X="160"/>
+                            <Point X="160" Y="384"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="5" X="-59"/>
+                            <Point X="-59" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="RB_turing_right">
                         <PointGeometry>
-                            <Point Y="304" X="160"/>
+                            <Point X="160" Y="304"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-3" X="11"/>
+                            <Point X="11" Y="-3"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="RB_turning_left" Source="RB_I">
+                    <Edge Source="RB_I" Target="RB_turning_left">
                         <LabelBlock>
                             <SimpleIdentifier Name="Ro_L"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-58" X="-57"/>
+                                <Point X="-57" Y="-58"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -1963,15 +1963,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-38" X="-284"/>
+                                <Point X="-284" Y="-38"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="RB_arm2_press" Source="RB_turning_left">
+                    <Edge Source="RB_turning_left" Target="RB_arm2_press">
                         <LabelBlock>
                             <SimpleIdentifier Name="Ro35"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-75" X="20"/>
+                                <Point X="20" Y="-75"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -1992,15 +1992,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-58" X="8"/>
+                                <Point X="8" Y="-58"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="RB_turing_left_con" Source="RB_arm2_press">
+                    <Edge Source="RB_arm2_press" Target="RB_turing_left_con">
                         <LabelBlock>
                             <SimpleIdentifier Name="Ro_L"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="8" X="62"/>
+                                <Point X="62" Y="8"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -2035,15 +2035,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="30" X="-226"/>
+                                <Point X="-226" Y="30"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="RB_a1Pr_a2DB" Source="RB_turing_left_con">
+                    <Edge Source="RB_turing_left_con" Target="RB_a1Pr_a2DB">
                         <LabelBlock>
                             <SimpleIdentifier Name="Ro90"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="3" X="-25"/>
+                                <Point X="-25" Y="3"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -2064,15 +2064,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="21" X="-61"/>
+                                <Point X="-61" Y="21"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="RB_turing_right" Source="RB_a1Pr_a2DB">
+                    <Edge Source="RB_a1Pr_a2DB" Target="RB_turing_right">
                         <LabelBlock>
                             <SimpleIdentifier Name="Ro_R"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-21" X="4"/>
+                                <Point X="4" Y="-21"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -2107,15 +2107,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-4" X="2"/>
+                                <Point X="2" Y="-4"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="RB_I" Source="RB_turing_right">
+                    <Edge Source="RB_turing_right" Target="RB_I">
                         <LabelBlock>
                             <SimpleIdentifier Name="Ro50"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-21" X="36"/>
+                                <Point X="36" Y="-21"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -2136,7 +2136,7 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-6" X="7"/>
+                                <Point X="7" Y="-6"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -2179,94 +2179,94 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="128" X="224"/>
+                            <Point X="224" Y="128"/>
                         </PointGeometry>
                         <InitialArrowGeometry>
-                            <Point Y="-5" X="-5"/>
+                            <Point X="-5" Y="-5"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-4" X="-61"/>
+                            <Point X="-61" Y="-4"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="A1_extending_for_load">
                         <PointGeometry>
-                            <Point Y="128" X="368"/>
+                            <Point X="368" Y="128"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="8" X="-67"/>
+                            <Point X="-67" Y="8"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="A1_extended_for_load">
                         <PointGeometry>
-                            <Point Y="128" X="512"/>
+                            <Point X="512" Y="128"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="8" X="-52"/>
+                            <Point X="-52" Y="8"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="A1_loaded">
                         <PointGeometry>
-                            <Point Y="128" X="720"/>
+                            <Point X="720" Y="128"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="-25"/>
+                            <Point X="-25" Y="10"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="A1_retracting_after_load">
                         <PointGeometry>
-                            <Point Y="128" X="832"/>
+                            <Point X="832" Y="128"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-5" X="9"/>
+                            <Point X="9" Y="-5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="A1_retracted">
                         <PointGeometry>
-                            <Point Y="240" X="832"/>
+                            <Point X="832" Y="240"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-5" X="9"/>
+                            <Point X="9" Y="-5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="A1_extending_for_unload">
                         <PointGeometry>
-                            <Point Y="240" X="720"/>
+                            <Point X="720" Y="240"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-29" X="-49"/>
+                            <Point X="-49" Y="-29"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="A1_extended_for_unload">
                         <PointGeometry>
-                            <Point Y="240" X="592"/>
+                            <Point X="592" Y="240"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-28" X="-80"/>
+                            <Point X="-80" Y="-28"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="A1_unloaded">
                         <PointGeometry>
-                            <Point Y="240" X="368"/>
+                            <Point X="368" Y="240"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-27" X="-29"/>
+                            <Point X="-29" Y="-27"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="A1_retracting_after_unload">
                         <PointGeometry>
-                            <Point Y="240" X="224"/>
+                            <Point X="224" Y="240"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-7" X="-159"/>
+                            <Point X="-159" Y="-7"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="A1_extending_for_load" Source="A1_initial">
+                    <Edge Source="A1_initial" Target="A1_extending_for_load">
                         <LabelBlock>
                             <SimpleIdentifier Name="A1_F"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-37" X="-23"/>
+                                <Point X="-23" Y="-37"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -2277,15 +2277,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-19" X="-54"/>
+                                <Point X="-54" Y="-19"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="A1_extended_for_load" Source="A1_extending_for_load">
+                    <Edge Source="A1_extending_for_load" Target="A1_extended_for_load">
                         <LabelBlock>
                             <SimpleIdentifier Name="A1_sEx"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-70" X="-29"/>
+                                <Point X="-29" Y="-70"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -2306,15 +2306,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-54" X="-56"/>
+                                <Point X="-56" Y="-54"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="A1_loaded" Source="A1_extended_for_load">
+                    <Edge Source="A1_extended_for_load" Target="A1_loaded">
                         <LabelBlock>
                             <SimpleIdentifier Name="A1_mOn"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-62" X="-39"/>
+                                <Point X="-39" Y="-62"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -2337,15 +2337,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-41" X="-104"/>
+                                <Point X="-104" Y="-41"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="A1_retracting_after_load" Source="A1_loaded">
+                    <Edge Source="A1_loaded" Target="A1_retracting_after_load">
                         <LabelBlock>
                             <SimpleIdentifier Name="A1_B"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-40" X="-22"/>
+                                <Point X="-22" Y="-40"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -2356,15 +2356,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-24" X="-53"/>
+                                <Point X="-53" Y="-24"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="A1_retracted" Source="A1_retracting_after_load">
+                    <Edge Source="A1_retracting_after_load" Target="A1_retracted">
                         <LabelBlock>
                             <SimpleIdentifier Name="A1_sRe"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-31" X="23"/>
+                                <Point X="23" Y="-31"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -2385,15 +2385,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-16" X="2"/>
+                                <Point X="2" Y="-16"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="A1_extending_for_unload" Source="A1_retracted">
+                    <Edge Source="A1_retracted" Target="A1_extending_for_unload">
                         <LabelBlock>
                             <SimpleIdentifier Name="A1_F"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="6" X="-14"/>
+                                <Point X="-14" Y="6"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -2404,15 +2404,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="20" X="-45"/>
+                                <Point X="-45" Y="20"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="A1_extended_for_unload" Source="A1_extending_for_unload">
+                    <Edge Source="A1_extending_for_unload" Target="A1_extended_for_unload">
                         <LabelBlock>
                             <SimpleIdentifier Name="A1_sEx"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="6" X="-19"/>
+                                <Point X="-19" Y="6"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -2433,15 +2433,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="20" X="-49"/>
+                                <Point X="-49" Y="20"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="A1_unloaded" Source="A1_extended_for_unload">
+                    <Edge Source="A1_extended_for_unload" Target="A1_unloaded">
                         <LabelBlock>
                             <SimpleIdentifier Name="A1_mOff"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="5" X="-21"/>
+                                <Point X="-21" Y="5"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -2464,15 +2464,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="20" X="-96"/>
+                                <Point X="-96" Y="20"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="A1_retracting_after_unload" Source="A1_unloaded">
+                    <Edge Source="A1_unloaded" Target="A1_retracting_after_unload">
                         <LabelBlock>
                             <SimpleIdentifier Name="A1_B"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="3" X="-13"/>
+                                <Point X="-13" Y="3"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -2483,15 +2483,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="17" X="-46"/>
+                                <Point X="-46" Y="17"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="A1_initial" Source="A1_retracting_after_unload">
+                    <Edge Source="A1_retracting_after_unload" Target="A1_initial">
                         <LabelBlock>
                             <SimpleIdentifier Name="A1_sRe"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-23" X="-78"/>
+                                <Point X="-78" Y="-23"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -2512,7 +2512,7 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-9" X="-111"/>
+                                <Point X="-111" Y="-9"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -2583,94 +2583,94 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="128" X="176"/>
+                            <Point X="176" Y="128"/>
                         </PointGeometry>
                         <InitialArrowGeometry>
-                            <Point Y="-5" X="-5"/>
+                            <Point X="-5" Y="-5"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-5" X="-64"/>
+                            <Point X="-64" Y="-5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="A2_extending_for_loading">
                         <PointGeometry>
-                            <Point Y="128" X="304"/>
+                            <Point X="304" Y="128"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="9" X="-69"/>
+                            <Point X="-69" Y="9"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="A2_extended_for_loading">
                         <PointGeometry>
-                            <Point Y="128" X="432"/>
+                            <Point X="432" Y="128"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="9" X="-40"/>
+                            <Point X="-40" Y="9"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="A2_loaded">
                         <PointGeometry>
-                            <Point Y="128" X="640"/>
+                            <Point X="640" Y="128"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="11" X="-17"/>
+                            <Point X="-17" Y="11"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="A2_retracting">
                         <PointGeometry>
-                            <Point Y="128" X="752"/>
+                            <Point X="752" Y="128"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-5" X="14"/>
+                            <Point X="14" Y="-5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="A2_retratced">
                         <PointGeometry>
-                            <Point Y="256" X="752"/>
+                            <Point X="752" Y="256"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-8" X="12"/>
+                            <Point X="12" Y="-8"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="A2_extending_for_unload">
                         <PointGeometry>
-                            <Point Y="256" X="640"/>
+                            <Point X="640" Y="256"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-26" X="-47"/>
+                            <Point X="-47" Y="-26"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="A2_extended_for_unload">
                         <PointGeometry>
-                            <Point Y="256" X="528"/>
+                            <Point X="528" Y="256"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-26" X="-84"/>
+                            <Point X="-84" Y="-26"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="A2_unloaded">
                         <PointGeometry>
-                            <Point Y="256" X="320"/>
+                            <Point X="320" Y="256"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-26" X="-30"/>
+                            <Point X="-30" Y="-26"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="A2_retracting_after_unload">
                         <PointGeometry>
-                            <Point Y="256" X="176"/>
+                            <Point X="176" Y="256"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-9" X="-159"/>
+                            <Point X="-159" Y="-9"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="A2_extending_for_loading" Source="A2_initial">
+                    <Edge Source="A2_initial" Target="A2_extending_for_loading">
                         <LabelBlock>
                             <SimpleIdentifier Name="A2_F"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-34" X="-19"/>
+                                <Point X="-19" Y="-34"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -2681,15 +2681,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-20" X="-52"/>
+                                <Point X="-52" Y="-20"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="A2_extended_for_loading" Source="A2_extending_for_loading">
+                    <Edge Source="A2_extending_for_loading" Target="A2_extended_for_loading">
                         <LabelBlock>
                             <SimpleIdentifier Name="A2_sEx"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-65" X="-24"/>
+                                <Point X="-24" Y="-65"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -2710,15 +2710,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-53" X="-56"/>
+                                <Point X="-56" Y="-53"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="A2_loaded" Source="A2_extended_for_loading">
+                    <Edge Source="A2_extended_for_loading" Target="A2_loaded">
                         <LabelBlock>
                             <SimpleIdentifier Name="A2_mOn"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-53" X="-24"/>
+                                <Point X="-24" Y="-53"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -2741,15 +2741,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-40" X="-104"/>
+                                <Point X="-104" Y="-40"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="A2_retracting" Source="A2_loaded">
+                    <Edge Source="A2_loaded" Target="A2_retracting">
                         <LabelBlock>
                             <SimpleIdentifier Name="A2_B"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-39" X="-20"/>
+                                <Point X="-20" Y="-39"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -2760,15 +2760,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-24" X="-49"/>
+                                <Point X="-49" Y="-24"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="A2_retratced" Source="A2_retracting">
+                    <Edge Source="A2_retracting" Target="A2_retratced">
                         <LabelBlock>
                             <SimpleIdentifier Name="A2_sRe"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-24" X="9"/>
+                                <Point X="9" Y="-24"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -2789,15 +2789,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-10" X="4"/>
+                                <Point X="4" Y="-10"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="A2_extending_for_unload" Source="A2_retratced">
+                    <Edge Source="A2_retratced" Target="A2_extending_for_unload">
                         <LabelBlock>
                             <SimpleIdentifier Name="A2_F"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="6" X="-8"/>
+                                <Point X="-8" Y="6"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -2808,15 +2808,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="18" X="-37"/>
+                                <Point X="-37" Y="18"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="A2_extended_for_unload" Source="A2_extending_for_unload">
+                    <Edge Source="A2_extending_for_unload" Target="A2_extended_for_unload">
                         <LabelBlock>
                             <SimpleIdentifier Name="A2_sEx"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="5" X="-11"/>
+                                <Point X="-11" Y="5"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -2837,15 +2837,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="20" X="-38"/>
+                                <Point X="-38" Y="20"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="A2_unloaded" Source="A2_extended_for_unload">
+                    <Edge Source="A2_extended_for_unload" Target="A2_unloaded">
                         <LabelBlock>
                             <SimpleIdentifier Name="A2_mOff"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="8" X="-23"/>
+                                <Point X="-23" Y="8"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -2868,15 +2868,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="22" X="-99"/>
+                                <Point X="-99" Y="22"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="A2_retracting_after_unload" Source="A2_unloaded">
+                    <Edge Source="A2_unloaded" Target="A2_retracting_after_unload">
                         <LabelBlock>
                             <SimpleIdentifier Name="A2_B"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="9" X="-17"/>
+                                <Point X="-17" Y="9"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -2887,15 +2887,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="22" X="-47"/>
+                                <Point X="-47" Y="22"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="A2_initial" Source="A2_retracting_after_unload">
+                    <Edge Source="A2_retracting_after_unload" Target="A2_initial">
                         <LabelBlock>
                             <SimpleIdentifier Name="A2_sRe"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-27" X="-59"/>
+                                <Point X="-59" Y="-27"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -2916,7 +2916,7 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-12" X="-113"/>
+                                <Point X="-113" Y="-12"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -2987,23 +2987,23 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="128" X="160"/>
+                            <Point X="160" Y="128"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-15" X="-70"/>
+                            <Point X="-70" Y="-15"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="C_A1_Pr" Source="C_A1_Pr">
+                    <Edge Source="C_A1_Pr" Target="C_A1_Pr">
                         <LabelBlock>
                             <SimpleIdentifier Name="A1_mOff"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="13" X="-30"/>
+                                <Point X="-30" Y="13"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="188" X="212"/>
+                            <Point X="212" Y="188"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -3033,19 +3033,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="26" X="-29"/>
+                                <Point X="-29" Y="26"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="C_A1_Pr" Source="C_A1_Pr">
+                    <Edge Source="C_A1_Pr" Target="C_A1_Pr">
                         <LabelBlock>
                             <SimpleIdentifier Name="A1_mOff"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-22" X="13"/>
+                                <Point X="13" Y="-22"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="68" X="210"/>
+                            <Point X="210" Y="68"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -3077,19 +3077,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-7" X="13"/>
+                                <Point X="13" Y="-7"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="C_A1_Pr" Source="C_A1_Pr">
+                    <Edge Source="C_A1_Pr" Target="C_A1_Pr">
                         <LabelBlock>
                             <SimpleIdentifier Name="A1_mOff"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="12" X="-17"/>
+                                <Point X="-17" Y="12"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="190" X="110"/>
+                            <Point X="110" Y="190"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -3099,7 +3099,7 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="26" X="-43"/>
+                                <Point X="-43" Y="26"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -3114,23 +3114,23 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="256" X="256"/>
+                            <Point X="256" Y="256"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-3" X="-63"/>
+                            <Point X="-63" Y="-3"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="C_A2_Pr" Source="C_A2_Pr">
+                    <Edge Source="C_A2_Pr" Target="C_A2_Pr">
                         <LabelBlock>
                             <SimpleIdentifier Name="A2_mOn"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-15" X="16"/>
+                                <Point X="16" Y="-15"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="202" X="306"/>
+                            <Point X="306" Y="202"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -3172,19 +3172,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="3" X="17"/>
+                                <Point X="17" Y="3"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="C_A2_Pr" Source="C_A2_Pr">
+                    <Edge Source="C_A2_Pr" Target="C_A2_Pr">
                         <LabelBlock>
                             <SimpleIdentifier Name="A2_mOn"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="2" X="-26"/>
+                                <Point X="-26" Y="2"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="327" X="257"/>
+                            <Point X="257" Y="327"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -3214,7 +3214,7 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="13" X="-158"/>
+                                <Point X="-158" Y="13"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -3229,37 +3229,37 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="176" X="240"/>
+                            <Point X="240" Y="176"/>
                         </PointGeometry>
                         <InitialArrowGeometry>
-                            <Point Y="-5" X="-5"/>
+                            <Point X="-5" Y="-5"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-7" X="-82"/>
+                            <Point X="-82" Y="-7"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="Turn_left_from_the_press">
                         <PointGeometry>
-                            <Point Y="176" X="400"/>
+                            <Point X="400" Y="176"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-2" X="9"/>
+                            <Point X="9" Y="-2"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="Turn_left_from_the_press" Source="Rotation_Sp">
+                    <Edge Source="Rotation_Sp" Target="Turn_left_from_the_press">
                         <LabelBlock>
                             <SimpleIdentifier Name="Ro_L"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-34" X="-17"/>
+                                <Point X="-17" Y="-34"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="146" X="318"/>
+                            <Point X="318" Y="146"/>
                         </SplineGeometry>
                         <EndPointGeometry>
-                            <Point Y="176" X="400"/>
+                            <Point X="400" Y="176"/>
                         </EndPointGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -3269,19 +3269,19 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-20" X="-50"/>
+                                <Point X="-50" Y="-20"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="Rotation_Sp" Source="Rotation_Sp">
+                    <Edge Source="Rotation_Sp" Target="Rotation_Sp">
                         <LabelBlock>
                             <SimpleIdentifier Name="Ro_R"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="4" X="-18"/>
+                                <Point X="-18" Y="4"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="248" X="243"/>
+                            <Point X="243" Y="248"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -3297,19 +3297,19 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="18" X="-114"/>
+                                <Point X="-114" Y="18"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="Rotation_Sp" Source="Turn_left_from_the_press">
+                    <Edge Source="Turn_left_from_the_press" Target="Rotation_Sp">
                         <LabelBlock>
                             <SimpleIdentifier Name="Ro_L"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="3" X="-14"/>
+                                <Point X="-14" Y="3"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="205" X="324"/>
+                            <Point X="324" Y="205"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -3337,7 +3337,7 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="16" X="-49"/>
+                                <Point X="-49" Y="16"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -3352,26 +3352,26 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="304" X="272"/>
+                            <Point X="272" Y="304"/>
                         </PointGeometry>
                         <InitialArrowGeometry>
-                            <Point Y="-5" X="-5"/>
+                            <Point X="-5" Y="-5"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-6" X="-67"/>
+                            <Point X="-67" Y="-6"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="Arms_Sp" Source="Arms_Sp">
+                    <Edge Source="Arms_Sp" Target="Arms_Sp">
                         <LabelBlock>
                             <SimpleIdentifier Name="A1_mOff"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-19" X="41"/>
+                                <Point X="41" Y="-19"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="224" X="274"/>
+                            <Point X="274" Y="224"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -3393,19 +3393,19 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-4" X="23"/>
+                                <Point X="23" Y="-4"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="Arms_Sp" Source="Arms_Sp">
+                    <Edge Source="Arms_Sp" Target="Arms_Sp">
                         <LabelBlock>
                             <SimpleIdentifier Name="A2_mOn"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-14" X="40"/>
+                                <Point X="40" Y="-14"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="380" X="275"/>
+                            <Point X="275" Y="380"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -3433,7 +3433,7 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="1" X="-87"/>
+                                <Point X="-87" Y="1"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -3448,78 +3448,78 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="128" X="304"/>
+                            <Point X="304" Y="128"/>
                         </PointGeometry>
                         <InitialArrowGeometry>
-                            <Point Y="-5" X="-5"/>
+                            <Point X="-5" Y="-5"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-2" X="-38"/>
+                            <Point X="-38" Y="-2"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="Pr_2_M">
                         <PointGeometry>
-                            <Point Y="128" X="496"/>
+                            <Point X="496" Y="128"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-2" X="10"/>
+                            <Point X="10" Y="-2"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="Pr_in_M">
                         <PointGeometry>
-                            <Point Y="256" X="496"/>
+                            <Point X="496" Y="256"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="12" X="-25"/>
+                            <Point X="-25" Y="12"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="Pr_in_T">
                         <PointGeometry>
-                            <Point Y="512" X="688"/>
+                            <Point X="688" Y="512"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="7" X="-8"/>
+                            <Point X="-8" Y="7"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="Pr_2_T">
                         <PointGeometry>
-                            <Point Y="320" X="688"/>
+                            <Point X="688" Y="320"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-7" X="11"/>
+                            <Point X="11" Y="-7"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="Pr_2_B">
                         <PointGeometry>
-                            <Point Y="384" X="496"/>
+                            <Point X="496" Y="384"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-26" X="-20"/>
+                            <Point X="-20" Y="-26"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="Pr_in_M_again">
                         <PointGeometry>
-                            <Point Y="512" X="496"/>
+                            <Point X="496" Y="512"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="6" X="-43"/>
+                            <Point X="-43" Y="6"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S0">
                         <PointGeometry>
-                            <Point Y="320" X="304"/>
+                            <Point X="304" Y="320"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-6" X="-34"/>
+                            <Point X="-34" Y="-6"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="Pr_2_M" Source="Pr_I">
+                    <Edge Source="Pr_I" Target="Pr_2_M">
                         <LabelBlock>
                             <SimpleIdentifier Name="Pr_U"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="3" X="-21"/>
+                                <Point X="-21" Y="3"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -3530,15 +3530,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="16" X="-35"/>
+                                <Point X="-35" Y="16"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="Pr_in_M" Source="Pr_2_M">
+                    <Edge Source="Pr_2_M" Target="Pr_in_M">
                         <LabelBlock>
                             <SimpleIdentifier Name="Pr_M"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-19" X="-63"/>
+                                <Point X="-63" Y="-19"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -3559,15 +3559,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-2" X="-85"/>
+                                <Point X="-85" Y="-2"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="Pr_2_T" Source="Pr_in_M">
+                    <Edge Source="Pr_in_M" Target="Pr_2_T">
                         <LabelBlock>
                             <SimpleIdentifier Name="Pr_U"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-36" X="17"/>
+                                <Point X="17" Y="-36"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -3578,15 +3578,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-19" X="2"/>
+                                <Point X="2" Y="-19"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="Pr_in_T" Source="Pr_2_T">
+                    <Edge Source="Pr_2_T" Target="Pr_in_T">
                         <LabelBlock>
                             <SimpleIdentifier Name="Pr_T"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-27" X="14"/>
+                                <Point X="14" Y="-27"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -3607,15 +3607,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-15" X="5"/>
+                                <Point X="5" Y="-15"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="Pr_in_M_again" Source="Pr_in_T">
+                    <Edge Source="Pr_in_T" Target="Pr_in_M_again">
                         <LabelBlock>
                             <SimpleIdentifier Name="Pr_D"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="1" X="-13"/>
+                                <Point X="-13" Y="1"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -3626,15 +3626,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="14" X="-31"/>
+                                <Point X="-31" Y="14"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="Pr_I" Source="S0">
+                    <Edge Source="S0" Target="Pr_I">
                         <LabelBlock>
                             <SimpleIdentifier Name="Pr_B"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-41" X="-53"/>
+                                <Point X="-53" Y="-41"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -3655,15 +3655,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-28" X="-85"/>
+                                <Point X="-85" Y="-28"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="Pr_2_B" Source="Pr_in_M_again">
+                    <Edge Source="Pr_in_M_again" Target="Pr_2_B">
                         <LabelBlock>
                             <SimpleIdentifier Name="Pr_M"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-19" X="27"/>
+                                <Point X="27" Y="-19"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -3684,15 +3684,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-6" X="4"/>
+                                <Point X="4" Y="-6"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="S0" Source="Pr_in_M">
+                    <Edge Source="Pr_in_M" Target="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="Pr_D"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-35" X="-40"/>
+                                <Point X="-40" Y="-35"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -3703,15 +3703,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-19" X="-63"/>
+                                <Point X="-63" Y="-19"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="S0" Source="Pr_2_B">
+                    <Edge Source="Pr_2_B" Target="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="Pr_D"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="6" X="-30"/>
+                                <Point X="-30" Y="6"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -3722,19 +3722,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="20" X="-45"/>
+                                <Point X="-45" Y="20"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="Pr_2_T" Source="Pr_2_B">
+                    <Edge Source="Pr_2_B" Target="Pr_2_T">
                         <LabelBlock>
                             <SimpleIdentifier Name="Pr_U"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="5" X="0"/>
+                                <Point X="0" Y="5"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="354" X="594"/>
+                            <Point X="594" Y="354"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
@@ -3744,7 +3744,7 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="17" X="-15"/>
+                                <Point X="-15" Y="17"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -3815,39 +3815,39 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="272" X="464"/>
+                            <Point X="464" Y="272"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="18" X="-37"/>
+                            <Point X="-37" Y="18"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="forged">
                         <PointGeometry>
-                            <Point Y="272" X="592"/>
+                            <Point X="592" Y="272"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-8" X="8"/>
+                            <Point X="8" Y="-8"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="empty">
                         <PointGeometry>
-                            <Point Y="272" X="336"/>
+                            <Point X="336" Y="272"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-9" X="-45"/>
+                            <Point X="-45" Y="-9"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="forged" Source="press_middle">
+                    <Edge Source="press_middle" Target="forged">
                         <LabelBlock>
                             <SimpleIdentifier Name="Pr_T"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-53" X="21"/>
+                                <Point X="21" Y="-53"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="244" X="525"/>
+                            <Point X="525" Y="244"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -3869,19 +3869,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-37" X="-30"/>
+                                <Point X="-30" Y="-37"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="empty" Source="press_middle">
+                    <Edge Source="press_middle" Target="empty">
                         <LabelBlock>
                             <SimpleIdentifier Name="Pr_T"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-52" X="-58"/>
+                                <Point X="-58" Y="-52"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="243" X="399"/>
+                            <Point X="399" Y="243"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -3891,41 +3891,41 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-33" X="-90"/>
+                                <Point X="-90" Y="-33"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="press_middle" Source="empty">
+                    <Edge Source="empty" Target="press_middle">
                         <LabelBlock>
                             <SimpleIdentifier Name="Pr_D"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="2" X="-21"/>
+                                <Point X="-21" Y="2"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="300" X="400"/>
+                            <Point X="400" Y="300"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="press_middle" Source="forged">
+                    <Edge Source="forged" Target="press_middle">
                         <LabelBlock>
                             <SimpleIdentifier Name="Pr_D"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="5" X="-11"/>
+                                <Point X="-11" Y="5"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="300" X="530"/>
+                            <Point X="530" Y="300"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="press_middle" Source="press_middle">
+                    <Edge Source="press_middle" Target="press_middle">
                         <LabelBlock>
                             <SimpleIdentifier Name="Pr_D"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-22" X="-17"/>
+                                <Point X="-17" Y="-22"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="200" X="463"/>
+                            <Point X="463" Y="200"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
@@ -3939,23 +3939,23 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="224" X="208"/>
+                            <Point X="208" Y="224"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-1" X="-80"/>
+                            <Point X="-80" Y="-1"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="C_Pr_DB" Source="C_Pr_DB">
+                    <Edge Source="C_Pr_DB" Target="C_Pr_DB">
                         <LabelBlock>
                             <SimpleIdentifier Name="A2_mOff"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-22" X="29"/>
+                                <Point X="29" Y="-22"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="166" X="244"/>
+                            <Point X="244" Y="166"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -3975,19 +3975,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-5" X="12"/>
+                                <Point X="12" Y="-5"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="C_Pr_DB" Source="C_Pr_DB">
+                    <Edge Source="C_Pr_DB" Target="C_Pr_DB">
                         <LabelBlock>
                             <SimpleIdentifier Name="A2_mOff"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="5" X="-13"/>
+                                <Point X="-13" Y="5"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="293" X="215"/>
+                            <Point X="215" Y="293"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -3997,7 +3997,7 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="18" X="-27"/>
+                                <Point X="-27" Y="18"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -4012,43 +4012,43 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="240" X="208"/>
+                            <Point X="208" Y="240"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-6" X="-104"/>
+                            <Point X="-104" Y="-6"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="press_at_middle_1">
                         <PointGeometry>
-                            <Point Y="176" X="336"/>
+                            <Point X="336" Y="176"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-28" X="-48"/>
+                            <Point X="-48" Y="-28"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="press_at_top">
                         <PointGeometry>
-                            <Point Y="240" X="464"/>
+                            <Point X="464" Y="240"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-2" X="12"/>
+                            <Point X="12" Y="-2"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="press_at_middle_2">
                         <PointGeometry>
-                            <Point Y="320" X="336"/>
+                            <Point X="336" Y="320"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="9" X="-49"/>
+                            <Point X="-49" Y="9"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="press_at_middle_1" Source="press_at_bottom">
+                    <Edge Source="press_at_bottom" Target="press_at_middle_1">
                         <LabelBlock>
                             <SimpleIdentifier Name="Pr_U"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-36" X="-59"/>
+                                <Point X="-59" Y="-36"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -4059,15 +4059,15 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-20" X="-83"/>
+                                <Point X="-83" Y="-20"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="press_at_top" Source="press_at_middle_1">
+                    <Edge Source="press_at_middle_1" Target="press_at_top">
                         <LabelBlock>
                             <SimpleIdentifier Name="Pr_U"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-35" X="46"/>
+                                <Point X="46" Y="-35"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -4084,29 +4084,29 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-19" X="-6"/>
+                                <Point X="-6" Y="-19"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="press_at_middle_2" Source="press_at_top">
+                    <Edge Source="press_at_top" Target="press_at_middle_2">
                         <LabelBlock>
                             <SimpleIdentifier Name="Pr_D"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="3" X="-2"/>
+                                <Point X="-2" Y="3"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="283" X="398"/>
+                            <Point X="398" Y="283"/>
                         </SplineGeometry>
                         <EndPointGeometry>
-                            <Point Y="320" X="336"/>
+                            <Point X="336" Y="320"/>
                         </EndPointGeometry>
                     </Edge>
-                    <Edge Target="press_at_bottom" Source="press_at_middle_2">
+                    <Edge Source="press_at_middle_2" Target="press_at_bottom">
                         <LabelBlock>
                             <SimpleIdentifier Name="Pr_D"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="2" X="-25"/>
+                                <Point X="-25" Y="2"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -4121,58 +4121,58 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="160" X="208"/>
+                            <Point X="208" Y="160"/>
                         </PointGeometry>
                         <InitialArrowGeometry>
-                            <Point Y="-5" X="-5"/>
+                            <Point X="-5" Y="-5"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-9" X="-43"/>
+                            <Point X="-43" Y="-9"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="DB_m_F">
                         <PointGeometry>
-                            <Point Y="160" X="400"/>
+                            <Point X="400" Y="160"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="6" X="-19"/>
+                            <Point X="-19" Y="6"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="DB_at_End">
                         <PointGeometry>
-                            <Point Y="160" X="560"/>
+                            <Point X="560" Y="160"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-11" X="6"/>
+                            <Point X="6" Y="-11"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="DB_tested">
                         <PointGeometry>
-                            <Point Y="304" X="560"/>
+                            <Point X="560" Y="304"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-15" X="-64"/>
+                            <Point X="-64" Y="-15"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="DB_stopped">
                         <PointGeometry>
-                            <Point Y="304" X="208"/>
+                            <Point X="208" Y="304"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-16" X="14"/>
+                            <Point X="14" Y="-16"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="DB_m_F" Source="DB_I">
+                    <Edge Source="DB_I" Target="DB_m_F">
                         <LabelBlock>
                             <SimpleIdentifier Name="DB_F"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="3" X="-17"/>
+                                <Point X="-17" Y="3"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="181" X="301"/>
+                            <Point X="301" Y="181"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
@@ -4182,19 +4182,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="16" X="-33"/>
+                                <Point X="-33" Y="16"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="DB_I" Source="DB_m_F">
+                    <Edge Source="DB_m_F" Target="DB_I">
                         <LabelBlock>
                             <SimpleIdentifier Name="DB_S"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-36" X="-23"/>
+                                <Point X="-23" Y="-36"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="129" X="305"/>
+                            <Point X="305" Y="129"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
@@ -4204,15 +4204,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-21" X="-42"/>
+                                <Point X="-42" Y="-21"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="DB_at_End" Source="DB_m_F">
+                    <Edge Source="DB_m_F" Target="DB_at_End">
                         <LabelBlock>
                             <SimpleIdentifier Name="DB_s2On"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-36" X="-28"/>
+                                <Point X="-28" Y="-36"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -4229,15 +4229,15 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-22" X="-76"/>
+                                <Point X="-76" Y="-22"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="DB_tested" Source="DB_at_End">
+                    <Edge Source="DB_at_End" Target="DB_tested">
                         <LabelBlock>
                             <SimpleIdentifier Name="DB_s2Off"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-26" X="10"/>
+                                <Point X="10" Y="-26"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -4260,15 +4260,15 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-12" X="7"/>
+                                <Point X="7" Y="-12"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="DB_stopped" Source="DB_tested">
+                    <Edge Source="DB_tested" Target="DB_stopped">
                         <LabelBlock>
                             <SimpleIdentifier Name="DB_S"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="4" X="-18"/>
+                                <Point X="-18" Y="4"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <GuardActionBlock>
@@ -4279,19 +4279,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="18" X="-38"/>
+                                <Point X="-38" Y="18"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="DB_I" Source="DB_stopped">
+                    <Edge Source="DB_stopped" Target="DB_I">
                         <LabelBlock>
                             <SimpleIdentifier Name="DB_no"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-12" X="15"/>
+                                <Point X="15" Y="-12"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="233" X="239"/>
+                            <Point X="239" Y="233"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -4307,19 +4307,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="4" X="6"/>
+                                <Point X="6" Y="4"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="DB_I" Source="DB_stopped">
+                    <Edge Source="DB_stopped" Target="DB_I">
                         <LabelBlock>
                             <SimpleIdentifier Name="DB_yes"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-6" X="-80"/>
+                                <Point X="-80" Y="-6"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="227" X="172"/>
+                            <Point X="172" Y="227"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -4335,7 +4335,7 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="11" X="-97"/>
+                                <Point X="-97" Y="11"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -4406,23 +4406,23 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="224" X="288"/>
+                            <Point X="288" Y="224"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-5" X="-66"/>
+                            <Point X="-66" Y="-5"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="C_DB_Cr" Source="C_DB_Cr">
+                    <Edge Source="C_DB_Cr" Target="C_DB_Cr">
                         <LabelBlock>
                             <SimpleIdentifier Name="Cr_mOn"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-15" X="76"/>
+                                <Point X="76" Y="-15"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="162" X="331"/>
+                            <Point X="331" Y="162"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -4456,19 +4456,19 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="2" X="28"/>
+                                <Point X="28" Y="2"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="C_DB_Cr" Source="C_DB_Cr">
+                    <Edge Source="C_DB_Cr" Target="C_DB_Cr">
                         <LabelBlock>
                             <SimpleIdentifier Name="Cr_mOn"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="2" X="-26"/>
+                                <Point X="-26" Y="2"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="299" X="288"/>
+                            <Point X="288" Y="299"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -4490,7 +4490,7 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="17" X="-111"/>
+                                <Point X="-111" Y="17"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -4505,26 +4505,26 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="304" X="336"/>
+                            <Point X="336" Y="304"/>
                         </PointGeometry>
                         <InitialArrowGeometry>
-                            <Point Y="-5" X="-5"/>
+                            <Point X="-5" Y="-5"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-17" X="14"/>
+                            <Point X="14" Y="-17"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="DB_Sp_I" Source="DB_Sp_I">
+                    <Edge Source="DB_Sp_I" Target="DB_Sp_I">
                         <LabelBlock>
                             <SimpleIdentifier Name="A2_mOff"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-38" X="-33"/>
+                                <Point X="-33" Y="-38"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="223" X="337"/>
+                            <Point X="337" Y="223"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -4546,19 +4546,19 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-22" X="-131"/>
+                                <Point X="-131" Y="-22"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="DB_Sp_I" Source="DB_Sp_I">
+                    <Edge Source="DB_Sp_I" Target="DB_Sp_I">
                         <LabelBlock>
                             <SimpleIdentifier Name="blank_rm"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="1" X="32"/>
+                                <Point X="32" Y="1"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="356" X="404"/>
+                            <Point X="404" Y="356"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -4574,19 +4574,19 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="16" X="-28"/>
+                                <Point X="-28" Y="16"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="DB_Sp_I" Source="DB_Sp_I">
+                    <Edge Source="DB_Sp_I" Target="DB_Sp_I">
                         <LabelBlock>
                             <SimpleIdentifier Name="Cr_mOn"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="0" X="-71"/>
+                                <Point X="-71" Y="0"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="357" X="269"/>
+                            <Point X="269" Y="357"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -4602,7 +4602,7 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="15" X="-135"/>
+                                <Point X="-135" Y="15"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -4617,23 +4617,23 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="80" X="80"/>
+                            <Point X="80" Y="80"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="7" X="-40"/>
+                            <Point X="-40" Y="7"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="output" Source="output">
+                    <Edge Source="output" Target="output">
                         <LabelBlock>
                             <SimpleIdentifier Name="blank_rm"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-20" X="14"/>
+                                <Point X="14" Y="-20"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="81" X="152"/>
+                            <Point X="152" Y="81"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
@@ -4647,7 +4647,7 @@
                                 </BinaryExpression>
                             </Actions>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-4" X="6"/>
+                                <Point X="6" Y="-4"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
@@ -4659,13 +4659,13 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="before_a1_load">
                         <PointGeometry>
-                            <Point Y="288" X="304"/>
+                            <Point X="304" Y="288"/>
                         </PointGeometry>
                         <InitialArrowGeometry>
-                            <Point Y="-5" X="-5"/>
+                            <Point X="-5" Y="-5"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-2" X="-101"/>
+                            <Point X="-101" Y="-2"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="after_a1_load">
@@ -4673,34 +4673,34 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="288" X="464"/>
+                            <Point X="464" Y="288"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-4" X="6"/>
+                            <Point X="6" Y="-4"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="after_a1_load" Source="before_a1_load">
+                    <Edge Source="before_a1_load" Target="after_a1_load">
                         <LabelBlock>
                             <SimpleIdentifier Name="A1_mOn"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-18" X="-27"/>
+                                <Point X="-27" Y="-18"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="257" X="384"/>
+                            <Point X="384" Y="257"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="before_a1_load" Source="after_a1_load">
+                    <Edge Source="after_a1_load" Target="before_a1_load">
                         <LabelBlock>
                             <SimpleIdentifier Name="Ta_U"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="2" X="-14"/>
+                                <Point X="-14" Y="2"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="317" X="386"/>
+                            <Point X="386" Y="317"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -4728,19 +4728,19 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="18" X="-162"/>
+                                <Point X="-162" Y="18"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="before_a1_load" Source="before_a1_load">
+                    <Edge Source="before_a1_load" Target="before_a1_load">
                         <LabelBlock>
                             <SimpleIdentifier Name="Ta_U"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-32" X="-25"/>
+                                <Point X="-25" Y="-32"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="241" X="260"/>
+                            <Point X="260" Y="241"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
@@ -4754,53 +4754,53 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="160" X="304"/>
+                            <Point X="304" Y="160"/>
                         </PointGeometry>
                         <InitialArrowGeometry>
-                            <Point Y="-5" X="-5"/>
+                            <Point X="-5" Y="-5"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="26" X="-38"/>
+                            <Point X="-38" Y="26"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="Pr_middle">
                         <PointGeometry>
-                            <Point Y="160" X="432"/>
+                            <Point X="432" Y="160"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-10" X="7"/>
+                            <Point X="7" Y="-10"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="Pr_bottom">
                         <PointGeometry>
-                            <Point Y="160" X="176"/>
+                            <Point X="176" Y="160"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-11" X="-69"/>
+                            <Point X="-69" Y="-11"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="Pr_middle" Source="RP_no_collision">
+                    <Edge Source="RP_no_collision" Target="Pr_middle">
                         <LabelBlock>
                             <SimpleIdentifier Name="A1_mOff"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-20" X="-24"/>
+                                <Point X="-24" Y="-20"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="131" X="365"/>
+                            <Point X="365" Y="131"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="RP_no_collision" Source="Pr_middle">
+                    <Edge Source="Pr_middle" Target="RP_no_collision">
                         <LabelBlock>
                             <SimpleIdentifier Name="Pr_U"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="7" X="-8"/>
+                                <Point X="-8" Y="7"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="188" X="369"/>
+                            <Point X="369" Y="188"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -4810,30 +4810,30 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="19" X="-44"/>
+                                <Point X="-44" Y="19"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="Pr_bottom" Source="RP_no_collision">
+                    <Edge Source="RP_no_collision" Target="Pr_bottom">
                         <LabelBlock>
                             <SimpleIdentifier Name="A2_mOn"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-21" X="-30"/>
+                                <Point X="-30" Y="-21"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="131" X="240"/>
+                            <Point X="240" Y="131"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="RP_no_collision" Source="Pr_bottom">
+                    <Edge Source="Pr_bottom" Target="RP_no_collision">
                         <LabelBlock>
                             <SimpleIdentifier Name="Pr_U"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="5" X="-17"/>
+                                <Point X="-17" Y="5"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="190" X="242"/>
+                            <Point X="242" Y="190"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -4843,19 +4843,19 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="16" X="-56"/>
+                                <Point X="-56" Y="16"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="RP_no_collision" Source="RP_no_collision">
+                    <Edge Source="RP_no_collision" Target="RP_no_collision">
                         <LabelBlock>
                             <SimpleIdentifier Name="Pr_U"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-24" X="-22"/>
+                                <Point X="-22" Y="-24"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="100" X="305"/>
+                            <Point X="305" Y="100"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
@@ -4869,50 +4869,50 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="320" X="400"/>
+                            <Point X="400" Y="320"/>
                         </PointGeometry>
                         <InitialArrowGeometry>
-                            <Point Y="-24" X="-1"/>
+                            <Point X="-1" Y="-24"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="11" X="-5"/>
+                            <Point X="-5" Y="11"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="robot_at_press_non_empty">
                         <PointGeometry>
-                            <Point Y="320" X="592"/>
+                            <Point X="592" Y="320"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-6" X="14"/>
+                            <Point X="14" Y="-6"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="arm2_extended">
                         <PointGeometry>
-                            <Point Y="368" X="496"/>
+                            <Point X="496" Y="368"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-25" X="-36"/>
+                            <Point X="-36" Y="-25"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="robot_at_press_empty">
                         <PointGeometry>
-                            <Point Y="320" X="208"/>
+                            <Point X="208" Y="320"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-2" X="-131"/>
+                            <Point X="-131" Y="-2"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="robot_at_press_non_empty" Source="i">
+                    <Edge Source="i" Target="robot_at_press_non_empty">
                         <LabelBlock>
                             <SimpleIdentifier Name="Ro35"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-32" X="-17"/>
+                                <Point X="-17" Y="-32"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="274" X="499"/>
+                            <Point X="499" Y="274"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -4922,19 +4922,19 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-19" X="-37"/>
+                                <Point X="-37" Y="-19"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="arm2_extended" Source="robot_at_press_non_empty">
+                    <Edge Source="robot_at_press_non_empty" Target="arm2_extended">
                         <LabelBlock>
                             <SimpleIdentifier Name="A2_F"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-5" X="9"/>
+                                <Point X="9" Y="-5"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="357" X="550"/>
+                            <Point X="550" Y="357"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -4950,33 +4950,33 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="8" X="-42"/>
+                                <Point X="-42" Y="8"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="i" Source="arm2_extended">
+                    <Edge Source="arm2_extended" Target="i">
                         <LabelBlock>
                             <SimpleIdentifier Name="Ro_R"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="19" X="-7"/>
+                                <Point X="-7" Y="19"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="350" X="435"/>
+                            <Point X="435" Y="350"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="robot_at_press_empty" Source="i">
+                    <Edge Source="i" Target="robot_at_press_empty">
                         <LabelBlock>
                             <SimpleIdentifier Name="Ro35"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-34" X="-24"/>
+                                <Point X="-24" Y="-34"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <StartPointGeometry>
-                            <Point Y="320" X="400"/>
+                            <Point X="400" Y="320"/>
                         </StartPointGeometry>
                         <SplineGeometry>
-                            <Point Y="272" X="303"/>
+                            <Point X="303" Y="272"/>
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
@@ -4986,30 +4986,30 @@
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-20" X="-47"/>
+                                <Point X="-47" Y="-20"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
-                    <Edge Target="i" Source="robot_at_press_empty">
+                    <Edge Source="robot_at_press_empty" Target="i">
                         <LabelBlock>
                             <SimpleIdentifier Name="Ro_R"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="5" X="-25"/>
+                                <Point X="-25" Y="5"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="366" X="306"/>
+                            <Point X="306" Y="366"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="arm2_extended" Source="arm2_extended">
+                    <Edge Source="arm2_extended" Target="arm2_extended">
                         <LabelBlock>
                             <SimpleIdentifier Name="A2_F"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="1" X="-16"/>
+                                <Point X="-16" Y="1"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="434" X="497"/>
+                            <Point X="497" Y="434"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
