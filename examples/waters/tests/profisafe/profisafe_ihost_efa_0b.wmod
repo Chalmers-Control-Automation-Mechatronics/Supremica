@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="profisafe_ihost_efa_block" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="profisafe_ihost_efa_0b" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>Faulty model of PROFIsafe f-Host (input configuration).
 The model is blocking because the transition from state 10 to 5 contains the incorrect condition 'in_ps_status_bit4_FV==0' in its guard.</ns2:Comment>
     <ConstantAliasList>
@@ -1767,9 +1767,9 @@ The model is blocking because the transition from state 10 to 5 contains the inc
                         </LabelGeometry>
                     </SimpleNode>
                     <GroupNode Name="G0">
-                        <NodeRef Name="OFF"/>
                         <NodeRef Name="DELAY"/>
                         <NodeRef Name="HOST"/>
+                        <NodeRef Name="OFF"/>
                         <BoxGeometry>
                             <Box Height="224" Width="288" X="48" Y="32"/>
                         </BoxGeometry>
@@ -3204,10 +3204,10 @@ The model is blocking because the transition from state 10 to 5 contains the inc
                         </LabelGeometry>
                     </SimpleNode>
                     <GroupNode Name="G0">
-                        <NodeRef Name="init0nok"/>
-                        <NodeRef Name="init_ok"/>
-                        <NodeRef Name="init_nok"/>
                         <NodeRef Name="init0ok"/>
+                        <NodeRef Name="init_ok"/>
+                        <NodeRef Name="init0nok"/>
+                        <NodeRef Name="init_nok"/>
                         <BoxGeometry>
                             <Box Height="80" Width="416" X="112" Y="160"/>
                         </BoxGeometry>
@@ -3219,10 +3219,10 @@ The model is blocking because the transition from state 10 to 5 contains the inc
                         </BoxGeometry>
                     </GroupNode>
                     <GroupNode Name="G2">
-                        <NodeRef Name="pre0ok"/>
                         <NodeRef Name="pre_nok"/>
-                        <NodeRef Name="pre0nok"/>
                         <NodeRef Name="pre_ok"/>
+                        <NodeRef Name="pre0ok"/>
+                        <NodeRef Name="pre0nok"/>
                         <BoxGeometry>
                             <Box Height="80" Width="416" X="112" Y="32"/>
                         </BoxGeometry>
@@ -4118,8 +4118,8 @@ The model is blocking because the transition from state 10 to 5 contains the inc
                         </BoxGeometry>
                     </GroupNode>
                     <GroupNode Name="G6">
-                        <NodeRef Name="pre_0"/>
                         <NodeRef Name="pre_other"/>
+                        <NodeRef Name="pre_0"/>
                         <BoxGeometry>
                             <Box Height="80" Width="288" X="128" Y="32"/>
                         </BoxGeometry>
@@ -4947,8 +4947,8 @@ The model is blocking because the transition from state 10 to 5 contains the inc
                                 </BoxGeometry>
                             </GroupNode>
                             <GroupNode Name="G1">
-                                <NodeRef Name="fv_fault"/>
                                 <NodeRef Name="fv_ok"/>
+                                <NodeRef Name="fv_fault"/>
                                 <BoxGeometry>
                                     <Box Height="96" Width="288" X="128" Y="416"/>
                                 </BoxGeometry>

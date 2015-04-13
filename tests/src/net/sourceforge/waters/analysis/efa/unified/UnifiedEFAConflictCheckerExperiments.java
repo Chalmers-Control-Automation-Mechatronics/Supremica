@@ -150,7 +150,7 @@ public class UnifiedEFAConflictCheckerExperiments
     }
     try {
       for (int maxseqno = 127; maxseqno <= 255; maxseqno += 128) {
-        checkProfisafe("profisafe_ihost_efa_block", maxseqno, false);
+        checkProfisafe("profisafe_ihost_efa_0b", maxseqno, false);
       }
     } catch (final AnalysisException | EvalException exception) {
       // next please ...
@@ -178,19 +178,19 @@ public class UnifiedEFAConflictCheckerExperiments
     }
     if (!(wrapper instanceof BDDConflictCheckerWrapper)) {
 
-      for (int m = 3; m <= 4; m += 1) {
+      for (int r = 3; r <= 4; r += 1) {
         try {
           for (int n = 500; n <= 500; n+= 100) {
-            checkTransferLineRework("transferline_efsm_rework_block", m, n, false);
+            checkTransferLineRework("transferline_efsm_rework_block", r, n, false);
           }
         } catch (final AnalysisException | EvalException exception) {
           // next please ...
         }
       }
-      for (int m = 3; m <= 4; m += 1) {
+      for (int r = 3; r <= 4; r += 1) {
         try {
           for (int n = 500; n <= 500; n+= 100) {
-            checkTransferLineRework("transferline_efsm_rework", m, n, true);
+            checkTransferLineRework("transferline_efsm_rework", r, n, true);
           }
         } catch (final AnalysisException | EvalException exception) {
           // next please ...

@@ -338,7 +338,7 @@ public class UnifiedEFAConflictCheckerTest extends AbstractAnalysisTest
   public void testProfisafeIHostEFABlock3()
     throws IOException, WatersException
   {
-    checkProfisafe("profisafe_ihost_efa_block", 3 ,false);
+    checkProfisafe("profisafe_ihost_efa_0b", 3 ,false);
   }
 
   public void testProfisafeIHostEFAv0()
