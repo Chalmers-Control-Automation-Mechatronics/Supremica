@@ -222,9 +222,11 @@ public class CommandLineTool
       for (final String name : argList) {
         final File filename = new File(name);
         final DocumentProxy doc = docManager.load(filename);
-        ProductDESProxy des = null;
+        final ProductDESProxy des;
+        final String fullName;
         if (doc instanceof ProductDESProxy) {
           des = (ProductDESProxy) doc;
+          fullName = des.getName();
         } else {
           final ModuleProxy module = (ModuleProxy) doc;
           final ModuleCompiler compiler =
@@ -235,10 +237,15 @@ public class CommandLineTool
           factory.configure(compiler);
           watchdog.addAbortable(compiler);
           des = compiler.compile(bindings);
+          fullName = ModuleCompiler.getParametrizedName(module, bindings);
           watchdog.removeAbortable(compiler);
         }
-        System.out.print(des.getName() + " ... ");
-        System.out.flush();
+        System.out.print(fullName + " ... ");
+        if (verbose) {
+          System.out.println();
+        } else {
+          System.out.flush();
+        }
 
         final long start = System.currentTimeMillis();
         wrapper.setModel(des);
@@ -311,7 +318,14 @@ public class CommandLineTool
               result.printCSVHorizontalHeadings(csv);
               csv.println();
             }
-            csv.print(des.getName() + ',');
+            if (fullName.indexOf(',') >= 0) {
+              csv.print('"');
+              csv.print(fullName);
+              csv.print('"');
+            } else {
+              csv.print(fullName);
+            }
+            csv.print(',');
             result.printCSVHorizontal(csv);
             csv.println();
           }

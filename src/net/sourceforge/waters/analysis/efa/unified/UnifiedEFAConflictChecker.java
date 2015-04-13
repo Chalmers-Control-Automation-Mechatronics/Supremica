@@ -50,8 +50,14 @@ import org.apache.log4j.Logger;
 
 
 /**
- * A compositional conflict checker for EFA.
- * This implementation is based on the unified EFA model.
+ * A compositional conflict checker for EFSM systems.
+ * This implementation is based on a normalised model.
+ *
+ * <I>Reference:</I><BR>
+ * Sahar Mohajerani, Robi Malik, Martin Fabian. An Algorithm for Compositional
+ * Nonblocking Verification of Extended Finite-state Machines. Proc. 12th
+ * International Workshop on Discrete Event Systems (WODES&nbsp;'14), 376-382,
+ * Paris, France, 2014.
  *
  * @author Robi Malik, Sahar Mohajerani
  */
@@ -260,13 +266,13 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       mDocumentManager = new DocumentManager();
     }
     final ModuleProxy module = getModel();
-    final List<ParameterBindingProxy> binding = getBindings();
+    final List<ParameterBindingProxy> bindings = getBindings();
     final UnifiedEFACompiler compiler =
       new UnifiedEFACompiler(mDocumentManager, module);
     compiler.setConfiguredDefaultMarking(getConfiguredDefaultMarking());
     final List<String> none = Collections.emptyList();
     compiler.setEnabledPropertyNames(none);
-    mMainEFASystem = compiler.compile(binding);
+    mMainEFASystem = compiler.compile(bindings);
     final UnifiedEFAVariableContext context =
       mMainEFASystem.getVariableContext();
     mSubSystemQueue = new PriorityQueue<SubSystemInfo>();
@@ -309,8 +315,9 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     }
     mSimplifier = UnifiedEFASimplifier.createStandardNonblockingProcedure
       (Equivalence.OBSERVATION_EQUIVALENCE, mInternalTransitionLimit);
-    final UnifiedEFAConflictCheckerAnalysisResult result = getAnalysisResult();
 
+    final UnifiedEFAConflictCheckerAnalysisResult result = getAnalysisResult();
+    result.setModel(mMainEFASystem);
     result.addSynchronousProductStatistics(mSynchronizer.getStatistics());
     mSimplifier = mSimplifierFactory.createAbstractionProcedure(this);
     result.setSimplifierStatistics(mSimplifier);

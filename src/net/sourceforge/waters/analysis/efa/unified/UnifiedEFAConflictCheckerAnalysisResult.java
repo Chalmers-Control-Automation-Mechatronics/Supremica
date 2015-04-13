@@ -18,19 +18,14 @@ import java.util.List;
 import net.sourceforge.waters.analysis.abstraction.TRSimplifierStatistics;
 import net.sourceforge.waters.analysis.efa.base.EFASimplifierStatistics;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
 
 
 /**
- * A result record that can be returned by a compositional analysis
- * algorithms.
+ * A result record containing performance data about a run of the
+ * {@link UnifiedEFAConflictChecker}.
  *
- * In addition to a standard analysis result ({@link AnalysisResult}),
- * the compositional verification result contains detailed statistics about
- * individual abstraction rules and the final (monolithic) verification.
- *
- * @author Rachel Francis, Robi Malik
+ * @author Robi Malik
  */
 
 public class UnifiedEFAConflictCheckerAnalysisResult
@@ -44,6 +39,8 @@ public class UnifiedEFAConflictCheckerAnalysisResult
    */
   public UnifiedEFAConflictCheckerAnalysisResult()
   {
+    mTotalVariables = -1;
+    mMaxDomain = -1;
     mTotalCompositionsCount = 0;
     mUnsuccessfulCompositionsCount = 0;
     mNumberOfSplitAttempts = 0;
@@ -96,6 +93,20 @@ public class UnifiedEFAConflictCheckerAnalysisResult
 
   //#########################################################################
   //# Providing Statistics
+  public void setModel(final UnifiedEFASystem system)
+  {
+    final int numEFSMs = system.getTransitionRelations().size();
+    super.setNumberOfAutomata(numEFSMs);
+    final List<UnifiedEFAVariable> vars = system.getVariables();
+    mTotalVariables = vars.size();
+    for (final UnifiedEFAVariable var : vars) {
+      final int domainSize = var.getRange().size();
+      if (domainSize > mMaxDomain) {
+        mMaxDomain = domainSize;
+      }
+    }
+  }
+
   public void addUnifiedEFATRTransitionRelation
     (final UnifiedEFATransitionRelation tr)
   {
@@ -187,6 +198,10 @@ public class UnifiedEFAConflictCheckerAnalysisResult
     super.print(writer);
     @SuppressWarnings("resource")
     final Formatter formatter = new Formatter(writer);
+    writer.print("Total number of EFSM variables:");
+    writer.println(mTotalVariables);
+    writer.print("Largest domain size of EFSM variables:");
+    writer.println(mMaxDomain);
     writer.print("Total number of compositions: ");
     writer.println(mTotalCompositionsCount);
     writer.print("Number of unsuccessful compositions: ");
@@ -232,6 +247,8 @@ public class UnifiedEFAConflictCheckerAnalysisResult
   public void printCSVHorizontalHeadings(final PrintWriter writer)
   {
     super.printCSVHorizontalHeadings(writer);
+    writer.print(",TotVar");
+    writer.print(",MaxDomain");
     writer.print(",Compositions");
     writer.print(",Overflows");
     writer.print(",SplitAttempts");
@@ -257,6 +274,10 @@ public class UnifiedEFAConflictCheckerAnalysisResult
   public void printCSVHorizontal(final PrintWriter writer)
   {
     super.printCSVHorizontal(writer);
+    writer.print(',');
+    writer.print(mTotalVariables);
+    writer.print(',');
+    writer.print(mMaxDomain);
     writer.print(',');
     writer.print(mTotalCompositionsCount);
     writer.print(',');
@@ -291,6 +312,8 @@ public class UnifiedEFAConflictCheckerAnalysisResult
   private EFASimplifierStatistics mUnfoldingStatistics;
   private List<TRSimplifierStatistics> mSimplifierStatistics;
 
+  private int mTotalVariables;
+  private int mMaxDomain;
   private int mTotalCompositionsCount;
   private int mUnsuccessfulCompositionsCount;
   private final int mNumberOfSplitAttempts;

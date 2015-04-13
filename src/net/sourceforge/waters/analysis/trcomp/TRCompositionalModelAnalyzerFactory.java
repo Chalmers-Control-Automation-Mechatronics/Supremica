@@ -328,7 +328,7 @@ public class TRCompositionalModelAnalyzerFactory
       final EnumFactory<SelectionHeuristic<TRCandidate>> factory =
         composer.getSelectionHeuristicFactory();
       final String name = getValue();
-      final String[] parts = name.split("/");
+      final String[] parts = name.split(",");
       final SelectionHeuristic<TRCandidate> heuristic;
       if (parts.length == 1) {
         heuristic = factory.getEnumValue(name);

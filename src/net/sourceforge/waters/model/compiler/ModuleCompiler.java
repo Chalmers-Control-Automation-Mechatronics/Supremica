@@ -9,12 +9,15 @@
 
 package net.sourceforge.waters.model.compiler;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.net.URI;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.compiler.context.SourceInfoCloner;
@@ -31,6 +34,7 @@ import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
+import net.sourceforge.waters.model.printer.ProxyPrinter;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
@@ -194,6 +198,41 @@ public class ModuleCompiler extends AbortableCompiler
 
 
   //##########################################################################
+  //# Static Invocation
+  /**
+   * Creates a name for a compiled module with its parameters appended
+   * in angle brackets.
+   * @param  module   The module being compiled.
+   * @param  bindings The list of parameter bindings, or <CODE>null</CODE>.
+   * @return A name string such as <CODE>&quot;factory&lt;N=5&gt;&quot;</CODE>.
+   */
+  public static String getParametrizedName
+    (final ModuleProxy module, final List<ParameterBindingProxy> bindings)
+  {
+    try {
+      final String name = module.getName();
+      if (bindings == null || bindings.isEmpty()) {
+        return name;
+      }
+      final StringWriter writer = new StringWriter();
+      writer.append(name);
+      char sep = '<';
+      for (final ParameterBindingProxy binding : bindings) {
+        writer.append(sep);
+        writer.append(binding.getName());
+        writer.append('=');
+        ProxyPrinter.printProxy(writer, binding.getExpression());
+        sep = ',';
+      }
+      writer.append('>');
+      return writer.toString();
+    } catch (final IOException exception) {
+      throw new WatersRuntimeException(exception);
+    }
+  }
+
+
+  //##########################################################################
   //# Configuration
   public boolean isOptimizationEnabled()
   {
@@ -346,4 +385,5 @@ public class ModuleCompiler extends AbortableCompiler
   private Collection<String> mEnabledPropertyNames = null;
   private Collection<String> mEnabledPropositionNames = null;
   private HISCCompileMode mHISCCompileMode = HISCCompileMode.NOT_HISC;
+
 }

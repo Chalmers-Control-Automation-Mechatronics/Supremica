@@ -46,6 +46,7 @@ import net.sourceforge.waters.model.analysis.Watchdog;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.OperatorTable;
@@ -214,9 +215,14 @@ public class UnifiedEFACommandLineTool
       for (final String name : argList) {
         final File filename = new File(name);
         final ModuleProxy module = (ModuleProxy) docManager.load(filename);
-        System.out.print(module.getName() + " ... ");
-        System.out.flush();
-
+        final String fullName =
+          ModuleCompiler.getParametrizedName(module, bindings);
+        System.out.print(fullName + " ... ");
+        if (verbose) {
+          System.out.println();
+        } else {
+          System.out.flush();
+        }
         final long start = System.currentTimeMillis();
         checker.setModel(module);
         boolean additions = false;
@@ -283,7 +289,14 @@ public class UnifiedEFACommandLineTool
               result.printCSVHorizontalHeadings(csv);
               csv.println();
             }
-            csv.print(module.getName() + ',');
+            if (fullName.indexOf(',') >= 0) {
+              csv.print('"');
+              csv.print(fullName);
+              csv.print('"');
+            } else {
+              csv.print(fullName);
+            }
+            csv.print(',');
             result.printCSVHorizontal(csv);
             csv.println();
           }

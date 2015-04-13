@@ -126,13 +126,13 @@ class UnifiedEFASimplifier extends AbstractEFAAlgorithm
       new TauLoopRemovalTRSimplifier();
     tauLoopRemover.setDumpStateAware(true);
     chain.add(tauLoopRemover);
-    final MarkingRemovalTRSimplifier markingRemover =
-      new MarkingRemovalTRSimplifier();
-    chain.add(markingRemover);
     final TransitionRemovalTRSimplifier transitionRemover =
       new TransitionRemovalTRSimplifier();
     transitionRemover.setTransitionLimit(limit);
     chain.add(transitionRemover);
+    final MarkingRemovalTRSimplifier markingRemover =
+      new MarkingRemovalTRSimplifier();
+    chain.add(markingRemover);
     final SilentIncomingTRSimplifier silentInRemover =
       new SilentIncomingTRSimplifier();
     silentInRemover.setRestrictsToUnreachableStates(true);
@@ -142,9 +142,6 @@ class UnifiedEFASimplifier extends AbstractEFAAlgorithm
       new OnlySilentOutgoingTRSimplifier();
     silentOutRemover.setDumpStateAware(true);
     chain.add(silentOutRemover);
-    final IncomingEquivalenceTRSimplifier incomingEquivalenceSimplifier =
-      new IncomingEquivalenceTRSimplifier();
-    chain.add(incomingEquivalenceSimplifier);
     final LimitedCertainConflictsTRSimplifier certainConflictsRemover =
       new LimitedCertainConflictsTRSimplifier();
     chain.add(certainConflictsRemover);
@@ -158,6 +155,9 @@ class UnifiedEFASimplifier extends AbstractEFAAlgorithm
       (ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
     bisimulator.setTransitionLimit(limit);
     chain.add(bisimulator);
+    final IncomingEquivalenceTRSimplifier incomingEquivalenceSimplifier =
+      new IncomingEquivalenceTRSimplifier();
+    chain.add(incomingEquivalenceSimplifier);
     final MarkingSaturationTRSimplifier saturator =
       new MarkingSaturationTRSimplifier();
     chain.add(saturator);
