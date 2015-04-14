@@ -49,6 +49,67 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
   }
 
 
+  //##########################################################################
+  //# Simple Access
+  public ModuleProxy getInputModule()
+  {
+    return mInputModule;
+  }
+
+
+  //##########################################################################
+  //# Configuration
+  public boolean isOptimizationEnabled()
+  {
+    return mIsOptimizationEnabled;
+  }
+
+  public void setOptimizationEnabled(final boolean enable)
+  {
+    mIsOptimizationEnabled = enable;
+  }
+
+  public boolean isSourceInfoEnabled()
+  {
+    return mIsSourceInfoEnabled;
+  }
+
+  public void setSourceInfoEnabled(final boolean enable)
+  {
+    mIsSourceInfoEnabled = enable;
+  }
+
+  public boolean isMultiExceptionsEnabled()
+  {
+    return mIsMultiExceptionsEnabled;
+  }
+
+  public void setMultiExceptionsEnabled(final boolean enable)
+  {
+    mIsMultiExceptionsEnabled = enable;
+  }
+
+  public Collection<String> getEnabledPropertyNames()
+  {
+    return mEnabledPropertyNames;
+  }
+
+  public void setEnabledPropertyNames(final Collection<String> names)
+  {
+    mEnabledPropertyNames = names;
+  }
+
+  public void setConfiguredDefaultMarking(final IdentifierProxy marking)
+  {
+    mMarking = marking;
+  }
+
+  public IdentifierProxy getConfiguredDefaultMarking()
+  {
+    return mMarking;
+  }
+
+
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
@@ -130,16 +191,17 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
       mGroupNodeCompiler = null;
 
       //Normalisation
+      final ModuleProxy normalised;
+      final ProxyAccessorMap<IdentifierProxy, ConstraintList> map;
       mEFANormaliser =
         new EFANormaliser(modfactory, mCompilationInfo, instantiated);
-      final ModuleProxy unified = mEFANormaliser.compile();
-      final ProxyAccessorMap<IdentifierProxy, ConstraintList> map =
-        mEFANormaliser.getEventUpdateMap();
+      normalised = mEFANormaliser.compile();
+      map = mEFANormaliser.getEventUpdateMap();
       mEFANormaliser = null;
 
       //Create UnifiedEFASystem
       mSystemBuilder = new UnifiedEFASystemBuilder
-        (modfactory, mCompilationInfo, unified, map);
+        (modfactory, mCompilationInfo, normalised, map);
       mSystemBuilder.setOptimizationEnabled(mIsOptimizationEnabled);
       mSystemBuilder.setConfiguredDefaultMarking(marking);
       return mSystemBuilder.compile();
@@ -151,81 +213,20 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
   }
 
 
-  //##########################################################################
-  //# Simple Access
-  public ModuleProxy getInputModule()
-  {
-    return mInputModule;
-  }
-
-
-  //##########################################################################
-  //# Configuration
-  public boolean isOptimizationEnabled()
-  {
-    return mIsOptimizationEnabled;
-  }
-
-  public void setOptimizationEnabled(final boolean enable)
-  {
-    mIsOptimizationEnabled = enable;
-  }
-
-  public boolean isSourceInfoEnabled()
-  {
-    return mIsSourceInfoEnabled;
-  }
-
-  public void setSourceInfoEnabled(final boolean enable)
-  {
-    mIsSourceInfoEnabled = enable;
-  }
-
-  public boolean isMultiExceptionsEnabled()
-  {
-    return mIsMultiExceptionsEnabled;
-  }
-
-  public void setMultiExceptionsEnabled(final boolean enable)
-  {
-    mIsMultiExceptionsEnabled = enable;
-  }
-
-  public Collection<String> getEnabledPropertyNames()
-  {
-    return mEnabledPropertyNames;
-  }
-
-  public void setEnabledPropertyNames(final Collection<String> names)
-  {
-    mEnabledPropertyNames = names;
-  }
-
-  public void setConfiguredDefaultMarking(final IdentifierProxy marking)
-  {
-    mMarking = marking;
-  }
-
-  public IdentifierProxy getConfiguredDefaultMarking()
-  {
-    return mMarking;
-  }
-
-
   //#########################################################################
   //# Data Members
   private final DocumentManager mDocumentManager;
   private final ModuleProxy mInputModule;
-
-  private ModuleInstanceCompiler mModuleInstanceCompiler;
-  private GroupNodeCompiler mGroupNodeCompiler;
-  private EFANormaliser mEFANormaliser;
-  private UnifiedEFASystemBuilder mSystemBuilder;
-  private CompilationInfo mCompilationInfo;
 
   private boolean mIsOptimizationEnabled = true;
   private boolean mIsSourceInfoEnabled = false;
   private boolean mIsMultiExceptionsEnabled = false;
   private Collection<String> mEnabledPropertyNames = null;
   private IdentifierProxy mMarking;
+
+  private ModuleInstanceCompiler mModuleInstanceCompiler;
+  private GroupNodeCompiler mGroupNodeCompiler;
+  private EFANormaliser mEFANormaliser;
+  private UnifiedEFASystemBuilder mSystemBuilder;
+  private CompilationInfo mCompilationInfo;
 }

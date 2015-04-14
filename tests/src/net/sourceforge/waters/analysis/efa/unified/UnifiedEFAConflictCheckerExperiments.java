@@ -423,8 +423,10 @@ public class UnifiedEFAConflictCheckerExperiments
         return stats.isSatisfied();
       } catch (final Throwable exception) {
         System.out.println(ProxyTools.getShortClassName(exception));
-        mPrintWriter.println('\"' + fullModuleName + "\"," +
-                             exception.getMessage());
+        if (exception.getMessage() != null) {
+          mPrintWriter.println('\"' + fullModuleName + "\"," +
+                               exception.getMessage());
+        }
         if (exception instanceof AnalysisException) {
           throw (AnalysisException) exception;
         } else if (exception instanceof EvalException) {

@@ -532,6 +532,8 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
   private void applyCandidate(final UnifiedEFACandidate candidate)
     throws AnalysisException, EvalException
   {
+    final Logger logger = getLogger();
+    logger.debug("Composition candidate: " + candidate);
     checkAbort();
     final List<UnifiedEFAVariable> vars = candidate.getVariables();
     List<UnifiedEFATransitionRelation> trs =
@@ -564,8 +566,6 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
         mLocalVariableTR = simplifiedTR;
       }
     } else if (trs.size() > 1) {
-      final Logger logger = getLogger();
-      logger.debug("Synchronizing: " + candidate);
       trs = addSelfloopTR(trs);
       mSynchronizer.setInputTransitionRelations(trs);
       mSynchronizer.run();

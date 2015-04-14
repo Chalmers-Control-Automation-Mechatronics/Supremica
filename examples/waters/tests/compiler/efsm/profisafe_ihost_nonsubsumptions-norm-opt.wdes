@@ -4,14 +4,14 @@
     <ns2:EventList>
         <ns2:Event Kind="UNCONTROLLABLE" Name="host_timeout"/>
         <ns2:Event Kind="CONTROLLABLE" Name="restart_host_timer.{!got_host_timeout}"/>
-        <ns2:Event Kind="CONTROLLABLE" Name="restart_host_timer"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="restart_host_timer.{!got_host_timeout'}"/>
         <ns2:Event Kind="CONTROLLABLE" Name="yield.{!got_host_timeout}"/>
         <ns2:Event Kind="CONTROLLABLE" Name="yield"/>
     </ns2:EventList>
     <ns2:AutomataList>
         <ns2:Automaton Kind="SPEC" Name="main">
             <ns2:EventRefList>
-                <ns2:EventRef Name="restart_host_timer"/>
+                <ns2:EventRef Name="restart_host_timer.{!got_host_timeout'}"/>
                 <ns2:EventRef Name="restart_host_timer.{!got_host_timeout}"/>
                 <ns2:EventRef Name="yield"/>
                 <ns2:EventRef Name="yield.{!got_host_timeout}"/>
@@ -23,7 +23,7 @@
                 <ns2:State Initial="true" Name="s0"/>
             </ns2:StateList>
             <ns2:TransitionList>
-                <ns2:Transition Event="restart_host_timer" Source="s0" Target="s1"/>
+                <ns2:Transition Event="restart_host_timer.{!got_host_timeout'}" Source="s0" Target="s1"/>
                 <ns2:Transition Event="yield" Source="s1" Target="s2"/>
                 <ns2:Transition Event="restart_host_timer.{!got_host_timeout}" Source="s2" Target="s3"/>
                 <ns2:Transition Event="yield.{!got_host_timeout}" Source="s2" Target="s2"/>
@@ -32,7 +32,7 @@
         <ns2:Automaton Kind="PLANT" Name="timers">
             <ns2:EventRefList>
                 <ns2:EventRef Name="host_timeout"/>
-                <ns2:EventRef Name="restart_host_timer"/>
+                <ns2:EventRef Name="restart_host_timer.{!got_host_timeout'}"/>
                 <ns2:EventRef Name="restart_host_timer.{!got_host_timeout}"/>
             </ns2:EventRefList>
             <ns2:StateList>
@@ -41,9 +41,9 @@
             </ns2:StateList>
             <ns2:TransitionList>
                 <ns2:Transition Event="host_timeout" Source="HOST" Target="OFF"/>
-                <ns2:Transition Event="restart_host_timer" Source="HOST" Target="HOST"/>
+                <ns2:Transition Event="restart_host_timer.{!got_host_timeout'}" Source="HOST" Target="HOST"/>
                 <ns2:Transition Event="restart_host_timer.{!got_host_timeout}" Source="HOST" Target="HOST"/>
-                <ns2:Transition Event="restart_host_timer" Source="OFF" Target="HOST"/>
+                <ns2:Transition Event="restart_host_timer.{!got_host_timeout'}" Source="OFF" Target="HOST"/>
                 <ns2:Transition Event="restart_host_timer.{!got_host_timeout}" Source="OFF" Target="HOST"/>
             </ns2:TransitionList>
         </ns2:Automaton>
@@ -58,7 +58,7 @@
         <ns2:Automaton Kind="PLANT" Name="got_host_timeout">
             <ns2:EventRefList>
                 <ns2:EventRef Name="host_timeout"/>
-                <ns2:EventRef Name="restart_host_timer"/>
+                <ns2:EventRef Name="restart_host_timer.{!got_host_timeout'}"/>
                 <ns2:EventRef Name="restart_host_timer.{!got_host_timeout}"/>
                 <ns2:EventRef Name="yield.{!got_host_timeout}"/>
             </ns2:EventRefList>
@@ -68,11 +68,11 @@
             </ns2:StateList>
             <ns2:TransitionList>
                 <ns2:Transition Event="host_timeout" Source="0" Target="1"/>
-                <ns2:Transition Event="restart_host_timer" Source="0" Target="0"/>
+                <ns2:Transition Event="restart_host_timer.{!got_host_timeout'}" Source="0" Target="0"/>
                 <ns2:Transition Event="restart_host_timer.{!got_host_timeout}" Source="0" Target="0"/>
                 <ns2:Transition Event="yield.{!got_host_timeout}" Source="0" Target="0"/>
                 <ns2:Transition Event="host_timeout" Source="1" Target="1"/>
-                <ns2:Transition Event="restart_host_timer" Source="1" Target="0"/>
+                <ns2:Transition Event="restart_host_timer.{!got_host_timeout'}" Source="1" Target="0"/>
             </ns2:TransitionList>
         </ns2:Automaton>
     </ns2:AutomataList>

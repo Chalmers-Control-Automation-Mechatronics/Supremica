@@ -19,13 +19,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.Proxy;
@@ -76,18 +74,16 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
 
 
 /**
- * A processor of EFA modules.
- * <P>
- * The normaliser identifies the overall updates associated with
+ * <P>The EFSM normalisation algorithm.
+ * The EFSM normaliser identifies the overall updates associated with
  * each event and produces a module where each event is associated
- * with a unique update formula shared over all automata.
- * <p>
- * If necessary, events are renamed in order to achieve this condition.
+ * with a unique update formula shared over all automata.</P>
+ *
+ * <P>If necessary, events are renamed in order to achieve this condition.</P>
  *
  * <P><STRONG>Algorithm</STRONG></P>
  *
- * The EFA normaliser proceeds in four passes:
- * <p>
+ * <P>The EFSM normaliser proceeds in four passes:</P>
  * <OL>
  * <LI>Compute the range of variables and initialise the constraint
  *     propagator context.</LI>
@@ -161,26 +157,25 @@ public class EFANormaliser extends AbortableCompiler
           new EFAEventNameBuilder(mFactory, mOperatorTable, mRootContext);
       }
       mEventUpdateMap = new ProxyAccessorHashMap<>(eq, size);
-      for (final Entry<ProxyAccessor<IdentifierProxy>,EFAEventInfo> e : mEventMap.entrySet())
-      {
+      for (final Map.Entry<ProxyAccessor<IdentifierProxy>,EFAEventInfo> e :
+           mEventMap.entrySet()) {
         final IdentifierProxy ident = e.getKey().getProxy();
         final EFAEventInfo info = e.getValue();
-
         info.makeDisjoint(ident);
         info.combineUpdates();
         info.generateEventNames(mComparator);
       }
       mEventNameBuilder = null;
-
       // Old semantics
-      if (mUsesEventAlphabet)
-        for (final EFAEventInfo e : mEventMap.values())
+      if (mUsesEventAlphabet) {
+        for (final EFAEventInfo e : mEventMap.values()) {
           e.createExplicitGuards();
-
+        }
+      }
       // End of Pass 3: Throw any accumulated exceptions
-      if (mCompilationInfo.hasExceptions())
+      if (mCompilationInfo.hasExceptions()) {
         throw mCompilationInfo.getExceptions();
-
+      }
       // Pass 4
       final Pass4Visitor pass4 = new Pass4Visitor();
       return pass4.visitModuleProxy(mInputModule);
@@ -1023,17 +1018,16 @@ public class EFANormaliser extends AbortableCompiler
     private void makeDisjoint(final IdentifierProxy ident) throws EvalException
     {
       // If the event is blocked, do nothing.
-      if (isBlocked()) return;
-
-      // Perform the disjoint operation for separate automata.
-      for (final EFAUpdateInfo update : mList) {
-        update.makeDisjoint(mEventDecl, ident);
+      if (!isBlocked()) {
+        // Perform the disjoint operation for separate automata.
+        for (final EFAUpdateInfo update : mList) {
+          update.makeDisjoint(mEventDecl, ident);
+        }
       }
     }
 
     /**
      * Computes all combinations of the guards in different automata.
-     * <P>
      * This base method uses another recursive method of the same name.
      */
     private void combineUpdates() throws EvalException
@@ -1044,12 +1038,13 @@ public class EFANormaliser extends AbortableCompiler
                       new ConstraintPropagator(mFactory, mCompilationInfo,
                                                mOperatorTable, mRootContext);
         final EFAUpdateInfo[] second = new EFAUpdateInfo[mList.size()];
-        for (int i = 0; i < second.length; i++)
+        for (int i = 0; i < second.length; i++) {
           second[i] = new EFAUpdateInfo(null);
           /* Because the component reference of each temporary
            * EFAUpdateInfo in the array 'second' is not used at
            * all, it is safe to pass 'null' as the parameter.
            */
+        }
         combineUpdates(0, propagator, second);
         for (int i = 0; i < second.length; i++)
           mList.get(i).combineMaps(second[i]);
@@ -1067,7 +1062,7 @@ public class EFANormaliser extends AbortableCompiler
     private void createExplicitGuards()
     {
       // The overall set of all prime variables used by an EFAEventInfo.
-      final Set<EFAVariable> allPrimes = new HashSet<>();
+      final Set<EFAVariable> allPrimes = new THashSet<>();
 
       /* Ensure that the set of prime variables of every EFAUpdateInfo is
        * properly initiated, then obtain the global set of prime variables.
@@ -1183,26 +1178,22 @@ public class EFANormaliser extends AbortableCompiler
      *               merged with the original ones.
      */
     private List<EFAIdentifier> combineUpdates(final int index,
-      final ConstraintPropagator propagator, final EFAUpdateInfo[] second)
-        throws EvalException
+                                               final ConstraintPropagator propagator,
+                                               final EFAUpdateInfo[] second)
+      throws EvalException
     {
-      if (index < mList.size())
-      {
+      if (index < mList.size()) {
         final List<EFAIdentifier> events = new ArrayList<>();
-        for (final ConstraintList update : mList.get(index).getUpdates())
-        {
-          if (update != null)
-          {
+        for (final ConstraintList update : mList.get(index).getUpdates()) {
+          if (update != null) {
             final ConstraintPropagator subPropagator =
-                                        new ConstraintPropagator(propagator);
+              new ConstraintPropagator(propagator);
             subPropagator.addConstraints(update);
             subPropagator.propagate();
-            if (!subPropagator.isUnsatisfiable())
-            {
+            if (!subPropagator.isUnsatisfiable()) {
               final List<EFAIdentifier> identifiers =
-                             combineUpdates(index + 1, subPropagator, second);
-              if (!identifiers.isEmpty())
-              {
+                combineUpdates(index + 1, subPropagator, second);
+              if (!identifiers.isEmpty()) {
                 second[index].addEvents(update, identifiers);
                 events.addAll(identifiers);
               }
@@ -1210,15 +1201,13 @@ public class EFANormaliser extends AbortableCompiler
           }
         }
         return events;
-      }
-
-      else // Base case of the recursion
-      {
-        //propagator.removeUnchangedVariables();
+      } else { // Base case of the recursion
+        if (!mUsesEventAlphabet) {
+          propagator.removeUnchangedVariables();
+        }
         final ConstraintList constraints = propagator.getAllConstraints();
         EFAIdentifier event = mConstraintMap.get(constraints);
-        if (event == null)
-        {
+        if (event == null) {
           event = new EFAIdentifier(mEventDecl, constraints);
           mEventList.add(event);
           mConstraintMap.put(constraints, event);
@@ -1391,7 +1380,7 @@ public class EFANormaliser extends AbortableCompiler
     {
       final EFAVariableCollector collector =
                        new EFAVariableCollector(mOperatorTable, mRootContext);
-      final Set<EFAVariable> primeVariables = new HashSet<>();
+      final Set<EFAVariable> primeVariables = new THashSet<>();
       for (final ConstraintList constraint : mUpdates)
         collector.collectPrimedVariables(constraint, primeVariables);
       return primeVariables;
@@ -1429,22 +1418,20 @@ public class EFANormaliser extends AbortableCompiler
       final Map<ConstraintList, EFAEventList> newMap = new HashMap<>();
 
       // For each entry 'x' of the original EFAUpdateInfo,
-      for (final Entry<ConstraintList, EFAEventList> x : mUpdateMap.entrySet())
-      {
-        final ConstraintList key = x.getKey();
-        final EFAEventList value0 = x.getValue();
+      for (final Map.Entry<ConstraintList, EFAEventList> entry :
+           mUpdateMap.entrySet()) {
+        final ConstraintList key = entry.getKey();
+        final EFAEventList value0 = entry.getValue();
 
         // The new list that will be mapped from 'x'.
         final EFAEventList value1 = new EFAEventList();
 
         // For each element 'y' of the EFAEventList mapped from 'x',
-        for (final EFAIdentifier y : value0)
-        {
+        for (final EFAIdentifier y : value0) {
           // For each entry 'z' of the other map,
-          for (final Entry<ConstraintList, EFAEventList> z : other.getMap().entrySet())
-          {
-            if (z.getKey().equals(y.getUpdate()))
-            {
+          for (final Map.Entry<ConstraintList, EFAEventList> z :
+               other.getMap().entrySet()) {
+            if (z.getKey().equals(y.getUpdate())) {
               value1.addAll(z.getValue());  // Add to the new map's list.
               newList.addAll(z.getValue()); // Add to the overall list.
             }
@@ -1465,33 +1452,29 @@ public class EFANormaliser extends AbortableCompiler
 
     /**
      * Decides whether the disjoint operation should be performed, and
-     * manipulate the data structure accordingly.
-     *
-     * @param event The {@link EventDeclProxy} of interest
-     *
+     * manipulates the data structure accordingly.
+     * @param event The {@link EventDeclProxy} of interest.
      * @param ident This is required for location identification
-     *              if an exception is thrown
+     *              if an exception is thrown.
      */
     private void makeDisjoint(final EventDeclProxy event,
                               final IdentifierProxy ident)
       throws EvalException
     {
       initialiseBlankMap();
-
       // Decide whether the disjoint operation should be performed.
       if (!shouldMakeDisjoint(event, ident)) {
         initialiseOriginalMap(event);
-        return;
+      } else {
+        // Carry out the disjoint operation.
+        final ListIterator<ConstraintList> iter = mUpdates.listIterator();
+        final List<ConstraintList> selected = new ArrayList<>(mUpdates.size());
+        final List<ConstraintList> result = new LinkedList<>();
+        final ConstraintPropagator propagator = new ConstraintPropagator
+          (mFactory, mCompilationInfo, mOperatorTable, mRootContext);
+        makeDisjoint(iter, selected, result, propagator, event);
+        mUpdates = result;
       }
-
-      // Carry out the disjoint operation.
-      final ListIterator<ConstraintList> iter = mUpdates.listIterator();
-      final List<ConstraintList> selected = new ArrayList<>(mUpdates.size());
-      final List<ConstraintList> result = new LinkedList<>();
-      final ConstraintPropagator propagator = new ConstraintPropagator
-                   (mFactory, mCompilationInfo, mOperatorTable, mRootContext);
-      makeDisjoint(iter, selected, result, propagator, event);
-      mUpdates = result;
     }
 
     /**
@@ -1518,8 +1501,7 @@ public class EFANormaliser extends AbortableCompiler
                               final EventDeclProxy event)
       throws EvalException
     {
-      if (iter.hasNext())
-      {
+      if (iter.hasNext()) {
         // First handle the positive current literal.
         final ConstraintList guard = iter.next();
         ConstraintPropagator propagator = new ConstraintPropagator(parent);
@@ -1531,7 +1513,6 @@ public class EFANormaliser extends AbortableCompiler
           makeDisjoint(iter, selected, result, propagator, event);
           selected.remove(end);
         }
-
         // Then handle the negated current literal.
         propagator = new ConstraintPropagator(parent);
         propagator.addNegation(guard);
@@ -1540,21 +1521,16 @@ public class EFANormaliser extends AbortableCompiler
           makeDisjoint(iter, selected, result, propagator, event);
         }
         iter.previous();
-      }
-
-      // Base case of the recursion
-      else
-      {
+      } else {
+        // Base case of the recursion
         final ConstraintList newUpdate = parent.getAllConstraints(false);
         final EFAIdentifier newId = new EFAIdentifier(event, newUpdate);
-        for (final ConstraintList literal : selected)
-        {
+        for (final ConstraintList literal : selected) {
           final Collection<EFAIdentifier> newIdC = new ArrayList<>(1);
           newIdC.add(newId);
           addEvents(literal, newIdC);
           result.add(newUpdate);
         }
-
         if (selected.isEmpty()) {
           result.add(newUpdate);
           mCaughtGuards.add(newUpdate);
@@ -1563,35 +1539,27 @@ public class EFANormaliser extends AbortableCompiler
     }
 
     /**
-     * Determines whether the disjoint operation should be carried out in a
-     * particular automaton.
-     * <p>
-     * The disjoint operation should be carried out only in the following cases:
+     * Determines whether the disjoint operation should be carried for an
+     * event in a particular automaton. The disjoint operation should be
+     * carried out only in the following cases:</P>
      * <OL>
-     * <LI><UL><LI>Automaton Type: SPECIFICATION</LI>
-     *         <LI>Event Type: CONTROLLABLE</LI>
-     *         <LI>Condition: No prime variables</LI>
-     *         </UL>
-     * <LI><UL><LI>Automaton Type: SUPERVISOR</LI>
-     *         <LI>Event Type: CONTROLLABLE</LI>
-     *         <LI>Condition: No prime variables</LI>
+     * <LI><UL><LI>Automaton Type: SPECIFICATION or SUPERVISOR</LI>
+     *         <LI>Event Type: UNCONTROLLABLE</LI>
+     *         <LI>Condition: No primed variables</LI>
      *         </UL>
      * <LI><UL><LI>Automaton Type: PROPERTY</LI>
      *         <LI>Event Type: CONTROLLABLE or UNCONTROLLABLE</LI>
-     *         <LI>Condition: No prime variables</LI>
+     *         <LI>Condition: No primed variables</LI>
      *         </UL>
      * </OL>
      * If the type of automaton and event matches one of the above conditions,
      * but the associated updates contain prime variables, then exceptions
-     * would be thrown.<p>
-     *
-     * @param event The {@link EventDeclProxy} of interest
-     *
-     * @param ident This is required for location identification
-     *              if an exception is thrown
-     *
+     * would be thrown.
+     * @param  event The {@link EventDeclProxy} of interest.
+     * @param  ident This is required for location identification
+     *               if an exception is thrown.
      * @return <code>true</code> if the disjoint operation should be performed;
-     *        <code>false</code> otherwise.
+     *         <code>false</code> otherwise.
      */
     private boolean shouldMakeDisjoint(final EventDeclProxy event,
                                        final IdentifierProxy ident)
@@ -1600,35 +1568,25 @@ public class EFANormaliser extends AbortableCompiler
       final EventKind eKind = event.getKind();
       final ComponentKind cKind = mComponent.getKind();
 
-      if (cKind == ComponentKind.PLANT || eKind == EventKind.PROPOSITION)
+      if (cKind == ComponentKind.PLANT || eKind == EventKind.PROPOSITION) {
         return false;
-
-      if (cKind == ComponentKind.PROPERTY || eKind == EventKind.UNCONTROLLABLE)
-      {
+      }
+      if (cKind == ComponentKind.PROPERTY || eKind == EventKind.UNCONTROLLABLE) {
         final EFAVariableCollector collector =
-                       new EFAVariableCollector(mOperatorTable, mRootContext);
-        Set<EFAVariable> primeVariables;
-
-        for (final Entry<ConstraintList, GuardActionBlockProxy> entry :
-                                                       mGABlockMap.entrySet())
-        {
+          new EFAVariableCollector(mOperatorTable, mRootContext);
+        for (final Map.Entry<ConstraintList, GuardActionBlockProxy> entry :
+             mGABlockMap.entrySet()) {
           final ConstraintList update = entry.getKey();
           final GuardActionBlockProxy gaBlock = entry.getValue();
-
-          primeVariables = new HashSet<>();
+          final Set<EFAVariable> primeVariables = new THashSet<>();
           collector.collectPrimedVariables(update, primeVariables);
-
-          if (!primeVariables.isEmpty())
-          {
+          if (!primeVariables.isEmpty()) {
             // Not controllable: Create an exception.
-            for (final EFAVariable var : primeVariables)
-            {
-              for (final BinaryExpressionProxy action : gaBlock.getActions())
-              {
-                final EFSMControllabilityException ex =
-                             new EFSMControllabilityException(mComponent, var,
-                                                              ident, action);
-                mCompilationInfo.raise(ex);
+            for (final EFAVariable var : primeVariables) {
+              for (final BinaryExpressionProxy action : gaBlock.getActions()) {
+                final EFSMControllabilityException exception =
+                  new EFSMControllabilityException(mComponent, var, ident, action);
+                mCompilationInfo.raise(exception);
               }
             }
             return false;
@@ -1769,8 +1727,8 @@ public class EFANormaliser extends AbortableCompiler
     private Set<EFAVariable> collectPrimeVariables()
     {
       final EFAVariableCollector collector =
-                      new EFAVariableCollector(mOperatorTable, mRootContext);
-      final Set<EFAVariable> primeVariables = new HashSet<>();
+        new EFAVariableCollector(mOperatorTable, mRootContext);
+      final Set<EFAVariable> primeVariables = new THashSet<>();
       collector.collectPrimedVariables(mUpdate, primeVariables);
       return primeVariables;
     }
@@ -1848,7 +1806,7 @@ public class EFANormaliser extends AbortableCompiler
 
   // Flags:
   private boolean mCreatesGuardAutomaton = false;
-  private boolean mUsesEventAlphabet = false; // Defalt: New semantics
+  private boolean mUsesEventAlphabet = false; // Default: New semantics
   private boolean mUsesEventNameBuilder = false;
 
   // Utilities:

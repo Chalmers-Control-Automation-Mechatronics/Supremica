@@ -774,7 +774,7 @@ public abstract class AbstractStandardConflictCheckerTest
         Collections.singletonList(binding);
     final ProductDESProxy des =
       getCompiledDES(bindings, "tests", "profisafe",
-                     "profisafe_ihost_efa_block.wmod");
+                     "profisafe_ihost_efa_2b.wmod");
     runModelVerifier(des, bindings, false);
   }
 
