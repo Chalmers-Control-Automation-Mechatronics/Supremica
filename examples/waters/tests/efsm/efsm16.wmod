@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="efsm16" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>Distributed prime number sieve.
-This is the basic version with two sieve processes for primes 2 and 3.
-It handles numbers up to 24.
-The number of reachable states is 759250075, and the diameter is 58.
+This is the basic version with one sieve processe for the prime number 2.
+It handles numbers up to N=8.
 
 Source generates numbers and sends them to the first sieve process sieve2.
 There is one sieve process for each prime number p,
@@ -59,7 +58,7 @@ loop</ns2:Comment>
         <EventDecl Kind="CONTROLLABLE" Name="tau0c2"/>
     </EventDeclList>
     <ComponentList>
-        <VariableComponent Deterministic="false" Name="x0">
+        <VariableComponent Name="x0">
             <VariableRange>
                 <BinaryExpression Operator="..">
                     <IntConstant Value="0"/>
