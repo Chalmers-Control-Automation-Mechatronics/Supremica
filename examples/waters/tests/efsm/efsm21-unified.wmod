@@ -23,19 +23,45 @@
         <SimpleComponent Kind="PLANT" Name="G">
             <Graph>
                 <NodeList>
-                    <SimpleNode Initial="true" Name="S0"/>
-                    <SimpleNode Name="S1"/>
+                    <SimpleNode Initial="true" Name="S0">
+                        <PointGeometry>
+                            <Point X="80" Y="48"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="7" Y="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S1">
+                        <PointGeometry>
+                            <Point X="80" Y="128"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="8" Y="-6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
                 </NodeList>
                 <EdgeList>
                     <Edge Source="S0" Target="S1">
                         <LabelBlock>
                             <SimpleIdentifier Name="a"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-20" Y="-10"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="69" Y="87"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="S1" Target="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="b"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="4" Y="-11"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="90" Y="87"/>
+                        </SplineGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>
@@ -43,28 +69,26 @@
         <SimpleComponent Kind="PLANT" Name=":updates">
             <Graph>
                 <NodeList>
-                    <SimpleNode Initial="true" Name="init"/>
+                    <SimpleNode Initial="true" Name="init">
+                        <PointGeometry>
+                            <Point X="80" Y="96"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-22" Y="8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
                 </NodeList>
                 <EdgeList>
                     <Edge Source="init" Target="init">
                         <LabelBlock>
-                            <SimpleIdentifier Name="a"/>
-                        </LabelBlock>
-                        <GuardActionBlock>
-                            <Guards>
-                                <BinaryExpression Operator="==">
-                                    <UnaryExpression Operator="'">
-                                        <SimpleIdentifier Name="x"/>
-                                    </UnaryExpression>
-                                    <SimpleIdentifier Name="x"/>
-                                </BinaryExpression>
-                            </Guards>
-                        </GuardActionBlock>
-                    </Edge>
-                    <Edge Source="init" Target="init">
-                        <LabelBlock>
                             <SimpleIdentifier Name="b"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="3" Y="-21"/>
+                            </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="125" Y="97"/>
+                        </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
                                 <BinaryExpression Operator="==">
@@ -77,6 +101,9 @@
                                     </BinaryExpression>
                                 </BinaryExpression>
                             </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="6" Y="-4"/>
+                            </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>
                 </EdgeList>
