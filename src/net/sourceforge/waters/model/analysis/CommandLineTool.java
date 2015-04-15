@@ -224,10 +224,12 @@ public class CommandLineTool
         final DocumentProxy doc = docManager.load(filename);
         final ProductDESProxy des;
         final String fullName;
+        long compileTime = -1;
         if (doc instanceof ProductDESProxy) {
           des = (ProductDESProxy) doc;
           fullName = des.getName();
         } else {
+          final long start = System.currentTimeMillis();
           final ModuleProxy module = (ModuleProxy) doc;
           final ModuleCompiler compiler =
             new ModuleCompiler(docManager, desFactory, module);
@@ -239,6 +241,8 @@ public class CommandLineTool
           des = compiler.compile(bindings);
           fullName = ModuleCompiler.getParametrizedName(module, bindings);
           watchdog.removeAbortable(compiler);
+          final long stop = System.currentTimeMillis();
+          compileTime = stop - start;
         }
         System.out.print(fullName + " ... ");
         if (verbose) {
@@ -302,6 +306,9 @@ public class CommandLineTool
         }
         final AnalysisResult result = wrapper.getAnalysisResult();
         if (result != null) {
+          if (compileTime >= 0) {
+            result.setCompileTime(compileTime);
+          }
           if (stats) {
             System.out.println(SEPARATOR);
             System.out.println("Statistics:");

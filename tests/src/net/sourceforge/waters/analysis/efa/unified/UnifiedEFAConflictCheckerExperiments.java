@@ -26,7 +26,6 @@ import net.sourceforge.waters.analysis.bdd.TransitionPartitioningStrategy;
 import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer;
 import net.sourceforge.waters.analysis.compositional.Candidate;
 import net.sourceforge.waters.analysis.compositional.ChainSelectionHeuristic;
-import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult;
 import net.sourceforge.waters.analysis.compositional.CompositionalConflictChecker;
 import net.sourceforge.waters.analysis.compositional.CompositionalSelectionHeuristicFactory;
 import net.sourceforge.waters.analysis.compositional.ConflictAbstractionProcedureFactory;
@@ -588,7 +587,7 @@ public class UnifiedEFAConflictCheckerExperiments
       final long finish = System.currentTimeMillis();
       mConflictChecker.setModel(des);
       mConflictChecker.run();
-      final CompositionalAnalysisResult result =
+      final AnalysisResult result =
         mConflictChecker.getAnalysisResult();
       result.setCompileTime(finish - start);
       return result;

@@ -19,6 +19,7 @@ import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.module.IntConstantProxy;
@@ -174,7 +175,7 @@ public class EnabledEventsCompositionalConflictCheckerExperiments
     } catch (final AnalysisException exception) {
       mPrintWriter.println(name + "," + exception.getMessage());
     } finally {
-      final CompositionalAnalysisResult stats =
+      final AnalysisResult stats =
         mConflictChecker.getAnalysisResult();
       if (!mHasBeenPrinted) {
         mHasBeenPrinted = true;

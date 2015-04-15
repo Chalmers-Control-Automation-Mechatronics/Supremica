@@ -742,7 +742,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   {
     super.setUp();
     setupMonolithicAnalyzer();
-    final CompositionalAnalysisResult result = getAnalysisResult();
+    final AnalysisResult result = getAnalysisResult();
     result.setNumberOfStates(0.0);
     result.setNumberOfTransitions(0.0);
     mAbstractionProcedure =
@@ -776,7 +776,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   }
 
   @Override
-  public CompositionalAnalysisResult createAnalysisResult()
+  public AnalysisResult createAnalysisResult()
   {
     return new CompositionalAnalysisResult();
   }
@@ -823,7 +823,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     throws AnalysisException
   {
     final Logger logger = getLogger();
-    final CompositionalAnalysisResult result = getAnalysisResult();
+    final AnalysisResult result = getAnalysisResult();
     // If simplify() returns true, the global system has been trivially
     // verified, and there is nothing left to do.
     if (!simplify()) {
@@ -1154,7 +1154,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         break;
       }
     }
-    final CompositionalAnalysisResult result = getAnalysisResult();
+    final AnalysisResult result = getAnalysisResult();
     result.setNumberOfAutomata(mCurrentAutomata.size());
     mUsedEventNames = new THashSet<String>(numEvents + numAutomata);
     for (final EventProxy event : mEventInfoMap.keySet()) {
