@@ -343,6 +343,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     try {
       //TODO
       setUp();
+      final UnifiedEFAConflictCheckerAnalysisResult result = getAnalysisResult();
       Collection<UnifiedEFATransitionRelation> trs =
         mMainEFASystem.getTransitionRelations();
       mCurrentSubSystem =
@@ -371,8 +372,8 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
           mCurrentSubSystem = mSubSystemQueue.poll();
           continue;
         }
-        final UnifiedEFATransitionRelation finalTR =
-          trs.iterator().next();
+        final UnifiedEFATransitionRelation finalTR = trs.iterator().next();
+        result.addFinalTransitionRelation(finalTR);
         final boolean nonblocking = mNonblockingChecker.run(finalTR);
         getLogger().debug("Result for final TR " + finalTR.getName() +
                           ": " + nonblocking);
@@ -552,7 +553,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       mUnfolder.run();
       final UnifiedEFATransitionRelation unfoldedTR =
         mUnfolder.getTransitionRelation();
-      result.addUnifiedEFATRTransitionRelation(unfoldedTR);
+      result.addIntermediateTransitionRelation(unfoldedTR);
       registerTR(unfoldedTR, true);
       unregisterVariable(selectedVarInfo);
       UnifiedEFATransitionRelation simplifiedTR = simplifyTR(unfoldedTR);
@@ -572,7 +573,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       final UnifiedEFATransitionRelation syncTR =
         mSynchronizer.getSynchronousProduct();
       registerTR(syncTR, false);
-      result.addUnifiedEFATRTransitionRelation(syncTR);
+      result.addIntermediateTransitionRelation(syncTR);
       for (final UnifiedEFATransitionRelation tr : trs) {
         unregisterTR(tr);
       }
@@ -585,7 +586,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       }
     } else {
       final UnifiedEFATransitionRelation tr = trs.get(0);
-      result.addUnifiedEFATRTransitionRelation(tr);
+      result.addIntermediateTransitionRelation(tr);
       final UnifiedEFATransitionRelation simplifiedTR = simplifyTR(tr);
       if (simplifiedTR != null) {
         mergeUpdates(simplifiedTR);
