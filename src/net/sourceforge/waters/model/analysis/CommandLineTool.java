@@ -37,6 +37,7 @@ import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.EvalAbortException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -231,6 +232,7 @@ public class CommandLineTool
         } else {
           final long start = System.currentTimeMillis();
           final ModuleProxy module = (ModuleProxy) doc;
+          fullName = ModuleCompiler.getParametrizedName(module, bindings);
           final ModuleCompiler compiler =
             new ModuleCompiler(docManager, desFactory, module);
           if (!keepPropositions) {
@@ -238,11 +240,22 @@ public class CommandLineTool
           }
           factory.configure(compiler);
           watchdog.addAbortable(compiler);
-          des = compiler.compile(bindings);
-          fullName = ModuleCompiler.getParametrizedName(module, bindings);
-          watchdog.removeAbortable(compiler);
-          final long stop = System.currentTimeMillis();
-          compileTime = stop - start;
+          try {
+            des = compiler.compile(bindings);
+            final long stop = System.currentTimeMillis();
+            compileTime = stop - start;
+          } catch (final EvalAbortException exception) {
+            final long stop = System.currentTimeMillis();
+            compileTime = stop - start;
+            showSupportedException(exception);
+            final AnalysisResult result = new DefaultAnalysisResult();
+            result.setCompileTime(compileTime);
+            result.setException(exception);
+            writeCSV(csv, fullName, result, first);
+            continue;
+          } finally {
+            watchdog.removeAbortable(compiler);
+          }
         }
         System.out.print(fullName + " ... ");
         if (verbose) {
@@ -319,23 +332,7 @@ public class CommandLineTool
             result.print(System.out);
             additions = true;
           }
-          if (csv != null) {
-            if (first) {
-              csv.print("Model,");
-              result.printCSVHorizontalHeadings(csv);
-              csv.println();
-            }
-            if (fullName.indexOf(',') >= 0) {
-              csv.print('"');
-              csv.print(fullName);
-              csv.print('"');
-            } else {
-              csv.print(fullName);
-            }
-            csv.print(',');
-            result.printCSVHorizontal(csv);
-            csv.println();
-          }
+          writeCSV(csv, fullName, result, first);
         }
         if (additions) {
           System.out.println(SEPARATOR);
@@ -380,6 +377,30 @@ public class CommandLineTool
     final String msg = exception.getMessage();
     if (msg != null) {
       System.err.println(exception.getMessage());
+    }
+  }
+
+  private static void writeCSV(final PrintWriter csv,
+                               final String fullName,
+                               final AnalysisResult result,
+                               final boolean first)
+  {
+    if (csv != null) {
+      if (first) {
+        csv.print("Model,");
+        result.printCSVHorizontalHeadings(csv);
+        csv.println();
+      }
+      if (fullName.indexOf(',') >= 0) {
+        csv.print('"');
+        csv.print(fullName);
+        csv.print('"');
+      } else {
+        csv.print(fullName);
+      }
+      csv.print(',');
+      result.printCSVHorizontal(csv);
+      csv.println();
     }
   }
 

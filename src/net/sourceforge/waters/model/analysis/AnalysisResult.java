@@ -12,6 +12,7 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.base.WatersException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
@@ -60,7 +61,7 @@ public interface AnalysisResult
    * accurate.
    * @see #isSatisfied()
    */
-  public AnalysisException getException();
+  public WatersException getException();
 
   /**
    * Gets the runtime of the operation that produced this result.
@@ -160,7 +161,7 @@ public interface AnalysisResult
    * the result run as 'finished'.
    * @see #isFinished()
    */
-  public void setException(final AnalysisException exception);
+  public void setException(final WatersException exception);
 
   /**
    * Sets a runtime for this result.

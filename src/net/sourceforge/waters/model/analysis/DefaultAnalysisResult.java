@@ -14,6 +14,7 @@ import java.io.StringWriter;
 import java.util.Formatter;
 
 import net.sourceforge.waters.model.base.ProxyTools;
+import net.sourceforge.waters.model.base.WatersException;
 
 
 /**
@@ -61,7 +62,7 @@ public class DefaultAnalysisResult
   }
 
   @Override
-  public AnalysisException getException()
+  public WatersException getException()
   {
     return mException;
   }
@@ -129,7 +130,7 @@ public class DefaultAnalysisResult
   }
 
   @Override
-  public void setException(final AnalysisException exception)
+  public void setException(final WatersException exception)
   {
     mFinished = true;
     mException = exception;
@@ -470,7 +471,7 @@ public class DefaultAnalysisResult
   private boolean mSatisfied;
   private long mRunTime;
   private long mCompileTime;
-  private AnalysisException mException;
+  private WatersException mException;
   private int mTotalNumberOfAutomata;
   private double mTotalNumberOfStates;
   private double mPeakNumberOfStates;
