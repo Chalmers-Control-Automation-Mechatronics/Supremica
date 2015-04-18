@@ -265,6 +265,22 @@ class TRSubsystemInfo
 
 
   //#########################################################################
+  //# Heuristic Support
+  int getFrontierSize2(final TRCandidate candidate)
+  {
+    final Set<TRAutomatonProxy> connected = new THashSet<>();
+    final EventEncoding enc = candidate.getEventEncoding();
+    for (final EventProxy event : enc.getUsedEvents()) {
+      final TREventInfo info = getEventInfo(event);
+      if (info != null) {
+        connected.addAll(info.getAutomata());
+      }
+    }
+    return connected.size();
+  }
+
+
+  //#########################################################################
   //# Auxiliary Methods
   private TREventInfo createEventInfo(final EventProxy event,
                                       final byte status)

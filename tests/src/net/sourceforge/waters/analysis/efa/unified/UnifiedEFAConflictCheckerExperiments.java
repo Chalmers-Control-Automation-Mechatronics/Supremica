@@ -683,7 +683,7 @@ public class UnifiedEFAConflictCheckerExperiments
 
   static {
     final SelectionHeuristic<UnifiedEFACandidate> minF =
-      new CompositionSelectionHeuristicMinF();
+      new CompositionSelectionHeuristicMinF1();
     final SelectionHeuristic<UnifiedEFACandidate> minS =
       new CompositionSelectionHeuristicMinS();
     CHAIN_MINF = new ChainSelectionHeuristic<UnifiedEFACandidate>(minF, minS);

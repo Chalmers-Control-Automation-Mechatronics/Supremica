@@ -179,6 +179,11 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
     return mDummyRoot;
   }
 
+  SubSystemInfo getCurrentSubSystem()
+  {
+    return mCurrentSubSystem;
+  }
+
   Set<UnifiedEFATransitionRelation> getTransitionRelations()
   {
     return mCurrentSubSystem.getTransitionRelations();
@@ -297,7 +302,7 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       final SelectionHeuristic<UnifiedEFACandidate> minS =
         new CompositionSelectionHeuristicMinS();
       final SelectionHeuristic<UnifiedEFACandidate> minF =
-        new CompositionSelectionHeuristicMinF();
+        new CompositionSelectionHeuristicMinF1();
       mCompositionSelectionHeuristic =
         new ChainSelectionHeuristic<UnifiedEFACandidate>(minF, minS);
     }
@@ -1792,6 +1797,37 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
       }
       return candidateMap.values();
     }
+
+    int getFrontierSize2(final UnifiedEFACandidate candidate)
+    {
+      // Set to contain variables and transition relations of the candidate
+      // plus its frontier
+      final Set<Object> frontierCount = new THashSet<>();
+      // Set to contain events used by the candidate
+      final Set<AbstractEFAEvent> events = new THashSet<>();
+      // Collect transition relations, variables, events of candidate
+      for (final UnifiedEFATransitionRelation tr :
+           candidate.getTransitionRelations()) {
+        frontierCount.add(tr);
+        events.addAll(tr.getUsedEventsExceptTau());
+      }
+      for (final VariableInfo var : candidate.getVariableInfo()) {
+        frontierCount.add(var);
+        for (final EventInfo info : var.getEvents()) {
+          events.add(info.getEvent());
+        }
+      }
+      // Add variables and transition relations of events to frontier
+      for (final AbstractEFAEvent event : events) {
+        final EventInfo info = getEventInfo(event);
+        frontierCount.addAll(info.getTransitionRelations());
+        frontierCount.addAll(info.getVariables());
+      }
+      // Frontier size is number of all variables and transition relations
+      // minus number of variables and transition relations of the candidate
+      return frontierCount.size();
+    }
+
 
 //    @SuppressWarnings("unused")
 //    private void createOneVariableCandidates()

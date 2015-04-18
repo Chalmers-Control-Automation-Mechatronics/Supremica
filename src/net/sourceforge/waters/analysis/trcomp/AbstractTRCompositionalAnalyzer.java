@@ -280,7 +280,8 @@ public abstract class AbstractTRCompositionalAnalyzer
         register(SEL_MaxC);
         register(SEL_MaxL);
         register(SEL_MinE);
-        register(SEL_MinF);
+        register(SEL_MinF1);
+        register(SEL_MinF2);
       }
     };
   }
@@ -1786,8 +1787,10 @@ public abstract class AbstractTRCompositionalAnalyzer
     new SelectionHeuristicMaxL();
   public static final SelectionHeuristic<TRCandidate> SEL_MinE =
     new SelectionHeuristicMinE();
-  public static final SelectionHeuristic<TRCandidate> SEL_MinF =
-    new SelectionHeuristicMinF();
+  public static final SelectionHeuristic<TRCandidate> SEL_MinF1 =
+    new SelectionHeuristicMinF1();
+  public static final SelectionHeuristic<TRCandidate> SEL_MinF2 =
+    new SelectionHeuristicMinF2();
   public static final NumericSelectionHeuristic<TRCandidate> SEL_MinS0 =
     new SelectionHeuristicMinS0();
   public static final NumericSelectionHeuristic<TRCandidate> SEL_MinS0a =

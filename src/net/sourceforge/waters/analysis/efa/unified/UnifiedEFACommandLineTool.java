@@ -456,7 +456,8 @@ public class UnifiedEFACommandLineTool
     private CompositionSelectionHeuristicFactory()
     {
       register(new CompositionSelectionHeuristicMinS());
-      register(new CompositionSelectionHeuristicMinF());
+      register(new CompositionSelectionHeuristicMinF1());
+      register(new CompositionSelectionHeuristicMinF2());
     }
   }
 
