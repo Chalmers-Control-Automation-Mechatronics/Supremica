@@ -34,6 +34,7 @@ public class DefaultAnalysisResult
   {
     mFinished = false;
     mRunTime = -1;
+    mCompileTime = -1;
     mException = null;
     mTotalNumberOfAutomata = -1;
     mTotalNumberOfStates = -1.0;
@@ -69,6 +70,12 @@ public class DefaultAnalysisResult
   public long getRunTime()
   {
     return mRunTime;
+  }
+
+  @Override
+  public long getCompileTime()
+  {
+    return mCompileTime;
   }
 
   @Override
@@ -132,6 +139,12 @@ public class DefaultAnalysisResult
   public void setRuntime(final long time)
   {
     mRunTime = time;
+  }
+
+  @Override
+  public void setCompileTime(final long time)
+  {
+    mCompileTime = time;
   }
 
   @Override
@@ -219,6 +232,7 @@ public class DefaultAnalysisResult
     if (other.getClass() == getClass()) {
       mFinished &= other.isFinished();
       mSatisfied &= other.isSatisfied();
+      mCompileTime = mergeAdd(mCompileTime, other.getCompileTime());
       mRunTime = mergeAdd(mRunTime, other.getRunTime());
       if (mException != null) {
         mException = other.getException();
@@ -293,8 +307,10 @@ public class DefaultAnalysisResult
     @SuppressWarnings("resource")
     final Formatter formatter = new Formatter(writer);
     if (mRunTime >= 0) {
-      final float seconds = 0.001f * mRunTime;
-      formatter.format("Total runtime: %.3fs\n", seconds);
+      formatter.format("Total runtime: %.3fs\n", 0.001f * mRunTime);
+    }
+    if (mCompileTime >= 0) {
+      formatter.format("Compile time: %.3fs\n", 0.001f * mCompileTime);
     }
     writer.println("Memory usage: " + (mPeakMemoryUsage >> 10) + " kB");
     if (mTotalNumberOfAutomata >= 0) {
@@ -332,6 +348,10 @@ public class DefaultAnalysisResult
       writer.print(mRunTime);
     }
     writer.print(',');
+    if (mCompileTime >= 0) {
+      writer.print(mCompileTime);
+    }
+    writer.print(',');
     writer.print(mPeakMemoryUsage);
     writer.print(',');
     if (mTotalNumberOfAutomata >= 0) {
@@ -364,7 +384,9 @@ public class DefaultAnalysisResult
   @Override
   public void printCSVHorizontalHeadings(final PrintWriter writer)
   {
-    writer.print("Result,RunTime");
+    writer.print("Result");
+    writer.print(",RunTime");
+    writer.print(",CompileTime");
     writer.print(",PeakMem");
     writer.print(",TotAut");
     writer.print(",TotStates");
@@ -447,6 +469,7 @@ public class DefaultAnalysisResult
   private boolean mFinished;
   private boolean mSatisfied;
   private long mRunTime;
+  private long mCompileTime;
   private AnalysisException mException;
   private int mTotalNumberOfAutomata;
   private double mTotalNumberOfStates;

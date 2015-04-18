@@ -43,6 +43,8 @@ public class UnifiedEFAConflictCheckerAnalysisResult
     mMaxDomain = -1;
     mTotalCompositionsCount = 0;
     mUnsuccessfulCompositionsCount = 0;
+    mFinalStates = 0;
+    mFinalTransitions = 0;
     mNumberOfSplitAttempts = 0;
     mNumberOfSplits = 0;
     mSplitTime = 0;
@@ -107,7 +109,7 @@ public class UnifiedEFAConflictCheckerAnalysisResult
     }
   }
 
-  public void addUnifiedEFATRTransitionRelation
+  public void addIntermediateTransitionRelation
     (final UnifiedEFATransitionRelation tr)
   {
     final ListBufferTransitionRelation rel = tr.getTransitionRelation();
@@ -123,6 +125,15 @@ public class UnifiedEFAConflictCheckerAnalysisResult
     final double peakTrans =
       Math.max(getPeakNumberOfTransitions(), numTrans);
     setPeakNumberOfTransitions(peakTrans);
+    updatePeakMemoryUsage();
+  }
+
+  public void addFinalTransitionRelation
+    (final UnifiedEFATransitionRelation tr)
+  {
+    final ListBufferTransitionRelation rel = tr.getTransitionRelation();
+    mFinalStates += rel.getNumberOfStates();
+    mFinalTransitions += rel.getNumberOfTransitions();
     updatePeakMemoryUsage();
   }
 
@@ -198,12 +209,16 @@ public class UnifiedEFAConflictCheckerAnalysisResult
     super.print(writer);
     @SuppressWarnings("resource")
     final Formatter formatter = new Formatter(writer);
-    writer.print("Total number of EFSM variables:");
+    writer.print("Total number of EFSM variables: ");
     writer.println(mTotalVariables);
-    writer.print("Largest domain size of EFSM variables:");
+    writer.print("Largest domain size of EFSM variables: ");
     writer.println(mMaxDomain);
     writer.print("Total number of compositions: ");
     writer.println(mTotalCompositionsCount);
+    writer.print("Number of states in final abstractions: ");
+    writer.println(mFinalStates);
+    writer.print("Number of transitions in final abstractions: ");
+    writer.println(mFinalTransitions);
     writer.print("Number of unsuccessful compositions: ");
     writer.println(mUnsuccessfulCompositionsCount);
     writer.print("Number of attempts to split off subsystems: ");
@@ -214,7 +229,6 @@ public class UnifiedEFAConflictCheckerAnalysisResult
                      0.001f * mSplitTime);
     writer.print("Time consumed by split attempts: ");
     writer.println(mNumberOfSplits);
-    writer.print("Number of redundant events: ");
     if (mUnsuccessfulCompositionsCount > 0) {
       final float probability =
         (float) (mTotalCompositionsCount - mUnsuccessfulCompositionsCount) /
@@ -251,6 +265,8 @@ public class UnifiedEFAConflictCheckerAnalysisResult
     writer.print(",MaxDomain");
     writer.print(",Compositions");
     writer.print(",Overflows");
+    writer.print(",FinalStates");
+    writer.print(",FinalTrans");
     writer.print(",SplitAttempts");
     writer.print(",Splits");
     writer.print(",SplitTime");
@@ -282,6 +298,10 @@ public class UnifiedEFAConflictCheckerAnalysisResult
     writer.print(mTotalCompositionsCount);
     writer.print(',');
     writer.print(mUnsuccessfulCompositionsCount);
+    writer.print(',');
+    writer.print(mFinalStates);
+    writer.print(',');
+    writer.print(mFinalTransitions);
     writer.print(',');
     writer.print(mNumberOfSplitAttempts);
     writer.print(',');
@@ -316,6 +336,10 @@ public class UnifiedEFAConflictCheckerAnalysisResult
   private int mMaxDomain;
   private int mTotalCompositionsCount;
   private int mUnsuccessfulCompositionsCount;
+  private int mFinalStates;
+  private int mFinalTransitions;
+
+  // TODO implement and record these also:
   private final int mNumberOfSplitAttempts;
   private final int mNumberOfSplits;
   private final long mSplitTime;

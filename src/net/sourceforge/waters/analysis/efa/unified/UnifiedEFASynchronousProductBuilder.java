@@ -83,6 +83,9 @@ public class UnifiedEFASynchronousProductBuilder
     throws AnalysisException
   {
     super.setUp();
+    configureTransitionRelations();
+    createEventEncoding();
+    createTransitionIterators();
   }
 
   public void run()
@@ -90,8 +93,6 @@ public class UnifiedEFASynchronousProductBuilder
   {
     try {
       setUp();
-      configureTransitionRelations();
-      createEventEncoding();
       exploreSynchronousProduct();
       createTransitionRelation();
     } finally {
@@ -108,6 +109,7 @@ public class UnifiedEFASynchronousProductBuilder
     mTransitionIterators = null;
     mStateSpace = null;
     mPreTransitionBuffer = null;
+    mDeadlockInfo = null;
   }
 
   public UnifiedEFATransitionRelation getSynchronousProduct()
@@ -178,6 +180,35 @@ public class UnifiedEFASynchronousProductBuilder
     }
   }
 
+  private void createTransitionIterators()
+  {
+    final int numTR = mInputTransitionRelations.size();
+    mTransitionIterators = new TransitionIterator[numTR];
+    mDeadlockInfo = new boolean[numTR][];
+    mUsesMarking = false;
+    mUsesTau = false;
+    for (int trIndex = 0; trIndex < numTR; trIndex++) {
+      final UnifiedEFATransitionRelation tr =
+        mInputTransitionRelations.get(trIndex);
+      final ListBufferTransitionRelation rel = tr.getTransitionRelation();
+      if (rel.isPropositionUsed(UnifiedEFAEventEncoding.OMEGA)) {
+        mUsesMarking = true;
+        final int numStates = rel.getNumberOfStates();
+        final boolean[] info = new boolean[numStates];
+        for (int s = 0; s < numStates; s++) {
+          info[s] = rel.isDeadlockState(s, UnifiedEFAEventEncoding.OMEGA);
+        }
+        mDeadlockInfo[trIndex] = info;
+      }
+      final byte tauStatus = rel.getProperEventStatus(EventEncoding.TAU);
+      mUsesTau |= EventStatus.isUsedEvent(tauStatus);
+      mTransitionIterators[trIndex] = rel.createSuccessorsReadOnlyIterator();
+    }
+    mPreTransitionBuffer =
+      new PreTransitionBuffer(mEventEncoding.size(), mTransitionLimit);
+    mDumpStateIndex = -1;
+  }
+
   private void configureTransitionRelations()
   {
     for (final UnifiedEFATransitionRelation tr : mInputTransitionRelations) {
@@ -186,39 +217,35 @@ public class UnifiedEFASynchronousProductBuilder
     }
   }
 
-  private void exploreSynchronousProduct() throws OverflowException
+  private void exploreSynchronousProduct() throws AnalysisException
   {
     final int numTR = mInputTransitionRelations.size();
     mStateSpace = new IntArrayBuffer(numTR, mStateLimit);
     final int[] sourceTuple = new int[numTR];
     createInitialStates(sourceTuple, 0);
     mNumberOfInitialStates = mStateSpace.size();
-    mUsesMarking = false;
-    mUsesTau = false;
-    mTransitionIterators = new TransitionIterator[numTR];
-    mPreTransitionBuffer =
-      new PreTransitionBuffer(mEventEncoding.size(), mTransitionLimit);
-    for (int trIndex = 0; trIndex < numTR; trIndex++) {
-      final UnifiedEFATransitionRelation tr =
-        mInputTransitionRelations.get(trIndex);
-      final ListBufferTransitionRelation rel = tr.getTransitionRelation();
-      mUsesMarking |= rel.isPropositionUsed(UnifiedEFAEventEncoding.OMEGA);
-      final byte tauStatus = rel.getProperEventStatus(EventEncoding.TAU);
-      mUsesTau |= EventStatus.isUsedEvent(tauStatus);
-      mTransitionIterators[trIndex] = rel.createSuccessorsReadOnlyIterator();
-    }
     final int[] targetTuple = new int[numTR];
     for (int stateNumber = 0; stateNumber < mStateSpace.size(); stateNumber++) {
+      if (stateNumber == mDumpStateIndex) {
+        continue;
+      }
       mStateSpace.getContents(stateNumber, sourceTuple);
       if (mUsesTau) {
-        mStateSpace.getContents(stateNumber, targetTuple);
+        System.arraycopy(sourceTuple, 0, targetTuple, 0, numTR);
         for (int trIndex = 0; trIndex < numTR; trIndex++) {
           targetTuple[trIndex] = sourceTuple[trIndex];
           final TransitionIterator iter = mTransitionIterators[trIndex];
           iter.reset(sourceTuple[trIndex], EventEncoding.TAU);
           while (iter.advance()) {
-            targetTuple[trIndex] = iter.getCurrentTargetState();
-            final int target = mStateSpace.add(targetTuple);
+            final int t = iter.getCurrentTargetState();
+            final int target;
+            // TODO Make deadlock pruning optional?
+            if (mDeadlockInfo[trIndex] != null && mDeadlockInfo[trIndex][t]) {
+              target = createDumpState();
+            } else {
+              targetTuple[trIndex] = t;
+              target = mStateSpace.add(targetTuple);
+            }
             mPreTransitionBuffer.addTransition
               (stateNumber, EventEncoding.TAU, target);
           }
@@ -252,13 +279,29 @@ public class UnifiedEFASynchronousProductBuilder
     }
   }
 
+  private int createDumpState()
+    throws OverflowException
+  {
+    if (mDumpStateIndex < 0) {
+      final int numTR = mInputTransitionRelations.size();
+      final int[] tuple = new int[numTR];
+      for (int trIndex = 0; trIndex < numTR; trIndex++) {
+        final ListBufferTransitionRelation rel =
+          mInputTransitionRelations.get(trIndex).getTransitionRelation();
+        tuple[trIndex] = rel.getDumpStateIndex();
+      }
+      mDumpStateIndex = mStateSpace.add(tuple);
+    }
+    return mDumpStateIndex;
+  }
+
   private void createSuccessorStates(final int source,
                                      final int[] sourceTuple,
                                      final int event,
                                      final int[] targetTuple,
                                      final List<EventTRInfo> infoList,
                                      final int index)
-    throws OverflowException
+    throws AnalysisException
   {
     if (index < infoList.size()) {
       final EventTRInfo info = infoList.get(index);
@@ -267,12 +310,26 @@ public class UnifiedEFASynchronousProductBuilder
       final TransitionIterator iter = mTransitionIterators[trIndex];
       iter.reset(sourceTuple[trIndex], eventCode);
       while (iter.advance()) {
-        targetTuple[trIndex] = iter.getCurrentTargetState();
-        createSuccessorStates(source, sourceTuple, event,
-                              targetTuple, infoList, index + 1);
+        if (targetTuple == null) {
+          createSuccessorStates(source, sourceTuple, event,
+                                null, infoList, index + 1);
+          continue;
+        }
+        final int target = iter.getCurrentTargetState();
+        // TODO Make deadlock pruning optional?
+        if (mDeadlockInfo[trIndex] != null && mDeadlockInfo[trIndex][target]) {
+          createSuccessorStates(source, sourceTuple, event,
+                                null, infoList, index + 1);
+        } else {
+          targetTuple[trIndex] = target;
+          createSuccessorStates(source, sourceTuple, event,
+                                targetTuple, infoList, index + 1);
+        }
       }
     } else {
-      final int target = mStateSpace.add(targetTuple);
+      checkAbort();
+      final int target =
+        targetTuple == null ? createDumpState() : mStateSpace.add(targetTuple);
       mPreTransitionBuffer.addTransition(source, event, target);
     }
   }
@@ -283,10 +340,16 @@ public class UnifiedEFASynchronousProductBuilder
     final ComponentKind kind = getOutputKind();
     final int numPropositions = mUsesMarking ? 1 : 0;
     final int config = ListBufferTransitionRelation.CONFIG_SUCCESSORS;
-    final ListBufferTransitionRelation resultRel =
-      new ListBufferTransitionRelation(name, kind, mEventEncoding.size(),
-                                       numPropositions, mStateSpace.size(),
-                                       config);
+    final ListBufferTransitionRelation resultRel;
+    if (mDumpStateIndex < 0) {
+      resultRel = new ListBufferTransitionRelation
+        (name, kind, mEventEncoding.size(), numPropositions,
+         mStateSpace.size(), config);
+    } else {
+      resultRel = new ListBufferTransitionRelation
+        (name, kind, mEventEncoding.size(), numPropositions,
+         mStateSpace.size(), mDumpStateIndex, config);
+    }
     if (!mUsesTau) {
       resultRel.setProperEventStatus(EventEncoding.TAU,
                                      EventStatus.STATUS_FULLY_LOCAL |
@@ -531,7 +594,9 @@ public class UnifiedEFASynchronousProductBuilder
   private boolean mUsesMarking;
   private boolean mUsesTau;
   private TransitionIterator[] mTransitionIterators;
+  private boolean[][] mDeadlockInfo;
   private IntArrayBuffer mStateSpace;
   private PreTransitionBuffer mPreTransitionBuffer;
+  private int mDumpStateIndex;
 
 }

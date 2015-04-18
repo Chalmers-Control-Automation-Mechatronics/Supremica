@@ -12,6 +12,9 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.compiler.ModuleCompiler;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.module.ModuleProxy;
 
 
 /**
@@ -65,6 +68,14 @@ public interface AnalysisResult
    *         that timing information is not available.
    */
   public long getRunTime();
+
+  /**
+   * Gets the compile time recorded for this analysis result.
+   * The compile time measures the time spent by the {@link ModuleCompiler}
+   * to compile the input {@link ModuleProxy} to a {@link ProductDESProxy},
+   * in milliseconds.
+   */
+  public long getCompileTime();
 
   /**
    * Gets the peak memory usage. Memory usage is determined by the maximum
@@ -157,6 +168,13 @@ public interface AnalysisResult
    *          Time to be stored, in milliseconds.
    */
   public void setRuntime(final long time);
+
+  /**
+   * Sets a compile for this result.
+   * @param time
+   *          Time to be stored, in milliseconds.
+   */
+  public void setCompileTime(final long time);
 
   /**
    * Updates the recorded memory usage.
