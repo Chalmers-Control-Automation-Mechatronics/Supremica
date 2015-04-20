@@ -86,6 +86,16 @@ public class TRCandidate
     return mEventEncoding;
   }
 
+  void setComposedSuccessfully()
+  {
+    mComposedSuccessfully = true;
+  }
+
+  boolean isComposedSuccessfully()
+  {
+    return mComposedSuccessfully;
+  }
+
 
   //#########################################################################
   //# Advanced Access
@@ -226,5 +236,6 @@ public class TRCandidate
   //# Data Members
   private final List<TRAutomatonProxy> mAutomata;
   private final EventEncoding mEventEncoding;
+  private boolean mComposedSuccessfully = false;
 
 }

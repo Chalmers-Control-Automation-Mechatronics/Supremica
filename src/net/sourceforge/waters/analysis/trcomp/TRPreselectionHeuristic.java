@@ -109,7 +109,8 @@ public abstract class TRPreselectionHeuristic
     } else if (overflow == candidate) {
       return true;
     } else {
-      return candidate.hasSameEventStatus(overflow);
+      return !overflow.isComposedSuccessfully() ||
+             overflow.hasSameEventStatus(candidate);
     }
   }
 

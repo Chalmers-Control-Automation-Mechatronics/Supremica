@@ -978,6 +978,7 @@ public abstract class AbstractTRCompositionalAnalyzer
       mSynchronousProductBuilder.run();
       final TRSynchronousProductResult syncResult =
         mSynchronousProductBuilder.getAnalysisResult();
+      candidate.setComposedSuccessfully();
       final CompositionalAnalysisResult combinedResult = getAnalysisResult();
       combinedResult.addSynchronousProductAnalysisResult(syncResult);
       final TRAutomatonProxy sync = syncResult.getComputedAutomaton();
