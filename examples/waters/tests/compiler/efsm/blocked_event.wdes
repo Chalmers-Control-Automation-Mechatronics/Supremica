@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:ProductDES Name="blocked_event" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
+<Comment>An EFSM compiler test with an event blocked through a guard that evaluates to false.</Comment>
+<ns2:AutomataList>
+<ns2:Automaton Kind="PLANT" Name="A[0]">
+<ns2:StateList>
+<ns2:State Initial="true" Name="S0"/>
+<ns2:State Name="S1"/>
+</ns2:StateList>
+</ns2:Automaton>
+<ns2:Automaton Kind="PLANT" Name="A[1]">
+<ns2:StateList>
+<ns2:State Initial="true" Name="S0"/>
+<ns2:State Name="S1"/>
+</ns2:StateList>
+</ns2:Automaton>
+<ns2:Automaton Kind="PLANT" Name="x">
+<ns2:StateList>
+<ns2:State Initial="true" Name="0"/>
+<ns2:State Name="1"/>
+</ns2:StateList>
+</ns2:Automaton>
+</ns2:AutomataList>
+</ns2:ProductDES>

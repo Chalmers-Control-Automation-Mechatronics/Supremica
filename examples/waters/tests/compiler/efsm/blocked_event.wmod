@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="blocked_event" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>An EFSM compiler test with an event blocked through a guard that evaluates to false.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Name="e"/>
+    </EventDeclList>
+    <ComponentList>
+        <VariableComponent Name="x">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="1"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="x"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+        </VariableComponent>
+        <ForeachComponent Name="i">
+            <BinaryExpression Operator="..">
+                <IntConstant Value="0"/>
+                <IntConstant Value="1"/>
+            </BinaryExpression>
+            <ComponentList>
+                <SimpleComponent Kind="PLANT">
+                    <IndexedIdentifier Name="A">
+                        <SimpleIdentifier Name="i"/>
+                    </IndexedIdentifier>
+                    <Graph>
+                        <NodeList>
+                            <SimpleNode Initial="true" Name="S0">
+                                <PointGeometry>
+                                    <Point X="96" Y="96"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point X="0" Y="10"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Name="S1">
+                                <PointGeometry>
+                                    <Point X="208" Y="96"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="NW">
+                                    <Point X="0" Y="10"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                        </NodeList>
+                        <EdgeList>
+                            <Edge Source="S0" Target="S1">
+                                <LabelBlock>
+                                    <SimpleIdentifier Name="e"/>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-35" Y="-24"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <GuardActionBlock>
+                                    <Guards>
+                                        <BinaryExpression Operator="==">
+                                            <SimpleIdentifier Name="i"/>
+                                            <IntConstant Value="0"/>
+                                        </BinaryExpression>
+                                    </Guards>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-7" Y="-25"/>
+                                    </LabelGeometry>
+                                </GuardActionBlock>
+                            </Edge>
+                        </EdgeList>
+                    </Graph>
+                </SimpleComponent>
+            </ComponentList>
+        </ForeachComponent>
+    </ComponentList>
+</Module>

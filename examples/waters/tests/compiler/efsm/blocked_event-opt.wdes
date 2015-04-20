@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:ProductDES Name="blocked_event" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
+<Comment>An EFSM compiler test with an event blocked through a guard that evaluates to false.</Comment>
+</ns2:ProductDES>

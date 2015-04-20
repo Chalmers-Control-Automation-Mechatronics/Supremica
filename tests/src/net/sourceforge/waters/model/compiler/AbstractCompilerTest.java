@@ -339,6 +339,14 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     testCompile(module);
   }
 
+  public void testCompile_blocked_event()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "blocked_event");
+    testCompile(module);
+  }
+
   public void testCompile_ControllableTestModelEFA()
     throws IOException, WatersException
   {

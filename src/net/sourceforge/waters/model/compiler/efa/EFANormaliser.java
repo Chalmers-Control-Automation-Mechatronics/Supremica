@@ -1055,48 +1055,44 @@ public class EFANormaliser extends AbortableCompiler
      * If the flag {@link #mUsesEventAlphabet} is set, then
      * this means that when a variable is not mentioned in an update,
      * this particular variable can be changed.
-     * <p>
+     *
      * This method achieves this by explicitly adding extra terms in the
      * form of (x'= x') to the updates.
      */
     private void createExplicitGuards()
     {
-      // The overall set of all prime variables used by an EFAEventInfo.
-      final Set<EFAVariable> allPrimes = new THashSet<>();
-
-      /* Ensure that the set of prime variables of every EFAUpdateInfo is
-       * properly initiated, then obtain the global set of prime variables.
-       */
-      for (final EFAUpdateInfo update : mList) {
-        update.setPrimeVariables();
-        allPrimes.addAll(update.getPrimeVariables());
-      }
-
-      /* Add literals such as (x'=x') if the variable (x') is not mentioned
-       * in the update of an event.
-       */
-      for (final EFAIdentifier event : mEventList) {
-        for (final EFAVariable primeVar : allPrimes) {
-          if (!event.collectPrimeVariables().contains(primeVar))
-          {
-            // Prepare the operators.
-            final BinaryOperator equal = mOperatorTable.getEqualsOperator();
-            final UnaryOperator prime = mOperatorTable.getNextOperator();
-
-            // Construct the new term.
-            SimpleExpressionProxy term = primeVar.getVariableName();
-            term = mFactory.createUnaryExpressionProxy(prime, term);
-            term = mFactory.createBinaryExpressionProxy(equal, term, term);
-
-            // Add the new term to the conjunction.
-            final List<SimpleExpressionProxy> oldGuards =
-                                           event.getUpdate().getConstraints();
-            final List<SimpleExpressionProxy> newGuards = new ArrayList<>();
-            for (final SimpleExpressionProxy exp : oldGuards)
-              newGuards.add(exp);
-            newGuards.add(term);
-            mEventUpdateMap.putByProxy(event.getIdentifier(),
-                                       new ConstraintList(newGuards));
+      if (!isBlocked()) {
+        // The overall set of all primed variables used by an EFAEventInfo.
+        final Set<EFAVariable> allPrimes = new THashSet<>();
+        // Ensure that the set of primed variables of every EFAUpdateInfo is
+        // properly initialised, then obtain the global set of primed variables.
+        for (final EFAUpdateInfo update : mList) {
+          update.setPrimeVariables();
+          allPrimes.addAll(update.getPrimeVariables());
+        }
+        // Add literals such as (x'=x') if the variable (x') is not mentioned
+        // in the update of the event.
+        for (final EFAIdentifier event : mEventList) {
+          for (final EFAVariable primeVar : allPrimes) {
+            if (!event.collectPrimeVariables().contains(primeVar)) {
+              // Prepare the operators.
+              final BinaryOperator equal = mOperatorTable.getEqualsOperator();
+              final UnaryOperator prime = mOperatorTable.getNextOperator();
+              // Construct the new term.
+              SimpleExpressionProxy term = primeVar.getVariableName();
+              term = mFactory.createUnaryExpressionProxy(prime, term);
+              term = mFactory.createBinaryExpressionProxy(equal, term, term);
+              // Add the new term to the conjunction.
+              final List<SimpleExpressionProxy> oldGuards =
+                event.getUpdate().getConstraints();
+              final List<SimpleExpressionProxy> newGuards = new ArrayList<>();
+              for (final SimpleExpressionProxy exp : oldGuards) {
+                newGuards.add(exp);
+              }
+              newGuards.add(term);
+              mEventUpdateMap.putByProxy(event.getIdentifier(),
+                                         new ConstraintList(newGuards));
+            }
           }
         }
       }
