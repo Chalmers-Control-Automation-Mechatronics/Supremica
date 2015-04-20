@@ -893,6 +893,8 @@ public abstract class AbstractTRCompositionalAnalyzer
       logger.debug("Simplifying " + aut.getName() + " ...");
       rel.logSizes(logger);
     }
+    final CompositionalAnalysisResult result = getAnalysisResult();
+    result.addCompositionAttempt();
     recordStatistics(aut);
     // Set event status ...
     final EventEncoding enc = aut.getEventEncoding();
@@ -959,6 +961,9 @@ public abstract class AbstractTRCompositionalAnalyzer
       // mCurrentSubsystem.saveModule("before" + mStepNo + ".wmod");
     }
     try {
+      // We are going to compose ...
+      final CompositionalAnalysisResult result = getAnalysisResult();
+      result.addCompositionAttempt();
       // Set up event encoding ...
       final EventEncoding candidateEncoding = candidate.getEventEncoding();
       countSpecialEvents(candidateEncoding);
@@ -1016,7 +1021,7 @@ public abstract class AbstractTRCompositionalAnalyzer
       // mCurrentSubsystem.saveModule("after" + mStepNo + ".wmod");
       return sync;
     } catch (final OverflowException exception) {
-      // BUG May or may not have been counted by recordStatistics() already?
+      // TODO Fix BUG: May or may not have been counted by recordStatistics() already?
       recordUnsuccessfulComposition(exception);
       throw exception;
     } finally {
@@ -1391,7 +1396,6 @@ public abstract class AbstractTRCompositionalAnalyzer
   void recordStatistics(final TRAutomatonProxy aut)
   {
     final CompositionalAnalysisResult result = getAnalysisResult();
-    result.addCompositionAttempt();
     final ListBufferTransitionRelation rel = aut.getTransitionRelation();
     final int numStates = rel.getNumberOfReachableStates();
     result.updateNumberOfStates(numStates);

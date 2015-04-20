@@ -305,8 +305,16 @@ public class CompositionalAnalysisResult
     final Formatter formatter = new Formatter(writer);
     writer.print("Total number of compositions: ");
     writer.println(mTotalCompositionsCount);
-    writer.print("Number of unsuccessful compositions: ");
+    writer.print("Number of compositions with overflow: ");
     writer.println(mUnsuccessfulCompositionsCount);
+    if (mUnsuccessfulCompositionsCount > 0) {
+      final float probability =
+        (float) (mTotalCompositionsCount - mUnsuccessfulCompositionsCount) /
+        (float) mTotalCompositionsCount;
+      formatter.format
+        ("Probability of a candidate selection being successful: %.2f%%\n",
+         100.0f * probability);
+    }
     writer.print("Number of attempts to split off subsystems: ");
     writer.println(mNumberOfSplitAttempts);
     writer.print("Number of subsystems split off: ");
@@ -328,14 +336,6 @@ public class CompositionalAnalysisResult
     if (mAlwaysEnabledEventsCount >= 0) {
       writer.print("Number of always enabled events: ");
       writer.println(mAlwaysEnabledEventsCount);
-    }
-    if (mUnsuccessfulCompositionsCount > 0) {
-      final float probability =
-        (float) (mTotalCompositionsCount - mUnsuccessfulCompositionsCount) /
-        (float) mTotalCompositionsCount;
-      formatter.format
-        ("Probability of a candidate selection being successful: %.2f%%\n",
-         100.0f * probability);
     }
     if (mSimplifierStatistics != null) {
       for (final TRSimplifierStatistics ruleStats : mSimplifierStatistics) {
