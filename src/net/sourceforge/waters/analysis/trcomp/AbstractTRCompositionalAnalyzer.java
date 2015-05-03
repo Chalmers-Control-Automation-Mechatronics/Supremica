@@ -1022,7 +1022,6 @@ public abstract class AbstractTRCompositionalAnalyzer
       // mCurrentSubsystem.saveModule("after" + mStepNo + ".wmod");
       return sync;
     } catch (final OverflowException exception) {
-      // TODO Fix BUG: May or may not have been counted by recordStatistics() already?
       recordUnsuccessfulComposition(exception);
       throw exception;
     } finally {
