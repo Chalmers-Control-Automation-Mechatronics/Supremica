@@ -1,9 +1,12 @@
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.analysis
+//# PACKAGE: net.sourceforge.waters.analysis.comp552
 //# CLASS:   ConflictChecker
 //###########################################################################
-//# $Id$
+//# This file contains the work of:
+//# Family name:
+//# First name:
+//# Student ID:
 //###########################################################################
 
 package net.sourceforge.waters.analysis.comp552;
@@ -28,6 +31,18 @@ import net.sourceforge.waters.xsd.des.ConflictKind;
  *
  * <P>The {@link #run()} method of this model checker does nothing,
  * and simply claims that every model is nonconflicting.</P>
+ *
+ * <P>You are welcome to edit this file as much as you like,
+ * but please <STRONG>do not change</STRONG> the public interface.
+ * Do not change the signature of the two constructors,
+ * or of the {@link #run()} or {@link #getCounterExample()} methods.
+ * You should expect a single constructor call, followed by several calls
+ * to {@link #run()} and {@link #getCounterExample()}, so your code needs
+ * to be reentrant.</P>
+ *
+ * <P><STRONG>WARNING:</STRONG> If you do not comply with these rules, the
+ * automatic tester may fail to run your program, resulting in 0 marks for
+ * your assignment.</P>
  *
  * @see ModelChecker
  *
@@ -86,6 +101,7 @@ public class ConflictChecker extends ModelChecker
    * @return <CODE>true</CODE> if the model is nonconflicting, or
    *         <CODE>false</CODE> if it is not.
    */
+  @Override
   public boolean run()
   {
     // The following code determines and prints the number of marked
@@ -121,6 +137,11 @@ public class ConflictChecker extends ModelChecker
     // Print the number of marked states that we have counted.
     System.out.print(count + " ");
 
+    // Try to compute a counterexample ...
+    // This is not yet implemented and should only be done of the model is
+    // conflicting, but never mind ...
+    mCounterExample = computeCounterExample();
+
     // This all was no good as far as conflict checking was concerned.
     // Let us just leave.
     return true;
@@ -136,16 +157,30 @@ public class ConflictChecker extends ModelChecker
    * coreachable. That is, after executing the counterexample, the automata
    * are in a state from where it is no longer possible to reach a state
    * where all automata are marked at the same time.
-   * @return A trace object representing the counterexample.
+   * @return A conflict trace object representing the counterexample.
    *         The returned trace is constructed for the input product DES
    *         of this conflict checker and shares its automata and
    *         event objects.
-   * @throws IllegalStateException if this method is called before
-   *         model checking has completed, i.e., before {@link #run()}
-   *         has been called, or model checking has found that the
-   *         property is satisfied and there is no counterexample.
    */
+  @Override
   public ConflictTraceProxy getCounterExample()
+  {
+    // Just return a stored counterexample. This is the recommended way
+    // of doing this, because we may no longer be able to use the
+    // data structures used by the algorithm once the run() method has
+    // finished. The counterexample can be computed by a method similar to
+    // computeCounterExample() below or otherwise.
+    return mCounterExample;
+  }
+
+  /**
+   * Computes a counterexample.
+   * This method is to be called from {@link #run()} after the model was
+   * found to be conflicting, before the BDD factory has been closed. It
+   * uses BDD operations to build the counterexample.
+   * @return The computed counterexample.
+   */
+  private ConflictTraceProxy computeCounterExample()
   {
     // The following creates a trace that consists of all the events in
     // the input model.
@@ -197,6 +232,14 @@ public class ConflictChecker extends ModelChecker
 
   //#########################################################################
   //# Data Members
+  /**
+   * The proposition chosen by the user to identify the marked states
+   * for conflict checking.
+   */
   private final EventProxy mMarking;
+  /**
+   * The computed counterexample or null if the model is nonblocking.
+   */
+  private ConflictTraceProxy mCounterExample;
 
 }

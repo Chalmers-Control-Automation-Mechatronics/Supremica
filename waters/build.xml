@@ -435,12 +435,10 @@
     <copy todir="${javadoc552}/src">
       <fileset dir="${supremica.src}">
         <include
-          name="net/sourceforge/waters/analysis/comp552/BDDControllabilityChecker.java"/>
+          name="net/sourceforge/waters/analysis/comp552/ConflictChecker.java"/>
         <include
-          name="net/sourceforge/waters/analysis/comp552/BDDControllabilityMain.java"/>
-        <include
-          name="net/sourceforge/waters/analysis/comp552/BDDEncoding.java"/>
-        <include name="net/sourceforge/waters/analysis/comp552/ControllabilityCounterExampleChecker.java"/>
+          name="net/sourceforge/waters/analysis/comp552/ConflictMain.java"/>
+        <include name="net/sourceforge/waters/analysis/comp552/ConflictCounterExampleChecker.java"/>
         <include
           name="net/sourceforge/waters/analysis/comp552/ModelChecker.java"/>
       </fileset>

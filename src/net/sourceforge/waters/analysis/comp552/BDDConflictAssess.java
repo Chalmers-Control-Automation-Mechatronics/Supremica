@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters COMP552 Assignment
+//# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.analysis
-//# CLASS:   ConflictAssess
+//# CLASS:   BDDConflictAssess
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -31,7 +31,7 @@ import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
-import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
+import net.sourceforge.waters.analysis.bdd.BDDLanguageInclusionChecker;
 import net.sourceforge.waters.cpp.analysis.NativeModelAnalyzer;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
@@ -74,19 +74,19 @@ import org.xml.sax.SAXException;
 
 
 /**
- * <P>A main class for testing the {@link ConflictChecker} class.
+ * <P>A main class for testing the {@link BDDConflictChecker} class.
  * It provides a simple application that reads a test suite description,
  * runs all tests contained, and prints a result with recommended grades.</P>
  *
  * @author Robi Malik
  */
 
-public class ConflictAssess
+public class BDDConflictAssess
 {
 
   //#########################################################################
   //# Constructors
-  private ConflictAssess(final File reportFile,
+  private BDDConflictAssess(final File reportFile,
                          final File progressFile,
                          final int minutes,
                          final long maxBytes,
@@ -309,12 +309,12 @@ public class ConflictAssess
       mProgressPrinter.flush();
     }
 
-    ConflictChecker checker;
+    BDDConflictChecker checker;
     boolean result;
     double time;
     try {
       mSecurityManager.setEnabled(true);
-      checker = new ConflictChecker(des, mDESFactory);
+      checker = new BDDConflictChecker(des, mDESFactory);
       final long starttime = System.currentTimeMillis();
       result = checker.run();
       final long stoptime = System.currentTimeMillis();
@@ -438,7 +438,7 @@ public class ConflictAssess
     }
     final ProductDESProxy ldes = createLanguageInclusionModel(des, tuple);
     final LanguageInclusionChecker checker =
-      new NativeLanguageInclusionChecker(ldes, mDESFactory);
+      new BDDLanguageInclusionChecker(ldes, mDESFactory);
     final boolean blocking;
     try {
       blocking = checker.run();
@@ -777,7 +777,7 @@ public class ConflictAssess
   /**
    * Main method.
    * This is a main method to check a set of files for controllability.
-   * Please refer to the class documentation ({@link ConflictAssess})
+   * Please refer to the class documentation ({@link BDDConflictAssess})
    * for more detailed information.
    * @param  args    Array of file names from the command line.
    */
@@ -791,11 +791,11 @@ public class ConflictAssess
     root.setLevel(Level.ERROR);
     root.addAppender(appender);
 
-    ConflictAssess assessor = null;
+    BDDConflictAssess assessor = null;
     try {
       if (args.length < 3) {
         System.err.println
-          ("USAGE: java " + ConflictAssess.class.getName() +
+          ("USAGE: java " + BDDConflictAssess.class.getName() +
            " <input> <output> <marks> <minutes> <maxbytes> <readable-dir> ...");
         System.exit(1);
       }
@@ -814,7 +814,7 @@ public class ConflictAssess
       secman.addLibrary("cudd");
       secman.close();
       assessor =
-        new ConflictAssess(outputfile, marksfile, minutes, maxBytes, secman);
+        new BDDConflictAssess(outputfile, marksfile, minutes, maxBytes, secman);
       assessor.runSuite(inputfile);
       assessor.terminate();
       System.exit(0);
@@ -891,7 +891,7 @@ public class ConflictAssess
         do {
           Thread.sleep(5000);
         } while (NativeModelAnalyzer.getPeakMemoryUsage() <= mLimit);
-        synchronized (ConflictAssess.this) {
+        synchronized (BDDConflictAssess.this) {
           mReportPrinter.println("OUT OF MEMORY");
           mProgressPrinter.println("abort");
         }

@@ -4,7 +4,10 @@
 //# PACKAGE: net.sourceforge.waters.analysis.comp552
 //# CLASS:   ConflictMain
 //##########################################################################
-//# $Id$
+//# This file contains the work of:
+//# Family name:
+//# First name:
+//# Student ID:
 //##########################################################################
 
 package net.sourceforge.waters.analysis.comp552;
@@ -12,6 +15,7 @@ package net.sourceforge.waters.analysis.comp552;
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
+
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
@@ -46,6 +50,10 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
  * <LI>Waters Modules (<CODE>.wmod</CODE>)</LI>
  * <LI>Waters Automata Models (<CODE>.wdes</CODE>)</LI>
  * </UL>
+ *
+ * <P>You are welcome to edit this file,
+ * but please <STRONG>do not change</STRONG> the way how the main class
+ * communicates with the {@link ConflictChecker} class.</P>
  *
  * @author Robi Malik
  */
