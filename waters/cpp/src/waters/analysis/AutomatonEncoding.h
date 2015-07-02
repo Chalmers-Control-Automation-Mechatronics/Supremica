@@ -198,15 +198,13 @@ public:
 			     const jni::EventGlue& alpha,
 			     const jni::EventGlue& omega,
 			     jni::ClassCache* cache,
-			     int numtags = 0,
-			     int extrawords = 0);
+			     int numtags = 0);
   ~AutomatonEncoding();
 
   //##########################################################################
   //# Simple Access
   inline int getEncodingSize() const {return mEncodingSize;}
   inline int getNumberOfTagBits() const {return mNumTags;}
-  inline int getNumberOfSignificantWords() const {return mNumSignificantWords;}
   inline int getNumberOfRecords() const {return mNumRecords;}
   inline AutomatonRecord* getRecord(int index) const
     {return mAutomatonRecords[index];}
@@ -279,7 +277,6 @@ private:
   int mEncodingSize;
   int mNumTags;
   int mNumRecords;
-  int mNumSignificantWords;
   int* mWordStop;
   bool mIsTriviallyNonblocking;
   bool mIsTriviallyBlocking;

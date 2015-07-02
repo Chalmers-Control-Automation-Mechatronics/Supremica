@@ -32,9 +32,11 @@ namespace waters {
 //# StateSpace: Constructors & Destructors
 
 StateSpace::
-StateSpace(const AutomatonEncoding* encoding, uint32_t limit)
-  : mEncodingSize(encoding->getEncodingSize()),
-    mNumSignificantWords(encoding->getNumberOfSignificantWords()),
+StateSpace(const AutomatonEncoding* encoding,
+           uint32_t limit,
+           int extraWords)
+  : mEncodingSize(encoding->getEncodingSize() + extraWords),
+    mNumSignificantWords(encoding->getEncodingSize()),
     mNumStates(0),
     mStateLimit(limit),
     mBlocks(INITBLOCKS),
@@ -83,7 +85,7 @@ prepare(uint32_t index)
 {
   uint32_t* source = get(index);
   uint32_t* target = prepare();
-  for (int i = 0; i < mEncodingSize; i++) {
+  for (int i = 0; i < mNumSignificantWords; i++) {
     target[i] = source[i];
   }
   return target;

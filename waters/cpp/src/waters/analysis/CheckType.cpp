@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.analysis
-//# CLASS:   ExplorerMode
+//# CLASS:   CheckType
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -11,4 +11,4 @@
 #pragma implementation
 #endif
 
-#include "waters/analysis/ExplorerMode.h"
+#include "waters/analysis/CheckType.h"

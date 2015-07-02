@@ -21,7 +21,7 @@
 
 #include "jni/glue/EventGlue.h"
 #include "waters/analysis/EventRecord.h"
-#include "waters/analysis/ExplorerMode.h"
+#include "waters/analysis/CheckType.h"
 
 namespace jni {
   class MapGlue;
@@ -55,7 +55,7 @@ public:
   inline bool isGloballyDisabled() const {return mIsGloballyDisabled;}
   inline bool isDisabledInSpec() const {return mIsDisabledInSpec;}
   inline bool isOnlySelfloops() const {return mNumNonSelfloopingRecords == 0;}
-  bool isSkippable(ExplorerMode mode) const;
+  bool isSkippable(CheckType mode) const;
   inline bool isDeterministic() const
     {return mNumNondeterministicRecords == 0;}
   inline int getNumberOfUpdates() const {return mNumberOfUpdates;}
@@ -84,7 +84,7 @@ public:
 				     uint32_t source, uint32_t target);
   void normalize(const AutomatonRecord* aut);
   TransitionUpdateRecord* createUpdateRecord(int wordindex);
-  void optimizeTransitionRecordsForSearch(ExplorerMode mode);
+  void optimizeTransitionRecordsForSearch(CheckType mode);
   void setupNotTakenSearchRecords();
   void markTransitionsTaken(const uint32_t* tuple);
   int removeTransitionsNotTaken();

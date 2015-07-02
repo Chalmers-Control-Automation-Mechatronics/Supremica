@@ -91,7 +91,7 @@ BroadEventRecord::
 //# BroadEventRecord: Simple Access
 
 bool BroadEventRecord::
-isSkippable(ExplorerMode mode)
+isSkippable(CheckType mode)
   const
 {
   if (mIsGloballyDisabled) {
@@ -100,7 +100,7 @@ isSkippable(ExplorerMode mode)
     return true;
   } else if (mNumNonSelfloopingRecords) {
     return false;
-  } else if (mode == EXPLORER_MODE_SAFETY) {
+  } else if (mode == CHECK_TYPE_SAFETY) {
     return isControllable() ? true : !mIsDisabledInSpec;
   } else {
     return true;
@@ -239,9 +239,9 @@ createUpdateRecord(int wordindex)
 }
 
 void BroadEventRecord::
-optimizeTransitionRecordsForSearch(ExplorerMode mode)
+optimizeTransitionRecordsForSearch(CheckType mode)
 {
-  bool safety = mode == EXPLORER_MODE_SAFETY;
+  bool safety = mode == CHECK_TYPE_SAFETY;
   bool controllable;
   if (safety && !mIsDisabledInSpec) {
     setControllable(true);

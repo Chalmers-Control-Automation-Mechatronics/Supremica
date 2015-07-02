@@ -23,14 +23,16 @@
 
 #include <jni.h>
 
+#include "jni/glue/ConflictCheckModeGlue.h"
 #include "jni/glue/ConflictKindGlue.h"
 #include "jni/glue/KindTranslatorGlue.h"
 #include "jni/glue/ProductDESProxyFactoryGlue.h"
 #include "waters/base/ArrayList.h"
 #include <stdint.h>
 #include "waters/analysis/AutomatonEncoding.h"
-#include "waters/analysis/ExplorerMode.h"
+#include "waters/analysis/CheckType.h"
 #include "waters/analysis/ReverseTransitionStore.h"
+#include "waters/analysis/TarjanStateSpace.h"
 
 
 namespace jni {
@@ -48,7 +50,6 @@ namespace jni {
 namespace waters {
 
 class EventRecord;
-class StateSpace;
 
 
 //############################################################################
@@ -94,7 +95,6 @@ public:
 			   jni::ClassCache* cache);
   virtual ~ProductExplorer();
 
-public:
   //##########################################################################
   //# Invocation
   virtual bool runSafetyCheck();
@@ -111,6 +111,10 @@ public:
   inline void setStateLimit(uint32_t limit) {mStateLimit = limit;}
   inline uint32_t getTransitionLimit() const {return mTransitionLimit;}
   inline void setTransitionLimit(uint32_t limit) {mTransitionLimit = limit;}
+  inline jni::ConflictCheckMode getConflictCheckMode() const
+    {return mConflictCheckMode;}
+  inline void setConflictCheckMode(jni::ConflictCheckMode mode)
+    {mConflictCheckMode = mode;}
   inline bool isDumpStateAware() const {return mDumpStateAware;}
   inline void setDumpStateAware(bool aware) {mDumpStateAware = aware;}
   inline bool isInitialUncontrollable() const {return mIsInitialUncontrollable;}
@@ -119,7 +123,7 @@ public:
 
   //##########################################################################
   //# Simple Access
-  inline ExplorerMode getMode() const {return mMode;}
+  inline CheckType getCheckType() const {return mCheckType;}
   inline const EventRecord* getTraceEvent() const {return mTraceEvent;}
   void setTraceEvent(const EventRecord* event) {mTraceEvent = event;}
   void setTraceEvent(const EventRecord* event, const AutomatonRecord* aut)
@@ -138,8 +142,13 @@ protected:
   virtual bool doSafetySearch();
   virtual bool doNonblockingReachabilitySearch();
   virtual bool doNonblockingCoreachabilitySearch();
-  virtual void computeCounterExample(const jni::ListGlue& list, uint32_t level);
+  virtual bool doNonblockingTarjanSearch();
+  virtual bool doNonblockingTarjanSearch(uint32_t root);
+  virtual void computeBFSCounterExample
+    (const jni::ListGlue& list, uint32_t level);
+  virtual void computeTarjanCounterExample(const jni::ListGlue& list);
   virtual void storeInitialStates(bool initzero, bool donondet = true);
+  virtual bool isLocalDumpState(const uint32_t* tuple) const;
   virtual bool expandSafetyState
     (const uint32_t* sourcetuple, const uint32_t* sourcepacked) = 0;
   virtual bool expandNonblockingReachabilityState
@@ -147,10 +156,18 @@ protected:
      const uint32_t* sourcepacked) = 0;
   virtual void expandNonblockingCoreachabilityState
     (const uint32_t* targettuple, const uint32_t* targetpacked) = 0;
+  virtual void expandTarjanState
+    (uint32_t source, const uint32_t* sourcetuple,
+     const uint32_t* sourcepacked) = 0;
+  virtual bool closeNonblockingTarjanState
+    (uint32_t state, uint32_t* tupleBuffer) = 0;
+  virtual bool expandTarjanTraceState
+    (uint32_t source, const uint32_t* sourcetuple,
+     const uint32_t* sourcepacked) = 0;
   virtual void setupReverseTransitionRelations() = 0;
   virtual void expandTraceState
-  (const uint32_t* targettuple, const uint32_t* targetpacked,
-   uint32_t level) = 0;
+    (const uint32_t* targettuple, const uint32_t* targetpacked,
+     uint32_t level) = 0;
   virtual const EventRecord* findEvent
     (const uint32_t* sourcetuple, const uint32_t* sourcepacked,
      const uint32_t* targetpacked) = 0;
@@ -163,6 +180,7 @@ protected:
     (uint32_t* targettuple, uint32_t* targetpacked);
   void checkCoreachabilityState();
   uint32_t getFirstState(uint32_t level) const {return mDepthMap->get(level);}
+  uint32_t getNumberOfInitialStates() const {return getFirstState(1);}
   uint32_t getDepth(uint32_t state) const;
 
   inline void checkAbort() const {if (mIsAbortRequested) doAbort();}
@@ -202,11 +220,12 @@ private:
   jni::KindTranslatorGlue mKindTranslator;
   jni::EventGlue mPreMarking;
   jni::EventGlue mMarking;
+  jni::ConflictCheckMode mConflictCheckMode;
   uint32_t mStateLimit;
   uint32_t mTransitionLimit;
   bool mDumpStateAware;
   bool mIsInitialUncontrollable;
-  ExplorerMode mMode;
+  CheckType mCheckType;
   bool mIsAbortRequested;
   AutomatonEncoding* mEncoding;
   StateSpace* mStateSpace;
@@ -232,6 +251,9 @@ private:
   clock_t mTraceStartTime;
   clock_t mStopTime;
 
+  //##########################################################################
+  //# Friends
+  friend class NonblockingTarjanCallBack;
 };
 
 }   /* namespace waters */

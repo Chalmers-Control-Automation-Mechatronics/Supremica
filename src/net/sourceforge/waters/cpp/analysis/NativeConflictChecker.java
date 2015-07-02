@@ -53,19 +53,6 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  * memory requirements. The number of states can be limited by specifying
  * the node limit ({@link #setNodeLimit(int) setNodeLimit()}).</P>
  *
- * <P>The algorithm can be configured to choose between two different
- * approaches for the coreachability search in the second pass. In the
- * first approach, all transitions encountered in the first pass are stored
- * and used to speed up the coreachability search in the second pass. In
- * the second approach, no transitions are stored in the first pass, and the
- * reverse transitions are calculated from the component automata in the
- * second pass. The first approach (storing transitions) can be up to ten
- * times faster than the second approach, but it requires up to&nbsp;100
- * times more memory. The approach to be taken is specified using the
- * {@link #setTransitionLimit(int) setTransitionLimit()} configuration
- * option, which is also used to limit the maximum number of transitions
- * that can be stored for the first approach (storing transitions).</P>
- *
  * <P>The algorithm to determine which transitions are enabled is highly
  * optimised. A lot of effort is taken to suppress the exploration of
  * disabled transitions or transitions known to be selfloops early.</P>
@@ -73,6 +60,18 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  * <P><STRONG>Configuration.</STRONG></P>
  *
  * <UL>
+ * <LI>The algorithm can be configured to choose between three different
+ *     approaches for the coreachability search in the second pass (see
+ *     {@link ConflictCheckMode}).
+ *     With {@link ConflictCheckMode#STORED_BACKWARDS_TRANSITIONS}, all
+ *     transitions encountered in the first pass are stored and used to speed
+ *     up the coreachability search in the second pass.
+ *     With {@link ConflictCheckMode#COMPUTED_BACKWARDS_TRANSITIONS}, no
+ *     transitions are stored in the first pass, and the reverse transitions
+ *     are calculated from the component automata in the second pass.
+ *     With {@link ConflictCheckMode#NO_BACKWARDS_TRANSITIONS}, the second
+ *     pass is avoided altogether, using a different search strategy
+ *     (Tarjan's algorithm) in the first pass.</LI>
  * <LI>If the node limit is specified ({@link #setNodeLimit(int)
  *     setNodeLimit()}), it defines the maximum number of states that can
  *     be constructed. If the synchronous product state space turns out to
@@ -81,13 +80,8 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  *     OverflowException} is thrown.</LI>
  * <LI>If the transition limit is specified ({@link #setTransitionLimit(int)
  *     setTransitionLimit()}), it defines the maximum number of transitions
- *     that can be stored. If the transition limit is set to&nbsp;0, no
- *     transitions will be stored during the first pass, and the reverse
- *     transition relation will be computed from the component transitions
- *     in the second pass. If the transition limit is nonzero, all
- *     transitions discovered during the first pass (except selfloops and
- *     multiple transitions) will be stored and used for faster
- *     coreachability computation in the second pass. If the synchronous
+ *     that can be stored when the mode is {@link
+ *     ConflictCheckMode#STORED_BACKWARDS_TRANSITIONS}. If the synchronous
  *     product turns out to include more transitions than specified by the
  *     transition limit, the verification attempt is aborted and an {@link
  *     net.sourceforge.waters.model.analysis.OverflowException
@@ -173,6 +167,35 @@ public class NativeConflictChecker
   //#########################################################################
   //# Specific Configuration
   /**
+   * Sets the conflict check algorithm to be used.
+   * @see ConflictCheckMode
+   */
+  public void setConflictCheckMode(final ConflictCheckMode mode)
+  {
+    mConflictCheckMode = mode;
+  }
+
+  /**
+   * Gets the conflict check algorithm used.
+   * @return The configured conflict check mode, with one exception.
+   *         If the configured mode is
+   *         {@link ConflictCheckMode#STORED_BACKWARDS_TRANSITIONS} and the
+   *         transition limit is zero, then a mode of
+   *         {@link ConflictCheckMode#COMPUTED_BACKWARDS_TRANSITIONS} is
+   *         returned instead. This is for backwards compatibility.
+   * @see ConflictCheckMode
+   */
+  public ConflictCheckMode getConflictCheckMode()
+  {
+    if (mConflictCheckMode == ConflictCheckMode.STORED_BACKWARDS_TRANSITIONS &&
+        getTransitionLimit() == 0) {
+      return ConflictCheckMode.COMPUTED_BACKWARDS_TRANSITIONS;
+    } else {
+      return mConflictCheckMode;
+    }
+  }
+
+  /**
    * Set whether this conflict checker should stop when encountering
    * a local dump state. A local dump state is an obvious deadlock state in
    * a single automaton of the system. If such a state is reached, the system
@@ -231,6 +254,8 @@ public class NativeConflictChecker
   private EventProxy mMarking;
   private EventProxy mUsedMarking;
   private EventProxy mPreconditionMarking;
+  private ConflictCheckMode mConflictCheckMode =
+    ConflictCheckMode.STORED_BACKWARDS_TRANSITIONS;
   private boolean mDumpStateAware;
 
 }

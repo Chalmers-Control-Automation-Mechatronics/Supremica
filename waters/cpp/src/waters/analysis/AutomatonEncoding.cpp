@@ -486,8 +486,7 @@ AutomatonEncoding(const jni::ProductDESGlue& des,
                   const jni::EventGlue& alpha,
                   const jni::EventGlue& omega,
                   jni::ClassCache* cache,
-                  int numtags,
-                  int extrawords)
+                  int numtags)
   : mNumTags(numtags),
     mIsTriviallyNonblocking(true),
     mIsTriviallyBlocking(false),
@@ -548,7 +547,7 @@ AutomatonEncoding(const jni::ProductDESGlue& des,
   for (w = 1; w < maxwords; w++) {
     used[w] = 0;
   }
-  mNumSignificantWords = 0;
+  mEncodingSize = 0;
   for (a = 0; a < mNumRecords; a++) {
     AutomatonRecord* record = records[a];
     int numbits = record->getNumberOfBits();
@@ -556,15 +555,14 @@ AutomatonEncoding(const jni::ProductDESGlue& des,
     int shift = used[w];
     record->allocate(w, shift);
     used[w] += numbits;
-    if (w == mNumSignificantWords) {
-      mNumSignificantWords++;
+    if (w == mEncodingSize) {
+      mEncodingSize++;
     }
   }
-  mEncodingSize = mNumSignificantWords + extrawords;
 
   // rearrange and store records ...
-  mWordStop = new int[mNumSignificantWords];
-  for (w = 0; w < mNumSignificantWords; w++) {
+  mWordStop = new int[mEncodingSize];
+  for (w = 0; w < mEncodingSize; w++) {
     mWordStop[w] = 0;
   }
   for (a = 0; a < mNumRecords; a++) {
@@ -572,7 +570,7 @@ AutomatonEncoding(const jni::ProductDESGlue& des,
     mWordStop[w]++;
   }
   int prev = 0;
-  for (w = 0; w < mNumSignificantWords; w++) {
+  for (w = 0; w < mEncodingSize; w++) {
     used[w] = prev;
     prev = (mWordStop[w] += prev);
   }
@@ -655,7 +653,7 @@ encode(const uint32_t* decoded, uint32_t* encoded)
 {
   int a = 0;
   int w = 0;
-  for (; w < mNumSignificantWords; w++) {
+  for (; w < mEncodingSize; w++) {
     const int end = mWordStop[w];
     uint32_t word = 0;
     for (; a < end; a++) {
@@ -676,7 +674,7 @@ decode(const uint32_t* encoded, uint32_t* decoded)
   const
 {
   int a = 0;
-  for (int w = 0; w < mNumSignificantWords; w++) {
+  for (int w = 0; w < mEncodingSize; w++) {
     const int end = mWordStop[w];
     const uint32_t word = encoded[w];
     for (; a < end; a++) {
@@ -792,7 +790,7 @@ void AutomatonEncoding::
 initMask(uint32_t* mask)
   const
 {
-  for (int w = 0; w < mNumSignificantWords; w++) {
+  for (int w = 0; w < mEncodingSize; w++) {
     mask[w] = 0;
   }
 }
@@ -811,7 +809,7 @@ bool AutomatonEncoding::
 equals(const uint32_t* encoded1, const uint32_t* encoded2, const uint32_t* nmask)
   const
 {
-  for (int w = 0; w < mNumSignificantWords; w++) {
+  for (int w = 0; w < mEncodingSize; w++) {
     if ((encoded1[w] ^ encoded2[w]) & ~nmask[w]) {
       return false;
     }
@@ -851,7 +849,7 @@ dump()
 {
   std::cerr << "ENCODING DUMP:" << std::endl;
   std::cerr << "  Number of automata: " << mNumRecords << std::endl;
-  std::cerr << "  Number of words: " << mNumSignificantWords << std::endl;
+  std::cerr << "  Number of words: " << mEncodingSize << std::endl;
   for (int a = 0; a < mNumRecords; a++) {
     const AutomatonRecord* record = mAutomatonRecords[a];
     const jni::JavaString name = record->getName();
@@ -871,7 +869,7 @@ dumpEncodedState(const uint32_t* encoded)
   const
 {
   std::cerr << '(';
-  for (int w = 0; w < mNumSignificantWords; w++) {
+  for (int w = 0; w < mEncodingSize; w++) {
     if (w > 0) {
       std::cerr << ',';
     }

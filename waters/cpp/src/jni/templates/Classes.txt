@@ -153,38 +153,38 @@ glue class ConflictTraceProxy extends TraceProxy {
 
 glue class ProductDESProxyFactory {
   glue AutomatonProxy createAutomatonProxy(String name,
-					   glue ComponentKind kind,
-					   glue Collection events,
-					   glue Collection states,
-					   glue Collection transitions);
+                                           glue ComponentKind kind,
+                                           glue Collection events,
+                                           glue Collection states,
+                                           glue Collection transitions);
   glue ConflictTraceProxy createConflictTraceProxy(String name,
-						   glue ProductDESProxy des,
-						   glue List events,
-						   glue ConflictKind kind);
+                                                   glue ProductDESProxy des,
+                                                   glue List events,
+                                                   glue ConflictKind kind);
   glue ConflictTraceProxy createConflictTraceProxy(String name,
-						   String comment,
-						   URI location,
-						   glue ProductDESProxy des,
-						   glue Collection automata,
-						   glue List steps,
-						   glue ConflictKind kind);
+                                                   String comment,
+                                                   URI location,
+                                                   glue ProductDESProxy des,
+                                                   glue Collection automata,
+                                                   glue List steps,
+                                                   glue ConflictKind kind);
   glue EventProxy createEventProxy(String name, glue EventKind kind);
   glue ProductDESProxy createProductDESProxy(String name,
-					     glue Collection events,
-					     glue Collection automata);
+                                             glue Collection events,
+                                             glue Collection automata);
   glue ProductDESProxy createProductDESProxy(String name);
   glue SafetyTraceProxy createSafetyTraceProxy(String name,
-					       glue ProductDESProxy des,
-					       glue List events);
+                                               glue ProductDESProxy des,
+                                               glue List events);
   glue SafetyTraceProxy createSafetyTraceProxy(String name,
-					       String comment,
-					       URI location,
-					       glue ProductDESProxy des,
-					       glue Collection automata,
-					       glue List steps);
+                                               String comment,
+                                               URI location,
+                                               glue ProductDESProxy des,
+                                               glue Collection automata,
+                                               glue List steps);
   glue TraceStepProxy createTraceStepProxy(glue EventProxy event);
   glue TraceStepProxy createTraceStepProxy(glue EventProxy event,
-					   glue Map statemap);
+                                           glue Map statemap);
 }
 
 
@@ -230,8 +230,8 @@ glue class EventNotFoundException extends Exception {
 glue class NondeterministicDESException extends Exception {
   NondeterministicDESException(glue AutomatonProxy aut, glue StateProxy state);
   NondeterministicDESException(glue AutomatonProxy aut,
-			       glue StateProxy state,
-			       glue EventProxy event);
+                               glue StateProxy state,
+                               glue EventProxy event);
 }
 
 
@@ -239,7 +239,17 @@ glue class NondeterministicDESException extends Exception {
 package net.sourceforge.waters.cpp.analysis;
 //###########################################################################
 
-enum class ExplorerMode {BROAD, NARROW, BEST_GUESS}
+enum class ExplorerMode {
+  BROAD,
+  NARROW,
+  BEST_GUESS
+}
+
+enum class ConflictCheckMode {
+  STORED_BACKWARDS_TRANSITIONS,
+  COMPUTED_BACKWARDS_TRANSITIONS,
+  NO_BACKWARDS_TRANSITIONS
+}
 
 glue class NativeModelAnalyzer {
   glue ProductDESProxyFactory getFactory();
@@ -260,13 +270,14 @@ glue class NativeSafetyVerifier extends NativeModelVerifier {
   glue KindTranslator getKindTranslator();
   boolean isInitialUncontrollable();
   String getTraceComment(glue EventProxy event,
-			 glue AutomatonProxy aut,
-			 glue StateProxy state);
+                         glue AutomatonProxy aut,
+                         glue StateProxy state);
 }
 
 glue class NativeConflictChecker extends NativeModelVerifier {
   glue EventProxy getUsedDefaultMarking();
   glue EventProxy getConfiguredPreconditionMarking();
   glue KindTranslator getKindTranslator();
+  glue ConflictCheckMode getConflictCheckMode();
   boolean isDumpStateAware();
 }

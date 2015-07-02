@@ -38,7 +38,7 @@
 #include "waters/analysis/NarrowProductExplorer.h"
 #include "waters/analysis/NarrowPreTransitionTable.h"
 #include "waters/analysis/NarrowTransitionTable.h"
-#include "waters/analysis/StateSpace.h"
+#include "waters/analysis/TarjanStateSpace.h"
 #include "waters/base/HashTable.h"
 
 
@@ -278,15 +278,15 @@ teardown()
 
 #define ADD_SUCCESSORS(source, sourcetuple, autcount, numaut, TAG)      \
   {                                                                     \
-    for (uint32_t a = 0; a < numaut; a++) {                               \
+    for (uint32_t a = 0; a < numaut; a++) {                             \
       mTargetTuple[a] = sourcetuple[a];                                 \
     }                                                                   \
-    uint32_t ndcount = 0;                                                 \
-    for (uint32_t i = 0; i < autcount; i++) {                             \
-      const uint32_t a = mCurrentAutomata[i];                             \
-      const uint32_t iter = mIterator[a];                                 \
+    uint32_t ndcount = 0;                                               \
+    for (uint32_t i = 0; i < autcount; i++) {                           \
+      const uint32_t a = mCurrentAutomata[i];                           \
+      const uint32_t iter = mIterator[a];                               \
       const NarrowTransitionTable& table = mTransitionTables[a];        \
-      const uint32_t raw = table.getRawSuccessors(iter);                  \
+      const uint32_t raw = table.getRawSuccessors(iter);                \
       if (raw & TAG) {                                                  \
         mTargetTuple[a] = raw & ~TAG;                                   \
       } else {                                                          \
@@ -295,23 +295,23 @@ teardown()
         mTargetTuple[a] = table.getRawNondetSuccessor(raw);             \
       }                                                                 \
     }                                                                   \
-    uint32_t ndindex = 0;                                                 \
+    uint32_t ndindex = 0;                                               \
     do {                                                                \
-      uint32_t* packed = getStateSpace().prepare();                       \
+      uint32_t* packed = getStateSpace().prepare();                     \
       getAutomatonEncoding().encode(mTargetTuple, packed);              \
       ADD_NEW_STATE(source);                                            \
       for (ndindex = 0; ndindex < ndcount; ndindex++) {                 \
-        const uint32_t a = mCurrentAutomata[ndindex];                     \
+        const uint32_t a = mCurrentAutomata[ndindex];                   \
         const NarrowTransitionTable& table = mTransitionTables[a];      \
-        const uint32_t offset = mNondetIterator[ndindex];                 \
-        const uint32_t raw = table.getRawNondetSuccessor(offset);         \
+        const uint32_t offset = mNondetIterator[ndindex];               \
+        const uint32_t raw = table.getRawNondetSuccessor(offset);       \
         if (raw & TAG) {                                                \
-          const uint32_t iter = mIterator[a];                             \
-          const uint32_t next =                                           \
+          const uint32_t iter = mIterator[a];                           \
+          const uint32_t next =                                         \
             mNondetIterator[ndindex] = table.getRawSuccessors(iter);    \
           mTargetTuple[a] = table.getRawNondetSuccessor(next);          \
         } else {                                                        \
-          const uint32_t next = mNondetIterator[ndindex] = offset + 1;    \
+          const uint32_t next = mNondetIterator[ndindex] = offset + 1;  \
           mTargetTuple[a] = table.getRawNondetSuccessor(next) & ~TAG;   \
           break;                                                        \
         }                                                               \
@@ -452,10 +452,10 @@ expandNonblockingReachabilityState(uint32_t source,
   }
 }
 
-
 #undef ADD_NEW_STATE
-#define ADD_NEW_STATE(source) checkCoreachabilityState()
 
+
+#define ADD_NEW_STATE(source) checkCoreachabilityState()
 
 void NarrowProductExplorer::
 expandNonblockingCoreachabilityState(const uint32_t* targettuple,
@@ -467,6 +467,105 @@ expandNonblockingCoreachabilityState(const uint32_t* targettuple,
   EXPAND(TARGET, targettuple, minevent, numaut, TAG);
 }
 
+#undef ADD_NEW_STATE
+
+
+#define ADD_NEW_STATE(source)                                           \
+  {                                                                     \
+    uint32_t target = getStateSpace().add();                            \
+    if (target != source) {                                             \
+      if (target == getNumberOfStates()) {                              \
+        incNumberOfStates();                                            \
+      }                                                                 \
+      incNumberOfTransitions();                                         \
+      tarjan->processTransition(source, target);                        \
+    }                                                                   \
+  }
+
+void NarrowProductExplorer::
+expandTarjanState(uint32_t source,
+                  const uint32_t* sourceTuple,
+                  const uint32_t* sourcePacked)
+{
+  const uint32_t numAut = getNumberOfAutomata();
+  const uint32_t TAG = NarrowTransitionTable::TAG_END_OF_LIST;
+  uint32_t minEvent = UINT32_MAX;
+  TarjanStateSpace* tarjan = (TarjanStateSpace*) &getStateSpace();
+  EXPAND(source, sourceTuple, minEvent, numAut, TAG);
+}
+
+#undef ADD_NEW_STATE
+
+
+#define ADD_NEW_STATE(source)                                           \
+  {                                                                     \
+    uint32_t target = getStateSpace().find();                           \
+    if (tarjan->isClosedState(target)) {                                \
+      return true;                                                      \
+    }                                                                   \
+  }
+
+bool NarrowProductExplorer::
+closeNonblockingTarjanState(uint32_t state, uint32_t* tupleBuffer)
+{
+  uint32_t* tuplePacked = getStateSpace().get(state);
+  getAutomatonEncoding().decode(tuplePacked, tupleBuffer);
+  if (getAutomatonEncoding().isMarkedStateTuple(tupleBuffer)) {
+    return true;
+  } else {
+    const uint32_t numAut = getNumberOfAutomata();
+    const uint32_t TAG = NarrowTransitionTable::TAG_END_OF_LIST;
+    uint32_t minEvent = UINT32_MAX;
+    TarjanStateSpace* tarjan = (TarjanStateSpace*) &getStateSpace();
+    EXPAND(state, tupleBuffer, minEvent, numAut, TAG);
+    return false;
+  }
+}
+
+#undef ADD_NEW_STATE
+
+
+#define ADD_NEW_STATE(source)                                           \
+  {                                                                     \
+    uint32_t target = getStateSpace().find();                           \
+    if (target != source) {                                             \
+      gotSuccessor = true;                                              \
+      if (target != UINT32_MAX) {                                       \
+        uint32_t& ref = tarjan->getTraceStatusRef(target);              \
+        switch (ref) {                                                  \
+        case TarjanStateSpace::TR_OPEN:                                 \
+          ref = source;                                                 \
+          break;                                                        \
+        case TarjanStateSpace::TR_CRITICAL:                             \
+          setTraceState(target);                                        \
+          setTraceEvent(0);                                             \
+          return false;                                                 \
+        default:                                                        \
+          break;                                                        \
+        }                                                               \
+      }                                                                 \
+    }                                                                   \
+  }
+
+bool NarrowProductExplorer::
+expandTarjanTraceState(uint32_t source,
+                       const uint32_t* sourceTuple,
+                       const uint32_t* sourcePacked)
+{
+  bool gotSuccessor = false;
+  if (!isLocalDumpState(sourceTuple)) {
+    const uint32_t numAut = getNumberOfAutomata();
+    const uint32_t TAG = NarrowTransitionTable::TAG_END_OF_LIST;
+    uint32_t minEvent = UINT32_MAX;
+    TarjanStateSpace* tarjan = (TarjanStateSpace*) &getStateSpace();
+    EXPAND(source, sourceTuple, minEvent, numAut, TAG);
+  }
+  if (!gotSuccessor) {
+    setTraceState(source);
+    setTraceEvent(0);
+  }
+  return gotSuccessor; 
+}
 
 #undef ADD_NEW_STATE
 

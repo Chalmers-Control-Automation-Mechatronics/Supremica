@@ -1,8 +1,8 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters C++
+//# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
-//# CLASS:   NativeStandardBroadStoringConflictCheckerTest
+//# CLASS:   NativeBroadStoringGeneralisedConflictCheckerTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -12,20 +12,21 @@ package net.sourceforge.waters.cpp.analysis;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import net.sourceforge.waters.model.analysis.AbstractGeneralisedConflictCheckerTest;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class NativeStandardBroadStoringConflictCheckerTest
-  extends AbstractNativeStandardConflictCheckerTest
+public class NativeBroadStoringGeneralisedConflictCheckerTest extends
+    AbstractGeneralisedConflictCheckerTest
 {
 
-  //#########################################################################
-  //# Entry points in junit.framework.TestCase
+  // #########################################################################
+  // # Entry points in junit.framework.TestCase
   public static Test suite()
   {
     final TestSuite suite =
-      new TestSuite(NativeStandardBroadStoringConflictCheckerTest.class);
+        new TestSuite(NativeBroadStoringGeneralisedConflictCheckerTest.class);
     return suite;
   }
 
@@ -34,16 +35,16 @@ public class NativeStandardBroadStoringConflictCheckerTest
     junit.textui.TestRunner.run(suite());
   }
 
-
-  //#########################################################################
-  //# Overrides for abstract base class
-  //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  // #########################################################################
+  // # Overrides for abstract base class
+  // # net.sourceforge.waters.analysis.AbstractModelVerifierTest
   @Override
-  protected ConflictChecker
-    createModelVerifier(final ProductDESProxyFactory factory)
+  protected ConflictChecker createModelVerifier(
+      final ProductDESProxyFactory factory)
   {
     final NativeConflictChecker checker = new NativeConflictChecker(factory);
     checker.setExplorerMode(ExplorerMode.BROAD);
+    checker.setConflictCheckMode(ConflictCheckMode.STORED_BACKWARDS_TRANSITIONS);
     return checker;
   }
 

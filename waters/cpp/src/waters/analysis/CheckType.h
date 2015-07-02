@@ -2,14 +2,14 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.analysis
-//# CLASS:   ExplorerMode
+//# CLASS:   CheckType
 //###########################################################################
 //# $Id$
 //###########################################################################
 
 
-#ifndef _ExplorerMode_h_
-#define _ExplorerMode_h_
+#ifndef _CheckType_h_
+#define _CheckType_h_
 
 #ifdef __GNUG__
 #pragma interface
@@ -21,17 +21,17 @@
 
 
 //############################################################################
-//# enumeration ExplorerMode
+//# enumeration CheckType
 //############################################################################
 
 namespace waters {
 
-enum ExplorerMode {
-  EXPLORER_MODE_SAFETY,
-  EXPLORER_MODE_NONBLOCKING
+enum CheckType {
+  CHECK_TYPE_SAFETY,
+  CHECK_TYPE_NONBLOCKING
 };
 
 }   /* namespace waters */
 
 
-#endif  /* !_ExplorerMode_h_ */
+#endif  /* !_CheckType_h_ */

@@ -39,7 +39,9 @@ class StateSpace : public Int32HashAccessor
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit StateSpace(const AutomatonEncoding* encoding, uint32_t limit);
+  explicit StateSpace(const AutomatonEncoding* encoding,
+		      uint32_t limit,
+		      int extraWords = 0);
   virtual ~StateSpace();
 
   //##########################################################################
@@ -53,7 +55,7 @@ public:
   uint32_t* get(uint32_t index) const;
   uint32_t* prepare();
   uint32_t* prepare(uint32_t index);
-  uint32_t add();
+  virtual uint32_t add();
   inline uint32_t find() const {return mLookupTable.get(mNumStates);}
   void clear();
 

@@ -27,6 +27,7 @@
 #include "jni/cache/ClassCache.h"
 #include "jni/cache/JavaString.h"
 #include "jni/cache/PreJavaException.h"
+#include "jni/glue/ConflictCheckModeGlue.h"
 #include "jni/glue/ConflictKindGlue.h"
 #include "jni/glue/ConflictTraceGlue.h"
 #include "jni/glue/EventGlue.h"
@@ -48,12 +49,59 @@
 #include "waters/analysis/EventRecord.h"
 #include "waters/analysis/NarrowProductExplorer.h"
 #include "waters/analysis/ProductExplorer.h"
-#include "waters/analysis/StateSpace.h"
 #include "waters/analysis/TransitionRecord.h"
 #include "waters/javah/Invocations.h"
 
 
 namespace waters {
+
+//############################################################################
+//# Class NonblockingTarjanCallBack
+//############################################################################
+
+class NonblockingTarjanCallBack : public TarjanCallBack
+{
+public:
+  //##########################################################################
+  //# Constructors & Destructors
+  explicit NonblockingTarjanCallBack
+    (TarjanStateSpace* tarjan, ProductExplorer* explorer) :
+    TarjanCallBack(tarjan),
+    mExplorer(*explorer)
+  {
+    int numAutomata = explorer->getNumberOfAutomata();
+    mTupleBuffer = new uint32_t[numAutomata];
+  }
+
+  virtual ~NonblockingTarjanCallBack()
+  {
+    delete [] mTupleBuffer;
+  }
+
+  //##########################################################################
+  //# Interface TarjanCallBack
+  virtual bool addStateToComponent(uint32_t state)
+  {
+    TarjanStateSpace& tarjan = getTarjan();
+    if (tarjan.getNumberOfComponents() == 0) {
+      // Only check markings for the first component ...
+      const AutomatonEncoding& enc = mExplorer.getAutomatonEncoding();
+      const uint32_t* tuplePacked = tarjan.get(state);
+      return enc.isMarkedStateTuplePacked(tuplePacked);
+    } else {
+      // For all other components also check transitions ...
+      return mExplorer.closeNonblockingTarjanState(state, mTupleBuffer);
+    }
+    return true;
+  }
+
+private:
+  //##########################################################################
+  //# Data Members
+  ProductExplorer& mExplorer;
+  uint32_t* mTupleBuffer;
+};
+
 
 //############################################################################
 //# class ProductExplorer
@@ -81,6 +129,7 @@ ProductExplorer(const jni::ProductDESProxyFactoryGlue& factory,
     mKindTranslator(translator),
     mPreMarking(premarking),
     mMarking(marking),
+    mConflictCheckMode(jni::ConflictCheckMode_STORED_BACKWARDS_TRANSITIONS),
     mStateLimit(UINT32_MAX),
     mTransitionLimit(UINT32_MAX),
     mIsInitialUncontrollable(false),
@@ -130,7 +179,7 @@ runSafetyCheck()
     // const jni::JavaString name(mCache->getEnvironment(), mModel.getName());
     // std::cerr << (const char*) name << std::endl;
     mStartTime = clock();
-    mMode = EXPLORER_MODE_SAFETY;
+    mCheckType = CHECK_TYPE_SAFETY;
     setup();
     bool result;
     if (mIsTrivial) {
@@ -160,7 +209,7 @@ runSafetyCheck()
           mFactory.createTraceStepProxyGlue(&mJavaTraceEvent, mCache);
         mTraceList->add(&step);
         const uint32_t level = mDepthMap->size() - 2;
-        computeCounterExample(*mTraceList, level);
+        computeBFSCounterExample(*mTraceList, level);
       }
     }
     teardown();
@@ -180,25 +229,42 @@ runNonblockingCheck()
     // std::cerr << (const char*) name << std::endl;
     mStartTime = clock();
     bool result = true;
-    mMode = EXPLORER_MODE_NONBLOCKING;
+    mCheckType = CHECK_TYPE_NONBLOCKING;
     setup();
     if (!mIsTrivial || mTraceState != UINT32_MAX) {
+      bool tarjan = false;
       if (mIsTrivial) {
         result = false;
         // mDeadlock = "transitions enabled in mTraceState";
       } else {
         storeInitialStates(false);
-        result = doNonblockingReachabilitySearch();
-        if (result) {
-          mConflictKind = jni::ConflictKind_LIVELOCK;
-          result = doNonblockingCoreachabilitySearch();
+        switch (mConflictCheckMode) {
+        case jni::ConflictCheckMode_STORED_BACKWARDS_TRANSITIONS:
+        case jni::ConflictCheckMode_COMPUTED_BACKWARDS_TRANSITIONS:
+          result = doNonblockingReachabilitySearch();
+          if (result) {
+            mConflictKind = jni::ConflictKind_LIVELOCK;
+            result = doNonblockingCoreachabilitySearch();
+          }
+          break;
+        case jni::ConflictCheckMode_NO_BACKWARDS_TRANSITIONS:
+          result = doNonblockingTarjanSearch();
+          tarjan = true;
+          break;
+        default:
+          // throw exception ?
+          break;
         }
       }
       if (!result) {
         mTraceStartTime = clock();
         mTraceList = new jni::LinkedListGlue(mCache);
-        const uint32_t level = getDepth(mTraceState);
-        computeCounterExample(*mTraceList, level);
+        if (tarjan) {
+          computeTarjanCounterExample(*mTraceList);
+        } else {
+          const uint32_t level = getDepth(mTraceState);
+          computeBFSCounterExample(*mTraceList, level);
+        } 
       }
     }
     teardown();
@@ -289,7 +355,7 @@ setup()
 {
   mIsAbortRequested = false;
   // Establish automaton encoding ...
-  const int numtags = mMode == EXPLORER_MODE_SAFETY ? 0 : 1;
+  const int numtags = mCheckType == CHECK_TYPE_SAFETY ? 0 : 1;
   mEncoding =
     new AutomatonEncoding(mModel, mKindTranslator,
                           mPreMarking, mMarking, mCache, numtags);
@@ -300,8 +366,8 @@ setup()
   mTraceAutomaton = 0;
   mTraceState = UINT32_MAX;
   mConflictKind = jni::ConflictKind_CONFLICT;
-  switch (mMode) {
-  case EXPLORER_MODE_SAFETY:
+  switch (mCheckType) {
+  case CHECK_TYPE_SAFETY:
     if (mEncoding->hasSpecs()) {
       mStateSpace = new StateSpace(mEncoding, mStateLimit);
       mDepthMap = new ArrayList<uint32_t>(128);
@@ -309,7 +375,7 @@ setup()
       setTrivial();
     }
     break;
-  case EXPLORER_MODE_NONBLOCKING:
+  case CHECK_TYPE_NONBLOCKING:
     if (mEncoding->isTriviallyNonblocking()) {
       setTrivial();
     } else if (mEncoding->isTriviallyBlocking()) {
@@ -319,10 +385,21 @@ setup()
       setTraceState(0);
       setTrivial();
     } else {
-      mStateSpace = new TaggedStateSpace(mEncoding, mStateLimit);
-      mDepthMap = new ArrayList<uint32_t>(128);
-      if (mTransitionLimit > 0) {
+      switch (mConflictCheckMode) {
+      case jni::ConflictCheckMode_STORED_BACKWARDS_TRANSITIONS:
         mReverseTransitionStore = new ReverseTransitionStore(mTransitionLimit);
+        // fall through ...
+      case jni::ConflictCheckMode_COMPUTED_BACKWARDS_TRANSITIONS:
+        mStateSpace = new TaggedStateSpace(mEncoding, mStateLimit);
+        mDepthMap = new ArrayList<uint32_t>(128);
+        break;
+      case jni::ConflictCheckMode_NO_BACKWARDS_TRANSITIONS:
+        mStateSpace = new TarjanStateSpace(mEncoding, mStateLimit);
+        mDepthMap = new ArrayList<uint32_t>(2); // for number of init states
+        break;
+      default:
+        // throw exception ?
+        break;
       }
     }
     break;
@@ -353,6 +430,9 @@ teardown()
   mTraceAutomaton = 0;
 }
 
+
+//----------------------------------------------------------------------------
+// Reachability
 
 #define DO_REACHABILITY                                           \
   {                                                               \
@@ -401,6 +481,10 @@ doNonblockingReachabilitySearch()
 }
 
 #undef EXPAND
+
+
+//----------------------------------------------------------------------------
+// Coreachability
 
 bool ProductExplorer::
 doNonblockingCoreachabilitySearch()
@@ -480,8 +564,78 @@ doNonblockingCoreachabilitySearch()
   return true;
 }
 
+#undef EXPAND
+
+
+//----------------------------------------------------------------------------
+// Tarjan
+
+
+bool ProductExplorer::
+doNonblockingTarjanSearch()
+{
+  uint32_t numInit = getNumberOfInitialStates();
+  for (uint32_t root = 0; root < numInit; root++) {
+    if (!doNonblockingTarjanSearch(root)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+#define EXPAND(source, sourcetuple, sourcepacked) \
+  expandNonblockingReachabilityState(source, sourcetuple, sourcepacked)
+
+bool ProductExplorer::
+doNonblockingTarjanSearch(uint32_t root)
+{
+  TarjanStateSpace* tarjan = (TarjanStateSpace*) mStateSpace;
+  if (!tarjan->isOpenState(root)) {
+    return true;
+  }
+  NonblockingTarjanCallBack callBack(tarjan, this);
+  uint32_t* sourceTuple = new uint32_t[mNumAutomata];
+  try {
+    do {
+      checkAbort();
+      if (tarjan->isTopControlStateClosing()) {
+        tarjan->mayBeCloseComponent(&callBack);
+        switch (callBack.getCriticalComponentSize()) {
+        case 0: // no critical component - continue ...
+          break;
+        case 1: // deadlock
+          setConflictKind(jni::ConflictKind_DEADLOCK);
+          return false;
+        default: // livelock
+          setConflictKind(jni::ConflictKind_LIVELOCK);
+          return false;
+        }
+      } else if (tarjan->isTopControlStateOpen()) {
+        uint32_t source = tarjan->beginStateExpansion();
+        uint32_t* sourcePacked = mStateSpace->get(source);
+        mEncoding->decode(sourcePacked, sourceTuple);
+        expandTarjanState(source, sourceTuple, sourcePacked);
+        // The above calls tarjan->processTransition(source, target) ...
+        tarjan->endStateExpansion();
+      } else {
+        tarjan->popRedundantControlState();
+      }
+    } while (!tarjan->isControlStackEmpty());
+    return true;
+  } catch (...) {
+    delete[] sourceTuple;
+    throw;
+  }
+}
+
+#undef EXPAND
+
+
+//----------------------------------------------------------------------------
+// Counterexamples
+
 void ProductExplorer::
-computeCounterExample(const jni::ListGlue& list, uint32_t level)
+computeBFSCounterExample(const jni::ListGlue& list, uint32_t level)
 {
   if (mReverseTransitionStore == 0 && level > 0) {
     setupReverseTransitionRelations();
@@ -528,6 +682,83 @@ computeCounterExample(const jni::ListGlue& list, uint32_t level)
   }
 }
 
+void ProductExplorer::
+computeTarjanCounterExample(const jni::ListGlue& list)
+{
+  TarjanStateSpace* tarjan = (TarjanStateSpace*) mStateSpace;
+  uint32_t numInit = getNumberOfInitialStates();
+  tarjan->setUpTraceSearch(numInit);
+
+  BlockedArrayList<uint32_t>* list1 = 0;
+  BlockedArrayList<uint32_t>* list2 = 0;
+  uint32_t* buffers = 0;
+  try {
+    mTraceState = UINT32_MAX;
+    list1 = new BlockedArrayList<uint32_t>();
+    for (uint32_t s = 0; s < numInit; s++) {
+      if (tarjan->getTraceStatus(s) == TarjanStateSpace::TR_CRITICAL) {
+        mTraceState = s;
+        break;
+      } else {
+        list1->add(s);
+      }      
+    }
+    list2 = new BlockedArrayList<uint32_t>();
+    buffers = new uint32_t[2 * mNumAutomata];
+    uint32_t* sourceTuple = buffers;
+    while (mTraceState == UINT32_MAX) {
+      for (uint32_t i = 0; i < list1->size(); i++) {
+        uint32_t source = list1->get(i);
+        uint32_t* sourcePacked = mStateSpace->get(source);
+        mEncoding->decode(sourcePacked, sourceTuple);
+        if (!expandTarjanTraceState(source, sourceTuple, sourcePacked)) {
+          break;
+        }
+      }
+      list1->clear();
+      BlockedArrayList<uint32_t>* tmp = list1;
+      list1 = list2;
+      list2 = tmp;
+    }
+    jni::HashMapGlue stateMap(mNumAutomata, mCache);
+    uint32_t* targetPacked = mStateSpace->get(mTraceState);
+    uint32_t* targetTuple = &buffers[mNumAutomata];
+    mEncoding->decode(targetPacked, targetTuple);
+    while (mTraceState >= numInit) {
+      uint32_t source = tarjan->getTraceStatus(mTraceState);
+      uint32_t* sourcePacked = mStateSpace->get(source);
+      mEncoding->decode(sourcePacked, sourceTuple);
+      if (mTraceEvent == 0) {
+        mTraceEvent = findEvent(sourceTuple, sourcePacked, targetPacked);
+      }
+      storeNondeterministicTargets(sourceTuple, targetTuple, stateMap);
+      const jni::EventGlue& event = mTraceEvent->getJavaEvent();
+      jni::TraceStepGlue step =
+        mFactory.createTraceStepProxyGlue(&event, &stateMap, mCache);
+      list.add(0, &step);
+      stateMap.clear();
+      uint32_t* tmp = sourceTuple;
+      sourceTuple = targetTuple;
+      targetTuple = tmp;
+      targetPacked = sourcePacked;
+      mTraceState = source;
+      mTraceEvent = 0;
+    }
+    mEncoding->storeNondeterministicInitialStates(targetTuple, stateMap);
+    jni::TraceStepGlue step =
+      mFactory.createTraceStepProxyGlue(0, &stateMap, mCache);
+    list.add(0, &step);
+  } catch (...) {
+    delete list1;
+    delete list2;
+    delete [] buffers;
+    throw;
+  }
+}
+
+
+//----------------------------------------------------------------------------
+// Common Auxiliary Methods
 
 void ProductExplorer::
 storeInitialStates(bool initzero, bool donondet)
@@ -585,6 +816,14 @@ storeInitialStates(bool initzero, bool donondet)
     mDepthMap->add(0);
     mDepthMap->add(mNumStates);
   }
+}
+
+
+bool ProductExplorer::
+isLocalDumpState(const uint32_t* tuple)
+  const
+{
+  return false;
 }
 
 
@@ -838,6 +1077,8 @@ Java_net_sourceforge_waters_cpp_analysis_NativeConflictChecker_runNativeAlgorith
       gchecker.getConfiguredPreconditionMarkingGlue(&cache);
     waters::ProductExplorer* checker =
       finalizer.createProductExplorer(translator, premarking, marking, cache);
+    jni::ConflictCheckMode mode = gchecker.getConflictCheckModeGlue(&cache);
+    checker->setConflictCheckMode(mode);
     bool aware = gchecker.isDumpStateAware();
     checker->setDumpStateAware(aware);
     bool result = checker->runNonblockingCheck();

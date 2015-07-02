@@ -105,6 +105,11 @@ public:
     mNumElements++;
   }
 
+  void removeLast(int count)
+  {
+    mNumElements -= count;
+  }
+
   void clear()
   {
     deleteBlocks();

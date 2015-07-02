@@ -54,6 +54,7 @@ public class NativeModelVerifierFactory
     addArgument(new CommandLineArgumentBroad());
     addArgument(new CommandLineArgumentDumpStateAware());
     addArgument(new CommandLineArgumentNarrow());
+    addArgument(new CommandLineArgumentTarjan());
   }
 
 
@@ -114,8 +115,11 @@ public class NativeModelVerifierFactory
     public void configureAnalyzer(final Object verifier)
     {
       if (verifier instanceof NativeConflictChecker) {
-        final NativeConflictChecker nverifier = (NativeConflictChecker) verifier;
-        nverifier.setDumpStateAware(true);
+        final NativeConflictChecker checker = (NativeConflictChecker) verifier;
+        checker.setDumpStateAware(true);
+      } else {
+        fail("Command line option " + getName() +
+             " is only supported for conflict check!");
       }
     }
   }
@@ -136,6 +140,30 @@ public class NativeModelVerifierFactory
     {
       final NativeModelVerifier nverifier = (NativeModelVerifier) verifier;
       nverifier.setExplorerMode(ExplorerMode.NARROW);
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class CommandLineArgumentTarjan
+  private static class CommandLineArgumentTarjan
+    extends CommandLineArgumentFlag
+  {
+    private CommandLineArgumentTarjan()
+    {
+      super("-tarjan", "Use Tarjan's algorithm for conflict check");
+    }
+
+    @Override
+    public void configureAnalyzer(final Object verifier)
+    {
+      if (verifier instanceof NativeConflictChecker) {
+        final NativeConflictChecker checker = (NativeConflictChecker) verifier;
+        checker.setConflictCheckMode(ConflictCheckMode.NO_BACKWARDS_TRANSITIONS);
+      } else {
+        fail("Command line option " + getName() +
+             " is only supported for conflict check!");
+      }
     }
   }
 

@@ -37,7 +37,7 @@
 
 #include "waters/analysis/BroadEventRecord.h"
 #include "waters/analysis/BroadProductExplorer.h"
-#include "waters/analysis/StateSpace.h"
+#include "waters/analysis/TarjanStateSpace.h"
 #include "waters/analysis/TransitionRecord.h"
 #include "waters/analysis/TransitionUpdateRecord.h"
 #include "waters/base/HashTable.h"
@@ -94,11 +94,11 @@ setup()
 {
   ProductExplorer::setup();
   if (!isTrivial()) {
-    switch (getMode()) {
-    case EXPLORER_MODE_SAFETY:
+    switch (getCheckType()) {
+    case CHECK_TYPE_SAFETY:
       setupSafety();
       break;
-    case EXPLORER_MODE_NONBLOCKING:
+    case CHECK_TYPE_NONBLOCKING:
       setupNonblocking();
       break;
     default:
@@ -124,6 +124,24 @@ teardown()
   delete [] mNondeterministicTransitionIterators;
   mNondeterministicTransitionIterators = 0;
   ProductExplorer::teardown();
+}
+
+
+bool BroadProductExplorer::
+isLocalDumpState(const uint32_t* tuple)
+  const
+{
+  if (mDumpStates != 0) {
+    uint32_t a = mDumpStates[0];
+    int d = 1;
+    do {
+      if (tuple[a] == mDumpStates[d++]) {
+        return true;
+      }
+      a = mDumpStates[d++];
+    } while (a != UINT32_MAX);
+  }
+  return false;
 }
 
 
@@ -260,7 +278,7 @@ teardown()
 bool BroadProductExplorer::
 expandSafetyState(const uint32_t* sourcetuple, const uint32_t* sourcepacked)
 {
-  const int numwords = getAutomatonEncoding().getNumberOfSignificantWords();
+  const int numwords = getAutomatonEncoding().getEncodingSize();
   for (int e = 0; e < mNumEventRecords; e++) {
     const BroadEventRecord* event = mEventRecords[e];
     const AutomatonRecord* dis = 0;
@@ -307,18 +325,11 @@ expandNonblockingReachabilityState(uint32_t source,
                                    const uint32_t* sourcetuple,
                                    const uint32_t* sourcepacked)
 {
-  const int numwords = getAutomatonEncoding().getNumberOfSignificantWords();
+  const int numwords = getAutomatonEncoding().getEncodingSize();
   setConflictKind(jni::ConflictKind_DEADLOCK);
   // Check for local dump states ...
-  if (mDumpStates != 0) {
-    uint32_t a = mDumpStates[0];
-    int d = 1;
-    do {
-      if (sourcetuple[a] == mDumpStates[d++]) {
-        return false;
-      }
-      a = mDumpStates[d++];
-    } while (a != UINT32_MAX);
+  if (isLocalDumpState(sourcetuple)) {
+    return false;
   }
   // Expand transitions, check for global deadlock ...
   if (getTransitionLimit() > 0) {
@@ -359,19 +370,135 @@ expandNonblockingReachabilityState(uint32_t source,
 }
 
 #undef ADD_NEW_STATE
-#define ADD_NEW_STATE(source) checkCoreachabilityState()
 #undef ADD_NEW_STATE_ALLOC
+
+
+#define ADD_NEW_STATE(source) checkCoreachabilityState()
 #define ADD_NEW_STATE_ALLOC(source, bufferpacked) ADD_NEW_STATE(source)
 
 void BroadProductExplorer::
 expandNonblockingCoreachabilityState(const uint32_t* targettuple,
                                      const uint32_t* targetpacked)
 {
-  const int numwords = getAutomatonEncoding().getNumberOfSignificantWords();
+  const int numwords = getAutomatonEncoding().getEncodingSize();
   EXPAND_REVERSE(numwords, TARGET, targettuple, targetpacked);
 }
 
 #undef ADD_NEW_STATE
+#undef ADD_NEW_STATE_ALLOC
+
+
+#define ADD_NEW_STATE(source)                                           \
+  {                                                                     \
+    uint32_t target = getStateSpace().add();                            \
+    if (target != source) {                                             \
+      if (target == getNumberOfStates()) {                              \
+        incNumberOfStates();                                            \
+      }                                                                 \
+      incNumberOfTransitions();                                         \
+      tarjan->processTransition(source, target);                        \
+    }                                                                   \
+  }
+#define ADD_NEW_STATE_ALLOC(source, bufferPacked)                       \
+  {                                                                     \
+    uint32_t target = getStateSpace().add();                            \
+    if (target != source) {                                             \
+      if (target == getNumberOfStates()) {                              \
+        bufferPacked = getStateSpace().prepare(incNumberOfStates());    \
+      }                                                                 \
+      incNumberOfTransitions();                                         \
+      tarjan->processTransition(source, target);                        \
+    }                                                                   \
+  }
+
+void BroadProductExplorer::
+expandTarjanState(uint32_t source,
+                  const uint32_t* sourceTuple,
+                  const uint32_t* sourcePacked)
+{
+  if (!isLocalDumpState(sourceTuple)) {
+    const int numWords = getAutomatonEncoding().getEncodingSize();
+    TarjanStateSpace* tarjan = (TarjanStateSpace*) &getStateSpace();
+    EXPAND_FORWARD(numWords, source, sourceTuple, sourcePacked);
+  }
+}
+
+#undef ADD_NEW_STATE
+#undef ADD_NEW_STATE_ALLOC
+
+
+#define ADD_NEW_STATE(source)                                           \
+  {                                                                     \
+    uint32_t target = getStateSpace().find();                           \
+    if (tarjan->isClosedState(target)) {                                \
+      return true;                                                      \
+    }                                                                   \
+  }
+#define ADD_NEW_STATE_ALLOC(source, bufferPacked) ADD_NEW_STATE(source)
+
+bool BroadProductExplorer::
+closeNonblockingTarjanState(uint32_t state, uint32_t* tupleBuffer)
+{
+  uint32_t* tuplePacked = getStateSpace().get(state);
+  getAutomatonEncoding().decode(tuplePacked, tupleBuffer);
+  if (getAutomatonEncoding().isMarkedStateTuple(tupleBuffer)) {
+    return true;
+  } else {
+    const int numWords = getAutomatonEncoding().getEncodingSize();
+    TarjanStateSpace* tarjan = (TarjanStateSpace*) &getStateSpace();
+    EXPAND_FORWARD(numWords, state, tupleBuffer, tuplePacked);
+    return false;
+  }
+}
+
+#undef ADD_NEW_STATE
+#undef ADD_NEW_STATE_ALLOC
+
+
+#define ADD_NEW_STATE(source)                                           \
+  {                                                                     \
+    uint32_t target = getStateSpace().find();                           \
+    if (target != source) {                                             \
+      gotSuccessor = true;                                              \
+      if (target != UINT32_MAX) {                                       \
+        uint32_t& ref = tarjan->getTraceStatusRef(target);              \
+        switch (ref) {                                                  \
+        case TarjanStateSpace::TR_OPEN:                                 \
+          ref = source;                                                 \
+          break;                                                        \
+        case TarjanStateSpace::TR_CRITICAL:                             \
+          setTraceState(target);                                        \
+          setTraceEvent(event);                                         \
+          return false;                                                 \
+        default:                                                        \
+          break;                                                        \
+        }                                                               \
+      }                                                                 \
+    }                                                                   \
+  }
+#define ADD_NEW_STATE_ALLOC(source, bufferPacked) ADD_NEW_STATE(source)
+
+bool BroadProductExplorer::
+expandTarjanTraceState(uint32_t source,
+                       const uint32_t* sourceTuple,
+                       const uint32_t* sourcePacked)
+{
+  bool gotSuccessor = false;
+  if (!isLocalDumpState(sourceTuple)) {
+    const int numWords = getAutomatonEncoding().getEncodingSize();
+    TarjanStateSpace* tarjan = (TarjanStateSpace*) &getStateSpace();
+    EXPAND_FORWARD(numWords, source, sourceTuple, sourcePacked);
+  }
+  if (!gotSuccessor) {
+    setTraceState(source);
+    setTraceEvent(0);
+    setConflictKind(jni::ConflictKind_DEADLOCK);
+  }
+  return gotSuccessor; 
+}
+
+#undef ADD_NEW_STATE
+#undef ADD_NEW_STATE_ALLOC
 
 
 void BroadProductExplorer::
@@ -379,7 +506,7 @@ setupReverseTransitionRelations()
 {
   if (mReversedEventRecords == 0) {
     bool removing =
-      getMode() == EXPLORER_MODE_NONBLOCKING && getTransitionLimit() == 0;
+      getCheckType() == CHECK_TYPE_NONBLOCKING && getTransitionLimit() == 0;
     int maxupdates = 0;
     BroadEventRecord** reversed = new BroadEventRecord*[mNumEventRecords];
     for (int e = 0; e < mNumEventRecords; e++) {
@@ -424,7 +551,7 @@ expandTraceState(const uint32_t* targettuple,
                  const uint32_t* targetpacked,
                  uint32_t level)
 {
-  const int numwords = getAutomatonEncoding().getNumberOfSignificantWords();
+  const int numwords = getAutomatonEncoding().getEncodingSize();
   const uint32_t prevLevelStart = getFirstState(level - 1);
   const uint32_t prevLevelEnd = getFirstState(level);
   const int prevLevelSize = prevLevelEnd - prevLevelStart;
@@ -440,6 +567,7 @@ expandTraceState(const uint32_t* targettuple,
         throw SearchAbort();                          \
       }                                               \
     }
+#   define ADD_NEW_STATE_ALLOC(source, bufferpacked) ADD_NEW_STATE(source)
     int numDeferred = 0;
     for (int e = 0; e < mNumReversedEventRecords; e++) {
       event = mReversedEventRecords[e];
@@ -505,7 +633,7 @@ findEvent(const uint32_t* sourcepacked,
           const uint32_t* sourcetuple,
           const uint32_t* targetpacked)
 {
-  const int numwords = getAutomatonEncoding().getNumberOfSignificantWords();
+  const int numwords = getAutomatonEncoding().getEncodingSize();
   const BroadEventRecord* event;
   try {
     int e = -1;
@@ -654,7 +782,7 @@ void BroadProductExplorer::
 setupEventMap(PtrHashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap)
 {
   jni::ClassCache* cache = getCache();
-  const int numwords = getAutomatonEncoding().getNumberOfSignificantWords();
+  const int numwords = getAutomatonEncoding().getEncodingSize();
   const jni::SetGlue events = getModel().getEventsGlue(cache);
   const jni::IteratorGlue iter = events.iteratorGlue(cache);
   while (iter.hasNext()) {
@@ -741,7 +869,7 @@ setupCompactEventList
 {
   mMaxNondeterministicUpdates = 0;
   mNumEventRecords = eventmap.size();
-  ExplorerMode mode = getMode();
+  CheckType mode = getCheckType();
   HashTableIterator hiter1 = eventmap.iterator();
   while (eventmap.hasNext(hiter1)) {
     const BroadEventRecord* event = eventmap.next(hiter1);
@@ -756,14 +884,14 @@ setupCompactEventList
   mEventRecords = new BroadEventRecord*[mNumEventRecords];
   HashTableIterator hiter2 = eventmap.iterator();
   int i = 0;
-  bool trivial = mode == EXPLORER_MODE_SAFETY;
+  bool trivial = mode == CHECK_TYPE_SAFETY;
   while (eventmap.hasNext(hiter2)) {
     BroadEventRecord* event = eventmap.next(hiter2);
     if (event->isSkippable(mode)) {
       delete event;
     } else {
       event->optimizeTransitionRecordsForSearch(mode);
-      if (mode == EXPLORER_MODE_NONBLOCKING && getTransitionLimit() == 0) {
+      if (mode == CHECK_TYPE_NONBLOCKING && getTransitionLimit() == 0) {
         event->setupNotTakenSearchRecords();
       }
       mEventRecords[i++] = event;
