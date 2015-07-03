@@ -57,6 +57,7 @@ public:
   bool isControlStackEmpty() const;
   bool isTopControlStateClosing() const;
   bool isTopControlStateOpen() const;
+  uint32_t getTopControlState() const;
   uint32_t getTopControlStateParent() const;
   inline void pushControlState(uint32_t state) {pushControlState(state, state);}
   void pushControlState(uint32_t state, uint32_t parent);
@@ -75,6 +76,10 @@ public:
   void setUpTraceSearch(uint32_t numInit);
   uint32_t getTraceStatus(uint32_t state) const {return getLowLink(state);}
   uint32_t& getTraceStatusRef(uint32_t state) {return getLowLinkRef(state);}
+
+  //##########################################################################
+  //# Debugging
+  void dumpControlStack();
 
 private:
   //##########################################################################

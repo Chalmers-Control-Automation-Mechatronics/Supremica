@@ -102,6 +102,19 @@ isTopControlStateOpen()
 }
 
 uint32_t TarjanStateSpace::
+getTopControlState()
+  const
+{
+  uint32_t top = mControlStack.size() - 2;
+  uint32_t value = mControlStack.get(top);
+  if ((value & TAG_CLOSING) == 0) {
+    return value;
+  } else {
+    return mComponentStack.get(value & ~TAG_CLOSING);
+  }
+}
+
+uint32_t TarjanStateSpace::
 getTopControlStateParent()
   const
 {
@@ -143,7 +156,7 @@ beginStateExpansion()
   ref = lowLink | TAG_CLOSING;
   mComponentStack.add(state);
   uint32_t* tuple = get(state);
-  int offset = getEncodingSize();
+  int offset = getSignificantTupleSize();
   tuple[offset] = lowLink;
   mNumStatesAtBegin = size();
   mControlStackSizeAtBegin = mControlStack.size();
@@ -153,7 +166,8 @@ beginStateExpansion()
 void TarjanStateSpace::
 processTransition(uint32_t source, uint32_t target)
 {
-  uint32_t lowLink = getLowLinkRef(target);
+  uint32_t& lowLink = getLowLinkRef(target);
+  // std::cerr << "  " << source << "->" << target << std::endl;
   if ((lowLink & TAG_GC) == 0) {
     switch (lowLink) {
     case LL_OPEN:
@@ -167,7 +181,6 @@ processTransition(uint32_t source, uint32_t target)
       break; // skip
     default:
       adjustLowLink(source, lowLink);
-      lowLink |= TAG_GC;
       break;
     }
   }
@@ -241,13 +254,49 @@ setUpTraceSearch(uint32_t numInit)
 
 
 //############################################################################
+//# TarjanStateSpace: Debugging
+
+void TarjanStateSpace::
+dumpControlStack()
+{
+  for (uint32_t pos = 0; pos < mControlStack.size(); pos += 2) {
+    uint32_t key = mControlStack.get(pos);
+    uint32_t state;
+    if ((key & TAG_CLOSING) == 0) {
+      std::cerr << "EXP:";
+      state = key;
+    } else {
+      std::cerr << "CLO:";
+      uint32_t comp = key & ~TAG_CLOSING;
+      state = mComponentStack.get(comp);
+    }
+    std::cerr << state << "[";
+    uint32_t lowLink = getLowLink(state);
+    switch (lowLink) {
+    case LL_OPEN:
+      std::cerr << "OPEN";
+      break;
+    case LL_CLOSED:
+      std::cerr << "CLOSED";
+      break;
+    default:
+      std::cerr << lowLink;
+      break;
+    }
+    uint32_t parent = mControlStack.get(pos + 1);
+    std::cerr << "]:" << parent << std::endl;
+  }
+}
+
+
+//############################################################################
 //# TarjanStateSpace: Low Link
 
 uint32_t TarjanStateSpace::
 getLowLink(uint32_t state)
   const
 {
-  int offset = getEncodingSize();
+  int offset = getSignificantTupleSize();
   const uint32_t* tuple = get(state);
   return tuple[offset];
 }
@@ -255,7 +304,7 @@ getLowLink(uint32_t state)
 uint32_t& TarjanStateSpace::
 getLowLinkRef(uint32_t state)
 {
-  int offset = getEncodingSize();
+  int offset = getSignificantTupleSize();
   uint32_t* tuple = get(state);
   return tuple[offset];
 }
@@ -263,7 +312,7 @@ getLowLinkRef(uint32_t state)
 void TarjanStateSpace::
 setLowLink(uint32_t state, uint32_t lowLink)
 {
-  int offset = getEncodingSize();
+  int offset = getSignificantTupleSize();
   uint32_t* tuple = get(state);
   tuple[offset] = lowLink;
 }
@@ -271,7 +320,7 @@ setLowLink(uint32_t state, uint32_t lowLink)
 void TarjanStateSpace::
 adjustLowLink(uint32_t state, uint32_t lowLink)
 {
-  int offset = getEncodingSize();
+  int offset = getSignificantTupleSize();
   uint32_t* tuple = get(state);
   if (lowLink < tuple[offset]) {
     tuple[offset] = lowLink;
@@ -305,12 +354,13 @@ garbageCollect()
     }
     uint32_t wpos = start;
     for (uint32_t rpos = start + 2; rpos < stackSize; rpos += 2) {
-      uint32_t& state = mControlStack.getref(rpos);
-      if (state != numStates) {
+      uint32_t& ref = mControlStack.getref(rpos);
+      if (ref != numStates) {
         uint64_t& wref = (uint64_t&) mControlStack.getref(wpos);
-        uint64_t& rref = (uint64_t&) state;
+        uint64_t& rref = (uint64_t&) ref;
         wref = rref; // copy two consecutive 32-bit words
         wpos += 2;
+        uint32_t state = ref & ~TAG_CLOSING;
         uint32_t& lowLink = getLowLinkRef(state);
         lowLink &= ~TAG_GC;
       }

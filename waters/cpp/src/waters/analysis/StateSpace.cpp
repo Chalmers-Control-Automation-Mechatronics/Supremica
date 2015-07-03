@@ -35,14 +35,14 @@ StateSpace::
 StateSpace(const AutomatonEncoding* encoding,
            uint32_t limit,
            int extraWords)
-  : mEncodingSize(encoding->getEncodingSize() + extraWords),
-    mNumSignificantWords(encoding->getEncodingSize()),
+  : mExtendedTupleSize(encoding->getEncodingSize() + extraWords),
+    mSignificantTupleSize(encoding->getEncodingSize()),
     mNumStates(0),
     mStateLimit(limit),
     mBlocks(INITBLOCKS),
     mLookupTable(this, BLOCKSIZE)
 {
-  initHashFactors(mNumSignificantWords);
+  initHashFactors(mSignificantTupleSize);
 }
 
 StateSpace::
@@ -63,7 +63,7 @@ get(uint32_t index)
   const
 {
   uint32_t* block = mBlocks.get(index >> BLOCKSHIFT);
-  return &block[mEncodingSize * (index & BLOCKMASK)];
+  return &block[mExtendedTupleSize * (index & BLOCKMASK)];
 }
 
 uint32_t* StateSpace::
@@ -72,12 +72,12 @@ prepare()
   uint32_t* block;
   uint32_t blockno = mNumStates >> BLOCKSHIFT;
   if (blockno >= mBlocks.size()) {
-    block = new uint32_t[mEncodingSize * BLOCKSIZE];
+    block = new uint32_t[mExtendedTupleSize * BLOCKSIZE];
     mBlocks.add(block);
   } else {
     block = mBlocks.get(blockno);
   }
-  return &block[mEncodingSize * (mNumStates & BLOCKMASK)];
+  return &block[mExtendedTupleSize * (mNumStates & BLOCKMASK)];
 }
 
 uint32_t* StateSpace::
@@ -85,7 +85,7 @@ prepare(uint32_t index)
 {
   uint32_t* source = get(index);
   uint32_t* target = prepare();
-  for (int i = 0; i < mNumSignificantWords; i++) {
+  for (int i = 0; i < mSignificantTupleSize; i++) {
     target[i] = source[i];
   }
   return target;
@@ -123,7 +123,7 @@ hash(int32_t key)
   const
 {
   const uint32_t* tuple = get(key);
-  return hashIntArray(tuple, mNumSignificantWords);
+  return hashIntArray(tuple, mSignificantTupleSize);
 }
 
 bool StateSpace::
@@ -139,7 +139,7 @@ bool StateSpace::
 equalTuples(const uint32_t* tuple1, const uint32_t* tuple2)
   const
 {
-  for (int i = 0; i < mNumSignificantWords; i++) {
+  for (int i = 0; i < mSignificantTupleSize; i++) {
     if (tuple1[i] != tuple2[i]) {
       return false;
     }
@@ -171,14 +171,14 @@ hash(int32_t key)
   const
 {
   const uint32_t* tuple = get(key);
-  return hashIntArray(tuple, getNumberOfSignificantWords(), mMask0);
+  return hashIntArray(tuple, getSignificantTupleSize(), mMask0);
 }
 
 bool TaggedStateSpace::
 equalTuples(const uint32_t* tuple1, const uint32_t* tuple2)
   const
 {
-  const int esize = getNumberOfSignificantWords();
+  const int esize = getSignificantTupleSize();
   if (esize > 0) {
     if (((tuple1[0] ^ tuple2[0]) & mMask0) != 0) {
       return false;

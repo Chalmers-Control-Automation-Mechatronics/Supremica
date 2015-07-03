@@ -134,8 +134,10 @@ private:
   void deleteBlocks()
   {
     if (mNumElements > 0) {
-      for (uint32_t bindex = (mNumElements - 1) >> mBlockShift;
-	   bindex >=0; bindex--) {
+      uint32_t bindex = (mNumElements - 1) >> mBlockShift;
+      delete [] mBlocks[bindex];
+      while (bindex > 0) {
+	bindex--;
 	delete [] mBlocks[bindex];
       }
     }

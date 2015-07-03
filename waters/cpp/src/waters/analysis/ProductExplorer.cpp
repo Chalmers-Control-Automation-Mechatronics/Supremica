@@ -87,12 +87,11 @@ public:
       // Only check markings for the first component ...
       const AutomatonEncoding& enc = mExplorer.getAutomatonEncoding();
       const uint32_t* tuplePacked = tarjan.get(state);
-      return enc.isMarkedStateTuplePacked(tuplePacked);
+      return !enc.isMarkedStateTuplePacked(tuplePacked);
     } else {
       // For all other components also check transitions ...
       return mExplorer.closeNonblockingTarjanState(state, mTupleBuffer);
     }
-    return true;
   }
 
 private:
@@ -355,10 +354,16 @@ setup()
 {
   mIsAbortRequested = false;
   // Establish automaton encoding ...
-  const int numtags = mCheckType == CHECK_TYPE_SAFETY ? 0 : 1;
+  int numTags;
+  if (mCheckType == CHECK_TYPE_NONBLOCKING &&
+      mConflictCheckMode != jni::ConflictCheckMode_NO_BACKWARDS_TRANSITIONS) {
+    numTags = 1;
+  } else {
+    numTags = 0;
+  }
   mEncoding =
     new AutomatonEncoding(mModel, mKindTranslator,
-                          mPreMarking, mMarking, mCache, numtags);
+                          mPreMarking, mMarking, mCache, numTags);
   // mEncoding->dump();
   mNumAutomata = mEncoding->getNumberOfRecords();
   mNumStates = mNumCoreachableStates = mNumTransitions = 0;
@@ -593,13 +598,18 @@ doNonblockingTarjanSearch(uint32_t root)
   if (!tarjan->isOpenState(root)) {
     return true;
   }
+  // std::cerr << "n=" << mStateSpace->size() << std::endl;
   NonblockingTarjanCallBack callBack(tarjan, this);
   uint32_t* sourceTuple = new uint32_t[mNumAutomata];
   try {
+    tarjan->pushControlState(root, root);
     do {
       checkAbort();
+      // tarjan->dumpControlStack();
       if (tarjan->isTopControlStateClosing()) {
+        // std::cerr << "c" << tarjan->getTopControlState() << std::endl;
         tarjan->mayBeCloseComponent(&callBack);
+        tarjan->popControlState();
         switch (callBack.getCriticalComponentSize()) {
         case 0: // no critical component - continue ...
           break;
@@ -611,13 +621,16 @@ doNonblockingTarjanSearch(uint32_t root)
           return false;
         }
       } else if (tarjan->isTopControlStateOpen()) {
+        // std::cerr << "o" << tarjan->getTopControlState() << std::endl;
         uint32_t source = tarjan->beginStateExpansion();
         uint32_t* sourcePacked = mStateSpace->get(source);
         mEncoding->decode(sourcePacked, sourceTuple);
         expandTarjanState(source, sourceTuple, sourcePacked);
         // The above calls tarjan->processTransition(source, target) ...
         tarjan->endStateExpansion();
+        // std::cerr << "n=" << mStateSpace->size() << std::endl;
       } else {
+        // std::cerr << "r" << tarjan->getTopControlState() << std::endl;
         tarjan->popRedundantControlState();
       }
     } while (!tarjan->isControlStackEmpty());
@@ -711,7 +724,7 @@ computeTarjanCounterExample(const jni::ListGlue& list)
         uint32_t source = list1->get(i);
         uint32_t* sourcePacked = mStateSpace->get(source);
         mEncoding->decode(sourcePacked, sourceTuple);
-        if (!expandTarjanTraceState(source, sourceTuple, sourcePacked)) {
+        if (!expandTarjanTraceState(source, sourceTuple, sourcePacked, list2)) {
           break;
         }
       }
@@ -729,7 +742,7 @@ computeTarjanCounterExample(const jni::ListGlue& list)
       uint32_t* sourcePacked = mStateSpace->get(source);
       mEncoding->decode(sourcePacked, sourceTuple);
       if (mTraceEvent == 0) {
-        mTraceEvent = findEvent(sourceTuple, sourcePacked, targetPacked);
+        mTraceEvent = findEvent(sourcePacked, sourceTuple, targetPacked);
       }
       storeNondeterministicTargets(sourceTuple, targetTuple, stateMap);
       const jni::EventGlue& event = mTraceEvent->getJavaEvent();

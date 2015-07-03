@@ -431,7 +431,7 @@ expandTarjanState(uint32_t source,
   {                                                                     \
     uint32_t target = getStateSpace().find();                           \
     if (tarjan->isClosedState(target)) {                                \
-      return true;                                                      \
+      return false; /* stop checking states */                          \
     }                                                                   \
   }
 #define ADD_NEW_STATE_ALLOC(source, bufferPacked) ADD_NEW_STATE(source)
@@ -442,12 +442,12 @@ closeNonblockingTarjanState(uint32_t state, uint32_t* tupleBuffer)
   uint32_t* tuplePacked = getStateSpace().get(state);
   getAutomatonEncoding().decode(tuplePacked, tupleBuffer);
   if (getAutomatonEncoding().isMarkedStateTuple(tupleBuffer)) {
-    return true;
+    return false; // stop checking states
   } else {
     const int numWords = getAutomatonEncoding().getEncodingSize();
     TarjanStateSpace* tarjan = (TarjanStateSpace*) &getStateSpace();
     EXPAND_FORWARD(numWords, state, tupleBuffer, tuplePacked);
-    return false;
+    return true; // continue checking states
   }
 }
 
@@ -464,9 +464,11 @@ closeNonblockingTarjanState(uint32_t state, uint32_t* tupleBuffer)
         uint32_t& ref = tarjan->getTraceStatusRef(target);              \
         switch (ref) {                                                  \
         case TarjanStateSpace::TR_OPEN:                                 \
+          successors->add(target);                                      \
           ref = source;                                                 \
           break;                                                        \
         case TarjanStateSpace::TR_CRITICAL:                             \
+          ref = source;                                                 \
           setTraceState(target);                                        \
           setTraceEvent(event);                                         \
           return false;                                                 \
@@ -481,7 +483,8 @@ closeNonblockingTarjanState(uint32_t state, uint32_t* tupleBuffer)
 bool BroadProductExplorer::
 expandTarjanTraceState(uint32_t source,
                        const uint32_t* sourceTuple,
-                       const uint32_t* sourcePacked)
+                       const uint32_t* sourcePacked,
+                       BlockedArrayList<uint32_t>* successors)
 {
   bool gotSuccessor = false;
   if (!isLocalDumpState(sourceTuple)) {

@@ -46,8 +46,8 @@ public:
 
   //##########################################################################
   //# Simple Access
-  inline int getEncodingSize() const {return mEncodingSize;}
-  inline int getNumberOfSignificantWords() const {return mNumSignificantWords;}
+  inline int getExtendedTupleSize() const {return mExtendedTupleSize;}
+  inline int getSignificantTupleSize() const {return mSignificantTupleSize;}
   inline uint32_t size() const {return mNumStates;}
 
   //##########################################################################
@@ -70,8 +70,8 @@ public:
 private:
   //##########################################################################
   //# Data Members
-  int mEncodingSize;
-  int mNumSignificantWords;
+  int mExtendedTupleSize;
+  int mSignificantTupleSize;
   uint32_t mNumStates;
   uint32_t mStateLimit;
   ArrayList<uint32_t*> mBlocks;

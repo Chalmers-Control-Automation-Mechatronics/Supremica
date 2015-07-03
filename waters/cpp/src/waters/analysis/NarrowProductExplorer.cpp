@@ -534,9 +534,11 @@ closeNonblockingTarjanState(uint32_t state, uint32_t* tupleBuffer)
         uint32_t& ref = tarjan->getTraceStatusRef(target);              \
         switch (ref) {                                                  \
         case TarjanStateSpace::TR_OPEN:                                 \
+          successors->add(target);                                      \
           ref = source;                                                 \
           break;                                                        \
         case TarjanStateSpace::TR_CRITICAL:                             \
+          ref = source;                                                 \
           setTraceState(target);                                        \
           setTraceEvent(0);                                             \
           return false;                                                 \
@@ -550,7 +552,8 @@ closeNonblockingTarjanState(uint32_t state, uint32_t* tupleBuffer)
 bool NarrowProductExplorer::
 expandTarjanTraceState(uint32_t source,
                        const uint32_t* sourceTuple,
-                       const uint32_t* sourcePacked)
+                       const uint32_t* sourcePacked,
+                       BlockedArrayList<uint32_t>* successors)
 {
   bool gotSuccessor = false;
   if (!isLocalDumpState(sourceTuple)) {

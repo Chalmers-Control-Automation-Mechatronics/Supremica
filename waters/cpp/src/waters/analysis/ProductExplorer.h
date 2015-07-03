@@ -163,7 +163,7 @@ protected:
     (uint32_t state, uint32_t* tupleBuffer) = 0;
   virtual bool expandTarjanTraceState
     (uint32_t source, const uint32_t* sourcetuple,
-     const uint32_t* sourcepacked) = 0;
+     const uint32_t* sourcepacked, BlockedArrayList<uint32_t>* successors) = 0;
   virtual void setupReverseTransitionRelations() = 0;
   virtual void expandTraceState
     (const uint32_t* targettuple, const uint32_t* targetpacked,

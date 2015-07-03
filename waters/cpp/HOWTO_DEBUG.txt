@@ -1,0 +1,5 @@
+launch test in Eclipse up to breakpoint
+ps -ef | grep java | grep waters | awk '{print $2}'
+gdb -p NNN
+cont
+resume test in Eclipse
