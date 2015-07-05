@@ -101,6 +101,7 @@ private:
   uint32_t mNumStatesAtBegin;
   uint32_t mControlStackSizeAtBegin;
   uint32_t mNumRedundantControlStackEntries;
+  uint32_t mNumGarbageCollections;
 
   //##########################################################################
   //# Class Constants

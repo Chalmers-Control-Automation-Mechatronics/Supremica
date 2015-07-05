@@ -32,7 +32,8 @@ TarjanStateSpace::
 TarjanStateSpace(const AutomatonEncoding* encoding, uint32_t limit)
   : StateSpace(encoding, limit, 1),
     mNumComponents(0),
-    mNumRedundantControlStackEntries(0)
+    mNumRedundantControlStackEntries(0),
+    mNumGarbageCollections(0)
 {
 }
 
@@ -343,39 +344,45 @@ garbageCollect()
     uint32_t start = stackSize;
     for (uint32_t pos = start; pos > 0;) {
       pos -= 2;
-      uint32_t& state = mControlStack.getref(pos);
-      if ((state & TAG_CLOSING) == 0) {
-        uint32_t& lowLink = getLowLinkRef(state);
-        if ((lowLink & TAG_GC) == 0) {
-          lowLink |= TAG_GC;
-        } else {
-          state = numStates;
-          start = pos;
-        }
+      uint32_t& ref = mControlStack.getref(pos);
+      bool closing = (ref & TAG_CLOSING) != 0;
+      uint32_t state = closing ? mComponentStack.get(ref & ~TAG_CLOSING) : ref;
+      uint32_t& lowLink = getLowLinkRef(state);
+      if (lowLink == LL_OPEN) {
+        lowLink |= TAG_GC;
+      } else if (!closing) {
+        ref = numStates;
+        start = pos;
       }
     }
     for (uint32_t pos = 0; pos < start; pos += 2) {
-      uint32_t state = mControlStack.get(pos);
-      if ((state & TAG_CLOSING) == 0) {
-        uint32_t& lowLink = getLowLinkRef(state);
-        lowLink &= ~TAG_GC;
-      }      
+      uint32_t value = mControlStack.get(pos);
+      bool closing = (value & TAG_CLOSING) != 0;
+      uint32_t state = 
+        closing ? mComponentStack.get(value & ~TAG_CLOSING) : value;
+      uint32_t& lowLink = getLowLinkRef(state);
+      lowLink &= ~TAG_GC;
     }
     uint32_t wpos = start;
     for (uint32_t rpos = start + 2; rpos < stackSize; rpos += 2) {
       uint32_t& ref = mControlStack.getref(rpos);
+      bool closing = (ref & TAG_CLOSING) != 0;
+      uint32_t state = closing ? mComponentStack.get(ref & ~TAG_CLOSING) : ref;
+      uint32_t& lowLink = getLowLinkRef(state);
+      lowLink &= ~TAG_GC;
       if (ref != numStates) {
         uint64_t& wref = (uint64_t&) mControlStack.getref(wpos);
         uint64_t& rref = (uint64_t&) ref;
         wref = rref; // copy two consecutive 32-bit words
         wpos += 2;
-        uint32_t state = ref & ~TAG_CLOSING;
-        uint32_t& lowLink = getLowLinkRef(state);
-        lowLink &= ~TAG_GC;
       }
-    }
+   }
     mControlStack.removeLast(stackSize - wpos);
     mNumRedundantControlStackEntries = 0;
+    mNumGarbageCollections++;
+    // std::cerr << "GC #" << mNumGarbageCollections
+    //           << " before: " << stackSize
+    //           << " after: " << mControlStack.size() << std::endl;
   }
 }
 
