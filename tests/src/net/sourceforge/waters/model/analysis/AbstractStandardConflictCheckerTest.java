@@ -767,6 +767,17 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(des, true);
   }
 
+  public void testProfisafeI3HostEFA() throws Exception
+  {
+    final ParameterBindingProxy binding = createBinding("MAXSEQNO", 3);
+    final List<ParameterBindingProxy> bindings =
+        Collections.singletonList(binding);
+    final ProductDESProxy des =
+      getCompiledDES(bindings, "tests", "profisafe",
+                     "profisafe_ihost_efa_2.wmod");
+    runModelVerifier(des, bindings, true);
+  }
+
   public void testProfisafeI3HostEFABlock() throws Exception
   {
     final ParameterBindingProxy binding = createBinding("MAXSEQNO", 3);

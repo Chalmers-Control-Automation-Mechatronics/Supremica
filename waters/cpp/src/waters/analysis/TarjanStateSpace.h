@@ -69,7 +69,7 @@ public:
   uint32_t beginStateExpansion();
   void processTransition(uint32_t source, uint32_t target);
   void endStateExpansion();
-  bool mayBeCloseComponent(TarjanCallBack *callBack);
+  void mayBeCloseComponent(TarjanCallBack *callBack);
 
   //##########################################################################
   //# Trace Search

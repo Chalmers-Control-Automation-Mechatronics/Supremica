@@ -123,7 +123,7 @@ private:
   {
     uint32_t newsize = mHeadArraySize << 1;
     Value** newblocks = new Value*[newsize];
-    for (uint32_t i = 0; i < newsize; i++) {
+    for (uint32_t i = 0; i < mHeadArraySize; i++) {
       newblocks[i] = mBlocks[i];
     }
     delete [] mBlocks;

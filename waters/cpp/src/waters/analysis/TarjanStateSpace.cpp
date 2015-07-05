@@ -198,15 +198,15 @@ endStateExpansion()
   garbageCollect();
 }
 
-bool TarjanStateSpace::
+void TarjanStateSpace::
 mayBeCloseComponent(TarjanCallBack *callBack)
 {
   uint32_t top = mControlStack.size() - 2;
   uint32_t index = mControlStack.get(top) & ~TAG_CLOSING;
   uint32_t state = mComponentStack.get(index);
   uint32_t lowLink = getLowLink(state);
-  uint32_t comp = LL_CLOSED;
   if (index == lowLink) {
+    uint32_t comp = LL_CLOSED;
     uint32_t end = mComponentStack.size();
     if (callBack != 0) {
       comp = TR_CRITICAL;
@@ -227,11 +227,13 @@ mayBeCloseComponent(TarjanCallBack *callBack)
     }
     mComponentStack.removeLast(end - index);
     mNumComponents++;
+    // std::cerr << "component " << mNumComponents << " "
+    //           << (comp == TR_CRITICAL ? "CRITICAL" : "ok")
+    //           << " " << callBack->getCriticalComponentSize() << std::endl;
   } else {
     uint32_t parent = mControlStack.get(top + 1);
     adjustLowLink(parent, lowLink);
   }
-  return comp == TR_CRITICAL;
 }
 
 
@@ -351,6 +353,13 @@ garbageCollect()
           start = pos;
         }
       }
+    }
+    for (uint32_t pos = 0; pos < start; pos += 2) {
+      uint32_t state = mControlStack.get(pos);
+      if ((state & TAG_CLOSING) == 0) {
+        uint32_t& lowLink = getLowLinkRef(state);
+        lowLink &= ~TAG_GC;
+      }      
     }
     uint32_t wpos = start;
     for (uint32_t rpos = start + 2; rpos < stackSize; rpos += 2) {

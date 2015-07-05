@@ -332,31 +332,39 @@ expandNonblockingReachabilityState(uint32_t source,
     return false;
   }
   // Expand transitions, check for global deadlock ...
-  if (getTransitionLimit() > 0) {
+  switch (getConflictCheckMode()) {
+  case jni::ConflictCheckMode_STORED_BACKWARDS_TRANSITIONS:
 #   define ADD_TRANSITION addCoreachabilityTransition
 #   define ADD_TRANSITION_ALLOC ADD_TRANSITION
     EXPAND_FORWARD(numwords, source, sourcetuple, sourcepacked);
 #   undef ADD_TRANSITION
 #   undef ADD_TRANSITION_ALLOC
-  } else {
-    // Nondeterministic transitions only need to be marked off once per
-    // state and event. The 'markedoff' flag suppresses the call to
-    // markTransitionsTakenFast() for subsequent nondeterministic transitions.
-    const BroadEventRecord* markedoff = 0;
-#   define ADD_TRANSITION(source, target) {                             \
-      incNumberOfTransitions();                                         \
-      event->markTransitionsTakenFast(sourcetuple);                     \
-    }
-#   define ADD_TRANSITION_ALLOC(source, target) {                       \
-      incNumberOfTransitions();                                         \
-      if (markedoff != event) {                                         \
+    break;
+  case jni::ConflictCheckMode_COMPUTED_BACKWARDS_TRANSITIONS:
+    {
+      // Nondeterministic transitions only need to be marked off once per
+      // state and event. The 'markedoff' flag suppresses the call to
+      // markTransitionsTakenFast() for subsequent nondeterministic transitions.
+      const BroadEventRecord* markedoff = 0;
+#     define ADD_TRANSITION(source, target) {                           \
+        incNumberOfTransitions();                                       \
         event->markTransitionsTakenFast(sourcetuple);                   \
-        markedoff = event;                                              \
-      }                                                                 \
+      }
+#     define ADD_TRANSITION_ALLOC(source, target) {                     \
+        incNumberOfTransitions();                                       \
+        if (markedoff != event) {                                       \
+          event->markTransitionsTakenFast(sourcetuple);                 \
+          markedoff = event;                                            \
+        }                                                               \
+      }
+      EXPAND_FORWARD(numwords, source, sourcetuple, sourcepacked);
+#     undef ADD_TRANSITION
+#     undef ADD_TRANSITION_ALLOC
     }
-    EXPAND_FORWARD(numwords, source, sourcetuple, sourcepacked);
-#   undef ADD_TRANSITION
-#   undef ADD_TRANSITION_ALLOC
+    break;
+  default:
+    // throw exception ?
+    break;
   }
   if (getConflictKind() != jni::ConflictKind_DEADLOCK) {
     return true;
@@ -492,7 +500,8 @@ expandTarjanTraceState(uint32_t source,
     TarjanStateSpace* tarjan = (TarjanStateSpace*) &getStateSpace();
     EXPAND_FORWARD(numWords, source, sourceTuple, sourcePacked);
   }
-  if (!gotSuccessor) {
+  if (!gotSuccessor &&
+      !getAutomatonEncoding().isMarkedStateTuple(sourceTuple)) {
     setTraceState(source);
     setTraceEvent(0);
     setConflictKind(jni::ConflictKind_DEADLOCK);

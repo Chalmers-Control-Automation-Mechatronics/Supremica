@@ -501,7 +501,8 @@ doNonblockingCoreachabilitySearch()
   mNumCoreachableStates = mPreMarking.isNull() ? 0 : UINT32_MAX;
   uint32_t* currenttuple = 0;
   bool overflow = false;
-  if (mTransitionLimit == 0) {
+  if (mConflictCheckMode == 
+      jni::ConflictCheckMode_COMPUTED_BACKWARDS_TRANSITIONS) {
     currenttuple = new uint32_t[mNumAutomata];
     setupReverseTransitionRelations();
   }
