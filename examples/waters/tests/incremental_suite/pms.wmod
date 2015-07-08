@@ -1,0 +1,2156 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="pms" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>This example was found in Ryan James Leduc's PhD-thesis 'Hierarchical Interface-based Supervisory Control'. The system is controllable and nonblocking.
+It has 5702550 reachable states and the diameter is 320.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="PROPOSITION" Name=":forbidden"/>
+        <EventDecl Kind="CONTROLLABLE" Name="allow_exit"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="attch_case_1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="attch_case_2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="attch_case_3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="attch_ptA_1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="attch_ptA_2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="attch_ptA_3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="attch_ptB_1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="attch_ptB_2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="attch_ptB_3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="cmpl_A_1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="cmpl_A_2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="cmpl_A_3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="cmpl_B_1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="cmpl_B_2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="cmpl_B_3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="compl_case_1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="compl_case_2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="compl_case_3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="compl_pol_1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="compl_pol_2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="compl_pol_3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="deposit_part"/>
+        <EventDecl Kind="CONTROLLABLE" Name="dip_acid_1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="dip_acid_2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="dip_acid_3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="finA_attch_1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="finA_attch_2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="finA_attch_3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="finB_attch_1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="finB_attch_2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="finB_attch_3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="fin_exit_1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="fin_exit_2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="fin_exit_3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="new_part"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="package"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="part_arr1_1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="part_arr1_2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="part_arr1_3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="part_arr2_1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="part_arr2_2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="part_arr2_3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="part_arr3_1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="part_arr3_2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="part_arr3_3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="part_ent_1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="part_ent_2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="part_ent_3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="part_f_obuff"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="part_fails"/>
+        <EventDecl Kind="CONTROLLABLE" Name="part_lv1_1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="part_lv1_2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="part_lv1_3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="part_lv2_1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="part_lv2_2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="part_lv2_3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="part_lv3_1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="part_lv3_2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="part_lv3_3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="part_lvExit_1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="part_lvExit_2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="part_lvExit_3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="part_passes"/>
+        <EventDecl Kind="CONTROLLABLE" Name="polish_1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="polish_2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="polish_3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="recog_A_1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="recog_A_2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="recog_A_3"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="recog_B_1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="recog_B_2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="recog_B_3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="ret_inbuff"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="ret_pt_1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="ret_pt_2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="ret_pt_3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="start_case_1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="start_case_2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="start_case_3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="start_pol_1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="start_pol_2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="start_pol_3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="str_exit_1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="str_exit_2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="str_exit_3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="str_ptA_1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="str_ptA_2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="str_ptA_3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="str_ptB_1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="str_ptB_2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="str_ptB_3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="str_rlse_1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="str_rlse_2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="str_rlse_3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="take_item"/>
+        <EventDecl Kind="CONTROLLABLE" Name="take_pt_1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="take_pt_2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="take_pt_3"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="LowLevel1_PathFlowModel">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                    <SimpleNode Name="A2"/>
+                    <SimpleNode Name="A3"/>
+                    <SimpleNode Name="A4"/>
+                    <SimpleNode Name="A5"/>
+                    <SimpleNode Name="A6"/>
+                    <SimpleNode Name="A7"/>
+                    <SimpleNode Name="A8"/>
+                    <SimpleNode Name="A9"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_ent_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_arr1_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_lv1_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A3" Target="A4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_lvExit_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A3" Target="A9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_exit_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A4" Target="A5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_arr2_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A5" Target="A6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="recog_A_1"/>
+                            <SimpleIdentifier Name="recog_B_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A6" Target="A7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_lv2_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A7" Target="A8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_arr3_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A8" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_lv3_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A9" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="fin_exit_1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="LowLevel3_InternalInterface">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                    <SimpleNode Name="A2"/>
+                    <SimpleNode Name="A3"/>
+                    <SimpleNode Name="A4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_pol_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A0" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="attch_ptA_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A0" Target="A3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="attch_ptB_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A0" Target="A4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_case_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="compl_pol_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finA_attch_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A3" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finB_attch_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A4" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="compl_case_3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="LowLevel2_AttachPart">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                    <SimpleNode Name="A2"/>
+                    <SimpleNode Name="A3"/>
+                    <SimpleNode Name="A4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_pt_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_ptA_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_ptB_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="cmpl_A_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A3" Target="A4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="cmpl_B_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A4" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ret_pt_2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="LowLevel3_PathFlowModel">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                    <SimpleNode Name="A2"/>
+                    <SimpleNode Name="A3"/>
+                    <SimpleNode Name="A4"/>
+                    <SimpleNode Name="A5"/>
+                    <SimpleNode Name="A6"/>
+                    <SimpleNode Name="A7"/>
+                    <SimpleNode Name="A8"/>
+                    <SimpleNode Name="A9"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_ent_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_arr1_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_lv1_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A3" Target="A4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_lvExit_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A3" Target="A9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_exit_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A4" Target="A5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_arr2_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A5" Target="A6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="recog_A_3"/>
+                            <SimpleIdentifier Name="recog_B_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A6" Target="A7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_lv2_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A7" Target="A8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_arr3_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A8" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_lv3_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A9" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="fin_exit_3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="LowLevel2_DefineNewEvents">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="attch_ptA_2"/>
+                            <SimpleIdentifier Name="attch_ptB_2"/>
+                            <SimpleIdentifier Name="finA_attch_2"/>
+                            <SimpleIdentifier Name="finB_attch_2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="HighLevel_Sink">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="allow_exit"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="HighLevel_InputBuffer">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                    <SimpleNode Name="A2"/>
+                    <SimpleNode Name="A3"/>
+                    <SimpleNode Name="A4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="new_part"/>
+                            <SimpleIdentifier Name="ret_inbuff"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_ent_1"/>
+                            <SimpleIdentifier Name="part_ent_2"/>
+                            <SimpleIdentifier Name="part_ent_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="new_part"/>
+                            <SimpleIdentifier Name="ret_inbuff"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_ent_1"/>
+                            <SimpleIdentifier Name="part_ent_2"/>
+                            <SimpleIdentifier Name="part_ent_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="new_part"/>
+                            <SimpleIdentifier Name="ret_inbuff"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A3" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_ent_1"/>
+                            <SimpleIdentifier Name="part_ent_2"/>
+                            <SimpleIdentifier Name="part_ent_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A3" Target="A4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="new_part"/>
+                            <SimpleIdentifier Name="ret_inbuff"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A4" Target="A3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_ent_1"/>
+                            <SimpleIdentifier Name="part_ent_2"/>
+                            <SimpleIdentifier Name="part_ent_3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="LowLevel3_AffixPart">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                    <SimpleNode Name="A10"/>
+                    <SimpleNode Name="A2"/>
+                    <SimpleNode Name="A3"/>
+                    <SimpleNode Name="A4"/>
+                    <SimpleNode Name="A5"/>
+                    <SimpleNode Name="A6"/>
+                    <SimpleNode Name="A7"/>
+                    <SimpleNode Name="A8"/>
+                    <SimpleNode Name="A9"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="attch_ptA_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A0" Target="A6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="attch_ptB_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_pt_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A10" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finB_attch_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_ptA_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A3" Target="A4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="cmpl_A_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A4" Target="A5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ret_pt_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A5" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finA_attch_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A6" Target="A7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_pt_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A7" Target="A8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_ptB_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A8" Target="A9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="cmpl_B_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A9" Target="A10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ret_pt_3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="LowLevel1_PolishPart">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                    <SimpleNode Name="A2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_pol_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="dip_acid_1"/>
+                            <SimpleIdentifier Name="polish_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_rlse_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="compl_pol_1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="LowLevel2_AttachCase">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                    <SimpleNode Name="A2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_case_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="attch_case_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="compl_case_2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="HighLevel_PackageBuffer">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                    <SimpleNode Name="A2"/>
+                    <SimpleNode Name="A3"/>
+                    <SimpleNode Name="A4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="deposit_part"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="deposit_part"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="deposit_part"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A3" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A3" Target="A4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="deposit_part"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A4" Target="A3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_item"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="LowLevel3_AttachPart">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                    <SimpleNode Name="A2"/>
+                    <SimpleNode Name="A3"/>
+                    <SimpleNode Name="A4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_pt_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_ptA_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_ptB_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="cmpl_A_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A3" Target="A4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="cmpl_B_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A4" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ret_pt_3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="LowLevel1_AffixPart">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                    <SimpleNode Name="A10"/>
+                    <SimpleNode Name="A2"/>
+                    <SimpleNode Name="A3"/>
+                    <SimpleNode Name="A4"/>
+                    <SimpleNode Name="A5"/>
+                    <SimpleNode Name="A6"/>
+                    <SimpleNode Name="A7"/>
+                    <SimpleNode Name="A8"/>
+                    <SimpleNode Name="A9"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="attch_ptA_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A0" Target="A6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="attch_ptB_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_pt_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A10" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finB_attch_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_ptA_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A3" Target="A4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="cmpl_A_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A4" Target="A5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ret_pt_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A5" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finA_attch_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A6" Target="A7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_pt_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A7" Target="A8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_ptB_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A8" Target="A9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="cmpl_B_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A9" Target="A10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ret_pt_1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="LowLevel1_AttachPart">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                    <SimpleNode Name="A2"/>
+                    <SimpleNode Name="A3"/>
+                    <SimpleNode Name="A4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_pt_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_ptA_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_ptB_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="cmpl_A_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A3" Target="A4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="cmpl_B_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A4" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ret_pt_1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="HighLevel_Source">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="new_part"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="HighLevel-PackagingSystem">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                    <SimpleNode Name="A2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_item"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="package"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="allow_exit"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="LowLevel1_InternalInterface">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                    <SimpleNode Name="A2"/>
+                    <SimpleNode Name="A3"/>
+                    <SimpleNode Name="A4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_pol_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A0" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="attch_ptA_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A0" Target="A3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="attch_ptB_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A0" Target="A4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_case_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="compl_pol_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finA_attch_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A3" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finB_attch_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A4" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="compl_case_1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="Interface_HighLevel_LowLevel3">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_ent_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="fin_exit_3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="LowLevel3_DefineNewEvents">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="attch_ptA_3"/>
+                            <SimpleIdentifier Name="attch_ptB_3"/>
+                            <SimpleIdentifier Name="finA_attch_3"/>
+                            <SimpleIdentifier Name="finB_attch_3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="Interface_HighLevel_LowLevel1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_ent_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="fin_exit_1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="LowLevel3_PolishPart">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                    <SimpleNode Name="A2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_pol_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="dip_acid_3"/>
+                            <SimpleIdentifier Name="polish_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_rlse_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="compl_pol_3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="Interface_HighLevel_LowLevel2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_ent_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="fin_exit_2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="HighLevel_MaterialFeedbackSupervisor">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                    <SimpleNode Name="A2"/>
+                    <SimpleNode Name="A3"/>
+                    <SimpleNode Name="A4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="new_part"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_passes"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="new_part"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_passes"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="new_part"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A3" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_passes"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A3" Target="A4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="new_part"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A4" Target="A3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_passes"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="LowLevel1_DefineNewEvents">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="attch_ptA_1"/>
+                            <SimpleIdentifier Name="attch_ptB_1"/>
+                            <SimpleIdentifier Name="finA_attch_1"/>
+                            <SimpleIdentifier Name="finB_attch_1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="LowLevel2-PathFlowModel">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                    <SimpleNode Name="A2"/>
+                    <SimpleNode Name="A3"/>
+                    <SimpleNode Name="A4"/>
+                    <SimpleNode Name="A5"/>
+                    <SimpleNode Name="A6"/>
+                    <SimpleNode Name="A7"/>
+                    <SimpleNode Name="A8"/>
+                    <SimpleNode Name="A9"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_ent_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_arr1_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_lv1_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A3" Target="A4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_lvExit_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A3" Target="A9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_exit_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A4" Target="A5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_arr2_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A5" Target="A6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="recog_A_2"/>
+                            <SimpleIdentifier Name="recog_B_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A6" Target="A7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_lv2_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A7" Target="A8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_arr3_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A8" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_lv3_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A9" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="fin_exit_2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="LowLevel2_AffixPart">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                    <SimpleNode Name="A10"/>
+                    <SimpleNode Name="A2"/>
+                    <SimpleNode Name="A3"/>
+                    <SimpleNode Name="A4"/>
+                    <SimpleNode Name="A5"/>
+                    <SimpleNode Name="A6"/>
+                    <SimpleNode Name="A7"/>
+                    <SimpleNode Name="A8"/>
+                    <SimpleNode Name="A9"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="attch_ptA_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A0" Target="A6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="attch_ptB_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_pt_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A10" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finB_attch_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_ptA_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A3" Target="A4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="cmpl_A_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A4" Target="A5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ret_pt_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A5" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finA_attch_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A6" Target="A7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="take_pt_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A7" Target="A8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_ptB_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A8" Target="A9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="cmpl_B_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A9" Target="A10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ret_pt_2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="LowLevel2_PolishingSequence">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                    <SimpleNode Name="A2"/>
+                    <SimpleNode Name="A3"/>
+                    <SimpleNode Name="A4"/>
+                    <SimpleNode Name="A5"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_pol_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="dip_acid_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="polish_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A3" Target="A4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="dip_acid_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A4" Target="A5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="polish_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A5" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_rlse_2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="HighLevel_TestUnit">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                    <SimpleNode Name="A2"/>
+                    <SimpleNode Name="A3"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_f_obuff"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_fails"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_passes"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ret_inbuff"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A3" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="deposit_part"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="LowLevel3_AttachCase">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                    <SimpleNode Name="A2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_case_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="attch_case_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="compl_case_3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="LowLevel2_SequenceTasks">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                    <SimpleNode Name="A10"/>
+                    <SimpleNode Name="A11"/>
+                    <SimpleNode Name="A12"/>
+                    <SimpleNode Name="A13"/>
+                    <SimpleNode Name="A14"/>
+                    <SimpleNode Name="A15"/>
+                    <SimpleNode Name="A16"/>
+                    <SimpleNode Name="A2"/>
+                    <SimpleNode Name="A3"/>
+                    <SimpleNode Name="A4"/>
+                    <SimpleNode Name="A5"/>
+                    <SimpleNode Name="A6"/>
+                    <SimpleNode Name="A7"/>
+                    <SimpleNode Name="A8"/>
+                    <SimpleNode Name="A9"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="fin_exit_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_ent_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_arr1_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A10" Target="A11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_lv2_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A11" Target="A12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_arr3_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A12" Target="A13">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_case_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A13" Target="A14">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="compl_case_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A14" Target="A15">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_lv3_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A15" Target="A16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_arr1_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A16" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_exit_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A16" Target="A16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_lv1_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_pol_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A3" Target="A4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="compl_pol_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A4" Target="A5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_lv1_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A5" Target="A5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_arr2_2"/>
+                            <SimpleIdentifier Name="part_lvExit_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A5" Target="A6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="recog_A_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A5" Target="A8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="recog_B_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A6" Target="A7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="attch_ptA_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A7" Target="A10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finA_attch_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A8" Target="A9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="attch_ptB_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A9" Target="A10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finB_attch_2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="LowLevel1_SequenceTasks">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                    <SimpleNode Name="A10"/>
+                    <SimpleNode Name="A11"/>
+                    <SimpleNode Name="A12"/>
+                    <SimpleNode Name="A13"/>
+                    <SimpleNode Name="A14"/>
+                    <SimpleNode Name="A15"/>
+                    <SimpleNode Name="A16"/>
+                    <SimpleNode Name="A2"/>
+                    <SimpleNode Name="A3"/>
+                    <SimpleNode Name="A4"/>
+                    <SimpleNode Name="A5"/>
+                    <SimpleNode Name="A6"/>
+                    <SimpleNode Name="A7"/>
+                    <SimpleNode Name="A8"/>
+                    <SimpleNode Name="A9"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="fin_exit_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_ent_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_arr1_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A10" Target="A11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_lv2_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A11" Target="A12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_arr3_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A12" Target="A13">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_case_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A13" Target="A14">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="compl_case_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A14" Target="A15">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_lv3_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A15" Target="A16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_arr1_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A16" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_exit_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A16" Target="A16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_lv1_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_pol_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A3" Target="A4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="compl_pol_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A4" Target="A5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_lv1_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A5" Target="A5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_arr2_1"/>
+                            <SimpleIdentifier Name="part_lvExit_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A5" Target="A6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="recog_A_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A5" Target="A8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="recog_B_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A6" Target="A7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="attch_ptA_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A7" Target="A10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finA_attch_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A8" Target="A9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="attch_ptB_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A9" Target="A10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finB_attch_1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="LowLevel2_PolishPart">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                    <SimpleNode Name="A2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_pol_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="dip_acid_2"/>
+                            <SimpleIdentifier Name="polish_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_rlse_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="compl_pol_2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="LowLevel3_SequenceTasks">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                    <SimpleNode Name="A10"/>
+                    <SimpleNode Name="A11"/>
+                    <SimpleNode Name="A12"/>
+                    <SimpleNode Name="A13"/>
+                    <SimpleNode Name="A14"/>
+                    <SimpleNode Name="A15"/>
+                    <SimpleNode Name="A16"/>
+                    <SimpleNode Name="A2"/>
+                    <SimpleNode Name="A3"/>
+                    <SimpleNode Name="A4"/>
+                    <SimpleNode Name="A5"/>
+                    <SimpleNode Name="A6"/>
+                    <SimpleNode Name="A7"/>
+                    <SimpleNode Name="A8"/>
+                    <SimpleNode Name="A9"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="fin_exit_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_ent_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_arr1_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A10" Target="A11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_lv2_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A11" Target="A12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_arr3_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A12" Target="A13">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_case_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A13" Target="A14">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="compl_case_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A14" Target="A15">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_lv3_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A15" Target="A16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_arr1_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A16" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_exit_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A16" Target="A16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_lv1_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_pol_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A3" Target="A4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="compl_pol_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A4" Target="A5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_lv1_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A5" Target="A5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_arr2_3"/>
+                            <SimpleIdentifier Name="part_lvExit_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A5" Target="A6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="recog_A_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A5" Target="A8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="recog_B_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A6" Target="A7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="attch_ptA_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A7" Target="A10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finA_attch_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A8" Target="A9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="attch_ptB_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A9" Target="A10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finB_attch_3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="HighLevel_OutputBuffer">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                    <SimpleNode Name="A2"/>
+                    <SimpleNode Name="A3"/>
+                    <SimpleNode Name="A4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_ent_1"/>
+                            <SimpleIdentifier Name="part_ent_2"/>
+                            <SimpleIdentifier Name="part_ent_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="fin_exit_1"/>
+                            <SimpleIdentifier Name="fin_exit_2"/>
+                            <SimpleIdentifier Name="fin_exit_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_f_obuff"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_ent_1"/>
+                            <SimpleIdentifier Name="part_ent_2"/>
+                            <SimpleIdentifier Name="part_ent_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="fin_exit_1"/>
+                            <SimpleIdentifier Name="fin_exit_2"/>
+                            <SimpleIdentifier Name="fin_exit_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_f_obuff"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="fin_exit_1"/>
+                            <SimpleIdentifier Name="fin_exit_2"/>
+                            <SimpleIdentifier Name="fin_exit_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A3" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_f_obuff"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A3" Target="A4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="fin_exit_1"/>
+                            <SimpleIdentifier Name="fin_exit_2"/>
+                            <SimpleIdentifier Name="fin_exit_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A4" Target="A3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="part_f_obuff"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="LowLevel2_InternalInterface">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                    <SimpleNode Name="A2"/>
+                    <SimpleNode Name="A3"/>
+                    <SimpleNode Name="A4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_pol_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A0" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="attch_ptA_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A0" Target="A3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="attch_ptB_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A0" Target="A4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_case_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="compl_pol_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finA_attch_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A3" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finB_attch_2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A4" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="compl_case_2"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="LowLevel3_PolishingSequence">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                    <SimpleNode Name="A2"/>
+                    <SimpleNode Name="A3"/>
+                    <SimpleNode Name="A4"/>
+                    <SimpleNode Name="A5"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_pol_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="dip_acid_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="polish_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A3" Target="A4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="dip_acid_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A4" Target="A5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="polish_3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A5" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_rlse_3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="LowLevel1_PolishingSequence">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                    <SimpleNode Name="A2"/>
+                    <SimpleNode Name="A3"/>
+                    <SimpleNode Name="A4"/>
+                    <SimpleNode Name="A5"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_pol_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="dip_acid_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="polish_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A3" Target="A4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="dip_acid_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A4" Target="A5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="polish_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A5" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="str_rlse_1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="LowLevel1_AttachCase">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="A0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="A1"/>
+                    <SimpleNode Name="A2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="A0" Target="A1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start_case_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A1" Target="A2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="attch_case_1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="A2" Target="A0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="compl_case_1"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>
