@@ -60,11 +60,12 @@ public:
   //# Throwing Exceptions
   virtual jint throwJavaException(ClassCache& cache) const;
 
-private:
+protected:
   //#########################################################################
   //# Auxiliary Methods
   void initMessage(const char* msg, bool staticString);
 
+private:
   //#########################################################################
   //# Data Members
   uint32_t mClassCode;

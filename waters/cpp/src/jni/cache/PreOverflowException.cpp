@@ -11,8 +11,6 @@
 #pragma implementation
 #endif
 
-#include <string.h>
-
 #include "jni/cache/ClassCache.h"
 #include "jni/cache/PreOverflowException.h"
 #include "jni/glue/Glue.h"

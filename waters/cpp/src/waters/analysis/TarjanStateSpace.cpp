@@ -16,6 +16,8 @@
 
 #include <jni.h>
 
+#include "jni/glue/NativeVerificationResultGlue.h"
+
 #include "waters/analysis/TarjanStateSpace.h"
 
 
@@ -31,8 +33,12 @@ namespace waters {
 TarjanStateSpace::
 TarjanStateSpace(const AutomatonEncoding* encoding, uint32_t limit)
   : StateSpace(encoding, limit, 1),
+    mControlStack(2048),
+    mComponentStack(1024),
     mNumComponents(0),
     mNumRedundantControlStackEntries(0),
+    mMaxControlStackHeight(0),
+    mMaxComponentStackHeight(0),
     mNumGarbageCollections(0)
 {
 }
@@ -156,6 +162,9 @@ beginStateExpansion()
   uint32_t lowLink = mComponentStack.size();
   ref = lowLink | TAG_CLOSING;
   mComponentStack.add(state);
+  if (mComponentStack.size() > mMaxComponentStackHeight) {
+    mMaxComponentStackHeight = mComponentStack.size();
+  }
   uint32_t* tuple = get(state);
   int offset = getSignificantTupleSize();
   tuple[offset] = lowLink;
@@ -195,6 +204,9 @@ endStateExpansion()
     uint32_t state = mControlStack.get(pos);
     uint32_t& lowLink = getLowLinkRef(state);
     lowLink &= ~TAG_GC;
+  }
+  if (mControlStack.size() > mMaxComponentStackHeight) {
+    mMaxControlStackHeight = mControlStack.size();
   }
   garbageCollect();
 }
@@ -253,6 +265,21 @@ setUpTraceSearch(uint32_t numInit)
       ref = s < numInit ? TR_INIT : TR_OPEN;
     }
   }
+}
+
+
+//############################################################################
+//# TarjanStateSpace: Statistics
+
+void TarjanStateSpace::
+addStatistics(const jni::NativeVerificationResultGlue& vresult)
+  const
+{
+  StateSpace::addStatistics(vresult);
+  vresult.setTarjanComponentCount(mNumComponents);
+  vresult.setTarjanControlStackHeight(mMaxControlStackHeight >> 1);
+  vresult.setTarjanComponentStackHeight(mMaxComponentStackHeight);
+  vresult.setTarjanGarbageCollections(mNumGarbageCollections);
 }
 
 

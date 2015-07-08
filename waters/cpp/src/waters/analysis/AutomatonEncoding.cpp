@@ -643,6 +643,18 @@ getNumberOfNondeterministicInitialAutomata()
   return ndcount;
 }
 
+int AutomatonEncoding::
+getNumberOfEncodedBits()
+  const
+{
+  int bits = 0;
+  for (int a = 0; a < mNumRecords; a++) {
+    const AutomatonRecord* record = mAutomatonRecords[a];
+    bits += record->getNumberOfBits();
+  }
+  return bits;
+}
+
 
 //############################################################################
 //# AutomatonEncoding: Encoding and Decoding

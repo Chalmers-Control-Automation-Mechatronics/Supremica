@@ -25,6 +25,11 @@
 #include "waters/base/HashTable.h"
 
 
+namespace jni {
+  class NativeVerificationResultGlue;
+}
+
+
 namespace waters {
 
 class AutomatonEncoding;
@@ -66,6 +71,11 @@ public:
   virtual bool equalTuples(const uint32_t* tuple1,
 			   const uint32_t* tuple2) const;
   virtual int32_t getKey(int32_t value) const {return value;}
+
+  //##########################################################################
+  //# Statistics
+  virtual void addStatistics
+    (const jni::NativeVerificationResultGlue& vresult) const {}
 
 private:
   //##########################################################################

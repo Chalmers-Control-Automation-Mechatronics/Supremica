@@ -78,6 +78,11 @@ public:
   uint32_t& getTraceStatusRef(uint32_t state) {return getLowLinkRef(state);}
 
   //##########################################################################
+  //# Statistics
+  virtual void addStatistics
+    (const jni::NativeVerificationResultGlue& vresult) const;
+
+  //##########################################################################
   //# Debugging
   void dumpControlStack();
 
@@ -95,12 +100,14 @@ private:
 
   //##########################################################################
   //# Data Members
-  uint32_t mNumComponents;
   BlockedArrayList<uint32_t> mControlStack;
   BlockedArrayList<uint32_t> mComponentStack;
+  uint32_t mNumComponents;
   uint32_t mNumStatesAtBegin;
   uint32_t mControlStackSizeAtBegin;
   uint32_t mNumRedundantControlStackEntries;
+  uint32_t mMaxControlStackHeight;
+  uint32_t mMaxComponentStackHeight;
   uint32_t mNumGarbageCollections;
 
   //##########################################################################

@@ -26,6 +26,7 @@
 
 #include "jni/cache/ClassCache.h"
 #include "jni/cache/JavaString.h"
+#include "jni/cache/PreAnalysisConfigurationException.h"
 #include "jni/cache/PreJavaException.h"
 #include "jni/glue/ConflictCheckModeGlue.h"
 #include "jni/glue/ConflictKindGlue.h"
@@ -38,12 +39,12 @@
 #include "jni/glue/LinkedListGlue.h"
 #include "jni/glue/NativeConflictCheckerGlue.h"
 #include "jni/glue/NativeSafetyVerifierGlue.h"
+#include "jni/glue/NativeVerificationResultGlue.h"
 #include "jni/glue/OverflowExceptionGlue.h"
 #include "jni/glue/SafetyTraceGlue.h"
 #include "jni/glue/SetGlue.h"
 #include "jni/glue/StateGlue.h"
 #include "jni/glue/TraceStepGlue.h"
-#include "jni/glue/VerificationResultGlue.h"
 
 #include "waters/analysis/BroadProductExplorer.h"
 #include "waters/analysis/EventRecord.h"
@@ -251,7 +252,7 @@ runNonblockingCheck()
           tarjan = true;
           break;
         default:
-          // throw exception ?
+          throw jni::PreAnalysisConfigurationException(mConflictCheckMode);
           break;
         }
       }
@@ -306,13 +307,21 @@ getConflictCounterExample(const jni::NativeConflictCheckerGlue& gchecker)
 
 
 void ProductExplorer::
-addStatistics(const jni::VerificationResultGlue& vresult)
+addStatistics(const jni::NativeVerificationResultGlue& vresult)
   const
 {
   vresult.setNumberOfAutomata(mNumAutomata);
   vresult.setNumberOfStates(mNumStates);
   vresult.setNumberOfTransitions(mNumTransitions);
   vresult.setPeakNumberOfNodes(mNumStates);
+  if (mEncoding == 0) {
+    vresult.setEncodingSize(0);
+  } else {
+    vresult.setEncodingSize(mEncoding->getNumberOfEncodedBits());
+  }
+  if (mStateSpace != 0) {
+    mStateSpace->addStatistics(vresult);
+  }
 #ifdef __MINGW32__
   /*
   PROCESS_MEMORY_COUNTERS counters;
@@ -403,13 +412,13 @@ setup()
         mDepthMap = new ArrayList<uint32_t>(2); // for number of init states
         break;
       default:
-        // throw exception ?
+        throw jni::PreAnalysisConfigurationException(mConflictCheckMode);
         break;
       }
     }
     break;
   default:
-    // throw exception ?
+    throw jni::PreAnalysisConfigurationException(mCheckType);
     break;
   }
 }
@@ -417,10 +426,6 @@ setup()
 void ProductExplorer::
 teardown()
 {
-  delete mEncoding;
-  mEncoding = 0;
-  delete mStateSpace;
-  mStateSpace = 0;
   delete mDepthMap;
   mDepthMap = 0;
   if (mReverseTransitionStore) {
@@ -1042,7 +1047,7 @@ Java_net_sourceforge_waters_cpp_analysis_NativeSafetyVerifier_runNativeAlgorithm
     bool initUncont = gchecker.isInitialUncontrollable();
     checker->setInitialUncontrollable(initUncont);
     bool result = checker->runSafetyCheck();
-    jni::VerificationResultGlue vresult =
+    jni::NativeVerificationResultGlue vresult =
       gchecker.createAnalysisResultGlue(&cache);
     if (result) {
       vresult.setSatisfied(true);
@@ -1096,7 +1101,7 @@ Java_net_sourceforge_waters_cpp_analysis_NativeConflictChecker_runNativeAlgorith
     bool aware = gchecker.isDumpStateAware();
     checker->setDumpStateAware(aware);
     bool result = checker->runNonblockingCheck();
-    jni::VerificationResultGlue vresult =
+    jni::NativeVerificationResultGlue vresult =
       gchecker.createAnalysisResultGlue(&cache);
     if (result) {
       vresult.setSatisfied(true);

@@ -39,7 +39,7 @@ PreJavaException::
 PreJavaException(uint32_t classcode)
   : mClassCode(classcode)
 {
-  initMessage(0,true);
+  initMessage(0, true);
 }
 
 PreJavaException::

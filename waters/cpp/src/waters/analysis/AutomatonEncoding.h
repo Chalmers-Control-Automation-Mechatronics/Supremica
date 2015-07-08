@@ -211,6 +211,7 @@ public:
   uint32_t getInverseTagMask() const;
   bool hasSpecs() const;
   int getNumberOfNondeterministicInitialAutomata() const;
+  int getNumberOfEncodedBits() const;
 
   //##########################################################################
   //# Encoding and Decoding

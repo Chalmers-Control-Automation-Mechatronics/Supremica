@@ -43,7 +43,7 @@ namespace jni {
   class NativeSafetyVerifierGlue;
   class ProductDESGlue;
   class SafetyTraceGlue;
-  class VerificationResultGlue;
+  class NativeVerificationResultGlue;
 }
 
 
@@ -103,7 +103,8 @@ public:
     (const jni::NativeSafetyVerifierGlue& gchecker) const;
   virtual jni::ConflictTraceGlue getConflictCounterExample
     (const jni::NativeConflictCheckerGlue& gchecker) const;
-  virtual void addStatistics(const jni::VerificationResultGlue& vresult) const;
+  virtual void addStatistics
+    (const jni::NativeVerificationResultGlue& vresult) const;
 
   //##########################################################################
   //# Parameters

@@ -20,6 +20,7 @@
 
 #include "jni/cache/ClassCache.h"
 #include "jni/cache/JavaString.h"
+#include "jni/cache/PreAnalysisConfigurationException.h"
 #include "jni/cache/PreEventNotFoundException.h"
 #include "jni/cache/PreJavaException.h"
 #include "jni/glue/AutomatonGlue.h"
@@ -29,11 +30,11 @@
 #include "jni/glue/IteratorGlue.h"
 #include "jni/glue/LinkedListGlue.h"
 #include "jni/glue/NativeSafetyVerifierGlue.h"
+#include "jni/glue/NativeVerificationResultGlue.h"
 #include "jni/glue/SetGlue.h"
 #include "jni/glue/StateGlue.h"
 #include "jni/glue/TransitionGlue.h"
 #include "jni/glue/TreeSetGlue.h"
-#include "jni/glue/VerificationResultGlue.h"
 
 #include "waters/analysis/BroadEventRecord.h"
 #include "waters/analysis/BroadProductExplorer.h"
@@ -66,7 +67,8 @@ BroadProductExplorer(const jni::ProductDESProxyFactoryGlue& factory,
     mReversedEventRecords(0),
     mMaxNondeterministicUpdates(0),
     mNondeterministicTransitionIterators(0),
-    mDumpStates(0)
+    mDumpStates(0),
+    mNumTransitionsExplored(0)
 {
 }
 
@@ -83,6 +85,18 @@ BroadProductExplorer::
   delete [] mEventRecords;
   delete [] mNondeterministicTransitionIterators;
   delete [] mDumpStates;
+}
+
+
+//############################################################################
+//# BroadProductExplorer: Overrides for ProductExplorer
+
+void BroadProductExplorer::
+addStatistics(const jni::NativeVerificationResultGlue& vresult)
+  const
+{
+  ProductExplorer::addStatistics(vresult);
+  vresult.setNumberOfExploredTransitions(mNumTransitionsExplored);
 }
 
 
@@ -215,6 +229,7 @@ isLocalDumpState(const uint32_t* tuple)
         }                                                               \
       }                                                                 \
       ADD_NEW_STATE(source);                                            \
+      mNumTransitionsExplored++;                                        \
     } else {                                                            \
       int ndend = 0;                                                    \
       for (int w = 0; w < numwords; w++) {                              \
@@ -242,10 +257,12 @@ isLocalDumpState(const uint32_t* tuple)
       }                                                                 \
       if (ndend == 0) {                                                 \
         ADD_NEW_STATE(source);                                          \
+        mNumTransitionsExplored++;                                      \
       } else {                                                          \
         int ndindex;                                                    \
         do {                                                            \
           ADD_NEW_STATE_ALLOC(source, bufferpacked);                    \
+          mNumTransitionsExplored++;                                    \
           for (ndindex = 0; ndindex < ndend; ndindex++) {               \
             if (!mNondeterministicTransitionIterators[ndindex].         \
                 advance(bufferpacked)) {                                \
@@ -363,7 +380,7 @@ expandNonblockingReachabilityState(uint32_t source,
     }
     break;
   default:
-    // throw exception ?
+    throw jni::PreAnalysisConfigurationException(getConflictCheckMode());
     break;
   }
   if (getConflictKind() != jni::ConflictKind_DEADLOCK) {
@@ -449,7 +466,9 @@ closeNonblockingTarjanState(uint32_t state, uint32_t* tupleBuffer)
 {
   uint32_t* tuplePacked = getStateSpace().get(state);
   getAutomatonEncoding().decode(tuplePacked, tupleBuffer);
-  if (getAutomatonEncoding().isMarkedStateTuple(tupleBuffer)) {
+  if (isLocalDumpState(tupleBuffer)) {
+    return true; // continue checking states - results in critical component
+  } else if (getAutomatonEncoding().isMarkedStateTuple(tupleBuffer)) {
     return false; // stop checking states
   } else {
     const int numWords = getAutomatonEncoding().getEncodingSize();

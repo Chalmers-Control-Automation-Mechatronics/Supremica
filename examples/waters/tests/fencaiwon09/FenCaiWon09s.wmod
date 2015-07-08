@@ -2,7 +2,9 @@
 <Module Name="FenCaiWon09s" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>Model of a production cell as documented in {Lei Feng, Kai Cai, W.M. Wonham, A structural approach to the non-blocking supervisory control of discrete-event systems, Int. J. Adv. Manuf. Technol. 41:1152-1168, 2009}.
 This is the version that achieves least restrictive nonblocking supervision according to the paper. 
-This is the synthesis version, containing only plants and specifications. It is not controllable and blocking.</ns2:Comment>
+This is the synthesis version, containing only plants and specifications.
+It is not controllable and blocking.
+It has 299650080 reachable states.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="blank_add"/>
         <EventDecl Kind="CONTROLLABLE" Name="Cr_mOn"/>

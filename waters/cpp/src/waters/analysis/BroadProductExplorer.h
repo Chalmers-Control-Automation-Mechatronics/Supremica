@@ -59,6 +59,11 @@ public:
 				jni::ClassCache* cache);
   virtual ~BroadProductExplorer();
 
+  //##########################################################################
+  //# Overrides for ProductExplorer
+  virtual void addStatistics
+    (const jni::NativeVerificationResultGlue& vresult) const;
+
 protected:
   //##########################################################################
   //# Shared Auxiliary Methods
@@ -116,6 +121,7 @@ private:
   // or NULL.
   uint32_t* mDumpStates;
   uint32_t mTraceLimit;
+  uint64_t mNumTransitionsExplored;
 };
 
 }   /* namespace waters */

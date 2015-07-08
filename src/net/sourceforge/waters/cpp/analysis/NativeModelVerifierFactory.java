@@ -9,6 +9,7 @@
 
 package net.sourceforge.waters.cpp.analysis;
 
+import net.sourceforge.waters.model.analysis.CommandLineArgumentBoolean;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -104,11 +105,11 @@ public class NativeModelVerifierFactory
   //#########################################################################
   //# Inner Class CommandLineArgumentDumpStateAware
   private static class CommandLineArgumentDumpStateAware
-    extends CommandLineArgumentFlag
+    extends CommandLineArgumentBoolean
   {
     private CommandLineArgumentDumpStateAware()
     {
-      super("-lds", "Conflict check stops in local deadlock state");
+      super("-lds", "Enable or disable stopping in local deadlock states");
     }
 
     @Override
@@ -116,7 +117,8 @@ public class NativeModelVerifierFactory
     {
       if (verifier instanceof NativeConflictChecker) {
         final NativeConflictChecker checker = (NativeConflictChecker) verifier;
-        checker.setDumpStateAware(true);
+        final boolean aware = getValue();
+        checker.setDumpStateAware(aware);
       } else {
         fail("Command line option " + getName() +
              " is only supported for conflict check!");

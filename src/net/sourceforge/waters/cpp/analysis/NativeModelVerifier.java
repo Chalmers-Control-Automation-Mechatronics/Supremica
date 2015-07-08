@@ -12,7 +12,6 @@ package net.sourceforge.waters.cpp.analysis;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
-import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
@@ -50,9 +49,9 @@ public abstract class NativeModelVerifier
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelVerifier
   @Override
-  public VerificationResult createAnalysisResult()
+  public NativeVerificationResult createAnalysisResult()
   {
-    return new DefaultVerificationResult();
+    return new NativeVerificationResult();
   }
 
   @Override

@@ -9,6 +9,8 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import java.io.PrintWriter;
+
 import net.sourceforge.waters.model.des.TraceProxy;
 
 
@@ -94,6 +96,37 @@ public class DefaultVerificationResult
       final VerificationResult result = (VerificationResult) other;
       mCounterExample = result.getCounterExample();
     }
+  }
+
+
+  //#########################################################################
+  //# Printing
+  @Override
+  public void print(final PrintWriter writer)
+  {
+    super.print(writer);
+    if (mCounterExample != null) {
+      final int len = mCounterExample.getEvents().size();
+      writer.println("Counterexample length: " + len);
+    }
+  }
+
+  @Override
+  public void printCSVHorizontal(final PrintWriter writer)
+  {
+    super.printCSVHorizontal(writer);
+    writer.print(',');
+    if (mCounterExample != null) {
+      final int len = mCounterExample.getEvents().size();
+      writer.print(len);
+    }
+  }
+
+  @Override
+  public void printCSVHorizontalHeadings(final PrintWriter writer)
+  {
+    super.printCSVHorizontalHeadings(writer);
+    writer.print(",CounterLength");
   }
 
 

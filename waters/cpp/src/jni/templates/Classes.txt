@@ -211,6 +211,10 @@ glue class AnalysisAbortException extends Exception {
   AnalysisAbortException();
 }
 
+glue class AnalysisConfigurationException extends Exception {
+  AnalysisConfigurationException(String msg);
+}
+
 enum class OverflowKind {STATE, TRANSITION, NODE, MEMORY}
 
 glue class OverflowException extends Exception {
@@ -251,6 +255,15 @@ enum class ConflictCheckMode {
   NO_BACKWARDS_TRANSITIONS
 }
 
+glue class NativeVerificationResult extends VerificationResult {
+  void setEncodingSize(int value);
+  void setNumberOfExploredTransitions(double value);
+  void setTarjanComponentCount(int value);
+  void setTarjanControlStackHeight(int value);
+  void setTarjanComponentStackHeight(int value);
+  void setTarjanGarbageCollections(int value);
+}
+
 glue class NativeModelAnalyzer {
   glue ProductDESProxyFactory getFactory();
   glue ProductDESProxy getModel();
@@ -263,7 +276,7 @@ glue class NativeModelAnalyzer {
 glue class NativeModelVerifier extends NativeModelAnalyzer {
   glue ExplorerMode getExplorerMode();
   String getTraceName();
-  glue VerificationResult createAnalysisResult();
+  glue NativeVerificationResult createAnalysisResult();
 }
 
 glue class NativeSafetyVerifier extends NativeModelVerifier {

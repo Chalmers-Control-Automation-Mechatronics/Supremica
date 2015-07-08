@@ -177,22 +177,33 @@ public class NativeConflictChecker
 
   /**
    * Gets the conflict check algorithm used.
-   * @return The configured conflict check mode, with one exception.
+   * @return The configured conflict check mode, with two exceptions.
    *         If the configured mode is
    *         {@link ConflictCheckMode#STORED_BACKWARDS_TRANSITIONS} and the
-   *         transition limit is zero, then a mode of
+   *         transition limit is zero, or if the configured mode is
+   *         {@link ConflictCheckMode#NO_BACKWARDS_TRANSITIONS}
+   *         and a precondition marking is configured, then a mode of
    *         {@link ConflictCheckMode#COMPUTED_BACKWARDS_TRANSITIONS} is
-   *         returned instead. This is for backwards compatibility.
+   *         returned instead.
    * @see ConflictCheckMode
    */
   public ConflictCheckMode getConflictCheckMode()
   {
-    if (mConflictCheckMode == ConflictCheckMode.STORED_BACKWARDS_TRANSITIONS &&
-        getTransitionLimit() == 0) {
-      return ConflictCheckMode.COMPUTED_BACKWARDS_TRANSITIONS;
-    } else {
-      return mConflictCheckMode;
+    switch (mConflictCheckMode) {
+    case STORED_BACKWARDS_TRANSITIONS:
+      if (getTransitionLimit() == 0) {
+        return ConflictCheckMode.COMPUTED_BACKWARDS_TRANSITIONS;
+      }
+      break;
+    case NO_BACKWARDS_TRANSITIONS:
+      if (getConfiguredPreconditionMarking() != null) {
+        return ConflictCheckMode.COMPUTED_BACKWARDS_TRANSITIONS;
+      }
+      break;
+    default:
+      break;
     }
+    return mConflictCheckMode;
   }
 
   /**
@@ -212,11 +223,18 @@ public class NativeConflictChecker
   /**
    * Returns whether this conflict checker stops when encountering a local
    * dump state.
+   * @return The <CODE>true</CODE> if local dump states are enabled,
+   *         <CODE>false</CODE> otherwise. However, always returns
+   *         <CODE>false</CODE> if a precondition marking is configured.
    * @see #setDumpStateAware(boolean) setDumpStateAware()
    */
   public boolean isDumpStateAware()
   {
-    return mDumpStateAware;
+    if (getConfiguredPreconditionMarking() == null) {
+      return mDumpStateAware;
+    } else {
+      return false;
+    }
   }
 
 
@@ -256,6 +274,6 @@ public class NativeConflictChecker
   private EventProxy mPreconditionMarking;
   private ConflictCheckMode mConflictCheckMode =
     ConflictCheckMode.STORED_BACKWARDS_TRANSITIONS;
-  private boolean mDumpStateAware;
+  private boolean mDumpStateAware = true;
 
 }

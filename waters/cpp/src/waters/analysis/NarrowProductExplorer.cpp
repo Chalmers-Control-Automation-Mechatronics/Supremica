@@ -510,15 +510,17 @@ closeNonblockingTarjanState(uint32_t state, uint32_t* tupleBuffer)
 {
   uint32_t* tuplePacked = getStateSpace().get(state);
   getAutomatonEncoding().decode(tuplePacked, tupleBuffer);
-  if (getAutomatonEncoding().isMarkedStateTuple(tupleBuffer)) {
-    return true;
+    if (isLocalDumpState(tupleBuffer)) {
+    return true; // continue checking states - results in critical component
+  } else if (getAutomatonEncoding().isMarkedStateTuple(tupleBuffer)) {
+    return false; // stop checking states
   } else {
     const uint32_t numAut = getNumberOfAutomata();
     const uint32_t TAG = NarrowTransitionTable::TAG_END_OF_LIST;
     uint32_t minEvent = UINT32_MAX;
     TarjanStateSpace* tarjan = (TarjanStateSpace*) &getStateSpace();
     EXPAND(state, tupleBuffer, minEvent, numAut, TAG);
-    return false;
+    return true; // continue checking states
   }
 }
 
