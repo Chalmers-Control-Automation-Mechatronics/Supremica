@@ -393,11 +393,12 @@ garbageCollect()
     uint32_t wpos = start;
     for (uint32_t rpos = start + 2; rpos < stackSize; rpos += 2) {
       uint32_t& ref = mControlStack.getref(rpos);
-      bool closing = (ref & TAG_CLOSING) != 0;
-      uint32_t state = closing ? mComponentStack.get(ref & ~TAG_CLOSING) : ref;
-      uint32_t& lowLink = getLowLinkRef(state);
-      lowLink &= ~TAG_GC;
       if (ref != numStates) {
+        bool closing = (ref & TAG_CLOSING) != 0;
+        uint32_t state =
+          closing ? mComponentStack.get(ref & ~TAG_CLOSING) : ref;
+        uint32_t& lowLink = getLowLinkRef(state);
+        lowLink &= ~TAG_GC;
         uint64_t& wref = (uint64_t&) mControlStack.getref(wpos);
         uint64_t& rref = (uint64_t&) ref;
         wref = rref; // copy two consecutive 32-bit words

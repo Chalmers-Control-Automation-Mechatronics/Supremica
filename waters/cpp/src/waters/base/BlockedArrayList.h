@@ -20,6 +20,7 @@
 #endif
 
 #include <stdint.h>
+#include <string.h>
 
 #include "waters/base/HashAccessor.h"
 
@@ -37,14 +38,15 @@ class BlockedArrayList
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit BlockedArrayList(uint32_t blocksize = 256,
-			    uint32_t headsize = 16)
+  explicit BlockedArrayList(uint32_t blockSize = 256,
+			    uint32_t headSize = 16)
   {
-    mBlockShift = log2(blocksize - 1);
+    mBlockShift = log2(blockSize - 1);
     mBlockSize = 1 << mBlockShift;
     mBlockMask = mBlockSize - 1;
-    mHeadArraySize = headsize;
-    mBlocks = new Value*[headsize];
+    mHeadArraySize = headSize;
+    mBlocks = new Value*[headSize];
+    memset(mBlocks, 0, headSize * sizeof(Value*));
     mNumElements = 0;
   }
 
@@ -86,7 +88,9 @@ public:
       if (blockno >= mHeadArraySize) {
 	growHeadArray();
       }
-      mBlocks[blockno] = new Value[mBlockSize];
+      if (mBlocks[blockno] == 0) {
+	mBlocks[blockno] = new Value[mBlockSize];
+      }
     }
     mNumElements++;
   }
@@ -99,7 +103,9 @@ public:
       if (blockno >= mHeadArraySize) {
 	growHeadArray();
       }
-      mBlocks[blockno] = new Value[mBlockSize];
+      if (mBlocks[blockno] == 0) {
+	mBlocks[blockno] = new Value[mBlockSize];
+      }
     }
     mBlocks[blockno][bindex] = value;
     mNumElements++;
@@ -121,14 +127,13 @@ private:
   //# Auxiliary Methods
   void growHeadArray()
   {
-    uint32_t newsize = mHeadArraySize << 1;
-    Value** newblocks = new Value*[newsize];
-    for (uint32_t i = 0; i < mHeadArraySize; i++) {
-      newblocks[i] = mBlocks[i];
-    }
+    uint32_t newSize = mHeadArraySize << 1;
+    Value** newBlocks = new Value*[newSize];
+    memcpy(newBlocks, mBlocks, mHeadArraySize * sizeof(Value*));
+    memset(&newBlocks[mHeadArraySize], 0, mHeadArraySize * sizeof(Value*));
     delete [] mBlocks;
-    mBlocks = newblocks;
-    mHeadArraySize = newsize;
+    mBlocks = newBlocks;
+    mHeadArraySize = newSize;
   }
 
   void deleteBlocks()
@@ -136,9 +141,11 @@ private:
     if (mNumElements > 0) {
       uint32_t bindex = (mNumElements - 1) >> mBlockShift;
       delete [] mBlocks[bindex];
+      mBlocks[bindex] = 0;
       while (bindex > 0) {
 	bindex--;
 	delete [] mBlocks[bindex];
+	mBlocks[bindex] = 0;
       }
     }
   }

@@ -536,8 +536,9 @@ void BroadProductExplorer::
 setupReverseTransitionRelations()
 {
   if (mReversedEventRecords == 0) {
-    bool removing =
-      getCheckType() == CHECK_TYPE_NONBLOCKING && getTransitionLimit() == 0;
+    bool removing = getCheckType() == CHECK_TYPE_NONBLOCKING &&
+                    getConflictCheckMode() ==
+                      jni::ConflictCheckMode_COMPUTED_BACKWARDS_TRANSITIONS;
     int maxupdates = 0;
     BroadEventRecord** reversed = new BroadEventRecord*[mNumEventRecords];
     for (int e = 0; e < mNumEventRecords; e++) {
@@ -900,11 +901,11 @@ setupCompactEventList
 {
   mMaxNondeterministicUpdates = 0;
   mNumEventRecords = eventmap.size();
-  CheckType mode = getCheckType();
+  CheckType checkType = getCheckType();
   HashTableIterator hiter1 = eventmap.iterator();
   while (eventmap.hasNext(hiter1)) {
     const BroadEventRecord* event = eventmap.next(hiter1);
-    if (event->isSkippable(mode)) {
+    if (event->isSkippable(checkType)) {
       mNumEventRecords--;
     }
     const int numupdates = event->getNumberOfNondeterministicUpdates();
@@ -915,14 +916,17 @@ setupCompactEventList
   mEventRecords = new BroadEventRecord*[mNumEventRecords];
   HashTableIterator hiter2 = eventmap.iterator();
   int i = 0;
-  bool trivial = mode == CHECK_TYPE_SAFETY;
+  bool trivial = checkType == CHECK_TYPE_SAFETY;
+  bool removing = checkType == CHECK_TYPE_NONBLOCKING &&
+                  getConflictCheckMode() ==
+                    jni::ConflictCheckMode_COMPUTED_BACKWARDS_TRANSITIONS;
   while (eventmap.hasNext(hiter2)) {
     BroadEventRecord* event = eventmap.next(hiter2);
-    if (event->isSkippable(mode)) {
+    if (event->isSkippable(checkType)) {
       delete event;
     } else {
-      event->optimizeTransitionRecordsForSearch(mode);
-      if (mode == CHECK_TYPE_NONBLOCKING && getTransitionLimit() == 0) {
+      event->optimizeTransitionRecordsForSearch(checkType);
+      if (removing) {
         event->setupNotTakenSearchRecords();
       }
       mEventRecords[i++] = event;
