@@ -261,7 +261,6 @@ glue class NativeVerificationResult extends VerificationResult {
   void setTarjanComponentCount(int value);
   void setTarjanControlStackHeight(int value);
   void setTarjanComponentStackHeight(int value);
-  void setTarjanGarbageCollections(int value);
 }
 
 glue class NativeModelAnalyzer {

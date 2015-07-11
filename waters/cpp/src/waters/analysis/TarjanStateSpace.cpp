@@ -24,6 +24,138 @@
 namespace waters {
 
 //############################################################################
+//# class TarjanControlStack
+//############################################################################
+
+//############################################################################
+//# TarjanControlStack: Constructors & Destructors
+
+TarjanControlStack::
+TarjanControlStack()
+  : BlockedArrayList<TarjanControlStackEntry>(1024),
+    mStackSize(0),
+    mMaxStackSize(0),
+    mFreeIndex(NO_INDEX)
+{
+  mPreTopIndex = add();
+  mPreTop = &getref(mPreTopIndex);
+  mPreTop->setNext(NO_INDEX);
+}
+
+
+//############################################################################
+//# TarjanControlStack: Stack Access
+
+const TarjanControlStackEntry& TarjanControlStack::
+top()
+  const
+{
+  uint32_t index = mPreTop->getNext();
+  return getref(index);
+}
+
+TarjanControlStackEntry& TarjanControlStack::
+top()
+{
+  uint32_t index = mPreTop->getNext();
+  return getref(index);
+}
+
+void TarjanControlStack::
+push(uint32_t state, uint32_t parent)
+{
+  mPreTop->setExpandingState(state, parent);
+  allocate();
+  mStackSize++;
+}
+
+void TarjanControlStack::
+pop()
+{
+  uint32_t topIndex = mPreTop->getNext();
+  TarjanControlStackEntry& topEntry = getref(topIndex);
+  uint32_t next = topEntry.getNext();
+  mPreTop->setNext(next);
+  topEntry.setNext(mFreeIndex);
+  mFreeIndex = topIndex;
+  mStackSize--;
+}
+
+TarjanControlStackEntry* TarjanControlStack::
+moveToTop(uint32_t behindIndex, uint32_t parent)
+{
+  uint32_t topIndex = mPreTop->getNext();
+  TarjanControlStackEntry& topEntry = getref(topIndex);
+  if (behindIndex == mPreTopIndex) {
+    topEntry.setParent(parent);
+    return 0;
+  } else {
+    TarjanControlStackEntry& behindEntry = getref(behindIndex);
+    uint32_t movedIndex = behindEntry.getNext();
+    TarjanControlStackEntry& movedEntry = getref(movedIndex);
+    if (movedEntry.getParent() == parent) {
+      return 0;
+    } else {
+      uint32_t beforeIndex = movedEntry.getNext();
+      behindEntry.setNext(beforeIndex);
+      mPreTop->setNext(movedIndex);
+      movedEntry.setNext(topIndex);
+      movedEntry.setParent(parent);
+      return &getref(beforeIndex);
+    }
+  }
+}
+
+
+//############################################################################
+//# TarjanControlStack: Debugging
+
+void TarjanControlStack::
+dump(const TarjanStateSpace* tarjan)
+  const
+{
+  std::cerr << "CONTROL STACK pretop=" << mPreTopIndex << std::endl;
+  uint32_t index = mPreTop->getNext();
+  while (index != NO_INDEX) {
+    const TarjanControlStackEntry& entry = getref(index);
+    uint32_t state;
+    if (entry.isClosing()) {
+      std::cerr << "CLO:";
+      uint32_t compIndex = entry.getClosingCompIndex();
+      state = tarjan->getStateForCompIndex(compIndex);
+    } else {
+      std::cerr << "EXP:";
+      state = entry.getExpandingState();
+    }
+    std::cerr << state << "[";
+    tarjan->dumpLowLink(state);
+    std::cerr << "]:" << entry.getParent() << " @ " << index << std::endl;
+    index = entry.getNext();
+  }
+  std::cerr << "CONTROL STACK END" << std::endl;
+}
+
+
+//############################################################################
+//# TarjanControlStack: Auxiliary Methods
+void TarjanControlStack::
+allocate()
+{
+  uint32_t index;
+  if (mFreeIndex == NO_INDEX) {
+    index = add();
+    mPreTop = &getref(index);
+  } else {
+    index = mFreeIndex;
+    mPreTop = &getref(index);
+    mFreeIndex = mPreTop->getNext();
+  }
+  mPreTop->setNext(mPreTopIndex);
+  mPreTopIndex = index;  
+}
+
+
+//############################################################################
 //# class TarjanStateSpace
 //############################################################################
 
@@ -33,13 +165,11 @@ namespace waters {
 TarjanStateSpace::
 TarjanStateSpace(const AutomatonEncoding* encoding, uint32_t limit)
   : StateSpace(encoding, limit, 1),
-    mControlStack(2048),
+    mControlStack(),
     mComponentStack(1024),
     mNumComponents(0),
-    mNumRedundantControlStackEntries(0),
-    mMaxControlStackHeight(0),
-    mMaxComponentStackHeight(0),
-    mNumGarbageCollections(0)
+    mCriticalComponentStart(UINT32_MAX),
+    mMaxComponentStackHeight(0)
 {
 }
 
@@ -82,42 +212,27 @@ bool TarjanStateSpace::
 isControlStackEmpty()
   const
 {
-  return mControlStack.size() == 0;
+  return mControlStack.getStackSize() == 0;
 }
 
 bool TarjanStateSpace::
 isTopControlStateClosing()
   const
 {
-  uint32_t top = mControlStack.size() - 2;
-  uint32_t value = mControlStack.get(top);
-  return (value & TAG_CLOSING) != 0;
-}
-
-bool TarjanStateSpace::
-isTopControlStateOpen()
-  const
-{
-  uint32_t top = mControlStack.size() - 2;
-  uint32_t value = mControlStack.get(top);
-  if ((value & TAG_CLOSING) == 0) {
-    uint32_t lowLink = getLowLink(value);
-    return lowLink == LL_OPEN;
-  } else {
-    return false;
-  }
+  const TarjanControlStackEntry& entry = mControlStack.top();
+  return entry.isClosing();
 }
 
 uint32_t TarjanStateSpace::
 getTopControlState()
   const
 {
-  uint32_t top = mControlStack.size() - 2;
-  uint32_t value = mControlStack.get(top);
-  if ((value & TAG_CLOSING) == 0) {
-    return value;
+  const TarjanControlStackEntry& entry = mControlStack.top();
+  if (entry.isClosing()) {
+    uint32_t compIndex = entry.getClosingCompIndex();
+    return mComponentStack.get(compIndex);
   } else {
-    return mComponentStack.get(value & ~TAG_CLOSING);
+    return entry.getExpandingState();
   }
 }
 
@@ -125,28 +240,20 @@ uint32_t TarjanStateSpace::
 getTopControlStateParent()
   const
 {
-  uint32_t top = mControlStack.size() - 1;
-  return mControlStack.get(top);
+  const TarjanControlStackEntry& entry = mControlStack.top();
+  return entry.getParent();
 }
 
 void TarjanStateSpace::
-pushControlState(uint32_t state, uint32_t parent)
+pushRootControlState(uint32_t state)
 {
-  mControlStack.add(state);
-  mControlStack.add(parent);
+  mControlStack.push(state, state);
 }
 
 void TarjanStateSpace::
 popControlState()
 {
-  mControlStack.removeLast(2);
-}
-
-void TarjanStateSpace::
-popRedundantControlState()
-{
-  popControlState();
-  mNumRedundantControlStackEntries--;
+  mControlStack.pop();
 }
 
 
@@ -156,42 +263,49 @@ popRedundantControlState()
 uint32_t TarjanStateSpace::
 beginStateExpansion()
 {
-  uint32_t top = mControlStack.size() - 2;
-  uint32_t& ref = mControlStack.getref(top);
-  uint32_t state = ref;
+  TarjanControlStackEntry& entry = mControlStack.top();
+  uint32_t state = entry.getExpandingState();
   uint32_t lowLink = mComponentStack.size();
-  ref = lowLink | TAG_CLOSING;
+  entry.setClosingCompIndex(lowLink);
   mComponentStack.add(state);
   if (mComponentStack.size() > mMaxComponentStackHeight) {
     mMaxComponentStackHeight = mComponentStack.size();
   }
-  uint32_t* tuple = get(state);
-  int offset = getSignificantTupleSize();
-  tuple[offset] = lowLink;
-  mNumStatesAtBegin = size();
-  mControlStackSizeAtBegin = mControlStack.size();
+  setLowLink(state, lowLink);
   return state;
 }
 
 void TarjanStateSpace::
 processTransition(uint32_t source, uint32_t target)
 {
-  uint32_t& lowLink = getLowLinkRef(target);
   // std::cerr << "  " << source << "->" << target << std::endl;
-  if ((lowLink & TAG_GC) == 0) {
-    switch (lowLink) {
-    case LL_OPEN:
-      pushControlState(target, source);
-      lowLink |= TAG_GC;
-      if (target < mNumStatesAtBegin) {
-        mNumRedundantControlStackEntries++;
+  uint32_t& ref = getLowLinkRef(target);
+  uint32_t lowLink = ref;
+  if ((lowLink & LL_EXPANDING) != 0) {
+    if (lowLink == LL_OPEN) {
+      mControlStack.push(target, source);
+      ref = mControlStack.getPreTopIndex() | LL_EXPANDING;
+    } else {
+      TarjanControlStackEntry& oldTopEntry = mControlStack.top();
+      uint32_t behindIndex = lowLink & ~LL_EXPANDING;
+      TarjanControlStackEntry* beforeEntry =
+        mControlStack.moveToTop(behindIndex, source);
+      if (beforeEntry != 0) {
+        ref = mControlStack.getPreTopIndex() | LL_EXPANDING;
+        if (!beforeEntry->isClosing()) {
+          uint32_t beforeState = beforeEntry->getExpandingState();
+          setLowLink(beforeState, lowLink);
+        }
+        if (!oldTopEntry.isClosing()) {
+          uint32_t oldTopState = oldTopEntry.getExpandingState();
+          uint32_t newTopIndex = mControlStack.getTopIndex();
+          setLowLink(oldTopState, newTopIndex | LL_EXPANDING);
+        }
       }
-      break;
-    case LL_CLOSED:
-      break; // skip
-    default:
+    }
+  } else {
+    if (lowLink != LL_CLOSED) {
       adjustLowLink(source, lowLink);
-      break;
     }
   }
 }
@@ -199,53 +313,57 @@ processTransition(uint32_t source, uint32_t target)
 void TarjanStateSpace::
 endStateExpansion()
 {
-  for (uint32_t pos = mControlStackSizeAtBegin;
-       pos < mControlStack.size(); pos += 2) {
-    uint32_t state = mControlStack.get(pos);
-    uint32_t& lowLink = getLowLinkRef(state);
-    lowLink &= ~TAG_GC;
-  }
-  if (mControlStack.size() > mMaxComponentStackHeight) {
-    mMaxControlStackHeight = mControlStack.size();
-  }
-  garbageCollect();
+  mControlStack.updateMaxStackSize();
 }
 
 void TarjanStateSpace::
 mayBeCloseComponent(TarjanCallBack *callBack)
 {
-  uint32_t top = mControlStack.size() - 2;
-  uint32_t index = mControlStack.get(top) & ~TAG_CLOSING;
-  uint32_t state = mComponentStack.get(index);
+  TarjanControlStackEntry& entry = mControlStack.top();
+  uint32_t compIndex = entry.getClosingCompIndex();
+  uint32_t state = mComponentStack.get(compIndex);
   uint32_t lowLink = getLowLink(state);
-  if (index == lowLink) {
-    uint32_t comp = LL_CLOSED;
+  if (compIndex == lowLink) {
+    bool critical = false;
     uint32_t end = mComponentStack.size();
     if (callBack != 0) {
-      comp = TR_CRITICAL;
-      for (uint32_t pos = index; pos < end; pos++) {
+      critical = true;
+      for (uint32_t pos = compIndex; pos < end; pos++) {
         uint32_t s = mComponentStack.get(pos);
         if (!callBack->addStateToComponent(s)) {
-          comp = LL_CLOSED;
+          critical = false;
           break;
         }
       }
-      if (comp == TR_CRITICAL) {
-        callBack->setCriticalComponentSize(end - index);
+      if (critical) {
+        mCriticalComponentStart = compIndex;
       }
     }
-    for (uint32_t pos = index; pos < end; pos++) {
-      uint32_t s = mComponentStack.get(pos);
-      setLowLink(s, comp);
+    if (!critical) {
+      for (uint32_t pos = compIndex; pos < end; pos++) {
+        uint32_t s = mComponentStack.get(pos);
+        setLowLink(s, LL_CLOSED);
+      }
+      mComponentStack.removeLast(end - compIndex);
     }
-    mComponentStack.removeLast(end - index);
     mNumComponents++;
     // std::cerr << "component " << mNumComponents << " "
-    //           << (comp == TR_CRITICAL ? "CRITICAL" : "ok")
+    //           << (critical ? "CRITICAL" : "ok")
     //           << " " << callBack->getCriticalComponentSize() << std::endl;
   } else {
-    uint32_t parent = mControlStack.get(top + 1);
+    uint32_t parent = entry.getParent();
     adjustLowLink(parent, lowLink);
+  }
+}
+
+uint32_t TarjanStateSpace::
+getCriticalComponentSize()
+  const
+{
+  if (mCriticalComponentStart == UINT32_MAX) {
+    return 0;
+  } else {
+    return mComponentStack.size() - mCriticalComponentStart;
   }
 }
 
@@ -257,14 +375,17 @@ void TarjanStateSpace::
 setUpTraceSearch(uint32_t numInit)
 {
   mControlStack.clear();
-  mComponentStack.clear();
   uint32_t numStates = size();
   for (uint32_t s = 0; s < numStates; s++) {
     uint32_t& ref = getTraceStatusRef(s);
-    if (ref != TR_CRITICAL) {
-      ref = s < numInit ? TR_INIT : TR_OPEN;
-    }
+    ref = s < numInit ? TR_INIT : TR_OPEN;
   }
+  uint32_t end = mComponentStack.size();
+  for (uint32_t pos = mCriticalComponentStart; pos < end; pos++) {
+    uint32_t s = mComponentStack.get(pos);
+    setLowLink(s, TR_CRITICAL);
+  }
+  mComponentStack.clear();
 }
 
 
@@ -277,9 +398,8 @@ addStatistics(const jni::NativeVerificationResultGlue& vresult)
 {
   StateSpace::addStatistics(vresult);
   vresult.setTarjanComponentCount(mNumComponents);
-  vresult.setTarjanControlStackHeight(mMaxControlStackHeight >> 1);
+  vresult.setTarjanControlStackHeight(mControlStack.getMaxStackSize());
   vresult.setTarjanComponentStackHeight(mMaxComponentStackHeight);
-  vresult.setTarjanGarbageCollections(mNumGarbageCollections);
 }
 
 
@@ -288,33 +408,26 @@ addStatistics(const jni::NativeVerificationResultGlue& vresult)
 
 void TarjanStateSpace::
 dumpControlStack()
+  const
 {
-  for (uint32_t pos = 0; pos < mControlStack.size(); pos += 2) {
-    uint32_t key = mControlStack.get(pos);
-    uint32_t state;
-    if ((key & TAG_CLOSING) == 0) {
-      std::cerr << "EXP:";
-      state = key;
-    } else {
-      std::cerr << "CLO:";
-      uint32_t comp = key & ~TAG_CLOSING;
-      state = mComponentStack.get(comp);
+  mControlStack.dump(this);
+}
+
+void TarjanStateSpace::
+dumpLowLink(uint32_t state)
+  const
+{
+  uint32_t lowLink = getLowLink(state);
+  if ((lowLink & LL_EXPANDING) != 0) {
+    std::cerr << "EXP";
+    if (lowLink != LL_OPEN) {
+      std::cerr << (lowLink & ~LL_EXPANDING);
     }
-    std::cerr << state << "[";
-    uint32_t lowLink = getLowLink(state);
-    switch (lowLink) {
-    case LL_OPEN:
-      std::cerr << "OPEN";
-      break;
-    case LL_CLOSED:
-      std::cerr << "CLOSED";
-      break;
-    default:
+  } else {
+    std::cerr << "CLO";
+    if (lowLink != LL_CLOSED) {
       std::cerr << lowLink;
-      break;
     }
-    uint32_t parent = mControlStack.get(pos + 1);
-    std::cerr << "]:" << parent << std::endl;
   }
 }
 
@@ -354,63 +467,6 @@ adjustLowLink(uint32_t state, uint32_t lowLink)
   uint32_t* tuple = get(state);
   if (lowLink < tuple[offset]) {
     tuple[offset] = lowLink;
-  }
-}
-
-
-//############################################################################
-//# TarjanStateSpace: Garbage Collection
-
-void TarjanStateSpace::
-garbageCollect()
-{
-  uint32_t stackSize = mControlStack.size();
-  if (stackSize > GC_MINIMUM &&
-      mNumRedundantControlStackEntries * GC_THRESHOLD >= stackSize) {
-    uint32_t numStates = size();
-    uint32_t start = stackSize;
-    for (uint32_t pos = start; pos > 0;) {
-      pos -= 2;
-      uint32_t& ref = mControlStack.getref(pos);
-      bool closing = (ref & TAG_CLOSING) != 0;
-      uint32_t state = closing ? mComponentStack.get(ref & ~TAG_CLOSING) : ref;
-      uint32_t& lowLink = getLowLinkRef(state);
-      if (lowLink == LL_OPEN) {
-        lowLink |= TAG_GC;
-      } else if (!closing) {
-        ref = numStates;
-        start = pos;
-      }
-    }
-    for (uint32_t pos = 0; pos < start; pos += 2) {
-      uint32_t value = mControlStack.get(pos);
-      bool closing = (value & TAG_CLOSING) != 0;
-      uint32_t state = 
-        closing ? mComponentStack.get(value & ~TAG_CLOSING) : value;
-      uint32_t& lowLink = getLowLinkRef(state);
-      lowLink &= ~TAG_GC;
-    }
-    uint32_t wpos = start;
-    for (uint32_t rpos = start + 2; rpos < stackSize; rpos += 2) {
-      uint32_t& ref = mControlStack.getref(rpos);
-      if (ref != numStates) {
-        bool closing = (ref & TAG_CLOSING) != 0;
-        uint32_t state =
-          closing ? mComponentStack.get(ref & ~TAG_CLOSING) : ref;
-        uint32_t& lowLink = getLowLinkRef(state);
-        lowLink &= ~TAG_GC;
-        uint64_t& wref = (uint64_t&) mControlStack.getref(wpos);
-        uint64_t& rref = (uint64_t&) ref;
-        wref = rref; // copy two consecutive 32-bit words
-        wpos += 2;
-      }
-   }
-    mControlStack.removeLast(stackSize - wpos);
-    mNumRedundantControlStackEntries = 0;
-    mNumGarbageCollections++;
-    // std::cerr << "GC #" << mNumGarbageCollections
-    //           << " before: " << stackSize
-    //           << " after: " << mControlStack.size() << std::endl;
   }
 }
 

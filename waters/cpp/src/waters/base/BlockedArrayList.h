@@ -80,7 +80,7 @@ public:
     return mBlocks[blockno][bindex];
   }
 
-  void add()
+  uint32_t add()
   {
     uint32_t bindex = mNumElements & mBlockMask;
     if (bindex == 0) {
@@ -92,7 +92,7 @@ public:
 	mBlocks[blockno] = new Value[mBlockSize];
       }
     }
-    mNumElements++;
+    return mNumElements++;
   }
 
   void add(const Value value)

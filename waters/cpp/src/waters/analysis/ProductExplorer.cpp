@@ -608,15 +608,15 @@ doNonblockingTarjanSearch(uint32_t root)
   NonblockingTarjanCallBack callBack(tarjan, this);
   uint32_t* sourceTuple = new uint32_t[mNumAutomata];
   try {
-    tarjan->pushControlState(root, root);
+    tarjan->pushRootControlState(root);
     do {
       checkAbort();
-      // tarjan->dumpControlStack();
+      //tarjan->dumpControlStack();
       if (tarjan->isTopControlStateClosing()) {
-        // std::cerr << "c" << tarjan->getTopControlState() << std::endl;
+        //std::cerr << "c" << tarjan->getTopControlState() << std::endl;
         tarjan->mayBeCloseComponent(&callBack);
         tarjan->popControlState();
-        switch (callBack.getCriticalComponentSize()) {
+        switch (tarjan->getCriticalComponentSize()) {
         case 0: // no critical component - continue ...
           break;
         case 1: // deadlock
@@ -626,8 +626,8 @@ doNonblockingTarjanSearch(uint32_t root)
           setConflictKind(jni::ConflictKind_LIVELOCK);
           return false;
         }
-      } else if (tarjan->isTopControlStateOpen()) {
-        // std::cerr << "o" << tarjan->getTopControlState() << std::endl;
+      } else {
+        //std::cerr << "e" << tarjan->getTopControlState() << std::endl;
         uint32_t source = tarjan->beginStateExpansion();
         uint32_t* sourcePacked = mStateSpace->get(source);
         mEncoding->decode(sourcePacked, sourceTuple);
@@ -635,9 +635,6 @@ doNonblockingTarjanSearch(uint32_t root)
         // The above calls tarjan->processTransition(source, target) ...
         tarjan->endStateExpansion();
         // std::cerr << "n=" << mStateSpace->size() << std::endl;
-      } else {
-        // std::cerr << "r" << tarjan->getTopControlState() << std::endl;
-        tarjan->popRedundantControlState();
       }
     } while (!tarjan->isControlStackEmpty());
     return true;

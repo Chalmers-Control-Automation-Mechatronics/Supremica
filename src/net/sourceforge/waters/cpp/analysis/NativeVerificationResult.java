@@ -38,7 +38,6 @@ public class NativeVerificationResult
     mTarjanComponentCount = -1;
     mTarjanControlStackHeight = -1;
     mTarjanComponentStackHeight = -1;
-    mTarjanGarbageCollections = -1;
   }
 
 
@@ -89,15 +88,6 @@ public class NativeVerificationResult
     return mTarjanComponentStackHeight;
   }
 
-  /**
-   * Gets the number of the control stack has been subjected to garbage
-   * collection when using Tarjan's algorithm.
-   */
-  public int getTarjanGarbageCollections()
-  {
-    return mTarjanGarbageCollections;
-  }
-
 
   //#########################################################################
   //# Providing Statistics
@@ -126,11 +116,6 @@ public class NativeVerificationResult
     mTarjanComponentStackHeight = value;
   }
 
-  public void setTarjanGarbageCollections(final int value)
-  {
-    mTarjanGarbageCollections = value;
-  }
-
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.analysis.AnalysisResult
@@ -148,8 +133,6 @@ public class NativeVerificationResult
       Math.max(mTarjanControlStackHeight, result.mTarjanControlStackHeight);
     mTarjanComponentStackHeight =
       Math.max(mTarjanComponentStackHeight, result.mTarjanComponentStackHeight);
-    mTarjanGarbageCollections =
-      mergeAdd(mTarjanGarbageCollections, result.mTarjanGarbageCollections);
   }
 
 
@@ -182,10 +165,6 @@ public class NativeVerificationResult
       writer.print("Maximum height of Tarjan component stack: ");
       writer.println(mTarjanComponentStackHeight);
     }
-    if (mTarjanGarbageCollections >= 0) {
-      writer.print("Number of Tarjan control stack garbage collections: ");
-      writer.println(mTarjanGarbageCollections);
-    }
   }
 
   @Override
@@ -197,7 +176,6 @@ public class NativeVerificationResult
     writer.print(",TarjanSCCs");
     writer.print(",TarjanControlStackHeight");
     writer.print(",TarjanComponentStackHeight");
-    writer.print(",TarjanGarbageCollections");
   }
 
   @Override
@@ -214,8 +192,6 @@ public class NativeVerificationResult
     writer.print(mTarjanControlStackHeight);
     writer.print(',');
     writer.print(mTarjanComponentStackHeight);
-    writer.print(',');
-    writer.print(mTarjanGarbageCollections);
   }
 
 
@@ -226,6 +202,5 @@ public class NativeVerificationResult
   private int mTarjanComponentCount;
   private int mTarjanControlStackHeight;
   private int mTarjanComponentStackHeight;
-  private int mTarjanGarbageCollections;
 
 }

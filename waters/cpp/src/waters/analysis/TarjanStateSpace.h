@@ -29,6 +29,96 @@ namespace waters {
 
 class AutomatonEncoding;
 class TarjanCallBack;
+class TarjanStateSpace;
+
+
+//############################################################################
+//# class TarjanControlStackEntry
+//############################################################################
+
+class TarjanControlStackEntry
+{
+public:
+  //##########################################################################
+  //# Simple Access
+  inline uint32_t getNext() const {return mNext;}
+  inline uint32_t isClosing() const {return (mIndex & TAG_CLOSING) != 0;}
+  inline uint32_t getExpandingState() const {return mIndex;}
+  inline uint32_t getClosingCompIndex() const {return mIndex & ~TAG_CLOSING;}
+  inline uint32_t getParent() const {return mParent;}
+
+  inline void setNext(uint32_t next) {mNext = next;}
+  inline void setExpandingState(uint32_t state, uint32_t parent)
+    {mIndex = state; mParent = parent;}
+  inline void setClosingCompIndex(uint32_t index)
+    {mIndex = index | TAG_CLOSING;}
+  inline void setParent(uint32_t parent) {mParent = parent;}
+
+private:
+  //##########################################################################
+  //# Data Members
+  uint32_t mNext;
+  uint32_t mIndex;
+  uint32_t mParent;
+
+  //##########################################################################
+  //# Class Constants
+  static const uint32_t TAG_CLOSING = 0x80000000;
+};
+
+
+//############################################################################
+//# class TarjanControlStack
+//############################################################################
+
+class TarjanControlStack : private BlockedArrayList<TarjanControlStackEntry>
+{
+public:
+  //##########################################################################
+  //# Constructors
+  explicit TarjanControlStack();
+
+  //##########################################################################
+  //# Simple Access
+  inline uint32_t getStackSize() const {return mStackSize;}
+  inline uint32_t getMaxStackSize() const {return mMaxStackSize;}
+  inline uint32_t getPreTopIndex() const {return mPreTopIndex;}
+  inline uint32_t getTopIndex() const {return mPreTop->getNext();}
+  inline void updateMaxStackSize()
+    { if (mStackSize > mMaxStackSize) {mMaxStackSize = mStackSize;} }
+
+  //##########################################################################
+  //# Stack Access
+  const TarjanControlStackEntry& top() const;
+  TarjanControlStackEntry& top();
+  void push(uint32_t state, uint32_t parent);
+  void pop();
+  TarjanControlStackEntry* moveToTop(uint32_t behindIndex, uint32_t parent);
+
+  inline void clear()
+    {BlockedArrayList<TarjanControlStackEntry>::clear();}
+
+  //##########################################################################
+  //# Debugging
+  void dump(const TarjanStateSpace* tarjan) const;
+
+private:
+  //##########################################################################
+  //# Auxiliary Methods
+  void allocate();
+
+  //##########################################################################
+  //# Data Members
+  uint32_t mStackSize;
+  uint32_t mMaxStackSize;
+  uint32_t mFreeIndex;
+  uint32_t mPreTopIndex;
+  TarjanControlStackEntry* mPreTop;
+  
+  //##########################################################################
+  //# Class Constants
+  static const uint32_t NO_INDEX = UINT32_MAX;
+};
 
 
 //############################################################################
@@ -56,13 +146,10 @@ public:
   bool isClosedState(uint32_t state) const;
   bool isControlStackEmpty() const;
   bool isTopControlStateClosing() const;
-  bool isTopControlStateOpen() const;
   uint32_t getTopControlState() const;
   uint32_t getTopControlStateParent() const;
-  inline void pushControlState(uint32_t state) {pushControlState(state, state);}
-  void pushControlState(uint32_t state, uint32_t parent);
+  void pushRootControlState(uint32_t state);
   void popControlState();
-  void popRedundantControlState();
 
   //##########################################################################
   //# Algorithm
@@ -70,6 +157,7 @@ public:
   void processTransition(uint32_t source, uint32_t target);
   void endStateExpansion();
   void mayBeCloseComponent(TarjanCallBack *callBack);
+  uint32_t getCriticalComponentSize() const;
 
   //##########################################################################
   //# Trace Search
@@ -84,7 +172,10 @@ public:
 
   //##########################################################################
   //# Debugging
-  void dumpControlStack();
+  void dumpControlStack() const;
+  void dumpLowLink(uint32_t state) const;
+  uint32_t getStateForCompIndex(uint32_t compIndex) const
+    {return mComponentStack.get(compIndex);}
 
 private:
   //##########################################################################
@@ -95,29 +186,18 @@ private:
   void adjustLowLink(uint32_t state, uint32_t lowLink);
 
   //##########################################################################
-  //# Garbage Collection
-  void garbageCollect();
-
-  //##########################################################################
   //# Data Members
-  BlockedArrayList<uint32_t> mControlStack;
+  TarjanControlStack mControlStack;
   BlockedArrayList<uint32_t> mComponentStack;
   uint32_t mNumComponents;
-  uint32_t mNumStatesAtBegin;
-  uint32_t mControlStackSizeAtBegin;
-  uint32_t mNumRedundantControlStackEntries;
-  uint32_t mMaxControlStackHeight;
+  uint32_t mCriticalComponentStart;
   uint32_t mMaxComponentStackHeight;
-  uint32_t mNumGarbageCollections;
 
   //##########################################################################
   //# Class Constants
 private:
-  static const uint32_t GC_MINIMUM = 1024;
-  static const uint32_t GC_THRESHOLD = 4;
-  static const uint32_t TAG_GC = 0x80000000;
-  static const uint32_t TAG_CLOSING = 0x80000000;
-  static const uint32_t LL_OPEN = 0x7ffffffe;
+  static const uint32_t LL_OPEN = 0xffffffff;
+  static const uint32_t LL_EXPANDING = 0x80000000;
   static const uint32_t LL_CLOSED = 0x7fffffff;
 
 public:
@@ -136,17 +216,12 @@ class TarjanCallBack
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit TarjanCallBack(TarjanStateSpace* tarjan) :
-    mTarjan(*tarjan), mCriticalComponentSize(0) {}
+  explicit TarjanCallBack(TarjanStateSpace* tarjan) : mTarjan(*tarjan) {}
   virtual ~TarjanCallBack() {}
 
   //##########################################################################
   //# Simple Access
   inline TarjanStateSpace& getTarjan() const {return mTarjan;}
-  inline uint32_t getCriticalComponentSize() const
-    {return mCriticalComponentSize;}
-  inline void setCriticalComponentSize(uint32_t size)
-    {mCriticalComponentSize = size;}
 
   //##########################################################################
   //# Interface TarjanCallBack
@@ -156,7 +231,6 @@ private:
   //##########################################################################
   //# Data Members
   TarjanStateSpace& mTarjan;
-  uint32_t mCriticalComponentSize;
 };
 
 }   /* namespace waters */
