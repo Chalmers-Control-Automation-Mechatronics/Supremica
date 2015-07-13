@@ -11,6 +11,7 @@ package net.sourceforge.waters.analysis.trcomp;
 
 import gnu.trove.set.hash.THashSet;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -59,6 +60,7 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.marshaller.MarshallingTools;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 import org.apache.log4j.Logger;
@@ -473,7 +475,7 @@ public abstract class AbstractTRCompositionalAnalyzer
   /**
    * Sets state and event encodings are to be preserved when copying
    * input automata of type {@link TRAutomatonProxy}. If set, the input
-   * automata will be used with the exact same encoding, which has to
+   * automata will be used with the exact same encoding, which has to be
    * compatible with the expectations of the abstraction procedures.
    * Otherwise, the encoding may change, resulting in counterexamples
    * with possibly different encoding.
@@ -491,6 +493,25 @@ public abstract class AbstractTRCompositionalAnalyzer
   public boolean getPreservingEncodings()
   {
     return mPreservingEncodings;
+  }
+
+  /**
+   * Sets a file name to dump abstracted models before monolithic
+   * verification. If set, any abstracted model will be written to this file
+   * before being sent for monolithic verification.
+   */
+  public void setMonolithicDumpFileName(final String fileName)
+  {
+    mMonolithicDumpFileName = fileName;
+  }
+
+  /**
+   * Returns the file name abstracted models are written to.
+   * @see #setMonolithicDumpFileName(File) setMonolithicDumpFileName()
+   */
+  public String getMonolithicDumpFileName()
+  {
+    return mMonolithicDumpFileName;
   }
 
 
@@ -1411,12 +1432,14 @@ public abstract class AbstractTRCompositionalAnalyzer
     result.addUnsuccessfulComposition();
   }
 
-  void recordMonolithicAttempt(final List<TRAutomatonProxy> automata)
+  void recordMonolithicAttempt(final ProductDESProxy des)
   {
     final Logger logger = getLogger();
     if (logger.isDebugEnabled()) {
       double estimate = 1.0;
-      for (final TRAutomatonProxy tr : automata) {
+      final Collection<AutomatonProxy> automata = des.getAutomata();
+      for (final AutomatonProxy aut : automata) {
+        final TRAutomatonProxy tr = (TRAutomatonProxy) aut;
         final ListBufferTransitionRelation rel = tr.getTransitionRelation();
         estimate *= rel.getNumberOfReachableStates();
       }
@@ -1425,6 +1448,9 @@ public abstract class AbstractTRCompositionalAnalyzer
         ("Monolithically composing %d automata, estimated " +
          code + " states.", automata.size(), estimate);
       logger.debug(msg);
+    }
+    if (mMonolithicDumpFileName != null) {
+      MarshallingTools.saveProductDESorModule(des, mMonolithicDumpFileName);
     }
   }
 
@@ -1745,6 +1771,7 @@ public abstract class AbstractTRCompositionalAnalyzer
   private boolean mAlwaysEnabledEventsEnabled = false;
   private boolean mTraceCheckingEnabled = false;
   private boolean mPreservingEncodings = false;
+  private String mMonolithicDumpFileName = null;
 
   // Tools
   private TRPreselectionHeuristic mPreselectionHeuristic;

@@ -355,20 +355,20 @@ public abstract class BDDModelVerifier
     final ProductDESProxy model = getModel();
     final KindTranslator translator = getKindTranslator();
     final Collection<EventProxy> events = model.getEvents();
-    int numevents = 0;
+    int numEvents = 0;
     for (final EventProxy event : events) {
       switch (translator.getEventKind(event)) {
       case UNCONTROLLABLE:
       case CONTROLLABLE:
-        numevents++;
+        numEvents++;
         break;
       default:
         break;
       }
     }
-    final EventBDD[] eventBDDs = new EventBDD[numevents];
+    final EventBDD[] eventBDDs = new EventBDD[numEvents];
     final Map<EventProxy,EventBDD> eventmap =
-      new HashMap<EventProxy,EventBDD>(numevents);
+      new HashMap<EventProxy,EventBDD>(numEvents);
     int eventindex = 0;
     for (final EventProxy event : events) {
       checkAbort();
@@ -423,6 +423,7 @@ public abstract class BDDModelVerifier
       }
     }
     final VerificationResult result = getAnalysisResult();
+    result.setTotalNumberOfEvents(numEvents);
     if (result.isFinished()) {
       return null;
     }

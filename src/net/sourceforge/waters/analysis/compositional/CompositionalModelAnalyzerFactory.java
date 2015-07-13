@@ -76,6 +76,7 @@ public class CompositionalModelAnalyzerFactory
     addArgument(new SelfloopOnlyEventsArgument());
     addArgument(new DeadlockPruningArgument());
     addArgument(new SecondaryFactoryArgument());
+    addArgument(new DumpFileArgument());
   }
 
 
@@ -639,6 +640,34 @@ public class CompositionalModelAnalyzerFactory
       final AbstractCompositionalModelAnalyzer composer =
         (AbstractCompositionalModelAnalyzer) analyzer;
       composer.setMonolithicAnalyzer(secondaryAnalyzer);
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class DumpFileArgument
+  private static class DumpFileArgument
+    extends CommandLineArgumentString
+  {
+    //#######################################################################
+    //# Constructors
+    protected DumpFileArgument()
+    {
+      super("-dump",
+            "Save abstracted model in given file before monolithic verification");
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    @Override
+    public void configureAnalyzer(final Object analyzer)
+      throws AnalysisConfigurationException
+    {
+      final AbstractCompositionalModelAnalyzer composer =
+        (AbstractCompositionalModelAnalyzer) analyzer;
+      final String fileName = getValue();
+      composer.setMonolithicDumpFileName(fileName);
     }
   }
 

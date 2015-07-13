@@ -201,4 +201,41 @@ public class MarshallingTools
     saveModule(des, filename);
   }
 
+  /**
+   * Saves a product DES as a product DES (<CODE>.wdes</CODE>) or
+   * module (<CODE>.wmod</CODE>) file, depending on the extension found
+   * in the file name.
+   * @param  des       The product DES to be saved.
+   * @param  filename  The name of the output file. If no extension is
+   *                   present, <CODE>.wdes</CODE> is added.
+   */
+  public static void saveProductDESorModule(final ProductDESProxy des,
+                                            String filename)
+  {
+    try {
+      final ProductDESProxyFactory desFactory =
+        ProductDESElementFactory.getInstance();
+      ProxyMarshaller<ProductDESProxy> desMarshaller;
+      desMarshaller = new JAXBProductDESMarshaller(desFactory);
+      final String desExt = desMarshaller.getDefaultExtension();
+      if (filename.endsWith(desExt)) {
+        saveProductDES(des, filename);
+        return;
+      }
+      final ModuleProxyFactory modFactory = ModuleElementFactory.getInstance();
+      final OperatorTable optable = CompilerOperatorTable.getInstance();
+      final ProxyMarshaller<ModuleProxy> modMarshaller =
+        new JAXBModuleMarshaller(modFactory, optable);
+      final String modExt = modMarshaller.getDefaultExtension();
+      if (filename.endsWith(modExt)) {
+        saveModule(des, filename);
+        return;
+      }
+      filename += desExt;
+      saveProductDES(des, filename);
+    } catch (final JAXBException | SAXException exception) {
+      throw new WatersRuntimeException(exception);
+    }
+  }
+
 }

@@ -87,14 +87,20 @@ public interface AnalysisResult
   public long getPeakMemoryUsage();
 
   /**
-   * Gets the total number of automata used by the analysis.
+   * Gets the total number of events used by the analysis algorithm.
+   * @return The number of events, or <CODE>-1</CODE> if unknown.
+   */
+  public int getTotalNumberOfEvents();
+
+  /**
+   * Gets the total number of automata used by the analysis algorithm.
    * @return The number of automata, or <CODE>-1</CODE> if unknown.
    */
   public int getTotalNumberOfAutomata();
 
 
   /**
-   * Gets the total number of states constructed by the analysis.
+   * Gets the total number of states constructed by the analysis algorithm.
    * @return The total number of states, or <CODE>-1</CODE> if unknown.
    */
   public double getTotalNumberOfStates();
@@ -198,14 +204,20 @@ public interface AnalysisResult
   public void setNumberOfAutomata(final int numaut);
 
   /**
+   * Specifies a value for the total number of events considered by the
+   * analysis algorithm.
+   */
+  public void setTotalNumberOfEvents(final int numEvents);
+
+  /**
    * Specifies a value for the total number of states constructed by the
-   * analysis.
+   * analysis algorithm.
    */
   public void setTotalNumberOfStates(final double numstates);
 
   /**
    * Specifies a value for the peak number of states constructed by the
-   * analysis.
+   * analysis algorithm.
    */
   public void setPeakNumberOfStates(final double numstates);
 

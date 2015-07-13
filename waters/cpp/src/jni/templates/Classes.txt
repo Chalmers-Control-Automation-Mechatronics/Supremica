@@ -200,6 +200,7 @@ glue class VerificationResult {
   void setNumberOfStates(double numstates);
   void setNumberOfTransitions(double numtrans);
   void setPeakNumberOfNodes(int numnodes);
+  void setTotalNumberOfEvents(int numEvents);
 }
 
 glue class KindTranslator {

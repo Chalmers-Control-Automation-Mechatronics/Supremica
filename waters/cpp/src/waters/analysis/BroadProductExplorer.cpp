@@ -75,14 +75,18 @@ BroadProductExplorer(const jni::ProductDESProxyFactoryGlue& factory,
 BroadProductExplorer::
 ~BroadProductExplorer()
 {
-  for (int i = 0; i < mNumReversedEventRecords; i++) {
-    delete mReversedEventRecords[i];
+  if (mReversedEventRecords != 0) {
+    for (int i = 0; i < mNumReversedEventRecords; i++) {
+      delete mReversedEventRecords[i];
+    }
+    delete [] mReversedEventRecords;
   }
-  delete [] mReversedEventRecords;
-  for (int i = 0; i < mNumEventRecords; i++) {
-    delete mEventRecords[i];
+  if (mEventRecords != 0) {
+    for (int i = 0; i < mNumEventRecords; i++) {
+      delete mEventRecords[i];
+    }
+    delete [] mEventRecords;
   }
-  delete [] mEventRecords;
   delete [] mNondeterministicTransitionIterators;
   delete [] mDumpStates;
 }
@@ -96,6 +100,7 @@ addStatistics(const jni::NativeVerificationResultGlue& vresult)
   const
 {
   ProductExplorer::addStatistics(vresult);
+  vresult.setTotalNumberOfEvents(mNumEventRecords);
   vresult.setNumberOfExploredTransitions(mNumTransitionsExplored);
 }
 
@@ -124,19 +129,24 @@ setup()
 void BroadProductExplorer::
 teardown()
 {
-  for (int i = 0; i < mNumReversedEventRecords; i++) {
-    delete mReversedEventRecords[i];
+  if (mReversedEventRecords != 0) {
+    for (int i = 0; i < mNumReversedEventRecords; i++) {
+      delete mReversedEventRecords[i];
+    }
+    delete [] mReversedEventRecords;
+    mReversedEventRecords = 0;
   }
-  mNumReversedEventRecords = 0;
-  for (int i = 0; i < mNumEventRecords; i++) {
-    delete mEventRecords[i];
+  if (mEventRecords != 0) {
+    for (int i = 0; i < mNumEventRecords; i++) {
+      delete mEventRecords[i];
+    }
+    delete [] mEventRecords;
+    mEventRecords = 0;
   }
-  mNumEventRecords = 0;
-  delete [] mEventRecords;
-  delete [] mReversedEventRecords;
-  mEventRecords = mReversedEventRecords = 0;
   delete [] mNondeterministicTransitionIterators;
   mNondeterministicTransitionIterators = 0;
+  delete [] mDumpStates;
+  mDumpStates = 0;
   ProductExplorer::teardown();
 }
 

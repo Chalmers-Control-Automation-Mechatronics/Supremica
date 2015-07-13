@@ -79,6 +79,7 @@ public class TRCompositionalModelAnalyzerFactory
     addArgument(new AlwaysEnabledEventsArgument());
     addArgument(new DeadlockPruningArgument());
     addArgument(new SecondaryFactoryArgument());
+    addArgument(new DumpFileArgument());
   }
 
 
@@ -567,6 +568,34 @@ public class TRCompositionalModelAnalyzerFactory
       final AbstractTRCompositionalAnalyzer composer =
         (AbstractTRCompositionalAnalyzer) analyzer;
       composer.setMonolithicAnalyzer(secondaryAnalyzer);
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class DumpFileArgument
+  private static class DumpFileArgument
+    extends CommandLineArgumentString
+  {
+    //#######################################################################
+    //# Constructors
+    protected DumpFileArgument()
+    {
+      super("-dump",
+            "Save abstracted model in given file before monolithic verification");
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    @Override
+    public void configureAnalyzer(final Object analyzer)
+      throws AnalysisConfigurationException
+    {
+      final AbstractTRCompositionalAnalyzer composer =
+        (AbstractTRCompositionalAnalyzer) analyzer;
+      final String fileName = getValue();
+      composer.setMonolithicDumpFileName(fileName);
     }
   }
 

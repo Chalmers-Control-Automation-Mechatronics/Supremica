@@ -37,6 +37,7 @@ public class DefaultAnalysisResult
     mRunTime = -1;
     mCompileTime = -1;
     mException = null;
+    mTotalNumberOfEvents = -1;
     mTotalNumberOfAutomata = -1;
     mTotalNumberOfStates = -1.0;
     mPeakNumberOfStates = -1.0;
@@ -83,6 +84,12 @@ public class DefaultAnalysisResult
   public long getPeakMemoryUsage()
   {
     return mPeakMemoryUsage;
+  }
+
+  @Override
+  public int getTotalNumberOfEvents()
+  {
+    return mTotalNumberOfEvents;
   }
 
   @Override
@@ -162,6 +169,12 @@ public class DefaultAnalysisResult
   }
 
   @Override
+  public void setTotalNumberOfEvents(final int numEvents)
+  {
+    mTotalNumberOfEvents = numEvents;
+  }
+
+  @Override
   public void setTotalNumberOfStates(final double numstates)
   {
     mTotalNumberOfStates = numstates;
@@ -238,6 +251,8 @@ public class DefaultAnalysisResult
       if (mException != null) {
         mException = other.getException();
       }
+      mTotalNumberOfEvents =
+        mergeAdd(mTotalNumberOfEvents, other.getTotalNumberOfEvents());
       mTotalNumberOfAutomata =
         mergeAdd(mTotalNumberOfAutomata, other.getTotalNumberOfAutomata());
       mTotalNumberOfStates =
@@ -314,6 +329,9 @@ public class DefaultAnalysisResult
       formatter.format("Compile time: %.3fs\n", 0.001f * mCompileTime);
     }
     writer.println("Memory usage: " + (mPeakMemoryUsage >> 10) + " kB");
+    if (mTotalNumberOfEvents >= 0) {
+      writer.println("Total number of events: " + mTotalNumberOfEvents);
+    }
     if (mTotalNumberOfAutomata >= 0) {
       writer.println("Total number of automata: " + mTotalNumberOfAutomata);
     }
@@ -356,6 +374,10 @@ public class DefaultAnalysisResult
     writer.print(mPeakMemoryUsage);
     writer.print(',');
     if (mTotalNumberOfAutomata >= 0) {
+      writer.print(mTotalNumberOfEvents);
+    }
+    writer.print(',');
+    if (mTotalNumberOfAutomata >= 0) {
       writer.print(mTotalNumberOfAutomata);
     }
     writer.print(',');
@@ -389,6 +411,7 @@ public class DefaultAnalysisResult
     writer.print(",RunTime");
     writer.print(",CompileTime");
     writer.print(",PeakMem");
+    writer.print(",TotEvents");
     writer.print(",TotAut");
     writer.print(",TotStates");
     writer.print(",TotTrans");
@@ -472,6 +495,7 @@ public class DefaultAnalysisResult
   private long mRunTime;
   private long mCompileTime;
   private WatersException mException;
+  private int mTotalNumberOfEvents;
   private int mTotalNumberOfAutomata;
   private double mTotalNumberOfStates;
   private double mPeakNumberOfStates;

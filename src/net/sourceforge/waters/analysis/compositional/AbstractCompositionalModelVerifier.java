@@ -36,8 +36,6 @@ import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 
-import org.apache.log4j.Logger;
-
 
 /**
  * A general compositional model verifier to be subclassed for different
@@ -336,16 +334,7 @@ public abstract class AbstractCompositionalModelVerifier
       return setSatisfiedResult();
     } else {
       final ProductDESProxy des = createProductDESProxy(automata);
-      final Logger logger = getLogger();
-      if (logger.isDebugEnabled()) {
-        final Collection<AutomatonProxy> automata1 = des.getAutomata();
-        double estimate = 1.0;
-        for (final AutomatonProxy aut : automata1) {
-          estimate *= aut.getStates().size();
-        }
-        logger.debug("Monolithically composing " + automata1.size() +
-                     " automata, estimated " + estimate + " states.");
-      }
+      reportMonolithicAnalysis(des);
       final ModelVerifier monolithicVerifier =
         (ModelVerifier) getCurrentMonolithicAnalyzer();
       monolithicVerifier.setModel(des);

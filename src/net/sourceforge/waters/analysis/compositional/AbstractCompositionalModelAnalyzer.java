@@ -13,6 +13,7 @@ import gnu.trove.iterator.TObjectByteIterator;
 import gnu.trove.map.hash.TObjectByteHashMap;
 import gnu.trove.set.hash.THashSet;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -52,6 +53,7 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.marshaller.MarshallingTools;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -529,6 +531,25 @@ public abstract class AbstractCompositionalModelAnalyzer
   public void setInternalTransitionLimit(final int limit)
   {
     mInternalTransitionLimit = limit;
+  }
+
+  /**
+   * Sets a file name to dump abstracted models before monolithic
+   * verification. If set, any abstracted model will be written to this file
+   * before being sent for monolithic verification.
+   */
+  public void setMonolithicDumpFileName(final String fileName)
+  {
+    mMonolithicDumpFileName = fileName;
+  }
+
+  /**
+   * Returns the file name abstracted models are written to.
+   * @see #setMonolithicDumpFileName(File) setMonolithicDumpFileName()
+   */
+  public String getMonolithicDumpFileName()
+  {
+    return mMonolithicDumpFileName;
   }
 
   public void setSynchronousProductBuilder
@@ -1118,6 +1139,23 @@ public abstract class AbstractCompositionalModelAnalyzer
   protected abstract boolean doMonolithicAnalysis
     (final List<AutomatonProxy> automata)
     throws AnalysisException;
+
+  protected void reportMonolithicAnalysis(final ProductDESProxy des)
+  {
+    final Logger logger = getLogger();
+    if (logger.isDebugEnabled()) {
+      final Collection<AutomatonProxy> automata1 = des.getAutomata();
+      double estimate = 1.0;
+      for (final AutomatonProxy aut : automata1) {
+        estimate *= aut.getStates().size();
+      }
+      logger.debug("Monolithically composing " + automata1.size() +
+                   " automata, estimated " + estimate + " states.");
+    }
+    if (mMonolithicDumpFileName != null) {
+      MarshallingTools.saveProductDESorModule(des, mMonolithicDumpFileName);
+    }
+  }
 
 
   //#########################################################################
@@ -3060,6 +3098,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   private int mLowerInternalStateLimit;
   private int mUpperInternalStateLimit;
   private int mInternalTransitionLimit;
+  private String mMonolithicDumpFileName = null;
   private ModelAnalyzer mMonolithicAnalyzer;
   private ModelAnalyzer mCurrentMonolithicAnalyzer;
 

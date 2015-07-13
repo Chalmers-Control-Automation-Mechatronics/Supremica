@@ -404,7 +404,7 @@ public class TRCompositionalConflictChecker
       final ProductDESProxyFactory factory = getFactory();
       final ProductDESProxy des =
         AutomatonTools.createProductDESProxy(name, automata, factory);
-      recordMonolithicAttempt(automata);
+      recordMonolithicAttempt(des);
       final ModelVerifier mono = getMonolithicVerifier();
       mono.setModel(des);
       final CompositionalAnalysisResult combinedResult = getAnalysisResult();
