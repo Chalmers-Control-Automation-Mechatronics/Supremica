@@ -11,7 +11,6 @@ package net.sourceforge.waters.analysis.trcomp;
 
 import gnu.trove.set.hash.THashSet;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
