@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
-//# CLASS:   NativeBroadNonStoringStandardConflictCheckerTest
+//# CLASS:   NativeTarjanStandardConflictCheckerTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -16,7 +16,7 @@ import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class NativeBroadNonStoringStandardConflictCheckerTest
+public class NativeTarjanStandardConflictCheckerTest
   extends AbstractNativeStandardConflictCheckerTest
 {
 
@@ -25,7 +25,7 @@ public class NativeBroadNonStoringStandardConflictCheckerTest
   public static Test suite()
   {
     final TestSuite suite =
-      new TestSuite(NativeBroadNonStoringStandardConflictCheckerTest.class);
+      new TestSuite(NativeTarjanStandardConflictCheckerTest.class);
     return suite;
   }
 
@@ -43,8 +43,7 @@ public class NativeBroadNonStoringStandardConflictCheckerTest
     createModelVerifier(final ProductDESProxyFactory factory)
   {
     final NativeConflictChecker checker = new NativeConflictChecker(factory);
-    checker.setExplorerMode(ExplorerMode.BROAD);
-    checker.setConflictCheckMode(ConflictCheckMode.COMPUTED_BACKWARDS_TRANSITIONS);
+    checker.setConflictCheckMode(ConflictCheckMode.NO_BACKWARDS_TRANSITIONS);
     return checker;
   }
 

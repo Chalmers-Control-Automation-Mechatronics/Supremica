@@ -244,12 +244,6 @@ glue class NondeterministicDESException extends Exception {
 package net.sourceforge.waters.cpp.analysis;
 //###########################################################################
 
-enum class ExplorerMode {
-  BROAD,
-  NARROW,
-  BEST_GUESS
-}
-
 enum class ConflictCheckMode {
   STORED_BACKWARDS_TRANSITIONS,
   COMPUTED_BACKWARDS_TRANSITIONS,
@@ -274,7 +268,6 @@ glue class NativeModelAnalyzer {
 }
 
 glue class NativeModelVerifier extends NativeModelAnalyzer {
-  glue ExplorerMode getExplorerMode();
   String getTraceName();
   glue NativeVerificationResult createAnalysisResult();
 }

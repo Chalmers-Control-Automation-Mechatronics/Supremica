@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
-//# CLASS:   NativeNarrowStoringStandardConflictCheckerTest
+//# CLASS:   NativeStoringGeneralisedConflictCheckerTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -12,20 +12,21 @@ package net.sourceforge.waters.cpp.analysis;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import net.sourceforge.waters.model.analysis.AbstractGeneralisedConflictCheckerTest;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class NativeNarrowStoringStandardConflictCheckerTest
-  extends AbstractNativeStandardConflictCheckerTest
+public class NativeStoringGeneralisedConflictCheckerTest extends
+    AbstractGeneralisedConflictCheckerTest
 {
 
-  //#########################################################################
-  //# Entry points in junit.framework.TestCase
+  // #########################################################################
+  // # Entry points in junit.framework.TestCase
   public static Test suite()
   {
     final TestSuite suite =
-      new TestSuite(NativeNarrowStoringStandardConflictCheckerTest.class);
+        new TestSuite(NativeStoringGeneralisedConflictCheckerTest.class);
     return suite;
   }
 
@@ -34,16 +35,14 @@ public class NativeNarrowStoringStandardConflictCheckerTest
     junit.textui.TestRunner.run(suite());
   }
 
-
-  //#########################################################################
-  //# Overrides for abstract base class
-  //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  // #########################################################################
+  // # Overrides for abstract base class
+  // # net.sourceforge.waters.analysis.AbstractModelVerifierTest
   @Override
-  protected ConflictChecker
-    createModelVerifier(final ProductDESProxyFactory factory)
+  protected ConflictChecker createModelVerifier(
+      final ProductDESProxyFactory factory)
   {
     final NativeConflictChecker checker = new NativeConflictChecker(factory);
-    checker.setExplorerMode(ExplorerMode.NARROW);
     checker.setConflictCheckMode(ConflictCheckMode.STORED_BACKWARDS_TRANSITIONS);
     return checker;
   }

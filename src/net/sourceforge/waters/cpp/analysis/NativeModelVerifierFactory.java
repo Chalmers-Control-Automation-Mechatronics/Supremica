@@ -52,9 +52,7 @@ public class NativeModelVerifierFactory
   protected void addArguments()
   {
     super.addArguments();
-    addArgument(new CommandLineArgumentBroad());
     addArgument(new CommandLineArgumentDumpStateAware());
-    addArgument(new CommandLineArgumentNarrow());
     addArgument(new CommandLineArgumentTarjan());
   }
 
@@ -84,25 +82,6 @@ public class NativeModelVerifierFactory
 
 
   //#########################################################################
-  //# Inner Class CommandLineArgumentBroad
-  private static class CommandLineArgumentBroad
-    extends CommandLineArgumentFlag
-  {
-    private CommandLineArgumentBroad()
-    {
-      super("-broad", "Run state expansion in 'broad' mode");
-    }
-
-    @Override
-    public void configureAnalyzer(final Object verifier)
-    {
-      final NativeModelVerifier nverifier = (NativeModelVerifier) verifier;
-      nverifier.setExplorerMode(ExplorerMode.BROAD);
-    }
-  }
-
-
-  //#########################################################################
   //# Inner Class CommandLineArgumentDumpStateAware
   private static class CommandLineArgumentDumpStateAware
     extends CommandLineArgumentBoolean
@@ -123,25 +102,6 @@ public class NativeModelVerifierFactory
         fail("Command line option " + getName() +
              " is only supported for conflict check!");
       }
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class CommandLineArgumentNarrow
-  private static class CommandLineArgumentNarrow
-    extends CommandLineArgumentFlag
-  {
-    private CommandLineArgumentNarrow()
-    {
-      super("-narrow", "Run state expansion in 'narrow' mode");
-    }
-
-    @Override
-    public void configureAnalyzer(final Object verifier)
-    {
-      final NativeModelVerifier nverifier = (NativeModelVerifier) verifier;
-      nverifier.setExplorerMode(ExplorerMode.NARROW);
     }
   }
 

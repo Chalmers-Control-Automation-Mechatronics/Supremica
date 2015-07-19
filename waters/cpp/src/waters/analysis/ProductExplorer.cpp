@@ -33,7 +33,6 @@
 #include "jni/glue/ConflictTraceGlue.h"
 #include "jni/glue/EventGlue.h"
 #include "jni/glue/ExceptionGlue.h"
-#include "jni/glue/ExplorerModeGlue.h"
 #include "jni/glue/Glue.h"
 #include "jni/glue/HashMapGlue.h"
 #include "jni/glue/LinkedListGlue.h"
@@ -48,7 +47,6 @@
 
 #include "waters/analysis/BroadProductExplorer.h"
 #include "waters/analysis/EventRecord.h"
-#include "waters/analysis/NarrowProductExplorer.h"
 #include "waters/analysis/ProductExplorer.h"
 #include "waters/analysis/TransitionRecord.h"
 #include "waters/javah/Invocations.h"
@@ -979,14 +977,8 @@ public:
     jni::ProductDESProxyFactoryGlue factory =
       mNativeModelVerifier.getFactoryGlue(&cache);
     jni::ProductDESGlue des = mNativeModelVerifier.getModelGlue(&cache);
-    jni::ExplorerMode mode = mNativeModelVerifier.getExplorerModeGlue(&cache);
-    if (mode == jni::ExplorerMode_NARROW) {
-      mProductExplorer = new NarrowProductExplorer
-        (factory, des, translator, premarking, marking, &cache);
-    } else {
-      mProductExplorer = new BroadProductExplorer
-        (factory, des, translator, premarking, marking, &cache);
-    }
+    mProductExplorer = new BroadProductExplorer
+      (factory, des, translator, premarking, marking, &cache);
     const int limit = mNativeModelVerifier.getNodeLimit();
     if (limit >= 0) {
       mProductExplorer->setStateLimit(limit);

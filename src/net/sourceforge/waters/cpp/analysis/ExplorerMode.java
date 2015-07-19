@@ -9,7 +9,7 @@
 
 package net.sourceforge.waters.cpp.analysis;
 
-
+@Deprecated
 public enum ExplorerMode {
 
   BROAD,

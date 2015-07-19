@@ -42,7 +42,6 @@ public abstract class NativeModelVerifier
                              final KindTranslator translator)
   {
     super(model, factory, translator);
-    mExplorerMode = ExplorerMode.BEST_GUESS;
   }
 
 
@@ -64,19 +63,6 @@ public abstract class NativeModelVerifier
   public boolean isCounterExampleEnabled()
   {
     return isDetailedOutputEnabled();
-  }
-
-
-  //#########################################################################
-  //# Configuration
-  public void setExplorerMode(final ExplorerMode mode)
-  {
-    mExplorerMode = mode;
-  }
-
-  public ExplorerMode getExplorerMode()
-  {
-    return mExplorerMode;
   }
 
 
@@ -145,10 +131,5 @@ public abstract class NativeModelVerifier
   abstract VerificationResult runNativeAlgorithm() throws AnalysisException;
 
   public abstract String getTraceName();
-
-
-  //#########################################################################
-  //# Data Members
-  private ExplorerMode mExplorerMode;
 
 }

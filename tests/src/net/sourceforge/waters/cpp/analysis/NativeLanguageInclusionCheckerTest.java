@@ -2,7 +2,7 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
-//# CLASS:   NativeBroadNonStoringGeneralisedConflictCheckerTest
+//# CLASS:   NativeLanguageInclusionCheckerTest
 //###########################################################################
 //# $Id$
 //###########################################################################
@@ -12,22 +12,22 @@ package net.sourceforge.waters.cpp.analysis;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.model.analysis.AbstractGeneralisedConflictCheckerTest;
-import net.sourceforge.waters.model.analysis.des.ConflictChecker;
+import net.sourceforge.waters.model.analysis.AbstractLanguageInclusionCheckerTest;
+import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class NativeBroadNonStoringGeneralisedConflictCheckerTest
-  extends AbstractGeneralisedConflictCheckerTest
+public class NativeLanguageInclusionCheckerTest
+  extends AbstractLanguageInclusionCheckerTest
 {
 
   //#########################################################################
   //# Entry points in junit.framework.TestCase
   public static Test suite()
   {
-    final TestSuite suite =
-      new TestSuite(NativeBroadNonStoringGeneralisedConflictCheckerTest.class);
-    return suite;
+    final TestSuite testSuite =
+      new TestSuite(NativeLanguageInclusionCheckerTest.class);
+    return testSuite;
   }
 
   public static void main(final String[] args)
@@ -40,13 +40,10 @@ public class NativeBroadNonStoringGeneralisedConflictCheckerTest
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
   @Override
-  protected ConflictChecker
+  protected LanguageInclusionChecker
     createModelVerifier(final ProductDESProxyFactory factory)
   {
-    final NativeConflictChecker checker = new NativeConflictChecker(factory);
-    checker.setExplorerMode(ExplorerMode.BROAD);
-    checker.setConflictCheckMode(ConflictCheckMode.COMPUTED_BACKWARDS_TRANSITIONS);
-    return checker;
+    return new NativeLanguageInclusionChecker(factory);
   }
 
 }
