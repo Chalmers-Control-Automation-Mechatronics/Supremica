@@ -44,7 +44,6 @@ BroadEventRecord(jni::EventGlue event, bool controllable, int numwords)
     mNumberOfUpdates(0),
     mUsedSearchRecords(0),
     mUnusedSearchRecords(0),
-    mNotTakenSearchRecords(0),
     mNonSelfloopingRecord(0),
     mForwardRecord(0)
 {
@@ -65,7 +64,6 @@ BroadEventRecord(const BroadEventRecord& fwd)
     mNumberOfUpdates(0),
     mUsedSearchRecords(0),
     mUnusedSearchRecords(0),
-    mNotTakenSearchRecords(0),
     mNonSelfloopingRecord(0),
     mForwardRecord(&fwd)
 {
@@ -269,72 +267,6 @@ optimizeTransitionRecordsForSearch(CheckType mode)
   LinkedRecordList<TransitionRecord> list(accessor, mUsedSearchRecords);
   list.qsort();
   mUsedSearchRecords = list.getHead();
-}
-
-void BroadEventRecord::
-setupNotTakenSearchRecords()
-{
-  TransitionRecord* list = 0;
-  for (TransitionRecord* trans = mUsedSearchRecords;
-       trans != 0;
-       trans = trans->getNextInSearch()) {
-    if (!trans->isOnlySelfloops()) {
-      trans->setNextInNotTaken(list);
-      list = trans;
-    }
-  }
-  for (TransitionRecord* trans = mUnusedSearchRecords;
-       trans != 0;
-       trans = trans->getNextInSearch()) {
-    if (!trans->isOnlySelfloops()) {
-      trans->setNextInNotTaken(list);
-      list = trans;
-    }
-  }
-  mNotTakenSearchRecords = list;
-}
-
-void BroadEventRecord::
-markTransitionsTaken(const uint32_t* tuple)
-{
-  TransitionRecord* prev = 0;
-  TransitionRecord* trans = mNotTakenSearchRecords;
-  while (trans != 0) {
-    bool alltaken = trans->markTransitionTaken(tuple);
-    if (!alltaken) {
-      prev = trans;
-      trans = trans->getNextInNotTaken();
-    } else if (prev) {
-      trans = trans->getNextInNotTaken();
-      prev->setNextInNotTaken(trans);
-    } else {
-      mNotTakenSearchRecords = trans = trans->getNextInNotTaken();
-    }
-  }
-}
-
-int BroadEventRecord::
-removeTransitionsNotTaken()
-{
-  int result = 0;
-  for (TransitionRecord* trans = mNotTakenSearchRecords;
-       trans != 0;
-       trans = trans->getNextInNotTaken()) {
-    bool det = trans->isDeterministic();
-    result += trans->removeTransitionsNotTaken();
-    if (trans->isAlwaysDisabled()) {
-      mIsGloballyDisabled = true;
-      return result;
-    }
-    if (!mIsDisabledInSpec && !trans->isAlwaysEnabled()) {
-      const AutomatonRecord* aut = trans->getAutomaton();
-      mIsDisabledInSpec = !aut->isPlant();
-    }
-    if (!det && trans->isDeterministic()) {
-      mNumNondeterministicRecords--;
-    }
-  }
-  return result;
 }
 
 BroadEventRecord* BroadEventRecord::

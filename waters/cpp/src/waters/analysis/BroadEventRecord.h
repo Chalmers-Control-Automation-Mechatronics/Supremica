@@ -85,13 +85,7 @@ public:
   void normalize(const AutomatonRecord* aut);
   TransitionUpdateRecord* createUpdateRecord(int wordindex);
   void optimizeTransitionRecordsForSearch(CheckType mode);
-  void setupNotTakenSearchRecords();
-  void markTransitionsTaken(const uint32_t* tuple);
-  int removeTransitionsNotTaken();
   BroadEventRecord* createReversedRecord() const;
-
-  inline void markTransitionsTakenFast(const uint32_t* tuple)
-    {if (mNotTakenSearchRecords) markTransitionsTaken(tuple);}
 
   //##########################################################################
   //# Trace Computation
@@ -128,7 +122,6 @@ private:
   int mNumberOfUpdates;
   TransitionRecord* mUsedSearchRecords;
   TransitionRecord* mUnusedSearchRecords;
-  TransitionRecord* mNotTakenSearchRecords;
   TransitionRecord* mNonSelfloopingRecord;
   TransitionUpdateRecord** mUpdateRecords;
   float mProbability;

@@ -52,10 +52,8 @@ TransitionRecord(const AutomatonRecord* aut,
     mNumNondeterministicSuccessors(0),
     mNondeterministicBuffer(0),
     mNondeterministicSuccessorsShifted(0),
-    mNumNotTaken(0),
     mNextInSearch(next),
-    mNextInUpdate(0),
-    mNextInNotTaken(0)
+    mNextInUpdate(0)
 {
   const uint32_t numstates = aut->getNumberOfStates();
   mFlags = new uint32_t[numstates];
@@ -77,10 +75,8 @@ TransitionRecord(const TransitionRecord& fwd)
     mNumNondeterministicSuccessors(fwd.mNumNondeterministicSuccessors),
     mNondeterministicBuffer(fwd.mNondeterministicBuffer),
     mNondeterministicSuccessorsShifted(fwd.mNondeterministicSuccessorsShifted),
-    mNumNotTaken(fwd.mNumNotTaken),
     mNextInSearch(0),
-    mNextInUpdate(0),
-    mNextInNotTaken(0)
+    mNextInUpdate(0)
 {
 }
 
@@ -237,7 +233,6 @@ void TransitionRecord::
 normalize()
 {
   const int numstates = mAutomaton->getNumberOfStates();
-  mNumNotTaken = mWeight;
   if (mWeight == numstates) {
     mWeight = PROBABILITY_1;
   } else {
@@ -265,66 +260,6 @@ getCommonTarget()
     }      
   }
   return result;
-}
-
-bool TransitionRecord::
-markTransitionTaken(const uint32_t* tuple)
-{
-  uint32_t index = mAutomaton->getAutomatonIndex();
-  uint32_t code = tuple[index];
-  uint32_t flags = mFlags[code];
-  if ((flags & FLAG_TAKEN) == 0) {
-    mFlags[code] = flags | FLAG_TAKEN;
-    return --mNumNotTaken == 0;
-  } else {
-    return false;
-  }
-}
-
-int TransitionRecord::
-removeTransitionsNotTaken()
-{
-  if (mNumNotTaken) {
-    uint32_t numstates = mAutomaton->getNumberOfStates();
-    int shift = mAutomaton->getShift();
-    bool keepnd = false;
-    bool onlyself = true;
-    int newweight = 0;
-    for (uint32_t source = 0; source < numstates; source++) {
-      if (mFlags[source] & FLAG_TAKEN) {
-        uint32_t succ = mDeterministicSuccessorsShifted[source];
-        switch (succ) {
-        case NO_TRANSITION:
-          break;
-        case MULTIPLE_TRANSITIONS:
-          keepnd = true;
-          onlyself = false;
-          newweight++;
-          break;
-        default:
-          onlyself &= (succ == (source << shift));
-          newweight++;
-          break;
-        }      
-      } else {
-        mDeterministicSuccessorsShifted[source] = NO_TRANSITION;
-      }
-    }
-    int removed = mNumNotTaken;
-    mWeight = newweight;
-    mIsOnlySelfloops = onlyself;
-    normalize();
-    if (!keepnd) {
-      delete [] mNondeterministicBuffer;
-      delete [] mNondeterministicSuccessorsShifted;
-      mNumNondeterministicSuccessors = mNondeterministicBuffer = 0;
-      mNondeterministicBuffer = 0;
-      mNondeterministicSuccessorsShifted = 0;
-    }
-    return removed;
-  } else {
-    return 0;
-  }
 }
 
 void TransitionRecord::

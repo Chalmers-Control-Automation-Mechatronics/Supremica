@@ -343,7 +343,7 @@ expandSafetyState(const uint32_t* sourcetuple, const uint32_t* sourcepacked)
       if (code == getNumberOfStates()) {                                \
         bufferpacked = getStateSpace().prepare(incNumberOfStates());    \
       }                                                                 \
-      ADD_TRANSITION_ALLOC(source, code);                               \
+      ADD_TRANSITION(source, code);                                     \
     }                                                                   \
   }
 
@@ -362,32 +362,13 @@ expandNonblockingReachabilityState(uint32_t source,
   switch (getConflictCheckMode()) {
   case jni::ConflictCheckMode_STORED_BACKWARDS_TRANSITIONS:
 #   define ADD_TRANSITION addCoreachabilityTransition
-#   define ADD_TRANSITION_ALLOC ADD_TRANSITION
     EXPAND_FORWARD(numwords, source, sourcetuple, sourcepacked);
 #   undef ADD_TRANSITION
-#   undef ADD_TRANSITION_ALLOC
     break;
   case jni::ConflictCheckMode_COMPUTED_BACKWARDS_TRANSITIONS:
-    {
-      // Nondeterministic transitions only need to be marked off once per
-      // state and event. The 'markedoff' flag suppresses the call to
-      // markTransitionsTakenFast() for subsequent nondeterministic transitions.
-      const BroadEventRecord* markedoff = 0;
-#     define ADD_TRANSITION(source, target) {                           \
-        incNumberOfTransitions();                                       \
-        event->markTransitionsTakenFast(sourcetuple);                   \
-      }
-#     define ADD_TRANSITION_ALLOC(source, target) {                     \
-        incNumberOfTransitions();                                       \
-        if (markedoff != event) {                                       \
-          event->markTransitionsTakenFast(sourcetuple);                 \
-          markedoff = event;                                            \
-        }                                                               \
-      }
-      EXPAND_FORWARD(numwords, source, sourcetuple, sourcepacked);
-#     undef ADD_TRANSITION
-#     undef ADD_TRANSITION_ALLOC
-    }
+#   define ADD_TRANSITION(source, target) incNumberOfTransitions()
+    EXPAND_FORWARD(numwords, source, sourcetuple, sourcepacked);
+#   undef ADD_TRANSITION
     break;
   default:
     throw jni::PreAnalysisConfigurationException(getConflictCheckMode());
@@ -546,16 +527,10 @@ void BroadProductExplorer::
 setupReverseTransitionRelations()
 {
   if (mReversedEventRecords == 0) {
-    bool removing = getCheckType() == CHECK_TYPE_NONBLOCKING &&
-                    getConflictCheckMode() ==
-                      jni::ConflictCheckMode_COMPUTED_BACKWARDS_TRANSITIONS;
     int maxupdates = 0;
     BroadEventRecord** reversed = new BroadEventRecord*[mNumEventRecords];
     for (int e = 0; e < mNumEventRecords; e++) {
       BroadEventRecord* event = mEventRecords[e];
-      if (removing) {
-        event->removeTransitionsNotTaken();
-      }
       if (!event->isGloballyDisabled() && !event->isOnlySelfloops()) {
         BroadEventRecord* rev = event->createReversedRecord();
         reversed[mNumReversedEventRecords++] = rev;
@@ -927,18 +902,12 @@ setupCompactEventList
   HashTableIterator hiter2 = eventmap.iterator();
   int i = 0;
   bool trivial = checkType == CHECK_TYPE_SAFETY;
-  bool removing = checkType == CHECK_TYPE_NONBLOCKING &&
-                  getConflictCheckMode() ==
-                    jni::ConflictCheckMode_COMPUTED_BACKWARDS_TRANSITIONS;
   while (eventmap.hasNext(hiter2)) {
     BroadEventRecord* event = eventmap.next(hiter2);
     if (event->isSkippable(checkType)) {
       delete event;
     } else {
       event->optimizeTransitionRecordsForSearch(checkType);
-      if (removing) {
-        event->setupNotTakenSearchRecords();
-      }
       mEventRecords[i++] = event;
       trivial &= (event->isControllable() | !event->isDisabledInSpec());
     }
