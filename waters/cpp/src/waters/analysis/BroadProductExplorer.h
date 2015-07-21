@@ -69,30 +69,31 @@ protected:
   //# Shared Auxiliary Methods
   virtual void setup();
   virtual void teardown();
+
+  //##########################################################################
+  //# State Expansion Procedures
   virtual bool isLocalDumpState(const uint32_t* tuple) const;
-  virtual bool expandSafetyState
-    (const uint32_t* sourcetuple, const uint32_t* sourcepacked);
-  virtual bool expandNonblockingReachabilityState
-    (uint32_t source, const uint32_t* sourcetuple,
-     const uint32_t* sourcepacked);
-  virtual void expandNonblockingCoreachabilityState
-    (const uint32_t* targettuple, const uint32_t* targetpacked);
-  virtual void expandTarjanState
-    (uint32_t source, const uint32_t* sourcetuple,
-     const uint32_t* sourcepacked);
-  virtual bool closeNonblockingTarjanState
-    (uint32_t state, uint32_t* tupleBuffer);
-  virtual bool expandTarjanTraceState
-    (uint32_t source, const uint32_t* sourcetuple,
-     const uint32_t* sourcepacked, BlockedArrayList<uint32_t>* successors);
   virtual void setupReverseTransitionRelations();
+  virtual bool expandSafetyState
+    (uint32_t source, const uint32_t* sourceTuple,
+     const uint32_t* sourcePacked, TransitionCallBack callBack = 0);
+  virtual bool expandForward
+    (uint32_t source, const uint32_t* sourceTuple,
+     const uint32_t* sourcePacked, TransitionCallBack callBack = 0);
+  virtual bool expandForwardAgain
+    (uint32_t source, const uint32_t* sourceTuple,
+     const uint32_t* sourcePacked, TransitionCallBack callBack = 0);
+  virtual bool expandReverse
+    (uint32_t target, const uint32_t* targetTuple,
+     const uint32_t* targetPacked, TransitionCallBack callBack = 0);
   virtual void expandTraceState
-    (const uint32_t* targettuple, const uint32_t* targetpacked, uint32_t level);
+    (uint32_t target, const uint32_t* targetTuple,
+     const uint32_t* targetPacked, uint32_t level);
   virtual const EventRecord* findEvent
-    (const uint32_t* sourcetuple, const uint32_t* sourcepacked,
-     const uint32_t* targetpacked);
+    (const uint32_t* sourceTuple, const uint32_t* sourcePacked,
+     const uint32_t* targetPacked);
   virtual void storeNondeterministicTargets
-    (const uint32_t* sourcetuple, const uint32_t* targettuple,
+    (const uint32_t* sourceTuple, const uint32_t* targetTuple,
      const jni::MapGlue& map);
 
 private:
@@ -121,7 +122,6 @@ private:
   // or NULL.
   uint32_t* mDumpStates;
   uint32_t mTraceLimit;
-  uint64_t mNumTransitionsExplored;
 };
 
 }   /* namespace waters */

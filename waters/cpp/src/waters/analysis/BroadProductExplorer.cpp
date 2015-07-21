@@ -67,8 +67,7 @@ BroadProductExplorer(const jni::ProductDESProxyFactoryGlue& factory,
     mReversedEventRecords(0),
     mMaxNondeterministicUpdates(0),
     mNondeterministicTransitionIterators(0),
-    mDumpStates(0),
-    mNumTransitionsExplored(0)
+    mDumpStates(0)
 {
 }
 
@@ -101,7 +100,6 @@ addStatistics(const jni::NativeVerificationResultGlue& vresult)
 {
   ProductExplorer::addStatistics(vresult);
   vresult.setTotalNumberOfEvents(mNumEventRecords);
-  vresult.setNumberOfExploredTransitions(mNumTransitionsExplored);
 }
 
 
@@ -151,6 +149,9 @@ teardown()
 }
 
 
+//############################################################################
+//# BroadProductExplorer: Shared Auxiliary Methods
+
 bool BroadProductExplorer::
 isLocalDumpState(const uint32_t* tuple)
   const
@@ -169,6 +170,46 @@ isLocalDumpState(const uint32_t* tuple)
 }
 
 
+void BroadProductExplorer::
+setupReverseTransitionRelations()
+{
+  if (mReversedEventRecords == 0) {
+    int maxupdates = 0;
+    BroadEventRecord** reversed = new BroadEventRecord*[mNumEventRecords];
+    for (int e = 0; e < mNumEventRecords; e++) {
+      BroadEventRecord* event = mEventRecords[e];
+      if (!event->isGloballyDisabled() && !event->isOnlySelfloops()) {
+        BroadEventRecord* rev = event->createReversedRecord();
+        reversed[mNumReversedEventRecords++] = rev;
+        const int numupdates = rev->getNumberOfNondeterministicUpdates();
+        if (numupdates > maxupdates) {
+          maxupdates = numupdates;
+        }
+      }
+    }
+    if (mNumReversedEventRecords < mNumEventRecords) {
+      mReversedEventRecords = new BroadEventRecord*[mNumReversedEventRecords];
+      for (int e = 0; e < mNumReversedEventRecords; e++) {
+        mReversedEventRecords[e] = reversed[e];
+      }
+      delete [] reversed;
+    } else {
+      mReversedEventRecords = reversed;
+    }
+    qsort(mReversedEventRecords, mNumReversedEventRecords,
+          sizeof(BroadEventRecord*),
+          BroadEventRecord::compareForBackwardSearch);
+    if (maxupdates > mMaxNondeterministicUpdates) {
+      mMaxNondeterministicUpdates = maxupdates;
+      delete [] mNondeterministicTransitionIterators;
+      mNondeterministicTransitionIterators =
+        new NondeterministicTransitionIterator[mMaxNondeterministicUpdates];
+    }
+  }
+}
+
+
+// OLD
 // I know this is really kludgy,
 // but inlining this code is 15% faster than using method calls.
 // ~~~Robi
@@ -177,19 +218,6 @@ isLocalDumpState(const uint32_t* tuple)
   {                                                                     \
     for (int e = 0; e < mNumEventRecords; e++) {                        \
       BroadEventRecord* event = mEventRecords[e];                       \
-      const AutomatonRecord* dis = 0;                                   \
-      FIND_DISABLING_AUTOMATON(sourcetuple, event, dis);                \
-      if (dis == 0) {                                                   \
-        EXPAND_ENABLED_TRANSITIONS                                      \
-          (numwords, source, sourcetuple, sourcepacked, event);         \
-      }                                                                 \
-    }                                                                   \
-  }
-
-#define EXPAND_REVERSE(numwords, source, sourcetuple, sourcepacked)     \
-  {                                                                     \
-    for (int e = 0; e < mNumReversedEventRecords; e++) {                \
-      BroadEventRecord* event = mReversedEventRecords[e];               \
       const AutomatonRecord* dis = 0;                                   \
       FIND_DISABLING_AUTOMATON(sourcetuple, event, dis);                \
       if (dis == 0) {                                                   \
@@ -239,7 +267,7 @@ isLocalDumpState(const uint32_t* tuple)
         }                                                               \
       }                                                                 \
       ADD_NEW_STATE(source);                                            \
-      mNumTransitionsExplored++;                                        \
+      incNumberOfTransitionsExplored();                                 \
     } else {                                                            \
       int ndend = 0;                                                    \
       for (int w = 0; w < numwords; w++) {                              \
@@ -267,12 +295,12 @@ isLocalDumpState(const uint32_t* tuple)
       }                                                                 \
       if (ndend == 0) {                                                 \
         ADD_NEW_STATE(source);                                          \
-        mNumTransitionsExplored++;                                      \
+        incNumberOfTransitionsExplored();                               \
       } else {                                                          \
         int ndindex;                                                    \
         do {                                                            \
           ADD_NEW_STATE_ALLOC(source, bufferpacked);                    \
-          mNumTransitionsExplored++;                                    \
+          incNumberOfTransitionsExplored();                             \
           for (ndindex = 0; ndindex < ndend; ndindex++) {               \
             if (!mNondeterministicTransitionIterators[ndindex].         \
                 advance(bufferpacked)) {                                \
@@ -285,34 +313,129 @@ isLocalDumpState(const uint32_t* tuple)
   }
 
 
-#define ADD_NEW_STATE(source)                                           \
+// NEW
+// I know this is really kludgy,
+// but inlining this code is 15% faster than using method calls.
+// ~~~Robi
+
+#define EXPAND_RAW(source, sourceTuple, sourcePacked,                   \
+                   records, numRecords, callBack)                       \
   {                                                                     \
-    incNumberOfTransitions();                                           \
-    if (getStateSpace().add() == getNumberOfStates()) {                 \
-      incNumberOfStates();                                              \
+    const int numWords = getAutomatonEncoding().getEncodingSize();      \
+    for (int e = 0; e < numRecords; e++) {                              \
+      BroadEventRecord* event = records[e];                             \
+      const AutomatonRecord* dis = 0;                                   \
+      FIND_DISABLING_AUTOMATON(sourceTuple, event, dis);                \
+      if (dis == 0) {                                                   \
+        EXPAND_ENABLED_TRANSITIONS2                                     \
+          (numWords, source, sourceTuple, sourcePacked, event, callBack); \
+      }                                                                 \
     }                                                                   \
   }
 
-#define ADD_NEW_STATE_ALLOC(source, bufferpacked)                       \
+#define EXPAND_ENABLED_TRANSITIONS2(numWords, source,                   \
+                                    sourceTuple, sourcePacked,          \
+                                    event, callBack)                    \
   {                                                                     \
-    incNumberOfTransitions();                                           \
-    if (getStateSpace().add() == getNumberOfStates()) {                 \
-      bufferpacked = getStateSpace().prepare(incNumberOfStates());      \
+    uint32_t* bufferPacked = getStateSpace().prepare();                 \
+    if (event->isDeterministic()) {                                     \
+      for (int w = 0; w < numWords; w++) {                              \
+        TransitionUpdateRecord* update = event->getTransitionUpdateRecord(w); \
+        if (update == 0) {                                              \
+          bufferPacked[w] = sourcePacked[w];                            \
+        } else {                                                        \
+          uint32_t word = (sourcePacked[w] & update->getKeptMask()) |   \
+            update->getCommonTargets();                                 \
+          for (TransitionRecord* trans = update->getTransitionRecords(); \
+               trans != 0;                                              \
+               trans = trans->getNextInUpdate()) {                      \
+            const AutomatonRecord* aut = trans->getAutomaton();         \
+            const int a = aut->getAutomatonIndex();                     \
+            const uint32_t source = sourceTuple[a];                     \
+            word |= trans->getDeterministicSuccessorShifted(source);    \
+          }                                                             \
+          bufferPacked[w] = word;                                       \
+        }                                                               \
+      }                                                                 \
+      ADD_NEW_STATE2(source, event, callBack, INC_NO_ALLOC);            \
+    } else {                                                            \
+      int ndend = 0;                                                    \
+      for (int w = 0; w < numWords; w++) {                              \
+        TransitionUpdateRecord* update = event->getTransitionUpdateRecord(w); \
+        if (update == 0) {                                              \
+          bufferPacked[w] = sourcePacked[w];                            \
+        } else {                                                        \
+          uint32_t word = (sourcePacked[w] & update->getKeptMask()) |   \
+            update->getCommonTargets();                                 \
+          for (TransitionRecord* trans = update->getTransitionRecords(); \
+               trans != 0;                                              \
+               trans = trans->getNextInUpdate()) {                      \
+            const AutomatonRecord* aut = trans->getAutomaton();         \
+            const int a = aut->getAutomatonIndex();                     \
+            const uint32_t source = sourceTuple[a];                     \
+            uint32_t succ = trans->getDeterministicSuccessorShifted(source); \
+            if (succ == TransitionRecord::MULTIPLE_TRANSITIONS) {       \
+              succ = mNondeterministicTransitionIterators[ndend++].     \
+                setup(trans, source);                                   \
+            }                                                           \
+            word |= succ;                                               \
+          }                                                             \
+          bufferPacked[w] = word;                                       \
+        }                                                               \
+      }                                                                 \
+      if (ndend == 0) {                                                 \
+        ADD_NEW_STATE2(source, event, callBack, INC_NO_ALLOC);          \
+      } else {                                                          \
+        int ndindex;                                                    \
+        do {                                                            \
+          ADD_NEW_STATE2(source, event, callBack, INC_ALLOC);           \
+          for (ndindex = 0; ndindex < ndend; ndindex++) {               \
+            if (!mNondeterministicTransitionIterators[ndindex].         \
+                advance(bufferPacked)) {                                \
+              break;                                                    \
+            }                                                           \
+          }                                                             \
+        } while (ndindex < ndend);                                      \
+      }                                                                 \
+    }                                                                   \
+  }
+
+#define INC_NO_ALLOC incNumberOfStates()
+#define INC_ALLOC bufferPacked = getStateSpace().prepare(incNumberOfStates())
+
+#define ADD_NEW_STATE2(source, event, callBack, INC)                    \
+  {                                                                     \
+    incNumberOfTransitionsExplored();                                   \
+    uint32_t target = getStateSpace().add();                            \
+    if (source != target) {                                             \
+      incNumberOfTransitions();                                         \
+      if (target == getNumberOfStates()) {                              \
+        INC;                                                            \
+      }                                                                 \
+      if (callBack != 0) {                                              \
+        bool cont = (this->*callBack)(source, event, target);           \
+        if (!cont) {                                                    \
+          return false;                                                 \
+        }                                                               \
+      }                                                                 \
     }                                                                   \
   }
 
 
 bool BroadProductExplorer::
-expandSafetyState(const uint32_t* sourcetuple, const uint32_t* sourcepacked)
+expandSafetyState(uint32_t source,
+                  const uint32_t* sourceTuple,
+                  const uint32_t* sourcePacked,
+                  TransitionCallBack callBack)
 {
-  const int numwords = getAutomatonEncoding().getEncodingSize();
+  const int numWords = getAutomatonEncoding().getEncodingSize();
   for (int e = 0; e < mNumEventRecords; e++) {
     const BroadEventRecord* event = mEventRecords[e];
     const AutomatonRecord* dis = 0;
-    FIND_DISABLING_AUTOMATON(sourcetuple, event, dis);
+    FIND_DISABLING_AUTOMATON(sourceTuple, event, dis);
     if (dis == 0) {
-      EXPAND_ENABLED_TRANSITIONS
-        (numwords, SOURCE, sourcetuple, sourcepacked, event);
+      EXPAND_ENABLED_TRANSITIONS2
+        (numWords, source, sourceTuple, sourcePacked, event, callBack);
     } else if (!dis->isPlant() && !event->isControllable()) {
       setTraceEvent(event, dis);
       return false;
@@ -321,251 +444,76 @@ expandSafetyState(const uint32_t* sourcetuple, const uint32_t* sourcepacked)
   return true;
 }
 
-#undef ADD_NEW_STATE
-#define ADD_NEW_STATE(source)                                           \
-  {                                                                     \
-    uint32_t code = getStateSpace().add();                              \
-    if (code != source) {                                               \
-      setConflictKind(jni::ConflictKind_CONFLICT);                      \
-      if (code == getNumberOfStates()) {                                \
-        incNumberOfStates();                                            \
-      }                                                                 \
-      ADD_TRANSITION(source, code);                                     \
-    }                                                                   \
-  }
-
-#undef ADD_NEW_STATE_ALLOC
-#define ADD_NEW_STATE_ALLOC(source, bufferpacked)                       \
-  {                                                                     \
-    uint32_t code = getStateSpace().add();                              \
-    if (code != source) {                                               \
-      setConflictKind(jni::ConflictKind_CONFLICT);                      \
-      if (code == getNumberOfStates()) {                                \
-        bufferpacked = getStateSpace().prepare(incNumberOfStates());    \
-      }                                                                 \
-      ADD_TRANSITION(source, code);                                     \
-    }                                                                   \
-  }
-
 bool BroadProductExplorer::
-expandNonblockingReachabilityState(uint32_t source,
-                                   const uint32_t* sourcetuple,
-                                   const uint32_t* sourcepacked)
+expandForward(uint32_t source,
+              const uint32_t* sourceTuple,
+              const uint32_t* sourcePacked,
+              TransitionCallBack callBack)
 {
-  const int numwords = getAutomatonEncoding().getEncodingSize();
-  setConflictKind(jni::ConflictKind_DEADLOCK);
-  // Check for local dump states ...
-  if (isLocalDumpState(sourcetuple)) {
-    return false;
-  }
-  // Expand transitions, check for global deadlock ...
-  switch (getConflictCheckMode()) {
-  case jni::ConflictCheckMode_STORED_BACKWARDS_TRANSITIONS:
-#   define ADD_TRANSITION addCoreachabilityTransition
-    EXPAND_FORWARD(numwords, source, sourcetuple, sourcepacked);
-#   undef ADD_TRANSITION
-    break;
-  case jni::ConflictCheckMode_COMPUTED_BACKWARDS_TRANSITIONS:
-#   define ADD_TRANSITION(source, target) incNumberOfTransitions()
-    EXPAND_FORWARD(numwords, source, sourcetuple, sourcepacked);
-#   undef ADD_TRANSITION
-    break;
-  default:
-    throw jni::PreAnalysisConfigurationException(getConflictCheckMode());
-    break;
-  }
-  if (getConflictKind() != jni::ConflictKind_DEADLOCK) {
-    return true;
-  } else if (getAutomatonEncoding().isMarkedStateTuple(sourcetuple) ||
-             !getAutomatonEncoding().isPreMarkedStateTuple(sourcetuple)) {
-    setConflictKind(jni::ConflictKind_CONFLICT);
-    return true;
-  } else {
-    return false;
-  }
+  EXPAND_RAW(source, sourceTuple, sourcePacked,
+             mEventRecords, mNumEventRecords, callBack);
+  return true;
 }
 
-#undef ADD_NEW_STATE
-#undef ADD_NEW_STATE_ALLOC
+#undef ADD_NEW_STATE2
 
 
-#define ADD_NEW_STATE(source) checkCoreachabilityState()
-#define ADD_NEW_STATE_ALLOC(source, bufferpacked) ADD_NEW_STATE(source)
-
-void BroadProductExplorer::
-expandNonblockingCoreachabilityState(const uint32_t* targettuple,
-                                     const uint32_t* targetpacked)
-{
-  const int numwords = getAutomatonEncoding().getEncodingSize();
-  EXPAND_REVERSE(numwords, TARGET, targettuple, targetpacked);
-}
-
-#undef ADD_NEW_STATE
-#undef ADD_NEW_STATE_ALLOC
-
-
-#define ADD_NEW_STATE(source)                                           \
+#define ADD_NEW_STATE2(source, event, callBack, INC)                    \
   {                                                                     \
-    uint32_t target = getStateSpace().add();                            \
-    if (target != source) {                                             \
-      if (target == getNumberOfStates()) {                              \
-        incNumberOfStates();                                            \
-      }                                                                 \
-      incNumberOfTransitions();                                         \
-      tarjan->processTransition(source, target);                        \
-    }                                                                   \
-  }
-#define ADD_NEW_STATE_ALLOC(source, bufferPacked)                       \
-  {                                                                     \
-    uint32_t target = getStateSpace().add();                            \
-    if (target != source) {                                             \
-      if (target == getNumberOfStates()) {                              \
-        bufferPacked = getStateSpace().prepare(incNumberOfStates());    \
-      }                                                                 \
-      incNumberOfTransitions();                                         \
-      tarjan->processTransition(source, target);                        \
-    }                                                                   \
-  }
-
-void BroadProductExplorer::
-expandTarjanState(uint32_t source,
-                  const uint32_t* sourceTuple,
-                  const uint32_t* sourcePacked)
-{
-  if (!isLocalDumpState(sourceTuple)) {
-    const int numWords = getAutomatonEncoding().getEncodingSize();
-    TarjanStateSpace* tarjan = (TarjanStateSpace*) &getStateSpace();
-    EXPAND_FORWARD(numWords, source, sourceTuple, sourcePacked);
-  }
-}
-
-#undef ADD_NEW_STATE
-#undef ADD_NEW_STATE_ALLOC
-
-
-#define ADD_NEW_STATE(source)                                           \
-  {                                                                     \
+    incNumberOfTransitionsExplored();                                   \
     uint32_t target = getStateSpace().find();                           \
-    if (tarjan->isClosedState(target)) {                                \
-      return false; /* stop checking states */                          \
-    }                                                                   \
-  }
-#define ADD_NEW_STATE_ALLOC(source, bufferPacked) ADD_NEW_STATE(source)
-
-bool BroadProductExplorer::
-closeNonblockingTarjanState(uint32_t state, uint32_t* tupleBuffer)
-{
-  uint32_t* tuplePacked = getStateSpace().get(state);
-  getAutomatonEncoding().decode(tuplePacked, tupleBuffer);
-  if (isLocalDumpState(tupleBuffer)) {
-    return true; // continue checking states - results in critical component
-  } else if (getAutomatonEncoding().isMarkedStateTuple(tupleBuffer)) {
-    return false; // stop checking states
-  } else {
-    const int numWords = getAutomatonEncoding().getEncodingSize();
-    TarjanStateSpace* tarjan = (TarjanStateSpace*) &getStateSpace();
-    EXPAND_FORWARD(numWords, state, tupleBuffer, tuplePacked);
-    return true; // continue checking states
-  }
-}
-
-#undef ADD_NEW_STATE
-#undef ADD_NEW_STATE_ALLOC
-
-
-#define ADD_NEW_STATE(source)                                           \
-  {                                                                     \
-    uint32_t target = getStateSpace().find();                           \
-    if (target != source) {                                             \
-      gotSuccessor = true;                                              \
-      if (target != UINT32_MAX) {                                       \
-        uint32_t& ref = tarjan->getTraceStatusRef(target);              \
-        switch (ref) {                                                  \
-        case TarjanStateSpace::TR_OPEN:                                 \
-          successors->add(target);                                      \
-          ref = source;                                                 \
-          break;                                                        \
-        case TarjanStateSpace::TR_CRITICAL:                             \
-          ref = source;                                                 \
-          setTraceState(target);                                        \
-          setTraceEvent(event);                                         \
-          return false;                                                 \
-        default:                                                        \
-          break;                                                        \
-        }                                                               \
+    if (source != target && callBack != 0) {                            \
+      bool cont = (this->*callBack)(source, event, target);             \
+      if (!cont) {                                                      \
+        return false;                                                   \
       }                                                                 \
     }                                                                   \
   }
-#define ADD_NEW_STATE_ALLOC(source, bufferPacked) ADD_NEW_STATE(source)
 
 bool BroadProductExplorer::
-expandTarjanTraceState(uint32_t source,
-                       const uint32_t* sourceTuple,
-                       const uint32_t* sourcePacked,
-                       BlockedArrayList<uint32_t>* successors)
+expandForwardAgain(uint32_t source,
+                   const uint32_t* sourceTuple,
+                   const uint32_t* sourcePacked,
+                   TransitionCallBack callBack)
 {
-  bool gotSuccessor = false;
-  if (!isLocalDumpState(sourceTuple)) {
-    const int numWords = getAutomatonEncoding().getEncodingSize();
-    TarjanStateSpace* tarjan = (TarjanStateSpace*) &getStateSpace();
-    EXPAND_FORWARD(numWords, source, sourceTuple, sourcePacked);
-  }
-  if (!gotSuccessor &&
-      !getAutomatonEncoding().isMarkedStateTuple(sourceTuple)) {
-    setTraceState(source);
-    setTraceEvent(0);
-    setConflictKind(jni::ConflictKind_DEADLOCK);
-  }
-  return gotSuccessor; 
+  EXPAND_RAW(source, sourceTuple, sourcePacked,
+             mEventRecords, mNumEventRecords, callBack);
+  return true;
 }
 
-#undef ADD_NEW_STATE
-#undef ADD_NEW_STATE_ALLOC
+#undef ADD_NEW_STATE2
+
+
+#define ADD_NEW_STATE2(source, event, callBack, INC)                    \
+  {                                                                     \
+    incNumberOfTransitionsExplored();                                   \
+    uint32_t target = getStateSpace().find();                           \
+    if (target != UINT32_MAX && source != target && callBack != 0) {    \
+      bool cont = (this->*callBack)(source, event, target);             \
+      if (!cont) {                                                      \
+        return false;                                                   \
+      }                                                                 \
+    }                                                                   \
+  }
+
+bool BroadProductExplorer::
+expandReverse(uint32_t source,
+              const uint32_t* sourceTuple,
+              const uint32_t* sourcePacked,
+              TransitionCallBack callBack)
+{
+  EXPAND_RAW(source, sourceTuple, sourcePacked,
+             mReversedEventRecords, mNumReversedEventRecords, callBack);
+  return true;
+}
+
+#undef ADD_NEW_STATE2
 
 
 void BroadProductExplorer::
-setupReverseTransitionRelations()
-{
-  if (mReversedEventRecords == 0) {
-    int maxupdates = 0;
-    BroadEventRecord** reversed = new BroadEventRecord*[mNumEventRecords];
-    for (int e = 0; e < mNumEventRecords; e++) {
-      BroadEventRecord* event = mEventRecords[e];
-      if (!event->isGloballyDisabled() && !event->isOnlySelfloops()) {
-        BroadEventRecord* rev = event->createReversedRecord();
-        reversed[mNumReversedEventRecords++] = rev;
-        const int numupdates = rev->getNumberOfNondeterministicUpdates();
-        if (numupdates > maxupdates) {
-          maxupdates = numupdates;
-        }
-      }
-    }
-    if (mNumReversedEventRecords < mNumEventRecords) {
-      mReversedEventRecords = new BroadEventRecord*[mNumReversedEventRecords];
-      for (int e = 0; e < mNumReversedEventRecords; e++) {
-        mReversedEventRecords[e] = reversed[e];
-      }
-      delete [] reversed;
-    } else {
-      mReversedEventRecords = reversed;
-    }
-    qsort(mReversedEventRecords, mNumReversedEventRecords,
-          sizeof(BroadEventRecord*),
-          BroadEventRecord::compareForBackwardSearch);
-    if (maxupdates > mMaxNondeterministicUpdates) {
-      mMaxNondeterministicUpdates = maxupdates;
-      delete [] mNondeterministicTransitionIterators;
-      mNondeterministicTransitionIterators =
-        new NondeterministicTransitionIterator[mMaxNondeterministicUpdates];
-    }
-  }
-}
-
-
-
-void BroadProductExplorer::
-expandTraceState(const uint32_t* targettuple,
-                 const uint32_t* targetpacked,
+expandTraceState(const uint32_t target,
+                 const uint32_t* targetTuple,
+                 const uint32_t* targetPacked,
                  uint32_t level)
 {
   const int numwords = getAutomatonEncoding().getEncodingSize();
@@ -573,105 +521,98 @@ expandTraceState(const uint32_t* targettuple,
   const uint32_t prevLevelEnd = getFirstState(level);
   const int prevLevelSize = prevLevelEnd - prevLevelStart;
   const BroadEventRecord* event = 0;
-  const BroadEventRecord** deferred =
-    new const BroadEventRecord*[mNumReversedEventRecords];
-  uint32_t* sourcetuple = new uint32_t[getNumberOfAutomata()];
+  const BroadEventRecord** deferred = 0;
+  uint32_t* sourceTuple = new uint32_t[getNumberOfAutomata()];
   try {
-#   define ADD_NEW_STATE(source) {                    \
-      uint32_t found = getStateSpace().find();        \
-      if (found < prevLevelEnd) {                     \
-        setTraceState(found);                         \
-        throw SearchAbort();                          \
-      }                                               \
+#   define ADD_NEW_STATE2(source, event, callBack, INC) {       \
+      incNumberOfTransitionsExplored();                         \
+      uint32_t found = getStateSpace().find();                  \
+      if (found < prevLevelEnd) {                               \
+        setTraceState(found);                                   \
+        throw SearchAbort();                                    \
+      }                                                         \
     }
-#   define ADD_NEW_STATE_ALLOC(source, bufferpacked) ADD_NEW_STATE(source)
     int numDeferred = 0;
     for (int e = 0; e < mNumReversedEventRecords; e++) {
       event = mReversedEventRecords[e];
       const AutomatonRecord* dis = 0;
-      FIND_DISABLING_AUTOMATON(targettuple, event, dis);
+      FIND_DISABLING_AUTOMATON(targetTuple, event, dis);
       if (dis == 0) {
-        if (event->getFanout(targettuple) <= prevLevelSize) {
-          EXPAND_ENABLED_TRANSITIONS
-            (numwords, TARGET, targettuple, targetpacked, event);
+        if (event->getFanout(targetTuple) <= prevLevelSize) {
+          EXPAND_ENABLED_TRANSITIONS2
+            (numwords, target, targetTuple, targetPacked, event, 0);
         } else {
           // If the event has too many transitions to this state,
           // do not try to expand. Search later in forward direction,
           // if really necessary ...
+          if (deferred == 0) {
+            deferred = new const BroadEventRecord*[mNumReversedEventRecords];
+          }
           deferred[numDeferred++] = event;
         }
       }
     }
-#   undef ADD_NEW_STATE
-#   define ADD_NEW_STATE(source) {                                      \
-      if (getStateSpace().equalTuples(bufferpacked, targetpacked)) {    \
+#   undef ADD_NEW_STATE2
+#   define ADD_NEW_STATE2(source, event, callBack, INC) {               \
+      incNumberOfTransitionsExplored();                                 \
+      if (getStateSpace().equalTuples(bufferPacked, targetPacked)) {    \
         setTraceState(source);                                          \
         throw SearchAbort();                                            \
       }                                                                 \
     }
     for (uint32_t source = prevLevelStart; source < prevLevelEnd; source++) {
-      uint32_t* sourcepacked = getStateSpace().get(source);
-      getAutomatonEncoding().decode(sourcepacked, sourcetuple);
+      uint32_t* sourcePacked = getStateSpace().get(source);
+      getAutomatonEncoding().decode(sourcePacked, sourceTuple);
       for (int e = 0; e < numDeferred; e++) {
         event = deferred[e]->getForwardRecord();
         const AutomatonRecord* dis = 0;
-        FIND_DISABLING_AUTOMATON(sourcetuple, event, dis);
+        FIND_DISABLING_AUTOMATON(sourceTuple, event, dis);
         if (dis == 0) {
-          EXPAND_ENABLED_TRANSITIONS
-            (numwords, source, sourcetuple, sourcepacked, event);
-        }                                                        
+          EXPAND_ENABLED_TRANSITIONS2
+            (numwords, source, sourceTuple, sourcePacked, event, 0);
+        }
       }
     }
+#   undef ADD_NEW_STATE2
     // We should never get here ...
     delete [] deferred;
-    delete [] sourcetuple;
+    delete [] sourceTuple;
   } catch (const SearchAbort& abort) {
     // OK. That's what we have been waiting for.
     setTraceEvent(event);
     delete [] deferred;
-    delete [] sourcetuple;
+    delete [] sourceTuple;
   } catch (...) {
     delete [] deferred;
-    delete [] sourcetuple;
+    delete [] sourceTuple;
     throw;
   }
 }
 
-#undef ADD_NEW_STATE
 
-
-#define ADD_NEW_STATE(source)                                    \
-  if (getStateSpace().equalTuples(bufferpacked, targetpacked)) { \
+#define ADD_NEW_STATE2(source, event, callBack, INC)             \
+  incNumberOfTransitionsExplored();                              \
+  if (getStateSpace().equalTuples(bufferPacked, targetPacked)) { \
+    foundEvent = event;                                          \
     throw SearchAbort();                                         \
   }
 
 const EventRecord* BroadProductExplorer::
-findEvent(const uint32_t* sourcepacked,
-          const uint32_t* sourcetuple,
-          const uint32_t* targetpacked)
+findEvent(const uint32_t* sourcePacked,
+          const uint32_t* sourceTuple,
+          const uint32_t* targetPacked)
 {
-  const int numwords = getAutomatonEncoding().getEncodingSize();
-  const BroadEventRecord* event;
+  const BroadEventRecord* foundEvent = 0;
   try {
-    int e = -1;
-    do {
-      event = mEventRecords[++e];
-      const AutomatonRecord* dis = 0;
-      FIND_DISABLING_AUTOMATON(sourcetuple, event, dis);
-      if (dis == 0) {
-        EXPAND_ENABLED_TRANSITIONS
-          (numwords, SOURCE, sourcetuple, sourcepacked, event);
-      }
-    } while (true);
+    EXPAND_RAW(source, sourceTuple, sourcePacked,
+               mEventRecords, mNumEventRecords, 0);
   } catch (const SearchAbort& abort) {
     // OK. That's what we have been waiting for.
-    return event;
   }
+  return foundEvent;
 }
 
-#undef ADD_NEW_STATE_ALLOC
-#undef EXPAND_FORWARD
-#undef EXPAND_REVERSE
+#   undef ADD_NEW_STATE2
 
 
 void BroadProductExplorer::

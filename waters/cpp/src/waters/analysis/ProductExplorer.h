@@ -50,6 +50,7 @@ namespace jni {
 namespace waters {
 
 class EventRecord;
+class ProductExplorer;
 
 
 //############################################################################
@@ -76,6 +77,14 @@ public:
   DFSStackOverflow() {}
   ~DFSStackOverflow() {}
 };
+
+
+//############################################################################
+//# callback TransitionCallBack
+//############################################################################
+
+typedef bool (ProductExplorer::*TransitionCallBack)
+  (uint32_t, const EventRecord*, uint32_t);
 
 
 //############################################################################
@@ -140,52 +149,77 @@ protected:
   //# Auxiliary Methods
   virtual void setup();
   virtual void teardown();
+  inline void checkAbort() const {if (mIsAbortRequested) doAbort();}
+  void doAbort() const;
+
+  //##########################################################################
+  //# Search Algorithms
   virtual bool doSafetySearch();
+
   virtual bool doNonblockingReachabilitySearch();
+  bool expandNonblockingReachabilityState
+    (uint32_t source, const uint32_t* sourceTuple,
+     const uint32_t* sourcePacked, TransitionCallBack callBack = 0);
+  bool rememberNonDeadlockTransition
+    (uint32_t source, const EventRecord* event, uint32_t target);
+  bool addCoreachabilityTransition
+    (uint32_t source, const EventRecord* event, uint32_t target);
+
   virtual bool doNonblockingCoreachabilitySearch();
+  void exploreNonblockingCoreachabilityStateDFS(uint32_t target);
+  void exploreNonblockingCoreachabilityStateDFS
+    (uint32_t target, uint32_t* targetTuple, uint32_t* targetPacked);
+  bool processCoreachabilityTransition
+    (uint32_t source, const EventRecord* event, uint32_t target);
+
   virtual bool doNonblockingTarjanSearch();
   virtual bool doNonblockingTarjanSearch(uint32_t root);
+  bool processTarjanTransition
+    (uint32_t source, const EventRecord* event, uint32_t target);
+  bool closeNonblockingTarjanState(uint32_t state, uint32_t* tupleBuffer);
+  bool closeNonblockingTarjanTransition
+    (uint32_t source, const EventRecord* event, uint32_t target);
+
   virtual void computeBFSCounterExample
     (const jni::ListGlue& list, uint32_t level);
+
   virtual void computeTarjanCounterExample(const jni::ListGlue& list);
+  bool expandTarjanTraceState
+    (uint32_t source, const uint32_t* sourceTuple,
+     const uint32_t* sourcePacked, BlockedArrayList<uint32_t>* successors);
+  bool processTarjanTraceTransition
+    (uint32_t source, const EventRecord* event, uint32_t target);
+
+  uint32_t getFirstState(uint32_t level) const {return mDepthMap->get(level);}
+  uint32_t getNumberOfInitialStates() const {return getFirstState(1);}
+  uint32_t getDepth(uint32_t state) const;
+
+  //##########################################################################
+  //# State Expansion Procedures
   virtual void storeInitialStates(bool initzero, bool donondet = true);
   virtual bool isLocalDumpState(const uint32_t* tuple) const;
-  virtual bool expandSafetyState
-    (const uint32_t* sourcetuple, const uint32_t* sourcepacked) = 0;
-  virtual bool expandNonblockingReachabilityState
-    (uint32_t source, const uint32_t* sourcetuple,
-     const uint32_t* sourcepacked) = 0;
-  virtual void expandNonblockingCoreachabilityState
-    (const uint32_t* targettuple, const uint32_t* targetpacked) = 0;
-  virtual void expandTarjanState
-    (uint32_t source, const uint32_t* sourcetuple,
-     const uint32_t* sourcepacked) = 0;
-  virtual bool closeNonblockingTarjanState
-    (uint32_t state, uint32_t* tupleBuffer) = 0;
-  virtual bool expandTarjanTraceState
-    (uint32_t source, const uint32_t* sourcetuple,
-     const uint32_t* sourcepacked, BlockedArrayList<uint32_t>* successors) = 0;
   virtual void setupReverseTransitionRelations() = 0;
+  virtual bool expandSafetyState
+    (uint32_t source, const uint32_t* sourceTuple,
+     const uint32_t* sourcePacked, TransitionCallBack callBack = 0) = 0;
+  virtual bool expandForward
+    (uint32_t source, const uint32_t* sourceTuple,
+     const uint32_t* sourcePacked, TransitionCallBack callBack = 0) = 0;
+  virtual bool expandForwardAgain
+    (uint32_t source, const uint32_t* sourceTuple,
+     const uint32_t* sourcePacked, TransitionCallBack callBack = 0) = 0;
+  virtual bool expandReverse
+    (uint32_t target, const uint32_t* targetTuple,
+     const uint32_t* targetPacked, TransitionCallBack callBack = 0) = 0;
   virtual void expandTraceState
-    (const uint32_t* targettuple, const uint32_t* targetpacked,
-     uint32_t level) = 0;
+    (uint32_t target, const uint32_t* targetTuple,
+     const uint32_t* targetpacked, uint32_t level) = 0;
   virtual const EventRecord* findEvent
     (const uint32_t* sourcetuple, const uint32_t* sourcepacked,
      const uint32_t* targetpacked) = 0;
   virtual void storeNondeterministicTargets
     (const uint32_t* sourcetuple, const uint32_t* targettuple,
      const jni::MapGlue& map) = 0;
-  
-  void exploreNonblockingCoreachabilityStateDFS(uint32_t target);
-  void exploreNonblockingCoreachabilityStateDFS
-    (uint32_t* targettuple, uint32_t* targetpacked);
-  void checkCoreachabilityState();
-  uint32_t getFirstState(uint32_t level) const {return mDepthMap->get(level);}
-  uint32_t getNumberOfInitialStates() const {return getFirstState(1);}
-  uint32_t getDepth(uint32_t state) const;
-
-  inline void checkAbort() const {if (mIsAbortRequested) doAbort();}
-  void doAbort() const;
 
   //##########################################################################
   //# Simple Access
@@ -201,16 +235,11 @@ protected:
   inline uint32_t getNumberOfStates() const {return mNumStates;}
   inline uint32_t incNumberOfStates() {return mNumStates++;}
   inline uint32_t incNumberOfTransitions() {return mNumTransitions++;}
-  inline void addCoreachabilityTransition(uint32_t source, uint32_t target)
-    {mReverseTransitionStore->addTransition(source, target);}
+  inline uint32_t incNumberOfTransitionsExplored()
+    {return mNumTransitionsExplored++;}
   inline void setTraceState(uint32_t state) {mTraceState = state;}
   inline jni::ConflictKind getConflictKind() const {return mConflictKind;}
   inline void setConflictKind(jni::ConflictKind kind) {mConflictKind = kind;}
-
-  //##########################################################################
-  //# Class Constants
-  static const uint32_t TAG_COREACHABLE;
-  static const uint32_t DFS_STACK_SIZE = 0x00100000;
 
 private:
   //##########################################################################
@@ -237,6 +266,7 @@ private:
   uint32_t mNumStates;
   uint32_t mNumCoreachableStates;
   uint32_t mNumTransitions;
+  uint64_t mNumTransitionsExplored;
   uint32_t* mDFSStack;
   uint32_t mDFSStackSize;
   uint32_t mDFSStackPos;
@@ -244,6 +274,8 @@ private:
   const EventRecord* mTraceEvent;
   const AutomatonRecord* mTraceAutomaton;
   uint32_t mTraceState;
+  bool mGotTarjanTraceSuccessor;
+  BlockedArrayList<uint32_t>* mTarjanTraceSuccessors;
   jni::EventGlue mJavaTraceEvent;
   jni::AutomatonGlue mJavaTraceAutomaton;
   jni::StateGlue mJavaTraceState;
@@ -251,6 +283,11 @@ private:
   clock_t mStartTime;
   clock_t mTraceStartTime;
   clock_t mStopTime;
+
+  //##########################################################################
+  //# Class Constants
+  static const uint32_t TAG_COREACHABLE;
+  static const uint32_t DFS_STACK_SIZE = 0x00100000;
 
   //##########################################################################
   //# Friends

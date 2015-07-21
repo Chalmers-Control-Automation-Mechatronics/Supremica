@@ -141,12 +141,14 @@ ProductExplorer(const jni::ProductDESProxyFactoryGlue& factory,
     mNumStates(0),
     mNumCoreachableStates(0),
     mNumTransitions(0),
+    mNumTransitionsExplored(0),
     mDFSStack(0),
     mDFSStackSize(0),
     mTraceList(0),
     mTraceEvent(0),
     mTraceAutomaton(0),
     mTraceState(UINT32_MAX),
+    mTarjanTraceSuccessors(0),
     mJavaTraceEvent(0, cache),
     mJavaTraceAutomaton(0, cache),
     mJavaTraceState(0, cache),
@@ -164,6 +166,7 @@ ProductExplorer::
   delete mReverseTransitionStore;
   delete [] mDFSStack;
   delete mTraceList;
+  delete mTarjanTraceSuccessors;
 }
 
 
@@ -311,6 +314,7 @@ addStatistics(const jni::NativeVerificationResultGlue& vresult)
   vresult.setNumberOfAutomata(mNumAutomata);
   vresult.setNumberOfStates(mNumStates);
   vresult.setNumberOfTransitions(mNumTransitions);
+  vresult.setNumberOfExploredTransitions(mNumTransitionsExplored);
   vresult.setPeakNumberOfNodes(mNumStates);
   if (mEncoding == 0) {
     vresult.setEncodingSize(0);
@@ -421,6 +425,7 @@ setup()
   }
 }
 
+
 void ProductExplorer::
 teardown()
 {
@@ -436,13 +441,27 @@ teardown()
   mDFSStackSize = 0;
   mTraceEvent = 0;
   mTraceAutomaton = 0;
+  delete mTarjanTraceSuccessors;
+  mTarjanTraceSuccessors = 0;
 }
 
 
-//----------------------------------------------------------------------------
-// Reachability
+void ProductExplorer::
+doAbort()
+  const
+{
+  throw jni::PreJavaException(jni::CLASS_AnalysisAbortException);
+}
 
-#define DO_REACHABILITY                                           \
+
+
+//############################################################################
+//# ProductExplorer: Search Algorithms
+
+//----------------------------------------------------------------------------
+// doSafetySearch()
+
+#define DO_REACHABILITY(callBack)                                 \
   {                                                               \
     uint32_t nextlevel = mNumStates;                              \
     uint32_t current = 0;                                         \
@@ -452,7 +471,7 @@ teardown()
         checkAbort();                                             \
         uint32_t* currentpacked = mStateSpace->get(current);      \
         mEncoding->decode(currentpacked, currenttuple);           \
-        if (!EXPAND(current, currenttuple, currentpacked)) {      \
+        if (!EXPAND(current, currenttuple, currentpacked, callBack)) {  \
           mTraceState = current;                                  \
           delete [] currenttuple;                                 \
           return false;                                           \
@@ -469,30 +488,78 @@ teardown()
     }                                                             \
   }
 
-#define EXPAND(source, sourcetuple, sourcepacked) \
-  expandSafetyState(sourcetuple, sourcepacked)
 
 bool ProductExplorer::
 doSafetySearch()
 {
-  DO_REACHABILITY;
+# define EXPAND expandSafetyState
+  DO_REACHABILITY(0);
+# undef EXPAND
 }
 
-#undef EXPAND
-#define EXPAND(source, sourcetuple, sourcepacked) \
-  expandNonblockingReachabilityState(source, sourcetuple, sourcepacked)
+
+//----------------------------------------------------------------------------
+// doNonblockingReachabilitySearch()
 
 bool ProductExplorer::
 doNonblockingReachabilitySearch()
 {
-  DO_REACHABILITY;
+  TransitionCallBack callBack;
+  switch (getConflictCheckMode()) {
+  case jni::ConflictCheckMode_STORED_BACKWARDS_TRANSITIONS:
+    callBack = &ProductExplorer::addCoreachabilityTransition;
+    break;
+  case jni::ConflictCheckMode_COMPUTED_BACKWARDS_TRANSITIONS:
+    callBack = &ProductExplorer::rememberNonDeadlockTransition;
+    break;
+  default:
+    throw jni::PreAnalysisConfigurationException(getConflictCheckMode());
+    break;
+  }
+# define EXPAND expandNonblockingReachabilityState
+  DO_REACHABILITY(callBack);
+# undef EXPAND
 }
 
-#undef EXPAND
+bool ProductExplorer::
+expandNonblockingReachabilityState
+  (uint32_t source, const uint32_t* sourceTuple,
+   const uint32_t* sourcePacked, TransitionCallBack callBack)
+{
+  setConflictKind(jni::ConflictKind_DEADLOCK);                        
+  if (isLocalDumpState(sourceTuple)) {                                
+    return false;                                                     
+  }                                                                   
+  expandForward(source, sourceTuple, sourcePacked, callBack);         
+  if (getConflictKind() != jni::ConflictKind_DEADLOCK) {              
+    return true;                                                      
+  } else if (getAutomatonEncoding().isMarkedStateTuple(sourceTuple) || 
+             !getAutomatonEncoding().isPreMarkedStateTuple(sourceTuple)) { 
+    setConflictKind(jni::ConflictKind_CONFLICT);                      
+    return true;                                                      
+  } else {                                                            
+    return false;                                                     
+  }                                                                   
+}
+
+bool ProductExplorer::rememberNonDeadlockTransition
+  (uint32_t source, const waters::EventRecord* event, uint32_t target)
+{
+  setConflictKind(jni::ConflictKind_CONFLICT);                  
+  return true;
+}
+
+bool ProductExplorer::addCoreachabilityTransition
+  (uint32_t source, const waters::EventRecord* event, uint32_t target)
+{
+  setConflictKind(jni::ConflictKind_CONFLICT);                  
+  mReverseTransitionStore->addTransition(source, target);
+  return true;
+}
 
 
 //----------------------------------------------------------------------------
-// Coreachability
+// doNonblockingCoreachabilitySearch()
 
 bool ProductExplorer::
 doNonblockingCoreachabilitySearch()
@@ -502,34 +569,34 @@ doNonblockingCoreachabilitySearch()
   mDFSStack = new uint32_t[mDFSStackSize];
   mDFSStackPos = 0;
   mNumCoreachableStates = mPreMarking.isNull() ? 0 : UINT32_MAX;
-  uint32_t* currenttuple = 0;
+  uint32_t* currentTuple = 0;
   bool overflow = false;
   if (mConflictCheckMode == 
       jni::ConflictCheckMode_COMPUTED_BACKWARDS_TRANSITIONS) {
-    currenttuple = new uint32_t[mNumAutomata];
+    currentTuple = new uint32_t[mNumAutomata];
     setupReverseTransitionRelations();
   }
   for (uint32_t current = 0; current < mNumStates; current++) {
     checkAbort();
-    uint32_t* currentpacked = mStateSpace->get(current);
-    if (mEncoding->hasTag(currentpacked, TAG_COREACHABLE)) {
+    uint32_t* currentPacked = mStateSpace->get(current);
+    if (mEncoding->hasTag(currentPacked, TAG_COREACHABLE)) {
       continue;
     }
-    if (mEncoding->isMarkedStateTuplePacked(currentpacked)) {
-      mEncoding->setTag(currentpacked, TAG_COREACHABLE);
+    if (mEncoding->isMarkedStateTuplePacked(currentPacked)) {
+      mEncoding->setTag(currentPacked, TAG_COREACHABLE);
       if (mNumCoreachableStates != UINT32_MAX &&
           ++mNumCoreachableStates == mNumStates) {
         return true;
       }
       try {
-        if (currenttuple == 0) { // storing
+        if (currentTuple == 0) { // storing
           exploreNonblockingCoreachabilityStateDFS(current);
         } else { // non-storing
-          exploreNonblockingCoreachabilityStateDFS(currenttuple,
-                                                   currentpacked);
+          exploreNonblockingCoreachabilityStateDFS
+            (current, currentTuple, currentPacked);
         }
       } catch (const SearchAbort& abort) {
-        delete [] currenttuple;
+        delete [] currentTuple;
         return true;
       } catch (const DFSStackOverflow& abort) {
         mDFSStackPos = 0;
@@ -542,30 +609,30 @@ doNonblockingCoreachabilitySearch()
     try {
       for (uint32_t current = mNumStates; current-- > 0;) {
         checkAbort();
-        uint32_t* currentpacked = mStateSpace->get(current);
-        if (mEncoding->hasTag(currentpacked, TAG_COREACHABLE)) {
-          if (currenttuple == 0) {
+        uint32_t* currentPacked = mStateSpace->get(current);
+        if (mEncoding->hasTag(currentPacked, TAG_COREACHABLE)) {
+          if (currentTuple == 0) {
             exploreNonblockingCoreachabilityStateDFS(current);
           } else {
             exploreNonblockingCoreachabilityStateDFS
-              (currenttuple, currentpacked);
+              (current, currentTuple, currentPacked);
           }
         }
       }
     } catch (const SearchAbort& abort) {
-      delete [] currenttuple;
+      delete [] currentTuple;
       return true;
     } catch (const DFSStackOverflow& abort) {
       mDFSStackPos = 0;
       overflow = true;
     }
   }
-  delete [] currenttuple;
+  delete [] currentTuple;
   for (uint32_t current = 0; current < mNumStates; current++) {
     checkAbort();
-    uint32_t* currentpacked = mStateSpace->get(current);
-    if (!mEncoding->hasTag(currentpacked, TAG_COREACHABLE) &&
-        mEncoding->isPreMarkedStateTuplePacked(currentpacked)) {
+    uint32_t* currentPacked = mStateSpace->get(current);
+    if (!mEncoding->hasTag(currentPacked, TAG_COREACHABLE) &&
+        mEncoding->isPreMarkedStateTuplePacked(currentPacked)) {
       mTraceState = current;
       return false;
     }
@@ -573,12 +640,84 @@ doNonblockingCoreachabilitySearch()
   return true;
 }
 
+
+#define EXPLORE(target, targetTuple, targetPacked)                      \
+  {                                                                     \
+    EXPAND(target, targetTuple, targetPacked);                          \
+    while (mDFSStackPos > 0) {                                          \
+      uint32_t popped = mDFSStack[--mDFSStackPos];                      \
+      UNPACK(popped, targetPacked);                                     \
+      EXPAND(popped, targetTuple, targetPacked);                        \
+    }                                                                   \
+  }
+
+#define UNPACK(target, targetPacked)
+
+#define EXPAND(target, targetTuple, targetPacked)                       \
+  {                                                                     \
+    uint32_t iter = mReverseTransitionStore->iterator(target);          \
+    while (mReverseTransitionStore->hasNext(iter)) {                    \
+      uint32_t source = mReverseTransitionStore->next(iter);            \
+      processCoreachabilityTransition(target, 0, source);               \
+    }                                                                   \
+  }
+
+void ProductExplorer::
+exploreNonblockingCoreachabilityStateDFS(uint32_t target)
+{
+  EXPLORE(target, TUPLE, PACKED);
+}
+
 #undef EXPAND
+#undef UNPACK
+
+
+#define EXPAND(target, targetTuple, targetPacked)                       \
+  {                                                                     \
+    mEncoding->decode(targetPacked, targetTuple);                       \
+    expandReverse(target, targetTuple, targetPacked,                    \
+                  &ProductExplorer::processCoreachabilityTransition);   \
+  }
+#define UNPACK(target, targetPacked) \
+  targetPacked = mStateSpace->get(target)
+
+void ProductExplorer::
+exploreNonblockingCoreachabilityStateDFS(uint32_t target,
+                                         uint32_t* targetTuple,
+                                         uint32_t* targetPacked)
+{
+  EXPLORE(target, targetTuple, targetPacked);
+}
+
+#undef EXPLORE
+#undef EXPAND
+#undef UNPACK
+
+
+bool ProductExplorer::
+processCoreachabilityTransition(uint32_t target,
+                                const EventRecord* event,
+                                uint32_t source)
+{
+  checkAbort();                                                       
+  uint32_t* sourcePacked = mStateSpace->get(source);                  
+  if (!mEncoding->hasTag(sourcePacked, TAG_COREACHABLE)) {            
+    mEncoding->setTag(sourcePacked, TAG_COREACHABLE);                 
+    if (mNumCoreachableStates != UINT32_MAX &&                        
+        ++mNumCoreachableStates == mNumStates) {                      
+      throw SearchAbort();                                            
+    } else if (mDFSStackPos < mDFSStackSize) {                        
+      mDFSStack[mDFSStackPos++] = source;                             
+    } else {                                                          
+      throw DFSStackOverflow();                                       
+    }                                                                 
+  }                                                                   
+  return true;
+}
 
 
 //----------------------------------------------------------------------------
-// Tarjan
-
+// doNonblockingTarjanSearch()
 
 bool ProductExplorer::
 doNonblockingTarjanSearch()
@@ -592,8 +731,6 @@ doNonblockingTarjanSearch()
   return true;
 }
 
-#define EXPAND(source, sourcetuple, sourcepacked) \
-  expandNonblockingReachabilityState(source, sourcetuple, sourcepacked)
 
 bool ProductExplorer::
 doNonblockingTarjanSearch(uint32_t root)
@@ -609,9 +746,9 @@ doNonblockingTarjanSearch(uint32_t root)
     tarjan->pushRootControlState(root);
     do {
       checkAbort();
-      //tarjan->dumpControlStack();
+      // tarjan->dumpControlStack();
       if (tarjan->isTopControlStateClosing()) {
-        //std::cerr << "c" << tarjan->getTopControlState() << std::endl;
+        // std::cerr << "c" << tarjan->getTopControlState() << std::endl;
         tarjan->mayBeCloseComponent(&callBack);
         tarjan->popControlState();
         switch (tarjan->getCriticalComponentSize()) {
@@ -625,11 +762,14 @@ doNonblockingTarjanSearch(uint32_t root)
           return false;
         }
       } else {
-        //std::cerr << "e" << tarjan->getTopControlState() << std::endl;
+        // std::cerr << "e" << tarjan->getTopControlState() << std::endl;
         uint32_t source = tarjan->beginStateExpansion();
         uint32_t* sourcePacked = mStateSpace->get(source);
         mEncoding->decode(sourcePacked, sourceTuple);
-        expandTarjanState(source, sourceTuple, sourcePacked);
+        if (!isLocalDumpState(sourceTuple)) {
+          expandForward(source, sourceTuple, sourcePacked,
+                        &ProductExplorer::processTarjanTransition);
+        }
         // The above calls tarjan->processTransition(source, target) ...
         tarjan->endStateExpansion();
         // std::cerr << "n=" << mStateSpace->size() << std::endl;
@@ -642,11 +782,48 @@ doNonblockingTarjanSearch(uint32_t root)
   }
 }
 
-#undef EXPAND
+bool ProductExplorer::
+processTarjanTransition(uint32_t source,
+                        const EventRecord* event, 
+                        uint32_t target)
+{
+  // std::cerr << "  " << source << "->" << target << std::endl;
+  TarjanStateSpace* tarjan = (TarjanStateSpace*) mStateSpace;
+  tarjan->processTransition(source, target);
+  return true;
+}
+
+bool ProductExplorer::
+closeNonblockingTarjanState(uint32_t source, uint32_t* sourceTuple)
+{
+  uint32_t* sourcePacked = getStateSpace().get(source);
+  getAutomatonEncoding().decode(sourcePacked, sourceTuple);
+  if (isLocalDumpState(sourceTuple)) {
+    return true; // continue checking states - results in critical component
+  } else if (getAutomatonEncoding().isMarkedStateTuple(sourceTuple)) {
+    return false; // stop checking states
+  } else if (isLocalDumpState(sourceTuple)) {
+    return true;
+  } else {
+    return expandForwardAgain
+      (source, sourceTuple, sourcePacked,
+       &ProductExplorer::closeNonblockingTarjanTransition);
+  }
+}
+
+bool ProductExplorer::
+closeNonblockingTarjanTransition(uint32_t source,
+                                 const EventRecord* event,
+                                 uint32_t target)
+{
+  TarjanStateSpace* tarjan = (TarjanStateSpace*) mStateSpace;
+  return !tarjan->isClosedState(target);
+  // false return value means to stop checking
+}
 
 
 //----------------------------------------------------------------------------
-// Counterexamples
+// computeBFSCounterExample()
 
 void ProductExplorer::
 computeBFSCounterExample(const jni::ListGlue& list, uint32_t level)
@@ -664,7 +841,7 @@ computeBFSCounterExample(const jni::ListGlue& list, uint32_t level)
     while (level > 0) {
       checkAbort();
       if (mReverseTransitionStore == 0) {
-        expandTraceState(targettuple, targetpacked, level);
+        expandTraceState(mTraceState, targettuple, targetpacked, level);
       } else {
         mTraceState = mReverseTransitionStore->getFirstPredecessor(mTraceState);
       }
@@ -695,6 +872,10 @@ computeBFSCounterExample(const jni::ListGlue& list, uint32_t level)
     throw;
   }
 }
+
+
+//----------------------------------------------------------------------------
+// computeTarjanCounterExample()
 
 void ProductExplorer::
 computeTarjanCounterExample(const jni::ListGlue& list)
@@ -763,6 +944,7 @@ computeTarjanCounterExample(const jni::ListGlue& list)
       mFactory.createTraceStepProxyGlue(0, &stateMap, mCache);
     list.add(0, &step);
   } catch (...) {
+    mTarjanTraceSuccessors = 0;
     delete list1;
     delete list2;
     delete [] buffers;
@@ -770,9 +952,80 @@ computeTarjanCounterExample(const jni::ListGlue& list)
   }
 }
 
+bool ProductExplorer::
+expandTarjanTraceState(uint32_t source,
+                       const uint32_t* sourceTuple,
+                       const uint32_t* sourcePacked,
+                       BlockedArrayList<uint32_t>* successors)
+{
+  mGotTarjanTraceSuccessor = false;
+  mTarjanTraceSuccessors = successors;
+  if (!isLocalDumpState(sourceTuple)) {
+    expandForwardAgain(source, sourceTuple, sourcePacked,
+                       &ProductExplorer::processTarjanTraceTransition);
+  }
+  if (!mGotTarjanTraceSuccessor &&
+      !getAutomatonEncoding().isMarkedStateTuple(sourceTuple)) {
+    setTraceState(source);
+    setTraceEvent(0);
+    setConflictKind(jni::ConflictKind_DEADLOCK);
+  }
+  return mGotTarjanTraceSuccessor;
+}
+
+bool ProductExplorer::
+processTarjanTraceTransition(uint32_t source, 
+                             const EventRecord* event,
+                             uint32_t target)
+{
+  mGotTarjanTraceSuccessor = true;
+  if (target != UINT32_MAX) {
+    TarjanStateSpace* tarjan = (TarjanStateSpace*) mStateSpace;
+    uint32_t& ref = tarjan->getTraceStatusRef(target);
+    switch (ref) {
+    case TarjanStateSpace::TR_OPEN:
+      mTarjanTraceSuccessors->add(target);
+      ref = source;
+      break;
+    case TarjanStateSpace::TR_CRITICAL:
+      ref = source;
+      setTraceState(target);
+      setTraceEvent(event);
+      return false;
+    default:
+      break;
+    }
+  }
+  return true;
+}
+
 
 //----------------------------------------------------------------------------
-// Common Auxiliary Methods
+// Depth Map
+
+uint32_t ProductExplorer::
+getDepth(uint32_t state)
+  const
+{
+  // return level such that depth[level] <= state < depth[level+1]
+  uint32_t l = 0;
+  uint32_t u = mDepthMap->size() - 1;
+  while (l < u) {
+    uint32_t m = (l + u) >> 1;
+    uint32_t m1 = m + 1;
+    if (state < mDepthMap->get(m1)) {
+      u = m;
+    } else {
+      l = m1;
+    }
+  }
+  return l;
+}
+
+
+
+//############################################################################
+//# ProductExplorer: State Expansion Procedures
 
 void ProductExplorer::
 storeInitialStates(bool initzero, bool donondet)
@@ -832,7 +1085,6 @@ storeInitialStates(bool initzero, bool donondet)
   }
 }
 
-
 bool ProductExplorer::
 isLocalDumpState(const uint32_t* tuple)
   const
@@ -840,112 +1092,6 @@ isLocalDumpState(const uint32_t* tuple)
   return false;
 }
 
-
-#define EXPLORE(target, targettuple, targetpacked)                      \
-  {                                                                     \
-    EXPAND(target, targettuple, targetpacked);                          \
-    while (mDFSStackPos > 0) {                                          \
-      uint32_t popped = mDFSStack[--mDFSStackPos];                      \
-      UNPACK(popped, targetpacked);                                     \
-      EXPAND(popped, targettuple, targetpacked);                        \
-    }                                                                   \
-  }
-
-#define UNPACK(target, targetpacked)
-
-#define EXPAND(target, targettuple, targetpacked)                       \
-  {                                                                     \
-    uint32_t iter = mReverseTransitionStore->iterator(target);          \
-    while (mReverseTransitionStore->hasNext(iter)) {                    \
-      uint32_t source = mReverseTransitionStore->next(iter);            \
-      VISIT(source);                                                    \
-    }                                                                   \
-  }
-
-#define VISIT(source)                                                   \
-  {                                                                     \
-    checkAbort();                                                       \
-    uint32_t* sourcepacked = mStateSpace->get(source);                  \
-    if (!mEncoding->hasTag(sourcepacked, TAG_COREACHABLE)) {            \
-      mEncoding->setTag(sourcepacked, TAG_COREACHABLE);                 \
-      if (mNumCoreachableStates != UINT32_MAX &&                        \
-          ++mNumCoreachableStates == mNumStates) {                      \
-        throw SearchAbort();                                            \
-      } else if (mDFSStackPos < mDFSStackSize) {                        \
-        mDFSStack[mDFSStackPos++] = source;                             \
-      } else {                                                          \
-        throw DFSStackOverflow();                                       \
-      }                                                                 \
-    }                                                                   \
-  }
-
-void ProductExplorer::
-exploreNonblockingCoreachabilityStateDFS(uint32_t target)
-{
-  EXPLORE(target, TUPLE, PACKED);
-}
-
-#undef EXPAND
-#undef UNPACK
-
-#define EXPAND(target, targettuple, targetpacked)                       \
-  {                                                                     \
-    mEncoding->decode(targetpacked, targettuple);                       \
-    expandNonblockingCoreachabilityState(targettuple, targetpacked);    \
-  }
-#define UNPACK(target, targetpacked) \
-  targetpacked = mStateSpace->get(target)
-
-void ProductExplorer::
-exploreNonblockingCoreachabilityStateDFS(uint32_t* targettuple,
-                                         uint32_t* targetpacked)
-{
-  EXPLORE(TARGET, targettuple, targetpacked);
-}
-
-#undef EXPLORE
-#undef EXPAND
-#undef UNPACK
-
-void ProductExplorer::
-checkCoreachabilityState()
-{
-  uint32_t source = mStateSpace->find();
-  if (source != UINT32_MAX) {
-    VISIT(source);
-  }
-}
-
-#undef EXPLORE
-#undef EXPAND
-#undef UNPACK
-#undef VISIT
-
-uint32_t ProductExplorer::
-getDepth(uint32_t state)
-  const
-{
-  // return level such that depth[level] <= state < depth[level+1]
-  uint32_t l = 0;
-  uint32_t u = mDepthMap->size() - 1;
-  while (l < u) {
-    uint32_t m = (l + u) >> 1;
-    uint32_t m1 = m + 1;
-    if (state < mDepthMap->get(m1)) {
-      u = m;
-    } else {
-      l = m1;
-    }
-  }
-  return l;
-}
-
-void ProductExplorer::
-doAbort()
-  const
-{
-  throw jni::PreJavaException(jni::CLASS_AnalysisAbortException);
-}
 
 
 //############################################################################
