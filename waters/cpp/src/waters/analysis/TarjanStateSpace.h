@@ -100,7 +100,9 @@ public:
 
   //##########################################################################
   //# Debugging
+#ifdef DEBUG
   void dump(const TarjanStateSpace* tarjan) const;
+#endif /* DEBUG */
 
 private:
   //##########################################################################
@@ -172,10 +174,12 @@ public:
 
   //##########################################################################
   //# Debugging
+#ifdef DEBUG
   void dumpControlStack() const;
   void dumpLowLink(uint32_t state) const;
   uint32_t getStateForCompIndex(uint32_t compIndex) const
     {return mComponentStack.get(compIndex);}
+#endif /* DEBUG */
 
 private:
   //##########################################################################

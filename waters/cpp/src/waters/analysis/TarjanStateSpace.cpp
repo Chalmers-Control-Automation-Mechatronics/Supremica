@@ -110,6 +110,8 @@ moveToTop(uint32_t behindIndex, uint32_t parent)
 //############################################################################
 //# TarjanControlStack: Debugging
 
+#ifdef DEBUG
+
 void TarjanControlStack::
 dump(const TarjanStateSpace* tarjan)
   const
@@ -134,6 +136,8 @@ dump(const TarjanStateSpace* tarjan)
   }
   std::cerr << "CONTROL STACK END" << std::endl;
 }
+
+#endif /* DEBUG */
 
 
 //############################################################################
@@ -406,6 +410,8 @@ addStatistics(const jni::NativeVerificationResultGlue& vresult)
 //############################################################################
 //# TarjanStateSpace: Debugging
 
+#ifdef DEBUG
+
 void TarjanStateSpace::
 dumpControlStack()
   const
@@ -430,6 +436,8 @@ dumpLowLink(uint32_t state)
     }
   }
 }
+
+#endif /* DEBUG */
 
 
 //############################################################################

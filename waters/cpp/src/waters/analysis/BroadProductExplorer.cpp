@@ -150,7 +150,10 @@ teardown()
 
 
 //############################################################################
-//# BroadProductExplorer: Shared Auxiliary Methods
+//# BroadProductExplorer: State Expansion Procedures
+
+//----------------------------------------------------------------------------
+// isLocalDumpState()
 
 bool BroadProductExplorer::
 isLocalDumpState(const uint32_t* tuple)
@@ -169,6 +172,9 @@ isLocalDumpState(const uint32_t* tuple)
   return false;
 }
 
+
+//----------------------------------------------------------------------------
+// setupReverseTransitionRelations()
 
 void BroadProductExplorer::
 setupReverseTransitionRelations()
@@ -209,20 +215,24 @@ setupReverseTransitionRelations()
 }
 
 
-// OLD
+//----------------------------------------------------------------------------
+// expandSafetyState()
+
 // I know this is really kludgy,
 // but inlining this code is 15% faster than using method calls.
 // ~~~Robi
 
-#define EXPAND_FORWARD(numwords, source, sourcetuple, sourcepacked)     \
+#define EXPAND_RAW(source, sourceTuple, sourcePacked,                   \
+                   records, numRecords, callBack)                       \
   {                                                                     \
-    for (int e = 0; e < mNumEventRecords; e++) {                        \
-      BroadEventRecord* event = mEventRecords[e];                       \
+    const int numWords = getAutomatonEncoding().getEncodingSize();      \
+    for (int e = 0; e < numRecords; e++) {                              \
+      BroadEventRecord* event = records[e];                             \
       const AutomatonRecord* dis = 0;                                   \
-      FIND_DISABLING_AUTOMATON(sourcetuple, event, dis);                \
+      FIND_DISABLING_AUTOMATON(sourceTuple, event, dis);                \
       if (dis == 0) {                                                   \
         EXPAND_ENABLED_TRANSITIONS                                      \
-          (numwords, source, sourcetuple, sourcepacked, event);         \
+          (numWords, source, sourceTuple, sourcePacked, event, callBack); \
       }                                                                 \
     }                                                                   \
   }
@@ -243,99 +253,9 @@ setupReverseTransitionRelations()
     }                                                                   \
   }
 
-#define EXPAND_ENABLED_TRANSITIONS(numwords, source,                    \
-                                   sourcetuple, sourcepacked, event)    \
-  {                                                                     \
-    uint32_t* bufferpacked = getStateSpace().prepare();                 \
-    if (event->isDeterministic()) {                                     \
-      for (int w = 0; w < numwords; w++) {                              \
-        TransitionUpdateRecord* update = event->getTransitionUpdateRecord(w); \
-        if (update == 0) {                                              \
-          bufferpacked[w] = sourcepacked[w];                            \
-        } else {                                                        \
-          uint32_t word = (sourcepacked[w] & update->getKeptMask()) |   \
-            update->getCommonTargets();                                 \
-          for (TransitionRecord* trans = update->getTransitionRecords(); \
-               trans != 0;                                              \
-               trans = trans->getNextInUpdate()) {                      \
-            const AutomatonRecord* aut = trans->getAutomaton();         \
-            const int a = aut->getAutomatonIndex();                     \
-            const uint32_t source = sourcetuple[a];                     \
-            word |= trans->getDeterministicSuccessorShifted(source);    \
-          }                                                             \
-          bufferpacked[w] = word;                                       \
-        }                                                               \
-      }                                                                 \
-      ADD_NEW_STATE(source);                                            \
-      incNumberOfTransitionsExplored();                                 \
-    } else {                                                            \
-      int ndend = 0;                                                    \
-      for (int w = 0; w < numwords; w++) {                              \
-        TransitionUpdateRecord* update = event->getTransitionUpdateRecord(w); \
-        if (update == 0) {                                              \
-          bufferpacked[w] = sourcepacked[w];                            \
-        } else {                                                        \
-          uint32_t word = (sourcepacked[w] & update->getKeptMask()) |   \
-            update->getCommonTargets();                                 \
-          for (TransitionRecord* trans = update->getTransitionRecords(); \
-               trans != 0;                                              \
-               trans = trans->getNextInUpdate()) {                      \
-            const AutomatonRecord* aut = trans->getAutomaton();         \
-            const int a = aut->getAutomatonIndex();                     \
-            const uint32_t source = sourcetuple[a];                     \
-            uint32_t succ = trans->getDeterministicSuccessorShifted(source); \
-            if (succ == TransitionRecord::MULTIPLE_TRANSITIONS) {       \
-              succ = mNondeterministicTransitionIterators[ndend++].     \
-                setup(trans, source);                                   \
-            }                                                           \
-            word |= succ;                                               \
-          }                                                             \
-          bufferpacked[w] = word;                                       \
-        }                                                               \
-      }                                                                 \
-      if (ndend == 0) {                                                 \
-        ADD_NEW_STATE(source);                                          \
-        incNumberOfTransitionsExplored();                               \
-      } else {                                                          \
-        int ndindex;                                                    \
-        do {                                                            \
-          ADD_NEW_STATE_ALLOC(source, bufferpacked);                    \
-          incNumberOfTransitionsExplored();                             \
-          for (ndindex = 0; ndindex < ndend; ndindex++) {               \
-            if (!mNondeterministicTransitionIterators[ndindex].         \
-                advance(bufferpacked)) {                                \
-              break;                                                    \
-            }                                                           \
-          }                                                             \
-        } while (ndindex < ndend);                                      \
-      }                                                                 \
-    }                                                                   \
-  }
-
-
-// NEW
-// I know this is really kludgy,
-// but inlining this code is 15% faster than using method calls.
-// ~~~Robi
-
-#define EXPAND_RAW(source, sourceTuple, sourcePacked,                   \
-                   records, numRecords, callBack)                       \
-  {                                                                     \
-    const int numWords = getAutomatonEncoding().getEncodingSize();      \
-    for (int e = 0; e < numRecords; e++) {                              \
-      BroadEventRecord* event = records[e];                             \
-      const AutomatonRecord* dis = 0;                                   \
-      FIND_DISABLING_AUTOMATON(sourceTuple, event, dis);                \
-      if (dis == 0) {                                                   \
-        EXPAND_ENABLED_TRANSITIONS2                                     \
-          (numWords, source, sourceTuple, sourcePacked, event, callBack); \
-      }                                                                 \
-    }                                                                   \
-  }
-
-#define EXPAND_ENABLED_TRANSITIONS2(numWords, source,                   \
-                                    sourceTuple, sourcePacked,          \
-                                    event, callBack)                    \
+#define EXPAND_ENABLED_TRANSITIONS(numWords, source,                    \
+                                   sourceTuple, sourcePacked,           \
+                                   event, callBack)                     \
   {                                                                     \
     uint32_t* bufferPacked = getStateSpace().prepare();                 \
     if (event->isDeterministic()) {                                     \
@@ -344,7 +264,8 @@ setupReverseTransitionRelations()
         if (update == 0) {                                              \
           bufferPacked[w] = sourcePacked[w];                            \
         } else {                                                        \
-          uint32_t word = (sourcePacked[w] & update->getKeptMask()) |   \
+          uint32_t word =                                               \
+            (sourcePacked[w] & update->getKeptMask()) |                 \
             update->getCommonTargets();                                 \
           for (TransitionRecord* trans = update->getTransitionRecords(); \
                trans != 0;                                              \
@@ -357,7 +278,7 @@ setupReverseTransitionRelations()
           bufferPacked[w] = word;                                       \
         }                                                               \
       }                                                                 \
-      ADD_NEW_STATE2(source, event, callBack, INC_NO_ALLOC);            \
+      ADD_NEW_STATE(source, event, callBack, INC_NO_ALLOC);             \
     } else {                                                            \
       int ndend = 0;                                                    \
       for (int w = 0; w < numWords; w++) {                              \
@@ -384,11 +305,11 @@ setupReverseTransitionRelations()
         }                                                               \
       }                                                                 \
       if (ndend == 0) {                                                 \
-        ADD_NEW_STATE2(source, event, callBack, INC_NO_ALLOC);          \
+        ADD_NEW_STATE(source, event, callBack, INC_NO_ALLOC);           \
       } else {                                                          \
         int ndindex;                                                    \
         do {                                                            \
-          ADD_NEW_STATE2(source, event, callBack, INC_ALLOC);           \
+          ADD_NEW_STATE(source, event, callBack, INC_ALLOC);            \
           for (ndindex = 0; ndindex < ndend; ndindex++) {               \
             if (!mNondeterministicTransitionIterators[ndindex].         \
                 advance(bufferPacked)) {                                \
@@ -403,7 +324,7 @@ setupReverseTransitionRelations()
 #define INC_NO_ALLOC incNumberOfStates()
 #define INC_ALLOC bufferPacked = getStateSpace().prepare(incNumberOfStates())
 
-#define ADD_NEW_STATE2(source, event, callBack, INC)                    \
+#define ADD_NEW_STATE(source, event, callBack, INC)                     \
   {                                                                     \
     incNumberOfTransitionsExplored();                                   \
     uint32_t target = getStateSpace().add();                            \
@@ -434,7 +355,7 @@ expandSafetyState(uint32_t source,
     const AutomatonRecord* dis = 0;
     FIND_DISABLING_AUTOMATON(sourceTuple, event, dis);
     if (dis == 0) {
-      EXPAND_ENABLED_TRANSITIONS2
+      EXPAND_ENABLED_TRANSITIONS
         (numWords, source, sourceTuple, sourcePacked, event, callBack);
     } else if (!dis->isPlant() && !event->isControllable()) {
       setTraceEvent(event, dis);
@@ -443,6 +364,10 @@ expandSafetyState(uint32_t source,
   }
   return true;
 }
+
+
+//----------------------------------------------------------------------------
+// expandForward()
 
 bool BroadProductExplorer::
 expandForward(uint32_t source,
@@ -455,10 +380,13 @@ expandForward(uint32_t source,
   return true;
 }
 
-#undef ADD_NEW_STATE2
+#undef ADD_NEW_STATE
 
 
-#define ADD_NEW_STATE2(source, event, callBack, INC)                    \
+//----------------------------------------------------------------------------
+// expandForwardAgain()
+
+#define ADD_NEW_STATE(source, event, callBack, INC)                     \
   {                                                                     \
     incNumberOfTransitionsExplored();                                   \
     uint32_t target = getStateSpace().find();                           \
@@ -481,10 +409,13 @@ expandForwardAgain(uint32_t source,
   return true;
 }
 
-#undef ADD_NEW_STATE2
+#undef ADD_NEW_STATE
 
 
-#define ADD_NEW_STATE2(source, event, callBack, INC)                    \
+//----------------------------------------------------------------------------
+// expandReverse()
+
+#define ADD_NEW_STATE(source, event, callBack, INC)                     \
   {                                                                     \
     incNumberOfTransitionsExplored();                                   \
     uint32_t target = getStateSpace().find();                           \
@@ -507,8 +438,11 @@ expandReverse(uint32_t source,
   return true;
 }
 
-#undef ADD_NEW_STATE2
+#undef ADD_NEW_STATE
 
+
+//----------------------------------------------------------------------------
+// expandTraceState()
 
 void BroadProductExplorer::
 expandTraceState(const uint32_t target,
@@ -524,7 +458,7 @@ expandTraceState(const uint32_t target,
   const BroadEventRecord** deferred = 0;
   uint32_t* sourceTuple = new uint32_t[getNumberOfAutomata()];
   try {
-#   define ADD_NEW_STATE2(source, event, callBack, INC) {       \
+#   define ADD_NEW_STATE(source, event, callBack, INC) {        \
       incNumberOfTransitionsExplored();                         \
       uint32_t found = getStateSpace().find();                  \
       if (found < prevLevelEnd) {                               \
@@ -539,7 +473,7 @@ expandTraceState(const uint32_t target,
       FIND_DISABLING_AUTOMATON(targetTuple, event, dis);
       if (dis == 0) {
         if (event->getFanout(targetTuple) <= prevLevelSize) {
-          EXPAND_ENABLED_TRANSITIONS2
+          EXPAND_ENABLED_TRANSITIONS
             (numwords, target, targetTuple, targetPacked, event, 0);
         } else {
           // If the event has too many transitions to this state,
@@ -552,8 +486,8 @@ expandTraceState(const uint32_t target,
         }
       }
     }
-#   undef ADD_NEW_STATE2
-#   define ADD_NEW_STATE2(source, event, callBack, INC) {               \
+#   undef ADD_NEW_STATE
+#   define ADD_NEW_STATE(source, event, callBack, INC) {                \
       incNumberOfTransitionsExplored();                                 \
       if (getStateSpace().equalTuples(bufferPacked, targetPacked)) {    \
         setTraceState(source);                                          \
@@ -568,12 +502,12 @@ expandTraceState(const uint32_t target,
         const AutomatonRecord* dis = 0;
         FIND_DISABLING_AUTOMATON(sourceTuple, event, dis);
         if (dis == 0) {
-          EXPAND_ENABLED_TRANSITIONS2
+          EXPAND_ENABLED_TRANSITIONS
             (numwords, source, sourceTuple, sourcePacked, event, 0);
         }
       }
     }
-#   undef ADD_NEW_STATE2
+#   undef ADD_NEW_STATE
     // We should never get here ...
     delete [] deferred;
     delete [] sourceTuple;
@@ -590,7 +524,10 @@ expandTraceState(const uint32_t target,
 }
 
 
-#define ADD_NEW_STATE2(source, event, callBack, INC)             \
+//----------------------------------------------------------------------------
+// findEvent()
+
+#define ADD_NEW_STATE(source, event, callBack, INC)              \
   incNumberOfTransitionsExplored();                              \
   if (getStateSpace().equalTuples(bufferPacked, targetPacked)) { \
     foundEvent = event;                                          \
@@ -612,8 +549,11 @@ findEvent(const uint32_t* sourcePacked,
   return foundEvent;
 }
 
-#   undef ADD_NEW_STATE2
+#undef ADD_NEW_STATE
 
+
+//----------------------------------------------------------------------------
+// storeNondeterministicTargets()
 
 void BroadProductExplorer::
 storeNondeterministicTargets(const uint32_t* sourcetuple,
