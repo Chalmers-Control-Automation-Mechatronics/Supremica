@@ -376,7 +376,7 @@ setup()
     new AutomatonEncoding(mModel, mKindTranslator,
                           mPreMarking, mMarking, mCache, numTags);
   // mEncoding->dump();
-  mNumAutomata = mEncoding->getNumberOfRecords();
+  mNumAutomata = mEncoding->getNumberOfAutomata();
   mNumStates = mNumCoreachableStates = mNumTransitions = 0;
   mTraceEvent = 0;
   mTraceAutomaton = 0;

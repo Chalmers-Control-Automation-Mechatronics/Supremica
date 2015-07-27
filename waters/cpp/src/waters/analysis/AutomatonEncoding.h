@@ -205,7 +205,7 @@ public:
   //# Simple Access
   inline int getEncodingSize() const {return mEncodingSize;}
   inline int getNumberOfTagBits() const {return mNumTags;}
-  inline int getNumberOfRecords() const {return mNumRecords;}
+  inline int getNumberOfAutomata() const {return mNumRecords;}
   inline AutomatonRecord* getRecord(int index) const
     {return mAutomatonRecords[index];}
   uint32_t getInverseTagMask() const;

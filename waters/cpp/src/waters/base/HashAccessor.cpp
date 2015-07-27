@@ -46,12 +46,16 @@ const uint64_t GOLD64 = 0x9e3779b97f4a7c13LL;
 uint64_t* FACTORS = 0;
 uint32_t NUM_FACTORS = 0;
 
-
-void initHashFactors(uint32_t size)
+void initHashFactors32(uint32_t size)
 {
-  uint32_t numFactors = (size / 2) + 1;
-  if (numFactors > NUM_FACTORS) {
-    NUM_FACTORS = numFactors;
+  initHashFactors64((size / 2) + 1);
+}
+
+void initHashFactors64(uint32_t size)
+{
+  if (size > NUM_FACTORS) {
+    delete [] FACTORS;
+    NUM_FACTORS = size;
     FACTORS = new uint64_t[NUM_FACTORS];
     uint64_t factor = GOLD64;
     for (uint32_t i = 0; i < NUM_FACTORS; i++) {
@@ -68,7 +72,7 @@ uint64_t hashInt(uint64_t key)
 }
 
 
-uint64_t hashIntArray(const uint32_t* array, uint32_t size, uint32_t mask0)
+uint64_t hashInt32Array(const uint32_t* array, uint32_t size, uint32_t mask0)
 {
   register int rest = size;
   register int factor = 0;
@@ -100,6 +104,30 @@ uint64_t hashIntArray(const uint32_t* array, uint32_t size, uint32_t mask0)
     break;
   default:
     break;
+  }
+  return result;
+}
+
+
+uint64_t hashInt64Array(const uint64_t* array, uint32_t size, uint64_t mask0)
+{
+  register int rest = size;
+  register int factor = 0;
+  register uint64_t a;
+  register uint64_t b;
+  register uint64_t result = 0;
+  // Handle most of the key ...
+  while (rest >= 2) {
+    a = (array[0] & mask0) + FACTORS[factor++];
+    b = array[1] + FACTORS[factor++];
+    result += a * b;
+    array += 2;
+    rest -= 2;
+    mask0 = ~0;
+  }
+  // Handle the last 0-1 words ...
+  if (rest) {
+    result += (array[0] & mask0) * FACTORS[factor];
   }
   return result;
 }

@@ -38,6 +38,7 @@
 
 #include "waters/analysis/BroadEventRecord.h"
 #include "waters/analysis/BroadProductExplorer.h"
+#include "waters/analysis/EventTree.h"
 #include "waters/analysis/TarjanStateSpace.h"
 #include "waters/analysis/TransitionRecord.h"
 #include "waters/analysis/TransitionUpdateRecord.h"

@@ -1,5 +1,20 @@
-launch test in Eclipse up to breakpoint
-ps -ef | grep java | grep waters | awk '{print $2}'
-gdb -p NNN
-cont
-resume test in Eclipse
+How to run the Debugger for C++ code called through JNI:
+
+  launch test in Eclipse up to breakpoint
+  ps -ef | grep java | grep waters | awk '{print $2}'
+  gdb -p NNN
+  cont
+  resume test in Eclipse
+
+How to print the name of a glue object representing a NamedProxy:
+
+  jni::NamedGlue& glue;
+  jni::ClassCache* cache;
+
+  JNIEnv* env = cache->getEnvironment();
+  jni::JavaString name(env, glue.getName());
+  std::cerr << (const char*) name << std::endl;    
+
+This also works (but does not release memory immediately):
+
+  std::cerr << (const char*) glue.getName() << std::endl;    

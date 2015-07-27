@@ -1,8 +1,0 @@
-How to print the name of a glue object representing a NamedProxy:
-
-  jni::NamedGlue& glue;
-  jni::ClassCache* cache;
-
-  JNIEnv* env = cache->getEnvironment();
-  jni::JavaString name(env, glue.getName());
-  std::cerr << (const char*) name << std::endl;    

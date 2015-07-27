@@ -61,6 +61,8 @@ public:
   inline uint32_t getNondeterministicSuccessorShifted
     (uint32_t source, uint32_t index) const
     {return mNondeterministicSuccessorsShifted[source][index];} // unsafe
+  inline bool isEnabled(uint32_t source) const
+    {return mDeterministicSuccessorsShifted[source] != NO_TRANSITION;}
   uint32_t getNumberOfSuccessors(uint32_t source) const; // slow
   uint32_t getSuccessorShifted(uint32_t source, uint32_t index) const; // slow
   inline bool isAlwaysDisabled() const {return mWeight == 0;}

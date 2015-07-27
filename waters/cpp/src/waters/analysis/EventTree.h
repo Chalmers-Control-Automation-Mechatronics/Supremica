@@ -1,0 +1,334 @@
+//# This may look like C code, but it really is -*- C++ -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: waters.analysis
+//# CLASS:   EventTree
+//###########################################################################
+//# $Id$
+//###########################################################################
+
+
+#ifndef _EventTree_h_
+#define _EventTree_h_
+
+#ifdef __GNUG__
+#pragma interface
+#endif
+
+#if _MSC_VER >= 1000
+#pragma once
+#endif
+
+#include <stdint.h>
+
+#include "waters/base/ArrayList.h"
+#include "waters/base/BitSet.h"
+#include "waters/base/HashTable.h"
+
+
+namespace waters {
+
+class BroadEventRecord;
+class TransitionRecord;
+class EventTreeGenerator;
+
+
+//###########################################################################
+//# Class EventTreeTaskHashAccessor
+//###########################################################################
+
+class EventTreeTaskHashAccessor : public PtrHashAccessor
+{
+private:
+  //##########################################################################
+  //# Constructors & Destructors
+  explicit EventTreeTaskHashAccessor() {};
+  friend class EventTreeTask;
+
+public:
+  //##########################################################################
+  //# Hash Methods
+  virtual uint64_t hash(intptr_t key) const;
+  virtual bool equals(intptr_t key1, intptr_t key2) const;
+};
+
+
+//############################################################################
+//# enumeration EventTreeTaskType
+//############################################################################
+
+enum EventTreeTaskType {
+  TASK_TYPE_END = 0,
+  TASK_TYPE_FAIL = 1,
+  TASK_TYPE_SPLIT = 2
+};
+
+
+//############################################################################
+//# class EventTreeTask
+//############################################################################
+
+class EventTreeTask
+{
+public:
+  //##########################################################################
+  //# Constructors & Destructors
+  explicit EventTreeTask();
+  virtual ~EventTreeTask() {};
+
+  //##########################################################################
+  //# Simple Access
+  inline uint32_t getTaskID() const {return mTaskID;}
+  inline void setTaskID(uint32_t id) {mTaskID = id;}
+  virtual EventTreeTaskType getTaskType() const = 0;
+
+  //##########################################################################
+  //# Comparing & Hashing
+  virtual bool equals(const EventTreeTask& task) const = 0;
+  virtual uint64_t hash() const = 0;
+  static const EventTreeTaskHashAccessor* getHashAccessor()
+    {return &theHashAccessor;}
+
+  //##########################################################################
+  //# Code Generation
+  virtual void execute(EventTreeGenerator& generator) = 0;
+
+private:
+  //##########################################################################
+  //# Data Members
+  uint32_t mTaskID;
+
+  //##########################################################################
+  //# Class Variables
+  static const EventTreeTaskHashAccessor theHashAccessor;
+};
+
+
+//############################################################################
+//# class EventTreeTaskSplit
+//############################################################################
+
+class EventTreeTaskSplit : public EventTreeTask
+{
+public:
+  //##########################################################################
+  //# Constructors & Destructors
+  explicit EventTreeTaskSplit(EventTreeTask* next,
+			      const EventTreeGenerator& generator);
+  explicit EventTreeTaskSplit(const ArrayList<uint32_t>& events,
+			      const ArrayList<uint32_t>& automata,
+			      uint32_t fanout,
+			      bool splittable,
+			      EventTreeTask* next,
+			      const EventTreeGenerator& generator);
+
+  //##########################################################################
+  //# Simple Access
+  virtual EventTreeTaskType getTaskType() const {return TASK_TYPE_SPLIT;}
+
+  //##########################################################################
+  //# Comparing & Hashing
+  virtual bool equals(const EventTreeTask& task) const;
+  virtual uint64_t hash() const;
+
+  //##########################################################################
+  //# Code Generation
+  virtual void execute(EventTreeGenerator& generator);
+  virtual void executeWithoutSplit(EventTreeGenerator& generator);
+  EventTreeTask* addTaskWithoutEvent(uint32_t event,
+				     EventTreeGenerator& generator) const;
+  EventTreeTask* addTaskWithEvents(const ArrayList<uint32_t>& events,
+				   EventTreeGenerator& generator) const;
+  uint32_t findFailedEvent(const EventTreeGenerator& generator) const;
+
+private:
+  //##########################################################################
+  //# Data Members
+  IntArrayList<uint32_t> mEventList;
+  IntArrayList<uint32_t> mAutomataList;
+  BitSet mAutomataSet;
+  uint32_t mFanout;
+  bool mSplittable;
+  EventTreeTask* mNextTask;
+
+  //##########################################################################
+  //# Class Variables
+  static const uint64_t theHashCode;
+};
+
+
+//############################################################################
+//# class EventTreeTaskFail
+//############################################################################
+
+class EventTreeTaskFail : public EventTreeTask
+{
+public:
+  //##########################################################################
+  //# Constructors & Destructors
+  explicit EventTreeTaskFail(uint32_t event);
+
+  //##########################################################################
+  //# Simple Access
+  virtual EventTreeTaskType getTaskType() const {return TASK_TYPE_FAIL;}
+
+  //##########################################################################
+  //# Comparing & Hashing
+  virtual bool equals(const EventTreeTask& task) const;
+  virtual uint64_t hash() const;
+
+  //##########################################################################
+  //# Code Generation
+  virtual void execute(EventTreeGenerator& generator);
+
+private:
+  //##########################################################################
+  //# Data Members
+  const uint32_t mEvent;
+
+  //##########################################################################
+  //# Class Variables
+  static const uint64_t theHashCode;
+};
+
+
+//############################################################################
+//# class EventTreeTaskEnd
+//############################################################################
+
+class EventTreeTaskEnd : public EventTreeTask
+{
+public:
+  //##########################################################################
+  //# Constructors & Destructors
+  explicit EventTreeTaskEnd() {};
+
+  //##########################################################################
+  //# Simple Access
+  virtual EventTreeTaskType getTaskType() const {return TASK_TYPE_END;}
+
+  //##########################################################################
+  //# Comparing & Hashing
+  virtual bool equals(const EventTreeTask& task) const
+    {return task.getTaskType() == TASK_TYPE_END;}
+  virtual uint64_t hash() const {return theHashCode;}
+
+  //##########################################################################
+  //# Code Generation
+  virtual void execute(EventTreeGenerator& generator) {}
+
+private:
+  //##########################################################################
+  //# Class Variables
+  static const uint64_t theHashCode;
+};
+
+
+//###########################################################################
+//# Class EventTreeGenerator
+//###########################################################################
+
+class EventTreeGenerator
+{
+public:
+  //##########################################################################
+  //# Constructors & Destructors
+  explicit EventTreeGenerator(const AutomatonEncoding& encoding,
+			      const ArrayList<const BroadEventRecord*>& events,
+			      bool safety);
+  virtual ~EventTreeGenerator();
+
+  //#########################################################################
+  //# Invocation
+  void execute();
+  void executeTask(EventTreeTask* task);
+
+  //#########################################################################
+  //# Task Management
+  EventTreeTask* peekNextTask() const;
+  EventTreeTask* addSplitTask(const ArrayList<uint32_t>& events,
+			      const ArrayList<uint32_t>& automata,
+			      uint32_t fanout,
+			      bool splittable,
+			      EventTreeTask* next);
+  EventTreeTask* addFailTask(uint32_t event);
+  EventTreeTask* addTask(EventTreeTask* task);
+
+  //#########################################################################
+  //# Event Access
+  inline uint32_t getNumberOfEvents() const {return mEvents.size();}
+  inline const BroadEventRecord* getEvent(uint32_t event) const
+    {return mEvents.get(event);}
+  bool isAlwaysEnabled(uint32_t event, const BitSet& automata) const;
+  bool isEnabled(uint32_t event, int aut, uint32_t state) const;
+
+  //#########################################################################
+  //# Automata Access
+  inline uint32_t getNumberOfAutomata() const
+    {return mAutomatonEncoding.getNumberOfAutomata();}
+  inline AutomatonRecord* getAutomaton(int a) const
+    {return mAutomatonEncoding.getRecord(a);}
+  void resetTopCounts();
+  void registerTopCounts
+    (uint32_t event, const BitSet& automata, uint32_t fanout);
+  uint32_t findTopAutomaton(const IntArrayList<uint32_t>& automata) const;
+  bool isTopAutomaton(int aut, uint32_t event,
+		      const BitSet& automata, uint32_t fanout) const;
+
+  //#########################################################################
+  //# Code Generation
+  void appendCase(int aut);
+  void appendIfDisabled(int aut, uint32_t event, uint32_t task);
+  void appendExecute(uint32_t event);
+  void appendFail(uint32_t event);
+  void appendGotoUnlessNext(const EventTreeTask* task);
+  void appendGoto(uint32_t task);
+  void appendRaw(uint32_t value);
+  void renumber();
+
+  //#########################################################################
+  //# Debugging
+#ifdef DEBUG
+  void dump() const;
+#endif /* DEBUG */
+
+private:
+  //#########################################################################
+  //# Data Members
+  const AutomatonEncoding& mAutomatonEncoding;
+  const ArrayList<const BroadEventRecord*>& mEvents;
+  bool mHasFailedEvents;
+  uint32_t mMaxFanout;
+
+  ArrayList<EventTreeTaskSplit*> mSplitTasks;
+  ArrayList<EventTreeTaskFail*> mFailTasks;
+  EventTreeTaskEnd* mEndTask;
+  PtrHashTable<EventTreeTask*,EventTreeTask*> mAllTasks;
+  ArrayList<uint32_t> mLineNumbers;
+
+  uint32_t* mTopCounts;
+
+  ArrayList<uint32_t> mCode;
+
+  //#########################################################################
+  //# Class Constants
+  static const uint32_t OPCODE_SHIFT_2 = 30;
+  static const uint32_t OPERAND_MASK_2 = (1 << OPCODE_SHIFT_2) - 1;
+  static const uint32_t OPCODE_MASK_2 = ~OPERAND_MASK_2;
+
+  static const uint32_t OPCODE_SHIFT_3 = 29;
+  static const uint32_t OPERAND_MASK_3 = (1 << OPCODE_SHIFT_3) - 1;
+  static const uint32_t OPCODE_MASK_3 = ~OPERAND_MASK_3;
+
+  static const uint32_t OPCODE_CASE_2 = 0x0 << OPCODE_SHIFT_2;  // 00*
+  static const uint32_t OPCODE_IFNN_2 = 0x1 << OPCODE_SHIFT_2;  // 01*
+  static const uint32_t OPCODE_EXEC_2 = 0x2 << OPCODE_SHIFT_2;  // 100
+  static const uint32_t OPCODE_EXEC_3 = OPCODE_EXEC_2;
+  static const uint32_t OPCODE_FAIL_2 = OPCODE_EXEC_2;          // 101
+  static const uint32_t OPCODE_FAIL_3 = OPCODE_FAIL_2 | (0x1 << OPCODE_SHIFT_3);
+  static const uint32_t OPCODE_GOTO_2 = 0x3 << OPCODE_SHIFT_2;  // 11*
+};
+
+}   /* namespace waters */
+
+#endif  /* !_EventTree_h_ */

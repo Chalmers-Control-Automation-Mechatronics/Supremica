@@ -51,13 +51,19 @@ inline hashindex_t bitmask(hashindex_t x)
 //# Some Hash Functions
 //############################################################################
 
-void initHashFactors(uint32_t size);
+void initHashFactors64(uint32_t size);
+
+void initHashFactors32(uint32_t size);
 
 uint64_t hashInt(uint64_t key);
 
-uint64_t hashIntArray(const uint32_t* array,
-		      uint32_t size,
-		      uint32_t mask0 = ~0);
+uint64_t hashInt32Array(const uint32_t* array,
+			uint32_t size,
+			uint32_t mask0 = ~0);
+
+uint64_t hashInt64Array(const uint64_t* array,
+			uint32_t size,
+			uint64_t mask0 = ~0);
 
 uint64_t hashString(const char* key);
 

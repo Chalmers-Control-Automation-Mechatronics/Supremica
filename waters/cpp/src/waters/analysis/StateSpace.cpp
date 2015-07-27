@@ -42,7 +42,7 @@ StateSpace(const AutomatonEncoding* encoding,
     mBlocks(INITBLOCKS),
     mLookupTable(this, BLOCKSIZE)
 {
-  initHashFactors(mSignificantTupleSize);
+  initHashFactors32(mSignificantTupleSize);
 }
 
 StateSpace::
@@ -123,7 +123,7 @@ hash(int32_t key)
   const
 {
   const uint32_t* tuple = get(key);
-  return hashIntArray(tuple, mSignificantTupleSize);
+  return hashInt32Array(tuple, mSignificantTupleSize);
 }
 
 bool StateSpace::
@@ -171,7 +171,7 @@ hash(int32_t key)
   const
 {
   const uint32_t* tuple = get(key);
-  return hashIntArray(tuple, getSignificantTupleSize(), mMask0);
+  return hashInt32Array(tuple, getSignificantTupleSize(), mMask0);
 }
 
 bool TaggedStateSpace::
