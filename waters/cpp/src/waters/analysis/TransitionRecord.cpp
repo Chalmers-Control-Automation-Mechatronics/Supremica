@@ -385,6 +385,45 @@ setupNondeterministicBuffers()
 }
 
 
+
+//############################################################################
+//# class FastEligibilityTestRecord
+//############################################################################
+
+//############################################################################
+//# FastEligibilityTestRecord : Simple Access
+
+void FastEligibilityTestRecord::
+setup(const TransitionRecord* trans, uint32_t event)
+{
+  const AutomatonRecord* aut = trans->getAutomaton();
+  mAutomatonIndex = aut->getAutomatonIndex();
+  mEventIndex = event;
+  mDeterministicSuccessorsShifted = trans->mDeterministicSuccessorsShifted;
+}
+
+
+//############################################################################
+//# FastEligibilityTestRecord : Comparing & Hashing
+
+bool FastEligibilityTestRecord::
+equals(const FastEligibilityTestRecord& record)
+  const
+{
+  return mAutomatonIndex == record.mAutomatonIndex &&
+         mEventIndex == record.mEventIndex;
+}
+
+uint64_t FastEligibilityTestRecord::
+hash()
+  const
+{
+  uint64_t key = (uint64_t) mAutomatonIndex | (uint64_t) mEventIndex << 32;
+  return hashInt(key);
+}
+
+
+
 //############################################################################
 //# class NondeterministicTransitionIterator
 //############################################################################

@@ -175,10 +175,10 @@ public abstract class AbstractGeneralisedConflictCheckerTest
     runModelVerifier(des, false);
   }
 
-  public void testTwoInit() throws Exception
+  public void testTwoInit3() throws Exception
   {
     final ProductDESProxy des =
-      getCompiledDES("tests", "nasty", "twoinit.wmod");
+      getCompiledDES("tests", "nasty", "twoinit3.wmod");
     runModelVerifier(des, true);
   }
 

@@ -24,13 +24,79 @@
 #include "waters/base/ArrayList.h"
 #include "waters/base/BitSet.h"
 #include "waters/base/HashTable.h"
+#include "waters/analysis/AutomatonEncoding.h"
+#include "waters/analysis/TransitionRecord.h"
 
 
 namespace waters {
 
 class BroadEventRecord;
-class TransitionRecord;
 class EventTreeGenerator;
+
+
+//###########################################################################
+//# Class EventTree
+//###########################################################################
+
+class EventTree
+{
+public:
+  //##########################################################################
+  //# Constructors & Destructors
+  explicit EventTree() {};
+  virtual ~EventTree() {};
+
+  //#########################################################################
+  //# Simple Access
+  inline bool isEmpty() const {return mCode.isEmpty();}
+  inline uint32_t getCodeSize() const {return mCode.size();}
+  inline uint32_t get(uint32_t index) const {return mCode.get(index);}
+  inline void set(uint32_t index, uint32_t code) {mCode.set(index, code);}
+
+  inline FastEligibilityTestRecord& getEligibilityRecord(uint32_t index)
+    {return mEligibilityRecords.getref(index);}
+  inline const FastEligibilityTestRecord&
+    getEligibilityRecord(uint32_t index) const
+    {return mEligibilityRecords.getref(index);}
+  inline uint32_t prepareEligibilityRecord()
+    {return mEligibilityRecords.prepare();}
+  inline void addEligibilityRecord(uint32_t t)
+    {if (mEligibilityRecords.size() == t) mEligibilityRecords.add();}
+
+  //#########################################################################
+  //# Code Generation
+  void appendCase(int aut);
+  void appendIfDisabled(uint32_t trans, uint32_t task);
+  void appendExecute(uint32_t event);
+  void appendFail(uint32_t event);
+  void appendGoto(uint32_t task);
+  void appendRaw(uint32_t value);
+
+private:
+  //#########################################################################
+  //# Data Members
+  ArrayList<uint32_t> mCode;
+  ArrayList<FastEligibilityTestRecord> mEligibilityRecords;
+
+public:
+  //#########################################################################
+  //# Class Constants
+  static const uint32_t OPCODE_SHIFT_2 = 30;
+  static const uint32_t OPERAND_MASK_2 = (1 << OPCODE_SHIFT_2) - 1;
+  static const uint32_t OPCODE_MASK_2 = ~OPERAND_MASK_2;
+
+  static const uint32_t OPCODE_SHIFT_3 = 29;
+  static const uint32_t OPERAND_MASK_3 = (1 << OPCODE_SHIFT_3) - 1;
+  static const uint32_t OPCODE_MASK_3 = ~OPERAND_MASK_3;
+
+  static const uint32_t OPCODE_CASE_2 = 0x0 << OPCODE_SHIFT_2;  // 00*
+  static const uint32_t OPCODE_IFNN_2 = 0x1 << OPCODE_SHIFT_2;  // 01*
+  static const uint32_t OPCODE_EXEC_2 = 0x2 << OPCODE_SHIFT_2;  // 100
+  static const uint32_t OPCODE_EXEC_3 = OPCODE_EXEC_2;
+  static const uint32_t OPCODE_FAIL_2 = OPCODE_EXEC_2;          // 101
+  static const uint32_t OPCODE_FAIL_3 = OPCODE_FAIL_2 | (0x1 << OPCODE_SHIFT_3);
+  static const uint32_t OPCODE_GOTO_2 = 0x3 << OPCODE_SHIFT_2;  // 11*
+};
 
 
 //###########################################################################
@@ -228,14 +294,15 @@ private:
 //# Class EventTreeGenerator
 //###########################################################################
 
-class EventTreeGenerator
+class EventTreeGenerator : public Int32HashAccessor
 {
 public:
   //##########################################################################
   //# Constructors & Destructors
   explicit EventTreeGenerator(const AutomatonEncoding& encoding,
-			      const ArrayList<const BroadEventRecord*>& events,
-			      bool safety);
+			      const ArrayList<BroadEventRecord*>& events,
+			      EventTree& output,
+			      bool safety = false);
   virtual ~EventTreeGenerator();
 
   //#########################################################################
@@ -253,6 +320,10 @@ public:
 			      EventTreeTask* next);
   EventTreeTask* addFailTask(uint32_t event);
   EventTreeTask* addTask(EventTreeTask* task);
+
+  //#########################################################################
+  //# Simple Access
+  inline bool isSafety() const {return mSafety;}
 
   //#########################################################################
   //# Event Access
@@ -278,13 +349,19 @@ public:
   //#########################################################################
   //# Code Generation
   void appendCase(int aut);
-  void appendIfDisabled(int aut, uint32_t event, uint32_t task);
+  void appendIfDisabled(const TransitionRecord* trans,
+			uint32_t event, uint32_t task);
   void appendExecute(uint32_t event);
   void appendFail(uint32_t event);
   void appendGotoUnlessNext(const EventTreeTask* task);
   void appendGoto(uint32_t task);
   void appendRaw(uint32_t value);
   void renumber();
+
+  //##########################################################################
+  //# Hash Methods
+  virtual uint64_t hash(int32_t key) const;
+  bool equals(int32_t key1, int32_t key2) const;
 
   //#########################################################################
   //# Debugging
@@ -296,7 +373,9 @@ private:
   //#########################################################################
   //# Data Members
   const AutomatonEncoding& mAutomatonEncoding;
-  const ArrayList<const BroadEventRecord*>& mEvents;
+  const ArrayList<BroadEventRecord*>& mEvents;
+  EventTree& mOutput;
+  bool mSafety;
   bool mHasFailedEvents;
   uint32_t mMaxFanout;
 
@@ -304,29 +383,10 @@ private:
   ArrayList<EventTreeTaskFail*> mFailTasks;
   EventTreeTaskEnd* mEndTask;
   PtrHashTable<EventTreeTask*,EventTreeTask*> mAllTasks;
+  Int32HashTable<uint32_t,uint32_t> mEligibilityRecordTable;
   ArrayList<uint32_t> mLineNumbers;
 
   uint32_t* mTopCounts;
-
-  ArrayList<uint32_t> mCode;
-
-  //#########################################################################
-  //# Class Constants
-  static const uint32_t OPCODE_SHIFT_2 = 30;
-  static const uint32_t OPERAND_MASK_2 = (1 << OPCODE_SHIFT_2) - 1;
-  static const uint32_t OPCODE_MASK_2 = ~OPERAND_MASK_2;
-
-  static const uint32_t OPCODE_SHIFT_3 = 29;
-  static const uint32_t OPERAND_MASK_3 = (1 << OPCODE_SHIFT_3) - 1;
-  static const uint32_t OPCODE_MASK_3 = ~OPERAND_MASK_3;
-
-  static const uint32_t OPCODE_CASE_2 = 0x0 << OPCODE_SHIFT_2;  // 00*
-  static const uint32_t OPCODE_IFNN_2 = 0x1 << OPCODE_SHIFT_2;  // 01*
-  static const uint32_t OPCODE_EXEC_2 = 0x2 << OPCODE_SHIFT_2;  // 100
-  static const uint32_t OPCODE_EXEC_3 = OPCODE_EXEC_2;
-  static const uint32_t OPCODE_FAIL_2 = OPCODE_EXEC_2;          // 101
-  static const uint32_t OPCODE_FAIL_3 = OPCODE_FAIL_2 | (0x1 << OPCODE_SHIFT_3);
-  static const uint32_t OPCODE_GOTO_2 = 0x3 << OPCODE_SHIFT_2;  // 11*
 };
 
 }   /* namespace waters */

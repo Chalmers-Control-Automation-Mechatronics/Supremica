@@ -31,7 +31,6 @@
 #include "jni/glue/ConflictCheckModeGlue.h"
 #include "jni/glue/ConflictKindGlue.h"
 #include "jni/glue/ConflictTraceGlue.h"
-#include "jni/glue/EventGlue.h"
 #include "jni/glue/ExceptionGlue.h"
 #include "jni/glue/Glue.h"
 #include "jni/glue/HashMapGlue.h"
@@ -42,12 +41,10 @@
 #include "jni/glue/OverflowExceptionGlue.h"
 #include "jni/glue/SafetyTraceGlue.h"
 #include "jni/glue/SetGlue.h"
-#include "jni/glue/StateGlue.h"
 #include "jni/glue/TraceStepGlue.h"
 
-#include "waters/analysis/BroadProductExplorer.h"
 #include "waters/analysis/EventRecord.h"
-#include "waters/analysis/ProductExplorer.h"
+#include "waters/analysis/EventTreeProductExplorer.h"
 #include "waters/analysis/TransitionRecord.h"
 #include "waters/javah/Invocations.h"
 
@@ -265,7 +262,7 @@ runNonblockingCheck()
         } else {
           const uint32_t level = getDepth(mTraceState);
           computeBFSCounterExample(*mTraceList, level);
-        } 
+        }
       }
     }
     teardown();
@@ -492,7 +489,7 @@ doAbort()
 bool ProductExplorer::
 doSafetySearch()
 {
-# define EXPAND expandSafetyState
+# define EXPAND expandForwardSafety
   DO_REACHABILITY(0);
 # undef EXPAND
 }
@@ -526,33 +523,33 @@ expandNonblockingReachabilityState
   (uint32_t source, const uint32_t* sourceTuple,
    const uint32_t* sourcePacked, TransitionCallBack callBack)
 {
-  setConflictKind(jni::ConflictKind_DEADLOCK);                        
-  if (isLocalDumpState(sourceTuple)) {                                
-    return false;                                                     
-  }                                                                   
-  expandForward(source, sourceTuple, sourcePacked, callBack);         
-  if (getConflictKind() != jni::ConflictKind_DEADLOCK) {              
-    return true;                                                      
-  } else if (getAutomatonEncoding().isMarkedStateTuple(sourceTuple) || 
-             !getAutomatonEncoding().isPreMarkedStateTuple(sourceTuple)) { 
-    setConflictKind(jni::ConflictKind_CONFLICT);                      
-    return true;                                                      
-  } else {                                                            
-    return false;                                                     
-  }                                                                   
+  setConflictKind(jni::ConflictKind_DEADLOCK);
+  if (isLocalDumpState(sourceTuple)) {
+    return false;
+  }
+  expandForward(source, sourceTuple, sourcePacked, callBack);
+  if (getConflictKind() != jni::ConflictKind_DEADLOCK) {
+    return true;
+  } else if (getAutomatonEncoding().isMarkedStateTuple(sourceTuple) ||
+             !getAutomatonEncoding().isPreMarkedStateTuple(sourceTuple)) {
+    setConflictKind(jni::ConflictKind_CONFLICT);
+    return true;
+  } else {
+    return false;
+  }
 }
 
 bool ProductExplorer::rememberNonDeadlockTransition
   (uint32_t source, const waters::EventRecord* event, uint32_t target)
 {
-  setConflictKind(jni::ConflictKind_CONFLICT);                  
+  setConflictKind(jni::ConflictKind_CONFLICT);
   return true;
 }
 
 bool ProductExplorer::addCoreachabilityTransition
   (uint32_t source, const waters::EventRecord* event, uint32_t target)
 {
-  setConflictKind(jni::ConflictKind_CONFLICT);                  
+  setConflictKind(jni::ConflictKind_CONFLICT);
   mReverseTransitionStore->addTransition(source, target);
   return true;
 }
@@ -571,7 +568,7 @@ doNonblockingCoreachabilitySearch()
   mNumCoreachableStates = mPreMarking.isNull() ? 0 : UINT32_MAX;
   uint32_t* currentTuple = 0;
   bool overflow = false;
-  if (mConflictCheckMode == 
+  if (mConflictCheckMode ==
       jni::ConflictCheckMode_COMPUTED_BACKWARDS_TRANSITIONS) {
     currentTuple = new uint32_t[mNumAutomata];
     setupReverseTransitionRelations();
@@ -699,19 +696,21 @@ processCoreachabilityTransition(uint32_t target,
                                 const EventRecord* event,
                                 uint32_t source)
 {
-  checkAbort();                                                       
-  uint32_t* sourcePacked = mStateSpace->get(source);                  
-  if (!mEncoding->hasTag(sourcePacked, TAG_COREACHABLE)) {            
-    mEncoding->setTag(sourcePacked, TAG_COREACHABLE);                 
-    if (mNumCoreachableStates != UINT32_MAX &&                        
-        ++mNumCoreachableStates == mNumStates) {                      
-      throw SearchAbort();                                            
-    } else if (mDFSStackPos < mDFSStackSize) {                        
-      mDFSStack[mDFSStackPos++] = source;                             
-    } else {                                                          
-      throw DFSStackOverflow();                                       
-    }                                                                 
-  }                                                                   
+  checkAbort();
+  if (source != UINT32_MAX) {
+    uint32_t* sourcePacked = mStateSpace->get(source);
+    if (!mEncoding->hasTag(sourcePacked, TAG_COREACHABLE)) {
+      mEncoding->setTag(sourcePacked, TAG_COREACHABLE);
+      if (mNumCoreachableStates != UINT32_MAX &&
+          ++mNumCoreachableStates == mNumStates) {
+        throw SearchAbort();
+      } else if (mDFSStackPos < mDFSStackSize) {
+        mDFSStack[mDFSStackPos++] = source;
+      } else {
+        throw DFSStackOverflow();
+      }
+    }
+  }
   return true;
 }
 
@@ -784,7 +783,7 @@ doNonblockingTarjanSearch(uint32_t root)
 
 bool ProductExplorer::
 processTarjanTransition(uint32_t source,
-                        const EventRecord* event, 
+                        const EventRecord* event,
                         uint32_t target)
 {
   // std::cerr << "  " << source << "->" << target << std::endl;
@@ -848,7 +847,8 @@ computeBFSCounterExample(const jni::ListGlue& list, uint32_t level)
       uint32_t* sourcepacked = mStateSpace->get(mTraceState);
       mEncoding->decode(sourcepacked, sourcetuple);
       if (mReverseTransitionStore != 0) {
-        mTraceEvent = findEvent(sourcepacked, sourcetuple, targetpacked);
+        mTraceEvent =
+          findEvent(mTraceState, sourcepacked, sourcetuple, targetpacked);
       }
       storeNondeterministicTargets(sourcetuple, targettuple, statemap);
       const jni::EventGlue& event = mTraceEvent->getJavaEvent();
@@ -896,7 +896,7 @@ computeTarjanCounterExample(const jni::ListGlue& list)
         break;
       } else {
         list1->add(s);
-      }      
+      }
     }
     list2 = new BlockedArrayList<uint32_t>();
     buffers = new uint32_t[2 * mNumAutomata];
@@ -906,7 +906,8 @@ computeTarjanCounterExample(const jni::ListGlue& list)
         uint32_t source = list1->get(i);
         uint32_t* sourcePacked = mStateSpace->get(source);
         mEncoding->decode(sourcePacked, sourceTuple);
-        if (!expandTarjanTraceState(source, sourceTuple, sourcePacked, list2)) {
+        expandTarjanTraceState(source, sourceTuple, sourcePacked, list2);
+        if (mTraceState != UINT32_MAX) {
           break;
         }
       }
@@ -924,7 +925,8 @@ computeTarjanCounterExample(const jni::ListGlue& list)
       uint32_t* sourcePacked = mStateSpace->get(source);
       mEncoding->decode(sourcePacked, sourceTuple);
       if (mTraceEvent == 0) {
-        mTraceEvent = findEvent(sourcePacked, sourceTuple, targetPacked);
+        mTraceEvent =
+          findEvent(source, sourcePacked, sourceTuple, targetPacked);
       }
       storeNondeterministicTargets(sourceTuple, targetTuple, stateMap);
       const jni::EventGlue& event = mTraceEvent->getJavaEvent();
@@ -943,6 +945,10 @@ computeTarjanCounterExample(const jni::ListGlue& list)
     jni::TraceStepGlue step =
       mFactory.createTraceStepProxyGlue(0, &stateMap, mCache);
     list.add(0, &step);
+    mTarjanTraceSuccessors = 0;
+    delete list1;
+    delete list2;
+    delete [] buffers;
   } catch (...) {
     mTarjanTraceSuccessors = 0;
     delete list1;
@@ -952,7 +958,7 @@ computeTarjanCounterExample(const jni::ListGlue& list)
   }
 }
 
-bool ProductExplorer::
+void ProductExplorer::
 expandTarjanTraceState(uint32_t source,
                        const uint32_t* sourceTuple,
                        const uint32_t* sourcePacked,
@@ -970,11 +976,10 @@ expandTarjanTraceState(uint32_t source,
     setTraceEvent(0);
     setConflictKind(jni::ConflictKind_DEADLOCK);
   }
-  return mGotTarjanTraceSuccessor;
 }
 
 bool ProductExplorer::
-processTarjanTraceTransition(uint32_t source, 
+processTarjanTraceTransition(uint32_t source,
                              const EventRecord* event,
                              uint32_t target)
 {
@@ -1123,7 +1128,7 @@ public:
     jni::ProductDESProxyFactoryGlue factory =
       mNativeModelVerifier.getFactoryGlue(&cache);
     jni::ProductDESGlue des = mNativeModelVerifier.getModelGlue(&cache);
-    mProductExplorer = new BroadProductExplorer
+    mProductExplorer = new EventTreeProductExplorer
       (factory, des, translator, premarking, marking, &cache);
     const int limit = mNativeModelVerifier.getNodeLimit();
     if (limit >= 0) {

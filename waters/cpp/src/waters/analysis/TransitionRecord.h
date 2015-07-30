@@ -135,6 +135,42 @@ private:
   static const TransitionRecordAccessorForSearch
     theUncontrollableSearchAccessor;
   static const TransitionRecordAccessorForTrace theTraceAccessor;
+
+  //##########################################################################
+  //# Friends
+  friend class FastEligibilityTestRecord;
+};
+
+
+//############################################################################
+//# class FastEligibilityTestRecord
+//############################################################################
+
+class FastEligibilityTestRecord
+{
+public:
+  //##########################################################################
+  //# Simple Access
+  void setup(const TransitionRecord* trans, uint32_t event);
+  inline int getAutomatonIndex() const {return mAutomatonIndex;}
+  inline uint32_t getEventIndex() const {return mEventIndex;}
+  inline bool isEnabled(uint32_t source) const
+  {
+    return mDeterministicSuccessorsShifted[source] != 
+	   TransitionRecord::NO_TRANSITION;
+  }
+
+  //##########################################################################
+  //# Comparing & Hashing
+  bool equals(const FastEligibilityTestRecord& record) const;
+  uint64_t hash() const;
+
+private:
+  //##########################################################################
+  //# Data Members
+  int mAutomatonIndex;
+  uint32_t mEventIndex;
+  uint32_t* mDeterministicSuccessorsShifted;
 };
 
 

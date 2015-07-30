@@ -19,27 +19,63 @@
 #pragma once
 #endif
 
-#include "jni/glue/KindTranslatorGlue.h"
-#include "jni/glue/ProductDESGlue.h"
+#include "waters/base/ArrayList.h"
 #include "waters/base/HashTable.h"
-#include <stdint.h>
 #include "waters/analysis/ProductExplorer.h"
 
 
 namespace jni {
   class AutomatonGlue;
-  class ClassCache;
-  class EventGlue;
-  class ListGlue;
-  class ProductDESGlue;
-  class VerificationResultGlue;
 }
 
 
 namespace waters {
 
 class BroadEventRecord;
+class BroadProductExplorer;
 class NondeterministicTransitionIterator;
+
+
+//############################################################################
+//# class BroadExpandHandler
+//############################################################################
+
+class BroadExpandHandler
+{
+public:
+  //##########################################################################
+  //# Constructors & Destructors
+  explicit BroadExpandHandler(BroadProductExplorer& explorer,
+			      TransitionCallBack callBack = 0);
+  virtual ~BroadExpandHandler() {}
+
+  //##########################################################################
+  //# Callbacks
+  virtual bool handleEvent(uint32_t source,
+			   const uint32_t* sourceTuple,
+			   const uint32_t* sourcePacked,
+			   const BroadEventRecord* event);
+  virtual bool handleState(uint32_t source,
+			   const uint32_t* sourceTuple,
+			   const uint32_t* sourcePacked,
+			   const BroadEventRecord* event);
+  inline bool handleTransition(uint32_t source,
+			       const BroadEventRecord* event,
+			       uint32_t target);
+
+protected:
+  //##########################################################################
+  //# Simple Access
+  BroadProductExplorer& getExplorer() const {return mExplorer;}
+
+private:
+  //##########################################################################
+  //# Data Members
+  BroadProductExplorer& mExplorer;
+  TransitionCallBack mTransitionCallBack;
+  int mNumberOfWords;
+  uint32_t* mNonDetBufferPacked;
+};
 
 
 //############################################################################
@@ -66,6 +102,13 @@ public:
 
 protected:
   //##########################################################################
+  //# Simple Access
+  inline ArrayList<BroadEventRecord*>& getForwardEventRecords()
+    {return mEventRecords;}
+  inline ArrayList<BroadEventRecord*>& getBackwardEventRecords()
+    {return mReversedEventRecords;}
+
+  //##########################################################################
   //# Shared Auxiliary Methods
   virtual void setup();
   virtual void teardown();
@@ -74,24 +117,32 @@ protected:
   //# State Expansion Procedures
   virtual bool isLocalDumpState(const uint32_t* tuple) const;
   virtual void setupReverseTransitionRelations();
-  virtual bool expandSafetyState
+  virtual bool expandForward
+    (uint32_t source, const uint32_t* sourceTuple,
+     const uint32_t* sourcePacked, BroadExpandHandler& handler);
+  virtual bool expandForward
     (uint32_t source, const uint32_t* sourceTuple,
      const uint32_t* sourcePacked, TransitionCallBack callBack = 0);
-  virtual bool expandForward
+  virtual bool expandForwardSafety
     (uint32_t source, const uint32_t* sourceTuple,
      const uint32_t* sourcePacked, TransitionCallBack callBack = 0);
   virtual bool expandForwardAgain
     (uint32_t source, const uint32_t* sourceTuple,
      const uint32_t* sourcePacked, TransitionCallBack callBack = 0);
   virtual bool expandReverse
+    (uint32_t source, const uint32_t* sourceTuple,
+     const uint32_t* sourcePacked, BroadExpandHandler& handler);
+  virtual bool expandReverse
     (uint32_t target, const uint32_t* targetTuple,
      const uint32_t* targetPacked, TransitionCallBack callBack = 0);
   virtual void expandTraceState
     (uint32_t target, const uint32_t* targetTuple,
      const uint32_t* targetPacked, uint32_t level);
+  virtual const AutomatonRecord* findDisablingAutomaton
+    (const uint32_t* sourceTuple, const BroadEventRecord* event) const;
   virtual const EventRecord* findEvent
-    (const uint32_t* sourceTuple, const uint32_t* sourcePacked,
-     const uint32_t* targetPacked);
+    (uint32_t source, const uint32_t* sourceTuple,
+     const uint32_t* sourcePacked, const uint32_t* targetPacked);
   virtual void storeNondeterministicTargets
     (const uint32_t* sourceTuple, const uint32_t* targetTuple,
      const jni::MapGlue& map);
@@ -113,15 +164,18 @@ private:
   //##########################################################################
   //# Data Members
   int mNumEventRecords;
-  BroadEventRecord** mEventRecords;
-  int mNumReversedEventRecords;
-  BroadEventRecord** mReversedEventRecords;
+  ArrayList<BroadEventRecord*> mEventRecords;
+  ArrayList<BroadEventRecord*> mReversedEventRecords;
   int mMaxNondeterministicUpdates;
   NondeterministicTransitionIterator* mNondeterministicTransitionIterators;
   // List of pairs (automaton number, state number), terminated by UINT32_MAX;
   // or NULL.
   uint32_t* mDumpStates;
   uint32_t mTraceLimit;
+
+  //##########################################################################
+  //# Friends
+  friend class BroadExpandHandler;
 };
 
 }   /* namespace waters */

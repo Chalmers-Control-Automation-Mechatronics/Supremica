@@ -21,14 +21,18 @@
 
 #include <ctime>
 
+#include <stdint.h>
 #include <jni.h>
 
 #include "jni/glue/ConflictCheckModeGlue.h"
 #include "jni/glue/ConflictKindGlue.h"
+#include "jni/glue/EventGlue.h"
 #include "jni/glue/KindTranslatorGlue.h"
+#include "jni/glue/ProductDESGlue.h"
 #include "jni/glue/ProductDESProxyFactoryGlue.h"
+#include "jni/glue/StateGlue.h"
+
 #include "waters/base/ArrayList.h"
-#include <stdint.h>
 #include "waters/analysis/AutomatonEncoding.h"
 #include "waters/analysis/CheckType.h"
 #include "waters/analysis/ReverseTransitionStore.h"
@@ -41,7 +45,6 @@ namespace jni {
   class ListGlue;
   class NativeConflictCheckerGlue;
   class NativeSafetyVerifierGlue;
-  class ProductDESGlue;
   class SafetyTraceGlue;
   class NativeVerificationResultGlue;
 }
@@ -134,6 +137,13 @@ public:
   //##########################################################################
   //# Simple Access
   inline CheckType getCheckType() const {return mCheckType;}
+  inline StateSpace& getStateSpace() {return *mStateSpace;}
+  inline int getNumberOfAutomata() const {return mNumAutomata;}
+  inline uint32_t getNumberOfStates() const {return mNumStates;}
+  inline uint32_t incNumberOfStates() {return mNumStates++;}
+  inline uint32_t incNumberOfTransitions() {return mNumTransitions++;}
+  inline uint32_t incNumberOfTransitionsExplored()
+    {return mNumTransitionsExplored++;}
   inline const EventRecord* getTraceEvent() const {return mTraceEvent;}
   void setTraceEvent(const EventRecord* event) {mTraceEvent = event;}
   void setTraceEvent(const EventRecord* event, const AutomatonRecord* aut)
@@ -184,7 +194,7 @@ protected:
     (const jni::ListGlue& list, uint32_t level);
 
   virtual void computeTarjanCounterExample(const jni::ListGlue& list);
-  bool expandTarjanTraceState
+  void expandTarjanTraceState
     (uint32_t source, const uint32_t* sourceTuple,
      const uint32_t* sourcePacked, BlockedArrayList<uint32_t>* successors);
   bool processTarjanTraceTransition
@@ -199,7 +209,7 @@ protected:
   virtual void storeInitialStates(bool initzero, bool donondet = true);
   virtual bool isLocalDumpState(const uint32_t* tuple) const;
   virtual void setupReverseTransitionRelations() = 0;
-  virtual bool expandSafetyState
+  virtual bool expandForwardSafety
     (uint32_t source, const uint32_t* sourceTuple,
      const uint32_t* sourcePacked, TransitionCallBack callBack = 0) = 0;
   virtual bool expandForward
@@ -215,8 +225,8 @@ protected:
     (uint32_t target, const uint32_t* targetTuple,
      const uint32_t* targetpacked, uint32_t level) = 0;
   virtual const EventRecord* findEvent
-    (const uint32_t* sourcetuple, const uint32_t* sourcepacked,
-     const uint32_t* targetpacked) = 0;
+    (uint32_t source, const uint32_t* sourcetuple,
+     const uint32_t* sourcepacked, const uint32_t* targetpacked) = 0;
   virtual void storeNondeterministicTargets
     (const uint32_t* sourcetuple, const uint32_t* targettuple,
      const jni::MapGlue& map) = 0;
@@ -228,15 +238,8 @@ protected:
   inline jni::KindTranslatorGlue& getKindTranslator() {return mKindTranslator;}
   inline jni::EventGlue& getMarking() {return mMarking;}
   inline AutomatonEncoding& getAutomatonEncoding() {return *mEncoding;}
-  inline StateSpace& getStateSpace() {return *mStateSpace;}
   inline bool isTrivial() const {return mIsTrivial;}
   inline void setTrivial() {mIsTrivial = true;}
-  inline int getNumberOfAutomata() const {return mNumAutomata;}
-  inline uint32_t getNumberOfStates() const {return mNumStates;}
-  inline uint32_t incNumberOfStates() {return mNumStates++;}
-  inline uint32_t incNumberOfTransitions() {return mNumTransitions++;}
-  inline uint32_t incNumberOfTransitionsExplored()
-    {return mNumTransitionsExplored++;}
   inline void setTraceState(uint32_t state) {mTraceState = state;}
   inline jni::ConflictKind getConflictKind() const {return mConflictKind;}
   inline void setConflictKind(jni::ConflictKind kind) {mConflictKind = kind;}

@@ -23,13 +23,53 @@
 
 #include "jni/cache/JavaString.h"
 
-#include "waters/analysis/AutomatonEncoding.h"
 #include "waters/analysis/BroadEventRecord.h"
 #include "waters/analysis/EventTree.h"
-#include "waters/analysis/TransitionRecord.h"
 
 
 namespace waters {
+
+
+//############################################################################
+//# EventTree: Code Generation
+
+void EventTree::
+appendCase(int aut)
+{
+  appendRaw(OPCODE_CASE_2 | aut);
+}
+
+void EventTree::
+appendExecute(uint32_t event)
+{
+  appendRaw(OPCODE_EXEC_3 | event);
+}
+  
+void EventTree::
+appendIfDisabled(uint32_t trans, uint32_t task)
+{
+  appendRaw(OPCODE_IFNN_2 | trans);
+  appendRaw(task);
+}
+
+void EventTree::
+appendFail(uint32_t event)
+{
+  appendRaw(OPCODE_FAIL_3 | event);
+}
+
+void EventTree::
+appendGoto(uint32_t task)
+{
+  appendRaw(OPCODE_GOTO_2 | task);
+}
+
+void EventTree::
+appendRaw(uint32_t value)
+{
+  mCode.add(value);
+}
+
 
 
 //############################################################################
@@ -119,12 +159,12 @@ EventTreeTaskSplit(const ArrayList<uint32_t>& events,
                    const EventTreeGenerator& generator)
   : mEventList(events.size()),
     mAutomataList(automata.size()),
-    mAutomataSet(automata.size()),
+    mAutomataSet(generator.getNumberOfAutomata()),
     mFanout(fanout),
     mSplittable(splittable),
     mNextTask(next)
 {
-  BitSet disablingAutomata(automata.size());
+  BitSet disablingAutomata(generator.getNumberOfAutomata());
   for (uint32_t i = 0; i < events.size(); i++) {
     uint32_t e = events.get(i);
     mEventList.add(e);
@@ -211,9 +251,9 @@ execute(EventTreeGenerator& generator)
     executeWithoutSplit(generator);
     return;
   }
-  uint32_t numEventsMinus1 = mEventList.size() - 1;
-  ArrayList<uint32_t> topEvents(numEventsMinus1);
-  ArrayList<uint32_t> otherEvents(numEventsMinus1);
+  uint32_t numEvents = mEventList.size();
+  ArrayList<uint32_t> topEvents(numEvents);
+  ArrayList<uint32_t> otherEvents(numEvents - 1);
   for (uint32_t i = 0; i < mEventList.size(); i++) {
     uint32_t e = mEventList.get(i);
     if (generator.isTopAutomaton(top, e, mAutomataSet, mFanout)) {
@@ -238,7 +278,7 @@ execute(EventTreeGenerator& generator)
   }
   ArrayList<uint32_t> remainingEvents(topEvents.size());
   const AutomatonRecord* topAut = generator.getAutomaton(top);
-  const bool spec = !topAut->isPlant();
+  const bool spec = generator.isSafety() && !topAut->isPlant();
   const uint32_t numStates = topAut->getNumberOfStates();
   const uint32_t remainingFanout = mFanout * numStates;
   uint32_t* branches = new uint32_t[numStates];
@@ -279,7 +319,7 @@ executeWithoutSplit(EventTreeGenerator& generator)
   const uint32_t e = mEventList.get(0);
   const EventTreeTask* taskAfter = addTaskWithoutEvent(e, generator);
   const BroadEventRecord* event = generator.getEvent(e);
-  const bool controllable = event->isControllable();
+  const bool controllable = !generator.isSafety() || event->isControllable();
   for (const TransitionRecord* trans = event->getTransitionRecord();
        trans != 0;
        trans = trans->getNextInSearch()) {
@@ -289,7 +329,7 @@ executeWithoutSplit(EventTreeGenerator& generator)
       const EventTreeTask* task =
         controllable || aut->isPlant() ? taskAfter : generator.addFailTask(e);
       uint32_t taskID = task->getTaskID();
-      generator.appendIfDisabled(a, e, taskID);
+      generator.appendIfDisabled(trans, e, taskID);
     }
   }
   generator.appendExecute(e);
@@ -329,7 +369,7 @@ uint32_t EventTreeTaskSplit::
 findFailedEvent(const EventTreeGenerator& generator)
   const
 {
-  if (mSplittable) {
+  if (mSplittable && generator.isSafety()) {
     for (uint32_t i = 0; i < mEventList.size(); i++) {
       const uint32_t e = mEventList.get(i);
       const BroadEventRecord* event = generator.getEvent(e);
@@ -430,14 +470,18 @@ const uint64_t EventTreeTaskEnd::theHashCode = hashInt(TASK_TYPE_END);
 
 EventTreeGenerator::
 EventTreeGenerator(const AutomatonEncoding& encoding,
-                   const ArrayList<const BroadEventRecord*>& events,
+                   const ArrayList<BroadEventRecord*>& events,
+                   EventTree& output,
                    bool safety)
   : mAutomatonEncoding(encoding),
     mEvents(events),
+    mOutput(output),
+    mSafety(safety),
     mHasFailedEvents(safety),
     mMaxFanout(events.size()),
     mEndTask(0),
     mAllTasks(EventTreeTask::getHashAccessor()),
+    mEligibilityRecordTable(this),
     mTopCounts(0)
 {
   for (int a = 0; a < encoding.getNumberOfAutomata(); a++) {
@@ -467,27 +511,29 @@ EventTreeGenerator::
 void EventTreeGenerator::
 execute()
 {
-  EventTreeTaskEnd* endTask = new EventTreeTaskEnd();
-  addTask(endTask);
-  EventTreeTaskSplit* mainTask = new EventTreeTaskSplit(endTask, *this);
-  addTask(mainTask);
-  while (!mSplitTasks.isEmpty()) {
-    EventTreeTaskSplit* task = mSplitTasks.removeLast();
-    executeTask(task);
+  if (getNumberOfEvents() > 0) {
+    EventTreeTaskEnd* endTask = new EventTreeTaskEnd();
+    addTask(endTask);
+    EventTreeTaskSplit* mainTask = new EventTreeTaskSplit(endTask, *this);
+    addTask(mainTask);
+    while (!mSplitTasks.isEmpty()) {
+      EventTreeTaskSplit* task = mSplitTasks.removeLast();
+      executeTask(task);
+    }
+    for (uint32_t i = 0; i < mFailTasks.size(); i++) {
+      EventTreeTaskFail* task = mFailTasks.get(i);
+      executeTask(task);
+    }
+    executeTask(mEndTask);
+    renumber();
   }
-  for (uint32_t i = 0; i < mFailTasks.size(); i++) {
-    EventTreeTaskFail* task = mFailTasks.get(i);
-    executeTask(task);
-  }
-  executeTask(mEndTask);
-  renumber();
 }
 
 void EventTreeGenerator::
 executeTask(EventTreeTask* task)
 {
   uint32_t id = task->getTaskID();
-  uint32_t lineNumber = mCode.size();
+  uint32_t lineNumber = mOutput.getCodeSize();
   mLineNumbers.set(id, lineNumber);
   task->execute(*this);
 }
@@ -621,7 +667,7 @@ resetTopCounts()
 #define PROCESS_TOP_COUNTS(e, automata, fanout)                         \
   {                                                                     \
     const BroadEventRecord* event = getEvent(e);                        \
-    const bool controllable = event->isControllable();                  \
+    const bool controllable = !mSafety || event->isControllable();      \
     const TransitionRecord* trans = event->getTransitionRecord();       \
     const AutomatonRecord* aut = 0;                                     \
     bool hasPlant = false;                                              \
@@ -629,11 +675,13 @@ resetTopCounts()
       aut = trans->getAutomaton();                                      \
       const int a = aut->getAutomatonIndex();                           \
       if (automata.get(a)) {                                            \
-        if (aut->isPlant()) {                                           \
-          hasPlant = true;                                              \
-        } else if (hasPlant && !controllable) {                         \
-          trans = 0;                                                    \
-          break;                                                        \
+        if (!controllable) {                                            \
+          if (aut->isPlant()) {                                         \
+            hasPlant = true;                                            \
+          } else if (hasPlant) {                                        \
+            trans = 0;                                                  \
+            break;                                                      \
+          }                                                             \
         }                                                               \
         if ((uint64_t) fanout * aut->getNumberOfStates() <= mMaxFanout) { \
           break;                                                        \
@@ -705,27 +753,30 @@ isTopAutomaton(int aTop, uint32_t e, const BitSet& automata, uint32_t fanout)
 void EventTreeGenerator::
 appendCase(int aut)
 {
-  appendRaw(OPCODE_CASE_2 | aut);
+  mOutput.appendCase(aut);
 }
 
 void EventTreeGenerator::
-appendIfDisabled(int aut, uint32_t event, uint32_t task)
+appendIfDisabled(const TransitionRecord* trans, uint32_t e, uint32_t task)
 {
-  appendRaw(OPCODE_IFNN_2 | aut);
-  appendRaw(event);
-  appendRaw(task);
+  uint32_t t = mOutput.prepareEligibilityRecord();
+  FastEligibilityTestRecord& record = mOutput.getEligibilityRecord(t);
+  record.setup(trans, e);
+  t = mEligibilityRecordTable.add(t);
+  mOutput.addEligibilityRecord(t);
+  mOutput.appendIfDisabled(t, task);
 }
 
 void EventTreeGenerator::
 appendExecute(uint32_t event)
 {
-  appendRaw(OPCODE_EXEC_3 | event);
+  mOutput.appendExecute(event);
 }
 
 void EventTreeGenerator::
 appendFail(uint32_t event)
 {
-  appendRaw(OPCODE_FAIL_3 | event);
+  mOutput.appendFail(event);
 }
 
 void EventTreeGenerator::
@@ -739,51 +790,50 @@ appendGotoUnlessNext(const EventTreeTask* task)
 void EventTreeGenerator::
 appendGoto(uint32_t task)
 {
-  appendRaw(OPCODE_GOTO_2 | task);
+  mOutput.appendGoto(task);
 }
 
 void EventTreeGenerator::
 appendRaw(uint32_t value)
 {
-  mCode.add(value);
+  mOutput.appendRaw(value);
 }
 
 
 void EventTreeGenerator::
 renumber()
 {
-  const uint32_t lines = mCode.size();
+  const uint32_t lines = mOutput.getCodeSize();
   uint32_t pos = 0;
   while (pos < lines) {
     const int line = pos;
-    const int code = mCode.get(pos++);
-    switch (code & OPCODE_MASK_2) {
-    case OPCODE_CASE_2:
+    const int code = mOutput.get(pos++);
+    switch (code & EventTree::OPCODE_MASK_2) {
+    case EventTree::OPCODE_CASE_2:
       {
-        const uint32_t a = code & OPERAND_MASK_2;
+        const uint32_t a = code & EventTree::OPERAND_MASK_2;
         const AutomatonRecord* aut = getAutomaton(a);
         for (uint32_t s = 0; s < aut->getNumberOfStates(); s++) {
-          const uint32_t l0 = mCode.get(pos);
+          const uint32_t l0 = mOutput.get(pos);
           const uint32_t l1 = mLineNumbers.get(l0);
-          mCode.set(pos++, l1);
+          mOutput.set(pos++, l1);
         }
         break;
       }
-    case OPCODE_IFNN_2:
+    case EventTree::OPCODE_IFNN_2:
       {
-        pos++;
-        const uint32_t l0 = mCode.get(pos);
+        const uint32_t l0 = mOutput.get(pos);
         const uint32_t l1 = mLineNumbers.get(l0);
-        mCode.set(pos++, l1);
+        mOutput.set(pos++, l1);
         break;
       }
-    case OPCODE_EXEC_2:
+    case EventTree::OPCODE_EXEC_2:
       break;  // nothing to be replaced here
-    case OPCODE_GOTO_2:
+    case EventTree::OPCODE_GOTO_2:
       {
-        const uint32_t l0 = code & OPERAND_MASK_2;
+        const uint32_t l0 = code & EventTree::OPERAND_MASK_2;
         const uint32_t l1 = mLineNumbers.get(l0);
-        mCode.set(line, OPCODE_GOTO_2 | l1);
+        mOutput.set(line, EventTree::OPCODE_GOTO_2 | l1);
         break;
       }
     default:
@@ -791,6 +841,29 @@ renumber()
     }
   }
 }
+
+
+
+//#################3##########################################################
+//# EventTreeGenerator: Hash Methods
+
+uint64_t EventTreeGenerator::
+hash(int32_t key)
+  const
+{
+  const FastEligibilityTestRecord& record = mOutput.getEligibilityRecord(key);
+  return record.hash();
+}
+
+bool EventTreeGenerator::
+equals(int32_t key1, int32_t key2)
+  const
+{
+  const FastEligibilityTestRecord& record1 = mOutput.getEligibilityRecord(key1);
+  const FastEligibilityTestRecord& record2 = mOutput.getEligibilityRecord(key2);
+  return record1.equals(record2);
+}
+
 
 
 //############################################################################
@@ -802,16 +875,16 @@ void EventTreeGenerator::
 dump()
   const
 {
-  const uint32_t lines = mCode.size();
+  const uint32_t lines = mOutput.getCodeSize();
   const int digits = (int) log10(lines) + 1;
   uint32_t pos = 0;
   while (pos < lines) {
     std::cerr << std::setw(digits) << pos << ": ";
-    const int code = mCode.get(pos++);
-    switch (code & OPCODE_MASK_2) {
-    case OPCODE_CASE_2:
+    const uint32_t code = mOutput.get(pos++);
+    switch (code & EventTree::OPCODE_MASK_2) {
+    case EventTree::OPCODE_CASE_2:
       {
-        const uint32_t a = code & OPERAND_MASK_2;
+        const uint32_t a = code & EventTree::OPERAND_MASK_2;
         const AutomatonRecord* aut = getAutomaton(a);
         const jni::JavaString name = aut->getName();
         std::cerr << "CASE " << (const char*) name << ' ';
@@ -822,40 +895,43 @@ dump()
           } else {
             std::cerr << ',';
           }
-          const uint32_t l = mCode.get(pos++);
+          const uint32_t l = mOutput.get(pos++);
           std::cerr << l;
         }
         break;
       }
-    case OPCODE_IFNN_2:
+    case EventTree::OPCODE_IFNN_2:
       {
-        const uint32_t a = code & OPERAND_MASK_2;
+        const uint32_t t = code & EventTree::OPERAND_MASK_2;
+        const FastEligibilityTestRecord& record =
+          mOutput.getEligibilityRecord(t);
+        const uint32_t a = record.getAutomatonIndex();
         const AutomatonRecord* aut = getAutomaton(a);
         const jni::JavaString autName = aut->getName();
-        const uint32_t e = mCode.get(pos++);
+        const uint32_t e = record.getEventIndex();
         const BroadEventRecord* event = getEvent(e);
         const jni::JavaString eventName = event->getName();
-        const uint32_t l = mCode.get(pos++);
+        const uint32_t l = mOutput.get(pos++);
         std::cerr << "IFNN " << (const char*) autName << ' '
                   << (const char*) eventName << " GOTO " << l;
         break;
       }
-    case OPCODE_EXEC_2:
+    case EventTree::OPCODE_EXEC_2:
       {
-        if ((code & OPCODE_MASK_3) == OPCODE_EXEC_3) {
+        if ((code & EventTree::OPCODE_MASK_3) == EventTree::OPCODE_EXEC_3) {
           std::cerr << "EXEC ";
         } else {
           std::cerr << "FAIL ";
         }
-        const uint32_t e = code & OPERAND_MASK_3;
+        const uint32_t e = code & EventTree::OPERAND_MASK_3;
         const BroadEventRecord* event = getEvent(e);
         const jni::JavaString eventName = event->getName();
         std::cerr << (const char*) eventName;
         break;
       }
-    case OPCODE_GOTO_2:
+    case EventTree::OPCODE_GOTO_2:
       {
-        const uint32_t l = code & OPERAND_MASK_2;
+        const uint32_t l = code & EventTree::OPERAND_MASK_2;
         std::cerr << "GOTO " << l;
         break;
       }

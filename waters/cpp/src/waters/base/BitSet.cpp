@@ -27,10 +27,12 @@ namespace waters {
 #define INDEX_MASK (__WORDSIZE - 1)
 
 #if __WORDSIZE == 64
+#  define ONE 1L
 #  define INDEX_SHIFT 6
 #  define initHashFactors initHashFactors64
 #  define hashIntArray hashInt64Array
 #else
+#  define ONE 1
 #  define INDEX_SHIFT 5
 #  define initHashFactors initHashFactors32
 #  define hashIntArray hashInt32Array
@@ -52,7 +54,7 @@ BitSet(uint32_t size, bool initValue) :
       memset(mArray, ~0, (mArraySize - 1) * sizeof(entry_t));
       uint32_t extraBits = size & INDEX_MASK;
       if (extraBits > 0) {
-        mArray[mArraySize - 1] = (1 << extraBits) - 1;
+        mArray[mArraySize - 1] = (ONE << extraBits) - 1;
       }
     } else {
       clear();
@@ -95,7 +97,7 @@ get(uint32_t index)
   const
 {
   entry_t word = mArray[index >> INDEX_SHIFT];
-  entry_t bit = 1 << (index & INDEX_MASK);
+  entry_t bit = ONE << (index & INDEX_MASK);
   return (word & bit) != 0;
 }
 
@@ -104,7 +106,7 @@ setBit(uint32_t index)
 {
   uint32_t wordIndex = index >> INDEX_SHIFT;
   grow(wordIndex + 1);
-  mArray[wordIndex] |= 1 << (index & INDEX_MASK);
+  mArray[wordIndex] |= ONE << (index & INDEX_MASK);
 }
 
 void BitSet::
@@ -112,7 +114,7 @@ clearBit(uint32_t index)
 {
   uint32_t wordIndex = index >> INDEX_SHIFT;
   grow(wordIndex + 1);
-  mArray[wordIndex] &= ~(1 << (index & INDEX_MASK));
+  mArray[wordIndex] &= ~(ONE << (index & INDEX_MASK));
 }
 
 bool BitSet::

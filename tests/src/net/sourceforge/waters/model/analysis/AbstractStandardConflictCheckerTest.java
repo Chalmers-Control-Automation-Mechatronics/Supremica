@@ -508,18 +508,25 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(des, true);
   }
 
-  public void testTwoInit() throws Exception
+  public void testTwoInit1() throws Exception
   {
     final ProductDESProxy des =
-      getCompiledDES("tests", "nasty", "twoinit.wmod");
-    runModelVerifier(des, true);
+      getCompiledDES("tests", "nasty", "twoinit1.wmod");
+    runModelVerifier(des, false);
   }
 
-  public void testTwoInitBlock() throws Exception
+  public void testTwoInit2() throws Exception
   {
     final ProductDESProxy des =
-      getCompiledDES("tests", "nasty", "twoinit_block.wmod");
+      getCompiledDES("tests", "nasty", "twoinit2.wmod");
     runModelVerifier(des, false);
+  }
+
+  public void testTwoInit3() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "twoinit3.wmod");
+    runModelVerifier(des, true);
   }
 
   public void testVerriegel4Counter2() throws Exception

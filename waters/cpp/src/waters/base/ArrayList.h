@@ -20,7 +20,12 @@
 #endif
 
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
+
+#ifdef DEBUG
+#include <iostream>
+#endif /* DEBUG */
 
 #include "waters/base/HashAccessor.h"
 
@@ -38,10 +43,10 @@ class ArrayList
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit ArrayList(uint32_t size = 16) :
+  explicit ArrayList(uint32_t size = MIN_SIZE) :
     mNumElements(0),
     mArraySize(size),
-    mArray(new Value[size])
+    mArray(size == 0 ? 0 : new Value[size])
   {
   }
 
@@ -49,7 +54,9 @@ public:
     mNumElements(count),
     mArraySize(count)
   {
-    if (copy) {
+    if (count == 0) {
+      mArray = 0;
+    } else if (copy) {
       mArray = new Value[count];
       memcpy(mArray, values, count * sizeof(Value));
     } else {
@@ -59,8 +66,8 @@ public:
 
   ArrayList(const ArrayList<Value>& list) :
     mNumElements(list.mNumElements),
-    mArraySize(list.mNumElements),
-    mArray(new Value[list.mNumElements])
+    mArraySize(mNumElements),
+    mArray(mNumElements == 0 ? 0 : new Value[mNumElements])
   {
     memcpy(mArray, list.mArray, mNumElements * sizeof(Value));
   }
@@ -72,6 +79,12 @@ public:
 
   //##########################################################################
   //# Access
+  void clear(uint32_t size = 0)
+  {
+    mNumElements = 0;
+    grow(size);
+  }
+
   bool isEmpty()
     const
   {
@@ -90,9 +103,31 @@ public:
     return mArray[index];
   }
 
+  Value& getref(uint32_t index)
+  {
+    return mArray[index];
+  }
+
+  const Value& getref(uint32_t index) const
+  {
+    return mArray[index];
+  }
+
   void set(uint32_t index, Value value)
   {
     mArray[index] = value;
+  }
+
+  uint32_t prepare()
+  {
+    grow(mNumElements + 1);
+    return mNumElements;
+  }
+
+  uint32_t add()
+  {
+    grow(mNumElements + 1);
+    return mNumElements++;
   }
 
   void add(const Value value)
@@ -106,10 +141,25 @@ public:
     return mArray[--mNumElements];
   }
 
-  void clear()
+  void sort(int (*comparator)(const void*,const void*))
   {
-    mNumElements = 0;
+    qsort(mArray, mNumElements, sizeof(Value), comparator);
   }
+
+#ifdef DEBUG
+  //##########################################################################
+  //# Debugging
+  void dump()
+    const
+  {
+    char ch = '[';
+    for (uint32_t i = 0; i < mNumElements; i++) {
+      std::cerr << ch << mArray[i];
+      ch = ',';
+    }
+    std::cerr << ']' << std::endl;
+  }
+#endif /* DEBUG */
 
 protected:
   //##########################################################################
@@ -159,7 +209,14 @@ protected:
   virtual bool grow(uint32_t newSize)
   {
     if (newSize > mArraySize) {
-      mArraySize <<= 1;
+      if (newSize < MIN_SIZE) {
+	newSize = MIN_SIZE;
+      }
+      if (newSize < (mArraySize << 1)) {
+	mArraySize <<= 1;
+      } else {
+	mArraySize = newSize;
+      }
       Value* newArray = new Value[mArraySize];
       memcpy(newArray, mArray, mNumElements * sizeof(Value));
       delete [] mArray;
@@ -169,6 +226,10 @@ protected:
       return false;
     }
   }
+
+  //##########################################################################
+  //# Class Constants
+  static const uint32_t MIN_SIZE = 16;
 
 private:
   //##########################################################################
@@ -189,10 +250,12 @@ class IntArrayList : public ArrayList<Value>
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit IntArrayList(uint32_t size = 16) :
+  explicit IntArrayList(uint32_t size = ArrayList<Value>::MIN_SIZE) :
     ArrayList<Value>(size) {ArrayList<Value>::initHashFactors();}
   explicit IntArrayList(Value* values, uint32_t count) : 
     ArrayList<Value>(values, count) {ArrayList<Value>::initHashFactors();}
+  IntArrayList(const IntArrayList<Value>& list) :
+    ArrayList<Value>(list) {ArrayList<Value>::initHashFactors();}
 
   //##########################################################################
   //# Hash Functions
