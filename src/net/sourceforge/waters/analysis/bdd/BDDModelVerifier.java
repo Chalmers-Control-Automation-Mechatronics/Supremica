@@ -761,8 +761,7 @@ public abstract class BDDModelVerifier
       final TransitionPartitionBDD subpart = entry.getValue();
       statemap = new HashMap<AutomatonProxy,StateProxy>(mNumAutomata);
       preds = getDeterminisedPredecessorsBDD
-        (targetPrimed, event, subpart, statemap);
-      preds.andWith(source.id());
+        (source, targetPrimed, event, subpart, statemap);
     }
     final ProductDESProxyFactory factory = getFactory();
     final TraceStepProxy step = factory.createTraceStepProxy(event, statemap);
@@ -833,7 +832,8 @@ public abstract class BDDModelVerifier
   }
 
   private BDD getDeterminisedPredecessorsBDD
-    (final BDD currentPrimed,
+    (final BDD source,
+     final BDD currentPrimed,
      final EventProxy event,
      final TransitionPartitionBDD part,
      final Map<AutomatonProxy,StateProxy> statemap)
@@ -857,6 +857,7 @@ public abstract class BDDModelVerifier
       currentPrimed.relprod(partBDD, detNextStateCube);
     currentPrimed.free();
     detNextStateCube.free();
+    currentPrimedRestricted.andWith(source.id());
 
     final TObjectIntHashMap<AutomatonBDD> codemap =
       new TObjectIntHashMap<AutomatonBDD>(mNumAutomata);

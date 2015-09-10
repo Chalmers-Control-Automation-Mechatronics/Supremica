@@ -99,6 +99,20 @@ public abstract class AbstractStandardConflictCheckerTest
 
   //#########################################################################
   //# Test Cases --- nondeterministic
+  public void testNondetCounter1() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nondeterministic", "nondet_counter_1.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testNondetCounter2() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nondeterministic", "nondet_counter_2.wmod");
+    runModelVerifier(des, false);
+  }
+
   public void testNondeterministicCombinations() throws Exception
   {
     final ProductDESProxy des =
