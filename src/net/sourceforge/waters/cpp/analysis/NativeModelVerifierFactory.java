@@ -53,6 +53,7 @@ public class NativeModelVerifierFactory
   {
     super.addArguments();
     addArgument(new CommandLineArgumentDumpStateAware());
+    addArgument(new CommandLineArgumentEventTree());
     addArgument(new CommandLineArgumentTarjan());
   }
 
@@ -102,6 +103,26 @@ public class NativeModelVerifierFactory
         fail("Command line option " + getName() +
              " is only supported for conflict check!");
       }
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class CommandLineArgumentEventTree
+  private static class CommandLineArgumentEventTree
+    extends CommandLineArgumentBoolean
+  {
+    private CommandLineArgumentEventTree()
+    {
+      super("-et", "Enable or disable event decision tree");
+    }
+
+    @Override
+    public void configureAnalyzer(final Object analyzer)
+    {
+      final NativeModelAnalyzer checker = (NativeModelAnalyzer) analyzer;
+      final boolean enabled = getValue();
+      checker.setEventTreeEnabled(enabled);
     }
   }
 

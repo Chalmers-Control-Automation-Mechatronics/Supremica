@@ -133,13 +133,13 @@ const uint64_t EventTreeTaskSplit::theHashCode = hashInt(TASK_TYPE_SPLIT);
 //# EventTreeTaskSplit: Constructors & Destructors
 
 EventTreeTaskSplit::
-EventTreeTaskSplit(EventTreeTask* next,
-		   const EventTreeGenerator& generator)
+EventTreeTaskSplit(EventTreeTask* next, EventTreeGenerator& generator)
   : mEventList(generator.getNumberOfEvents()),
     mAutomataList(generator.getNumberOfAutomata()),
     mAutomataSet(generator.getNumberOfAutomata(), true),
     mFanout(1),
     mSplittable(true),
+    mGenerator(generator),
     mNextTask(next)
 {
   for (uint32_t e = 0; e < generator.getNumberOfEvents(); e++) {
@@ -156,12 +156,13 @@ EventTreeTaskSplit(const ArrayList<uint32_t>& events,
                    uint32_t fanout,
                    bool splittable,
                    EventTreeTask* next,
-                   const EventTreeGenerator& generator)
+                   EventTreeGenerator& generator)
   : mEventList(events.size()),
     mAutomataList(automata.size()),
     mAutomataSet(generator.getNumberOfAutomata()),
     mFanout(fanout),
     mSplittable(splittable),
+    mGenerator(generator),
     mNextTask(next)
 {
   BitSet disablingAutomata(generator.getNumberOfAutomata());
@@ -221,34 +222,34 @@ hash()
 //# EventTreeTaskSplit: Code Generation
 
 void EventTreeTaskSplit::
-execute(EventTreeGenerator& generator)
+execute()
 {
   // 1. Don't try to split if we know it is not possible
   if (!mSplittable || mEventList.size() <= 1) {
-    executeWithoutSplit(generator);
+    executeWithoutSplit();
     return;
   }
 
   // 2. Execute any always enabled events
   for (uint32_t i = 0; i < mEventList.size(); i++) {
     uint32_t e = mEventList.get(i);
-    if (generator.isAlwaysEnabled(e, mAutomataSet)) {
-      generator.appendExecute(e);
-      EventTreeTask* task = addTaskWithoutEvent(e, generator);
-      generator.appendGotoUnlessNext(task);
+    if (mGenerator.isAlwaysEnabled(e, mAutomataSet)) {
+      mGenerator.appendExecute(e);
+      EventTreeTask* task = addTaskWithoutEvent(e);
+      mGenerator.appendGotoUnlessNext(task);
       return;
     }
   }
 
   // 3. Try to find an automaton to split upon
-  generator.resetTopCounts();
+  mGenerator.resetTopCounts();
   for (uint32_t i = 0; i < mEventList.size(); i++) {
     uint32_t e = mEventList.get(i);
-    generator.registerTopCounts(e, mAutomataSet, mFanout);
+    mGenerator.registerTopCounts(e, mAutomataSet, mFanout);
   }
-  uint32_t top = generator.findTopAutomaton(mAutomataList);
+  uint32_t top = mGenerator.findTopAutomaton(mAutomataList);
   if (top == UINT32_MAX) {
-    executeWithoutSplit(generator);
+    executeWithoutSplit();
     return;
   }
   uint32_t numEvents = mEventList.size();
@@ -256,19 +257,19 @@ execute(EventTreeGenerator& generator)
   ArrayList<uint32_t> otherEvents(numEvents - 1);
   for (uint32_t i = 0; i < mEventList.size(); i++) {
     uint32_t e = mEventList.get(i);
-    if (generator.isTopAutomaton(top, e, mAutomataSet, mFanout)) {
+    if (mGenerator.isTopAutomaton(top, e, mAutomataSet, mFanout)) {
       topEvents.add(e);
     } else {
       otherEvents.add(e);
     }
   }
   if (topEvents.size() <= 1) {
-    executeWithoutSplit(generator);
+    executeWithoutSplit();
     return;
   }
 
   // 4. Split on top automaton using topEvents, then continue using otherEvents
-  EventTreeTask* taskAfter = addTaskWithEvents(otherEvents, generator);
+  EventTreeTask* taskAfter = addTaskWithEvents(otherEvents);
   ArrayList<uint32_t> remainingAutomata(mAutomataList.size() - 1);
   for (uint32_t i = 0; i < mAutomataList.size(); i++) {
     uint32_t a = mAutomataList.get(i);
@@ -277,8 +278,8 @@ execute(EventTreeGenerator& generator)
     }
   }
   ArrayList<uint32_t> remainingEvents(topEvents.size());
-  const AutomatonRecord* topAut = generator.getAutomaton(top);
-  const bool spec = generator.isSafety() && !topAut->isPlant();
+  const AutomatonRecord* topAut = mGenerator.getAutomaton(top);
+  const bool spec = mGenerator.isSafety() && !topAut->isPlant();
   const uint32_t numStates = topAut->getNumberOfStates();
   const uint32_t remainingFanout = mFanout * numStates;
   uint32_t* branches = new uint32_t[numStates];
@@ -289,37 +290,37 @@ execute(EventTreeGenerator& generator)
     EventTreeTask* task = 0;
     for (uint32_t i = 0; i < topEvents.size(); i++) {
       uint32_t e = topEvents.get(i);
-      if (generator.isEnabled(e, top, s)) {
+      if (mGenerator.isEnabled(e, top, s)) {
         remainingEvents.add(e);
       } else if (spec) {
-        const BroadEventRecord* event = generator.getEvent(e);
+        const BroadEventRecord* event = mGenerator.getEvent(e);
         if (!event->isControllable()) {
-          task = generator.addFailTask(e);
+          task = mGenerator.addFailTask(e);
           break;
         }
       }
     }
     if (task == 0) {
-      task = generator.addSplitTask(remainingEvents, remainingAutomata,
-                                    remainingFanout, true, taskAfter);
+      task = mGenerator.addSplitTask(remainingEvents, remainingAutomata,
+                                     remainingFanout, true, taskAfter);
     }
     branches[s] = task->getTaskID();
   } while (s > 0);
-  generator.appendCase(top);
+  mGenerator.appendCase(top);
   for (uint32_t s = 0; s < numStates; s++) {
-    generator.appendRaw(branches[s]);
+    mGenerator.appendRaw(branches[s]);
   }
   delete [] branches;
 }
 
 void EventTreeTaskSplit::
-executeWithoutSplit(EventTreeGenerator& generator)
+executeWithoutSplit()
 {
   mSplittable = false;
   const uint32_t e = mEventList.get(0);
-  const EventTreeTask* taskAfter = addTaskWithoutEvent(e, generator);
-  const BroadEventRecord* event = generator.getEvent(e);
-  const bool controllable = !generator.isSafety() || event->isControllable();
+  const EventTreeTask* taskAfter = addTaskWithoutEvent(e);
+  const BroadEventRecord* event = mGenerator.getEvent(e);
+  const bool controllable = !mGenerator.isSafety() || event->isControllable();
   for (const TransitionRecord* trans = event->getTransitionRecord();
        trans != 0;
        trans = trans->getNextInSearch()) {
@@ -327,18 +328,18 @@ executeWithoutSplit(EventTreeGenerator& generator)
     const int a = aut->getAutomatonIndex();
     if (mAutomataSet.get(a)) {
       const EventTreeTask* task =
-        controllable || aut->isPlant() ? taskAfter : generator.addFailTask(e);
+        controllable || aut->isPlant() ? taskAfter : mGenerator.addFailTask(e);
       uint32_t taskID = task->getTaskID();
-      generator.appendIfDisabled(trans, e, taskID);
+      mGenerator.appendIfDisabled(trans, e, taskID);
     }
   }
-  generator.appendExecute(e);
-  generator.appendGotoUnlessNext(taskAfter);
+  mGenerator.appendExecute(e);
+  mGenerator.appendGotoUnlessNext(taskAfter);
 }
 
 
 EventTreeTask* EventTreeTaskSplit::
-addTaskWithoutEvent(uint32_t event, EventTreeGenerator& generator)
+addTaskWithoutEvent(uint32_t event)
   const
 {
   if (mEventList.size() <= 1) {
@@ -351,28 +352,27 @@ addTaskWithoutEvent(uint32_t event, EventTreeGenerator& generator)
         remainingEvents.add(e);
       }
     }
-    return addTaskWithEvents(remainingEvents, generator);
+    return addTaskWithEvents(remainingEvents);
   }
 }
 
 EventTreeTask* EventTreeTaskSplit::
-addTaskWithEvents(const ArrayList<uint32_t>& events,
-                  EventTreeGenerator& generator)
+addTaskWithEvents(const ArrayList<uint32_t>& events)
   const
 {
-  return generator.addSplitTask(events, mAutomataList,
-                                mFanout, mSplittable, mNextTask);
+  return mGenerator.addSplitTask(events, mAutomataList,
+                                 mFanout, mSplittable, mNextTask);
 }
 
 
 uint32_t EventTreeTaskSplit::
-findFailedEvent(const EventTreeGenerator& generator)
+findFailedEvent()
   const
 {
-  if (mSplittable && generator.isSafety()) {
+  if (mSplittable && mGenerator.isSafety()) {
     for (uint32_t i = 0; i < mEventList.size(); i++) {
       const uint32_t e = mEventList.get(i);
-      const BroadEventRecord* event = generator.getEvent(e);
+      const BroadEventRecord* event = mGenerator.getEvent(e);
       if (!event->isControllable()) {
         for (const TransitionRecord* trans = event->getTransitionRecord();
              trans != 0;
@@ -411,10 +411,12 @@ const uint64_t EventTreeTaskFail::theHashCode = hashInt(TASK_TYPE_FAIL);
 //# EventTreeTaskFail: Constructors & Destructors
 
 EventTreeTaskFail::
-EventTreeTaskFail(uint32_t event)
-  : mEvent(event)
+EventTreeTaskFail(uint32_t event, EventTreeGenerator& generator)
+  : mEvent(event),
+    mGenerator(generator)
 {
 }
+
 
 //############################################################################
 //# EventTreeTaskFail: Comparing & Hashing
@@ -443,9 +445,9 @@ hash()
 //# EventTreeTaskFail: Code Generation
 
 void EventTreeTaskFail::
-execute(EventTreeGenerator& generator)
+execute()
 {
-  generator.appendFail(mEvent);
+  mGenerator.appendFail(mEvent);
 }
 
 
@@ -535,7 +537,7 @@ executeTask(EventTreeTask* task)
   uint32_t id = task->getTaskID();
   uint32_t lineNumber = mOutput.getCodeSize();
   mLineNumbers.set(id, lineNumber);
-  task->execute(*this);
+  task->execute();
 }
 
 
@@ -569,7 +571,7 @@ addSplitTask(const ArrayList<uint32_t>& events,
   EventTreeTaskSplit* task = 
     new EventTreeTaskSplit(events, automata, fanout, splittable, next, *this);
   if (mHasFailedEvents) {
-    uint32_t failed = task->findFailedEvent(*this);
+    uint32_t failed = task->findFailedEvent();
     if (failed != UINT32_MAX) {
       delete task;
       return addFailTask(failed);
@@ -581,7 +583,7 @@ addSplitTask(const ArrayList<uint32_t>& events,
 EventTreeTask* EventTreeGenerator::
 addFailTask(uint32_t event)
 {
-  EventTreeTaskFail* task = new EventTreeTaskFail(event);
+  EventTreeTaskFail* task = new EventTreeTaskFail(event, *this);
   return addTask(task);
 }
 
@@ -592,7 +594,7 @@ addTask(EventTreeTask* task)
   if (added != task) {
     delete task;
   } else {
-    uint64_t id = mLineNumbers.size();
+    uint32_t id = mLineNumbers.size();
     task->setTaskID(id);
     mLineNumbers.add(UINT32_MAX);
     switch (task->getTaskType()) {

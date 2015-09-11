@@ -74,6 +74,19 @@ public abstract class NativeModelAnalyzer
 
 
   //#########################################################################
+  //# Configuration
+  public void setEventTreeEnabled(final boolean enable)
+  {
+    mEventTreeEnabled = enable;
+  }
+
+  public boolean isEventTreeEnabled()
+  {
+    return mEventTreeEnabled;
+  }
+
+
+  //#########################################################################
   //# Native Methods
   @Override
   public native void requestAbort();
@@ -101,5 +114,6 @@ public abstract class NativeModelAnalyzer
   //# Data Members
   private ByteBuffer mNativeModelAnalyzer;
   private boolean mDetailedOutputEnabled;
+  private boolean mEventTreeEnabled = true;
 
 }

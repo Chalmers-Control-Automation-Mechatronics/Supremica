@@ -1120,16 +1120,22 @@ public:
   //##########################################################################
   //# Initialisation
   ProductExplorer* createProductExplorer
-    (const jni::KindTranslatorGlue& translator,
-     const jni::EventGlue& premarking,
+    (const jni::EventGlue& premarking,
      const jni::EventGlue& marking,
      jni::ClassCache& cache)
   {
     jni::ProductDESProxyFactoryGlue factory =
       mNativeModelVerifier.getFactoryGlue(&cache);
     jni::ProductDESGlue des = mNativeModelVerifier.getModelGlue(&cache);
-    mProductExplorer = new EventTreeProductExplorer
-      (factory, des, translator, premarking, marking, &cache);
+    jni::KindTranslatorGlue translator =
+      mNativeModelVerifier.getKindTranslatorGlue(&cache);
+    if (mNativeModelVerifier.isEventTreeEnabled()) {
+      mProductExplorer = new EventTreeProductExplorer
+        (factory, des, translator, premarking, marking, &cache);
+    } else {
+      mProductExplorer = new BroadProductExplorer
+        (factory, des, translator, premarking, marking, &cache);
+    }
     const int limit = mNativeModelVerifier.getNodeLimit();
     if (limit >= 0) {
       mProductExplorer->setStateLimit(limit);
@@ -1179,11 +1185,9 @@ Java_net_sourceforge_waters_cpp_analysis_NativeSafetyVerifier_runNativeAlgorithm
   jni::NativeSafetyVerifierGlue gchecker(jchecker, &cache);
   waters::ProductExplorerFinalizer finalizer(gchecker);
   try {
-    jni::KindTranslatorGlue translator =
-      gchecker.getKindTranslatorGlue(&cache);
     jni::EventGlue nomarking(0, &cache);
     waters::ProductExplorer* checker =
-      finalizer.createProductExplorer(translator, nomarking, nomarking, cache);
+      finalizer.createProductExplorer(nomarking, nomarking, cache);
     bool initUncont = gchecker.isInitialUncontrollable();
     checker->setInitialUncontrollable(initUncont);
     bool result = checker->runSafetyCheck();
@@ -1229,13 +1233,11 @@ Java_net_sourceforge_waters_cpp_analysis_NativeConflictChecker_runNativeAlgorith
   jni::NativeConflictCheckerGlue gchecker(jchecker, &cache);
   waters::ProductExplorerFinalizer finalizer(gchecker);
   try {
-    jni::KindTranslatorGlue translator =
-      gchecker.getKindTranslatorGlue(&cache);
     jni::EventGlue marking = gchecker.getUsedDefaultMarkingGlue(&cache);
     jni::EventGlue premarking =
       gchecker.getConfiguredPreconditionMarkingGlue(&cache);
     waters::ProductExplorer* checker =
-      finalizer.createProductExplorer(translator, premarking, marking, cache);
+      finalizer.createProductExplorer(premarking, marking, cache);
     jni::ConflictCheckMode mode = gchecker.getConflictCheckModeGlue(&cache);
     checker->setConflictCheckMode(mode);
     bool aware = gchecker.isDumpStateAware();

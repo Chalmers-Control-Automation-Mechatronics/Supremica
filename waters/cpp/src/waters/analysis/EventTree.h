@@ -94,7 +94,7 @@ public:
   static const uint32_t OPCODE_EXEC_2 = 0x2 << OPCODE_SHIFT_2;  // 100
   static const uint32_t OPCODE_EXEC_3 = OPCODE_EXEC_2;
   static const uint32_t OPCODE_FAIL_2 = OPCODE_EXEC_2;          // 101
-  static const uint32_t OPCODE_FAIL_3 = OPCODE_FAIL_2 | (0x1 << OPCODE_SHIFT_3);
+  static const uint32_t OPCODE_FAIL_3 = OPCODE_FAIL_2 | (1 << OPCODE_SHIFT_3);
   static const uint32_t OPCODE_GOTO_2 = 0x3 << OPCODE_SHIFT_2;  // 11*
 };
 
@@ -157,7 +157,7 @@ public:
 
   //##########################################################################
   //# Code Generation
-  virtual void execute(EventTreeGenerator& generator) = 0;
+  virtual void execute() = 0;
 
 private:
   //##########################################################################
@@ -180,13 +180,13 @@ public:
   //##########################################################################
   //# Constructors & Destructors
   explicit EventTreeTaskSplit(EventTreeTask* next,
-			      const EventTreeGenerator& generator);
+			      EventTreeGenerator& generator);
   explicit EventTreeTaskSplit(const ArrayList<uint32_t>& events,
 			      const ArrayList<uint32_t>& automata,
 			      uint32_t fanout,
 			      bool splittable,
 			      EventTreeTask* next,
-			      const EventTreeGenerator& generator);
+			      EventTreeGenerator& generator);
 
   //##########################################################################
   //# Simple Access
@@ -199,13 +199,11 @@ public:
 
   //##########################################################################
   //# Code Generation
-  virtual void execute(EventTreeGenerator& generator);
-  virtual void executeWithoutSplit(EventTreeGenerator& generator);
-  EventTreeTask* addTaskWithoutEvent(uint32_t event,
-				     EventTreeGenerator& generator) const;
-  EventTreeTask* addTaskWithEvents(const ArrayList<uint32_t>& events,
-				   EventTreeGenerator& generator) const;
-  uint32_t findFailedEvent(const EventTreeGenerator& generator) const;
+  virtual void execute();
+  virtual void executeWithoutSplit();
+  EventTreeTask* addTaskWithoutEvent(uint32_t event) const;
+  EventTreeTask* addTaskWithEvents(const ArrayList<uint32_t>& events) const;
+  uint32_t findFailedEvent() const;
 
 private:
   //##########################################################################
@@ -215,6 +213,7 @@ private:
   BitSet mAutomataSet;
   uint32_t mFanout;
   bool mSplittable;
+  EventTreeGenerator& mGenerator;
   EventTreeTask* mNextTask;
 
   //##########################################################################
@@ -232,7 +231,7 @@ class EventTreeTaskFail : public EventTreeTask
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit EventTreeTaskFail(uint32_t event);
+  explicit EventTreeTaskFail(uint32_t event, EventTreeGenerator& generator);
 
   //##########################################################################
   //# Simple Access
@@ -245,12 +244,13 @@ public:
 
   //##########################################################################
   //# Code Generation
-  virtual void execute(EventTreeGenerator& generator);
+  virtual void execute();
 
 private:
   //##########################################################################
   //# Data Members
   const uint32_t mEvent;
+  EventTreeGenerator& mGenerator;
 
   //##########################################################################
   //# Class Variables
@@ -281,7 +281,7 @@ public:
 
   //##########################################################################
   //# Code Generation
-  virtual void execute(EventTreeGenerator& generator) {}
+  virtual void execute() {}
 
 private:
   //##########################################################################

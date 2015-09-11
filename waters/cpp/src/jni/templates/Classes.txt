@@ -261,8 +261,10 @@ glue class NativeVerificationResult extends VerificationResult {
 glue class NativeModelAnalyzer {
   glue ProductDESProxyFactory getFactory();
   glue ProductDESProxy getModel();
+  glue KindTranslator getKindTranslator();
   int getNodeLimit();
   int getTransitionLimit();
+  boolean isEventTreeEnabled();
   ByteBuffer getNativeModelAnalyzer();
   void setNativeModelAnalyzer(ByteBuffer buffer);
 }
@@ -273,7 +275,6 @@ glue class NativeModelVerifier extends NativeModelAnalyzer {
 }
 
 glue class NativeSafetyVerifier extends NativeModelVerifier {
-  glue KindTranslator getKindTranslator();
   boolean isInitialUncontrollable();
   String getTraceComment(glue EventProxy event,
                          glue AutomatonProxy aut,
@@ -283,7 +284,6 @@ glue class NativeSafetyVerifier extends NativeModelVerifier {
 glue class NativeConflictChecker extends NativeModelVerifier {
   glue EventProxy getUsedDefaultMarking();
   glue EventProxy getConfiguredPreconditionMarking();
-  glue KindTranslator getKindTranslator();
   glue ConflictCheckMode getConflictCheckMode();
   boolean isDumpStateAware();
 }
