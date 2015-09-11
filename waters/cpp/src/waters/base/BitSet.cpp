@@ -51,10 +51,12 @@ BitSet(uint32_t size, bool initValue) :
   initHashFactors(mArraySize);
   if (size > 0) {
     if (initValue) {
-      memset(mArray, ~0, (mArraySize - 1) * sizeof(entry_t));
       uint32_t extraBits = size & INDEX_MASK;
       if (extraBits > 0) {
+        memset(mArray, ~0, (mArraySize - 1) * sizeof(entry_t));
         mArray[mArraySize - 1] = (ONE << extraBits) - 1;
+      } else {
+        memset(mArray, ~0, mArraySize * sizeof(entry_t));
       }
     } else {
       clear();
@@ -84,7 +86,7 @@ clear(uint32_t newSize)
 {
   uint32_t newArraySize = (newSize + INDEX_MASK) >> INDEX_SHIFT;
   if (newArraySize != mArraySize) {
-    delete mArray;
+    delete [] mArray;
     mArray = new entry_t[newArraySize];
     mArraySize = newArraySize;
     initHashFactors(mArraySize);

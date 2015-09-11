@@ -404,6 +404,15 @@ public abstract class AbstractLanguageInclusionCheckerTest
 
 
   //#########################################################################
+  //# Test Cases -- HISC
+  public void testRhoneSubsystem1Patch0Coreach0() throws Exception
+  {
+    runModelVerifier("tests", "hisc",
+                     "rhone_subsystem1_patch0_coreach0.wmod", true);
+  }
+
+
+  //#########################################################################
   //# Test Cases -- Parameterised
 
 

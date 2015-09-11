@@ -170,6 +170,8 @@ handleTransition(uint32_t source,
                  const BroadEventRecord* event,
                  uint32_t target)
 {
+  // std::cerr << source << " -" << (const char*) event->getName() << "-> "
+  //           << target << std::endl;
   if (mTransitionCallBack == 0) {
     return true;
   } else {
