@@ -18,8 +18,11 @@ END IF
 q = """"
 JavaCmd = FindJava("1.7")
 IF JavaCmd = "" THEN
-  WScript.echo("Could not locate Java 1.7." & VBNewLine & "Please make sure it is installed correctly.")
-  Wscript.Quit(1)
+  JavaCmd = FindJava("1.8")
+  IF JavaCmd = "" THEN
+    WScript.echo("Could not locate Java 1.7 or 1.8." & VBNewLine & "Please make sure it is installed correctly.")
+    Wscript.Quit(1)
+  END IF
 END IF
 Jar = ScriptDir & "\Supremica.jar"
 WatersCmd = q & JavaCmd & q & " -classpath " & q & Jar & q & " org.supremica.gui.ide.IDE -p " & q & PropPath & q
@@ -33,7 +36,16 @@ SHO.Run WatersCmd, 0, False
 
 FUNCTION FindJava(version)
   On Error Resume Next
-  RegistryKey = "HKEY_LOCAL_MACHINE\SOFTWARE\JavaSoft\Java Runtime Environment\" & version & "\JavaHome"
+  RegistryPrefix = "HKEY_LOCAL_MACHINE\SOFTWARE"
+  RegistrySuffix = "JavaSoft\Java Runtime Environment\" & version & "\JavaHome"
+  RegistryKey = RegistryPrefix & "\" & RegistrySuffix
+  JavaHome = SHO.RegRead(RegistryKey)
+  IF err.Number = 0 THEN
+    FindJava = JavaHome & "\bin\java"
+    EXIT FUNCTION
+  END IF
+  err.Clear
+  RegistryKey = RegistryPrefix & "\Wow6432Node\" & RegistrySuffix
   JavaHome = SHO.RegRead(RegistryKey)
   IF err.Number = 0 THEN
     FindJava = JavaHome & "\bin\java"
