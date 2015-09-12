@@ -21,6 +21,8 @@
 
 #include <stdint.h>
 
+#include "waters/base/WordSize.h"
+
 
 namespace waters {
 
