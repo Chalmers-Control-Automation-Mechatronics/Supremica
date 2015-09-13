@@ -258,10 +258,7 @@ teardown()
     delete mReversedEventRecords.get(i);
   }
   mReversedEventRecords.clear();
-  for (uint32_t i = 0; i < mEventRecords.size(); i++) {
-    delete mEventRecords.get(i);
-  }
-  mEventRecords.clear();
+  // Keeping mEventRecords - for stats
   delete [] mNondeterministicTransitionIterators;
   mNondeterministicTransitionIterators = 0;
   delete [] mDumpStates;
