@@ -7,6 +7,10 @@
 //# $Id$
 //###########################################################################
 
+#ifdef __GNUG__
+#pragma interface
+#endif
+
 #ifndef __WORDSIZE
 
 // Check windows

@@ -1,5 +1,5 @@
 //###########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters C++
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
 //# CLASS:   NativeHashSet
 //###########################################################################
@@ -14,6 +14,11 @@ import java.util.Iterator;
 
 
 /**
+ * A Java encapsulation of the C++ hash table for the purpose of unit
+ * testing with JUnit. This tests the C++ class <CODE>PtrHashTable</CODE>
+ * declared in <CODE>waters/base/HashTable.h</CODE>
+ * through its encapsulation in <CODE>waters/base/JavaHashTable.h</CODE>.
+ *
  * @author Robi Malik
  */
 
@@ -47,11 +52,13 @@ public class NativeHashSet<E> extends AbstractSet<E>
 
   //#########################################################################
   //# Interface java.util.Collection
+  @Override
   public int size()
   {
     return getNativeSize(mNativeHandler);
   }
 
+  @Override
   public Iterator<E> iterator()
   {
     return new NativeHashSetIterator();
@@ -123,16 +130,19 @@ public class NativeHashSet<E> extends AbstractSet<E>
 
     //#######################################################################
     //# Interface java.util.Iterator
+    @Override
     public boolean hasNext()
     {
       return hasNativeNext(mNativeHandler, mNativeIter);
     }
 
+    @Override
     public E next()
     {
       return getNativeNext(mNativeHandler, mNativeIter);
     }
 
+    @Override
     public void remove()
     {
       throw new UnsupportedOperationException

@@ -13,8 +13,11 @@
 
 #include <string.h>
 
+#include <jni.h>
+
 #include "waters/base/BitSet.h"
 #include "waters/base/HashAccessor.h"
+#include "waters/javah/Invocations.h"
 
 
 namespace waters {
@@ -98,7 +101,10 @@ bool BitSet::
 get(uint32_t index)
   const
 {
-  entry_t word = mArray[index >> INDEX_SHIFT];
+  uint32_t wordIndex = index >> INDEX_SHIFT;
+  BitSet* nonConst = (BitSet*) this;
+  nonConst->grow(wordIndex + 1);
+  entry_t word = mArray[wordIndex];
   entry_t bit = ONE << (index & INDEX_MASK);
   return (word & bit) != 0;
 }
@@ -178,3 +184,78 @@ grow(uint32_t newArraySize)
 
 
 }   /* namespace waters */
+
+
+//############################################################################
+//# BitSet: Invocation through JNI
+
+JNIEXPORT jlong JNICALL
+Java_net_sourceforge_waters_cpp_analysis_NativeBitSet_createNativeBitSet__I
+  (JNIEnv* env, jobject /* bitset */, jint initialSize)
+{
+  return (jlong) new waters::BitSet(initialSize);
+}
+
+JNIEXPORT jlong JNICALL
+Java_net_sourceforge_waters_cpp_analysis_NativeBitSet_createNativeBitSet__IZ
+  (JNIEnv* env, jobject /* bitset */, jint initialSize, jboolean initialValue)
+{
+  return (jlong) new waters::BitSet(initialSize, initialValue);
+}
+
+JNIEXPORT void JNICALL
+Java_net_sourceforge_waters_cpp_analysis_NativeBitSet_destroyNativeBitSet
+  (JNIEnv* env, jobject /* bitset */, jlong handler)
+{
+  waters::BitSet *bitSet = (waters::BitSet*) handler;
+  delete bitSet;
+}
+
+JNIEXPORT void JNICALL
+Java_net_sourceforge_waters_cpp_analysis_NativeBitSet_clearNative__J
+  (JNIEnv* env, jobject /* bitset */, jlong handler)
+{
+  waters::BitSet *bitSet = (waters::BitSet*) handler;
+  bitSet->clear();
+}
+
+JNIEXPORT void JNICALL
+Java_net_sourceforge_waters_cpp_analysis_NativeBitSet_clearNative__JI
+  (JNIEnv* env, jobject /* bitset */, jlong handler, jint newSize)
+{
+  waters::BitSet *bitSet = (waters::BitSet*) handler;
+  bitSet->clear(newSize);
+}
+
+JNIEXPORT jboolean JNICALL
+Java_net_sourceforge_waters_cpp_analysis_NativeBitSet_getNative
+  (JNIEnv* env, jobject /* bitset */, jlong handler, jint index)
+{
+  const waters::BitSet *bitSet = (const waters::BitSet*) handler;
+  return bitSet->get(index) ? JNI_TRUE : JNI_FALSE;
+}
+
+JNIEXPORT void JNICALL
+Java_net_sourceforge_waters_cpp_analysis_NativeBitSet_setBitNative
+  (JNIEnv* env, jobject /* bitset */, jlong handler, jint index)
+{
+  waters::BitSet *bitSet = (waters::BitSet*) handler;
+  bitSet->setBit(index);
+}
+
+JNIEXPORT void JNICALL
+Java_net_sourceforge_waters_cpp_analysis_NativeBitSet_clearBitNative
+  (JNIEnv* env, jobject /* bitset */, jlong handler, jint index)
+{
+  waters::BitSet *bitSet = (waters::BitSet*) handler;
+  bitSet->clearBit(index);
+}
+
+JNIEXPORT jboolean JNICALL
+Java_net_sourceforge_waters_cpp_analysis_NativeBitSet_equalsNative
+  (JNIEnv* env, jobject /* bitset */, jlong handler1, jlong handler2)
+{
+  const waters::BitSet *bitSet1 = (const waters::BitSet*) handler1;
+  const waters::BitSet *bitSet2 = (const waters::BitSet*) handler2;
+  return bitSet1->equals(*bitSet2) ? JNI_TRUE : JNI_FALSE;
+}

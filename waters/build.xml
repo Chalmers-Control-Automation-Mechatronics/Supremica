@@ -231,14 +231,21 @@
     </jar>
   </target>
 
-  <target name="javah" depends="waters-compile"
+  <target name="javah" depends="waters-compile,test-compile"
           if="native.make" description="Create JNI headers.">
     <mkdir dir="${javah.dir}"/>
-    <javah outputFile="${javah.file}" classpath="${waters.classes}">
+    <javah outputFile="${javah.file}">
+      <classpath> 
+        <pathelement location="${waters.classes}"/>
+        <pathelement location="${test.classes}"/>
+        <pathelement location="${junit.jar}"/>
+      </classpath>
+      <class name="net.sourceforge.waters.cpp.analysis.NativeBitSet"/>
       <class name="net.sourceforge.waters.cpp.analysis.NativeConflictChecker"/>
+      <class name="net.sourceforge.waters.cpp.analysis.NativeHashSet"/>
       <class name="net.sourceforge.waters.cpp.analysis.NativeModelAnalyzer"/>
       <class name="net.sourceforge.waters.cpp.analysis.NativeSafetyVerifier"/>
-      <class name="net.sourceforge.waters.cpp.analysis.NativeHashSet"/>
+      <class name="net.sourceforge.waters.cpp.analysis.NativeWordSizeTest"/>
     </javah>
   </target>
 
