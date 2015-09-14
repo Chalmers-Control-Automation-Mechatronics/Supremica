@@ -13,7 +13,6 @@
   </macrodef>
 
   <property file="build.properties"/>
-
   <property name="supremica.root" location=".."/>
   <property name="supremica.lib" location="${supremica.root}/lib"/>
   <property name="supremica.src" location="${supremica.root}/src"/>
@@ -97,6 +96,8 @@
     <pathelement location="${test.jar}"/>
     <pathelement location="${junit.jar}"/>
   </path>
+
+  <property name="junit.maxmemory" value="2048m"/>
 
 
   <target name="init">
@@ -356,7 +357,7 @@
 
   <target name="runtest" depends="test-jar,cpp">
     <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" maxmemory="2048m">
+    <junit printsummary="on" fork="true" maxmemory="${junit.maxmemory}">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">

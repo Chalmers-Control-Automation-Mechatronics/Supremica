@@ -27,6 +27,14 @@ debuglevel=lines,source
 optimize=off
 
 ##############################################################################
+# TEST PROPERTIES
+
+# Uncomment this to control how much memory is available to JUnit tests.
+# The default (2048m) should be fine for most computers, but some old
+# 32-bit Windows systems cannot allocate that much.
+#junit.maxmemory = 2048m
+
+##############################################################################
 # NATIVE CODE COMPILATION
 
 # Settings in this section control if and how the Waters C++ library is
