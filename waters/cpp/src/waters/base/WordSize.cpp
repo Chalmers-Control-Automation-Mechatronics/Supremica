@@ -21,7 +21,7 @@
 
 
 JNIEXPORT jboolean JNICALL
-Java_net_sourceforge_waters_cpp_analysis_WordSizeTest_nativeWordSizeTest
+Java_net_sourceforge_waters_cpp_analysis_NativeWordSizeTest_nativeWordSizeTest
   (JNIEnv *env, jclass /* none */)
 {
   if (__WORDSIZE == 8 * sizeof(void*)) {
