@@ -71,7 +71,7 @@ bool BroadExpandHandler::
 handleEvent(uint32_t source,
             const uint32_t* sourceTuple,
             const uint32_t* sourcePacked,
-            const BroadEventRecord* event)
+            BroadEventRecord* event)
 {
   uint32_t* bufferPacked = mExplorer.getStateSpace().prepare();
   if (event->isDeterministic()) {
@@ -146,7 +146,7 @@ bool BroadExpandHandler::
 handleState(uint32_t source,
             const uint32_t* sourceTuple,
             const uint32_t* sourcePacked,
-            const BroadEventRecord* event)
+            BroadEventRecord* event)
 {
   mExplorer.incNumberOfTransitionsExplored();
   StateSpace& stateSpace = mExplorer.getStateSpace();
@@ -155,6 +155,7 @@ handleState(uint32_t source,
     return true;  // skip selfloop
   }
   mExplorer.incNumberOfTransitions();
+  event->markTransitionsTakenFast(sourceTuple);
   if (target == mExplorer.getNumberOfStates()) {
     if (mNonDetBufferPacked == 0) {
       mExplorer.incNumberOfStates();
@@ -167,7 +168,7 @@ handleState(uint32_t source,
 
 bool BroadExpandHandler::
 handleTransition(uint32_t source,
-                 const BroadEventRecord* event,
+                 BroadEventRecord* event,
                  uint32_t target)
 {
   // std::cerr << source << " -" << (const char*) event->getName() << "-> "
@@ -301,6 +302,7 @@ setupReverseTransitionRelations()
     int maxUpdates = 0;
     for (uint32_t e = 0; e < mEventRecords.size(); e++) {
       BroadEventRecord* event = mEventRecords.get(e);
+      event->removeTransitionsNotTaken();
       if (!event->isGloballyDisabled() && !event->isOnlySelfloops()) {
         BroadEventRecord* reversed = event->createReversedRecord();
         mReversedEventRecords.add(reversed);
@@ -389,7 +391,7 @@ expandForwardSafety(uint32_t source,
   BroadExpandHandler handler(*this, callBack);
   const uint32_t numEvents = mEventRecords.size();
   for (uint32_t e = 0; e < numEvents; e++) {
-    const BroadEventRecord* event = mEventRecords.get(e);
+    BroadEventRecord* event = mEventRecords.get(e);
     const AutomatonRecord* dis = 0;
     FIND_DISABLING_AUTOMATON(sourceTuple, event, dis);
     if (dis == 0) {
@@ -423,7 +425,7 @@ public:
   virtual bool handleState(uint32_t source,
 			   const uint32_t* sourceTuple,
 			   const uint32_t* sourcePacked,
-			   const BroadEventRecord* event)
+			   BroadEventRecord* event)
   {
     getExplorer().incNumberOfTransitionsExplored();
     StateSpace& stateSpace = getExplorer().getStateSpace();
@@ -501,7 +503,7 @@ public:
   virtual bool handleEvent(uint32_t source,
 			   const uint32_t* sourceTuple,
 			   const uint32_t* sourcePacked,
-			   const BroadEventRecord* event)
+			   BroadEventRecord* event)
   {
     if (event->getFanout(sourceTuple) <= mPrevLevelSize) {
       return BroadExpandHandler::handleEvent(source, sourceTuple,
@@ -515,7 +517,7 @@ public:
   virtual bool handleState(uint32_t source,
 			   const uint32_t* sourceTuple,
 			   const uint32_t* sourcePacked,
-			   const BroadEventRecord* event)
+			   BroadEventRecord* event)
   {
     getExplorer().incNumberOfTransitionsExplored();
     StateSpace& stateSpace = getExplorer().getStateSpace();
@@ -563,7 +565,7 @@ public:
   virtual bool handleState(uint32_t source,
 			   const uint32_t* sourceTuple,
 			   const uint32_t* sourcePacked,
-			   const BroadEventRecord* event)
+			   BroadEventRecord* event)
   {
     getExplorer().incNumberOfTransitionsExplored();
     const StateSpace& stateSpace = getExplorer().getStateSpace();
@@ -612,7 +614,7 @@ expandTraceState(const uint32_t target,
       uint32_t* sourcePacked = getStateSpace().get(source);
       getAutomatonEncoding().decode(sourcePacked, sourceTuple);
       for (uint32_t e = 0; e < numDeferred; e++) {
-        const BroadEventRecord* event = deferred.get(e)->getForwardRecord();
+        BroadEventRecord* event = deferred.get(e)->getForwardRecord();
         const AutomatonRecord* dis = 0;
         FIND_DISABLING_AUTOMATON(sourceTuple, event, dis);
         if (dis == 0 &&
@@ -888,12 +890,18 @@ setupCompactEventList
   mEventRecords.clear(numEvents);
   HashTableIterator hiter2 = eventmap.iterator();
   bool trivial = checkType == CHECK_TYPE_SAFETY;
+  bool removing = checkType == CHECK_TYPE_NONBLOCKING &&
+                  getConflictCheckMode() ==
+                    jni::ConflictCheckMode_COMPUTED_BACKWARDS_TRANSITIONS;
   while (eventmap.hasNext(hiter2)) {
     BroadEventRecord* event = eventmap.next(hiter2);
     if (event->isSkippable(checkType)) {
       delete event;
     } else {
       event->optimizeTransitionRecordsForSearch(checkType);
+      if (removing) {
+        event->setupNotTakenSearchRecords();
+      }
       mEventRecords.add(event);
       trivial &= (event->isControllable() | !event->isDisabledInSpec());
     }

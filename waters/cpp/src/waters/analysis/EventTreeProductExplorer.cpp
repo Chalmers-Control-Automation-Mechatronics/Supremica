@@ -117,7 +117,7 @@ setupReverseTransitionRelations()
       case EventTree::OPCODE_EXEC_2:                                    \
         {                                                               \
           const uint32_t e = code & EventTree::OPERAND_MASK_3;          \
-          const BroadEventRecord* event = events.get(e);                \
+          BroadEventRecord* event = events.get(e);                \
           if (safety && ((code & EventTree::OPCODE_MASK_3) ==           \
                          EventTree::OPCODE_FAIL_3)) {                   \
             const AutomatonRecord* dis =                                \

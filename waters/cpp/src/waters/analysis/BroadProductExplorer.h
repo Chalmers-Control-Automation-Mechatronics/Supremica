@@ -54,13 +54,13 @@ public:
   virtual bool handleEvent(uint32_t source,
 			   const uint32_t* sourceTuple,
 			   const uint32_t* sourcePacked,
-			   const BroadEventRecord* event);
+			   BroadEventRecord* event);
   virtual bool handleState(uint32_t source,
 			   const uint32_t* sourceTuple,
 			   const uint32_t* sourcePacked,
-			   const BroadEventRecord* event);
+			   BroadEventRecord* event);
   inline bool handleTransition(uint32_t source,
-			       const BroadEventRecord* event,
+			       BroadEventRecord* event,
 			       uint32_t target);
 
 protected:

@@ -488,7 +488,7 @@ doAbort()
 
 bool ProductExplorer::
 doSafetySearch()
-{
+{    
 # define EXPAND expandForwardSafety
   DO_REACHABILITY(0);
 # undef EXPAND

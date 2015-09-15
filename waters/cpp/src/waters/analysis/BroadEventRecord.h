@@ -47,7 +47,7 @@ public:
   explicit BroadEventRecord(jni::EventGlue event,
 			    bool controllable,
 			    int numwords);
-  explicit BroadEventRecord(const BroadEventRecord& fwd);
+  explicit BroadEventRecord(BroadEventRecord& fwd);
   virtual ~BroadEventRecord();
 
   //##########################################################################
@@ -65,8 +65,7 @@ public:
     {return mUsedSearchRecords;}
   inline TransitionUpdateRecord* getTransitionUpdateRecord(int w) const
     {return mUpdateRecords[w];}
-  inline const BroadEventRecord* getForwardRecord() const
-    {return mForwardRecord;}
+  inline BroadEventRecord* getForwardRecord() const {return mForwardRecord;}
 
   //##########################################################################
   //# Comparing and Hashing
@@ -85,7 +84,13 @@ public:
   void normalize(const AutomatonRecord* aut);
   TransitionUpdateRecord* createUpdateRecord(int wordindex);
   void optimizeTransitionRecordsForSearch(CheckType mode);
-  BroadEventRecord* createReversedRecord() const;
+  void setupNotTakenSearchRecords();
+  void markTransitionsTaken(const uint32_t* tuple);
+  int removeTransitionsNotTaken();
+  BroadEventRecord* createReversedRecord();
+
+  inline void markTransitionsTakenFast(const uint32_t* tuple)
+    {if (mNotTakenSearchRecords) markTransitionsTaken(tuple);}
 
   //##########################################################################
   //# Trace Computation
@@ -122,10 +127,11 @@ private:
   int mNumberOfUpdates;
   TransitionRecord* mUsedSearchRecords;
   TransitionRecord* mUnusedSearchRecords;
+  TransitionRecord* mNotTakenSearchRecords;
   TransitionRecord* mNonSelfloopingRecord;
   TransitionUpdateRecord** mUpdateRecords;
   float mProbability;
-  const BroadEventRecord* mForwardRecord;
+  BroadEventRecord* mForwardRecord;
 };
 
 }   /* namespace waters */

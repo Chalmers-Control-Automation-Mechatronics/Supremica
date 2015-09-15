@@ -75,6 +75,9 @@ public:
   inline void setNextInSearch(TransitionRecord* next) {mNextInSearch = next;}
   inline TransitionRecord* getNextInUpdate() const {return mNextInUpdate;}
   inline void setNextInUpdate(TransitionRecord* next) {mNextInUpdate = next;}
+  inline TransitionRecord* getNextInNotTaken() const {return mNextInNotTaken;}
+  inline void setNextInNotTaken(TransitionRecord* next)
+    {mNextInNotTaken = next;}
 
   //##########################################################################
   //# Comparing and Hashing
@@ -92,6 +95,8 @@ public:
   void addNondeterministicTransition(uint32_t source, uint32_t target);
   void normalize();
   uint32_t getCommonTarget() const;
+  bool markTransitionTaken(const uint32_t* tuple);
+  int removeTransitionsNotTaken();
   void removeSelfloops();
 
   //##########################################################################
@@ -121,12 +126,15 @@ private:
   uint32_t* mNumNondeterministicSuccessors;
   uint32_t* mNondeterministicBuffer;
   uint32_t** mNondeterministicSuccessorsShifted;
+  uint32_t mNumNotTaken;
   TransitionRecord* mNextInSearch;
   TransitionRecord* mNextInUpdate;
+  TransitionRecord* mNextInNotTaken;
 
   //##########################################################################
   //# Class Constants
   static const uint32_t FLAG_NONDET = 0x00000001;
+  static const uint32_t FLAG_TAKEN = 0x00000002;
 
   static const int PROBABILITY_1 = 0x40000000;
   static const float PROBABILITY_ADJUST = 1.0f / PROBABILITY_1;
