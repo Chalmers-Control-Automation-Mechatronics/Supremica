@@ -506,7 +506,7 @@ public abstract class AbstractTRCompositionalAnalyzer
 
   /**
    * Returns the file name abstracted models are written to.
-   * @see #setMonolithicDumpFileName(File) setMonolithicDumpFileName()
+   * @see #setMonolithicDumpFileName(String) setMonolithicDumpFileName()
    */
   public String getMonolithicDumpFileName()
   {

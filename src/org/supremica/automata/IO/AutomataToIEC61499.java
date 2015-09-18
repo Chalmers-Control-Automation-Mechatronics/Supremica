@@ -53,13 +53,23 @@
 
 package org.supremica.automata.IO;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Iterator;
 
-import org.supremica.log.*;
-import org.supremica.automata.*;
+import net.sourceforge.waters.config.Version;
+
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.Project;
+import org.supremica.automata.State;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 import org.supremica.util.SupremicaException;
 
 /** This class generates an IEC-61499 function block
@@ -123,7 +133,7 @@ public class AutomataToIEC61499
 			{
 				final Project tempProject = new Project();
 
-				tempProject.addAutomaton((Automaton) autIt.next());
+				tempProject.addAutomaton(autIt.next());
 
 				final File tmpFile = new File(file.getParent() + "/" + tempProject.getAutomatonAt(0).getName() + ".fbt");
 
@@ -253,7 +263,7 @@ public class AutomataToIEC61499
 		{
 			pw.println("<!--");
 			pw.println(" This function block was automatically generated from Supremica.");
-			pw.println(" Supremica version: " + org.supremica.Version.version());
+			pw.println(" " + Version.getInstance().toString());
 			pw.println(" Time of generation: " + DateFormat.getDateTimeInstance().format(new Date()));
 			pw.println("-->");
 		}
@@ -673,7 +683,7 @@ public class AutomataToIEC61499
 		{
 			pw.println("<!--");
 			pw.println(" This function block was automatically generated from Supremica.");
-			pw.println(" Supremica version: " + org.supremica.Version.version());
+			pw.println(" " + Version.getInstance().toString());
 			pw.println(" Time of generation: " + DateFormat.getDateTimeInstance().format(new Date()));
 			pw.println("-->");
 		}

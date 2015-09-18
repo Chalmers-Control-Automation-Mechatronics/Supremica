@@ -54,7 +54,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Image;
-import java.awt.Point;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -82,9 +81,10 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
+import net.sourceforge.waters.config.Version;
+import net.sourceforge.waters.gui.about.AboutPopup;
 import net.sourceforge.waters.gui.util.IconLoader;
 
-import org.supremica.Version;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.Project;
@@ -92,6 +92,7 @@ import org.supremica.automata.IO.EncodingHelper;
 import org.supremica.automata.IO.ProjectBuildFromXML;
 import org.supremica.comm.xmlrpc.Server;
 import org.supremica.gui.help.ContentHelp;
+import org.supremica.gui.ide.IDEReportInterface;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
@@ -99,7 +100,8 @@ import org.supremica.properties.Config;
 
 public class Supremica
     extends JFrame
-    implements TableModelListener, Gui, VisualProjectContainerListener
+    implements IDEReportInterface, TableModelListener,
+               Gui, VisualProjectContainerListener
 {
     private static final long serialVersionUID = 1L;
     private final Logger logger = LoggerFactory.createLogger(Supremica.class);
@@ -146,7 +148,7 @@ public class Supremica
         // theVisualProjectContainer = currProject.getVisualProjectContainer();
         // theVisualProjectContainer.addListener(this);
 
-        logger.info("Supremica version: " + Version.version());
+        logger.info("Supremica version: " + Version.getInstance().toString());
 
         if (Config.XML_RPC_ACTIVE.isTrue())
         {
@@ -708,14 +710,8 @@ public class Supremica
      */
     public void helpAbout()
     {
-        final AboutBox dlg = new AboutBox(this);
-        final Dimension dlgSize = dlg.getPreferredSize();
-        final Dimension frmSize = getSize();
-        final Point loc = getLocation();
-
-        dlg.setLocation((frmSize.width - dlgSize.width) / 2 + loc.x, (frmSize.height - dlgSize.height) / 2 + loc.y);
-        dlg.setModal(true);
-        dlg.setVisible(true);
+      final AboutPopup popup = new AboutPopup(this);
+      popup.setVisible(true);
     }
 
     // Overridden so we can exit when window is closed

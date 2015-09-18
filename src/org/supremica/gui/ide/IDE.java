@@ -25,7 +25,9 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.xml.bind.JAXBException;
 
+import net.sourceforge.waters.config.Version;
 import net.sourceforge.waters.gui.EditorWindowInterface;
+import net.sourceforge.waters.gui.about.WelcomeScreen;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
@@ -37,7 +39,6 @@ import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 
-import org.supremica.Version;
 import org.supremica.automata.Project;
 import org.supremica.comm.xmlrpc.Server;
 import org.supremica.gui.InterfaceManager;
@@ -68,9 +69,15 @@ public class IDE
 {
 
   //#########################################################################
-  //# Constructor
+  //# Constructors
   public IDE()
-  throws JAXBException, SAXException
+    throws JAXBException, SAXException
+  {
+    this(true);
+  }
+
+  public IDE(final boolean showVersion)
+    throws JAXBException, SAXException
   {
     // Instantiate all actions
     mObservers = new LinkedList<Observer>();
@@ -82,7 +89,7 @@ public class IDE
 
     // Create GUI
     Utility.setupFrame(this, IDEDimensions.mainWindowPreferredSize);
-    setTitle(getName());
+    setTitle(Version.getInstance().getTitle());
     final BorderLayout layout = new BorderLayout();
     final JPanel contents = (JPanel) getContentPane();
     contents.setLayout(layout);
@@ -90,11 +97,11 @@ public class IDE
     setJMenuBar(menuBar);
     mToolBar = new IDEToolBar(this);
     contents.add(mToolBar, BorderLayout.NORTH);
-    mBlankPanel = new JPanel();
-    mBlankPanel.setPreferredSize(IDEDimensions.mainWindowPreferredSize);
+    mWelcomeScreen = new WelcomeScreen(this);
+    mWelcomeScreen.setPreferredSize(IDEDimensions.mainWindowPreferredSize);
     mLogPanel = new LogPanel(this, "Logger");
     mSplitPaneVertical =
-      new JSplitPane(JSplitPane.VERTICAL_SPLIT, mBlankPanel, mLogPanel);
+      new JSplitPane(JSplitPane.VERTICAL_SPLIT, mWelcomeScreen, mLogPanel);
     mSplitPaneVertical.setContinuousLayout(false);
     mSplitPaneVertical.setOneTouchExpandable(false);
     mSplitPaneVertical.setDividerLocation(0.8);
@@ -108,16 +115,17 @@ public class IDE
     mDocumentContainerManager = new DocumentContainerManager(this);
     mDocumentContainerManager.attach(this);
 
-    // Show Version number
-    info("Supremica version: " + (new Version()));
-
-	// Show memory
-	final int MB = 1024*1024;
-	info("JVM:" + System.getProperty("java.version")
-			+ ", Free/Total/Max mem: " + Runtime.getRuntime().freeMemory()/MB + "/"
-							   + Runtime.getRuntime().totalMemory()/MB + "/"
-							   + Runtime.getRuntime().maxMemory()/MB + " MB");
-
+    if (showVersion) {
+      // Show Version number
+      info(Version.getInstance().toString());
+      // Show memory
+      final int MB = 1024*1024;
+      info("JVM:" + System.getProperty("java.version") +
+           ", Free/Total/Max mem: " +
+           Runtime.getRuntime().freeMemory()/MB + "/" +
+           Runtime.getRuntime().totalMemory()/MB + "/" +
+           Runtime.getRuntime().maxMemory()/MB + " MB");
+    }
     // Initialise XML_RPC
     if (Config.XML_RPC_ACTIVE.isTrue()) {
       try {
@@ -217,7 +225,7 @@ public class IDE
       final DocumentContainer container =
         mDocumentContainerManager.getActiveContainer();
       if (container == null) {
-        mSplitPaneVertical.setTopComponent(mBlankPanel);
+        mSplitPaneVertical.setTopComponent(mWelcomeScreen);
       } else {
         final Component panel = container.getPanel();
         mSplitPaneVertical.setTopComponent(panel);
@@ -334,10 +342,12 @@ public class IDE
     // Now start the gui...
     InterfaceManager.getInstance().initLookAndFeel();
     //WatersDragSourceListener.setup();
-    final IDE ide = new IDE();
-
+    final boolean hasFiles = (files != null && files.size() > 0);
+    final boolean showVersion =
+      hasFiles || Config.GUI_EDITOR_DEFAULT_EMPTY_MODULE.isTrue();
+    final IDE ide = new IDE(showVersion);
     // Open initial module(s)
-    if (files != null && files.size() > 0) {
+    if (hasFiles) {
       ide.openFiles(files);
     } else if (Config.GUI_EDITOR_DEFAULT_EMPTY_MODULE.isTrue()) {
       ide.openEmptyDocument();
@@ -471,7 +481,7 @@ public class IDE
   private final DocumentContainerManager mDocumentContainerManager;
   private final IDEMenuBar menuBar;
   private final IDEToolBar mToolBar;
-  private final JPanel mBlankPanel;
+  private final JPanel mWelcomeScreen;
   private final JSplitPane mSplitPaneVertical;
   private final LogPanel mLogPanel;
   private final JFileChooser mFileChooser;

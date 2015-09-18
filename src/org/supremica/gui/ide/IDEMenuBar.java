@@ -44,6 +44,7 @@ import net.sourceforge.waters.gui.actions.AnalyzeSICProperty6Action;
 import net.sourceforge.waters.gui.actions.GraphLayoutAction;
 import net.sourceforge.waters.gui.actions.GraphSaveEPSAction;
 import net.sourceforge.waters.gui.actions.GraphSavePDFAction;
+import net.sourceforge.waters.gui.actions.IDEAboutAction;
 import net.sourceforge.waters.gui.actions.IDECopyAction;
 import net.sourceforge.waters.gui.actions.IDECutAction;
 import net.sourceforge.waters.gui.actions.IDEDeleteAction;
@@ -556,9 +557,9 @@ public class IDEMenuBar extends JMenuBar
     if (mHelpMenu == null) {
       mHelpMenu = new JMenu("Help");
       mHelpMenu.setMnemonic(KeyEvent.VK_H);
+      final Action about = actions.getAction(IDEAboutAction.class);
+      mHelpMenu.add(about);
       mHelpMenu.add(actions.helpWebAction.getMenuItem());
-      mHelpMenu.addSeparator();
-      mHelpMenu.add(actions.helpAboutAction.getMenuItem());
     }
   }
 

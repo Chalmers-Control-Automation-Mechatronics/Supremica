@@ -23,6 +23,7 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.xml.bind.JAXBException;
 
+import net.sourceforge.waters.config.Version;
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
 import net.sourceforge.waters.gui.ControlledToolbar;
 import net.sourceforge.waters.gui.EditorWindowInterface;
@@ -61,7 +62,6 @@ import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
 import org.apache.batik.dom.GenericDOMImplementation;
 import org.apache.batik.svggen.SVGGraphics2D;
-import org.supremica.Version;
 import org.supremica.automata.Project;
 import org.supremica.automata.IO.ADSUnmarshaller;
 import org.supremica.automata.IO.HISCUnmarshaller;
@@ -389,7 +389,7 @@ public class ProcessCommandLineArguments
         System.out.println(SupremicaProperties.getProperties());
         quit = true;
       } else if (args[i].equals("-v") || args[i].equals("--version")) {
-        System.out.println("Supremica version: " + Version.version());
+        System.out.println(Version.getInstance().toString());
         quit = true;
       } else {
         final String filename = args[i];
@@ -417,9 +417,7 @@ public class ProcessCommandLineArguments
   private static void printUsage()
   {
     System.out
-      .println("Supremica: "
-               + org.supremica.Version.version()
-               + "\n"
+      .println(Version.getInstance().toString() + "\n"
                + "More information about Supremica is available at www.supremica.org\n"
                + "\n"
                + "Usage: IDE [OPTION] MODULE_FILES\n"

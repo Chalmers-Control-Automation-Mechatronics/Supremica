@@ -27,6 +27,8 @@ import java.util.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import net.sourceforge.waters.config.Version;
+
 import org.supremica.log.*;
 import org.supremica.automata.*;
 import org.supremica.util.SupremicaException;
@@ -227,7 +229,7 @@ public class ModuleToIEC61499
 		{
 			pw.println("<!--");
 			pw.println(" This function block was automatically generated from Supremica.");
-			pw.println(" Supremica version: " + org.supremica.Version.version());
+			pw.println(" " + Version.getInstance().toString());
 			pw.println(" Time of generation: " + DateFormat.getDateTimeInstance().format(new Date()));
 			pw.println("-->");
 		}
@@ -660,7 +662,7 @@ public class ModuleToIEC61499
 		{
 			pw.println("<!--");
 			pw.println(" This function block was automatically generated from Supremica.");
-			pw.println(" Supremica version: " + org.supremica.Version.version());
+			pw.println(" " + Version.getInstance().toString());
 			pw.println(" Time of generation: " + DateFormat.getDateTimeInstance().format(new Date()));
 			pw.println("-->");
 		}

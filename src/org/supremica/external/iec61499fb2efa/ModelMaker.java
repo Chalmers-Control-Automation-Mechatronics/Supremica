@@ -39,7 +39,7 @@ import java.util.Iterator;
 import java.util.Calendar;
 import java.util.Properties;
 
-import org.supremica.Version;
+import net.sourceforge.waters.config.Version;
 
 class ModelMaker
 {
@@ -194,7 +194,7 @@ class ModelMaker
 		ModelBuilder theBuilder = null;
 
 		Logger.output("ModelMaker  Copyright (C) " + Calendar.getInstance().get(Calendar.YEAR) + " Goran Cengic");
-		Logger.output("Build time: " + Version.version());
+		Logger.output(Version.getInstance().toString());
         Logger.output("");
 		
         if (properties.getProperty("systemFileName") == null)

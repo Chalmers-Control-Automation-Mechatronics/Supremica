@@ -60,6 +60,7 @@ public abstract class WatersActionManager implements Observer
     addAction(new GraphLayoutAction(ide));
     addAction(new GraphSaveEPSAction(ide));
     addAction(new GraphSavePDFAction(ide));
+    addAction(new IDEAboutAction(ide));
     addAction(new IDECopyAction(ide));
     addAction(new IDECutAction(ide));
     addAction(new IDEDeleteAction(ide));

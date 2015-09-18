@@ -248,6 +248,11 @@
 
     <target name="-init">
         <tstamp/>
+        <tstamp>
+            <format property="build.time"
+                    pattern="YYYY-MM-dd HH:mm:ss z"
+                    timezone="GMT"/>
+        </tstamp>
     </target>
             
     <target name="backup" depends="-init,clean">
@@ -263,25 +268,26 @@
         <tar tarfile="${backup.dir}/${project.name}_onlysrc_${DSTAMP}_${TSTAMP}.tar" 
              basedir="../${project.name}/src"
              excludes="rsync/**,put,get"/>
-        <gzip zipfile="${backup.dir}/${project.name}_onlysrc_${DSTAMP}_${TSTAMP}.tar.gz"
+        <gzip zipfile="${backup.dir}/${project.name}_onlysrc_${DSTAnet/sourceforge/waters/configMP}_${TSTAMP}.tar.gz"
               src="${backup.dir}/${project.name}_onlysrc_${DSTAMP}_${TSTAMP}.tar"/>
         <delete file="${backup.dir}/${project.name}_onlysrc_${DSTAMP}_${TSTAMP}.tar"/>
     </target>
     
-    <target name="version" depends="-init">
+    <target name="version" depends="-init,detect_arch">
         <delete quiet="true" file="${src}/${supremica_basedir}/Version.java"/>
-        <copy file="${templates}/Version.tmpl" tofile="${src}/${supremica_basedir}/Version.java"/>      
-        <replace file="${src}/${supremica_basedir}/Version.java" token="@BUILDDATE" value="${DSTAMP}${TSTAMP}"/>
-        <delete quiet="true" file="${dist}/SupremicaVersion.txt"/>
-        <copy file="${templates}/SupremicaVersion.txt" tofile="${dist}/SupremicaVersion.txt"/>  
-        <replace file="${dist}/SupremicaVersion.txt" token="@BUILDDATE" value="${DSTAMP}${TSTAMP}"/>
+        <property name="version.dir" value="net/sourceforge/waters/config"/>
+        <property name="version.file"
+                  location="${build}/${version.dir}/Version.properties"/>
+        <copy file="${templates}/Version.properties"
+              tofile="${version.file}" overwrite="true"/>
+        <replace file="${version.file}">
+            <replacefilter token="@TIME" value="${build.time}"/>
+            <replacefilter token="@ARCH" value="${native.host.arch}"/>
+        </replace>
+        <copy todir="${build}/${version.dir}">
+            <fileset dir="${src}/${version.dir}" includes="*.html"/>
+        </copy>
     </target>
-    
-    <!-- Compile:
-*       Reuses existing class files, but recompiles those
-*       source files that have changed.
-    -->
-    <target name="compileAndRun" depends="compile,runLocal"/>
     
     <target name="compile" depends="compile_manufacturingTables_jaxb,compile_supremica,compile_supremica_tests"/>
     
@@ -449,7 +455,7 @@
         
     </target>
         
-    <target name="build" depends="version,compile,-jar_supremica,-startfiles_supremica" description=
+    <target name="build" depends="compile,-jar_supremica,-startfiles_supremica" description=
             "Recompiles only the files that have changed, then packages all files into a jar file.">
     </target>
     
@@ -495,15 +501,16 @@ Class-Path: ${manifest.pathlist}</echo>
         </copy>
     </target>
     
-    <target name="-jar_supremica" depends="compile_supremica,downloads_supremica,copy_watersxmlfiles_into_build">
+    <target name="-jar_supremica"
+            depends="compile_supremica,downloads_supremica,copy_watersxmlfiles_into_build,version">
         <jar jarfile="${dist}/Supremica.jar" manifest="${build}/manifest.txt"> 
             <fileset dir="${build}"
                      excludes="net/sourceforge/waters/analysis/comp552/"/>
             <fileset dir="${images}"/>
             <fileset dir="${examples}" includes="includeInJarFile/"/>
-            <fileset dir="${animations}"/>              
+            <fileset dir="${animations}"/>
             <fileset dir="${userinterfaces}"/>  
-            <fileset dir="${runtimesoftplcbuild}"/>                     
+            <fileset dir="${runtimesoftplcbuild}"/>
         </jar>
     </target>
     
@@ -1112,7 +1119,6 @@ Class-Path: ${manifest.pathlist}</echo>
     <target name="deployLocal">
         <copy file="${dist}/Supremica.jar" todir="C:\Supremica Installer\Input\Runtime\NoArch"/>        
         <copy file="${dist}/SupremicaLib.jar" todir="C:\Supremica Installer\Input\Runtime\NoArch"/>     
-        <copy file="${dist}/SupremicaVersion.txt" todir="C:\Supremica Installer\Input\Runtime\NoArch"/> 
         <copy file="${platform}/win.x86/lib/buddy.dll" todir="${installer.dir}\Input"/> 
         <chmod file="${installer.dir}\Input\buddy.dll" perm="644"/>
         <copy file="${platform}/win.x86/lib/BisimulationEquivalence.dll" todir="${installer.dir}\Input"/>       
@@ -1133,10 +1139,8 @@ Class-Path: ${manifest.pathlist}</echo>
     <target name="deployWeb">
         <copy file="${dist}/Supremica.jar" todir="W:\public_html\Supremica\updates\noarch"/>    
         <copy file="${dist}/SupremicaLib.jar" todir="W:\public_html\Supremica\updates\noarch"/> 
-        <copy file="${dist}/SupremicaVersion.txt" todir="W:\public_html\Supremica\updates\noarch"/>
         <copy file="${dist}/Supremica.jar" todir="C:\Supremica Installer\Input\Runtime\NoArch"/>        
         <copy file="${dist}/SupremicaLib.jar" todir="C:\Supremica Installer\Input\Runtime\NoArch"/>     
-        <copy file="${dist}/SupremicaVersion.txt" todir="C:\Supremica Installer\Input\Runtime\NoArch"/> 
         <copy file="${platform}/win.x86/lib/buddy.dll" todir="${installer.dir}\Input"/> 
         <chmod file="${installer.dir}\Input\buddy.dll" perm="644"/>
         <copy file="${platform}/win.x86/lib/BisimulationEquivalence.dll" todir="${installer.dir}\Input"/>       

@@ -49,10 +49,12 @@
  */
 package org.supremica.apps;
 
-import org.supremica.log.*;
-import org.supremica.*;
-import org.supremica.comm.xmlrpc.*;
+import net.sourceforge.waters.config.Version;
+
+import org.supremica.comm.xmlrpc.Server;
 import org.supremica.gui.VisualProjectContainer;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
 
 public class SupremicaServer
@@ -73,7 +75,7 @@ public class SupremicaServer
 	{
 		theVisualProjectContainer = new VisualProjectContainer();
 
-		logger.info("Supremica version: " + (new Version()).toString());
+		logger.info(Version.getInstance().toString());
 
 		boolean serverStarted = true;
 
@@ -81,7 +83,7 @@ public class SupremicaServer
 		{
 			xmlRpcServer = new Server(theVisualProjectContainer, Config.XML_RPC_PORT.get());
 		}
-		catch (Exception e)
+		catch (final Exception e)
 		{
 			serverStarted = false;
 
@@ -95,7 +97,7 @@ public class SupremicaServer
 		}
 	}
 
-	public static void main(String args[])
+	public static void main(final String args[])
 	{
 		new SupremicaServer();
 	}

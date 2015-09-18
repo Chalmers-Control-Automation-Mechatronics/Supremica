@@ -32,17 +32,22 @@ public class IconLoader
     return ICON_PLANT.getIconHeight();
   }
 
+  public static ImageIcon loadImage(final String subdir, final String name)
+  {
+    return getWatersIcon(subdir, name);
+  }
+
 
   //#########################################################################
   //# Private Static Class Methods
-  private static final ImageIcon getWatersIcon(final String name)
+  private static ImageIcon getWatersIcon(final String name)
   {
     final String subdir = Config.GUI_EDITOR_ICONSET.getAsString();
     return getWatersIcon(subdir, name);
   }
 
-  private static final ImageIcon getWatersIcon(final String subdir,
-                                               final String name)
+  private static ImageIcon getWatersIcon(final String subdir,
+                                         final String name)
   {
     final Class<?> cls = IconLoader.class;
     final String prefix = "/icons/" + subdir + "/" + name;
@@ -57,7 +62,7 @@ public class IconLoader
     return null;
   }
 
-  private static final ImageIcon getSupremicaIcon(final String name)
+  private static ImageIcon getSupremicaIcon(final String name)
   {
     final Class<?> cls = IconLoader.class;
     final String resourcename = "/icons/" + name + ".gif";
