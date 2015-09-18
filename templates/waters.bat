@@ -1,35 +1,31 @@
 @echo off
 
 set TMP1=%TMP%\regtmp1.txt
-set TMP2=%TMP%\regtmp2.txt
 
 ::Get the home directory of Java 1.7
-start /w regedit /e %TMP1% "HKEY_LOCAL_MACHINE\SOFTWARE\JavaSoft\Java Runtime Environment\1.7"
-type %TMP1% | find "JavaHome" > %TMP2%
+reg query "HKEY_LOCAL_MACHINE\SOFTWARE\JavaSoft\Java Runtime Environment\1.7" /v JavaHome >%TMP1%
 if errorlevel 1 goto NOJAVA17_64
-for /f "tokens=2 delims==" %%x in (%TMP2%) do set JAVA_HOME=%%~x
+::  note: delims is a TAB followed by a space
+for /f "tokens=2* delims=	 " %%A in (%TMP1%) do set JAVA_HOME=%%B
 if not errorlevel 1 goto GOTJAVA
 
 :NOJAVA17_64
-start /w regedit /e %TMP1% "HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\JavaSoft\Java Runtime Environment\1.7"
-type %TMP1% | find "JavaHome" > %TMP2%
+reg query "HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\JavaSoft\Java Runtime Environment\1.7" /v JavaHome >%TMP1%
 if errorlevel 1 goto NOJAVA17
-for /f "tokens=2 delims==" %%x in (%TMP2%) do set JAVA_HOME=%%~x
+for /f "tokens=2* delims=	 " %%A in (%TMP1%) do set JAVA_HOME=%%B
 if not errorlevel 1 goto GOTJAVA
 
 :NOJAVA17
 ::Get the home directory of Java 1.8
-start /w regedit /e %TMP1% "HKEY_LOCAL_MACHINE\SOFTWARE\JavaSoft\Java Runtime Environment\1.8"
-type %TMP1% | find "JavaHome" > %TMP2%
+reg query "HKEY_LOCAL_MACHINE\SOFTWARE\JavaSoft\Java Runtime Environment\1.8" /v JavaHome >%TMP1%
 if errorlevel 1 goto NOJAVA18_64
-for /f "tokens=2 delims==" %%x in (%TMP2%) do set JAVA_HOME=%%~x
+for /f "tokens=2* delims=	 " %%A in (%TMP1%) do set JAVA_HOME=%%B
 if not errorlevel 1 goto GOTJAVA
 
 :NOJAVA18_64
-start /w regedit /e %TMP1% "HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\JavaSoft\Java Runtime Environment\1.8"
-type %TMP1% | find "JavaHome" > %TMP2%
+reg query "HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\JavaSoft\Java Runtime Environment\1.8" /v JavaHome >%TMP1%
 if errorlevel 1 goto NOJAVA
-for /f "tokens=2 delims==" %%x in (%TMP2%) do set JAVA_HOME=%%~x
+for /f "tokens=2* delims=	 " %%A in (%TMP1%) do set JAVA_HOME=%%B
 if not errorlevel 1 goto GOTJAVA
 
 :NOJAVA
@@ -38,7 +34,6 @@ goto END
 
 :GOTJAVA
 del %TMP1%
-del %TMP2%
 
 set JAVACMD="%JAVA_HOME%\bin\java"
 
