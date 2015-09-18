@@ -51,8 +51,15 @@ import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 
-import org.supremica.gui.Utility;
 
+/**
+ * The dialog window for guard/action blocks.
+ * This window is associated with edges of a graph, and opened by double-click
+ * or the "Properties..." option from the popup menu. It contains text fields
+ * for the guards and actions.
+ *
+ * @author Markus Sk&ouml;ldstam, Robi Malik
+ */
 
 public class EdgeEditorDialog
   extends JDialog
@@ -177,9 +184,9 @@ public class EdgeEditorDialog
     boolean first = true;
     for (final BinaryExpressionSubject action : actions) {
       if (first) {
-	first = false;
+        first = false;
       } else {
-	buffer.append("; ");
+        buffer.append("; ");
       }
       final String text = action.toString();
       buffer.append(text);
@@ -199,7 +206,7 @@ public class EdgeEditorDialog
     add(scrollPaneA);
 
     pack();
-    Utility.setupDialog(this, this.getWidth(), this.getHeight());
+    setLocationRelativeTo(root.getRootWindow());
     setVisible(true);
   }
 
@@ -332,9 +339,10 @@ public class EdgeEditorDialog
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
   private static final int fieldHeight = 100;
   private static final int fieldWidth = 200;
   private static Dimension MIN_SIZE = new Dimension(273, 284);
+
+  private static final long serialVersionUID = 308147283952619954L;
 
 }

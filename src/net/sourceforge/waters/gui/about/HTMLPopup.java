@@ -11,8 +11,6 @@ package net.sourceforge.waters.gui.about;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.MouseInfo;
-import java.awt.Point;
 import java.awt.Toolkit;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -43,7 +41,6 @@ public class HTMLPopup
     throws IOException
   {
     super(owner, title);
-    mClickPosition = MouseInfo.getPointerInfo().getLocation();
     final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     final int screenWidth = (int) screenSize.getWidth();
     final int textWidth = Math.min(TEXT_WIDTH, screenWidth);
@@ -73,20 +70,7 @@ public class HTMLPopup
     setBackground(Color.WHITE);
     add(scroll);
     pack();
-    final Dimension windowSize = getSize();
-    int x = mClickPosition.x - windowSize.width / 2;
-    if (x < 0) {
-      x = 0;
-    } else if (x + windowSize.width > screenWidth) {
-      x = screenWidth - windowSize.width;
-    }
-    int y = mClickPosition.y - windowSize.height / 2;
-    if (y < 0) {
-      y = 0;
-    } else if (y + windowSize.height > screenHeight) {
-      y = screenHeight - windowSize.height;
-    }
-    setLocation(x, y);
+    setLocationRelativeTo(getOwner());
     setVisible(true);
   }
 
@@ -94,7 +78,6 @@ public class HTMLPopup
   //#########################################################################
   //# Data Members
   private final JEditorPane mPanel;
-  private final Point mClickPosition;
 
 
   //#########################################################################

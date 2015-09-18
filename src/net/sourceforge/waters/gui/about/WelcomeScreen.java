@@ -100,12 +100,7 @@ public class WelcomeScreen
   private void createContents()
   {
     // Create the about box with the version information
-    final AboutPanel preAbout = new AboutPanel(mIDE);
-    preAbout.setSize(TEXT_WIDTH - 11, Integer.MAX_VALUE);
-    final int textHeight = preAbout.getPreferredSize().height;
-    final Dimension size = new Dimension(TEXT_WIDTH, textHeight + 8);
-    mAboutPanel = new AboutPanel(mIDE);
-    mAboutPanel.setPreferredSize(size);
+    final AboutPanel mAboutPanel = new AboutPanel(mIDE);
     final Border border1 = BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1);
     final Border border2 = BorderFactory.createRaisedBevelBorder();
     Border border = BorderFactory.createCompoundBorder(border1, border2);
@@ -113,9 +108,13 @@ public class WelcomeScreen
     border = BorderFactory.createCompoundBorder(border, border3);
     final Border border4 = BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1);
     border = BorderFactory.createCompoundBorder(border, border4);
-    final Border border5 = BorderFactory.createEmptyBorder(2, 4, 2, 3);
+    final Border border5 = BorderFactory.createEmptyBorder(2, 4, 2, 1);
     border = BorderFactory.createCompoundBorder(border, border5);
     mAboutPanel.setBorder(border);
+    mAboutPanel.setSize(TEXT_WIDTH, Integer.MAX_VALUE);
+    final int textHeight = mAboutPanel.getPreferredSize().height;
+    final Dimension size = new Dimension(TEXT_WIDTH, textHeight);
+    mAboutPanel.setPreferredSize(size);
 
     // Is there enough space for the images also
     final int fullHeight =
