@@ -177,38 +177,89 @@ public class AboutPanel
 
   private String getDotVersion()
   {
+    final DotVersionTask task = new DotVersionTask();
+    final Thread thread = new Thread(task);
+    thread.start();
     try {
-      final String command = Config.DOT_EXECUTE_COMMAND.get();
-      final ProcessBuilder builder = new ProcessBuilder(command, "-version");
-      builder.redirectErrorStream(true);
-      final Process proc = builder.start();
-      final InputStream stream = proc.getInputStream();
-      final BufferedReader reader =
-        new BufferedReader(new InputStreamReader(stream));
-      final String line = reader.readLine();
-      reader.close();
-      final Pattern pattern =
-        Pattern.compile("^dot - graphviz version ([0-9\\.]+)");
-      final Matcher matcher = pattern.matcher(line);
-      if (matcher.find()) {
-        final String version = matcher.group(1);
-        final Pattern subPattern = Pattern.compile("2\\.([0-9]{1,2}).*");
-        final Matcher subMatcher = subPattern.matcher(version);
-        int minorVersion = 99;
-        if (subMatcher.matches()) {
-          minorVersion = Integer.parseInt(subMatcher.group(1));
-        }
-        if (minorVersion <= 26) {
-          return version;
-        } else {
-          return version + " - <span style=\"color: red;\">incompatible</span>";
-        }
-      } else {
-        return null;
-      }
-    } catch (final IOException exception) {
-      return null;
+      thread.join(500);
+    } catch (final InterruptedException exception) {
+      // Interrupted? Timeout? Never mind ...
     }
+    task.kill();
+    return task.getVersionInfo();
+  }
+
+
+  //#########################################################################
+  //# Inner Class DotVersionTask
+  /**
+   * Background task to run the command 'dot -version' and retrieve a
+   * version number. This is run in a separate thread to provide better
+   * robustness in cases where the external command fails to terminate.
+   */
+  private static class DotVersionTask implements Runnable
+  {
+
+    //#######################################################################
+    //# Interface java.lang.Runnable
+    @Override
+    public void run()
+    {
+      try {
+        final String command = Config.DOT_EXECUTE_COMMAND.get();
+        final ProcessBuilder builder = new ProcessBuilder(command, "-version");
+        builder.redirectErrorStream(true);
+        mProcess = builder.start();
+        // Some versions of dot read stdin even with the -version option.
+        // By closing the stream, we stop dot from waiting for input:
+        mProcess.getOutputStream().close();
+        final InputStream stream = mProcess.getInputStream();
+        final BufferedReader reader =
+          new BufferedReader(new InputStreamReader(stream));
+        final String line = reader.readLine();
+        reader.close();
+        if (line != null) {
+          final Pattern pattern =
+            Pattern.compile("^dot - graphviz version ([0-9\\.]+)");
+          final Matcher matcher = pattern.matcher(line);
+          if (matcher.find()) {
+            mVersionInfo = matcher.group(1);
+            final Pattern subPattern = Pattern.compile("2\\.([0-9]{1,2}).*");
+            final Matcher subMatcher = subPattern.matcher(mVersionInfo);
+            int minorVersion = 99;
+            if (subMatcher.matches()) {
+              minorVersion = Integer.parseInt(subMatcher.group(1));
+            }
+            if (minorVersion > 26) {
+              mVersionInfo +=
+                " - <span style=\"color: red;\">incompatible</span>";
+            }
+          }
+        }
+      } catch (final IOException exception) {
+        // mVersionInfo remains null
+      }
+    }
+
+    //#######################################################################
+    //# Retrieving Result
+    String getVersionInfo()
+    {
+      return mVersionInfo;
+    }
+
+    void kill()
+    {
+      if (mProcess != null) {
+        mProcess.destroy();
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private Process mProcess = null;
+    private String mVersionInfo = null;
+
   }
 
 
