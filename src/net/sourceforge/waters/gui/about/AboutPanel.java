@@ -112,7 +112,7 @@ public class AboutPanel
   {
     final Version version = Version.getInstance();
     final StringBuilder builder = new StringBuilder();
-    builder.append("<HTML><BODY STYLE=\"font-size: 12; font-family: serif;\">");
+    builder.append("<HTML><BODY STYLE=\"font-size: 10px; font-family: serif;\">");
     builder.append("<H1 STYLE=\"text-align: center; color: #00008d; font-style: italic;\">");
     builder.append(version.getTitle());
     builder.append("</H1>");

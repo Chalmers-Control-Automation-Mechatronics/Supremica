@@ -154,7 +154,7 @@ public class WelcomeScreen
   //#########################################################################
   //# Class Constants
   private static final int VERTICAL_SPACE = 24;
-  private static final int TEXT_WIDTH = 480;
+  private static final int TEXT_WIDTH = 512;
 
   private static final ImageIcon LOGO_SUPREMICA =
     IconLoader.loadImage("greeter", "supremica");
