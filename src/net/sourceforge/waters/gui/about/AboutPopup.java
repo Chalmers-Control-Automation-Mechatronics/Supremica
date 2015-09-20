@@ -41,11 +41,12 @@ public class AboutPopup
     panel.setBorder(border);
     panel.setSize(TEXT_WIDTH, Integer.MAX_VALUE);
     final int textHeight = panel.getPreferredSize().height;
-    final Dimension size = new Dimension(TEXT_WIDTH, textHeight);
-    panel.setPreferredSize(size);
+    final Dimension panelSize = new Dimension(TEXT_WIDTH, textHeight);
+    panel.setPreferredSize(panelSize);
     add(panel);
     pack();
     setLocationRelativeTo(ide.getFrame());
+    setResizable(false);
   }
 
 

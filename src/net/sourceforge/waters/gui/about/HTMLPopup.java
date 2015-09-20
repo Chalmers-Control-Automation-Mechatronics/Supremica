@@ -41,6 +41,7 @@ public class HTMLPopup
     throws IOException
   {
     super(owner, title);
+    setBackground(Color.WHITE);
     final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     final int screenWidth = (int) screenSize.getWidth();
     final int textWidth = Math.min(TEXT_WIDTH, screenWidth);
@@ -49,6 +50,9 @@ public class HTMLPopup
     mPanel.setSize(textWidth, Integer.MAX_VALUE);
     mPanel.addPropertyChangeListener("page", this);
     mPanel.setPage(url);
+    // The data is loaded asynchronously by another thread.
+    // We can only query and adjust the panel size after loading,
+    // hence the propertyChange() listener below completes the display.
   }
 
 
@@ -67,7 +71,6 @@ public class HTMLPopup
       Math.min(mPanel.getPreferredSize().height, screenHeight * 7 / 8);
     final Dimension size = new Dimension(textWidth, textHeight);
     mPanel.setPreferredSize(size);
-    setBackground(Color.WHITE);
     add(scroll);
     pack();
     setLocationRelativeTo(getOwner());

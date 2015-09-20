@@ -123,10 +123,10 @@ public class AboutPanel
     builder.append("<P>Authors: Knut &Aring;kesson, Goran \u010Cengi\u0107, ");
     builder.append("Martin Fabian, Hugo Flordal, Carly Hona, Tom Levy, Robi Malik, ");
     builder.append("Markus Sk&ouml;ldstam, Arash Vahidi, and many others.</P>");
-    builder.append("<P>Supremica is released using the ");
-    builder.append("<A HREF=\"suplic.html\">Supremica Software License Agreement</A>.<BR>");
-    builder.append("The Waters source code is released under the ");
-    builder.append("<A HREF=\"gpl2.html\">GNU General Public License, version&nbsp;2</A>.</P>");
+    builder.append("<P>Waters is released under the ");
+    builder.append("<A HREF=\"gpl2.html\">GNU General Public License, version&nbsp;2</A>.<BR>");
+    builder.append("Supremica is released using the ");
+    builder.append("<A HREF=\"suplic.html\">Supremica Software License Agreement</A>.</P>");
     builder.append("<P>This is ");
     builder.append(version.getTitle());
     builder.append("<BR>");
