@@ -3192,7 +3192,7 @@ public class GraphEditorPanel
         mDraggedList = (List<ProxySubject>) transferable
             .getTransferData(WatersDataFlavor.IDENTIFIER);
       } catch (final UnsupportedFlavorException exception) {
-        throw new WatersRuntimeException(exception);
+        return false;
       } catch (final IOException exception) {
         throw new WatersRuntimeException(exception);
       }
