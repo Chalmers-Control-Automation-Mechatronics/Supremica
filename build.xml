@@ -9,12 +9,10 @@
 
     <property name="src" value="src"/>
     <property name="testssrc" value="tests/src"/>
-    <property name="benchmarkssrc" value="benchmarks/src"/>
     <property name="runtimesoftplcsrc" value="runtime/softplc/src"/>
     <property name="build" value="build"/>
     <property name="platform" value="platform"/>
     <property name="testsbuild" value="tests/build"/>
-    <property name="benchmarksbuild" value="benchmarks/build"/>
     <property name="runtimesoftplcbuild" value="runtime/softplc/build"/>
     <property name="dist"  value="dist"/>
     <property name="doc" value="doc"/>
@@ -217,8 +215,6 @@
         <mkdir dir="${build}"/>
         <delete dir="${testsbuild}"/>
         <mkdir dir="${testsbuild}"/>
-        <delete dir="${benchmarksbuild}"/>
-        <mkdir dir="${benchmarksbuild}"/>
     </target>
     
     <target name="clean" depends="clean_build">
