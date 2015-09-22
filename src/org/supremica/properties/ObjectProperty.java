@@ -46,11 +46,10 @@ public class ObjectProperty<T> extends Property
   }
 
   @Override
-  public void set(final String value)
+  public void set(final String text)
   {
-    final Object oldvalue = mValue;
-    setValue(parseObject(value));
-    firePropertyChanged(oldvalue.toString());
+    final T value = parseObject(text);
+    setValue(value);
   }
 
   @Override
@@ -75,7 +74,7 @@ public class ObjectProperty<T> extends Property
 
   public void setValue(final T value)
   {
-    if (mValue != value) {
+    if (!mValue.equals(value)) {
       checkValid(value);
       checkMutable();
       final String oldvalue = getAsString();
