@@ -141,7 +141,6 @@
         <unjar src="${lib}/scenebeansXmlCompability.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/BCEL.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/jgl3.1.0.jar" dest="${lib}/${unjared}"/>
-        <!--    <unjar src="${lib}/izmcomjni.jar" dest="${lib}/${unjared}"/>-->
     	<!-- JacoZoom -->
         <unjar src="${lib}/ctrlmngr.jar" dest="${lib}/${unjared}"/>     
         <unjar src="${lib}/CCOM.jar" dest="${lib}/${unjared}"/> 
@@ -1123,8 +1122,6 @@ Class-Path: ${manifest.pathlist}</echo>
         <chmod file="${installer.dir}\Input\buddy.dll" perm="644"/>
         <copy file="${platform}/win.x86/lib/BisimulationEquivalence.dll" todir="${installer.dir}\Input"/>       
         <chmod file="${installer.dir}\Input\BisimulationEquivalence.dll" perm="644"/>
-        <copy file="${platform}/win.x86/lib/izmjnicom.dll" todir="${installer.dir}\Input"/>     
-        <chmod file="${installer.dir}\Input\izmjnicom.dll" perm="644"/>
         <copy file="${platform}/win.x86/lib/21100280.LIC" todir="${installer.dir}\Input"/>      
         <chmod file="${installer.dir}\Input\21100280.LIC" perm="644"/>
         <copy file="${platform}/linux.x86/lib/libbuddy.so" todir="${installer.dir}\Input"/>     
@@ -1145,8 +1142,6 @@ Class-Path: ${manifest.pathlist}</echo>
         <chmod file="${installer.dir}\Input\buddy.dll" perm="644"/>
         <copy file="${platform}/win.x86/lib/BisimulationEquivalence.dll" todir="${installer.dir}\Input"/>       
         <chmod file="${installer.dir}\Input\BisimulationEquivalence.dll" perm="644"/>
-        <copy file="${platform}/win.x86/lib/izmjnicom.dll" todir="${installer.dir}\Input"/>     
-        <chmod file="${installer.dir}\Input\izmjnicom.dll" perm="644"/>
         <copy file="${platform}/win.x86/lib/21100280.LIC" todir="${installer.dir}\Input"/>      
         <chmod file="${installer.dir}\Input\21100280.LIC" perm="644"/>
         <copy file="${platform}/linux.x86/lib/libbuddy.so" todir="${installer.dir}\Input"/>     
