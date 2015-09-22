@@ -140,7 +140,6 @@ public class Actions extends WatersActionManager
     public IDEAction editorSaveSVGAction = new EditorSaveSVGAction(mIDEActions);
 
     // Editor Actions
-    public IDEAction editorCopyAsWMFAction = new EditorCopyAsWMFAction(mIDEActions);
     public IDEAction editorAddForeachComponentAction = new EditorAddForeachComponentAction(mIDEActions);
     public IDEAction editorAddInstanceAction = new EditorAddInstanceAction(mIDEActions);
     public IDEAction editorAddBindingAction = new EditorAddBindingAction(mIDEActions);

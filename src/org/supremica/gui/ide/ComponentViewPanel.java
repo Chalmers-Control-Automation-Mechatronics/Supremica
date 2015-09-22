@@ -37,7 +37,6 @@ package org.supremica.gui.ide;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.LayoutManager;
 
 import javax.swing.JPanel;
@@ -53,8 +52,6 @@ import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
-
-import org.supremica.gui.GraphicsToClipboard;
 
 
 /**
@@ -78,7 +75,6 @@ public class ComponentViewPanel
     private final GraphEventPanel events;
     private SimpleComponentSubject element = null;
     private ModuleSubject mModule = null;
-    private GraphicsToClipboard toClipboard = null;
 
 
     /**
@@ -152,34 +148,6 @@ public class ComponentViewPanel
     public UndoInterface getUndoInterface()
     {
         return mModuleContainer;
-    }
-
-    @Override
-    @Deprecated
-    public void copyAsWMFToClipboard()
-    {
-        if (toClipboard == null)
-        {
-            toClipboard = GraphicsToClipboard.getInstance();
-        }
-
-        //Rectangle2D bb = surface.getBoundingBox();
-        //double minX = bb.getMinX();
-        //double maxX = bb.getMaxX();
-        //double minY = bb.getMinY();
-        //double maxY = bb.getMaxY();
-        //logger.debug("minX: " + minX + " maxX: " + maxX + " minY: " + minY + " maxY: " + maxY);
-        //create a WMF object
-        //int width = (int)(maxX - minX) + 1;
-        //int height = (int)(maxY - minY) + 1;
-        // Copy a larger area, approx 10 percent, there seems to be
-        // a problem with the size of wmf-data
-        //width += (int)0.1*width;
-        //height += (int)0.1*height;
-        final Graphics theGraphics = toClipboard.getGraphics(surface.getWidth(), surface.getHeight());
-
-        surface.print(theGraphics);
-        toClipboard.copyToClipboard();
     }
 
 }

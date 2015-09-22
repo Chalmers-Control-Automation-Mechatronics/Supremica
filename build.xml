@@ -150,7 +150,6 @@
         <unjar src="${lib}/xmlBlaster.jar" dest="${lib}/${unjared}"/>   
         <unjar src="${lib}/xtdash.jar" dest="${lib}/${unjared}"/>       
         <unjar src="${lib}/jgrafchart.jar" dest="${lib}/${unjared}"/>   
-        <unjar src="${lib}/WMFWriter2D.jar" dest="${lib}/${unjared}"/>  
         <unjar src="${lib}/sysutils.jar" dest="${lib}/${unjared}"/>     
         <!-- Libraries for IEC61499 Fuber runtime support in Supremica. -->
         <!--   Maintained by: cengic@chalmers.se -->

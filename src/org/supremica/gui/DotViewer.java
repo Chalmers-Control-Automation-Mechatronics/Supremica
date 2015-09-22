@@ -36,16 +36,47 @@
 package org.supremica.gui;
 
 //import org.supremica.automata.algorithms.*;
-import org.supremica.log.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import javax.swing.*;
-import att.grappa.*;
-import org.supremica.properties.Config;
-import org.supremica.automata.IO.*;
+import att.grappa.Graph;
+import att.grappa.GrappaPanel;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Frame;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Writer;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JToolBar;
+import javax.swing.JViewport;
+
+import org.supremica.automata.IO.AutomataSerializer;
 import org.supremica.gui.texteditor.TextFrame;
-import java.awt.geom.Rectangle2D;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
+import org.supremica.properties.Config;
 
 /**
  * Abstract class for the viewer frame. Implemented by the different viewers.
@@ -63,10 +94,10 @@ public abstract class DotViewer
 
 	private JScrollPane currScrollPanel = null;
 	private GrappaPanel viewerPanel;
-	private BorderLayout layout = new BorderLayout();
-	private JPanel contentPane;
-	private JMenuBar menuBar = new JMenuBar();
-	private JToolBar toolBar = new JToolBar();
+	private final BorderLayout layout = new BorderLayout();
+	private final JPanel contentPane;
+	private final JMenuBar menuBar = new JMenuBar();
+	private final JToolBar toolBar = new JToolBar();
 	private boolean updateNeeded = false;
 	protected JCheckBoxMenuItem leftToRightCheckBox = new JCheckBoxMenuItem("Layout left to right", Config.DOT_LEFT_TO_RIGHT.isTrue());
 	protected JCheckBoxMenuItem withCirclesCheckBox = new JCheckBoxMenuItem("Draw circles", Config.DOT_WITH_CIRCLES.isTrue());
@@ -82,7 +113,6 @@ public abstract class DotViewer
 	private String objectName = "";
 	@SuppressWarnings("unused")
 	private InputStream dotReturnStream;
-	private GraphicsToClipboard toClipboard = null;
 
 	public DotViewer()
 		throws Exception
@@ -97,7 +127,8 @@ public abstract class DotViewer
 		Utility.setupFrame(this, 400, 500);
 		addWindowListener(new WindowAdapter()
 		{
-			public void windowClosing(WindowEvent e)
+			@Override
+      public void windowClosing(final WindowEvent e)
 			{
 				setVisible(false);
 				terminateProcesses();
@@ -130,19 +161,20 @@ public abstract class DotViewer
 	}
 */
 
-	public void updated(Object o)
+	public void updated(final Object o)
 	{
 		update();
 	}
 
-	public void setObjectName(String name)
+	public void setObjectName(final String name)
 	{
 		setTitle(name);
 
 		objectName = name;
 	}
 
-	public void setVisible(boolean toVisible)
+	@Override
+  public void setVisible(final boolean toVisible)
 	{
 		super.setVisible(toVisible);
 
@@ -157,14 +189,14 @@ public abstract class DotViewer
 		setJMenuBar(menuBar);
 
 		// File
-		JMenu menuFile = new JMenu();
+		final JMenu menuFile = new JMenu();
 
 		menuFile.setText("File");
 		menuFile.setMnemonic(KeyEvent.VK_F);
 		menuBar.add(menuFile);
 
 		// File.Export
-		JMenuItem menuFileExport = new JMenuItem();
+		final JMenuItem menuFileExport = new JMenuItem();
 
 		menuFileExport.setText("Export...");
 		menuFile.add(menuFileExport);
@@ -178,40 +210,13 @@ public abstract class DotViewer
 		menuFile.addSeparator();
 
 		// File.Close
-		JMenuItem menuFileClose = new JMenuItem();
+		final JMenuItem menuFileClose = new JMenuItem();
 
 		menuFileClose.setText("Close");
 		menuFile.add(menuFileClose);
 
-		// File
-		JMenu menuEdit = new JMenu();
-
-		menuEdit.setText("Edit");
-		menuEdit.setMnemonic(KeyEvent.VK_E);
-		menuBar.add(menuEdit);
-
-		if (org.supremica.properties.LocalSystem.isWindows())
-		{
-			// Edit
-			JMenuItem menuEditCopy = new JMenuItem();
-
-			menuEditCopy.setText("Copy");
-			menuEditCopy.setMnemonic(KeyEvent.VK_C);
-			menuEditCopy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK));
-
-			menuEdit.add(menuEditCopy);
-
-			menuEditCopy.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					copyToClipboard();
-				}
-			});
-		}
-
 		// Layout
-		JMenu menuLayout = new JMenu();
+		final JMenu menuLayout = new JMenu();
 
 		menuLayout.setText("Layout");
 		menuLayout.setMnemonic(KeyEvent.VK_L);
@@ -224,50 +229,54 @@ public abstract class DotViewer
 		menuLayout.add(useArcColorsCheckBox);
 		menuLayout.addSeparator();
 
-		JMenuItem menuLayoutUpdate = new JMenuItem();
+		final JMenuItem menuLayoutUpdate = new JMenuItem();
 
 		menuLayoutUpdate.setText("Update");
 		menuLayout.add(menuLayoutUpdate);
 		menuLayout.add(automaticUpdateCheckBox);
 
 		// Zoom
-		JMenu menuZoom = new JMenu();
+		final JMenu menuZoom = new JMenu();
 
 		menuZoom.setText("Zoom");
 		menuLayout.setMnemonic(KeyEvent.VK_Z);
 		menuBar.add(menuZoom);
 
-		JMenuItem menuZoomIn = new JMenuItem("Zoom In");
-		JMenuItem menuZoomOut = new JMenuItem("Zoom Out");
-		JMenuItem menuZoomReset = new JMenuItem("Reset view");
+		final JMenuItem menuZoomIn = new JMenuItem("Zoom In");
+		final JMenuItem menuZoomOut = new JMenuItem("Zoom Out");
+		final JMenuItem menuZoomReset = new JMenuItem("Reset view");
 
 		menuZoom.add(menuZoomIn);
 		menuZoom.add(menuZoomOut);
 		menuZoom.add(menuZoomReset);
 		menuZoomIn.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent e)
+			@Override
+      public void actionPerformed(final ActionEvent e)
 			{
 				zoomin_actionPerformed(e);
 			}
 		});
 		menuZoomOut.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent e)
+			@Override
+      public void actionPerformed(final ActionEvent e)
 			{
 				zoomout_actionPerformed(e);
 			}
 		});
 		menuZoomReset.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent e)
+			@Override
+      public void actionPerformed(final ActionEvent e)
 			{
 				resetzoom_actionPerformed(e);
 			}
 		});
 		menuFileExport.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent e)
+			@Override
+      public void actionPerformed(final ActionEvent e)
 			{
 				fileExport_actionPerformed(e);
 			}
@@ -275,7 +284,8 @@ public abstract class DotViewer
 
 		menuFileClose.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent e)
+			@Override
+      public void actionPerformed(final ActionEvent e)
 			{
 				setVisible(false);
 				terminateProcesses();
@@ -286,7 +296,8 @@ public abstract class DotViewer
 
 		leftToRightCheckBox.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent e)
+			@Override
+      public void actionPerformed(final ActionEvent e)
 			{
 				if (automaticUpdateCheckBox.isSelected())
 				{
@@ -296,7 +307,8 @@ public abstract class DotViewer
 		});
 		withLabelsCheckBox.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent e)
+			@Override
+      public void actionPerformed(final ActionEvent e)
 			{
 				if (automaticUpdateCheckBox.isSelected())
 				{
@@ -307,7 +319,8 @@ public abstract class DotViewer
 
 		withEventLabelsCheckBox.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent e)
+			@Override
+      public void actionPerformed(final ActionEvent e)
 			{
 				if (automaticUpdateCheckBox.isSelected())
 				{
@@ -318,7 +331,8 @@ public abstract class DotViewer
 
 		withCirclesCheckBox.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent e)
+			@Override
+      public void actionPerformed(final ActionEvent e)
 			{
 				if (automaticUpdateCheckBox.isSelected())
 				{
@@ -328,7 +342,8 @@ public abstract class DotViewer
 		});
 		useStateColorsCheckBox.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent e)
+			@Override
+      public void actionPerformed(final ActionEvent e)
 			{
 				if (automaticUpdateCheckBox.isSelected())
 				{
@@ -338,7 +353,8 @@ public abstract class DotViewer
 		});
 		useArcColorsCheckBox.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent e)
+			@Override
+      public void actionPerformed(final ActionEvent e)
 			{
 				if (automaticUpdateCheckBox.isSelected())
 				{
@@ -348,7 +364,8 @@ public abstract class DotViewer
 		});
 		automaticUpdateCheckBox.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent e)
+			@Override
+      public void actionPerformed(final ActionEvent e)
 			{
 				if (automaticUpdateCheckBox.isSelected())
 				{
@@ -358,7 +375,8 @@ public abstract class DotViewer
 		});
 		menuLayoutUpdate.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent e)
+			@Override
+      public void actionPerformed(final ActionEvent e)
 			{
 				update();
 			}
@@ -370,19 +388,20 @@ public abstract class DotViewer
 		toolBar.setRollover(true);
 		contentPane.add(toolBar, BorderLayout.NORTH);
 
-		Insets tmpInsets = new Insets(0, 0, 0, 0);
+		final Insets tmpInsets = new Insets(0, 0, 0, 0);
 
 		// Create buttons
-		JButton exportButton = new JButton();
+		final JButton exportButton = new JButton();
 
 		exportButton.setToolTipText("Export");
 
-		ImageIcon export16Img = new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Export16.gif"));
+		final ImageIcon export16Img = new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Export16.gif"));
 
 		exportButton.setIcon(export16Img);
 		exportButton.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent e)
+			@Override
+      public void actionPerformed(final ActionEvent e)
 			{
 				fileExport_actionPerformed(e);
 			}
@@ -391,16 +410,17 @@ public abstract class DotViewer
 		toolBar.add(exportButton, "WEST");
 		toolBar.addSeparator();
 
-		JButton zoominButton = new JButton();
+		final JButton zoominButton = new JButton();
 
 		zoominButton.setToolTipText("Zoom In");
 
-		ImageIcon zoomin16Img = new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/ZoomIn16.gif"));
+		final ImageIcon zoomin16Img = new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/ZoomIn16.gif"));
 
 		zoominButton.setIcon(zoomin16Img);
 		zoominButton.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent e)
+			@Override
+      public void actionPerformed(final ActionEvent e)
 			{
 				zoomin_actionPerformed(e);
 			}
@@ -408,16 +428,17 @@ public abstract class DotViewer
 		zoominButton.setMargin(tmpInsets);
 		toolBar.add(zoominButton, "WEST");
 
-		JButton zoomoutButton = new JButton();
+		final JButton zoomoutButton = new JButton();
 
 		zoomoutButton.setToolTipText("Zoom Out");
 
-		ImageIcon zoomout16Img = new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/ZoomOut16.gif"));
+		final ImageIcon zoomout16Img = new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/ZoomOut16.gif"));
 
 		zoomoutButton.setIcon(zoomout16Img);
 		zoomoutButton.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent e)
+			@Override
+      public void actionPerformed(final ActionEvent e)
 			{
 				zoomout_actionPerformed(e);
 			}
@@ -425,16 +446,17 @@ public abstract class DotViewer
 		zoomoutButton.setMargin(tmpInsets);
 		toolBar.add(zoomoutButton, "WEST");
 
-		JButton resetzoomButton = new JButton();
+		final JButton resetzoomButton = new JButton();
 
 		resetzoomButton.setToolTipText("Reset Zoom");
 
-		ImageIcon resetzoom16Img = new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Zoom16.gif"));
+		final ImageIcon resetzoom16Img = new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Zoom16.gif"));
 
 		resetzoomButton.setIcon(resetzoom16Img);
 		resetzoomButton.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent e)
+			@Override
+      public void actionPerformed(final ActionEvent e)
 			{
 				resetzoom_actionPerformed(e);
 			}
@@ -447,12 +469,13 @@ public abstract class DotViewer
 		throws Exception
 	{
 		@SuppressWarnings("unused")
+    final
 		DotBuilder builder = DotBuilder.getDotBuilder(null, this, getSerializer(), "");
 		//builder = new DotBuilder(this);
 		//builder.start();
 	}
 
-	public void updated(Object update, Object original)
+	public void updated(final Object update, final Object original)
 	{
 
 		//System.err.println("updated");
@@ -465,7 +488,7 @@ public abstract class DotViewer
 					update();
 				}
 			}
-			catch (Exception ex)
+			catch (final Exception ex)
 			{
 				logger.error("Error while displaying " + objectName, ex);
 				logger.debug(ex.getStackTrace());
@@ -488,7 +511,7 @@ public abstract class DotViewer
 
 				updateNeeded = false;
 			}
-			catch (Exception ex)
+			catch (final Exception ex)
 			{
 				logger.error("Error while viewing " + objectName, ex);
 				logger.debug(ex.getStackTrace());
@@ -516,13 +539,13 @@ public abstract class DotViewer
 		//** MF GrappaPanel, line 109: this.graph = subgraph.getGraph();
 		//** MF where "subgraph" is theGraph passed from here
 		//** MF Things seem to work anyway, though...
-		
+
 		viewerPanel.setScaleToFit(false);
 		viewerPanel.multiplyScaleFactor(scaleFactor);
 
 		// logger.debug("After creating panel");
-		JScrollPane scrollPanel = new JScrollPane(viewerPanel);
-		JViewport vp = scrollPanel.getViewport();
+		final JScrollPane scrollPanel = new JScrollPane(viewerPanel);
+		final JViewport vp = scrollPanel.getViewport();
 
 		vp.setBackground(Color.white);
 
@@ -538,89 +561,7 @@ public abstract class DotViewer
 		currScrollPanel = scrollPanel;
 	}
 
-/*
-	public void createPDF(File file)
-	{
-		int width = surface.getWidth();
-		int height = surface.getHeight();
-		Document document = new Document(new com.lowagie.text.Rectangle(width, height));
-
-		try
-		{
-			PdfWriter writer= PdfWriter.getInstance(document,  new FileOutputStream(file));
-
-			document.addAuthor("Supremica");
-			document.open();
-
-			PdfContentByte cb = writer.getDirectContent();
-			PdfTemplate tp = cb.createTemplate(width, height);
-			Graphics2D g2 = tp.createGraphics(width, height, new DefaultFontMapper());
-			surface.print(g2);
-
-			g2.dispose();
-			cb.addTemplate(tp, 0, 0);
-
-		}
-		catch (DocumentException de)
-		{
-			System.err.println(de.getMessage());
-		}
-		catch (IOException ioe)
-		{
-			System.err.println(ioe.getMessage());
-		}
-
-		document.close();
-	}
-*/
-
-/*
-// Printing using Acrobat Reader
-String osName = System.getProperty("os.name" );
-//FOR WINDOWS 95 AND 98 USE COMMAND.COM
-if(osName.equals("Windows 95") || osName.equals("Windows 98")){
-    Runtime.getRuntime().exec(
-		"command.com /C start acrord32 /p /h" + claim.pdf);
-}
-//FOR WINDOWS NT/XP/2000 USE CMD.EXE
-else {
-    Runtime.getRuntime().exec("cmd.exe start /C acrord32 /p /h" + claim.pdf);
-}
-*/
-
-	public void copyToClipboard()
-	{
-		if (toClipboard == null)
-		{
-			toClipboard = GraphicsToClipboard.getInstance();
-		}
-
-		Rectangle2D bb = theGraph.resetBoundingBox();
-
-		double minX = bb.getMinX();
-		double maxX = bb.getMaxX();
-		double minY = bb.getMinY();
-		double maxY = bb.getMaxY();
-
-		logger.debug("minX: " + minX + " maxX: " + maxX + " minY: " + minY + " maxY: " + maxY);
-
-		//create a WMF object
-		int width = (int)(maxX - minX) + 1;
-		int height = (int)(maxY - minY) + 1;
-
-		// Copy a larger area, approx 10 percent, there seems to be
-		// a problem with the size of wmf-data
-		width += (int)0.1*width;
-		height += (int)0.1*height;
-
-		Graphics theGraphics = toClipboard.getGraphics(width, height);
-		viewerPanel.paint(theGraphics);
-
-		toClipboard.copyToClipboard();
-	}
-
-
-	public void zoomin_actionPerformed(ActionEvent e)
+	public void zoomin_actionPerformed(final ActionEvent e)
 	{
 		scaleFactor *= SCALE_CHANGE;
 		scaleFactor = Math.max(scaleFactor, MIN_SCALE);
@@ -628,7 +569,7 @@ else {
 		update();
 	}
 
-	public void zoomout_actionPerformed(ActionEvent e)
+	public void zoomout_actionPerformed(final ActionEvent e)
 	{
 		scaleFactor /= SCALE_CHANGE;
 		scaleFactor = Math.min(scaleFactor, MAX_SCALE);
@@ -636,7 +577,7 @@ else {
 		update();
 	}
 
-	public void resetzoom_actionPerformed(ActionEvent e)
+	public void resetzoom_actionPerformed(final ActionEvent e)
 	{
 		if (scaleFactor != SCALE_RESET)
 		{
@@ -647,7 +588,8 @@ else {
 	}
 
 
-	public void setGraph(Graph theGraph)
+	@Override
+  public void setGraph(final Graph theGraph)
 	{
 		this.theGraph = theGraph;
 		draw();
@@ -655,9 +597,9 @@ else {
 
 	public abstract AutomataSerializer getSerializer();
 
-	public void fileExport_actionPerformed(ActionEvent e)
+	public void fileExport_actionPerformed(final ActionEvent e)
 	{
-		ExportDialog dlg = new ExportDialog(this);
+		final ExportDialog dlg = new ExportDialog(this);
 
 		dlg.show();
 
@@ -670,7 +612,7 @@ else {
 		// (the real reason is that there's no (obvious) conversion from Writer to OutputStream)
 		if (dlg.toDebugView())
 		{
-			AutomataSerializer serializer = getSerializer();
+			final AutomataSerializer serializer = getSerializer();
 
 			DotBuilder.getDotBuilder(new DotDebugViewer(), null, serializer, dlg.getDotArgument());
 			return;
@@ -678,14 +620,14 @@ else {
 		else
 		{
 
-			JFileChooser fileExporter = dlg.getFileExporter();
+			final JFileChooser fileExporter = dlg.getFileExporter();
 
 			// Suggest a reasonable filename based on the name of the automaton...
 			fileExporter.setSelectedFile(new File(Config.FILE_SAVE_PATH.get() + "/" + objectName + "." + dlg.getSelectedValue()));
 
 			if (fileExporter.showSaveDialog(this) == JFileChooser.APPROVE_OPTION)
 			{
-				File currFile = fileExporter.getSelectedFile();
+				final File currFile = fileExporter.getSelectedFile();
 
 				if (currFile != null)
 				{
@@ -693,13 +635,13 @@ else {
 					{
 						try
 						{
-							AutomataSerializer serializer = getSerializer();
+							final AutomataSerializer serializer = getSerializer();
 
 							DotBuilder.getDotBuilder(new DotFileViewer(currFile), null, serializer, dlg.getDotArgument());
 							Config.FILE_SAVE_PATH.set(currFile.getParentFile().getAbsolutePath());
 
 						}
-						catch (Exception ex)
+						catch (final Exception ex)
 						{
 							logger.error("Error while exporting " + currFile.getAbsolutePath() + "\n", ex);
 							logger.debug(ex.getStackTrace());
@@ -722,14 +664,15 @@ else {
 
 		}
 
-		public void setInputStream(InputStream theInputStream)
+		@Override
+    public void setInputStream(final InputStream theInputStream)
 		{
 			BufferedInputStream buffInStream = null;
 			try
 			{
 				buffInStream = new BufferedInputStream(theInputStream);
-				TextFrame debugview = new TextFrame("Dot debug output");
-				Writer writer = debugview.getPrintWriter();
+				final TextFrame debugview = new TextFrame("Dot debug output");
+				final Writer writer = debugview.getPrintWriter();
 				int currChar = buffInStream.read();
 
 				while (currChar != -1)
@@ -745,7 +688,7 @@ else {
 					buffInStream.close();
 				}
 			}
-			catch (IOException ex)
+			catch (final IOException ex)
 			{
 				logger.error(ex);
 			}
@@ -761,12 +704,13 @@ else {
 	{
 		File theFile;
 
-		public DotFileViewer(File theFile)
+		public DotFileViewer(final File theFile)
 		{
 			this.theFile = theFile;
 		}
 
-		public void setInputStream(InputStream theInputStream)
+		@Override
+    public void setInputStream(final InputStream theInputStream)
 		{
 			BufferedInputStream buffInStream = null;
 			BufferedOutputStream buffOutStream = null;
@@ -775,7 +719,7 @@ else {
 			{
 				// Send the response to a file
 				buffInStream = new BufferedInputStream(theInputStream);
-				FileOutputStream fw = new FileOutputStream(theFile);
+				final FileOutputStream fw = new FileOutputStream(theFile);
 				buffOutStream = new BufferedOutputStream(fw);
 				int currChar = buffInStream.read();
 
@@ -797,7 +741,7 @@ else {
 
 			}
 
-			catch (IOException ex)
+			catch (final IOException ex)
 			{
 				logger.error(ex);
 			}
@@ -827,7 +771,7 @@ else {
 		private String dotArgument = null;
 		private JFileChooser fileExporter = null;
 
-		ExportDialog(Frame comp)
+		ExportDialog(final Frame comp)
 		{
 			this.pane = new JOptionPane("Export as::", JOptionPane.INFORMATION_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null,    // icon
 										null,    // options

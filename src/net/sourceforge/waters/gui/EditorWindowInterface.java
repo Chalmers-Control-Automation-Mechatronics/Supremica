@@ -58,9 +58,6 @@ public interface EditorWindowInterface
 
     public UndoInterface getUndoInterface();
 
-	@Deprecated
-    public void copyAsWMFToClipboard();
-
 }
 
 

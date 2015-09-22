@@ -37,7 +37,6 @@ package org.supremica.gui.ide;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.LayoutManager;
 import java.awt.print.PrinterJob;
 import java.io.File;
@@ -71,7 +70,6 @@ import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import org.apache.batik.dom.GenericDOMImplementation;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.svggen.SVGGraphics2DIOException;
-import org.supremica.gui.GraphicsToClipboard;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.properties.SupremicaPropertyChangeEvent;
@@ -167,35 +165,6 @@ public class ComponentEditorPanel
     {
         return mModuleContainer;
     }
-
-    @Override
-    @Deprecated
-    public void copyAsWMFToClipboard()
-    {
-        if (toClipboard == null)
-        {
-            toClipboard = GraphicsToClipboard.getInstance();
-        }
-
-        //Rectangle2D bb = mSurface.getBoundingBox();
-        //double minX = bb.getMinX();
-        //double maxX = bb.getMaxX();
-        //double minY = bb.getMinY();
-        //double maxY = bb.getMaxY();
-        //LOGGER.debug("minX: " + minX + " maxX: " + maxX + " minY: " + minY + " maxY: " + maxY);
-        //create a WMF object
-        //int width = (int)(maxX - minX) + 1;
-        //int height = (int)(maxY - minY) + 1;
-        // Copy a larger area, approx 10 percent, there seems to be
-        // a problem with the size of wmf-data
-        //width += (int)0.1*width;
-        //height += (int)0.1*height;
-        final Graphics theGraphics = toClipboard.getGraphics(mSurface.getWidth(), mSurface.getHeight());
-
-        mSurface.print(theGraphics);
-        toClipboard.copyToClipboard();
-    }
-
 
     public void exportSVG(){
         // Get file to export to
@@ -296,8 +265,6 @@ public class ComponentEditorPanel
     private final GraphEventPanel mEventsPane;
     private final SimpleComponentSubject mComponent;
     private final ModuleSubject mModule;
-
-    private GraphicsToClipboard toClipboard;
 
 
     //########################################################################
