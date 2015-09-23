@@ -75,6 +75,7 @@ public class WelcomeScreen
     createContents();
     setBackground(new Color(240, 255, 255));
     addComponentListener(this);
+    Config.DOT_USE.addPropertyChangeListener(this);
     Config.DOT_EXECUTE_COMMAND.addPropertyChangeListener(this);
   }
 
@@ -115,7 +116,9 @@ public class WelcomeScreen
   @Override
   public void propertyChanged(final SupremicaPropertyChangeEvent event)
   {
-    mAboutPanel.update();
+    removeAll();
+    createContents();
+    revalidate();
   }
 
 

@@ -162,7 +162,7 @@ public class AboutPanel
       builder.append("Dynamic libraries <span style=\"color: red;\">unavailable</span><BR>");
     } else {
       builder.append("Dynamic libraries compiled for ");
-      builder.append(version.getOSType());
+      builder.append(osType);
       if (!version.checkOSType()) {
         builder.append(" - <span style=\"color: red;\">incompatible</span>");
       }
@@ -171,13 +171,15 @@ public class AboutPanel
     builder.append("Running in Java ");
     builder.append(version.getJavaVersionText());
     builder.append("<BR>");
-    final String dotVersion = getDotVersion();
-    if (dotVersion == null) {
-      builder.append("GraphViz <span style=\"color: red;\">not found</span><BR>");
-    } else {
-      builder.append("Using GraphViz/dot version ");
-      builder.append(dotVersion);
-      builder.append("<BR>");
+    if (Config.DOT_USE.get() && !Config.DOT_EXECUTE_COMMAND.get().equals("")) {
+      final String dotVersion = getDotVersion();
+      if (dotVersion == null) {
+        builder.append("GraphViz <span style=\"color: red;\">not found</span><BR>");
+      } else {
+        builder.append("Using GraphViz/dot version ");
+        builder.append(dotVersion);
+        builder.append("<BR>");
+      }
     }
     builder.append("Maximum available memory: ");
     builder.append(Runtime.getRuntime().maxMemory() / 0x100000L);
@@ -248,7 +250,7 @@ public class AboutPanel
           final Matcher matcher = pattern.matcher(line);
           if (matcher.find()) {
             mVersionInfo = matcher.group(1);
-            final Pattern subPattern = Pattern.compile("2\\.([0-9]{1,2}).*");
+            final Pattern subPattern = Pattern.compile("2\\.([0-9]{1,3}).*");
             final Matcher subMatcher = subPattern.matcher(mVersionInfo);
             int minorVersion = 99;
             if (subMatcher.matches()) {
