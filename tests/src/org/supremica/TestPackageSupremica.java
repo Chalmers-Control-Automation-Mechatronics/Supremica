@@ -51,8 +51,8 @@ package org.supremica;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
 import org.supremica.automata.TestPackageAutomata;
-import org.supremica.util.TestPackageUtil;
 import org.supremica.properties.Config;
 
 public class TestPackageSupremica
@@ -64,7 +64,7 @@ public class TestPackageSupremica
 		Config.LOG_TO_GUI.set(false);
 	}
 
-	public TestPackageSupremica(String name)
+	public TestPackageSupremica(final String name)
 	{
 		super(name);
 	}
@@ -75,9 +75,8 @@ public class TestPackageSupremica
 	 */
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite();
+		final TestSuite suite = new TestSuite();
 		suite.addTest(TestPackageAutomata.suite());
-		suite.addTest(TestPackageUtil.suite());
 		return suite;
 	}
 }

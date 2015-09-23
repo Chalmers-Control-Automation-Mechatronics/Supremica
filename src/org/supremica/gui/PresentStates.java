@@ -35,39 +35,47 @@
 
 package org.supremica.gui;
 
-import java.util.Vector;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Iterator;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
-import org.supremica.log.*;
-import org.supremica.util.IntArrayVector;
+import java.util.Vector;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.table.DefaultTableModel;
+
 import org.supremica.automata.Automata;
-import org.supremica.automata.State;
 import org.supremica.automata.Automaton;
-import org.supremica.automata.algorithms.SearchStates;
+import org.supremica.automata.State;
 import org.supremica.automata.algorithms.Forbidder;
-import org.supremica.gui.Presenter;
-import org.supremica.gui.VisualProject;
+import org.supremica.automata.algorithms.SearchStates;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 
 //-- owner: MF
 class PresentStatesTableModel
 	extends DefaultTableModel    // AbstractTableModel
 {
 	private static final long serialVersionUID = 1L;
-	@SuppressWarnings("unused")
-	private IntArrayVector states;
-	private SearchStates ss;
+
+	private final SearchStates ss;
 	@SuppressWarnings("unused")
 	private final int rows;
 	@SuppressWarnings("unused")
 	private final int cols;
 
-	private static Vector<String> formColumnNameVector(Automata a)
+	private static Vector<String> formColumnNameVector(final Automata a)
 	{
-		Vector<String> v = new Vector<String>();
+		final Vector<String> v = new Vector<String>();
 
 		for (int i = 0; i < a.size(); ++i)
 		{
@@ -77,7 +85,7 @@ class PresentStatesTableModel
 		return v;
 	}
 
-	public PresentStatesTableModel(SearchStates ss, Automata a)
+	public PresentStatesTableModel(final SearchStates ss, final Automata a)
 	{
 		super(formColumnNameVector(a), ss.numberFound());
 
@@ -87,13 +95,15 @@ class PresentStatesTableModel
 	}
 
 	// col indexes an automaton, row a state
-	public Object getValueAt(int row, int col)
+	@Override
+  public Object getValueAt(final int row, final int col)
 	{
 		return ss.getState(col, row).getName();
 	}
 
 	// None of the cells are editable (DefaultTableMode return true! AbstractTableModel does not!!)
-	public boolean isCellEditable(int rowIndex, int columnIndex)
+	@Override
+  public boolean isCellEditable(final int rowIndex, final int columnIndex)
 	{
 		return false;
 	}
@@ -114,11 +124,11 @@ class PresentStatesTable
 	private static final long serialVersionUID = 1L;
 	private static Logger logger = LoggerFactory.createLogger(PresentStatesTable.class);
 	private SelectionListener listener;
-	private VisualProject theVisualProject;
-	private SearchStates searchStates;
-	private Automata theAutomata;
+	private final VisualProject theVisualProject;
+	private final SearchStates searchStates;
+	private final Automata theAutomata;
 
-	public PresentStatesTable(SearchStates ss, Automata a, VisualProject theVisualProject)
+	public PresentStatesTable(final SearchStates ss, final Automata a, final VisualProject theVisualProject)
 	{
 		super(new PresentStatesTableModel(ss, a));
 
@@ -128,10 +138,11 @@ class PresentStatesTable
 
 		addMouseListener(new MouseAdapter()
 		{
-			public void mousePressed(MouseEvent e)
+			@Override
+      public void mousePressed(final MouseEvent e)
 			{
-				int currRow = rowAtPoint(new Point(e.getX(), e.getY()));
-				
+				final int currRow = rowAtPoint(new Point(e.getX(), e.getY()));
+
 /*	Why would this be an error? When is this problematic?
  *		// This code handles a flaw in the selection model
 		// By default, once a row is selected it cannot be unseleced unless a new row is selected
@@ -174,30 +185,31 @@ class PresentStatesTable
 	/**
 	 * This is only valid to call when exactly one state in one automaton is selected.
 	 */
-	private void viewInAutomatonExplorer(int index)
+	private void viewInAutomatonExplorer(final int index)
 	{
-		Automaton currAutomaton = theAutomata.getFirstAutomaton();
-		State currState = searchStates.getState(0, index);
+		final Automaton currAutomaton = theAutomata.getFirstAutomaton();
+		final State currState = searchStates.getState(0, index);
 
 		try
 		{
-			AutomatonExplorer theExplorer = theVisualProject.getAutomatonExplorer(currAutomaton.getName());
+			final AutomatonExplorer theExplorer = theVisualProject.getAutomatonExplorer(currAutomaton.getName());
 
 			theExplorer.setState(currState);
 		}
-		catch (Exception ex)
+		catch (final Exception ex)
 		{
 			logger.error("Could not create AutomatonExplorer.");
 			logger.debug(ex.getStackTrace());
 		}
 	}
 
-	public void setSelectionListener(SelectionListener listener)
+	public void setSelectionListener(final SelectionListener listener)
 	{
 		this.listener = listener;
 	}
 
-	public void valueChanged(ListSelectionEvent e)
+	@Override
+  public void valueChanged(final ListSelectionEvent e)
 	{
 		super.valueChanged(e);
 
@@ -223,15 +235,15 @@ class PresentStatesFrame
 
 	private static Logger logger = LoggerFactory.createLogger(PresentStatesFrame.class);
 
-	private SearchStates search_states;
-	private Automata automata;
-	private VisualProject theVisualProject;
-	private PresentStatesTable table;
-	private ForbidButton forbid_button;
+	private final SearchStates search_states;
+	private final Automata automata;
+	private final VisualProject theVisualProject;
+	private final PresentStatesTable table;
+	private final ForbidButton forbid_button;
 //      private RouteButton route_button;
 
 	@SuppressWarnings("unused")
-	private static void debug(String s)
+	private static void debug(final String s)
 	{
 		logger.debug(s);
 	}
@@ -248,14 +260,15 @@ class PresentStatesFrame
 			setToolTipText("Close this window");
 			addActionListener(new ActionListener()
 			{
-				public void actionPerformed(ActionEvent e)
+				@Override
+        public void actionPerformed(final ActionEvent e)
 				{
 					action(e);
 				}
 			});
 		}
 
-		void action(ActionEvent e)
+		void action(final ActionEvent e)
 		{
 
 			// debug("FineButton disposing");
@@ -267,34 +280,35 @@ class PresentStatesFrame
 		extends JButton
 	{
 		private static final long serialVersionUID = 1L;
-		private boolean use_dump;
-		
-		public ForbidButton(boolean use_dump)
+		private final boolean use_dump;
+
+		public ForbidButton(final boolean use_dump)
 		{
 			super("Forbid");
 			setToolTipText("Forbid selected states"); // if none selected, should forbid all?
 			setEnabled(false);
 			this.use_dump = use_dump;
-			
+
 			addActionListener(new ActionListener()
 			{
-				public void actionPerformed(ActionEvent e)
+				@Override
+        public void actionPerformed(final ActionEvent e)
 				{
 					action(e);
 				}
 			});
 		}
 
-		void action(ActionEvent e)
+		void action(final ActionEvent e)
 		{
-			
+
 			// Get selected states
 			// Get involved automata
 			// Set mousepointer to timeglass
 			// Instantiate a Forbidder object
 			// Let it do its work
 			// Reset mousepointer
-			
+
 			/** / For now, iterate over all state
 			Iterator it = search_states.iterator();
 			while(it.hasNext())
@@ -310,21 +324,21 @@ class PresentStatesFrame
 				while(state_it.hasNext())
 				{
 					Automaton automaton = automata.getAutomatonAt(i++);
-					
+
 					State state = state_it.getState();
 					logger.info(automaton.getName() + ": " + state.getName());
 					state_it.inc();
 				}
 			}
 			**/
-			
+
 			/** For now: iterate over the selected composite states
 			int[] selects = table.getSelectedRows();	// holds the indices for all selected rows
 			// Each row is a composite state, loop over all rows/composite states
 			for(int i = 0; i < selects.length; ++i)
 			{
 				int indx = selects[i];	// This is the index for one particular composite state (row)
-				
+
 				// Loop over all automata -- a is the index for one particular automaton (col)
 				for(int a = 0; a < automata.nbrOfAutomata(); ++a)
 				{
@@ -335,8 +349,9 @@ class PresentStatesFrame
 
 				}
 			}
-			**/ 
+			**/
 			@SuppressWarnings("unused")
+      final
 			Forbidder forbidder = new Forbidder(automata, table.getSelectedRows(), search_states, theVisualProject, use_dump);
 		}
 	}
@@ -358,7 +373,7 @@ class PresentStatesFrame
 				}
 		}
 */
-	public PresentStatesFrame(SearchStates ss, Automata a, VisualProject theVisualProject, boolean use_dump)
+	public PresentStatesFrame(final SearchStates ss, final Automata a, final VisualProject theVisualProject, final boolean use_dump)
 	{
 		this.search_states = ss;
 		this.automata = a;
@@ -375,26 +390,28 @@ class PresentStatesFrame
 
 		table.setSelectionListener(this);
 
-		JPanel panel = new JPanel();
+		final JPanel panel = new JPanel();
 
 		// panel.add(new JLabel(ss.numberFound() + " states found"));
 		panel.add(Utility.setDefaultButton(this, new FineButton()));
 		panel.add(forbid_button);
 //              panel.add(route_button);
-		Container contentPane = getContentPane();
+		final Container contentPane = getContentPane();
 
 		contentPane.add(new WhiteScrollPane(table), BorderLayout.CENTER);
 		contentPane.add(panel, BorderLayout.SOUTH);
 	}
 
 	// SelectionListener interface implementation
-	public void emptySelection()
+	@Override
+  public void emptySelection()
 	{
 		forbid_button.setEnabled(false);
 //              route_button.setEnabled(false);
 	}
 
-	public void nonEmptySelection()
+	@Override
+  public void nonEmptySelection()
 	{
 		forbid_button.setEnabled(true);
 		// Utility.setDefaultButton(this, route_button);
@@ -440,10 +457,10 @@ public class PresentStates
 	private SearchStates searchs = null;
 	private Automata automata = null;
 	private boolean dispose_frame = false;
-	private VisualProject theVisualProject;
+	private final VisualProject theVisualProject;
 	private boolean use_dump = false;
-	
-	public PresentStates(JFrame frame, SearchStates ss, Automata a, VisualProject theVisualProject, boolean use_dump)
+
+	public PresentStates(final JFrame frame, final SearchStates ss, final Automata a, final VisualProject theVisualProject, final boolean use_dump)
 	{
 		super(ss);	// PresentStates is a Presenter, which is a Thread. Calling start() on PresentStates
 					// invokes Presenter::run() which waits for ss to finish, before calling taskStopped()
@@ -456,7 +473,8 @@ public class PresentStates
 		this.use_dump = use_dump;
 	}
 
-	public void taskFinished()
+	@Override
+  public void taskFinished()
 	{
 		if (searchs.numberFound() > 0)
 		{
@@ -471,7 +489,8 @@ public class PresentStates
 		execute();
 	}
 
-	public void taskStopped()
+	@Override
+  public void taskStopped()
 	{
 		frame = new UserInterruptFrame();
 		dispose_frame = true;
@@ -506,11 +525,11 @@ public class PresentStates
 		System.out.println();
 
 		// Next we print the states one by one
-		for (Iterator<?> it1 = searchs.iterator(); it1.hasNext(); )
+		for (final Iterator<?> it1 = searchs.iterator(); it1.hasNext(); )
 		{
 			System.out.print("<");
 
-			for (SearchStates.StateIterator it2 = searchs.getStateIterator((int[]) it1.next());
+			for (final SearchStates.StateIterator it2 = searchs.getStateIterator((int[]) it1.next());
 					it2.hasNext(); it2.inc())
 			{
 				System.out.print(it2.getState().getName() + ",");

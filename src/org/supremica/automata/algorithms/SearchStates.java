@@ -13,6 +13,7 @@
 //-- owner: MF
 package org.supremica.automata.algorithms;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.supremica.automata.Automata;
@@ -21,22 +22,21 @@ import org.supremica.gui.MonitorableThread;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
-import org.supremica.util.IntArrayVector;
 
 public class SearchStates
     extends MonitorableThread
 {
     private static Logger logger = LoggerFactory.createLogger(SearchStates.class);
     private AutomataSynchronizer syncher = null;
-    private IntArrayVector container = null;
+    private ArrayList<int[]> container = null;
     private StateMatcher matcher = null;
     protected /* volatile */ boolean stopRequested = false;
     protected boolean mode = false;    // false means sychronization mode, true is matching mode
     protected int progress = 1;
 
-    private IntArrayVector makeContainer()
+    private ArrayList<int[]> makeContainer()
     {
-        return new IntArrayVector();
+        return new ArrayList<>();
     }
 
     public SearchStates(final Automata automata, final StateMatcher m)
@@ -166,7 +166,7 @@ public class SearchStates
     public org.supremica.automata.State getState(final int automaton, final int index)
     {
         final org.supremica.automata.State[][] states = syncher.getHelper().getIndexFormStateTable();    // should be cached?
-        final int[] composite = container.getElement(index);
+        final int[] composite = container.get(index);
 
         return states[automaton][composite[automaton]];
     }
