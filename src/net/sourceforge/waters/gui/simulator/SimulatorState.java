@@ -118,31 +118,44 @@ class SimulatorState
     (final SimulatorState pred,
      final EventProxy event,
      final Map<AutomatonProxy,StateProxy> nextMap)
-{
-  final Map<AutomatonProxy,Entry> predMap = pred.mStateMap;
-  final int numAutomata = predMap.size();
-  final SimulatorState result = new SimulatorState(event, numAutomata);
-  for (final Map.Entry<AutomatonProxy,StateProxy> entry : nextMap.entrySet()) {
-    final AutomatonProxy aut = entry.getKey();
-    final StateProxy source = pred.getState(aut);
-    final Collection<EventProxy> local = aut.getEvents();
-    final boolean relevant = local.contains(event);
-    StateProxy target = entry.getValue();
-    final AutomatonStatus status;
-    if (target == null || pred.getStatus(aut) == AutomatonStatus.DISABLED) {
-      status = AutomatonStatus.DISABLED;
-      target = null;
-    } else if (!relevant) {
-      status = AutomatonStatus.IGNORED;
-    } else if (target == source) {
-      status = AutomatonStatus.SELFLOOPED;
-    } else {
-      status = AutomatonStatus.OK;
+  {
+    final Map<AutomatonProxy,Entry> predMap = pred.mStateMap;
+    final int numAutomata = predMap.size();
+    final SimulatorState result = new SimulatorState(event, numAutomata);
+    for (final Map.Entry<AutomatonProxy,StateProxy> entry : nextMap.entrySet()) {
+      final AutomatonProxy aut = entry.getKey();
+      if (pred.getStatus(aut) == AutomatonStatus.DISABLED) {
+        result.setState(aut, null, AutomatonStatus.DISABLED);
+      } else {
+        final StateProxy target = entry.getValue();
+        final AutomatonStatus status =
+          findAutomatonStatus(pred, aut, event, target);
+        result.setState(aut, target, status);
+      }
     }
-    result.setState(aut, target, status);
+    return result;
   }
-  return result;
-}
+
+  static AutomatonStatus findAutomatonStatus(final SimulatorState current,
+                                             final AutomatonProxy aut,
+                                             final EventProxy event,
+                                             final StateProxy target)
+  {
+    if (current == null) {
+      return AutomatonStatus.IGNORED;
+    }
+    final StateProxy source = current == null ? null : current.getState(aut);
+    final Collection<EventProxy> local = aut.getEvents();
+    if (target == null) {
+      return AutomatonStatus.DISABLED;
+    } else if (!local.contains(event)) {
+      return AutomatonStatus.IGNORED;
+    } else if (target == source) {
+      return AutomatonStatus.SELFLOOPED;
+    } else {
+      return AutomatonStatus.OK;
+    }
+  }
 
 
   //#########################################################################
@@ -223,6 +236,7 @@ class SimulatorState
 
   //#########################################################################
   //# Overrides for java.lang.Object
+  @Override
   public String toString()
   {
     final StringBuilder buffer = new StringBuilder();

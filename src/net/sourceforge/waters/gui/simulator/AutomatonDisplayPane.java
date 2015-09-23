@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -407,11 +408,15 @@ public class AutomatonDisplayPane
 
   private void updateToolTip()
   {
-    if (mFocusedItem == null) {
-      setToolTipText(null);
-    } else {
+    if (!mSim.isAutomatonEnabled(mAutomaton)) {
+      final ToolTipVisitor visitor = mSim.getToolTipVisitor();
+      final String tooltip = visitor.getToolTip(mAutomaton, true);
+      setToolTipText(tooltip);
+    } else if (mFocusedItem != null) {
       final String tooltip = mToolTipVisitor.getToolTip(mFocusedItem);
       setToolTipText(tooltip);
+    } else {
+      setToolTipText(null);
     }
   }
 
@@ -446,62 +451,66 @@ public class AutomatonDisplayPane
   private void updateRenderingStatus()
   {
     if (mRenderingStatusMap == null) {
-      final Collection<StateProxy> states = mAutomaton.getStates();
-      final Collection<TransitionProxy> transitions =
-        mAutomaton.getTransitions();
-      final int size = states.size() + 2 * transitions.size();
-      mRenderingStatusMap = new HashMap<Proxy,RenderingStatus>(size);
-      final Map<Object,SourceInfo> infomap = mContainer.getSourceInfoMap();
-      if (infomap != null) {
-        final StateProxy currentState = mSim.getCurrentState(mAutomaton);
-        for (final StateProxy state : states) {
-          final SourceInfo info = infomap.get(state);
-          if (info != null) {
-            final Proxy source = info.getGraphSourceObject();
-            final boolean active = (state == currentState);
-            final RenderingStatus render =
-              new RenderingStatus(state, active, false);
-            mRenderingStatusMap.put(source, render);
+      if (mSim.isAutomatonEnabled(mAutomaton)) {
+        final Collection<StateProxy> states = mAutomaton.getStates();
+        final Collection<TransitionProxy> transitions =
+          mAutomaton.getTransitions();
+        final int size = states.size() + 2 * transitions.size();
+        mRenderingStatusMap = new HashMap<Proxy,RenderingStatus>(size);
+        final Map<Object,SourceInfo> infomap = mContainer.getSourceInfoMap();
+        if (infomap != null) {
+          final StateProxy currentState = mSim.getCurrentState(mAutomaton);
+          for (final StateProxy state : states) {
+            final SourceInfo info = infomap.get(state);
+            if (info != null) {
+              final Proxy source = info.getGraphSourceObject();
+              final boolean active = (state == currentState);
+              final RenderingStatus render =
+                new RenderingStatus(state, active, false);
+              mRenderingStatusMap.put(source, render);
+            }
           }
-        }
-        StateProxy prevState = null;
-        EventProxy prevEvent = mSim.getCurrentState().getEvent();
-        if (prevEvent != null) {
-          final int time = mSim.getCurrentTime();
-          final SimulatorState tuple = mSim.getHistoryState(time - 1);
-          prevState = tuple.getState(mAutomaton);
-        }
-        for (final TransitionProxy trans : transitions) {
-          final SourceInfo info = infomap.get(trans);
-          if (info != null) {
-            Proxy source = info.getGraphSourceObject();
-            final StateProxy from = trans.getSource();
-            final EventProxy event = trans.getEvent();
-            final StateProxy to = trans.getTarget();
-            final EventStatus status = mSim.getEventStatus(event);
-            final boolean enabled =
-              from == currentState && status.canBeFired();
-            final boolean active =
-              from == prevState && event == prevEvent && to == currentState;
-            do {
-              if (!(source instanceof EventListExpressionProxy)) {
-                RenderingStatus render = mRenderingStatusMap.get(source);
-                if (render == null) {
-                  render = new RenderingStatus(trans, active, enabled);
-                  mRenderingStatusMap.put(source, render);
-                } else {
-                  render.addStatus(active, enabled);
+          StateProxy prevState = null;
+          EventProxy prevEvent = mSim.getCurrentState().getEvent();
+          if (prevEvent != null) {
+            final int time = mSim.getCurrentTime();
+            final SimulatorState tuple = mSim.getHistoryState(time - 1);
+            prevState = tuple.getState(mAutomaton);
+          }
+          for (final TransitionProxy trans : transitions) {
+            final SourceInfo info = infomap.get(trans);
+            if (info != null) {
+              Proxy source = info.getGraphSourceObject();
+              final StateProxy from = trans.getSource();
+              final EventProxy event = trans.getEvent();
+              final StateProxy to = trans.getTarget();
+              final EventStatus status = mSim.getEventStatus(event);
+              final boolean enabled =
+                from == currentState && status.canBeFired();
+              final boolean active =
+                from == prevState && event == prevEvent && to == currentState;
+              do {
+                if (!(source instanceof EventListExpressionProxy)) {
+                  RenderingStatus render = mRenderingStatusMap.get(source);
+                  if (render == null) {
+                    render = new RenderingStatus(trans, active, enabled);
+                    mRenderingStatusMap.put(source, render);
+                  } else {
+                    render.addStatus(active, enabled);
+                  }
                 }
+                final Subject subject = (Subject) source;
+                source = SubjectTools.getProxyParent(subject);
+              } while (!(source instanceof GraphProxy));
+              if (active) {
+                prevState = null;
+                prevEvent = null;
               }
-              final Subject subject = (Subject) source;
-              source = SubjectTools.getProxyParent(subject);
-            } while (!(source instanceof GraphProxy));
-            if (active) {
-              prevState = null;
-              prevEvent = null;
             }
           }
         }
+      } else {
+        mRenderingStatusMap = Collections.emptyMap();
       }
     }
   }

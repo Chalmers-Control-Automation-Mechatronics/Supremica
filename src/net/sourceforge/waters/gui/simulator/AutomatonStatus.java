@@ -48,8 +48,8 @@ enum AutomatonStatus
 {
 
   /**
-   * Status to indicate a property automaton that has been disabled because
-   * of a failure in an earlier step.
+   * Status to indicate a property automaton that has been disabled,
+   * either by the user or because of a failure in an earlier step.
    */
   DISABLED(IconLoader.ICON_TABLE_DISABLED_PROPERTY, "has been disabled"),
   /**

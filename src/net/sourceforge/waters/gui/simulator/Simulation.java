@@ -363,6 +363,31 @@ public class Simulation implements ModelObserver, Observer
     fireSimulationChangeEvent(simEvent);
   }
 
+  public boolean isAutomatonEnabled(final AutomatonProxy aut)
+  {
+    return getAutomatonStatus(aut) != AutomatonStatus.DISABLED;
+  }
+
+  public void setAutomatonEnabled(final AutomatonProxy aut, final boolean enabled)
+  {
+    final StateProxy state = mCurrentState.getState(aut);
+    final AutomatonStatus status;
+    if (enabled) {
+      final SimulatorState pred =
+        mCurrentTime == 0 ? null : getHistoryState(mCurrentTime - 1);
+      final EventProxy event = mCurrentState.getEvent();
+      status = SimulatorState.findAutomatonStatus(pred, aut, event, state);
+    } else {
+      status = AutomatonStatus.DISABLED;
+    }
+    mCurrentState.setState(aut, state, status);
+    removeFutureSteps();
+    loadSimulatorState();
+    final SimulationChangeEvent simEvent = new SimulationChangeEvent
+      (this, SimulationChangeEvent.STATE_CHANGED);
+    fireSimulationChangeEvent(simEvent);
+  }
+
 
   //#########################################################################
   //# Accessing the Product DES
@@ -491,7 +516,7 @@ public class Simulation implements ModelObserver, Observer
   /**
    * Gets the current state of the given automaton in the simulation.
    */
-  StateProxy getCurrentState(final AutomatonProxy aut)
+  public StateProxy getCurrentState(final AutomatonProxy aut)
   {
     return mCurrentState.getState(aut);
   }
@@ -712,14 +737,16 @@ public class Simulation implements ModelObserver, Observer
       mAutomataSensitiveToEvent =
         new HashMap<EventProxy,List<AutomatonProxy>>(numEvents);
       for (final AutomatonProxy aut : mOrderedAutomata) {
-        for (final EventProxy event : aut.getEvents()) {
-          if (event.getKind() != EventKind.PROPOSITION) {
-            List<AutomatonProxy> list = mAutomataSensitiveToEvent.get(event);
-            if (list == null) {
-              list = new ArrayList<AutomatonProxy>();
-              mAutomataSensitiveToEvent.put(event, list);
+        if (isAutomatonEnabled(aut)) {
+          for (final EventProxy event : aut.getEvents()) {
+            if (event.getKind() != EventKind.PROPOSITION) {
+              List<AutomatonProxy> list = mAutomataSensitiveToEvent.get(event);
+              if (list == null) {
+                list = new ArrayList<AutomatonProxy>();
+                mAutomataSensitiveToEvent.put(event, list);
+              }
+              list.add(aut);
             }
-            list.add(aut);
           }
         }
       }
@@ -748,6 +775,7 @@ public class Simulation implements ModelObserver, Observer
     mCurrentState = mStateHistory.get(mCurrentTime);
     mEnabledSteps = null;
     mEventStatusMap = null;
+    mAutomataSensitiveToEvent = null;
   }
 
   /**

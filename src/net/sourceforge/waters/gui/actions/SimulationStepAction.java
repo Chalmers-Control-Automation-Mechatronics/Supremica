@@ -37,8 +37,8 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 
 import javax.swing.Action;
+
 import net.sourceforge.waters.gui.simulator.Simulation;
-import net.sourceforge.waters.gui.simulator.SimulationObserver;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
 import net.sourceforge.waters.gui.simulator.SimulatorStep;
 import net.sourceforge.waters.gui.util.IconLoader;
@@ -48,7 +48,6 @@ import org.supremica.gui.ide.IDE;
 
 public class SimulationStepAction
   extends WatersSimulationAction
-  implements SimulationObserver
 {
 
   //#########################################################################
@@ -59,11 +58,13 @@ public class SimulationStepAction
     putValue(Action.NAME, "Step");
     putValue(Action.SHORT_DESCRIPTION, "Execute an event");
     putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_STEP);
+    updateEnabledStatus();
   }
 
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent event)
   {
     final SimulatorPanel panel = getObservedSimulatorPanel();
@@ -99,11 +100,3 @@ public class SimulationStepAction
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-
-

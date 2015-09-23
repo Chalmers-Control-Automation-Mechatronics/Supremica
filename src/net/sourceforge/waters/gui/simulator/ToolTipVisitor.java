@@ -39,8 +39,8 @@ import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
-import net.sourceforge.waters.model.des.DefaultProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.DefaultProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -86,6 +86,7 @@ class ToolTipVisitor extends DefaultProductDESProxyVisitor
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.des.ProductDESProxyVisitor
+  @Override
   public String visitAutomatonProxy(final AutomatonProxy aut)
   {
     final StringBuilder buffer = new StringBuilder();
@@ -104,6 +105,7 @@ class ToolTipVisitor extends DefaultProductDESProxyVisitor
     return buffer.toString();
   }
 
+  @Override
   public String visitEventProxy(final EventProxy event)
   {
     final StringBuilder buffer = new StringBuilder();
@@ -125,6 +127,7 @@ class ToolTipVisitor extends DefaultProductDESProxyVisitor
     return buffer.toString();
   }
 
+  @Override
   public String visitStateProxy(final StateProxy state)
   {
     final StringBuilder buffer = new StringBuilder();
@@ -162,11 +165,3 @@ class ToolTipVisitor extends DefaultProductDESProxyVisitor
   private boolean mShowActivity;
 
 }
-
-
-
-
-
-
-
-

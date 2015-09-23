@@ -207,7 +207,6 @@ public class WatersPopupActionManager
     return master.getAction(InsertForeachAction.class);
   }
 
-  //TODO Auto-generated method stub
   public IDEAction getInsertInstanceAction()
   {
     final WatersActionManager master = mIDE.getActions();
@@ -326,6 +325,11 @@ public class WatersPopupActionManager
   public IDEAction getTraceTravelAction(final int time)
   {
     return new TraceTravelAction(mIDE, time);
+  }
+
+  public IDEAction getSimulationDisableAutomatonAction(final AutomatonProxy aut)
+  {
+    return new SimulationDisableAutomatonAction(mIDE, aut);
   }
 
   public IDEAction getLanguageIncusionAction(final NamedProxy aut)

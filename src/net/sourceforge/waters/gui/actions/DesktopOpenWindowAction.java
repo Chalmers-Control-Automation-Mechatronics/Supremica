@@ -37,27 +37,36 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.Action;
 
+import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 
 public class DesktopOpenWindowAction extends WatersDesktopAction
 {
-  protected DesktopOpenWindowAction(final IDE ide, final AutomatonProxy autoToOpen)
+  protected DesktopOpenWindowAction(final IDE ide, final AutomatonProxy aut)
   {
     super(ide);
-    mAutomaton = autoToOpen;
-    final String name = mAutomaton.getName();
+    mAutomaton = aut;
+    final ComponentKind kind = mAutomaton.getKind();
+    final String kindName = ModuleContext.getComponentKindToolTip(kind);
+    final String compName = mAutomaton.getName();
+    String name = null;
+    if (compName.length() <= 32) {
+      name = kindName + " " + compName;
+    }
     if (name.length() <= 32) {
-      putValue(Action.NAME, "Open Automaton " + name);
+      putValue(Action.NAME, "Show " + name);
     } else {
-      putValue(Action.NAME, "Open Automaton");
+      putValue(Action.NAME, "Show " + kindName);
     }
     putValue(Action.SHORT_DESCRIPTION, "Open this Automaton window");
     setEnabled(true);
   }
 
+  @Override
   public void actionPerformed(final ActionEvent e)
   {
     final ModuleContainer mContainer = (ModuleContainer)getIDE().getActiveDocumentContainer();
@@ -68,10 +77,3 @@ public class DesktopOpenWindowAction extends WatersDesktopAction
 
   private static final long serialVersionUID = -1644229513613033199L;
 }
-
-
-
-
-
-
-

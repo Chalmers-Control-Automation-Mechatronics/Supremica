@@ -301,7 +301,7 @@ public class IconLoader
   public static final ImageIcon ICON_TABLE_ENABLED_AUTOMATON = ICON_YES;
   public static final ImageIcon ICON_TABLE_WARNING_PROPERTY = ICON_CONSOLE_WARNING;
   public static final ImageIcon ICON_TABLE_ERROR_AUTOMATON = ICON_CONSOLE_WARNING;
-  public static final ImageIcon ICON_TABLE_DISABLED_PROPERTY = ICON_NO;
+  public static final ImageIcon ICON_TABLE_DISABLED_PROPERTY = ICON_SIMULATOR_RESET;
   public static final ImageIcon ICON_EVENTTREE_BLOCKING_EVENT = ICON_CONSOLE_WARNING;
   public static final ImageIcon ICON_EVENTTREE_INVALID_EVENT = ICON_NO;
   public static final ImageIcon ICON_EVENTTREE_VALID_EVENT = ICON_YES;

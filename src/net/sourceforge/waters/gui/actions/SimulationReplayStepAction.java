@@ -63,11 +63,13 @@ public class SimulationReplayStepAction
     putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_REPLAY);
     putValue(Action.ACCELERATOR_KEY,
              KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
+    updateEnabledStatus();
   }
 
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent event)
   {
     final SimulatorPanel panel = getObservedSimulatorPanel();
@@ -103,11 +105,3 @@ public class SimulationReplayStepAction
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-
-

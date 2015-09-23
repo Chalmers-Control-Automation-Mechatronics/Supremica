@@ -37,23 +37,76 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.Action;
 
+import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
+import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.supremica.gui.ide.IDE;
 
-public class TraceTravelAction extends WatersSimulationAction
+
+/**
+ * <P>The action to disable (and enable again) automata in the simulator.</P>
+ *
+ * <P>This action is linked to context-sensitive popup menus of the simulator,
+ * and allows the user to disable the selected automaton. A disabled
+ * automaton is marked with the status {@link AutomatonStatus#DISABLED},
+ * which causes the simulator to stop tracking its state, and not to
+ * check the state of this automaton when it is determined whether events
+ * are enabled. The disabled status is carried forward to all future
+ * simulation steps.</P>
+ *
+ * <P>An automaton can also be enabled again through this action, if it is
+ * invoked in the same state where the automaton was disabled. Enablement
+ * in later states is not possible because the state information may be
+ * lost. However, it is also possible to enable a disabled automaton by
+ * resetting the simulation to an earlier state and simply resuming from
+ * there.</P>
+ *
+ * @author Robi Malik
+ */
+public class SimulationDisableAutomatonAction
+  extends WatersSimulationAction
 {
 
   //#########################################################################
-  //# Constructors
-  TraceTravelAction(final IDE ide, final int time)
+  //# Constructor
+  SimulationDisableAutomatonAction(final IDE ide, final AutomatonProxy aut)
   {
     super(ide);
-    mTime = time;
-    putValue(Action.NAME, "Jump to step " + time);
+    mAutomaton = aut;
+    boolean enable = false;
+    final SimulatorPanel panel = getActiveSimulatorPanel();
+    if (panel != null) {
+      final Simulation sim = panel.getSimulation();
+      if (sim.getCurrentState(mAutomaton) != null &&
+          !sim.isAutomatonEnabled(mAutomaton)) {
+        enable = true;
+      }
+    }
+    final String operation = enable ? "Enable " : "Disable ";
+    final ComponentKind kind = mAutomaton.getKind();
+    final String kindName = ModuleContext.getComponentKindToolTip(kind);
+    final String compName = mAutomaton.getName();
+    String name = null;
+    if (compName.length() <= 32) {
+      name = kindName + " " + compName;
+    }
+    if (name.length() <= 32) {
+      putValue(Action.NAME, operation + name);
+    } else {
+      putValue(Action.NAME, operation + kindName);
+    }
     putValue(Action.SHORT_DESCRIPTION,
-             "Reset the simulation to the state after this event was fired");
+             operation + "this automaton for simulation");
+    if (enable) {
+      putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_REPLAY);
+    } else {
+      putValue(Action.SMALL_ICON, IconLoader.ICON_TABLE_DISABLED_PROPERTY);
+    }
     updateEnabledStatus();
   }
 
@@ -61,31 +114,40 @@ public class TraceTravelAction extends WatersSimulationAction
   //#########################################################################
   //# Interface java.awt.event.ActionListener
   @Override
-  public void actionPerformed(final ActionEvent e)
+  public void actionPerformed(final ActionEvent event)
   {
     final SimulatorPanel panel = getActiveSimulatorPanel();
-    final Simulation sim = panel.getSimulation();
-    sim.setState(mTime);
+    if (panel != null) {
+      final Simulation sim = panel.getSimulation();
+      final boolean enabled = sim.isAutomatonEnabled(mAutomaton);
+      sim.setAutomatonEnabled(mAutomaton, !enabled);
+    }
   }
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.gui.actions.WaterSimulationAction
+  //# Auxiliary Methods
   @Override
   void updateEnabledStatus()
   {
     final SimulatorPanel panel = getActiveSimulatorPanel();
-    setEnabled(panel != null);
+    if (panel != null) {
+      final Simulation sim = panel.getSimulation();
+      final StateProxy state = sim.getCurrentState(mAutomaton);
+      setEnabled(state != null);
+    } else {
+      setEnabled(false);
+    }
   }
 
 
   //#########################################################################
   //# Data Members
-  private final int mTime;
+  private final AutomatonProxy mAutomaton;
 
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = -4783316648203187306L;
+  private static final long serialVersionUID = -6517158301347074008L;
 
 }

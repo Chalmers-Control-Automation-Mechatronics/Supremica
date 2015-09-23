@@ -56,12 +56,12 @@ public abstract class WatersSimulationAction
   WatersSimulationAction(final IDE ide)
   {
     super(ide);
-    updateEnabledStatus();
   }
 
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.observer.Observer
+  @Override
   public void update(final EditorChangedEvent event)
   {
     switch (event.getKind()) {
@@ -84,6 +84,7 @@ public abstract class WatersSimulationAction
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.simulation.SimulationObserver
+  @Override
   public void simulationChanged(final SimulationChangeEvent event)
   {
     updateEnabledStatus();

@@ -44,9 +44,10 @@ import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
-import net.sourceforge.waters.model.des.DefaultProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.DefaultProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.EventProxy;
+
 import org.supremica.gui.ide.ModuleContainer;
 
 
@@ -132,6 +133,7 @@ class SimulatorPopupFactory extends PopupFactory
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.printer.ProxyVisitor
+    @Override
     public Object visitProxy(final Proxy proxy)
     {
       // do nothing
@@ -165,6 +167,10 @@ class SimulatorPopupFactory extends PopupFactory
       if (desktop.canResize(name)) {
         final IDEAction resize = master.getResizeAction(aut);
         popup.add(resize);
+      }
+      if (mSimulation.getCurrentState(aut) != null) {
+        final IDEAction disable = master.getSimulationDisableAutomatonAction(aut);
+        popup.add(disable);
       }
       final IDEAction edit = master.getDesktopEditAction(aut);
       popup.add(edit);

@@ -57,10 +57,12 @@ public class SimulationBackToStartAction extends WatersSimulationAction
     putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_TO_START);
     putValue(Action.ACCELERATOR_KEY,
              KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0));
+    updateEnabledStatus();
   }
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent event)
   {
     final SimulatorPanel panel = getObservedSimulatorPanel();

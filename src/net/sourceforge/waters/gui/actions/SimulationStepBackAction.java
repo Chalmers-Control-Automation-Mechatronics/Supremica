@@ -60,10 +60,12 @@ public class SimulationStepBackAction
     putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_BACK);
     putValue(Action.ACCELERATOR_KEY,
              KeyStroke.getKeyStroke(KeyEvent.VK_F4, 0));
+    updateEnabledStatus();
   }
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent event)
   {
     final SimulatorPanel panel = getObservedSimulatorPanel();
@@ -93,11 +95,3 @@ public class SimulationStepBackAction
   //# Class Constants
   private static final long serialVersionUID = 1L;
 }
-
-
-
-
-
-
-
-

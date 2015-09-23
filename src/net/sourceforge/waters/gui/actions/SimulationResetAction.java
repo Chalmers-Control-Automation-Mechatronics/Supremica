@@ -34,7 +34,9 @@
 package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
+
 import javax.swing.Action;
+
 import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.simulator.SimulationObserver;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
@@ -54,10 +56,12 @@ public class SimulationResetAction
     putValue(Action.NAME, "Reset");
     putValue(Action.SHORT_DESCRIPTION, "Reset the Simulation");
     putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_RESET);
+    updateEnabledStatus();
   }
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent event)
   {
     final SimulatorPanel panel = getObservedSimulatorPanel();
@@ -95,11 +99,3 @@ public class SimulationResetAction
   //# Class Constants
   private static final long serialVersionUID = 1L;
 }
-
-
-
-
-
-
-
-

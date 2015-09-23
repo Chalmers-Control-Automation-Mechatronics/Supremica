@@ -37,26 +37,35 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.Action;
 
+import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.supremica.gui.ide.IDE;
 
 public class DesktopCloseWindowAction extends WatersDesktopAction
 {
-  protected DesktopCloseWindowAction(final IDE ide, final AutomatonProxy autoToClose)
+  protected DesktopCloseWindowAction(final IDE ide, final AutomatonProxy aut)
   {
     super(ide);
-    mAutomaton = autoToClose;
-    final String name = mAutomaton.getName();
+    mAutomaton = aut;
+    final ComponentKind kind = mAutomaton.getKind();
+    final String kindName = ModuleContext.getComponentKindToolTip(kind);
+    final String compName = mAutomaton.getName();
+    String name = null;
+    if (compName.length() <= 32) {
+      name = kindName + " " + compName;
+    }
     if (name.length() <= 32) {
-      putValue(Action.NAME, "Close Automaton " + name);
+      putValue(Action.NAME, "Close " + name);
     } else {
-      putValue(Action.NAME, "Close Automaton");
+      putValue(Action.NAME, "Close " + kindName);
     }
     putValue(Action.SHORT_DESCRIPTION, "Close this Automaton window");
     setEnabled(true);
   }
 
+  @Override
   public void actionPerformed(final ActionEvent e)
   {
     getDesktop().closeAutomaton(mAutomaton.getName());
@@ -66,11 +75,3 @@ public class DesktopCloseWindowAction extends WatersDesktopAction
 
   private static final long serialVersionUID = -1644229513613033199L;
 }
-
-
-
-
-
-
-
-
