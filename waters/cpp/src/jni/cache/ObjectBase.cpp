@@ -145,7 +145,7 @@ initJavaObject(jobject javaobject)
 {
   mObjectReference->initJavaObject(javaobject);
 }
-  
+
 
 //############################################################################
 //# Error Handling
@@ -163,11 +163,3 @@ checkNonNull()
 
 
 }  /* namespace jni */
-
-
-
-
-
-
-
-

@@ -96,12 +96,3 @@ public class EFSMEventEncoding extends AbstractEFATransitionLabelEncoding<Constr
   }
 
 }
-
-
-
-
-
-
-
-
-

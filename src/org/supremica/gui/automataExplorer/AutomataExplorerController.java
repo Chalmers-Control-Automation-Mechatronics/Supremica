@@ -51,28 +51,28 @@ public class AutomataExplorerController
 	private Automata theAutomata;
     private JButton undoButton;
     private JButton redoButton;
-    
+
     public AutomataExplorerController(AutomataStateViewer stateViewer, AutomataSynchronizerHelper synchHelper)
     {
         setLayout(new BorderLayout());
-        
+
         this.stateViewer = stateViewer;
         this.theAutomata = synchHelper.getAutomata();
-        
+
         Box redoBox = new Box(BoxLayout.X_AXIS);
         ImageIcon forwardImg = new ImageIcon(AutomataExplorerController.class.getResource("/toolbarButtonGraphics/navigation/Forward24.gif"));
         ImageIcon backwardImg = new ImageIcon(AutomataExplorerController.class.getResource("/toolbarButtonGraphics/navigation/Back24.gif"));
         ImageIcon homeImg = new ImageIcon(AutomataExplorerController.class.getResource("/toolbarButtonGraphics/navigation/Home24.gif"));
-        
+
         undoButton = new JButton(backwardImg);        
         undoButton.setToolTipText("Back");
-        
+
         redoButton = new JButton(forwardImg);
         redoButton.setToolTipText("Forward");
-        
+
         JButton resetButton = new JButton(homeImg);
         resetButton.setToolTipText("Go to the initial state");
-        
+
         redoBox.add(Box.createHorizontalGlue());
         redoBox.add(Box.createHorizontalGlue());
         redoBox.add(undoButton);
@@ -105,32 +105,27 @@ public class AutomataExplorerController
             }
         });
     }
-    
+
     public void reset_actionPerformed(ActionEvent e)
     {
         stateViewer.goToInitialState();
-        
+
         // stateViewer.initialize();
     }
-    
+
     public void undo_actionPerformed(ActionEvent e)
     {
         stateViewer.undoState();
     }
-    
+
     public void redo_actionPerformed(ActionEvent e)
     {
         stateViewer.redoState();
     }
-    
+
     public void update()
     {
         undoButton.setEnabled(stateViewer.undoEnabled());
         redoButton.setEnabled(stateViewer.redoEnabled());
     }
 }
-
-
-
-
-

@@ -128,11 +128,3 @@ public class PartitionedAutomatonResult
   private List<int[]> mPartition;
 
 }
-
-
-
-
-
-
-
-

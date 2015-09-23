@@ -74,10 +74,3 @@ public class CompositionSelectionHeuristicMinF1
   private UnifiedEFAConflictChecker mConflictChecker;
 
 }
-
-
-
-
-
-
-

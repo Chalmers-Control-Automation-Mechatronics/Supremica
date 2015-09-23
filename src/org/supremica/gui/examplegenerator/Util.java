@@ -51,7 +51,7 @@ class Util
             di=1;
             dj=0;
         }
-        
+
         x += di;
         y += dj;
 
@@ -127,18 +127,18 @@ class Util
                 dj=1;
             }
         }
-        
+
        zigzagTraversing(result,i+1,x,y,di,dj,min_x,min_y,max_x,max_y, false);
 
 	return null;
     }    
-    
+
     public Point[] verticalTraversing(Point[] result, int i, int x, int y, int min_x, int min_y, int max_x, int max_y)
     {
         result[i] = new Point(x,y);
 
         y++;
-        
+
         if(y > max_y)
         {
             x++;
@@ -152,10 +152,10 @@ class Util
         }
         else
             verticalTraversing(result, i+1, x, y, min_x, min_y, max_x, max_y);
-        
+
         return null;
     }
-     
+
     public void writeToFile(BufferedWriter bw, String text, boolean tokenizable) throws Exception
     {
         if(tokenizable)
@@ -169,7 +169,7 @@ class Util
                 try { bw.write(token); } 
                 catch (IOException e) {}
             }
-            
+
         }
         else
         {
@@ -178,8 +178,3 @@ class Util
         }
     }
 }
-
-
-
-
-

@@ -58,11 +58,11 @@ public class AutomataStateViewer
     private JSplitPane stateEventSplitter;
     private LinkedList<int[]> prevStates = new LinkedList<int[]>();
     private LinkedList<int[]> nextStates = new LinkedList<int[]>();
-    
+
     public AutomataStateViewer(AutomataSynchronizerHelper helper)
     {
         setLayout(new BorderLayout());
-        
+
         theAutomata = helper.getAutomata();
         this.helper = helper;
         forwardEvents = new AutomataEventList(this, helper, true);
@@ -70,21 +70,21 @@ public class AutomataStateViewer
         eventSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT, forwardEvents, backwardEvents);
         stateDisplayer = new AutomataStateDisplayer(this, helper);
         stateEventSplitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, stateDisplayer, eventSplitter);
-        
+
         add(stateEventSplitter, BorderLayout.CENTER);
     }
-    
+
     public void initialize()
     {
         eventSplitter.setDividerLocation(0.5);
         stateEventSplitter.setDividerLocation(0.6);
     }
-    
+
     public void setCurrState(int[] newState)
     {
         setCurrState(newState, false);
     }
-    
+
     private void setCurrState(int[] newState, boolean isUndo)
     {
         if (!isUndo)
@@ -93,57 +93,57 @@ public class AutomataStateViewer
             {
                 prevStates.addLast(currState);
             }
-            
+
             nextStates.clear();
         }
-        
+
         currState = newState;
-        
+
         update();
     }
-    
+
     public void goToInitialState()
     {
         prevStates.clear();
-        
+
         currState = null;
-        
+
         helper.getCoExecuter().setCurrState(AutomataExplorerHelper.getInitialState());
         setCurrState(AutomataExplorerHelper.getInitialState(), false);
     }
-    
+
     public void undoState()
     {
         if (prevStates.size() > 0)
         {
             int[] newState = prevStates.removeLast();
-            
+
             nextStates.addFirst(currState);
             setCurrState(newState, true);
         }
     }
-    
+
     public boolean undoEnabled()
     {
         return prevStates.size() > 0;
     }
-    
+
     public void redoState()
     {
         if (nextStates.size() > 0)
         {
             int[] newState = nextStates.removeFirst();
-            
+
             prevStates.addLast(currState);
             setCurrState(newState, true);
         }
     }
-    
+
     public boolean redoEnabled()
     {
         return nextStates.size() > 0;
     }
-    
+
     public void update()
     {
         // The order of theese is important(?), for states to be properly
@@ -153,14 +153,9 @@ public class AutomataStateViewer
         stateDisplayer.setCurrState(currState);
         controller.update();
     }
-    
+
     public void setController(AutomataExplorerController controller)
     {
         this.controller = controller;
     }
 }
-
-
-
-
-

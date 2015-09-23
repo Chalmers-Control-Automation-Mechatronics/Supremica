@@ -155,11 +155,3 @@ public class IntListBufferTest extends AbstractWatersTest
      593, 594, 595, 596, 597, 598, 599};
 
 }
-
-
-
-
-
-
-
-

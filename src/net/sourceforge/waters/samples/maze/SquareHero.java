@@ -53,7 +53,7 @@ class SquareHero extends Square
   {
     return Square.HERO;
   }
-  
+
   int[] getEnteringActions()
   {
     return ENTERING;
@@ -65,11 +65,3 @@ class SquareHero extends Square
   private static final int[] ENTERING = {Action.MOVE};
 
 }
-
-
-
-
-
-
-
-

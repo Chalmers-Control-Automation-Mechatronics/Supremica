@@ -146,11 +146,3 @@ class ComponentsTreePopupFactory
   private final ModuleContext mContext;
 
 }
-
-
-
-
-
-
-
-

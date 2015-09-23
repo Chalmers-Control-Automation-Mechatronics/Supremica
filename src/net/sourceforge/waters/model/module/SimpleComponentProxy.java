@@ -87,11 +87,3 @@ public interface SimpleComponentProxy extends ComponentProxy {
   public Map<String,String> getAttributes();
 
 }
-
-
-
-
-
-
-
-

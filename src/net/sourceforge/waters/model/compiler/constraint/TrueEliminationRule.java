@@ -89,10 +89,3 @@ class TrueEliminationRule extends SimplificationRule
   private static final PlaceHolder[] PLACEHOLDERS = {};
 
 }
-
-
-
-
-
-
-

@@ -224,11 +224,3 @@ class ReplaceVisitor extends DefaultModuleProxyVisitor
   private SimplificationRule mCurrentRule;
 
 }
-
-
-
-
-
-
-
-

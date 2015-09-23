@@ -48,17 +48,12 @@ public class DeleteAction
     public DeleteAction()
     {
         super("Delete...", new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Delete16.gif")));
-        
+
         putValue(SHORT_DESCRIPTION, "Delete selected automata");
     }
-    
+
     public void actionPerformed(ActionEvent e)
     {
         ActionMan.automataDelete_actionPerformed(ActionMan.getGui());
     }
 }
-
-
-
-
-

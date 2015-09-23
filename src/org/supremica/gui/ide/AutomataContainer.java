@@ -112,8 +112,3 @@ public class AutomataContainer
     static final String TYPE_STRING = "Supremica project";
 
 }
-
-
-
-
-

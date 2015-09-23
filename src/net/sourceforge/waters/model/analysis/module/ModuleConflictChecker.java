@@ -126,11 +126,3 @@ public interface ModuleConflictChecker extends ModuleVerifier
   public ConflictTraceProxy getCounterExample();
 
 }
-
-
-
-
-
-
-
-

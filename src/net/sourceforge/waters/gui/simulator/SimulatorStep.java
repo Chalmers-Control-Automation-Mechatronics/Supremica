@@ -115,11 +115,3 @@ public class SimulatorStep
   private final List<AutomatonProxy> mNonDeterministicAutomata;
 
 }
-
-
-
-
-
-
-
-

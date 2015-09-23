@@ -297,12 +297,3 @@ public class SelfloopSubsumptionTRSimplifier
   private TIntArrayStack mStack;
 
 }
-
-
-
-
-
-
-
-
-

@@ -2175,11 +2175,3 @@ class EditorGraph
     new LabelGeometrySubject(LabelBlockProxyShape.DEFAULT_OFFSET);
 
 }
-
-
-
-
-
-
-
-

@@ -46,11 +46,3 @@ public interface ProxyAccessor<P extends Proxy>
   public P getProxy();
 
 }
-
-
-
-
-
-
-
-

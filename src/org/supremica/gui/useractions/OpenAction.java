@@ -48,21 +48,16 @@ public class OpenAction
     public OpenAction()
     {
         super();
-        
+
         putValue(NAME, "Open...");
         putValue(SHORT_DESCRIPTION, "Open a new project");
         putValue(MNEMONIC_KEY, new Integer(KeyEvent.VK_O));
         putValue(SMALL_ICON,
             new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Open16.gif")));
     }
-    
+
     public void actionPerformed(ActionEvent e)
     {
         ActionMan.fileOpen(ActionMan.getGui());
     }
 }
-
-
-
-
-

@@ -299,11 +299,3 @@ public class AboutPanel
   private static final long serialVersionUID = 5614454534701458734L;
 
 }
-
-
-
-
-
-
-
-

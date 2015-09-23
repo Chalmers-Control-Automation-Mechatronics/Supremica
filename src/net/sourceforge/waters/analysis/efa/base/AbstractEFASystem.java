@@ -208,11 +208,3 @@ public abstract class AbstractEFASystem<L,
   private static final int DEFAULT_SIZE = 16;
 
 }
-
-
-
-
-
-
-
-

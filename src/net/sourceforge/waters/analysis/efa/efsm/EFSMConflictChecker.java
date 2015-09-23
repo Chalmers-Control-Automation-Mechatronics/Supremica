@@ -704,11 +704,3 @@ public class EFSMConflictChecker extends AbstractModuleConflictChecker
   private EFSMSystem mCurrentEFSMSystem;
 
 }
-
-
-
-
-
-
-
-

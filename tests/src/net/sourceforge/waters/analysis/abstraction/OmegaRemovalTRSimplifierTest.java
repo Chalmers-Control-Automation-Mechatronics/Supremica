@@ -224,11 +224,3 @@ public class OmegaRemovalTRSimplifierTest
   }
 
 }
-
-
-
-
-
-
-
-

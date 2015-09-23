@@ -71,17 +71,9 @@ public class ModelException extends IllegalArgumentException {
     super(cause);
   }
 
-  
+
   //#########################################################################
   //# Static Class Variables
   public static final long serialVersionUID = 1;
 
 }
-
-
-
-
-
-
-
-

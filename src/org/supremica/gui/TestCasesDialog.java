@@ -1791,8 +1791,3 @@ public class TestCasesDialog
         setLocation(point);
     }
 }
-
-
-
-
-

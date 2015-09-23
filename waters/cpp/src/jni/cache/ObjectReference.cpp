@@ -117,11 +117,3 @@ removeReference()
 
 
 }  /* namespace jni */
-
-
-
-
-
-
-
-

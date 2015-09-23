@@ -198,11 +198,3 @@ abstract class Square
   };
 
 }
-
-
-
-
-
-
-
-

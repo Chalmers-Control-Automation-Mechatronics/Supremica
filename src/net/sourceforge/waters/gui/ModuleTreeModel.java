@@ -509,11 +509,3 @@ class ModuleTreeModel
   private final ChildrenGetterVisitor mChildrenGetterVisitor;
 
 }
-
-
-
-
-
-
-
-

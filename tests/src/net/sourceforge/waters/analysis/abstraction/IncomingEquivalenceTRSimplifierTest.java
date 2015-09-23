@@ -279,11 +279,3 @@ public class IncomingEquivalenceTRSimplifierTest
   }
 
 }
-
-
-
-
-
-
-
-

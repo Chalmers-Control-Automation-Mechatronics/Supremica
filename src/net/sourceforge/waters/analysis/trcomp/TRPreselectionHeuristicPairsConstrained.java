@@ -156,11 +156,3 @@ abstract class TRPreselectionHeuristicPairsConstrained
   private TObjectDoubleHashMap<TRAutomatonProxy> mCache;
 
 }
-
-
-
-
-
-
-
-

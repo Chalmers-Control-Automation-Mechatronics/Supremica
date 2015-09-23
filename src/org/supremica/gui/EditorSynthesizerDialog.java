@@ -619,8 +619,3 @@ public class EditorSynthesizerDialog
         }
     }
 }
-
-
-
-
-

@@ -85,8 +85,3 @@ public class VisualProjectContainerListeners
 		}
 	}
 }
-
-
-
-
-

@@ -208,8 +208,3 @@ public class AutomataSynchronizerWorker
       abortRequested = false;
     }
 }
-
-
-
-
-

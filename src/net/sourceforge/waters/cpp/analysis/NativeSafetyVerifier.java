@@ -153,11 +153,3 @@ public class NativeSafetyVerifier
   private final SafetyDiagnostics mDiagnostics;
 
 }
-
-
-
-
-
-
-
-

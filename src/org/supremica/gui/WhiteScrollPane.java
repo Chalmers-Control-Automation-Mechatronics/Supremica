@@ -50,35 +50,30 @@ public class WhiteScrollPane
     {
         Utility.setupPane(this);
     }
-    
+
     public WhiteScrollPane()
     {
         setWhite();
     }
-    
+
     public WhiteScrollPane(Component view)
     {
         super(view);
-        
+
         setWhite();
     }
-    
+
     public WhiteScrollPane(Component view, int vsbPolicy, int hsbPolicy)
     {
         super(view, vsbPolicy, hsbPolicy);
-        
+
         setWhite();
     }
-    
+
     public WhiteScrollPane(int vsbPolicy, int hsbPolicy)
     {
         super(vsbPolicy, hsbPolicy);
-        
+
         setWhite();
     }
 }
-
-
-
-
-

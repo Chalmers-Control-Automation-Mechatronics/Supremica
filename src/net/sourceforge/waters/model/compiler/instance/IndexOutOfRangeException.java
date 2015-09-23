@@ -110,18 +110,10 @@ public class IndexOutOfRangeException extends EvalException {
   //# Data Members
   private final Object mValue;
   private final CompiledRange mRange;
-  
-  
+
+
   //#########################################################################
   //# Static Class Variables
   public static final long serialVersionUID = 1;
- 
+
 }
-
-
-
-
-
-
-
-

@@ -46,10 +46,3 @@ interface ProbabilityEstimator
    */
   public AutomatonProbability estimate(AutomatonSchema aut, AutomatonSchema[] automata);
 }
-
-
-
-
-
-
-

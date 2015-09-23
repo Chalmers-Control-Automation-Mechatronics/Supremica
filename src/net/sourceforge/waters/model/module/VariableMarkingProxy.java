@@ -61,11 +61,3 @@ public interface VariableMarkingProxy extends Proxy {
   public SimpleExpressionProxy getPredicate();
 
 }
-
-
-
-
-
-
-
-

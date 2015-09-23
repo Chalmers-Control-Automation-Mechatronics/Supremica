@@ -63,11 +63,3 @@ public class PlainAutomatonTest extends AbstractAutomatonTest
   }
 
 }
-
-
-
-
-
-
-
-

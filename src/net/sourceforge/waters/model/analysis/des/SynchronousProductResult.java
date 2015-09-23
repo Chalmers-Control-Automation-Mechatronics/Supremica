@@ -63,11 +63,3 @@ public interface SynchronousProductResult
   public void setStateMap(final SynchronousProductStateMap map);
 
 }
-
-
-
-
-
-
-
-

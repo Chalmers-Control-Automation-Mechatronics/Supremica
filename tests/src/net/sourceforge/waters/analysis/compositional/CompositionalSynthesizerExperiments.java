@@ -516,11 +516,3 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
   private PrintWriter mPrintWriter;
   private boolean mHasBeenPrinted;
 }
-
-
-
-
-
-
-
-

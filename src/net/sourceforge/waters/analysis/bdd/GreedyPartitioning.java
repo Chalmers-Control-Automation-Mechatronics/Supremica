@@ -174,11 +174,3 @@ class GreedyPartitioning<P extends PartitionBDD>
   }
 
 }
-
-
-
-
-
-
-
-

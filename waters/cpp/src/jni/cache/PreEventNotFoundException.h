@@ -85,11 +85,3 @@ private:
 }   /* namespace jni */
 
 #endif  /* !_PreEventNotFoundException_h_ */
-
-
-
-
-
-
-
-

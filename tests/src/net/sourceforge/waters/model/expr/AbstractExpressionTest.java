@@ -711,11 +711,3 @@ public abstract class AbstractExpressionTest extends TestCase
   private static final String GARBLE1 = "{1+1}";
   private static final String GARBLE2 = "a{2+}bc{= (}";
 }
-
-
-
-
-
-
-
-

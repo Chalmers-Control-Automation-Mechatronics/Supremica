@@ -844,11 +844,3 @@ public class ConstraintPropagatorTest extends TestCase
     new CompiledIntRange(0, 1);
 
 }
-
-
-
-
-
-
-
-

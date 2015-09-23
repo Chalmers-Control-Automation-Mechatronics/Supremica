@@ -117,10 +117,3 @@ public class AutomatonLeafNode extends DefaultMutableTreeNode
   private static final long serialVersionUID = 4785226183311677790L;
 
 }
-
-
-
-
-
-
-

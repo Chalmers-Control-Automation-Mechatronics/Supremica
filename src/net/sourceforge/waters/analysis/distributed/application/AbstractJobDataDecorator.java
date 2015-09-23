@@ -89,10 +89,3 @@ public abstract class AbstractJobDataDecorator implements JobData, Serializable
 
   private final JobData mJobData;
 }
-
-
-
-
-
-
-

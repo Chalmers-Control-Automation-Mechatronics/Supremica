@@ -42,7 +42,3 @@ public interface AutomatonViewerFactory
 {
 	AutomatonViewer createAutomatonViewer(Automaton automaton) throws Exception;
 }
-
-
-
-

@@ -205,11 +205,3 @@ public class NativeHashSetTest extends AbstractWatersTest
   private final int TESTSIZE = 1000;
 
 }
-
-
-
-
-
-
-
-

@@ -58,17 +58,9 @@ public class DivisionByZeroException extends EvalException {
     super("Division by zero in expression!", expr);
   }
 
-  
+
   //#########################################################################
   //# Static Class Variables
   public static final long serialVersionUID = 1;
 
 }
-
-
-
-
-
-
-
-

@@ -100,11 +100,3 @@ public interface SimpleNodeProxy extends NodeProxy {
   public LabelGeometryProxy getLabelGeometry();
 
 }
-
-
-
-
-
-
-
-

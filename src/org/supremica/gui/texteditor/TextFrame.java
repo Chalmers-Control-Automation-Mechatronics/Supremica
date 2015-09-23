@@ -71,8 +71,3 @@ public class TextFrame
 		return new PrintWriter(new TextWriter(textpanel));
 	}
 }
-
-
-
-
-

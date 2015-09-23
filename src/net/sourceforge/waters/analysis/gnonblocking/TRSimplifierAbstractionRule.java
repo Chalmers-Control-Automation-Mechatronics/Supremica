@@ -104,11 +104,3 @@ abstract class TRSimplifierAbstractionRule extends AbstractionRule
   private final TransitionRelationSimplifier mSimplifier;
 
 }
-
-
-
-
-
-
-
-

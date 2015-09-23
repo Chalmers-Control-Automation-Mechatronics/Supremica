@@ -158,11 +158,3 @@ class QuadraticEdgeProxyShape
   private final Point2D mArrowTip;
 
 }
-
-
-
-
-
-
-
-

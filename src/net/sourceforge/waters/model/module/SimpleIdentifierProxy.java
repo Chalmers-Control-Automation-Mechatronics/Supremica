@@ -54,11 +54,3 @@ public interface SimpleIdentifierProxy extends IdentifierProxy {
   public String getName();
 
 }
-
-
-
-
-
-
-
-

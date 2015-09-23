@@ -73,7 +73,7 @@ class BaseJobData implements Serializable, JobData
     this(new HashMap<String,Object>());
   }
 
- 
+
   public <T extends Serializable>
 	    void set(String attr, T obj) 
     throws IllegalStateException,
@@ -97,10 +97,10 @@ class BaseJobData implements Serializable, JobData
 
     if (other == null)
       throw new NullPointerException("Other job data was null");
-    
+
     if (this == other)
       throw new IllegalArgumentException("Cannot merge with self");
-    
+
     for (Map.Entry<String,Object> entry : other.getAttributeMap().entrySet())
       {
 	if (!mAttributes.containsKey(entry.getKey()))
@@ -148,10 +148,3 @@ class BaseJobData implements Serializable, JobData
   private static final long serialVersionUID = 1L;
   private static final String IMMUTABLE_MESSAGE = "Cannot modify immutable job data";
 }
-
-
-
-
-
-
-

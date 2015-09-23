@@ -1190,11 +1190,3 @@ public abstract class AbstractEqualityVisitor
   private Diagnostics mDiagnostics;
 
 }
-
-
-
-
-
-
-
-

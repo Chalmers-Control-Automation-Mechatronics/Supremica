@@ -337,11 +337,3 @@ public class TauLoopRemovalTRSimplifier
   private static final int FOR_CLOSING = 0x80000000;
 
 }
-
-
-
-
-
-
-
-

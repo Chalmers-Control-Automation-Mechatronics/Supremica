@@ -400,7 +400,3 @@ class ExtPhilosPanel extends JPanel implements TestCase, ActionListener {
 		result.setVisible(true);
 	}
 }
-
-
-
-

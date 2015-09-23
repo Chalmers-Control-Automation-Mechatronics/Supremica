@@ -112,11 +112,3 @@ public class RenamedEFAEvent extends AbstractEFAEvent
   private int mIndex;
 
 }
-
-
-
-
-
-
-
-

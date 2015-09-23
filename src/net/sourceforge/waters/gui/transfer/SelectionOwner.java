@@ -266,11 +266,3 @@ public interface SelectionOwner
   public void close();
 
 }
-
-
-
-
-
-
-
-

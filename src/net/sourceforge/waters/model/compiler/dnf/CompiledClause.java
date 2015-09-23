@@ -192,10 +192,3 @@ public class CompiledClause implements Cloneable
   private final ProxyAccessorSet<SimpleExpressionProxy> mLiterals;
 
 }
-
-
-
-
-
-
-

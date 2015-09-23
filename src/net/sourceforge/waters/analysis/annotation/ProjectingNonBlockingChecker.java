@@ -1791,12 +1791,3 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
       LoggerFactory.createLogger(ProjectingNonBlockingChecker.class);
 
 }
-
-
-
-
-
-
-
-
-

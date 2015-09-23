@@ -39,11 +39,3 @@ public interface MiscShape
 {
   public void draw(Graphics2D graphics);
 }
-
-
-
-
-
-
-
-

@@ -111,7 +111,7 @@ public class EditorSynthesizerAction
         final int nbrOfComponents = module.getComponentList().size();
         if(nbrOfComponents == 0)
             return;
-        
+
         /*** Check that we do not have any for-each blocks that create IndexedIdentifierSubject events (see issue #56) ***/
         for(final Proxy sub : module.getComponentList())
         {
@@ -122,11 +122,11 @@ public class EditorSynthesizerAction
                         "Sorry, but your module contains for-each blocks\nCurrently we cannot handle this\nWorking on it...",
                         "Unable to handle...",                       
                         JOptionPane.WARNING_MESSAGE);
-                
+
                 return;
             }
         }
-        
+
         // Synchronize EFAs
 /*        SynchronizationOptions so = new SynchronizationOptions();
         AutomataSynchronizer as = new AutomataSynchronizer(module.getComponentListModifiable(),so);
@@ -165,7 +165,7 @@ public class EditorSynthesizerAction
         {
             return;
         }
-                
+
         final ExtendedAutomata exAutomata = options.getOptimization() ? 
                                 new ExtendedAutomata(module, (int)options.getGlobalClockDomain()) : 
                                 new ExtendedAutomata(module);
@@ -263,7 +263,7 @@ public class EditorSynthesizerAction
         //logger.info("Number of reachable states: "+bddSynthesizer.bddAutomata.numberOfReachableStates());
         if(options.getOptimization())
             logger.info("The minimum time to 'safely' reach a marked state from the initial state: "+bddSynthesizer.bddAutomata.getOptimalTime(bddSynthesizer.getResult())+".");       
-        
+
         if(!options.getOptVaribale().isEmpty())
         {
             logger.info("The minimum value of variable "+ options.getOptVaribale()+" among the reachable marked states is: "+bddSynthesizer.bddAutomata.getMinValueOfVar()+".");
@@ -406,8 +406,3 @@ public class EditorSynthesizerAction
     }
 
 }
-
-
-
-
-

@@ -65,8 +65,3 @@ public class EditorAddBindingAction
 		System.err.println("Add Binding is not implemented yet!");
 	}
 }
-
-
-
-
-

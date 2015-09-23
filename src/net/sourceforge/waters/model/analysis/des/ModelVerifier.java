@@ -134,11 +134,3 @@ public interface ModelVerifier extends ModelAnalyzer
   public VerificationResult getAnalysisResult();
 
 }
-
-
-
-
-
-
-
-

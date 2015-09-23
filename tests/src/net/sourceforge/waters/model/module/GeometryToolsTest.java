@@ -122,11 +122,3 @@ public class GeometryToolsTest extends TestCase
   }
 
 }
-
-
-
-
-
-
-
-

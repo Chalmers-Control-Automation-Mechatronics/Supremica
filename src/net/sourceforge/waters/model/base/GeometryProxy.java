@@ -47,11 +47,3 @@ package net.sourceforge.waters.model.base;
 public interface GeometryProxy extends Proxy {
 
 }
-
-
-
-
-
-
-
-

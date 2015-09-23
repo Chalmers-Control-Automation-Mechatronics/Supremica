@@ -132,11 +132,3 @@ public class CompilationWorker implements Runnable
   private boolean mTerminate = false;
 
 }
-
-
-
-
-
-
-
-

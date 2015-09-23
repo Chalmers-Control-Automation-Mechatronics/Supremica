@@ -643,11 +643,3 @@ public class CompositionalStateRepresentationSynthesizer extends
   private Map<AutomatonProxy,SynthesisStateSpace.SynthesisStateMap> mStateRepresentationMap;
   private SynthesisStateSpace mSynthesisStateSpace;
 }
-
-
-
-
-
-
-
-

@@ -185,11 +185,3 @@ class UncontrollableEventBDD extends EventBDD
   private BDD mEnabledBDD;
 
 }
-
-
-
-
-
-
-
-

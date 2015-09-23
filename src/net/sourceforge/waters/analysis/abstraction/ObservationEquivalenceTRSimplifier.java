@@ -2383,11 +2383,3 @@ public class ObservationEquivalenceTRSimplifier
   private int mMaxInfoSize;
 
 }
-
-
-
-
-
-
-
-

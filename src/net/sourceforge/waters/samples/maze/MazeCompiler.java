@@ -331,11 +331,3 @@ public class MazeCompiler implements CopyingProxyUnmarshaller<ModuleProxy>
     Collections.singletonList(MAZEFILTER);
 
 }
-
-
-
-
-
-
-
-

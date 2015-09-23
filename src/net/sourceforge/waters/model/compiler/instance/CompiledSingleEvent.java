@@ -157,11 +157,3 @@ class CompiledSingleEvent implements CompiledEvent
   private IdentifierProxy mIdentifier;
 
 }
-
-
-
-
-
-
-
-

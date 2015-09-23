@@ -39,6 +39,8 @@
 # waters/cpp/src/jni/templates/*
 # waters/xml/xsd/*.xsd
 # waters/xml/xsl/*.xsl
+# Eclipse template: Project -> Properties -> Java Code Style ->
+#                   Code Templates -> Comments -> Files
 ###########################################################################
 
 set gHeaderDir [file join "src" "net" "sourceforge" "waters" "config"]
@@ -118,9 +120,18 @@ proc Java_ProcessFile {fileName} {
   if {[string compare $line ""] != 0} {
     puts $outStream ""
     puts $outStream $line
+    set blankLines 0
     while {![eof $inStream]} {
       set line [gets $inStream]
-      puts $outStream $line
+      if {[regexp {^ *$} $line all]} {
+        incr blankLines
+      } else {
+        for {set i 0} {$i < $blankLines} {incr i} {
+          puts $outStream ""
+        }
+        puts $outStream $line
+        set blankLines 0
+      }
     }
   }
   close $inStream

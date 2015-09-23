@@ -65,11 +65,3 @@ public interface AliasProxy extends IdentifiedProxy {
   public ExpressionProxy getExpression();
 
 }
-
-
-
-
-
-
-
-

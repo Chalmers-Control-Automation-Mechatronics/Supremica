@@ -110,11 +110,3 @@ public class GeometryChecker extends DefaultModuleProxyVisitor
   }
 
 }
-
-
-
-
-
-
-
-

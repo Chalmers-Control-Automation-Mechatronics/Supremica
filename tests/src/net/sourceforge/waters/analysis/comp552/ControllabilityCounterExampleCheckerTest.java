@@ -221,11 +221,3 @@ public class ControllabilityCounterExampleCheckerTest
   ControllabilityCounterExampleChecker mChecker;
 
 }
-
-
-
-
-
-
-
-

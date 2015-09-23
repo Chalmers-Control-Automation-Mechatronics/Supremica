@@ -377,12 +377,3 @@ public class SilentContinuationTRSimplifier
   private int mTransitionLimit = Integer.MAX_VALUE;
 
 }
-
-
-
-
-
-
-
-
-

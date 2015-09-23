@@ -70,11 +70,3 @@ public interface TraceStepProxy
   public Map<AutomatonProxy,StateProxy> getStateMap();
 
 }
-
-
-
-
-
-
-
-

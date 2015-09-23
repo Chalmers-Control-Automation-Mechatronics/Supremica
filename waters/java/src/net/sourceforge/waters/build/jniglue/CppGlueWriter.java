@@ -111,10 +111,3 @@ class CppGlueWriter extends ErrorReporter {
   private final TemplateFragment mTemplate;
 
 }
-
-
-
-
-
-
-

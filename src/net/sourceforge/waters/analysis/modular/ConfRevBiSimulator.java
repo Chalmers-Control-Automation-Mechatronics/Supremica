@@ -569,12 +569,3 @@ public class ConfRevBiSimulator
     }
   }
 }
-
-
-
-
-
-
-
-
-

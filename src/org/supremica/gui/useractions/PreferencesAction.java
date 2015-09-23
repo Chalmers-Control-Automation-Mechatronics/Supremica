@@ -57,8 +57,3 @@ public class PreferencesAction
 		ActionMan.configurePreferences_actionPerformed(ActionMan.getGui());
 	}
 }
-
-
-
-
-

@@ -130,8 +130,3 @@ public class SoftplcSimulationDialog
 		ok = true;
 	}
 }
-
-
-
-
-

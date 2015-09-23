@@ -116,8 +116,3 @@ public class EditCommentDialog
 		return newComment;
 	}
 }
-
-
-
-
-

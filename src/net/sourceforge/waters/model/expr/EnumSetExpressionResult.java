@@ -85,11 +85,3 @@ class EnumSetExpressionResult extends ParseResult {
   private final List<SimpleIdentifierProxy> mItems;
 
 }
-
-
-
-
-
-
-
-

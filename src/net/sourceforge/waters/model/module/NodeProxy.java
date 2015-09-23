@@ -88,11 +88,3 @@ public interface NodeProxy extends NamedProxy {
   public Map<String,String> getAttributes();
 
 }
-
-
-
-
-
-
-
-

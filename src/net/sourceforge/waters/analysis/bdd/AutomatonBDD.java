@@ -634,12 +634,3 @@ class AutomatonBDD
   private Set<EventProxy> mNondeterministicEvents;
 
 }
-
-
-
-
-
-
-
-
-

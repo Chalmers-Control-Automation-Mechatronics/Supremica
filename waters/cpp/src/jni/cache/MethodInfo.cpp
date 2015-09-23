@@ -55,11 +55,3 @@ MethodInfo(uint32_t code,
 }
 
 }  /* namespace jni */
-
-
-
-
-
-
-
-

@@ -190,11 +190,3 @@ public class EventAliasEditorDialog extends AbstractBindingEditorDialog
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-
-

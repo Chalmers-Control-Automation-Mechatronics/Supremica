@@ -1020,11 +1020,3 @@ public abstract class AbstractControllabilityCheckerTest
   }
 
 }
-
-
-
-
-
-
-
-

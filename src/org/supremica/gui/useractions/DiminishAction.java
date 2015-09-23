@@ -257,8 +257,3 @@ public class DiminishAction
 		logger.debug("Delicate purging done");
 	}
 }
-
-
-
-
-

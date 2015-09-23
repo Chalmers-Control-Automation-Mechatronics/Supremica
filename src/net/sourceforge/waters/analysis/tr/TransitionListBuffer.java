@@ -2196,11 +2196,3 @@ public abstract class TransitionListBuffer
   private static final int MAX_BLOCK_SIZE = 2048;
 
 }
-
-
-
-
-
-
-
-

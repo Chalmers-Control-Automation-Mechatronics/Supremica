@@ -277,11 +277,3 @@ abstract class EdgeProxyShape
   static final int CLICK_TOLERANCE = 2;
   static final int CLICK_TOLERANCE_SQ = CLICK_TOLERANCE * CLICK_TOLERANCE;
 }
-
-
-
-
-
-
-
-

@@ -428,11 +428,3 @@ public class EFASimplifierStatistics
   private long mPeakMemoryUsage;
 
 }
-
-
-
-
-
-
-
-

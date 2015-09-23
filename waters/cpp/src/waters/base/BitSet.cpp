@@ -283,11 +283,3 @@ Java_net_sourceforge_waters_cpp_analysis_NativeBitSet_equalsNative
   const waters::BitSet *bitSet2 = (const waters::BitSet*) handler2;
   return bitSet1->equals(*bitSet2) ? JNI_TRUE : JNI_FALSE;
 }
-
-
-
-
-
-
-
-

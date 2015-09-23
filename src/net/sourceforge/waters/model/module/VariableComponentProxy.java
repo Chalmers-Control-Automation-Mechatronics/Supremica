@@ -87,11 +87,3 @@ public interface VariableComponentProxy extends ComponentProxy {
   public List<VariableMarkingProxy> getVariableMarkings();
 
 }
-
-
-
-
-
-
-
-

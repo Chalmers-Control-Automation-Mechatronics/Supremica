@@ -505,11 +505,3 @@ public class AutomatonDesktopPane
   private static final long serialVersionUID = -5528014241244952875L;
 
 }
-
-
-
-
-
-
-
-

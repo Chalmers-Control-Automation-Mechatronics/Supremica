@@ -73,7 +73,7 @@ public class GroupNodeProxyShape
     mHandles.add(new DefaultHandle(c.getX(), max.getY(), Handle.HandleType.S));
     mHandles.add(new DefaultHandle(max, Handle.HandleType.SE));
   }
-    
+
 
   //########################################################################
   //# Simple Access
@@ -81,17 +81,17 @@ public class GroupNodeProxyShape
     {
         return mHandles;
     }
-    
+
     public Rectangle2D getShape()
     {
         return mRect;
     }
-    
+
     public GroupNodeProxy getProxy()
     {
         return (GroupNodeProxy)super.getProxy();
     }
-    
+
     public boolean isClicked(int ex, int ey)
     {
         for (Handle h : getHandles())
@@ -104,19 +104,19 @@ public class GroupNodeProxyShape
         Rectangle2D rect = new Rectangle2D.Double(ex - 2, ey - 2, 4, 4);
         return (getShape().intersects(rect) && !getShape().contains(rect));
     }
-    
+
     public void draw(Graphics2D g, RenderingInformation status)
     {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
             RenderingHints.VALUE_ANTIALIAS_ON);
-                
+
         super.draw(g, status);
 
         // Thicker line for the rectangle!
         g.setColor(status.getColor());
         g.setStroke(DOUBLESTROKE);
         g.draw(getShape());
-        
+
         if (status.showHandles())
         {
             for (RendererShape handle : getHandles())
@@ -125,15 +125,7 @@ public class GroupNodeProxyShape
             }
         }
     }
-    
+
     private final Rectangle2D mRect;
     private final List<Handle> mHandles;
 }
-
-
-
-
-
-
-
-

@@ -82,11 +82,3 @@ PreAnalysisConfigurationException(const char* description, int value)
 
 
 }  /* namespace jni */
-
-
-
-
-
-
-
-

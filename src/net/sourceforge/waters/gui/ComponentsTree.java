@@ -90,10 +90,3 @@ public class ComponentsTree extends ModuleTree
   private final PopupFactory mPopupFactory;
 
 }
-
-
-
-
-
-
-

@@ -265,10 +265,3 @@ class RelationNormalizationRule extends SimplificationRule
   private final boolean mNegated;
 
 }
-
-
-
-
-
-
-

@@ -89,11 +89,3 @@ public class UnifiedEFAVariable
   private SimpleExpressionProxy mMarkedStatePredicate;
 
 }
-
-
-
-
-
-
-
-

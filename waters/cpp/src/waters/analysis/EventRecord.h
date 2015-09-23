@@ -119,11 +119,3 @@ private:
 }   /* namespace waters */
 
 #endif  /* !_EventRecord_h_ */
-
-
-
-
-
-
-
-

@@ -166,11 +166,3 @@ class CompiledEventDecl
   private final Map<List<SimpleExpressionProxy>,CompiledEvent> mIndexValueMap;
 
 }
-
-
-
-
-
-
-
-

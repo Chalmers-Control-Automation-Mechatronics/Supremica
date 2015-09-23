@@ -422,11 +422,3 @@ public class CertainUnsupervisabilityTRSimplifier
   private BitSet mBadStates;
   private TLongHashSet mUnsupervisablePairs;
 }
-
-
-
-
-
-
-
-

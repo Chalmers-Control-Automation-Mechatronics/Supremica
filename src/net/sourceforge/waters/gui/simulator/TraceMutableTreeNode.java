@@ -114,10 +114,3 @@ public class TraceMutableTreeNode extends DefaultMutableTreeNode implements Simu
   private static final long serialVersionUID = 4899696734198560636L;
 
 }
-
-
-
-
-
-
-

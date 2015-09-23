@@ -109,7 +109,7 @@ public class JAXBModuleMarshaller
   {
     return ".wmod";
   }
-  
+
   public String getDescription()
   {
       return "Waters Module files [*.wmod]";
@@ -126,11 +126,3 @@ public class JAXBModuleMarshaller
   }
 
 }
-
-
-
-
-
-
-
-

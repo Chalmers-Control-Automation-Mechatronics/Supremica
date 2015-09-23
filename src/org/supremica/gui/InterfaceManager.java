@@ -120,8 +120,3 @@ public class InterfaceManager
       "javax.swing.plaf.metal.MetalLookAndFeel";
 
 }
-
-
-
-
-

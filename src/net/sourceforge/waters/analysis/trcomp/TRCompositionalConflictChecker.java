@@ -1441,11 +1441,3 @@ public class TRCompositionalConflictChecker
   private static final String PROPERTY_NAME = ":never";
 
 }
-
-
-
-
-
-
-
-

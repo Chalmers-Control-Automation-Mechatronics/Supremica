@@ -47,7 +47,7 @@ public interface Controller extends Runnable
    */
   public ControllerState getState();
 
-  
+
   /**
    * Get the exception that was thrown by the controller.
    * It is only valid to call this method if the controller
@@ -65,7 +65,7 @@ public interface Controller extends Runnable
    */
   public void setJob(Job job) throws IllegalStateException;
 
-  
+
   /**
    * Gets the job for this controller. If no job has been set
    * then this method will return null.
@@ -133,10 +133,3 @@ public interface Controller extends Runnable
    */
   public void run();
 }
-
-
-
-
-
-
-

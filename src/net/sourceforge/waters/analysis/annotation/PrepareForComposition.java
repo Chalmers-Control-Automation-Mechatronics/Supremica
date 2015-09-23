@@ -334,12 +334,3 @@ public class PrepareForComposition
                                         nextStates, newTransitions);
   }
 }
-
-
-
-
-
-
-
-
-

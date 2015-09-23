@@ -148,11 +148,3 @@ public interface ForeachProxy extends NamedProxy
   public List<Proxy> getBody();
 
 }
-
-
-
-
-
-
-
-

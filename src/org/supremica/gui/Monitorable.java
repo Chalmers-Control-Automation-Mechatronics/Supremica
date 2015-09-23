@@ -45,8 +45,3 @@ public interface Monitorable
 
 	boolean wasStopped(); // return whether the task was stopped or completed
 }
-
-
-
-
-

@@ -63,11 +63,3 @@ public class PlainTraceTest extends AbstractTraceTest
   }
 
 }
-
-
-
-
-
-
-
-

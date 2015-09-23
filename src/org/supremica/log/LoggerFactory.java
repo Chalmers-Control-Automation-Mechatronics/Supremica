@@ -75,32 +75,32 @@ public class LoggerFactory
 		install(this);
 	}
 
-    
+
     //#######################################################################
     //# Factory Methods
     public LoggerFilter getLoggerFilter()
     {
         return mLoggerFilter;
     }
-    
+
     public Logger createLoggerFor(final Class<?> clazz)
     {
         return createLoggerFor(clazz.getName());
     }
-    
+
     public Logger createLoggerFor(final String name)
     {
         final org.apache.log4j.Logger logger =
             org.apache.log4j.Logger.getLogger(name);
         return new SupremicaLogger(logger);
     }
-    
+
     public Layout getLayout()
     {
         return mLayout;
     }
 
-    
+
     //#######################################################################
     //# Redirection
     public void logToNull()
@@ -110,7 +110,7 @@ public class LoggerFactory
             org.apache.log4j.Logger.getRootLogger();
         root.addAppender(appender);
     }
-    
+
     public void logToFile(final File file)
     throws FileNotFoundException
     {
@@ -119,12 +119,12 @@ public class LoggerFactory
         final PrintStream pstream = new PrintStream(fstream, true);
         logToStream(pstream, name);
     }
-    
+
     public void logToStream(final PrintStream stream)
     {
         logToStream(stream, null);
     }
-    
+
     public void logToStream(final PrintStream stream, final String name)
     {
         final PrintWriter writer = new PrintWriter(stream);
@@ -137,7 +137,7 @@ public class LoggerFactory
             org.apache.log4j.Logger.getRootLogger();
         root.addAppender(appender);
     }
-    
+
     public void cancelLogToFile(final File file)
     {
         final String name = file.toString();
@@ -147,8 +147,8 @@ public class LoggerFactory
         root.removeAppender(appender);
         appender.close();
     }
-    
-    
+
+
     //#######################################################################
     //# Static Access
     public static LoggerFactory getInstance()
@@ -158,12 +158,12 @@ public class LoggerFactory
 		}
         return theInstance;
     }
-    
+
     public static Logger createLogger(final Class<?> clazz)
     {
         return getInstance().createLoggerFor(clazz);
     }
-    
+
     public static Logger createLogger(final String name)
     {
         return getInstance().createLoggerFor(name);
@@ -187,14 +187,9 @@ public class LoggerFactory
     //# Data Members
     private final Layout mLayout;
     private final LoggerFilter mLoggerFilter;
-    
-    
+
+
     //#######################################################################
     //# Singleton Pattern
     private static LoggerFactory theInstance = null;
 }
-
-
-
-
-

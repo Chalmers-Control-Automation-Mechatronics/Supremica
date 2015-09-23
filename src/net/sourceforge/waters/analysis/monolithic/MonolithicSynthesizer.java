@@ -1570,10 +1570,3 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   private static final byte STATE_STATUS_DISABLED = 3;
 
 }
-
-
-
-
-
-
-

@@ -145,11 +145,3 @@ public class TRSynchronousProductResult
   private int mReducedDiamondsCount;
 
 }
-
-
-
-
-
-
-
-

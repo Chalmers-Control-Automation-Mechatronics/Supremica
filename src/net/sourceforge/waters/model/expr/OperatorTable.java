@@ -67,11 +67,3 @@ public interface OperatorTable {
   public static final int PRIORITY_OUTER = 0;
 
 }
-
-
-
-
-
-
-
-

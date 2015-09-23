@@ -338,11 +338,3 @@ public class ValidTest extends AbstractWatersTest
   private DocumentManager mDocumentManager;
 
 }
-
-
-
-
-
-
-
-

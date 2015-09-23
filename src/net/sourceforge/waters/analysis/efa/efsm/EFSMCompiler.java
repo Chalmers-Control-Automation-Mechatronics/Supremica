@@ -222,11 +222,3 @@ class EFSMCompiler extends AbstractEFSMAlgorithm
   private IdentifierProxy mMarking;
 
 }
-
-
-
-
-
-
-
-

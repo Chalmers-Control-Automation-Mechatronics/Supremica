@@ -111,8 +111,3 @@ public class AnalyzerMinimizeAction
         new AutomataMinimizationWorker(ide.getFrame(), selectedAutomata, currProject, options);
     }
 }
-
-
-
-
-

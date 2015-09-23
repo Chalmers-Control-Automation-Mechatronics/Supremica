@@ -263,10 +263,3 @@ public class AutomataSynthesisAbstractionProcedureFactory
   };
 
 }
-
-
-
-
-
-
-

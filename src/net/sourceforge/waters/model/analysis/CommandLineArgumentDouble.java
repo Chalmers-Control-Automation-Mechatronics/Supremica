@@ -135,11 +135,3 @@ public abstract class CommandLineArgumentDouble
   private double mValue;
 
 }
-
-
-
-
-
-
-
-

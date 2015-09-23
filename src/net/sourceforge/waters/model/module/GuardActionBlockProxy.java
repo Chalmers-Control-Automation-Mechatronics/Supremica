@@ -49,17 +49,9 @@ public interface GuardActionBlockProxy extends Proxy {
   //#########################################################################
   //# Getters and Setters  
   public List<SimpleExpressionProxy> getGuards();
-  
+
   public List<BinaryExpressionProxy> getActions();
-  
+
   public LabelGeometryProxy getGeometry();
 
 }
-
-
-
-
-
-
-
-

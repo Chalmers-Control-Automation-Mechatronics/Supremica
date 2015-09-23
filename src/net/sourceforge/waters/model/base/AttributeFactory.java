@@ -69,11 +69,3 @@ public interface AttributeFactory
   public List<String> getApplicableValues(String attrib);
 
 }
-
-
-
-
-
-
-
-

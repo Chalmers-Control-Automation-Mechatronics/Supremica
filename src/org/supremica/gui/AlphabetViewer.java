@@ -53,7 +53,7 @@ public class AlphabetViewer
     private JMenuBar menuBar = new JMenuBar();
     //private AlphabetViewerPanel alphabetPanel;
     private EventsViewerPanel alphabetPanel;
-    
+
     /**
      * Shows the events in the intersection of alphabetSubset and the union alphabet of <code>automata</code> 
      * and shows which of the automata in <code>automata</code> share those events.
@@ -64,73 +64,73 @@ public class AlphabetViewer
         //this.alphabetPanel = new AlphabetViewerPanel(theAutomata);
         this.alphabetPanel = new EventsViewerPanel(automata, alphabetSubset);
         contentPane = (JPanel) getContentPane();
-        
+
         // contentPane.setLayout(new BorderLayout());
         // contentPane.add(toolBar, BorderLayout.NORTH);
         setTitle("Alphabet Viewer");    // : " + theAutomaton.getName());
-        
+
         // setSize(200, 500);
         addWindowListener(new WindowAdapter()
         {
             public void windowClosing(WindowEvent e)
             {
                 setVisible(false);
-                
+
                 //dispose();
             }
         });
-        
+
                 /* Center the window
                 Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
                 Dimension frameSize = getSize();
-                 
+
                 if (frameSize.height > screenSize.height)
                 {
                                 frameSize.height = screenSize.height;
                 }
-                 
+
                 if (frameSize.width > screenSize.width)
                 {
                                 frameSize.width = screenSize.width;
                 }
-                 
+
                 setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
                 setIconImage(Supremica.cornerImage);*/
         Utility.setupFrame(this, 200, 500);
         initMenubar();
         contentPane.add(alphabetPanel, BorderLayout.CENTER);
     }
-    
+
     private void initMenubar()
     {
         setJMenuBar(menuBar);
-        
+
         // File
         JMenu menuFile = new JMenu();
-        
+
         menuFile.setText("File");
         menuFile.setMnemonic(KeyEvent.VK_F);
-        
+
         // File.Close
         JMenuItem menuFileClose = new JMenuItem();
-        
+
         menuFileClose.setText("Close");
         menuFileClose.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e)
             {
                 setVisible(false);
-                
+
                 //dispose();
             }
         });
         menuFile.add(menuFileClose);
         menuBar.add(menuFile);
-        
+
         // View
         JMenu viewMenu = new JMenu("View");
         viewMenu.setMnemonic(KeyEvent.VK_V);
-        
+
         // View.Union (default, therefore initially checked)
         JRadioButtonMenuItem viewMenuUnion = new JRadioButtonMenuItem("Union", true);
         viewMenuUnion.addActionListener(new ActionListener()
@@ -140,7 +140,7 @@ public class AlphabetViewer
                 alphabetPanel.showUnion();
             }
         });
-        
+
         // View.Intersection
         JRadioButtonMenuItem viewMenuIntersection = new JRadioButtonMenuItem("Intersection");
         viewMenuIntersection.addActionListener(new ActionListener()
@@ -150,21 +150,16 @@ public class AlphabetViewer
                 alphabetPanel.showIntersection();
             }
         });
-        
+
         ButtonGroup buttongroup = new ButtonGroup();
-        
+
         buttongroup.add(viewMenuUnion);
         buttongroup.add(viewMenuIntersection);
         viewMenu.add(viewMenuUnion);
         viewMenu.add(viewMenuIntersection);
         menuBar.add(viewMenu);
     }
-    
+
     public void initialize()
     {}
 }
-
-
-
-
-

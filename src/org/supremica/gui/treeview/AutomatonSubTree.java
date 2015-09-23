@@ -109,8 +109,3 @@ public class AutomatonSubTree
         return ((Automaton) userObject).getName();
     }
 }
-
-
-
-
-

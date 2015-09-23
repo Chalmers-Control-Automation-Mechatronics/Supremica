@@ -1533,10 +1533,3 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
   //  Aborting:
   private boolean mIsAborting;
 }
-
-
-
-
-
-
-

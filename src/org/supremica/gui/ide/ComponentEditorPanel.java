@@ -274,8 +274,3 @@ public class ComponentEditorPanel
 		LoggerFactory.createLogger(ComponentEditorPanel.class);
 
 }
-
-
-
-
-

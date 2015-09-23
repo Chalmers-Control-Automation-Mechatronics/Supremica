@@ -421,11 +421,3 @@ public class UnifiedEFAVariableUnfolder extends AbstractEFAAlgorithm
   private UnifiedEFATransitionRelation mTransitionRelation;
 
 }
-
-
-
-
-
-
-
-

@@ -106,11 +106,3 @@ public class SDActivityLoopKindTranslator
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-
-

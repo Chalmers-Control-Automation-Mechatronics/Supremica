@@ -74,11 +74,3 @@ class TRPreselectionHeuristicMinS
   }
 
 }
-
-
-
-
-
-
-
-

@@ -181,12 +181,3 @@ public class AbstractEFATransitionLabelEncoding<L>
   private final List<L> mTransitionLabelList;
 
 }
-
-
-
-
-
-
-
-
-

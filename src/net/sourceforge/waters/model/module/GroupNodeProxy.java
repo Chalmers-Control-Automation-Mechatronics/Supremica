@@ -73,11 +73,3 @@ public interface GroupNodeProxy extends NodeProxy
   public BoxGeometryProxy getGeometry();
 
 }
-
-
-
-
-
-
-
-

@@ -208,11 +208,3 @@ class SimpleTypeGlue extends TypeGlue {
   private final Class<?> mJavaClass;
 
 }
-
-
-
-
-
-
-
-

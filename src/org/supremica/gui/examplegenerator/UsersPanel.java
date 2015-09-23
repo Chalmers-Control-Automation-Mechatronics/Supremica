@@ -88,7 +88,3 @@ class UsersPanel extends JPanel implements TestCase
 		return users.getProject();
 	}
 }
-
-
-
-

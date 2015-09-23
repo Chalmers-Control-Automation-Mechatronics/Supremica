@@ -259,11 +259,3 @@ public class ProductDESProxyPrinter
   }
 
 }
-
-
-
-
-
-
-
-

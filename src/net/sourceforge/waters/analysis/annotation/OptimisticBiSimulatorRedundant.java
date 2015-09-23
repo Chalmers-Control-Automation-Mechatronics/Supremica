@@ -729,12 +729,3 @@ public class OptimisticBiSimulatorRedundant
     }
   }
 }
-
-
-
-
-
-
-
-
-

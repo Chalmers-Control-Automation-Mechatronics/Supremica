@@ -54,7 +54,7 @@ public class MergeEvents
   private final EventProxy mMarking;
   public static int ENACTED = 0;
   public static int TIME = 0;
-  
+
   public MergeEvents(EventProxy marking, Set<EventProxy> events)
   {
     mEventsAllwaysHappenTogether = 
@@ -62,13 +62,13 @@ public class MergeEvents
     mEvents = events;
     mMarking = marking;
   }
-  
+
   public static void clearStats()
   {
     ENACTED = 0;
     TIME = 0;
   }
-  
+
   private Map<EventProxy, Set<EventProxy>> calculateEquivalent(AutomatonProxy aut)
   {
     Map<EventProxy, Set<EventProxy>> map =
@@ -94,13 +94,13 @@ public class MergeEvents
     mEventsAllwaysHappenTogether.put(aut, map);
     return map;
   }
-  
+
   public static String stats()
   {
     return "MergeEvents: ENACTED = " + ENACTED + 
            " TIME = " + TIME;
   }
-  
+
   public Set<AutomatonProxy> run(Set<AutomatonProxy> automata,
                                  ProductDESProxyFactory factory)
   {
@@ -145,12 +145,3 @@ public class MergeEvents
     return res;
   }
 }
-
-
-
-
-
-
-
-
-

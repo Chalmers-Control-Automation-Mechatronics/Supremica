@@ -132,18 +132,10 @@ public class ParseException extends WatersException
   //#########################################################################
   //# Data Members
   private final int mPosition;
-  
-  
+
+
   //#########################################################################
   //# Static Class Variables
   public static final long serialVersionUID = 1;
 
 }
-
-
-
-
-
-
-
-

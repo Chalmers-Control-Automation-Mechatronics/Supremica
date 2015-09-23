@@ -50,29 +50,29 @@ public class AnalyzerDeleteSelectedAutomataAction
     extends IDEAction
 {
     private static final long serialVersionUID = 1L;
-    
+
     /**
      * Constructor.
      */
     public AnalyzerDeleteSelectedAutomataAction(List<IDEAction> actionList)
     {
         super(actionList);
-        
+
         setEditorActiveRequired(false);
         setAnalyzerActiveRequired(true);
-        
+
         putValue(Action.NAME, "Delete selected");
         putValue(Action.SHORT_DESCRIPTION, "Delete selected automata");
         putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_D));
         putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Remove16.gif")));
     }
-    
+
     public void actionPerformed(ActionEvent e)
     {
         doAction();
     }
-    
+
     /**
      * The code that is run when the action is invoked.
      */
@@ -82,8 +82,3 @@ public class AnalyzerDeleteSelectedAutomataAction
             ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata());
     }
 }
-
-
-
-
-

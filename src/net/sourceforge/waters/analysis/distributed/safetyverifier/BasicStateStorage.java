@@ -53,12 +53,12 @@ public class BasicStateStorage implements StateStorage
 	mStateList.add(state);
       }
   }
-  
+
   public synchronized StateTuple getNextState()
   {
     return mStateList.get(mCurrentStateIndex++);
   }
-  
+
   public synchronized int getUnprocessedStateCount()
   {
     return mStateList.size() - mCurrentStateIndex;
@@ -92,11 +92,3 @@ public class BasicStateStorage implements StateStorage
   private final List<StateTuple> mStateList;
   private volatile int mCurrentStateIndex = 0;
 }
-
-
-
-
-
-
-
-

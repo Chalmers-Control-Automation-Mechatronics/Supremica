@@ -69,7 +69,3 @@ class CountersPanel extends JPanel implements TestCase {
 		return counters.getProject();
 	}
 }
-
-
-
-

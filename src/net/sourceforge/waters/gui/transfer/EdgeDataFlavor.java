@@ -77,10 +77,3 @@ class EdgeDataFlavor extends ModuleDataFlavor
   }
 
 }
-
-
-
-
-
-
-

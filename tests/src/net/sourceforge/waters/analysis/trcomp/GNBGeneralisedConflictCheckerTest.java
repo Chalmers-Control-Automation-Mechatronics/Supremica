@@ -86,11 +86,3 @@ public class GNBGeneralisedConflictCheckerTest
   }
 
 }
-
-
-
-
-
-
-
-

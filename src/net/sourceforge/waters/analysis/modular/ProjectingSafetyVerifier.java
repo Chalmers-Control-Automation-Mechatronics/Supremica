@@ -990,12 +990,3 @@ public class ProjectingSafetyVerifier
     LoggerFactory.createLogger(ProjectingSafetyVerifier.class);
 
 }
-
-
-
-
-
-
-
-
-

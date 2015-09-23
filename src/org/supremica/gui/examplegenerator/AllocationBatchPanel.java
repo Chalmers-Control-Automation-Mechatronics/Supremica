@@ -102,7 +102,3 @@ class AllocationBatchPanel extends JPanel implements TestCase, ActionListener {
 		}
 	}
 }
-
-
-
-

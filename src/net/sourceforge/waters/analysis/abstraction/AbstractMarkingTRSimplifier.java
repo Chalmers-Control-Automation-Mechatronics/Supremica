@@ -196,11 +196,3 @@ public abstract class AbstractMarkingTRSimplifier
   private int[] mPropositions;
 
 }
-
-
-
-
-
-
-
-

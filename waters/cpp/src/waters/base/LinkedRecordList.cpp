@@ -131,7 +131,7 @@ qsort()
 
 //############################################################################
 //# TransitionRecordList: Auxiliary Methods
-  
+
 void UntypedLinkedRecordList::
 seek()
 {
@@ -144,11 +144,3 @@ seek()
 
 
 }  /* namespace waters */
-
-
-
-
-
-
-
-

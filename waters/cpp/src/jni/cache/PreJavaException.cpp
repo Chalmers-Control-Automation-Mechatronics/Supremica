@@ -132,11 +132,3 @@ initMessage(const char* msg, bool staticString)
 
 
 }  /* namespace jni */
-
-
-
-
-
-
-
-

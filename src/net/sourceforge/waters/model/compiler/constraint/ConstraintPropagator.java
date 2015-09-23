@@ -1374,10 +1374,3 @@ public class ConstraintPropagator
   private boolean mIsUnsatisfiable;
   private int mNumberOfInvocations;
 }
-
-
-
-
-
-
-

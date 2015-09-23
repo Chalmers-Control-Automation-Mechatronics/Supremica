@@ -161,11 +161,3 @@ class EFAVariableTransition implements Comparable<EFAVariableTransition>
   private final SimpleExpressionProxy mTarget;
 
 }
-
-
-
-
-
-
-
-

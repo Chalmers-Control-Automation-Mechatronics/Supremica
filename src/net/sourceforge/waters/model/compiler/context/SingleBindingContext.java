@@ -125,12 +125,3 @@ public class SingleBindingContext implements BindingContext
   private final BindingContext mParent;
 
 }
-
-
-
-
-
-
-
-
-

@@ -319,11 +319,3 @@ public class ModuleIdentifierChecker
   private final IdentifierVisitor mVisitor;
 
 }
-
-
-
-
-
-
-
-

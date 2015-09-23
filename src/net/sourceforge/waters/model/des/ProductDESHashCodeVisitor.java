@@ -208,11 +208,3 @@ public class ProductDESHashCodeVisitor
   }
 
 }
-
-
-
-
-
-
-
-

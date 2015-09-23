@@ -143,11 +143,3 @@ public class SDSingularProhibitableBehaviorVerifier
   private EventProxy mFailedProhibitable;
 
 }
-
-
-
-
-
-
-
-

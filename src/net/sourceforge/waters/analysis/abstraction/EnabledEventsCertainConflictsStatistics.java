@@ -137,11 +137,3 @@ public class EnabledEventsCertainConflictsStatistics extends TRSimplifierStatist
   private int mNumEnabledEvents;
 
 }
-
-
-
-
-
-
-
-

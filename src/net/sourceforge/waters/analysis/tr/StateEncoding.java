@@ -261,12 +261,3 @@ public class StateEncoding
   private TObjectIntHashMap<StateProxy> mStateCodeMap;
 
 }
-
-
-
-
-
-
-
-
-

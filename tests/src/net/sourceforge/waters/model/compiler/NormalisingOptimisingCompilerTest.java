@@ -90,10 +90,3 @@ public class NormalisingOptimisingCompilerTest extends AbstractCompilerTest
     return array;
   }
 }
-
-
-
-
-
-
-

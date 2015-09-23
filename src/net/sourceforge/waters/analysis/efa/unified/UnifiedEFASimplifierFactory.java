@@ -130,10 +130,3 @@ public enum UnifiedEFASimplifierFactory
     (final UnifiedEFAConflictChecker analyzer);
 
 }
-
-
-
-
-
-
-

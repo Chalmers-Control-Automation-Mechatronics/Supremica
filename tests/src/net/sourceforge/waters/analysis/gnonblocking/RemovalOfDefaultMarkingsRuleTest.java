@@ -241,11 +241,3 @@ public class RemovalOfDefaultMarkingsRuleTest extends
   }
 
 }
-
-
-
-
-
-
-
-

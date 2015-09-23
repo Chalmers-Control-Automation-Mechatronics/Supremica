@@ -235,12 +235,3 @@ class RemovalOfDefaultMarkingsRule extends AbstractionRule
   private OldTransitionRelation mTR;
 
 }
-
-
-
-
-
-
-
-
-

@@ -100,11 +100,3 @@ public class NB2StandardConflictCheckerTest
   }
 
 }
-
-
-
-
-
-
-
-

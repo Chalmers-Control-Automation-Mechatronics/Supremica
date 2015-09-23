@@ -47,7 +47,7 @@ class ProductDESAutomataListHandler
   extends JAXBCheckedListHandler
             <ProductDES,AutomataList,AutomatonProxy>
 {
-  
+
   //#########################################################################
   //# Constructors
   ProductDESAutomataListHandler()
@@ -60,7 +60,7 @@ class ProductDESAutomataListHandler
     mFactory = factory;
   }
 
-  
+
   //#########################################################################
   //# Overrides for Abstract Base Class JAXBListHandler
   AutomataList createListElement(ProductDES container)
@@ -86,11 +86,3 @@ class ProductDESAutomataListHandler
   private final ObjectFactory mFactory;
 
 }
-
-
-
-
-
-
-
-

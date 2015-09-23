@@ -66,8 +66,8 @@ public abstract class AbstractSaveAction
     super(ide);
     setEnabled(false);
   }
-    
-    
+
+
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.observer.Observer
   public void update(final EditorChangedEvent event)
@@ -99,14 +99,9 @@ public abstract class AbstractSaveAction
 
   abstract String getShortDescription(final String type);
 
-  
+
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-

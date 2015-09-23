@@ -953,11 +953,3 @@ public class BDDConflictAssess
   private int mNumHalfCorrectTraces;
 
 }
-
-
-
-
-
-
-
-

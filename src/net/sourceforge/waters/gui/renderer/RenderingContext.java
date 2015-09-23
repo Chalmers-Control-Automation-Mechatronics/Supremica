@@ -86,11 +86,3 @@ public interface RenderingContext
                                                GraphProxy graph);
 
 }
-
-
-
-
-
-
-
-

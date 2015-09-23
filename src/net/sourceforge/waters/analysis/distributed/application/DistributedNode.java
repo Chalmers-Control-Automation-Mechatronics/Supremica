@@ -85,7 +85,7 @@ public class DistributedNode
 
     //Export the worker as a remote object.
     Worker stub = (Worker) UnicastRemoteObject.exportObject(w, 0);
-    
+
     //Set the remote proxy for the worker.
     try
       {
@@ -115,7 +115,7 @@ public class DistributedNode
   {
     System.err.format("Cleaning up for %s\n", id);
     mWorkerCleanup.cleanup(id);
-    
+
     //Probably unnecessary with modern JVMs, but hint that now is a
     //good time to run the garbage collector.
     System.gc();
@@ -210,7 +210,7 @@ public class DistributedNode
   {
     return;
   }
-  
+
 
   /**
    * The number of times a ping fails before the node gives up and exits.
@@ -256,13 +256,6 @@ public class DistributedNode
 	System.err.println("Node exception:");
 	e.printStackTrace();
       }
-    
+
   }
 }
-
-
-
-
-
-
-

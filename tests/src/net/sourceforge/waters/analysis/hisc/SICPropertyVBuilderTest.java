@@ -410,11 +410,3 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
   private DocumentManager mDocumentManager;
   private SICPropertyBuilder mBuilder;
 }
-
-
-
-
-
-
-
-

@@ -46,11 +46,3 @@ public interface IndexedSet<P extends NamedProxy>
   extends IndexedCollection<P>, Set<P>
 {
 }
-
-
-
-
-
-
-
-

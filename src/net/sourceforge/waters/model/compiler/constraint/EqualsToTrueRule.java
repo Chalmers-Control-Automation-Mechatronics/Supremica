@@ -85,10 +85,3 @@ class EqualsToTrueRule extends DirectReplacementRule
   }
 
 }
-
-
-
-
-
-
-

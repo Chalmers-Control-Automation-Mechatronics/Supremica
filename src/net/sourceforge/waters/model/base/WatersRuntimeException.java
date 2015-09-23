@@ -72,17 +72,9 @@ public class WatersRuntimeException extends RuntimeException {
     super(cause);
   }
 
-  
+
   //#########################################################################
   //# Static Class Variables
   public static final long serialVersionUID = 1;
 
 }
-
-
-
-
-
-
-
-

@@ -41,7 +41,3 @@ public interface DotBuilderGraphObserver
 {
 	public void setGraph(Graph theGraph);
 }
-
-
-
-

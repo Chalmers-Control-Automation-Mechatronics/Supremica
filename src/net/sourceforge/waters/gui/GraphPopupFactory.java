@@ -259,11 +259,3 @@ class GraphPopupFactory
   private final EditorWindowInterface mEditorWindowInterface;
 
 }
-
-
-
-
-
-
-
-

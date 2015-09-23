@@ -415,11 +415,3 @@ private:
 }   /* namespace waters */
 
 #endif  /* !_EventTree_h_ */
-
-
-
-
-
-
-
-

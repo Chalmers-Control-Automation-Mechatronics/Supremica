@@ -1189,12 +1189,3 @@ public class MonolithicSynchronousProductBuilder
   private static final int MAX_TABLE_SIZE = 500000;
 
 }
-
-
-
-
-
-
-
-
-

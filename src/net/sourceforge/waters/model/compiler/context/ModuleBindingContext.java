@@ -185,12 +185,3 @@ public class ModuleBindingContext implements BindingContext
   private final SourceInfo mInstanceSource;
 
 }
-
-
-
-
-
-
-
-
-

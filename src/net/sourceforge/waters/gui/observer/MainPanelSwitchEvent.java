@@ -67,11 +67,3 @@ public class MainPanelSwitchEvent
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-
-

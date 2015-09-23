@@ -86,12 +86,12 @@ public class AnalyzerViewAlphabetAction
         Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
         Alphabet alphabetSubset = selectedAutomata.getUnionAlphabet();
         Automata allAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getAllAutomata();
-        
+
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 1, false, false, true, false))
         {
             return;
         }
-        
+
         // Why not simpy instantiate an AlphabetViewer with the given
         // automata object?? Use AutomataViewer instead!
         try
@@ -109,8 +109,3 @@ public class AnalyzerViewAlphabetAction
         }
     }
 }
-
-
-
-
-

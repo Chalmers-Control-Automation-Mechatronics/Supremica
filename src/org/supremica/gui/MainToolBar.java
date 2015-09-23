@@ -125,8 +125,3 @@ public class MainToolBar
 		return theButton;
 	}
 }
-
-
-
-
-

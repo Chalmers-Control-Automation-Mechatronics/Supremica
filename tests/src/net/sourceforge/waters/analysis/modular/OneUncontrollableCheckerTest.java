@@ -120,11 +120,3 @@ public class OneUncontrollableCheckerTest
   }
 
 }
-
-
-
-
-
-
-
-

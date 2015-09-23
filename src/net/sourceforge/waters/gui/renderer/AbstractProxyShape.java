@@ -44,12 +44,12 @@ public abstract class AbstractProxyShape
     implements ProxyShape
 {
     private final Proxy mProxy;
-    
+
     protected AbstractProxyShape(Proxy proxy)
     {
         mProxy = proxy;        
     }
-    
+
     public void draw(Graphics2D g, RenderingInformation status)
     {
         super.draw(g, status);
@@ -61,17 +61,17 @@ public abstract class AbstractProxyShape
             }
         }
     }
-    
+
     public Proxy getProxy()
     {
         return mProxy;
     }
-    
+
     public List<Handle> getHandles()
     {
         return Collections.emptyList();
     }
-    
+
     public boolean isClicked(int x, int y)
     {
         for (Handle h : getHandles())
@@ -83,7 +83,7 @@ public abstract class AbstractProxyShape
         }
         return super.isClicked(x, y);
     }
-    
+
     public Handle getClickedHandle(int x, int y)
     {
         for (Handle handle : getHandles())
@@ -96,11 +96,3 @@ public abstract class AbstractProxyShape
         return null;
     }
 }
-
-
-
-
-
-
-
-

@@ -67,7 +67,3 @@ public class SupremicaLevel extends Level
     new SupremicaLevel(INFO_INT + 1, "INFO", INFO.getSyslogEquivalent());
 
 }
-
-
-
-

@@ -117,10 +117,3 @@ class DeMorgansOrRule extends SimplificationRule
   private final PlaceHolder mRHS;
 
 }
-
-
-
-
-
-
-

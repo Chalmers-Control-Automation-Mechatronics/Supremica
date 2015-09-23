@@ -77,11 +77,3 @@ public interface SplineGeometryProxy extends GeometryProxy {
   public SplineKind getKind();
 
 }
-
-
-
-
-
-
-
-

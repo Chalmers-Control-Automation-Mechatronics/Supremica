@@ -122,11 +122,3 @@ public class SICProperty6Verifier extends AbstractSICConflictChecker
   }
 
 }
-
-
-
-
-
-
-
-

@@ -237,12 +237,3 @@ public class OneEventCachingTransitionIterator implements TransitionIterator
   private int mEvent;
 
 }
-
-
-
-
-
-
-
-
-

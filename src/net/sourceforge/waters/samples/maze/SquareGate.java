@@ -53,7 +53,7 @@ class SquareGate extends SquareWithID
   {
     return Square.GATE;
   }
-  
+
   int[] getEnteringActions()
   {
     return ENTERING;
@@ -65,11 +65,3 @@ class SquareGate extends SquareWithID
   private static final int[] ENTERING = {Action.MOVE};
 
 }
-
-
-
-
-
-
-
-

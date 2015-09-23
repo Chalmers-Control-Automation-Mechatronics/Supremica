@@ -67,11 +67,3 @@ public interface SynchronousProductStateMap
   public StateProxy getOriginalState(final StateProxy tuple,
                                      final AutomatonProxy aut);
 }
-
-
-
-
-
-
-
-

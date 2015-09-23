@@ -61,10 +61,3 @@ public interface Server extends Remote
 
   public void shutdown() throws RemoteException;
 } 
-
-
-
-
-
-
-

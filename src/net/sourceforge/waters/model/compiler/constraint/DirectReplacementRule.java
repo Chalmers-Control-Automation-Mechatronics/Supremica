@@ -101,10 +101,3 @@ class DirectReplacementRule extends SimplificationRule {
   private final List<SimpleExpressionProxy> mReplacements;
 
 }
-
-
-
-
-
-
-

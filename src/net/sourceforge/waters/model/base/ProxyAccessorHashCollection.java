@@ -316,11 +316,3 @@ public class ProxyAccessorHashCollection<P extends Proxy>
   private final AbstractHashCodeVisitor mHashCodeVisitor;
 
 }
-
-
-
-
-
-
-
-

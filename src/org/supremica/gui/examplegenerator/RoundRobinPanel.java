@@ -77,7 +77,3 @@ class RoundRobinPanel extends JPanel implements TestCase {
 		return rr.getProject();
 	}
 }
-
-
-
-

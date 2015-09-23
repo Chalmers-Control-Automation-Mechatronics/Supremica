@@ -1132,11 +1132,3 @@ public class VariableEditorDialog
   private static final Transferable TRANSFERABLE =
     WatersDataFlavor.createTransferable(VARIABLE_TEMPLATE);
 }
-
-
-
-
-
-
-
-

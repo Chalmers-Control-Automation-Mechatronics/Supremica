@@ -49,8 +49,3 @@ public class CenteredFrame
 		Utility.setupFrame(this, width, height);
 	}
 }
-
-
-
-
-

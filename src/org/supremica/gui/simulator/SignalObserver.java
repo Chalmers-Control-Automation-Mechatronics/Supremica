@@ -39,8 +39,3 @@ interface SignalObserver
 {
 	void signalUpdated();
 }
-
-
-
-
-

@@ -69,11 +69,3 @@ public class PartialOrderComponentsConflictCheckerTest
     return new PartialOrderComponentsConflictChecker(factory);
   }
 }
-
-
-
-
-
-
-
-

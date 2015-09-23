@@ -575,11 +575,3 @@ public class ProxyShapeProducer
   private static final String BLOCKED_HEADER = "BLOCKED:";
   private static final double BORDER = 5;
 }
-
-
-
-
-
-
-
-

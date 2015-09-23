@@ -150,10 +150,3 @@ public class ProxyTransferable implements Transferable
   private final DataFlavor[] mFlavors;
 
 }
-
-
-
-
-
-
-

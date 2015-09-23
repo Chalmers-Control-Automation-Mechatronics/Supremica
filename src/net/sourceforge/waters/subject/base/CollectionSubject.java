@@ -47,11 +47,3 @@ public interface CollectionSubject<P extends ProxySubject>
   extends Collection<P>, Subject
 {
 }
-
-
-
-
-
-
-
-

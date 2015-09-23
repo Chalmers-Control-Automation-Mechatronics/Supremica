@@ -63,8 +63,3 @@ public class HelpAction
 		helpDisplayer.actionPerformed(e);
 	}
 }
-
-
-
-
-

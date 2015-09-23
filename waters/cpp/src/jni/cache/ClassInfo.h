@@ -88,11 +88,3 @@ private:
 }   /* namespace jni */
 
 #endif  /* !_ClassInfo_h_ */
-
-
-
-
-
-
-
-

@@ -207,11 +207,3 @@ public abstract class CommandLineArgumentEnum<E extends Enum<E>>
   private E mValue;
 
 }
-
-
-
-
-
-
-
-

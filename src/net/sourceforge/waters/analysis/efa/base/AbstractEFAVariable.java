@@ -156,11 +156,3 @@ public abstract class AbstractEFAVariable<L>
   private final THashSet<EventDeclProxy> mEventDecls;
 
 }
-
-
-
-
-
-
-
-

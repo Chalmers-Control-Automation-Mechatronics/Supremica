@@ -90,11 +90,3 @@ public interface SafetyDiagnostics
                                 final StateProxy state);
 
 }
-
-
-
-
-
-
-
-

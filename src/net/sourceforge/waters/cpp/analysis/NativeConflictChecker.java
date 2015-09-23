@@ -301,11 +301,3 @@ public class NativeConflictChecker
   private boolean mDumpStateAware = true;
 
 }
-
-
-
-
-
-
-
-

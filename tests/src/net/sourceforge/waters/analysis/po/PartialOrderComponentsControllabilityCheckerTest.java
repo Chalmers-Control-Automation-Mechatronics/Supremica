@@ -69,11 +69,3 @@ public class PartialOrderComponentsControllabilityCheckerTest
     return new PartialOrderComponentsControllabilityChecker(factory);
   }
 }
-
-
-
-
-
-
-
-

@@ -388,11 +388,3 @@ public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
   private TRConflictPreorderChecker mConflictPreorderChecker;
 
 }
-
-
-
-
-
-
-
-

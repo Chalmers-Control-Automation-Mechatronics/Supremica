@@ -470,11 +470,3 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
   private List<ParameterBindingProxy> mBindings;
 
 }
-
-
-
-
-
-
-
-

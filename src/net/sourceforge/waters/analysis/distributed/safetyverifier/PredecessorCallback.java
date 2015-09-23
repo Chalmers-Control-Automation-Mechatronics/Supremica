@@ -60,10 +60,3 @@ public interface PredecessorCallback extends Remote
    */
   public void searchCompleted(StateTuple original, String worker) throws RemoteException;
 }
-
-
-
-
-
-
-

@@ -295,11 +295,3 @@ public abstract class AbstractEFAVariableFinder<L,
   private boolean mContainsVariable;
   private boolean mContainsPrimedVariable;
 }
-
-
-
-
-
-
-
-

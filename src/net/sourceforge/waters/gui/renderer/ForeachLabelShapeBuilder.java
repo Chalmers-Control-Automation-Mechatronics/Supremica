@@ -157,11 +157,3 @@ public class ForeachLabelShapeBuilder
   private AttributedString mText;
 
 }
-
-
-
-
-
-
-
-

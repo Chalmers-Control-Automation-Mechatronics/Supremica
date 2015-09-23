@@ -62,13 +62,5 @@ class ObjectClassGlue extends PlainClassGlue {
       new PlainMethodGlue(SimpleTypeGlue.TYPE_INT, "hashCode");
     addMethod(hashmethod, reporter);
   }
-   
+
 }
-
-
-
-
-
-
-
-

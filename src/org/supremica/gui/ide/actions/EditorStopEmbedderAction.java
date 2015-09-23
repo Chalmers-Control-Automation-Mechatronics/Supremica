@@ -80,8 +80,3 @@ public class EditorStopEmbedderAction
         SpringEmbedder.stopAll();
     }
 }
-
-
-
-
-

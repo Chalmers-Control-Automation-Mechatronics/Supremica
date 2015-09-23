@@ -93,11 +93,3 @@ public class UnderlineShape extends AbstractProxyShape
           BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10.0f, DASHES, 0);
 
 }
-
-
-
-
-
-
-
-

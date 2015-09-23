@@ -220,12 +220,3 @@ public class ProductDESIntegrityChecker
   private Set<EventProxy> mAutomatonEventSet;
 
 }
-
-
-
-
-
-
-
-
-

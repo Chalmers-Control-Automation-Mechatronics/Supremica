@@ -561,11 +561,3 @@ public class InstanceEditorDialog extends JDialog
     .createTransferable(TEMPLATE);
 
 }
-
-
-
-
-
-
-
-

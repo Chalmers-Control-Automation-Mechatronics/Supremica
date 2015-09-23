@@ -45,8 +45,3 @@ public abstract class MonitorableThread
 
 	// all inherited
 }
-
-
-
-
-

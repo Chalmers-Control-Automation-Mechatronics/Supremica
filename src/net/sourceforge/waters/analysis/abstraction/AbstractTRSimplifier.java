@@ -450,11 +450,3 @@ public abstract class AbstractTRSimplifier
   private TRPartition mResultPartition;
 
 }
-
-
-
-
-
-
-
-

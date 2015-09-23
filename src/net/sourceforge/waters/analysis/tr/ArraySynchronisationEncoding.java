@@ -248,11 +248,3 @@ public class ArraySynchronisationEncoding extends
 
 
 }
-
-
-
-
-
-
-
-

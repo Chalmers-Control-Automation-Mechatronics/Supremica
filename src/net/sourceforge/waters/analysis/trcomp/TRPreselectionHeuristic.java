@@ -198,11 +198,3 @@ public abstract class TRPreselectionHeuristic
   private int mAutomataLimit = 2;
 
 }
-
-
-
-
-
-
-
-

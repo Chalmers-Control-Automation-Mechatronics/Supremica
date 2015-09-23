@@ -1250,11 +1250,3 @@ public abstract class AbstractStandardConflictCheckerTest
   }
 
 }
-
-
-
-
-
-
-
-

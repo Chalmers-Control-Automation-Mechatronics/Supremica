@@ -114,10 +114,3 @@ public class NormalisingCompilerTest extends AbstractCompilerTest
   }
 
 }
-
-
-
-
-
-
-

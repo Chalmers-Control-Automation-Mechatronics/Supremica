@@ -570,11 +570,3 @@ public abstract class AbstractCompositionalModelVerifier
   private List<AbstractionStep> mAbstractionSteps;
 
 }
-
-
-
-
-
-
-
-

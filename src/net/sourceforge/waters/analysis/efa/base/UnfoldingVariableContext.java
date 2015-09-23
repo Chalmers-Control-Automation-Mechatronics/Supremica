@@ -140,11 +140,3 @@ public class UnfoldingVariableContext implements VariableContext
   private SimpleExpressionProxy mPrimedValue;
 
 }
-
-
-
-
-
-
-
-

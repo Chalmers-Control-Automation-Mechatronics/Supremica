@@ -60,7 +60,7 @@ class SingleEventOutput
     mEvent = event;
     mSourceInfo = info;
   }
-    
+
 
   //#########################################################################
   //# Simple Access
@@ -81,10 +81,3 @@ class SingleEventOutput
   private final SourceInfo mSourceInfo;
 
 }
-
-
-
-
-
-
-

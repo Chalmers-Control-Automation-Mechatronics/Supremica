@@ -41,7 +41,3 @@ public interface DotBuilderStreamObserver
 {
 	public void setInputStream(InputStream inputStream);
 }
-
-
-
-

@@ -77,10 +77,3 @@ public class ModuleDataFlavor extends WatersDataFlavor
   }
 
 }
-
-
-
-
-
-
-

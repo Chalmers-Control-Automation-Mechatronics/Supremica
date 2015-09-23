@@ -73,10 +73,3 @@ class ClassModifier {
   static final ClassModifier M_GLUE = new ClassModifier(T_GLUE);
 
 }
-
-
-
-
-
-
-

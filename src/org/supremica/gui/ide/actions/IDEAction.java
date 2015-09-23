@@ -76,7 +76,7 @@ public abstract class IDEAction
     {
         editorActiveRequired = required;
     }
-    
+
     public boolean getEditorActiveRequired()
     {
         return editorActiveRequired;
@@ -86,7 +86,7 @@ public abstract class IDEAction
     {
         analyzerActiveRequired = required;
     }
-    
+
     public boolean getAnalyzerActiveRequired()
     {
         return analyzerActiveRequired;
@@ -104,8 +104,3 @@ public abstract class IDEAction
     }
 
 }
-
-
-
-
-

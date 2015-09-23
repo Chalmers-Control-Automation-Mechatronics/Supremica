@@ -81,11 +81,3 @@ public interface ProductDESResult
   public void setComputedProductDES(final ProductDESProxy des);
 
 }
-
-
-
-
-
-
-
-

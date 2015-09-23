@@ -147,11 +147,3 @@ public class PlainTextPrinter
   }
 
 }
-
-
-
-
-
-
-
-

@@ -273,11 +273,3 @@ public class OPVerifierTRChainTest
   private final String OMEGA = EventDeclProxy.DEFAULT_MARKING_NAME;
 
 }
-
-
-
-
-
-
-
-

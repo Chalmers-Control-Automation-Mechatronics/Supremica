@@ -51,11 +51,3 @@ public class SimpleEFAVariableCollector
     super(optable, context);
   }
 }
-
-
-
-
-
-
-
-

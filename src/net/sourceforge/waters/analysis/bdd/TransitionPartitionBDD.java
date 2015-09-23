@@ -250,11 +250,3 @@ class TransitionPartitionBDD
   private BDDPairing mNextToCurrent;
 
 }
-
-
-
-
-
-
-
-

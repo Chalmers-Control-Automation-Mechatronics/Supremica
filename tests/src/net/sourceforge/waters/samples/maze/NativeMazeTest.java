@@ -51,11 +51,3 @@ public class NativeMazeTest extends AbstractMazeTest
   }
 
 }
-
-
-
-
-
-
-
-

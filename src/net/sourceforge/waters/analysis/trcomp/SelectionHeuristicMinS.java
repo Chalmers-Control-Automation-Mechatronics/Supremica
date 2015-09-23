@@ -153,11 +153,3 @@ public class SelectionHeuristicMinS
   private final NumericSelectionHeuristic<TRCandidate> mStateEstimator;
 
 }
-
-
-
-
-
-
-
-

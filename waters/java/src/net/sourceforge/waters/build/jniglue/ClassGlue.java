@@ -475,13 +475,5 @@ abstract class ClassGlue implements Comparable<Object>, FileWritableGlue {
   private int mNumStaticMethods;
   private Set<ClassGlue> mResultingGlue;
   private Set<ClassGlue> mUsedGlue;
-   
+
 }
-
-
-
-
-
-
-
-

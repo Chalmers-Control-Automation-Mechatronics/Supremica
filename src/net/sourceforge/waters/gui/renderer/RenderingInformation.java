@@ -101,11 +101,3 @@ public class RenderingInformation
     return mPriority;
   }
 }
-
-
-
-
-
-
-
-

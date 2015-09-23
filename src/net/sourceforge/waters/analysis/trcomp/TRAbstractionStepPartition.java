@@ -485,11 +485,3 @@ class TRAbstractionStepPartition
   private BitSet mRelevantPreconditionMarkings;
 
 }
-
-
-
-
-
-
-
-

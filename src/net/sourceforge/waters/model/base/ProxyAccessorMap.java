@@ -67,11 +67,3 @@ public interface ProxyAccessorMap<P extends Proxy,V>
   public boolean removeAllProxies(Collection<? extends P> collection);
 
 }
-
-
-
-
-
-
-
-

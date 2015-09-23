@@ -1051,11 +1051,3 @@ public abstract class BDDModelVerifier
   private static final int START_REORDER_INDEX = 8;
 
 }
-
-
-
-
-
-
-
-

@@ -171,11 +171,3 @@ class FieldGlue implements Comparable<FieldGlue>, WritableGlue {
   private TypeSignature mTypeSignature;
 
 }
-
-
-
-
-
-
-
-

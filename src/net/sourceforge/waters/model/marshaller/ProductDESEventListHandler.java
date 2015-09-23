@@ -46,7 +46,7 @@ import net.sourceforge.waters.xsd.des.ProductDES;
 class ProductDESEventListHandler
   extends JAXBCheckedListHandler<ProductDES,EventList,EventProxy>
 {
-  
+
   //#########################################################################
   //# Constructors
   ProductDESEventListHandler()
@@ -59,7 +59,7 @@ class ProductDESEventListHandler
     mFactory = factory;
   }
 
-  
+
   //#########################################################################
   //# Overrides for Abstract Base Class JAXBListHandler
   EventList createListElement(ProductDES container)
@@ -85,11 +85,3 @@ class ProductDESEventListHandler
   private final ObjectFactory mFactory;
 
 }
-
-
-
-
-
-
-
-

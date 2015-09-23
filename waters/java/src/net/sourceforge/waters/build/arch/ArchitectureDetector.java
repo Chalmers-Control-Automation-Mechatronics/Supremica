@@ -230,11 +230,3 @@ public class ArchitectureDetector
   private static final LibraryFilter LIBRARY_FILTER = new LibraryFilter();
 
 }
-
-
-
-
-
-
-
-

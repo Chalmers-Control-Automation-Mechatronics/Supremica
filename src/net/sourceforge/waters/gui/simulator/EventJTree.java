@@ -474,11 +474,3 @@ public class EventJTree
   private static final int noduleWidth = 30;
 
 }
-
-
-
-
-
-
-
-

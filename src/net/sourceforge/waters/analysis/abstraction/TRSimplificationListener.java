@@ -78,11 +78,3 @@ public interface TRSimplificationListener
                                      boolean result);
 
 }
-
-
-
-
-
-
-
-

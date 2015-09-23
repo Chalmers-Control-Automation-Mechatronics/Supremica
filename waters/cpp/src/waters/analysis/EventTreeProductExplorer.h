@@ -92,11 +92,3 @@ private:
 }   /* namespace waters */
 
 #endif  /* !_EventTreeProductExplorer_h_ */
-
-
-
-
-
-
-
-

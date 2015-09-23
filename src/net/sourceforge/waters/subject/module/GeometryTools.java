@@ -1329,11 +1329,3 @@ public final class GeometryTools
     2.0 * (SELFLOOP_SIN + 1.0) / (2.0 * SELFLOOP_SIN + SQRT2);
 
 }
-
-
-
-
-
-
-
-

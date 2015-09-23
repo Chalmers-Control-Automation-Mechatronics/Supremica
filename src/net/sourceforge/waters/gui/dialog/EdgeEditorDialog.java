@@ -369,11 +369,3 @@ public class EdgeEditorDialog
   private static final long serialVersionUID = 308147283952619954L;
 
 }
-
-
-
-
-
-
-
-

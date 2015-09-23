@@ -71,10 +71,3 @@ class TemplateFragmentSequence extends TemplateFragment {
   private final List<TemplateFragment> mBody;
 
 }
-
-
-
-
-
-
-

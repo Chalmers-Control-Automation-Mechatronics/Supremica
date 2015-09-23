@@ -1031,11 +1031,3 @@ public class EventEncoding
     FILTER_PROPER_EVENTS | FILTER_PROPOSITIONS;
 
 }
-
-
-
-
-
-
-
-

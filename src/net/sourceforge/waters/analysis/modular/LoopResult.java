@@ -147,11 +147,3 @@ public class LoopResult extends DefaultVerificationResult
   private int mNumberOfCompositions;
 
 }
-
-
-
-
-
-
-
-

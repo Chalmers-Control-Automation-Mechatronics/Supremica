@@ -107,11 +107,3 @@ class TRPreselectionHeuristicPairs extends TRPreselectionHeuristic
   }
 
 }
-
-
-
-
-
-
-
-

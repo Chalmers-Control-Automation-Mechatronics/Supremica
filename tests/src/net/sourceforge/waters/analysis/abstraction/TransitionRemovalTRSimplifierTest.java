@@ -113,11 +113,3 @@ public class TransitionRemovalTRSimplifierTest
   }
 
 }
-
-
-
-
-
-
-
-

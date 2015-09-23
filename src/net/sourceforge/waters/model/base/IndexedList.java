@@ -46,11 +46,3 @@ public interface IndexedList<P extends NamedProxy>
   extends IndexedCollection<P>, List<P>
 {
 }
-
-
-
-
-
-
-
-

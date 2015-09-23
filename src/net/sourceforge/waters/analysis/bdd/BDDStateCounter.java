@@ -208,12 +208,3 @@ class BDDStateCounter
   private final TObjectDoubleHashMap<BDD> mCache;
 
 }
-
-
-
-
-
-
-
-
-

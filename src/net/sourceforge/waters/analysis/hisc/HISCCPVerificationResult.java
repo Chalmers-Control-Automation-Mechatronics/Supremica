@@ -165,11 +165,3 @@ class HISCCPVerificationResult
   private ConflictPreorderResult mConflictPreorderResult;
 
 }
-
-
-
-
-
-
-
-

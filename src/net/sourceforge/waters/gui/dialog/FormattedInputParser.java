@@ -47,10 +47,3 @@ public interface FormattedInputParser
   public Object parse(final String text) throws ParseException;
   public DocumentFilter getDocumentFilter();
 }
-
-
-
-
-
-
-

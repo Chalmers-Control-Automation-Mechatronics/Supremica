@@ -851,11 +851,3 @@ public class SimpleEFASystemBuilder implements Abortable
   private SimpleEFAEventEncoding mEventEncoding;
 
 }
-
-
-
-
-
-
-
-

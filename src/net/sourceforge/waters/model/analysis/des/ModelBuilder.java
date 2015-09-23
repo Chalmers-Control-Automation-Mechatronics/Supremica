@@ -96,11 +96,3 @@ public interface ModelBuilder<P extends Proxy> extends ModelAnalyzer
   public ProxyResult<P> getAnalysisResult();
 
 }
-
-
-
-
-
-
-
-

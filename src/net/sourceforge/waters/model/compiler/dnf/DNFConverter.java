@@ -454,11 +454,3 @@ public class DNFConverter extends DefaultModuleProxyVisitor {
   private BinaryOperator mClauseLevelOperator;
 
 }
-
-
-
-
-
-
-
-

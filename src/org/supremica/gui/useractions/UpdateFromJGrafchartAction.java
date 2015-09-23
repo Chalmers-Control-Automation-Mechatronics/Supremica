@@ -708,8 +708,3 @@ public class UpdateFromJGrafchartAction
 		supervisor.connect(t2, s1);
 	}
 }
-
-
-
-
-

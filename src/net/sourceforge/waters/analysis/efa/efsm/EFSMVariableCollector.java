@@ -95,11 +95,3 @@ class EFSMVariableCollector
   }
 
 }
-
-
-
-
-
-
-
-

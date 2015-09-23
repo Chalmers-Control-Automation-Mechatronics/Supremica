@@ -618,11 +618,3 @@ public class BDDStateCounterTest
   private BDDControllabilityChecker mBDDChecker;
 
 }
-
-
-
-
-
-
-
-

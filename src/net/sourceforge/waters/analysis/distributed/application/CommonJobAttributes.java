@@ -48,10 +48,3 @@ public class CommonJobAttributes
   public static final String NODECOUNT_ATTR = "nodecount";
   public static final String EXCEPTION_ATTR = "exception";
 }
-
-
-
-
-
-
-

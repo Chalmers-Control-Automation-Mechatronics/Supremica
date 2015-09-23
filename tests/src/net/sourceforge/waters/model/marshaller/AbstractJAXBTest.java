@@ -455,11 +455,3 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
   private boolean mIsPrinting = true;
 
 }
-
-
-
-
-
-
-
-

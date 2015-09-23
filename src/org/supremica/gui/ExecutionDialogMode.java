@@ -41,7 +41,7 @@ package org.supremica.gui;
 public class ExecutionDialogMode
 {
     // Arguments are ExecutionDialogMode(String ID, String txt, boolean value, boolean progress)
-    
+
     // Keep these in alphabetical order for convenience
     public static final ExecutionDialogMode HIDE = new ExecutionDialogMode("Hide", "", false, false);
     public static final ExecutionDialogMode MINIMIZING = new ExecutionDialogMode("Minimizing...", "", false, true);
@@ -57,12 +57,12 @@ public class ExecutionDialogMode
     public static final ExecutionDialogMode VERIFYINGMUTUALNONBLOCKINGFIRSTRUN = new ExecutionDialogMode("Verifying mutual nonblocking...", "First run", false, true);
     public static final ExecutionDialogMode VERIFYINGMUTUALNONBLOCKINGSECONDRUN = new ExecutionDialogMode("Verifying mutual nonblocking...", "Second run", false, true);
     public static final ExecutionDialogMode UNINITIALIZED = new ExecutionDialogMode("Uninitialized", "", false, false);
-    
+
     private final String ID;
     private final String TEXT;
     private final boolean SHOWVALUE;
     private final boolean SHOWPROGRESS;
-    
+
     private ExecutionDialogMode(String id, String txt, boolean value, boolean progress)
     {
         this.ID = id;
@@ -70,29 +70,24 @@ public class ExecutionDialogMode
         this.SHOWVALUE = value;
         this.SHOWPROGRESS = progress;
     }
-    
+
     public String getId()
     {
         return ID;
     }
-    
+
     public String getText()
     {
         return TEXT;
     }
-    
+
     public boolean showValue()
     {
         return SHOWVALUE;
     }
-    
+
     public boolean showProgress()
     {
         return SHOWPROGRESS;
     }
 }
-
-
-
-
-

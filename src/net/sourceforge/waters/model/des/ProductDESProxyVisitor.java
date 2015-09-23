@@ -72,11 +72,3 @@ public interface ProductDESProxyVisitor
     throws VisitorException;
 
 }
-
-
-
-
-
-
-
-

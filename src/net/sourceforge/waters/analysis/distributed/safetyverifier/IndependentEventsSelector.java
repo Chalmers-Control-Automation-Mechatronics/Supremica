@@ -70,7 +70,7 @@ class IndependentEventsSelector implements AutomataSelector
     //automaton should be discarded from the list.
     List<AutomatonProbability> aplist = 
       new ArrayList<AutomatonProbability>(Arrays.asList(probs));
-    
+
     Iterator<AutomatonProbability> it = aplist.iterator();
   iterating: while (it.hasNext())
       {
@@ -105,15 +105,8 @@ class IndependentEventsSelector implements AutomataSelector
 
     return result;
   }
-  
+
   private final ProbabilityEstimator mEstimator;
   @SuppressWarnings("unused")
   private final ProductDESSchema mModel;
 }
-
-
-
-
-
-
-

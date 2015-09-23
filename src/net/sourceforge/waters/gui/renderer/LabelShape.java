@@ -142,11 +142,3 @@ public class LabelShape extends AbstractLabelShape
       new Point(DEFAULT_OFFSET_X, DEFAULT_OFFSET_Y);
 
 }
-
-
-
-
-
-
-
-

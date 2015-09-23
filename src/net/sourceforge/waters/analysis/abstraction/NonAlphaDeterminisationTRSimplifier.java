@@ -303,12 +303,3 @@ public class NonAlphaDeterminisationTRSimplifier
   private TransitionIterator mTauIterator;
 
 }
-
-
-
-
-
-
-
-
-

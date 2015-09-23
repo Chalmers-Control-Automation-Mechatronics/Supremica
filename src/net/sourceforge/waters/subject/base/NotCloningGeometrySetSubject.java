@@ -332,12 +332,3 @@ public class NotCloningGeometrySetSubject<E>
   private Set<E> mSet;
 
 }
-
-
-
-
-
-
-
-
-

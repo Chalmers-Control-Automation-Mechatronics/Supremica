@@ -389,11 +389,3 @@ public abstract class WatersAnalyzeAction
   private static final Dimension DEFAULT_DIALOG_SIZE = new Dimension(290, 160);
 
 }
-
-
-
-
-
-
-
-

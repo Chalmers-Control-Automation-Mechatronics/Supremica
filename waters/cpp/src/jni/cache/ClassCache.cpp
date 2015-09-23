@@ -107,7 +107,7 @@ equals(intptr_t val1, intptr_t val2)
 
 //###########################################################################
 //# ClassCache: Constructors & Destructors
-  
+
 ClassCache::
 ClassCache(JNIEnv* env)
   : mEnvironment(env),
@@ -205,11 +205,3 @@ throwJavaException(const ExceptionGlue& glue)
 
 
 }  /* namespace jni */
-
-
-
-
-
-
-
-

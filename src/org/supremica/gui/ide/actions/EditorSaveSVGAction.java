@@ -50,21 +50,21 @@ public class EditorSaveSVGAction extends IDEAction {
     public EditorSaveSVGAction(List<IDEAction> actionList)
     {
         super(actionList);
-        
+
         //setEditorActiveRequired(true);
-        
+
         putValue(Action.NAME, "Save As SVG...");
         putValue(Action.SHORT_DESCRIPTION, "Save As SVG");
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Print16.gif")));
-        
+
         setEnabled(false);
     }
-    
+
     public void actionPerformed(ActionEvent e)
     {
         doAction();
     }
-    
+
     public void doAction()
     {
         try
@@ -77,11 +77,6 @@ public class EditorSaveSVGAction extends IDEAction {
             ide.getIDE().info("Must have an editor panel open.");
         }
     }    
-    
-    
+
+
 }
-
-
-
-
-

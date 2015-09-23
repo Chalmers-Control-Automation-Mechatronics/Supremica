@@ -790,11 +790,3 @@ class CompiledNameSpace
     new NameSpaceAddVisitor();
 
 }
-
-
-
-
-
-
-
-

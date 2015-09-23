@@ -40,10 +40,3 @@ public class TestWorker extends AbstractWorker
     System.out.format("Created test worker!");
   }
 }
-
-
-
-
-
-
-

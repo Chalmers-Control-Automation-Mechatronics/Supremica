@@ -147,10 +147,3 @@ public class AutomatonSchema implements Serializable
   public static final int PROPERTY = 2;
   public static final int SUPERVISOR = 3;
 }
-
-
-
-
-
-
-

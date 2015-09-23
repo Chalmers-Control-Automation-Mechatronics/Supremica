@@ -1375,10 +1375,3 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   private DescendantCheckVisitor mDescendantCheckVisitor;
   private SourceInfoCheckVisitor mSourceInfoChecker;
 }
-
-
-
-
-
-
-

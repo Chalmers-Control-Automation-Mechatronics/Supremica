@@ -233,11 +233,3 @@ class HidingStep extends AbstractionStep
   private final EventProxy mHiddenEvent;
   private final SynchronousProductStateMap mStateMap;
 }
-
-
-
-
-
-
-
-

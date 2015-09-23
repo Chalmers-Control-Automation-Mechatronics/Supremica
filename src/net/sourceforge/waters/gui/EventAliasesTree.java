@@ -99,10 +99,3 @@ public class EventAliasesTree extends ModuleTree
 
   private final PopupFactory mPopupFactory;
 }
-
-
-
-
-
-
-

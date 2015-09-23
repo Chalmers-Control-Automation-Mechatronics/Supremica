@@ -144,11 +144,3 @@ public abstract class CompositionalSynthesisResult
   private int mSynchTransitions;
 
 }
-
-
-
-
-
-
-
-

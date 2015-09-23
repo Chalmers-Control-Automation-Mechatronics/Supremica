@@ -592,11 +592,3 @@ public class SimpleEFAHelper {
   public static final int DEFAULT_FORBIDDEN_ID = 1;
 
 }
-
-
-
-
-
-
-
-

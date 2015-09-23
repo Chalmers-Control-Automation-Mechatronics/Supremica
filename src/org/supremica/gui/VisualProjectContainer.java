@@ -46,94 +46,94 @@ public class VisualProjectContainer
     private List<VisualProject> theProjects;
     private VisualProject currentProject;
     private VisualProjectContainerListeners projectListeners = null;
-    
+
     public VisualProjectContainer()
     {
         theProjects = new LinkedList<VisualProject>();
     }
-    
+
     public void addProject(VisualProject theProject)
     {
         addProject(theProject, false);
     }
-    
+
     public void addProject(VisualProject theProject, boolean setActive)
     {        
         theProjects.add(theProject);
-        
+
         if (setActive)
         {
             currentProject = theProject;
         }
     }
-    
+
     public void removeProject(VisualProject theProject)
     {
         theProjects.remove(theProject);
-        
+
         if (currentProject == theProject)
         {
             currentProject = null;
         }
     }
-    
+
     public VisualProject getProject(String name)
     {
         if (name == null)
         {
             return null;
         }
-        
+
         for (Iterator<VisualProject> projIt = iterator(); projIt.hasNext(); )
         {
             VisualProject currProject = projIt.next();
-            
+
             if (name.equals(currProject.getName()))
             {
                 return currProject;
             }
         }
-        
+
         return null;
     }
-    
+
     public VisualProject getActiveProject()
     {
         return currentProject;
     }
-    
+
     public void setActiveProject(VisualProject theProject)
     {
         this.currentProject = theProject;
     }
-    
+
     public Iterator<VisualProject> iterator()
     {
         return theProjects.iterator();
     }
-    
+
     public String getUniqueProjectName()
     {    // Implement this
         return "Untitled";
     }
-    
+
     public VisualProjectContainerListeners getListeners()
     {
         if (projectListeners == null)
         {
             projectListeners = new VisualProjectContainerListeners(this);
         }
-        
+
         return projectListeners;
     }
-    
+
     public void addListener(VisualProjectContainerListener listener)
     {
         Listeners currListeners = getListeners();
-        
+
         currListeners.addListener(listener);
     }
-    
+
     @SuppressWarnings("unused")
 	private void notifyListeners()
     {
@@ -142,7 +142,7 @@ public class VisualProjectContainer
             projectListeners.notifyListeners();
         }
     }
-    
+
     @SuppressWarnings("unused")
 	private void notifyListeners(int mode, Project p)
     {
@@ -151,7 +151,7 @@ public class VisualProjectContainer
             projectListeners.notifyListeners(mode, p);
         }
     }
-    
+
     public void beginTransaction()
     {
         if (projectListeners != null)
@@ -159,7 +159,7 @@ public class VisualProjectContainer
             projectListeners.beginTransaction();
         }
     }
-    
+
     public void endTransaction()
     {
         if (projectListeners != null)
@@ -168,8 +168,3 @@ public class VisualProjectContainer
         }
     }
 }
-
-
-
-
-

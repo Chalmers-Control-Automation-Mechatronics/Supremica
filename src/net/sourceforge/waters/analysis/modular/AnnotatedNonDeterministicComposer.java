@@ -741,12 +741,3 @@ public class AnnotatedNonDeterministicComposer
   private Set<TIntHashSet>[][] mAnnotations;
   private final TIntHashSet mNewInitial = new TIntHashSet();
 }
-
-
-
-
-
-
-
-
-

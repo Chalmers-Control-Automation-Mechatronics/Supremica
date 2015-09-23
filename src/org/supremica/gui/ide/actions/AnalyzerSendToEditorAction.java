@@ -204,8 +204,3 @@ public class AnalyzerSendToEditorAction extends IDEAction
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-

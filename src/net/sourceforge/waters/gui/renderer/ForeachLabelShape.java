@@ -100,11 +100,3 @@ public class ForeachLabelShape extends AbstractLabelShape
   private final AttributedString mText;
 
 }
-
-
-
-
-
-
-
-

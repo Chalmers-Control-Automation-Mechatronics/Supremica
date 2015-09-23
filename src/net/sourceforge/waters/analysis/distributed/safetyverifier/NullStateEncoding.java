@@ -51,7 +51,7 @@ public class NullStateEncoding extends StateEncoding
   {
     return packed.getStateArray();
   }
-  
+
   public String interpret(int[] unpacked)
   {
     StringBuilder sb = new StringBuilder();
@@ -87,10 +87,3 @@ public class NullStateEncoding extends StateEncoding
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-

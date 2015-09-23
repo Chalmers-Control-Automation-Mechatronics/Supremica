@@ -867,11 +867,3 @@ public class BDDEncoding
   private int mNumAutomataBits;
 
 }
-
-
-
-
-
-
-
-

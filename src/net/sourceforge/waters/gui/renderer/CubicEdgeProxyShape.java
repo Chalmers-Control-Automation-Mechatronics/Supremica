@@ -180,11 +180,3 @@ class CubicEdgeProxyShape
   private Point2D mArrowTip;
 
 }
-
-
-
-
-
-
-
-

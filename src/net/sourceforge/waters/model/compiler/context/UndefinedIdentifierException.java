@@ -95,17 +95,10 @@ public class UndefinedIdentifierException extends EvalException {
   {
     super("Undeclared " + typename + " '" + name + "'!", location);
   }
-  
-  
+
+
   //#########################################################################
   //# Static Class Variables
   public static final long serialVersionUID = 1;
 
 }
-
-
-
-
-
-
-

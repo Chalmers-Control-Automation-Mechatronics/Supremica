@@ -641,11 +641,3 @@ public class ListBufferTransitionRelationTest extends
   }
 
 }
-
-
-
-
-
-
-
-

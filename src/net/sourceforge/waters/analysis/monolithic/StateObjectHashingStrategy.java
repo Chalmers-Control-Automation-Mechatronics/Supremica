@@ -70,11 +70,3 @@ interface StateObjectHashingStrategy<E> extends Serializable {
      */
     public boolean equals(E o1, E o2);
 } // StateObjectHashingStrategy
-
-
-
-
-
-
-
-

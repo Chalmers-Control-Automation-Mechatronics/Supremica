@@ -169,12 +169,3 @@ public class RemoveAnnotations
     }
   }
 }
-
-
-
-
-
-
-
-
-

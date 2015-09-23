@@ -207,11 +207,3 @@ public abstract class AbstractionRule
   private int mUnchangedTransitions;
 
 }
-
-
-
-
-
-
-
-

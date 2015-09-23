@@ -286,11 +286,3 @@ public class CompositionalGeneralisedConflictCheckerVerificationResult
   private double mComposedModelNumberOfTransitions;
 
 }
-
-
-
-
-
-
-
-

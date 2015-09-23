@@ -124,11 +124,3 @@ class StraightEdgeProxyShape
   private final Point2D mArrowTip;
 
 }
-
-
-
-
-
-
-
-

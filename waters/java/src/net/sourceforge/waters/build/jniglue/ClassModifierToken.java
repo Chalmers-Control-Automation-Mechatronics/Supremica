@@ -60,10 +60,3 @@ class ClassModifierToken extends Token {
   private final ClassModifier mClassModifier;
 
 }
-
-
-
-
-
-
-

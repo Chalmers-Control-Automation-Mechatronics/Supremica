@@ -121,11 +121,3 @@ public interface InstanceProxy extends ComponentProxy {
   public List<ParameterBindingProxy> getBindingList();
 
 }
-
-
-
-
-
-
-
-

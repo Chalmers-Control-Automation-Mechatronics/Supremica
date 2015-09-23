@@ -512,10 +512,3 @@ public class ModularAndCompositionalSynthesizer
   private final CompositionalConflictChecker mCompositionalConflictChecker;
 
 }
-
-
-
-
-
-
-

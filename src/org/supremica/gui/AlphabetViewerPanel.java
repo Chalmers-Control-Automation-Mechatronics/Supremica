@@ -235,8 +235,3 @@ public class AlphabetViewerPanel
  *
  *  }
  */
-
-
-
-
-

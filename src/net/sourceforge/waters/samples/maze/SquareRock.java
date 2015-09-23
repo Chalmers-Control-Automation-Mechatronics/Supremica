@@ -53,7 +53,7 @@ class SquareRock extends Square
   {
     return Square.ROCK;
   }
-  
+
   int[] getEnteringActions()
   {
     return ENTERING;
@@ -65,11 +65,3 @@ class SquareRock extends Square
   private static final int[] ENTERING = {Action.MOVE};
 
 }
-
-
-
-
-
-
-
-

@@ -92,11 +92,3 @@ public interface CopyingProxyUnmarshaller<D extends DocumentProxy> extends
       WatersMarshalException, WatersUnmarshalException;
 
 }
-
-
-
-
-
-
-
-

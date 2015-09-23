@@ -150,12 +150,3 @@ public class SourceInfo
   private final BindingContext mBindingContext;
 
 }
-
-
-
-
-
-
-
-
-

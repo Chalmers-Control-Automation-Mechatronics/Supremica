@@ -96,11 +96,3 @@ public abstract class GeometrySubject
   }
 
 }
-
-
-
-
-
-
-
-

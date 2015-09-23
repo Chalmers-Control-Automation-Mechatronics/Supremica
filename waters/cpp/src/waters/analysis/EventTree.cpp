@@ -68,7 +68,7 @@ appendExecute(uint32_t event)
 {
   appendRaw(OPCODE_EXEC_3 | event);
 }
-  
+
 void EventTree::
 appendIfDisabled(uint32_t trans, uint32_t task)
 {
@@ -972,11 +972,3 @@ dump()
 
 
 }  /* namespace waters */
-
-
-
-
-
-
-
-

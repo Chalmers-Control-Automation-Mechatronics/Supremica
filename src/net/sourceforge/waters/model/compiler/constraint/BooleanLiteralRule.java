@@ -121,10 +121,3 @@ class BooleanLiteralRule extends SimplificationRule
   private final IntConstantProxy mValue;
 
 }
-
-
-
-
-
-
-

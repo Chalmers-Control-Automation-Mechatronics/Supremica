@@ -57,11 +57,3 @@ public class EstimatedMinStatesVariableSelectionHeuristic
   }
 
 }
-
-
-
-
-
-
-
-

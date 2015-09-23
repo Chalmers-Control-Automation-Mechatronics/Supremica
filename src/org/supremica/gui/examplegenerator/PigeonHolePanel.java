@@ -88,7 +88,3 @@ class PigeonHolePanel extends JPanel implements TestCase {
 		return ph.getProject();
 	}
 }
-
-
-
-

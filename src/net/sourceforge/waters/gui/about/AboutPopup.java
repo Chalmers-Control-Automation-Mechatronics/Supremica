@@ -81,11 +81,3 @@ public class AboutPopup
   private static final long serialVersionUID = -6488302835635607997L;
 
 }
-
-
-
-
-
-
-
-

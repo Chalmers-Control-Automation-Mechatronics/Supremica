@@ -82,11 +82,3 @@ class ConditionPartitionBDD
   }
 
 }
-
-
-
-
-
-
-
-

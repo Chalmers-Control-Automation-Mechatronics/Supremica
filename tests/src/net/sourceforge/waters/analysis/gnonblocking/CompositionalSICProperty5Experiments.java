@@ -102,11 +102,3 @@ public class CompositionalSICProperty5Experiments extends
   }
 
 }
-
-
-
-
-
-
-
-

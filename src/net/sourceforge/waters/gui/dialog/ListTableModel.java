@@ -254,11 +254,3 @@ public class ListTableModel<E>
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-
-

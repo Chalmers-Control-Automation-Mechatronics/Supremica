@@ -1490,11 +1490,3 @@ public class EventDeclEditorDialog
   private static Dimension MIN_MORE_OPTIONS_SIZE = new Dimension(502, 437);
 
 }
-
-
-
-
-
-
-
-

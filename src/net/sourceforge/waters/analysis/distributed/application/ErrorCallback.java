@@ -57,10 +57,3 @@ public interface ErrorCallback extends Remote
    */
   public void handle(String workerid, Worker worker, Throwable throwable) throws RemoteException;
 }
-
-
-
-
-
-
-

@@ -340,11 +340,3 @@ public class NonAlphaDeterminisationTRSimplifierTest
   }
 
 }
-
-
-
-
-
-
-
-

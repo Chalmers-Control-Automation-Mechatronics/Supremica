@@ -179,11 +179,3 @@ public abstract class NamedSubject
   private String mName;
 
 }
-
-
-
-
-
-
-
-

@@ -67,10 +67,3 @@ public interface VariableContext extends BindingContext {
   public int getNumberOfVariables();
 
 }
-
-
-
-
-
-
-

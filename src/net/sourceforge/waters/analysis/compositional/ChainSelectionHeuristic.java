@@ -248,10 +248,3 @@ public class ChainSelectionHeuristic<T extends Comparable<? super T>>
   private final SelectionHeuristic<T>[] mSteps;
 
 }
-
-
-
-
-
-
-

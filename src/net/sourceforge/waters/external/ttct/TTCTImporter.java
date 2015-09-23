@@ -276,12 +276,3 @@ public class TTCTImporter
   private Collection<EventProxy> mMarkings;
 
 }
-
-
-
-
-
-
-
-
-

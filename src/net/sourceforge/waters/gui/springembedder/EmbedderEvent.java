@@ -118,11 +118,3 @@ public class EmbedderEvent extends EventObject
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-
-

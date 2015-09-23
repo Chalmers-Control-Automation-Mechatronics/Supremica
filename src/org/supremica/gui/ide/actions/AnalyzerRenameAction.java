@@ -110,8 +110,3 @@ public class AnalyzerRenameAction
         }
     }
 }
-
-
-
-
-

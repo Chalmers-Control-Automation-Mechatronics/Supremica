@@ -148,11 +148,3 @@ public class AlphaDeterminisationTRSimplifierTest
   }
 
 }
-
-
-
-
-
-
-
-

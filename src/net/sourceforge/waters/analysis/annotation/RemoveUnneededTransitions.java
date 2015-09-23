@@ -42,23 +42,23 @@ public class RemoveUnneededTransitions
   private final TransitionRelation mTransitionRelation;
   private final int mTau;
   public static int TIME = 0;
-  
+
   public static void clearStats()
   {
     TIME = 0;
   }
-  
+
   public static String stats()
   {
     return "TIME = " + TIME;
   }
-  
+
   public RemoveUnneededTransitions(TransitionRelation transitionrelation, int tau)
   {
     mTransitionRelation = transitionrelation;
     mTau = tau;
   }
-  
+
   private void removeTransitions(int state)
   {
     TIntHashSet targets = mTransitionRelation.getSuccessors(state, mTau);
@@ -73,7 +73,7 @@ public class RemoveUnneededTransitions
       mTransitionRelation.addTransition(state, mTau, target);
     }
   }
-  
+
   public void run()
   {
     TIME -= System.currentTimeMillis();
@@ -83,12 +83,3 @@ public class RemoveUnneededTransitions
     TIME += System.currentTimeMillis();
   }
 }
-
-
-
-
-
-
-
-
-

@@ -77,11 +77,3 @@ public interface BindingContext
   public ModuleBindingContext getModuleBindingContext();
 
 }
-
-
-
-
-
-
-
-

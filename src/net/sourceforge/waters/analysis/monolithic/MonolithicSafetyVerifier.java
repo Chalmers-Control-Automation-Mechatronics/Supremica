@@ -657,12 +657,3 @@ public class MonolithicSafetyVerifier
   private int mErrorAutomaton;
 
 }
-
-
-
-
-
-
-
-
-

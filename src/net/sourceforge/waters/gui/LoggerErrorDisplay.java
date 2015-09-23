@@ -76,11 +76,3 @@ public class LoggerErrorDisplay implements ErrorDisplay
     LoggerFactory.createLogger(LoggerErrorDisplay.class);
 
 }
-
-
-
-
-
-
-
-

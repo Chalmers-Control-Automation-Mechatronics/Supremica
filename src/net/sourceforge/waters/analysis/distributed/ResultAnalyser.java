@@ -146,10 +146,3 @@ public class ResultAnalyser
       }
   }
 }
-
-
-
-
-
-
-

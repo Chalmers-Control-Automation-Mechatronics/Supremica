@@ -316,10 +316,3 @@ public class LimitedCertainConflictsTRSimplifierTest
   }
 
 }
-
-
-
-
-
-
-

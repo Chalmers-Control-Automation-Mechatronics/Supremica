@@ -130,10 +130,3 @@ public enum EFSMTRSimplifierFactory
     (final EFSMConflictChecker analyzer);
 
 }
-
-
-
-
-
-
-

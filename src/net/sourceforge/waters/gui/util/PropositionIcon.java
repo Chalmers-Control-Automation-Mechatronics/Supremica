@@ -248,10 +248,3 @@ public class PropositionIcon implements Icon
   private static PropositionIcon UNMARKED_ICON;
 
 }
-
-
-
-
-
-
-

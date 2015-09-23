@@ -423,12 +423,3 @@ public class ModularControlLoopChecker
   private Set<EventProxy> mLoopEvents;
   private final int mNodesRemaining = 3000000;
 }
-
-
-
-
-
-
-
-
-

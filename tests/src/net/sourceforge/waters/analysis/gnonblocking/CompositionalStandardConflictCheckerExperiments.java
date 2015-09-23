@@ -205,11 +205,3 @@ public class CompositionalStandardConflictCheckerExperiments extends
     runModel(group, dir, name);
   }
 }
-
-
-
-
-
-
-
-

@@ -485,12 +485,3 @@ public class CompositionalSafetyVerifier
   static final byte FORBIDDEN = 2;
 
 }
-
-
-
-
-
-
-
-
-

@@ -150,11 +150,3 @@ public abstract class AbstractSafetyVerifier
   private final SafetyDiagnostics mDiagnostics;
 
 }
-
-
-
-
-
-
-
-

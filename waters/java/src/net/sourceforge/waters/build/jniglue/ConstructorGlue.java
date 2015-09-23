@@ -103,11 +103,3 @@ class ConstructorGlue extends MethodGlue {
   }
 
 }
-
-
-
-
-
-
-
-

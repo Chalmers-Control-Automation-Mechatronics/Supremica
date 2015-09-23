@@ -200,12 +200,3 @@ public class SubsetConstructionTRSimplifierTest
   }
 
 }
-
-
-
-
-
-
-
-
-

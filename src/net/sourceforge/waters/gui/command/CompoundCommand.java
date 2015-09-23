@@ -160,11 +160,3 @@ public class CompoundCommand
   private boolean mInProgress;
 
 }
-
-
-
-
-
-
-
-

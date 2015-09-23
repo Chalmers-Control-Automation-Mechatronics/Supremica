@@ -195,10 +195,3 @@ class GlueFileScanner {
   private int mPutbackCharacter;
 
 }
-
-
-
-
-
-
-

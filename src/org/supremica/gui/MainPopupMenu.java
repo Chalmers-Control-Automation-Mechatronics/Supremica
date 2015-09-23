@@ -660,8 +660,3 @@ class MainPopupMenu
         }
     }
 }
-
-
-
-
-

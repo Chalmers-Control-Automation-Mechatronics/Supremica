@@ -207,11 +207,3 @@ class EFAEventDecl {
    */
   private boolean mIsBlocked;
 }
-
-
-
-
-
-
-
-

@@ -222,11 +222,3 @@ public class ConflictEquivalenceTraceExpander extends TRTraceExpander
   }
 
 }
-
-
-
-
-
-
-
-

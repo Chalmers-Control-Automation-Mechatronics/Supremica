@@ -80,11 +80,3 @@ public class CCAbstractionStandardConflictCheckerTest
   }
 
 }
-
-
-
-
-
-
-
-

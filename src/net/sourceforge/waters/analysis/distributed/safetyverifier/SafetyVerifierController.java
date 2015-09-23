@@ -187,14 +187,14 @@ public class SafetyVerifierController extends AbstractController
       throw new IllegalArgumentException("No job was set");
 
     mNodes = getNodes();
-    
+
     if (mNodes.size() == 0)
       throw new IllegalArgumentException("Node collection was empty");
     mJob = new SafetyVerificationJob(getJob());
 
     //Extract parameters from the job.
     mActualModel = mJob.getModel();
-    
+
     if (mActualModel == null)
       throw new IllegalArgumentException("No model was set");
 
@@ -223,7 +223,7 @@ public class SafetyVerifierController extends AbstractController
   private void createWorkers() throws Exception
   {
     mWorkers = new SafetyVerifierWorker[mNodes.size()];
-    
+
     int k = 0;
     for (Node n : mNodes)
       {
@@ -239,7 +239,7 @@ public class SafetyVerifierController extends AbstractController
       }
 
     mWorkerIDs = workerIdSet.toArray(new String[0]);
-    
+
     //Set parameters on workers.
     for (int i = 0; i < mWorkers.length; i++)
       {
@@ -321,7 +321,7 @@ public class SafetyVerifierController extends AbstractController
 	public AsyncWorkerException(String message, String workerid, Throwable e)
     {
       super(message, e);
-      
+
       mWorkerID = workerid;
     }
 
@@ -505,7 +505,7 @@ public class SafetyVerifierController extends AbstractController
 	  }
       }
   }
-  
+
   private JobStats[] getWorkerStats()
   {
     if (mWorkers == null) {
@@ -529,7 +529,7 @@ public class SafetyVerifierController extends AbstractController
       return stats;
     }
   }
-  
+
   private JobStats getControllerStats()
   {
     JobStats stats = new JobStats();
@@ -537,14 +537,14 @@ public class SafetyVerifierController extends AbstractController
       stats.set("job-name", mJob.getName());
     }
     stats.set("worker-stats", getWorkerStats());
-    
+
     stats.set("exploration-time", mExplorationTime);
     stats.set("trace-time", mTraceTime);
 
     stats.set("total-states", mTotalStates);
     stats.set("total-incoming", mTotalIncoming);
     stats.set("total-outgoing", mTotalOutgoing);
-    
+
     return stats;
   }
 
@@ -613,7 +613,7 @@ public class SafetyVerifierController extends AbstractController
   private StateTuple findInitialState()
   {
     int[] start = new int[mModel.getAutomataCount()];
-    
+
     for (int i = 0; i < mModel.getAutomataCount(); i++)
       {
 	AutomatonSchema aut = mModel.getAutomaton(i);
@@ -714,10 +714,3 @@ public class SafetyVerifierController extends AbstractController
 
   private static final String WORKER_CLASS = "net.sourceforge.waters.analysis.distributed.safetyverifier.SafetyVerifierWorkerImpl";
 }
-
-
-
-
-
-
-

@@ -218,11 +218,3 @@ public class RestrictedSilentIncomingTRSimplifierTest
   }
 
 }
-
-
-
-
-
-
-
-

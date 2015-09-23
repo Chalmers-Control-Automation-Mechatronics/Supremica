@@ -102,11 +102,3 @@ public abstract class AbstractAbortable implements Abortable
   private boolean mIsAborting;
 
 }
-
-
-
-
-
-
-
-

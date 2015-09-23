@@ -44,7 +44,3 @@ public interface DotViewerInterface
 	public void draw();
 	public void stopProcess();
 }
-
-
-
-

@@ -136,11 +136,3 @@ public class MonolithicSynchronousProductBuilderTest
   private boolean mPruningDeadlocks = false;
 
 }
-
-
-
-
-
-
-
-

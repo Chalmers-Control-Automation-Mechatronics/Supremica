@@ -45,7 +45,7 @@ import net.sourceforge.waters.xsd.des.ObjectFactory;
 class AutomatonEventRefListHandler
   extends JAXBCheckedListHandler<Automaton,EventRefList,EventProxy>
 {
-  
+
   //#########################################################################
   //# Constructors
   AutomatonEventRefListHandler()
@@ -58,7 +58,7 @@ class AutomatonEventRefListHandler
     mFactory = factory;
   }
 
-  
+
   //#########################################################################
   //# Overrides for Abstract Base Class JAXBListHandler
   EventRefList createListElement(Automaton container)
@@ -84,11 +84,3 @@ class AutomatonEventRefListHandler
   private final ObjectFactory mFactory;
 
 }
-
-
-
-
-
-
-
-

@@ -171,11 +171,3 @@ public class EFSMVariable
   private EFSMEventEncoding mSelfloops;
 
 }
-
-
-
-
-
-
-
-

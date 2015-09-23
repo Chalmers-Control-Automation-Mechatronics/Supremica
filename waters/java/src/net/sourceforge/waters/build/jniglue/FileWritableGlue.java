@@ -41,11 +41,3 @@ interface FileWritableGlue extends WritableGlue {
   public boolean isUpToDate(File rootdir, long outfiletime);
 
 }
-
-
-
-
-
-
-
-

@@ -192,10 +192,3 @@ class ProjectionAbstractionProcedure extends TRAbstractionProcedure
   }
 
 }
-
-
-
-
-
-
-

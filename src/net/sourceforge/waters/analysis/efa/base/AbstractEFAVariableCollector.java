@@ -189,13 +189,5 @@ public abstract class AbstractEFAVariableCollector<L,
   private Collection<V> mUnprimedVariables;
   private Collection<V> mPrimedVariables;
 
-  
+
 }
-
-
-
-
-
-
-
-

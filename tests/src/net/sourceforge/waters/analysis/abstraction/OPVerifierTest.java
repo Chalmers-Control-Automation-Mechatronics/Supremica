@@ -256,11 +256,3 @@ public class OPVerifierTest
   private final String BEFORE = "before";
 
 }
-
-
-
-
-
-
-
-

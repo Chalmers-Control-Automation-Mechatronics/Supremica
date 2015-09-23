@@ -108,11 +108,3 @@ public class SelectionHeuristicMaxC
   }
 
 }
-
-
-
-
-
-
-
-

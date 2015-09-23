@@ -110,7 +110,7 @@ public abstract class StateDistribution implements StateHandler, Serializable
   protected void handlersUpdated()
   {
   }
-  
+
   private final Map<String,StateHandler> mHandlers = new HashMap<String,StateHandler>();
 
 
@@ -119,10 +119,3 @@ public abstract class StateDistribution implements StateHandler, Serializable
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-

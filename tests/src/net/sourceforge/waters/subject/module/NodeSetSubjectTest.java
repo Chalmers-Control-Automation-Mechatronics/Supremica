@@ -238,11 +238,3 @@ public class NodeSetSubjectTest extends AbstractWatersTest
   private GroupNodeSubject mGroup2;
 
 }
-
-
-
-
-
-
-
-

@@ -72,19 +72,19 @@ class TextArea extends JFrame {
         _resultArea.setText(text);
          _resultArea.setEditable(false);
         JScrollPane scrollingArea = new JScrollPane(_resultArea);
-        
+
         //... Get the content pane, set layout, add to center
         JPanel content = new JPanel();
         content.setLayout(new BorderLayout());
         content.add(scrollingArea, BorderLayout.CENTER);
-        
-        
+
+
         //... Set window characteristics.
         this.setContentPane(content);
         this.setTitle("Results");
         this.pack();
     }
-     
+
      public void setText(String text)
      {
         _resultArea.setText(text);
@@ -128,7 +128,7 @@ interface TestCase
 {
     Project generateAutomata()
     throws Exception;
-    
+
     void synthesizeSupervisor(IDE ide)
     throws Exception;
 }
@@ -168,7 +168,7 @@ public class TestCasesDialog
     private ExampleTab extab = new ExampleTab();
     private Project project = null;
     private Object gui;
-    
+
     public class ComputeButton
         extends JButton
     {
@@ -285,7 +285,7 @@ public class TestCasesDialog
         void action()
         {}
     }
-    
+
     void synthesizeSupervisor(IDE ide)
     throws Exception
     {
@@ -299,7 +299,7 @@ public class TestCasesDialog
         tc.synthesizeSupervisor(ide);  
     }
 
-    
+
     void generateAutomata()
     throws Exception
     {
@@ -311,7 +311,7 @@ public class TestCasesDialog
         setVisible(false);
 
         project = tc.generateAutomata();    // Should return a Project (named)
-        
+
 //        System.out.println("Name of project: "+project);
 
         if (gui instanceof Gui)
@@ -333,7 +333,7 @@ public class TestCasesDialog
     {
         return project;
     }
-    
+
     public TestCasesDialog(Frame frame, Object gui)
     {
         super(frame, "Example Generator", false);    // modal dialog with frame as parent
@@ -351,7 +351,7 @@ public class TestCasesDialog
         // setLocation(point);
         JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton tmp;
-        
+
 //        ComputeButton cb = new ComputeButton();
         buttons.add(new ComputeButton());
         buttons.add(tmp = new DoitButton());
@@ -367,8 +367,3 @@ public class TestCasesDialog
         setLocation(point);
     }
 }
-
-
-
-
-

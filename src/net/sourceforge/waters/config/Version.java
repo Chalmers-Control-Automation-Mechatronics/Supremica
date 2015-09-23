@@ -191,11 +191,3 @@ public class Version
   private final String mOSType;
 
 }
-
-
-
-
-
-
-
-

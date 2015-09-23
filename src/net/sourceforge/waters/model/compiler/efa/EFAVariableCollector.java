@@ -243,11 +243,3 @@ class EFAVariableCollector
   private Collection<EFAVariable> mPrimedVariables;
 
 }
-
-
-
-
-
-
-
-

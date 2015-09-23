@@ -81,11 +81,3 @@ public class AnalyzeSDCThree_one_propertyAction extends WatersAnalyzeAction
 
   private static final long serialVersionUID = -1008097797553564719L;
 }
-
-
-
-
-
-
-
-

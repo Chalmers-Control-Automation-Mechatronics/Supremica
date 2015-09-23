@@ -92,17 +92,9 @@ public class BadFileTypeException extends WatersUnmarshalException {
     this("Can't determine contents type for file '" + filename + "'!");
   }
 
-  
+
   //#########################################################################
   //# Static Class Variables
   public static final long serialVersionUID = 1;
 
 }
-
-
-
-
-
-
-
-

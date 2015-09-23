@@ -107,10 +107,3 @@ class EqualsToFalseRule extends SimplificationRule
   private final PlaceHolder mPlaceHolder;
 
 }
-
-
-
-
-
-
-

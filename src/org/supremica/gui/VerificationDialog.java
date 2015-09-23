@@ -525,8 +525,3 @@ public class VerificationDialog
         }
     }
 }
-
-
-
-
-

@@ -124,11 +124,3 @@ class EqualitySubstitutionRule extends SimplificationRule
   private final PlaceHolder mEXPR;
 
 }
-
-
-
-
-
-
-
-

@@ -62,10 +62,3 @@ class DefaultProcessorVariable implements ProcessorVariable {
   private final String mText;
 
 }
-
-
-
-
-
-
-

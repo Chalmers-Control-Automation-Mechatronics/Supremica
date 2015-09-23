@@ -82,8 +82,3 @@ public class ToolsTestCasesAction
         testCasesDialog.setVisible(true);
     }
 }
-
-
-
-
-

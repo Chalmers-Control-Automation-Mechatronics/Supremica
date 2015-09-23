@@ -52,11 +52,3 @@ public interface LanguageInclusionChecker extends SafetyVerifier
   public VerificationResult getAnalysisResult();
 
 }
-
-
-
-
-
-
-
-

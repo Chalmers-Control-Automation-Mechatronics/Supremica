@@ -465,8 +465,3 @@ public class AnalyzerAutomataPanel
         theTableSorter.sortByColumn(TABLE_NAME_COLUMN);
     }
 }
-
-
-
-
-

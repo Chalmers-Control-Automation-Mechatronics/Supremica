@@ -340,8 +340,3 @@ public class ExampleTemplates implements Iterable<TemplateGroup>
     return mAllGroups.iterator();
   }
 }
-
-
-
-
-

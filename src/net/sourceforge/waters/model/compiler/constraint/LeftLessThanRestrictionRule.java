@@ -117,10 +117,3 @@ class LeftLessThanRestrictionRule extends RangeRestrictionRule
   private final IntegerExpressionPlaceHolder mEXPR; 
 
 }
-
-
-
-
-
-
-

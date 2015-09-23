@@ -103,11 +103,3 @@ public class SelectionHeuristicMaxL
   }
 
 }
-
-
-
-
-
-
-
-

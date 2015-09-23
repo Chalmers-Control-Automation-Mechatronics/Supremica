@@ -487,7 +487,7 @@ public class DNFConverterTest extends TestCase
     }
     return nf;
   }
-        
+
 
   //#########################################################################
   //# Overrides for junit.framework.TestCase
@@ -518,11 +518,3 @@ public class DNFConverterTest extends TestCase
   private BinaryOperator mOrOp;
 
 }
-
-
-
-
-
-
-
-

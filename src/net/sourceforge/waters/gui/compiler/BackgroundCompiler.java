@@ -288,11 +288,3 @@ public class BackgroundCompiler
   private static final int DELAY_AFTER_EDIT = 1000;
 
 }
-
-
-
-
-
-
-
-

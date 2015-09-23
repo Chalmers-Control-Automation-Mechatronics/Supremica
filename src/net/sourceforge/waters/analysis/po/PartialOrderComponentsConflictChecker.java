@@ -481,11 +481,3 @@ extends PartialOrderComponentsModelVerifier implements ConflictChecker
   private EventProxy mConfiguredMarking;
 
 }
-
-
-
-
-
-
-
-

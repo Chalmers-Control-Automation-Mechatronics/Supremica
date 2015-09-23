@@ -249,10 +249,3 @@ public class StateRepresentationSynthesisAbstractionProcedureFactory
   };
 
 }
-
-
-
-
-
-
-

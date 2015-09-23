@@ -57,11 +57,3 @@ public class TreePseudoTable extends MouseAdapter
   private final EventJTree mTree;
   private final JTableHeader mParent;
 }
-
-
-
-
-
-
-
-

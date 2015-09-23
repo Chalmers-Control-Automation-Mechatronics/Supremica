@@ -150,11 +150,3 @@ public class SelfRunningExperimentModularAndCompositionalSynthesis
   }
 
 }
-
-
-
-
-
-
-
-

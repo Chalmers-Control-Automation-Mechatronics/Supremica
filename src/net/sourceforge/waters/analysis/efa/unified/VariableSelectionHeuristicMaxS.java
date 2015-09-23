@@ -73,10 +73,3 @@ public class VariableSelectionHeuristicMaxS
   private UnifiedEFAConflictChecker mConflictChecker;
 
 }
-
-
-
-
-
-
-

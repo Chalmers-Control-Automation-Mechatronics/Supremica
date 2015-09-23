@@ -1061,11 +1061,3 @@ public class AutomataSynthesisAbstractionProcedure extends
                                | USE_WSOE;
 
 }
-
-
-
-
-
-
-
-

@@ -686,8 +686,3 @@ public class SynthesizerDialog implements ActionListener
   }
 
 }
-
-
-
-
-

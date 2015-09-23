@@ -52,11 +52,3 @@ class JAXBTraceExporter
   }
 
 }
-
-
-
-
-
-
-
-

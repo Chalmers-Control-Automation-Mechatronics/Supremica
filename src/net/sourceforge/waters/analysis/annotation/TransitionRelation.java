@@ -1230,12 +1230,3 @@ public class TransitionRelation
     return num;
   }
 }
-
-
-
-
-
-
-
-
-

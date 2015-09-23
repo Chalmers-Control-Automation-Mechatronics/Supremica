@@ -84,7 +84,7 @@ public abstract class AbstractController implements Controller
     mControllerState = state;
   }
 
-  
+
   public final void setJob(Job job) throws IllegalStateException
   {
     if (getState() != ControllerState.NOT_RUN)
@@ -139,7 +139,7 @@ public abstract class AbstractController implements Controller
     return mNodes;
   }
 
-  
+
   public final void setControllerID(ControllerID id)
   {
     mControllerID = id;
@@ -200,10 +200,3 @@ public abstract class AbstractController implements Controller
   private Collection<Node> mNodes = null;
   private ControllerID mControllerID;
 }
-
-
-
-
-
-
-

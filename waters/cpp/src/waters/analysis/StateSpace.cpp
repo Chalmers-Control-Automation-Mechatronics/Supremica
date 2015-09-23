@@ -218,11 +218,3 @@ equalTuples(const uint32_t* tuple1, const uint32_t* tuple2)
 
 
 }  /* namespace waters */
-
-
-
-
-
-
-
-

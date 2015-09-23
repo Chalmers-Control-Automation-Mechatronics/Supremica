@@ -612,11 +612,3 @@ public class EventDeclListView
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-
-

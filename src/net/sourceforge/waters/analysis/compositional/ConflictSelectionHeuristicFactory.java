@@ -292,10 +292,3 @@ public class ConflictSelectionHeuristicFactory
   }
 
 }
-
-
-
-
-
-
-

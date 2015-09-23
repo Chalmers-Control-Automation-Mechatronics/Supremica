@@ -203,8 +203,3 @@ public class Actions extends WatersActionManager
     public IDEAction helpWebAction = new HelpWebAction(mIDEActions);
 
 }
-
-
-
-
-

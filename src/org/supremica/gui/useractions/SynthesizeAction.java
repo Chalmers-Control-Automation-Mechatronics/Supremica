@@ -56,8 +56,3 @@ public class SynthesizeAction
 		ActionMan.automataSynthesize_actionPerformed(ActionMan.getGui());
 	}
 }
-
-
-
-
-

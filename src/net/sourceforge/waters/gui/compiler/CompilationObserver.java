@@ -52,11 +52,3 @@ public interface CompilationObserver
   public String getVerb();
 
 }
-
-
-
-
-
-
-
-

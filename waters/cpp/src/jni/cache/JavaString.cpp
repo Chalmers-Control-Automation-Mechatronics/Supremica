@@ -112,11 +112,3 @@ operator const char* ()
 
 
 }  /* namespace jni */
-
-
-
-
-
-
-
-

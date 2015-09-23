@@ -48,48 +48,48 @@ public class AutomataHierarchyViewer
     private static final long serialVersionUID = 1L;
     private static Logger logger = LoggerFactory.createLogger(AutomataHierarchyViewer.class);
     private Automata theAutomata;
-    
+
     public AutomataHierarchyViewer(Automata theAutomata)
     throws Exception
     {
         this.theAutomata = theAutomata;
-        
+
         //super.setObjectName("Hierarchy " + theAutomata);
         super.setObjectName("Modular structure");
         theAutomata.getListeners().addListener(this);
     }
-    
+
     // Implementation of AutomataListener interface
     public void automatonAdded(Automata automata, Automaton automaton)
     {
         updated(automata, theAutomata);
     }
-    
+
     public void automatonRemoved(Automata automata, Automaton automaton)
     {
         updated(automata, theAutomata);
     }
-    
+
     public void automatonRenamed(Automata automata, Automaton automaton)
     {
         updated(automata, theAutomata);
     }
-    
+
     public void actionsOrControlsChanged(Automata automata)
     {
         updated(automata, theAutomata);
     }
-    
+
     // End of interface implementation
     public AutomataSerializer getSerializer()
     {
         AutomataToHierarchyToDot serializer = new AutomataToHierarchyToDot(theAutomata);
-        
+
         serializer.setLeftToRight(leftToRightCheckBox.isSelected());
         serializer.setWithLabels(withLabelsCheckBox.isSelected());
         serializer.setWithCircles(withCirclesCheckBox.isSelected());
         serializer.setUseColors(useStateColorsCheckBox.isSelected());
-        
+
         try
         {
             serializer.serialize("Output.txt");
@@ -98,12 +98,7 @@ public class AutomataHierarchyViewer
         {
             logger.error(ex.getMessage());
         }
-        
+
         return serializer;
     }
 }
-
-
-
-
-

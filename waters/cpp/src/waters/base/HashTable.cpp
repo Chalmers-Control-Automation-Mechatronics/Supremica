@@ -218,7 +218,7 @@ found(const K key, V value) const
     return mDefault;
   }
 }
-      
+
 
 //###########################################################################
 //# RawHashTable: Instances
@@ -228,11 +228,3 @@ template class RawHashTable<int64_t,int64_t>;
 template class RawHashTable<int64_t,int32_t>;
 
 }  /* namespace waters */
-
-
-
-
-
-
-
-

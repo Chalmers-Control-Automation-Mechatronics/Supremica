@@ -2117,10 +2117,3 @@ public class IncomingEquivalenceTRSimplifier
   private static final int HASH_REALLOC_THRESHOLD = 64;
 
 }
-
-
-
-
-
-
-

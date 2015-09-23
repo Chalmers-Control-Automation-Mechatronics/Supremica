@@ -177,12 +177,3 @@ public abstract class AbstractAutomatonBuilder
   private ComponentKind mOutputKind = ComponentKind.PLANT;
 
 }
-
-
-
-
-
-
-
-
-

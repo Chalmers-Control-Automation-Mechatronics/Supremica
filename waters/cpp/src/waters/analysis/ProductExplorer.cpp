@@ -1345,11 +1345,3 @@ Java_net_sourceforge_waters_cpp_analysis_NativeModelAnalyzer_getPeakMemoryUsage
 #endif
   return -1;
 }
-
-
-
-
-
-
-
-

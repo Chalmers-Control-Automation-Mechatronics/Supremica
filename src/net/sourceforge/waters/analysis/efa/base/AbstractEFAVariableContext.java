@@ -148,10 +148,3 @@ public abstract class AbstractEFAVariableContext<L,
   protected final ProxyAccessorMap<IdentifierProxy, V> mGlobalVariableMap;
 
 }
-
-
-
-
-
-
-

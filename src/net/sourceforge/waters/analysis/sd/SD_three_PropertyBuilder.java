@@ -239,7 +239,7 @@ private AutomatonProxy createSD3_Test(final EventProxy hib)
   newEvents.add(hib);
   newEvents.add(enEvent);
   newEvents.add(tick);
-  
+
   for (final EventProxy ev: disablEvents)
     newEvents.add(ev);
 
@@ -595,11 +595,3 @@ private EventProxy tick;
 
 private int pCounta=0;    // Counts for naming disable events
 }
-
-
-
-
-
-
-
-

@@ -285,11 +285,3 @@ public class StateTupleEncoding
   private static final int SIZE_INT = 32;
 
 }
-
-
-
-
-
-
-
-

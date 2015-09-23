@@ -1128,12 +1128,3 @@ public class OldTransitionRelation
   private TObjectIntHashMap<StateProxy> mResultingStates;
 
 }
-
-
-
-
-
-
-
-
-

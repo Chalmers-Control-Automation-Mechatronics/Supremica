@@ -209,11 +209,3 @@ public class SpecialEventsFinderTest
   };
 
 }
-
-
-
-
-
-
-
-

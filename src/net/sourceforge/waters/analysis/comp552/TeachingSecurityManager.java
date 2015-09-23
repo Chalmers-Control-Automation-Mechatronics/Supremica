@@ -280,10 +280,3 @@ class TeachingSecurityManager extends SecurityManager
   private boolean mClosed;
 
 }
-
-
-
-
-
-
-

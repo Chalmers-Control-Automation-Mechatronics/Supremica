@@ -337,11 +337,3 @@ public class SimpleEFAEventDecl
   private static final long serialVersionUID = -3739541318333865287L;
 
 }
-
-
-
-
-
-
-
-

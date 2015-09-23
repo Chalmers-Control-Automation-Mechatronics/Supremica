@@ -53,7 +53,7 @@ class SquareFree extends Square
   {
     return Square.FREE;
   }
-  
+
   int[] getEnteringActions()
   {
     return ENTERING;
@@ -65,11 +65,3 @@ class SquareFree extends Square
   private static final int[] ENTERING = {Action.MOVE};
 
 }
-
-
-
-
-
-
-
-

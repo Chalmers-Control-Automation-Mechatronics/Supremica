@@ -58,21 +58,21 @@ public class AutomataStateDisplayer
     private JLabel stateId = new JLabel();
     private JLabel stateName = new JLabel();
     private AutomataSynchronizerHelper helper;
-    
+
     public AutomataStateDisplayer(AutomataStateViewer stateViewer, AutomataSynchronizerHelper helper)
     {
         setLayout(new BorderLayout());
-        
+
         this.stateViewer = stateViewer;
         this.theAutomata = helper.getAutomata();
         this.helper = helper;
-        
+
         JLabel header = new JLabel("Current composite state");
-        
+
         add(header, BorderLayout.NORTH);
-        
+
         Box statusBox = new Box(BoxLayout.Y_AXIS);
-        
+
         isInitialBox.setEnabled(false);
         isInitialBox.setBackground(Color.white);
         statusBox.add(isInitialBox);
@@ -85,27 +85,27 @@ public class AutomataStateDisplayer
         statusBox.add(stateCost);
         statusBox.add(stateId);
         statusBox.add(stateName);
-        
+
         JScrollPane boxScroller = new JScrollPane(statusBox);
-        
+
         add(boxScroller, BorderLayout.CENTER);
-        
+
         JViewport vp = boxScroller.getViewport();
-        
+
         vp.setBackground(Color.white);
     }
-    
+
     public void setCurrState(int[] currState)
     {
         helper.addStatus(currState);
-        
+
         if (!helper.getCoExecuter().isControllable())
             helper.setForbidden(currState, true);
-        
+
         isInitialBox.setSelected(AutomataIndexFormHelper.isInitial(currState));
         isAcceptingBox.setSelected(AutomataIndexFormHelper.isAccepting(currState));
         isForbiddenBox.setSelected(AutomataIndexFormHelper.isForbidden(currState));
-        
+
         StringBuilder stateNameBuffer = new StringBuilder();
         stateNameBuffer.append(helper.getIndexMap().getStateAt(0,currState[0]).getName());
         for (int i=1; i<helper.getAutomata().size(); i++)
@@ -116,8 +116,3 @@ public class AutomataStateDisplayer
         stateName.setText(stateNameBuffer.toString());
     }
 }
-
-
-
-
-

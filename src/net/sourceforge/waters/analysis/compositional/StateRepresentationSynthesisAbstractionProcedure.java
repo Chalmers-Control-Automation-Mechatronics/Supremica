@@ -295,11 +295,3 @@ public class StateRepresentationSynthesisAbstractionProcedure extends
   static final int CHAIN_ALL = USE_HALFWAY | USE_BISIMULATION | USE_SOE
                                | USE_WSOE | USE_TRANSITIONREMOVAL;
 }
-
-
-
-
-
-
-
-

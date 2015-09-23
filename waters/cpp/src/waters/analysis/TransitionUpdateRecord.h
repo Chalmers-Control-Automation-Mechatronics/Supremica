@@ -89,11 +89,3 @@ private:
 }   /* namespace waters */
 
 #endif  /* !_TransitionUpdateRecord_h_ */
-
-
-
-
-
-
-
-

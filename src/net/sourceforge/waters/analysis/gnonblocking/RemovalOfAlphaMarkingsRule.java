@@ -220,12 +220,3 @@ class RemovalOfAlphaMarkingsRule extends AbstractionRule
   private OldTransitionRelation mTR = null;
 
 }
-
-
-
-
-
-
-
-
-

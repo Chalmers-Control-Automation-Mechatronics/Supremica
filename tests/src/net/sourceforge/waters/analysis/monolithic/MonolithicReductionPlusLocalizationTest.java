@@ -82,11 +82,3 @@ public class MonolithicReductionPlusLocalizationTest extends
   }
 
 }
-
-
-
-
-
-
-
-

@@ -272,11 +272,3 @@ public class ObserverProjectionTRSimplifier
   private int mVisibleTau;
 
 }
-
-
-
-
-
-
-
-

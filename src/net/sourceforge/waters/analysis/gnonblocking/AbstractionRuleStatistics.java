@@ -409,11 +409,3 @@ public class AbstractionRuleStatistics
   private int mUnchangedTransitions;
 
 }
-
-
-
-
-
-
-
-

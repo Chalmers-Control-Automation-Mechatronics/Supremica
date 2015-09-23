@@ -96,11 +96,3 @@ public class ModularControllabilitySynthesizerTest
   }
 
 }
-
-
-
-
-
-
-
-

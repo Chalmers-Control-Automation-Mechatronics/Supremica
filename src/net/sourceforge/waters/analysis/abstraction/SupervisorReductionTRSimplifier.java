@@ -1018,11 +1018,3 @@ public class SupervisorReductionTRSimplifier extends
   private Queue<Integer> mQueue;
   private BitSet mSearchingBitSet;
 }
-
-
-
-
-
-
-
-

@@ -1301,8 +1301,3 @@ public class FindStates
 		new FindStatesFrame(theProject, theAutomata).setVisible(true);
 	}
 }
-
-
-
-
-

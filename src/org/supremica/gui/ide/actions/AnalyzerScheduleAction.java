@@ -54,24 +54,24 @@ public class AnalyzerScheduleAction
     @SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.createLogger(AnalyzerScheduleAction.class);
     private static final long serialVersionUID = 1L;
-    
+
     /** Creates a new instance of AnalyzerScheduleAction */
     public AnalyzerScheduleAction(List<IDEAction> actionList)
     {
         super(actionList);
-        
+
         setEditorActiveRequired(false);
         setAnalyzerActiveRequired(true);
-        
+
         putValue(Action.NAME, "Schedule...");
         putValue(Action.SHORT_DESCRIPTION, "Several scheduling methods to find a time-optimal working schedule for the automata");
     }
-    
+
     public void actionPerformed(ActionEvent e)
     {
         doAction();
     }
-    
+
     /**
      * The code that is run when the action is invoked.
      */
@@ -83,8 +83,3 @@ public class AnalyzerScheduleAction
 //        Automata automata = ide.getSelectedAutomata();
     }
 }
-
-
-
-
-

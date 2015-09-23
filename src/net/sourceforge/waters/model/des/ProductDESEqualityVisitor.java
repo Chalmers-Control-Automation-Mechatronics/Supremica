@@ -355,11 +355,3 @@ public class ProductDESEqualityVisitor
   }
 
 }
-
-
-
-
-
-
-
-

@@ -80,11 +80,3 @@ class IntConstantResult extends ParseResult {
   private final int mValue;
 
 }
-
-
-
-
-
-
-
-

@@ -364,11 +364,3 @@ public class BDDConflictChecker extends ModelChecker
   private ConflictTraceProxy mCounterExample;
 
 }
-
-
-
-
-
-
-
-

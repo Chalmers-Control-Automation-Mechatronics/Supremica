@@ -342,11 +342,3 @@ public class EFSMSynchronizerTest extends AbstractWatersTest
 
   private  EFSMSynchronizer mEFSMSynchronization;
 }
-
-
-
-
-
-
-
-

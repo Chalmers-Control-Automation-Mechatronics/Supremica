@@ -100,11 +100,3 @@ abstract class JAXBDocumentExporter
   private static final ObjectFactory mFactory = new ObjectFactory();
 
 }
-
-
-
-
-
-
-
-

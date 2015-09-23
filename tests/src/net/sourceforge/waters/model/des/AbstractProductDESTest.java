@@ -146,11 +146,3 @@ public abstract class AbstractProductDESTest
   private ProxyPrinter mPrinter;
 
 }
-
-
-
-
-
-
-
-

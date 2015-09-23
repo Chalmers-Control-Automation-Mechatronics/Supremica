@@ -43,19 +43,19 @@ public class GeneralShape
   private final Shape mShape;
   private final Color mColor;
   private final Color mFillColor;
-  
+
   public GeneralShape(Shape shape, Color color)
   {
     this(shape, color, null);
   }
-  
+
   public GeneralShape(Shape shape, Color color, Color fillColor)
   {
     mShape = shape;
     mColor = color;
     mFillColor = fillColor;
   }
-  
+
   public void draw(Graphics2D graphics)
   {
     graphics.setStroke(AbstractRendererShape.BASICSTROKE);
@@ -67,11 +67,3 @@ public class GeneralShape
     graphics.draw(mShape);
   }
 }
-
-
-
-
-
-
-
-

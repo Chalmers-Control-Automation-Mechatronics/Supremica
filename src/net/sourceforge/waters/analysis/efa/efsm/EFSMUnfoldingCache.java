@@ -170,10 +170,3 @@ class EFSMUnfoldingCache
   private EFSMTransitionRelation mSecondUnfolding;
 
 }
-
-
-
-
-
-
-

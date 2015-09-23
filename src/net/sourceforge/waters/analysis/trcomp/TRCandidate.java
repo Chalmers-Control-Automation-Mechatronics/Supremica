@@ -263,11 +263,3 @@ public class TRCandidate
   private boolean mComposedSuccessfully = false;
 
 }
-
-
-
-
-
-
-
-

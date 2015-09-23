@@ -193,11 +193,3 @@ public class ModularHeuristicFactory {
   };
 
 }
-
-
-
-
-
-
-
-

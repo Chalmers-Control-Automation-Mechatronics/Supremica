@@ -105,11 +105,3 @@ public class TransitionEventMap
 
   HashMap<AutomatonProxy, Map<StateProxy, List<TransitionProxy>>> data;
 }
-
-
-
-
-
-
-
-

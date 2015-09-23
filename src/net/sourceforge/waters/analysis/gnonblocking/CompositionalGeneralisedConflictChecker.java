@@ -3385,12 +3385,3 @@ public class CompositionalGeneralisedConflictChecker
   private double mComposedModelNumberOfTransitions;
 
 }
-
-
-
-
-
-
-
-
-

@@ -72,11 +72,3 @@ public interface SimpleListSubject<E>
                                  Set<? extends Subject> boundary);
 
 }
-
-
-
-
-
-
-
-

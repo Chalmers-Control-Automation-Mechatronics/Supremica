@@ -172,11 +172,3 @@ public interface ModuleAnalyzer
   public void clearAnalysisResult();
 
 }
-
-
-
-
-
-
-
-

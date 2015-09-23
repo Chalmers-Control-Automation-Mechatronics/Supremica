@@ -332,11 +332,3 @@ class UnifiedEFASimplifier extends AbstractEFAAlgorithm
   private final TransitionRelationSimplifier mSimplifier;
 
 }
-
-
-
-
-
-
-
-

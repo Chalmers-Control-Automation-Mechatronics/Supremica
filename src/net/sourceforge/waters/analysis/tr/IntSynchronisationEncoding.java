@@ -235,11 +235,3 @@ public class IntSynchronisationEncoding
   static final int MAX_BITS = 31;
 
 }
-
-
-
-
-
-
-
-

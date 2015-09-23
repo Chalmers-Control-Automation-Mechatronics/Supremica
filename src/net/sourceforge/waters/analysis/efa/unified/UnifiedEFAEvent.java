@@ -93,11 +93,3 @@ public class UnifiedEFAEvent extends AbstractEFAEvent
   private final EventDeclProxy mEventDecl;
 
 }
-
-
-
-
-
-
-
-

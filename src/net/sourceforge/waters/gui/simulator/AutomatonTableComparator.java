@@ -117,11 +117,3 @@ class AutomatonTableComparator implements Comparator<Object>
   private final List<Pair<Boolean,Integer>> mSortingMethods;
 
 }
-
-
-
-
-
-
-
-

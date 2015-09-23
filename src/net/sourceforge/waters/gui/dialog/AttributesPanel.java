@@ -583,11 +583,3 @@ class AttributesPanel extends JPanel
   private static final String[] EMPTY_ROW = {"", ""};
 
 }
-
-
-
-
-
-
-
-

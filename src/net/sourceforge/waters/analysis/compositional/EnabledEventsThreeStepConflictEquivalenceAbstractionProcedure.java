@@ -491,10 +491,3 @@ class EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure
   private Set<EventProxy> mAlwaysEnabledEvents;
 
 }
-
-
-
-
-
-
-

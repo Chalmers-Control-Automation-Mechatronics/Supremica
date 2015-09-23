@@ -53,13 +53,5 @@ class EnumClassGlue extends ClassGlue {
   {
     return true;
   }
-   
+
 }
-
-
-
-
-
-
-
-

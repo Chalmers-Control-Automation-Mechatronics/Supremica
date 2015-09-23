@@ -558,12 +558,3 @@ public class RevBiSimulator
     }
   }
 }
-
-
-
-
-
-
-
-
-

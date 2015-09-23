@@ -369,8 +369,3 @@ public class ImportDialog<D extends DocumentProxy> extends JDialog
   private static final Insets INSETS = new Insets(2, 4, 2, 4);
 
 }
-
-
-
-
-

@@ -54,11 +54,3 @@ public interface SimpleCollectionSubject<E>
   public SimpleCollectionSubject<E> clone();
 
 }
-
-
-
-
-
-
-
-

@@ -76,10 +76,3 @@ public enum ConflictCheckMode
   NO_BACKWARDS_TRANSITIONS
 
 }
-
-
-
-
-
-
-

@@ -46,11 +46,3 @@ public interface SafetyTraceProxy
   extends TraceProxy
 {
 }
-
-
-
-
-
-
-
-

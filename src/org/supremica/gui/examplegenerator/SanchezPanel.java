@@ -79,7 +79,3 @@ class SanchezPanel extends JPanel implements TestCase {
 		return stc.getProject();
 	}
 }
-
-
-
-

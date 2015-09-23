@@ -113,11 +113,3 @@ class TypeSignature implements Comparable<Object>, WritableGlue {
   private int mCode;
 
 }
-
-
-
-
-
-
-
-

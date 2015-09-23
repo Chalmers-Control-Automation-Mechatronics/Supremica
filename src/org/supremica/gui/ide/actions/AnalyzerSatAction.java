@@ -51,13 +51,13 @@ public class AnalyzerSatAction extends IDEAction {
 
     public AnalyzerSatAction(List<IDEAction> actionList){
         super(actionList);
-        
+
         setAnalyzerActiveRequired(true);
-        
+
         putValue(Action.NAME, "Verify SAT");
         putValue(Action.SHORT_DESCRIPTION, "Run controllability verification by SAT (with induction)");
     }
-    
+
     @Override
     public void doAction() {
         Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
@@ -65,7 +65,7 @@ public class AnalyzerSatAction extends IDEAction {
         {
             return;
         }
-        
+
         try {
             boolean isControllable;
             isControllable = (new SATAutomata(selectedAutomata)).isControllableByInduction();
@@ -73,7 +73,7 @@ public class AnalyzerSatAction extends IDEAction {
         } catch (org.sat4j.specs.TimeoutException e){
             JOptionPane.showMessageDialog(null, "Timed out.");
         }
-        
+
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -81,8 +81,3 @@ public class AnalyzerSatAction extends IDEAction {
     }
 
 }
-
-
-
-
-

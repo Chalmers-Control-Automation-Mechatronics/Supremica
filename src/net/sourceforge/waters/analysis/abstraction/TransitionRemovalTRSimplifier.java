@@ -243,12 +243,3 @@ public class TransitionRemovalTRSimplifier
   private boolean mUsingSpecialEvents = true;
 
 }
-
-
-
-
-
-
-
-
-

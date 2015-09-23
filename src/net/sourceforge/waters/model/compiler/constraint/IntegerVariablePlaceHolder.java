@@ -41,7 +41,7 @@ import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 
 class IntegerVariablePlaceHolder extends VariablePlaceHolder
 {
-  
+
   //#########################################################################
   //# Constructors
   IntegerVariablePlaceHolder(final ModuleProxyFactory factory,
@@ -75,10 +75,3 @@ class IntegerVariablePlaceHolder extends VariablePlaceHolder
   }
 
 }
-
-
-
-
-
-
-

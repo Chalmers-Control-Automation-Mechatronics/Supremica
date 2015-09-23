@@ -105,8 +105,3 @@ public class SimulatorStateDisplayer
 		isForbiddenBox.setSelected(AutomataIndexFormHelper.isForbidden(currState));
 	}
 }
-
-
-
-
-

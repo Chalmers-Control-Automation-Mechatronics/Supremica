@@ -210,11 +210,3 @@ public class OccursChecker extends DefaultModuleProxyVisitor
   private SimpleExpressionProxy mVarName;
 
 }
-
-
-
-
-
-
-
-

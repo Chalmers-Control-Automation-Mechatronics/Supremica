@@ -188,11 +188,3 @@ public interface IndexedCollection<P extends NamedProxy>
   public P removeName(String name);
 
 }
-
-
-
-
-
-
-
-

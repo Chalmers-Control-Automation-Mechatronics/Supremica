@@ -99,11 +99,3 @@ class SynthesisAbstractionStep extends AbstractionStep
   private Map<EventProxy, List<EventProxy>> mRenaming;
 
 }
-
-
-
-
-
-
-
-

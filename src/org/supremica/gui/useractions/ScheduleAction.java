@@ -50,14 +50,14 @@ public class ScheduleAction
 	
 	@SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.createLogger(ScheduleAction.class);
-    
+
     public ScheduleAction()
     {
         super("Schedule...", null);
-        
+
         putValue(SHORT_DESCRIPTION, "Schedule selected automata (experimental)");
     }
-    
+
     /**
      *      Calls the ScheduleDialog if the number of selected automata is equal to one.
      *      (Otherwise, synchronization is strongly recommended.)
@@ -66,11 +66,11 @@ public class ScheduleAction
     {
         launchScheduleDialog();
     }
-    
+
     private void launchScheduleDialog()
     {
         ScheduleDialog dlg = null;
-        
+
         try
         {
             // dlg = new ScheduleDialog(ActionMan.getGui());
@@ -90,8 +90,3 @@ public class ScheduleAction
         }
     }
 }
-
-
-
-
-

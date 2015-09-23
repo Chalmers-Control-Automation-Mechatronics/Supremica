@@ -544,12 +544,3 @@ public class TransBiSimulator
     }
   }
 }
-
-
-
-
-
-
-
-
-

@@ -96,11 +96,3 @@ public enum EventStatus
   private ImageIcon mIcon;
 
 }
-
-
-
-
-
-
-
-

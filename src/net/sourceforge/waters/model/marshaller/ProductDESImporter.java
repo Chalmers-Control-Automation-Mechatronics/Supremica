@@ -620,12 +620,3 @@ public class ProductDESImporter
   private Map<StateProxy,SimpleNodeProxy> mCurrentNodeMap;
 
 }
-
-
-
-
-
-
-
-
-

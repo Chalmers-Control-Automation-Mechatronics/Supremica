@@ -334,10 +334,3 @@ public class IndexedListModel<E extends IdentifiedSubject>
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-

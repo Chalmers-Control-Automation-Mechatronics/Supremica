@@ -79,11 +79,3 @@ public interface ProxyResult<P extends Proxy>
   public String getResultDescription();
 
 }
-
-
-
-
-
-
-
-

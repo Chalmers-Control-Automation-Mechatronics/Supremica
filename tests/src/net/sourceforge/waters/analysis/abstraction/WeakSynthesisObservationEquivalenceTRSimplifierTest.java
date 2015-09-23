@@ -464,13 +464,3 @@ public class WeakSynthesisObservationEquivalenceTRSimplifierTest
   private int mDefaultMarkingID;
 
 }
-
-
-
-
-
-
-
-
-
-

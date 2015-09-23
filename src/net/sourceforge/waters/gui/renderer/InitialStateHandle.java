@@ -133,11 +133,3 @@ class InitialStateHandle
   private static final double CLICK_TOLERANCE_SQ = 6.0 * 6.0;
 
 }
-
-
-
-
-
-
-
-

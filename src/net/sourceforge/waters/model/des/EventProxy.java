@@ -101,11 +101,3 @@ public interface EventProxy
   public Map<String,String> getAttributes();
 
 }
-
-
-
-
-
-
-
-

@@ -370,12 +370,3 @@ class AutomatonPartitioning
   private static final double THRESHOLD = 0.4;
 
 }
-
-
-
-
-
-
-
-
-

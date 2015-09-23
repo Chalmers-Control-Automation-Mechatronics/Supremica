@@ -496,11 +496,3 @@ public abstract class AbstractAutomatonTest
   private List<AutomatonProxy> mAutomata;
 
 }
-
-
-
-
-
-
-
-

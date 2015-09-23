@@ -94,11 +94,3 @@ public class AnnotationEvent
     return "Annotation: " + mAnnotations.toString();
   }
 }
-
-
-
-
-
-
-
-

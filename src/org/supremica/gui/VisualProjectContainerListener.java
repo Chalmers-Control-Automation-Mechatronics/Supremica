@@ -46,8 +46,3 @@ public interface VisualProjectContainerListener
 
 	void projectRenamed(VisualProjectContainer container, Project theProject);
 }
-
-
-
-
-

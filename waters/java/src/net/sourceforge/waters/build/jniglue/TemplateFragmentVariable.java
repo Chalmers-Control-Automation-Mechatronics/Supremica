@@ -75,11 +75,3 @@ class TemplateFragmentVariable extends TemplateFragment {
   private final String mName;
 
 }
-
-
-
-
-
-
-
-

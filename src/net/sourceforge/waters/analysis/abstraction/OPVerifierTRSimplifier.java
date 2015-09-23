@@ -435,11 +435,3 @@ public class OPVerifierTRSimplifier
   private boolean mOPResult;
 
 }
-
-
-
-
-
-
-
-

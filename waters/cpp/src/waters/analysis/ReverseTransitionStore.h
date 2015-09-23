@@ -108,11 +108,3 @@ private:
 }   /* namespace waters */
 
 #endif  /* !_ReverseTransitionStore_h_ */
-
-
-
-
-
-
-
-

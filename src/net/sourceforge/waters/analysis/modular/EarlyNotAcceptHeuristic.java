@@ -107,11 +107,3 @@ public class EarlyNotAcceptHeuristic
     return bestautomaton == null ? null : Collections.singleton(bestautomaton);
   }
 }
-
-
-
-
-
-
-
-

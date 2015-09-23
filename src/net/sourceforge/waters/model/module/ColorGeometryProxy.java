@@ -67,11 +67,3 @@ public interface ColorGeometryProxy extends GeometryProxy {
   public Set<Color> getColorSet();
 
 }
-
-
-
-
-
-
-
-

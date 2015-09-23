@@ -62,10 +62,3 @@ class IdentifierToken extends Token {
   }
 
 }
-
-
-
-
-
-
-

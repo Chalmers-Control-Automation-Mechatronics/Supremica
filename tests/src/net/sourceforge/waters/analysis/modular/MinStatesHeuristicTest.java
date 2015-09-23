@@ -74,11 +74,3 @@ public class MinStatesHeuristicTest
   }
 
 }
-
-
-
-
-
-
-
-

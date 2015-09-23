@@ -179,11 +179,3 @@ public class DeleteCommand
   private boolean mHasBeenExecuted;
 
 }
-
-
-
-
-
-
-
-

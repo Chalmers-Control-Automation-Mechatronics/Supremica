@@ -47,13 +47,13 @@ public class EditorPrintAction
     extends IDEAction
 {
     private static final long serialVersionUID = 1L;
-    
+
     public EditorPrintAction(List<IDEAction> actionList)
     {
         super(actionList);
-        
+
         //setEditorActiveRequired(true);
-        
+
         putValue(Action.NAME, "Print...");
         putValue(Action.SHORT_DESCRIPTION, "Print current editor figure");
         putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_P));
@@ -67,7 +67,7 @@ public class EditorPrintAction
     {
         doAction();
     }
-    
+
     public void doAction()
     {
         try
@@ -98,8 +98,3 @@ public class EditorPrintAction
     }
      */
 }
-
-
-
-
-

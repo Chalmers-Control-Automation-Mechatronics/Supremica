@@ -1132,12 +1132,3 @@ public class BiSimulatorLanguage
     }
   }
 }
-
-
-
-
-
-
-
-
-

@@ -100,11 +100,3 @@ public abstract class AbstractRendererShape
    */
   public static Stroke BASICSTROKE = SINGLESTROKE;
 }
-
-
-
-
-
-
-
-

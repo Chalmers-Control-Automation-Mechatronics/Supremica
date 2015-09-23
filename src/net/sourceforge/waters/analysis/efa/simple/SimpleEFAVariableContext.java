@@ -267,11 +267,3 @@ public class SimpleEFAVariableContext extends AbstractEFAVariableContext<Integer
   private final SimpleEFAVariableFinder mVarFinder;
   private final SimpleEFAVariableCollector mVarCollector;
 }
-
-
-
-
-
-
-
-

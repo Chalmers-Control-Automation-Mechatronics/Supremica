@@ -181,11 +181,3 @@ class EFAAutomatonTransitionGroup
   private boolean mHasTrueGuard;
 
 }
-
-
-
-
-
-
-
-

@@ -187,11 +187,3 @@ public class SilentIncomingTRSimplifierTest
   }
 
 }
-
-
-
-
-
-
-
-

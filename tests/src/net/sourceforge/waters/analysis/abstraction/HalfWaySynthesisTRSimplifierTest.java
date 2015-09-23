@@ -293,12 +293,3 @@ public class HalfWaySynthesisTRSimplifierTest
   private int mDefaultMarkingID;
 
 }
-
-
-
-
-
-
-
-
-

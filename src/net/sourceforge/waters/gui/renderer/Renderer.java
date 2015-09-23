@@ -235,11 +235,3 @@ public class Renderer
   private Graphics2D mGraphics;
 
 }
-
-
-
-
-
-
-
-

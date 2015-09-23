@@ -237,11 +237,3 @@ class TRConflictEquivalenceAbstractionProcedure
   private int mPreconditionMarkingID;
 
 }
-
-
-
-
-
-
-
-

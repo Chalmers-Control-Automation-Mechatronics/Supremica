@@ -181,11 +181,3 @@ public class SpecialEventsTRSimplifierTest
   }
 
 }
-
-
-
-
-
-
-
-

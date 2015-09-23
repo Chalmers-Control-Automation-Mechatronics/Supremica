@@ -53,26 +53,26 @@ public class AnalyzerSynthesizerAction
     private static final long serialVersionUID = 1L;
     @SuppressWarnings("unused")
 	private Logger logger = LoggerFactory.createLogger(IDE.class);
-    
+
     public AnalyzerSynthesizerAction(List<IDEAction> actionList)
     {
         super(actionList);
-        
+
         setAnalyzerActiveRequired(true);
-        
+
         putValue(Action.NAME, "Synthesize...");
         putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_Y));
         //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
         putValue(Action.SHORT_DESCRIPTION, "Synthesize a supervisor for the selected automata");
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/synthesize16.gif")));
     }
-    
+
     public void actionPerformed(ActionEvent e)
     {
         doAction();
     }
-    
-    
+
+
     public void doAction()
     {
         // Retrieve the selected automata and make a sanity check
@@ -81,7 +81,7 @@ public class AnalyzerSynthesizerAction
         {
             return;
         }
-        
+
         // Get the current options and allow the user to change them...
         SynthesizerOptions options = new SynthesizerOptions();
 
@@ -97,8 +97,3 @@ public class AnalyzerSynthesizerAction
     }
 
 }
-
-
-
-
-

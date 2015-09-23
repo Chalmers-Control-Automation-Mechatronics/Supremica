@@ -89,8 +89,3 @@ public class Monitor
 		}
 	}
 }
-
-
-
-
-

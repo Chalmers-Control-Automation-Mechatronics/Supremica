@@ -196,11 +196,3 @@ Java_net_sourceforge_waters_cpp_analysis_NativeHashSet_hasNativeNext
   const bool result = table->hasNext(*iter);
   return result ? JNI_TRUE : JNI_FALSE;
 }
-
-
-
-
-
-
-
-

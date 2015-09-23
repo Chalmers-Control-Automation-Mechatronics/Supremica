@@ -388,8 +388,3 @@ public class SimulatorExecuter
         //theAnimationSignals.notifyObservers();
     }
 }
-
-
-
-
-

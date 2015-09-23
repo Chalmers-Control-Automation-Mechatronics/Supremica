@@ -71,11 +71,3 @@ public class BDDSICProperty6VerifierTest extends
   }
 
 }
-
-
-
-
-
-
-
-

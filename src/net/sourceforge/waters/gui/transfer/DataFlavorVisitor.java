@@ -374,11 +374,3 @@ class DataFlavorVisitor extends DefaultModuleProxyVisitor
     Collections.singletonList(WatersDataFlavor.PARAMETER_BINDING);
 
 }
-
-
-
-
-
-
-
-

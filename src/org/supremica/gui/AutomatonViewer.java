@@ -109,8 +109,3 @@ public class AutomatonViewer
 		return theAutomaton;
 	}
 }
-
-
-
-
-

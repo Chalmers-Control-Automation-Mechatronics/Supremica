@@ -423,11 +423,3 @@ public class BDDConflictChecker
   private BDD mDeadlockBDD;
 
 }
-
-
-
-
-
-
-
-

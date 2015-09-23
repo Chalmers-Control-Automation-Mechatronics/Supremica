@@ -63,11 +63,3 @@ public interface PointGeometryProxy extends GeometryProxy {
   public Point2D getPoint();
 
 }
-
-
-
-
-
-
-
-

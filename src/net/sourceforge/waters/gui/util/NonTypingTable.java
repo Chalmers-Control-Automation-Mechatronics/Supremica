@@ -129,7 +129,7 @@ public class NonTypingTable
       amap.put(name, action);
     }
   }
-  
+
 
   //#########################################################################
   //# Overrides for Base Class javax.swing.JTable
@@ -224,7 +224,7 @@ public class NonTypingTable
       putValue(Action.ACCELERATOR_KEY,
                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
     }
- 
+
     //#######################################################################
     //# Interface javax.swing.Action
     public boolean isEnabled()
@@ -300,11 +300,3 @@ public class NonTypingTable
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-
-

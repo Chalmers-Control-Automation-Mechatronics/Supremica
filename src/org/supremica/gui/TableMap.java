@@ -108,8 +108,3 @@ public class TableMap
 		fireTableChanged(e);
 	}
 }
-
-
-
-
-

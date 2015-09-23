@@ -75,11 +75,3 @@ public enum TransitionPartitioningStrategy
                        final int partitioningSizeLimit);
 
 }
-
-
-
-
-
-
-
-

@@ -63,11 +63,3 @@ public interface SimpleExpressionProxy
   public String getPlainText();
 
 }
-
-
-
-
-
-
-
-

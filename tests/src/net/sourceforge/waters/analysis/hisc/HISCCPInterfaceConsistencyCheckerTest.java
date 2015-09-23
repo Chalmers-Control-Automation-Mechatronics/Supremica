@@ -491,11 +491,3 @@ public class HISCCPInterfaceConsistencyCheckerTest
   }
 
 }
-
-
-
-
-
-
-
-

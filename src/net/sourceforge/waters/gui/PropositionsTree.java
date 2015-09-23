@@ -119,11 +119,3 @@ public class PropositionsTree extends ModuleTree
   private final PopupFactory mPopupFactory;
 
 }
-
-
-
-
-
-
-
-

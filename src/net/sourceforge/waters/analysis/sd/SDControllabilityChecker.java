@@ -66,11 +66,3 @@ public class SDControllabilityChecker
   }
 
 }
-
-
-
-
-
-
-
-

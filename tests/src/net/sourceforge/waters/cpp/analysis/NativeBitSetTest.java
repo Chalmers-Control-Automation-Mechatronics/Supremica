@@ -177,11 +177,3 @@ public class NativeBitSetTest extends AbstractWatersTest
   };
 
 }
-
-
-
-
-
-
-
-

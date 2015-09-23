@@ -682,12 +682,3 @@ public class LimitedCertainConflictsTRSimplifier
   private static final int COREACHABLE = -1;
 
 }
-
-
-
-
-
-
-
-
-

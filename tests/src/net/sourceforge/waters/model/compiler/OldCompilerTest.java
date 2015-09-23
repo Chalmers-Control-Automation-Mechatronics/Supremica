@@ -71,10 +71,3 @@ public class OldCompilerTest extends AbstractCompilerTest
     return array;
   }
 }
-
-
-
-
-
-
-

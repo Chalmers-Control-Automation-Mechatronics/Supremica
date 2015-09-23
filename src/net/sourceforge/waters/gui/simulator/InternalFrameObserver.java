@@ -37,11 +37,3 @@ public interface InternalFrameObserver
 {
   public void onFrameEvent(InternalFrameEvent event);
 }
-
-
-
-
-
-
-
-

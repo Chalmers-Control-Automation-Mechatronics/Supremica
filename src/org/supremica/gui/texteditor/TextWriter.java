@@ -76,8 +76,3 @@ class TextWriter
 		open = false;
 	}
 }
-
-
-
-
-

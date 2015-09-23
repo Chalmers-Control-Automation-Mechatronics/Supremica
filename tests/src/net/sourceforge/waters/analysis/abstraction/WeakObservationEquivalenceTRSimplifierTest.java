@@ -298,11 +298,3 @@ public class WeakObservationEquivalenceTRSimplifierTest
   }
 
 }
-
-
-
-
-
-
-
-

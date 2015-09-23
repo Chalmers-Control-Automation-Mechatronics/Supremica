@@ -170,11 +170,3 @@ abstract class AbstractModularHeuristic
   static final String HEURISTIC_SUFFIX = "Heuristic";
 
 }
-
-
-
-
-
-
-
-

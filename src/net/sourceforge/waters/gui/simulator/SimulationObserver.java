@@ -37,11 +37,3 @@ public interface SimulationObserver
 {
   public void simulationChanged(SimulationChangeEvent event);
 }
-
-
-
-
-
-
-
-

@@ -144,11 +144,3 @@ extends AbstractConflictCheckerTest
   }
 
 }
-
-
-
-
-
-
-
-

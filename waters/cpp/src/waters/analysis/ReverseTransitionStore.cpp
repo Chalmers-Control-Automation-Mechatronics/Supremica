@@ -240,16 +240,8 @@ dump(uint32_t numstates)
     std::cerr << "N" << bindex << ": " << DUMPING(data) << std::endl;
   }
 }
-    
+
 #endif /* DEBUG */
 
 
 }  /* namespace waters */
-
-
-
-
-
-
-
-

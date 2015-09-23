@@ -333,11 +333,3 @@ class ForceVariableOrdering
   private static final int MAX_ITER = 127;
 
 }
-
-
-
-
-
-
-
-

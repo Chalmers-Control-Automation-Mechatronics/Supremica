@@ -73,11 +73,3 @@ public interface IndexedIdentifierProxy extends IdentifierProxy {
   public List<SimpleExpressionProxy> getIndexes();
 
 }
-
-
-
-
-
-
-
-

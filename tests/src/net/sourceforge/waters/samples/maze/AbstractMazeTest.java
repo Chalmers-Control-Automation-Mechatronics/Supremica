@@ -560,11 +560,3 @@ public abstract class AbstractMazeTest extends AbstractWatersTest
   private DocumentManager mDocumentManager;
 
 }
-
-
-
-
-
-
-
-

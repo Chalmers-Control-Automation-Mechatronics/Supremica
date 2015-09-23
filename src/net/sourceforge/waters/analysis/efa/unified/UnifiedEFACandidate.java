@@ -168,11 +168,3 @@ class UnifiedEFACandidate implements Comparable<UnifiedEFACandidate>
   private boolean mIsVariableLocal = false;
 
 }
-
-
-
-
-
-
-
-

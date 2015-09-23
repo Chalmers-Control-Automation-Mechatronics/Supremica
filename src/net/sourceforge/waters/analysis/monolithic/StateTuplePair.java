@@ -116,11 +116,3 @@ class StateTuplePair
     }
 
   }
-
-
-
-
-
-
-
-

@@ -155,12 +155,3 @@ public class TauLoopRemovalTRSimplifierTest
   }
 
 }
-
-
-
-
-
-
-
-
-

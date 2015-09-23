@@ -72,10 +72,3 @@ public interface Node extends Remote
 
   public void shutdown() throws RemoteException;
 }
-
-
-
-
-
-
-

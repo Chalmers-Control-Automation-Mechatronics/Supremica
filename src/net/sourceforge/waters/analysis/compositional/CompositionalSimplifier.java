@@ -300,12 +300,3 @@ public class CompositionalSimplifier
   private Set<EventProxy> mPreservedEvents = Collections.emptySet();
 
 }
-
-
-
-
-
-
-
-
-

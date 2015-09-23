@@ -101,11 +101,3 @@ public class EditModuleNameCommand
   private final String mNewName;
 
 }
-
-
-
-
-
-
-
-

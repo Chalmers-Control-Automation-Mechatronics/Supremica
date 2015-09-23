@@ -227,11 +227,3 @@ public abstract class AbstractModuleConflictChecker
   private IdentifierProxy mUsedMarking;
   private IdentifierProxy mPreconditionMarking;
 }
-
-
-
-
-
-
-
-

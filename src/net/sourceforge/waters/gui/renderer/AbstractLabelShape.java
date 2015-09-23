@@ -60,11 +60,3 @@ public abstract class AbstractLabelShape extends AbstractProxyShape
   public static double CORNER_RADIUS = 8;
 
 }
-
-
-
-
-
-
-
-

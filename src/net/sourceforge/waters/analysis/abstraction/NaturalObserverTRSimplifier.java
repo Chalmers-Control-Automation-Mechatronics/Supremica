@@ -615,11 +615,3 @@ public class NaturalObserverTRSimplifier
   private TIntHashSet mObsEvents = null;
   private TRPartition mPartition = null;
 }
-
-
-
-
-
-
-
-

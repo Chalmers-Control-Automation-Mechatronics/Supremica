@@ -116,12 +116,3 @@ public class RemoveRedundantTransitions
     TIME += System.currentTimeMillis();
   }
 }
-
-
-
-
-
-
-
-
-

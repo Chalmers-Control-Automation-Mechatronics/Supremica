@@ -577,12 +577,3 @@ public class IndexedHashSetSubject<P extends NamedSubject>
   private Map<String,P> mProxyMap;
 
 }
-
-
-
-
-
-
-
-
-

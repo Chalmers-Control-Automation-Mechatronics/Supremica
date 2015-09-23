@@ -185,11 +185,3 @@ public class GraphDataFlavor extends ModuleDataFlavor
   private final GraphExportVisitor VISITOR = new GraphExportVisitor();
 
 }
-
-
-
-
-
-
-
-

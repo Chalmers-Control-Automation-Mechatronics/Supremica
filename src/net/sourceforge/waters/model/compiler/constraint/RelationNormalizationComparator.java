@@ -160,11 +160,3 @@ class RelationNormalizationComparator
   private final LiteralTypeVisitor mVisitor;
 
 }
-
-
-
-
-
-
-
-

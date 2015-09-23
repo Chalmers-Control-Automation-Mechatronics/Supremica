@@ -1110,12 +1110,3 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
   private static final int MAXDEPTH = 1024;
 
 }
-
-
-
-
-
-
-
-
-

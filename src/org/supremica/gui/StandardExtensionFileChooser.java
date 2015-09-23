@@ -125,8 +125,3 @@ public class StandardExtensionFileChooser
 		return standardFileFilter.ensureDefaultExtension(orgFile);
 	}
 }
-
-
-
-
-

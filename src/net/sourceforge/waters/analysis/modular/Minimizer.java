@@ -423,11 +423,3 @@ public class Minimizer
   private final Map<EventProxy,Integer> mEventMap;
 
 }
-
-
-
-
-
-
-
-

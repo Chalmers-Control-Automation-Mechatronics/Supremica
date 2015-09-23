@@ -41,7 +41,7 @@ import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 
 class BooleanVariablePlaceHolder extends VariablePlaceHolder
 {
-  
+
   //#########################################################################
   //# Constructors
   BooleanVariablePlaceHolder(final ModuleProxyFactory factory,
@@ -79,10 +79,3 @@ class BooleanVariablePlaceHolder extends VariablePlaceHolder
   }
 
 }
-
-
-
-
-
-
-

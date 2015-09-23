@@ -80,8 +80,3 @@ public class SplashWindow extends java.awt.Window
                 (screenSize.height - splashWindowSize.height) / 2);
   }
 }
-
-
-
-
-

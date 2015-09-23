@@ -660,12 +660,3 @@ public class IsomorphismChecker
   private TObjectIntHashMap<StateProxy> mSplitMap;
 
 }
-
-
-
-
-
-
-
-
-

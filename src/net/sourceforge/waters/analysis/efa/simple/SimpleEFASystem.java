@@ -184,11 +184,3 @@ public class SimpleEFASystem
   private SimpleEFAEventEncoding mEventEncoding;
 
 }
-
-
-
-
-
-
-
-

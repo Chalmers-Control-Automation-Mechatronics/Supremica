@@ -42,7 +42,7 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 
 class VariablePlaceHolder extends PlaceHolder
 {
-  
+
   //#########################################################################
   //# Constructors
   VariablePlaceHolder(final ModuleProxyFactory factory, final String name)
@@ -86,10 +86,3 @@ class VariablePlaceHolder extends PlaceHolder
   private CompiledRange mRange;
 
 }
-
-
-
-
-
-
-

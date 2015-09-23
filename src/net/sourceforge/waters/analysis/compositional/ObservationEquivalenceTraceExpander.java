@@ -245,11 +245,3 @@ public class ObservationEquivalenceTraceExpander extends TRTraceExpander
   }
 
 }
-
-
-
-
-
-
-
-

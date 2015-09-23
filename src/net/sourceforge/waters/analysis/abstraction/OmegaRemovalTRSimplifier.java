@@ -141,11 +141,3 @@ public class OmegaRemovalTRSimplifier
   }
 
 }
-
-
-
-
-
-
-
-

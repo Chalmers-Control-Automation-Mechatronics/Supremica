@@ -99,11 +99,3 @@ private:
 }   /* namespace jni */
 
 #endif  /* !_PreJavaException_h_ */
-
-
-
-
-
-
-
-

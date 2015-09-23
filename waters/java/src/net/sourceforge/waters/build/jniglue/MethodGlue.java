@@ -260,11 +260,3 @@ abstract class MethodGlue implements Comparable<MethodGlue>, WritableGlue {
   private int mMethodCodeSuffix;
 
 }
-
-
-
-
-
-
-
-

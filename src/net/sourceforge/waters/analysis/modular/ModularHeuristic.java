@@ -70,11 +70,3 @@ public interface ModularHeuristic
      TraceProxy counterExample);
 
 }
-
-
-
-
-
-
-
-

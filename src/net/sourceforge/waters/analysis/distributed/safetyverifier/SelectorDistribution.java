@@ -53,8 +53,8 @@ public class SelectorDistribution extends HashStateDistribution
       {
 	System.err.format("%s: %d\n", aut.getName(), aut.getStateCount());
       }
-     
-   
+
+
     mHashAutomata = new int[selectedAutomata.length];
     mAutomataShift = new int[selectedAutomata.length];
     int cshift = 0;
@@ -85,10 +85,3 @@ public class SelectorDistribution extends HashStateDistribution
   private final StateEncoding mEncoding;
 
 }
-
-
-
-
-
-
-

@@ -262,11 +262,3 @@ public class OPSearchAutomatonSimplifierTest
   private final String AFTER = "after";
 
 }
-
-
-
-
-
-
-
-

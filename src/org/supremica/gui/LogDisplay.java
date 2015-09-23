@@ -972,8 +972,3 @@ public class LogDisplay
     private static final String FONT_SIZE_OPTION = "Font.Size";
 
 }
-
-
-
-
-

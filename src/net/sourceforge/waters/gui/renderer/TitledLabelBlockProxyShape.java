@@ -136,11 +136,3 @@ public class TitledLabelBlockProxyShape
   private final UnderlineShape mUnderline;
 
 }
-
-
-
-
-
-
-
-

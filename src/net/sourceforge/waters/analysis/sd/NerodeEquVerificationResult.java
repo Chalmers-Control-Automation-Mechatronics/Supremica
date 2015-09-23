@@ -86,11 +86,3 @@ public class NerodeEquVerificationResult extends DefaultVerificationResult
   private SafetyTraceProxy mCounterExample2;
 
 }
-
-
-
-
-
-
-
-

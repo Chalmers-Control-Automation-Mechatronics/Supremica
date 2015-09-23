@@ -129,11 +129,3 @@ public class GeometryAbsentException
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-
-

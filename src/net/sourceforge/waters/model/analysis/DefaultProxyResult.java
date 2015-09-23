@@ -96,11 +96,3 @@ public class DefaultProxyResult<P extends Proxy>
   private P mComputedProxy;
 
 }
-
-
-
-
-
-
-
-

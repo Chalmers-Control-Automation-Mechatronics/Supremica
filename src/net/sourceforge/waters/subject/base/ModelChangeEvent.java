@@ -471,11 +471,3 @@ public class ModelChangeEvent extends EventObject
   private final int mIndex;
 
 }
-
-
-
-
-
-
-
-

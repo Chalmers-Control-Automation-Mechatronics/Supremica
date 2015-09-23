@@ -219,11 +219,3 @@ public abstract class AbstractProductDESImporterTest
   private ModuleIntegrityChecker mIntegrityChecker;
 
 }
-
-
-
-
-
-
-
-

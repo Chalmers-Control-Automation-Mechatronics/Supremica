@@ -104,11 +104,3 @@ public interface Subject {
   public Collection<ModelObserver> getModelObservers();
 
 }
-
-
-
-
-
-
-
-

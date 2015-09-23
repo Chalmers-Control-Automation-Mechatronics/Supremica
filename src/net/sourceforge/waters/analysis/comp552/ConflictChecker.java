@@ -265,11 +265,3 @@ public class ConflictChecker extends ModelChecker
   private ConflictTraceProxy mCounterExample;
 
 }
-
-
-
-
-
-
-
-

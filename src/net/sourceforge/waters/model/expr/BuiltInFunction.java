@@ -107,11 +107,3 @@ public interface BuiltInFunction extends Operator {
     throws EvalException;
 
 }
-
-
-
-
-
-
-
-

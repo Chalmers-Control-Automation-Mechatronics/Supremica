@@ -289,11 +289,3 @@ public class SimpleEFAVariable extends AbstractEFAVariable<Integer>
   private final VariableComponentProxy mVar;
   private final Collection<SimpleEFAComponent> mTransitionRelations;
 }
-
-
-
-
-
-
-
-

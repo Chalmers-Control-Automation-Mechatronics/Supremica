@@ -83,10 +83,3 @@ class DoubleNegationRule extends DirectReplacementRule
   }
 
 }
-
-
-
-
-
-
-

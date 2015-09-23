@@ -89,10 +89,3 @@ abstract class AbstractSplitCandidate
   static final int DISJUNCTION_SPLIT = 2;
 
 }
-
-
-
-
-
-
-

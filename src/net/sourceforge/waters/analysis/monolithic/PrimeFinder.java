@@ -65,7 +65,7 @@ final class PrimeFinder {
      * <tt>Integer.MAX_VALUE</tt>.
      */
     public static final int largestPrime = Integer.MAX_VALUE; //yes, it is prime.
-    
+
     /**
      * The prime number list consists of 11 chunks.
      *
@@ -102,7 +102,7 @@ final class PrimeFinder {
      *
      * If you are stingy, then delete every second or fourth chunk.
      */
-    
+
     private static final int[] primeCapacities = {
 	//chunk #0
 	largestPrime,
@@ -155,14 +155,14 @@ final class PrimeFinder {
         3125257,6250537,12501169,25002389,50004791,100009607,200019221,400038451,800076929,
         1600153859
     };
-    
+
     static { //initializer
 	// The above prime numbers are formatted for human readability.
 	// To find numbers fast, we sort them once and for all.
 	
 	Arrays.sort(primeCapacities);
     }
-    
+
     /**
      * Returns a prime number which is <code>&gt;= desiredCapacity</code>
      * and very close to <code>desiredCapacity</code> (within 11% if
@@ -181,11 +181,3 @@ final class PrimeFinder {
         return primeCapacities[i];
     }
 }
-
-
-
-
-
-
-
-

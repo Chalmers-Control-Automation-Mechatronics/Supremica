@@ -125,11 +125,3 @@ public class MaxCommonUncontrollableEventsHeuristic
     }
   }
 }
-
-
-
-
-
-
-
-

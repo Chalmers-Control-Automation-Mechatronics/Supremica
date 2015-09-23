@@ -82,10 +82,3 @@ public class NBAbstractionEnabledEventsStandardConflictCheckerTest
   }
 
 }
-
-
-
-
-
-
-

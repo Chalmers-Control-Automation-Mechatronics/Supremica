@@ -147,11 +147,3 @@ public class SimpleInfoEncoder<L>
   private final TObjectIntHashMap<L> mInfoMap;
   private final List<L> mInfoList;
 }
-
-
-
-
-
-
-
-

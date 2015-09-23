@@ -110,11 +110,3 @@ public class SDPlantCompletenessKindTranslator
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-
-

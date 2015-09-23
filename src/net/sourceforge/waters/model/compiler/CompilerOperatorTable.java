@@ -2213,11 +2213,3 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   private static final int OPCHAR_MAX = 128;
 
 }
-
-
-
-
-
-
-
-

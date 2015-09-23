@@ -78,11 +78,3 @@ public interface AutomatonBuilder extends ModelBuilder<AutomatonProxy>
   public AutomatonResult getAnalysisResult();
 
 }
-
-
-
-
-
-
-
-

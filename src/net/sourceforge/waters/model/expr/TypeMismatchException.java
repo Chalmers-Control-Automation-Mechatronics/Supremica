@@ -72,18 +72,10 @@ public class TypeMismatchException extends EvalException {
           "' is not bound to a " + typename + "!",
           binding);
   }
-  
-  
+
+
   //#########################################################################
   //# Static Class Variables
   public static final long serialVersionUID = 1;
 
 }
-
-
-
-
-
-
-
-
