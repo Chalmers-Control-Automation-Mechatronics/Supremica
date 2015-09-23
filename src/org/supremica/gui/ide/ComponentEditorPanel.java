@@ -39,20 +39,12 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.LayoutManager;
 import java.awt.print.PrinterJob;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 import java.util.Locale;
-import java.util.logging.Level;
 
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttribute;
 import javax.print.attribute.PrintRequestAttributeSet;
 import javax.print.attribute.standard.JobName;
-import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -67,14 +59,10 @@ import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
-import org.apache.batik.dom.GenericDOMImplementation;
-import org.apache.batik.svggen.SVGGraphics2D;
-import org.apache.batik.svggen.SVGGraphics2DIOException;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.properties.SupremicaPropertyChangeEvent;
 import org.supremica.properties.SupremicaPropertyChangeListener;
-import org.w3c.dom.DOMImplementation;
 
 
 /**
@@ -164,49 +152,6 @@ public class ComponentEditorPanel
     public UndoInterface getUndoInterface()
     {
         return mModuleContainer;
-    }
-
-    public void exportSVG(){
-        // Get file to export to
-        final JFileChooser chooser = new JFileChooser();
-        chooser.setSelectedFile(new File(getName() + ".svg"));
-        final int returnVal = chooser.showSaveDialog(mSurface);
-        final File file = chooser.getSelectedFile();
-        // Not OK?
-        if (returnVal != JFileChooser.APPROVE_OPTION)
-        {
-            return;
-        }
-        // Get a DOMImplementation.
-        final DOMImplementation domImpl =
-            GenericDOMImplementation.getDOMImplementation();
-
-        // Create an instance of org.w3c.dom.Document.
-        final String svgNS = "http://www.w3.org/2000/svg";
-        final org.w3c.dom.Document document = domImpl.createDocument(svgNS, "svg", null);
-
-        // Create an instance of the SVG Generator.
-        final SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
-
-        // Ask the test to render into the SVG Graphics2D implementation.
-        //Graphics2D
-        mSurface.paint(svgGenerator);
-
-        // Finally, stream out SVG to the standard output using
-        // UTF-8 encoding.
-        final boolean useCSS = true; // we want to use CSS style attributes
-        Writer out;
-        try {
-            out = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
-            svgGenerator.stream(out, useCSS);
-        } catch (final UnsupportedEncodingException ex) {
-            java.util.logging.Logger.getLogger(ComponentEditorPanel.class.getName()).log(Level.SEVERE, "unsupported encoding UTF-8", ex);
-        } catch (final SVGGraphics2DIOException ex) {
-            java.util.logging.Logger.getLogger(ComponentEditorPanel.class.getName()).log(Level.SEVERE, "somethign wrong with svg output", ex);
-        } catch (final FileNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ComponentEditorPanel.class.getName()).log(Level.SEVERE, "file not found", ex);
-        }
-
     }
 
     /**

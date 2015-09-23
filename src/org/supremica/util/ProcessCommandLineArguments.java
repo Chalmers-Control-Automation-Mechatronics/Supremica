@@ -10,30 +10,18 @@
 package org.supremica.util;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
 import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.config.Version;
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
-import net.sourceforge.waters.gui.ControlledToolbar;
-import net.sourceforge.waters.gui.EditorWindowInterface;
-import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.ModuleContext;
-import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
-import net.sourceforge.waters.gui.observer.EditorChangedEvent;
-import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.renderer.EPSGraphPrinter;
-import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.renderer.GeometryChecker;
 import net.sourceforge.waters.gui.renderer.ModuleRenderingContext;
 import net.sourceforge.waters.gui.renderer.RenderingContext;
@@ -56,22 +44,16 @@ import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
-import net.sourceforge.waters.subject.module.GraphSubject;
-import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
-import org.apache.batik.dom.GenericDOMImplementation;
-import org.apache.batik.svggen.SVGGraphics2D;
 import org.supremica.automata.Project;
 import org.supremica.automata.IO.ADSUnmarshaller;
 import org.supremica.automata.IO.HISCUnmarshaller;
 import org.supremica.automata.IO.SupremicaUnmarshaller;
 import org.supremica.automata.IO.UMDESUnmarshaller;
 import org.supremica.gui.ide.DefaultAttributeFactory;
-import org.supremica.gui.ide.ModuleContainer;
 import org.supremica.properties.Config;
 import org.supremica.properties.SupremicaProperties;
-import org.w3c.dom.DOMImplementation;
 import org.xml.sax.SAXException;
 
 
@@ -211,178 +193,6 @@ public class ProcessCommandLineArguments
             System.err.println("Problems when visiting module: " + ex);
           }
         }
-        // Quit after this (even if there were no files)
-        quit = true;
-      } else if (args[i].equals("--svgfigs")) {
-        // Create eps figs for all components in the supplied file
-        while ((i + 1 < args.length) && !(args[i + 1].startsWith("-"))) {
-          final String fileName = args[++i];
-          final File figFile = new File(fileName);
-
-          // Set up document manager ...
-          final DocumentManager documentManager = new DocumentManager();
-          ProductDESImporter importer;
-          try {
-            final ModuleProxyFactory factory =
-              ModuleSubjectFactory.getInstance();
-            final OperatorTable opTable = CompilerOperatorTable.getInstance();
-            final JAXBModuleMarshaller moduleMarshaller =
-              new JAXBModuleMarshaller(factory, opTable);
-            final ProxyUnmarshaller<Project> supremicaUnmarshaller =
-              new SupremicaUnmarshaller(factory);
-            final ProxyUnmarshaller<ModuleProxy> validUnmarshaller =
-              new ValidUnmarshaller(factory, opTable);
-            final ProxyUnmarshaller<ModuleProxy> hiscUnmarshaller =
-              new HISCUnmarshaller(factory);
-            final ProxyUnmarshaller<ModuleProxy> umdesUnmarshaller =
-              new UMDESUnmarshaller(factory);
-            final ProxyUnmarshaller<ModuleProxy> adsUnmarshaller =
-              new ADSUnmarshaller(factory);
-            // Add unmarshallers in order of importance ...
-            // (shows up in the file-open dialog)
-            documentManager.registerUnmarshaller(moduleMarshaller);
-            documentManager.registerUnmarshaller(supremicaUnmarshaller);
-            documentManager.registerUnmarshaller(validUnmarshaller);
-            documentManager.registerUnmarshaller(hiscUnmarshaller);
-            documentManager.registerUnmarshaller(umdesUnmarshaller);
-            documentManager.registerUnmarshaller(adsUnmarshaller);
-
-            importer = new ProductDESImporter(factory);
-          } catch (final SAXException ex) {
-            System.err
-              .println("SAXException when initialising document manager: "
-                       + ex);
-            return null;
-          } catch (final JAXBException ex) {
-            System.err
-              .println("JAXBException when initialising document manager: "
-                       + ex);
-            return null;
-          }
-
-          // Do the printing
-          try {
-            // Load file
-            final DocumentProxy doc = documentManager.load(figFile);
-
-            // Build module
-            ModuleProxy module;
-            if (doc instanceof ModuleProxy) {
-              module = (ModuleProxy) doc;
-            } else if (doc instanceof Project) {
-              module = importer.importModule((Project) doc);
-            } else {
-              throw new ClassCastException("Unknown document type");
-            }
-
-            // Loop throgh components and print eps-figures
-            //module.acceptVisitor(new EPSPrinterVisitor(module));
-            final List<Proxy> components = module.getComponentList();
-            //AbstractProxyVisitor visitor = new EPSPrinterVisitor(module, verbose);
-            //visitor.visitCollection(components);
-
-            for (final Proxy p : components) {
-              if (!(p instanceof SimpleComponentProxy))
-                continue;
-              final SimpleComponentProxy component = (SimpleComponentProxy) p;
-              final GraphEditorPanel mSurface =
-                new GraphEditorPanel(
-                                     (GraphSubject) component.getGraph(),
-                                     (ModuleSubject) module,
-                                     (ModuleContainer) null,
-                                     (EditorWindowInterface) null,
-                                     (ControlledToolbar) new ControlledToolbar() {
-
-                                       @Override
-                                      public Tool getTool()
-                                       {
-                                         return ControlledToolbar.Tool.SELECT;
-                                       }
-
-                                       @Override
-                                      public void attach(final Observer o)
-                                       {
-                                         throw new UnsupportedOperationException(
-                                                                                 "Not supported yet.");
-                                       }
-
-                                       @Override
-                                      public void detach(final Observer o)
-                                       {
-                                         throw new UnsupportedOperationException(
-                                                                                 "Not supported yet.");
-                                       }
-
-                                       @Override
-                                      public void fireEditorChangedEvent(final EditorChangedEvent e)
-                                       {
-                                         throw new UnsupportedOperationException(
-                                                                                 "Not supported yet.");
-                                       }
-                                     }, (WatersPopupActionManager) null);
-
-              //mSurface.setPreferredSize(new Dimension(640, 480));
-              //mSurface.setMinimumSize(new Dimension(640, 480));
-
-              // Get a DOMImplementation.
-              final DOMImplementation domImpl =
-                GenericDOMImplementation.getDOMImplementation();
-
-              // Create an instance of org.w3c.dom.Document.
-              final String svgNS = "http://www.w3.org/2000/svg";
-              final org.w3c.dom.Document document =
-                domImpl.createDocument(svgNS, "svg", null);
-
-              // Create an instance of the SVG Generator.
-              final SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
-
-              // Ask the test to render into the SVG Graphics2D implementation.
-              //Graphics2D
-              final JScrollPane scrollsurface = new JScrollPane(mSurface);
-
-              final JFrame frame = new JFrame("ToolBarDemo");
-              frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-              //Add content to the window.
-              frame.add(scrollsurface);
-
-              //Display the window.
-              frame.pack();
-              frame.setVisible(true);
-
-              mSurface.print(svgGenerator);
-
-              // Finally, stream out SVG to the standard output using
-              // UTF-8 encoding.
-              final boolean useCSS = true; // we want to use CSS style attributes
-              final Writer out =
-                new OutputStreamWriter(
-                                       new FileOutputStream(
-                                                            new File(
-                                                                     (fileName
-                                                                      + "-"
-                                                                      + component
-                                                                        .getName() + ".svg")
-                                                                       .replace("|",
-                                                                                "-")
-                                                                       .replace(":",
-                                                                                "-"))),
-                                       "UTF-8");
-              svgGenerator.stream(out, useCSS);
-            }
-          } catch (final IOException ex) {
-            System.err.println("IO problem: " + ex);
-          } catch (final WatersUnmarshalException ex) {
-            System.err.println("Problem unmarshalling: " + ex);
-          } catch (final ParseException ex) {
-            System.err.println("Problem importing to module: " + ex);
-          } catch (final GeometryAbsentException ex) {
-            System.err.println("Trying to print component without geometry!");
-          } catch (final ClassCastException ex) {
-            System.err.println("Only import of modules is supported: " + ex);
-          }
-        }
-
         // Quit after this (even if there were no files)
         quit = true;
       } else if (args[i].equals("-l") || args[i].equals("--list")) {

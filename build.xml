@@ -174,15 +174,6 @@
         <unjar src="${lib}/org.sat4j.pb.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/js.jar" dest="${lib}/${unjared}"/>
         
-        <!-- svg export -->
-        <unjar src="${lib}/batik-awt-util.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/batik-svggen.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/batik-dom.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/batik-util.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/batik-ext.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/xml-apis.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/batik-xml.jar" dest="${lib}/${unjared}"/>
-        <!-- unjar src="${lib}/bsh.jar" dest="${lib}/${unjared}"/-->
         <!-- Tools for Adobe PostScript. -->
         <unjar src="${lib}/xmlgraphics-commons-1.4.jar"
                dest="${lib}/${unjared}"/>
@@ -198,6 +189,7 @@
         <unjar src="${lib}/licensed/JGo.jar" dest="${lib}/${unjared}"/> 
         <unjar src="${lib}/licensed/JGoLayout.jar" dest="${lib}/${unjared}"/>
         -->
+        <!-- JAXB -->
         <unjar src="${activation.jar}" dest="${lib}/${unjared}"/>       
         <unjar src="${jaxb-api.jar}" dest="${lib}/${unjared}"/>
         <unjar src="${jaxb-impl.jar}" dest="${lib}/${unjared}"/>
