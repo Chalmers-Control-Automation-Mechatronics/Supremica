@@ -20,8 +20,6 @@
 
   <property name="activation.jar" location="${supremica.lib}/activation.jar"/>
   <property name="anarres.jar" location="${supremica.lib}/anarres-cpp.jar"/>
-  <property name="antlr.complete.jar" location="${supremica.lib}/antlr-3.5.2-complete.jar"/>
-  <property name="antlr.runtime.jar" location="${supremica.lib}/antlr-runtime-3.5.2.jar"/>
   <property name="javabdd.jar" location="${supremica.lib}/javabdd-2.0.jar"/>
   <property name="jaxb-api.jar" location="${supremica.lib}/jaxb-api.jar"/>
   <property name="jaxb-impl.jar" location="${supremica.lib}/jaxb-impl.jar"/>
@@ -32,12 +30,6 @@
   <property name="junit.jar" location="${supremica.lib}/junit.jar"/>
   <property name="trove.jar" location="${supremica.lib}/trove-3.0.3.jar"/>
 
-  <path id="antlr.compile.classpath" location="${antlr.complete.jar}"/>
-  <path id="antlr.runtime.classpath">
-    <pathelement location="${antlr.runtime.jar}"/>
-    <pathelement location="${anarres.jar}"/>
-    <pathelement location="${trove.jar}"/>
-  </path>
   <path id="jaxb.classpath">
     <pathelement location="${activation.jar}"/>
     <pathelement location="${jaxb-api.jar}"/>
@@ -47,7 +39,6 @@
 
   <property name="bddlib" location="${supremica.root}/dist"/>
   <property name="classes" location="java/classes"/>
-  <property name="antlr" location="antlr"/>
   <property name="cpp" location="cpp"/>
   <property name="docsrc" location="java/javadoc"/>
   <property name="supremica.examples" location="${supremica.root}/examples"/>
@@ -69,10 +60,6 @@
   <property name="jniglue.outdir" location="${cpp}/src/jni/glue"/>
   <property name="jniglue.jar" location="${jar}/jniglue.jar"/>
     
-  <property name="antlr.promela.input" location="${antlr}/Promela.g"/>
-  <property name="antlr.promela.outdir"
-            location="${supremica.src}/net/sourceforge/waters/external/promela/parser/"/>
-
   <property name="test.jar" location="${jar}/waters_test.jar"/>
   <property name="test.classes" location="${classes}/test"/>
   <property name="waters.jar" location="${jar}/waters.jar"/>
@@ -91,7 +78,6 @@
 
   <path id="waters.test.classpath">
     <path refid="waters.compile.classpath"/>
-    <path refid="antlr.runtime.classpath"/>
     <pathelement location="${waters.jar}"/>
     <pathelement location="${test.jar}"/>
     <pathelement location="${junit.jar}"/>
@@ -120,17 +106,7 @@
     </xjc>
   </target>
 
-  <target name="antlr-promela">
-    <java jar="${antlr.complete.jar}" fork="true" failonerror="true">
-      <arg value="-verbose"/>
-      <arg value="-make"/>
-      <arg value="-o"/>
-      <arg path="${antlr.promela.outdir}"/>
-      <arg path="${antlr.promela.input}"/>
-    </java>
-  </target>
-
-  <target name="jaxb-compile" depends="jaxb-generate,antlr-promela">
+  <target name="jaxb-compile" depends="jaxb-generate">
     <mkdir dir="${waters.classes}"/>
     <javac srcdir="${src}" destdir="${waters.classes}"
            includes="net/sourceforge/waters/xsd/**/*.java"
@@ -138,19 +114,12 @@
            includeantruntime="false">
       <classpath refid="jaxb.classpath"/>
     </javac>
-    <javac srcdir="${supremica.src}" destdir="${waters.classes}"
-           includes="net/sourceforge/waters/external/promela/**/*.java"
-           debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}"
-           includeantruntime="false">
-      <classpath refid="antlr.runtime.classpath"/>
-    </javac>
   </target>
 
   <target name="jaxb-jar" depends="jaxb-compile"
           description="Create the waters_jaxb.jar archive.">
     <jar jarfile="${jaxb.jar}">
       <fileset dir="${waters.classes}">
-        <include name="net/sourceforge/waters/external/promela/parser/**/*.class"/>
         <include name="net/sourceforge/waters/xsd/**/*.class"/>
        </fileset>
       <fileset dir="${src}">
@@ -169,7 +138,6 @@
       <compilerarg value="-Xlint:unchecked"/>
       <compilerarg value="-Xlint:deprecation"/>
       <include name="net/sourceforge/waters/**/*.java"/>
-      <exclude name="net/sourceforge/waters/external/promela/parser/**/*.java"/>
       <exclude name="net/sourceforge/waters/analysis/efa/simple/**/*.java"/>
       <exclude name="net/sourceforge/waters/gui/**/*.java"/>
       <include name="org/supremica/log/**/*.java"/>
@@ -410,7 +378,6 @@
         <include name="net/sourceforge/waters/**"/>
         <exclude name="net/sourceforge/waters/analysis/efa/simple/**"/>
         <exclude name="net/sourceforge/waters/build/**"/>
-        <exclude name="net/sourceforge/waters/external/promela/**"/>
         <exclude name="net/sourceforge/waters/gui/**"/>
       </packageset>
       <doctitle><![CDATA[<h1>Waters API Documentation</h1>]]></doctitle>
@@ -495,7 +462,6 @@
     <delete dir="${javadoc}"/>
     <delete dir="${javah.dir}"/>
     <delete dir="${jniglue.outdir}"/>
-    <delete dir="${antlr.promela.outdir}"/>
   </target>
 
 </project>

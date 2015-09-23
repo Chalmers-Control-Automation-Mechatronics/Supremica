@@ -55,7 +55,6 @@ import javax.swing.filechooser.FileFilter;
 import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.external.despot.DESpotImporter;
-import net.sourceforge.waters.external.promela.PromelaUnmarshaller;
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
 import net.sourceforge.waters.gui.observer.ContainerSwitchEvent;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
@@ -123,8 +122,6 @@ public class DocumentContainerManager
       new ProductDESToModuleUnmarshaller(factory);
     final ProxyUnmarshaller<ModuleProxy> hiscUnmarshaller =
       new HISCUnmarshaller(factory);
-    final ProxyUnmarshaller<ModuleProxy> promelaUnmarshaller =
-      new PromelaUnmarshaller(factory);
     final ProxyUnmarshaller<ModuleProxy> umdesUnmarshaller =
       new UMDESUnmarshaller(factory);
     // final ProxyUnmarshaller<ModuleProxy> adsUnmarshaller =
@@ -153,7 +150,6 @@ public class DocumentContainerManager
     mDocumentManager.registerUnmarshaller(supremicaUnmarshaller);
     mDocumentManager.registerUnmarshaller(desUnmarshaller);
     mDocumentManager.registerUnmarshaller(hiscUnmarshaller);
-    mDocumentManager.registerUnmarshaller(promelaUnmarshaller);
     mDocumentManager.registerUnmarshaller(umdesUnmarshaller);
     mDocumentManager.registerUnmarshaller(adsUnmarshaller);
     mDocumentManager.registerUnmarshaller(tctUnmarshaller);
