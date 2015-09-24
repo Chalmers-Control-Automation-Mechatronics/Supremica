@@ -1,26 +1,34 @@
 package org.supremica.automata.BDD.EFA;
 
 import gnu.trove.list.array.TIntArrayList;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
+
 import net.sf.javabdd.BDD;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.subject.base.AbstractSubject;
+import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
+import net.sourceforge.waters.subject.module.LabelBlockSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
+import net.sourceforge.waters.subject.module.SplineGeometrySubject;
+
 import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions;
+import org.supremica.automata.algorithms.SynthesisType;
 import org.supremica.automata.algorithms.Guard.BDDExtendedGuardGenerator;
 import org.supremica.automata.algorithms.Guard.GeneticMinimizer.Chromosome;
-import org.supremica.automata.algorithms.SynthesisType;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.util.ActionTimer;
@@ -119,7 +127,7 @@ public class BDDExtendedSynthesizer {
 //
 //            BDD minimalDeadlocks = state1.or(state2);
             statesAfterSynthesis =  bddAutomata.getUnsafeStates();
-            nbrOfStates = (long)bddAutomata.nbrOfBoundaryUnsafeStates;
+            nbrOfStates = bddAutomata.nbrOfBoundaryUnsafeStates;
             synthesisTimer.stop();
         }
 
@@ -240,71 +248,100 @@ public class BDDExtendedSynthesizer {
 
     public void addGuardsToAutomata(final ModuleSubject module)
     {
-        String guard = "";
-        BDDExtendedGuardGenerator currBDDGG = null;
+      String guard = "";
+      BDDExtendedGuardGenerator currBDDGG = null;
 
-        for(final AbstractSubject simSubj: module.getComponentListModifiable())
+      for(final AbstractSubject simSubj: module.getComponentListModifiable())
+      {
+        if(simSubj instanceof SimpleComponentSubject)
         {
-            if(simSubj instanceof SimpleComponentSubject)
+          final List<EdgeSubject> edgesToBeAdded = new ArrayList<EdgeSubject>();
+          for(final EdgeSubject ep:((SimpleComponentSubject)simSubj).getGraph().getEdgesModifiable())
+          {
+            SimpleExpressionSubject ses = null;
+            SimpleExpressionSubject ses1 = null;
+            SimpleExpressionSubject ses2 = null;
+
+            // Some edges could have multiple events. If a guard is generated for one event, we need to
+            // create an extra edge labeled by the event, copy the existing guards and actions and
+            // put the generated guards there.
+
+            final ListSubject<AbstractSubject> eventList = ep.getLabelBlock().getEventIdentifierListModifiable();
+            final List<AbstractSubject> eventsToBeRemovedFromEdge = new ArrayList<AbstractSubject>();
+
+            for (final AbstractSubject event: eventList)
             {
-                for(final EdgeSubject ep:((SimpleComponentSubject)simSubj).getGraph().getEdgesModifiable())
+              final String currEvent = event.toString();
+              currBDDGG = event2guard.get(currEvent);
+
+              if (currBDDGG != null && !currBDDGG.guardIsTrue())
+              {
+                EdgeSubject manipulatedEdge = null;
+                if (eventList.size() - eventsToBeRemovedFromEdge.size() == 1)
                 {
-                    SimpleExpressionSubject ses = null;
-                    SimpleExpressionSubject ses1 = null;
-                    SimpleExpressionSubject ses2 = null;
+                  manipulatedEdge = ep; // we manipulate ep itself
+                }
+                else // create a new edge to manipulate
+                {
+                  eventsToBeRemovedFromEdge.add(event);
 
-                    final String currEvent = ep.getLabelBlock().getEventIdentifierList().iterator().next().toString();
-                    currBDDGG = event2guard.get(currEvent);
+                  final LabelBlockSubject lbs = new LabelBlockSubject();
+                  lbs.getEventIdentifierListModifiable().add(event.clone());
 
-                    if(ep.getGuardActionBlock()==null)
-                    {
-                        ep.setGuardActionBlock(new GuardActionBlockSubject());
-                    }
+                  manipulatedEdge = new EdgeSubject(ep.getSource(),
+                                                    ep.getTarget(),
+                                                    lbs,
+                                                    ep.getGuardActionBlock(),
+                                                    new SplineGeometrySubject(),
+                                                    ep.getStartPoint(),
+                                                    ep.getEndPoint());
 
-                    if( currBDDGG != null && !currBDDGG.guardIsTrue())
-                    {
-                        String currGuard="";
-                        try
-                        {
-                            guard = currBDDGG.getGuard();
-                            currGuard="";
+                  edgesToBeAdded.add(manipulatedEdge);
+                }
 
-                            if(!ep.getGuardActionBlock().getGuardsModifiable().isEmpty())
-                            {
-                                ses1 = ep.getGuardActionBlock().getGuardsModifiable().iterator().next().clone();
-                                currGuard = "("+ses1.toString()+")"+" & ";
-                            }
-                            ses = (SimpleExpressionSubject)(parser.parse(currGuard+guard,Operator.TYPE_BOOLEAN));
+                // next, we insert the generated guards to the manipulated edge
+                if (manipulatedEdge.getGuardActionBlock()==null)
+                  manipulatedEdge.setGuardActionBlock(new GuardActionBlockSubject());
 
-                            //The following line cocerns the new guards that will be attached to the automata with a DIFFERENT COLOR!
-                            ses2 = (SimpleExpressionSubject)(parser.parse(guard,Operator.TYPE_BOOLEAN));
-                        }
-                        catch(final ParseException pe)
-                        {
-                            System.err.println(pe);
-                            logger.error("Some of the guards could not be parsed and attached to the automata: It is likely that there exist some 'strange' characters in some variables or values!");
-                            break;
-                        }
-                        if(!ep.getGuardActionBlock().getGuardsModifiable().isEmpty())
-                        {
-                            ep.getGuardActionBlock().getGuardsModifiable().remove(0);
-                            ep.getGuardActionBlock().getGuardsModifiable().add(ses);
-                            //For color purposes
-                            ep.getGuardActionBlock().getGuardsModifiable().add(ses1);
-                            ep.getGuardActionBlock().getGuardsModifiable().add(ses2);
-                        }
-                        else
-                        {
-                            ep.getGuardActionBlock().getGuardsModifiable().add(ses);
-                            //For color purposes
-                            ep.getGuardActionBlock().getGuardsModifiable().add(ses2);
-                        }
-
-
-                    }
-                 }
+                String currGuard = "";
+                guard = currBDDGG.getGuard();
+                currGuard="";
+                if(!manipulatedEdge.getGuardActionBlock().getGuardsModifiable().isEmpty())
+                {
+                    ses1 = manipulatedEdge.getGuardActionBlock().getGuardsModifiable().iterator().next().clone();
+                    currGuard = "("+ses1.toString()+")"+" & ";
+                }
+                try {
+                  ses = (SimpleExpressionSubject)(parser.parse(currGuard+guard,Operator.TYPE_BOOLEAN));
+                  //The following line concerns the new guards that will be attached to the automata with a DIFFERENT COLOR!
+                  ses2 = (SimpleExpressionSubject)(parser.parse(guard,Operator.TYPE_BOOLEAN));
+                } catch (final ParseException pe) {
+                  System.err.println(pe);
+                  logger.error("Some of the guards could not be parsed and attached to the automata: "
+                    + "It is likely that there exist some 'strange' characters in some variables or values!");
+                  break;
+                }
+                if(!manipulatedEdge.getGuardActionBlock().getGuardsModifiable().isEmpty())
+                {
+                  manipulatedEdge.getGuardActionBlock().getGuardsModifiable().remove(0);
+                  manipulatedEdge.getGuardActionBlock().getGuardsModifiable().add(ses);
+                  //For color purposes
+                  manipulatedEdge.getGuardActionBlock().getGuardsModifiable().add(ses1);
+                  manipulatedEdge.getGuardActionBlock().getGuardsModifiable().add(ses2);
+                }
+                else
+                {
+                  manipulatedEdge.getGuardActionBlock().getGuardsModifiable().add(ses);
+                  //For color purposes
+                  manipulatedEdge.getGuardActionBlock().getGuardsModifiable().add(ses2);
+                }
+              }
             }
+            eventList.removeAll(eventsToBeRemovedFromEdge);
+          }
+          ((SimpleComponentSubject)simSubj).getGraph().getEdgesModifiable().addAll(edgesToBeAdded);
         }
+      }
     }
 
     public HashMap<String,BDDExtendedGuardGenerator> getEventGuardMap()

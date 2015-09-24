@@ -447,6 +447,13 @@ public final class BDDExtendedGuardGenerator {
         return false;
     }
 
+    public boolean guardIsFalse()
+    {
+      if (guard.equals(FALSE))
+         return true;
+      return false;
+    }
+
     public String generateGuard(final BDD states)
 	{
         nbrOfTerms = 0;
