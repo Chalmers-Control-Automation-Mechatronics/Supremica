@@ -67,6 +67,7 @@ public final class EditorSynthesizerOptions
     private boolean reduceSupervisors;
     private boolean printGuard;
     private boolean addGuards;
+    private boolean createAutVars;
     private boolean saveInFile;
     private boolean saveIDDInFile;
     private boolean compHeuristic;
@@ -106,6 +107,7 @@ public final class EditorSynthesizerOptions
             Config.BDD_SYNTHESIS_EXTRACT_AUTOMATON.get(),
             Config.SYNTHESIS_PRINT_GUARD.get(),
             Config.SYNTHESIS_ADD_GUARDS.get(),
+            Config.SYNTHESIS_CREATE_AUTOMATON_VARIABLES.get(),
             Config.SYNTHESIS_SAVE_IN_FILE.get(),
             Config.SYNTHESIS_REACHABILITY.get(),
             Config.SYNTHESIS_OPTIMIZATION.get());
@@ -117,10 +119,20 @@ public final class EditorSynthesizerOptions
      * modify the necessary options one by one, starting from default! Much more readable and
      * also more practical when adding new options.
      */
-    private EditorSynthesizerOptions(final SynthesisType synthesisType, final SynthesisAlgorithm synthesisAlgorithm,
-    		final boolean purge, final boolean removeUnnecessarySupervisors, final boolean maximallyPermissive,
-    		final boolean maximallyPermissiveIncremental, final boolean reduceSupervisors, final boolean bddExtractSupervisor,
-                final boolean computePrintGuard, final boolean addGuards, final boolean saveInFile, final boolean reachability, final boolean optimization)
+    private EditorSynthesizerOptions(final SynthesisType synthesisType,
+                                     final SynthesisAlgorithm synthesisAlgorithm,
+                                     final boolean purge,
+                                     final boolean removeUnnecessarySupervisors,
+                                     final boolean maximallyPermissive,
+                                     final boolean maximallyPermissiveIncremental,
+                                     final boolean reduceSupervisors,
+                                     final boolean bddExtractSupervisor,
+                                     final boolean computePrintGuard,
+                                     final boolean addGuards,
+                                     final boolean createAutVars,
+                                     final boolean saveInFile,
+                                     final boolean reachability,
+                                     final boolean optimization)
     {
         this.synthesisType = synthesisType;
         this.synthesisAlgorithm = synthesisAlgorithm;
@@ -132,6 +144,7 @@ public final class EditorSynthesizerOptions
         this.bddExtractSupervisor = bddExtractSupervisor;
         this.printGuard = computePrintGuard;
         this.addGuards = addGuards;
+        this.createAutVars = createAutVars;
         this.saveInFile = saveInFile;
         this.reachability = reachability;
         this.optimization = optimization;
@@ -304,6 +317,16 @@ public final class EditorSynthesizerOptions
         addGuards = bool;
     }
 
+    public boolean getCreateAutVars()
+    {
+        return createAutVars;
+    }
+
+    public void setCreateAutVars(final boolean bool)
+    {
+        createAutVars = bool;
+    }
+
     public boolean getSaveInFile()
     {
         return saveInFile;
@@ -391,6 +414,7 @@ public final class EditorSynthesizerOptions
         Config.BDD_SYNTHESIS_EXTRACT_AUTOMATON.set(bddExtractSupervisor);
         Config.SYNTHESIS_PRINT_GUARD.set(printGuard);
         Config.SYNTHESIS_ADD_GUARDS.set(addGuards);
+        Config.SYNTHESIS_CREATE_AUTOMATON_VARIABLES.set(createAutVars);
         Config.SYNTHESIS_SAVE_IN_FILE.set(saveInFile);
         Config.SYNTHESIS_SAVE_IDD_IN_FILE.set(saveIDDInFile);
         Config.SYNTHESIS_COMPLEMENT_HEURISTIC.set(compHeuristic);
@@ -403,7 +427,7 @@ public final class EditorSynthesizerOptions
      */
     public static EditorSynthesizerOptions getDefaultSynthesizerOptions()
     {
-        return new EditorSynthesizerOptions(SynthesisType.CONTROLLABLE, SynthesisAlgorithm.BDD, true, true, true, true, true, false,true, true, false, true, false);
+        return new EditorSynthesizerOptions(SynthesisType.CONTROLLABLE, SynthesisAlgorithm.BDD, true, true, true, true, true, false,true, true, false, false, true, false);
     }
 
     /**
@@ -418,6 +442,7 @@ public final class EditorSynthesizerOptions
         options.reduceSupervisors = false;
         options.printGuard = true;
         options.addGuards = true;
+        options.createAutVars = false;
         options.saveInFile = false;
         options.reachability = true;
         options.saveIDDInFile = false;

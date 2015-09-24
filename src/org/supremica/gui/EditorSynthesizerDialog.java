@@ -35,11 +35,30 @@
 
 package org.supremica.gui;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Vector;
-import javax.swing.*;
-import org.supremica.automata.algorithms.*;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+
+import org.supremica.automata.algorithms.EditorSynthesizerOptions;
+import org.supremica.automata.algorithms.SynthesisAlgorithm;
+import org.supremica.automata.algorithms.SynthesisType;
 
 abstract class EditorSynthesizerPanel
     extends JPanel
@@ -64,6 +83,7 @@ class EditorSynthesizerDialogStandardPanel
 
     private final JCheckBox printGuardBox;
     private final JCheckBox addGuardsBox;
+    private final JCheckBox createAutVarsBox;
     private final JCheckBox saveEventGuardInFileBox;
     private final JCheckBox saveIDDInFileBox;
 
@@ -284,6 +304,12 @@ class EditorSynthesizerDialogStandardPanel
 
         addGuardsBox.addActionListener(this);
 
+        createAutVarsBox = new JCheckBox("Create Automaton Variables and add updates");
+        createAutVarsBox.setToolTipText("Create automaton variables mentioned in the generated guards; add updates"
+          + "to the automaton transitions");
+
+        createAutVarsBox.addActionListener(this);
+
         saveEventGuardInFileBox = new JCheckBox("Save the result in a file");
         saveEventGuardInFileBox.setToolTipText("Compute and write the event-guard pairs in a file.");
 
@@ -299,6 +325,7 @@ class EditorSynthesizerDialogStandardPanel
         representationPanel.setLayout(new GridLayout(4, 1));
         representationPanel.add(printGuardBox);
         representationPanel.add(addGuardsBox);
+        representationPanel.add(createAutVarsBox);
         representationPanel.add(saveEventGuardInFileBox);
         representationPanel.add(saveIDDInFileBox);
 
@@ -355,6 +382,7 @@ class EditorSynthesizerDialogStandardPanel
         updatePanel();
     }
 
+    @Override
     public void update(final EditorSynthesizerOptions synthesizerOptions)
     {
         typeSelector.setType(synthesizerOptions.getSynthesisType());
@@ -435,12 +463,14 @@ class EditorSynthesizerDialogStandardPanel
         algorithmSelector.setAlgorithm(selected);
     }
 
+    @Override
     public void regain(final EditorSynthesizerOptions synthesizerOptions)
     {
         synthesizerOptions.setSynthesisType(typeSelector.getType());
         synthesizerOptions.setSynthesisAlgorithm(algorithmSelector.getAlgorithm());
         synthesizerOptions.setPrintGuard(printGuardBox.isSelected());
         synthesizerOptions.setAddGuards(addGuardsBox.isSelected());
+        synthesizerOptions.setCreateAutVars(createAutVarsBox.isSelected());
         synthesizerOptions.setSaveInFile(saveEventGuardInFileBox.isSelected());
         synthesizerOptions.setSaveIDDInFile(saveIDDInFileBox.isSelected());
         synthesizerOptions.setReachability(reachableBox.isSelected());
@@ -480,6 +510,7 @@ class EditorSynthesizerDialogStandardPanel
 
     }
 
+    @Override
     public void actionPerformed(final ActionEvent e)
     {
         // Default
@@ -534,7 +565,7 @@ public class EditorSynthesizerDialog
         synthesizerOptions.setReachability(true);
 
         dialog.setTitle("Synthesizer options");
-        dialog.setSize(new Dimension(520, 500));
+        dialog.setSize(new Dimension(650, 650));
 
         final Container contentPane = dialog.getContentPane();
 
@@ -587,6 +618,7 @@ public class EditorSynthesizerDialog
         dialog.setVisible(true);
     }
 
+    @Override
     public void actionPerformed(final ActionEvent event)
     {
         final Object source = event.getSource();
