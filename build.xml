@@ -130,12 +130,10 @@
         <unjar src="${lib}/jlfgr-1_0.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/log4j.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/regler.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/jel.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/scenebeans.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/natutil.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/scenebeansXmlCompability.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/BCEL.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/jgl3.1.0.jar" dest="${lib}/${unjared}"/>
     	<!-- JacoZoom -->
         <unjar src="${lib}/ctrlmngr.jar" dest="${lib}/${unjared}"/>     
         <unjar src="${lib}/CCOM.jar" dest="${lib}/${unjared}"/> 
@@ -164,7 +162,6 @@
         <unjar src="${lib}/fsa2sat-1.0.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/javailp-1.2.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/lpsolve55j.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/minisatjni1.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/cplex.jar" dest="${lib}/${unjared}"/>
         
         <!-- Library for handling Sat4j. -->
@@ -179,7 +176,6 @@
                dest="${lib}/${unjared}"/>
 
         <unjar src="${lib}/jgrafchartresources.jar" dest="${resources}"/>
-        <unjar src="${lib}/swing-worker.jar" dest="${resources}"/>
 
         <!-- Ant 1.6.0 is not able to unjar empty jar files -->
         <!--
