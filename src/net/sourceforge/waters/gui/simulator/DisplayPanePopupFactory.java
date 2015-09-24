@@ -161,11 +161,3 @@ class DisplayPanePopupFactory
   private final AutomatonDisplayPane mDisplayPane;
 
 }
-
-
-
-
-
-
-
-

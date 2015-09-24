@@ -211,11 +211,3 @@ public class StandardExtensionFileFilter
     new HashMap<String,StandardExtensionFileFilter>();
 
 }
-
-
-
-
-
-
-
-

@@ -157,11 +157,3 @@ class EFSMPair implements Comparable<EFSMPair>
   private final EFSMTransitionRelation mEFSMTransitionRelation2;
 
 }
-
-
-
-
-
-
-
-

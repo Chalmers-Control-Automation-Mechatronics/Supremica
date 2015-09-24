@@ -120,11 +120,3 @@ public class LabelBlockProxyShape
     new Point(DEFAULT_OFFSET_X, DEFAULT_OFFSET_Y);
 
 }
-
-
-
-
-
-
-
-

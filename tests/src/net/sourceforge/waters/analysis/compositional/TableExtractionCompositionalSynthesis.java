@@ -553,11 +553,3 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
   private static final String[] BAR_COLOUR = {"fillstyle=solid,fillcolor=lightgray",
                                               "fillstyle=solid,fillcolor=gray"};
 }
-
-
-
-
-
-
-
-

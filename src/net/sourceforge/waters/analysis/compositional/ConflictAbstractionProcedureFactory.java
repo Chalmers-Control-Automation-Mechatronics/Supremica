@@ -306,10 +306,3 @@ public class ConflictAbstractionProcedureFactory
   };
 
 }
-
-
-
-
-
-
-

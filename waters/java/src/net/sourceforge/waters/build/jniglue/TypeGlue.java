@@ -108,11 +108,3 @@ abstract class TypeGlue implements Comparable<TypeGlue>, WritableGlue {
   }
 
 }
-
-
-
-
-
-
-
-

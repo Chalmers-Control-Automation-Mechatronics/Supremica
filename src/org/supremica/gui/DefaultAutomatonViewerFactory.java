@@ -47,7 +47,3 @@ public class DefaultAutomatonViewerFactory
 		return new AutomatonViewer(automaton);
 	}
 }
-
-
-
-

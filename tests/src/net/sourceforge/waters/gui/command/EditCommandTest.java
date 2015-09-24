@@ -228,10 +228,3 @@ public class EditCommandTest extends AbstractCommandTest
   }
 
 }
-
-
-
-
-
-
-

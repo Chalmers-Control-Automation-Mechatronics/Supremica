@@ -87,8 +87,3 @@ public class ExampleAnimations
 		return allGroups.iterator();
 	}
 }
-
-
-
-
-

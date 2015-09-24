@@ -214,11 +214,3 @@ public class CompositionalStateRepresentationSynthesisResult
   private final List<SynthesisStateSpace> mSupervisors;
 
 }
-
-
-
-
-
-
-
-

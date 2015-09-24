@@ -62,11 +62,3 @@ abstract class JAXBCheckedListHandler
   }
 
 }
-
-
-
-
-
-
-
-

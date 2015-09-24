@@ -95,11 +95,3 @@ public class ColorRenderer
 		return this;
 	}
 }
-
-
-
-
-
-
-
-

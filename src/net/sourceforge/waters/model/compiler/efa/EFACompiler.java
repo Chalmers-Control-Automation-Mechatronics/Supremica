@@ -1093,11 +1093,3 @@ public class EFACompiler extends AbortableCompiler
   private Map<Proxy,Collection<EFAEvent>> mEFAEventMap;
 
 }
-
-
-
-
-
-
-
-

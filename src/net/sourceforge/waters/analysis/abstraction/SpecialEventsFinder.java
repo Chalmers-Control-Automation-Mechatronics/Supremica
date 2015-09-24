@@ -411,11 +411,3 @@ public class SpecialEventsFinder
   private static final byte HASTAU = 0x02;
 
 }
-
-
-
-
-
-
-
-

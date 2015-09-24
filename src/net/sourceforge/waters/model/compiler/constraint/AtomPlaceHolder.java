@@ -40,7 +40,7 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 
 class AtomPlaceHolder extends PlaceHolder
 {
-  
+
   //#########################################################################
   //# Constructors
   AtomPlaceHolder(final ModuleProxyFactory factory, final String name)
@@ -63,10 +63,3 @@ class AtomPlaceHolder extends PlaceHolder
   }
 
 }
-
-
-
-
-
-
-

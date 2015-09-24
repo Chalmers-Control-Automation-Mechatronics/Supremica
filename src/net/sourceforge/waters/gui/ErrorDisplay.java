@@ -46,11 +46,3 @@ public interface ErrorDisplay
   public void clearDisplay();
 
 }
-
-
-
-
-
-
-
-

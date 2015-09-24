@@ -194,11 +194,3 @@ public class EventChooserDialog extends JDialog
   private static final Point DEFAULT_STARTING_LOCATION = new Point(100, 100);
   private static final int LIST_BORDER_SIZE = 5;
 }
-
-
-
-
-
-
-
-

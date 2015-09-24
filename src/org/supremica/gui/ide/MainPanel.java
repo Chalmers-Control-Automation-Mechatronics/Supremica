@@ -160,8 +160,3 @@ public abstract class MainPanel
     private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-

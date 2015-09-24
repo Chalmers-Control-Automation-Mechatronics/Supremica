@@ -44,27 +44,27 @@ public class RemoveAllTau
   public static int mTausRemoved = 0;
   public static int mStatesRemoved = 0;
   public static int TIME = 0;
-  
+
   public static void clearStats()
   {
     mTausRemoved = 0;
     mStatesRemoved = 0;
     TIME = 0;
   }
-  
+
   public static String stats()
   {
     return "RemoveFollowOnTau: mTausRemoved = " + mTausRemoved + " mStatesRemoved = " + mStatesRemoved +
             " TIME = " + TIME;
   }
-  
+
   public RemoveAllTau(TransitionRelation transitionrelation, int tau)
   {
     mTransitionRelation = transitionrelation;
     mTau = tau;
     mVisited = new boolean[mTransitionRelation.numberOfStates()];
   }
-  
+
   private void removeFollowons(int state)
   {
     mVisited[state] = true;
@@ -83,7 +83,7 @@ public class RemoveAllTau
       }
     }
   }
-  
+
   /*private void removeFollowons(int state)
   {
     mVisited[state] = true;
@@ -105,7 +105,7 @@ public class RemoveAllTau
       mTransitionRelation.addAllSuccessors(target, state);
     }
   }*/
-  
+
   public void run()
   {
     TIME -= System.currentTimeMillis();
@@ -122,12 +122,3 @@ public class RemoveAllTau
     TIME += System.currentTimeMillis();
   }
 }
-
-
-
-
-
-
-
-
-

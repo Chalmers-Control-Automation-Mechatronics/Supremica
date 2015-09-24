@@ -185,11 +185,3 @@ public class NativeHashSet<E> extends AbstractSet<E>
   private final long mNativeHandler;
 
 }
-
-
-
-
-
-
-
-

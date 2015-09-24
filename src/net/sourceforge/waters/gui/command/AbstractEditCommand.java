@@ -230,12 +230,3 @@ public abstract class AbstractEditCommand
   private boolean mUpdatesSelection;
 
 }
-
-
-
-
-
-
-
-
-

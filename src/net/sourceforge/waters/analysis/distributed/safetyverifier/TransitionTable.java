@@ -189,11 +189,3 @@ public class TransitionTable
   private final int mEvents;
   private final int[][] mTransitions;
 }
-
-
-
-
-
-
-
-

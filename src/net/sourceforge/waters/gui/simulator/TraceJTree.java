@@ -402,11 +402,3 @@ public class TraceJTree
   private static final int rowHeight = 20;
 
 }
-
-
-
-
-
-
-
-

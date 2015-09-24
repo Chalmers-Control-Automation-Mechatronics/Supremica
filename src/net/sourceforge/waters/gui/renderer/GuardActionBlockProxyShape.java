@@ -83,11 +83,3 @@ public class GuardActionBlockProxyShape
     public static final int DEFAULTOFFSETX = 0;
     public static final int DEFAULTOFFSETY = 10;
 }
-
-
-
-
-
-
-
-

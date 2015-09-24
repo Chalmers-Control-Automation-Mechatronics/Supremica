@@ -92,11 +92,3 @@ public class NBCAbstractionStandardConflictCheckerTest
   }
 
 }
-
-
-
-
-
-
-
-

@@ -51,8 +51,3 @@ class AutomataExplorerHelper
 		return initialState;
 	}
 }
-
-
-
-
-

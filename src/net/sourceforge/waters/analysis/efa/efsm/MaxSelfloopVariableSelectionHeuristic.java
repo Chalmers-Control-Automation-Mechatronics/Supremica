@@ -58,11 +58,3 @@ public class MaxSelfloopVariableSelectionHeuristic
   }
 
 }
-
-
-
-
-
-
-
-

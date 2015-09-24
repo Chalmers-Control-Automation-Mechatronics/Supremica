@@ -263,11 +263,3 @@ public class SpecialEventsTRSimplifier
   }
 
 }
-
-
-
-
-
-
-
-

@@ -825,12 +825,3 @@ public class Projection2
   private Bag mUnvisited;
   private int[][] mEventAutomaton;
 }
-
-
-
-
-
-
-
-
-

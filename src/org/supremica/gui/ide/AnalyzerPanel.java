@@ -243,8 +243,3 @@ public class AnalyzerPanel
 
     private final VisualProject mVisualProject = new VisualProject();
 }
-
-
-
-
-

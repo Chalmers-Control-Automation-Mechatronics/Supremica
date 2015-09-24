@@ -125,11 +125,3 @@ public interface ConflictChecker extends ModelVerifier
   public ConflictTraceProxy getCounterExample();
 
 }
-
-
-
-
-
-
-
-

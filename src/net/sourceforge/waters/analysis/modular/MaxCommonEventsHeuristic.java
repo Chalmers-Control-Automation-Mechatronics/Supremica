@@ -114,11 +114,3 @@ public class MaxCommonEventsHeuristic
     }
   }
 }
-
-
-
-
-
-
-
-

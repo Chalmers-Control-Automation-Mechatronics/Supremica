@@ -59,11 +59,3 @@ public abstract class GeometryElement
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-
-

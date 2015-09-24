@@ -78,11 +78,3 @@ public interface ProductDESProxy
    */
   public Set<AutomatonProxy> getAutomata();
 }
-
-
-
-
-
-
-
-

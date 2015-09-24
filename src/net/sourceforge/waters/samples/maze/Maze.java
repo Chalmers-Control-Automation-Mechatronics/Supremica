@@ -474,11 +474,3 @@ class Maze
   private static final Point DIRECTIONS[] = {NORTH, EAST, SOUTH, WEST};
 
 }
-
-
-
-
-
-
-
-

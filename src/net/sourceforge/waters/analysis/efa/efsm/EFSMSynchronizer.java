@@ -248,11 +248,3 @@ public class EFSMSynchronizer extends AbstractEFSMAlgorithm
   private boolean mSourceInfoEnabled;
 
 }
-
-
-
-
-
-
-
-

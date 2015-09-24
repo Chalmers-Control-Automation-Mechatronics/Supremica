@@ -75,11 +75,3 @@ private:
 }   /* namespace jni */
 
 #endif  /* !_MethodInfo_h_ */
-
-
-
-
-
-
-
-

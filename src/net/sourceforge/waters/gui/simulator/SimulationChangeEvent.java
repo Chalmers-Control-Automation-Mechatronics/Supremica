@@ -142,11 +142,3 @@ public class SimulationChangeEvent extends EventObject
   private static final long serialVersionUID = 1;
 
 }
-
-
-
-
-
-
-
-

@@ -302,8 +302,3 @@ public class SimulatorEventListModel
         update();
     }
 }
-
-
-
-
-

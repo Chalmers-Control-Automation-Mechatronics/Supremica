@@ -133,11 +133,3 @@ public class OPVerifierTRChain
   private final OPVerifierTRSimplifier mOPVerifier;
 
 }
-
-
-
-
-
-
-
-

@@ -240,8 +240,3 @@ class ExternalEventExecuter
 
     public native void native_check_external_events();
 }
-
-
-
-
-

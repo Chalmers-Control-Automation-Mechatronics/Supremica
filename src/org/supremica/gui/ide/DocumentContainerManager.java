@@ -835,8 +835,3 @@ public class DocumentContainerManager
   private static final String WARN_UNSAVED_CHANGES =
     "has unsaved changes.\nWould you like to save it before closing?";
 }
-
-
-
-
-

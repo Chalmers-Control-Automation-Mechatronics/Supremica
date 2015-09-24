@@ -322,12 +322,3 @@ public class SynthesisTransitionRemovalTRSimplifier
   private TransitionIterator mIteratorUncontrollableClosure;
 
 }
-
-
-
-
-
-
-
-
-

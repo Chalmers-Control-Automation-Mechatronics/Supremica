@@ -985,11 +985,3 @@ public class EventTableModel
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-
-

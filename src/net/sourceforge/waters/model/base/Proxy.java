@@ -98,11 +98,3 @@ public interface Proxy {
     throws VisitorException;
 
 }
-
-
-
-
-
-
-
-

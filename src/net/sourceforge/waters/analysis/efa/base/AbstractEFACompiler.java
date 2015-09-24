@@ -85,11 +85,3 @@ public abstract class AbstractEFACompiler
   private final ModuleProxy mInputModule;
 
 }
-
-
-
-
-
-
-
-

@@ -108,11 +108,3 @@ public class IdentifierInputParser
   private final DocumentFilter mDocumentFilter;
 
 }
-
-
-
-
-
-
-
-

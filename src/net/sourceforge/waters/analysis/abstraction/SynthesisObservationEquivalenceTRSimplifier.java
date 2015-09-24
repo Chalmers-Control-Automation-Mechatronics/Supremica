@@ -1333,12 +1333,3 @@ public class SynthesisObservationEquivalenceTRSimplifier
   private TIntArrayList mTempClass;
 
 }
-
-
-
-
-
-
-
-
-

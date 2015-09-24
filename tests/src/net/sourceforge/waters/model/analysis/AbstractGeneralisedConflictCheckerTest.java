@@ -417,11 +417,3 @@ public abstract class AbstractGeneralisedConflictCheckerTest
   private SICPropertyBuilder mBuilder;
 
 }
-
-
-
-
-
-
-
-

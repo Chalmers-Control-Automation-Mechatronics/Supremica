@@ -763,11 +763,3 @@ public class Projection3
   private Map<Integer, DeterministicState> mNonDetRecord;
   private int[][] eventAutomaton;
 }
-
-
-
-
-
-
-
-

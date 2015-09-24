@@ -1784,12 +1784,3 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
       LoggerFactory.createLogger(CanonicalGeneralisedConflictChecker.class);
 
 }
-
-
-
-
-
-
-
-
-

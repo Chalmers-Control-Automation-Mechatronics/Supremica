@@ -51,8 +51,3 @@ public class VisualProjectFactory
 		return new VisualProject();
 	}
 }
-
-
-
-
-

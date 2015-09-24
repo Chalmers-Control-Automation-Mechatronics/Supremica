@@ -1697,11 +1697,3 @@ public class SimpleExpressionCompiler
   private VariableContext mVariableContext;
 
 }
-
-
-
-
-
-
-
-

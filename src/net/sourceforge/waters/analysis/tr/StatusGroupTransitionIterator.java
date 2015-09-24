@@ -319,12 +319,3 @@ public class StatusGroupTransitionIterator implements TransitionIterator
   private int mIndex;
 
 }
-
-
-
-
-
-
-
-
-

@@ -123,11 +123,3 @@ public class StateTuple
   private final int mStateCodes[];
 
 }
-
-
-
-
-
-
-
-

@@ -99,11 +99,3 @@ abstract public class DefaultProxyVisitor implements ProxyVisitor {
   }
 
 }
-
-
-
-
-
-
-
-

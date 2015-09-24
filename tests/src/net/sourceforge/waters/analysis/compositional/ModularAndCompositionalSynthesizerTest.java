@@ -88,11 +88,3 @@ public class ModularAndCompositionalSynthesizerTest
   }
 
 }
-
-
-
-
-
-
-
-

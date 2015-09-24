@@ -115,11 +115,3 @@ public abstract class EnumFactory<E>
   }
 
 }
-
-
-
-
-
-
-
-

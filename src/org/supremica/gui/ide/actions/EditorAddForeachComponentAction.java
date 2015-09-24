@@ -65,8 +65,3 @@ public class EditorAddForeachComponentAction
 		System.err.println("Add Foreach Component is not implemented yet!");
 	}
 }
-
-
-
-
-

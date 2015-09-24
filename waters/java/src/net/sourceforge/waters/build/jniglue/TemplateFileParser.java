@@ -384,7 +384,7 @@ class TemplateFileParser extends ErrorReporter {
       }
     }
   }
-    
+
   private int getNextCharacter()
     throws IOException
   {
@@ -464,11 +464,3 @@ class TemplateFileParser extends ErrorReporter {
   private int mLineNo;
 
 }
-
-
-
-
-
-
-
-

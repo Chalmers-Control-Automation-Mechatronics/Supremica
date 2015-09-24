@@ -438,11 +438,3 @@ public abstract class AbstractBindingEditorDialog extends JDialog
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-
-

@@ -500,11 +500,3 @@ class EFAEventNameBuilder {
   private NameTreeNode mRoot;
   private CountedLiteral mScratch;
 }
-
-
-
-
-
-
-
-

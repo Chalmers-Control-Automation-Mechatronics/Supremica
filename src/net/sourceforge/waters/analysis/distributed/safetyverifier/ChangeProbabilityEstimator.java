@@ -85,7 +85,7 @@ class ChangeProbabilityEstimator implements ProbabilityEstimator
 	if (t.getEventId() == event && t.getSource() != t.getTarget())
 	  count++;
       }
-    
+
     return count;
   }
 
@@ -115,10 +115,3 @@ class ChangeProbabilityEstimator implements ProbabilityEstimator
 
   private final ProductDESSchema mModel;
 }
-
-
-
-
-
-
-

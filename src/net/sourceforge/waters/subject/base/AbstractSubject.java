@@ -176,11 +176,3 @@ public abstract class AbstractSubject
   private Subject mParent;
 
 }
-
-
-
-
-
-
-
-

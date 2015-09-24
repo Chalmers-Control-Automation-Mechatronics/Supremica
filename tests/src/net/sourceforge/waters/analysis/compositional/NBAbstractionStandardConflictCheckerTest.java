@@ -117,11 +117,3 @@ public class NBAbstractionStandardConflictCheckerTest
   }
 
 }
-
-
-
-
-
-
-
-

@@ -1348,11 +1348,3 @@ public class SpringEmbedder
   private static final Point2D POINT_CENTER = new Point2D.Double(200.0, 200.0);
 
 }
-
-
-
-
-
-
-
-

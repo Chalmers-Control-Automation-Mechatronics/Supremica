@@ -519,7 +519,7 @@ hash()
 
 //############################################################################
 //# NondeterministicTransitionIterator: Constructors & Destructors
-  
+
 NondeterministicTransitionIterator::
 NondeterministicTransitionIterator() :
   mAutomatonRecord(0), mTransitionRecord(0), mSource(0), mIndex(UINT32_MAX)
@@ -615,11 +615,3 @@ current()
 
 
 }  /* namespace waters */
-
-
-
-
-
-
-
-

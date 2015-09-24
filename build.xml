@@ -114,7 +114,6 @@
 
         <!-- Library for handling db in SOC -->
         <unjar src="${lib}/sqljdbc.jar" dest="${lib}/${unjared}"/>
-
         <!-- Library used by SOC -->
         <unjar src="${lib}/jniwrap-3.1.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/jexcel-1.0.jar" dest="${lib}/${unjared}"/>
@@ -124,7 +123,6 @@
 
         <unjar src="${lib}/JGo.jar" dest="${lib}/${unjared}"/>  
         <unjar src="${lib}/JGoLayout.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/anarres-cpp.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/grappa.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/help.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/jdom.jar" dest="${lib}/${unjared}"/>
@@ -132,26 +130,24 @@
         <unjar src="${lib}/jlfgr-1_0.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/log4j.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/regler.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/jel.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/scenebeans.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/natutil.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/scenebeansXmlCompability.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/BCEL.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/jgl3.1.0.jar" dest="${lib}/${unjared}"/>
     	<!-- JacoZoom -->
         <unjar src="${lib}/ctrlmngr.jar" dest="${lib}/${unjared}"/>     
         <unjar src="${lib}/CCOM.jar" dest="${lib}/${unjared}"/> 
         <unjar src="${lib}/jacorb.jar" dest="${lib}/${unjared}"/>       
         <unjar src="${lib}/jutils.jar" dest="${lib}/${unjared}"/>       
-        <!--    <unjar src="${lib}/xalan.jar" dest="${lib}/${unjared}"/>-->
+        <!-- <unjar src="${lib}/xalan.jar" dest="${lib}/${unjared}"/>-->
         <unjar src="${lib}/xmlBlaster.jar" dest="${lib}/${unjared}"/>   
         <unjar src="${lib}/xtdash.jar" dest="${lib}/${unjared}"/>       
         <unjar src="${lib}/jgrafchart.jar" dest="${lib}/${unjared}"/>   
         <unjar src="${lib}/sysutils.jar" dest="${lib}/${unjared}"/>     
         <!-- Libraries for IEC61499 Fuber runtime support in Supremica. -->
         <!--   Maintained by: cengic@chalmers.se -->
-        <unjar src="${lib}/fcc_demo.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/fuber.jar" dest="${lib}/${unjared}"/>
+        <!-- <unjar src="${lib}/fcc_demo.jar" dest="${lib}/${unjared}"/> -->
+        <!-- <unjar src="${lib}/fuber.jar" dest="${lib}/${unjared}"/> -->
         <!-- End IEC61499 runtime libraries -->
         <unjar src="${lib}/swixml.jar" dest="${lib}/${unjared}"/>
         <!-- GNU Trove -->
@@ -159,13 +155,13 @@
         <!-- Library for handling BDDs. -->
         <unjar src="${lib}/javabdd-2.0.jar" dest="${lib}/${unjared}"/>
         <unjar src="${waters.jaxbjar}" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/manufacturingTables_jaxb.jar" dest="${lib}/${unjared}"/>
+        <!-- <unjar src="${lib}/manufacturingTables_jaxb.jar"
+                    dest="${lib}/${unjared}"/> -->
         <unjar src="${lib}/genericPLCProgramDescription_jaxb.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/itext.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/fsa2sat-1.0.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/javailp-1.2.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/lpsolve55j.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/minisatjni1.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/cplex.jar" dest="${lib}/${unjared}"/>
         
         <!-- Library for handling Sat4j. -->
@@ -175,22 +171,11 @@
         <unjar src="${lib}/org.sat4j.pb.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/js.jar" dest="${lib}/${unjared}"/>
         
-        <!-- svg export -->
-        <unjar src="${lib}/batik-awt-util.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/batik-svggen.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/batik-dom.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/batik-util.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/batik-ext.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/xml-apis.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/batik-xml.jar" dest="${lib}/${unjared}"/>
-        <!-- unjar src="${lib}/java_cup.jar" dest="${lib}/${unjared}"/-->
-        <!-- unjar src="${lib}/bsh.jar" dest="${lib}/${unjared}"/-->
         <!-- Tools for Adobe PostScript. -->
         <unjar src="${lib}/xmlgraphics-commons-1.4.jar"
                dest="${lib}/${unjared}"/>
 
         <unjar src="${lib}/jgrafchartresources.jar" dest="${resources}"/>
-        <unjar src="${lib}/swing-worker.jar" dest="${resources}"/>
 
         <!-- Ant 1.6.0 is not able to unjar empty jar files -->
         <!--
@@ -200,6 +185,7 @@
         <unjar src="${lib}/licensed/JGo.jar" dest="${lib}/${unjared}"/> 
         <unjar src="${lib}/licensed/JGoLayout.jar" dest="${lib}/${unjared}"/>
         -->
+        <!-- JAXB -->
         <unjar src="${activation.jar}" dest="${lib}/${unjared}"/>       
         <unjar src="${jaxb-api.jar}" dest="${lib}/${unjared}"/>
         <unjar src="${jaxb-impl.jar}" dest="${lib}/${unjared}"/>
@@ -282,7 +268,7 @@
         </copy>
     </target>
     
-    <target name="compile" depends="compile_manufacturingTables_jaxb,compile_supremica,compile_supremica_tests"/>
+    <target name="compile" depends="compile_supremica,compile_supremica_tests"/>
     
     <target name="compile_supremica" depends="-startfiles_local_supremica">
         <javac debug="on"
@@ -291,7 +277,18 @@
                destdir="${build}"
                verbose="false"
                nowarn="true"
-               excludes="${supremica_basedir}/net/sourceforge/waters/external/promela/parser/**"
+               excludes="org/supremica/external/fbd2smv/**,
+                         org/supremica/external/genericPLCProgramDescription/**,
+                         org/supremica/external/iec61131/**,
+                         org/supremica/external/iec61499fb2efa/**,
+                         org/supremica/external/interfaceExample/**,
+                         org/supremica/external/jgrafchart/**,
+                         org/supremica/external/processAlgebraPetriNet/**,
+                         org/supremica/external/rac/**,
+                         org/supremica/external/relationExtraction/**,
+                         org/supremica/external/specificationSynthesis/**,
+                         org/supremica/manufacturingTables/**,
+                         org/supremica/softplc/**"
                source="1.7"
 	       encoding="ISO-8859-15"
                fork="true"
@@ -325,10 +322,7 @@
         </javac>
     </target>
     
-    <!-- Compile:
-*       Reuses existing class files, but recompiles those
-*       source files that have changed.
-    -->
+    <!-- manufacturingTables is now excluded from build -->
     <target name="compile_manufacturingTables_jaxb" depends="build_rop_processeditor">
         <javac
             srcdir="${src}"
@@ -602,6 +596,7 @@ Class-Path: ${manifest.pathlist}</echo>
       </copy>
     </target>
 
+    <!-- manufacturingTables is now excluded from build -->
     <target name="-jar_manufacturingTables_jaxb" depends="compile_manufacturingTables_jaxb">
         <jar jarfile="${lib}/manufacturingTables_jaxb.jar"> 
             <fileset dir="${build}/">
@@ -647,11 +642,11 @@ Class-Path: ${manifest.pathlist}</echo>
         <chmod file="${dist}/loadGenericPLCProgramDescriptionLocal.cmd" perm="644"/>
         <copy file="${templates}/loadGenericPLCProgramDescription.cmd" todir="${dist}"/>
         <chmod file="${dist}/loadGenericPLCProgramDescription.cmd" perm="644"/>
+        <!--
         <copy file="${templates}/manufacturingTablesTestLocal" todir="${dist}"/>
         <chmod file="${dist}/manufacturingTablesTestLocal" perm="644"/>
         <copy file="${templates}/manufacturingTablesTestLocal.cmd" todir="${dist}"/>
         <chmod file="${dist}/manufacturingTablesTestLocal.cmd" perm="644"/>
-        <!--
         <copy file="${templates}/IDELocal.cmd" todir="${dist}"/>
         <chmod file="${dist}/IDELocal.cmd" perm="644"/>
         <copy file="${templates}/IDELocal" todir="${dist}"/>    
@@ -662,7 +657,7 @@ Class-Path: ${manifest.pathlist}</echo>
         <chmod file="${dist}/SupremicaLocalMoreMem.cmd" perm="644"/>
         <copy file="${templates}/SupremicaLocal" todir="${dist}"/>      
         <chmod file="${dist}/SupremicaLocal" perm="755"/>
--->
+        -->
         <copy file="${templates}/SFCtoSMV.cmd" todir="${dist}"/>        
         <chmod file="${dist}/SFCtoSMV.cmd" perm="644"/>
         <!--
@@ -700,22 +695,22 @@ Class-Path: ${manifest.pathlist}</echo>
         <chmod file="${dist}/demo_d" perm="755"/>
         <copy file="${templates}/demo_d.cmd" todir="${dist}"/>
         <chmod file="${dist}/demo_d.cmd" perm="644"/>
+        <!--
         <copy file="${templates}/manufacturingTablesTest" todir="${dist}"/>
         <chmod file="${dist}/manufacturingTablesTest" perm="755"/>
         <copy file="${templates}/manufacturingTablesTest.cmd" todir="${dist}"/>
         <chmod file="${dist}/manufacturingTablesTest.cmd" perm="755"/>
-        <!--
         <copy file="${templates}/SupremicaProfiling.cmd" todir="${dist}"/>
         <chmod file="${dist}/SupremicaProfiling.cmd" perm="644"/>
         <copy file="${templates}/SupremicaProfiling" todir="${dist}"/>  
         <chmod file="${dist}/SupremicaProfiling" perm="755"/>
         <copy file="${templates}/SupremicaStandard.cmd" todir="${dist}"/>
         <chmod file="${dist}/SupremicaStandard.cmd" perm="644"/>
--->
         <copy file="${templates}/SupremicaApplet.html" todir="${dist}"/>
         <chmod file="${dist}/SupremicaApplet.html" perm="644"/> 
         <copy file="${templates}/SupremicaAppletViewer.html" todir="${dist}"/>
         <chmod file="${dist}/SupremicaAppletViewer.html" perm="644"/>
+        -->
     </target>
 
     <!--

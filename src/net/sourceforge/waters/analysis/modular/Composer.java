@@ -780,12 +780,3 @@ public class Composer
   private int mNewDumpState;
   private int mDumpState = -1;
 }
-
-
-
-
-
-
-
-
-

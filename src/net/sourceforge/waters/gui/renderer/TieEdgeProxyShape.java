@@ -172,11 +172,3 @@ class TieEdgeProxyShape
   private final GeneralPath mTie;
 
 }
-
-
-
-
-
-
-
-

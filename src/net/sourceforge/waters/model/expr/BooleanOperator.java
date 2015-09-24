@@ -47,11 +47,3 @@ public interface BooleanOperator extends Operator {
 	//i.e. "==" becomes "!=", "<" becomes ">=", etc.
 	public BooleanOperator getNegative();
 }
-
-
-
-
-
-
-
-

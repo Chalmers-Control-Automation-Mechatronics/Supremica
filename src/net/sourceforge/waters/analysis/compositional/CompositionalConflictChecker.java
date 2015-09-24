@@ -1062,11 +1062,3 @@ public class CompositionalConflictChecker
   private static final byte ALL_ALPHA = 0x08;
 
 }
-
-
-
-
-
-
-
-

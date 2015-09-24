@@ -226,10 +226,3 @@ public class FocusTracker
   private JTextComponent mSwingSelectionOwner;
 
 }
-
-
-
-
-
-
-

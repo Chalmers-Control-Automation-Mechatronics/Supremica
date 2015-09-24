@@ -71,11 +71,3 @@ public interface BinaryExpressionProxy
   public SimpleExpressionProxy getRight();
 
 }
-
-
-
-
-
-
-
-

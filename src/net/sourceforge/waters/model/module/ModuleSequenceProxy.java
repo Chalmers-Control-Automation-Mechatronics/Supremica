@@ -67,11 +67,3 @@ public interface ModuleSequenceProxy
    */
   public List<ModuleProxy> getModules();
 }
-
-
-
-
-
-
-
-

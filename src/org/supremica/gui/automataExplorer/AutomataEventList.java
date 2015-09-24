@@ -130,8 +130,3 @@ public class AutomataEventList
         stateViewer.setCurrState(newState);
     }
 }
-
-
-
-
-

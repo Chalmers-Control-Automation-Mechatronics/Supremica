@@ -1650,12 +1650,3 @@ public class ModelAssess
   private static final String MOODLE_FILE_PATTERN = "_assignsubmission_file_";
 
 }
-
-
-
-
-
-
-
-
-

@@ -160,11 +160,3 @@ public class SelfloopSubsumptionTRSimplifierTest
   }
 
 }
-
-
-
-
-
-
-
-

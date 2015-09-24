@@ -866,10 +866,3 @@ public class SusynaImporter
   private int mLineNo;
 
 }
-
-
-
-
-
-
-

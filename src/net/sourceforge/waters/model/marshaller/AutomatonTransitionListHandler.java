@@ -46,7 +46,7 @@ import net.sourceforge.waters.xsd.des.TransitionList;
 class AutomatonTransitionListHandler
   extends JAXBListHandler<Automaton,TransitionList,TransitionProxy>
 {
-  
+
   //#########################################################################
   //# Constructors
   AutomatonTransitionListHandler()
@@ -59,7 +59,7 @@ class AutomatonTransitionListHandler
     mFactory = factory;
   }
 
-  
+
   //#########################################################################
   //# Overrides for Abstract Base Class JAXBListHandler
   TransitionList createListElement(Automaton container)
@@ -85,11 +85,3 @@ class AutomatonTransitionListHandler
   private final ObjectFactory mFactory;
 
 }
-
-
-
-
-
-
-
-

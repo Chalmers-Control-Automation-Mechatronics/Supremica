@@ -229,8 +229,3 @@ public class AutomataExplorer
         updated(aut);
     }
 }
-
-
-
-
-

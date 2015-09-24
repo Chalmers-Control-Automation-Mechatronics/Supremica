@@ -54,11 +54,3 @@ public class LargeCompositionalSICPropertyVVerifierTest extends
     return new SICProperty5Verifier(checker, factory);
   }
 }
-
-
-
-
-
-
-
-

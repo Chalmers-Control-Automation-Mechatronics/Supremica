@@ -144,11 +144,3 @@ abstract class SelectionHeuristicMinSync0
   private TRAbstractSynchronousProductBuilder mSynchronousProductBuilder;
 
 }
-
-
-
-
-
-
-
-

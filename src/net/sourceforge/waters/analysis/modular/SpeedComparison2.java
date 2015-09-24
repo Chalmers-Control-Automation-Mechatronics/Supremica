@@ -57,7 +57,7 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 public class SpeedComparison2
 {
-  
+
   public static void main(String[] args) throws Exception
   {
     JFileChooser chooser = new JFileChooser(new File("/home/darius/waters"));
@@ -81,7 +81,7 @@ public class SpeedComparison2
       a.printStackTrace();
     }
   }
-  
+
   private static ProductDESProxy getCompiledDES
     (final File filename,
      final List<ParameterBindingProxy> bindings)
@@ -99,10 +99,10 @@ public class SpeedComparison2
       return null;
     }
   }
-  
+
   private static DocumentManager mDocumentManager = new DocumentManager();
   private static ProductDESProxyFactory mProductDESProxyFactory = ProductDESElementFactory.getInstance();
-  
+
   static {
     ModuleElementFactory mModuleFactory = ModuleElementFactory.getInstance();
     final OperatorTable optable = CompilerOperatorTable.getInstance();
@@ -115,11 +115,3 @@ public class SpeedComparison2
     }
   }
 }
-
-
-
-
-
-
-
-

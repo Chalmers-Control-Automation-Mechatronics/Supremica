@@ -58,11 +58,3 @@ class SimpleTypeToken extends Token {
   private final SimpleTypeGlue mTypeGlue;
 
 }
-
-
-
-
-
-
-
-

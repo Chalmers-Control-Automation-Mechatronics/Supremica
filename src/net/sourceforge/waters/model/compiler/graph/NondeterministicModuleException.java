@@ -90,18 +90,10 @@ public class NondeterministicModuleException extends EvalException {
           "' originating from state '" + node.getName() +
           "' in automaton '" + comp.getName() + "'!", node);
   }
-  
-  
+
+
   //#########################################################################
   //# Static Class Variables
   public static final long serialVersionUID = 1;
 
 }
-
-
-
-
-
-
-
-

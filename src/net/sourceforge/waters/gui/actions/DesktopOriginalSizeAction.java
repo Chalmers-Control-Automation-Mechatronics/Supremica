@@ -61,11 +61,3 @@ public class DesktopOriginalSizeAction extends WatersDesktopAction
 
   private static final long serialVersionUID = -1644229513613033199L;
 }
-
-
-
-
-
-
-
-

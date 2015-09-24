@@ -94,11 +94,3 @@ abstract public class AbstractSDConflictChecker
   private ConflictChecker mChecker;
 
 }
-
-
-
-
-
-
-
-

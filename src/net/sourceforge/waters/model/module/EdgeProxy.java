@@ -72,7 +72,7 @@ public interface EdgeProxy extends Proxy {
   // @ref
   // @optional
   public NodeProxy getTarget();
-  
+
   /**
    * Gets the label block of this edge. The label block contains a list
    * of labels, each representing one event and therefore one transition
@@ -80,7 +80,7 @@ public interface EdgeProxy extends Proxy {
    */
   // @default empty  
   public LabelBlockProxy getLabelBlock();
-  
+
   // @optional
   public GuardActionBlockProxy getGuardActionBlock();
 
@@ -120,11 +120,3 @@ public interface EdgeProxy extends Proxy {
   public PointGeometryProxy getEndPoint();
 
 }
-
-
-
-
-
-
-
-

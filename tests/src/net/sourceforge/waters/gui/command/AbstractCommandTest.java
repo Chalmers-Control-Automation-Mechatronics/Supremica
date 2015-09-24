@@ -424,12 +424,3 @@ public abstract class AbstractCommandTest extends AbstractWatersTest
   private ProxyCollector mCollector;
 
 }
-
-
-
-
-
-
-
-
-

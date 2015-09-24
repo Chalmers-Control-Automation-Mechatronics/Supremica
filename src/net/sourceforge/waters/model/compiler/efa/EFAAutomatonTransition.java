@@ -89,11 +89,3 @@ class EFAAutomatonTransition
   private final Collection<Proxy> mSourceLocations;
 
 }
-
-
-
-
-
-
-
-

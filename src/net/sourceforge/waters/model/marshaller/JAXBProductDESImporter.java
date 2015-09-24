@@ -249,11 +249,3 @@ class JAXBProductDESImporter
     mStateEventRefListHandler = new StateEventRefListHandler();
 
 }
-
-
-
-
-
-
-
-

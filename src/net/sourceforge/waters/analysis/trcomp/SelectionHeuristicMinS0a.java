@@ -101,11 +101,3 @@ public class SelectionHeuristicMinS0a
   }
 
 }
-
-
-
-
-
-
-
-

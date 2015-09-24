@@ -117,12 +117,3 @@ class AutomataStats
     mPrint.close();
   }
 }
-
-
-
-
-
-
-
-
-

@@ -689,11 +689,3 @@ public class SynthesisStateSpace implements AutomatonProxy
   private AutomatonProxy mAutomaton;
 
 }
-
-
-
-
-
-
-
-

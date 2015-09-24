@@ -106,8 +106,3 @@ class PhilosPanel extends JPanel implements TestCase {
 		return dp.getProject();
 	}
 }
-
-
-
-
-

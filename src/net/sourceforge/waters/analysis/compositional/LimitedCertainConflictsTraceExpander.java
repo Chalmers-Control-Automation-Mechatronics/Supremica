@@ -719,11 +719,3 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
   private Map<StateProxy,StateProxy> mReverseStateMap;
 
 }
-
-
-
-
-
-
-
-

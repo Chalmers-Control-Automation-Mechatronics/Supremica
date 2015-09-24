@@ -323,11 +323,3 @@ public class IconLoader
     getIconList(NAME_SUPERVISOR);
 
 }
-
-
-
-
-
-
-
-

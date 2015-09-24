@@ -501,11 +501,3 @@ class GlueFileParser extends ErrorReporter {
   private String mPackageName;
 
 }
-
-
-
-
-
-
-
-

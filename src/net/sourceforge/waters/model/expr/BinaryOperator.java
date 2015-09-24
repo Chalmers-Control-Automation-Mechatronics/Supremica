@@ -47,7 +47,7 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
  */
 
 public interface BinaryOperator extends Operator {
-  
+
   //#########################################################################
   //# Simple Access Methods
   public int getAssociativity();
@@ -85,11 +85,3 @@ public interface BinaryOperator extends Operator {
   public static final int ASSOC_RIGHT = 2;
 
 }
-
-
-
-
-
-
-
-

@@ -42,7 +42,7 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 
 class IntegerExpressionPlaceHolder extends RangedExpressionPlaceHolder
 {
-  
+
   //#########################################################################
   //# Constructors
   IntegerExpressionPlaceHolder(final ModuleProxyFactory factory,
@@ -77,10 +77,3 @@ class IntegerExpressionPlaceHolder extends RangedExpressionPlaceHolder
   }
 
 }
-
-
-
-
-
-
-

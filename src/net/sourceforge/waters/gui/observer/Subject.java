@@ -60,11 +60,3 @@ public interface Subject
      */
     public void fireEditorChangedEvent(EditorChangedEvent e);
 }
-
-
-
-
-
-
-
-

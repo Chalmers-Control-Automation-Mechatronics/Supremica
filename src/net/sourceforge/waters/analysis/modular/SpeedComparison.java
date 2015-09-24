@@ -152,11 +152,3 @@ public class SpeedComparison
     }
   }
 }
-
-
-
-
-
-
-
-

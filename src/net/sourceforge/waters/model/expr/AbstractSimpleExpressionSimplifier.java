@@ -144,11 +144,3 @@ public abstract class AbstractSimpleExpressionSimplifier
   private final ModuleProxyFactory mFactory;
 
 }
-
-
-
-
-
-
-
-

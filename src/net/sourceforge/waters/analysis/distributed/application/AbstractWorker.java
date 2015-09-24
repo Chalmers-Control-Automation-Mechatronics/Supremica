@@ -68,7 +68,7 @@ public abstract class AbstractWorker implements Worker, WorkerLocal
 	errorCallbackFailed(e, throwable);
 	return;
       }
-    
+
     errorCallbackSucceeded(throwable);
  }
 
@@ -122,15 +122,8 @@ public abstract class AbstractWorker implements Worker, WorkerLocal
   {
     mWorkerID = workerid;
   }
-  
+
   private volatile Worker mWorkerProxy;
   private volatile ErrorCallback mErrorCallback;
   private volatile String mWorkerID;
 }
-
-
-
-
-
-
-

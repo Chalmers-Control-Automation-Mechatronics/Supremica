@@ -96,17 +96,9 @@ public class CyclicGroupNodeException extends ModelException {
   //# Data Members
   private String mOperation;
 
-  
+
   //#########################################################################
   //# Static Class Variables
   public static final long serialVersionUID = 1;
 
 }
-
-
-
-
-
-
-
-

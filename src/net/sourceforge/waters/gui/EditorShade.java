@@ -82,11 +82,3 @@ public class EditorShade
 		return name;
 	}
 }
-
-
-
-
-
-
-
-

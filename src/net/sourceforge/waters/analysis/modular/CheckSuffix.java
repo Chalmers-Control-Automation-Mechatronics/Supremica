@@ -56,7 +56,7 @@ public class CheckSuffix
     }
     return nonsuffixs;
   }
-  
+
   protected static int accepts(AutomatonProxy automaton, TraceProxy counterExample)
   {
     Map<Key, StateProxy> mapAutomaton = createMap(automaton);
@@ -79,7 +79,7 @@ public class CheckSuffix
     }
     return i;
   }
-  
+
   private static Map<Key, StateProxy> createMap(AutomatonProxy automaton) 
   {
     Map<Key, StateProxy> mapAutomaton =
@@ -90,18 +90,18 @@ public class CheckSuffix
     }
     return mapAutomaton;
   }
-  
+
   private static final class Key
   {
     private final StateProxy mSource;
     private final EventProxy mEvent;
-    
+
     public Key(StateProxy source, EventProxy event)
     {
       mSource = source;
       mEvent = event;
     }
-    
+
     public boolean equals(Object o)
     {
       if (!(o instanceof Key)) {
@@ -110,7 +110,7 @@ public class CheckSuffix
       Key k = (Key)o;
       return k.mSource.equals(mSource) && mEvent.equals(k.mEvent);
     }
-    
+
     public int hashCode()
     {
       int hashCode = 17;
@@ -120,11 +120,3 @@ public class CheckSuffix
     }
   }
 }
-
-
-
-
-
-
-
-

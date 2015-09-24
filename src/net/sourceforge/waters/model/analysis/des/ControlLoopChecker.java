@@ -82,11 +82,3 @@ public interface ControlLoopChecker extends ModelVerifier
    */
   public Collection<EventProxy> getNonLoopEvents();
 }
-
-
-
-
-
-
-
-

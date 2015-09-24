@@ -71,7 +71,7 @@ public class SupremicaLoggerFactory
     private SupremicaLoggerFactory()
     {
     }
-    
+
     protected void initialiseAppenders()
     {
 		super.initialiseAppenders();
@@ -97,7 +97,7 @@ public class SupremicaLoggerFactory
         Config.LOG_TO_CONSOLE.addPropertyChangeListener(this);
         Config.LOG_TO_GUI.addPropertyChangeListener(this);
     }
-    
+
 
     //#######################################################################
     //# Factory Methods
@@ -105,8 +105,8 @@ public class SupremicaLoggerFactory
     {
         return mConsoleAppender;
     }
-    
-    
+
+
     //#######################################################################
     //# Interface org.supremica.properties.SupremicaPropertyChangeListener
     /**
@@ -143,8 +143,8 @@ public class SupremicaLoggerFactory
             root.removeAppender(appender);
         }
     }
-    
-    
+
+
     //#######################################################################
     //# Inner Class VerboseFilter
 	private class VerboseFilter extends Filter
@@ -171,10 +171,5 @@ public class SupremicaLoggerFactory
     //#######################################################################
     //# Data Members
     private Appender mConsoleAppender;
-    
+
 }
-
-
-
-
-

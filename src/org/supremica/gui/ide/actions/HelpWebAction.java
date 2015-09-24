@@ -70,8 +70,3 @@ public class HelpWebAction
 		BrowserControl.displayURL("http://www.supremica.org");
 	}
 }
-
-
-
-
-

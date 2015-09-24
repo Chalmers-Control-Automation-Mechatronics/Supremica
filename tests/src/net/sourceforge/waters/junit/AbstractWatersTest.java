@@ -254,11 +254,3 @@ public abstract class AbstractWatersTest
   private File mLogFile;
 
 }
-
-
-
-
-
-
-
-

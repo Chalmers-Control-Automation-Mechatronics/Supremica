@@ -317,11 +317,3 @@ public class HTMLPrinter
     "style='border-bottom: 1px red dashed'";
 
 }
-
-
-
-
-
-
-
-

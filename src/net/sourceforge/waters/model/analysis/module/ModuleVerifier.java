@@ -86,11 +86,3 @@ public interface ModuleVerifier extends ModuleAnalyzer
   public VerificationResult getAnalysisResult();
 
 }
-
-
-
-
-
-
-
-

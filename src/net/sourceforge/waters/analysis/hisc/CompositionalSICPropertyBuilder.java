@@ -784,11 +784,3 @@ public class CompositionalSICPropertyBuilder
   private EventProxy mTau;
 
 }
-
-
-
-
-
-
-
-

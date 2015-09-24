@@ -97,11 +97,3 @@ getFieldInfo(uint32_t fieldcode)
 
 
 }  /* namespace jni */
-
-
-
-
-
-
-
-

@@ -64,7 +64,7 @@ class LowestProbabilitySelector implements AutomataSelector
       }
 
     Arrays.sort(probs, new LowestProbabilityFirst());
-    
+
     System.err.println(Arrays.toString(probs));
 
     List<AutomatonSchema> result = new ArrayList<AutomatonSchema>();
@@ -90,10 +90,3 @@ class LowestProbabilitySelector implements AutomataSelector
   private final ProductDESSchema mModel;
   private final int mDesiredBits;
 }
-
-
-
-
-
-
-

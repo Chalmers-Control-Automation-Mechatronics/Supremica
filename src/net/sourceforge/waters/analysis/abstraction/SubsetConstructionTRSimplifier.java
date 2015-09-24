@@ -440,12 +440,3 @@ public class SubsetConstructionTRSimplifier
   private int mDumpStateIndex;
 
 }
-
-
-
-
-
-
-
-
-

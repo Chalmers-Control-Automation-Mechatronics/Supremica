@@ -232,11 +232,3 @@ public class LongSynchronisationEncoding
   static final int MAX_BITS = 63;
 
 }
-
-
-
-
-
-
-
-

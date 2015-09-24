@@ -57,7 +57,7 @@ public class JobStats implements Serializable
     if (obj != null && !(Serializable.class.isAssignableFrom(obj.getClass())))
       throw new IllegalArgumentException("Attribute value for '" + attr 
 					 + "' was not serializable");
-    
+
     mStatsMap.put(attr, obj);
   }
 
@@ -88,10 +88,3 @@ public class JobStats implements Serializable
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-

@@ -57,11 +57,3 @@ class EFSMVariableFinder
   }
 
 }
-
-
-
-
-
-
-
-

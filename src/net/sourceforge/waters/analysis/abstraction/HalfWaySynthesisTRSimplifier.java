@@ -441,11 +441,3 @@ public class HalfWaySynthesisTRSimplifier extends AbstractMarkingTRSimplifier
   private BitSet mBadStates;
 
 }
-
-
-
-
-
-
-
-

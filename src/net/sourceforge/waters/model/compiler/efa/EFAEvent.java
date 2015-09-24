@@ -143,11 +143,3 @@ class EFAEvent {
   private String mSuffix;
 
 }
-
-
-
-
-
-
-
-

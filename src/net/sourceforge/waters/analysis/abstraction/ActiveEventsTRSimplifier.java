@@ -1050,10 +1050,3 @@ public class ActiveEventsTRSimplifier
   private static final byte INTERNAL = 0x02;
 
 }
-
-
-
-
-
-
-

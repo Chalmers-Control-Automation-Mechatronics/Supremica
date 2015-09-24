@@ -1059,11 +1059,3 @@ public class MonolithicSCCControlLoopChecker
   private static final int SIZE_BUFFER = 1024;
 
 }
-
-
-
-
-
-
-
-

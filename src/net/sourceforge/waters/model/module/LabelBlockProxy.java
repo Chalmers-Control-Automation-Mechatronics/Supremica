@@ -51,11 +51,3 @@ public interface LabelBlockProxy extends EventListExpressionProxy {
   public LabelGeometryProxy getGeometry();
 
 }
-
-
-
-
-
-
-
-

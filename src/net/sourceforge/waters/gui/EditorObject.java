@@ -48,30 +48,22 @@ import net.sourceforge.waters.subject.base.Subject;
 public abstract class EditorObject
 {
     protected boolean visible;
-    
+
     public EditorObject()
     {
     }
-    
+
     public void drawObject(Graphics g, boolean selected)
     {
     }
-    
+
     public abstract int getX();
-    
+
     public abstract int getY();
-    
+
     public abstract void setPosition(double x, double y);
-    
+
     public abstract Point2D getPosition();
-    
+
     public abstract Subject getSubject();
 }
-
-
-
-
-
-
-
-

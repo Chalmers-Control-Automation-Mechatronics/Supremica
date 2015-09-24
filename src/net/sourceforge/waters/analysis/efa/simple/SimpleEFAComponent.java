@@ -398,11 +398,3 @@ public class SimpleEFAComponent
   private ComponentKind mKind;
   private final SimpleEFAVariableContext mVarContext;
 }
-
-
-
-
-
-
-
-

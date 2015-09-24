@@ -90,11 +90,3 @@ public class InsertSimpleComponentAction
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-
-

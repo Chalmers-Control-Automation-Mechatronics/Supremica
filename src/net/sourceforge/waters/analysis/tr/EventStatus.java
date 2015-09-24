@@ -255,11 +255,3 @@ public class EventStatus
   };
 
 }
-
-
-
-
-
-
-
-

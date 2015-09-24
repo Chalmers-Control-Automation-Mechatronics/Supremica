@@ -62,11 +62,3 @@ abstract class JAXBForeachHandler<C extends ForeachType, L extends ElementType>
   }
 
 }
-
-
-
-
-
-
-
-

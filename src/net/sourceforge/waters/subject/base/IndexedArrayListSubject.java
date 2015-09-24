@@ -635,11 +635,3 @@ public class IndexedArrayListSubject<P extends NamedSubject>
   private Map<String,P> mProxyMap;
 
 }
-
-
-
-
-
-
-
-

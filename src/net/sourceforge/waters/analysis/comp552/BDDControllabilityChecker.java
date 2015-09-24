@@ -308,11 +308,3 @@ public class BDDControllabilityChecker extends ModelChecker
   private SafetyTraceProxy mCounterExample;
 
 }
-
-
-
-
-
-
-
-

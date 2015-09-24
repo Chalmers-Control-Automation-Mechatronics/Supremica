@@ -1076,12 +1076,3 @@ public class NDProjectingControllabilityChecker
     LoggerFactory.createLogger(ProjectingControllabilityChecker.class);
 
 }
-
-
-
-
-
-
-
-
-

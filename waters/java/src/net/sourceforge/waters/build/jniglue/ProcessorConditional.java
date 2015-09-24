@@ -39,10 +39,3 @@ interface ProcessorConditional {
   public boolean isConditionSatisfied();
 
 }
-
-
-
-
-
-
-

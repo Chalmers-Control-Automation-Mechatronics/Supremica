@@ -315,11 +315,3 @@ private:
 
 
 #endif  /* !_AutomatonEncoding_h_ */
-
-
-
-
-
-
-
-

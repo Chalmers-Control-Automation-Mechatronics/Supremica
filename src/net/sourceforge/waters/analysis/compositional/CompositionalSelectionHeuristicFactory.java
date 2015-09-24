@@ -464,10 +464,3 @@ public class CompositionalSelectionHeuristicFactory
   }
 
 }
-
-
-
-
-
-
-

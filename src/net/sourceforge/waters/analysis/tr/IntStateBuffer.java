@@ -706,12 +706,3 @@ public class IntStateBuffer
   private static final int TAG_ALL = TAG_INITIAL | TAG_REACHABLE;
 
 }
-
-
-
-
-
-
-
-
-

@@ -54,8 +54,3 @@ public class EditorMode
 		this.mode = mode;
 	}
 }
-
-
-
-
-

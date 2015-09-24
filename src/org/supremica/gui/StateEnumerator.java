@@ -48,26 +48,21 @@ public class StateEnumerator
     private static final long serialVersionUID = 1L;
     @SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.createLogger(StateEnumerator.class);
-    
+
     public StateEnumerator()
     {
         putValue(NAME, "Enumerate States");
         putValue(SHORT_DESCRIPTION, "Rename states with q0, q1, etc");
     }
-    
+
     public void actionPerformed(ActionEvent event)
     {
         // Get the selected automata
         Automata automata = ActionMan.getGui().getSelectedAutomata();
-        
+
         // No dialog just yet, prefix is always 'q'
         EnumerateStates enumer = new EnumerateStates(automata, "q");
-        
+
         enumer.execute();
     }
 }
-
-
-
-
-

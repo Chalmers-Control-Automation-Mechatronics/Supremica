@@ -210,8 +210,3 @@ class SupremicaLogger
     //# Data Members
     private final org.apache.log4j.Logger mLogger;
 }
-
-
-
-
-

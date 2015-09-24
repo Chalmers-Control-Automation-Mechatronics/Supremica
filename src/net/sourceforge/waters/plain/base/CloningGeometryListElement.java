@@ -168,11 +168,3 @@ public class CloningGeometryListElement<E extends Cloneable>
   private Method mLastCloneMethod;
 
 }
-
-
-
-
-
-
-
-

@@ -59,10 +59,3 @@ interface CompiledEvent
   public Iterator<? extends CompiledEvent> getChildrenIterator();
 
 }
-
-
-
-
-
-
-

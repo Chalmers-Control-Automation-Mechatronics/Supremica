@@ -123,11 +123,3 @@ public class HISCConflictKindTranslator
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-
-

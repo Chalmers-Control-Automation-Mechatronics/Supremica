@@ -190,11 +190,3 @@ class ClassTypeGlue extends TypeGlue {
   private final boolean mUseGlue;
 
 }
-
-
-
-
-
-
-
-

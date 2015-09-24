@@ -116,11 +116,3 @@ public interface AutomatonProxy
   public Map<String,String> getAttributes();
 
 }
-
-
-
-
-
-
-
-

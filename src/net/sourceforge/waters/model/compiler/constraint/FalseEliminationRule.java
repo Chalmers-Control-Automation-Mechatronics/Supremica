@@ -87,10 +87,3 @@ class FalseEliminationRule extends SimplificationRule
   private static final PlaceHolder[] PLACEHOLDERS = {};
 
 }
-
-
-
-
-
-
-

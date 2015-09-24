@@ -129,11 +129,3 @@ public abstract class MutableSubject
   private Collection<ModelObserver> mObservers;
 
 }
-
-
-
-
-
-
-
-

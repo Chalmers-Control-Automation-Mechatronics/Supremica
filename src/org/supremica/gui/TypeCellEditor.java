@@ -111,8 +111,3 @@ class TypeCellEditor
 		}
 	}
 }
-
-
-
-
-

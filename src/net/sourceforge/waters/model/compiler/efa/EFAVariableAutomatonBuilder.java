@@ -345,11 +345,3 @@ class EFAVariableAutomatonBuilder extends AbortableCompiler
   private Map<EFAVariableEdge,EFAVariableEdge> mEdgeMap;
 
 }
-
-
-
-
-
-
-
-

@@ -96,8 +96,3 @@ public class AnalyzerDeadEventsDetectorAction
         //logger.info("After action");
     }
 }
-
-
-
-
-

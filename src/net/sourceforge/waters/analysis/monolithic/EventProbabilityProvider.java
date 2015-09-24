@@ -40,11 +40,3 @@ interface EventProbabilityProvider
 {
   public double getProbability(int aut, int event);
 }
-
-
-
-
-
-
-
-

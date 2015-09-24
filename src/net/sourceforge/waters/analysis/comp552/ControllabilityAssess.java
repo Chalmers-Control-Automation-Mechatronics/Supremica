@@ -708,11 +708,3 @@ public class ControllabilityAssess
   private int mNumHalfCorrectTraces;
 
 }
-
-
-
-
-
-
-
-

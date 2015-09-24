@@ -643,10 +643,3 @@ public class ModularControllabilitySynthesizer
   private Map<AutomatonProxy,Collection<AutomatonProxy>> mSupervisorUsedAutomataMap;
 
 }
-
-
-
-
-
-
-

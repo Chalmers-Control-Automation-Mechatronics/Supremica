@@ -57,7 +57,7 @@ public class GreedyPackedStateEncoding extends StateEncoding
     //Get the automata and sort them by size. To facilitate this, the
     //automaton schema now stores the id, rather than having it
     //implicit in the ordering of automata.
-    
+
     //The total number of words necessary can be calculated, and the
     //automata can be allocated to words in order of size. In most
     //cases, this should result in fairly good packing efficiency, as
@@ -65,12 +65,12 @@ public class GreedyPackedStateEncoding extends StateEncoding
     //gaps.
     AutomatonSchema[] aut = des.getAutomata();
     Arrays.sort(aut, new AutomatonSizeComparator());
-    
+
     mWordIndex = new int[aut.length];
     mNumBits = new int[aut.length];
     mBitMask = new int[aut.length];
     mShift = new int[aut.length];
-    
+
     //The worst possible encoding will have one word
     //for every automaton. While this is very unlikely,
     //it gives an upper bound on tuple size.
@@ -151,7 +151,7 @@ public class GreedyPackedStateEncoding extends StateEncoding
   public int[] decodeState(StateTuple packed, int[] unpacked)
   {
     int[] pstate = packed.getStateArray();
-    
+
     for (int i = 0; i < unpacked.length; i++)
       {
 	unpacked[i] = (pstate[mWordIndex[i]] & mBitMask[i]) >>> mShift[i];
@@ -222,13 +222,6 @@ public class GreedyPackedStateEncoding extends StateEncoding
   private final int[] mBitMask;
   private final int[] mShift;
   private final int mWordCount;
-  
+
   private final ProductDESSchema mModel;
 }
-
-
-
-
-
-
-

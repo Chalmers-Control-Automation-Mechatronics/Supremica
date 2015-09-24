@@ -52,11 +52,3 @@ public class NativeSICProperty5VerifierTest extends
   }
 
 }
-
-
-
-
-
-
-
-

@@ -70,7 +70,7 @@ class TransitionProperty
 	this.event = event;
     }
 
-    
+
     //#########################################################################
     //# Invocation
     /**
@@ -100,11 +100,3 @@ class TransitionProperty
 	return event;
     }
 }
-
-
-
-
-
-
-
-

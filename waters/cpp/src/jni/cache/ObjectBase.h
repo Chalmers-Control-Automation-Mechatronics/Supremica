@@ -98,11 +98,3 @@ private:
 }   /* namespace jni */
 
 #endif  /* !_ObjectBase_h_ */
-
-
-
-
-
-
-
-

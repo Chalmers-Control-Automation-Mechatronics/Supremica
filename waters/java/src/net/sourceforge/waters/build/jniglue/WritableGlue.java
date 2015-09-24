@@ -39,10 +39,3 @@ interface WritableGlue {
   public void registerProcessors(TemplateContext context);
 
 }
-
-
-
-
-
-
-

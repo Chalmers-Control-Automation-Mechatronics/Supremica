@@ -470,12 +470,3 @@ public class AutomataGroup
     Naive
   }
 }
-
-
-
-
-
-
-
-
-

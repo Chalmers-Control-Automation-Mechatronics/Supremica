@@ -93,7 +93,7 @@ class WorkerCleanup
 	wset = mWorkers.get(id);
 	mWorkers.remove(id);
       }
-    
+
     if (wset == null)
       return;
 
@@ -132,10 +132,3 @@ class WorkerCleanup
   //that workers implement object equality and hashcode.
   private final Map<ControllerID, Set<WorkerLocal>> mWorkers;
 }
-
-
-
-
-
-
-

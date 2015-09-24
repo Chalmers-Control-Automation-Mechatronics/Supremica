@@ -57,8 +57,3 @@ public class SoftplcInterface
 		return super.getName();
 	}
 }
-
-
-
-
-

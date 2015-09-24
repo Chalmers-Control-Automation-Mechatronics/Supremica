@@ -1211,11 +1211,3 @@ public class Simulation implements ModelObserver, Observer
   private boolean mTraceInvalidated;
 
 }
-
-
-
-
-
-
-
-

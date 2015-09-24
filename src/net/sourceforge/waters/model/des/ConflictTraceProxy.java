@@ -59,11 +59,3 @@ public interface ConflictTraceProxy
   public ConflictKind getKind();
 
 }
-
-
-
-
-
-
-
-

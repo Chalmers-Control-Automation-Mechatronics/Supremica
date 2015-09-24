@@ -440,12 +440,3 @@ public class NodeEditorDialog
   private static final Insets INSETS = new Insets(2,4,2,4);
 
 }
-
-
-
-
-
-
-
-
-

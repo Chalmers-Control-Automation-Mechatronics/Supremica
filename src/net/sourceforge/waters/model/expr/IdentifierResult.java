@@ -96,11 +96,3 @@ class IdentifierResult extends ParseResult {
   private final List<ParseResult> mIndexes;
 
 }
-
-
-
-
-
-
-
-

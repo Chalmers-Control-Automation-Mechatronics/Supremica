@@ -82,11 +82,3 @@ private:
 }   /* namespace jni */
 
 #endif  /* !_JavaString_h_ */
-
-
-
-
-
-
-
-

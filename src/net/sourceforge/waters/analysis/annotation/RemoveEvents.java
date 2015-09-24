@@ -201,12 +201,3 @@ public class RemoveEvents
     return mImpossibleEvent;
   }
 }
-
-
-
-
-
-
-
-
-

@@ -160,8 +160,3 @@ public class ActionAndControlViewer
 
 	public void initialize() {}
 }
-
-
-
-
-

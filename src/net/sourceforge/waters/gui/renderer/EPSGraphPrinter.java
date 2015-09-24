@@ -123,12 +123,3 @@ public class EPSGraphPrinter extends Renderer
   private AbstractPSDocumentGraphics2D mGraphics;
 
 }
-
-
-
-
-
-
-
-
-

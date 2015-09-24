@@ -167,11 +167,3 @@ public interface EventDeclProxy extends IdentifiedProxy {
   public static final String DEFAULT_PRECONDITION_NAME = ":alpha";
 
 }
-
-
-
-
-
-
-
-

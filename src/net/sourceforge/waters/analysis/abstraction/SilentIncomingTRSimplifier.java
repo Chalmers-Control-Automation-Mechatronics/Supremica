@@ -316,12 +316,3 @@ public class SilentIncomingTRSimplifier
   private TransitionIterator mAlwaysEnabledIterator;
 
 }
-
-
-
-
-
-
-
-
-

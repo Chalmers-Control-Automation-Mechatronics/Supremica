@@ -174,11 +174,3 @@ public class ConflictTraceElement
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-
-

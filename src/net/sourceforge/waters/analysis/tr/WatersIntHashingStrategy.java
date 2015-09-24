@@ -64,11 +64,3 @@ public interface WatersIntHashingStrategy extends Serializable
   public boolean equals(int val1, int val2);
 
 }
-
-
-
-
-
-
-
-

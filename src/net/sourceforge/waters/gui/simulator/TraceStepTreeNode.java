@@ -164,11 +164,3 @@ class TraceStepTreeNode extends DefaultMutableTreeNode
   private static final long serialVersionUID = 1581075011997555080L;
 
 }
-
-
-
-
-
-
-
-

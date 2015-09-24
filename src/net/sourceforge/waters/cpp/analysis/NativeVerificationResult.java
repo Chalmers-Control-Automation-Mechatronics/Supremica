@@ -228,11 +228,3 @@ public class NativeVerificationResult
   private int mTarjanComponentStackHeight;
 
 }
-
-
-
-
-
-
-
-

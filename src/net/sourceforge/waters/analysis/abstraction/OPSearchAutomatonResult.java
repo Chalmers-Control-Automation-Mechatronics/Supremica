@@ -201,11 +201,3 @@ public class OPSearchAutomatonResult
   private int mNumberOfIterations;
 
 }
-
-
-
-
-
-
-
-

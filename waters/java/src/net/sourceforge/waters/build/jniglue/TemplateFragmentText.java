@@ -66,10 +66,3 @@ class TemplateFragmentText extends TemplateFragment {
   private final String mText;
 
 }
-
-
-
-
-
-
-

@@ -57,11 +57,3 @@ class UnifiedEFAVariableCollector
     super(optable, context);
   }
 }
-
-
-
-
-
-
-
-

@@ -275,11 +275,3 @@ class TraceFinder implements PredecessorCallback
   private final StateEncoding mStateEncoding;
   private final SafetyVerifierWorker[] mWorkers;
 }
-
-
-
-
-
-
-
-

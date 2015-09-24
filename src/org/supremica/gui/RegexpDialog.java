@@ -290,8 +290,3 @@ public class RegexpDialog
 		return reg_exp.getText();
 	}
 }
-
-
-
-
-

@@ -128,8 +128,3 @@ class AnimationSignals
 		}
 */
 }
-
-
-
-
-

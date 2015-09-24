@@ -138,11 +138,3 @@ public class ConflictKindTranslator
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-
-

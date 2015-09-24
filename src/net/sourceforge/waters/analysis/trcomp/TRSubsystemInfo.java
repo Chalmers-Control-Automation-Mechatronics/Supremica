@@ -347,11 +347,3 @@ class TRSubsystemInfo
   private final Map<EventProxy,TREventInfo> mEvents;
 
 }
-
-
-
-
-
-
-
-

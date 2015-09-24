@@ -426,11 +426,3 @@ class EFSMTRSimplifier extends AbstractEFSMAlgorithm
   private List<ConstraintList> mSelfloopedUpdates;
 
 }
-
-
-
-
-
-
-
-

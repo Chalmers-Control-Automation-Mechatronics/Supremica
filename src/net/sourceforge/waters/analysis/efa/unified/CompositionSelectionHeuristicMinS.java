@@ -116,10 +116,3 @@ public class CompositionSelectionHeuristicMinS
   }
 
 }
-
-
-
-
-
-
-

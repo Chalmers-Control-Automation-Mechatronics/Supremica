@@ -102,8 +102,3 @@ public class SaturateAction
 		logger.debug("Added " + i + " automata, SaturateAction::actionPerformed done");
 	}
 }
-
-
-
-
-

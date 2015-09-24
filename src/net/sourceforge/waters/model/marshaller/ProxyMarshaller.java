@@ -93,11 +93,3 @@ public interface ProxyMarshaller<D extends DocumentProxy>
   public FileFilter getDefaultFileFilter();
 
 }
-
-
-
-
-
-
-
-

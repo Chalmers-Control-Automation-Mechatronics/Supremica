@@ -49,11 +49,3 @@ public interface ComparableProxy<T>
   public ComparableProxy<T> clone();
 
 }
-
-
-
-
-
-
-
-

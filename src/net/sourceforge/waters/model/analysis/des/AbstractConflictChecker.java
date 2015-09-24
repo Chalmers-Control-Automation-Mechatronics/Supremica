@@ -295,11 +295,3 @@ public abstract class AbstractConflictChecker
   private EventProxy mUsedMarking;
   private EventProxy mPreconditionMarking;
 }
-
-
-
-
-
-
-
-

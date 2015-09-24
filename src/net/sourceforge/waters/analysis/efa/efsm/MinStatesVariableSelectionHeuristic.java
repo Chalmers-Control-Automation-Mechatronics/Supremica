@@ -83,11 +83,3 @@ public class MinStatesVariableSelectionHeuristic
   private EFSMUnfoldingCache mCache;
 
 }
-
-
-
-
-
-
-
-

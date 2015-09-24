@@ -110,7 +110,7 @@ public:
   //# Exceptions
   jint throwJavaException(uint32_t classcode, const char* msg);
   jint throwJavaException(const ExceptionGlue& glue);
-  
+
 private:
   //##########################################################################
   //# Data Members
@@ -124,11 +124,3 @@ private:
 }   /* namespace jni */
 
 #endif  /* !_ClassCache_h_ */
-
-
-
-
-
-
-
-

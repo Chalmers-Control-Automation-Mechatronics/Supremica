@@ -138,12 +138,3 @@ public class TauLoopRemoval
     TIME += System.currentTimeMillis();
   }
 }
-
-
-
-
-
-
-
-
-

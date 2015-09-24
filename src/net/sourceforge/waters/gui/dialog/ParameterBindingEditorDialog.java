@@ -251,11 +251,3 @@ public class ParameterBindingEditorDialog extends AbstractBindingEditorDialog
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-
-

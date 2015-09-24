@@ -67,11 +67,3 @@ public interface FunctionCallExpressionProxy
   public List<SimpleExpressionProxy> getArguments();
 
 }
-
-
-
-
-
-
-
-

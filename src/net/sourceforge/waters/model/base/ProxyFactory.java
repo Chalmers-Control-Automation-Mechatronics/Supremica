@@ -37,11 +37,3 @@ package net.sourceforge.waters.model.base;
 public interface ProxyFactory
 {
 }
-
-
-
-
-
-
-
-

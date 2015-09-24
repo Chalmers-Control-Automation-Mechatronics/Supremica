@@ -137,7 +137,6 @@ public class Actions extends WatersActionManager
 
     // Printing Actions
     public IDEAction editorPrintAction = new EditorPrintAction(mIDEActions);
-    public IDEAction editorSaveSVGAction = new EditorSaveSVGAction(mIDEActions);
 
     // Editor Actions
     public IDEAction editorAddForeachComponentAction = new EditorAddForeachComponentAction(mIDEActions);
@@ -203,8 +202,3 @@ public class Actions extends WatersActionManager
     public IDEAction helpWebAction = new HelpWebAction(mIDEActions);
 
 }
-
-
-
-
-

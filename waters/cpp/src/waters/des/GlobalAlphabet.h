@@ -97,11 +97,3 @@ private:
 }   /* namespace waters */
 
 #endif  /* !_GlobalAlphabet_h_ */
-
-
-
-
-
-
-
-

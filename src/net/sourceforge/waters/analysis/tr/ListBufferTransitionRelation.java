@@ -3140,10 +3140,3 @@ public class ListBufferTransitionRelation implements EventStatusProvider
   public static final int CONFIG_ALL = CONFIG_SUCCESSORS
                                        | CONFIG_PREDECESSORS;
 }
-
-
-
-
-
-
-

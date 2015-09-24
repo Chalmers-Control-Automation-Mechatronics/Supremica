@@ -443,11 +443,3 @@ public class ForeachEditorDialog
     WatersDataFlavor.createTransferable(TEMPLATE);
 
 }
-
-
-
-
-
-
-
-

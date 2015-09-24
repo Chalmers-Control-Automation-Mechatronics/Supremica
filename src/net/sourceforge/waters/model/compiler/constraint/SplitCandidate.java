@@ -49,10 +49,3 @@ public interface SplitCandidate
     (ModuleProxyFactory factory, CompilerOperatorTable optable);
 
 }
-
-
-
-
-
-
-

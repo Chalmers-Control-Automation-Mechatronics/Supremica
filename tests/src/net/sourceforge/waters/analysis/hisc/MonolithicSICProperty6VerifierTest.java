@@ -87,11 +87,3 @@ public class MonolithicSICProperty6VerifierTest extends
   }
 
 }
-
-
-
-
-
-
-
-

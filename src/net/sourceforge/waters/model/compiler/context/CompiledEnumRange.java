@@ -319,11 +319,3 @@ public class CompiledEnumRange implements CompiledRange
   private final List<SimpleIdentifierProxy> mAtoms;
 
 }
-
-
-
-
-
-
-
-

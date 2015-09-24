@@ -64,11 +64,3 @@ class EventDeclListPopupFactory
   }
 
 }
-
-
-
-
-
-
-
-

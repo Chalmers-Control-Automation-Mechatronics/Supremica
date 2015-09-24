@@ -287,11 +287,3 @@ public class EFSMVariablePartitionComputerTest
   //# Class Constants
   private static final String PARTITION = "PARTITION";
 }
-
-
-
-
-
-
-
-

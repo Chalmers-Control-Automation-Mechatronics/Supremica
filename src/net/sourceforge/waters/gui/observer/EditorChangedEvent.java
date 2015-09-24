@@ -107,11 +107,3 @@ public abstract class EditorChangedEvent extends EventObject
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-
-

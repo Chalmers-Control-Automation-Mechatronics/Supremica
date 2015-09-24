@@ -155,11 +155,3 @@ public interface ModuleWindowInterface
   public void showPanel(SelectionOwner panel);
 
 }
-
-
-
-
-
-
-
-

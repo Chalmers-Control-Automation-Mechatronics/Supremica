@@ -110,11 +110,3 @@ private:
 }   /* namespace waters */
 
 #endif  /* !_JavaHashTable_h_ */
-
-
-
-
-
-
-
-

@@ -56,10 +56,10 @@ public class TestController extends AbstractController
     if (job == null)
       throw new IllegalStateException("No job was given");
 
-    
+
     Node[] nodesArray = new Node[nodes.size()];
     Worker[] workers = new Worker[nodes.size()];
-    
+
 
     int i = 0;
     for (Node n : nodes)
@@ -79,10 +79,3 @@ public class TestController extends AbstractController
       }
   }
 }
-
-
-
-
-
-
-

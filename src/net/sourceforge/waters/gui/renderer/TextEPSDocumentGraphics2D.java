@@ -143,11 +143,3 @@ public class TextEPSDocumentGraphics2D extends EPSDocumentGraphics2D
   }
 
 }
-
-
-
-
-
-
-
-

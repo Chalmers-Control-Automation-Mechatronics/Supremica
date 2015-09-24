@@ -71,11 +71,3 @@ public interface AutomatonResult
   public void setComputedAutomaton(final AutomatonProxy aut);
 
 }
-
-
-
-
-
-
-
-

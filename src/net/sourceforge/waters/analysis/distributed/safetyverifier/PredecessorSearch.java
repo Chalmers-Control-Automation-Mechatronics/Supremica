@@ -68,7 +68,7 @@ public class PredecessorSearch
     //Stop the producer and consumer while changing parameters.
     mProducer.setStopped(true);
     mConsumer.setStopped(true);
-    
+
     //Reset the search targets.
     mProducer.setSearchState(state);
     mConsumer.setSearchCallback(cb);
@@ -153,7 +153,7 @@ class PredecessorProducer extends Thread
     notifyAll();
     interrupt();
   }
-  
+
   public void run()
   {
     while (true)
@@ -306,13 +306,13 @@ class PredecessorConsumer extends Thread
     mBestDepth = Integer.MAX_VALUE;
     poke();
   }
-  
+
   public synchronized void shutdown()
   {
     mKill = true;
     poke();
   }
-  
+
   public synchronized void setStopped(boolean value)
   {
     mStopped = value;
@@ -324,7 +324,7 @@ class PredecessorConsumer extends Thread
     notifyAll();
     interrupt();
   }
-      
+
   public void run()
   {
     while (true)
@@ -387,7 +387,7 @@ class PredecessorConsumer extends Thread
 	  }
       }
   }
-      
+
   private final BlockingQueue<Predecessor> mQueue;
   private final SafetyVerifierWorkerImpl mWorker;
   private PredecessorCallback mCallback;
@@ -410,30 +410,23 @@ class Predecessor
     mPredecessorState = predecessor;
     mEvent = event;
   }
-  
+
   public StateTuple getOriginal()
   {
     return mOriginalState;
   }
-  
+
   public StateTuple getPredecessor()
   {
     return mPredecessorState;
   }
-  
+
   public int getEvent()
   {
     return mEvent;
   }
-  
+
   private final StateTuple mOriginalState;
   private final StateTuple mPredecessorState;
   private final int mEvent;
 }
-
-
-
-
-
-
-

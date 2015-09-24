@@ -61,8 +61,3 @@ public class AnimationTypes
 		return description;
 	}
 }
-
-
-
-
-

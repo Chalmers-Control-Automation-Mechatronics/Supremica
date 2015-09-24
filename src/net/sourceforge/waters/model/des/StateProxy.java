@@ -75,11 +75,3 @@ public interface StateProxy
   public Collection<EventProxy> getPropositions();
 
 }
-
-
-
-
-
-
-
-

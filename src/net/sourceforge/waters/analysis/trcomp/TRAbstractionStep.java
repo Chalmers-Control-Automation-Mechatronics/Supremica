@@ -158,11 +158,3 @@ abstract class TRAbstractionStep
   private TRAutomatonProxy mOutputAutomaton;
 
 }
-
-
-
-
-
-
-
-

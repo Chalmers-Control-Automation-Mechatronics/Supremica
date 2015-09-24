@@ -59,11 +59,3 @@ public class AnalysisConfigurationException extends AnalysisException {
   private static final long serialVersionUID = -3131107766968296988L;
 
 }
-
-
-
-
-
-
-
-

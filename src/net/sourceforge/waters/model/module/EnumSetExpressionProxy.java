@@ -67,11 +67,3 @@ public interface EnumSetExpressionProxy extends SimpleExpressionProxy {
   public List<SimpleIdentifierProxy> getItems();
 
 }
-
-
-
-
-
-
-
-

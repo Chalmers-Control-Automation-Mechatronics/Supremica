@@ -426,11 +426,3 @@ public class UnifiedEFASimplifierStatistics
   private long mPeakMemoryUsage;
 
 }
-
-
-
-
-
-
-
-

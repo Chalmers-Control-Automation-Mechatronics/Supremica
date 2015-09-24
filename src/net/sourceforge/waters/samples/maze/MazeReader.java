@@ -132,7 +132,7 @@ class MazeReader
       mSquares = null;
     }
   }
-      
+
 
   //#########################################################################
   //# Auxiliary Methods
@@ -322,7 +322,7 @@ class MazeReader
   private abstract class SimpleSquareCreator extends SquareCreator
   {
     abstract Square createSquare(Point pos);
-    
+
     Square getSquare(final Point pos, final String key)
       throws MazeSyntaxException
     {
@@ -341,7 +341,7 @@ class MazeReader
   private abstract class KeySquareCreator extends SquareCreator
   {
     abstract Square createSquare(Point pos, final String key);
-    
+
     Square getSquare(final Point pos, final String key)
       throws MazeSyntaxException
     {
@@ -354,11 +354,3 @@ class MazeReader
   }
 
 }
-
-
-
-
-
-
-
-

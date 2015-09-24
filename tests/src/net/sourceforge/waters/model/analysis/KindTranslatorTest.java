@@ -105,11 +105,3 @@ public class KindTranslatorTest
   }
 
 }
-
-
-
-
-
-
-
-

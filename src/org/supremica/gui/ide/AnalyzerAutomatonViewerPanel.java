@@ -51,11 +51,11 @@ class AnalyzerAutomatonViewerPanel
     implements DotBuilderGraphObserver
 {
     private static final long serialVersionUID = 1L;
-    
+
     private String name;
     private Automaton theAutomaton;
     private GrappaPanel viewerPanel = null;
-    
+
     AnalyzerAutomatonViewerPanel(String name, Automaton theAutomaton)
     {
         this.name = name;
@@ -64,12 +64,12 @@ class AnalyzerAutomatonViewerPanel
         setMinimumSize(IDEDimensions.rightAnalyzerMinimumSize);
         build();
     }
-    
+
     public String getName()
     {
         return name;
     }
-    
+
     public void setPreferredSize(Dimension dimension)
     {
         super.setPreferredSize(dimension);
@@ -78,7 +78,7 @@ class AnalyzerAutomatonViewerPanel
             viewerPanel.setPreferredSize(dimension);
         }
     }
-    
+
     public void setMinimumSize(Dimension dimension)
     {
         super.setMinimumSize(dimension);
@@ -87,12 +87,12 @@ class AnalyzerAutomatonViewerPanel
             viewerPanel.setMinimumSize(dimension);
         }
     }
-    
+
     private void build()
     {
         DotBuilder.getDotBuilder(null, this, new AutomatonToDot(theAutomaton), "");
     }
-    
+
     public void setGraph(Graph theGraph)
     {
         viewerPanel = new GrappaPanel(theGraph);
@@ -104,9 +104,5 @@ class AnalyzerAutomatonViewerPanel
         getViewport().setMinimumSize(getMinimumSize());
         validate();
     }
-    
+
 }
-
-
-
-

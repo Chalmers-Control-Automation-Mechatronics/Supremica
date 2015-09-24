@@ -139,11 +139,3 @@ public interface EventStatusProvider
   public int MAX_PROPOSITIONS = 30;
 
 }
-
-
-
-
-
-
-
-

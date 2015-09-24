@@ -95,11 +95,3 @@ public class MaxTrueVariableSelectionHeuristic
   private EFSMUnfoldingCache mCache;
 
 }
-
-
-
-
-
-
-
-

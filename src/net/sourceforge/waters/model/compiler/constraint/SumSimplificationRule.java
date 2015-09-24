@@ -471,11 +471,3 @@ class SumSimplificationRule extends SimplificationRule
   private final SumPlaceHolder mRHS;
 
 }
-
-
-
-
-
-
-
-

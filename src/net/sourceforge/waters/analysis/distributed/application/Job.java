@@ -118,10 +118,3 @@ public class Job extends AbstractJobDataDecorator
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-

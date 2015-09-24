@@ -49,11 +49,3 @@ package net.sourceforge.waters.model.base;
 abstract public class DescendingProxyVisitor extends DefaultProxyVisitor {
 
 }
-
-
-
-
-
-
-
-

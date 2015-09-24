@@ -469,11 +469,3 @@ class EFAVariableTransitionRelation
   private ConstraintList mFormula;
 
 }
-
-
-
-
-
-
-
-

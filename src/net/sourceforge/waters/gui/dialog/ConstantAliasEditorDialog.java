@@ -450,11 +450,3 @@ public class ConstantAliasEditorDialog
   private static Dimension MIN_SIZE = new Dimension(333, 213);
   private static Dimension MAX_SIZE = new Dimension(433, 213);
 }
-
-
-
-
-
-
-
-

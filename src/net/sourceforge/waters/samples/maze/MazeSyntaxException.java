@@ -76,17 +76,9 @@ public class MazeSyntaxException extends IOException {
     initCause(cause);
   }
 
-  
+
   //#########################################################################
   //# Static Class Variables
   public static final long serialVersionUID = 1;
 
 }
-
-
-
-
-
-
-
-

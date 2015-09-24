@@ -71,11 +71,3 @@ public interface Operator {
     TYPE_BOOLEAN | TYPE_INT | TYPE_ATOM | TYPE_RANGE | TYPE_NAME;
 
 }
-
-
-
-
-
-
-
-

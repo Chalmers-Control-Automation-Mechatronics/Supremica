@@ -120,11 +120,3 @@ public class IDEDeselectAllAction
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-
-

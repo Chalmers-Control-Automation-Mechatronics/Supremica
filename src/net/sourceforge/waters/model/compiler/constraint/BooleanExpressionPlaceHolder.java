@@ -43,7 +43,7 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 
 class BooleanExpressionPlaceHolder extends RangedExpressionPlaceHolder
 {
-  
+
   //#########################################################################
   //# Constructors
   BooleanExpressionPlaceHolder(final ModuleProxyFactory factory,
@@ -83,10 +83,3 @@ class BooleanExpressionPlaceHolder extends RangedExpressionPlaceHolder
   }
 
 }
-
-
-
-
-
-
-

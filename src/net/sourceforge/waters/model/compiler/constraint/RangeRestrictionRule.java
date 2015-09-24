@@ -94,10 +94,3 @@ abstract class RangeRestrictionRule extends SimplificationRule
   private CompiledRange mRestrictedRange;
 
 }
-
-
-
-
-
-
-

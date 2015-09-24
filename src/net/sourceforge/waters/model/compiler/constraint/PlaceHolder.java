@@ -103,10 +103,3 @@ class PlaceHolder {
   private SimpleExpressionProxy mBoundExpression;
 
 }
-
-
-
-
-
-
-

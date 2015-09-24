@@ -195,11 +195,3 @@ public class MoveCommand
   private boolean mHasBeenExecuted;
 
 }
-
-
-
-
-
-
-
-

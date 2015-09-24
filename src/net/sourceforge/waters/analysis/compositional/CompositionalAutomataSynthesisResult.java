@@ -392,11 +392,3 @@ public class CompositionalAutomataSynthesisResult
   private int mTotalRenamedSupervisorTransitions;
 
 }
-
-
-
-
-
-
-
-

@@ -1204,11 +1204,3 @@ public class CompositionalAutomataSynthesizer
   private EventEncoding mTempEventEncoding;
 
 }
-
-
-
-
-
-
-
-

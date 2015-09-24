@@ -241,11 +241,3 @@ public class GlueCompiler {
   private static final String TEMPLATE_PLAIN_CPP = "PlainGlue.cpp";
 
 }
-
-
-
-
-
-
-
-

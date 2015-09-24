@@ -63,7 +63,7 @@ public interface HashStrategy
    * @return True if the indirect pointer values are equal.
    */
   public boolean equalIndirect(int x, int y);
-  
+
   /**
    * Computes a hash code for the object.
    * @param x the object to compute the hash code for
@@ -81,10 +81,3 @@ public interface HashStrategy
    */
   public int computeIndirectHash(int ptr);
 }
-
-
-
-
-
-
-

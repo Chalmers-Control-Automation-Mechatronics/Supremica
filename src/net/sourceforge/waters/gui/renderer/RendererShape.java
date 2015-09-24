@@ -50,11 +50,3 @@ public interface RendererShape
   public boolean isClicked(int x, int y);
 
 }
-
-
-
-
-
-
-
-

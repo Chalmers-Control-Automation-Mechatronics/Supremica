@@ -208,11 +208,3 @@ public interface ModelAnalyzer
   public void clearAnalysisResult();
 
 }
-
-
-
-
-
-
-
-

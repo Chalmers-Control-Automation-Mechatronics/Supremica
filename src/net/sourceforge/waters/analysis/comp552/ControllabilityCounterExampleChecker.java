@@ -283,11 +283,3 @@ public class ControllabilityCounterExampleChecker
   private StringBuilder mDiagnostics;
 
 }
-
-
-
-
-
-
-
-

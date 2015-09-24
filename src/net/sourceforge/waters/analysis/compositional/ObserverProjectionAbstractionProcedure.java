@@ -122,11 +122,3 @@ class ObserverProjectionAbstractionProcedure
   private final ObserverProjectionTRSimplifier mOPSimplifier;
 
 }
-
-
-
-
-
-
-
-

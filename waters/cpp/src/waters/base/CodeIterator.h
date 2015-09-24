@@ -74,11 +74,3 @@ private:
 }   /* namespace waters */
 
 #endif  /* !_CodeIterator_h_ */
-
-
-
-
-
-
-
-

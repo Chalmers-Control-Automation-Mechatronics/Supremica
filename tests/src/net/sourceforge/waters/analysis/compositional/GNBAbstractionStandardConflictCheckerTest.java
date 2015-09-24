@@ -78,11 +78,3 @@ public class GNBAbstractionStandardConflictCheckerTest
   }
 
 }
-
-
-
-
-
-
-
-

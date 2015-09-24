@@ -217,11 +217,3 @@ public interface TransitionRelationSimplifier
   public void reset();
 
 }
-
-
-
-
-
-
-
-

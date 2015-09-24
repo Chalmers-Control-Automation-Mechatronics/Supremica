@@ -69,11 +69,3 @@ class TRPreselectionHeuristicMaxS
   }
 
 }
-
-
-
-
-
-
-
-

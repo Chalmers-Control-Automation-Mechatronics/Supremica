@@ -77,11 +77,3 @@ public class MaxOccurrenceVariableSelectionHeuristic
   }
 
 }
-
-
-
-
-
-
-
-

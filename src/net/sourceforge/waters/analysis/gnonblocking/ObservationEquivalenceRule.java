@@ -209,11 +209,3 @@ class ObservationEquivalenceRule extends TRSimplifierAbstractionRule
   private StateEncoding mOutputEncoding;
 
 }
-
-
-
-
-
-
-
-

@@ -162,11 +162,3 @@ abstract class AbstractAbstractionProcedure implements AbstractionProcedure
   private final AbstractCompositionalModelAnalyzer mAnalyzer;
 
 }
-
-
-
-
-
-
-
-

@@ -153,11 +153,3 @@ class ClassGlueCollection implements FileWritableGlue {
   private Collection<TypeSignature> mSignatures;
 
 }
-
-
-
-
-
-
-
-

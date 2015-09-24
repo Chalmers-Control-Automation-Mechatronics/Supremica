@@ -44,49 +44,44 @@ public class SupremicaTreeNode
     private static final long serialVersionUID = 1L;
 
     boolean enabled = true;
-    
+
     public SupremicaTreeNode()
     {
         super();
     }
-    
+
     public SupremicaTreeNode(Object obj)
     {
         super(obj);
     }
-    
+
     public boolean isEnabled()
     {
         return enabled;
     }
-    
+
     public void setEnabled(boolean b)
     {
         enabled = b;
     }
-    
+
     public Icon getOpenIcon()
     {
         return null;
     }
-    
+
     public Icon getLeafIcon()
     {
         return null;
     }
-    
+
     public Icon getClosedIcon()
     {
         return null;
     }
-    
+
     public Icon getDisabledIcon()
     {
         return null;
     }
 }
-
-
-
-
-

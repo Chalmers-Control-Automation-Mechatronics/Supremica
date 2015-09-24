@@ -160,11 +160,3 @@ class ValidTransformer
   private Exception mException;
 
 }
-
-
-
-
-
-
-
-

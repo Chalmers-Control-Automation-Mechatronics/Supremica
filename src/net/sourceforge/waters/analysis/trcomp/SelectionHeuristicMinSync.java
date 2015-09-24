@@ -160,11 +160,3 @@ public class SelectionHeuristicMinSync
   private int mStateLimit;
 
 }
-
-
-
-
-
-
-
-

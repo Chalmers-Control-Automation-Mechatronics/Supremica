@@ -299,11 +299,3 @@ private:
 }   /* namespace waters */
 
 #endif  /* !_TransitionRecord_h_ */
-
-
-
-
-
-
-
-

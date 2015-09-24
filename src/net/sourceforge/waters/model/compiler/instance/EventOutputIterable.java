@@ -218,11 +218,3 @@ class EventOutputIterable implements Iterable<SingleEventOutput>
   private final CompiledEvent mEvent;
 
 }
-
-
-
-
-
-
-
-

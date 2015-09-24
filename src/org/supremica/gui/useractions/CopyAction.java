@@ -57,8 +57,3 @@ public class CopyAction
 		ActionMan.automataCopy_actionPerformed(ActionMan.getGui());
 	}
 }
-
-
-
-
-

@@ -145,11 +145,3 @@ class TRTraceSearchRecord
   private final TRTraceSearchRecord mPredecessor;
 
 }
-
-
-
-
-
-
-
-

@@ -53,7 +53,7 @@ class SquareExit extends Square
   {
     return Square.EXIT;
   }
-  
+
   int[] getEnteringActions()
   {
     return canGetRock() ? ENTERING_ROCK : ENTERING_NOROCK;
@@ -71,11 +71,3 @@ class SquareExit extends Square
   private static final int[] ENTERING_NOROCK = {Action.ESCAPE};
 
 }
-
-
-
-
-
-
-
-

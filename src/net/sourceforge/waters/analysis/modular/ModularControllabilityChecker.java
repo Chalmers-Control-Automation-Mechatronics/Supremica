@@ -418,11 +418,3 @@ public class ModularControllabilityChecker
   private boolean mStartsWithSmallestSpec = false;
 
 }
-
-
-
-
-
-
-
-

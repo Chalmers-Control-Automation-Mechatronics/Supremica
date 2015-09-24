@@ -157,11 +157,3 @@ public class CompositionalSimplificationResult
   private final List<AutomatonProxy> mSimplifiedAutomata;
 
 }
-
-
-
-
-
-
-
-

@@ -318,11 +318,3 @@ class SimulatorState
   private final Map<AutomatonProxy,Entry> mStateMap;
 
 }
-
-
-
-
-
-
-
-

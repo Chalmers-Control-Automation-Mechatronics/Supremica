@@ -525,11 +525,3 @@ class TREventInfo
     EventStatus.STATUS_FULLY_LOCAL | EventStatus.STATUS_BLOCKED;
 
 }
-
-
-
-
-
-
-
-

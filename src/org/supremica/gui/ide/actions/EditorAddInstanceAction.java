@@ -65,8 +65,3 @@ public class EditorAddInstanceAction
 		System.err.println("Add Instance is not implemented yet!");
 	}
 }
-
-
-
-
-

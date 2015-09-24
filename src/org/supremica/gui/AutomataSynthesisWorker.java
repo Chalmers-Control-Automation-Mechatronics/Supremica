@@ -282,8 +282,3 @@ public class AutomataSynthesisWorker
       abortRequested = false;
     }
 }
-
-
-
-
-

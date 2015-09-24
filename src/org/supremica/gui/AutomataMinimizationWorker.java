@@ -304,8 +304,3 @@ public class AutomataMinimizationWorker
       abortRequested = false;
     }
 }
-
-
-
-
-

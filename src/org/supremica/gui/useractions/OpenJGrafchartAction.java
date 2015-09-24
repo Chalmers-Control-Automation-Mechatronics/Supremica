@@ -57,8 +57,3 @@ public class OpenJGrafchartAction
 		ActionMan.openJGrafchartEditor(ActionMan.getGui());
 	}
 }
-
-
-
-
-

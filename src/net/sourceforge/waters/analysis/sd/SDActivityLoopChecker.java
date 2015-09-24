@@ -135,11 +135,3 @@ public class SDActivityLoopChecker
   private ControlLoopChecker mControlLoopChecker;
 
 }
-
-
-
-
-
-
-
-

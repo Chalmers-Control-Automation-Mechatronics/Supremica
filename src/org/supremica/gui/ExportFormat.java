@@ -47,7 +47,3 @@ public enum ExportFormat
 	SSPC,    // ARASH: Sanchez SSPC tool
     STS, STS_DEBUG //Sajed: State Tree Structure introduced by Chuan Ma and Wonham
 }
-
-
-
-

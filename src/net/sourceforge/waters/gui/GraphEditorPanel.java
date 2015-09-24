@@ -5561,12 +5561,3 @@ public class GraphEditorPanel
   private static final int STATE_INPUT_WIDTH = 128;
 
 }
-
-
-
-
-
-
-
-
-

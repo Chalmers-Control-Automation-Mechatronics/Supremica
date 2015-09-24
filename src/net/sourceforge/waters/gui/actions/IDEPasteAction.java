@@ -181,11 +181,3 @@ public class IDEPasteAction
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-
-

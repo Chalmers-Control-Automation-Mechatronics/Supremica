@@ -139,12 +139,3 @@ public class MonolithicSCCControlLoopCheckerTest
   }
 
 }
-
-
-
-
-
-
-
-
-

@@ -244,7 +244,7 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 				AutomataSynthesisWorker asw = new AutomataSynthesisWorker(null,
 						ecm.getAutomata(), synthesizerOptions);
 				asw.join();
-                
+
 				result_text += " " + asw.getTimeSeconds() + "\t";
 				result_text += " \t ";
 
@@ -302,7 +302,3 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 		return cm.getProject();
 	}
 }
-
-
-
-

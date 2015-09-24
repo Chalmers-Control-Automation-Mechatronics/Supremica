@@ -153,11 +153,3 @@ public abstract class AbstractSynchronousProductBuilderTest
   private static final String EXPECTED_NAME = "sync";
 
 }
-
-
-
-
-
-
-
-

@@ -85,11 +85,3 @@ public class ModuleSubjectIntegrityChecker
   private final ModuleHierarchyChecker mHierarchyChecker;
 
 }
-
-
-
-
-
-
-
-

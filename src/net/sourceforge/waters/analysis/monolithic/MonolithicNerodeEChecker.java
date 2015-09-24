@@ -973,12 +973,3 @@ public class MonolithicNerodeEChecker
   private static final int SIZE_BUFFER = 1024;
 
 }
-
-
-
-
-
-
-
-
-

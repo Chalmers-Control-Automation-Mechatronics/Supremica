@@ -134,11 +134,3 @@ public class NativeBitSet
   private final long mNativeHandler;
 
 }
-
-
-
-
-
-
-
-

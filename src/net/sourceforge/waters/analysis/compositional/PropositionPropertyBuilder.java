@@ -403,12 +403,3 @@ public class PropositionPropertyBuilder
   private PropositionKindTranslator mKindTranslator;
 
 }
-
-
-
-
-
-
-
-
-

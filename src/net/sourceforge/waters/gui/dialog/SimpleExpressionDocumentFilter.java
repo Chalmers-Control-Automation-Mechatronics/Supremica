@@ -73,11 +73,3 @@ class SimpleExpressionDocumentFilter
   private final ExpressionParser mExpressionParser;
 
 }
-
-
-
-
-
-
-
-

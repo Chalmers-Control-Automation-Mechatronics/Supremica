@@ -138,9 +138,3 @@ class AnalyzerPopupMenu
         }
     }
 }
-
-
-
-
-
-

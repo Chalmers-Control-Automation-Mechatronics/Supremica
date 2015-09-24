@@ -103,11 +103,3 @@ class PropositionsTreePopupFactory
   private final ModuleContext mContext;
 
 }
-
-
-
-
-
-
-
-

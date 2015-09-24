@@ -883,7 +883,3 @@ class ApproxWeightsDialog
     @Override
     public void keyTyped(final KeyEvent ev){}
 }
-
-
-
-

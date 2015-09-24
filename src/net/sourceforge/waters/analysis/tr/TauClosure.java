@@ -1354,12 +1354,3 @@ public class TauClosure
   private static final int[] EMPTY_ARRAY = new int[0];
 
 }
-
-
-
-
-
-
-
-
-

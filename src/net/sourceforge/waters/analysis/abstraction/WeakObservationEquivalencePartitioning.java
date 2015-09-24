@@ -336,12 +336,3 @@ public class WeakObservationEquivalencePartitioning
   private PreTransitionBuffer mAdditionalTransitions;
 
 }
-
-
-
-
-
-
-
-
-

@@ -86,11 +86,3 @@ public interface ModelObserver {
   public static final int RENDERING_PRIORITY = 30;
 
 }
-
-
-
-
-
-
-
-

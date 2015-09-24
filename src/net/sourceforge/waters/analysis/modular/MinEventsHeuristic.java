@@ -93,11 +93,3 @@ public class MinEventsHeuristic
     }
   }
 }
-
-
-
-
-
-
-
-

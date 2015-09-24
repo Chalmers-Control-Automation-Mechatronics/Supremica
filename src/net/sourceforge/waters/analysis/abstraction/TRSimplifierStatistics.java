@@ -532,11 +532,3 @@ public class TRSimplifierStatistics
   private long mRunTime;
 
 }
-
-
-
-
-
-
-
-

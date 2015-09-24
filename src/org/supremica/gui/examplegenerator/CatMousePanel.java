@@ -122,8 +122,3 @@ class CatMousePanel extends JPanel implements TestCase, ActionListener {
 		return cm.getProject();
 	}
 }
-
-
-
-
-

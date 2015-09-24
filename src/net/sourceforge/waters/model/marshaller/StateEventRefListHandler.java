@@ -46,7 +46,7 @@ import net.sourceforge.waters.xsd.des.State;
 class StateEventRefListHandler
   extends JAXBCheckedListHandler<State,EventRefList,EventProxy>
 {
-  
+
   //#########################################################################
   //# Constructors
   StateEventRefListHandler()
@@ -59,7 +59,7 @@ class StateEventRefListHandler
     mFactory = factory;
   }
 
-  
+
   //#########################################################################
   //# Overrides for Abstract Base Class JAXBListHandler
   EventRefList createListElement(State container)
@@ -85,11 +85,3 @@ class StateEventRefListHandler
   private final ObjectFactory mFactory;
 
 }
-
-
-
-
-
-
-
-

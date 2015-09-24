@@ -50,11 +50,3 @@ public interface Observer
      */
     public void update(EditorChangedEvent e);
 }
-
-
-
-
-
-
-
-

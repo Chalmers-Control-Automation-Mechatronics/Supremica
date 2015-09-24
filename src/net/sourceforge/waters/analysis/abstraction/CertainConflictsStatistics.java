@@ -116,11 +116,3 @@ public class CertainConflictsStatistics extends TRSimplifierStatistics
   private int mMaxLevel;
 
 }
-
-
-
-
-
-
-
-

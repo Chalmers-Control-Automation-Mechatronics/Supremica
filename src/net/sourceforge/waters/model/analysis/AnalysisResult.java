@@ -307,11 +307,3 @@ public interface AnalysisResult
   public void printCSVHorizontalHeadings(final PrintWriter writer);
 
 }
-
-
-
-
-
-
-
-

@@ -85,8 +85,3 @@ abstract public class Presenter
 		SwingUtilities.invokeLater(do_finish);
 	}
 }
-
-
-
-
-

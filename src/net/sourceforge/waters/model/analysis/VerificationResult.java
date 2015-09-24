@@ -64,11 +64,3 @@ public interface VerificationResult extends ProxyResult<TraceProxy>
   public void setCounterExample(final TraceProxy trace);
 
 }
-
-
-
-
-
-
-
-

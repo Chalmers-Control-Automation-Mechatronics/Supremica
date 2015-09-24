@@ -444,11 +444,3 @@ class ThreeStepConflictEquivalenceAbstractionProcedure
   private final ChainTRSimplifier mCompleteChain;
 
 }
-
-
-
-
-
-
-
-

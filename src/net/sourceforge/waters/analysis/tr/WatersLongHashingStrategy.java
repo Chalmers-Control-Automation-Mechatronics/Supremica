@@ -64,11 +64,3 @@ public interface WatersLongHashingStrategy extends Serializable
   public boolean equals(long val1, long val2);
 
 }
-
-
-
-
-
-
-
-

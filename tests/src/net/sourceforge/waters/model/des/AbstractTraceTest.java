@@ -174,11 +174,3 @@ public abstract class AbstractTraceTest extends AbstractJAXBTest<TraceProxy>
   private ProxyPrinter mPrinter;
 
 }
-
-
-
-
-
-
-
-

@@ -98,11 +98,3 @@ public class UnsupportedOperatorException extends EvalException {
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-
-

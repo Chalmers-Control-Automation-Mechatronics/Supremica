@@ -164,8 +164,3 @@ public class AnalyzerSMVAction extends IDEAction {
     }
 
 }
-
-
-
-
-

@@ -307,11 +307,3 @@ public class ObservationEquivalenceTRSimplifierTest
   }
 
 }
-
-
-
-
-
-
-
-

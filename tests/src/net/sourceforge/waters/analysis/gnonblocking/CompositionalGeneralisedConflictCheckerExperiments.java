@@ -134,11 +134,3 @@ public class CompositionalGeneralisedConflictCheckerExperiments extends
     runModel("despot", "song_aip/aip3_syn", "tu4.wmod");
   }
 }
-
-
-
-
-
-
-
-

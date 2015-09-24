@@ -124,11 +124,3 @@ public class SDPropertyVerifierVerificationResult
   private List<? extends VerificationResult> mCheckerStats;
 
 }
-
-
-
-
-
-
-
-

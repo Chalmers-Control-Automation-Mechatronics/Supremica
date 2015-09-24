@@ -274,7 +274,3 @@ class GraphicalZone
 		return name;
 	}
 }
-
-
-
-

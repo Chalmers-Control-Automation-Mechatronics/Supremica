@@ -109,10 +109,3 @@ public class NormalisingPerEventCompilerTest extends AbstractCompilerTest
   }
 
 }
-
-
-
-
-
-
-

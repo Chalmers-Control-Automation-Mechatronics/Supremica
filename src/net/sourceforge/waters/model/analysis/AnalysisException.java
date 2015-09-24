@@ -81,17 +81,9 @@ public class AnalysisException extends WatersException
     super(message, cause);
   }
 
-  
+
   //#########################################################################
   //# Static Class Variables
   public static final long serialVersionUID = 1;
 
 }
-
-
-
-
-
-
-
-

@@ -479,12 +479,3 @@ public class ModularNerodeEquivalenceChecker
   static final String HEURISTIC_SUFFIX = "Heuristic";
 
 }
-
-
-
-
-
-
-
-
-

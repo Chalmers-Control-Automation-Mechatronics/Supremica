@@ -228,12 +228,3 @@ abstract class EventBDD
   private StateProxy[] mCurrentAutomatonDeterministicSuccessors;
 
 }
-
-
-
-
-
-
-
-
-

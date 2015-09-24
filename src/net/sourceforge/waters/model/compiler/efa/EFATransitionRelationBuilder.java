@@ -688,11 +688,3 @@ class EFATransitionRelationBuilder extends AbortableCompiler
   private Map<EFAVariable,VariableRecord> mVariableRecords;
 
 }
-
-
-
-
-
-
-
-

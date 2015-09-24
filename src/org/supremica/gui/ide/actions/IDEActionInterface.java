@@ -54,8 +54,3 @@ public interface IDEActionInterface
     public void repaint();
     public EditorWindowInterface getActiveEditorWindowInterface();
 }
-
-
-
-
-

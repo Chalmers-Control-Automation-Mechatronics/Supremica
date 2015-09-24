@@ -98,11 +98,3 @@ public final class AnalysisTools
     return checker;
   }
 }
-
-
-
-
-
-
-
-

@@ -74,10 +74,3 @@ public class MinFrontierCompositionSelectionHeuristic
   }
 
 }
-
-
-
-
-
-
-

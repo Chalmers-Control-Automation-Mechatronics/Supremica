@@ -79,11 +79,3 @@ public class SubjectModuleTest extends AbstractModuleTest
   }
 
 }
-
-
-
-
-
-
-
-

@@ -668,11 +668,3 @@ public class DocumentManager
   private final Map<URI,DocumentEntry> mDocumentCache;
 
 }
-
-
-
-
-
-
-
-

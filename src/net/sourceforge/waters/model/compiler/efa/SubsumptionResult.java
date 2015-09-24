@@ -163,11 +163,3 @@ class SubsumptionResult {
     new SubsumptionResult(Kind.INTERSECTS);
 
 }
-
-
-
-
-
-
-
-

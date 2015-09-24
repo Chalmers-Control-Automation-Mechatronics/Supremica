@@ -41,10 +41,3 @@ interface ProcessorForeach {
   public Iterator<?> getIterator();
 
 }
-
-
-
-
-
-
-

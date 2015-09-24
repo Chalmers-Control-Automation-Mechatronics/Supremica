@@ -383,11 +383,3 @@ public class SubjectShapeProducer
   private LabelBlockProxy mOldBlockedEventsList = null;
 
 }
-
-
-
-
-
-
-
-

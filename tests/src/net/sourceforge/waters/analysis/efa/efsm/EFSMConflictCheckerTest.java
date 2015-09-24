@@ -572,10 +572,3 @@ public class EFSMConflictCheckerTest
   }
 
 }
-
-
-
-
-
-
-

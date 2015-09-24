@@ -43,11 +43,11 @@ class LogPanel
     extends WhiteScrollPane
 {
     private static final long serialVersionUID = 1L;
-    
+
     @SuppressWarnings("unused")
 	private IDE ide;
     private String title;
-    
+
     LogPanel(IDE ide, String title)
     {
         super(LogDisplay.getInstance().getComponentWithoutScrollPane());
@@ -57,14 +57,10 @@ class LogPanel
         setMinimumSize(IDEDimensions.loggerMinimumSize);
         updateUI();
     }
-    
+
     public String getTitle()
     {
         return title;
     }
-    
+
 }
-
-
-
-

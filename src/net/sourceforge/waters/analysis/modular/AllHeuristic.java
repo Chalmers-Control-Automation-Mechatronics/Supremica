@@ -97,11 +97,3 @@ public class AllHeuristic
     return automata.size() == 0 ? null : automata;
   }
 }
-
-
-
-
-
-
-
-

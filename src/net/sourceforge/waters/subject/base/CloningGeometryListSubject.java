@@ -397,11 +397,3 @@ public class CloningGeometryListSubject<E extends Cloneable>
   private Method mLastCloneMethod;
 
 }
-
-
-
-
-
-
-
-

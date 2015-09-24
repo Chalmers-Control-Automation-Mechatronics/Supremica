@@ -89,11 +89,3 @@ public class SelectionHeuristicMinF1
   private AbstractTRCompositionalAnalyzer mAnalyzer;
 
 }
-
-
-
-
-
-
-
-

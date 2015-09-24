@@ -67,10 +67,3 @@ public class SafetyVerificationJobResult extends VerificationJobResult
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-

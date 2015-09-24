@@ -75,11 +75,3 @@ public class InternalFrameEvent extends EventObject
 
   private static final long serialVersionUID = -1492942591191059689L;
 }
-
-
-
-
-
-
-
-

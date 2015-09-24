@@ -1953,11 +1953,3 @@ public class UnifiedEFAConflictChecker extends AbstractModuleConflictChecker
   private AbstractEFAEvent mDummyRoot;
 
 }
-
-
-
-
-
-
-
-

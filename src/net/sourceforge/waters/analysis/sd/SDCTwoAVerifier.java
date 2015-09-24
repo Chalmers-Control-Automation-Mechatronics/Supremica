@@ -159,10 +159,3 @@ public class SDCTwoAVerifier extends AbstractSDLanguageInclusionChecker
   private EventProxy mFailedProhibitable;
 
 }
-
-
-
-
-
-
-

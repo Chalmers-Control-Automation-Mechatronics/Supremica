@@ -219,12 +219,3 @@ public class CachingTransitionIterator implements TransitionIterator
   private final int mEventShift;
 
 }
-
-
-
-
-
-
-
-
-

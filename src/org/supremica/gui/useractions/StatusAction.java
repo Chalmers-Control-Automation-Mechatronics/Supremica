@@ -57,8 +57,3 @@ public class StatusAction
 		ActionMan.automatonStatus_actionPerformed(ActionMan.getGui());
 	}
 }
-
-
-
-
-

@@ -83,10 +83,3 @@ public class MaxTrueCompositionSelectionHeuristic
   }
 
 }
-
-
-
-
-
-
-

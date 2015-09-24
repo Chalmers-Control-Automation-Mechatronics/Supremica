@@ -1256,12 +1256,3 @@ public class CompNonBlockingChecker
     LoggerFactory.createLogger(ProjectingNonBlockingChecker.class);
 
 }
-
-
-
-
-
-
-
-
-

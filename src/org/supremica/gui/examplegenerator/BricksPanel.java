@@ -69,8 +69,3 @@ class BricksPanel extends JPanel implements TestCase {
 		return bg.getProject();
 	}
 }
-
-
-
-
-

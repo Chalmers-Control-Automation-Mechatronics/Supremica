@@ -119,8 +119,3 @@ class WarehousePanel extends JPanel implements TestCase {
 		return warehouse.getProject();
 	}
 }
-
-
-
-
-

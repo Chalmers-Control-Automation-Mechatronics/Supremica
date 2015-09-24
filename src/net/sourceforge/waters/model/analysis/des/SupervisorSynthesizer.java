@@ -122,11 +122,3 @@ public interface SupervisorSynthesizer
   public boolean getSupervisorLocalizationEnabled();
 
 }
-
-
-
-
-
-
-
-

@@ -47,7 +47,7 @@ public interface Worker extends Remote
    * @return the worker id, null if undefined.
    */
   public String getWorkerID() throws RemoteException;
-  
+
   /**
    * Sets a (hopefully) unique ID for the worker. This should uniquely
    * identify workers in the current job/controller.
@@ -55,10 +55,3 @@ public interface Worker extends Remote
    */
   public void setWorkerID(String id) throws RemoteException;
 }
-
-
-
-
-
-
-

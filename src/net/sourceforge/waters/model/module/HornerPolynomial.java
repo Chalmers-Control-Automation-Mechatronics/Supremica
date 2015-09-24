@@ -604,11 +604,3 @@ public class HornerPolynomial
   public static final int MAXITER = 100;
 
 }
-
-
-
-
-
-
-
-

@@ -77,11 +77,3 @@ public class ListedEnumFactory<E> extends EnumFactory<E>
   private final List<E> mRegisteredElements;
 
 }
-
-
-
-
-
-
-
-

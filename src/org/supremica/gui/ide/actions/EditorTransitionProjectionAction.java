@@ -177,9 +177,9 @@ public class EditorTransitionProjectionAction
             final HashSet<String> projectedEFAs = new HashSet<>();
             for(final String efa : components){
                 final ExtendedAutomaton oriEFA = exAutomata.getExtendedAutomaton(efa);
-                
+
                 nbrOriNodes += oriEFA.getNodes().size();
-                
+
                 if(oriEFA.isNondeterministic() != null){
                     logger.error("EFA '" + efa +"' is nondeterministic and therefore it is skipped");
                     nbrPrjNodes += oriEFA.getNodes().size();  
@@ -196,7 +196,7 @@ public class EditorTransitionProjectionAction
                     logger.info("The projected EFA for '"+ efa +"' is the same as the original EFA");
                     continue;
                 }
-                
+
                 if(prjEFA.isNondeterministic() != null){
                     elapsed += TP.getElapsedTime();
                     nbrPrjNodes += prjEFA.getNodes().size();                    
@@ -242,15 +242,15 @@ public class EditorTransitionProjectionAction
                 for(final ExtendedAutomaton efa : prjs) {
                     uniPrjAlphabet.addAll(efa.getAlphabet());
                 }
-                
+
                 final HashSet<EventDeclProxy> locEvents = new HashSet<>();
-                
+
                 if(!(uniPrjAlphabet.isEmpty() || uniPrjAlphabet.size() == uniAlphabet.size())){
                     @SuppressWarnings("unchecked")
                     final HashSet<EventDeclProxy> temp = (HashSet<EventDeclProxy>) ExtendedAutomaton.setMinus(uniAlphabet, uniPrjAlphabet);        
                     locEvents.addAll(temp);
                 }
-                
+
                 String l = "{";
                 for (final Iterator<EventDeclProxy> it = locEvents.iterator(); it.hasNext();) {
                     final EventDeclProxy e = it.next();
@@ -281,8 +281,3 @@ public class EditorTransitionProjectionAction
         }
     }
 }
-
-
-
-
-

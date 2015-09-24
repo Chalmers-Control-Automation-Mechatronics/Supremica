@@ -132,12 +132,3 @@ public class ListBufferTauLoopRemoval
     TIME += System.currentTimeMillis();
   }
 }
-
-
-
-
-
-
-
-
-

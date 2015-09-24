@@ -112,11 +112,3 @@ public interface ProxyUnmarshaller<D extends DocumentProxy>
   public void setDocumentManager(DocumentManager manager);
 
 }
-
-
-
-
-
-
-
-

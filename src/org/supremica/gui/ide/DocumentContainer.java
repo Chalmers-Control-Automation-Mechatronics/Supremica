@@ -182,7 +182,3 @@ public abstract class DocumentContainer
   private boolean mDocumentNameHasChanged;
 
 }
-
-
-
-

@@ -86,10 +86,3 @@ class AndEliminationRule extends DirectReplacementRule
   }
 
 }
-
-
-
-
-
-
-

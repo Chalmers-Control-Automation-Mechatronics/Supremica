@@ -86,8 +86,3 @@ public class AnalyzerOptionsAction extends IDEAction
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-

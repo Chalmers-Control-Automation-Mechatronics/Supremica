@@ -72,11 +72,3 @@ public class NativeNonStoringStandardConflictCheckerTest
   }
 
 }
-
-
-
-
-
-
-
-

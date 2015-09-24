@@ -59,11 +59,3 @@ public interface EditorWindowInterface
     public UndoInterface getUndoInterface();
 
 }
-
-
-
-
-
-
-
-

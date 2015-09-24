@@ -381,11 +381,3 @@ public class Candidate implements Comparable<Candidate>
   private int mEventCount;
 
 }
-
-
-
-
-
-
-
-

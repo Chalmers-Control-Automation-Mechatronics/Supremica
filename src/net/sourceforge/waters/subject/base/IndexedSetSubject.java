@@ -47,11 +47,3 @@ public interface IndexedSetSubject<P extends NamedSubject>
   extends IndexedSet<P>, SetSubject<P>
 {
 }
-
-
-
-
-
-
-
-

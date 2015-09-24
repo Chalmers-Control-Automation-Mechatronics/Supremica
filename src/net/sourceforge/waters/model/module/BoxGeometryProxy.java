@@ -66,11 +66,3 @@ public interface BoxGeometryProxy extends GeometryProxy {
   public Rectangle2D getRectangle();
 
 }
-
-
-
-
-
-
-
-

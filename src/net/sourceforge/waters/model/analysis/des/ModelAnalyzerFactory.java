@@ -117,11 +117,3 @@ public interface ModelAnalyzerFactory
   public void postConfigure(ModelAnalyzer analyzer) throws AnalysisException;
 
 }
-
-
-
-
-
-
-
-

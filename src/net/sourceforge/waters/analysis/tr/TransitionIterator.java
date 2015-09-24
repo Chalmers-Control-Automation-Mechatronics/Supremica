@@ -209,11 +209,3 @@ public interface TransitionIterator
   public void remove();
 
 }
-
-
-
-
-
-
-
-

@@ -76,7 +76,3 @@ class RandomPanel extends JPanel implements TestCase {
 		return ra.getProject();
 	}
 }
-
-
-
-

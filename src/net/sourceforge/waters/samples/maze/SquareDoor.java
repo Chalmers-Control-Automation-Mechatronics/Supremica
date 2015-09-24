@@ -54,7 +54,7 @@ class SquareDoor extends SquareWithID
   {
     return Square.DOOR;
   }
-  
+
   int[] getEnteringActions()
   {
     return ENTERING;
@@ -92,11 +92,3 @@ class SquareDoor extends SquareWithID
   private static final String TEMPLNAME_LOCKED = "door_locked";
 
 }
-
-
-
-
-
-
-
-

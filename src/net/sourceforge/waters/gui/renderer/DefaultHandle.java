@@ -106,11 +106,3 @@ public class DefaultHandle
   public static final int CLICK_TOLERANCE = 2;
 
 }
-
-
-
-
-
-
-
-

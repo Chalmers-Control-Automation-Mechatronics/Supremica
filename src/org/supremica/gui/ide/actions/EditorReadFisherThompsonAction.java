@@ -381,8 +381,3 @@ public class EditorReadFisherThompsonAction
 
     }
 }
-
-
-
-
-

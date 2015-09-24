@@ -149,11 +149,3 @@ public class OutgoingTransitionListBuffer extends TransitionListBuffer
   }
 
 }
-
-
-
-
-
-
-
-

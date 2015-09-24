@@ -530,11 +530,3 @@ public class DefaultAnalysisResult
   private long mPeakMemoryUsage;
 
 }
-
-
-
-
-
-
-
-

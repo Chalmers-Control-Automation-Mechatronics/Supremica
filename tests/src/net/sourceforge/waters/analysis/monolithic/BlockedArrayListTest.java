@@ -57,7 +57,7 @@ public class BlockedArrayListTest extends TestCase {
       assertEquals(true, ba.add(item));
     }
   }
-  
+
   public void testGet()
   {
     for (int i = 0; i<1000000; i++){
@@ -112,11 +112,3 @@ public class BlockedArrayListTest extends TestCase {
   }
 
 }
-
-
-
-
-
-
-
-

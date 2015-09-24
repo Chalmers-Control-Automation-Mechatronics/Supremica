@@ -138,11 +138,3 @@ public class TRAutomatonTest extends AbstractAutomatonTest
   }
 
 }
-
-
-
-
-
-
-
-

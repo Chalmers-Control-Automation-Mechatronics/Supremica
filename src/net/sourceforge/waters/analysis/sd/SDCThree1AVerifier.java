@@ -139,11 +139,3 @@ public class SDCThree1AVerifier extends AbstractSDLanguageInclusionChecker
   private EventProxy mFailedProhibitable;
 
 }
-
-
-
-
-
-
-
-

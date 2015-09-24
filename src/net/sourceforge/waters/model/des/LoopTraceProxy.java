@@ -58,11 +58,3 @@ public interface LoopTraceProxy
   public int getLoopIndex();
 
 }
-
-
-
-
-
-
-
-

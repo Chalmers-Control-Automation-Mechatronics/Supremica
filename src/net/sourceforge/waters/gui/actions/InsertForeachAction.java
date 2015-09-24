@@ -133,11 +133,3 @@ public class InsertForeachAction
     WatersDataFlavor.createTransferable(TEMPLATE);
 
 }
-
-
-
-
-
-
-
-

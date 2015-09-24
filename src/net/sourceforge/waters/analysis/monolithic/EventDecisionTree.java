@@ -301,11 +301,3 @@ public class EventDecisionTree
   private static final int OPCODE_GOTO = 0x03 << OPCODE_SHIFT;
 
 }
-
-
-
-
-
-
-
-

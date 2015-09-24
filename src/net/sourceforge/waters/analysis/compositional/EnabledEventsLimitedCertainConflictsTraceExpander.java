@@ -735,11 +735,3 @@ public class EnabledEventsLimitedCertainConflictsTraceExpander extends TRTraceEx
   private Map<StateProxy,StateProxy> mReverseStateMap;
 
 }
-
-
-
-
-
-
-
-

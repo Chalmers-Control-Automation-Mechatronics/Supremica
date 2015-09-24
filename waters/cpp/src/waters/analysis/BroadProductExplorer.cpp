@@ -943,11 +943,3 @@ setupCompactEventList
 
 
 }  /* namespace waters */
-
-
-
-
-
-
-
-

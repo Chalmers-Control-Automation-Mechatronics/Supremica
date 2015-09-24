@@ -71,11 +71,3 @@ public class BDDSICProperty5VerifierTest extends
   }
 
 }
-
-
-
-
-
-
-
-

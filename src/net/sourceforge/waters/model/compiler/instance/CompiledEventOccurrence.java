@@ -54,7 +54,7 @@ class CompiledEventOccurrence implements CompiledEvent
     mEvent = event;
     mSourceInfo = info;
   }
-    
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.compiler.instance.CompiledEvent
@@ -96,10 +96,3 @@ class CompiledEventOccurrence implements CompiledEvent
   private final SourceInfo mSourceInfo;
 
 }
-
-
-
-
-
-
-

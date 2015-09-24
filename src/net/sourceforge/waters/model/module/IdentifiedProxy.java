@@ -59,11 +59,3 @@ public interface IdentifiedProxy extends NamedProxy
   public IdentifierProxy getIdentifier();
 
 }
-
-
-
-
-
-
-
-

@@ -536,8 +536,3 @@ public class IDE
     Config.LOG_TO_GUI.set(true);
   }
 }
-
-
-
-
-

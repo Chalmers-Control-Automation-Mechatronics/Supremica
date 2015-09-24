@@ -101,11 +101,3 @@ public class SDPlantCompletenessDiagnostics
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-
-

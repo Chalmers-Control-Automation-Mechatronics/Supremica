@@ -162,11 +162,3 @@ public class DefaultEventStatusProvider
   private int mUsedPropositions;
 
 }
-
-
-
-
-
-
-
-

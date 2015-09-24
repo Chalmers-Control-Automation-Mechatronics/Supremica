@@ -208,11 +208,3 @@ public class SimpleNodeProxyShape
   private static final Color FILLCOLOR = Color.WHITE;
 
 }
-
-
-
-
-
-
-
-

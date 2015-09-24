@@ -111,11 +111,3 @@ private:
 }   /* namespace jni */
 
 #endif  /* !_ClassGlue_h_ */
-
-
-
-
-
-
-
-

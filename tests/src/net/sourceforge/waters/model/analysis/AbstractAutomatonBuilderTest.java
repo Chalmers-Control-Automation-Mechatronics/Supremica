@@ -230,11 +230,3 @@ public abstract class AbstractAutomatonBuilderTest
   private List<ParameterBindingProxy> mBindings;
 
 }
-
-
-
-
-
-
-
-

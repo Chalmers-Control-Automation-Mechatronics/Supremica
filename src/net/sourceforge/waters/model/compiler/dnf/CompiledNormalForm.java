@@ -246,10 +246,3 @@ public class CompiledNormalForm implements Cloneable
   private final Set<CompiledClause> mClauses;
 
 }
-
-
-
-
-
-
-

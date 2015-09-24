@@ -107,11 +107,3 @@ public enum VariableOrdering
                                                KindTranslator translator);
 
 }
-
-
-
-
-
-
-
-

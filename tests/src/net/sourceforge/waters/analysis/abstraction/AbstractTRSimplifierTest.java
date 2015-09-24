@@ -477,11 +477,3 @@ public abstract class AbstractTRSimplifierTest
   protected static final String AFTER = "after";
 
 }
-
-
-
-
-
-
-
-

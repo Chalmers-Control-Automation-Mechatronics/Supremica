@@ -350,11 +350,3 @@ public abstract class AbstractSICProperty6VerifierTest extends
   }
 
 }
-
-
-
-
-
-
-
-

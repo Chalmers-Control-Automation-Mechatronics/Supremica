@@ -209,11 +209,3 @@ public abstract class DocumentSubject
   private URI mLocation;
 
 }
-
-
-
-
-
-
-
-

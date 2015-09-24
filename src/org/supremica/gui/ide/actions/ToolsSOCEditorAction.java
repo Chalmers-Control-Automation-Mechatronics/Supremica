@@ -82,8 +82,3 @@ public class ToolsSOCEditorAction
     	soc.getGraphContainer().setIDE( ide.getIDE() );
     }
 }
-
-
-
-
-

@@ -758,11 +758,3 @@ class SDCTwoPropertyBuilder
   private static final String TICK_NAME = "tick";
 
 }
-
-
-
-
-
-
-
-

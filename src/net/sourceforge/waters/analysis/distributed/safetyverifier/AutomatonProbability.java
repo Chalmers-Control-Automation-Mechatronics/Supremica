@@ -109,10 +109,3 @@ class ProbabilityOverStatesSquared
     return m1prob.compareTo(m2prob);
   }
 }
-
-
-
-
-
-
-

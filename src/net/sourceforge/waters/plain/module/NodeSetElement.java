@@ -56,7 +56,7 @@ class NodeSetElement extends IndexedArraySet<NodeProxy> {
       insertUnique(node);
     }
   }
-  
+
   //#########################################################################
   //# Overrides from base class IndexedArrayList
   protected ItemNotFoundException createItemNotFound(final String name)
@@ -64,13 +64,13 @@ class NodeSetElement extends IndexedArraySet<NodeProxy> {
     return new ItemNotFoundException
       ("Graph does not contain the node named '" + name + "'!");
   }
-  
+
   protected NameNotFoundException createNameNotFound(final String name)
   {
     return new NameNotFoundException
       ("Graph does not contain a node named '" + name + "'!");
   }
-  
+
   protected DuplicateNameException createDuplicateName(final String name)
   {
     return new DuplicateNameException
@@ -83,10 +83,3 @@ class NodeSetElement extends IndexedArraySet<NodeProxy> {
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-

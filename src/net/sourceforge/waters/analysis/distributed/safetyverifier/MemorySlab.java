@@ -116,15 +116,8 @@ public class MemorySlab
   private static final int CHUNK_MASK = ~0 >>> (32 - CHUNK_BITS);
   private static final int CHUNK_SIZE = 1 << CHUNK_BITS;
   private static final int NUM_CHUNKS = 1 << (32 - CHUNK_BITS);
-  
+
   private int mCurrentChunk;
   private int mChunkPos;
   private final int[][] mChunks = new int[NUM_CHUNKS][];
 }
-
-
-
-
-
-
-

@@ -1044,8 +1044,3 @@ class ExplorerController
         redoButton.setEnabled(stateViewer.redoEnabled());
     }
 }
-
-
-
-
-

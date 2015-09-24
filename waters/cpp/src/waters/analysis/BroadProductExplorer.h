@@ -204,11 +204,3 @@ private:
 }   /* namespace waters */
 
 #endif  /* !_BroadProductExplorer_h_ */
-
-
-
-
-
-
-
-

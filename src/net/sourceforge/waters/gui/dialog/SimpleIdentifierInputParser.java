@@ -163,10 +163,3 @@ public class SimpleIdentifierInputParser
   private final ExpressionParser mExpressionParser;
 
 }
-
-
-
-
-
-
-

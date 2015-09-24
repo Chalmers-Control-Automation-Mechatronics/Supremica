@@ -153,11 +153,3 @@ class EFAVariable implements Comparable<EFAVariable> {
   private final Set<EFAEvent> mEventSet;
 
 }
-
-
-
-
-
-
-
-

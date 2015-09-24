@@ -79,11 +79,3 @@ public interface ProxyCloner {
   Set<P> getClonedSet(Collection<? extends P> collection);
 
 }
-
-
-
-
-
-
-
-

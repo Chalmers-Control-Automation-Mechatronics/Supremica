@@ -71,11 +71,3 @@ public class CanonicalGeneralisedConflictCheckerTest extends
   // #########################################################################
 
 }
-
-
-
-
-
-
-
-

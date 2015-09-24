@@ -73,11 +73,3 @@ public class NativeSICProperty6VerifierTest extends
   }
 
 }
-
-
-
-
-
-
-
-

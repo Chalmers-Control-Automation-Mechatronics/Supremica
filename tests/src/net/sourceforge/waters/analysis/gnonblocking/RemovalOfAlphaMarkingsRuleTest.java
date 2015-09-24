@@ -291,11 +291,3 @@ public class RemovalOfAlphaMarkingsRuleTest extends AbstractAbstractionRuleTest
     test_tauLoop();
   }
 }
-
-
-
-
-
-
-
-

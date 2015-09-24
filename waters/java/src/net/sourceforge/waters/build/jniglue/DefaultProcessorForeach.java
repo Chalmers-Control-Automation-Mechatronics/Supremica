@@ -60,10 +60,3 @@ class DefaultProcessorForeach implements ProcessorForeach {
   private final Collection<?> mGlue;
 
 }
-
-
-
-
-
-
-

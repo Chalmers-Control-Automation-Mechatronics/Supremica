@@ -90,7 +90,7 @@ class EFAVariableCombination {
     return mContents.contains(expr);
   }
 
-  
+
   //#########################################################################
   //# Simplification
   EFAVariableCombination getReducedCombination(final EFAVariable removed)
@@ -138,11 +138,3 @@ class EFAVariableCombination {
   private final Set<EFAVariable> mContents;
 
 }
-
-
-
-
-
-
-
-

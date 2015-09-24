@@ -62,13 +62,5 @@ class PlainClassGlue extends ClassGlue {
   {
     return false;
   }
-   
+
 }
-
-
-
-
-
-
-
-

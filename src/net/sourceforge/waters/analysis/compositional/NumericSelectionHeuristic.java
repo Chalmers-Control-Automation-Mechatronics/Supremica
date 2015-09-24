@@ -119,10 +119,3 @@ public abstract class NumericSelectionHeuristic<T extends Comparable<? super T>>
   private double mBestValue = Double.POSITIVE_INFINITY;
 
 }
-
-
-
-
-
-
-

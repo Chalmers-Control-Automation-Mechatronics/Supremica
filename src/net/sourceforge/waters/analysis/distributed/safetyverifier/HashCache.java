@@ -56,14 +56,14 @@ class HashCache
     int hc = rehash(o.hashCode());
     mObjects[Math.abs(hc % mObjects.length)] = o;
   }
-  
+
   public boolean contains(Object o)
   {
     int hc = rehash(o.hashCode());
     Object cached = mObjects[Math.abs(hc % mObjects.length)];
     return cached != null && o.equals(cached);
   }
-  
+
   public void invalidate()
   {
     for (int i = 0; i < mObjects.length; i++)
@@ -74,10 +74,3 @@ class HashCache
 
   private final Object[] mObjects;
 }
-
-
-
-
-
-
-

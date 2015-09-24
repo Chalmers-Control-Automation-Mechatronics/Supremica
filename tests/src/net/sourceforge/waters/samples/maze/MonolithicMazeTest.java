@@ -52,11 +52,3 @@ public class MonolithicMazeTest extends AbstractMazeTest
   }
 
 }
-
-
-
-
-
-
-
-

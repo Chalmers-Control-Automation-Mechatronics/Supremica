@@ -53,7 +53,7 @@ class SquareKey extends SquareWithID
   {
     return Square.KEY;
   }
-  
+
   int[] getEnteringActions()
   {
     return ENTERING;
@@ -65,11 +65,3 @@ class SquareKey extends SquareWithID
   private static final int[] ENTERING = {Action.MOVE, Action.PICKUP};
 
 }
-
-
-
-
-
-
-
-

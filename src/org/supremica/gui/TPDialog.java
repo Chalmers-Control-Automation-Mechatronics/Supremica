@@ -531,8 +531,3 @@ public class TPDialog extends javax.swing.JDialog {
     private javax.swing.JTextField jTextSuffix;
     // End of variables declaration//GEN-END:variables
 }
-
-
-
-
-

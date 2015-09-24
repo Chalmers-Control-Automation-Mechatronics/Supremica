@@ -470,11 +470,3 @@ public class CompositionalAnalysisResult
   private AnalysisResult mMonolithicStats;
 
 }
-
-
-
-
-
-
-
-

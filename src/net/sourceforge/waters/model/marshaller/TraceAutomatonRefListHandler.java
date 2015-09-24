@@ -46,7 +46,7 @@ import net.sourceforge.waters.xsd.des.ObjectFactory;
 class TraceAutomatonRefListHandler
   extends JAXBCheckedListHandler<TraceType,AutomatonRefList,AutomatonProxy>
 {
-  
+
   //#########################################################################
   //# Constructors
   TraceAutomatonRefListHandler()
@@ -59,7 +59,7 @@ class TraceAutomatonRefListHandler
     mFactory = factory;
   }
 
-  
+
   //#########################################################################
   //# Overrides for Abstract Base Class JAXBListHandler
   AutomatonRefList createListElement(TraceType container)
@@ -85,11 +85,3 @@ class TraceAutomatonRefListHandler
   private final ObjectFactory mFactory;
 
 }
-
-
-
-
-
-
-
-

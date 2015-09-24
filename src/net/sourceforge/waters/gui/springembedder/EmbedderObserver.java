@@ -37,11 +37,3 @@ public interface EmbedderObserver
 {
   public void embedderChanged(EmbedderEvent event);
 }
-
-
-
-
-
-
-
-

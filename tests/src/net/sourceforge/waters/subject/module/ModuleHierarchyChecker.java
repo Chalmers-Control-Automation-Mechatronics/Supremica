@@ -478,11 +478,3 @@ class ModuleHierarchyChecker
   private static ModuleHierarchyChecker theInstance = null;
 
 }
-
-
-
-
-
-
-
-

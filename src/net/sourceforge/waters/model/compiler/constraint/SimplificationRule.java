@@ -46,7 +46,7 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
 abstract class SimplificationRule {
-  
+
   //#########################################################################
   //# Constructors
   SimplificationRule(final SimpleExpressionProxy template,
@@ -146,10 +146,3 @@ abstract class SimplificationRule {
   private SimpleExpressionProxy mMatchedExpression;
 
 }
-
-
-
-
-
-
-

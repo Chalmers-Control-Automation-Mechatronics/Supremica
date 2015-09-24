@@ -46,7 +46,7 @@ import net.sourceforge.waters.xsd.des.StateList;
 class AutomatonStateListHandler
   extends JAXBCheckedListHandler<Automaton,StateList,StateProxy>
 {
-  
+
   //#########################################################################
   //# Constructors
   AutomatonStateListHandler()
@@ -59,7 +59,7 @@ class AutomatonStateListHandler
     mFactory = factory;
   }
 
-  
+
   //#########################################################################
   //# Overrides for Abstract Base Class JAXBListHandler
   StateList createListElement(final Automaton container)
@@ -85,11 +85,3 @@ class AutomatonStateListHandler
   private final ObjectFactory mFactory;
 
 }
-
-
-
-
-
-
-
-

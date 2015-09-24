@@ -70,11 +70,3 @@ class ModuleSequenceListHandler
   }
 
 }
-
-
-
-
-
-
-
-

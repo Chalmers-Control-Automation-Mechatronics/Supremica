@@ -52,19 +52,19 @@ public class RemoveImpossibleTransitions
   private final EventProxy mMarking;
   public static int ENACTED = 0;
   public static int TIME = 0;
-  
+
   public RemoveImpossibleTransitions(EventProxy marking)
   {
     mMarking = marking;
     mEventsCantHappen = new THashMap<AutomatonProxy, Map<EventProxy, Tuple>>();
   }
-  
+
   public static void clearStats()
   {
     ENACTED = 0;
     TIME = 0;
   }
-  
+
   private Map<EventProxy, Set<Set<EventProxy>>> findEventsWhichAreImpossibleAfter(EventProxy event)
   {
     Map<EventProxy, Set<Set<EventProxy>>> eventRequires =
@@ -83,7 +83,7 @@ public class RemoveImpossibleTransitions
     }
     return eventRequires;
   }
-  
+
   public Map<EventProxy, Map<EventProxy, Set<Set<EventProxy>>>> 
     findEventsWhichAreImpossibleAfter(Set<EventProxy> events)
   {
@@ -108,38 +108,38 @@ public class RemoveImpossibleTransitions
     }
     return eventRequires;
   }
-  
+
   private class Tuple
   {
     final Set<EventProxy> mLeaves;
     final Set<EventProxy> mImpossible;
-    
+
     public Tuple(Set<EventProxy> leaves, Set<EventProxy> impossible)
     {
       mLeaves = leaves;
       mImpossible = impossible;
     }
-    
+
     public String toString()
     {
       return mLeaves.toString() + mImpossible.toString();
     }
   }
-  
+
   public void removeAutomata(Collection<AutomatonProxy> automata)
   {
     for (AutomatonProxy aut : automata) {
       mEventsCantHappen.remove(aut);
     }
   }
-  
+
   public void addAutomata(Collection<AutomatonProxy> automata)
   {
     for (AutomatonProxy aut : automata) {
       findEventsCantHappen(aut);
     }
   }
-  
+
   private void findEventsCantHappen(AutomatonProxy automaton)
   {
     TransitionRelation tr = new TransitionRelation(automaton, mMarking);
@@ -172,13 +172,13 @@ public class RemoveImpossibleTransitions
     //System.out.println(automaton);
     //System.out.println(map);
   }
-  
+
   public static String stats()
   {
     return "RemoveImpossibleTransitions: ENACTED = " + ENACTED + 
            " TIME = " + TIME;
   }
-  
+
   public void run(TransitionRelation tr)
   {
     TIME -= System.currentTimeMillis();
@@ -237,12 +237,3 @@ public class RemoveImpossibleTransitions
     TIME += System.currentTimeMillis();
   }
 }
-
-
-
-
-
-
-
-
-

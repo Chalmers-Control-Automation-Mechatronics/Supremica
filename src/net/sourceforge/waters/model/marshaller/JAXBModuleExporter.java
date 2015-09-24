@@ -1335,11 +1335,3 @@ public class JAXBModuleExporter
     new ModuleSequenceListHandler();
 
 }
-
-
-
-
-
-
-
-

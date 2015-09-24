@@ -71,11 +71,3 @@ public interface AbstractionProcedure extends Abortable
   public void resetStatistics();
 
 }
-
-
-
-
-
-
-
-

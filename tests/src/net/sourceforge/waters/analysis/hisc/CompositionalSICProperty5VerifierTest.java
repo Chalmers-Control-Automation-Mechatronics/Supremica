@@ -85,11 +85,3 @@ public class CompositionalSICProperty5VerifierTest
   }
 
 }
-
-
-
-
-
-
-
-

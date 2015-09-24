@@ -392,11 +392,3 @@ public class ArrayListSubject<P extends ProxySubject>
   private List<P> mProxyList;
 
 }
-
-
-
-
-
-
-
-

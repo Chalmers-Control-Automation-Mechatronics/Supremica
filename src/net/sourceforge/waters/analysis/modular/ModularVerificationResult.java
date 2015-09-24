@@ -110,11 +110,3 @@ public class ModularVerificationResult
   private Collection<AutomatonProxy> mFailedSpecs;
 
 }
-
-
-
-
-
-
-
-

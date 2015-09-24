@@ -81,11 +81,3 @@ public class SourceInfoCloner extends ModuleProxyCloner
   private final CompilationInfo mCompilationInfo;
 
 }
-
-
-
-
-
-
-
-

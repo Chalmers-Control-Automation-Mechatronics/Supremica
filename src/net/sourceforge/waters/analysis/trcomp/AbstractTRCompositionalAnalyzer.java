@@ -1864,11 +1864,3 @@ public abstract class AbstractTRCompositionalAnalyzer
   static final int PRECONDITION_MARKING = 1;
 
 }
-
-
-
-
-
-
-
-

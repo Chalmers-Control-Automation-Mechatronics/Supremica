@@ -118,11 +118,3 @@ public class EFSMTransitionRelation
   //# Data members
   private final Collection<EFSMVariable> mVariables;
 }
-
-
-
-
-
-
-
-

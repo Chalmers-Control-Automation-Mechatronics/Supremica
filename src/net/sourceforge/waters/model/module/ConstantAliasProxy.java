@@ -66,11 +66,3 @@ public interface ConstantAliasProxy extends AliasProxy {
   public ScopeKind getScope();
 
 }
-
-
-
-
-
-
-
-

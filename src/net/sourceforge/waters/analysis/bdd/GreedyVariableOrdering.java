@@ -252,11 +252,3 @@ class GreedyVariableOrdering
   private final KindTranslator mKindTranslator;
 
 }
-
-
-
-
-
-
-
-

@@ -62,11 +62,3 @@ public class PlainExpressionTest extends AbstractExpressionTest
   }
 
 }
-
-
-
-
-
-
-
-

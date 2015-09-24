@@ -125,8 +125,3 @@ public class OpenAction extends net.sourceforge.waters.gui.actions.IDEAction
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-

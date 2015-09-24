@@ -99,11 +99,3 @@ public class MazeSolutionChecker
   private final MazeReader mReader;
 
 }
-
-
-
-
-
-
-
-

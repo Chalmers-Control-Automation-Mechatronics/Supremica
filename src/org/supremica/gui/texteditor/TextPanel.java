@@ -82,8 +82,3 @@ public class TextPanel
 		pw.println("Hello World!");
 	}
 }
-
-
-
-
-

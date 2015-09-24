@@ -404,11 +404,3 @@ public class ConflictCounterExampleChecker
   private StringBuilder mDiagnostics;
 
 }
-
-
-
-
-
-
-
-

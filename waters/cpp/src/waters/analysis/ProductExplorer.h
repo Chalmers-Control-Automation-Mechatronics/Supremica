@@ -323,11 +323,3 @@ private:
 }   /* namespace waters */
 
 #endif  /* !_ProductExplorer_h_ */
-
-
-
-
-
-
-
-

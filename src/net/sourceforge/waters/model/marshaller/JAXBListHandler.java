@@ -90,11 +90,3 @@ abstract class JAXBListHandler
   }
 
 }
-
-
-
-
-
-
-
-

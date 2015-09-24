@@ -176,12 +176,3 @@ class RemovalOfNoncoreachableStatesRule extends TRSimplifierAbstractionRule
   private StateEncoding mOutputEncoding;
 
 }
-
-
-
-
-
-
-
-
-

@@ -237,11 +237,3 @@ public abstract class AbstractOperatorTable implements OperatorTable {
   private char mFunctionKeyCharacter;
 
 }
-
-
-
-
-
-
-
-

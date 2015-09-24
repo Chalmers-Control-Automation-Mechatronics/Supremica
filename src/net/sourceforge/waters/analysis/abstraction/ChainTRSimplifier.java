@@ -280,12 +280,3 @@ public class ChainTRSimplifier
   private boolean[] mReducedMarkings;
 
 }
-
-
-
-
-
-
-
-
-

@@ -127,11 +127,3 @@ public class CompositionalVerificationResult
   private TraceProxy mCounterExample;
 
 }
-
-
-
-
-
-
-
-

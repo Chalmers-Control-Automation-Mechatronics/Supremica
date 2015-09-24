@@ -97,11 +97,3 @@ public class BlockedArrayList<T> extends AbstractList<T> {
   private static final int BLOCK_SIZE = 1024;
 
 }
-
-
-
-
-
-
-
-

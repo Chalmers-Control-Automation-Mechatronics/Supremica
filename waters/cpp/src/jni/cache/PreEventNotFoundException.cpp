@@ -94,11 +94,3 @@ throwJavaException(ClassCache& cache)
 
 
 }  /* namespace jni */
-
-
-
-
-
-
-
-

@@ -47,7 +47,7 @@ public class PrototypeStateDistribution extends HashStateDistribution
     super(handlers);
     MachineProbability[] probs = getMachineChangeProbabilities(model);
     Arrays.sort(probs, new ProbabilityOverStatesSquared(model));
-    
+
     double sum = 0;
 
     //Override the desired hash bits parameter to calculate
@@ -108,7 +108,7 @@ public class PrototypeStateDistribution extends HashStateDistribution
   {
     AutomatonSchema as = model.getAutomaton(aut);
     int evx = 0;
-    
+
     //Count the number of transitions with the specified event
     for (int i = 0; i < as.getTransitionCount(); i++)
       {
@@ -118,10 +118,10 @@ public class PrototypeStateDistribution extends HashStateDistribution
 	    evx++;
 	  }
       }
-    
+
     return evx;
   }
-  
+
   /**
    * Gets the number of meaningful transitions in a machine
    */
@@ -173,12 +173,12 @@ public class PrototypeStateDistribution extends HashStateDistribution
 
     return (evProb < 0.0) ? 0.0 : evProb;
   }
-  
+
   private double machineChangeProb(ProductDESSchema model, int aut)
   {
     double p = -1.0;
     AutomatonSchema as = model.getAutomaton(aut);
-        
+
     for (int e = 0; e < as.getEventIdCount(); e++)
       {
 	int event = as.getEventId(e);
@@ -199,7 +199,7 @@ public class PrototypeStateDistribution extends HashStateDistribution
   private MachineProbability[] getMachineChangeProbabilities(ProductDESSchema model)
   {
     MachineProbability[] probs = new MachineProbability[model.getAutomataCount()];
-    
+
     for (int i = 0; i < model.getAutomataCount(); i++)
       {
 	probs[i] = new MachineProbability(i, machineChangeProb(model, i));
@@ -314,10 +314,3 @@ public class PrototypeStateDistribution extends HashStateDistribution
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-

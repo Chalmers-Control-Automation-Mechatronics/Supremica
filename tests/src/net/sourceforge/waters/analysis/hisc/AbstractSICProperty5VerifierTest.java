@@ -487,11 +487,3 @@ public abstract class AbstractSICProperty5VerifierTest
   }
 
 }
-
-
-
-
-
-
-
-

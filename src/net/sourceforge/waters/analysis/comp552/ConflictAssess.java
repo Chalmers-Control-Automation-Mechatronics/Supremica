@@ -953,11 +953,3 @@ public class ConflictAssess
   private int mNumHalfCorrectTraces;
 
 }
-
-
-
-
-
-
-
-

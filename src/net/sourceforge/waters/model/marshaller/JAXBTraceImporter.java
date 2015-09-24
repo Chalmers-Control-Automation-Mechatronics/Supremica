@@ -378,11 +378,3 @@ class JAXBTraceImporter
   private Map<AutomatonProxy,IndexedList<StateProxy>> mStateCaches;
 
 }
-
-
-
-
-
-
-
-

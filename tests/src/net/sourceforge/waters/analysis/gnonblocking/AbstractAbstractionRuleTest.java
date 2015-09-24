@@ -275,11 +275,3 @@ public abstract class AbstractAbstractionRuleTest extends AbstractAnalysisTest
   private final String AFTER = "after";
 
 }
-
-
-
-
-
-
-
-

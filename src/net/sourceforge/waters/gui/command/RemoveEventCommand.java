@@ -84,11 +84,3 @@ public class RemoveEventCommand
         return mDescription;
     }
 }
-
-
-
-
-
-
-
-

@@ -389,11 +389,3 @@ public class MonolithicSynthesizerExperiments
   private PrintWriter mPrintWriter;
   private boolean mHasBeenPrinted;
 }
-
-
-
-
-
-
-
-

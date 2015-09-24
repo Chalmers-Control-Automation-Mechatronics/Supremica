@@ -51,11 +51,3 @@ public interface IntConstantProxy extends SimpleExpressionProxy {
   public int getValue();
 
 }
-
-
-
-
-
-
-
-

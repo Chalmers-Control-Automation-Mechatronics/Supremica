@@ -282,11 +282,3 @@ public class PlainProductDESEqualityTest extends TestCase
   private AbstractEqualityVisitor mEquality;
 
 }
-
-
-
-
-
-
-
-

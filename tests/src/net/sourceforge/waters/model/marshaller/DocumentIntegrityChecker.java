@@ -83,11 +83,3 @@ public abstract class DocumentIntegrityChecker<D extends DocumentProxy>
   }
 
 }
-
-
-
-
-
-
-
-

@@ -196,11 +196,3 @@ public class AlphaDeterminisationTRSimplifier
     mTransitionRemovalMode;
 
 }
-
-
-
-
-
-
-
-

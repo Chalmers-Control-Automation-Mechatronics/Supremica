@@ -2067,12 +2067,3 @@ public class OPSearchAutomatonSimplifier
   private static final int OBSERVABLE_TAU = 1;
 
 }
-
-
-
-
-
-
-
-
-

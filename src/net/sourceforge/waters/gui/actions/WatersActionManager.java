@@ -188,11 +188,3 @@ public abstract class WatersActionManager implements Observer
   private final Map<Class<? extends IDEAction>,Action> mKeyboardActionMap;
 
 }
-
-
-
-
-
-
-
-

@@ -62,7 +62,7 @@ public interface DocumentProxy
    * that may extend over several lines.
    */
   public String getComment();
- 
+
   /**
    * Gets the URL associated with this document.
    */
@@ -81,11 +81,3 @@ public interface DocumentProxy
    */
   public void setLocation(URI location);
 }
-
-
-
-
-
-
-
-

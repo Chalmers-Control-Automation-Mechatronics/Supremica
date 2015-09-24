@@ -82,18 +82,10 @@ public class EmptyLabelBlockException extends EvalException {
   //# Static Class Variables
   private final EdgeProxy mEdge;
   private final ComponentProxy mComponent;
-  
-  
+
+
   //#########################################################################
   //# Static Class Variables
   public static final long serialVersionUID = 1;
 
 }
-
-
-
-
-
-
-
-

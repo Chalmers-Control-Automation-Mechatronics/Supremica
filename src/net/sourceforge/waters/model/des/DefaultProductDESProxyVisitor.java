@@ -115,11 +115,3 @@ public class DefaultProductDESProxyVisitor
   }
 
 }
-
-
-
-
-
-
-
-

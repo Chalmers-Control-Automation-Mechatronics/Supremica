@@ -182,11 +182,3 @@ public class SICProperty5Verifier extends AbstractSICConflictChecker
   private boolean mFirstResult;
 
 }
-
-
-
-
-
-
-
-

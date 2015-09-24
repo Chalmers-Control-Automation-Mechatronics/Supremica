@@ -127,11 +127,3 @@ public class InsertParameterBindingAction
     WatersDataFlavor.createTransferable(TEMPLATE);
 
 }
-
-
-
-
-
-
-
-

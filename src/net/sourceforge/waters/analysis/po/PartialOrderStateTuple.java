@@ -234,11 +234,3 @@ public class PartialOrderStateTuple
   protected int mTotalSuccessors; //
   protected int mAmpleSuccessors; //
 }
-
-
-
-
-
-
-
-

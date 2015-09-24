@@ -385,12 +385,3 @@ class ChildNodeSetSubject
   private Set<NodeSubject> mProxySet;
 
 }
-
-
-
-
-
-
-
-
-

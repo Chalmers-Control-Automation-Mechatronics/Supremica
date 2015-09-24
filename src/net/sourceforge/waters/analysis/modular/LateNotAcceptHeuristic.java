@@ -107,11 +107,3 @@ public class LateNotAcceptHeuristic
     return bestautomaton == null ? null : Collections.singleton(bestautomaton);
   }
 }
-
-
-
-
-
-
-
-

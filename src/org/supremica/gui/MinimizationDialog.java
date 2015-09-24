@@ -431,8 +431,3 @@ public class MinimizationDialog
         }
     }
 }
-
-
-
-
-

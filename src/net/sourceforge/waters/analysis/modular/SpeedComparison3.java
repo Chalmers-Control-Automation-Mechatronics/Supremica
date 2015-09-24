@@ -476,11 +476,3 @@ public class SpeedComparison3
     }
   }
 }
-
-
-
-
-
-
-
-

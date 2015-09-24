@@ -71,11 +71,3 @@ public abstract class AbstractKindTranslator
   }
 
 }
-
-
-
-
-
-
-
-

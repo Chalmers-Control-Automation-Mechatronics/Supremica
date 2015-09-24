@@ -78,7 +78,7 @@ public class JAXBProductDESMarshaller
   {
       return ".wdes";
   }
-  
+
   public String getDescription()
   {
       return "Instantiated Waters automata files [*.wdes]";
@@ -95,11 +95,3 @@ public class JAXBProductDESMarshaller
   }
 
 }
-
-
-
-
-
-
-
-

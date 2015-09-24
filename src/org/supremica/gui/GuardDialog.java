@@ -243,9 +243,3 @@ public class GuardDialog
 		}
 	}
 }
-
-
-
-
-
-

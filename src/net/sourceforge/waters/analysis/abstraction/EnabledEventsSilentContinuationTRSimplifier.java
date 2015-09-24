@@ -428,12 +428,3 @@ public class EnabledEventsSilentContinuationTRSimplifier
   private int mNumberOfEnabledEvents;
 
 }
-
-
-
-
-
-
-
-
-

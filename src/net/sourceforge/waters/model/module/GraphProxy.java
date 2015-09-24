@@ -91,11 +91,3 @@ public interface GraphProxy extends Proxy
   public Collection<EdgeProxy> getEdges();
 
 }
-
-
-
-
-
-
-
-

@@ -399,11 +399,3 @@ public interface ProductDESProxyFactory
        StateProxy target);
 
 }
-
-
-
-
-
-
-
-

@@ -78,11 +78,3 @@ class GraphEventPanelPopupFactory
   }
 
 }
-
-
-
-
-
-
-
-

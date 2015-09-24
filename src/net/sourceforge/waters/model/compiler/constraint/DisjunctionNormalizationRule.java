@@ -355,10 +355,3 @@ class DisjunctionNormalizationRule extends SimplificationRule
     new DisjunctionCollector();
 
 }
-
-
-
-
-
-
-

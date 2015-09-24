@@ -98,10 +98,3 @@ public interface WorkerLocal
   public void setErrorCallback(ErrorCallback callback);
 
 }
-
-
-
-
-
-
-

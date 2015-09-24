@@ -689,11 +689,3 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
   private ProxyPrinter mPrinter;
 
 }
-
-
-
-
-
-
-
-

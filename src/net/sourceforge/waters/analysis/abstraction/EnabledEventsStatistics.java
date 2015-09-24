@@ -125,11 +125,3 @@ public class EnabledEventsStatistics extends TRSimplifierStatistics
   private int mNumEnabledEvents;
 
 }
-
-
-
-
-
-
-
-

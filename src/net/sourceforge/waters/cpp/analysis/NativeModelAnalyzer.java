@@ -141,11 +141,3 @@ public abstract class NativeModelAnalyzer
   private boolean mEventTreeEnabled = true;
 
 }
-
-
-
-
-
-
-
-

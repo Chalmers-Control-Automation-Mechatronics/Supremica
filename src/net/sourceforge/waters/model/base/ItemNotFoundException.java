@@ -71,17 +71,9 @@ public class ItemNotFoundException extends ModelException {
     super(cause);
   }
 
-  
+
   //#########################################################################
   //# Static Class Variables
   public static final long serialVersionUID = 1;
 
 }
-
-
-
-
-
-
-
-

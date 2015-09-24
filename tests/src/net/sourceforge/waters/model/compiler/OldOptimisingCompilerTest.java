@@ -71,10 +71,3 @@ public class OldOptimisingCompilerTest extends AbstractCompilerTest
     return array;
   }
 }
-
-
-
-
-
-
-

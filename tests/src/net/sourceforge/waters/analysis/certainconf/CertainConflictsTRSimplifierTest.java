@@ -266,11 +266,3 @@ public class CertainConflictsTRSimplifierTest extends AbstractTRSimplifierTest {
     runTransitionRelationSimplifier(group, subdir, name);
   }
 }
-
-
-
-
-
-
-
-

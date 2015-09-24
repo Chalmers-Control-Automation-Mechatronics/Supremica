@@ -245,8 +245,3 @@ class CreateEventPanel
 		super.setVisible(visible);
 	}
 }
-
-
-
-
-

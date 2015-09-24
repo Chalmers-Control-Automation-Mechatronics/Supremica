@@ -178,11 +178,3 @@ public class MemStateProxy
   private static final int TAG_INITIAL = 0x80000000;
 
 }
-
-
-
-
-
-
-
-

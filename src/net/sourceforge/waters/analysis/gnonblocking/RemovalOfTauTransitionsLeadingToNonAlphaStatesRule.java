@@ -196,11 +196,3 @@ class RemovalOfTauTransitionsLeadingToNonAlphaStatesRule
   private StateEncoding mOutputEncoding;
 
 }
-
-
-
-
-
-
-
-

@@ -106,10 +106,10 @@ public class PackedStateEncoding extends StateEncoding
       }
 
     StateTuple t = new StateTuple(pstate, depth);
-  
-    
+
+
     int[] unpacked2 = decodeState(t);
-   
+
       //Check if the state encodes/decodes correctly. 
       if (!java.util.Arrays.equals(unpacked, unpacked2))
 	{
@@ -135,7 +135,7 @@ public class PackedStateEncoding extends StateEncoding
   {
     int[] pstate = packed.getStateArray();
     int[] unpacked = new int[mStartBit.length];
-    
+
     for (int i = 0; i < unpacked.length; i++)
       {
 	unpacked[i] = decodeAutomatonState(pstate, i);
@@ -283,10 +283,3 @@ public class PackedStateEncoding extends StateEncoding
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-

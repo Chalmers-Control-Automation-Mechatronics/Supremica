@@ -678,8 +678,3 @@ public class ModuleContainer
   static final String TYPE_STRING = "Waters module";
 
 }
-
-
-
-
-

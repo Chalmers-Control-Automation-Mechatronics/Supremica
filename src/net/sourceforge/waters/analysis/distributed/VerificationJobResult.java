@@ -74,10 +74,3 @@ public class VerificationJobResult extends JobResult
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-

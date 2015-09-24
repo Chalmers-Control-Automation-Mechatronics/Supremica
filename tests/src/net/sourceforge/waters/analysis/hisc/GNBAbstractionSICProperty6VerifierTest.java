@@ -76,11 +76,3 @@ public class GNBAbstractionSICProperty6VerifierTest
   }
 
 }
-
-
-
-
-
-
-
-

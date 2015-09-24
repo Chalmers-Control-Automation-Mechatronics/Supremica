@@ -218,11 +218,3 @@ class DeterminisationOfNonAlphaStatesRule
   private StateEncoding mOutputEncoding;
 
 }
-
-
-
-
-
-
-
-

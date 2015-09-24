@@ -39,10 +39,3 @@ interface ProcessorVariable {
   public String getText();
 
 }
-
-
-
-
-
-
-

@@ -330,12 +330,3 @@ public class SilentOutGoing
     TIME += System.currentTimeMillis();
   }
 }
-
-
-
-
-
-
-
-
-

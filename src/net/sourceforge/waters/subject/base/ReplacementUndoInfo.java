@@ -113,11 +113,3 @@ public class ReplacementUndoInfo implements UndoInfo
   private final Object mNewValue;
 
 }
-
-
-
-
-
-
-
-

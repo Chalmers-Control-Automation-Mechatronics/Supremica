@@ -139,7 +139,7 @@ private:
   uint32_t mFreeIndex;
   uint32_t mPreTopIndex;
   TarjanControlStackEntry* mPreTop;
-  
+
   //##########################################################################
   //# Class Constants
   static const uint32_t NO_INDEX = UINT32_MAX;
@@ -263,11 +263,3 @@ private:
 }   /* namespace waters */
 
 #endif  /* !_TarjanStateSpace_h_ */
-
-
-
-
-
-
-
-

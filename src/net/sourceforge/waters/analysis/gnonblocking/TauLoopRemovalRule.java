@@ -144,11 +144,3 @@ class TauLoopRemovalRule extends TRSimplifierAbstractionRule
   private StateEncoding mOutputEncoding;
 
 }
-
-
-
-
-
-
-
-

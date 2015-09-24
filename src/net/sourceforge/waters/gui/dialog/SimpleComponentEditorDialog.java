@@ -506,12 +506,3 @@ public class SimpleComponentEditorDialog
     WatersDataFlavor.createTransferable(COMPONENT_TEMPLATE);
 
 }
-
-
-
-
-
-
-
-
-

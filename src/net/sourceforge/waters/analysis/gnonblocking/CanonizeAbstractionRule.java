@@ -225,12 +225,3 @@ public class CanonizeAbstractionRule
 
   private boolean mIsAborting = false;
 }
-
-
-
-
-
-
-
-
-

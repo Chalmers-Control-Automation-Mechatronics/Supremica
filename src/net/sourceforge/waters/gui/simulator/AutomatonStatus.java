@@ -113,11 +113,3 @@ enum AutomatonStatus
   private String mText;
 
 }
-
-
-
-
-
-
-
-

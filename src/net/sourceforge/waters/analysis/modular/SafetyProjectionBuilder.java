@@ -85,11 +85,3 @@ public interface SafetyProjectionBuilder
   public void setForbidden(final Set<EventProxy> forbidden);
 
 }
-
-
-
-
-
-
-
-

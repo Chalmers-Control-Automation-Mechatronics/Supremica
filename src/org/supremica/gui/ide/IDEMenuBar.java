@@ -837,8 +837,3 @@ public class IDEMenuBar extends JMenuBar
   private static final int MAX_MODULES = 24;
 
 }
-
-
-
-
-

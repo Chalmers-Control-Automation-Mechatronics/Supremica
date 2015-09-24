@@ -58,11 +58,3 @@ enum CheckType {
 
 
 #endif  /* !_CheckType_h_ */
-
-
-
-
-
-
-
-

@@ -347,11 +347,3 @@ class EFAVariableTransitionRelationPart
   private boolean mIsAllSelfloops;
 
 }
-
-
-
-
-
-
-
-

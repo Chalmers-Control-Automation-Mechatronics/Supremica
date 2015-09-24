@@ -1323,12 +1323,3 @@ public class ProjectingNonBlockingCheckerB
     LoggerFactory.createLogger(ProjectingNonBlockingChecker.class);
 
 }
-
-
-
-
-
-
-
-
-

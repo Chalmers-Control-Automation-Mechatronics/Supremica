@@ -604,11 +604,3 @@ public class Projection
   private Bag unvisited;
   private int[][] eventAutomaton;
 }
-
-
-
-
-
-
-
-

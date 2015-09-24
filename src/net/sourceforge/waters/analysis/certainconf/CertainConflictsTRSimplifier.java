@@ -759,11 +759,3 @@ public class CertainConflictsTRSimplifier extends AbstractMarkingTRSimplifier {
     private TIntHashSet mTotalBadStates;
 
 }
-
-
-
-
-
-
-
-

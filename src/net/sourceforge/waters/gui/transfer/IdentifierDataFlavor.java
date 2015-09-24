@@ -189,10 +189,3 @@ class IdentifierDataFlavor extends ModuleDataFlavor
   private final ConversionVisitor mVisitor = new ConversionVisitor();
 
 }
-
-
-
-
-
-
-

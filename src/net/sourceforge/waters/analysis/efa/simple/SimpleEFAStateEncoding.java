@@ -236,11 +236,3 @@ public class SimpleEFAStateEncoding implements Iterable<SimpleNodeProxy>
   private final TIntArrayList mForbiddenStates;
   private final ModuleProxyCloner mCloner;
 }
-
-
-
-
-
-
-
-

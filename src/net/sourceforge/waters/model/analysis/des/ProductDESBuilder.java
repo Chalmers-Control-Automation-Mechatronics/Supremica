@@ -61,11 +61,3 @@ public interface ProductDESBuilder extends ModelBuilder<ProductDESProxy>
   public ProductDESResult getAnalysisResult();
 
 }
-
-
-
-
-
-
-
-

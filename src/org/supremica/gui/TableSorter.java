@@ -55,32 +55,32 @@ public class TableSorter
     Vector<Integer> sortingColumns = new Vector<Integer>();
     boolean ascending = true;
     int compares;
-    
+
     public TableSorter()
     {
         indexes = new int[0];    // for consistency
     }
-    
+
     public TableSorter(TableModel model)
     {
         setModel(model);
     }
-    
+
     public void setModel(TableModel model)
     {
         super.setModel(model);
         reallocateIndexes();
     }
-    
+
     public int compareRowsByColumn(int row1, int row2, int column)
     {
         Class<?> type = model.getColumnClass(column);
         TableModel data = model;
-        
+
         // Check for nulls.
         Object o1 = data.getValueAt(row1, column);
         Object o2 = data.getValueAt(row2, column);
-        
+
         // If both values are null, return 0.
         if ((o1 == null) && (o2 == null))
         {
@@ -94,7 +94,7 @@ public class TableSorter
         {
             return 1;
         }
-        
+
                 /*
                  * We copy all returned values from the getValue call in case
                  * an optimised model is reusing one object to return many
@@ -109,7 +109,7 @@ public class TableSorter
             double d1 = n1.doubleValue();
             Number n2 = (Number) data.getValueAt(row2, column);
             double d2 = n2.doubleValue();
-            
+
             if (d1 < d2)
             {
                 return -1;
@@ -129,7 +129,7 @@ public class TableSorter
             long n1 = d1.getTime();
             Date d2 = (Date) data.getValueAt(row2, column);
             long n2 = d2.getTime();
-            
+
             if (n1 < n2)
             {
                 return -1;
@@ -148,7 +148,7 @@ public class TableSorter
             String s1 = (String) data.getValueAt(row1, column);
             String s2 = (String) data.getValueAt(row2, column);
             int result = s1.compareToIgnoreCase(s2);
-            
+
             if (result < 0)
             {
                 return -1;
@@ -168,7 +168,7 @@ public class TableSorter
             boolean b1 = bool1.booleanValue();
             Boolean bool2 = (Boolean) data.getValueAt(row2, column);
             boolean b2 = bool2.booleanValue();
-            
+
             if (b1 == b2)
             {
                 return 0;
@@ -189,7 +189,7 @@ public class TableSorter
             Object v2 = data.getValueAt(row2, column);
             String s2 = v2.toString();
             int result = s1.compareTo(s2);
-            
+
             if (result < 0)
             {
                 return -1;
@@ -204,16 +204,16 @@ public class TableSorter
             }
         }
     }
-    
+
     public int compare(int row1, int row2)
     {
         compares++;
-        
+
         for (int level = 0; level < sortingColumns.size(); level++)
         {
             Integer column = sortingColumns.elementAt(level);
             int result = compareRowsByColumn(row1, row2, column.intValue());
-            
+
             if (result != 0)
             {
                 return ascending
@@ -221,55 +221,55 @@ public class TableSorter
                     : -result;
             }
         }
-        
+
         return 0;
     }
-    
+
     public void reallocateIndexes()
     {
         int rowCount = model.getRowCount();
-        
+
         // Set up a new array of indexes with the right number of elements
         // for the new data model.
         indexes = new int[rowCount];
-        
+
         // Initialise with the identity mapping.
         for (int row = 0; row < rowCount; row++)
         {
             indexes[row] = row;
         }
     }
-    
+
     public void tableChanged(TableModelEvent e)
     {
-        
+
         // System.out.println("Sorter: tableChanged");
         reallocateIndexes();
         super.tableChanged(e);
     }
-    
+
     public void checkModel()
     {
         if (indexes.length != model.getRowCount())
         {
-            
+
             // System.err.println("Sorter not informed of a change in model.");
         }
     }
-    
+
     public void sort(Object sender)
     {
         checkModel();
-        
+
         compares = 0;
-        
+
         // n2sort();
         // qsort(0, indexes.length-1);
         shuttlesort((int[]) indexes.clone(), indexes, 0, indexes.length);
-        
+
         // System.out.println("Compares: "+compares);
     }
-    
+
     public void n2sort()
     {
         for (int i = 0; i < getRowCount(); i++)
@@ -283,7 +283,7 @@ public class TableSorter
             }
         }
     }
-    
+
     // This is a home-grown implementation which we have not had time
     // to research - it may perform poorly in some circumstances. It
     // requires twice the space of an in-place algorithm and makes
@@ -297,15 +297,15 @@ public class TableSorter
         {
             return;
         }
-        
+
         int middle = (low + high) / 2;
-        
+
         shuttlesort(to, from, low, middle);
         shuttlesort(to, from, middle, high);
-        
+
         int p = low;
         int q = middle;
-        
+
                 /*
                  * This is an optional short-cut; at each recursive call,
                  * check to see if the elements in this subset are already
@@ -328,10 +328,10 @@ public class TableSorter
             {
                 to[i] = from[i];
             }
-            
+
             return;
         }
-        
+
         // A normal merge.
         for (int i = low; i < high; i++)
         {
@@ -345,21 +345,21 @@ public class TableSorter
             }
         }
     }
-    
+
     public void swap(int i, int j)
     {
         int tmp = indexes[i];
-        
+
         indexes[i] = indexes[j];
         indexes[j] = tmp;
     }
-    
+
     // The mapping only affects the contents of the data rows.
     // Pass all requests to these rows through the mapping array: "indexes".
     public Object getValueAt(int aRow, int aColumn)
     {
         checkModel();
-        
+
         try
         {
             return model.getValueAt(indexes[aRow], aColumn);
@@ -370,33 +370,33 @@ public class TableSorter
             return null;
         }
     }
-    
+
     public int getOriginalRowIndex(int aRow)
     {
         return indexes[aRow];
     }
-    
+
     public void setValueAt(Object aValue, int aRow, int aColumn)
     {
         checkModel();
         model.setValueAt(aValue, indexes[aRow], aColumn);
     }
-    
+
     public void sortByColumn(int column)
     {
         sortByColumn(column, true);
     }
-    
+
     public void sortByColumn(int column, boolean ascending)
     {
         this.ascending = ascending;
-        
+
         sortingColumns.removeAllElements();
         sortingColumns.addElement(new Integer(column));
         sort(this);
         super.tableChanged(new TableModelEvent(this));
     }
-    
+
     // There is no-where else to put this.
     // Add a mouse listener to the Table to trigger a table sort
     // when a column heading is clicked in the JTable.
@@ -404,20 +404,20 @@ public class TableSorter
     {
         final TableSorter sorter = this;
         final JTable tableView = table;
-        
+
         tableView.setColumnSelectionAllowed(false);
-        
+
         MouseAdapter listMouseListener = new MouseAdapter()
         {
             private int currentSortColumn = -1;
             private boolean ascending = true;
-            
+
             public void mouseClicked(MouseEvent e)
             {
                 TableColumnModel columnModel = tableView.getColumnModel();
                 int viewColumn = columnModel.getColumnIndexAtX(e.getX());
                 int column = tableView.convertColumnIndexToModel(viewColumn);
-                
+
                 if ((e.getClickCount() == 1) && (column != -1))
                 {
                     // System.out.println("Sorting ...");
@@ -433,7 +433,7 @@ public class TableSorter
                         currentSortColumn = column;
                         ascending = true;
                     }
-                    
+
                     sorter.sortByColumn(column, ascending);
                 }
             }
@@ -442,8 +442,3 @@ public class TableSorter
         th.addMouseListener(listMouseListener);
     }
 }
-
-
-
-
-

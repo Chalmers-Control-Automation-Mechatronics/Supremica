@@ -507,11 +507,3 @@ public class ModularAndCompositionalSynthesizerExperiments extends AbstractAnaly
   private PrintWriter mPrintWriter;
   private boolean mHasBeenPrinted;
 }
-
-
-
-
-
-
-
-

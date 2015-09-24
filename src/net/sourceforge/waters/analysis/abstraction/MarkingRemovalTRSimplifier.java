@@ -170,12 +170,3 @@ public class MarkingRemovalTRSimplifier
   private boolean[] mReducedMarkings;
 
 }
-
-
-
-
-
-
-
-
-

@@ -127,11 +127,3 @@ public class ReorganizeListCommand
 		return mDescription;
     }
 }
-
-
-
-
-
-
-
-

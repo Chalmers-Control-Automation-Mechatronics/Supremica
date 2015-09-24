@@ -138,11 +138,3 @@ public class RecursiveUndoInfo
   private final List<UndoInfo> mChildren;
 
 }
-
-
-
-
-
-
-
-

@@ -333,11 +333,3 @@ public class HISCAttributeFactory implements AttributeFactory
     ATTRIBUTE_VALUES.put(INTERFACE_KEY, empty);
   }
 }
-
-
-
-
-
-
-
-

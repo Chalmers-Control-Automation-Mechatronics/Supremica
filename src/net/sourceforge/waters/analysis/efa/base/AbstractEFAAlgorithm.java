@@ -194,11 +194,3 @@ public abstract class AbstractEFAAlgorithm
   private EFASimplifierStatistics mStatistics;
 
 }
-
-
-
-
-
-
-
-

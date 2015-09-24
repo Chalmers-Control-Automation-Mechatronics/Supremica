@@ -673,12 +673,3 @@ public class CertainConflictsTraceExpander extends TRTraceExpander
   private ListBufferTransitionRelation mCertainConfRel;
   private int mOriginalTraceEndState;
 }
-
-
-
-
-
-
-
-
-

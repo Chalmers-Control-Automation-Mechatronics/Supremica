@@ -114,12 +114,12 @@ public interface SafetyVerifierWorker extends Remote, StateHandler, Worker
    */
   public void addState(StateTuple state) throws RemoteException;
 
-  
+
   public int getStateCount() throws RemoteException;
   public long getIncomingStateCount() throws RemoteException;
   public long getOutgoingStateCount() throws RemoteException;
   public int getWaitingStateCount() throws RemoteException;
-  
+
   /**
    * Sets the worker to pause. This will prevent it from processing
    * new states. This method may not take effect immediately, that is
@@ -179,10 +179,3 @@ public interface SafetyVerifierWorker extends Remote, StateHandler, Worker
    */
   public JobStats getWorkerStats() throws RemoteException;
 }
-
-
-
-
-
-
-

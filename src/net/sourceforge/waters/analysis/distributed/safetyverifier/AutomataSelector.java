@@ -42,10 +42,3 @@ interface AutomataSelector
 {
   public AutomatonSchema[] select(AutomatonSchema[] automata);
 }
-
-
-
-
-
-
-

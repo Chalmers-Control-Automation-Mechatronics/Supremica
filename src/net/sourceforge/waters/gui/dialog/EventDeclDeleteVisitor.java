@@ -516,11 +516,3 @@ public class EventDeclDeleteVisitor
   private String mAction;
 
 }
-
-
-
-
-
-
-
-

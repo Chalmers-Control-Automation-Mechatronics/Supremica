@@ -338,12 +338,3 @@ public final class AutomatonTools
   }
 
 }
-
-
-
-
-
-
-
-
-

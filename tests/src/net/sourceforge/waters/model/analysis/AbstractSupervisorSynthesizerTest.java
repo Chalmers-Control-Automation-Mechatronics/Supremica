@@ -847,12 +847,3 @@ public abstract class AbstractSupervisorSynthesizerTest
   private List<ParameterBindingProxy> mBindings;
 
 }
-
-
-
-
-
-
-
-
-

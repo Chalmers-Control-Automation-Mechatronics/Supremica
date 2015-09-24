@@ -72,8 +72,3 @@ class StickGamePanel extends JPanel implements TestCase {
 		return spg.getProject();
 	}
 }
-
-
-
-
-

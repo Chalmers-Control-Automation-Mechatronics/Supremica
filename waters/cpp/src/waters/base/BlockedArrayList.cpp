@@ -42,11 +42,3 @@
  * Complete implementation of template is in header file.
  * This file is only needed for the #pragma.
  */
-
-
-
-
-
-
-
-

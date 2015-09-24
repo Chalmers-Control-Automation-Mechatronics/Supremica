@@ -67,11 +67,3 @@ public interface SafetyVerifier extends ModelVerifier
   public SafetyTraceProxy getCounterExample();
 
 }
-
-
-
-
-
-
-
-

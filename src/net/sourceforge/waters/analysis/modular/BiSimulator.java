@@ -640,12 +640,3 @@ public class BiSimulator
     }
   }
 }
-
-
-
-
-
-
-
-
-

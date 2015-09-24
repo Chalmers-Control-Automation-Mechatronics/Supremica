@@ -252,11 +252,3 @@ class EventTreeModel
   private final List<EventProxy> mSortedEvents;
   private final ArrayList<Pair<Boolean,Integer>> mSortingEvents;
 }
-
-
-
-
-
-
-
-

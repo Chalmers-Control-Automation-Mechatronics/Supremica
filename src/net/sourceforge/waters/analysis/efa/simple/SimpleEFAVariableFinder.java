@@ -50,11 +50,3 @@ public class SimpleEFAVariableFinder
     super(optable);
   }
 }
-
-
-
-
-
-
-
-

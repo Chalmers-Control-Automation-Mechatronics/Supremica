@@ -106,10 +106,3 @@ class NodeLabelDataFlavor extends ModuleDataFlavor
   }
 
 }
-
-
-
-
-
-
-

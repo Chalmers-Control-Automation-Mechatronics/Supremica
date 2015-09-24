@@ -184,11 +184,3 @@ class EncodedStateTuple
 	return true;
     }
 }
-
-
-
-
-
-
-
-

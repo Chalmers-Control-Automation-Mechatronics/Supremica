@@ -42,13 +42,13 @@ public class RemoveSubsetTau
 {
   private final TransitionRelation mTransitionRelation;
   private final int mTau;
-  
+
   public static int ANNOTATIONSADDED = 0;
   public static int ANNOTATIONSREMOVEDSUBSET = 0;
   public static int STATESREMOVED = 0;
   public static int STATESTAUSREMOVEDFROM = 0;
   public static int TIME = 0;
-  
+
   public static void clearStats()
   {
     ANNOTATIONSADDED = 0;
@@ -57,7 +57,7 @@ public class RemoveSubsetTau
     STATESTAUSREMOVEDFROM = 0;
     TIME = 0;
   }
-  
+
   public static String stats()
   {
     return "REMOVE SUBSET TAU: ANNOTATIONSADDED = " + ANNOTATIONSADDED +
@@ -66,13 +66,13 @@ public class RemoveSubsetTau
             " STATESTAUSREMOVEDFROM = " + STATESTAUSREMOVEDFROM +
             " TIME = " + TIME;
   }
-  
+
   public RemoveSubsetTau(TransitionRelation transitionrelation, int tau)
   {
     mTransitionRelation = transitionrelation;
     mTau = tau;
   }
-  
+
   public void run()
   {
     TIME -= System.currentTimeMillis();
@@ -139,12 +139,3 @@ public class RemoveSubsetTau
     TIME += System.currentTimeMillis();
   }
 }
-
-
-
-
-
-
-
-
-

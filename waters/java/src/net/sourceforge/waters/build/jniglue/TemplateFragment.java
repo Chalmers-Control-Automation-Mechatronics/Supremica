@@ -82,11 +82,3 @@ abstract class TemplateFragment {
   private final int mNumSkippedFrames;
 
 }
-
-
-
-
-
-
-
-

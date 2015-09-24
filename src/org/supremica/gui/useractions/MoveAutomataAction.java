@@ -91,8 +91,3 @@ public class MoveAutomataAction
 		ActionMan.automataMove_actionPerformed(ActionMan.getGui(), directionIsUp, allTheWay);
 	}
 }
-
-
-
-
-

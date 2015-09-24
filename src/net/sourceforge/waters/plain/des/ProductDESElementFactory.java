@@ -285,11 +285,3 @@ public class ProductDESElementFactory
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-
-

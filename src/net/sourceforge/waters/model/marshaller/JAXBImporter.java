@@ -107,11 +107,3 @@ abstract class JAXBImporter
   private boolean mImportingGeometry;
 
 }
-
-
-
-
-
-
-
-

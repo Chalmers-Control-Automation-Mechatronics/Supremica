@@ -102,11 +102,3 @@ public abstract class AbstractSynchronisationEncoding
   private final int mNumberOfAutomata;
 
 }
-
-
-
-
-
-
-
-

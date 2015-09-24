@@ -626,12 +626,3 @@ public class CompareLessConflicting
   private int mExpanded;
 
 }
-
-
-
-
-
-
-
-
-

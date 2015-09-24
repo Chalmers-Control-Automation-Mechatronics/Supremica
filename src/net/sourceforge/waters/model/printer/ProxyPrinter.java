@@ -370,11 +370,3 @@ public class ProxyPrinter
   private boolean mAtLineStart = true;
 
 }
-
-
-
-
-
-
-
-

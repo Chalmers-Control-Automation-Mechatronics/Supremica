@@ -81,11 +81,3 @@ public enum BDDPackage
   private final boolean mIsReorderingSupported;
 
 }
-
-
-
-
-
-
-
-

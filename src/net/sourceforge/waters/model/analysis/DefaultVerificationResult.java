@@ -159,11 +159,3 @@ public class DefaultVerificationResult
   private TraceProxy mCounterExample;
 
 }
-
-
-
-
-
-
-
-

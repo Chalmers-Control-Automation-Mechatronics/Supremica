@@ -256,11 +256,3 @@ abstract class AbstractEFSMTest
   static final String RESULT = "result";
 
 }
-
-
-
-
-
-
-
-

@@ -135,8 +135,3 @@ public class AnalyzerViewModularStructureAction
         }
     }
 }
-
-
-
-
-

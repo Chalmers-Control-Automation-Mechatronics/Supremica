@@ -71,11 +71,3 @@ public interface QualifiedIdentifierProxy extends IdentifierProxy {
   public IdentifierProxy getComponentIdentifier();
 
 }
-
-
-
-
-
-
-
-

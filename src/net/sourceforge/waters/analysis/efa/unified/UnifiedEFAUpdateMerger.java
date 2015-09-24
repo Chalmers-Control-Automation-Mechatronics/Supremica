@@ -422,10 +422,3 @@ class UnifiedEFAUpdateMerger extends AbstractEFAAlgorithm
   private final AbstractEFAEvent mDummyRoot;
 
 }
-
-
-
-
-
-
-

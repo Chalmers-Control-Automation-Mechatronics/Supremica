@@ -162,11 +162,3 @@ class CompiledEventList implements CompiledEvent
   private boolean mIsObservable;
 
 }
-
-
-
-
-
-
-
-

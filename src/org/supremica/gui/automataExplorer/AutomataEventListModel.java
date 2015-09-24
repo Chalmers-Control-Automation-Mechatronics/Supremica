@@ -195,8 +195,3 @@ public class AutomataEventListModel
                  */
     }
 }
-
-
-
-
-

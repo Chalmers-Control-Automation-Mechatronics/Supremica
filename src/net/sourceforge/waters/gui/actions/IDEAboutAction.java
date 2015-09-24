@@ -82,11 +82,3 @@ public class IDEAboutAction extends IDEAction
   private static final long serialVersionUID = -2970500283126405824L;
 
 }
-
-
-
-
-
-
-
-

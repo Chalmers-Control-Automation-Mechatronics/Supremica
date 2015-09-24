@@ -49,11 +49,3 @@ public interface UndoInfo
   public ModelChangeEvent undo(Subject parent);
 
 }
-
-
-
-
-
-
-
-

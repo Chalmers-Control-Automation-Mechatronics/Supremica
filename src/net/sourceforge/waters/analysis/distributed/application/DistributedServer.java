@@ -76,7 +76,7 @@ public class DistributedServer
   {
     return new ControllerID(java.util.UUID.randomUUID().toString());
   }
-  
+
   private synchronized Collection<Node> selectNodes(int count)
   {
     Set<Node> nodes = new HashSet<Node>();
@@ -103,7 +103,7 @@ public class DistributedServer
 	    continue;
 	  }
       }
- 
+
     return nodes;
   }
 
@@ -125,7 +125,7 @@ public class DistributedServer
     ClassNotFoundException, 
     IllegalAccessException, 
     InstantiationException
-    
+
   {
     Class<?> c = Class.forName(name);
 
@@ -285,9 +285,9 @@ public class DistributedServer
 
     System.exit(0);
   }
-  
+
   private final List<Node> mNodes;
-  
+
 
   //#########################################################################
   //# Main code
@@ -311,10 +311,3 @@ public class DistributedServer
   public static final String DEFAULT_SERVICE_NAME = "waters-analysis-server";
   public static final int DEFAULT_PORT = 23232;
 }
-
-
-
-
-
-
-

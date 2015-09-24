@@ -94,12 +94,3 @@ public class SingleBindingVariableContext
   }
 
 }
-
-
-
-
-
-
-
-
-

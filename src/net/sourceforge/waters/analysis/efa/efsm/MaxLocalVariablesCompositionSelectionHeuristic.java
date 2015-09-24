@@ -73,10 +73,3 @@ public class MaxLocalVariablesCompositionSelectionHeuristic
   }
 
 }
-
-
-
-
-
-
-

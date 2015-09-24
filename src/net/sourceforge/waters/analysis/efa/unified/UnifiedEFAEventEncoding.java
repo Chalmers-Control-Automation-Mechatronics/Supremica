@@ -119,12 +119,3 @@ public class UnifiedEFAEventEncoding
   public static final int OMEGA = 0;
 
 }
-
-
-
-
-
-
-
-
-

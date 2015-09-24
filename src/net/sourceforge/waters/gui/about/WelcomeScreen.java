@@ -75,6 +75,7 @@ public class WelcomeScreen
     createContents();
     setBackground(new Color(240, 255, 255));
     addComponentListener(this);
+    Config.DOT_USE.addPropertyChangeListener(this);
     Config.DOT_EXECUTE_COMMAND.addPropertyChangeListener(this);
   }
 
@@ -115,7 +116,9 @@ public class WelcomeScreen
   @Override
   public void propertyChanged(final SupremicaPropertyChangeEvent event)
   {
-    mAboutPanel.update();
+    removeAll();
+    createContents();
+    revalidate();
   }
 
 
@@ -124,7 +127,7 @@ public class WelcomeScreen
   private void createContents()
   {
     // Create the about box with the version information
-    final AboutPanel mAboutPanel = new AboutPanel(mIDE);
+    mAboutPanel = new AboutPanel(mIDE);
     final Border border1 = BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1);
     final Border border2 = BorderFactory.createRaisedBevelBorder();
     Border border = BorderFactory.createCompoundBorder(border1, border2);
@@ -188,11 +191,3 @@ public class WelcomeScreen
   private static final long serialVersionUID = -4208529601505410762L;
 
 }
-
-
-
-
-
-
-
-

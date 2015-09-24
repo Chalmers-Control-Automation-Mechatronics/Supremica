@@ -256,8 +256,3 @@ public class ActionAndControlViewerPanel
 		rebuild();
 	}
 }
-
-
-
-
-

@@ -94,11 +94,3 @@ public interface KindTranslator
     createEventProxy(":init", EventKind.CONTROLLABLE, false);
 
 }
-
-
-
-
-
-
-
-

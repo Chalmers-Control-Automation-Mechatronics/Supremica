@@ -181,17 +181,10 @@ public class EventKindException extends EvalException {
   private final CompiledEvent mEvent;
   private final int mIndex;
   private final CompiledRange mDeclRange;
-  
-  
+
+
   //#########################################################################
   //# Static Class Variables
   public static final long serialVersionUID = 1;
 
 }
-
-
-
-
-
-
-

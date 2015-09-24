@@ -266,11 +266,3 @@ public class SynthesisTransitionRemovalTRSimplifierTest
 
   private int mDefaultMarkingID;
 }
-
-
-
-
-
-
-
-

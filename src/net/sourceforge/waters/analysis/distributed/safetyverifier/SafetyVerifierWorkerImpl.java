@@ -120,7 +120,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
   {
     final String ExceptionText = "Cannot add new processing threads after "+
       "worker has been killed";
-      
+
     //Check for kill state before and after entering the synchronized
     //region, as the kill state could be set while the thread is
     //waiting on mThreads.
@@ -169,7 +169,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
       super();
       mBufferSize = bufferSize;
       mOutgoingBuffer = new StateTuple[bufferSize];
-      
+
       //A small cache for recently queued states.
       mOutputCache = new HashCache(1 << 18);
     }
@@ -302,7 +302,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
       int autCount = mModel.getAutomataCount();
       int eventCount = mModel.getEventCount();
       int[] successor = new int[autCount];    
-      
+
     events:for (int ev = 0; ev < eventCount; ev++)
 	{
 	  //Calculate successor states by first checking
@@ -365,8 +365,8 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 	    }
 	}
     }
-    
-    
+
+
     //Queue a state to be dispatched in the outgoing buffer, and send 
     //if the buffer is full.
     private void outputState(StateTuple state)
@@ -383,7 +383,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 	{
 	  handle(new RuntimeException("Dispatch state failed", e));
 	}
-      
+
       /*
       mOutgoingBuffer[mOutgoingBufferIndex++] = state;
 
@@ -392,7 +392,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 	  flushOutputBuffer();
 	}
       */
-      
+
     }
 
 
@@ -423,7 +423,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
       */
     }
 
-      
+
 
     @SuppressWarnings("unused")
 	private final StateTuple[] mOutgoingBuffer;
@@ -433,7 +433,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
     private final HashCache mOutputCache; 
   }
 
-    
+
   /**
    * Gets the number of unprocessed states. This method synchronises on
    * the state list.
@@ -455,7 +455,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 	return mStateStorage.getNextState();
       }
   }
-  
+
 
   private void setBadState(StateTuple bad, int event)
   {
@@ -497,7 +497,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
   protected TransitionTable[] generateTransitionTables()
   {
     List<TransitionTable> tts = new ArrayList<TransitionTable>();
-    
+
     for (int i = 0; i < mModel.getAutomataCount(); i++)
       {
 	tts.add(new TransitionTable(mModel, i));
@@ -593,7 +593,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 	mPausedState = false;
 	mWorkerState.notifyAll();
       }    
-    
+
     //Hack? Also wake up threads waiting on the incoming state list.
     //This is necessary so that any processing threads that are waiting
     //on states can check the pause/kill status too.
@@ -609,7 +609,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
     return mPausedState;
   }
 
-  
+
   public void kill()
   {
     synchronized (mWorkerState)
@@ -627,7 +627,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
       }
   }
 
-  
+
   public void created() throws Exception
   {
     super.created();
@@ -672,7 +672,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
 	      }
 	  }
       }
-    
+
     System.err.format("Safety verifier worker: all threads terminated\n");
   }
 
@@ -774,7 +774,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
   public JobStats getWorkerStats()
   {
     JobStats stats = new JobStats();
-    
+
     stats.set("worker-id", getWorkerID());
     stats.set("bad-state", getBadState());
     stats.set("bad-event", getBadEvent());
@@ -785,7 +785,7 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
       {
 	stats.set("local-added-states", mLocalHandler.getCount());
       }
-    
+
     synchronized (mIncomingLock)
       {
 	if (mStateStorage != null)
@@ -853,9 +853,9 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
   private List<Thread> mThreads = new ArrayList<Thread>();
 
   private ProductDESSchema mModel = null;
-  
+
   private final Object mIncomingLock = new Object();
-  
+
   private StateStorage mStateStorage;
 
   /**
@@ -868,13 +868,13 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
   private long mIncomingStateCounter = 0;
   private long mOutgoingStateCounter = 0;
   private boolean mIdleCanaryFlag = false;
-  
+
   //An object, for the purpose of synchronisation
   private final Object mOutgoingLock = new Object();
 
   private TransitionTable[] mPlantTransitions;
   private TransitionTable[] mSpecTransitions;
- 
+
   //An array of transition tables, indexed by automaton id.
   private TransitionTable[] mTransitionTables;
 
@@ -897,10 +897,3 @@ public class SafetyVerifierWorkerImpl extends AbstractWorker implements SafetyVe
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-

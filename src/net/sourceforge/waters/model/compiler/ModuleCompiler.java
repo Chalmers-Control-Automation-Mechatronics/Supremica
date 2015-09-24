@@ -411,10 +411,3 @@ public class ModuleCompiler extends AbortableCompiler
   private HISCCompileMode mHISCCompileMode = HISCCompileMode.NOT_HISC;
 
 }
-
-
-
-
-
-
-

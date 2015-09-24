@@ -227,11 +227,3 @@ public class CoreachabilityTRSimplifierTest
   }
 
 }
-
-
-
-
-
-
-
-

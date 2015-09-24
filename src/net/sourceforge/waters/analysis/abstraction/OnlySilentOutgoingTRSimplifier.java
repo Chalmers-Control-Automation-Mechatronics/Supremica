@@ -180,10 +180,3 @@ public class OnlySilentOutgoingTRSimplifier
   private boolean mDumpStateAware = false;
 
 }
-
-
-
-
-
-
-

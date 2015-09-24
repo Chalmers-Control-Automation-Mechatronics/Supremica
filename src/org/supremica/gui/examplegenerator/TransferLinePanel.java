@@ -93,8 +93,3 @@ class TransferLinePanel extends JPanel implements TestCase {
 		return tl.getProject();
 	}
 }
-
-
-
-
-

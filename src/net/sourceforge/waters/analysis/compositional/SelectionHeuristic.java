@@ -230,10 +230,3 @@ public abstract class SelectionHeuristic<T extends Comparable<? super T>>
   }
 
 }
-
-
-
-
-
-
-

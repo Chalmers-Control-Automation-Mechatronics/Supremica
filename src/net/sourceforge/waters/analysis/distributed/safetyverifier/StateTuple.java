@@ -80,7 +80,7 @@ public class StateTuple implements Serializable
   {
     return mState;
   }
-  
+
   /**
    * Without an encoding for interpretation, a string
    * representation of this state will not be very useful.
@@ -136,7 +136,7 @@ public class StateTuple implements Serializable
    * values as integer words.
    */
 
-  
+
   private void writeObject(java.io.ObjectOutputStream out) 
     throws IOException
   {
@@ -179,10 +179,3 @@ public class StateTuple implements Serializable
 
   private static final long serialVersionUID = 1L;
 }
-
-
-
-
-
-
-

@@ -1300,11 +1300,3 @@ public abstract class JAXBAbstractModuleImporter
     new NodeEventListHandler();
 
 }
-
-
-
-
-
-
-
-

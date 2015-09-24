@@ -324,11 +324,3 @@ public class EnabledEventsSelectionHeuristicFactory
   }
 
 }
-
-
-
-
-
-
-
-

@@ -57,12 +57,3 @@ Java_net_sourceforge_waters_cpp_analysis_NativeWordSizeTest_nativeWordSizeTest
     return JNI_FALSE;
   }
 }
-
-
-
-
-
-
-
-
-

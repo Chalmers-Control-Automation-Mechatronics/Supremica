@@ -144,8 +144,3 @@ public class AnalyzerStatisticsAction
         }
     }
 }
-
-
-
-
-

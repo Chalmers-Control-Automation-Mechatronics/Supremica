@@ -642,11 +642,3 @@ public class EFSMConflictCheckerExperiments
   private SelectionHeuristic<EFSMPair> mCompositionSelectionHeuristic;
 
 }
-
-
-
-
-
-
-
-

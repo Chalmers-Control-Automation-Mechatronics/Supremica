@@ -57,10 +57,3 @@ class UnifiedEFAVariableContext
   }
 
 }
-
-
-
-
-
-
-

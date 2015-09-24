@@ -297,8 +297,3 @@ public class SynchronizationDialog
 		}
 	}
 }
-
-
-
-
-

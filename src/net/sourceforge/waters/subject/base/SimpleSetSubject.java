@@ -71,11 +71,3 @@ public interface SimpleSetSubject<E>
                                  Set<? extends Subject> boundary);
 
 }
-
-
-
-
-
-
-
-

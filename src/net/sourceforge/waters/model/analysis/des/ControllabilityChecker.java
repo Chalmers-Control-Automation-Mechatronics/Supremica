@@ -52,11 +52,3 @@ public interface ControllabilityChecker extends SafetyVerifier
   public VerificationResult getAnalysisResult();
 
 }
-
-
-
-
-
-
-
-

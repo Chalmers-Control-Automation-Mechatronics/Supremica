@@ -98,8 +98,3 @@ public class AnalyzerEventHiderAction
         eventHider.doAction(selectedAutomata, ide.getActiveDocumentContainer().getAnalyzerPanel().getUnselectedAutomata().getUnionAlphabet());
     }
 }
-
-
-
-
-

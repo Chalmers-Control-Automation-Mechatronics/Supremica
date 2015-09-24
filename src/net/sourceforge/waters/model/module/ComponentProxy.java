@@ -52,11 +52,3 @@ package net.sourceforge.waters.model.module;
 public interface ComponentProxy extends IdentifiedProxy {
 
 }
-
-
-
-
-
-
-
-

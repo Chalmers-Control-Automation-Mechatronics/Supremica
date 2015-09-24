@@ -236,11 +236,3 @@ public class SimpleEFAEventEncoding extends SimpleInfoEncoder<SimpleEFAEventDecl
   private TIntByteHashMap mEventStatus;
   private THashSet<EventDeclProxy> mPropositions;
 }
-
-
-
-
-
-
-
-

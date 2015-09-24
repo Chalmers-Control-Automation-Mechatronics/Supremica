@@ -177,10 +177,3 @@ public class SimulatorPanel
   private static final boolean EVENT_VERTICAL_SCROLLBAR_ALWAYS = false;
   private static final boolean EVENT_HORIZONTAL_SCROLLBAR_NEVER = true;
 }
-
-
-
-
-
-
-

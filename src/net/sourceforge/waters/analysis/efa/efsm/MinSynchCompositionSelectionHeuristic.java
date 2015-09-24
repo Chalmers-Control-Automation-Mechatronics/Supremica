@@ -65,11 +65,3 @@ public class MinSynchCompositionSelectionHeuristic
   }
 
 }
-
-
-
-
-
-
-
-

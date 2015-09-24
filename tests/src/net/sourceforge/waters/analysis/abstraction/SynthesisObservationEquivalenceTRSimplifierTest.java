@@ -448,11 +448,3 @@ public class SynthesisObservationEquivalenceTRSimplifierTest
   private int mDefaultMarkingID;
 
 }
-
-
-
-
-
-
-
-

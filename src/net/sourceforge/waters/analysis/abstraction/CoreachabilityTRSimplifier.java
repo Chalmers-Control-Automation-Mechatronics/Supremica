@@ -143,12 +143,3 @@ public class CoreachabilityTRSimplifier
   }
 
 }
-
-
-
-
-
-
-
-
-

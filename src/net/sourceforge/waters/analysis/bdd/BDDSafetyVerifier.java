@@ -432,11 +432,3 @@ public class BDDSafetyVerifier
   private EventProxy mBadEvent;
 
 }
-
-
-
-
-
-
-
-

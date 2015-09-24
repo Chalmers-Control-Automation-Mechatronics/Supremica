@@ -86,11 +86,3 @@ class ModuleComponentListHandler
   private final ObjectFactory mFactory;
 
 }
-
-
-
-
-
-
-
-

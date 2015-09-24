@@ -242,11 +242,3 @@ public abstract class AbstractEFATransitionRelation<L>
   private final AbstractEFATransitionLabelEncoding<L> mTransitionLabelEncoding;
   private final List<SimpleNodeProxy> mNodeList;
 }
-
-
-
-
-
-
-
-

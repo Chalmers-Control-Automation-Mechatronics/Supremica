@@ -68,11 +68,3 @@ public interface TransitionProxy
   public StateProxy getTarget();
 
 }
-
-
-
-
-
-
-
-

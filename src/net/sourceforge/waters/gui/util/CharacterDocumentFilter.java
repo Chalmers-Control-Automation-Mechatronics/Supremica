@@ -108,10 +108,3 @@ public abstract class CharacterDocumentFilter
   }
 
 }
-
-
-
-
-
-
-

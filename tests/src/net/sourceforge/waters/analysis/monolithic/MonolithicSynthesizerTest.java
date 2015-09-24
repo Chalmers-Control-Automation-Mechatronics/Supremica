@@ -123,11 +123,3 @@ public class MonolithicSynthesizerTest
   }
 
 }
-
-
-
-
-
-
-
-

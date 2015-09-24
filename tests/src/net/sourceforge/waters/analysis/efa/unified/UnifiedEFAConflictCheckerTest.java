@@ -769,10 +769,3 @@ public class UnifiedEFAConflictCheckerTest extends AbstractAnalysisTest
     return result;
   }
 }
-
-
-
-
-
-
-

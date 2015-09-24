@@ -225,11 +225,3 @@ public abstract class AbstractTRSynchronousProductBuilderTest
   private boolean mPruningDeadlocks = false;
 
 }
-
-
-
-
-
-
-
-

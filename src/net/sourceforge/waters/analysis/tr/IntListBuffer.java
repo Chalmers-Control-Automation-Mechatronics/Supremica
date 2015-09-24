@@ -980,11 +980,3 @@ public class IntListBuffer
   private static final int BLOCK_MASK = BLOCK_SIZE - 1;
 
 }
-
-
-
-
-
-
-
-

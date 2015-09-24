@@ -105,8 +105,3 @@ public class SplitAction
 		newautomata.addAutomata(split);
 	}
 }
-
-
-
-
-

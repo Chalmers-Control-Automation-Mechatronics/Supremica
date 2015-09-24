@@ -384,11 +384,3 @@ public final class AttributeMapSubject
   private List<ModelObserver> mObservers;
 
 }
-
-
-
-
-
-
-
-

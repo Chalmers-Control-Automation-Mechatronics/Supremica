@@ -211,11 +211,3 @@ public class DefaultRenderingContext
   }
 
 }
-
-
-
-
-
-
-
-

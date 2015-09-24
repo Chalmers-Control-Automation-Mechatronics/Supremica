@@ -120,8 +120,3 @@ public class AnalyzerVerifierAction
                                      vOptions, sOptions, mOptions);
     }
 }
-
-
-
-
-

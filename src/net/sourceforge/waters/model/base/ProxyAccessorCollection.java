@@ -75,11 +75,3 @@ public interface ProxyAccessorCollection<P extends Proxy>
   public boolean removeAll(Collection<? extends P> collection);
 
 }
-
-
-
-
-
-
-
-

@@ -52,7 +52,7 @@ public class SpringAbortDialog
   extends JDialog
   implements ActionListener, EmbedderObserver
 {
-  
+
   //#########################################################################
   //# Constructors
   public SpringAbortDialog(final Frame owner,
@@ -142,11 +142,3 @@ public class SpringAbortDialog
   private static final long serialVersionUID = 1L;
 
 }
-
-
-
-
-
-
-
-

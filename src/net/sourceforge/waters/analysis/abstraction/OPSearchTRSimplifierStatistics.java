@@ -157,11 +157,3 @@ public class OPSearchTRSimplifierStatistics extends TRSimplifierStatistics
   private int mNumberOfIterations;
 
 }
-
-
-
-
-
-
-
-

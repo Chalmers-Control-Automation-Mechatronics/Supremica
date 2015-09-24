@@ -61,11 +61,3 @@ abstract class SquareWithID extends Square
   private final String mKey;
 
 }
-
-
-
-
-
-
-
-

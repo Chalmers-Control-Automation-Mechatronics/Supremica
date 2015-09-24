@@ -318,11 +318,3 @@ public abstract class AbstractModuleAnalyzer implements ModuleAnalyzer
   List<ParameterBindingProxy> mBindings;
 
 }
-
-
-
-
-
-
-
-

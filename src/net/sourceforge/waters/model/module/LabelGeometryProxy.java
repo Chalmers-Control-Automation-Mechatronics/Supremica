@@ -111,11 +111,3 @@ public interface LabelGeometryProxy extends GeometryProxy {
   public AnchorPosition getAnchor();
 
 }
-
-
-
-
-
-
-
-

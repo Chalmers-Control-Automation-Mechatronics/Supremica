@@ -61,8 +61,3 @@ public class SaveAction
 		ActionMan.fileSave(ActionMan.getGui());
 	}
 }
-
-
-
-
-
