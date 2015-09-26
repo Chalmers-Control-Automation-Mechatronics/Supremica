@@ -4,8 +4,11 @@ import gnu.trove.list.array.TIntArrayList;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import net.sf.javabdd.BDD;
@@ -13,8 +16,11 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
+import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
+import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
 import net.sourceforge.waters.subject.module.LabelBlockSubject;
@@ -25,6 +31,7 @@ import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.SplineGeometrySubject;
 
 import org.supremica.automata.ExtendedAutomata;
+import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions;
 import org.supremica.automata.algorithms.SynthesisType;
 import org.supremica.automata.algorithms.Guard.BDDExtendedGuardGenerator;
@@ -51,6 +58,8 @@ public class BDDExtendedSynthesizer {
     ModuleSubjectFactory factory = null;
     ExpressionParser parser = null;
     long nbrOfStates = -1;
+    private Set<ExtendedAutomaton> autTobeDeclaredAsVars;
+    private final EditorSynthesizerOptions options;
 
     public BDDExtendedSynthesizer(final ExtendedAutomata theAutomata, final  EditorSynthesizerOptions options)
     {
@@ -58,6 +67,9 @@ public class BDDExtendedSynthesizer {
         bddAutomata = new BDDExtendedAutomata(theAutomata, options);
         factory = ModuleSubjectFactory.getInstance();
         parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
+        this.options = options;
+        if (options.getCreateAutVars())
+          autTobeDeclaredAsVars = new HashSet<ExtendedAutomaton>();
     }
 
     public void synthesize(final EditorSynthesizerOptions options)
@@ -276,6 +288,9 @@ public class BDDExtendedSynthesizer {
 
               if (currBDDGG != null && !currBDDGG.guardIsTrue())
               {
+                if (options.getCreateAutVars())
+                  autTobeDeclaredAsVars.addAll(currBDDGG.getAutGuardVars());
+
                 EdgeSubject manipulatedEdge = null;
                 if (eventList.size() - eventsToBeRemovedFromEdge.size() == 1)
                 {
@@ -301,8 +316,9 @@ public class BDDExtendedSynthesizer {
 
                 // next, we insert the generated guards to the manipulated edge
                 if (manipulatedEdge.getGuardActionBlock()==null)
+                {
                   manipulatedEdge.setGuardActionBlock(new GuardActionBlockSubject());
-
+                }
                 String currGuard = "";
                 guard = currBDDGG.getGuard();
                 currGuard="";
@@ -340,6 +356,42 @@ public class BDDExtendedSynthesizer {
             eventList.removeAll(eventsToBeRemovedFromEdge);
           }
           ((SimpleComponentSubject)simSubj).getGraph().getEdgesModifiable().addAll(edgesToBeAdded);
+        }
+      }
+      if (options.getCreateAutVars())
+        createAutVarsAndUpdates();
+    }
+
+    private void createAutVarsAndUpdates()
+    {
+      for (final ExtendedAutomaton aut: autTobeDeclaredAsVars)
+      {
+        final Set<String> markedValues = new HashSet<>();
+        for (final NodeProxy node: aut.getMarkedLocations())
+           markedValues.add(node.getName());
+
+        final String autVarName = aut.getName() + ExtendedAutomata.getlocVarSuffix();
+        aut.getExAutomata().addEnumerationVariable(autVarName,
+                                                   aut.getNameToLocationMap().keySet(),
+                                                   aut.getInitialLocation().getName(), markedValues);
+
+        // add updates to the edges
+        for (final Map.Entry<NodeProxy, ArrayList<EdgeSubject>> entry: aut.getLocationToIngoingEdgesMap().entrySet())
+        {
+          final String target = entry.getKey().getName();
+          for (final EdgeSubject edge: entry.getValue())
+          {
+            if (edge.getGuardActionBlock() == null)
+              edge.setGuardActionBlock(new GuardActionBlockSubject());
+            final String assignment = autVarName + " = " + target;
+            SimpleExpressionProxy assignmentAsAction = null;
+            try {
+              assignmentAsAction = parser.parse(assignment);
+            } catch (final ParseException exception) {
+              exception.printStackTrace();
+            }
+            edge.getGuardActionBlock().getActionsModifiable().add((BinaryExpressionSubject) assignmentAsAction);
+          }
         }
       }
     }

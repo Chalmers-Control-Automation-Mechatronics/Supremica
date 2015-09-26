@@ -56,18 +56,46 @@
  */
 package org.supremica.automata;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.expr.TypeMismatchException;
-import net.sourceforge.waters.model.module.*;
-import net.sourceforge.waters.subject.module.*;
+import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.EventListExpressionProxy;
+import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+import net.sourceforge.waters.model.module.VariableComponentProxy;
+import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
+import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.GraphSubject;
+import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
+import net.sourceforge.waters.subject.module.IdentifierSubject;
+import net.sourceforge.waters.subject.module.LabelBlockSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.subject.module.PlainEventListSubject;
+import net.sourceforge.waters.subject.module.SimpleComponentSubject;
+import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
+import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
+import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
+
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.util.Args;
@@ -228,9 +256,9 @@ public class ExtendedAutomaton {
         }
 
 
-        for (final EdgeSubject edge : component.getGraph().getEdgesModifiable()) 
+        for (final EdgeSubject edge : component.getGraph().getEdgesModifiable())
         {
-            for (final Proxy event : edge.getLabelBlock().getEventIdentifierList()) 
+            for (final Proxy event : edge.getLabelBlock().getEventIdentifierList())
             {
                 final String eventName = ((SimpleIdentifierSubject) event).getName();
                 final EventDeclProxy e = automata.eventIdToProxy(eventName);
@@ -380,6 +408,10 @@ public class ExtendedAutomaton {
         return false;
     }
 
+    public ExtendedAutomata getExAutomata () {
+      return automata;
+    }
+
     public NodeProxy getInitialLocation() {
         return initialLocations.iterator().next();
     }
@@ -435,10 +467,14 @@ public class ExtendedAutomaton {
     public List<NodeProxy> getNodes()
     {
         return new ArrayList<NodeProxy>(nodes);
-    }    
+    }
 
     public NodeProxy getLocationWithName(final String name) {
         return nameToLocationMap.get(name);
+    }
+
+    public Map<String, NodeProxy> getNameToLocationMap() {
+      return nameToLocationMap;
     }
 
     public EventDeclProxy getEvent(final String name)
@@ -592,13 +628,13 @@ public class ExtendedAutomaton {
     @SuppressWarnings("serial")
     public void addTransition(final String source, final String target, final String label, final String guardIn, final String actionIn)
     {
-        NodeProxy fromNode = (SimpleNodeSubject) graph.getNodesModifiable().get(source);
+        NodeProxy fromNode = graph.getNodesModifiable().get(source);
         if (fromNode == null)
         {
                 fromNode = addState(source);
         }
 
-        NodeProxy toNode = (SimpleNodeSubject) graph.getNodesModifiable().get(target);
+        NodeProxy toNode = graph.getNodesModifiable().get(target);
         if (toNode == null)
         {
                 toNode = addState(target);
@@ -767,11 +803,11 @@ public class ExtendedAutomaton {
                     if(!added){
                         /**
                          * ToDo: One can check that no two guard of outgoing transitions with the same label
-                         * will be evaluated to true so for sure it is deterministic, e.g., g1:x==1 of 
+                         * will be evaluated to true so for sure it is deterministic, e.g., g1:x==1 of
                          * transition 1 and g2:x==2 of transition 2 will never evaluate true at the same time
                          * but for g1:x==1 and g2:y==1 we cannot say so.
                          * /Mohammad Reza
-                        **/       
+                        **/
                         return new NondeterministicEFAException(this, node, e);
                     }
                 }
@@ -828,8 +864,8 @@ public class ExtendedAutomaton {
 
     /**
      * Returns true if either all the locations are marked or no location is marked.
-     * 
-     * @return <code>true</code> if all the locations are marked or no one is marked. 
+     *
+     * @return <code>true</code> if all the locations are marked or no one is marked.
      */
     public boolean isAllMarked(){
         return nodes.size() == acceptedLocations.size() || acceptedLocations.isEmpty();

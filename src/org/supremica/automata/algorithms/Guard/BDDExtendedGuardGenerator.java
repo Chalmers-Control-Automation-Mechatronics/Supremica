@@ -15,7 +15,9 @@ package org.supremica.automata.algorithms.Guard;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import net.sf.javabdd.BDD;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -87,6 +89,7 @@ public final class BDDExtendedGuardGenerator {
     private boolean isEventBlocked = false;
     @SuppressWarnings("unused")
     private final EditorSynthesizerOptions options;
+    private Set<ExtendedAutomaton> autGuardVars;
 
     /** Creates a new instance of BDDExtendedGuardGenerator */
     public BDDExtendedGuardGenerator(final BDDExtendedAutomata bddAutomata, final String eventName, final BDD states, final EditorSynthesizerOptions options) {
@@ -97,6 +100,8 @@ public final class BDDExtendedGuardGenerator {
         generateIDD_PS = options.getSaveIDDInFile();
 
         this.options = options;
+        if (options.getCreateAutVars())
+          this.autGuardVars = new HashSet<ExtendedAutomaton>();
         /*
         final ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
         final ExpressionParser parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
@@ -447,13 +452,6 @@ public final class BDDExtendedGuardGenerator {
         return false;
     }
 
-    public boolean guardIsFalse()
-    {
-      if (guard.equals(FALSE))
-         return true;
-      return false;
-    }
-
     public String generateGuard(final BDD states)
 	{
         nbrOfTerms = 0;
@@ -669,6 +667,11 @@ public final class BDDExtendedGuardGenerator {
             final String autVarName = idd.getRoot().getName();
             final BDDExtendedAutomaton bddAut = automataBDD.getBDDExAutomaton(autVarName);
             final boolean isAutomaton = (bddAut != null) ? true : false;
+            if (options.getCreateAutVars())
+            {
+              if (isAutomaton && !autGuardVars.contains(bddAut.getExAutomaton()))
+                autGuardVars.add(bddAut.getExAutomaton());
+            }
             StringIntPair expr_Nbr = null;
             final String idChild = iddChild.getRoot().getID();
             if (!applyComplementHeuristics)
@@ -1008,5 +1011,10 @@ public final class BDDExtendedGuardGenerator {
             this.s = s;
             this.i = i;
         }
+    }
+
+    public Set<ExtendedAutomaton> getAutGuardVars()
+    {
+      return autGuardVars;
     }
 }

@@ -308,9 +308,9 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
             }
         }
 
-        for (final AbstractSubject sub : module.getComponentListModifiable()) 
+        for (final AbstractSubject sub : module.getComponentListModifiable())
         {
-            if (sub instanceof SimpleComponentSubject) 
+            if (sub instanceof SimpleComponentSubject)
             {
                 final ExtendedAutomaton exAutomaton = new ExtendedAutomaton(this, (SimpleComponentSubject) sub);
 
@@ -395,7 +395,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
         domain = d;
     }
 
-    public String getlocVarSuffix() {
+    public static String getlocVarSuffix() {
         return LOCAL_VAR_SUFFIX;
     }
 
