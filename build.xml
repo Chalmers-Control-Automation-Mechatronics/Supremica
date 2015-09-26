@@ -1252,6 +1252,7 @@ Class-Path: ${manifest.pathlist}</echo>
         	<runtime dir="${env.JAVA_HOME}" />
             <classpath file="${dist}/Supremica.jar"/>
         	<classpath file="${dist}/SupremicaLib.jar"/>
+            <option value="-Dapple.laf.useScreenMenuBar=true"/>
         </bundleapp>
     </target>
 </project>
