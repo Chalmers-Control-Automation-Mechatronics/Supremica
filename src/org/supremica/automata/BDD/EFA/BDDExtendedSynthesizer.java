@@ -305,7 +305,7 @@ public class BDDExtendedSynthesizer {
                   manipulatedEdge = new EdgeSubject(ep.getSource(),
                                                     ep.getTarget(),
                                                     lbs,
-                                                    ep.getGuardActionBlock(),
+                                                    ep.getGuardActionBlock() == null? null : ep.getGuardActionBlock().clone(),
                                                     null, // straight line
                                                     ep.getStartPoint(),
                                                     ep.getEndPoint());
