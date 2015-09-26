@@ -1234,5 +1234,25 @@ Class-Path: ${manifest.pathlist}</echo>
         </java>
     </target>
     
+	<!-- Package Supremica on Mac-->
+	<property environment="env" />
+	
+    <taskdef name="bundleapp"
+             classname="com.oracle.appbundler.AppBundlerTask"   
+             classpath="lib/appbundler-1.0.jar" />
+
+    <target name="bundle-Supremica">
+        <bundleapp outputdirectory="${dist}"
+            name="Supremica"
+            displayname="Supremica"
+        	icon="${images}/icons/Supremica.icns"
+        	shortversion="0.1"	
+            identifier="${supremica_basepackage}.gui.ide.IDE"
+            mainclassname="${supremica_basepackage}.gui.ide.IDE">
+        	<runtime dir="${env.JAVA_HOME}" />
+            <classpath file="${dist}/Supremica.jar"/>
+        	<classpath file="${dist}/SupremicaLib.jar"/>
+        </bundleapp>
+    </target>
 </project>
 
