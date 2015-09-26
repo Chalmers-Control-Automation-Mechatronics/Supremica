@@ -49,10 +49,23 @@
  */
 
 package org.supremica.automata.IO;
-import java.io.*;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.LineNumberReader;
+import java.io.PrintWriter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+import net.sourceforge.waters.config.Version;
+
 import org.supremica.automata.Project;
 import org.supremica.testhelpers.TestFiles;
-import junit.framework.*;
 
 
 /**
@@ -109,19 +122,27 @@ public class TestAutomataToJava extends TestCase {
         // Compare each line except those where date and version are written
         String refLine = refReader.readLine();
         String genLine = genReader.readLine();
+        final Pattern versionPattern =
+          Pattern.compile("Supremica version: [0-9]+");
+        final Pattern datePattern =
+          Pattern.compile("This file was generated at:");
         while (refLine != null && genLine != null) {
-          if (!(genLine.startsWith(" * Supremica version:") && refLine
-            .startsWith(" * Supremica version:"))
-            && !(genLine.startsWith(" * This file was generated at:") && refLine
-              .startsWith(" * This file was generated at:"))) {
-            assertEquals("Line " + genReader.getLineNumber(), refLine, genLine);
+          final Matcher versionMatcher = versionPattern.matcher(refLine);
+          if (versionMatcher.find()) {
+            final String versionInfo = Version.getInstance().toString();
+            refLine = versionMatcher.replaceFirst(versionInfo);
+          } else if (datePattern.matcher(refLine).find()) {
+            assertTrue("Date keyword not found in generated file!",
+                       datePattern.matcher(genLine).find());
+            refLine = genLine = null;
           }
+          assertEquals("Line " + genReader.getLineNumber(), refLine, genLine);
           refLine = refReader.readLine();
           genLine = genReader.readLine();
         }
-        assertNull("The reference file is shorter than the generated file",
+        assertNull("The reference file is shorter than the generated file!",
                    genLine);
-        assertNull("The generated file is shorter than the reference file ",
+        assertNull("The generated file is longer than the reference file!",
                    refLine);
       } finally {
         if (genReader != null) {

@@ -216,6 +216,7 @@
         <mkdir dir="${resources}"/>
         <delete dir="${lib}/${unjared}/META-INF"/>
         <mkdir dir="${lib}/${unjared}/META-INF"/>
+        <delete dir="${src}/net/sourceforge/waters/external/promela/parser"/>
         <ant dir="${waters.dir}" target="clean" inheritAll="false"/>
     </target>
     

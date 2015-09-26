@@ -4,14 +4,6 @@
   <description>
   </description>
 
-  <macrodef name="propertycopy">
-    <attribute name="name"/>
-    <attribute name="from"/>
-    <sequential>
-      <property name="@{name}" value="${@{from}}"/>
-    </sequential>
-  </macrodef>
-
   <property file="build.properties"/>
   <property name="supremica.root" location=".."/>
   <property name="supremica.lib" location="${supremica.root}/lib"/>
