@@ -28,7 +28,6 @@ import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
-import net.sourceforge.waters.subject.module.SplineGeometrySubject;
 
 import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.ExtendedAutomaton;
@@ -307,7 +306,7 @@ public class BDDExtendedSynthesizer {
                                                     ep.getTarget(),
                                                     lbs,
                                                     ep.getGuardActionBlock(),
-                                                    new SplineGeometrySubject(),
+                                                    null, // straight line
                                                     ep.getStartPoint(),
                                                     ep.getEndPoint());
 
