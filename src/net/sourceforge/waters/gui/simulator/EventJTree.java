@@ -156,12 +156,15 @@ public class EventJTree
       @Override
       public void mouseMoved(final MouseEvent e)
       {
-        final TreePath path = EventJTree.this.getClosestPathForLocation(e.getX(), e.getY());
-        final Object comp = path.getLastPathComponent();
-        final Proxy proxy = (Proxy) comp;
-        final ToolTipVisitor visitor = mSim.getToolTipVisitor();
-        final String tooltip = visitor.getToolTip(proxy, true);
-        setToolTipText(tooltip);
+        final TreePath path =
+          EventJTree.this.getClosestPathForLocation(e.getX(), e.getY());
+        if (path != null) {
+          final Object comp = path.getLastPathComponent();
+          final Proxy proxy = (Proxy) comp;
+          final ToolTipVisitor visitor = mSim.getToolTipVisitor();
+          final String tooltip = visitor.getToolTip(proxy, true);
+          setToolTipText(tooltip);
+        }
       }
 
       @Override
