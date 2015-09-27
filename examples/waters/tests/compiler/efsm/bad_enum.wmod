@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="bad_enum" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>A test case that involves an enumeration type containing a number as one of its elements. This should result in a type mismatch exception.</ns2:Comment>
+    <ConstantAliasList>
+        <ConstantAlias Name="enum">
+            <ConstantAliasExpression>
+                <EnumSetExpression Text="[a,2]">
+                    <SimpleIdentifier Name="a"/>
+                    <SimpleIdentifier Name="2"/>
+                </EnumSetExpression>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+    </ConstantAliasList>
+</Module>

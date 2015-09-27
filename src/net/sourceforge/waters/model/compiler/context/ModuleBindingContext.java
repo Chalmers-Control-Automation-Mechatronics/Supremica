@@ -37,6 +37,8 @@ package net.sourceforge.waters.model.compiler.context;
 import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
 import net.sourceforge.waters.model.base.ProxyAccessorSet;
+import net.sourceforge.waters.model.expr.ExpressionScanner;
+import net.sourceforge.waters.model.expr.TypeMismatchException;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxy;
@@ -161,8 +163,9 @@ public class ModuleBindingContext implements BindingContext
   }
 
   public void insertEnumAtom(final SimpleIdentifierProxy ident)
-    throws DuplicateIdentifierException
+    throws DuplicateIdentifierException, TypeMismatchException
   {
+    ExpressionScanner.checkWatersIdentifier(ident);
     final ProxyAccessor<SimpleExpressionProxy> key = mMap.createAccessor(ident);
     final SimpleExpressionProxy expr = mMap.get(key);
     if (expr == null) {

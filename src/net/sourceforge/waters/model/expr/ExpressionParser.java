@@ -273,7 +273,7 @@ public class ExpressionParser {
    */
   public boolean isWhitespace(final int ch)
   {
-    return mScanner.isWhitespace(ch);
+    return ExpressionScanner.isWhitespace(ch);
   }
 
   /**
@@ -284,7 +284,7 @@ public class ExpressionParser {
    */
   public boolean isDigit(final int ch)
   {
-    return mScanner.isDigit(ch);
+    return ExpressionScanner.isDigit(ch);
   }
 
   /**
@@ -295,7 +295,7 @@ public class ExpressionParser {
    */
   public boolean isIdentifierStart(final int ch)
   {
-    return mScanner.isIdentifierStart(ch);
+    return ExpressionScanner.isIdentifierStart(ch);
   }
 
   /**
@@ -306,7 +306,7 @@ public class ExpressionParser {
    */
   public boolean isIdentifierCharacter(final int ch)
   {
-    return mScanner.isIdentifierCharacter(ch);
+    return ExpressionScanner.isIdentifierCharacter(ch);
   }
 
   /**
@@ -353,7 +353,7 @@ public class ExpressionParser {
    */
   public boolean isWatersIdentifier(final String word)
   {
-    return mScanner.isWatersIdentifier(word);
+    return ExpressionScanner.isWatersIdentifier(word);
   }
 
 

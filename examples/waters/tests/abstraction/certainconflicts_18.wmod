@@ -2,46 +2,6 @@
 <Module Name="certainconflicts_18" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>A test for certain conflicts abstraction.
 This test involves a moderately large automaton with moderately large state sets in its subset construction.</ns2:Comment>
-    <ConstantAliasList>
-        <ConstantAlias Name=":symbols">
-            <ConstantAliasExpression>
-                <EnumSetExpression>
-                    <SimpleIdentifier Name="{!fs_master_bit2_CRCNO}"/>
-                    <SimpleIdentifier Name="{!got_operator_ack}"/>
-                    <SimpleIdentifier Name="{fs_master_bit2_CRCNO'==fs_master_bit2_CRCNO,fs_slave_bit2_CRCNO'==fs_slave_bit2_CRCNO}"/>
-                    <SimpleIdentifier Name="{fs_master_bit2_CRCNO'==fs_master_bit2_CRCNO,fs_slave_bit3_TO'==fs_slave_bit3_TO}"/>
-                    <SimpleIdentifier Name="{fs_master_bit2_CRCNO'==fs_master_bit2_CRCNO,in_ps_status_bit2_CRCNO}"/>
-                    <SimpleIdentifier Name="{fs_master_bit2_CRCNO}"/>
-                    <SimpleIdentifier Name="{fs_master_bit3_TO}"/>
-                    <SimpleIdentifier Name="{fs_slave_bit2_CRCNO'==fs_slave_bit2_CRCNO,fs_slave_bit3_TO'==fs_slave_bit3_TO}"/>
-                    <SimpleIdentifier Name="{fs_slave_bit2_CRCNO'==fs_slave_bit2_CRCNO,in_CRC==nok}"/>
-                    <SimpleIdentifier Name="{fs_slave_bit2_CRCNO}"/>
-                    <SimpleIdentifier Name="{fs_slave_bit3_TO'==fs_slave_bit3_TO}"/>
-                    <SimpleIdentifier Name="{fs_slave_bit3_TO}"/>
-                    <SimpleIdentifier Name="{got_host_timeout}"/>
-                    <SimpleIdentifier Name="{in_CRC==nok,fs_master_bit2_CRCNO'}"/>
-                    <SimpleIdentifier Name="{in_CRC==nok,in_ps_status_bit2_CRCNO,fs_slave_bit2_CRCNO'}"/>
-                    <SimpleIdentifier Name="{in_CRC==nok,in_ps_status_bit2_CRCNO,in_ps_status_bit3_TO}"/>
-                    <SimpleIdentifier Name="{in_CRC==nok,in_ps_status_bit3_TO}"/>
-                    <SimpleIdentifier Name="{in_cons_num==0,in_ps_f_process_data==FV}"/>
-                    <SimpleIdentifier Name="{in_cons_num==0,in_ps_f_process_data==PV}"/>
-                    <SimpleIdentifier Name="{in_cons_num==0,in_ps_status_bit4_FV}"/>
-                    <SimpleIdentifier Name="{old_cons_num'==1,in_ps_f_process_data==FV}"/>
-                    <SimpleIdentifier Name="{old_cons_num'==1,in_ps_f_process_data==PV}"/>
-                    <SimpleIdentifier Name="{old_cons_num'==1,out_cons_num==1}"/>
-                    <SimpleIdentifier Name="{old_cons_num'==2,in_ps_f_process_data==FV}"/>
-                    <SimpleIdentifier Name="{old_cons_num'==2,in_ps_f_process_data==PV}"/>
-                    <SimpleIdentifier Name="{old_cons_num'==2,out_cons_num==2}"/>
-                    <SimpleIdentifier Name="{old_cons_num'==3,in_ps_f_process_data==FV}"/>
-                    <SimpleIdentifier Name="{old_cons_num'==3,in_ps_f_process_data==PV}"/>
-                    <SimpleIdentifier Name="{old_cons_num'==3,out_cons_num==3}"/>
-                    <SimpleIdentifier Name="{out_cons_num==0,in_ps_status_bit2_CRCNO,fs_slave_bit2_CRCNO'}"/>
-                    <SimpleIdentifier Name="{out_cons_num==0,in_ps_status_bit2_CRCNO,in_ps_status_bit3_TO}"/>
-                    <SimpleIdentifier Name="{out_cons_num==0,in_ps_status_bit3_TO}"/>
-                </EnumSetExpression>
-            </ConstantAliasExpression>
-        </ConstantAlias>
-    </ConstantAliasList>
     <EventDeclList>
         <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="tau"/>
         <EventDecl Kind="CONTROLLABLE" Name="restart"/>

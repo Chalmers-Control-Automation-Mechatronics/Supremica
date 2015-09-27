@@ -43,6 +43,7 @@ import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
+import net.sourceforge.waters.model.expr.TypeMismatchException;
 import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
@@ -180,7 +181,7 @@ public class EFAModuleContext
 
   @Override
   public void insertEnumAtom(final SimpleIdentifierProxy ident)
-    throws DuplicateIdentifierException
+    throws DuplicateIdentifierException, TypeMismatchException
   {
     if (mMap.containsProxyKey(ident)) {
       throw new DuplicateIdentifierException(ident);

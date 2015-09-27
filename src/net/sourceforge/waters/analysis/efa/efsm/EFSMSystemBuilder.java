@@ -57,7 +57,6 @@ import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintPropagator;
 import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
-import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierException;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.efa.EFAGuardCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
@@ -313,7 +312,7 @@ public class EFSMSystemBuilder extends AbstractEFSMAlgorithm
           mVariableContext.insertEnumAtom(ident);
         }
         return null;
-      } catch (final DuplicateIdentifierException exception) {
+      } catch (final EvalException exception) {
         throw wrap(exception);
       }
     }

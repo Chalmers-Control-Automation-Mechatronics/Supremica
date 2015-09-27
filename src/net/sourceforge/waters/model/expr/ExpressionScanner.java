@@ -38,6 +38,8 @@ import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+
 
 /**
  * <P>The expression scanner.
@@ -70,7 +72,7 @@ import java.util.Map;
  * @author Robi Malik
  */
 
-class ExpressionScanner {
+public class ExpressionScanner {
 
   //#########################################################################
   //# Constructors
@@ -143,7 +145,7 @@ class ExpressionScanner {
    * @return <CODE>true</CODE> if the given character can be used as
    *         whitespace in a Waters expression.
    */
-  boolean isWhitespace(final int ch)
+  public static boolean isWhitespace(final int ch)
   {
     return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r';
   }
@@ -154,7 +156,7 @@ class ExpressionScanner {
    * @return <CODE>true</CODE> if the given character can be used as
    *         a digit in a Waters expression.
    */
-  boolean isDigit(final int ch)
+  public static boolean isDigit(final int ch)
   {
     return ch >= '0' && ch <= '9';
   }
@@ -165,7 +167,7 @@ class ExpressionScanner {
    * @return <CODE>true</CODE> if the given character can be used as the
    *         first character of a Waters identifier.
    */
-  boolean isIdentifierStart(final int ch)
+  public static boolean isIdentifierStart(final int ch)
   {
     return
       ch >= 'a' && ch <= 'z' ||
@@ -180,7 +182,7 @@ class ExpressionScanner {
    * @return <CODE>true</CODE> if the given character can be used in
    *         a Waters identifier.
    */
-  boolean isIdentifierCharacter(final int ch)
+  public static boolean isIdentifierCharacter(final int ch)
   {
     return isIdentifierStart(ch) || isDigit(ch);
   }
@@ -213,7 +215,7 @@ class ExpressionScanner {
    * Checks whether a character represents the escape-start character
    * <CODE>'{'</CODE>.
    */
-  boolean isEscapeStartCharachter(final int ch)
+  public static boolean isEscapeStartCharachter(final int ch)
   {
     return ch == '{';
   }
@@ -222,7 +224,7 @@ class ExpressionScanner {
    * Checks whether a character represents the escape-end character
    * <CODE>'}'</CODE>.
    */
-  boolean isEscapeEndCharacter(final int ch)
+  public static boolean isEscapeEndCharacter(final int ch)
   {
     return ch == '}';
   }
@@ -261,10 +263,12 @@ class ExpressionScanner {
    * net.sourceforge.waters.model.module.SimpleIdentifierProxy
    * SimpleIdentifierProxy}, or as names of any Waters elements that are
    * identified by strings rather than identifiers.
+   * Identifiers must start with a character, underscore, or colon,
+   * which can be followed by more characters, digits, underscores, or colons.
    * @param  word        The string to be examined.
    * @return <CODE>true</CODE> if the given string is a valid identifier.
    */
-  boolean isWatersIdentifier(final String word)
+  public static boolean isWatersIdentifier(final String word)
   {
     final int len = word.length();
     if (len == 0 || !isIdentifierStart(word.charAt(0))) {
@@ -279,6 +283,22 @@ class ExpressionScanner {
     }
   }
 
+  /**
+   * Checks whether the given simple identifier has a syntactically
+   * correct name. Identifiers must pass the test {@link
+   * #isWatersIdentifier(String) isWatersIdentifier()}.
+   * Identifiers must start with a character, underscore, or colon,
+   * which can be followed by more characters, digits, underscores, or colons.
+   * @throws TypeMismatchException to indicate the name is invalid.
+   */
+  public static void checkWatersIdentifier(final SimpleIdentifierProxy ident)
+    throws TypeMismatchException
+  {
+    final String name = ident.getName();
+    if (!isWatersIdentifier(name)) {
+      throw new TypeMismatchException(ident, "IDENTIFIER");
+    }
+  }
 
   //#########################################################################
   //# Auxiliary Methods for Scanning

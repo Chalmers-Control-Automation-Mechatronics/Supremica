@@ -62,6 +62,7 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.MultiEvalException;
 import net.sourceforge.waters.model.expr.OperatorTable;
+import net.sourceforge.waters.model.expr.TypeMismatchException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
@@ -638,6 +639,14 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   {
     final ModuleProxy module = loadModule("tests", "compiler", "efsm", "assignment_in_guard2");
     compileError(module, ActionSyntaxException.class, "Assignment operator =");
+  }
+
+  public void testCompile_bad_enum()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "bad_enum");
+    compileError(module, TypeMismatchException.class, "'2'");
   }
 
   public void testCompile_duplicate_identifier()

@@ -272,6 +272,7 @@ public class RangeEstimator
   private IdentifierProxy checkIdentifier(final SimpleExpressionProxy expr)
     throws TypeMismatchException
   {
+
     if (expr instanceof IdentifierProxy) {
       return (IdentifierProxy) expr;
     } else {

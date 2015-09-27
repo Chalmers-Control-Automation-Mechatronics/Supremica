@@ -451,7 +451,7 @@ public class SimpleExpressionCompiler
               final ModuleBindingContext modulecontext =
                 mContext.getModuleBindingContext();
               modulecontext.insertEnumAtom(item);
-            } catch (final DuplicateIdentifierException exception) {
+            } catch (final EvalException exception) {
               throw wrap(exception);
             }
           }

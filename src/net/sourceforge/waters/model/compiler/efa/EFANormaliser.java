@@ -432,7 +432,7 @@ public class EFANormaliser extends AbortableCompiler
         mRootContext.insertEnumAtom(ident);
         mCurrentRange.add(ident);
         return ident;
-      } catch (final DuplicateIdentifierException exception) {
+      } catch (final EvalException exception) {
         exception.replaceLocation(node);
         throw wrap(exception);
       }

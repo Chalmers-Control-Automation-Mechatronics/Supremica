@@ -492,7 +492,7 @@ public class EFACompiler extends AbortableCompiler
         mRootContext.insertEnumAtom(ident);
         mCurrentRange.add(ident);
         return ident;
-      } catch (final DuplicateIdentifierException exception) {
+      } catch (final EvalException exception) {
         throw wrap(exception);
       }
     }

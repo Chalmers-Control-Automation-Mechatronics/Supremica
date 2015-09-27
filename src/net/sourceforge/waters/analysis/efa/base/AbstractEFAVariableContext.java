@@ -40,6 +40,7 @@ import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierException;
 import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
+import net.sourceforge.waters.model.expr.TypeMismatchException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
@@ -136,15 +137,17 @@ public abstract class AbstractEFAVariableContext<L,
   }
 
   public void insertEnumAtom(final SimpleIdentifierProxy ident)
-   throws DuplicateIdentifierException
+    throws DuplicateIdentifierException, TypeMismatchException
   {
     mModuleContext.insertEnumAtom(ident);
   }
-  private final ModuleBindingContext mModuleContext;
-  private final UnaryOperator mNextOperator;
+
 
   //#######################################################################
   //# Data Members
+  private final ModuleBindingContext mModuleContext;
+  private final UnaryOperator mNextOperator;
+
   protected final ProxyAccessorMap<IdentifierProxy, V> mGlobalVariableMap;
 
 }
