@@ -175,7 +175,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
     public BDDExtendedAutomata(final ExtendedAutomata orgExAutomata, final EditorSynthesizerOptions options) {
         this.orgExAutomata = orgExAutomata;
-        locaVarSuffix = orgExAutomata.getlocVarSuffix();
+        locaVarSuffix = ExtendedAutomata.getlocVarSuffix();
         theIndexMap = new ExtendedAutomataIndexMap(orgExAutomata);
         theExAutomata = new PCGExtendedAutomataSorter().sortAutomata(orgExAutomata.getExtendedAutomataList());
 
@@ -1249,7 +1249,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
         return coreachableStatesBDD;
     }
-    
+
     public BDD mForbiddenStates = (new BDDExtendedManager()).getZeroBDD();
 
     public BDD getNonblockingControllableStates(final boolean reachable) {

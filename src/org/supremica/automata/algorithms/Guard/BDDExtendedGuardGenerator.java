@@ -87,7 +87,6 @@ public final class BDDExtendedGuardGenerator {
     private static Logger logger = LoggerFactory.createLogger(BDDAutomata.class);
     String bestStateSet = "";
     private boolean isEventBlocked = false;
-    @SuppressWarnings("unused")
     private final EditorSynthesizerOptions options;
     private Set<ExtendedAutomaton> autGuardVars;
 
