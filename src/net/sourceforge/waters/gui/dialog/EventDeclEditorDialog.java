@@ -98,6 +98,7 @@ import net.sourceforge.waters.gui.util.NonTypingTable;
 import net.sourceforge.waters.gui.util.PropositionIcon;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.model.expr.ExpressionScanner;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -1230,12 +1231,11 @@ public class EventDeclEditorDialog
         if (text == null) {
           return null;
         } else {
-          final ExpressionParser parser = getExpressionParser();
           final int len = text.length();
           final StringBuilder buffer = new StringBuilder(len);
           for (int i = 0; i < len; i++) {
             final char ch = text.charAt(i);
-            if (parser.isIdentifierCharacter(ch)) {
+            if (ExpressionScanner.isIdentifierCharacter(ch)) {
               buffer.append(ch);
             }
           }

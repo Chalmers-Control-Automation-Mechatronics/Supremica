@@ -300,6 +300,7 @@ public class ExpressionScanner {
     }
   }
 
+
   //#########################################################################
   //# Auxiliary Methods for Scanning
   private void storeNextToken(final boolean allowNeg)

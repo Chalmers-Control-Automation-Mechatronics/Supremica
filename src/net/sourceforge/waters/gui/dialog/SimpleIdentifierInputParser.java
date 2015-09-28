@@ -38,6 +38,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 
 import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.model.expr.ExpressionScanner;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
@@ -143,7 +144,7 @@ public class SimpleIdentifierInputParser
       final StringBuilder buffer = new StringBuilder(len);
       for (int i = 0; i < len; i++) {
         final char ch = text.charAt(i);
-        if (mExpressionParser.isIdentifierCharacter(ch)) {
+        if (ExpressionScanner.isIdentifierCharacter((int) ch)) {
           buffer.append(ch);
         }
       }

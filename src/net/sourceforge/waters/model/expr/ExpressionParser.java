@@ -148,7 +148,7 @@ public class ExpressionParser {
       int pos = 0;
       do {
         final char ch = input.charAt(pos);
-        if (!isIdentifierCharacter(ch) && !isWhitespace(ch)) {
+        if (!ExpressionScanner.isIdentifierCharacter((int) ch) && !ExpressionScanner.isWhitespace((int) ch)) {
           break;
         }
       } while (++pos < len);
@@ -263,52 +263,6 @@ public class ExpressionParser {
   }
 
 
-  //#########################################################################
-  //# Character Classes
-  /**
-   * Checks whether a character is whitespace.
-   * @param  ch          The character to be checked.
-   * @return <CODE>true</CODE> if the given character can be used as
-   *         whitespace in a Waters expression.
-   */
-  public boolean isWhitespace(final int ch)
-  {
-    return ExpressionScanner.isWhitespace(ch);
-  }
-
-  /**
-   * Checks whether a character represents a digit.
-   * @param  ch          The character to be checked.
-   * @return <CODE>true</CODE> if the given character can be used as
-   *         a digit in a Waters expression.
-   */
-  public boolean isDigit(final int ch)
-  {
-    return ExpressionScanner.isDigit(ch);
-  }
-
-  /**
-   * Checks whether a character represents an identifier start.
-   * @param  ch          The character to be checked.
-   * @return <CODE>true</CODE> if the given character can be used as the
-   *         first character of a Waters identifier.
-   */
-  public boolean isIdentifierStart(final int ch)
-  {
-    return ExpressionScanner.isIdentifierStart(ch);
-  }
-
-  /**
-   * Checks whether a character represents an identifier character.
-   * @param  ch          The character to be checked.
-   * @return <CODE>true</CODE> if the given character can be used in
-   *         a Waters identifier.
-   */
-  public boolean isIdentifierCharacter(final int ch)
-  {
-    return ExpressionScanner.isIdentifierCharacter(ch);
-  }
-
   /**
    * Checks whether a character represents an operator character.
    * @param  ch          The character to be checked.
@@ -342,21 +296,6 @@ public class ExpressionParser {
     return mScanner.isExpressionCharacter(ch);
   }
 
-  /**
-   * Checks whether a string qualifies as a Waters identifier. Strings that
-   * pass this test can be used as the name of a valid {@link
-   * net.sourceforge.waters.model.module.SimpleIdentifierProxy
-   * SimpleIdentifierProxy}, or as names of any Waters elements that are
-   * identified by strings rather than identifiers.
-   * @param  word        The string to be examined.
-   * @return <CODE>true</CODE> if the given string is a valid identifier.
-   */
-  public boolean isWatersIdentifier(final String word)
-  {
-    return ExpressionScanner.isWatersIdentifier(word);
-  }
-
-
   private String removeBlanks(final String text)
   {
     final int len = text.length();
@@ -364,7 +303,7 @@ public class ExpressionParser {
     char c;
     for (; start < len; start++) {
       c = text.charAt(start);
-      if (!isWhitespace(c)) {
+      if (!ExpressionScanner.isWhitespace((int) c)) {
         break;
       }
     }
@@ -374,7 +313,7 @@ public class ExpressionParser {
     int end = len;
     do {
       c = text.charAt(--end);
-    } while (isWhitespace(c));
+    } while (ExpressionScanner.isWhitespace((int) c));
     return text.substring(start, end + 1);
   }
 
