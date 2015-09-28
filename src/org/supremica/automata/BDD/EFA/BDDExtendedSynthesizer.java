@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
@@ -305,12 +304,14 @@ public class BDDExtendedSynthesizer {
                   manipulatedEdge = new EdgeSubject(ep.getSource(),
                                                     ep.getTarget(),
                                                     lbs,
-                                                    ep.getGuardActionBlock() == null? null : ep.getGuardActionBlock().clone(),
+                                                    ep.getGuardActionBlock(),
                                                     null, // straight line
                                                     ep.getStartPoint(),
                                                     ep.getEndPoint());
 
                   edgesToBeAdded.add(manipulatedEdge);
+
+                  //
                 }
 
                 // next, we insert the generated guards to the manipulated edge
@@ -375,22 +376,19 @@ public class BDDExtendedSynthesizer {
                                                    aut.getInitialLocation().getName(), markedValues);
 
         // add updates to the edges
-        for (final Map.Entry<NodeProxy, ArrayList<EdgeSubject>> entry: aut.getLocationToIngoingEdgesMap().entrySet())
+        for (final EdgeSubject edge:aut.getComponent().getGraph().getEdgesModifiable())
         {
-          final String target = entry.getKey().getName();
-          for (final EdgeSubject edge: entry.getValue())
-          {
-            if (edge.getGuardActionBlock() == null)
-              edge.setGuardActionBlock(new GuardActionBlockSubject());
-            final String assignment = autVarName + " = " + target;
-            SimpleExpressionProxy assignmentAsAction = null;
-            try {
-              assignmentAsAction = parser.parse(assignment);
-            } catch (final ParseException exception) {
-              exception.printStackTrace();
-            }
-            edge.getGuardActionBlock().getActionsModifiable().add((BinaryExpressionSubject) assignmentAsAction);
+          final String targetState = edge.getTarget().getName();
+          if (edge.getGuardActionBlock() == null)
+            edge.setGuardActionBlock(new GuardActionBlockSubject());
+          final String assignment = autVarName + " = " + targetState;
+          SimpleExpressionProxy assignmentAsAction = null;
+          try {
+            assignmentAsAction = parser.parse(assignment);
+          } catch (final ParseException exception) {
+            exception.printStackTrace();
           }
+          edge.getGuardActionBlock().getActionsModifiable().add((BinaryExpressionSubject) assignmentAsAction);
         }
       }
     }
