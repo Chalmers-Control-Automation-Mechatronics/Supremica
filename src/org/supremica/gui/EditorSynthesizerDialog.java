@@ -35,9 +35,12 @@
 
 package org.supremica.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -78,7 +81,7 @@ class EditorSynthesizerDialogStandardPanel
     private final SynthesisSelector typeSelector;
     private final AlgorithmSelector algorithmSelector;
     private final JCheckBox reachableBox;
-    private final Box guardBox;
+    private final JPanel guardBox;
     private final Box genGuardComputeSupBox;
 
     private final JCheckBox printGuardBox;
@@ -197,11 +200,10 @@ class EditorSynthesizerDialogStandardPanel
         typeSelector = SynthesisSelector.create();
         typeSelector.addActionListener(this);
 
-        // Create layout!
+        // Supervisor options
         final Box mainBox = Box.createVerticalBox();
-
         final JPanel supervisorPanel = new JPanel();
-	supervisorPanel.setBorder(BorderFactory.createTitledBorder("Supervisor"));
+        supervisorPanel.setBorder(BorderFactory.createTitledBorder("Supervisor"));
         supervisorPanel.setLayout(new GridLayout(3, 1));
 
         JPanel panel = new JPanel();
@@ -210,7 +212,6 @@ class EditorSynthesizerDialogStandardPanel
         box.add(typeSelector);
         panel.add(box);
         supervisorPanel.add(panel);
-//        mainBox.add(panel);
 
         panel = new JPanel();
         box = Box.createHorizontalBox();
@@ -220,7 +221,6 @@ class EditorSynthesizerDialogStandardPanel
         box.add(algorithmSelector);
         panel.add(box);
         supervisorPanel.add(panel);
-//        mainBox.add(panel);
 
         panel = new JPanel();
         box = Box.createHorizontalBox();
@@ -231,67 +231,55 @@ class EditorSynthesizerDialogStandardPanel
         reachableBox.addActionListener(this);
         panel.add(box);
         supervisorPanel.add(panel);
-//        mainBox.add(panel);
 
         mainBox.add(supervisorPanel);
 
-        // Add components
-        this.add(mainBox);
-
-        //Guard options
-        guardBox = Box.createVerticalBox();
-
-        fromAllowedStatesButton = new JRadioButton("From allowed states");
-        fromAllowedStatesButton.setToolTipText("Generate the guard from the states where the event is allowed to occur");
-
-        fromForbiddenStatesButton = new JRadioButton("From forbidden states");
-	fromForbiddenStatesButton.setToolTipText("Generate the guard from the states where the event is forbidden to occur");
+        // Guard computation options
+        GridBagLayout layout = new GridBagLayout();
+        guardBox = new JPanel(layout);
+        guardBox.setBorder(BorderFactory.createTitledBorder("Guard computation"));
+        final GridBagConstraints constraints = new GridBagConstraints();
+        constraints.gridy = 0;
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.weightx = 1.0;
+        constraints.weighty = 1.0;
 
         optimalButton = new JRadioButton("Adaptive solution");
         optimalButton.setToolTipText("Generate the guard from the state set that yields the best result");
         optimalButton.setSelected(true);
-
-//		eventField = new JTextField(15);
-//		eventField.setToolTipText("The name of the desired event");
-
+        fromAllowedStatesButton = new JRadioButton("From allowed states");
+        fromAllowedStatesButton.setToolTipText("Generate the guard from the states where the event is allowed to occur");
+        fromForbiddenStatesButton = new JRadioButton("From forbidden states");
+        fromForbiddenStatesButton.setToolTipText("Generate the guard from the states where the event is forbidden to occur");
         ButtonGroup group = new ButtonGroup();
+        group.add(optimalButton);
         group.add(fromAllowedStatesButton);
         group.add(fromForbiddenStatesButton);
-        group.add(optimalButton);
 
         complementHeuristicBox = new JCheckBox("Complement Heuristic");
         complementHeuristicBox.setToolTipText("Apply the 'Complement Heuristic'.");
         complementHeuristicBox.setEnabled(true);
         complementHeuristicBox.setSelected(true);
-
         independentHeuristicBox = new JCheckBox("Independent Heuristic");
         independentHeuristicBox.setToolTipText("Apply the 'Independent Heuristic'.");
         independentHeuristicBox.setEnabled(true);
         independentHeuristicBox.setSelected(true);
 
-        final JPanel expressionTypePanel = new JPanel();
-        expressionTypePanel.setBorder(BorderFactory.createTitledBorder("Guard computation"));
-        expressionTypePanel.setLayout(new GridLayout(3, 1));
-        panel = new JPanel();
-        panel.add(optimalButton);
-        panel.add(fromAllowedStatesButton);
-        panel.add(fromForbiddenStatesButton);
-        expressionTypePanel.add(panel);
-        panel = new JPanel();
-        panel.add(complementHeuristicBox);
-        panel.add(independentHeuristicBox);
-        expressionTypePanel.add(panel);
+        guardBox.add(optimalButton, constraints);
+        guardBox.add(complementHeuristicBox, constraints);
+        constraints.gridy++;
+        guardBox.add(fromAllowedStatesButton, constraints);
+        guardBox.add(independentHeuristicBox, constraints);
+        constraints.gridy++;
+        guardBox.add(fromForbiddenStatesButton, constraints);
+        constraints.gridy++;
 
         eventList = new JComboBox<String>(events);
+        constraints.gridwidth = 2;
+        guardBox.add(eventList, constraints);
+        constraints.gridwidth = 1;
 
-        expressionTypePanel.add(eventList);
-
-        guardBox.add(expressionTypePanel);
-        guardBox.setVisible(true);
-
-        this.add(guardBox);
-
-        //Presentation options
+        // Guard Representation options
         genGuardComputeSupBox = Box.createVerticalBox();
 
         printGuardBox = new JCheckBox("Print the guards");
@@ -322,7 +310,7 @@ class EditorSynthesizerDialogStandardPanel
 
         final JPanel representationPanel = new JPanel();
         representationPanel.setBorder(BorderFactory.createTitledBorder("Guard representation"));
-        representationPanel.setLayout(new GridLayout(4, 1));
+        representationPanel.setLayout(new GridLayout(5, 1));
         representationPanel.add(printGuardBox);
         representationPanel.add(addGuardsBox);
         representationPanel.add(createAutVarsBox);
@@ -331,53 +319,53 @@ class EditorSynthesizerDialogStandardPanel
 
         genGuardComputeSupBox.add(representationPanel);
 
-        this.add(genGuardComputeSupBox);
-
-        final JPanel optimizationPanel = new JPanel(new GridLayout(5, 2));
+        // Optimisation options
+        layout = new GridBagLayout();
+        final JPanel optimizationPanel = new JPanel(layout);
+        constraints.gridy = 0;
         optimizationPanel.setBorder(BorderFactory.createTitledBorder("Optimization"));
-
-        //Optimization options
 
         timeOptBox = new JCheckBox("Compute optimal time");
         timeOptBox.setToolTipText("Compute the supervisor that will restrict the plant to reach a marked state with the minimum time.");
-
         timeOptBox.addActionListener(this);
+        constraints.gridwidth = 2;
+        optimizationPanel.add(timeOptBox, constraints);
 
-        optimizationPanel.add(timeOptBox);
-        optimizationPanel.add(new JLabel());
-
-        optimizationPanel.add(new JLabel("Enter the global time domain:"));
+        constraints.gridwidth = 1;
+        constraints.gridy++;
+        optimizationPanel.add(new JLabel("Global time domain:"), constraints);
         globalClockDomainField = new JTextField("0");
         globalClockDomainField.setToolTipText("Guess a reasonably large amount of time to reach a marked state");
+        globalClockDomainField.setColumns(10);
         globalClockDomainField.setEnabled(false);
-        optimizationPanel.add(globalClockDomainField);
+        optimizationPanel.add(globalClockDomainField, constraints);
 
+        constraints.gridy++;
         final JLabel miniSupLabel = new JLabel("Optimize variable:");
         miniSupLabel.setToolTipText("Compute the supervisor that ensures the variable will have its optimal value among the reachable markes states.");
-        optimizationPanel.add(miniSupLabel);
-        optimizationPanel.add(new JLabel());
+        optimizationPanel.add(miniSupLabel, constraints);
+        variablesList = new JComboBox<String>(variables);
+        optimizationPanel.add(variablesList, constraints);
 
+        constraints.gridy++;
         minVarButton = new JRadioButton("Minimize");
         minVarButton.setSelected(true);
         maxVarButton = new JRadioButton("Maximize");
-
-//		eventField = new JTextField(15);
-//		eventField.setToolTipText("The name of the desired event");
-
         group = new ButtonGroup();
         group.add(minVarButton);
         group.add(maxVarButton);
+        optimizationPanel.add(minVarButton, constraints);
+        optimizationPanel.add(maxVarButton, constraints);
 
-        optimizationPanel.add(minVarButton);
-        optimizationPanel.add(maxVarButton);
-
-        variablesList = new JComboBox<String>(variables);
-        optimizationPanel.add(variablesList);
-
-
-//        optimizationSupBox.add(optimizationPanel);
-
-        this.add(optimizationPanel);
+        // Create layout!
+        layout = new GridBagLayout();
+        setLayout(layout);
+        constraints.gridy = 0;
+        add(mainBox, constraints);
+        add(guardBox, constraints);
+        constraints.gridy++;
+        add(genGuardComputeSupBox, constraints);
+        add(optimizationPanel, constraints);
 
         updatePanel();
     }
@@ -552,44 +540,28 @@ public class EditorSynthesizerDialog
     EditorSynthesizerDialogStandardPanel standardPanel;
 
     private final JDialog dialog;
-    private final Frame parentFrame;
 
     /**
      * Creates modal dialog box for input of synthesizer and guard  options.
      */
     public EditorSynthesizerDialog(final Frame parentFrame, final int numSelected, final EditorSynthesizerOptions synthesizerOptions, final Vector<String> events, final Vector<String> variables)
     {
-        dialog = new JDialog(parentFrame, true);    // modal
-        this.parentFrame = parentFrame;
         this.synthesizerOptions = synthesizerOptions;
         synthesizerOptions.setReachability(true);
-
+        dialog = new JDialog(parentFrame, true);    // modal
         dialog.setTitle("Synthesizer options");
-        dialog.setSize(new Dimension(650, 650));
-
-        final Container contentPane = dialog.getContentPane();
-
-        standardPanel = new EditorSynthesizerDialogStandardPanel(numSelected, events, variables);
-
-//        final JTabbedPane tabbedPane = new JTabbedPane();
-
-//        tabbedPane.addTab("Standard options", null, standardPanel, "Standard options");
-
-        // buttonPanel
+        standardPanel =
+          new EditorSynthesizerDialogStandardPanel(numSelected, events, variables);
         final JPanel buttonPanel = new JPanel();
-
         okButton = addButton(buttonPanel, "OK");
         cancelButton = addButton(buttonPanel, "Cancel");
-
-        contentPane.add("Center", standardPanel);
-        contentPane.add("South", buttonPanel);
+        dialog.add(standardPanel, BorderLayout.CENTER);
+        dialog.add(buttonPanel, BorderLayout.SOUTH);
         Utility.setDefaultButton(dialog, okButton);
-
-        // ** MF ** Fix to get the frigging thing centered
-        final Dimension dim = dialog.getMinimumSize();
-
-        dialog.setLocation(Utility.getPosForCenter(dim));
-        dialog.setResizable(false);
+        dialog.pack();
+        dialog.setLocationRelativeTo(parentFrame);
+        final Dimension size = dialog.getSize();
+        dialog.setMinimumSize(size);
         update();
     }
 
@@ -637,7 +609,8 @@ public class EditorSynthesizerDialog
             }
             else
             {
-                JOptionPane.showMessageDialog(parentFrame, "Invalid combination of type and algorithm", "Alert", JOptionPane.ERROR_MESSAGE);
+                final Container parent = dialog.getParent();
+                JOptionPane.showMessageDialog(parent, "Invalid combination of type and algorithm", "Alert", JOptionPane.ERROR_MESSAGE);
             }
             //////////////
 
