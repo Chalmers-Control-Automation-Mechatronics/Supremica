@@ -2,13 +2,13 @@
 /***************************** StickPickingGame.java *******************/
 package org.supremica.testcases;
 
-import org.supremica.automata.AutomatonType;
-import org.supremica.automata.Automaton;
-import org.supremica.automata.Project;
 import org.supremica.automata.Alphabet;
-import org.supremica.automata.State;
 import org.supremica.automata.Arc;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonType;
 import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.Project;
+import org.supremica.automata.State;
 
 class PlayerEvents
 {
@@ -46,14 +46,14 @@ class Sticks
         setType(AutomatonType.PLANT);
 
         sticks = new State[num + 1];    // one more state than sticks
-        sticks[0] = new State(Integer.toString(num));    // starting at "num" and counting down
+        sticks[0] = new State("S" + Integer.toString(num));    // starting at "num" and counting down
 
         sticks[0].setInitial(true);    // first state is initial
         addState(sticks[0]);
 
         for (int i = 1; i < num + 1; ++i)
         {
-            sticks[i] = new State(Integer.toString(num - i));
+            sticks[i] = new State("S" + Integer.toString(num - i));
 
             addState(sticks[i]);
         }
@@ -132,7 +132,7 @@ class Players
         // All other states except for the one immediately after the first player
         // has made a move should be marked (player 1 must not take the last stick)!
         players = new State[num];
-        players[0] = new State(PlayerEvents.getPlayerId(0));
+        players[0] = new State("P" + PlayerEvents.getPlayerId(0));
         players[0].setInitial(true);
         players[0].setAccepting(true);
         addState(players[0]);
@@ -150,7 +150,7 @@ class Players
             // From this guy...
             final State from = players[i];
             // ...to this one
-            players[i + 1] = new State(PlayerEvents.getPlayerId(i + 1));
+            players[i + 1] = new State("P" + PlayerEvents.getPlayerId(i + 1));
             final State to = players[i + 1];
 
             // All but one state should be accepting!
