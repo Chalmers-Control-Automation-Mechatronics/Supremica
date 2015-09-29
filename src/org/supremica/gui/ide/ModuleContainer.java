@@ -87,6 +87,7 @@ import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.supremica.properties.Config;
 import org.supremica.properties.SupremicaPropertyChangeEvent;
@@ -181,6 +182,33 @@ public class ModuleContainer
   public String getTypeString()
   {
     return TYPE_STRING;
+  }
+
+  /**
+   * Returns a string to be assigned as title to the main IDE window.
+   * This override adds the name of the currently edited automaton, if
+   * applicable, to the title that by default only contains the module
+   * name.
+   */
+  @Override
+  public String getWindowTitle()
+  {
+    String title = super.getWindowTitle();
+    if (getActivePanel() == mEditorPanel) {
+      final EditorWindowInterface editor =
+        mEditorPanel.getActiveEditorWindowInterface();
+      if (editor != null) {
+        final StringBuilder builder = new StringBuilder(title);
+        builder.append(" - ");
+        final SimpleComponentProxy comp = editor.getComponent();
+        final ComponentKind kind = comp.getKind();
+        builder.append(ModuleContext.getComponentKindToolTip(kind));
+        builder.append(" ");
+        builder.append(comp.getName());
+        title = builder.toString();
+      }
+    }
+    return title;
   }
 
 

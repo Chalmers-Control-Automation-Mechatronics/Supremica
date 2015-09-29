@@ -34,19 +34,19 @@
 package net.sourceforge.waters.gui.observer;
 
 /**
- * The Observer Interface for the Observer Design Pattern.
+ * The observer interface for editor changes. This interface receives
+ * notifications of state changes of the IDE such as the opening or closing of
+ * a module.
  *
- * It makes So many it so that many method of viewing and Modifying Concrete data
- * representation can Operate on the Same data representation at the Same Time and 
- * can be Updated Simultaneously
+ * @see EditorChangedEvent
  *
  * @author Simon Ware
  */
 
 public interface Observer
 {
-    /**
-     * called to update the observer when its subject is modified
-     */
-    public void update(EditorChangedEvent e);
+  /**
+   * Called to update the observer when its subject is modified.
+   */
+  public void update(EditorChangedEvent event);
 }

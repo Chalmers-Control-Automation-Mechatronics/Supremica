@@ -59,7 +59,6 @@ import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.Subject;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
-import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
@@ -115,7 +114,6 @@ public class IDE
 
     // Create GUI
     Utility.setupFrame(this, IDEDimensions.mainWindowPreferredSize);
-    setTitle(Version.getInstance().getTitle());
     final BorderLayout layout = new BorderLayout();
     final JPanel contents = (JPanel) getContentPane();
     contents.setLayout(layout);
@@ -139,7 +137,8 @@ public class IDE
 
     // Initialise document managers
     mDocumentContainerManager = new DocumentContainerManager(this);
-    mDocumentContainerManager.attach(this);
+    attach(this);
+    updateWindowTitle();
 
     if (showVersion) {
       // Show Version number
@@ -167,12 +166,6 @@ public class IDE
 
   //#########################################################################
   //# Simple Access
-  @Override
-  public String getName()
-  {
-    return IDENAME;
-  }
-
   @Override
   public JFrame getFrame()
   {
@@ -259,10 +252,13 @@ public class IDE
       mModuleNameObserver.setModule(container);
       updateWindowTitle();
       break;
+    case MAINPANEL_SWITCH:
+    case SUBPANEL_SWITCH:
+      updateWindowTitle();
+      break;
     default:
       break;
     }
-    fireEditorChangedEvent(event);
   }
 
 
@@ -401,22 +397,11 @@ public class IDE
     final DocumentContainer container =
       mDocumentContainerManager.getActiveContainer();
     if (container == null) {
-      return IDENAME;
+      return mWelcomeScreen.getWindowTitle();
     } else {
-      final DocumentProxy doc = container.getDocument();
-      final String name = doc.getName();
-      final File file = container.getFileLocation();
-      final StringBuilder buffer = new StringBuilder(IDENAME + " - Module");
-      if (name != null && !name.equals("")) {
-        buffer.append(": ");
-        buffer.append(name);
-      }
-      if (file != null) {
-        buffer.append(" [");
-        buffer.append(file);
-        buffer.append(']');
-      }
-      return buffer.toString();
+      final String title = container.getWindowTitle();
+      return title == null || title.length() == 0 ?
+             mWelcomeScreen.getWindowTitle() : title;
     }
   }
 
@@ -507,7 +492,7 @@ public class IDE
   private final DocumentContainerManager mDocumentContainerManager;
   private final IDEMenuBar menuBar;
   private final IDEToolBar mToolBar;
-  private final JPanel mWelcomeScreen;
+  private final WelcomeScreen mWelcomeScreen;
   private final JSplitPane mSplitPaneVertical;
   private final LogPanel mLogPanel;
   private final JFileChooser mFileChooser;
@@ -525,7 +510,6 @@ public class IDE
   //#########################################################################
   //# Static Class Constants
   private static final long serialVersionUID = 1L;
-  private static final String IDENAME = "Supremica";
 
   static
   {

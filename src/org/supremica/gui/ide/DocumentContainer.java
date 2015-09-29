@@ -121,25 +121,22 @@ public abstract class DocumentContainer
     return getFileLocation(doc);
   }
 
+  /**
+   * Returns a string to be assigned as title to the main IDE window.
+   * This method is called by the IDE after a container switch.
+   * It is used to set the title depending on the file being edited.
+   * The default implementation returns the name of the file being
+   * edited.
+   */
   public String getWindowTitle()
   {
-    final String type = getTypeString();
-    final DocumentProxy doc = getDocument();
-    final String name = doc.getName();
-    final File file = getFileLocation();
-    final StringBuilder buffer = new StringBuilder(type);
-    if (name != null && !name.equals(""))
-    {
-      buffer.append(": ");
-      buffer.append(name);
+    final File fullPath = getFileLocation();
+    if (fullPath != null) {
+      return fullPath.getName();
+    } else {
+      final DocumentProxy doc = getDocument();
+      return doc.getName();
     }
-    if (file != null)
-    {
-      buffer.append(" [");
-      buffer.append(file);
-      buffer.append(']');
-    }
-    return buffer.toString();
   }
 
   void adjustDocumentName(final File file)
