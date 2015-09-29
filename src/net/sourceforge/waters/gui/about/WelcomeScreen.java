@@ -47,6 +47,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
+import net.sourceforge.waters.config.Version;
 import net.sourceforge.waters.gui.util.IconLoader;
 
 import org.supremica.gui.ide.IDE;
@@ -77,6 +78,14 @@ public class WelcomeScreen
     addComponentListener(this);
     Config.DOT_USE.addPropertyChangeListener(this);
     Config.DOT_EXECUTE_COMMAND.addPropertyChangeListener(this);
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  public String getWindowTitle()
+  {
+    return Version.getInstance().getTitle();
   }
 
 
