@@ -35,8 +35,10 @@ package net.sourceforge.waters.gui.about;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.LayoutManager;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -86,6 +88,26 @@ public class WelcomeScreen
   public String getWindowTitle()
   {
     return Version.getInstance().getTitle();
+  }
+
+
+  //#########################################################################
+  //# Painting
+  @Override
+  public void paintComponent(final Graphics graphics)
+  {
+    if (BACKGROUND != null) {
+      final int width = getWidth();
+      final int height = getHeight();
+      final int tileWidth = BACKGROUND.getIconWidth();
+      final int tileHeight = BACKGROUND.getIconHeight();
+      final Image image = BACKGROUND.getImage();
+      for (int x = 0; x < width; x+= tileWidth) {
+        for (int y = 0; y < height; y += tileHeight) {
+          graphics.drawImage(image, x, y, null);
+        }
+      }
+    }
   }
 
 
@@ -196,6 +218,8 @@ public class WelcomeScreen
     IconLoader.loadImage("greeter", "supremica");
   private static final ImageIcon LOGO_WATERS =
     IconLoader.loadImage("greeter", "waters");
+  private static final ImageIcon BACKGROUND =
+    IconLoader.loadImage("greeter", "waves");
 
   private static final long serialVersionUID = -4208529601505410762L;
 
