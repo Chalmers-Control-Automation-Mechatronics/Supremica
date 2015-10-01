@@ -148,7 +148,8 @@ public class ExpressionParser {
       int pos = 0;
       do {
         final char ch = input.charAt(pos);
-        if (!ExpressionScanner.isIdentifierCharacter((int) ch) && !ExpressionScanner.isWhitespace((int) ch)) {
+        if (!ExpressionScanner.isIdentifierCharacter(ch) &&
+            !ExpressionScanner.isWhitespace(ch)) {
           break;
         }
       } while (++pos < len);
@@ -263,6 +264,8 @@ public class ExpressionParser {
   }
 
 
+  //#########################################################################
+  //# Character Classes
   /**
    * Checks whether a character represents an operator character.
    * @param  ch          The character to be checked.
@@ -303,7 +306,7 @@ public class ExpressionParser {
     char c;
     for (; start < len; start++) {
       c = text.charAt(start);
-      if (!ExpressionScanner.isWhitespace((int) c)) {
+      if (!ExpressionScanner.isWhitespace(c)) {
         break;
       }
     }
@@ -313,7 +316,7 @@ public class ExpressionParser {
     int end = len;
     do {
       c = text.charAt(--end);
-    } while (ExpressionScanner.isWhitespace((int) c));
+    } while (ExpressionScanner.isWhitespace(c));
     return text.substring(start, end + 1);
   }
 

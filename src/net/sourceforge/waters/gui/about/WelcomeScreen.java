@@ -34,11 +34,13 @@
 package net.sourceforge.waters.gui.about;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -47,6 +49,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.AbstractBorder;
 import javax.swing.border.Border;
 
 import net.sourceforge.waters.config.Version;
@@ -159,15 +162,7 @@ public class WelcomeScreen
   {
     // Create the about box with the version information
     mAboutPanel = new AboutPanel(mIDE);
-    final Border border1 = BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1);
-    final Border border2 = BorderFactory.createRaisedBevelBorder();
-    Border border = BorderFactory.createCompoundBorder(border1, border2);
-    final Border border3 = BorderFactory.createRaisedBevelBorder();
-    border = BorderFactory.createCompoundBorder(border, border3);
-    final Border border4 = BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1);
-    border = BorderFactory.createCompoundBorder(border, border4);
-    final Border border5 = BorderFactory.createEmptyBorder(2, 4, 2, 1);
-    border = BorderFactory.createCompoundBorder(border, border5);
+    final Border border = new AboutBoxBorder();
     mAboutPanel.setBorder(border);
     mAboutPanel.setSize(TEXT_WIDTH, Integer.MAX_VALUE);
     final int textHeight = mAboutPanel.getPreferredSize().height;
@@ -204,6 +199,69 @@ public class WelcomeScreen
 
 
   //#########################################################################
+  //# Inner Class AboutBoxBorder
+  /**
+   * A thick raised bevel border in shades of blue-grey, used to display the
+   * about box with a cute 3d-effect.
+   */
+  private static class AboutBoxBorder extends AbstractBorder
+  {
+    //#######################################################################
+    //# Overrides for javax.swing.border.AbstractBorder
+    @Override
+    public void paintBorder(final Component comp, final Graphics graphics,
+                            final int x, final int y, final int width,
+                            final int height)
+    {
+      super.paintBorder(comp, graphics, x, y, width, height);
+      final int[] xPoints = {x, x + width,
+                             x + width - BORDER_WIDTH, x + BORDER_WIDTH,
+                             x + BORDER_WIDTH, x};
+      final int[] yPoints = {y, y,
+                             y + BORDER_WIDTH, y + BORDER_WIDTH,
+                             y + height - BORDER_WIDTH, y + height};
+      graphics.setColor(BORDER_BRIGHT_COLOR);
+      graphics.fillPolygon(xPoints, yPoints, xPoints.length);
+      xPoints[0] = xPoints[1];
+      xPoints[3] = xPoints[2];
+      yPoints[0] = yPoints[5];
+      yPoints[3] = yPoints[4];
+      graphics.setColor(BORDER_DARK_COLOR);
+      graphics.fillPolygon(xPoints, yPoints, xPoints.length);
+      graphics.drawLine(x, y, x + width, y);
+      graphics.drawLine(x, y, x, y + height);
+      graphics.drawLine(x, y, x + BORDER_WIDTH, y + BORDER_WIDTH);
+      graphics.drawLine(x + BORDER_WIDTH, y + BORDER_WIDTH,
+                        x + width - BORDER_WIDTH, y + BORDER_WIDTH);
+      graphics.drawLine(x + BORDER_WIDTH, y + BORDER_WIDTH,
+                        x + BORDER_WIDTH, y + height - BORDER_WIDTH);
+      graphics.setColor(BORDER_BRIGHT_COLOR);
+      graphics.drawLine(x + width, y + height,
+                        x + width - BORDER_WIDTH, y + height - BORDER_WIDTH);
+    }
+
+    @Override
+    public Insets getBorderInsets(final Component c, final Insets insets)
+    {
+      insets.left = BORDER_WIDTH + 4;
+      insets.top = BORDER_WIDTH + 2;
+      insets.right = insets.bottom = BORDER_WIDTH;
+      return insets;
+    }
+
+    @Override
+    public boolean isBorderOpaque()
+    {
+      return true;
+    }
+
+    //#######################################################################
+    //# Class Constants
+    private static final long serialVersionUID = -5784899618541645886L;
+  }
+
+
+  //#########################################################################
   //# Data Members
   private final IDE mIDE;
   private AboutPanel mAboutPanel;
@@ -213,6 +271,7 @@ public class WelcomeScreen
   //# Class Constants
   private static final int VERTICAL_SPACE = 24;
   private static final int TEXT_WIDTH = 512;
+  private static final int BORDER_WIDTH = 6;
 
   private static final ImageIcon LOGO_SUPREMICA =
     IconLoader.loadImage("greeter", "supremica");
@@ -220,6 +279,9 @@ public class WelcomeScreen
     IconLoader.loadImage("greeter", "waters");
   private static final ImageIcon BACKGROUND =
     IconLoader.loadImage("greeter", "waves");
+
+  private static final Color BORDER_BRIGHT_COLOR = new Color(232, 232, 255);
+  private static final Color BORDER_DARK_COLOR = new Color(120, 120, 136);
 
   private static final long serialVersionUID = -4208529601505410762L;
 
