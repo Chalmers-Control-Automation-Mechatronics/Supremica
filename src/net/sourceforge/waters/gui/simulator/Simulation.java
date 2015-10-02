@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.gui.simulator;
 
-import gnu.trove.set.hash.THashSet;
-
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -81,6 +79,8 @@ import net.sourceforge.waters.xsd.base.EventKind;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 
+import gnu.trove.set.hash.THashSet;
+
 
 public class Simulation implements ModelObserver, Observer
 {
@@ -102,13 +102,6 @@ public class Simulation implements ModelObserver, Observer
     module.addModelObserver(this);
     container.attach(this);
     setCompiledDES(null);
-
-    /*
-    mTransitionsToEvents = new TransitionEventMap(des);
-    updateControllability(true);
-    findEventClassification();
-    addNewSimulatorState();
-    */
   }
 
 
@@ -689,7 +682,7 @@ public class Simulation implements ModelObserver, Observer
 
   private void warnAboutMissingInitialStates(final SimulatorState state)
   {
-    if (state.getNumberOfEnabledAutomata() < mOrderedAutomata.size()) {
+    if (state.getNumberOfDisabledAutomata() > 0) {
       final StringBuilder buffer =
         new StringBuilder("Could not determine initial state for ");
       boolean first = true;
@@ -775,7 +768,6 @@ public class Simulation implements ModelObserver, Observer
     mCurrentState = mStateHistory.get(mCurrentTime);
     mEnabledSteps = null;
     mEventStatusMap = null;
-    mAutomataSensitiveToEvent = null;
   }
 
   /**
@@ -806,8 +798,9 @@ public class Simulation implements ModelObserver, Observer
       for (final ComponentKind kind : order) {
         for (final AutomatonProxy aut : mOrderedAutomata) {
           if (aut.getKind() == kind) {
-            final AutomatonStatus status = mCurrentState.getStatus(aut);
-            if (status != AutomatonStatus.DISABLED) {
+            final AutomatonStatus oldStatus = mCurrentState.getStatus(aut);
+            if (oldStatus != AutomatonStatus.DISABLED) {
+              AutomatonStatus newStatus = AutomatonStatus.IGNORED;
               final StateProxy source = mCurrentState.getState(aut);
               final Collection<EventProxy> local = aut.getEvents();
               for (final TransitionProxy trans : aut.getTransitions()) {
@@ -829,7 +822,7 @@ public class Simulation implements ModelObserver, Observer
                   if (successors != null) {
                     entry.setSuccessors(aut, successors);
                   } else {
-                    switch (aut.getKind()) {
+                    switch (kind) {
                     case PLANT:
                       entry.setStatus(aut, EventStatus.DISABLED);
                       break;
@@ -840,7 +833,7 @@ public class Simulation implements ModelObserver, Observer
                         entry.setStatus(aut, EventStatus.DISABLED);
                       } else {
                         entry.setStatus(aut, EventStatus.ERROR);
-                        mCurrentState.addStatus(aut, AutomatonStatus.ERROR);
+                        newStatus = AutomatonStatus.ERROR;
                       }
                       break;
                     case PROPERTY:
@@ -848,7 +841,9 @@ public class Simulation implements ModelObserver, Observer
                         entry.setStatus(aut, EventStatus.DISABLED);
                       } else {
                         entry.setStatus(aut, EventStatus.WARNING);
-                        mCurrentState.addStatus(aut, AutomatonStatus.WARNING);
+                        if (newStatus == AutomatonStatus.IGNORED) {
+                          newStatus = AutomatonStatus.WARNING;
+                        }
                       }
                       break;
                     default:
@@ -859,6 +854,18 @@ public class Simulation implements ModelObserver, Observer
                 }
               }
               enabled.clear();
+              if (newStatus != AutomatonStatus.IGNORED) {
+                mCurrentState.setState(aut, source, newStatus);
+              } else if (oldStatus == AutomatonStatus.WARNING ||
+                         oldStatus == AutomatonStatus.ERROR) {
+                if (mCurrentTime > 0) {
+                  final SimulatorState pred = getHistoryState(mCurrentTime - 1);
+                  final EventProxy event = mCurrentState.getEvent();
+                  newStatus =
+                    SimulatorState.findAutomatonStatus(pred, aut, event, source);
+                }
+                mCurrentState.setState(aut, source, newStatus);
+              }
             }
           }
         }

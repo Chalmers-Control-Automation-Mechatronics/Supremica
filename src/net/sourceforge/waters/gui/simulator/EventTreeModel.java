@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
@@ -68,6 +69,7 @@ class EventTreeModel
 
   //#########################################################################
   //# Interface javax.swing.tree.TreeModel
+  @Override
   public void addTreeModelListener(final TreeModelListener l)
   {
     if (mListeners == null) {
@@ -76,17 +78,36 @@ class EventTreeModel
     mListeners.add(l);
   }
 
-  public Object getChild(final Object parent, final int index)
+  @Override
+  public Object getChild(final Object parent, int index)
   {
     if (parent instanceof Simulation) {
       return mSortedEvents.get(index);
     } else if (parent instanceof EventProxy) {
-      return mSim.getAutomataSensitiveToEvent((EventProxy)parent).get(index);
+      final EventProxy event = (EventProxy) parent;
+      final List<AutomatonProxy> automata =
+        mSim.getAutomataSensitiveToEvent(event);
+      final SimulatorState state = mSim.getCurrentState();
+      if (state.getNumberOfDisabledAutomata() == 0) {
+        return automata.get(index);
+      } else {
+        for (final AutomatonProxy aut : automata) {
+          if (state.getStatus(aut) != AutomatonStatus.DISABLED) {
+            if (index == 0) {
+              return aut;
+            } else {
+              index--;
+            }
+          }
+        }
+        return null;
+      }
     } else {
       return null;
     }
   }
 
+  @Override
   public int getChildCount(final Object parent)
   {
     if (parent instanceof Simulation) {
@@ -95,33 +116,60 @@ class EventTreeModel
       final EventProxy event = (EventProxy) parent;
       final List<AutomatonProxy> automata =
         mSim.getAutomataSensitiveToEvent(event);
-      return automata.size();
+      int count = automata.size();
+      final SimulatorState state = mSim.getCurrentState();
+      if (state.getNumberOfDisabledAutomata() > 0) {
+        for (final AutomatonProxy aut : automata) {
+          if (state.getStatus(aut) == AutomatonStatus.DISABLED) {
+            count--;
+          }
+        }
+      }
+      return count;
     } else {
       return 0;
     }
   }
 
+  @Override
   public int getIndexOfChild(final Object parent, final Object child)
   {
     if (parent instanceof Simulation) {
       return mSortedEvents.indexOf(child);
     } else if (parent instanceof EventProxy) {
-      return mSim.getAutomataSensitiveToEvent((EventProxy)parent).indexOf(child);
+      final EventProxy event = (EventProxy) parent;
+      final List<AutomatonProxy> automata =
+        mSim.getAutomataSensitiveToEvent(event);
+      final SimulatorState state = mSim.getCurrentState();
+      int index = 0;
+      for (final AutomatonProxy aut : automata) {
+        if (state.getStatus(aut) != AutomatonStatus.DISABLED) {
+          if (aut == child) {
+            return index;
+          } else {
+            index++;
+          }
+        }
+      }
+      return -1;
     } else {
       return -1;
     }
   }
 
+  @Override
   public Object getRoot()
   {
     return mSim;
   }
 
+  @Override
   public boolean isLeaf(final Object node)
   {
     return node instanceof AutomatonProxy;
   }
 
+  @Override
   public void removeTreeModelListener(final TreeModelListener l)
   {
     mListeners.remove(l);
@@ -130,6 +178,7 @@ class EventTreeModel
     }
   }
 
+  @Override
   public void valueForPathChanged(final TreePath path, final Object newValue)
   {
     throw new UnsupportedOperationException
@@ -139,6 +188,7 @@ class EventTreeModel
 
   //#########################################################################
   //# Interface SimulationObserver
+  @Override
   public void simulationChanged(final SimulationChangeEvent event)
   {
     if (mListeners != null) {
@@ -175,6 +225,7 @@ class EventTreeModel
 
     //#######################################################################
     //# Interface java.util.Comparator<EventProxy>
+    @Override
     public int compare(final EventProxy a, final EventProxy b)
     {
       for (final Pair<Boolean,Integer> pair : mSortingMethods) {

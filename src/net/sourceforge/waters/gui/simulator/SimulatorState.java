@@ -98,17 +98,8 @@ class SimulatorState
           target = source;
         }
       }
-      final AutomatonStatus status;
-      if (target == null || pred.getStatus(aut) == AutomatonStatus.DISABLED) {
-        status = AutomatonStatus.DISABLED;
-        target = null;
-      } else if (!relevant) {
-        status = AutomatonStatus.IGNORED;
-      } else if (target == source) {
-        status = AutomatonStatus.SELFLOOPED;
-      } else {
-        status = AutomatonStatus.OK;
-      }
+      final AutomatonStatus status =
+        findAutomatonStatus(pred, aut, event, target);
       result.setState(aut, target, status);
     }
     return result;
@@ -164,11 +155,17 @@ class SimulatorState
   {
     this(null, automata.size());
     for (final AutomatonProxy aut : automata) {
+      StateProxy init = null;
       for (final StateProxy state : aut.getStates()) {
         if (state.isInitial()) {
-          setState(aut, state, AutomatonStatus.IGNORED);
+          init = state;
           break;
         }
+      }
+      if (init != null) {
+        setState(aut, init, AutomatonStatus.IGNORED);
+      } else {
+        mNumDisabledAutomata++;
       }
     }
   }
@@ -188,6 +185,7 @@ class SimulatorState
   {
     mEvent = event;
     mStateMap = new HashMap<AutomatonProxy,Entry>(numAutomata);
+    mNumDisabledAutomata = 0;
   }
 
 
@@ -198,9 +196,9 @@ class SimulatorState
     return mEvent;
   }
 
-  int getNumberOfEnabledAutomata()
+  int getNumberOfDisabledAutomata()
   {
-    return mStateMap.size();
+    return mNumDisabledAutomata;
   }
 
   StateProxy getState(final AutomatonProxy aut)
@@ -220,16 +218,12 @@ class SimulatorState
                 final AutomatonStatus status)
   {
     final Entry entry = new Entry(state, status);
-    mStateMap.put(aut, entry);
-  }
-
-  void addStatus(final AutomatonProxy aut, final AutomatonStatus status)
-  {
-    final Entry entry = mStateMap.get(aut);
-    if (status.compareTo(entry.getStatus()) > 0) {
-      final StateProxy state = entry.getState();
-      final Entry newEntry = new Entry(state, status);
-      mStateMap.put(aut, newEntry);
+    final Entry old = mStateMap.put(aut, entry);
+    if (old != null && old.getStatus() == AutomatonStatus.DISABLED) {
+      mNumDisabledAutomata--;
+    }
+    if (status == AutomatonStatus.DISABLED) {
+      mNumDisabledAutomata++;
     }
   }
 
@@ -310,11 +304,14 @@ class SimulatorState
    * to indicate an initial state.
    */
   private final EventProxy mEvent;
-
   /**
    * Maps automata to their current states.
    * Missing entries may exist for disabled properties.
    */
   private final Map<AutomatonProxy,Entry> mStateMap;
-
+  /**
+   * The number of disabled automata, i.e., the number of automata with status
+   * {@link AutomatonStatus#DISABLED}, in this state.
+   */
+  private int mNumDisabledAutomata;
 }
