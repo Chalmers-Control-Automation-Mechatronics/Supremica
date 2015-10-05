@@ -155,8 +155,8 @@
         <!-- Library for handling BDDs. -->
         <unjar src="${lib}/javabdd-2.0.jar" dest="${lib}/${unjared}"/>
         <unjar src="${waters.jaxbjar}" dest="${lib}/${unjared}"/>
-        <!-- <unjar src="${lib}/manufacturingTables_jaxb.jar"
-                    dest="${lib}/${unjared}"/> -->
+        <unjar src="${lib}/manufacturingTables_jaxb.jar"
+               dest="${lib}/${unjared}"/>
         <unjar src="${lib}/genericPLCProgramDescription_jaxb.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/itext.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/fsa2sat-1.0.jar" dest="${lib}/${unjared}"/>
@@ -269,7 +269,7 @@
         </copy>
     </target>
     
-    <target name="compile" depends="compile_supremica,compile_supremica_tests"/>
+    <target name="compile" depends="compile_manufacturingTables_jaxb,compile_supremica,compile_supremica_tests"/>
     
     <target name="compile_supremica" depends="-startfiles_local_supremica">
         <javac debug="on"
@@ -278,19 +278,7 @@
                destdir="${build}"
                verbose="false"
                nowarn="true"
-               excludes="org/supremica/external/fbd2smv/**,
-                         org/supremica/external/genericPLCProgramDescription/**,
-                         org/supremica/external/iec61131/**,
-                         org/supremica/external/iec61499fb2efa/**,
-                         org/supremica/external/interfaceExample/**,
-                         org/supremica/external/jgrafchart/**,
-                         org/supremica/external/processAlgebraPetriNet/**,
-                         org/supremica/external/rac/**,
-                         org/supremica/external/relationExtraction/**,
-                         org/supremica/external/specificationSynthesis/**,
-                         org/supremica/manufacturingTables/**,
-                         org/supremica/softplc/**"
-               source="1.7"
+	       source="1.7"
 	       encoding="ISO-8859-15"
                fork="true"
                includeantruntime="false"
@@ -298,32 +286,9 @@
             <classpath>    
                 <pathelement location="${lib}/${unjared}"/>
             </classpath>
-            <!--
-    <compilerarg value="-Xlint"/> -->
         </javac>
     </target>
     
-    <target name="compile_supremica_xlint" depends="-startfiles_local_supremica">
-        <javac debug="on"
-               debuglevel="lines,source,vars"
-               srcdir="${src}"
-               destdir="${build}"
-               deprecation="false"
-               verbose="false"
-               nowarn="true"
-               source="1.7"
-	       encoding="ISO-8859-15"
-               fork="true"
-               includeantruntime="false"
-               memoryMaximumSize="256M">
-            <classpath>    
-                <pathelement location="${lib}/${unjared}"/>
-            </classpath>
-            <compilerarg value="-Xlint"/>
-        </javac>
-    </target>
-    
-    <!-- manufacturingTables is now excluded from build -->
     <target name="compile_manufacturingTables_jaxb" depends="build_rop_processeditor">
         <javac
             srcdir="${src}"
@@ -597,7 +562,6 @@ Class-Path: ${manifest.pathlist}</echo>
       </copy>
     </target>
 
-    <!-- manufacturingTables is now excluded from build -->
     <target name="-jar_manufacturingTables_jaxb" depends="compile_manufacturingTables_jaxb">
         <jar jarfile="${lib}/manufacturingTables_jaxb.jar"> 
             <fileset dir="${build}/">
