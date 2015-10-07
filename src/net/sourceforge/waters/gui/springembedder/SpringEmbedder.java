@@ -375,9 +375,9 @@ public class SpringEmbedder
   //# Algorithm
   private void createWrappers()
   {
-    final int numnodes = mNodes.size();
-    mNodeWrappers = new NodeWrapper[numnodes];
-    mNodeMap = new HashMap<SimpleNodeSubject,NodeWrapper>(numnodes);
+    final int numNodes = mNodes.size();
+    mNodeWrappers = new NodeWrapper[numNodes];
+    mNodeMap = new HashMap<SimpleNodeSubject,NodeWrapper>(numNodes);
     mNextWrapperId = 0;
     for (final NodeSubject node : mNodes) {
       if (node instanceof SimpleNodeSubject) {
@@ -392,11 +392,15 @@ public class SpringEmbedder
            ProxyTools.getShortClassName(node) + "!");
       }
     }
-    final int numedges = mEdges.size();
-    mEdgeWrappers = new EdgeWrapper[numedges];
-    mEdgeMap = new HashMap<EdgeSubject,EdgeWrapper>(numedges);
+    final int numEdges = mEdges.size();
+    int numNonSelfloopEdges = 0;
+    mEdgeWrappers = new EdgeWrapper[numEdges];
+    mEdgeMap = new HashMap<EdgeSubject,EdgeWrapper>(numEdges);
     mNextWrapperId = 0;
     for (final EdgeSubject edge : mEdges) {
+      if (edge.getSource() != edge.getTarget()) {
+        numNonSelfloopEdges++;
+      }
       final EdgeWrapper wrapper = new EdgeWrapper(edge);
       final int id = wrapper.getId();
       mEdgeWrappers[id] = wrapper;
@@ -406,11 +410,11 @@ public class SpringEmbedder
       }
     }
     mMultiEdgePairs = new LinkedList<EdgeWrapperPair>();
-    for (int e1 = 0; e1 < numedges; e1++) {
+    for (int e1 = 0; e1 < numEdges; e1++) {
       final EdgeWrapper edge1 = mEdgeWrappers[e1];
       final NodeWrapper source1 = edge1.getSource();
       final NodeWrapper target1 = edge1.getTarget();
-      for (int e2 = e1 + 1; e2 < numedges; e2++) {
+      for (int e2 = e1 + 1; e2 < numEdges; e2++) {
         final EdgeWrapper edge2 = mEdgeWrappers[e2];
         if (edge2.getSource() == source1 && edge2.getTarget() == target1) {
           final EdgeWrapperPair pair = new EdgeWrapperPair(edge1, edge2);
@@ -418,24 +422,26 @@ public class SpringEmbedder
         }
       }
     }
-    int maxfanout = 1;
+    int maxFanout = 1;
     for (final NodeWrapper wrapper : mNodeWrappers) {
       final int fanout = wrapper.getFanout();
-      if (fanout > maxfanout) {
-        maxfanout = fanout;
+      if (fanout > maxFanout) {
+        maxFanout = fanout;
       }
     }
-    mWrapperSet = new WrapperSet();
-    mBackgroundAttraction = BACKGROUND_ATTRACTION / numnodes;
+    final double avgFanout = numNodes * numNonSelfloopEdges == 0 ? 1.0 :
+      (double) numNonSelfloopEdges / numNodes;
+    mBackgroundAttraction = BACKGROUND_ATTRACTION / numNodes;
     mInitialStateAttraction = INITIALSTATE_ATTRACTION;
-    mNodeRepulsion = NODE_REPULSION / numnodes;
-    mNodeEdgeRepulsion = NODEEDGE_REPULSION / numnodes;
+    mNodeRepulsion = NODE_REPULSION / numNodes * avgFanout;
+    mNodeEdgeRepulsion = NODEEDGE_REPULSION / numNodes * avgFanout;
     mEdgeRepulsion = EDGE_REPULSION;
-    mMaxAttraction = 0.5 / maxfanout;
+    mMaxAttraction = 0.5 / maxFanout;
     mCenter = (Point2D) POINT_CENTER.clone();
     final double diameter = 2.0 * Config.GUI_EDITOR_NODE_RADIUS.get();
     mJumpThresholdSq = diameter * diameter;
-    mTotalJumpsAvailable = numnodes;
+    mTotalJumpsAvailable = numNodes;
+    mWrapperSet = new WrapperSet();
   }
 
   private void runToConvergence()
@@ -814,7 +820,7 @@ public class SpringEmbedder
         if (weight == null) {
           mNeighbours.put(other, 1.0);
         } else {
-          mNeighbours.put(other, weight * MULTI_EDGE_WEIGHT);
+          mNeighbours.put(other, weight + MULTI_EDGE_WEIGHT);
         }
       }
     }
@@ -1323,7 +1329,7 @@ public class SpringEmbedder
   private static final int MAX_JUMPS_EACH = 3;
 
   private static final int NUM_PASSES = 3;
-  private static final double MULTI_EDGE_WEIGHT = 1.333;
+  private static final double MULTI_EDGE_WEIGHT = 0.3;
   private static final double SELFLOOP_WEIGHT = 1.05;
 
   private static final double BACKGROUND_ATTRACTION = 0.05;
