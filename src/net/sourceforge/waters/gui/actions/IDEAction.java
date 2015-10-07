@@ -70,10 +70,10 @@ import org.supremica.gui.ide.ModuleContainer;
  * the action.</DD>
  *
  * <DT>Enablement.</DT> <DD>All actions implement the {@link Observer}
- * interface and as such are notified of changes to the IDE's state. They
- * should check their enablement conditions in the {@link
- * Observer#update(EditorChangedEvent) update()} method, and enable or
- * disable the action accordingly using the {@link
+ * interface and as such are notified of changes to the IDE's state by the
+ * {@link WatersActionManager}. They should check their enablement conditions
+ * in the {@link Observer#update(EditorChangedEvent) update()} method, and
+ * enable or disable the action accordingly using the {@link
  * javax.swing.Action@setEnabled(boolean) setEnabled()} method. At the same
  * time, other attributes such as the description can also be changed.</DD>
  *

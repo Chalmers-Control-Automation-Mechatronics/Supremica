@@ -107,7 +107,13 @@ public class IDE
     // Instantiate all actions
     mObservers = new LinkedList<Observer>();
     mFocusTracker = new FocusTracker(this);
-    mFocusTracker.attach(this);
+    mFocusTracker.attach(new Observer() {
+      @Override
+      public void update(final EditorChangedEvent event)
+      {
+        // Events from focus tracker are forwarded to IDE's listeners.
+        fireEditorChangedEvent(event);
+      }});
     mActions = new Actions(this);
     mPopupActionManager = new WatersPopupActionManager(this);
     mModuleNameObserver = new ModuleNameObserver();
