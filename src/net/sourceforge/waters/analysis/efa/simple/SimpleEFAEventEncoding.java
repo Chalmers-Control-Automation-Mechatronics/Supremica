@@ -122,6 +122,11 @@ public class SimpleEFAEventEncoding extends SimpleInfoEncoder<SimpleEFAEventDecl
     return -1;
   }
 
+  public int getEventId(final String name)
+  {
+    return getEventId(getEventDecl(name));
+  }
+
   public final int createEventId(final SimpleEFAEventDecl event)
   {
     int id = encode(event);
