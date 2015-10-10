@@ -1,13 +1,5 @@
 package org.supremica.automata.BDD.EFA;
 
-/**
- *
- * @author Sajed Miremadi, Zhennan Fei
- */
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.set.hash.TIntHashSet;
-
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.math.BigInteger;
@@ -43,6 +35,14 @@ import org.supremica.automata.algorithms.EditorSynthesizerOptions;
 import org.supremica.automata.algorithms.SynthesisAlgorithm;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
+
+/**
+ *
+ * @author Sajed Miremadi, Zhennan Fei
+ */
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.TIntHashSet;
 
 public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
@@ -173,6 +173,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     public BDD minValueOfVarBDD = null;
     private String optVarName = null;
 
+    public boolean trackPeakBDD = false;
+
     public BDDExtendedAutomata(final ExtendedAutomata orgExAutomata, final EditorSynthesizerOptions options) {
         this.orgExAutomata = orgExAutomata;
         locaVarSuffix = ExtendedAutomata.getlocVarSuffix();
@@ -192,6 +194,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         variableOrdering = new ArrayList<Object>();
 
         manager = new BDDExtendedManager();
+        if (options.getPeakBDD())
+          trackPeakBDD = true;
 
         enablingSigmaMap = new HashMap<String, HashSet<Integer>>();
 
@@ -1291,10 +1295,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         if (controllableStatesBDD == null) {
             if (synType.equals(SynthesisAlgorithm.MONOLITHICBDD)) {
                 final BDD uncontrollableStates = manager.getInitiallyUncontrollableStates().or(getForbiddenLocations());
-//             BDD uncontrollableStates = manager.uncontrollableBackward(manager.getInitiallyUncontrollableStates().or(getForbiddenLocations()));
                 if (reachable) {
                     controllableStatesBDD = manager.restrictedForward(getInitialState(), uncontrollableStates);
-
                 } else {
                     controllableStatesBDD = uncontrollableStates.not();
                 }
@@ -1927,6 +1929,10 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
             parAlgoWorker = BDDPartitionTypeFactory.getPartitioningAlgorithmWorker(this, synType);
         }
         return parAlgoWorker;
+    }
+
+    public int getMaxNbrNodes() {
+      return manager.maxNbrNodes; // for monolithic algorithm
     }
 
     /**

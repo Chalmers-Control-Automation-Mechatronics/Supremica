@@ -73,6 +73,7 @@ public final class EditorSynthesizerOptions
     private boolean compHeuristic;
     private boolean indpHeuristic;
     private boolean reachability;
+    private boolean peakBDD;
     private boolean rememberDisabledUncontrollableEvents;
     private boolean optimization;
     private long globalClockDomain = 0;
@@ -110,6 +111,7 @@ public final class EditorSynthesizerOptions
             Config.SYNTHESIS_CREATE_AUTOMATON_VARIABLES.get(),
             Config.SYNTHESIS_SAVE_IN_FILE.get(),
             Config.SYNTHESIS_REACHABILITY.get(),
+            Config.SYNTHESIS_PEAKBDD.get(),
             Config.SYNTHESIS_OPTIMIZATION.get());
     }
 
@@ -132,6 +134,7 @@ public final class EditorSynthesizerOptions
                                      final boolean createAutVars,
                                      final boolean saveInFile,
                                      final boolean reachability,
+                                     final boolean peakBDD,
                                      final boolean optimization)
     {
         this.synthesisType = synthesisType;
@@ -147,6 +150,7 @@ public final class EditorSynthesizerOptions
         this.createAutVars = createAutVars;
         this.saveInFile = saveInFile;
         this.reachability = reachability;
+        this.peakBDD = peakBDD;
         this.optimization = optimization;
 
         this.event = "";
@@ -379,6 +383,16 @@ public final class EditorSynthesizerOptions
         reachability = bool;
     }
 
+    public boolean getPeakBDD()
+    {
+      return peakBDD;
+    }
+
+    public void setPeakBDD(final boolean bool)
+    {
+      peakBDD = bool;
+    }
+
     public boolean getOptimization()
     {
         return optimization;
@@ -427,7 +441,21 @@ public final class EditorSynthesizerOptions
      */
     public static EditorSynthesizerOptions getDefaultSynthesizerOptions()
     {
-        return new EditorSynthesizerOptions(SynthesisType.CONTROLLABLE, SynthesisAlgorithm.BDD, true, true, true, true, true, false,true, true, false, false, true, false);
+        return new EditorSynthesizerOptions(SynthesisType.CONTROLLABLE,
+                                            SynthesisAlgorithm.BDD,
+                                            true,
+                                            true,
+                                            true,
+                                            true,
+                                            true,
+                                            false,
+                                            true,
+                                            true,
+                                            false,
+                                            false,
+                                            true,
+                                            true,
+                                            false);
     }
 
     /**

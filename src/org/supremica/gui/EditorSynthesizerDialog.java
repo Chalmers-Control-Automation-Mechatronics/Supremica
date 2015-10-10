@@ -81,6 +81,7 @@ class EditorSynthesizerDialogStandardPanel
     private final SynthesisSelector typeSelector;
     private final AlgorithmSelector algorithmSelector;
     private final JCheckBox reachableBox;
+    private final JCheckBox peakBDDBox;
     private final JPanel guardBox;
     private final Box genGuardComputeSupBox;
 
@@ -204,7 +205,7 @@ class EditorSynthesizerDialogStandardPanel
         final Box mainBox = Box.createVerticalBox();
         final JPanel supervisorPanel = new JPanel();
         supervisorPanel.setBorder(BorderFactory.createTitledBorder("Supervisor"));
-        supervisorPanel.setLayout(new GridLayout(3, 1));
+        supervisorPanel.setLayout(new GridLayout(4, 1));
 
         JPanel panel = new JPanel();
         Box box = Box.createHorizontalBox();
@@ -229,6 +230,16 @@ class EditorSynthesizerDialogStandardPanel
         reachableBox.setVisible(true);
         box.add(reachableBox);
         reachableBox.addActionListener(this);
+        panel.add(box);
+        supervisorPanel.add(panel);
+
+        panel = new JPanel();
+        box = Box.createHorizontalBox();
+        peakBDDBox = new JCheckBox("Compute peak BDD nodes");
+        peakBDDBox.setEnabled(true);
+        peakBDDBox.setVisible(true);
+        box.add(peakBDDBox);
+        peakBDDBox.addActionListener(this);
         panel.add(box);
         supervisorPanel.add(panel);
 
@@ -292,7 +303,7 @@ class EditorSynthesizerDialogStandardPanel
 
         addGuardsBox.addActionListener(this);
 
-        createAutVarsBox = new JCheckBox("Create Automaton Variables and add updates");
+        createAutVarsBox = new JCheckBox("Create automaton variables and add updates");
         createAutVarsBox.setToolTipText("Create automaton variables mentioned in the generated guards; add updates"
           + "to the automaton transitions");
 
@@ -377,6 +388,7 @@ class EditorSynthesizerDialogStandardPanel
         algorithmSelector.setAlgorithm(synthesizerOptions.getSynthesisAlgorithm());
         printGuardBox.setSelected(synthesizerOptions.getPrintGuard());
         reachableBox.setSelected(synthesizerOptions.getReachability());
+        peakBDDBox.setSelected(synthesizerOptions.getPeakBDD());
         globalClockDomainField.setEnabled(timeOptBox.isSelected());
 
 /*
@@ -462,6 +474,7 @@ class EditorSynthesizerDialogStandardPanel
         synthesizerOptions.setSaveInFile(saveEventGuardInFileBox.isSelected());
         synthesizerOptions.setSaveIDDInFile(saveIDDInFileBox.isSelected());
         synthesizerOptions.setReachability(reachableBox.isSelected());
+        synthesizerOptions.setPeakBDD(peakBDDBox.isSelected());
         synthesizerOptions.setCompHeuristic(complementHeuristicBox.isSelected());
         synthesizerOptions.setIndpHeuristic(independentHeuristicBox.isSelected());
         synthesizerOptions.setOptimization(timeOptBox.isSelected());

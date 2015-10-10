@@ -1,15 +1,5 @@
 package org.supremica.automata.BDD.EFA;
 
-/**
- *
- * @author Sajed Miremadi, Zhennan Fei
- */
-import gnu.trove.iterator.TIntIterator;
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.procedure.TIntObjectProcedure;
-import gnu.trove.set.hash.TIntHashSet;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +22,16 @@ import org.supremica.automata.FlowerEFABuilder;
 import org.supremica.automata.BDD.BDDLibraryType;
 import org.supremica.automata.BDD.SupremicaBDDBitVector.SupremicaBDDBitVector;
 import org.supremica.properties.Config;
+
+/**
+ *
+ * @author Sajed Miremadi, Zhennan Fei
+ */
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.procedure.TIntObjectProcedure;
+import gnu.trove.set.hash.TIntHashSet;
 
 public class BDDExtendedManager extends BDDAbstractManager {
 
@@ -68,6 +68,8 @@ public class BDDExtendedManager extends BDDAbstractManager {
     public int maxBDDSizeMinimization = 0;
     public int maxBDDSizePartitioning = 0;
 
+    public int maxNbrNodes = 0;
+
     public BDDExtendedManager() {
         this(BDDLibraryType.fromDescription(Config.BDD2_BDDLIBRARY.getAsString()));
     }
@@ -91,20 +93,22 @@ public class BDDExtendedManager extends BDDAbstractManager {
     public BDD getInitiallyUncontrollableStates() {
         final BDDMonolithicEdges edges = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges());
         BDD uncontrollableStates = getZeroBDD();
-        if (bddExAutomata.orgExAutomata.modelHasNoPlants()
-                || bddExAutomata.orgExAutomata.modelHasNoSpecs()) {
-            return getZeroBDD();
-        } else {
+        if (!bddExAutomata.orgExAutomata.modelHasNoPlants() // model has both plants and specifications
+                && !bddExAutomata.orgExAutomata.modelHasNoSpecs()) {
             final BDD t1 = edges.getPlantMonolithicUncontrollableEdgesForwardBDD();
             final BDD t2 = edges.getSpecMonolithicUncontrollableEdgesForwardBDD().and(t1).exist(bddExAutomata.getDestStatesVarSet());
             uncontrollableStates =  t1.and(t2.not()).exist(bddExAutomata.getDestStatesVarSet()).exist(bddExAutomata.getEventVarSet());
+
+            if (bddExAutomata.trackPeakBDD) {
+              maxNbrNodes = t1.nodeCount() > maxNbrNodes ? t1.nodeCount() : maxNbrNodes;
+              maxNbrNodes = t2.nodeCount() > maxNbrNodes ? t2.nodeCount() : maxNbrNodes;
+            }
         }
-//        if(!bddExAutomata.orgExAutomata.getClocks().isEmpty()){
-//            uncontrollableStates = uncontrollableStates.or(getInitiallyTimedUncontrollableStates());
-//        }
+
+        if (bddExAutomata.trackPeakBDD)
+          maxNbrNodes = uncontrollableStates.nodeCount() > maxNbrNodes ? uncontrollableStates.nodeCount() : maxNbrNodes;
 
         return uncontrollableStates;
-
     }
 
     public BDD getInitiallyTimedUncontrollableStates()
@@ -120,6 +124,10 @@ public class BDDExtendedManager extends BDDAbstractManager {
         System.err.println("UncontrollableBackward entered.");
         final BDDMonolithicEdges bddEdges = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges());
         final BDD t_u = bddEdges.getMonolithicUncontrollableEdgesBackwardBDD();
+
+        if (bddExAutomata.trackPeakBDD)
+          maxNbrNodes = t_u.nodeCount() > maxNbrNodes ? t_u.nodeCount() : maxNbrNodes;
+
         @SuppressWarnings("unused")
         final BDD backwardTime = bddEdges.getBackwardClocksWithTheSameRate();
         @SuppressWarnings("unused")
@@ -166,6 +174,10 @@ public class BDDExtendedManager extends BDDAbstractManager {
 /////                bddEdges.removeFromMonolithicForcibleEdgesForwardBDD(ucDueToTime);
 //                Qkn = Qkn.or(ucDueToTime);
 //            }
+            if (bddExAutomata.trackPeakBDD) {
+              maxNbrNodes = newUCstates.nodeCount() > maxNbrNodes ? newUCstates.nodeCount() : maxNbrNodes;
+              maxNbrNodes = Qkn.nodeCount() > maxNbrNodes ? Qkn.nodeCount() : maxNbrNodes;
+            }
         } while (!Qkn.equals(Qk));
 
         System.err.println("UncontrollableBackward exited.");
@@ -177,6 +189,10 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
         final BDDMonolithicEdges bddEdges = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges());
         final BDD trans = bddEdges.getMonolithicEdgesBackwardBDD();
+
+        if (bddExAutomata.trackPeakBDD)
+          maxNbrNodes = trans.nodeCount() > maxNbrNodes ? trans.nodeCount() : maxNbrNodes;
+
         final BDD forwardTime = bddEdges.getForwardClocksWithTheSameRate();
         final BDD backwardTime = bddEdges.getBackwardClocksWithTheSameRate();
 
@@ -189,50 +205,24 @@ public class BDDExtendedManager extends BDDAbstractManager {
         BDD Qkn = markedStates.and(forbidden.not());
         BDD Qk = null;
         BDD Qm = null;
-        /*
-         FileWriter fstream = null;
-         try
-         {
-         fstream = new FileWriter("C:/Users/sajed/Documents/My Dropbox/Documents/Papers/Supremica_Models/FisherThompson/BDDstatistics_RB.txt");
-         //           fstream = new FileWriter("/Users/sajed/Dropbox/Documents/Papers/Supremica_Models/FisherThompson/BDDstatistics_RB.txt");
 
-         } catch (final Exception e){}
-         final BufferedWriter out = new BufferedWriter(fstream);
-         */
         int i = 0;
         do {
             System.err.println("rb "+(i++));
-/*            try
-             {
-             out.write((iteration++) + "\t" + Qkn.nodeCount());
-             out.newLine();
-             out.close();
-             } catch (final Exception e){}
-             */
+
             Qk = Qkn.id();
             Qm = image_preImage(Qk, trans, backwardTime);//.and(bddExAutomata.getReachableStates());
 
-//            BDD clockBDD = Qm.exist(bddExAutomata.sourceLocationVarSet);
-//            String nameOfClock = bddExAutomata.getAutVarName(clockBDD.var());
-//
-//            int minClockValue = getMinimalValue(clockBDD);
-//            SupremicaBDDBitVector minClockValueBDDVec = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, factory,
-//                    bddExAutomata.getSourceVariableDomain(nameOfClock).size().intValue(),minClockValue);
-//            SupremicaBDDBitVector clockBDDVec = bddExAutomata.getBDDBitVecSource(nameOfClock);
-//
-//            BDD extendedClockBDD = clockBDDVec.lth(minClockValueBDDVec);
-//            Qm = Qm.or(extendedClockBDD);
-
-
             Qkn = ((Qk.or(Qm)).and(forbidden.not()));
-            //           iteration++;
+
+            if (bddExAutomata.trackPeakBDD) {
+              maxNbrNodes = Qm.nodeCount() > maxNbrNodes ? Qm.nodeCount() : maxNbrNodes;
+              maxNbrNodes = Qkn.nodeCount() > maxNbrNodes ? Qkn.nodeCount() : maxNbrNodes;
+            }
+
         } while (!Qkn.equals(Qk));
 
-//        System.err.println("number of iterations in restrictedBackward: "+iteration);
-
-//        try{out.close();}catch (final Exception e){}
         System.err.println("RestrictedBackward exited.");
-
         return Qkn;
     }
 
@@ -240,65 +230,35 @@ public class BDDExtendedManager extends BDDAbstractManager {
         System.err.println("RestrictedForward entered.");
         final BDDMonolithicEdges bddEdges = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges());
         final BDD trans = bddEdges.getMonolithicEdgesForwardBDD();
+
+        if (bddExAutomata.trackPeakBDD)
+          maxNbrNodes = trans.nodeCount() > maxNbrNodes ? trans.nodeCount() : maxNbrNodes;
+
         final BDD forwardTime = bddEdges.getForwardClocksWithTheSameRate();
 
-//        System.out.println("restrictedForward");
-
         final BDD forbidden = forb.id();
-//        if(!bddExAutomata.orgExAutomata.getClocks().isEmpty())
-//        {
-//           forbidden = timeEvolSource(forb,forwardTime);
-//        }
 
         BDD Qkn = initialStates.and(forbidden.not());
         BDD Qk;
         BDD Qm;
 
-
-//        FileWriter fstream = null;
-//        try
-//        {
-//            fstream = new FileWriter("/Users/sajed/Desktop/fxdPoint.txt");
-//        } catch (final Exception e){}
-//        out = new BufferedWriter(fstream);
         int iteration = 0;
 
         do {
             System.err.println("RForward "+(iteration++) + "\t" + Qkn.nodeCount());
 
-//            try
-//            {
-//                out.write((iteration++) + "\t" + Qkn.nodeCount());
-//                out.newLine();
-//            } catch (final Exception e){}
-//
-//            try
-//            {
-//                out.write((iteration++) + "\t");
-//            } catch (final Exception e){}
-
-//            System.err.println("("+(iteration++)+","+Qkn.nodeCount()+")");
             Qk = Qkn.id();
             Qm = image_preImage(Qk, trans, forwardTime);
 
-//            BDD clockBDD = Qm.exist(bddExAutomata.sourceLocationVarSet);
-//            String nameOfClock = bddExAutomata.getAutVarName(clockBDD.var());
-//
-//            int minClockValue = getMinimalValue(clockBDD);
-//            SupremicaBDDBitVector minClockValueBDDVec = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, factory,
-//                    bddExAutomata.getSourceVariableDomain(nameOfClock).size().intValue(),minClockValue);
-//            SupremicaBDDBitVector clockBDDVec = bddExAutomata.getBDDBitVecSource(nameOfClock);
-//
-//            BDD extendedClockBDD = clockBDDVec.gte(minClockValueBDDVec);
-//            Qm = Qm.or(extendedClockBDD);
-//            iteration++;
             Qkn = (Qk.or(Qm)).and(forbidden.not());
+
+            if (bddExAutomata.trackPeakBDD) {
+              maxNbrNodes = Qm.nodeCount() > maxNbrNodes ? Qm.nodeCount() : maxNbrNodes;
+              maxNbrNodes = Qkn.nodeCount() > maxNbrNodes ? Qkn.nodeCount() : maxNbrNodes;
+            }
 
         } while (!Qkn.equals(Qk));
 
-//        System.err.println("number of iterations in restrictedForward: "+iteration);
-
-//        System.out.println("RestrictedForward exited.");
         System.err.println("RestrictedForward exited.");
         return Qkn;
     }
