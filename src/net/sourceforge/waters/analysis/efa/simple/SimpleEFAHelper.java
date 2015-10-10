@@ -45,6 +45,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -382,6 +383,7 @@ public class SimpleEFAHelper {
       try {
         exps.add(parser.parse(s));
       } catch (final ParseException ignored) {
+    	  return null;
       }
     }
     return exps;
@@ -397,6 +399,7 @@ public class SimpleEFAHelper {
       try {
         exps.add(parser.parse(s));
       } catch (final ParseException ignored) {
+    	  return null;
       }
     }
     return exps;
@@ -410,6 +413,40 @@ public class SimpleEFAHelper {
       result.add((EventDeclSubject) mCloner.getClone(item));
     }
     return result;
+  }
+
+  public SimpleExpressionProxy createExpression(final List<SimpleExpressionProxy> exp,
+                                                final BinaryOperator operator)
+  {
+    final ListIterator<SimpleExpressionProxy> iter = exp.listIterator(exp.size());
+    if (iter.hasPrevious()) {
+      SimpleExpressionProxy result = iter.previous();
+      while (iter.hasPrevious()) {
+        final SimpleExpressionProxy previous = iter.previous();
+        result = mFactory.createBinaryExpressionProxy(operator, previous, result);
+      }
+      return result;
+    } else {
+      return null;
+    }
+  }
+
+  public void importToIDE(final ModuleWindowInterface root, final ModuleSubject oModule,
+                          final List<ComponentProxy> list)
+   throws IOException, UnsupportedFlavorException
+  {
+    final List<Proxy> componentList = mCloner.getClonedList(list);
+    final SelectionOwner panel = root.getComponentsPanel();
+    final InstanceSubject template = new InstanceSubject(new SimpleIdentifierSubject(""), "");
+    final Transferable transfer = WatersDataFlavor.createTransferable(template);
+    final Object position = panel.getInsertInfo(transfer).get(0).getInsertPosition();
+    final List<InsertInfo> nList = new ArrayList<>();
+    for (int i = componentList.size() - 1; i >= 0; i--) {
+      final InsertInfo insert = new InsertInfo(componentList.get(i), position);
+      nList.add(insert);
+    }
+    panel.insertItems(nList);
+    panel.clearSelection(true);
   }
 
   public void importToIDE(final ModuleWindowInterface root, final ModuleProxy nModule,
@@ -583,7 +620,7 @@ public class SimpleEFAHelper {
   public static final String DEFAULT_OPENING_STRING = "(";
   public static final String DEFAULT_CLOSING_STRING = ")";
   public static final String DEFAULT_VALUE_SEPARATOR = ",";
-  public static final String DEFAULT_SPEC_SEPARATOR = ";";
+  public static final String DEFAULT_SPEC_TO = "#";
   public static final String DEFAULT_SPEC_LOCGUARD = "_";
   public static final ModuleSubjectFactory FACTORY = ModuleSubjectFactory.getInstance();
   public static final CompilerOperatorTable OPTABLE = CompilerOperatorTable.getInstance();

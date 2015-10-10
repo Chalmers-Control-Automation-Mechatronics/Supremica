@@ -59,8 +59,8 @@ public class SimpleEFAStateEncoding implements Iterable<SimpleNodeProxy>
   {
     mStateMap = new TObjectIntHashMap<>(size, 0.5f, -1);
     mStateList = new ArrayList<>(size);
-    mMarkedStates = new TIntArrayList();
-    mForbiddenStates = new TIntArrayList();
+    mMarkedStates = new TIntArrayList(25, -1);
+    mForbiddenStates = new TIntArrayList(25, -1);
     mCloner = ModuleSubjectFactory.getCloningInstance();
     mInitialStateId = -1;
   }

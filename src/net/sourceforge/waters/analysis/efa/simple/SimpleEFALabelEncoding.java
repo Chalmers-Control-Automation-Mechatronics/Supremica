@@ -129,7 +129,7 @@ public class SimpleEFALabelEncoding
     return mConstraintEncoder.decode(getConstraintId(label));
   }
 
-  public ConstraintList getConstraintByLabelId(final Integer labelId)
+  public ConstraintList getConstraintByLabelId(final int labelId)
   {
     return mConstraintEncoder.decode(getConstraintId(getTransitionLabel(labelId)));
   }
@@ -185,6 +185,11 @@ public class SimpleEFALabelEncoding
      labelId)));
   }
 
+  public boolean hasTrueCondition(final int labelId)
+  {
+    return getConstraintByLabelId(labelId).isTrue();
+  }
+
   public int getEventSize()
   {
     return mEventList.size() - 1;
@@ -200,7 +205,7 @@ public class SimpleEFALabelEncoding
     return label >> 16;
   }
 
-  private static int calculateLabel(final int event, final int con)
+  private int calculateLabel(final int event, final int con)
   {
     return (con << 16) | event;
   }

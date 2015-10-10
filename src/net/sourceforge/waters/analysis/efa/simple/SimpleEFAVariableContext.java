@@ -35,8 +35,11 @@ package net.sourceforge.waters.analysis.efa.simple;
 
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.set.TIntSet;
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
 import net.sourceforge.waters.analysis.efa.base.AbstractEFAVariableContext;
 import net.sourceforge.waters.model.base.ProxyAccessor;
@@ -112,13 +115,13 @@ public class SimpleEFAVariableContext extends AbstractEFAVariableContext<Integer
     return mVariableEncoding.decode(varId);
   }
 
-  public Collection<SimpleEFAVariable> getVariables(final TIntSet varIds)
+  public List<SimpleEFAVariable> getVariables(final int[] varIds)
   {
-    final HashSet<SimpleEFAVariable> vars = new HashSet<>(varIds.size());
-    for (final int id : varIds.toArray()) {
+    final HashSet<SimpleEFAVariable> vars = new HashSet<>(varIds.length);
+    for (final int id : varIds) {
       vars.add(getVariable(id));
     }
-    return vars;
+    return new ArrayList<>(vars);
   }
 
   public int getVariableId(final SimpleEFAVariable var)
