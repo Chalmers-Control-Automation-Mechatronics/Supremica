@@ -1218,8 +1218,6 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         if (coreachableStatesBDD == null) {
             if (synType.equals(SynthesisAlgorithm.PARTITIONBDD)) {
                 parAlgoWorker = getParAlgoWorker();
-                if (trackPeakBDD)
-                  parAlgoWorker.setTrackPeakBDD();
                 coreachableStatesBDD = parAlgoWorker.reachableBackwardWorkSetAlgorithm(getMarkedStates(), getReachableStates());
             } else {
                 coreachableStatesBDD = manager.restrictedBackward(getMarkedStates(), forbiddenStatesBDD);
@@ -1902,6 +1900,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     public BDDPartitionAlgoWorker getParAlgoWorker() {
         if (parAlgoWorker == null) {
             parAlgoWorker = BDDPartitionTypeFactory.getPartitioningAlgorithmWorker(this, synType);
+            if (trackPeakBDD)
+              parAlgoWorker.setTrackPeakBDD();
         }
         return parAlgoWorker;
     }
