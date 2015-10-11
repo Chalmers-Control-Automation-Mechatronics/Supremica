@@ -59,7 +59,7 @@ import net.sourceforge.waters.model.des.StateProxy;
  * code of an equivalence class is given by its position in the list.
  * The list may contain <CODE>null</CODE> entries to represent unused
  * or bad equivalence class numbers.</DD>
- * <DT>State-to-Class Map.</DD>
+ * <DT>State-to-Class Map.</DT>
  * <DD>An integer array that assigns to each state the number of its
  * equivalence class (which is the position of the class in the above
  * class list). Two states are equivalent of their array entries contain
@@ -396,8 +396,8 @@ public class TRPartition
    * Combines two partitions. This method computes the partition that results
    * if a state space is first partitioned using the given <CODE>first</CODE>
    * partition, and afterwards the result is further partitioned using the
-   * given <CODE>second partition. If either partition is <CODE>null</CODE>,
-   * the other one is returned.
+   * given <CODE>second</CODE> partition. If either partition is
+   * <CODE>null</CODE>, the other one is returned.
    */
   public static TRPartition combine(final TRPartition first,
                                     final TRPartition second)

@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.subject.base;
 
-import gnu.trove.set.hash.THashSet;
-
 import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.HashSet;
@@ -44,15 +42,17 @@ import java.util.Set;
 
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 
+import gnu.trove.set.hash.THashSet;
+
 
 /**
- * <E>A wrapper of the {@link THashSet} class that also implements the
+ * <P>A wrapper of the {@link THashSet} class that also implements the
  * {@link Subject} interface.</P>
  *
- * <E>This is an implementation of a mutable set with full event
+ * <P>This is an implementation of a mutable set with full event
  * notification support. In contrast to other collection subject
  * implementations, this class is intended for geometry information, and
- * therefore fires geometry change events when a change occurs.  This
+ * therefore fires geometry change events when a change occurs. This
  * implementation assumes that the set elements are immutable.</P>
  *
  * @author Robi Malik
@@ -95,6 +95,7 @@ public class NotCloningGeometrySetSubject<E>
 
   //#########################################################################
   //# Cloning
+  @Override
   public NotCloningGeometrySetSubject<E> clone()
   {
     try {
@@ -114,6 +115,7 @@ public class NotCloningGeometrySetSubject<E>
 
   //#########################################################################
   //# Interface java.util.Set
+  @Override
   public boolean add(final E element)
   {
     final boolean result = mSet.add(element);
@@ -124,16 +126,19 @@ public class NotCloningGeometrySetSubject<E>
     return result;
   }
 
+  @Override
   public boolean contains(final Object object)
   {
     return mSet.contains(object);
   }
 
+  @Override
   public Iterator<E> iterator()
   {
     return new GeometrySetIterator();
   }
 
+  @Override
   public boolean remove(final Object victim)
   {
     final boolean result = mSet.remove(victim);
@@ -144,6 +149,7 @@ public class NotCloningGeometrySetSubject<E>
     return result;
   }
 
+  @Override
   public int size()
   {
     return mSet.size();
@@ -152,11 +158,13 @@ public class NotCloningGeometrySetSubject<E>
 
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.Subject
+  @Override
   public Subject getParent()
   {
     return mParent;
   }
 
+  @Override
   public DocumentSubject getDocument()
   {
     if (mParent != null) {
@@ -166,12 +174,14 @@ public class NotCloningGeometrySetSubject<E>
     }
   }
 
+  @Override
   public void setParent(final Subject parent)
   {
     checkSetParent(parent);
     mParent = parent;
   }
 
+  @Override
   public void checkSetParent(final Subject parent)
   {
     if (parent != null && mParent != null) {
@@ -183,6 +193,7 @@ public class NotCloningGeometrySetSubject<E>
     }
   }
 
+  @Override
   public void addModelObserver(final ModelObserver observer)
   {
     if (mObservers == null) {
@@ -191,6 +202,7 @@ public class NotCloningGeometrySetSubject<E>
     mObservers.add(observer);
   }
 
+  @Override
   public void removeModelObserver(final ModelObserver observer)
   {
     if (mObservers != null &&
@@ -200,6 +212,7 @@ public class NotCloningGeometrySetSubject<E>
     }
   }
 
+  @Override
   public Collection<ModelObserver> getModelObservers()
   {
     return mObservers;
@@ -208,6 +221,7 @@ public class NotCloningGeometrySetSubject<E>
 
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.SimpleSetSubject
+  @Override
   public UndoInfo createUndoInfo(final Set<? extends E> newSet,
                                  final Set<? extends Subject> boundary)
   {
@@ -234,6 +248,7 @@ public class NotCloningGeometrySetSubject<E>
     }
   }
 
+  @Override
   public ModelChangeEvent assignMember(final int index,
                                        final Object oldValue,
                                        final Object newValue)
@@ -267,7 +282,7 @@ public class NotCloningGeometrySetSubject<E>
     final Subject source = mParent != null ? mParent.getParent() : this;
     final ModelChangeEvent event =
       ModelChangeEvent.createGeometryChanged(source,
-                                             (GeometrySubject) mParent);
+                                             mParent);
     return event;
   }
 
@@ -287,16 +302,19 @@ public class NotCloningGeometrySetSubject<E>
 
     //#######################################################################
     //# Interface java.util.Iterator
+    @Override
     public boolean hasNext()
     {
       return mIterator.hasNext();
     }
 
+    @Override
     public E next()
     {
       return mIterator.next();
     }
 
+    @Override
     public void remove()
     {
       mIterator.remove();

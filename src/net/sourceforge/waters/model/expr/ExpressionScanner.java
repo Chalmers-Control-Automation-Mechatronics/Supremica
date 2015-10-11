@@ -50,18 +50,18 @@ import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
  * <DL>
  * <DT>Separators</DT>
  * <DD>The special separator characters produce tokens of their own:
- * <CODE>'('</CODE> ({@link Token#OPENBR}),
- * <CODE>'['</CODE> ({@link Token#OPENSQ}),
- * <CODE>')'</CODE> ({@link Token#CLOSEBR}),
- * <CODE>']'</CODE> ({@link Token#CLOSESQ}),
- * <CODE>','</CODE> ({@link Token#COMMA}).</DD>
- * <DT>Operators (<CODE>{@link Token#OPERATOR}</CODE>)</DT>
+ * <CODE>'('</CODE> ({@link Token.Type#OPENBR}),
+ * <CODE>'['</CODE> ({@link Token.Type#OPENSQ}),
+ * <CODE>')'</CODE> ({@link Token.Type#CLOSEBR}),
+ * <CODE>']'</CODE> ({@link Token.Type#CLOSESQ}),
+ * <CODE>','</CODE> ({@link Token.Type#COMMA}).</DD>
+ * <DT>Operators (<CODE>{@link Token.Type#OPERATOR}</CODE>)</DT>
  * <DD>Operator tokens such as <CODE>+</CODE> or <CODE>..</CODE> as
  * defined by a {@link OperatorTable}.</DD>
- * <DT>Numbers (<CODE>{@link Token#NUMBER}</CODE>)</DT>
- * Any sequence of digits, optionally preceded by a minus sign,
- * forms a number token.
- * <DT>Symbols (<CODE>{@link Token#SYMBOL}</CODE>)</DT>
+ * <DT>Numbers (<CODE>{@link Token.Type#NUMBER}</CODE>)</DT>
+ * <DD>Any sequence of digits, optionally preceded by a minus sign,
+ * forms a number token.</DD>
+ * <DT>Symbols (<CODE>{@link Token.Type#SYMBOL}</CODE>)</DT>
  * <DD>Any character sequence matching the regular expression
  * <CODE>[a-zA-Z:_][a-zA-Z0-9:_]*</CODE> forms a symbol token. In addition, any
  * sequence of characters enclosed in curled braces <CODE>{...}</CODE> can

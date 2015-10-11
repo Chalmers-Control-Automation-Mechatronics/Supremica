@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.analysis.efa.base;
 
-import gnu.trove.set.hash.THashSet;
-
 import java.util.Collection;
 
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -48,9 +46,11 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 
+import gnu.trove.set.hash.THashSet;
+
 /**
  * A representation of an EFA variable for use in compositional analysis.
- * <p/>
+ *
  * @author Robi Malik
  */
 public abstract class AbstractEFAVariable<L>

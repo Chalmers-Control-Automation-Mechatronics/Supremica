@@ -289,7 +289,7 @@ public interface AnalysisResult
    * as counterexamples) may be removed by this method.</P>
    * @param other
    *          The record to be merged into this record.
-   * @throws ClassCaseException
+   * @throws ClassCastException
    *          to indicate that the two records merged are not of exactly the
    *          same type.
    */

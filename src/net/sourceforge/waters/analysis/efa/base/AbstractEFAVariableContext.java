@@ -52,7 +52,7 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 /**
  * A variable context for EFA compilation. Contains ranges of all variables, and
  * identifies enumeration atoms.
- * <p/>
+ *
  * @author Robi Malik
  */
 public abstract class AbstractEFAVariableContext<L,

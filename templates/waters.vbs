@@ -16,13 +16,10 @@ IF NOT FSO.FileExists(PropPath) THEN
 END IF
 
 q = """"
-JavaCmd = FindJava("1.7")
+JavaCmd = FindJava("1.8")
 IF JavaCmd = "" THEN
-  JavaCmd = FindJava("1.8")
-  IF JavaCmd = "" THEN
-    WScript.echo("Could not locate Java 1.7 or 1.8." & VBNewLine & "Please make sure it is installed correctly.")
-    Wscript.Quit(1)
-  END IF
+  WScript.echo("Could not locate Java 1.8." & VBNewLine & "Please make sure it is installed correctly.")
+  Wscript.Quit(1)
 END IF
 Jar = ScriptDir & "\Supremica.jar"
 WatersCmd = q & JavaCmd & q & " -classpath " & q & Jar & q & " org.supremica.gui.ide.IDE -p " & q & PropPath & q

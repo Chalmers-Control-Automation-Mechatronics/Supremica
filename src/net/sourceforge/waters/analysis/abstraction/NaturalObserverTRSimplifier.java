@@ -33,13 +33,8 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.set.hash.TIntHashSet;
-import gnu.trove.stack.TIntStack;
-import gnu.trove.stack.array.TIntArrayStack;
-
 import java.util.ArrayList;
+
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -47,6 +42,12 @@ import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
+
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
 
 /**
  * <P>An implementation of the natural observer algorithm.</P>
@@ -56,20 +57,18 @@ import net.sourceforge.waters.model.analysis.OverflowException;
  * and repartitions accordingly. However, if the natural projection is not an
  * observer, i.e., the quotient automaton has transitions with unobservable
  * events ({@link EventEncoding#TAU}) and/or it is nondeterministic w.r.t.
- * observable events, the polynomial-time extention algorithm in [2] is used to
+ * observable events, the polynomial-time extension algorithm in [2] is used to
  * resolve it. While the algorithm does not guarantee to find a minimal set of
- * observable events, it is in practice often reasonably small.
- * </P>
- * <I>Reference:</I>
- * <p/>
+ * observable events, it is in practice often reasonably small.</P>
+ *
+ * <P><I>References:</I><BR>
  * [1] K. C. Wong and W. M. Wonham, On the Computation of Observers in
  * Discrete-Event Systems, Discrete Event Dynamic Systems, vol. 14, no. 1, pp.
- * 55�107, 2004.
- * <p/>
+ * 55-107, 2004.<BR>
  * [2] L. Feng and W. M. Wonham, On the Computation of Natural Observers in
  * Discrete-Event Systems, Discrete Event Dynamic Systems, vol. 20, no. 1, pp.
- * 63�102, 2008.
- * <p/>
+ * 63-102, 2008.</P>
+ *
  * @author Mohammad Reza Shoaei
  */
 public class NaturalObserverTRSimplifier
@@ -80,14 +79,11 @@ public class NaturalObserverTRSimplifier
   //# Constructor
   /**
    * The constructor of the the natural observer simplifier.
-   * <p/>
    * @param rel       The original transition relation
    * @param obsEvents Set of observable events. This set will be modified
    *                  iteratively s.t. the corresponding natural projection
    *                  becomes an observer. The end result can be retrieved by
    *                  {@link #getObservableEvents()} method.
-   * <p/>
-   * @throws OverflowException
    */
   public NaturalObserverTRSimplifier(final ListBufferTransitionRelation rel,
                                      final int[] obsEvents)
@@ -111,11 +107,8 @@ public class NaturalObserverTRSimplifier
    * The constructor of the the natural observer simplifier. In this, the local
    * events (i.e. events with local status {@link EventStatus#STATUS_LOCAL})
    * are considered as unobservable events hence will be projected.
-   * <p/>
    * @param rel The original transition relation where the local events are
    *            considered as unobservable events hence will be projected.
-   * <p/>
-   * @throws OverflowException
    */
   public NaturalObserverTRSimplifier(final ListBufferTransitionRelation rel)
    throws OverflowException
@@ -157,7 +150,6 @@ public class NaturalObserverTRSimplifier
 
   /**
    * Sets the mode which redundant transitions are to be removed.
-   * <p/>
    * @see ObservationEquivalenceTRSimplifier.TransitionRemoval
    */
   public void setTransitionRemovalMode(
@@ -168,7 +160,6 @@ public class NaturalObserverTRSimplifier
 
   /**
    * Gets the mode which redundant transitions are to be removed.
-   * <p/>
    * @see ObservationEquivalenceTRSimplifier.TransitionRemoval
    */
   public ObservationEquivalenceTRSimplifier.TransitionRemoval getTransitionRemovalMode()
@@ -180,7 +171,6 @@ public class NaturalObserverTRSimplifier
    * Sets the transition limit. The transition limit specifies the maximum
    * number of transitions (including stored silent transitions of the
    * transitive closure) that will be stored.
-   * <p/>
    * @param limit The new transition limit, or {@link Integer#MAX_VALUE} to
    *              allow an unlimited number of transitions.
    */
@@ -191,7 +181,6 @@ public class NaturalObserverTRSimplifier
 
   /**
    * Gets the transition limit.
-   * <p/>
    * @see #setTransitionLimit(int) setTransitionLimit()
    */
   public int getTransitionLimit()
@@ -289,7 +278,7 @@ public class NaturalObserverTRSimplifier
           final int targetClass = pmap[target];
           // If it is not a selfloop
           if (sourceClass != targetClass) {
-            // Finding the correponding unobservable event on the 
+            // Finding the correponding unobservable event on the
             // original transition relation
             mIter.resetState(source);
             while (mIter.advance()) {
@@ -321,7 +310,7 @@ public class NaturalObserverTRSimplifier
           int targets = 1;
           iter.reset(source, event);
           while (iter.advance()) {
-            // If form the source state there are more than one outgoing 
+            // If form the source state there are more than one outgoing
             // transitions labeled by this event
             if (targets++ > 1) {
               final TIntHashSet key = N.get(source);
@@ -337,7 +326,7 @@ public class NaturalObserverTRSimplifier
         }
       }
     }
-    // If it is nondeterministic then fix it by making hidden (unobservable) 
+    // If it is nondeterministic then fix it by making hidden (unobservable)
     // events in the cosets to observable
     if (!N.isEmpty()) {
       modified = true;

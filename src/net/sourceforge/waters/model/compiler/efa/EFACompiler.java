@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.model.compiler.efa;
 
-import gnu.trove.set.hash.THashSet;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -87,21 +85,23 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
 
+import gnu.trove.set.hash.THashSet;
+
 
 /**
- * The third pass of the compiler.
- * <P>
- * This compiler accepts a module ({@link ModuleProxy}) as input and
+ * <P>The third pass of the compiler.</P>
+ *
+ * <P>This compiler accepts a module ({@link ModuleProxy}) as input and
  * produces another module as output. It expands all guard/action blocks
  * by partitioning the events, and replaces all variables by simple
  * components. Event arrays, aliases, foreach constructs, and
  * instantiations are not allowed in the input; these should be expanded by
  * a previous call the the module instance compiler ({@link
  * net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler
- * ModuleInstanceCompiler}).
- * <P>
- * The EFA compiler ensures that the resultant module only contains
- * nodes of the following types:
+ * ModuleInstanceCompiler}).</P>
+ *
+ * <P>The EFA compiler ensures that the resultant module only contains
+ * nodes of the following types:</P>
  * <UL>
  * <LI>{@link EventDeclProxy}, where only simple events are defined,
  *     i.e., the list of ranges is guaranteed to be empty;</LI>
@@ -110,8 +110,7 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
  *
  * <P><STRONG>Algorithm</STRONG></P>
  *
- * The EFA compiler proceeds in four passes:
- * <P>
+ * <P>The EFA compiler proceeds in four passes:</P>
  * <OL>
  * <LI>Identify all components (simple or variable) and their state
  *     space.</LI>

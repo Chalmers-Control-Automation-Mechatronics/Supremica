@@ -361,7 +361,9 @@
           description="Generate Javadoc documentation.">
     <delete dir="${javadoc}"/>
     <mkdir dir="${javadoc}"/>
-    <javadoc destdir="${javadoc}" windowtitle="Waters API">
+    <javadoc destdir="${javadoc}"
+             windowtitle="Waters API"
+             additionalparam="-Xdoclint:all,-syntax,-html,-missing">
       <packageset dir="${src}">
         <include name="net/sourceforge/waters/xsd/**/*"/>
         <exclude name="net/sourceforge/waters/xsd/*/impl/**"/>

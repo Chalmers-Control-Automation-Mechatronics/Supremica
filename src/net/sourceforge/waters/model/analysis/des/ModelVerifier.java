@@ -65,7 +65,7 @@ import net.sourceforge.waters.model.des.TraceProxy;
  * <CODE>{@link ModelAnalyzerFactory} vfactory =
  *   {@link net.sourceforge.waters.analysis.monolithic.MonolithicModelAnalyzerFactory}.{@link
  *   net.sourceforge.waters.analysis.monolithic.MonolithicModelAnalyzerFactory#getInstance()
- *   getInstance}(); //</CODE> <I>e.g.</I></CODE><BR>
+ *   getInstance}(); //</CODE> <I>e.g.</I><BR>
  * <CODE>ModelVerifier verifier = vfactory.{@link
  *   ModelAnalyzerFactory#createControllabilityChecker(ProductDESProxyFactory)
  *   createControllabilityChecker}(desfactory); //</CODE> <I>e.g.</I><BR>

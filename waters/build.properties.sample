@@ -10,7 +10,7 @@
 # JAVADOC LINKS
 
 # The following URLs are passed to javadoc to link to external documentation.
-java.api.url = http://docs.oracle.com/javase/7/docs/api/
+java.api.url = http://docs.oracle.com/javase/8/docs/api/
 javabdd.api.url = http://javabdd.sourceforge.net/apidocs/
 jaxme.api.url = http://ws.apache.org/jaxme/apidocs/
 junit.api.url = http://junit.sourceforge.net/javadoc/

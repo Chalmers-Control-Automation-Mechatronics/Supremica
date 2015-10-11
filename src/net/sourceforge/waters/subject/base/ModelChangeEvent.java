@@ -46,8 +46,8 @@ import net.sourceforge.waters.model.base.ProxyTools;
  * <P>A notification sent by a subject to inform its observers that its
  * state has been changed.</P>
  *
- * <P>All objects in the subject implementation support the <EMPH>observer
- * design pattern</EMPH>. Whenever some aspect of a subject is changed,
+ * <P>All objects in the subject implementation support the <EM>observer
+ * design pattern</EM>. Whenever some aspect of a subject is changed,
  * a <CODE>ModelChangeEvent</CODE> is created and passed to the
  * {@link ModelObserver#modelChanged(ModelChangeEvent) modelChanged()}
  * method of all registered observers, as well as all observers registered
@@ -55,7 +55,7 @@ import net.sourceforge.waters.model.base.ProxyTools;
  *
  * <P>The model change event class provides detailed information about the
  * change that is signalled.  The specific type of change signalled is
- * identified by the event <EMPH>kind</EMPH>, which can take the following
+ * identified by the event <EM>kind</EM>, which can take the following
  * values.</P>
  * <UL>
  * <LI>{@link #ITEM_ADDED}</LI>
@@ -65,9 +65,9 @@ import net.sourceforge.waters.model.base.ProxyTools;
  * <LI>{@link #GEOMETRY_CHANGED}</LI>
  * <LI>{@link #GENERAL_NOTIFICATION}</LI>
  * </UL>
- * <P>In addition, each event has its <EMPH>source</EMPH> that identifies
+ * <P>In addition, each event has its <EM>source</EM> that identifies
  * the item that was affected by the change, and may have an additional
- * <EMPH>value</EMPH> and an index representing the position of a change in
+ * <EM>value</EM> and an index representing the position of a change in
  * a list. The precise meaning of these fields depends on the event
  * kind.</P>
  *

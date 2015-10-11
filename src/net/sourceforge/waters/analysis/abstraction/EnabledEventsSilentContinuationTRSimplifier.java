@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.set.hash.TIntHashSet;
-
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -51,6 +49,8 @@ import net.sourceforge.waters.analysis.tr.WatersIntHashingStrategy;
 import net.sourceforge.waters.analysis.tr.WatersIntIntHashMap;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.des.AutomatonTools;
+
+import gnu.trove.set.hash.TIntHashSet;
 
 
 /**

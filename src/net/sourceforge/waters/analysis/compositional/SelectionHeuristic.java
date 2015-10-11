@@ -133,7 +133,7 @@ public abstract class SelectionHeuristic<T extends Comparable<? super T>>
    * determined individually by each subclass. The default implementation
    * return this heuristic if it is decisive, and otherwise creates a
    * one-step chain that uses standard comparison through the {@link
-   * java.util.Comparable Comparable} interface if this heuristic fails to
+   * java.lang.Comparable Comparable} interface if this heuristic fails to
    * distinguish two candidates.
    */
   public SelectionHeuristic<T> createDecisiveHeuristic()

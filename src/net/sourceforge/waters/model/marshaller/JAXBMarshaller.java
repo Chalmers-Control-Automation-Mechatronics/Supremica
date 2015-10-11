@@ -178,7 +178,7 @@ public abstract class JAXBMarshaller
    * Write a document to a file.
    * @param  filename The name of the file to be written.
    * @param  docproxy The document to be written.
-   * @throws JAXBException to indicate a failure while writing the
+   * @throws WatersMarshalException to indicate a failure while writing the
    *                  XML structures.
    * @throws IOException to indicate that the output file could not be
    *                  opened.

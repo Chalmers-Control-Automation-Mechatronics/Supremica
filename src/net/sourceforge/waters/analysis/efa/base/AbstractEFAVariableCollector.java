@@ -47,10 +47,10 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 /**
  * A utility class to collect all the EFA variables (primed or not) in a
  * constraint or transition label encoding.
- * <p/>
+ *
  * @author Robi Malik
  */
-public abstract class AbstractEFAVariableCollector<L, 
+public abstract class AbstractEFAVariableCollector<L,
                                                    V extends AbstractEFAVariable<L>>
  extends DescendingModuleProxyVisitor
 {
@@ -68,7 +68,6 @@ public abstract class AbstractEFAVariableCollector<L,
   //# Invocation
   /**
    * Collects all variables in the given expression.
-   * <p/>
    * @param expr The expression to be searched.
    * @param vars All variables will be added to this collection.
    */
@@ -80,7 +79,6 @@ public abstract class AbstractEFAVariableCollector<L,
 
   /**
    * Collects all variables in the given constraint list.
-   * <p/>
    * @param update The constraint list to be searched.
    * @param vars   All variables will be added to this collection.
    */
@@ -92,7 +90,6 @@ public abstract class AbstractEFAVariableCollector<L,
 
   /**
    * Collects all variables in the given expression.
-   * <p/>
    * @param expr     The expression to be searched.
    * @param unprimed Unprimed variables will be added to this collection. This
    *                 may be <CODE>null</CODE> to suppress collecting unprimed
@@ -117,7 +114,6 @@ public abstract class AbstractEFAVariableCollector<L,
 
   /**
    * Collects all variables in the given constraint list.
-   * <p/>
    * @param update   The constraint list to be searched.
    * @param unprimed Unprimed variables will be added to this collection. This
    *                 may be <CODE>null</CODE> to suppress collecting unprimed

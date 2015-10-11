@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.set.hash.THashSet;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -45,6 +43,8 @@ import java.util.Set;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
+
+import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -127,8 +127,6 @@ public class Candidate implements Comparable<Candidate>
 
   /**
    * Sets the local events for this candidate.
-   *
-   * @param localEvents
    */
   public void setLocalEvents(final Set<EventProxy> localEvents)
   {

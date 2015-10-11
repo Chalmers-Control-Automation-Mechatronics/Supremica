@@ -33,13 +33,6 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TLongObjectHashMap;
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
-import gnu.trove.stack.TIntStack;
-import gnu.trove.stack.array.TIntArrayStack;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -66,6 +59,13 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.apache.log4j.Logger;
+
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TLongObjectHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
 
 
 /**
@@ -1277,7 +1277,7 @@ public class ListBufferTransitionRelation implements EventStatusProvider
 
   /**
    * Creates a read-only iterator over all transitions with the given
-   * event.</P> The iterator returned is set up to return the first transition
+   * event. The iterator returned is set up to return the first transition
    * with the given event after calling {@link TransitionIterator#advance()}.
    * It does not implement the methods
    * {@link TransitionIterator#resetState(int)} or
@@ -2394,7 +2394,6 @@ public class ListBufferTransitionRelation implements EventStatusProvider
    *          Configuration flags defining which transition buffers are to be
    *          used from now on. Should be one of {@link #CONFIG_SUCCESSORS},
    *          {@link #CONFIG_PREDECESSORS}, or {@link #CONFIG_ALL}.
-   * @throws OverflowException
    */
   public void reset(final int numStates,
                     final int dumpIndex,
@@ -2419,7 +2418,6 @@ public class ListBufferTransitionRelation implements EventStatusProvider
    *          Configuration flags defining which transition buffers are to be
    *          used from now on. Should be one of {@link #CONFIG_SUCCESSORS},
    *          {@link #CONFIG_PREDECESSORS}, or {@link #CONFIG_ALL}.
-   * @throws OverflowException
    */
   public void reset(final int numStates,
                     final int numTrans,
@@ -2440,7 +2438,6 @@ public class ListBufferTransitionRelation implements EventStatusProvider
    *          Configuration flags defining which transition buffers are to be
    *          used from now on. Should be one of {@link #CONFIG_SUCCESSORS},
    *          {@link #CONFIG_PREDECESSORS}, or {@link #CONFIG_ALL}.
-   * @throws OverflowException
    */
   public void reset(final int numTrans, final int config)
     throws OverflowException

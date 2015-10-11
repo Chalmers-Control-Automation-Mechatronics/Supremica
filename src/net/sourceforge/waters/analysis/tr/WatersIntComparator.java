@@ -34,7 +34,7 @@
 package net.sourceforge.waters.analysis.tr;
 
 /**
- * An interface for compare <CODE>int</CDE> primitives
+ * An interface for compare <CODE>int</CODE> primitives
  *
  * @author Robi Malik
  */

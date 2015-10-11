@@ -39,6 +39,13 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
+
+/**
+ * An exception to report controllability issues when compiling EFSMs.
+ *
+ * @author Roger Su
+ */
+
 public class EFSMControllabilityException extends EvalException
 {
   private static final long serialVersionUID = 5983937125200118084L;
@@ -46,17 +53,15 @@ public class EFSMControllabilityException extends EvalException
   //#########################################################################
   //# Constructors
   /**
-   * Constructs an exception with the error message in the form of the
-   * examples below.
-   * <p>
-   * <STRONG>Examples:</STRONG>
+   * <P>Constructs an exception with the error message in the form of the
+   * examples below.</P>
+   *
+   * <P><STRONG>Examples:</STRONG></P>
    * <UL>
    * <LI>"Specification '____' attempts to modify the variable '____' on the
    * uncontrollable event '____."</LI>
-   * <p>
    * <LI>"Supervisor '____' attempts to modify the variable '____' on the
    * uncontrollable event '____'."</LI>
-   * <p>
    * <LI>"Property '____' attempts to modify the variable '____' on the
    * event '____'."</LI></UL>
    *

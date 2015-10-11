@@ -33,9 +33,6 @@
 
 package net.sourceforge.waters.analysis.efa.simple;
 
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.set.hash.THashSet;
-
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
@@ -98,6 +95,9 @@ import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
+
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -435,7 +435,7 @@ public class SimpleEFAHelper {
                           final List<ComponentProxy> list)
    throws IOException, UnsupportedFlavorException
   {
-    final List<Proxy> componentList = mCloner.getClonedList(list);
+    final List<ComponentProxy> componentList = mCloner.getClonedList(list);
     final SelectionOwner panel = root.getComponentsPanel();
     final InstanceSubject template = new InstanceSubject(new SimpleIdentifierSubject(""), "");
     final Transferable transfer = WatersDataFlavor.createTransferable(template);

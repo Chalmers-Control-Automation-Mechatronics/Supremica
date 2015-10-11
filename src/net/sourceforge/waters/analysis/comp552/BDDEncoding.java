@@ -73,8 +73,8 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * Events and states are encoded in binary, with the most significant bit
  * appearing first in the ordering.</P>
  *
- * <H4>You are encouraged to modify this class or replace it by something
- * better.</H4>
+ * <P><STRONG>You are encouraged to modify this class or replace it by
+ * something better.</STRONG></P>
  *
  * <P>This class mainly serves as a demonstration how to encode
  * automata using BDDs. It is kept simple and leaves a lot of room for

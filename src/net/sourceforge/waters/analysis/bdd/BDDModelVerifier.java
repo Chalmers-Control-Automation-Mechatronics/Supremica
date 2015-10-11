@@ -33,9 +33,6 @@
 
 package net.sourceforge.waters.analysis.bdd;
 
-import gnu.trove.iterator.TObjectIntIterator;
-import gnu.trove.map.hash.TObjectIntHashMap;
-
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -70,8 +67,11 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.apache.log4j.Logger;
 
+import gnu.trove.iterator.TObjectIntIterator;
+import gnu.trove.map.hash.TObjectIntHashMap;
+
 /**
- * An abstract base class for all BDD-based model verifiers.</P>
+ * An abstract base class for all BDD-based model verifiers.
  *
  * @author Robi Malik
  */

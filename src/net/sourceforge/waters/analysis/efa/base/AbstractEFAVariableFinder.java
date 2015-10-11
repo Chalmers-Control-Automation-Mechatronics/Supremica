@@ -48,7 +48,7 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 /**
  * A utility class to determine whether a given variable occurs in an expression
  * in primed or unprimed form.
- * <p/>
+ *
  * @author Robi Malik
  */
 public abstract class AbstractEFAVariableFinder<L,
@@ -90,10 +90,8 @@ public abstract class AbstractEFAVariableFinder<L,
 
   /**
    * Determines if a given variable is in the given constraint list.
-   * <p/>
    * @param constraints The constraint list to be searched.
    * @param var    The variable to be searched for.
-   * <p/>
    * @return <CODE>true</CODE> if the variable has been found in its primed or
    *         unprimed form. More detailed results can be queried using the
    *         {@link #containsVariable()} and {@link #containsPrimedVariable()}
@@ -119,7 +117,6 @@ public abstract class AbstractEFAVariableFinder<L,
 
   /**
    * Determines if a given expression contains a primed identifier.
-   * <p/>
    * @param expr The expression to be searched.
    */
   public boolean findPrime(final SimpleExpressionProxy expr)
@@ -137,7 +134,6 @@ public abstract class AbstractEFAVariableFinder<L,
 
   /**
    * Determines if a given constraint list contains a primed identifier.
-   * <p/>
    * @param constraints The constraint list to be searched.
    */
   public boolean findPrime(final ConstraintList constraints)
@@ -160,7 +156,6 @@ public abstract class AbstractEFAVariableFinder<L,
 
   /**
    * Determines if a given expression contains a primed identifier.
-   * <p/>
    * @param expr The expression to be searched.
    */
   public boolean findPrimeVariable(final SimpleExpressionProxy expr, final V var)
@@ -179,7 +174,6 @@ public abstract class AbstractEFAVariableFinder<L,
 
   /**
    * Determines if a given constraint list contains a primed identifier.
-   * <p/>
    * @param constraints The constraint list to be searched.
    */
   public boolean findPrimeVariable(final ConstraintList constraints, final V var)

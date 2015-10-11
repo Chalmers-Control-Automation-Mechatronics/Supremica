@@ -33,12 +33,6 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import gnu.trove.iterator.TIntIterator;
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TObjectIntHashMap;
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -81,6 +75,12 @@ import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.des.ConflictKind;
 
 import org.apache.log4j.Logger;
+
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 
 /**
@@ -986,8 +986,6 @@ public class CompositionalGeneralisedConflictChecker
   /**
    * Sets the maximum number of states for an automaton being constructed by the
    * synchronous product.
-   *
-   * @param limit
    */
   public void setInternalStepNodeLimit(final int limit)
   {
@@ -1036,8 +1034,6 @@ public class CompositionalGeneralisedConflictChecker
   /**
    * Sets the maximum number of Transition for an automaton being constructed by
    * the synchronous product.
-   *
-   * @param limit
    */
   public void setInternalStepTransitionLimit(final int limit)
   {

@@ -41,7 +41,6 @@ package net.sourceforge.waters.analysis.monolithic;
  *
  * @author Eric D. Friedman
  * @version $Id$
- * @param <E>
  */
 
 abstract class StateHash<E> implements Cloneable {
@@ -113,6 +112,7 @@ abstract class StateHash<E> implements Cloneable {
         setUp((int)Math.ceil(initialCapacity / loadFactor));
     }
 
+    @Override
     public Object clone() {
         try {
             return super.clone();
@@ -132,7 +132,7 @@ abstract class StateHash<E> implements Cloneable {
 
     /**
      * Ensure that this hashtable has sufficient capacity to hold
-     * <tt>desiredCapacity<tt> <b>additional</b> elements without
+     * <CODE>desiredCapacity</CODE> <b>additional</b> elements without
      * requiring a rehash.  This is a tuning method you can call
      * before doing a large insert.
      *

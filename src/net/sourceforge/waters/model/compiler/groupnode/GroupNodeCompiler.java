@@ -73,18 +73,18 @@ import net.sourceforge.waters.model.module.VariableComponentProxy;
 
 
 /**
- * The second pass of the compiler.
- * <P>
- * This pass of the compiler accepts a module ({@link ModuleProxy}) as the
+ * <P>The second pass of the compiler.</P>
+ *
+ * <P>This pass of the compiler accepts a module ({@link ModuleProxy}) as the
  * input and produces another module as the output. It assumes that the input
  * module has neither foreach blocks nor instantiations, and it removes the
  * group nodes by explicitly creating new edges between their simple child
  * nodes ({@link SimpleNodeProxy}). This compiler also explicitly expands
- * guards and pass them to the next pass of the {@link ModuleCompiler}.
- * <P>
- * It is ensured that the resultant module only contains objects of the
- * following types:
- * <UI>
+ * guards and pass them to the next pass of the {@link ModuleCompiler}.</P>
+ *
+ * <P>It is ensured that the resultant module only contains objects of the
+ * following types:</P>
+ * <UL>
  * <LI>{@link EventDeclProxy}, where only simple events are defined,
  *     i.e. the list of ranges is guaranteed to be empty;</LI>
  * <LI>{@link SimpleComponentProxy} containing no {@link GroupNodeProxy};</LI>

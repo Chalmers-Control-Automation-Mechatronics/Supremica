@@ -48,7 +48,7 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
  * controlled object to abort. It is possible to restart the timer by calling
  * the watchdog's {@link #reset()} method.</P>
  *
- * <P>Sample code:<P>
+ * <P><I>Sample code:</I></P>
  * <PRE> {@link ModelAnalyzer} analyzer;
  * Watchdog watchdog = new {@link #Watchdog(Abortable, int) Watchdog}(analyer, 10);  // 10 sec timeout
  * watchdog.{@link Thread#start() start}();

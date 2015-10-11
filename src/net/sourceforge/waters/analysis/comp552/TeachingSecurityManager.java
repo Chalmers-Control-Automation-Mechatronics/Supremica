@@ -114,6 +114,7 @@ class TeachingSecurityManager extends SecurityManager
 
   //#########################################################################
   //# Overrides for Base Class java.lang.SecurityManager
+  @Override
   public void checkAccept(final String host, final int port)
   {
     throw new SecurityException
@@ -122,6 +123,7 @@ class TeachingSecurityManager extends SecurityManager
        host + ", port " + port + ".)");
   }
 
+  @Override
   public void checkConnect(final String host, final int port)
   {
     throw new SecurityException
@@ -130,16 +132,19 @@ class TeachingSecurityManager extends SecurityManager
        host + ", port " + port + ".)");
   }
 
+  @Override
   public void checkConnect(final String host, final int port,
                            final Object context)
   {
     checkConnect(host, port);
   }
 
+  @Override
   public void checkCreateClassLoader()
   {
   }
 
+  @Override
   public void checkExit(final int status)
   {
     if (mEnabled) {
@@ -147,6 +152,7 @@ class TeachingSecurityManager extends SecurityManager
     }
   }
 
+  @Override
   public void checkLink(final String libname)
   {
     if (mEnabled && !mAllowedLibraries.contains(libname)) {
@@ -156,6 +162,7 @@ class TeachingSecurityManager extends SecurityManager
     }
   }
 
+  @Override
   public void checkListen(final int port)
   {
     throw new SecurityException
@@ -163,6 +170,8 @@ class TeachingSecurityManager extends SecurityManager
        "(Attempted to listen on port " + port + ".)");
   }
 
+  @Override
+  @Deprecated
   public void checkMemberAccess(final Class<?> clazz, final int which)
   {
     if (mEnabled || clazz == getClass()) {
@@ -170,6 +179,7 @@ class TeachingSecurityManager extends SecurityManager
     }
   }
 
+  @Override
   public void checkPermission(final Permission perm)
   {
     final String name = perm.getName();
@@ -222,16 +232,19 @@ class TeachingSecurityManager extends SecurityManager
     }
   }
 
+  @Override
   public void checkPackageAccess(final String pack)
   {
   }
 
+  @Override
   public void checkSetFactory()
   {
     throw new SecurityException
       ("Network access disabled!\n(Attempted set socket a factory.)");
   }
 
+  @Override
   public void checkSystemClipboardAccess()
   {
     throw new SecurityException("Clipboard access disabled!");

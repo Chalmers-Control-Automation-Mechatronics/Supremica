@@ -61,7 +61,8 @@ import net.sourceforge.waters.model.base.Proxy;
  * <DT>{@link ForeachProxy}</DT>
  * <DD>This construct can be used to include several events by processing a
  * loop.</DD>
-  *
+ * </DL>
+ *
  * @author Robi Malik
  */
 
