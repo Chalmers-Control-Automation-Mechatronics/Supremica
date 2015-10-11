@@ -1,7 +1,5 @@
 package org.supremica.automata.BDD.EFA;
 
-import gnu.trove.list.array.TIntArrayList;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,10 +36,11 @@ import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.util.ActionTimer;
 
+import gnu.trove.list.array.TIntArrayList;
+
 
 /**
- *
- * @author sajed
+ * @author sajed, zhennan
  */
 public class BDDExtendedSynthesizer {
 
@@ -72,22 +71,6 @@ public class BDDExtendedSynthesizer {
 
     public void synthesize(final EditorSynthesizerOptions options)
     {
- /*
-        Map<String,Integer> var2val = new HashMap<String,Integer>();
-        for(VariableComponentProxy var:theAutomata.getVars())
-        {
-            int i = Integer.parseInt(((BinaryExpressionProxy)(var.getInitialStatePredicate())).getRight().toString());
-            var2val.put(var.getName(), i);
-        }
-*/
-/*
-        System.err.println("Computing reachablity graph");
-        ExtendedAutomaton efa = theAutomata.iterator().next();
-        EFAMonlithicReachability efaMR = new EFAMonlithicReachability(efa.getComponent(), theAutomata.getVars(),efa.getAlphabet());
-        theAutomata.addAutomaton(new ExtendedAutomaton(theAutomata, efaMR.createEFA()));
-        System.err.println("Reachablity graph computed");
-*/
-
         synthesisTimer = new ActionTimer();
 
         if(options.getSynthesisType().equals(SynthesisType.CONTROLLABLE))
@@ -115,34 +98,12 @@ public class BDDExtendedSynthesizer {
         else if(options.getSynthesisType().equals(SynthesisType.UNSAFETY))
         {
             synthesisTimer.start();
-
-//            BDDDomain v11Domain = bddAutomata.getSourceVariableDomain(bddAutomata.theIndexMap.getVariableIndexByName("v11"));
-//            BDDDomain v12Domain = bddAutomata.getSourceVariableDomain(bddAutomata.theIndexMap.getVariableIndexByName("v12"));
-//            BDDDomain v21Domain = bddAutomata.getSourceVariableDomain(bddAutomata.theIndexMap.getVariableIndexByName("v21"));
-//            BDDDomain v22Domain = bddAutomata.getSourceVariableDomain(bddAutomata.theIndexMap.getVariableIndexByName("v22"));
-//            BDDDomain VR1Domain = bddAutomata.getSourceVariableDomain(bddAutomata.theIndexMap.getVariableIndexByName("r1"));
-//            BDDDomain VR2Domain = bddAutomata.getSourceVariableDomain(bddAutomata.theIndexMap.getVariableIndexByName("r2"));
-//            BDDDomain VR3Domain = bddAutomata.getSourceVariableDomain(bddAutomata.theIndexMap.getVariableIndexByName("r3"));
-//
-//            BDD state1 = bddAutomata.getManager().createBDD(0,v11Domain).and(
-//                    bddAutomata.getManager().createBDD(1,v12Domain)).and(
-//                    bddAutomata.getManager().createBDD(1,v21Domain)).and(
-//                    bddAutomata.getManager().createBDD(0,v22Domain));
-//
-//            BDD state2 = bddAutomata.getManager().createBDD(1,v11Domain).and(
-//                    bddAutomata.getManager().createBDD(0,v12Domain)).and(
-//                    bddAutomata.getManager().createBDD(0,v21Domain)).and(
-//                    bddAutomata.getManager().createBDD(1,v22Domain));
-//
-//
-//            BDD minimalDeadlocks = state1.or(state2);
             statesAfterSynthesis =  bddAutomata.getUnsafeStates();
             nbrOfStates = bddAutomata.nbrOfBoundaryUnsafeStates;
             synthesisTimer.stop();
         }
 
     }
-
 
     public String getFeasibleValues(final String variable)
     {
@@ -156,6 +117,10 @@ public class BDDExtendedSynthesizer {
     public long nbrOfStates()
     {
         return nbrOfStates;
+    }
+
+    public int peakBDDNodes() {
+      return bddAutomata.getMaxNbrNodes();
     }
 
     public BDD getResult()
@@ -192,33 +157,6 @@ public class BDDExtendedSynthesizer {
         while(it.hasNext())
         {
             final String sigmaName = it.next();
-//            System.err.println("The currrrrent event is: "+ sigmaName);
-//            Set<String> genes = new HashSet<String>(bddAutomata.variableOrderingNames);
-//            genes.remove("Events");
-//            genes.remove("1");
-//            FitnessEvaluation fitnessEvaluation = new FitnessEvaluation() {
-//                Map<Chromosome,Integer> cache = new HashMap<Chromosome, Integer>();
-//                public int eval(Chromosome chromosome)
-//                {
-//                    if(cache.containsKey(chromosome))
-//                    {
-//                        return cache.get(chromosome);
-//                    }
-//                    else
-//                    {
-//                        int[] optimalVarOrdering = decodeToIntArray(chromosome);
-////                        System.err.println("Changing var order...");
-//                        bddAutomata.getManager().getFactory().setVarOrder(optimalVarOrdering);
-////                        System.err.println("Change of var order completed.");
-//                        BDDExtendedGuardGenerator bddgg = new BDDExtendedGuardGenerator(bddAutomata, sigmaName, statesAfterSynthesis, options);
-//                        cache.put(chromosome, bddgg.getNbrOfTerms());
-//                        return bddgg.getNbrOfTerms();
-//                    }
-//                }
-//            };
-//            int[] optimalVarOrdering = decodeToIntArray((new Genetics(fitnessEvaluation, genes, new Genetics.GeneticOptions()).runGenetics()));
-//            bddAutomata.getManager().getFactory().setVarOrder(optimalVarOrdering);
-
             bddgg = new BDDExtendedGuardGenerator(bddAutomata, sigmaName, statesAfterSynthesis, options);
             event2guard.put(sigmaName, bddgg);
         }
@@ -310,8 +248,6 @@ public class BDDExtendedSynthesizer {
                                                     ep.getEndPoint());
 
                   edgesToBeAdded.add(manipulatedEdge);
-
-                  //
                 }
 
                 // next, we insert the generated guards to the manipulated edge
@@ -375,7 +311,6 @@ public class BDDExtendedSynthesizer {
                                                    aut.getNameToLocationMap().keySet(),
                                                    aut.getInitialLocation().getName(), markedValues);
 
-        // add updates to the edges
         for (final EdgeSubject edge:aut.getComponent().getGraph().getEdgesModifiable())
         {
           final String targetState = edge.getTarget().getName();

@@ -1,13 +1,5 @@
 package org.supremica.automata.BDD.EFA;
 
-/**
- *
- * @author Sajed Miremadi, Zhennan Fei
- */
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.set.hash.TIntHashSet;
-
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.math.BigInteger;
@@ -43,6 +35,14 @@ import org.supremica.automata.algorithms.EditorSynthesizerOptions;
 import org.supremica.automata.algorithms.SynthesisAlgorithm;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
+
+/**
+ *
+ * @author Sajed Miremadi, Zhennan Fei
+ */
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.TIntHashSet;
 
 public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
@@ -173,6 +173,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     public BDD minValueOfVarBDD = null;
     private String optVarName = null;
 
+    public boolean trackPeakBDD = false;
+
     public BDDExtendedAutomata(final ExtendedAutomata orgExAutomata, final EditorSynthesizerOptions options) {
         this.orgExAutomata = orgExAutomata;
         locaVarSuffix = ExtendedAutomata.getlocVarSuffix();
@@ -192,6 +194,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         variableOrdering = new ArrayList<Object>();
 
         manager = new BDDExtendedManager();
+        if (options.getPeakBDD())
+          trackPeakBDD = true;
 
         enablingSigmaMap = new HashMap<String, HashSet<Integer>>();
 
@@ -1219,18 +1223,9 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
                 coreachableStatesBDD = manager.restrictedBackward(getMarkedStates(), forbiddenStatesBDD);
             }
 
-            System.out.println("CoReachable states computed!" + ": " + coreachableStatesBDD.satCount(sourceStateVarSet));
-            //            if(options.getOptimization())
-//            {
-//                coreachableStatesBDD = coreachableStatesBDD.exist(
-//                        getSourceVariableDomain(theIndexMap.getVariableIndexByName(orgExAutomata.getGlobalClockName())).set());
-//            }
-
-            //nbrOfCoreachableStates = nbrOfStatesBDD(coreachableStatesBDD);
             final IDD idd = generateIDD(coreachableStatesBDD, coreachableStatesBDD);
             nbrOfCoreachableStates = nbrOfStatesIDD(idd).longValue();
             System.err.println(nbrOfCoreachableStates + " coreachable states found.");
-//            nbrOfCoreachableStates = 1;
         }
     }
 
@@ -1291,10 +1286,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         if (controllableStatesBDD == null) {
             if (synType.equals(SynthesisAlgorithm.MONOLITHICBDD)) {
                 final BDD uncontrollableStates = manager.getInitiallyUncontrollableStates().or(getForbiddenLocations());
-//             BDD uncontrollableStates = manager.uncontrollableBackward(manager.getInitiallyUncontrollableStates().or(getForbiddenLocations()));
                 if (reachable) {
                     controllableStatesBDD = manager.restrictedForward(getInitialState(), uncontrollableStates);
-
                 } else {
                     controllableStatesBDD = uncontrollableStates.not();
                 }
@@ -1327,34 +1320,16 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     }
 
     public BDD getNonblockingStates() {
-//        nonblockingStatesBDD = getOptimalNonblockingStates();
         if (nonblockingStatesBDD == null) {
             if (synType.equals(SynthesisAlgorithm.PARTITIONBDD)) {
                 nonblockingStatesBDD = getCoreachableStates();
             } else {
                 nonblockingStatesBDD = getReachableStates().and(getCoreachableStates());
             }
-//            getReachableStates().printDot();
-            //nonblockingStatesBDD = (getCoreachableStates());
-//                final IDD idd = generateIDD(nonblockingStatesBDD, nonblockingStatesBDD);
-//                nbrOfNonblockingStates = nbrOfStatesIDD(idd, new HashMap<IDDNode, BigInteger>()).longValue();
-
-//            if(options.getOptimization())
-//            {
-//                nonblockingStatesBDD = nonblockingStatesBDD.exist(
-//                        getSourceVariableDomain(theIndexMap.getVariableIndexByName(orgExAutomata.getGlobalClockName())).set());
-//            }
-
-            //BDD2IDD2PS(nonblockingStatesBDD, nonblockingStatesBDD, "C:/Users/sajed/Desktop/IDDsnonblockingStates");
             final IDD idd = generateIDD(nonblockingStatesBDD, nonblockingStatesBDD);
-            // printDOT(idd);
             nbrOfNonblockingStates = nbrOfStatesIDD(idd).longValue();
-//            System.err.println("---------------------------- "+nonblockingStatesBDD.satCount(sourceStateVarSet));
-//            nbrOfNonblockingStates = (long)nonblockingStatesBDD.satCount(sourceStateVarSet);
-
             nbrOfBlockingStates = (int) numberOfReachableStates() - nbrOfNonblockingStates;
         }
-
         return nonblockingStatesBDD;
     }
 
@@ -1925,8 +1900,21 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     public BDDPartitionAlgoWorker getParAlgoWorker() {
         if (parAlgoWorker == null) {
             parAlgoWorker = BDDPartitionTypeFactory.getPartitioningAlgorithmWorker(this, synType);
+            if (trackPeakBDD)
+              parAlgoWorker.setTrackPeakBDD();
         }
         return parAlgoWorker;
+    }
+
+    public int getMaxNbrNodes() {
+      if (synType.equals(SynthesisAlgorithm.MONOLITHICBDD)) {
+        return manager.maxNbrNodes;
+      }
+
+      else if (synType.equals(SynthesisAlgorithm.PARTITIONBDD))
+        return parAlgoWorker.getMaxNbrNodes();
+      else
+        throw new UnsupportedOperationException("Added later");
     }
 
     /**

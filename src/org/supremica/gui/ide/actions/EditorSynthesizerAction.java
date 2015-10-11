@@ -53,7 +53,6 @@ import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
-
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.automata.ExtendedAutomata;
@@ -85,11 +84,13 @@ public class EditorSynthesizerAction
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/synthesize16.gif")));
     }
 
+    @Override
     public void actionPerformed(final ActionEvent e)
     {
         doAction();
     }
 
+    @Override
     public void doAction()
     {
         //QMC minimizer test
@@ -118,9 +119,9 @@ public class EditorSynthesizerAction
             if(sub instanceof ForeachProxy)
             {
                 // We do not handle this at the moment, fail gracefully (sort of)
-                JOptionPane.showMessageDialog(ide.getFrame(), 
+                JOptionPane.showMessageDialog(ide.getFrame(),
                         "Sorry, but your module contains for-each blocks\nCurrently we cannot handle this\nWorking on it...",
-                        "Unable to handle...",                       
+                        "Unable to handle...",
                         JOptionPane.WARNING_MESSAGE);
 
                 return;
@@ -166,8 +167,8 @@ public class EditorSynthesizerAction
             return;
         }
 
-        final ExtendedAutomata exAutomata = options.getOptimization() ? 
-                                new ExtendedAutomata(module, (int)options.getGlobalClockDomain()) : 
+        final ExtendedAutomata exAutomata = options.getOptimization() ?
+                                new ExtendedAutomata(module, (int)options.getGlobalClockDomain()) :
                                 new ExtendedAutomata(module);
 
 
@@ -262,7 +263,7 @@ public class EditorSynthesizerAction
         logger.info("Synthesis completed after "+bddSynthesizer.getSynthesisTimer().toString()+".");
         //logger.info("Number of reachable states: "+bddSynthesizer.bddAutomata.numberOfReachableStates());
         if(options.getOptimization())
-            logger.info("The minimum time to 'safely' reach a marked state from the initial state: "+bddSynthesizer.bddAutomata.getOptimalTime(bddSynthesizer.getResult())+".");       
+            logger.info("The minimum time to 'safely' reach a marked state from the initial state: "+bddSynthesizer.bddAutomata.getOptimalTime(bddSynthesizer.getResult())+".");
 
         if(!options.getOptVaribale().isEmpty())
         {
@@ -270,6 +271,9 @@ public class EditorSynthesizerAction
         }
 
         logger.info("The "+options.getSynthesisType().toString()+" supervisor consists of "+(double)bddSynthesizer.nbrOfStates()+" states.");
+
+        if (options.getPeakBDD())
+          logger.info("The maximal number of BDD nodes used is " + bddSynthesizer.peakBDDNodes());
 
         final List<VariableComponentProxy> pars = bddSynthesizer.bddAutomata.getExtendedAutomata().getParameters();
         if(!pars.isEmpty())

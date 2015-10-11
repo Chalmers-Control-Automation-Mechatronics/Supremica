@@ -170,6 +170,9 @@
         <unjar src="${lib}/org.sat4j.csp.xmlparser.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/org.sat4j.pb.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/js.jar" dest="${lib}/${unjared}"/>
+		
+        <!-- Library for handling Microsoft Z3 SMT Solver. -->
+        <unjar src="${lib}/com.microsoft.z3.jar" dest="${lib}/${unjared}"/>		
         
         <!-- Tools for Adobe PostScript. -->
         <unjar src="${lib}/xmlgraphics-commons-1.4.jar"
