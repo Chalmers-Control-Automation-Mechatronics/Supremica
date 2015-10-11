@@ -1,177 +1,220 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 package org.supremica.automata.BDD.EFA;
 
 import net.sf.javabdd.BDD;
-import static org.supremica.automata.BDD.EFA.BDDPartitionReachabilityUti.restrictedImage;
-import static org.supremica.automata.BDD.EFA.BDDPartitionReachabilityUti.restrictedPreImage;
+
 
 /**
- * The class implements these fix-point automaton-based algorithms for synthesis and verification.
- * 
- * @author zhennanfei
+ * The class implements these fix-point automaton-based algorithms for
+ * synthesis and verification.
+ *
+ * @author zhennan
  */
 
-public class BDDPartitionAlgoWorkerAut extends BDDPartitionAlgoWorker{
-    public BDDPartitionAlgoWorkerAut(BDDPartitionSet partitions, BDDPartitionCoordinator coordinator) {
-        super(partitions, coordinator);
-    }
-    
-    @Override
-    public BDD forwardWorkSetAlgorithm(BDD initialStates) {
-      
-        BDD noForbiddenStates = partitions.bddExAutomata.getManager().getZeroBDD();
-        return internalForwardRestrictedWorkSetAlgorithm(initialStates, noForbiddenStates);
-    }
-    
-    @Override
-    public BDD forwardRestrictedWorkSetAlgorithm(BDD initialStates, BDD forbiddenStates) {
-        
-        BDD currentReachableStatesBDD = initialStates;
-        BDD previousReachableStatesBDD = null;
-        
-        do {
-            previousReachableStatesBDD = currentReachableStatesBDD.id();
-            currentReachableStatesBDD = internalForwardRestrictedWorkSetAlgorithm(currentReachableStatesBDD, forbiddenStates);
-        } while (!previousReachableStatesBDD.equals(currentReachableStatesBDD));
-        
-        return currentReachableStatesBDD;
-    }
-    
-    private BDD internalForwardRestrictedWorkSetAlgorithm(BDD initialStates, BDD forbiddenStates) {
-        
-        resetCoordinator();
-        
-        BDD currentReachableStatesBDD = initialStates;
-        BDD previousReachableStatesBDD = null;
-        
-        while (!shouldStop()) {
-            previousReachableStatesBDD = currentReachableStatesBDD.id();
-            int choice = pickCompFwd();
-            BDD currentTransitionRelation = getCompBDD(choice);
-            currentReachableStatesBDD = restrictedImage(partitions.bddExAutomata, currentReachableStatesBDD, 
-                                                                forbiddenStates, currentTransitionRelation);
-            record_forward(!previousReachableStatesBDD.equals(currentReachableStatesBDD));
-        }
-        
-        return currentReachableStatesBDD;
-    }
-    
-    @Override
-    public BDD backwardWorkSetAlgorithm(BDD markedStates) {
-        
-        if (partitions.bddExAutomata.isAllMarked()) {
-            return partitions.manager.getOneBDD();
-        }
-        
-        BDD noTargetForbiddenStates = partitions.bddExAutomata.getManager().getZeroBDD();
-        BDD allTargetReachableStates = partitions.bddExAutomata.getManager().getOneBDD();
-        
-        BDD targetMarkedStates = markedStates.id()
-                .replaceWith(partitions.bddExAutomata.getSourceToDestLocationPairing())
-                .replaceWith(partitions.bddExAutomata.getSourceToDestVariablePairing());
-        
-        return internalReachableBackwardRestrictedWorkSetAlgorithm(targetMarkedStates, 
-                noTargetForbiddenStates, allTargetReachableStates)
-                .replaceWith(partitions.bddExAutomata.getDestToSourceLocationPairing())
-                .replaceWith(partitions.bddExAutomata.getDestToSourceVariablePairing());
+public class BDDPartitionAlgoWorkerAut extends BDDPartitionAlgoWorker
+{
+  public BDDPartitionAlgoWorkerAut(final BDDPartitionSet partitions,
+                                   final BDDPartitionCoordinator coordinator,
+                                   final BDDPartitionImageOperator imageOperator)
+  {
+    super(partitions, coordinator, imageOperator);
+  }
+
+  @Override
+  public BDD forwardWorkSetAlgorithm(final BDD initialStates)
+  {
+
+    final BDD noForbiddenStates =
+      partitions.bddExAutomata.getManager().getZeroBDD();
+    return internalForwardRestrictedWorkSetAlgorithm(initialStates,
+                                                     noForbiddenStates);
+  }
+
+  @Override
+  public BDD forwardRestrictedWorkSetAlgorithm(final BDD initialStates,
+                                               final BDD forbiddenStates)
+  {
+
+    BDD currentReachableStatesBDD = initialStates;
+    BDD previousReachableStatesBDD = null;
+
+    do {
+      previousReachableStatesBDD = currentReachableStatesBDD.id();
+      currentReachableStatesBDD =
+        internalForwardRestrictedWorkSetAlgorithm(currentReachableStatesBDD,
+                                                  forbiddenStates);
+    } while (!previousReachableStatesBDD.equals(currentReachableStatesBDD));
+
+    return currentReachableStatesBDD;
+  }
+
+  private BDD internalForwardRestrictedWorkSetAlgorithm(final BDD initialStates,
+                                                        final BDD forbiddenStates)
+  {
+
+    resetCoordinator();
+
+    BDD currentReachableStatesBDD = initialStates;
+    BDD previousReachableStatesBDD = null;
+
+    while (!shouldStop()) {
+      previousReachableStatesBDD = currentReachableStatesBDD.id();
+      final int choice = pickCompFwd();
+      final BDD currentTransitionRelation = getCompBDD(choice);
+      currentReachableStatesBDD = imageOperator
+        .restrictedImage(partitions.bddExAutomata, currentReachableStatesBDD,
+                         forbiddenStates, currentTransitionRelation);
+      record_forward(!previousReachableStatesBDD
+        .equals(currentReachableStatesBDD));
     }
 
-    @Override
-    public BDD reachableBackwardWorkSetAlgorithm(BDD markedStates, BDD reachableStates) {
-        
-        if (partitions.bddExAutomata.isAllMarked()) {
-            return reachableStates;
-        }
-        
-        BDD noTargetForbiddenStates = partitions.bddExAutomata.getManager().getZeroBDD();
-        BDD targetMarkedStates = markedStates.id()
-                .replaceWith(partitions.bddExAutomata.getSourceToDestLocationPairing())
-                .replaceWith(partitions.bddExAutomata.getSourceToDestVariablePairing());
-        BDD targetReachableStates = reachableStates.id()
-                .replaceWith(partitions.bddExAutomata.getSourceToDestLocationPairing())
-                .replaceWith(partitions.bddExAutomata.getSourceToDestVariablePairing());
-        return internalReachableBackwardRestrictedWorkSetAlgorithm(targetMarkedStates, 
-                noTargetForbiddenStates, targetReachableStates)
-                .replaceWith(partitions.bddExAutomata.getDestToSourceLocationPairing())
-                .replaceWith(partitions.bddExAutomata.getDestToSourceVariablePairing());
+    return currentReachableStatesBDD;
+  }
+
+  @Override
+  public BDD backwardWorkSetAlgorithm(final BDD markedStates)
+  {
+
+    if (partitions.bddExAutomata.isAllMarked()) {
+      return partitions.manager.getOneBDD();
     }
 
-    @Override
-    public BDD backwardRestrictedWorkSetAlgorithm(BDD markedStates, BDD forbiddenStates) {
-        
-        if(partitions.bddExAutomata.isAllMarked() && forbiddenStates.isZero()) {
-            return partitions.manager.getOneBDD();
-        }
-        
-        BDD targetMarkedStates = markedStates.id()
-                .replaceWith(partitions.bddExAutomata.getSourceToDestLocationPairing())
-                .replaceWith(partitions.bddExAutomata.getSourceToDestVariablePairing());
-        BDD targetForbiddenStates = forbiddenStates.id()
-                .replaceWith(partitions.bddExAutomata.getSourceToDestLocationPairing())
-                .replaceWith(partitions.bddExAutomata.getSourceToDestVariablePairing());
-        BDD targetReachableStates = partitions.manager.getOneBDD();
-        
-        BDD currentTargetCoreachableStatesBDD = targetMarkedStates;
-        BDD previousTargetCoreachableStatesBDD = null;
-        
-        do {
-            previousTargetCoreachableStatesBDD = currentTargetCoreachableStatesBDD.id();
-            currentTargetCoreachableStatesBDD 
-                = internalReachableBackwardRestrictedWorkSetAlgorithm(targetMarkedStates, 
-                  targetForbiddenStates, targetReachableStates);
-        } while (!previousTargetCoreachableStatesBDD.equals(currentTargetCoreachableStatesBDD));
-        
-        return currentTargetCoreachableStatesBDD
-                .replaceWith(partitions.bddExAutomata.getDestToSourceLocationPairing())
-                .replaceWith(partitions.bddExAutomata.getDestToSourceVariablePairing());
-    }
-    
-    @Override
-    public BDD reachableBackwardRestrictedWorkSetAlgorithm(BDD markedStates, BDD forbiddenStates, BDD reachableStates) {
-        
-        if(partitions.bddExAutomata.isAllMarked() && forbiddenStates.isZero())
-            return reachableStates;
-        
-        BDD targetMarkedStates = markedStates.id()
-                .replaceWith(partitions.bddExAutomata.getSourceToDestLocationPairing())
-                .replaceWith(partitions.bddExAutomata.getSourceToDestVariablePairing());
-        BDD targetForbiddenStates = forbiddenStates.id()
-                .replaceWith(partitions.bddExAutomata.getSourceToDestLocationPairing())
-                .replaceWith(partitions.bddExAutomata.getSourceToDestVariablePairing());
-        BDD targetReachableStates = reachableStates.id()
-                .replaceWith(partitions.bddExAutomata.getSourceToDestLocationPairing())
-                .replaceWith(partitions.bddExAutomata.getSourceToDestVariablePairing());
-        
-        BDD currentTargetCoreachableStatesBDD = targetMarkedStates;
-        BDD previousTargetCoreachableStatesBDD = null;
-        
-        do {
-            previousTargetCoreachableStatesBDD = currentTargetCoreachableStatesBDD.id();
-            currentTargetCoreachableStatesBDD 
-                = internalReachableBackwardRestrictedWorkSetAlgorithm(targetMarkedStates, 
-                  targetForbiddenStates, targetReachableStates);
-        } while (!previousTargetCoreachableStatesBDD.equals(currentTargetCoreachableStatesBDD));
-        
-        return currentTargetCoreachableStatesBDD
-                .replaceWith(partitions.bddExAutomata.getDestToSourceLocationPairing())
-                .replaceWith(partitions.bddExAutomata.getDestToSourceVariablePairing());
-    }
-    
-    private BDD internalReachableBackwardRestrictedWorkSetAlgorithm(BDD targetMarkedStates, BDD targetForbiddenStates, 
-                                                                                            BDD targetReachableStates) {
-        resetCoordinator();
+    final BDD noTargetForbiddenStates =
+      partitions.bddExAutomata.getManager().getZeroBDD();
+    final BDD allTargetReachableStates =
+      partitions.bddExAutomata.getManager().getOneBDD();
 
-        BDD currentTargetCoreachableStatesBDD = targetMarkedStates;
-        BDD previousTargetCoreachableStatesBDD = null;
+    final BDD targetMarkedStates = markedStates.id()
+      .replaceWith(partitions.bddExAutomata.getSourceToDestLocationPairing())
+      .replaceWith(partitions.bddExAutomata.getSourceToDestVariablePairing());
 
-        while (!shouldStop()) {
-            previousTargetCoreachableStatesBDD = currentTargetCoreachableStatesBDD.id();
-            int choice = pickCompBwd();
-            BDD currentTransitionRelation = getCompBDD(choice);
-            currentTargetCoreachableStatesBDD = restrictedPreImage(partitions.bddExAutomata, 
-                    currentTargetCoreachableStatesBDD, targetForbiddenStates, currentTransitionRelation);
-            currentTargetCoreachableStatesBDD = currentTargetCoreachableStatesBDD.and(targetReachableStates);
-            record_backward(!previousTargetCoreachableStatesBDD.equals(currentTargetCoreachableStatesBDD));
-        }
-        return currentTargetCoreachableStatesBDD;
+    return interReachBwdRestrictedWorkSetAlgm(targetMarkedStates,
+                                              noTargetForbiddenStates,
+                                              allTargetReachableStates)
+      .replaceWith(partitions.bddExAutomata.getDestToSourceLocationPairing())
+      .replaceWith(partitions.bddExAutomata.getDestToSourceVariablePairing());
+  }
+
+  @Override
+  public BDD reachableBackwardWorkSetAlgorithm(final BDD markedStates,
+                                               final BDD reachableStates)
+  {
+
+    if (partitions.bddExAutomata.isAllMarked()) {
+      return reachableStates;
     }
+
+    final BDD noTargetForbiddenStates =
+      partitions.bddExAutomata.getManager().getZeroBDD();
+    final BDD targetMarkedStates = markedStates.id()
+      .replaceWith(partitions.bddExAutomata.getSourceToDestLocationPairing())
+      .replaceWith(partitions.bddExAutomata.getSourceToDestVariablePairing());
+    final BDD targetReachableStates = reachableStates.id()
+      .replaceWith(partitions.bddExAutomata.getSourceToDestLocationPairing())
+      .replaceWith(partitions.bddExAutomata.getSourceToDestVariablePairing());
+    return interReachBwdRestrictedWorkSetAlgm(targetMarkedStates,
+                                              noTargetForbiddenStates,
+                                              targetReachableStates)
+      .replaceWith(partitions.bddExAutomata.getDestToSourceLocationPairing())
+      .replaceWith(partitions.bddExAutomata.getDestToSourceVariablePairing());
+  }
+
+  @Override
+  public BDD backwardRestrictedWorkSetAlgorithm(final BDD markedStates,
+                                                final BDD forbiddenStates)
+  {
+
+    if (partitions.bddExAutomata.isAllMarked() && forbiddenStates.isZero()) {
+      return partitions.manager.getOneBDD();
+    }
+
+    final BDD targetMarkedStates = markedStates.id()
+      .replaceWith(partitions.bddExAutomata.getSourceToDestLocationPairing())
+      .replaceWith(partitions.bddExAutomata.getSourceToDestVariablePairing());
+    final BDD targetForbiddenStates = forbiddenStates.id()
+      .replaceWith(partitions.bddExAutomata.getSourceToDestLocationPairing())
+      .replaceWith(partitions.bddExAutomata.getSourceToDestVariablePairing());
+    final BDD targetReachableStates = partitions.manager.getOneBDD();
+
+    BDD currentTargetCoreachableStatesBDD = targetMarkedStates;
+    BDD previousTargetCoreachableStatesBDD = null;
+
+    do {
+      previousTargetCoreachableStatesBDD =
+        currentTargetCoreachableStatesBDD.id();
+      currentTargetCoreachableStatesBDD =
+        interReachBwdRestrictedWorkSetAlgm(targetMarkedStates,
+                                           targetForbiddenStates,
+                                           targetReachableStates);
+    } while (!previousTargetCoreachableStatesBDD
+      .equals(currentTargetCoreachableStatesBDD));
+
+    return currentTargetCoreachableStatesBDD
+      .replaceWith(partitions.bddExAutomata.getDestToSourceLocationPairing())
+      .replaceWith(partitions.bddExAutomata.getDestToSourceVariablePairing());
+  }
+
+  @Override
+  public BDD reachableBackwardRestrictedWorkSetAlgorithm(final BDD markedStates,
+                                                         final BDD forbiddenStates,
+                                                         final BDD reachableStates)
+  {
+
+    if (partitions.bddExAutomata.isAllMarked() && forbiddenStates.isZero())
+      return reachableStates;
+
+    final BDD targetMarkedStates = markedStates.id()
+      .replaceWith(partitions.bddExAutomata.getSourceToDestLocationPairing())
+      .replaceWith(partitions.bddExAutomata.getSourceToDestVariablePairing());
+    final BDD targetForbiddenStates = forbiddenStates.id()
+      .replaceWith(partitions.bddExAutomata.getSourceToDestLocationPairing())
+      .replaceWith(partitions.bddExAutomata.getSourceToDestVariablePairing());
+    final BDD targetReachableStates = reachableStates.id()
+      .replaceWith(partitions.bddExAutomata.getSourceToDestLocationPairing())
+      .replaceWith(partitions.bddExAutomata.getSourceToDestVariablePairing());
+
+    BDD currentTargetCoreachableStatesBDD = targetMarkedStates;
+    BDD previousTargetCoreachableStatesBDD = null;
+
+    do {
+      previousTargetCoreachableStatesBDD =
+        currentTargetCoreachableStatesBDD.id();
+      currentTargetCoreachableStatesBDD =
+        interReachBwdRestrictedWorkSetAlgm(targetMarkedStates,
+                                           targetForbiddenStates,
+                                           targetReachableStates);
+    } while (!previousTargetCoreachableStatesBDD
+      .equals(currentTargetCoreachableStatesBDD));
+
+    return currentTargetCoreachableStatesBDD
+      .replaceWith(partitions.bddExAutomata.getDestToSourceLocationPairing())
+      .replaceWith(partitions.bddExAutomata.getDestToSourceVariablePairing());
+  }
+
+  private BDD interReachBwdRestrictedWorkSetAlgm(final BDD targetMarkedStates,
+                                                 final BDD targetForbiddenStates,
+                                                 final BDD targetReachableStates)
+  {
+    resetCoordinator();
+
+    BDD currentTargetCoreachableStatesBDD = targetMarkedStates;
+    BDD previousTargetCoreachableStatesBDD = null;
+
+    while (!shouldStop()) {
+      previousTargetCoreachableStatesBDD =
+        currentTargetCoreachableStatesBDD.id();
+      final int choice = pickCompBwd();
+      final BDD currentTransitionRelation = getCompBDD(choice);
+      currentTargetCoreachableStatesBDD = imageOperator
+        .restrictedPreImage(partitions.bddExAutomata,
+                            currentTargetCoreachableStatesBDD,
+                            targetForbiddenStates, currentTransitionRelation);
+      currentTargetCoreachableStatesBDD =
+        currentTargetCoreachableStatesBDD.and(targetReachableStates);
+      record_backward(!previousTargetCoreachableStatesBDD
+        .equals(currentTargetCoreachableStatesBDD));
+    }
+
+    return currentTargetCoreachableStatesBDD;
+  }
 }
