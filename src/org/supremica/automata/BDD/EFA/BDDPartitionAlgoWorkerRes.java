@@ -115,7 +115,7 @@ public class BDDPartitionAlgoWorkerRes extends BDDPartitionAlgoWorker
       final BDD currentTransitionRelation = relationSet[comIndex];
       activeFlags[comIndex] = false;
       workCount--;
-      currentReachableStatesBDD = BDDPartitionReachabilityUti
+      currentReachableStatesBDD = imageOperator
         .restrictedImage(partitions.bddExAutomata, currentReachableStatesBDD,
                          forbiddenStates, currentTransitionRelation);
 
