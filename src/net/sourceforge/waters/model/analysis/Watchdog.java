@@ -52,7 +52,7 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
  * <PRE> {@link ModelAnalyzer} analyzer;
  * Watchdog watchdog = new {@link #Watchdog(Abortable, int) Watchdog}(analyer, 10);  // 10 sec timeout
  * watchdog.{@link Thread#start() start}();
- * for (int i = 0; i < 10; i++) {
+ * for (int i = 0; i &lt; 10; i++) {
  *   // configure analyzer for experiment i ...
  *   try {
  *     analyzer.{@link ModelAnalyzer#run() run}();

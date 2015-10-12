@@ -33,6 +33,11 @@
 
 package net.sourceforge.waters.analysis.tr;
 
+import java.util.Collection;
+import java.util.NoSuchElementException;
+
+import net.sourceforge.waters.model.base.ProxyTools;
+
 import gnu.trove.TIntCollection;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.procedure.TIntProcedure;
@@ -41,14 +46,9 @@ import gnu.trove.set.hash.TIntHashSet;
 import gnu.trove.stack.TIntStack;
 import gnu.trove.stack.array.TIntArrayStack;
 
-import java.util.Collection;
-import java.util.NoSuchElementException;
-
-import net.sourceforge.waters.model.base.ProxyTools;
-
 
 /**
- * <P>A search space of <CODE>int</CODE> primitives for depth-first search.</P
+ * <P>A search space of <CODE>int</CODE> primitives for depth-first search.</P>
  *
  * <P>This class encapsulates a stack and a hash set.
  * The stack contains unvisited items to be processed in last-in-first-out

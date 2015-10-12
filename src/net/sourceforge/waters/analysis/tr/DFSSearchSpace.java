@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.set.hash.THashSet;
-
 import java.util.AbstractQueue;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -43,9 +41,11 @@ import java.util.ListIterator;
 import java.util.Queue;
 import java.util.Set;
 
+import gnu.trove.set.hash.THashSet;
+
 
 /**
- * <P>A queue for depth-first search.</P
+ * <P>A queue for depth-first search.</P>
  *
  * <P>This class encapsulates a stack and a hash set.
  * The stack contains unvisited items to be processed in last-in-first-out

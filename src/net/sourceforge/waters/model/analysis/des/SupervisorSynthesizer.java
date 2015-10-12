@@ -34,6 +34,7 @@
 package net.sourceforge.waters.model.analysis.des;
 
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
 
 
 /**
@@ -68,11 +69,9 @@ public interface SupervisorSynthesizer
    * this event (exactly the same object).</P>
    * <P>A marking proposition of&nbsp;<CODE>null</CODE> may be specified to
    * use the <I>default marking</I>. In this case, the model must contain a
-   * proposition event named {@link
-   * net.sourceforge.waters.model.module#EventDeclProxy.DEFAULT_MARKING_NAME
-   * EventDeclProxy.DEFAULT_MARKING_NAME}, which is used as marking
-   * proposition. It is an error to request default marking, if no suitable
-   * event is present.</P>
+   * proposition event named {@link EventDeclProxy#DEFAULT_MARKING_NAME},
+   * which is used as marking proposition. It is an error to request default
+   * marking, if no suitable event is present.</P>
    * @param  marking  The marking proposition to be used,
    *                  or <CODE>null</CODE> to use the default marking
    *                  proposition of the model.

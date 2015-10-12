@@ -10,23 +10,21 @@
   <property name="supremica.src" location="${supremica.root}/src"/>
   <property name="supremica.testsrc" location="${supremica.root}/tests/src"/>
 
-  <property name="activation.jar" location="${supremica.lib}/activation.jar"/>
   <property name="anarres.jar" location="${supremica.lib}/anarres-cpp.jar"/>
   <property name="javabdd.jar" location="${supremica.lib}/javabdd-2.0.jar"/>
   <property name="jaxb-api.jar" location="${supremica.lib}/jaxb-api.jar"/>
+  <property name="jaxb-core.jar" location="${supremica.lib}/jaxb-core.jar"/>
   <property name="jaxb-impl.jar" location="${supremica.lib}/jaxb-impl.jar"/>
+  <property name="jaxb-jxc.jar" location="${supremica.lib}/jaxb-jxc.jar"/>
   <property name="jaxb-xjc.jar" location="${supremica.lib}/jaxb-xjc.jar"/>
-  <property name="jsr173_api.jar"
-            location="${supremica.lib}/jsr173_1.0_api.jar"/>
   <property name="log4j.jar" location="${supremica.lib}/log4j.jar"/>
   <property name="junit.jar" location="${supremica.lib}/junit.jar"/>
   <property name="trove.jar" location="${supremica.lib}/trove-3.0.3.jar"/>
 
   <path id="jaxb.classpath">
-    <pathelement location="${activation.jar}"/>
     <pathelement location="${jaxb-api.jar}"/>
+    <pathelement location="${jaxb-core.jar}"/>
     <pathelement location="${jaxb-impl.jar}"/>
-    <pathelement location="${jsr173_api.jar}"/>
   </path>
 
   <property name="bddlib" location="${supremica.root}/dist"/>
@@ -41,6 +39,7 @@
   <property name="logs.reports" location="${logs}/reports"/>
   <property name="logs.results" location="${logs}/results"/>
   <property name="src" location="java/src"/>
+  <property name="tmp" location="tmp"/>
   <property name="xml" location="xml"/>
   <property name="xsd" location="${xml}/xsd"/>
   <property name="xsl" location="${xml}/xsl"/>
@@ -90,12 +89,26 @@
         <pathelement location="${jaxb-xjc.jar}"/>
       </classpath>
     </taskdef>
-    <xjc target="${src}" extension="true" removeOldOutput="yes">
+    <delete dir="${tmp}" quiet="true"/>
+    <mkdir dir="${tmp}"/>
+    <xjc destdir="${tmp}" extension="true" removeOldOutput="yes">
       <schema dir="${xsd}" includes="waters-des.xsd waters-module.xsd"/>
       <produces dir="${src}/net/sourceforge/waters/xsd/"
                 includes="base/* base/impl/* des/* des/impl/*
                           module/* module/impl/*"/>
     </xjc>
+    <!-- Remove "* <p>" lines from generated code - avoid javadoc warnings -->
+    <copy todir="${src}">
+      <fileset dir="${tmp}">
+        <include name="**/*.java"/>
+      </fileset>
+      <filterchain>
+        <linecontainsregexp negate="true">
+          <regexp pattern="^ *\* *&lt;p&gt; *$"/>
+        </linecontainsregexp>
+      </filterchain>
+    </copy>
+    <delete dir="${tmp}"/>
   </target>
 
   <target name="jaxb-compile" depends="jaxb-generate">
@@ -363,7 +376,7 @@
     <mkdir dir="${javadoc}"/>
     <javadoc destdir="${javadoc}"
              windowtitle="Waters API"
-             additionalparam="-Xdoclint:all,-syntax,-html,-missing">
+             additionalparam="-Xdoclint:all,-missing">
       <packageset dir="${src}">
         <include name="net/sourceforge/waters/xsd/**/*"/>
         <exclude name="net/sourceforge/waters/xsd/*/impl/**"/>
@@ -411,7 +424,9 @@
           name="net/sourceforge/waters/analysis/comp552/ModelChecker.java"/>
       </fileset>
     </copy>
-    <javadoc destdir="${javadoc552}" windowtitle="Waters API">
+    <javadoc destdir="${javadoc552}"
+             windowtitle="Waters API"
+             additionalparam="-Xdoclint:all,-missing">
       <packageset dir="${src}">
         <include name="net/sourceforge/waters/xsd/**/*"/>
         <exclude name="net/sourceforge/waters/xsd/*/impl/**"/>

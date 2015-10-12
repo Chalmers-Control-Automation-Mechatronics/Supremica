@@ -60,9 +60,10 @@ abstract class StateHash<E> implements Cloneable {
      * 11. */
     protected static final int DEFAULT_INITIAL_CAPACITY = 10;
 
-    /** Determines how full the internal table can become before
-     * rehashing is required. This must be a value in the range: 0.0 <
-     * loadFactor < 1.0.  The default value is 0.5, which is about as
+    /**
+     * Determines how full the internal table can become before
+     * rehashing is required. This must be a value in the range: 0.0&nbsp;&lt;
+     * loadFactor&nbsp;&lt; 1.0.  The default value is 0.5, which is about as
      * large as you can get in open addressing without hurting
      * performance.  Cf. Knuth, Volume 3., Chapter 6.
      */

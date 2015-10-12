@@ -26,84 +26,84 @@
   </taskdef>
 
   <target name="gen_automation_objects" description="Generate Automation Objects JAXB classes.">
-    <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.automationobjects.xsd.libraryelement">
+    <xjc destdir="${src}" extension="true" removeOldOutput="yes" package="org.supremica.automationobjects.xsd.libraryelement">
       <schema dir="ao" includes="AutomationObjects.xsd"/>
       <produces dir="${src}/org/supremica/automationobjects/xsd/libraryelement"/>
     </xjc>
   </target>
   <target name="gen_implementation_mapping" description="Generate Implementation Mapping JAXB classes.">
-    <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.automationobjects.xsd.implementationmapping">
+    <xjc destdir="${src}" extension="true" removeOldOutput="yes" package="org.supremica.automationobjects.xsd.implementationmapping">
       <schema dir="ao" includes="ImplementationMapping.xsd"/>
       <produces dir="${src}/org/supremica/automationobjects/xsd/implementationmapping"/>
     </xjc>
   </target>
 
   <target name="gen_iec61499" description="Generate IEC 61499 JAXB classes.">
-    <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.functionblocks.xsd.datatype">
+    <xjc destdir="${src}" extension="true" removeOldOutput="yes" package="org.supremica.functionblocks.xsd.datatype">
       <schema dir="${xsd_iec61499}" includes="DataType.xsd"/>
       <produces dir="${src}/org/supremica/functionblocks/xsd/datatype"/>
     </xjc>
-    <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.functionblocks.xsd.fbmanagement">
+    <xjc destdir="${src}" extension="true" removeOldOutput="yes" package="org.supremica.functionblocks.xsd.fbmanagement">
       <schema dir="${xsd_iec61499}" includes="FBMGT.xsd"/>
       <produces dir="${src}/org/supremica/functionblocks/xsd/fbmanagement"/>
     </xjc>
-    <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.functionblocks.xsd.libraryelement">
+    <xjc destdir="${src}" extension="true" removeOldOutput="yes" package="org.supremica.functionblocks.xsd.libraryelement">
       <schema dir="${xsd_iec61499}" includes="LibraryElement.xsd"/>
       <produces dir="${src}/org/supremica/functionblocks/xsd/libraryelement"/>
     </xjc>
   </target>
 
   <target name="gen_genericPLCProgramDescription" description="Generate generic PLC Program JAXB classes (extended PLC Open IEC 61131).">
-    <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.external.genericPLCProgramDescription.xsd">
+    <xjc destdir="${src}" extension="true" removeOldOutput="yes" package="org.supremica.external.genericPLCProgramDescription.xsd">
       <schema dir="${xsd_iec61131}" includes="TC6_XML_V10.xsd"/>
       <produces dir="${src}/org/supremica/external/genericPLCProgramDescription/xsd"/>
     </xjc>
   </target>
 
   <target name="gen_manufacturingtables_factory" description="Generate Manufacturing Tables Factory JAXB classes.">
-    <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.manufacturingTables.xsd.factory">
+    <xjc destdir="${src}" extension="true" removeOldOutput="yes" package="org.supremica.manufacturingTables.xsd.factory">
       <schema dir="${xsd_manufacturingTables}" includes="Factory.xsd"/>
       <produces dir="${src}/org/supremica/manufacturingTables/xsd/factory"/>
     </xjc>
   </target>
 
   <target name="gen_manufacturingtables_eop" description="Generate Manufacturing Tables EOP JAXB classes.">
-    <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.manufacturingTables.xsd.eop">
+    <xjc destdir="${src}" extension="true" removeOldOutput="yes" package="org.supremica.manufacturingTables.xsd.eop">
       <schema dir="${xsd_manufacturingTables}" includes="EOP.xsd"/>
       <produces dir="${src}/org/supremica/manufacturingTables/xsd/eop"/>
     </xjc>
   </target>
 
   <target name="gen_manufacturingtables_rop" description="Generate Manufacturing Tables ROP JAXB classes.">
-    <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.manufacturingTables.xsd.rop">
+    <xjc destdir="${src}" extension="true" removeOldOutput="yes" package="org.supremica.manufacturingTables.xsd.rop">
       <schema dir="${xsd_manufacturingTables}" includes="ROP.xsd"/>
       <produces dir="${src}/org/supremica/manufacturingTables/xsd/rop"/>
     </xjc>
   </target>
 	
   <target name="gen_manufacturingtables_il" description="Generate Manufacturing Tables IL JAXB classes.">
-  	<xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.manufacturingTables.xsd.il">
+  	<xjc destdir="${src}" extension="true" removeOldOutput="yes" package="org.supremica.manufacturingTables.xsd.il">
   		<schema dir="${xsd_manufacturingTables}" includes="IL.xsd"/>
   		<produces dir="${src}/org/supremica/manufacturingTables/xsd/il"/>
   	</xjc>
   </target>
 
   <target name="gen_manufacturingtables_pr" description="Generate Manufacturing Tables PhysicalResources JAXB classes.">
-  	<xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.manufacturingTables.xsd.pr">
+  	<xjc destdir="${src}" extension="true" removeOldOutput="yes" package="org.supremica.manufacturingTables.xsd.pr">
   		<schema dir="${xsd_manufacturingTables}" includes="PhysicalResources.xsd"/>
   		<produces dir="${src}/org/supremica/manufacturingTables/xsd/pr"/>
   	</xjc>
   </target>
   
   <target name="gen_manufacturingtables_vr" description="Generate Manufacturing Tables VirtualResources JAXB classes.">
-  	<xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.manufacturingTables.xsd.vr">
+  	<xjc destdir="${src}" extension="true" removeOldOutput="yes" package="org.supremica.manufacturingTables.xsd.vr">
   		<schema dir="${xsd_manufacturingTables}" includes="VirtualResources.xsd"/>
   		<produces dir="${src}/org/supremica/manufacturingTables/xsd/vr"/>
   	</xjc>
   </target>
 
   <!--target name="gen_manufacturingtables_rop_processeditor" description="Generate Manufacturing Tables ROP processeditor JAXB classes.">
-    <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.manufacturingTables.xsd.processeditor">
+    <xjc destdir="${src}" extension="true" removeOldOutput="yes" package="org.supremica.manufacturingTables.xsd.processeditor">
       <schema dir="${xsd_manufacturingTables}" includes="ROP_processeditor.xsd"/>
       <produces dir="${src}/org/supremica/manufacturingTables/xsd/processeditor"/>
     </xjc>
@@ -113,7 +113,7 @@
   
   <!-- This generatete both ROP and worksheet -->
   <target name="gen_manufacturingtables_rop_ppnedit" description="Generate Manufacturing Tables ROP PPNedit JAXB classes.">
-  	<xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.manufacturingTables.xsd.processeditor">
+  	<xjc destdir="${src}" extension="true" removeOldOutput="yes" package="org.supremica.manufacturingTables.xsd.processeditor">
   		<schema dir="${xsd_manufacturingTables}" includes="PPNEditWorksheet.xsd"/>
   		<produces dir="${src}/org/supremica/manufacturingTables/xsd/processeditor"/>
   	</xjc>

@@ -521,7 +521,7 @@ public class ConstraintPropagator
    *                  variable&nbsp;<CODE>x</CODE> can take all values from
    *                  a ten-valued enumeration except <CODE>b</CODE>
    *                  or&nbsp;<CODE>c</CODE>, this may be represented as
-   *                  <CODE>x&nbsp;!=&nbsp;b&nbsp;& x&nbsp;!=&nbsp;c</CODE>.
+   *                  <CODE>x&nbsp;!=&nbsp;b&nbsp;&amp; x&nbsp;!=&nbsp;c</CODE>.
    * @return List of constraints, or <CODE>null</CODE> if the current
    *         constraints have been found to be unsatisfiable.
    */

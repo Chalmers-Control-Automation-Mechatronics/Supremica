@@ -52,7 +52,7 @@ public interface LoopTraceProxy
    * Gets the loop index of this trace.
    * The loop index identifies the number of the step (starting at&nbsp;0)
    * in the trace where the loop starts. If the trace has steps 0,...,<I>n</I>,
-   * and the loop index is at position&nbsp<I>i</I>, then it represents the
+   * and the loop index is at position&nbsp;<I>i</I>, then it represents the
    * loop 0,...,<I>n</I>,<I>i</I>,...,<I>n</I>,...
    */
   public int getLoopIndex();

@@ -33,17 +33,17 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.set.hash.THashSet;
-
 import java.util.AbstractQueue;
 import java.util.ArrayDeque;
 import java.util.Iterator;
 import java.util.Queue;
 import java.util.Set;
 
+import gnu.trove.set.hash.THashSet;
+
 
 /**
- * <P>A queue for breadth-first search.</P
+ * <P>A queue for breadth-first search.</P>
  *
  * <P>This class encapsulates a queue and a hash set.
  * The queue contains unvisited items to be processed in first-in-first-out

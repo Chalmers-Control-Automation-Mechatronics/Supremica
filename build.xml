@@ -58,18 +58,14 @@
               location="${waters.dir}/java/jar/jniglue.jar"/>
 
     <!-- JAXB -->
-    <property name="activation.jar" location="${lib}/activation.jar"/>
     <property name="jaxb-api.jar" location="${lib}/jaxb-api.jar"/>
+    <property name="jaxb-core.jar" location="${lib}/jaxb-api.jar"/>
     <property name="jaxb-impl.jar" location="${lib}/jaxb-impl.jar"/>
-    <property name="jaxb1-impl.jar" location="${lib}/jaxb1-impl.jar"/>
-    <property name="jsr173_api.jar" location="${lib}/jsr173_1.0_api.jar"/>
     
     <path id="jaxb.classpath">
-        <pathelement location="${activation.jar}"/>
         <pathelement location="${jaxb-api.jar}"/>
+        <pathelement location="${jaxb-core.jar}"/>
         <pathelement location="${jaxb-impl.jar}"/>
-        <pathelement location="${jaxb1-impl.jar}"/>
-        <pathelement location="${jsr173_api.jar}"/>
     </path>
 
     <!-- Build Instructions -->
@@ -189,11 +185,9 @@
         <unjar src="${lib}/licensed/JGoLayout.jar" dest="${lib}/${unjared}"/>
         -->
         <!-- JAXB -->
-        <unjar src="${activation.jar}" dest="${lib}/${unjared}"/>       
         <unjar src="${jaxb-api.jar}" dest="${lib}/${unjared}"/>
+        <unjar src="${jaxb-core.jar}" dest="${lib}/${unjared}"/>
         <unjar src="${jaxb-impl.jar}" dest="${lib}/${unjared}"/>
-        <unjar src="${jaxb1-impl.jar}" dest="${lib}/${unjared}"/>
-        <unjar src="${jsr173_api.jar}" dest="${lib}/${unjared}"/>   
         <!-- JUnit -->
         <unjar src="${lib}/junit.jar" dest="${lib}/${unjared}"/>
     </target>

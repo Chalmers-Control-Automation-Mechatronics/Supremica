@@ -333,7 +333,7 @@ public interface ProductDESProxyFactory
    * provides a simple interface to create a controllability error trace
    * for a deterministic product DES. It creates a trace with a
    * <CODE>null</CODE> file location, with the name of the product DES
-   * catenated with <CODE>&quot:uncontrollable&quot;</CODE>, with a set of
+   * catenated with <CODE>&quot;uncontrollable&quot;</CODE>, with a set of
    * automata equal to that of the product DES, and without any state
    * information in the trace steps.
    * @param  des          The product DES for which the new trace is

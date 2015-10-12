@@ -245,6 +245,7 @@ class TeachingSecurityManager extends SecurityManager
   }
 
   @Override
+  @Deprecated
   public void checkSystemClipboardAccess()
   {
     throw new SecurityException("Clipboard access disabled!");
