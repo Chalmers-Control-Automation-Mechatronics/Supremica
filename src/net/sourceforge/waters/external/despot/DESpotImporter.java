@@ -642,7 +642,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
   /**
    * Determines which events are blocked in this automata. Events are blocked if
-   * they do not appear on a transition or self-loop.   *
+   * they do not appear on a transition or selfloop.
    * @param transitions
    *          The list of Transitions and self-loops from the DOM.
    */

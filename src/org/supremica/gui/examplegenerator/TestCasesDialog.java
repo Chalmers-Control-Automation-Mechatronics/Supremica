@@ -67,14 +67,14 @@ class TextArea extends JFrame {
 	private static final long serialVersionUID = 1L;
 
 	JTextArea _resultArea = new JTextArea(20, 70);
-     public TextArea(String text) {
+     public TextArea(final String text) {
         //... Set textarea's initial text, scrolling, and border.
         _resultArea.setText(text);
          _resultArea.setEditable(false);
-        JScrollPane scrollingArea = new JScrollPane(_resultArea);
+        final JScrollPane scrollingArea = new JScrollPane(_resultArea);
 
         //... Get the content pane, set layout, add to center
-        JPanel content = new JPanel();
+        final JPanel content = new JPanel();
         content.setLayout(new BorderLayout());
         content.add(scrollingArea, BorderLayout.CENTER);
 
@@ -85,7 +85,7 @@ class TextArea extends JFrame {
         this.pack();
     }
 
-     public void setText(String text)
+     public void setText(final String text)
      {
         _resultArea.setText(text);
      }
@@ -97,7 +97,7 @@ class IntegerField
 {
     private static final long serialVersionUID = 1L;
 
-    public IntegerField(String init, int cols)
+    public IntegerField(final String init, final int cols)
     {
         super(init, cols);
     }
@@ -113,7 +113,7 @@ class DoubleField
 {
     private static final long serialVersionUID = 1L;
 
-    public DoubleField(String init, int cols)
+    public DoubleField(final String init, final int cols)
     {
         super(init, cols);
     }
@@ -122,15 +122,6 @@ class DoubleField
     {
         return Double.parseDouble(getText());
     }
-}
-
-interface TestCase
-{
-    Project generateAutomata()
-    throws Exception;
-
-    void synthesizeSupervisor(IDE ide)
-    throws Exception;
 }
 
 class ExampleTab
@@ -165,9 +156,9 @@ public class TestCasesDialog
 {
     private static final long serialVersionUID = 1L;
     private static Logger logger = LoggerFactory.createLogger(TestCasesDialog.class);
-    private ExampleTab extab = new ExampleTab();
+    private final ExampleTab extab = new ExampleTab();
     private Project project = null;
-    private Object gui;
+    private final Object gui;
 
     public class ComputeButton
         extends JButton
@@ -181,7 +172,8 @@ public class TestCasesDialog
             setToolTipText("Run the example for multiple instances");
             addActionListener(new ActionListener()
             {
-                public void actionPerformed(ActionEvent e)
+                @Override
+                public void actionPerformed(final ActionEvent e)
 
                 // throws Exception // cannot do this - what the f**k!
                 {
@@ -194,7 +186,7 @@ public class TestCasesDialog
                             System.out.println("ide is null: (TestCasesDialog in ComputeButton)");
                         synthesizeSupervisor(ide);
                     }
-                    catch (Exception ex)
+                    catch (final Exception ex)
                     {
                         logger.error("Exception while constructing test case: " + ex);
                         logger.debug(ex.getStackTrace());
@@ -218,7 +210,8 @@ public class TestCasesDialog
             setToolTipText("Generate automata and close this dialog");
             addActionListener(new ActionListener()
             {
-                public void actionPerformed(ActionEvent e)
+                @Override
+                public void actionPerformed(final ActionEvent e)
 
                 // throws Exception // cannot do this - what the f**k!
                 {
@@ -226,7 +219,7 @@ public class TestCasesDialog
                     {
                         generateAutomata();
                     }
-                    catch (Exception ex)
+                    catch (final Exception ex)
                     {
                         logger.error("Exception while constructing test case: " + ex);
                         logger.debug(ex.getStackTrace());
@@ -250,7 +243,8 @@ public class TestCasesDialog
             setToolTipText("Enough of this");
             addActionListener(new ActionListener()
             {
-                public void actionPerformed(ActionEvent e)
+                @Override
+                public void actionPerformed(final ActionEvent e)
                 {
                     action();
                 }
@@ -275,7 +269,8 @@ public class TestCasesDialog
             setToolTipText("Want some help?");
             addActionListener(new ActionListener()
             {
-                public void actionPerformed(ActionEvent e)
+                @Override
+                public void actionPerformed(final ActionEvent e)
                 {
                     action();
                 }
@@ -286,27 +281,27 @@ public class TestCasesDialog
         {}
     }
 
-    void synthesizeSupervisor(IDE ide)
+    void synthesizeSupervisor(final IDE ide)
     throws Exception
     {
-        Component comp = extab.getSelectedComponent();
+        final Component comp = extab.getSelectedComponent();
 
         // We know that this is actually also a TestCase (right?)
-        TestCase tc = (TestCase) comp;
+        final TestCase tc = (TestCase) comp;
 
         setVisible(false);
 
-        tc.synthesizeSupervisor(ide);  
+        tc.synthesizeSupervisor(ide);
     }
 
 
     void generateAutomata()
     throws Exception
     {
-        Component comp = extab.getSelectedComponent();
+        final Component comp = extab.getSelectedComponent();
 
         // We know that this is actually also a TestCase (right?)
-        TestCase tc = (TestCase) comp;
+        final TestCase tc = (TestCase) comp;
 
         setVisible(false);
 
@@ -334,13 +329,13 @@ public class TestCasesDialog
         return project;
     }
 
-    public TestCasesDialog(Frame frame, Object gui)
+    public TestCasesDialog(final Frame frame, final Object gui)
     {
         super(frame, "Example Generator", false);    // modal dialog with frame as parent
 
         this.gui = gui;
 
-        Container pane = getContentPane();
+        final Container pane = getContentPane();
 
         pane.setLayout(new BorderLayout(10, 10));
 
@@ -349,7 +344,7 @@ public class TestCasesDialog
         // Point point = Utility.getPosForCenter(size);
         // setSize(size);
         // setLocation(point);
-        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        final JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton tmp;
 
 //        ComputeButton cb = new ComputeButton();
@@ -362,7 +357,7 @@ public class TestCasesDialog
         getRootPane().setDefaultButton(tmp);    // :)
         pack();
 
-        Point point = Utility.getPosForCenter(getSize());
+        final Point point = Utility.getPosForCenter(getSize());
 
         setLocation(point);
     }
