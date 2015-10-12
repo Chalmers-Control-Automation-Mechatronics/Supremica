@@ -50,7 +50,7 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
  * ConstraintList}) representing the possible values of the EFA variables
  * when this event is taken.
  *
- * @see {@link EFACompiler}.
+ * @see EFACompiler
  * @author Robi Malik
  */
 

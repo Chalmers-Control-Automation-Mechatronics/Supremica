@@ -43,8 +43,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,9 +69,9 @@ import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
+import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.NodeProxy;
-import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.PointGeometryProxy;
@@ -121,16 +121,19 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   // #########################################################################
   // # Interface
   // # net.sourceforge.waters.model.marshaller.CopyingProxyUnmarshaller
+  @Override
   public File getOutputDirectory()
   {
     return mOutputDir;
   }
 
+  @Override
   public void setOutputDirectory(final File outputdir)
   {
     mOutputDir = outputdir;
   }
 
+  @Override
   public ModuleProxy unmarshalCopying(final URI uri) throws IOException,
       WatersMarshalException, WatersUnmarshalException
   {
@@ -147,6 +150,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
   // #########################################################################
   // # Interface net.sourceforge.waters.model.marshaller.ProxyUnmarshaller
+  @Override
   public ModuleProxy unmarshal(final URI uri) throws IOException,
       WatersUnmarshalException
   {
@@ -157,31 +161,37 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     }
   }
 
+  @Override
   public Class<ModuleProxy> getDocumentClass()
   {
     return ModuleProxy.class;
   }
 
+  @Override
   public String getDefaultExtension()
   {
     return DESPOTEXT;
   }
 
+  @Override
   public Collection<String> getSupportedExtensions()
   {
     return EXTENSIONS;
   }
 
+  @Override
   public Collection<FileFilter> getSupportedFileFilters()
   {
     return FILTERS;
   }
 
+  @Override
   public DocumentManager getDocumentManager()
   {
     return mDocumentManager;
   }
 
+  @Override
   public void setDocumentManager(final DocumentManager manager)
   {
     mDocumentManager = manager;
@@ -632,9 +642,8 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
   /**
    * Determines which events are blocked in this automata. Events are blocked if
-   * they do not appear on a transition or self-loop.
-   *
-   * @param transLoopList
+   * they do not appear on a transition or self-loop.   *
+   * @param transitions
    *          The list of Transitions and self-loops from the DOM.
    */
   private LabelBlockProxy findBlockedEvents(final NodeList transitions,
@@ -806,7 +815,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     numCtrlPoints = geoList.size();
     if (numCtrlPoints > 0) {
       for (int i = 0; i < numCtrlPoints; i++) {
-        final Element pos = (Element) geoList.get(i);
+        final Element pos = geoList.get(i);
 
         final String xPosStr = pos.getAttribute("x");
         final String yPosStr = pos.getAttribute("y");
@@ -962,6 +971,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    */
   private static class LevelComparator implements Comparator<Element>
   {
+    @Override
     public int compare(final Element e1, final Element e2)
     {
       final String LEVEL = "level";
@@ -988,11 +998,13 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       mTarget = target;
     }
 
+    @Override
     public int hashCode()
     {
       return mSource + 5 * mTarget;
     }
 
+    @Override
     public boolean equals(final Object other)
     {
       if (other != null && getClass() == other.getClass()) {

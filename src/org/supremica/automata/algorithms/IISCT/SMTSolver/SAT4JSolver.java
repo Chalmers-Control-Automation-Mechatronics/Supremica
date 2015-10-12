@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: 
+//# PROJECT:
 //# PACKAGE: org.supremica.automata.algorithms.LBSC
 //# CLASS:   SAT4JSolver
 //###########################################################################
@@ -8,26 +8,6 @@
 //###########################################################################
 
 package org.supremica.automata.algorithms.IISCT.SMTSolver;
-
-import org.sat4j.core.Vec;
-import org.sat4j.csp.Constant;
-import org.sat4j.csp.Domain;
-import org.sat4j.csp.EnumeratedDomain;
-import org.sat4j.csp.Evaluable;
-import org.sat4j.csp.Predicate;
-import org.sat4j.csp.RangeDomain;
-import org.sat4j.csp.SolverFactory;
-import org.sat4j.csp.Var;
-import org.sat4j.specs.ContradictionException;
-import org.sat4j.specs.IVec;
-import org.sat4j.specs.TimeoutException;
-import org.sat4j.tools.ModelIterator;
-
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.THashMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +44,26 @@ import net.sourceforge.waters.plain.module.BinaryExpressionElement;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.plain.module.UnaryExpressionElement;
 
+import org.sat4j.core.Vec;
+import org.sat4j.csp.Constant;
+import org.sat4j.csp.Domain;
+import org.sat4j.csp.EnumeratedDomain;
+import org.sat4j.csp.Evaluable;
+import org.sat4j.csp.Predicate;
+import org.sat4j.csp.RangeDomain;
+import org.sat4j.csp.SolverFactory;
+import org.sat4j.csp.Var;
+import org.sat4j.specs.ContradictionException;
+import org.sat4j.specs.IVec;
+import org.sat4j.specs.TimeoutException;
+import org.sat4j.tools.ModelIterator;
+
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+
 /**
  * A Constraint Satisfaction Problem (CSP) solver based on SAT4J CSP package. Given a set of
  constraints over variables, SAT4JSolver attempts to find all variables values that satisfies the
@@ -77,8 +77,8 @@ import net.sourceforge.waters.plain.module.UnaryExpressionElement;
  * <p>
  * A sample code to use this solver is as follows.
  * <PRE>
- * {@link SAT4JSolver} solver = new {@link #CSPSolver(net.sourceforge.waters.analysis.efa.simple.SimpleEFAVariableContext) (varcontext)};
- * solver.{@link #init(java.util.List)} (constraints);
+ * {@link SAT4JSolver} solver = new {@link #SAT4JSolver(SimpleEFAVariableContext) SAT4JSolver}(net.sourceforge.waters.analysis.efa.simple.SimpleEFAVariableContext) (varcontext)};
+ * solver.{@link #init(java.util.List) init}(constraints);
  * solver.{@link #solve()};
  * while (solver.{@link #isSatisfiable()}){
  *    model = solver.{@link #getModel()};
@@ -234,7 +234,7 @@ public class SAT4JSolver
    * <p>
    * @param step
    */
-  public void stepTo(int step)
+  public void stepTo(final int step)
   {
     mVarPostfix = step;
   }
@@ -272,12 +272,10 @@ public class SAT4JSolver
 
   /**
    * Stores the information (except learned clauses) in the buffer at given index. The stored
-   * information can be retrieved at any time by calling {@link #resume()} and   * the index.
-   * @param index
-   * <p>
-   * @throws net.sourceforge.waters.model.analysis.AnalysisException
+   * information can be retrieved at any time by calling {@link #resume(int)}
+   * and the index.
    */
-  public void pause(int index) throws AnalysisException
+  public void pause(final int index) throws AnalysisException
   {
     if (index < 0) {
       throw new AnalysisException("CSPSolver > pause > Index out of bounds!");
@@ -293,18 +291,18 @@ public class SAT4JSolver
   }
 
   /**
-   * Restoring all the information stored by {@link #pause()} at the given index.
-   * <p>
+   * Restoring all the information stored by {@link #pause(int)} at the given
+   * index.
    * @param index index of the information in the buffer.
    * @throws net.sourceforge.waters.model.analysis.AnalysisException index out of bounds error
    */
   @SuppressWarnings("unchecked")
-  public void resume(int index) throws AnalysisException
+  public void resume(final int index) throws AnalysisException
   {
     if (index < 0 || index > mBuffer.size()) {
       throw new AnalysisException("CSPSolver > resume > Index out of bounds!");
     }
-    Object[] info = mBuffer.get(index);
+    final Object[] info = mBuffer.get(index);
     mJVarNameToDomain = (THashMap<String, Domain>) info[0];
     mJVarNameToSimVar = (THashMap<String, String>) info[1];
     mJVarNameToJVar = (THashMap<String, Var>) info[2];
@@ -674,7 +672,7 @@ public class SAT4JSolver
           }
         }
       }
-    }    
+    }
     return cVarToValue;
   }
 
@@ -816,7 +814,7 @@ public class SAT4JSolver
 
   }
 
-  //#########################################################################  
+  //#########################################################################
   public static final int SOLVER_LIGHT = 1;
   public static final int SOLVER_DEFUALT = 0;
   public static final int DEFUALT_TIMEOUT = 300;
@@ -852,7 +850,7 @@ public class SAT4JSolver
   private TIntObjectHashMap<Evaluable> mIntToJEval;
   private ArrayList<Object[]> mJPredicatesList;
   private boolean mTrivialFalsity;
-  private ArrayList<Object[]> mBuffer;
+  private final ArrayList<Object[]> mBuffer;
   private int mNbJVars;
   private int mVarPostfix;
 }

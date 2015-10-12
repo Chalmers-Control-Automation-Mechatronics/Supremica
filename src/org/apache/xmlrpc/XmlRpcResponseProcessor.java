@@ -55,8 +55,8 @@ package org.apache.xmlrpc;
  * <http://www.apache.org/>.
  */
 import java.io.ByteArrayOutputStream;
-import java.io.UnsupportedEncodingException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Hashtable;
 
 /**
@@ -113,7 +113,7 @@ public class XmlRpcResponseProcessor
 	 * Process an exception, and return output in the specified
 	 * encoding.
 	 *
-	 * @param e The exception to process;
+	 * @param x The exception to process;
 	 * @param encoding The output encoding.
 	 * @return byte[] The XML-RPC response.
 	 */

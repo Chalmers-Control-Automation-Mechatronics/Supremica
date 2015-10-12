@@ -70,7 +70,7 @@ import java.util.Hashtable;
 public class DefaultHandlerMapping
 	implements XmlRpcHandlerMapping
 {
-	private Hashtable<String, Object> handlers;
+	private final Hashtable<String, Object> handlers;
 
 	/**
 	 * Create a new mapping.
@@ -87,10 +87,10 @@ public class DefaultHandlerMapping
 	 * handlers see the <a href="../index.html#1a">main documentation
 	 * page</a>.
 	 *
-	 * @param handlername The name to identify the handler by.
+	 * @param handlerName The name to identify the handler by.
 	 * @param handler The handler itself.
 	 */
-	public void addHandler(String handlerName, Object handler)
+	public void addHandler(final String handlerName, final Object handler)
 	{
 		if ((handler instanceof XmlRpcHandler) || (handler instanceof AuthenticatedXmlRpcHandler) || (handler instanceof ContextXmlRpcHandler))
 		{
@@ -108,7 +108,7 @@ public class DefaultHandlerMapping
 	 *
 	 * @param handlerName The name identifying the handler to remove.
 	 */
-	public void removeHandler(String handlerName)
+	public void removeHandler(final String handlerName)
 	{
 		handlers.remove(handlerName);
 	}
@@ -122,12 +122,13 @@ public class DefaultHandlerMapping
 	 * @return A handler object and method name.
 	 * @see org.apache.xmlrpc.XmlRpcHandlerMapping#getHandler(String)
 	 */
-	public Object getHandler(String methodName)
+	@Override
+  public Object getHandler(final String methodName)
 		throws Exception
 	{
 		Object handler = null;
 		String handlerName = null;
-		int dot = methodName.lastIndexOf('.');
+		final int dot = methodName.lastIndexOf('.');
 
 		if (dot > -1)
 		{

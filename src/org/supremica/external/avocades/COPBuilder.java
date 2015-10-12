@@ -1,65 +1,31 @@
 package org.supremica.external.avocades;
 
+//-----------------------------------------------------------------------------
+//
+//Imported constants
+//
+//-----------------------------------------------------------------------------
+
+import static org.supremica.external.avocades.AutomataNames.EVENT_MACHINE_SEPARATOR;
+import static org.supremica.external.avocades.dop2efa.DOPnative.BOOK;
+import static org.supremica.external.avocades.dop2efa.DOPnative.FREE;
+import static org.supremica.external.avocades.dop2efa.DOPnative.RESOURCE;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
 import java.net.URI;
-
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.LinkedList;
-
 import java.util.Comparator;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import java.util.Date;
-
 import javax.xml.bind.JAXBException;
-
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
-import org.jdom.input.SAXBuilder;
-import org.jdom.JDOMException;
-
-import org.supremica.automata.Automata;
-import org.supremica.automata.Automaton;
-import org.supremica.automata.ModularSupervisor;
-import org.supremica.automata.Supervisor;
-
-import org.supremica.automata.Project;
-import org.supremica.automata.IO.SupremicaMarshaller;
-import org.supremica.automata.IO.SupremicaUnmarshaller;
-import org.supremica.external.avocades.relationextraction.Extractor;
-import org.supremica.external.avocades.specificationsynthesis.ConverterILtoAutomata;
-import org.supremica.external.avocades.specificationsynthesis.SpecificationSynthesInputBuilder;
-
-import org.supremica.manufacturingTables.xsd.processeditor.ROP;
-import org.supremica.manufacturingTables.xsd.processeditor.Activity;
-import org.supremica.manufacturingTables.xsd.processeditor.Attribute;
-import org.supremica.manufacturingTables.xsd.processeditor.UpperIndicator;
-import org.supremica.manufacturingTables.xsd.processeditor.LowerIndicator;
-import org.supremica.manufacturingTables.xsd.processeditor.ObjectFactory;
-import org.supremica.manufacturingTables.xsd.processeditor.OperationReferenceType;
-import org.supremica.manufacturingTables.xsd.processeditor.Relation;
-import org.supremica.manufacturingTables.xsd.processeditor.RelationType;
-import org.supremica.manufacturingTables.xsd.eop.EOP;
-import org.supremica.manufacturingTables.xsd.eop.Action;
-import org.supremica.manufacturingTables.xsd.eop.ZoneState;
-
-import org.supremica.manufacturingTables.xsd.il.IL;
-import org.supremica.manufacturingTables.xsd.il.Term;
-import org.supremica.manufacturingTables.xsd.il.OperationCheck;
-
-import org.supremica.external.avocades.xml.Converter;
-
-import org.supremica.external.avocades.dop2efa.DOPtoEFA;
-import org.supremica.external.avocades.eop2efa.EOPtoEFA;
-import org.xml.sax.SAXException;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
@@ -70,10 +36,8 @@ import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.ProductDESImporter;
-
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
-
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.subject.base.AbstractSubject;
@@ -81,25 +45,45 @@ import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.XMLOutputter;
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.ModularSupervisor;
+import org.supremica.automata.Project;
+import org.supremica.automata.Supervisor;
+import org.supremica.automata.IO.ProjectBuildFromWaters;
+import org.supremica.automata.IO.SupremicaMarshaller;
+import org.supremica.automata.IO.SupremicaUnmarshaller;
 import org.supremica.automata.algorithms.AutomataSynchronizer;
 import org.supremica.automata.algorithms.AutomataSynthesizer;
 import org.supremica.automata.algorithms.SynchronizationOptions;
 import org.supremica.automata.algorithms.SynthesizerOptions;
-
-import org.supremica.automata.IO.ProjectBuildFromWaters;
-
-
-//-----------------------------------------------------------------------------
-//
-//Imported constants
-//
-//-----------------------------------------------------------------------------
-
-import static org.supremica.external.avocades.AutomataNames.EVENT_MACHINE_SEPARATOR;
-import static org.supremica.external.avocades.dop2efa.DOPnative.RESOURCE;
-
-import static org.supremica.external.avocades.dop2efa.DOPnative.BOOK;
-import static org.supremica.external.avocades.dop2efa.DOPnative.FREE;
+import org.supremica.external.avocades.dop2efa.DOPtoEFA;
+import org.supremica.external.avocades.eop2efa.EOPtoEFA;
+import org.supremica.external.avocades.relationextraction.Extractor;
+import org.supremica.external.avocades.specificationsynthesis.ConverterILtoAutomata;
+import org.supremica.external.avocades.specificationsynthesis.SpecificationSynthesInputBuilder;
+import org.supremica.external.avocades.xml.Converter;
+import org.supremica.manufacturingTables.xsd.eop.Action;
+import org.supremica.manufacturingTables.xsd.eop.EOP;
+import org.supremica.manufacturingTables.xsd.eop.ZoneState;
+import org.supremica.manufacturingTables.xsd.il.IL;
+import org.supremica.manufacturingTables.xsd.il.OperationCheck;
+import org.supremica.manufacturingTables.xsd.il.Term;
+import org.supremica.manufacturingTables.xsd.processeditor.Activity;
+import org.supremica.manufacturingTables.xsd.processeditor.Attribute;
+import org.supremica.manufacturingTables.xsd.processeditor.LowerIndicator;
+import org.supremica.manufacturingTables.xsd.processeditor.ObjectFactory;
+import org.supremica.manufacturingTables.xsd.processeditor.OperationReferenceType;
+import org.supremica.manufacturingTables.xsd.processeditor.ROP;
+import org.supremica.manufacturingTables.xsd.processeditor.Relation;
+import org.supremica.manufacturingTables.xsd.processeditor.RelationType;
+import org.supremica.manufacturingTables.xsd.processeditor.UpperIndicator;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -356,8 +340,6 @@ public class COPBuilder {
     /**
      * Returns a list of IL renamed to match the ROPs and EOPs added
      * to COPBuilder.
-     *
-     * @return
      */
     public List<IL> getAdaptedILList(){
 
@@ -1044,7 +1026,7 @@ public class COPBuilder {
 		start = new Date();
 
 		for( final Iterator<Document> cIter = tmpROPList.iterator(); cIter.hasNext(); ){
-			final Document cop = (Document) cIter.next();
+			final Document cop = cIter.next();
 			removeMachineNameFromActivitiesInROP( cop );
 			//removeDuplicatesOfPreconditionsInOperations( rop.getRelation() );
 		}
@@ -1228,7 +1210,8 @@ public class COPBuilder {
                                          implements
                                              Comparator<OperationReferenceType>
     {
-    	public int compare(final OperationReferenceType opRef1,
+    	@Override
+      public int compare(final OperationReferenceType opRef1,
     			           final OperationReferenceType opRef2)
     	{
     		final int operationCompare = opRef1.getOperation().compareTo( opRef2.getOperation() );
@@ -1279,8 +1262,6 @@ public class COPBuilder {
 
     /**
      * Merge a List of waters modules by adding all components to one module.
-     * @param moduleList
-     * @return
      */
     public ModuleSubject mergeModules(final List<ModuleSubject> moduleList){
     	ModuleSubject module;

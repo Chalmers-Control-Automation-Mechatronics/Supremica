@@ -37,6 +37,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.List;
+
 import javax.swing.Action;
 
 import net.sourceforge.waters.gui.command.UndoInterface;
@@ -50,7 +51,7 @@ import net.sourceforge.waters.model.base.Proxy;
  *
  * <P>A selection owner also must implement the {@link Subject} interface
  * and provide {@link
- * net.sourceforge.waters.gui.observer.EditorChangedEvent#SELECTION_CHANGED
+ * net.sourceforge.waters.gui.observer.EditorChangedEvent.Kind#SELECTION_CHANGED
  * SELECTION_CHANGED} events whenever the selection changes.</P>
  *
  * @author Robi Malik
@@ -76,8 +77,6 @@ public interface SelectionOwner
   /**
    * Determines whether this component contains more items that could be
    * selected.
-   * @return <CODE>true</CODE> if a call to {@link #selectAll()} would
-   *         change the state of this component.
    */
   public boolean canSelectMore();
 
@@ -114,9 +113,9 @@ public interface SelectionOwner
    * in this panel. Usually, this method simply returns the given item, but
    * some panels may not be able to display the item directly, but only
    * indirectly through one of its ancestors. In such cases, the selectable
-   * ancestor needs to be passed to the {@link replaceSelection(List<?
-   * extends Proxy>) replaceSelection()} or {@link addToSelection(List<?
-   * extends Proxy>) addToSelection()} methods, and no attempts should be
+   * ancestor needs to be passed to the {@link #replaceSelection(List)
+   * replaceSelection()} or {@link #addToSelection(List) addToSelection()}
+   * methods, and no attempts should be
    * made to select the item itself.
    * @param  item    The item the user wants to select.
    * @return The best ancestor that can be selected in this panel, or
@@ -141,7 +140,7 @@ public interface SelectionOwner
    * The selection is performed directly, without using a command.
    * @param  items   The list of items to be selected. Should only
    *                 include selectable ancestors.
-   * @see    {@link #getSelectableAncestor(Proxy) getSelectableAncestor()}
+   * @see    #getSelectableAncestor(Proxy) getSelectableAncestor()
    */
   public void replaceSelection(List<? extends Proxy> items);
 
@@ -150,7 +149,7 @@ public interface SelectionOwner
    * The selection is performed directly, without using a command.
    * @param  items   The list of items to be selected. Should only
    *                 include selectable ancestors.
-   * @see    {@link #getSelectableAncestor(Proxy) getSelectableAncestor()}
+   * @see    #getSelectableAncestor(Proxy) getSelectableAncestor()
    */
   public void addToSelection(List<? extends Proxy> items);
 
@@ -159,7 +158,7 @@ public interface SelectionOwner
    * The deselection is performed directly, without using a command.
    * @param  items   The list of items to be deselected. Should only
    *                 include selectable ancestors.
-   * @see    {@link #getSelectableAncestor(Proxy) getSelectableAncestor()}
+   * @see    #getSelectableAncestor(Proxy) getSelectableAncestor()
    */
   public void removeFromSelection(List<? extends Proxy> items);
 
@@ -173,7 +172,7 @@ public interface SelectionOwner
    * <P>Copies the contents of the given transferable to a list of items that
    * can be inserted into this component.</P>
    * <P>This method can be used by a paste operation to obtain insert
-   * position as required for the {@link #insertItems(List<InsertInfo>)
+   * position as required for the {@link #insertItems(List)
    * insertItems()} method. A previous call to {@link
    * #canPaste(Transferable) canPaste()} should have returned
    * <CODE>true</CODE>, otherwise the result of this method is
@@ -194,7 +193,7 @@ public interface SelectionOwner
    * deleted.
    * @param items   A list of items to be deleted, as produced by the
    *                {@link #getCurrentSelection()} method.
-   * @return <CODE>true</CODE> if the {@link #getDeletionVictims(List<Proxy>)
+   * @return <CODE>true</CODE> if the {@link #getDeletionVictims(List)
    *         getDeletionVictims()} method would return a non-empty list
    *         when passed the given selection as input.
    */
@@ -224,9 +223,9 @@ public interface SelectionOwner
    * Inserts the given items.
    * This method inserts the given deleted items into the model. This can
    * be used to undo the effects of a previous call to {@link
-   * #deleteItems(List<InsertInfo>) deleteItems()}.
+   * #deleteItems(List) deleteItems()}.
    * @param  inserts A list of {@link InsertInfo} objects as returned by
-   *                 the {@link #getDeletionVictims(List<Proxy>)
+   *                 the {@link #getDeletionVictims(List)
    *                 getDeletionVictims()} method.
    */
   public void insertItems(List<InsertInfo> inserts);
@@ -237,7 +236,7 @@ public interface SelectionOwner
    * The deletion is performed directly, without using a command.
    * The items are not deselected, this has to be done separately.
    * @param  deletes A list of {@link InsertInfo} objects as returned by
-   *                 the {@link #getDeletionVictims(List<Proxy>)
+   *                 the {@link #getDeletionVictims(List)
    *                 getDeletionVictims()} method.
    */
   public void deleteItems(List<InsertInfo> deletes);

@@ -33,9 +33,6 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
-import gnu.trove.strategy.HashingStrategy;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -73,6 +70,9 @@ import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.des.ConflictKind;
+
+import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
+import gnu.trove.strategy.HashingStrategy;
 
 
 /**
@@ -1182,7 +1182,6 @@ public class CompositionalSpecialTransitionsChecker
    * abstraction step and represents the current state of the model. It may
    * contain abstractions of only part of the original model, if event
    * disjoint subsystems are found.
-   * @see #mPostponedSubsystems
    */
   private Map<AutomatonProxy,AutomatonInfo> mAutomatonInfoMap;
 

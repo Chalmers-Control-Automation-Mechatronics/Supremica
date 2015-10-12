@@ -1586,9 +1586,6 @@ public class AutomatonMinimizer
 
     /**
      * Merges all "single-outgoing-epsilon-transition-states".
-     *
-     * @return Number of states that have been removed by merging or
-     * -1 if method didn't complete successfully.
      */
     private void mergeTriviallyObservationEquivalentStatesSynthesis(final Automaton aut)
     {

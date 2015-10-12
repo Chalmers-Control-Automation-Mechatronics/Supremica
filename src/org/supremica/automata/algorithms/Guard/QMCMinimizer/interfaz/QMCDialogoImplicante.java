@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.supremica.automata.algorithms.Guard.QMCMinimizer.interfaz;
 
@@ -26,22 +26,22 @@ public class QMCDialogoImplicante extends JDialog
     private static final long serialVersionUID = 1L;
 
     private JPanel jContentPane = null;
-	private JButton botonAceptar = null;	
+	private JButton botonAceptar = null;
 	private JPanel panelImplicantePrimo = null;
 	private JLabel etiquetaValorDecimal = null;
 	private JLabel etiquetaValorBinario = null;
 	private JLabel etiquetaNombre = null;
 	private JTextField cajaNombreImplicante = null;
-    
+
     private QMCImplicanteBean implicante = null;
     private char nombreImplicante = '\n';
 	private JTextField cajaValorDecimal = null;
 	private JTextField cajaValorBinario = null;
-    
+
     /**
      * Constructor por defecto
      */
-    public QMCDialogoImplicante(QMCImplicanteBean implicante) {
+    public QMCDialogoImplicante(final QMCImplicanteBean implicante) {
         super();
         this.implicante = implicante;
         initialize();
@@ -49,7 +49,7 @@ public class QMCDialogoImplicante extends JDialog
 
     /**
      * Método que inicializa los componentes del dialogo
-     * 
+     *
      */
     private void initialize() {
         this.setSize(351, 200);
@@ -62,7 +62,7 @@ public class QMCDialogoImplicante extends JDialog
 
     /**
      * This method initializes jContentPane
-     * 
+     *
      * @return javax.swing.JPanel
      */
     private JPanel getJContentPane() {
@@ -72,15 +72,15 @@ public class QMCDialogoImplicante extends JDialog
             jContentPane.add(getBotonAceptar(), null);
             jContentPane.add(getPanelImplicantePrimo(), null);
             getCajaNombreImplicante().requestFocus();
-            
+
         }
         return jContentPane;
     }
 
 	/**
-	 * This method initializes jButton	
-	 * 	
-	 * @return javax.swing.JButton	
+	 * This method initializes jButton
+	 *
+	 * @return javax.swing.JButton
 	 */
 	private JButton getBotonAceptar() {
 	    if (botonAceptar == null) {
@@ -90,7 +90,8 @@ public class QMCDialogoImplicante extends JDialog
 	        botonAceptar.setText("Aceptar");
 	        botonAceptar.setPreferredSize(new Dimension(86, 26));
 	        botonAceptar.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent e) 
+	            @Override
+              public void actionPerformed(final java.awt.event.ActionEvent e)
                 {
                     // VALIDACIONES
                     if (getCajaNombreImplicante().getText().equals(""))
@@ -104,17 +105,17 @@ public class QMCDialogoImplicante extends JDialog
                         nombreImplicante = cajaNombreImplicante.getText().toUpperCase().charAt(0);
                         dispose();
                     }
-                    
-                }    
+
+                }
 	        });
 	    }
 	    return botonAceptar;
 	}
 
 	/**
-	 * This method initializes panelImplicantePrimo	
-	 * 	
-	 * @return javax.swing.JPanel	
+	 * This method initializes panelImplicantePrimo
+	 *
+	 * @return javax.swing.JPanel
 	 */
 	private JPanel getPanelImplicantePrimo() {
 	    if (panelImplicantePrimo == null) {
@@ -142,18 +143,19 @@ public class QMCDialogoImplicante extends JDialog
 	}
 
 	/**
-	 * This method initializes cajaNombreImplicante	
-	 * 	
-	 * @return javax.swing.JTextField	
+	 * This method initializes cajaNombreImplicante
+	 *
+	 * @return javax.swing.JTextField
 	 */
 	private JTextField getCajaNombreImplicante() {
 	    if (cajaNombreImplicante == null) {
 	        cajaNombreImplicante = new JTextField();
-	        cajaNombreImplicante.setBounds(new java.awt.Rectangle(112,73,31,18));            
+	        cajaNombreImplicante.setBounds(new java.awt.Rectangle(112,73,31,18));
             cajaNombreImplicante.addKeyListener(new java.awt.event.KeyAdapter() {
                 // Validacion por tecla pulsada(escrita)
-                public void keyTyped(java.awt.event.KeyEvent e) {
-                    char tecla = e.getKeyChar();
+                @Override
+                public void keyTyped(final java.awt.event.KeyEvent e) {
+                    final char tecla = e.getKeyChar();
                     if(tecla=='\n')
                     {
                         botonAceptar.doClick();
@@ -168,10 +170,9 @@ public class QMCDialogoImplicante extends JDialog
 	    }
 	    return cajaNombreImplicante;
 	}
-    
+
     /**
      * Devuelve el nombre introducido para el implicante
-     * @return
      */
     public char getNombreImplicante()
     {
@@ -179,9 +180,9 @@ public class QMCDialogoImplicante extends JDialog
     }
 
 	/**
-	 * This method initializes cajaValorDecimal	
-	 * 	
-	 * @return javax.swing.JTextField	
+	 * This method initializes cajaValorDecimal
+	 *
+	 * @return javax.swing.JTextField
 	 */
 	private JTextField getCajaValorDecimal() {
 	    if (cajaValorDecimal == null) {
@@ -194,9 +195,9 @@ public class QMCDialogoImplicante extends JDialog
 	}
 
 	/**
-	 * This method initializes jTextField	
-	 * 	
-	 * @return javax.swing.JTextField	
+	 * This method initializes jTextField
+	 *
+	 * @return javax.swing.JTextField
 	 */
 	private JTextField getCajaValorBinario() {
 	    if (cajaValorBinario == null) {

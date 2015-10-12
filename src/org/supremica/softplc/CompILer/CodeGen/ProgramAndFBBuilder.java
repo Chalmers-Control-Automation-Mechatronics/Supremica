@@ -1,10 +1,48 @@
 package org.supremica.softplc.CompILer.CodeGen;
 
-import org.supremica.softplc.CompILer.CodeGen.Constants.*;
-import org.supremica.softplc.CompILer.CodeGen.Datatypes.*;
 import org.supremica.log.Logger;
-import de.fub.bytecode.generic.*;
+import org.supremica.softplc.CompILer.CodeGen.Constants.IlCallOperator;
+import org.supremica.softplc.CompILer.CodeGen.Constants.IlExprOperator;
+import org.supremica.softplc.CompILer.CodeGen.Constants.IlJumpOperator;
+import org.supremica.softplc.CompILer.CodeGen.Constants.IlSimpleOperator;
+import org.supremica.softplc.CompILer.CodeGen.Constants.IllegalOperatorException;
+import org.supremica.softplc.CompILer.CodeGen.Datatypes.IECConstant;
+import org.supremica.softplc.CompILer.CodeGen.Datatypes.IECDirectVariable;
+import org.supremica.softplc.CompILer.CodeGen.Datatypes.IECSymbolicVariable;
+import org.supremica.softplc.CompILer.CodeGen.Datatypes.IECVariable;
+import org.supremica.softplc.CompILer.CodeGen.Datatypes.TypeANY_ELEMENTARY;
+import org.supremica.softplc.CompILer.CodeGen.Datatypes.TypeBOOL;
+import org.supremica.softplc.CompILer.CodeGen.Datatypes.TypeConstant;
+import org.supremica.softplc.CompILer.CodeGen.Datatypes.TypeDINT;
+import org.supremica.softplc.CompILer.CodeGen.Datatypes.TypeFUNCTION_BLOCK;
+import org.supremica.softplc.CompILer.CodeGen.Datatypes.TypeREAL;
+import org.supremica.softplc.CompILer.CodeGen.Datatypes.TypeWSTRING;
+
 import de.fub.bytecode.Constants;
+import de.fub.bytecode.generic.BranchHandle;
+import de.fub.bytecode.generic.BranchInstruction;
+import de.fub.bytecode.generic.ClassGen;
+import de.fub.bytecode.generic.ConstantPoolGen;
+import de.fub.bytecode.generic.FieldGen;
+import de.fub.bytecode.generic.GOTO;
+import de.fub.bytecode.generic.GOTO_W;
+import de.fub.bytecode.generic.IDIV;
+import de.fub.bytecode.generic.IFEQ;
+import de.fub.bytecode.generic.IFGE;
+import de.fub.bytecode.generic.IFGT;
+import de.fub.bytecode.generic.IFLE;
+import de.fub.bytecode.generic.IFLT;
+import de.fub.bytecode.generic.IFNE;
+import de.fub.bytecode.generic.IMUL;
+import de.fub.bytecode.generic.ISUB;
+import de.fub.bytecode.generic.InstructionConstants;
+import de.fub.bytecode.generic.InstructionFactory;
+import de.fub.bytecode.generic.InstructionHandle;
+import de.fub.bytecode.generic.InstructionList;
+import de.fub.bytecode.generic.MethodGen;
+import de.fub.bytecode.generic.ObjectType;
+import de.fub.bytecode.generic.PUSH;
+import de.fub.bytecode.generic.Type;
 
 /**
  * This class handles java bytecode generation. It handles all parts common
@@ -81,7 +119,7 @@ public abstract class ProgramAndFBBuilder
 	 * takes care of debug messages.
 	 * @param message a message to be displayed.
 	 */
-	void debug(Object message)
+	void debug(final Object message)
 	{
 		if (logger != null)
 		{
@@ -98,7 +136,7 @@ public abstract class ProgramAndFBBuilder
 	 * After calling this method calls to dumpCode() has no effect.
 	 * @param message a message to be displayed.
 	 */
-	void error(Object message)
+	void error(final Object message)
 	{
 		if (logger != null)
 		{
@@ -116,7 +154,7 @@ public abstract class ProgramAndFBBuilder
 	 * takes care of info messages.
 	 * @param message a message to be displayed.
 	 */
-	void info(Object message)
+	void info(final Object message)
 	{
 		if (logger != null)
 		{
@@ -134,7 +172,7 @@ public abstract class ProgramAndFBBuilder
 	 */
 
 	//XXX fråga knut hur denna fungerar
-	void warn(Object message)
+	void warn(final Object message)
 	{
 		if (logger != null)
 		{
@@ -149,7 +187,8 @@ public abstract class ProgramAndFBBuilder
 	/**dumpCode should be called when the IL POU generation is finished.
 	 * This method will then dump the generated code to a class file.
 	 */
-	public void dumpCode()
+	@Override
+  public void dumpCode()
 	{
 		ilRun.append(InstructionConstants.RETURN);
 		ilInit.append(InstructionConstants.RETURN);
@@ -164,7 +203,7 @@ public abstract class ProgramAndFBBuilder
 			{
 				classGen.getJavaClass().dump(classFileName);
 			}
-			catch (java.io.IOException e)
+			catch (final java.io.IOException e)
 			{
 				error(e);
 			}
@@ -185,7 +224,8 @@ public abstract class ProgramAndFBBuilder
 	 * @param inputOutputVar decide whether this variable should be
 	 *                       accessible from owner POU (e.g. Program)
 	 */
-	public void emitVarField(String varName, Object type, boolean global, boolean inputOutputVar)
+	@Override
+  public void emitVarField(final String varName, final Object type, final boolean global, final boolean inputOutputVar)
 	{
 		if (type instanceof TypeConstant)
 		{
@@ -214,7 +254,7 @@ public abstract class ProgramAndFBBuilder
 	 * @param inputOutputVar decide whether this variable should be
 	 *                       accessible from owner POU (e.g. Program)
 	 */
-	public void emitVarField(String varName, TypeConstant type, boolean global, boolean inputOutputVar)
+	public void emitVarField(final String varName, final TypeConstant type, final boolean global, final boolean inputOutputVar)
 	{
 		int accessFlags = Constants.ACC_PRIVATE;
 
@@ -225,28 +265,28 @@ public abstract class ProgramAndFBBuilder
 
 		if (type == TypeConstant.T_BOOL)
 		{
-			FieldGen var = new FieldGen(accessFlags, Type.BOOLEAN, varName, constPoolGen);
+			final FieldGen var = new FieldGen(accessFlags, Type.BOOLEAN, varName, constPoolGen);
 
 			classGen.addField(var.getField());
 			constPoolGen.addFieldref(className, varName, "Z" /*bcode basetype*/);
 		}
 		else if (type == TypeConstant.T_DINT)
 		{
-			FieldGen var = new FieldGen(accessFlags, Type.INT, varName, constPoolGen);
+			final FieldGen var = new FieldGen(accessFlags, Type.INT, varName, constPoolGen);
 
 			classGen.addField(var.getField());
 			constPoolGen.addFieldref(className, varName, "I" /*bcode basetype*/);
 		}
 		else if (type == TypeConstant.T_REAL)
 		{
-			FieldGen var = new FieldGen(accessFlags, Type.FLOAT, varName, constPoolGen);
+			final FieldGen var = new FieldGen(accessFlags, Type.FLOAT, varName, constPoolGen);
 
 			classGen.addField(var.getField());
 			constPoolGen.addFieldref(className, varName, "F" /*bcode basetype*/);
 		}
 		else if (type == TypeConstant.T_WSTRING)
 		{
-			FieldGen var = new FieldGen(accessFlags, Type.STRING, varName, constPoolGen);
+			final FieldGen var = new FieldGen(accessFlags, Type.STRING, varName, constPoolGen);
 
 			classGen.addField(var.getField());
 			constPoolGen.addFieldref(className, varName, "Ljava/lang/String;");
@@ -268,9 +308,9 @@ public abstract class ProgramAndFBBuilder
 	 * @param inputOutputVar decide whether this variable should be
 	 *                       accessible from owner POU (e.g. Program)
 	 */
-	public void emitVarField(String varName, TypeANY_ELEMENTARY type, boolean global, boolean inputOutputVar)
+	public void emitVarField(final String varName, final TypeANY_ELEMENTARY type, final boolean global, final boolean inputOutputVar)
 	{
-		TypeConstant t = type.getType();
+		final TypeConstant t = type.getType();
 
 		if ((t == TypeConstant.T_BOOL) || (t == TypeConstant.T_DINT) || (t == TypeConstant.T_REAL) || (t == TypeConstant.T_WSTRING))
 		{
@@ -278,7 +318,7 @@ public abstract class ProgramAndFBBuilder
 			emitVarField(varName, type.getType(), global, inputOutputVar);
 
 			/* initialise the variable */
-			IECSymbolicVariable var = new IECSymbolicVariable(varName, type.getType());
+			final IECSymbolicVariable var = new IECSymbolicVariable(varName, type.getType());
 
 			ilInit.append(emitLoadG(type));
 			ilInit.append(emitStoreVariable(var));
@@ -299,7 +339,7 @@ public abstract class ProgramAndFBBuilder
 	 * @param inputOutputVar decide whether this variable should be
 	 *                       accessible from owner POU (e.g. Program)
 	 */
-	public void emitVarField(String varName, TypeFUNCTION_BLOCK type, boolean global, boolean inputOutputVar)
+	public void emitVarField(final String varName, final TypeFUNCTION_BLOCK type, final boolean global, final boolean inputOutputVar)
 	{
 
 		// create a field
@@ -310,8 +350,8 @@ public abstract class ProgramAndFBBuilder
 			accessFlags = Constants.ACC_PUBLIC;
 		}
 
-		ObjectType fbType = new ObjectType(type.getName());
-		FieldGen var = new FieldGen(accessFlags, fbType, varName, constPoolGen);
+		final ObjectType fbType = new ObjectType(type.getName());
+		final FieldGen var = new FieldGen(accessFlags, fbType, varName, constPoolGen);
 
 		classGen.addField(var.getField());
 		constPoolGen.addFieldref(className, varName, "L" + type.getName() + ";");
@@ -328,7 +368,8 @@ public abstract class ProgramAndFBBuilder
 	 * @param v the direct variable
 	 * @param i the value the variable should be set to
 	 */
-	abstract public void emitDirectInit(IECDirectVariable v, TypeBOOL i);
+	@Override
+  abstract public void emitDirectInit(IECDirectVariable v, TypeBOOL i);
 
 	/**
 	 * emitLoadVariable pushes the value of a specified variable
@@ -336,7 +377,7 @@ public abstract class ProgramAndFBBuilder
 	 * previous stack values
 	 * @param var variable to load
 	 */
-	InstructionList emitLoadVariable(IECVariable var)
+	InstructionList emitLoadVariable(final IECVariable var)
 	{
 		if (var instanceof IECSymbolicVariable)
 		{
@@ -354,11 +395,11 @@ public abstract class ProgramAndFBBuilder
 	 * previous stack values
 	 * @param var symbolic variable to load
 	 */
-	InstructionList emitLoadVariable(IECSymbolicVariable var)
+	InstructionList emitLoadVariable(final IECSymbolicVariable var)
 	{
-		InstructionList il = new InstructionList();
+		final InstructionList il = new InstructionList();
 		TypeConstant type = var.getType();
-		String varName = var.getName();
+		final String varName = var.getName();
 
 		if (type == TypeConstant.T_BOOL)
 		{
@@ -445,7 +486,7 @@ public abstract class ProgramAndFBBuilder
 	 * the specified variable
 	 * @param var variable to store TOS value in
 	 */
-	InstructionList emitStoreVariable(IECVariable var)
+	InstructionList emitStoreVariable(final IECVariable var)
 	{
 		if (var instanceof IECSymbolicVariable)
 		{
@@ -462,11 +503,11 @@ public abstract class ProgramAndFBBuilder
 	 * the specified variable
 	 * @param var variable to store TOS value in
 	 */
-	InstructionList emitStoreVariable(IECSymbolicVariable var)
+	InstructionList emitStoreVariable(final IECSymbolicVariable var)
 	{
-		InstructionList il = new InstructionList();
+		final InstructionList il = new InstructionList();
 		TypeConstant type = var.getType();
-		String varName = var.getName();
+		final String varName = var.getName();
 
 		if (type == TypeConstant.T_BOOL)
 		{
@@ -559,14 +600,15 @@ public abstract class ProgramAndFBBuilder
 
 	/**
 	 * emitIL_SIMPLE_OPERATION choose operator function
-	 * @param oparator operator to choose
+	 * @param operator operator to choose
 	 * @param arg operator argument
 	 */
-	public void emitIL_SIMPLE_OPERATION(String operator, Object arg)
+	@Override
+  public void emitIL_SIMPLE_OPERATION(final String operator, final Object arg)
 	{
 		try
 		{
-			IlSimpleOperator op = IlSimpleOperator.getOperator(operator);
+			final IlSimpleOperator op = IlSimpleOperator.getOperator(operator);
 
 			if (op == IlSimpleOperator.LD)
 			{
@@ -676,7 +718,7 @@ public abstract class ProgramAndFBBuilder
 				error("Operator " + op + " not implemented");
 			}
 		}
-		catch (IllegalOperatorException e)
+		catch (final IllegalOperatorException e)
 		{
 			error("Illegal operator: " + operator);
 		}
@@ -686,7 +728,8 @@ public abstract class ProgramAndFBBuilder
 	 * emitStackSpace is used when opening a new scope in IL
 	 * @param size nr of spaces on JVM-stack to reserve
 	 */
-	public void emitStackSpace(int size)
+	@Override
+  public void emitStackSpace(final int size)
 	{
 		if (size == 1)
 		{
@@ -709,29 +752,29 @@ public abstract class ProgramAndFBBuilder
 	 * @param arg the value to push
 	 * @return BCEL instructions for loading
 	 */
-	InstructionList emitLoadG(Object arg)
+	InstructionList emitLoadG(final Object arg)
 	{
-		InstructionList il = new InstructionList();
+		final InstructionList il = new InstructionList();
 
 		if (arg instanceof IECConstant)
 		{
-			TypeConstant t = ((IECConstant) arg).getType();
+			final TypeConstant t = ((IECConstant) arg).getType();
 
 			if (t == TypeConstant.T_DINT)
 			{
-				il.append(new PUSH(constPoolGen, (int) ((TypeDINT) arg).getValue()));
+				il.append(new PUSH(constPoolGen, ((TypeDINT) arg).getValue()));
 			}
 			else if (t == TypeConstant.T_REAL)
 			{
-				il.append(new PUSH(constPoolGen, (float) ((TypeREAL) arg).getValue()));
+				il.append(new PUSH(constPoolGen, ((TypeREAL) arg).getValue()));
 			}
 			else if (t == TypeConstant.T_BOOL)
 			{
-				il.append(new PUSH(constPoolGen, (boolean) ((TypeBOOL) arg).getValue()));
+				il.append(new PUSH(constPoolGen, ((TypeBOOL) arg).getValue()));
 			}
 			else if (t == TypeConstant.T_WSTRING)
 			{
-				il.append(new PUSH(constPoolGen, (String) ((TypeWSTRING) arg).getValue()));
+				il.append(new PUSH(constPoolGen, ((TypeWSTRING) arg).getValue()));
 			}
 			else
 			{
@@ -755,7 +798,8 @@ public abstract class ProgramAndFBBuilder
 	 * previous values (inserts instructions into the run method)
 	 * @param arg the value to push
 	 */
-	public void emitLoad(Object arg)
+	@Override
+  public void emitLoad(final Object arg)
 	{
 		ilRun.append(emitLoadG(arg));
 	}
@@ -765,7 +809,7 @@ public abstract class ProgramAndFBBuilder
 	 * behaviour)
 	 * @param arg the value to push
 	 */
-	private void emitLD(Object arg)
+	private void emitLD(final Object arg)
 	{
 		ilRun.append(InstructionConstants.POP);
 		emitLoad(arg);
@@ -776,7 +820,7 @@ public abstract class ProgramAndFBBuilder
 	 * behaviour)
 	 * @param arg the value to push
 	 */
-	private void emitLDN(Object arg)
+	private void emitLDN(final Object arg)
 	{
 		if (((arg instanceof IECConstant) && ((IECConstant) arg).getType() == TypeConstant.T_BOOL) || ((arg instanceof IECVariable) && ((IECVariable) arg).getType() == TypeConstant.T_BOOL))
 		{
@@ -798,7 +842,7 @@ public abstract class ProgramAndFBBuilder
 	 * specified variable
 	 * @param arg where the value is to be stored (must be of type BOOL)
 	 */
-	private void emitSTN(Object arg)
+	private void emitSTN(final Object arg)
 	{
 		if (arg instanceof IECConstant)
 		{
@@ -806,7 +850,7 @@ public abstract class ProgramAndFBBuilder
 		}
 		else if (arg instanceof IECVariable)
 		{
-			IECVariable var = (IECVariable) arg;
+			final IECVariable var = (IECVariable) arg;
 
 			/*
 			 * first we must duplicate stack value to be able to keep
@@ -834,7 +878,7 @@ public abstract class ProgramAndFBBuilder
 	 * specified variable
 	 * @param arg where the value is to be stored
 	 */
-	private void emitST(Object arg)
+	private void emitST(final Object arg)
 	{
 		if (arg instanceof IECConstant)
 		{
@@ -842,7 +886,7 @@ public abstract class ProgramAndFBBuilder
 		}
 		else if (arg instanceof IECVariable)
 		{
-			IECVariable var = (IECVariable) arg;
+			final IECVariable var = (IECVariable) arg;
 
 			/*
 			 * first we must duplicate stack value to be able to keep
@@ -871,8 +915,8 @@ public abstract class ProgramAndFBBuilder
 	private void emitNOT()
 	{
 		InstructionHandle end_ldn, iffalse;
-		BranchInstruction ifeq = new IFEQ(null);
-		BranchInstruction jmp = new GOTO(null);
+		final BranchInstruction ifeq = new IFEQ(null);
+		final BranchInstruction jmp = new GOTO(null);
 
 		ilRun.append(ifeq);    //if stack == false jump
 		ilRun.append(new PUSH(constPoolGen, false));
@@ -889,7 +933,7 @@ public abstract class ProgramAndFBBuilder
 	 * emitS set the argument (a variable) to true if the TOS value is true
 	 * @param arg an IL BOOL-variable
 	 */
-	private void emitS(Object arg)
+	private void emitS(final Object arg)
 	{
 		if (arg instanceof IECConstant)
 		{
@@ -897,11 +941,11 @@ public abstract class ProgramAndFBBuilder
 		}
 		else if (arg instanceof IECVariable)
 		{
-			IECVariable var = (IECVariable) arg;
+			final IECVariable var = (IECVariable) arg;
 
 			if (var.getType() == TypeConstant.T_BOOL)
 			{
-				BranchInstruction ifne = new IFEQ(null);
+				final BranchInstruction ifne = new IFEQ(null);
 				InstructionHandle skipStore;
 
 				ilRun.append(InstructionConstants.DUP);
@@ -934,7 +978,7 @@ public abstract class ProgramAndFBBuilder
 	 * emitR set the argument (a variable) to false if the TOS value is true
 	 * @param arg an IL BOOL-variable
 	 */
-	private void emitR(Object arg)
+	private void emitR(final Object arg)
 	{
 		if (arg instanceof IECConstant)
 		{
@@ -942,11 +986,11 @@ public abstract class ProgramAndFBBuilder
 		}
 		else if (arg instanceof IECVariable)
 		{
-			IECVariable var = (IECVariable) arg;
+			final IECVariable var = (IECVariable) arg;
 
 			if (var.getType() == TypeConstant.T_BOOL)
 			{
-				BranchInstruction ifne = new IFEQ(null);
+				final BranchInstruction ifne = new IFEQ(null);
 				InstructionHandle skipStore;
 
 				ilRun.append(InstructionConstants.DUP);
@@ -979,11 +1023,11 @@ public abstract class ProgramAndFBBuilder
 	 * on the stack
 	 * @param arg an IL BOOL-variable
 	 */
-	private void emitADD(Object arg)
+	private void emitADD(final Object arg)
 	{
 		if (arg instanceof IECConstant)
 		{
-			TypeConstant t = ((IECConstant) arg).getType();
+			final TypeConstant t = ((IECConstant) arg).getType();
 
 			if (t == TypeConstant.T_DINT)
 			{
@@ -1002,7 +1046,7 @@ public abstract class ProgramAndFBBuilder
 		}
 		else if (arg instanceof IECVariable)
 		{
-			IECVariable var = (IECVariable) arg;
+			final IECVariable var = (IECVariable) arg;
 			TypeConstant t = var.getType();
 
 			if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_DERIVED) && (((IECSymbolicVariable) var).getFieldSelectorType() != null))
@@ -1035,11 +1079,11 @@ public abstract class ProgramAndFBBuilder
 	 * emitAND does a logical and between TOS value and the argument.
 	 * @param arg an IL BOOL-variable
 	 */
-	private void emitAND(Object arg)
+	private void emitAND(final Object arg)
 	{
 		if (arg instanceof IECConstant)
 		{
-			TypeConstant t = ((IECConstant) arg).getType();
+			final TypeConstant t = ((IECConstant) arg).getType();
 
 			if (t == TypeConstant.T_BOOL)
 			{
@@ -1057,7 +1101,7 @@ public abstract class ProgramAndFBBuilder
 		}
 		else if (arg instanceof IECVariable)
 		{
-			IECVariable var = (IECVariable) arg;
+			final IECVariable var = (IECVariable) arg;
 			TypeConstant t = var.getType();
 
 			if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_DERIVED) && (((IECSymbolicVariable) var).getFieldSelectorType() != null))
@@ -1070,7 +1114,7 @@ public abstract class ProgramAndFBBuilder
 				ilRun.append(emitLoadVariable(var));
 
 				InstructionHandle end_and;
-				BranchInstruction ifne = new IFNE(null);
+				final BranchInstruction ifne = new IFNE(null);
 
 				ilRun.append(ifne);    // if stack != false jump
 				ilRun.append(InstructionConstants.POP);
@@ -1096,11 +1140,11 @@ public abstract class ProgramAndFBBuilder
 	 * emitANDN makes a logical AND between TOS value and the inverted argument.
 	 * @param arg an IL BOOL-variable
 	 */
-	private void emitANDN(Object arg)
+	private void emitANDN(final Object arg)
 	{
 		if (arg instanceof IECConstant)
 		{
-			TypeConstant t = ((IECConstant) arg).getType();
+			final TypeConstant t = ((IECConstant) arg).getType();
 
 			if (t == TypeConstant.T_BOOL)
 			{
@@ -1119,7 +1163,7 @@ public abstract class ProgramAndFBBuilder
 		}
 		else if (arg instanceof IECVariable)
 		{
-			IECVariable var = (IECVariable) arg;
+			final IECVariable var = (IECVariable) arg;
 			TypeConstant t = var.getType();
 
 			if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_DERIVED) && (((IECSymbolicVariable) var).getFieldSelectorType() != null))
@@ -1132,7 +1176,7 @@ public abstract class ProgramAndFBBuilder
 				ilRun.append(emitLoadVariable(var));
 
 				InstructionHandle end_andn;
-				BranchInstruction ifeq = new IFEQ(null);
+				final BranchInstruction ifeq = new IFEQ(null);
 
 				ilRun.append(ifeq);    // if stack == false jump
 				ilRun.append(InstructionConstants.POP);
@@ -1158,11 +1202,11 @@ public abstract class ProgramAndFBBuilder
 	 * emitOR makes a logical OR between TOS value and the argument.
 	 * @param arg an IL BOOL
 	 */
-	private void emitOR(Object arg)
+	private void emitOR(final Object arg)
 	{
 		if (arg instanceof IECConstant)
 		{
-			TypeConstant t = ((IECConstant) arg).getType();
+			final TypeConstant t = ((IECConstant) arg).getType();
 
 			if (t == TypeConstant.T_BOOL)
 			{
@@ -1181,7 +1225,7 @@ public abstract class ProgramAndFBBuilder
 		}
 		else if (arg instanceof IECVariable)
 		{
-			IECVariable var = (IECVariable) arg;
+			final IECVariable var = (IECVariable) arg;
 			TypeConstant t = var.getType();
 
 			if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_DERIVED) && (((IECSymbolicVariable) var).getFieldSelectorType() != null))
@@ -1194,7 +1238,7 @@ public abstract class ProgramAndFBBuilder
 				ilRun.append(emitLoadVariable(var));
 
 				InstructionHandle end_or;
-				BranchInstruction ifeq = new IFEQ(null);
+				final BranchInstruction ifeq = new IFEQ(null);
 
 				ilRun.append(ifeq);    // stack = false
 				ilRun.append(InstructionConstants.POP);
@@ -1219,11 +1263,11 @@ public abstract class ProgramAndFBBuilder
 	 * emitXOR makes a logical XOR between TOS value and the argument.
 	 * @param arg an IL BOOL
 	 */
-	private void emitXOR(Object arg)
+	private void emitXOR(final Object arg)
 	{
 		if (arg instanceof IECConstant)
 		{
-			TypeConstant t = ((IECConstant) arg).getType();
+			final TypeConstant t = ((IECConstant) arg).getType();
 
 			if (t == TypeConstant.T_BOOL)
 			{
@@ -1241,7 +1285,7 @@ public abstract class ProgramAndFBBuilder
 		}
 		else if (arg instanceof IECVariable)
 		{
-			IECVariable var = (IECVariable) arg;
+			final IECVariable var = (IECVariable) arg;
 			TypeConstant t = var.getType();
 
 			if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_DERIVED) && (((IECSymbolicVariable) var).getFieldSelectorType() != null))
@@ -1254,7 +1298,7 @@ public abstract class ProgramAndFBBuilder
 				ilRun.append(emitLoadVariable(var));
 
 				InstructionHandle end_xor;
-				BranchInstruction ifeq = new IFEQ(null);
+				final BranchInstruction ifeq = new IFEQ(null);
 
 				ilRun.append(ifeq);    // stack = false
 				emitNOT();
@@ -1278,11 +1322,11 @@ public abstract class ProgramAndFBBuilder
 	 * emitORN makes a logical ORN between TOS value and the inverted argument.
 	 * @param arg an IL BOOL
 	 */
-	private void emitORN(Object arg)
+	private void emitORN(final Object arg)
 	{
 		if (arg instanceof IECConstant)
 		{
-			TypeConstant t = ((IECConstant) arg).getType();
+			final TypeConstant t = ((IECConstant) arg).getType();
 
 			if (t == TypeConstant.T_BOOL)
 			{
@@ -1301,7 +1345,7 @@ public abstract class ProgramAndFBBuilder
 		}
 		else if (arg instanceof IECVariable)
 		{
-			IECVariable var = (IECVariable) arg;
+			final IECVariable var = (IECVariable) arg;
 			TypeConstant t = var.getType();
 
 			if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_DERIVED) && ((IECSymbolicVariable) var).getFieldSelectorType() != null)
@@ -1314,7 +1358,7 @@ public abstract class ProgramAndFBBuilder
 				ilRun.append(emitLoadVariable(var));
 
 				InstructionHandle end_orn;
-				BranchInstruction ifne = new IFNE(null);
+				final BranchInstruction ifne = new IFNE(null);
 
 				ilRun.append(ifne);    // stack = true
 				ilRun.append(InstructionConstants.POP);
@@ -1344,11 +1388,11 @@ public abstract class ProgramAndFBBuilder
 	T xn F   F
 F xn T   F
 F xn F   T*/
-	private void emitXORN(Object arg)
+	private void emitXORN(final Object arg)
 	{
 		if (arg instanceof IECConstant)
 		{
-			TypeConstant t = ((IECConstant) arg).getType();
+			final TypeConstant t = ((IECConstant) arg).getType();
 
 			if (t == TypeConstant.T_BOOL)
 			{
@@ -1366,7 +1410,7 @@ F xn F   T*/
 		}
 		else if (arg instanceof IECVariable)
 		{
-			IECVariable var = (IECVariable) arg;
+			final IECVariable var = (IECVariable) arg;
 			TypeConstant t = var.getType();
 
 			if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_DERIVED) && (((IECSymbolicVariable) var).getFieldSelectorType() != null))
@@ -1379,7 +1423,7 @@ F xn F   T*/
 				ilRun.append(emitLoadVariable(var));
 
 				InstructionHandle end_xorn;
-				BranchInstruction ifne = new IFNE(null);
+				final BranchInstruction ifne = new IFNE(null);
 
 				ilRun.append(ifne);    // stack = true
 				emitNOT();
@@ -1402,11 +1446,11 @@ F xn F   T*/
 	/**emitSUB sub stack value with argument and put the result on the stack
 	 * @param arg an IL DINT or REAL
 	 */
-	private void emitSUB(Object arg)
+	private void emitSUB(final Object arg)
 	{
 		if (arg instanceof IECConstant)
 		{
-			TypeConstant t = ((IECConstant) arg).getType();
+			final TypeConstant t = ((IECConstant) arg).getType();
 
 			if (t == TypeConstant.T_DINT)
 			{
@@ -1425,7 +1469,7 @@ F xn F   T*/
 		}
 		else if (arg instanceof IECVariable)
 		{
-			IECVariable var = (IECVariable) arg;
+			final IECVariable var = (IECVariable) arg;
 			TypeConstant t = var.getType();
 
 			if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_DERIVED) && (((IECSymbolicVariable) var).getFieldSelectorType() != null))
@@ -1457,11 +1501,11 @@ F xn F   T*/
 	/**emitMUL multiplicates the argument with stack value and put the result on the stack
 	 * @param arg an IL DINT or REAL
 	 */
-	private void emitMUL(Object arg)
+	private void emitMUL(final Object arg)
 	{
 		if (arg instanceof IECConstant)
 		{
-			TypeConstant t = ((IECConstant) arg).getType();
+			final TypeConstant t = ((IECConstant) arg).getType();
 
 			if (t == TypeConstant.T_DINT)
 			{
@@ -1480,7 +1524,7 @@ F xn F   T*/
 		}
 		else if (arg instanceof IECVariable)
 		{
-			IECVariable var = (IECVariable) arg;
+			final IECVariable var = (IECVariable) arg;
 			TypeConstant t = var.getType();
 
 			if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_DERIVED) && (((IECSymbolicVariable) var).getFieldSelectorType() != null))
@@ -1513,11 +1557,11 @@ F xn F   T*/
 	 * result on the stack
 	 * @param arg an IL DINT or REAL
 	 */
-	private void emitDIV(Object arg)
+	private void emitDIV(final Object arg)
 	{
 		if (arg instanceof IECConstant)
 		{
-			TypeConstant t = ((IECConstant) arg).getType();
+			final TypeConstant t = ((IECConstant) arg).getType();
 
 			if (t == TypeConstant.T_DINT)
 			{
@@ -1536,7 +1580,7 @@ F xn F   T*/
 		}
 		else if (arg instanceof IECVariable)
 		{
-			IECVariable var = (IECVariable) arg;
+			final IECVariable var = (IECVariable) arg;
 			TypeConstant t = var.getType();
 
 			if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_DERIVED) && (((IECSymbolicVariable) var).getFieldSelectorType() != null))
@@ -1574,25 +1618,25 @@ F xn F   T*/
 	 * value1' and value2'.
 	 * @param arg
 	 */
-	private void emitMOD(Object arg)
+	private void emitMOD(final Object arg)
 	{
 		if (arg instanceof IECConstant)
 		{
-			TypeConstant t = ((IECConstant) arg).getType();
+			final TypeConstant t = ((IECConstant) arg).getType();
 
 			if (t == TypeConstant.T_DINT)
 			{
 				ilRun.append(new PUSH(constPoolGen, ((TypeDINT) arg).getValue()));
 
 				InstructionHandle mod_0;
-				BranchInstruction ifeq = new IFEQ(null);
+				final BranchInstruction ifeq = new IFEQ(null);
 
 				ilRun.append(ifeq);    // if mod 0, then jump
 				ilRun.append(new PUSH(constPoolGen, ((TypeDINT) arg).getValue()));
 				ilRun.append(InstructionConstants.IREM);
 
 				InstructionHandle end_mod;
-				BranchInstruction jmp = new GOTO(null);
+				final BranchInstruction jmp = new GOTO(null);
 
 				ilRun.append(jmp);    // always jump to end_mod
 
@@ -1617,7 +1661,7 @@ F xn F   T*/
 		}
 		else if (arg instanceof IECVariable)
 		{
-			IECVariable var = (IECVariable) arg;
+			final IECVariable var = (IECVariable) arg;
 			TypeConstant t = var.getType();
 
 			if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_DERIVED) && (((IECSymbolicVariable) var).getFieldSelectorType() != null))
@@ -1630,14 +1674,14 @@ F xn F   T*/
 				ilRun.append(emitLoadVariable(var));
 
 				InstructionHandle mod_0;
-				BranchInstruction ifeq = new IFEQ(null);
+				final BranchInstruction ifeq = new IFEQ(null);
 
 				ilRun.append(ifeq);    // if mod 0, then jump
 				ilRun.append(emitLoadVariable(var));
 				ilRun.append(InstructionConstants.IREM);
 
 				InstructionHandle end_mod;
-				BranchInstruction jmp = new GOTO(null);
+				final BranchInstruction jmp = new GOTO(null);
 
 				ilRun.append(jmp);    // always jump to end_mod
 
@@ -1669,11 +1713,11 @@ F xn F   T*/
 	/**emitEQ test for equality and put the result on the stack
 	 * @param arg argument to compare to TOS
 	 */
-	private void emitEQ(Object arg)
+	private void emitEQ(final Object arg)
 	{
 		if (arg instanceof IECConstant)
 		{
-			TypeConstant t = ((IECConstant) arg).getType();
+			final TypeConstant t = ((IECConstant) arg).getType();
 
 			if ((t == TypeConstant.T_BOOL) || (t == TypeConstant.T_DINT) || (t == TypeConstant.T_REAL))
 			{
@@ -1694,13 +1738,13 @@ F xn F   T*/
 				}
 
 				InstructionHandle if_true;
-				BranchInstruction ifeq = new IFEQ(null);
+				final BranchInstruction ifeq = new IFEQ(null);
 
 				ilRun.append(ifeq);    // if condition is true, jump to if_true
 				ilRun.append(new PUSH(constPoolGen, false));
 
 				InstructionHandle end;
-				BranchInstruction jmp = new GOTO(null);
+				final BranchInstruction jmp = new GOTO(null);
 
 				ilRun.append(jmp);    // always jump to end
 
@@ -1717,7 +1761,7 @@ F xn F   T*/
 		}
 		else if (arg instanceof IECVariable)
 		{
-			IECVariable var = (IECVariable) arg;
+			final IECVariable var = (IECVariable) arg;
 			TypeConstant t = var.getType();
 
 			if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_DERIVED) && (((IECSymbolicVariable) var).getFieldSelectorType() != null))
@@ -1739,13 +1783,13 @@ F xn F   T*/
 				}
 
 				InstructionHandle if_true;
-				BranchInstruction ifeq = new IFEQ(null);
+				final BranchInstruction ifeq = new IFEQ(null);
 
 				ilRun.append(ifeq);    // if condition is true, jump to if_true
 				ilRun.append(new PUSH(constPoolGen, false));
 
 				InstructionHandle end;
-				BranchInstruction jmp = new GOTO(null);
+				final BranchInstruction jmp = new GOTO(null);
 
 				ilRun.append(jmp);    // always jump to end
 
@@ -1769,11 +1813,11 @@ F xn F   T*/
 	/** emitGT does the test TOS > arg and puts the result in TOS.
 	 * @param arg argument to compare to TOS
 	 */
-	private void emitGT(Object arg)
+	private void emitGT(final Object arg)
 	{
 		if (arg instanceof IECConstant)
 		{
-			TypeConstant t = ((IECConstant) arg).getType();
+			final TypeConstant t = ((IECConstant) arg).getType();
 
 			if ((t == TypeConstant.T_BOOL) || (t == TypeConstant.T_DINT) || (t == TypeConstant.T_REAL))
 			{
@@ -1794,13 +1838,13 @@ F xn F   T*/
 				}
 
 				InstructionHandle if_true;
-				BranchInstruction ifgt = new IFGT(null);
+				final BranchInstruction ifgt = new IFGT(null);
 
 				ilRun.append(ifgt);    // if condition is true, jump to if_true
 				ilRun.append(new PUSH(constPoolGen, false));
 
 				InstructionHandle end;
-				BranchInstruction jmp = new GOTO(null);
+				final BranchInstruction jmp = new GOTO(null);
 
 				ilRun.append(jmp);    // always jump to end
 
@@ -1817,7 +1861,7 @@ F xn F   T*/
 		}
 		else if (arg instanceof IECVariable)
 		{
-			IECVariable var = (IECVariable) arg;
+			final IECVariable var = (IECVariable) arg;
 			TypeConstant t = var.getType();
 
 			if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_DERIVED) && (((IECSymbolicVariable) var).getFieldSelectorType() != null))
@@ -1839,13 +1883,13 @@ F xn F   T*/
 				}
 
 				InstructionHandle if_true;
-				BranchInstruction ifgt = new IFGT(null);
+				final BranchInstruction ifgt = new IFGT(null);
 
 				ilRun.append(ifgt);    // if condition is true, jump to if_true
 				ilRun.append(new PUSH(constPoolGen, false));
 
 				InstructionHandle end;
-				BranchInstruction jmp = new GOTO(null);
+				final BranchInstruction jmp = new GOTO(null);
 
 				ilRun.append(jmp);    // always jump to end
 
@@ -1869,11 +1913,11 @@ F xn F   T*/
 	/**emitGE does the test >= and put the result on the stack
 	 * @param arg argument to compare to TOS
 	 */
-	private void emitGE(Object arg)
+	private void emitGE(final Object arg)
 	{
 		if (arg instanceof IECConstant)
 		{
-			TypeConstant t = ((IECConstant) arg).getType();
+			final TypeConstant t = ((IECConstant) arg).getType();
 
 			if ((t == TypeConstant.T_BOOL) || (t == TypeConstant.T_DINT) || (t == TypeConstant.T_REAL))
 			{
@@ -1895,13 +1939,13 @@ F xn F   T*/
 
 				// subtracting values on the stack
 				InstructionHandle if_true;
-				BranchInstruction ifge = new IFGE(null);
+				final BranchInstruction ifge = new IFGE(null);
 
 				ilRun.append(ifge);    // if condition is true, jump to if_true
 				ilRun.append(new PUSH(constPoolGen, false));
 
 				InstructionHandle end;
-				BranchInstruction jmp = new GOTO(null);
+				final BranchInstruction jmp = new GOTO(null);
 
 				ilRun.append(jmp);    // always jump to end
 
@@ -1918,7 +1962,7 @@ F xn F   T*/
 		}
 		else if (arg instanceof IECVariable)
 		{
-			IECVariable var = (IECVariable) arg;
+			final IECVariable var = (IECVariable) arg;
 			TypeConstant t = var.getType();
 
 			if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_DERIVED) && (((IECSymbolicVariable) var).getFieldSelectorType() != null))
@@ -1940,13 +1984,13 @@ F xn F   T*/
 				}
 
 				InstructionHandle if_true;
-				BranchInstruction ifge = new IFGE(null);
+				final BranchInstruction ifge = new IFGE(null);
 
 				ilRun.append(ifge);    // if condition is true, jump to if_true
 				ilRun.append(new PUSH(constPoolGen, false));
 
 				InstructionHandle end;
-				BranchInstruction jmp = new GOTO(null);
+				final BranchInstruction jmp = new GOTO(null);
 
 				ilRun.append(jmp);    // always jump to end
 
@@ -1971,11 +2015,11 @@ F xn F   T*/
 	 * emitLT does the test  <  and put the result on the stack
 	 * @param arg argument to compare to TOS
 	 */
-	private void emitLT(Object arg)
+	private void emitLT(final Object arg)
 	{
 		if (arg instanceof IECConstant)
 		{
-			TypeConstant t = ((IECConstant) arg).getType();
+			final TypeConstant t = ((IECConstant) arg).getType();
 
 			if ((t == TypeConstant.T_BOOL) || (t == TypeConstant.T_DINT) || (t == TypeConstant.T_REAL))
 			{
@@ -1997,13 +2041,13 @@ F xn F   T*/
 
 				// subtracting values on the stack
 				InstructionHandle if_true;
-				BranchInstruction iflt = new IFLT(null);
+				final BranchInstruction iflt = new IFLT(null);
 
 				ilRun.append(iflt);    // if condition is true, jump to if_true
 				ilRun.append(new PUSH(constPoolGen, false));
 
 				InstructionHandle end;
-				BranchInstruction jmp = new GOTO(null);
+				final BranchInstruction jmp = new GOTO(null);
 
 				ilRun.append(jmp);    // always jump to end
 
@@ -2020,7 +2064,7 @@ F xn F   T*/
 		}
 		else if (arg instanceof IECVariable)
 		{
-			IECVariable var = (IECVariable) arg;
+			final IECVariable var = (IECVariable) arg;
 			TypeConstant t = var.getType();
 
 			if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_DERIVED) && (((IECSymbolicVariable) var).getFieldSelectorType() != null))
@@ -2042,13 +2086,13 @@ F xn F   T*/
 				}
 
 				InstructionHandle if_true;
-				BranchInstruction iflt = new IFLT(null);
+				final BranchInstruction iflt = new IFLT(null);
 
 				ilRun.append(iflt);    // if condition is true, jump to if_true
 				ilRun.append(new PUSH(constPoolGen, false));
 
 				InstructionHandle end;
-				BranchInstruction jmp = new GOTO(null);
+				final BranchInstruction jmp = new GOTO(null);
 
 				ilRun.append(jmp);    // always jump to end
 
@@ -2073,11 +2117,11 @@ F xn F   T*/
 	 * emitLE does the test  <= and put the result on the stack
 	 * @param arg argument to compare to TOS
 	 */
-	private void emitLE(Object arg)
+	private void emitLE(final Object arg)
 	{
 		if (arg instanceof IECConstant)
 		{
-			TypeConstant t = ((IECConstant) arg).getType();
+			final TypeConstant t = ((IECConstant) arg).getType();
 
 			if ((t == TypeConstant.T_BOOL) || (t == TypeConstant.T_DINT) || (t == TypeConstant.T_REAL))
 			{
@@ -2099,13 +2143,13 @@ F xn F   T*/
 
 				// subtracting values on the stack
 				InstructionHandle if_true;
-				BranchInstruction ifle = new IFLE(null);
+				final BranchInstruction ifle = new IFLE(null);
 
 				ilRun.append(ifle);    // if condition is true, jump to if_true
 				ilRun.append(new PUSH(constPoolGen, false));
 
 				InstructionHandle end;
-				BranchInstruction jmp = new GOTO(null);
+				final BranchInstruction jmp = new GOTO(null);
 
 				ilRun.append(jmp);    // always jump to end
 
@@ -2122,7 +2166,7 @@ F xn F   T*/
 		}
 		else if (arg instanceof IECVariable)
 		{
-			IECVariable var = (IECVariable) arg;
+			final IECVariable var = (IECVariable) arg;
 			TypeConstant t = var.getType();
 
 			if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_DERIVED) && (((IECSymbolicVariable) var).getFieldSelectorType() != null))
@@ -2144,13 +2188,13 @@ F xn F   T*/
 				}
 
 				InstructionHandle if_true;
-				BranchInstruction ifle = new IFLE(null);
+				final BranchInstruction ifle = new IFLE(null);
 
 				ilRun.append(ifle);    // if condition is true, jump to if_true
 				ilRun.append(new PUSH(constPoolGen, false));
 
 				InstructionHandle end;
-				BranchInstruction jmp = new GOTO(null);
+				final BranchInstruction jmp = new GOTO(null);
 
 				ilRun.append(jmp);    // always jump to end
 
@@ -2174,11 +2218,11 @@ F xn F   T*/
 	/**emitNE tests two values for difference and put the result on the stack
 	 * @param arg argument to compare to TOS
 	 */
-	private void emitNE(Object arg)
+	private void emitNE(final Object arg)
 	{
 		if (arg instanceof IECConstant)
 		{
-			TypeConstant t = ((IECConstant) arg).getType();
+			final TypeConstant t = ((IECConstant) arg).getType();
 
 			if ((t == TypeConstant.T_BOOL) || (t == TypeConstant.T_DINT) || (t == TypeConstant.T_REAL))
 			{
@@ -2199,13 +2243,13 @@ F xn F   T*/
 				}
 
 				InstructionHandle if_true;
-				BranchInstruction ifne = new IFNE(null);
+				final BranchInstruction ifne = new IFNE(null);
 
 				ilRun.append(ifne);    // if condition is true, jump to if_true
 				ilRun.append(new PUSH(constPoolGen, false));
 
 				InstructionHandle end;
-				BranchInstruction jmp = new GOTO(null);
+				final BranchInstruction jmp = new GOTO(null);
 
 				ilRun.append(jmp);    // always jump to end
 
@@ -2222,7 +2266,7 @@ F xn F   T*/
 		}
 		else if (arg instanceof IECVariable)
 		{
-			IECVariable var = (IECVariable) arg;
+			final IECVariable var = (IECVariable) arg;
 			TypeConstant t = var.getType();
 
 			if ((var instanceof IECSymbolicVariable) && (t == TypeConstant.T_DERIVED) && (((IECSymbolicVariable) var).getFieldSelectorType() != null))
@@ -2244,13 +2288,13 @@ F xn F   T*/
 				}
 
 				InstructionHandle if_true;
-				BranchInstruction ifne = new IFNE(null);
+				final BranchInstruction ifne = new IFNE(null);
 
 				ilRun.append(ifne);    // if condition is true, jump to if_true
 				ilRun.append(new PUSH(constPoolGen, false));
 
 				InstructionHandle end;
-				BranchInstruction jmp = new GOTO(null);
+				final BranchInstruction jmp = new GOTO(null);
 
 				ilRun.append(jmp);    // always jump to end
 
@@ -2277,11 +2321,12 @@ F xn F   T*/
 	 * @param t what datatype is the operator to work on
 	 * @param arg for future use, i.e. for derived types
 	 */
-	public void emitIL_EXPRESSION(String operator, TypeConstant t, Object arg)
+	@Override
+  public void emitIL_EXPRESSION(final String operator, final TypeConstant t, final Object arg)
 	{
 		try
 		{
-			IlExprOperator op = IlExprOperator.getOperator(operator);
+			final IlExprOperator op = IlExprOperator.getOperator(operator);
 
 			if (op == IlExprOperator.AND)
 			{    // Logical AND
@@ -2329,7 +2374,7 @@ F xn F   T*/
 				error("Not implemented: " + operator + ", operand of type: " + t);
 			}
 		}
-		catch (IllegalOperatorException e)
+		catch (final IllegalOperatorException e)
 		{
 			error("Illegal operator: " + operator);
 		}
@@ -2340,14 +2385,14 @@ F xn F   T*/
 	 * next to TOS value
 	 * @param arg type constant
 	 */
-	private void emitExprAND(TypeConstant t, Object arg)
+	private void emitExprAND(final TypeConstant t, final Object arg)
 	{
 		if (t == TypeConstant.T_BOOL)
 		{
 
 			// BranchInstruction theTarget = new Branch
 			InstructionHandle end_and;
-			BranchInstruction ifne = new IFNE(null);
+			final BranchInstruction ifne = new IFNE(null);
 
 			ilRun.append(ifne);    // stack != false
 			ilRun.append(InstructionConstants.POP);
@@ -2369,14 +2414,14 @@ F xn F   T*/
 	 * next to TOS value
 	 * @param arg type constant
 	 */
-	private void emitExprANDN(TypeConstant t, Object arg)
+	private void emitExprANDN(final TypeConstant t, final Object arg)
 	{
 		if (t == TypeConstant.T_BOOL)
 		{
 
 			// BranchInstruction theTarget = new Branch
 			InstructionHandle end_andn;
-			BranchInstruction ifeq = new IFEQ(null);
+			final BranchInstruction ifeq = new IFEQ(null);
 
 			ilRun.append(ifeq);    // stack != false
 			ilRun.append(InstructionConstants.POP);
@@ -2398,12 +2443,12 @@ F xn F   T*/
 	 * next to TOS value
 	 * @param arg type constant
 	 */
-	private void emitExprOR(TypeConstant t, Object arg)
+	private void emitExprOR(final TypeConstant t, final Object arg)
 	{
 		if (t == TypeConstant.T_BOOL)
 		{
 			InstructionHandle end_or;
-			BranchInstruction ifeq = new IFEQ(null);
+			final BranchInstruction ifeq = new IFEQ(null);
 
 			ilRun.append(ifeq);    // stack = false
 			ilRun.append(InstructionConstants.POP);
@@ -2427,11 +2472,11 @@ F xn F   T*/
 	 * @param arg type constant
 	 */
 	@SuppressWarnings("unused")
-	private void emitExprORN(TypeConstant t, Object arg)
+	private void emitExprORN(final TypeConstant t, final Object arg)
 	{
 		if (t == TypeConstant.T_BOOL)
 		{
-			BranchInstruction ifne = new IFNE(null);
+			final BranchInstruction ifne = new IFNE(null);
 			ilRun.append(ifne);    // stack = false
 			ilRun.append(InstructionConstants.POP);
 			ilRun.append(new PUSH(constPoolGen, true));
@@ -2461,9 +2506,10 @@ F xn F   T*/
 	 * be pointed to it.
 	 * @param label the name of the label
 	 */
-	public void emitLABEL(String label)
+	@Override
+  public void emitLABEL(final String label)
 	{
-		InstructionHandle ih = ilRun.append(InstructionConstants.NOP);
+		final InstructionHandle ih = ilRun.append(InstructionConstants.NOP);
 
 		jumpController.addTarget(label, ih);
 	}
@@ -2473,36 +2519,37 @@ F xn F   T*/
 	 * @param op the jump operator
 	 * @param targetLabel the label (position) to which the jump should point
 	 */
-	public void emitIL_JUMP_OPERATION(IlJumpOperator op, String targetLabel)
+	@Override
+  public void emitIL_JUMP_OPERATION(final IlJumpOperator op, final String targetLabel)
 	{
 		if (op == IlJumpOperator.JMP)
 		{
-			BranchHandle jmp = ilRun.append(new GOTO_W(null));
+			final BranchHandle jmp = ilRun.append(new GOTO_W(null));
 
 			jumpController.addJump(targetLabel, jmp);
 		}
 		else if (op == IlJumpOperator.JMPC)
 		{
-			BranchInstruction ifeq = new IFEQ(null);
+			final BranchInstruction ifeq = new IFEQ(null);
 
 			ilRun.append(InstructionConstants.DUP);
 			ilRun.append(ifeq);
 
-			BranchHandle jmp = ilRun.append(new GOTO_W(null));
-			InstructionHandle end_jmpc = ilRun.append(InstructionConstants.NOP);
+			final BranchHandle jmp = ilRun.append(new GOTO_W(null));
+			final InstructionHandle end_jmpc = ilRun.append(InstructionConstants.NOP);
 
 			ifeq.setTarget(end_jmpc);
 			jumpController.addJump(targetLabel, jmp);
 		}
 		else if (op == IlJumpOperator.JMPCN)
 		{
-			BranchInstruction ifne = new IFNE(null);
+			final BranchInstruction ifne = new IFNE(null);
 
 			ilRun.append(InstructionConstants.DUP);
 			ilRun.append(ifne);
 
-			BranchHandle jmp = ilRun.append(new GOTO_W(null));
-			InstructionHandle end_jmpc = ilRun.append(InstructionConstants.NOP);
+			final BranchHandle jmp = ilRun.append(new GOTO_W(null));
+			final InstructionHandle end_jmpc = ilRun.append(InstructionConstants.NOP);
 
 			ifne.setTarget(end_jmpc);
 			jumpController.addJump(targetLabel, jmp);
@@ -2520,7 +2567,8 @@ F xn F   T*/
 	 * it takes care of checks associated to conditional calls
 	 * @param op IL call operator
 	 */
-	public BranchInstruction emitIL_FB_CALL_Start(IlCallOperator op)
+	@Override
+  public BranchInstruction emitIL_FB_CALL_Start(final IlCallOperator op)
 	{
 		/* check conditions */
 		BranchInstruction callCondition = null;
@@ -2559,7 +2607,8 @@ F xn F   T*/
 	 * @param callCondition the branch instruction returned by
 	 *                      emitIL_FB_CALL_Start
 	 */
-	public void emitIL_FB_CALL_End(BranchInstruction callCondition)
+	@Override
+  public void emitIL_FB_CALL_End(final BranchInstruction callCondition)
 	{
 		if (callCondition != null    /*
 									  * call operator != CAL,
@@ -2567,7 +2616,7 @@ F xn F   T*/
 									  */
 		)
 		{
-			InstructionHandle end_call = ilRun.append(InstructionConstants.NOP);
+			final InstructionHandle end_call = ilRun.append(InstructionConstants.NOP);
 
 			callCondition.setTarget(end_call);
 		}
@@ -2578,9 +2627,10 @@ F xn F   T*/
 	 * @param fbName name of the function block to be called
 	 * @param fbTypeName the type (class name) of the FB to be called
 	 */
-	public void emitIL_FB_CALL_Run(String fbName, String fbTypeName)
+	@Override
+  public void emitIL_FB_CALL_Run(final String fbName, final String fbTypeName)
 	{
-		ObjectType fbType = new ObjectType(fbTypeName);
+		final ObjectType fbType = new ObjectType(fbTypeName);
 
 		ilRun.append(InstructionConstants.THIS);
 		ilRun.append(fac.createFieldAccess(className, fbName, fbType, Constants.GETFIELD));

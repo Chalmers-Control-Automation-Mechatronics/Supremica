@@ -42,9 +42,9 @@ import java.util.List;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -64,7 +64,7 @@ import net.sourceforge.waters.subject.module.LabelBlockSubject;
  * <P>A utility class to determine the data flavours that can be supported
  * by a given collection of {@link Proxy} objects. This visitor is not
  * intended to be used directly, please call the static methods in class
- * {@link WaterDataFlavor} instead.</P>
+ * {@link WatersDataFlavor} instead.</P>
  *
  * @see WatersDataFlavor
  * @author Robi Malik
@@ -134,7 +134,7 @@ class DataFlavorVisitor extends DefaultModuleProxyVisitor
    *                 other.
    * @return List of data flavours in order of preference. The first element
    *         in the list is the <I>primary</I> data flavour.
-   * @throws {@link IllegalArgumentException} to indicate that no data flavour
+   * @throws IllegalArgumentException to indicate that no data flavour
    *         could be identified that supports all the data.
    * @see WatersDataFlavor
    */

@@ -106,18 +106,13 @@ public class XmlRpcClientLite
 		super(hostname, port);
 	}
 
-	/**
-	 *
-	 * @param async
-	 * @return
-	 * @throws IOException
-	 */
-	synchronized Worker getWorker(final boolean async)
+	@Override
+  synchronized Worker getWorker(final boolean async)
 		throws IOException
 	{
 		try
 		{
-			final Worker w = (Worker) pool.pop();
+			final Worker w = pool.pop();
 
 			if (async)
 			{
@@ -167,15 +162,8 @@ public class XmlRpcClientLite
 			super();
 		}
 
-		/**
-		 *
-		 * @param method
-		 * @param params
-		 * @return
-		 * @throws XmlRpcException
-		 * @throws IOException
-		 */
-		Object execute(final String method, final Vector<Comparable<?>> params)
+		@Override
+    Object execute(final String method, final Vector<Comparable<?>> params)
 			throws XmlRpcException, IOException
 		{
 			final long now = System.currentTimeMillis();
@@ -384,12 +372,6 @@ public class XmlRpcClientLite
 			catch (final Exception ignore) {}
 		}
 
-		/**
-		 *
-		 * @param request
-		 * @return
-		 * @throws IOException
-		 */
 		public InputStream sendRequest(final byte[] request)
 			throws IOException
 		{
@@ -479,11 +461,6 @@ public class XmlRpcClientLite
 			return new ServerInputStream(input, contentLength);
 		}
 
-		/**
-		 *
-		 * @return
-		 * @throws IOException
-		 */
 		private String readLine()
 			throws IOException
 		{
@@ -522,7 +499,8 @@ public class XmlRpcClientLite
 		 *
 		 * @throws Throwable
 		 */
-		protected void finalize()
+		@Override
+    protected void finalize()
 			throws Throwable
 		{
 			closeConnection();

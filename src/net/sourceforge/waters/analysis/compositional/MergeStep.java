@@ -111,7 +111,6 @@ class MergeStep extends TRAbstractionStep
   /**
    * A flag, indicating that the precondition markings have been reduced
    * during abstraction and need to be recovered for trace expansion.
-   * @see #mRecoveredPreconditionMarking
    */
   private final boolean mHasReducedPreconditionMarking;
 

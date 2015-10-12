@@ -37,15 +37,15 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.List;
 
+import net.sourceforge.waters.model.base.ItemNotFoundException;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
-
 import net.sourceforge.waters.xsd.des.ConflictKind;
 
 
@@ -132,6 +132,7 @@ public class ConflictTraceElement
   /**
    * Returns a copy of this product DES.
    */
+  @Override
   public ConflictTraceElement clone()
   {
     return (ConflictTraceElement) super.clone();
@@ -140,6 +141,7 @@ public class ConflictTraceElement
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.base.Proxy
+  @Override
   public Object acceptVisitor(final ProxyVisitor visitor)
     throws VisitorException
   {
@@ -150,6 +152,7 @@ public class ConflictTraceElement
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.des.ConflictTraceProxy
+  @Override
   public ConflictKind getKind()
   {
     return mKind;
@@ -158,6 +161,7 @@ public class ConflictTraceElement
 
   //#########################################################################
   //# Equals and Hashcode
+  @Override
   public Class<ConflictTraceProxy> getProxyInterface()
   {
     return ConflictTraceProxy.class;

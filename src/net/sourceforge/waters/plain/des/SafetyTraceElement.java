@@ -37,6 +37,7 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.List;
 
+import net.sourceforge.waters.model.base.ItemNotFoundException;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -139,6 +140,7 @@ public final class SafetyTraceElement
   /**
    * Returns a copy of this product DES.
    */
+  @Override
   public SafetyTraceElement clone()
   {
     return (SafetyTraceElement) super.clone();
@@ -147,6 +149,7 @@ public final class SafetyTraceElement
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.base.Proxy
+  @Override
   public Object acceptVisitor(final ProxyVisitor visitor)
     throws VisitorException
   {
@@ -157,6 +160,7 @@ public final class SafetyTraceElement
 
   //#########################################################################
   //# Equals and Hashcode
+  @Override
   public Class<SafetyTraceProxy> getProxyInterface()
   {
     return SafetyTraceProxy.class;

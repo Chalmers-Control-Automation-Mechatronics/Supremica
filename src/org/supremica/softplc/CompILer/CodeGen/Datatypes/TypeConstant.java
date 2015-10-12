@@ -1,19 +1,22 @@
 
+package org.supremica.softplc.CompILer.CodeGen.Datatypes;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 /** TypeConstant supplies constants for the elementary datatypes in IEC 61131-3
- * @see "Chapter 2.3 Datatypes in Programming industrial control
+ * See "Chapter 2.3 Datatypes in Programming industrial control
  *       systems using IEC 1131-3 by R. W. Lewis. ISBN: 0 85296 827 2"
  * @author Anders Röding
  */
-package org.supremica.softplc.CompILer.CodeGen.Datatypes;
-
-import java.util.*;
 
 public final class TypeConstant
 {
 	private static List<TypeConstant> theTypes = new ArrayList<TypeConstant>();
-	private String type;
+	private final String type;
 
-	private TypeConstant(String t)
+	private TypeConstant(final String t)
 	{
 		type = t;
 
@@ -25,7 +28,8 @@ public final class TypeConstant
 		return theTypes.iterator();
 	}
 
-	public String toString()
+	@Override
+  public String toString()
 	{
 		return type;
 	}

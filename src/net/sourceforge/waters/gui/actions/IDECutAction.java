@@ -68,16 +68,11 @@ import org.supremica.gui.ide.IDE;
  * owns the focus to the system clipboard. To support this action,
  * components including editable items must implement the {@link
  * SelectionOwner#getCurrentSelection() getCurrentSelection()}, {@link
- * SelectionOwner#canCut(List<? extends Proxy>) canCopy()}, {@link
- * SelectionOwner#canCut(List<? extends Proxy>) canDelete()}, {@link
- * SelectionOwner#createTransferable(List<? extends Proxy>)
- * createTransferable()}, {@link
- * SelectionOwner#getDeletionVictims(List<Proxy>) getDeletionVictims()},
- * {@link
- * SelectionOwner#insertItems(List<net.sourceforge.waters.gui.transfer.InsertInfo>)
- * insertItems()} and {@link
- * SelectionOwner#deleteItems(List<net.sourceforge.waters.gui.transfer.InsertInfo>)
- * deleteItems()} methods of the {@link SelectionOwner} interface.</P>
+ * SelectionOwner#canDelete(List) canDelete()}, {@link
+ * SelectionOwner#getDeletionVictims(List) getDeletionVictims()},
+ * {@link SelectionOwner#insertItems(List) insertItems()} and {@link
+ * SelectionOwner#deleteItems(List) deleteItems()} methods of the
+ * {@link SelectionOwner} interface.</P>
  *
  * @author Robi Malik
  */

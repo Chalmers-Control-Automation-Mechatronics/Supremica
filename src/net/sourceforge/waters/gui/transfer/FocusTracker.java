@@ -61,7 +61,7 @@ import net.sourceforge.waters.gui.observer.Subject;
  * supported components, or to the window focus of the entire application,
  * and any changes of the selection in the component that has the keyboard
  * focus. All these changes are remapped to editor events of type {@link
- * EditorChangedEvent.Kind#SELECTION_CHANGED}, and interested components
+ * net.sourceforge.waters.gui.observer.EditorChangedEvent.Kind#SELECTION_CHANGED}, and interested components
  * can register listeners through the {@link Subject} interface.</P>
  *
  * <P>This implementation supports two types of focus-owning components,

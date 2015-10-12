@@ -33,10 +33,6 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.iterator.TObjectByteIterator;
-import gnu.trove.map.hash.TObjectByteHashMap;
-import gnu.trove.set.hash.THashSet;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -81,6 +77,10 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.apache.log4j.Logger;
+
+import gnu.trove.iterator.TObjectByteIterator;
+import gnu.trove.map.hash.TObjectByteHashMap;
+import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -1883,10 +1883,6 @@ public abstract class AbstractCompositionalModelAnalyzer
    * current subsystem can be split into event-disjoint components, and if
    * so, performs the split and replaces the current subsystem by its
    * smallest component.
-   * @param  eventsChanged  A flag, indicating that the event alphabet has
-   *                        been changed prior to the call, so the test for
-   *                        event-disjoint subsystems is performed even if
-   *                        no further simplification is possible.
    * @return <CODE>true</CODE> if the subsystem has been found to be
    *         trivially blocking or nonblocking. If <CODE>true</CODE>
    *         is returned and the result for the global property is known,
@@ -3149,7 +3145,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   private Queue<AutomatonProxy> mDirtyAutomata;
   /**
    * A flag indicating that a proper transition has been removed from an
-   * automaton by the {@link #removeEvents(AutomatonProxy, Set) removeEvents()}
+   * automaton by the {@link #removeEvents(AutomatonProxy,Set,Map) removeEvents()}
    * method. This may trigger a reachability search.
    * @see #mDirtyAutomata
    */

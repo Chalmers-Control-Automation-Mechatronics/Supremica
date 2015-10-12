@@ -44,7 +44,7 @@ import net.sourceforge.waters.gui.util.IconLoader;
  * @author Robi Malik
  */
 
-enum AutomatonStatus
+public enum AutomatonStatus
 {
 
   /**

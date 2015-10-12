@@ -7,11 +7,10 @@
 
 package org.supremica.external.avocades.relationextraction;
 
-import java.util.*;
-
-import org.jdom.*;
-
-import java.util.Hashtable;
+import static org.supremica.external.avocades.AutomataNames.DONT_CARE_STATE_POSTFIX;
+import static org.supremica.external.avocades.AutomataNames.END_STATE_POSTFIX;
+import static org.supremica.external.avocades.AutomataNames.EXECUTION_STATE_POSTFIX;
+import static org.supremica.external.avocades.AutomataNames.INITIAL_STATE_POSTFIX;
 
 /*-----------------------------------------------------------------------------
  *
@@ -21,14 +20,18 @@ import java.util.Hashtable;
 
 import static org.supremica.external.avocades.AutomataNames.OPERATION_START_PREFIX;
 import static org.supremica.external.avocades.AutomataNames.OPERATION_STOP_PREFIX;
-
-import static org.supremica.external.avocades.AutomataNames.STATE_SEPARATOR;
 import static org.supremica.external.avocades.AutomataNames.STATE_INDICATOR;
+import static org.supremica.external.avocades.AutomataNames.STATE_SEPARATOR;
 
-import static org.supremica.external.avocades.AutomataNames.INITIAL_STATE_POSTFIX;
-import static org.supremica.external.avocades.AutomataNames.EXECUTION_STATE_POSTFIX;
-import static org.supremica.external.avocades.AutomataNames.END_STATE_POSTFIX;
-import static org.supremica.external.avocades.AutomataNames.DONT_CARE_STATE_POSTFIX;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import org.jdom.Document;
+import org.jdom.Element;
 
 public class Extractor
 {
@@ -760,7 +763,7 @@ public Restriction replaceIEC(final Restriction restr)
 		String opName = new String();
 
 		//Get the restr (operation) we are currently working with. List containing strings.
-		final ArrayList<String> states = (ArrayList<String>) restrictions.get(i);
+		final ArrayList<String> states = restrictions.get(i);
 		int stateNumber = -1;
 
 		/* For all states of the operation, e.g. O1_init, O1_init, O1_comp,
@@ -893,7 +896,7 @@ public Restriction replaceIEC(final Restriction restr)
 ******************************************************/
 public ArrayList<ArrayList<String>> findPredecessors(final Restriction restr)
 {
-	final String op = (String) restr.opName;
+	final String op = restr.opName;
 
 	final ArrayList<?> theRestr = (ArrayList<?>) restr.restrictions;
 	final ArrayList<ArrayList<String>> predSucc = new ArrayList<ArrayList<String>>();
@@ -1725,8 +1728,6 @@ public ArrayList<ArrayList<String>> getOpMachMatching(final ArrayList<Document> 
 
 /**
  * Returns all activities in a relation.
- * @param relation
- * @return
  */
 @SuppressWarnings("unchecked")
 public List<Element> getActivitiesFromRelation(final Element relation){

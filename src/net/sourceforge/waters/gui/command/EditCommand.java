@@ -35,6 +35,7 @@ package net.sourceforge.waters.gui.command;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.gui.language.ProxyNamer;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
@@ -57,7 +58,7 @@ import net.sourceforge.waters.subject.base.UndoInfo;
  * disabled.</P>
  *
  * <P>The internal mechanism for the assignment is the {@link
- * ProxySubject#createUndoInfo(ProxySubject) createUndoInfo} method, which
+ * ProxySubject#createUndoInfo(ProxySubject,Set) createUndoInfo} method, which
  * supports uniform assignments between subjects.</P>
  *
  * @author Robi Malik
@@ -159,6 +160,7 @@ public class EditCommand
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.command.Command
+  @Override
   public void execute()
   {
     mUndoInfo.redo(mSubject);
@@ -169,6 +171,7 @@ public class EditCommand
     }
   }
 
+  @Override
   public void undo()
   {
     mUndoInfo.undo(mSubject);

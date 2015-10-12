@@ -33,12 +33,6 @@
 
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.iterator.TIntIterator;
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TObjectIntHashMap;
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -56,6 +50,12 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.DefaultAnalysisResult;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 
 /**
@@ -171,7 +171,6 @@ public class TRConflictPreorderChecker
    * This method should be called by all subclasses at the beginning of
    * each {@link ModelAnalyzer#run() run()}. If overridden, the overriding
    * method should call the superclass methods first.
-   * @throws AnalysisException
    */
   private void setUp()
   {

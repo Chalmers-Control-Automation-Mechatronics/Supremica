@@ -55,8 +55,8 @@ package org.apache.xmlrpc;
  * <http://www.apache.org/>.
  */
 import java.io.BufferedInputStream;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  *
@@ -74,25 +74,21 @@ class ServerInputStream
 	// assumed as unknown and the standard InputStream methods will be used
 	private long available = -1;
 	private long markedAvailable;
-	private BufferedInputStream in;
+	private final BufferedInputStream in;
 
 	/**
 	 *
 	 * @param in
 	 * @param available
 	 */
-	public ServerInputStream(BufferedInputStream in, int available)
+	public ServerInputStream(final BufferedInputStream in, final int available)
 	{
 		this.in = in;
 		this.available = available;
 	}
 
-	/**
-	 *
-	 * @return
-	 * @throws IOException
-	 */
-	public int read()
+	@Override
+  public int read()
 		throws IOException
 	{
 		if (available > 0)
@@ -109,27 +105,15 @@ class ServerInputStream
 		return -1;
 	}
 
-	/**
-	 *
-	 * @param b
-	 * @return
-	 * @throws IOException
-	 */
-	public int read(byte b[])
+	@Override
+  public int read(final byte b[])
 		throws IOException
 	{
 		return read(b, 0, b.length);
 	}
 
-	/**
-	 *
-	 * @param b
-	 * @param off
-	 * @param len
-	 * @return
-	 * @throws IOException
-	 */
-	public int read(byte b[], int off, int len)
+	@Override
+  public int read(final byte b[], final int off, int len)
 		throws IOException
 	{
 		if (available > 0)
@@ -141,7 +125,7 @@ class ServerInputStream
 				len = (int) available;
 			}
 
-			int read = in.read(b, off, len);
+			final int read = in.read(b, off, len);
 
 			if (read != -1)
 			{
@@ -162,16 +146,11 @@ class ServerInputStream
 		return -1;
 	}
 
-	/**
-	 *
-	 * @param n
-	 * @return
-	 * @throws IOException
-	 */
-	public long skip(long n)
+	@Override
+  public long skip(final long n)
 		throws IOException
 	{
-		long skip = in.skip(n);
+		final long skip = in.skip(n);
 
 		if (available > 0)
 		{
@@ -181,22 +160,16 @@ class ServerInputStream
 		return skip;
 	}
 
-	/**
-	 *
-	 * @param readlimit
-	 */
-	public void mark(int readlimit)
+	@Override
+  public void mark(final int readlimit)
 	{
 		in.mark(readlimit);
 
 		markedAvailable = available;
 	}
 
-	/**
-	 *
-	 * @throws IOException
-	 */
-	public void reset()
+	@Override
+  public void reset()
 		throws IOException
 	{
 		in.reset();
@@ -204,11 +177,8 @@ class ServerInputStream
 		available = markedAvailable;
 	}
 
-	/**
-	 *
-	 * @return
-	 */
-	public boolean markSupported()
+	@Override
+  public boolean markSupported()
 	{
 		return true;
 	}

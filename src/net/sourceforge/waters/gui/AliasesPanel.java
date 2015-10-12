@@ -49,8 +49,8 @@ import org.supremica.gui.ide.ModuleContainer;
  * for editing the constant aliases and the event aliases of a module,
  * respectively.
  *
- * @see ConstantAliasTree
- * @see EventAliasTree
+ * @see ConstantAliasesTree
+ * @see EventAliasesTree
  * @author Carly Hona
  */
 

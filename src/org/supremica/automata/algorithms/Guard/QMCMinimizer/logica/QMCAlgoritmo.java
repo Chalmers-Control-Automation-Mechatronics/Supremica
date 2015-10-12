@@ -6,8 +6,8 @@ package org.supremica.automata.algorithms.Guard.QMCMinimizer.logica;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-import org.supremica.automata.algorithms.Guard.QMCMinimizer.util.QMCUtilLogica;
 import org.supremica.automata.algorithms.Guard.QMCMinimizer.util.QMCUtilFormateo;
+import org.supremica.automata.algorithms.Guard.QMCMinimizer.util.QMCUtilLogica;
 
 
 
@@ -82,11 +82,11 @@ public class QMCAlgoritmo {
             existenAdyacenciasSuperiores = false;
             for(int i=0;i<adyacencias.size();i++)
             {
-                adyacenciaIndMenor = (QMCBinarioBean)adyacencias.get(i);
+                adyacenciaIndMenor = adyacencias.get(i);
                 j = i+1;
                 while(j<adyacencias.size())
                 {
-                    adyacenciaIndMayor = (QMCBinarioBean)adyacencias.get(j);
+                    adyacenciaIndMayor = adyacencias.get(j);
 
                     terminosAdyacenciaMenor = adyacenciaIndMenor.getValorDec();
                     terminosAdyacenciaMayor = adyacenciaIndMayor.getValorDec();
@@ -218,7 +218,7 @@ public class QMCAlgoritmo {
 
     /**
      * Método que estable la lista de implicantes primos
-     * @param array de terminos.
+     * @param terminos array de terminos.
      */
     public void setListaImplicantesPrimos(final String[] terminos)
     {
@@ -241,7 +241,7 @@ public class QMCAlgoritmo {
         // Recorre las listas empezando por las adyacencias mayores
         for(int i=arrayListasAdyacencias.size()-1;i>=0; i--)
         {
-            listaAdyacencias =(ArrayList<?>)arrayListasAdyacencias.get(i);
+            listaAdyacencias =arrayListasAdyacencias.get(i);
             for(int j=listaAdyacencias.size()-1;j>=0;j--)
             {
                 adyacencia = (QMCBinarioBean)listaAdyacencias.get(j);
@@ -296,7 +296,7 @@ public class QMCAlgoritmo {
             if(esencial)
             {
                 // Marca el implicante y actualiza la lista
-                implicante = (QMCImplicanteBean)listaImplicantesPrimos.get(x);
+                implicante = listaImplicantesPrimos.get(x);
                 implicante.setEsencial(esencial);
                 // Marca los terminos que quedan cubiertos
                 implicante.marcaTerminosCubiertos(listaTerminosImplicantes, true);
@@ -307,7 +307,7 @@ public class QMCAlgoritmo {
         // INTRODUCE LOS IMPLICANTES ESENCIALES EN LA LISTA DE IMPLICANTES SOLUCION FINAL
         for(int i=0;i<listaImplicantesPrimos.size(); i++)
         {
-            implicante = (QMCImplicanteBean)listaImplicantesPrimos.get(i);
+            implicante = listaImplicantesPrimos.get(i);
             if(implicante.isEsencial())
             {
                 listaImplicantesSolucion.add(implicante);
@@ -335,7 +335,6 @@ public class QMCAlgoritmo {
 
     /**
      * Método que establece la lista de términos no cubiertos
-     * @param listaTerminosNoCubiertos The listaTerminosNoCubiertos to set.
      */
     public void setListaTerminosNoCubiertos()
     {
@@ -345,7 +344,7 @@ public class QMCAlgoritmo {
         for(int i=0;i<listaTerminosImplicantes.size();i++)
         {
             // Construir un termino nuevo
-            termino = (QMCBinarioBean)((QMCBinarioBean)listaTerminosImplicantes.get(i)).clone();
+            termino = (QMCBinarioBean)listaTerminosImplicantes.get(i).clone();
 
             if(!termino.isCubierta())
             {
@@ -358,7 +357,6 @@ public class QMCAlgoritmo {
 
     /**
      * Método que establece la lista de implicantes reducida
-     * @param listaImplicantesReducida The listaImplicantesReducida to set.
      */
     public void setListaImplicantesReducida()
     {
@@ -367,7 +365,7 @@ public class QMCAlgoritmo {
         int x = 0;
         for(int i=0;i<listaImplicantesPrimos.size();i++)
         {
-            implicante = (QMCImplicanteBean)((QMCImplicanteBean)listaImplicantesPrimos.get(i)).clone();
+            implicante = (QMCImplicanteBean)listaImplicantesPrimos.get(i).clone();
             if(!implicante.isEsencial())
             {
                 implicante.setPosicionesTerminos(QMCUtilLogica.generaArrayPosiciones(listaTerminosNoCubiertos.toArray(),implicante.getTerminos()));
@@ -396,7 +394,7 @@ public class QMCAlgoritmo {
                 if(matrizImplicantesReducida[i][j]=="X")
                 {
                     // Añade el implicante(posicion) a la lista
-                    grupoImplicantes.add(String.valueOf(((QMCImplicanteBean)listaImplicantesReducida.get(i)).getNombre()));
+                    grupoImplicantes.add(String.valueOf(listaImplicantesReducida.get(i).getNombre()));
                 }
             }
             listaGruposImplicantes.add(grupoImplicantes);
@@ -413,10 +411,10 @@ public class QMCAlgoritmo {
         // Paso 3: Análisis de la lista resultante en busca de las soluciones mínimas
         // Establece el tamaño de las soluciones minimas
         int tamanoMin, tamano;
-        tamanoMin = ((String)resultado.get(0)).length();
+        tamanoMin = resultado.get(0).length();
         for(int i=1;i<resultado.size();i++)
         {
-            tamano = ((String)resultado.get(i)).length();
+            tamano = resultado.get(i).length();
             if(tamanoMin>tamano)
             {
                 tamanoMin = tamano;
@@ -445,7 +443,7 @@ public class QMCAlgoritmo {
 
     /**
      * Para una única Solucion minima (Modo interactivo)
-     * @param listaSolucionesMinimas The listaSolucionesMinimas to set.
+     * @param cadenaSolucionMinima The listaSolucionesMinimas to set.
      */
     public void setListaSolucionesMinimas(final String cadenaSolucionMinima)
     {
@@ -455,7 +453,7 @@ public class QMCAlgoritmo {
 
     /**
      * Añade los implicantes de la cadena a la solucion final para marcar los terminos que cubren y generar la expresión algebraica
-     * @param listaImplicantesSolucion The listaImplicantesSolucion to set.
+     * @param cadenaImplicantesSolucion The listaImplicantesSolucion to set.
      */
     public void setListaImplicantesSolucion(final String cadenaImplicantesSolucion)
     {
@@ -475,7 +473,7 @@ public class QMCAlgoritmo {
         // Resetea los valores de la solucion anterior
         for(int i=0;i<listaImplicantesReducida.size();i++)
         {
-            implicante = (QMCImplicanteBean)listaImplicantesReducida.get(i);
+            implicante = listaImplicantesReducida.get(i);
             implicante.setEsencial(false);
             implicante.marcaTerminosCubiertos(listaTerminosNoCubiertos, false);
         }
@@ -503,7 +501,6 @@ public class QMCAlgoritmo {
 
     /**
      * Método que genera la lista de Implicantes interactivos
-     * @param listaImplicantesInteractivos The listaImplicantesInteractivos to set.
      */
     public void setListaImplicantesInteractivos(final ArrayList<?> listaImplicantes)
     {
@@ -522,7 +519,6 @@ public class QMCAlgoritmo {
 
     /**
      * Método que genera un ArrayList de términos interactivos
-     * @param listaTerminosInteractivos The listaTerminosInteractivos to set.
      */
     public void setListaTerminosInteractivos(final ArrayList<?> listaTerminos)
     {

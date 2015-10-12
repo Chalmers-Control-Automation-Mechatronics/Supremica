@@ -275,9 +275,10 @@ public class ModuleContext
   /**
    * Tries to determine the list of proposition for a given node.
    *
-   * @return A {@link PropositionColors} object containing the list of all
-   *         colours found on the node, including a flag indicating the
-   *         presence of the 'forbidden' marking.
+   * @return A {@link net.sourceforge.waters.gui.util.PropositionIcon.ColorInfo}
+   *         object containing the list of all colours found on the node,
+   *         including a flag indicating the presence of the 'forbidden'
+   *         marking.
    */
   public PropositionIcon.ColorInfo guessPropositionColors(final GraphProxy graph,
                                                           final SimpleNodeProxy node)
@@ -478,8 +479,7 @@ public class ModuleContext
    * name is not used, it is returned. Otherwise, this method constructs an
    * alternative name that is not yet taken, such that the original name is
    * still recognisable.
-   *
-   * @param ident
+   * @param subject
    *          The identifier representing a component (
    *          {@link SimpleComponentProxy}, {@link VariableComponentProxy},
    *          etc.) to be added.

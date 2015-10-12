@@ -69,8 +69,8 @@ import org.supremica.gui.ide.IDE;
  * components including editable items must implement the {@link
  * SelectionOwner#canPaste(Transferable) canPaste()}, {@link
  * SelectionOwner#getInsertInfo(Transferable) getInsertInfo()}, {@link
- * SelectionOwner#insertItems(List<InsertInfo>) insertItems()}, and {@link
- * SelectionOwner#deleteItems(List<InsertInfo>) deleteItems()} methods of
+ * SelectionOwner#insertItems(List) insertItems()}, and {@link
+ * SelectionOwner#deleteItems(List) deleteItems()} methods of
  * the {@link SelectionOwner} interface.</P>
  *
  * @author Robi Malik

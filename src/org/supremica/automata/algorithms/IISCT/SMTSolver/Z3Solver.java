@@ -588,8 +588,7 @@ public class Z3Solver extends AbstractSolver {
 	}
 
 	/**
-	 * Resets and clears all the stored information (cold reset, see
-	 * {@link #reset(boolean) reset()}).
+	 * Resets and clears all the stored information (cold reset).
 	 */
 	@Override
 	public void reset() {

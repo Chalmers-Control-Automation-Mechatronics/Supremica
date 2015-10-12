@@ -21,8 +21,6 @@ public class QMCUtilFormateo
 
     /**
      * Genera los datos binarios de la tabla de verdad
-     * @param cadenaTerminos
-     * @param cadenaIndiferencas
      */
     public static Object[][] generaDatosTablaVerdad(final int numVariables, final char forma, final String[] terminos, final String[] indiferencias)
     {
@@ -153,7 +151,7 @@ public class QMCUtilFormateo
         for(int i=0;i<numFilas; i++)
         {
             // Valor decimal del termino
-            termino = (QMCBinarioBean)terminos.get(i);
+            termino = terminos.get(i);
             if(minimizacionAuto)
             {
                 matrizTerminos[i][0] = termino.getValorDec();
@@ -186,7 +184,7 @@ public class QMCUtilFormateo
 
         for(int i=0; i<terminos.size(); i++)
         {
-            termino = (QMCBinarioBean)terminos.get(i);
+            termino = terminos.get(i);
 
             if(terminoAnt == null || termino.getIndice()!=terminoAnt.getIndice())
             {
@@ -221,7 +219,7 @@ public class QMCUtilFormateo
 
         for(int i=0; i<adyacencias.size(); i++)
         {
-            adyacencia = (QMCBinarioBean)adyacencias.get(i);
+            adyacencia = adyacencias.get(i);
 
             if(adyacenciaAnt == null || adyacencia.getIndice()!=adyacenciaAnt.getIndice())
             {
@@ -363,7 +361,6 @@ public class QMCUtilFormateo
     /**
      * M�todo que que formatea la lista de grupos de implicantes no esenciales en un array de cadenas
      * @param solucionesMinimas
-     * @return
      */
     public static String[] generaArrayImplicantesNoEsenciales
       (final ArrayList<String> solucionesMinimas, final char forma)
@@ -500,8 +497,6 @@ public class QMCUtilFormateo
     }
     /**
      * M�todo que actualiza los terminos cubiertos por una lista de implicantes dada
-     * @param listaImplicantes
-     * @param listaTerminos
      */
     public static void renuevaMarcas(final ArrayList<QMCImplicanteBean> listaImplicantes,
                                      final ArrayList<QMCBinarioBean> listaTerminos)
@@ -509,7 +504,7 @@ public class QMCUtilFormateo
         QMCImplicanteBean implicante;
         for(int i=0;i<listaImplicantes.size();i++)
         {
-            implicante = (QMCImplicanteBean)listaImplicantes.get(i);
+            implicante = listaImplicantes.get(i);
             if(implicante.isEsencial())
             {
                 implicante.marcaTerminosCubiertos(listaTerminos,true);
@@ -518,9 +513,6 @@ public class QMCUtilFormateo
     }
     /**
      * Convierte un array de String a una cadena string normal uniendo las posiciones del array por el separador dado
-     * @param arrayCadenas
-     * @param separador
-     * @return
      */
     public static String array2String(final String[] arrayCadenas, final char separador)
     {

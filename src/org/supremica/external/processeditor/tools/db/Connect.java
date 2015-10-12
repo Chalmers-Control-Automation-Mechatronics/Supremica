@@ -1,18 +1,22 @@
 package org.supremica.external.processeditor.tools.db;
 
-import java.util.*;
-import java.io.*;
-import java.sql.*;
-import javax.xml.bind.*;
-import javax.xml.transform.stream.*;
+import java.io.StringWriter;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Vector;
 
-import org.supremica.manufacturingTables.xsd.pr.*;
-import org.supremica.manufacturingTables.xsd.vr.*;
-import org.supremica.manufacturingTables.xsd.processeditor.*;
-import org.supremica.manufacturingTables.xsd.eop.*;
-import org.supremica.manufacturingTables.xsd.il.*;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+import javax.xml.transform.stream.StreamResult;
 
 import org.supremica.external.processeditor.xml.Loader;
+import org.supremica.manufacturingTables.xsd.eop.Operation;
+import org.supremica.manufacturingTables.xsd.il.IL;
+import org.supremica.manufacturingTables.xsd.pr.Factory;
+import org.supremica.manufacturingTables.xsd.processeditor.ROP;
+import org.supremica.manufacturingTables.xsd.vr.VirtualResources;
 
 
 /**
@@ -34,16 +38,16 @@ public class Connect {
 	private final String PKGS_EOP = "org.supremica.manufacturingTables.xsd.eop";
 	private final String PKGS_IL = "org.supremica.manufacturingTables.xsd.il";
 	private java.sql.Connection con = null;
-	private String url;
-	private String serverName;
-	private String portNumber;
-	private String databaseName;
-	private String userName;
-	private String password;
+	private final String url;
+	private final String serverName;
+	private final String portNumber;
+	private final String databaseName;
+	private final String userName;
+	private final String password;
 	// Informs the driver if a server side cursor will be used,
 	// which permits more than one active statement
 	// on a connection.
-	private String selectMethod;
+	private final String selectMethod;
 
 /*
 	--------------------
@@ -73,8 +77,8 @@ public class Connect {
 	 * @param	password	the user password
 	 * @param	selectMethod	the method used to retrieve result sets, can be set to either cursor or direct
 	 */
-	public Connect(String url, String serverName, String portNumber, String databaseName,
-						String userName, String password, String selectMethod){
+	public Connect(final String url, final String serverName, final String portNumber, final String databaseName,
+						final String userName, final String password, final String selectMethod){
 		this.url = url;
 		this.serverName = serverName;
 		this.portNumber = portNumber;
@@ -107,7 +111,7 @@ public class Connect {
 		try{
 			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 			con = java.sql.DriverManager.getConnection(getConnectionUrl(),userName,password);
-		}catch(Exception e){
+		}catch(final Exception e){
 			//e.printStackTrace();
 			DBInterface.getPrintArea().append("\nError Trace in getConnection() : " + e.getMessage());
 		}
@@ -125,7 +129,7 @@ public class Connect {
 			con = this.getConnection();
 			if (con != null)
 				return true;
-		}catch(Exception e){
+		}catch(final Exception e){
 			DBInterface.getPrintArea().append("\nError: No active Connection" + e.getMessage());
 			closeConnection();
 		}
@@ -141,7 +145,7 @@ public class Connect {
 			if(con != null)
 				con.close();
 			con = null;
-		}catch(Exception e){
+		}catch(final Exception e){
 			e.printStackTrace();
 		}
 	}
@@ -174,7 +178,7 @@ public class Connect {
 			}
 			else
 				DBInterface.getPrintArea().append("\nError: No active Connection");
-		}catch(Exception e){
+		}catch(final Exception e){
 			DBInterface.getPrintArea().append("\nError: No active Connection " + e.getMessage());
 			closeConnection();
 		}
@@ -189,13 +193,13 @@ public class Connect {
 	public Vector<String> getAllProjects() {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		Vector<String> projects = new Vector<String>();
+		final Vector<String> projects = new Vector<String>();
 		try {
 			if(isConnected()){
 				ps = con.prepareStatement("SELECT Project_name FROM Projects");
 				try {
 					rs = ps.executeQuery();
-				}catch(SQLException sqle){
+				}catch(final SQLException sqle){
 					DBInterface.getPrintArea().append("\nAn SQL Exception Occurred! " + sqle.getMessage());
 				}
 				while (rs.next()) {
@@ -208,7 +212,7 @@ public class Connect {
 			}
 			else
 				DBInterface.getPrintArea().append("\nError: No active Connection");
-		}catch(Exception e){
+		}catch(final Exception e){
 			DBInterface.getPrintArea().append("\nError: " + e.getMessage());
 			closeConnection();
 		}
@@ -221,7 +225,7 @@ public class Connect {
 	 * @param	projectName	the project name
 	 * @return	the database ID of a project as INT
 	 */
-	public int getProjectID(String projectName) {
+	public int getProjectID(final String projectName) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		int projectID = 0;
@@ -231,7 +235,7 @@ public class Connect {
 				ps.setString(1, projectName);
 				try {
 					rs = ps.executeQuery();
-				}catch(SQLException sqle){
+				}catch(final SQLException sqle){
 					DBInterface.getPrintArea().append("\nAn SQL Exception Occurred! " + sqle.getMessage());
 				}
 				if (rs.next()) {
@@ -244,7 +248,7 @@ public class Connect {
 			}
 			else
 				DBInterface.getPrintArea().append("\nError: No active Connection");
-		}catch(Exception e){
+		}catch(final Exception e){
 			DBInterface.getPrintArea().append("\nError: " + e.getMessage());
 			closeConnection();
 		}
@@ -259,7 +263,7 @@ public class Connect {
 	 * @param	projectName	the project name
 	 * @return	the project as a String object
 	 */
-	public String getProjectXMLAsString(String projectName) {
+	public String getProjectXMLAsString(final String projectName) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		String xmlStr = "";
@@ -269,7 +273,7 @@ public class Connect {
 				ps.setString(1, projectName);
 				try {
 					rs = ps.executeQuery();
-				}catch(SQLException sqle){
+				}catch(final SQLException sqle){
 					DBInterface.getPrintArea().append("\nAn SQL Exception Occurred! " + sqle.getMessage());
 				}
 				if (rs != null) {
@@ -285,7 +289,7 @@ public class Connect {
 			}
 			else
 				DBInterface.getPrintArea().append("\nError: No active Connection");
-		}catch(Exception e){
+		}catch(final Exception e){
 			DBInterface.getPrintArea().append("\nError: " + e.getMessage());
 			closeConnection();
 		}
@@ -297,10 +301,9 @@ public class Connect {
 	//	Export project XML as String
 	/**
 	 * Returns the database ID of a project by using the project name
-	 * @param	projectName	the project name
-	 * @return	the database ID of a project as INT
+	 * @param	xmlStr	the project name
 	 */
-	public void setProjectXMLFromString(String xmlStr) {
+	public void setProjectXMLFromString(final String xmlStr) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		String resultSet = "\nNo resultSet returned!";
@@ -310,7 +313,7 @@ public class Connect {
 				ps.setString(1, xmlStr);
 				try {
 					rs = ps.executeQuery();
-				}catch(SQLException sqle){
+				}catch(final SQLException sqle){
 					DBInterface.getPrintArea().append("\nAn SQL Exception Occurred! " + sqle.getMessage());
 				}
 				if (rs != null) {
@@ -326,7 +329,7 @@ public class Connect {
 			}
 			else
 				DBInterface.getPrintArea().append("\nError: No active Connection");
-		}catch(Exception e){
+		}catch(final Exception e){
 			DBInterface.getPrintArea().append("\nError: " + e.getMessage());
 			closeConnection();
 		}
@@ -337,7 +340,7 @@ public class Connect {
 	 * Sends a predefined query to the database
 	 * @param	query	the predefined query as String
 	 */
-	public void sendQuery(String query) {
+	public void sendQuery(final String query) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		String result = "";
@@ -347,7 +350,7 @@ public class Connect {
 				//ps.setString(1, projectName);
 				try {
 					rs = ps.executeQuery();
-				}catch(SQLException sqle){
+				}catch(final SQLException sqle){
 					DBInterface.getPrintArea().append("\nAn SQL Exception Occurred! " + sqle.getMessage());
 				}
 				while (rs.next()) {
@@ -361,7 +364,7 @@ public class Connect {
 			}
 			else
 				DBInterface.getPrintArea().append("\nError: No active Connection");
-		}catch(Exception e){
+		}catch(final Exception e){
 			DBInterface.getPrintArea().append("\nError: " + e.getMessage());
 			closeConnection();
 		}
@@ -370,9 +373,8 @@ public class Connect {
 	// Link project
 	/**
 	 * Sends a predefined query to the database
-	 * @param	query	the predefined query as String
 	 */
-	public String linkProject(int projectID) {
+	public String linkProject(final int projectID) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		String result = "";
@@ -382,7 +384,7 @@ public class Connect {
 				ps.setInt(1, projectID);
 				try {
 					rs = ps.executeQuery();
-				}catch(SQLException sqle){
+				}catch(final SQLException sqle){
 					DBInterface.getPrintArea().append("\nAn SQL Exception Occurred! " + sqle.getMessage());
 				}
 				while (rs.next()) {
@@ -396,7 +398,7 @@ public class Connect {
 			}
 			else
 				DBInterface.getPrintArea().append("\nError: No active Connection");
-		}catch(Exception e){
+		}catch(final Exception e){
 			DBInterface.getPrintArea().append("\nError: " + e.getMessage());
 			closeConnection();
 		}
@@ -409,8 +411,8 @@ public class Connect {
 	 * @param	projectID	the project database ID
 	 * @return	an ArrayList object
 	 */
-	public ArrayList<Integer> getStandardsInUse(int projectID){
-		ArrayList<Integer> standardsInUse = new ArrayList<Integer>();
+	public ArrayList<Integer> getStandardsInUse(final int projectID){
+		final ArrayList<Integer> standardsInUse = new ArrayList<Integer>();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
@@ -419,7 +421,7 @@ public class Connect {
 				ps.setInt(1, projectID);
 				try {
 					rs = ps.executeQuery();
-				}catch(SQLException sqle){
+				}catch(final SQLException sqle){
 					DBInterface.getPrintArea().append("\nAn SQL Exception Occurred! " + sqle.getMessage());
 				}
 				if (rs != null) {
@@ -437,7 +439,7 @@ public class Connect {
 			}
 			else
 				DBInterface.getPrintArea().append("\nError: No active Connection");
-		}catch(Exception e){
+		}catch(final Exception e){
 			DBInterface.getPrintArea().append("\nError: " + e.getMessage());
 			closeConnection();
 		}
@@ -449,7 +451,7 @@ public class Connect {
 	 * Permanently deletes a project from the database
 	 * @param	projectID	the project database ID
 	 */
-	public void deleteProject(int projectID) {
+	public void deleteProject(final int projectID) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
@@ -458,7 +460,7 @@ public class Connect {
 				ps.setInt(1, projectID);
 				try {
 					rs = ps.executeQuery();
-				}catch(SQLException sqle){
+				}catch(final SQLException sqle){
 					DBInterface.getPrintArea().append("\nAn SQL Exception Occurred! " + sqle.getMessage());
 				}
 
@@ -470,7 +472,7 @@ public class Connect {
 			}
 			else
 				DBInterface.getPrintArea().append("\nError: No active Connection");
-		}catch(Exception e){
+		}catch(final Exception e){
 			DBInterface.getPrintArea().append("\nError: " + e.getMessage());
 			closeConnection();
 		}
@@ -486,10 +488,10 @@ public class Connect {
 	 * @param	standardIndex	the selected standard type
 	 * @return	a Vector object with all the instances of the standard type
 	 */
-	public ArrayList<String> getAllStandards(int projectID, int standardIndex) {
+	public ArrayList<String> getAllStandards(final int projectID, final int standardIndex) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		ArrayList<String> list = new ArrayList<String>();
+		final ArrayList<String> list = new ArrayList<String>();
 		try {
 			if(isConnected()){
 				switch (standardIndex) {
@@ -502,7 +504,7 @@ public class Connect {
 				ps.setInt(1,projectID);
 				try {
 					rs = ps.executeQuery();
-				}catch(SQLException sqle){
+				}catch(final SQLException sqle){
 					DBInterface.getPrintArea().append("\nAn SQL Exception Occurred! " + sqle.getMessage());
 				}
 				while (rs.next()) {
@@ -515,7 +517,7 @@ public class Connect {
 			}
 			else
 				DBInterface.getPrintArea().append("\nError: No active Connection");
-		}catch(Exception e){
+		}catch(final Exception e){
 			DBInterface.getPrintArea().append("\nError: " + e.getMessage());
 			closeConnection();
 		}
@@ -529,7 +531,7 @@ public class Connect {
 	 * @param	standardIndex	the selected standard type
 	 * @param	standardNameID	the selected instance of the standard type
 	 */
-	public void deleteStandard(int projectID, int standardIndex, String standardNameID) {
+	public void deleteStandard(final int projectID, final int standardIndex, final String standardNameID) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
@@ -547,7 +549,7 @@ public class Connect {
 				ps.setInt(1, projectID);
 				try {
 					rs = ps.executeQuery();
-				}catch(SQLException sqle){
+				}catch(final SQLException sqle){
 					DBInterface.getPrintArea().append("\nAn SQL Exception Occurred! " + sqle.getMessage());
 				}
 				if (rs != null) {
@@ -563,7 +565,7 @@ public class Connect {
 			}
 			else
 				DBInterface.getPrintArea().append("\nError: No active Connection");
-		}catch(Exception e){
+		}catch(final Exception e){
 			DBInterface.getPrintArea().append("\nError: " + e.getMessage());
 			closeConnection();
 		}
@@ -579,7 +581,7 @@ public class Connect {
 	 * @param	standardNameID	the selected instance of the standard type
 	 * @return	the selected standard as an XML String
 	 */
-	public String getStandardXMLAsString(int projectID, int standardIndex, String standardNameID) {
+	public String getStandardXMLAsString(final int projectID, final int standardIndex, final String standardNameID) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		String xmlStr = "No ResultSet returned ";
@@ -598,7 +600,7 @@ public class Connect {
 				ps.setInt(1, projectID);
 				try {
 					rs = ps.executeQuery();
-				}catch(SQLException sqle){
+				}catch(final SQLException sqle){
 					DBInterface.getPrintArea().append("\nAn SQL Exception Occurred! " + sqle.getMessage());
 				}
 				if (rs != null) {
@@ -614,7 +616,7 @@ public class Connect {
 			}
 			else
 				DBInterface.getPrintArea().append("\nError: No active Connection ");
-		}catch(Exception e){
+		}catch(final Exception e){
 			DBInterface.getPrintArea().append("\nError: No active Connection: " + e.getMessage());
 			closeConnection();
 		}
@@ -629,7 +631,7 @@ public class Connect {
 	 * @param	standardNameID	the selected instance of the standard type
 	 * @return	the selected standard as a JAXB object
 	 */
-	public Object getStandardXMLAsObject(int projectID, int standardIndex, String standardNameID) {
+	public Object getStandardXMLAsObject(final int projectID, final int standardIndex, final String standardNameID) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		Object o = null;
@@ -648,17 +650,17 @@ public class Connect {
 				ps.setInt(1, projectID);
 				try {
 					rs = ps.executeQuery();
-				}catch(SQLException sqle){
+				}catch(final SQLException sqle){
 					DBInterface.getPrintArea().append("\nAn SQL Exception Occurred! " + sqle.getMessage());
 				}
 				if (rs != null) {
 					rs.next();
-					String xmlStr = rs.getString(1);	// The complete XML file as a String object
-					Loader ldr = new Loader();
+					final String xmlStr = rs.getString(1);	// The complete XML file as a String object
+					final Loader ldr = new Loader();
 					JAXBContext jc = null;
 					Marshaller m = null;
-					StringWriter stringWriter = new StringWriter();
-					StreamResult result = new StreamResult(stringWriter);
+					final StringWriter stringWriter = new StringWriter();
+					final StreamResult result = new StreamResult(stringWriter);
 					String content = "";
 					try {
 						switch(standardIndex){
@@ -703,7 +705,7 @@ public class Connect {
 								content = stringWriter.toString();
 								DBInterface.getPrintArea().append("\n\n" + content); break;
 						}
-					}catch(Exception e) {
+					}catch(final Exception e) {
 						DBInterface.getPrintArea().append("Exception: " + e.getMessage());
 					}
 				}
@@ -716,7 +718,7 @@ public class Connect {
 			}
 			else
 				DBInterface.getPrintArea().append("\nError: No active Connection ");
-		}catch(Exception e){
+		}catch(final Exception e){
 			DBInterface.getPrintArea().append("\nError: No active Connection: " + e.getMessage());
 			closeConnection();
 		}
@@ -732,7 +734,7 @@ public class Connect {
 	 * @param	standardIndex	the selected standard type
 	 * @param	xmlStr	the XML data as a String object
 	 */
-	public void setStandardXMLFromString(int projectID, int standardIndex, String xmlStr) {
+	public void setStandardXMLFromString(final int projectID, final int standardIndex, final String xmlStr) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		String resultStr = "No ResultSet returned";
@@ -740,11 +742,11 @@ public class Connect {
 
 		try {
 			if(isConnected()) {
-				Loader ldr = new Loader();
+				final Loader ldr = new Loader();
 				JAXBContext jc = null;
 				Marshaller m = null;
-				StringWriter stringWriter = new StringWriter();
-				StreamResult result = new StreamResult(stringWriter);
+				final StringWriter stringWriter = new StringWriter();
+				final StreamResult result = new StreamResult(stringWriter);
 				String content = "";
 				Object o = null;
 				boolean instanceFlag = false;
@@ -802,7 +804,7 @@ public class Connect {
 							m.marshal(o, result);
 							content = stringWriter.toString(); break;
 					}
-				}catch(Exception e) {
+				}catch(final Exception e) {
 					DBInterface.getPrintArea().append("\nError: " + e.getMessage() + "\nWrong encoding? Not validated?");
 				}
 				if (instanceFlag) {
@@ -817,7 +819,7 @@ public class Connect {
 					ps.setString(2, content);
 					try {
 						rs = ps.executeQuery();
-					}catch(SQLException sqle) {
+					}catch(final SQLException sqle) {
 						DBInterface.getPrintArea().append("\nAn SQL Exception Occurred! " + sqle.getMessage());
 						closeConnection();
 						insertStr = "";
@@ -838,7 +840,7 @@ public class Connect {
 			}
 			else
 				DBInterface.getPrintArea().append("\nError: No active Connection ");
-		}catch(Exception e) {
+		}catch(final Exception e) {
 			DBInterface.getPrintArea().append("\nError: " + e.getMessage());
 		}
 	}
@@ -850,7 +852,7 @@ public class Connect {
 	 * @param	standardIndex	the selected standard type
 	 * @param	o	the XML data as a JAXB object
 	 */
-	public void setStandardXMLFromObject(int projectID, int standardIndex, Object o) {
+	public void setStandardXMLFromObject(final int projectID, final int standardIndex, final Object o) {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		String xmlStr = "";
@@ -866,12 +868,12 @@ public class Connect {
 				case 3: jc = JAXBContext.newInstance(PKGS_EOP); break;
 				case 4: jc = JAXBContext.newInstance(PKGS_IL); break;
 				}
-				Marshaller m = jc.createMarshaller();
+				final Marshaller m = jc.createMarshaller();
 				m.setProperty(Marshaller.JAXB_ENCODING, "UTF-16");
 				m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
-				StringWriter stringWriter = new StringWriter();
-				StreamResult result = new StreamResult(stringWriter);
+				final StringWriter stringWriter = new StringWriter();
+				final StreamResult result = new StreamResult(stringWriter);
 				m.marshal(o, result);
 				xmlStr = stringWriter.toString();
 
@@ -886,7 +888,7 @@ public class Connect {
 				ps.setString(2, xmlStr);
 				try {
 					rs = ps.executeQuery();
-				}catch(SQLException sqle) {
+				}catch(final SQLException sqle) {
 					DBInterface.getPrintArea().append("\nAn SQL Exception Occurred! " + sqle.getMessage());
 					closeConnection();
 					insertStr = "";
@@ -902,7 +904,7 @@ public class Connect {
 			}
 			else
 				DBInterface.getPrintArea().append("\nError: No active Connection ");
-		}catch(Exception e) {
+		}catch(final Exception e) {
 			DBInterface.getPrintArea().append("\nError: A resource must be selected in SOC. " + e.getMessage());
 		}
 	}

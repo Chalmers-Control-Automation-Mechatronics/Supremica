@@ -57,21 +57,21 @@
  */
 package org.supremica.automata.algorithms;
 
-import org.supremica.log.*;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
-import org.supremica.util.SupremicaException;
 
 public class SynchronizationOptions
 {
 	@SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.createLogger(SynchronizationOptions.class);
-	
+
 	private SynchronizationType syncType;    // PRIORITIZED, FULL, Broadcast, Unknown
 	private boolean forbidUnconStates;    // mark uc-states as uncontrollable
 	private boolean expandForbiddenStates;    // expand beyond an uc-state
-	private int initialHashtableSize;
+	private final int initialHashtableSize;
 	private boolean expandHashtable;
-	private int nbrOfExecuters;
+	private final int nbrOfExecuters;
 	private boolean buildAutomaton;    // Build automaton (also add the arcs)
 	private boolean useShortStateNames;    // Generate short, abstract, state names
 	private boolean expandEventsUsingPriority;    // ??
@@ -83,16 +83,15 @@ public class SynchronizationOptions
 	private String automatonNameSeparator;
 	private String stateNameSeparator;
     @SuppressWarnings("unused")
-	private boolean EFAMode;
+	private final boolean EFAMode;
 
 	/**
-	 * Default constructor
+	 * Default constructor.
 	 *
-	 * The parametrisized constructor was removed due to unreadable code.
+	 * The parametrised constructor was removed due to unreadable code.
 	 * Use the "getDefault..."-methods in this class instead or when they won't suit you,
 	 * modify the necessary options one by one, starting from default! Much more readable and
 	 * also more practical when adding new options.
-	 * @throws SupremicaException
 	 */
 	public SynchronizationOptions()
 	// throws SupremicaException
@@ -129,7 +128,7 @@ public class SynchronizationOptions
 
 	}
 
-	public void setDialogOK(boolean bool)
+	public void setDialogOK(final boolean bool)
 	{
 		dialogOK = bool;
 	}
@@ -149,7 +148,7 @@ public class SynchronizationOptions
 		return syncType;
 	}
 
-	public void setSynchronizationType(SynchronizationType type)
+	public void setSynchronizationType(final SynchronizationType type)
 	{
 		syncType = type;
 	}
@@ -164,7 +163,7 @@ public class SynchronizationOptions
 		return expandHashtable;
 	}
 
-	public void setExpandHashtable(boolean set)
+	public void setExpandHashtable(final boolean set)
 	{
 		expandHashtable = set;
 	}
@@ -174,7 +173,7 @@ public class SynchronizationOptions
 		return forbidUnconStates;
 	}
 
-	public void setForbidUncontrollableStates(boolean set)
+	public void setForbidUncontrollableStates(final boolean set)
 	{
 		forbidUnconStates = set;
 	}
@@ -184,12 +183,12 @@ public class SynchronizationOptions
 		return expandForbiddenStates;
 	}
 
-	public void setExpandForbiddenStates(boolean set)
+	public void setExpandForbiddenStates(final boolean set)
 	{
 		expandForbiddenStates = set;
 	}
 
-	public void setExpandEventsUsingPriority(boolean set)
+	public void setExpandEventsUsingPriority(final boolean set)
 	{
 		expandEventsUsingPriority = set;
 	}
@@ -204,7 +203,7 @@ public class SynchronizationOptions
 		return requireConsistentControllability;
 	}
 
-	public void setRequireConsistentControllability(boolean require)
+	public void setRequireConsistentControllability(final boolean require)
 	{
 		requireConsistentControllability = require;
 	}
@@ -214,7 +213,7 @@ public class SynchronizationOptions
 		return requireConsistentImmediate;
 	}
 
-	public void setRequireConsistentImmediate(boolean require)
+	public void setRequireConsistentImmediate(final boolean require)
 	{
 		requireConsistentImmediate = require;
 	}
@@ -224,7 +223,7 @@ public class SynchronizationOptions
 		return rememberDisabledEvents;
 	}
 
-	public void setRememberDisabledEvents(boolean remember)
+	public void setRememberDisabledEvents(final boolean remember)
 	{
 		rememberDisabledEvents = remember;
 	}
@@ -234,7 +233,7 @@ public class SynchronizationOptions
 		return buildAutomaton;
 	}
 
-	public void setBuildAutomaton(boolean set)
+	public void setBuildAutomaton(final boolean set)
 	{
 		buildAutomaton = set;
 	}
@@ -244,7 +243,7 @@ public class SynchronizationOptions
 		return useShortStateNames;
 	}
 
-	public void setUseShortStateNames(boolean set)
+	public void setUseShortStateNames(final boolean set)
 	{
 		useShortStateNames = set;
 	}
@@ -287,7 +286,7 @@ public class SynchronizationOptions
 	 */
 	public static SynchronizationOptions getDefaultSynchronizationOptions()
 	{
-		SynchronizationOptions options = new SynchronizationOptions();
+		final SynchronizationOptions options = new SynchronizationOptions();
 		options.setSynchronizationType(SynchronizationType.FULL);
 		// options.setForbidUncontrollableStates(true);  // This is controversial!
 		options.setForbidUncontrollableStates(false);   // So why was it like that?
@@ -303,7 +302,7 @@ public class SynchronizationOptions
 	 */
 	public static SynchronizationOptions getDefaultVerificationOptions()
 	{
-		SynchronizationOptions options = getDefaultSynchronizationOptions();
+		final SynchronizationOptions options = getDefaultSynchronizationOptions();
 		options.setForbidUncontrollableStates(true); // Doesn't really matter, this is not how controllability is decided
 		options.setBuildAutomaton(false);        // We don't want to see the stuff, anyway...
 		options.setExpandForbiddenStates(false); // Don't need to do that, then...
@@ -315,11 +314,11 @@ public class SynchronizationOptions
 	 */
 	public static SynchronizationOptions getDefaultSynthesisOptions()
 	{
-		SynchronizationOptions options = getDefaultSynchronizationOptions();
+		final SynchronizationOptions options = getDefaultSynchronizationOptions();
 		// This is important!
-		options.setForbidUncontrollableStates(true); 
+		options.setForbidUncontrollableStates(true);
 		// Don't need to do expand forbidden if we're not using them anyway...
-		options.setExpandForbiddenStates(false); 
+		options.setExpandForbiddenStates(false);
 
 		// Return result
 		return options;
@@ -328,7 +327,7 @@ public class SynchronizationOptions
 	/**
 	 * @param automatonNameSeparator The automatonNameSeparator to set.
 	 */
-	public void setAutomatonNameSeparator(String automatonNameSeparator)
+	public void setAutomatonNameSeparator(final String automatonNameSeparator)
 	{
 		this.automatonNameSeparator = automatonNameSeparator;
 	}
@@ -352,7 +351,7 @@ public class SynchronizationOptions
 	/**
 	 * @param stateNameSeparator The stateNameSeparator to set.
 	 */
-	public void setStateNameSeparator(String stateNameSeparator)
+	public void setStateNameSeparator(final String stateNameSeparator)
 	{
 		this.stateNameSeparator = stateNameSeparator;
 	}

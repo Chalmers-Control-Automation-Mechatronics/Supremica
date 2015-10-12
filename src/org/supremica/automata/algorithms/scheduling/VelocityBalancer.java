@@ -28,7 +28,7 @@ import org.supremica.util.ActionTimer;
 
 /**
  * Creates a new instance of VelocityBalancer
- * 
+ *
  * @author Avenir Kobetski
  */
 public class VelocityBalancer
@@ -90,19 +90,19 @@ public class VelocityBalancer
   int[] plantIndexMapping;
 
   /** The logger */
-  private Logger logger = LoggerFactory.createLogger(this.getClass());
+  private final Logger logger = LoggerFactory.createLogger(this.getClass());
 
   Scheduler callingScheduler = null;
 
-  public VelocityBalancer(Automata theAutomata) throws Exception
+  public VelocityBalancer(final Automata theAutomata) throws Exception
   {
     this(theAutomata, null);
   }
 
-  public VelocityBalancer(Automata theAutomata, Scheduler callingScheduler)
+  public VelocityBalancer(final Automata theAutomata, final Scheduler callingScheduler)
       throws Exception
   {
-    ActionTimer timer = new ActionTimer();
+    final ActionTimer timer = new ActionTimer();
     timer.start();
 
     this.callingScheduler = callingScheduler;
@@ -135,7 +135,7 @@ public class VelocityBalancer
     }
     addToMessages(tempStr, SchedulingConstants.MESSAGE_TYPE_INFO, false);
     tempStr = "Path points: \n\t";
-    for (double[] teff : pathPoints) {
+    for (final double[] teff : pathPoints) {
       tempStr += "[";
       for (int i = 0; i < teff.length; i++) {
         tempStr += roundOff(teff[i], 2) + " ";
@@ -146,7 +146,7 @@ public class VelocityBalancer
     for (int i = 0; i < mutexLimits.length; i++) {
       for (int j = 0; j < mutexLimits[i].length; j++) {
         tempStr += "i = " + i + ", j = " + j + ": ";
-        for (double[] mutlim : mutexLimits[i][j]) {
+        for (final double[] mutlim : mutexLimits[i][j]) {
           tempStr += "[";
           for (int k = 0; k < mutlim.length; k++) {
             tempStr += mutlim[k] + " ";
@@ -160,7 +160,7 @@ public class VelocityBalancer
       for (int j = 0; j < circWaitLimits[i].length; j++) {
         if (circWaitLimits[i][j].size() > 0) {
           tempStr += "i = " + i + ", j = " + j + ": ";
-          for (double[] lim : circWaitLimits[i][j]) {
+          for (final double[] lim : circWaitLimits[i][j]) {
             tempStr += "[";
             for (int k = 0; k < lim.length; k++) {
               tempStr += lim[k] + " ";
@@ -244,7 +244,7 @@ public class VelocityBalancer
     // Prepare optimalSubPlants for the addition of the velocity profiles.
     // This is done by looping through keyPoints and recording which states
     // have the same velocities.
-    double[][] relativeVelocities = improveKeyPointsUsingVisibilitySmoothing();
+    final double[][] relativeVelocities = improveKeyPointsUsingVisibilitySmoothing();
     setRelativeVelocitiesInPlants(relativeVelocities);
 
     // Gathers some statistics about the velocity changes (smooth schedule)
@@ -266,14 +266,14 @@ public class VelocityBalancer
   }
 
   @SuppressWarnings("unchecked")
-  private void init(Automata theAutomata) throws Exception
+  private void init(final Automata theAutomata) throws Exception
   {
     // Extract the schedule automaton from the supplied supervisor automata
     if (theAutomata.getSupervisorAutomata().size() == 1) {
       schedule = theAutomata.getSupervisorAutomata().getAutomatonAt(0);
     } else {
-      for (Automaton supAuto : theAutomata.getSupervisorAutomata()) {
-        State initState = supAuto.getInitialState();
+      for (final Automaton supAuto : theAutomata.getSupervisorAutomata()) {
+        final State initState = supAuto.getInitialState();
         if (initState.getName().contains(("firing_time"))) {
           schedule = supAuto;
         }
@@ -287,8 +287,8 @@ public class VelocityBalancer
 
     plants = theAutomata.getPlantAutomata();
     specs = theAutomata.getSpecificationAutomata();
-    Automata powerlessSpecs = new Automata();
-    for (Automaton spec : specs) {
+    final Automata powerlessSpecs = new Automata();
+    for (final Automaton spec : specs) {
       // We don't need to care about single-state specs, while zone specs are
       // taken care of further down the code
       if (spec.nbrOfStates() == 2) {
@@ -334,11 +334,11 @@ public class VelocityBalancer
     // during the walk through the states of the optimal schedule.
     optimalSubPlants = new Automata();
     for (int i = 0; i < plants.size(); i++) {
-      Automaton currOptimalSubPlant =
+      final Automaton currOptimalSubPlant =
           new Automaton(indexMap.getAutomatonAt(plantIndexMapping[i]).getName()
               + "_optimal");
       currOptimalSubPlant.setType(AutomatonType.PLANT);
-      State initialState = new State("q0");
+      final State initialState = new State("q0");
       initialState.setInitial(true);
       initialState.setAccepting(true);
       currOptimalSubPlant.addState(initialState);
@@ -369,8 +369,8 @@ public class VelocityBalancer
     // don't know
     // exactly how many events correspond to each robot are in the optimal
     // schedule).
-    ArrayList<Double>[] firingTimesArrays = new ArrayList[plants.size()];
-    ArrayList<Double>[] simulationTimesArrays = new ArrayList[plants.size()];
+    final ArrayList<Double>[] firingTimesArrays = new ArrayList[plants.size()];
+    final ArrayList<Double>[] simulationTimesArrays = new ArrayList[plants.size()];
     for (int i = 0; i < firingTimesArrays.length; i++) {
       firingTimesArrays[i] = new ArrayList<Double>();
       simulationTimesArrays[i] = new ArrayList<Double>();
@@ -378,14 +378,14 @@ public class VelocityBalancer
 
     // The plant states that build up the currently examimed schedule state,
     // starting with the initial of course.
-    State[] currPlantStates = new State[plants.size()];
+    final State[] currPlantStates = new State[plants.size()];
     for (int plantIndex = 0; plantIndex < currPlantStates.length; plantIndex++) {
       currPlantStates[plantIndex] =
           indexMap.getAutomatonAt(plantIndexMapping[plantIndex])
               .getInitialState();
     }
 
-    double[] remainingTimesInState = new double[plants.size()];
+    final double[] remainingTimesInState = new double[plants.size()];
     for (int i = 0; i < remainingTimesInState.length; i++) {
       remainingTimesInState[i] =
           plants.getAutomatonAt(plantIndexMapping[i]).getInitialState()
@@ -401,14 +401,14 @@ public class VelocityBalancer
         throw new Exception("Velocity balancing not implemented for a "
             + "schedule with uncontrollable alternatives");
       } else {
-        for (Iterator<Arc> arcIt = scheduleState.outgoingArcsIterator(); arcIt
+        for (final Iterator<Arc> arcIt = scheduleState.outgoingArcsIterator(); arcIt
             .hasNext();) {
-          LabeledEvent currEvent = arcIt.next().getEvent();
+          final LabeledEvent currEvent = arcIt.next().getEvent();
           double currCost = -1;
           int activeAutomatonIndex = -1;
 
           for (int plantIndex = 0; plantIndex < currPlantStates.length; plantIndex++) {
-            Alphabet currPlantEvents =
+            final Alphabet currPlantEvents =
                 currPlantStates[plantIndex].activeEvents(false);
             if (currPlantEvents.contains(currEvent)) {
               // Record the index of the automaton that contains the currently
@@ -444,8 +444,8 @@ public class VelocityBalancer
           // Of course, when treating the plant that fired the schedule event,
           // we know that the time update is equal to current cost of the
           // schedule state.
-          double[] newPathPoint = new double[plants.size()];
-          double activeTime = remainingTimesInState[activeAutomatonIndex]; // currCost
+          final double[] newPathPoint = new double[plants.size()];
+          final double activeTime = remainingTimesInState[activeAutomatonIndex]; // currCost
                                                                            // could
                                                                            // also
                                                                            // be
@@ -536,7 +536,7 @@ public class VelocityBalancer
           // with the last value set to -1, is created.
           for (int i = 0; i < specs.size(); i++) {
             if (specs.getAutomatonAt(i).getAlphabet().contains(currEvent)) {
-              int nrOfAddedMutexLimits =
+              final int nrOfAddedMutexLimits =
                   mutexLimits[i][activeAutomatonIndex].size();
               if ((nrOfAddedMutexLimits > 0)
                   && (mutexLimits[i][activeAutomatonIndex]
@@ -552,15 +552,15 @@ public class VelocityBalancer
           }
 
           // Add the current event to corresponding optimal plant part
-          Automaton currOptimalSubPlant =
+          final Automaton currOptimalSubPlant =
               optimalSubPlants
                   .getAutomatonAt(plantIndexMapping[activeAutomatonIndex]);
-          State fromState =
+          final State fromState =
               currOptimalSubPlant.getStateWithName("q"
                   + (currOptimalSubPlant.nbrOfStates() - 1));
           fromState.setCost(simulationTimesArrays[activeAutomatonIndex]
               .get(simulationTimesArrays[activeAutomatonIndex].size() - 1));
-          State toState = new State("q" + currOptimalSubPlant.nbrOfStates());
+          final State toState = new State("q" + currOptimalSubPlant.nbrOfStates());
           currOptimalSubPlant.addState(toState);
           if (!currOptimalSubPlant.getAlphabet().contains(currEvent)) {
             currOptimalSubPlant.getAlphabet().addEvent(currEvent);
@@ -573,12 +573,12 @@ public class VelocityBalancer
     // Connect the currOptimalSubPlant as a loop by redirecting the last
     // transition to the initial state
     for (int i = 0; i < optimalSubPlants.size(); i++) {
-      Automaton currOptimalSubPlant =
+      final Automaton currOptimalSubPlant =
           optimalSubPlants.getAutomatonAt(plantIndexMapping[i]);
-      State fromState =
+      final State fromState =
           currOptimalSubPlant.getStateWithName("q"
               + (currOptimalSubPlant.nbrOfStates() - 2));
-      State prevToState =
+      final State prevToState =
           currOptimalSubPlant.getStateWithName("q"
               + (currOptimalSubPlant.nbrOfStates() - 1));
       currOptimalSubPlant.addArc(new Arc(fromState, currOptimalSubPlant
@@ -587,7 +587,7 @@ public class VelocityBalancer
       currOptimalSubPlant.removeState(prevToState);
     }
 
-    Automata plantsAndSpecs = new Automata(optimalSubPlants);
+    final Automata plantsAndSpecs = new Automata(optimalSubPlants);
     plantsAndSpecs.addAutomata(specs);
     FindCircWaitLimits(plantsAndSpecs);
 
@@ -615,19 +615,19 @@ public class VelocityBalancer
   // Automaton synthAuto = synchronizer.getAutomaton();
   // synthAuto.setName("Plants||Specs");
   // synthAuto.setType(AutomatonType.PLANT);
-  //                
+  //
   // AutomataIndexMap synthIndexMap = new AutomataIndexMap(new
   // Automata(synthAuto));
-  //        
+  //
   // // Contains the indices of allowed states that lead to a forbidden state in
   // one transition,
   // // together with the indices of the events leading to a forbidden state,
   // i.e. one entry is
   // // [border_allowed_state_index, event_leading_to_forbidden_state_index].
   // IntArrayTreeSet borderAllowedStates = new IntArrayTreeSet();
-  //        
+  //
   // ArrayList<State> listOfForbiddenRegionRoots = new ArrayList<State>();
-  //               
+  //
   // for (Iterator<State> stateIt = synthAuto.stateIterator();
   // stateIt.hasNext();)
   // {
@@ -637,7 +637,7 @@ public class VelocityBalancer
   // //temp
   // addToMessages("Found deadlock state = " + state.getName(),
   // SchedulingConstants.MESSAGE_TYPE_ERROR);
-  //                
+  //
   // boolean isRootOfForbiddenRegion = true;
   // for (Iterator<Arc> incomingArcIt = state.incomingArcsIterator();
   // incomingArcIt.hasNext();)
@@ -654,27 +654,27 @@ public class VelocityBalancer
   // synthIndexMap.getEventIndex(incomingArc.getEvent())});
   // }
   // }
-  //                
+  //
   // if (isRootOfForbiddenRegion)
   // {
   // listOfForbiddenRegionRoots.add(state);
   // }
   // }
   // }
-  //        
+  //
   // // Create the deadlock limit array
   // circWaitLimits = new
   // ArrayList[listOfForbiddenRegionRoots.size()][plants.size()];
-  //        
+  //
   // for (int j = 0; j < listOfForbiddenRegionRoots.size(); j++)
   // {
   // for (int k = 0; k < circWaitLimits[j].length; k++)
   // {
   // circWaitLimits[j][k] = new ArrayList<double[]>();
   // }
-  //            
+  //
   // State state = listOfForbiddenRegionRoots.get(j);
-  //                
+  //
   // // // This array contains true values for each plant that is involved in a
   // deadlock in current forbidden state
   // // boolean[] isLockedPlant = new boolean[plants.size()];
@@ -748,7 +748,7 @@ public class VelocityBalancer
   // {
   // circWaitLimits[j][i].add(new double[]{currMinDLLimit, -1});
   // }
-  //                                
+  //
   // // if (minDLLimit[i] > currMinDLLimit)
   // // {
   // // minDLLimit[i] = currMinDLLimit;
@@ -809,7 +809,7 @@ public class VelocityBalancer
   // {
   // circWaitLimits[j][i].add(new double[]{-1, currMaxDLLimit});
   // }
-  //                                                
+  //
   // // if (maxDLLimit[i] < currMaxDLLimit)
   // // {
   // // maxDLLimit[i] = currMaxDLLimit;
@@ -823,7 +823,7 @@ public class VelocityBalancer
   // }
   // }
   // }
-  //            
+  //
   // // String dlStr = "State " + state.getName() +
   // " is the root of forbidden region...\n";
   // // for (int i = 0; i < maxDLLimit.length; i++)
@@ -855,10 +855,10 @@ public class VelocityBalancer
   // }
 
   @SuppressWarnings("unchecked")
-  private void FindCircWaitLimits(Automata plantsAndSpecs) throws Exception
+  private void FindCircWaitLimits(final Automata plantsAndSpecs) throws Exception
   {
-    AutomataIndexMap map = new AutomataIndexMap(plantsAndSpecs);
-    ArrayList<int[]>[] edges =
+    final AutomataIndexMap map = new AutomataIndexMap(plantsAndSpecs);
+    final ArrayList<int[]>[] edges =
         new ArrayList[plantsAndSpecs.getSpecificationAutomata().size()];
     for (int specIndex = 0; specIndex < edges.length; specIndex++) {
       edges[specIndex] = new ArrayList<int[]>();
@@ -866,13 +866,13 @@ public class VelocityBalancer
 
     for (int plantIndex = 0; plantIndex < plantsAndSpecs.getPlantAutomata()
         .size(); plantIndex++) {
-      Automaton plant =
+      final Automaton plant =
           plantsAndSpecs.getPlantAutomata().getAutomatonAt(plantIndex);
-      Alphabet[] bookingAlphabets = new Alphabet[edges.length];
-      Alphabet[] unbookingAlphabets = new Alphabet[edges.length];
+      final Alphabet[] bookingAlphabets = new Alphabet[edges.length];
+      final Alphabet[] unbookingAlphabets = new Alphabet[edges.length];
 
       for (int specIndex = 0; specIndex < edges.length; specIndex++) {
-        Alphabet commonAlphabet =
+        final Alphabet commonAlphabet =
             AlphabetHelpers.intersect(plant.getAlphabet(), plantsAndSpecs
                 .getSpecificationAutomata().getAutomatonAt(specIndex)
                 .getAlphabet());
@@ -891,7 +891,7 @@ public class VelocityBalancer
 
       do {
         boolean bookingFound = false;
-        Arc arc = state.outgoingArcsIterator().next(); // Note that the plants
+        final Arc arc = state.outgoingArcsIterator().next(); // Note that the plants
                                                        // should have exactly
                                                        // one outgoing arc per
                                                        // state
@@ -899,8 +899,8 @@ public class VelocityBalancer
         for (int j = 0; j < bookingAlphabets.length; j++) {
           if (bookingAlphabets[j] != null
               && bookingAlphabets[j].contains(arc.getEvent())) {
-            int zoneIndex2 = j;
-            int stateIndex2 = map.getStateIndex(plant, state);
+            final int zoneIndex2 = j;
+            final int stateIndex2 = map.getStateIndex(plant, state);
 
             if (zoneIndex1 != -1) {
               edges[zoneIndex1].add(new int[] { zoneIndex2, plantIndex,
@@ -925,10 +925,10 @@ public class VelocityBalancer
       } while (!state.isAccepting());
     }
 
-    ConnectedComponentsGraph cycleFinder =
+    final ConnectedComponentsGraph cycleFinder =
         new ConnectedComponentsGraph(edges, plantsAndSpecs.getPlantAutomata()
             .size());
-    ArrayList<ArrayList<ConnectedComponentEdge>> cycles =
+    final ArrayList<ArrayList<ConnectedComponentEdge>> cycles =
         cycleFinder.enumerateAllCycles();
 
     // //temp
@@ -952,9 +952,9 @@ public class VelocityBalancer
     }
 
     for (int cycleIndex = 0; cycleIndex < cycles.size(); cycleIndex++) {
-      ArrayList<ConnectedComponentEdge> cycle = cycles.get(cycleIndex);
+      final ArrayList<ConnectedComponentEdge> cycle = cycles.get(cycleIndex);
 
-      ArrayList<double[]> tempLimitList = new ArrayList<double[]>();
+      final ArrayList<double[]> tempLimitList = new ArrayList<double[]>();
 
       // For each edge in the current rainbow cycle
       boolean bufferInCycle = false;
@@ -962,11 +962,11 @@ public class VelocityBalancer
         // Convert the information stored in the edge into
         // plant-state-bookingtic-form
         // int zoneIndex = cycle.get(i).getFromVertice().getVerticeIndex();
-        int plantIndex = cycle.get(i).getColor();
-        int stateIndex1 = cycle.get(i).getFromTic(); // In this case the tic are
+        final int plantIndex = cycle.get(i).getColor();
+        final int stateIndex1 = cycle.get(i).getFromTic(); // In this case the tic are
                                                      // equivalent to the
                                                      // booking state
-        int stateIndex2 = cycle.get(i).getToTic(); // In this case the tic are
+        final int stateIndex2 = cycle.get(i).getToTic(); // In this case the tic are
                                                    // equivalent to the booking
                                                    // state
 
@@ -975,10 +975,10 @@ public class VelocityBalancer
           bufferInCycle = true;
         }
 
-        State minLimState =
+        final State minLimState =
             map.getStateAt(plantsAndSpecs.getAutomatonAt(plantIndex),
                 stateIndex1);
-        State maxLimState =
+        final State maxLimState =
             map.getStateAt(plantsAndSpecs.getAutomatonAt(plantIndex),
                 stateIndex2);
         int accCost = 0;
@@ -1000,8 +1000,8 @@ public class VelocityBalancer
       }
 
       if (!bufferInCycle) {
-        for (double[] tempLimitInfo : tempLimitList) {
-          int plantIndex = (int) tempLimitInfo[0];
+        for (final double[] tempLimitInfo : tempLimitList) {
+          final int plantIndex = (int) tempLimitInfo[0];
           circWaitLimits[cycleIndex][plantIndex].add(new double[] {
               tempLimitInfo[1], tempLimitInfo[2] });
         }
@@ -1009,7 +1009,7 @@ public class VelocityBalancer
     }
 
     //
-    //    
+    //
     // if (callingScheduler instanceof Milp)
     // {
     // ArrayList<CircularWaitConstraintBlock> circWaitConstraints = ((Milp)
@@ -1041,8 +1041,8 @@ public class VelocityBalancer
    * TEST-ing to add better key points, in order to reduce stop time.
    */
   @SuppressWarnings("unused")
-  private void tryNewKeyPoint(double[] newKeyPoint, double[] pointBefore,
-      double[] pointAfter)
+  private void tryNewKeyPoint(final double[] newKeyPoint, final double[] pointBefore,
+      final double[] pointAfter)
   {
     addToMessages("", SchedulingConstants.MESSAGE_TYPE_WARN);
 
@@ -1088,7 +1088,7 @@ public class VelocityBalancer
   private void calcVelocityStatisticsForEventSmoothing()
   {
     // here, relativeVelocities[robot_index][path_point_index]
-    double[][] relativeVelocities = new double[simulationTimes.length][];
+    final double[][] relativeVelocities = new double[simulationTimes.length][];
 
     for (int i = 0; i < simulationTimes.length; i++) {
       String str = "";
@@ -1121,11 +1121,11 @@ public class VelocityBalancer
     }
 
     // COPY-PASTE
-    double[] nrOfMaxVelocityPassages = new double[relativeVelocities.length];
-    double[] nrOfMinVelocityPassages = new double[relativeVelocities.length];
-    double[] nrOfVelocityChanges = new double[relativeVelocities.length];
-    double[] totalVelocityChange = new double[relativeVelocities.length];
-    double[] meanVelocityChange = new double[relativeVelocities.length];
+    final double[] nrOfMaxVelocityPassages = new double[relativeVelocities.length];
+    final double[] nrOfMinVelocityPassages = new double[relativeVelocities.length];
+    final double[] nrOfVelocityChanges = new double[relativeVelocities.length];
+    final double[] totalVelocityChange = new double[relativeVelocities.length];
+    final double[] meanVelocityChange = new double[relativeVelocities.length];
 
     addToMessages("Single-event balancing statistics: ",
         SchedulingConstants.MESSAGE_TYPE_INFO);
@@ -1181,11 +1181,11 @@ public class VelocityBalancer
    */
   private void calcVelocityStatisticsForUnprocessedSchedule()
   {
-    double[] nrOfMaxVelocityPassages = new double[pathPoints.get(0).length];
-    double[] nrOfMinVelocityPassages = new double[pathPoints.get(0).length];
-    double[] nrOfVelocityChanges = new double[pathPoints.get(0).length];
-    double[] totalVelocityChange = new double[pathPoints.get(0).length];
-    double[] meanVelocityChange = new double[pathPoints.get(0).length];
+    final double[] nrOfMaxVelocityPassages = new double[pathPoints.get(0).length];
+    final double[] nrOfMinVelocityPassages = new double[pathPoints.get(0).length];
+    final double[] nrOfVelocityChanges = new double[pathPoints.get(0).length];
+    final double[] totalVelocityChange = new double[pathPoints.get(0).length];
+    final double[] meanVelocityChange = new double[pathPoints.get(0).length];
 
     for (int plantIndex = 0; plantIndex < optimalSubPlants.size(); plantIndex++) {
       double accTime = 0;
@@ -1223,7 +1223,7 @@ public class VelocityBalancer
         // have the time to think
         double activeTime = -1;
         for (int k = 0; k < pathPoints.get(i).length; k++) {
-          double aTime =
+          final double aTime =
               roundOff(pathPoints.get(i + 1)[k] - pathPoints.get(i)[k], 2);
           if (aTime > activeTime) {
             activeTime = aTime;
@@ -1292,17 +1292,17 @@ public class VelocityBalancer
    * the total and mean amount of velocity change.
    */
   private void calcVelocityStatisticsForVisibilitySmoothing(
-      ArrayList<double[]> points)
+      final ArrayList<double[]> points)
   {
-    double[] timeToPrevKeyPoint = calcTimeToPreviousPoint(points);
-    double[][] relativeVelocities =
+    final double[] timeToPrevKeyPoint = calcTimeToPreviousPoint(points);
+    final double[][] relativeVelocities =
         calcRelativeVelocities(points, timeToPrevKeyPoint);
 
-    double[] nrOfMaxVelocityPassages = new double[points.get(0).length];
-    double[] nrOfMinVelocityPassages = new double[points.get(0).length];
-    double[] nrOfVelocityChanges = new double[points.get(0).length];
-    double[] totalVelocityChange = new double[points.get(0).length];
-    double[] meanVelocityChange = new double[points.get(0).length];
+    final double[] nrOfMaxVelocityPassages = new double[points.get(0).length];
+    final double[] nrOfMinVelocityPassages = new double[points.get(0).length];
+    final double[] nrOfVelocityChanges = new double[points.get(0).length];
+    final double[] totalVelocityChange = new double[points.get(0).length];
+    final double[] meanVelocityChange = new double[points.get(0).length];
 
     addToMessages("Multi-balanced statistics: ",
         SchedulingConstants.MESSAGE_TYPE_INFO);
@@ -1354,22 +1354,22 @@ public class VelocityBalancer
   /**
    * Calculates the (maximal) time differeces between the supplied points. Each
    * point "keeps track" of the distance to the previous point.
-   * 
-   * @param a
+   *
+   * @param points
    *          list of points
    * @return an array of time differences between the points
    */
-  private double[] calcTimeToPreviousPoint(ArrayList<double[]> points)
+  private double[] calcTimeToPreviousPoint(final ArrayList<double[]> points)
   {
     // (Maximal) times to the previous key point are collected
     // for each point (except the first one)
-    double[] timeToPrevPoint = new double[points.size()];
+    final double[] timeToPrevPoint = new double[points.size()];
 
     for (int i = 1; i < timeToPrevPoint.length; i++) {
       timeToPrevPoint[i] = 0;
 
       for (int j = 0; j < points.get(i).length; j++) {
-        double currTimeDiff = points.get(i)[j] - points.get(i - 1)[j];
+        final double currTimeDiff = points.get(i)[j] - points.get(i - 1)[j];
 
         if (currTimeDiff > timeToPrevPoint[i]) {
           timeToPrevPoint[i] = currTimeDiff;
@@ -1389,11 +1389,11 @@ public class VelocityBalancer
    * it is reached
    * (relativeVelocities[destination_key_point_index][robot_index]).
    */
-  private double[][] calcRelativeVelocities(ArrayList<double[]> points,
-      double[] timeToPrevPoint)
+  private double[][] calcRelativeVelocities(final ArrayList<double[]> points,
+      final double[] timeToPrevPoint)
   {
     // Stores the relative robot velocities (max_velocity = 1)
-    double[][] relativeVelocities =
+    final double[][] relativeVelocities =
         new double[points.size()][points.get(0).length];
 
     for (int i = 1; i < points.size(); i++) {
@@ -1417,10 +1417,10 @@ public class VelocityBalancer
   {
     // Stores the maximal difference between the elements of this and the
     // previous key point.
-    double[] timeToPrevKeyPoint = calcTimeToPreviousPoint(keyPoints);
+    final double[] timeToPrevKeyPoint = calcTimeToPreviousPoint(keyPoints);
 
     // Stores the relative robot velocities (max_velocity = 1)
-    double[][] relativeVelocities =
+    final double[][] relativeVelocities =
         calcRelativeVelocities(keyPoints, timeToPrevKeyPoint);
 
     // The largest velocity change from the previous point to the next is
@@ -1452,7 +1452,7 @@ public class VelocityBalancer
         // For each robot (j) that has not been checked yet in this loop...
         for (int j = 0; j < keyPoints.get(i).length; j++) {
           if (!checkedIndices[j]) {
-            double diffVelocity =
+            final double diffVelocity =
                 Math.abs(relativeVelocities[i][j]
                     - relativeVelocities[i - 1][j])
                     + Math.abs(relativeVelocities[i + 1][j]
@@ -1469,7 +1469,7 @@ public class VelocityBalancer
         if (maxDiffVelocityIndex > -1) {
           // Calculate the new and smoother relative velocity of the robot that
           // experiences maximum velocity change
-          double smoothRelativeVelocity =
+          final double smoothRelativeVelocity =
               (keyPoints.get(i + 1)[maxDiffVelocityIndex] - keyPoints
                   .get(i - 1)[maxDiffVelocityIndex])
                   / (timeToPrevKeyPoint[i] + timeToPrevKeyPoint[i + 1]);
@@ -1484,7 +1484,7 @@ public class VelocityBalancer
           } else {
             // Store temporarily the old time value for the robot that
             // experiences maximum velocity change
-            double oldKeyTimePoint = keyPoints.get(i)[maxDiffVelocityIndex];
+            final double oldKeyTimePoint = keyPoints.get(i)[maxDiffVelocityIndex];
 
             // Update the current key point, taking into account the change of
             // velocity
@@ -1594,10 +1594,10 @@ public class VelocityBalancer
   private void findKeyPoints()
   {
     // Used to find the smallest number of steps from each point to the goal
-    int[] nrOfVelocityChangesBeforeGoal = new int[pathPoints.size()];
+    final int[] nrOfVelocityChangesBeforeGoal = new int[pathPoints.size()];
 
     // Used to keep track of the smoothest path from each point to the goal
-    int[] indexOfNextNode = new int[pathPoints.size()];
+    final int[] indexOfNextNode = new int[pathPoints.size()];
 
     // The initialization fase (the goal point is already there)
     nrOfVelocityChangesBeforeGoal[nrOfVelocityChangesBeforeGoal.length - 1] = 0;
@@ -1632,8 +1632,8 @@ public class VelocityBalancer
 
       // This (ugly) procedure is done to avoid mixing with path- and key points
       // by accident
-      double[] currPathPoint = pathPoints.get(currKeyPointIndex);
-      double[] currKeyPoint = new double[currPathPoint.length];
+      final double[] currPathPoint = pathPoints.get(currKeyPointIndex);
+      final double[] currKeyPoint = new double[currPathPoint.length];
       for (int i = 0; i < currKeyPoint.length; i++) {
         currKeyPoint[i] = currPathPoint[i];
       }
@@ -1732,19 +1732,19 @@ public class VelocityBalancer
   /**
    * Checks if there is a straight line between two points, that does not cross
    * any zone.
-   * 
+   *
    * @param startPoint
    * @param endPoint
    * @return true if there is no obstacle on the straight line between the
    *         points.
    */
-  private boolean areVisible(double[] startPoint, double[] endPoint)
+  private boolean areVisible(final double[] startPoint, final double[] endPoint)
   {
     // For each mutex zone...
     for (int i = 0; i < mutexLimits.length; i++) {
       // Start and end times of collisions between the startPoint-endPoint-line
       // and current mutex zone
-      ArrayList<double[]>[] collisionTimes =
+      final ArrayList<double[]>[] collisionTimes =
           getCollisionTimesForZone(startPoint, endPoint, mutexLimits[i]);
 
       // //temp
@@ -1790,7 +1790,7 @@ public class VelocityBalancer
     for (int i = 0; i < circWaitLimits.length; i++) {
       // Start and end times of collisions between the startPoint-endPoint-line
       // and current deadlock zone
-      ArrayList<double[]>[] collisionTimes =
+      final ArrayList<double[]>[] collisionTimes =
           getCollisionTimesForZone(startPoint, endPoint, circWaitLimits[i]);
 
       // If any robot that is involved in current circular wait does not pass
@@ -1855,9 +1855,9 @@ public class VelocityBalancer
    * in the deadlock) are contained in the collision times list.
    */
   private ArrayList<double[]> intersectRecursively(
-      ArrayList<double[]>[] collisionTimes, int fromIndex)
+      final ArrayList<double[]>[] collisionTimes, final int fromIndex)
   {
-    ArrayList<double[]> currCollisionIntersections = new ArrayList<double[]>();
+    final ArrayList<double[]> currCollisionIntersections = new ArrayList<double[]>();
 
     // Next, intersection of all collision times is calculated
     for (int i = 0; i < collisionTimes[fromIndex].size(); i++) {
@@ -1866,13 +1866,13 @@ public class VelocityBalancer
             collisionTimes[fromIndex].get(i)[0],
             collisionTimes[fromIndex].get(i)[0] });
       } else {
-        ArrayList<double[]> nextCollisionIntersections =
+        final ArrayList<double[]> nextCollisionIntersections =
             intersectRecursively(collisionTimes, fromIndex + 1);
         for (int j = 0; j < nextCollisionIntersections.size(); j++) {
-          double intersectionStart =
+          final double intersectionStart =
               Math.max(collisionTimes[fromIndex].get(i)[0],
                   nextCollisionIntersections.get(j)[0]);
-          double intersectionEnd =
+          final double intersectionEnd =
               Math.min(collisionTimes[fromIndex].get(i)[1],
                   nextCollisionIntersections.get(j)[1]);
 
@@ -1893,12 +1893,12 @@ public class VelocityBalancer
    * ending in endPoint.
    */
   @SuppressWarnings("unchecked")
-  private ArrayList<double[]>[] getCollisionTimesForZone(double[] startPoint,
-      double[] endPoint, ArrayList<double[]>[] zoneLimits)
+  private ArrayList<double[]>[] getCollisionTimesForZone(final double[] startPoint,
+      final double[] endPoint, final ArrayList<double[]>[] zoneLimits)
   {
     // This list is filled with start and end times of collisions between the
     // startPoint-endPoint-line and the zones
-    ArrayList<double[]>[] collisionTimes = new ArrayList[plants.size()];
+    final ArrayList<double[]>[] collisionTimes = new ArrayList[plants.size()];
     for (int i = 0; i < collisionTimes.length; i++) {
       collisionTimes[i] = new ArrayList<double[]>();
     }
@@ -1909,7 +1909,7 @@ public class VelocityBalancer
       for (int j = 0; j < zoneLimits[i].size(); j++) {
         // The enter/exit times for the current robot-zone-pair (is null if the
         // robot never enters the zone)
-        double[] currZoneLimits = zoneLimits[i].get(j);
+        final double[] currZoneLimits = zoneLimits[i].get(j);
 
         // If the end points of the line are within the zone limits, we have a
         // collision...
@@ -1919,7 +1919,7 @@ public class VelocityBalancer
           // to
           // the parametrization of the line between startPoint and endPoint.
           // Thus they belong to [0, 1].
-          double[] currCollisionTimes = new double[2];
+          final double[] currCollisionTimes = new double[2];
 
           // If the line starts within the line, the parametrization time value
           // of
@@ -2091,7 +2091,7 @@ public class VelocityBalancer
    * state as state.name += "; velocity=x", where x is the relative velocity
    * w.r.t. max velocity.
    */
-  private void setRelativeVelocitiesInPlants(double[][] relativeVelocities)
+  private void setRelativeVelocitiesInPlants(final double[][] relativeVelocities)
   {
     for (int plantIndex = 0; plantIndex < optimalSubPlants.size(); plantIndex++) {
       State currState =
@@ -2099,7 +2099,7 @@ public class VelocityBalancer
               .getInitialState();
       double accCost = 0;
       int relVelIndex = 0;
-      innerForLoop: for (double[] keyPoint : keyPoints) {
+      innerForLoop: for (final double[] keyPoint : keyPoints) {
         // If we have looped through the optimalSubPlant and arrived at the
         // initial state
         // for the second time, then stop and continue with the next plant.
@@ -2132,18 +2132,18 @@ public class VelocityBalancer
   /**
    * A method for rounding off floating numbers.
    */
-  private double roundOff(double number, double nrOfDecimals)
+  private double roundOff(final double number, final double nrOfDecimals)
   {
     return Math.round(number * Math.pow(10, nrOfDecimals))
         / (Math.pow(10, nrOfDecimals) + 0.0);
   }
 
-  private void addToMessages(String str, int msgType)
+  private void addToMessages(final String str, final int msgType)
   {
     addToMessages(str, msgType, true);
   }
 
-  private void addToMessages(String str, int msgType, boolean linebreak)
+  private void addToMessages(String str, final int msgType, final boolean linebreak)
   {
     if (callingScheduler != null) {
       if (linebreak) {
@@ -2174,23 +2174,23 @@ public class VelocityBalancer
 
   public Automata getSubControllers()
   {
-    Alphabet zoneAlphabet = new Alphabet();
-    for (Automaton zone : specs) {
+    final Alphabet zoneAlphabet = new Alphabet();
+    for (final Automaton zone : specs) {
       zoneAlphabet.union(zone.getAlphabet());
     }
 
-    Automata subControllers = new Automata();
+    final Automata subControllers = new Automata();
     for (int i = 0; i < plants.size(); i++) {
-      Automaton subController =
+      final Automaton subController =
           new Automaton("subC_" + plants.getAutomatonAt(i).getName());
-      State currState = new State("q0");
+      final State currState = new State("q0");
       currState.setInitial(true);
       currState.setAccepting(true);
       subController.addState(currState);
       subControllers.addAutomaton(subController);
     }
-    Automaton subController = new Automaton("subC_" + schedule.getName());
-    State currState = new State("q0");
+    final Automaton subController = new Automaton("subC_" + schedule.getName());
+    final State currState = new State("q0");
     currState.setInitial(true);
     currState.setAccepting(true);
     subController.addState(currState);
@@ -2200,17 +2200,17 @@ public class VelocityBalancer
     boolean firstLoop = true;
     while (firstLoop || !scheduleState.isInitial()) {
       firstLoop = false;
-      Arc arc = scheduleState.outgoingArcsIterator().next();
+      final Arc arc = scheduleState.outgoingArcsIterator().next();
 
       if (zoneAlphabet.contains(arc.getEvent())) {
-        Automaton commonSubController =
+        final Automaton commonSubController =
             subControllers.getAutomatonAt(subControllers.size() - 1);
-        State currCommonState =
+        final State currCommonState =
             commonSubController.getStateWithName("q"
                 + (commonSubController.nbrOfStates() - 1));
-        State nextCommonState =
+        final State nextCommonState =
             new State("q" + commonSubController.nbrOfStates());
-        Arc newArc = new Arc(currCommonState, nextCommonState, arc.getEvent());
+        final Arc newArc = new Arc(currCommonState, nextCommonState, arc.getEvent());
         commonSubController.addState(nextCommonState);
         commonSubController.addArc(newArc);
         if (!commonSubController.getAlphabet().contains(arc.getEvent())) {
@@ -2220,13 +2220,13 @@ public class VelocityBalancer
         for (int i = 0; i < plants.size(); i++) {
           if (optimalSubPlants.getAutomatonAt(i).getAlphabet().contains(
               arc.getEvent())) {
-            Automaton currSubController = subControllers.getAutomatonAt(i);
-            State currSubState =
+            final Automaton currSubController = subControllers.getAutomatonAt(i);
+            final State currSubState =
                 currSubController.getStateWithName("q"
                     + (currSubController.nbrOfStates() - 1));
-            State nextSubState =
+            final State nextSubState =
                 new State("q" + currSubController.nbrOfStates());
-            Arc newArc = new Arc(currSubState, nextSubState, arc.getEvent());
+            final Arc newArc = new Arc(currSubState, nextSubState, arc.getEvent());
             currSubController.addState(nextSubState);
             currSubController.addArc(newArc);
             if (!currSubController.getAlphabet().contains(arc.getEvent())) {
@@ -2240,11 +2240,11 @@ public class VelocityBalancer
     }
 
     for (int i = 0; i < subControllers.size(); i++) {
-      Automaton currSubC = subControllers.getAutomatonAt(i);
+      final Automaton currSubC = subControllers.getAutomatonAt(i);
       for (int j = 0; j < currSubC.nbrOfStates(); j++) {
-        State state = currSubC.getStateWithIndex(j);
+        final State state = currSubC.getStateWithIndex(j);
         if (!state.outgoingArcsIterator().hasNext()) {
-          Arc inArc = state.incomingArcsIterator().next();
+          final Arc inArc = state.incomingArcsIterator().next();
           currSubC.addArc(new Arc(inArc.getFromState(), currSubC
               .getInitialState(), inArc.getEvent()));
           currSubC.removeState(state);

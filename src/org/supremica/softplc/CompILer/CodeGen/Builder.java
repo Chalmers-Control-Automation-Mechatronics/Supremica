@@ -1,8 +1,12 @@
 package org.supremica.softplc.CompILer.CodeGen;
 
-import org.supremica.softplc.CompILer.CodeGen.Datatypes.*;
-import org.supremica.softplc.CompILer.CodeGen.Constants.*;
-import de.fub.bytecode.generic.*;
+import org.supremica.softplc.CompILer.CodeGen.Constants.IlCallOperator;
+import org.supremica.softplc.CompILer.CodeGen.Constants.IlJumpOperator;
+import org.supremica.softplc.CompILer.CodeGen.Datatypes.IECDirectVariable;
+import org.supremica.softplc.CompILer.CodeGen.Datatypes.TypeBOOL;
+import org.supremica.softplc.CompILer.CodeGen.Datatypes.TypeConstant;
+
+import de.fub.bytecode.generic.BranchInstruction;
 
 /**
  * Interface describing an entity for generating java byte code from
@@ -65,15 +69,13 @@ public interface Builder
 
 	/**
 	 * the middle part of generating code for an IL function block call.
-	 *
-	 * @see {@link #emitIL_FB_CALL_start}
+	 * @see #emitIL_FB_CALL_Start(IlCallOperator)
 	 */
 	void emitIL_FB_CALL_Run(String fbName, String fbTypeName);
 
 	/**
 	 * the last part of generating code for an IL function block call.
-	 *
-	 * @see {@link #emitIL_FB_CALL_start}
+     * @see #emitIL_FB_CALL_Start(IlCallOperator)
 	 */
 	void emitIL_FB_CALL_End(BranchInstruction callCondition);
 

@@ -33,13 +33,13 @@
 
 package net.sourceforge.waters.analysis.distributed.safetyverifier;
 
-import gnu.trove.list.array.TIntArrayList;
-
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
 import net.sourceforge.waters.analysis.distributed.schemata.ProductDESSchema;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+
+import gnu.trove.list.array.TIntArrayList;
 
 /**
  * Finds a trace between two reachable states in a distributed
@@ -181,14 +181,15 @@ class TraceFinder implements PredecessorCallback
    * @param badevent the event that caused the property to fail on the
    *                 bad state
    * @param initial the initial state
-   * @param workers workers to search on
    * @return array of events needed to reach the bad state from
    *         initial state
    * @throws RemoteException if something bad happens with RMI calls
    * @throws AnalysisException if something bad happens while
    *                           generating the trace
    */
-  public int[] findTrace(final StateTuple bad, final int badevent, final StateTuple initial)
+  public int[] findTrace(final StateTuple bad,
+                         final int badevent,
+                         final StateTuple initial)
     throws RemoteException, AnalysisException
   {
     //Export this object on an anonymous port. This will be passed to

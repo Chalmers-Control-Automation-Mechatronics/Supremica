@@ -85,7 +85,7 @@ class DeterminisationOfNonAlphaStatesRule
 
   /**
    * Sets the mode which redundant transitions are to be removed.
-   * @see ObservationEquivalenceTRSimplifier.TransitionRemoval
+   * @see net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier.TransitionRemoval
    */
   void setTransitionRemovalMode
     (final ObservationEquivalenceTRSimplifier.TransitionRemoval mode)
@@ -96,7 +96,7 @@ class DeterminisationOfNonAlphaStatesRule
 
   /**
    * Gets the mode which redundant transitions are to be removed.
-   * @see ObservationEquivalenceTRSimplifier.TransitionRemoval
+   * @see net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier.TransitionRemoval
    */
   ObservationEquivalenceTRSimplifier.TransitionRemoval
     getTransitionRemovalMode()
@@ -124,7 +124,7 @@ class DeterminisationOfNonAlphaStatesRule
 
   /**
    * Gets the transition limit.
-   * @see {@link #setTransitionLimit(int) setTransitionLimit()}
+   * @see #setTransitionLimit(int) setTransitionLimit()
    */
   int getTransitionLimit()
   {

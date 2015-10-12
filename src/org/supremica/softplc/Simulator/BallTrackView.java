@@ -1,9 +1,28 @@
 package org.supremica.softplc.Simulator;
 
-import java.awt.*;
-import javax.swing.*;
-import java.util.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Canvas;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.MediaTracker;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.util.Iterator;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+
 import org.supremica.gui.Utility;
 
 /**Class BallTrackView paints the background ball track and possibly several
@@ -162,76 +181,88 @@ public class BallTrackView
 		//Add mouseListener to the buttons
 		insSmallBall.addMouseListener(new java.awt.event.MouseAdapter()
 		{
-			public void mouseClicked(final MouseEvent e)
+			@Override
+      public void mouseClicked(final MouseEvent e)
 			{
 				insSmallBall_mouseClicked(e);
 			}
 		});
 		insLargeBall.addMouseListener(new java.awt.event.MouseAdapter()
 		{
-			public void mouseClicked(final MouseEvent e)
+			@Override
+      public void mouseClicked(final MouseEvent e)
 			{
 				insLargeBall_mouseClicked(e);
 			}
 		});
 		delBall.addMouseListener(new java.awt.event.MouseAdapter()
 		{
-			public void mouseClicked(final MouseEvent e)
+			@Override
+      public void mouseClicked(final MouseEvent e)
 			{
 				delBall_mouseClicked(e);
 			}
 		});
 		changeImage.addMouseListener(new java.awt.event.MouseAdapter()
 		{
-			public void mouseClicked(final MouseEvent e)
+			@Override
+      public void mouseClicked(final MouseEvent e)
 			{
 				changeImage_mouseClicked(e);
 			}
 		});
 		manuellStart.addMouseListener(new java.awt.event.MouseAdapter()
 		{
-			public void mousePressed(final MouseEvent e)
+			@Override
+      public void mousePressed(final MouseEvent e)
 			{
 				manuellStart_mousePressed(e);
 			}
 
-			public void mouseReleased(final MouseEvent e)
+			@Override
+      public void mouseReleased(final MouseEvent e)
 			{
 				manuellStart_mouseReleased(e);
 			}
 		});
 		autoStart.addMouseListener(new java.awt.event.MouseAdapter()
 		{
-			public void mousePressed(final MouseEvent e)
+			@Override
+      public void mousePressed(final MouseEvent e)
 			{
 				autoStart_mousePressed(e);
 			}
 
-			public void mouseReleased(final MouseEvent e)
+			@Override
+      public void mouseReleased(final MouseEvent e)
 			{
 				autoStart_mouseReleased(e);
 			}
 		});
 		nodStop.addMouseListener(new java.awt.event.MouseAdapter()
 		{
-			public void mousePressed(final MouseEvent e)
+			@Override
+      public void mousePressed(final MouseEvent e)
 			{
 				nodStop_mousePressed(e);
 			}
 
-			public void mouseReleased(final MouseEvent e)
+			@Override
+      public void mouseReleased(final MouseEvent e)
 			{
 				nodStop_mouseReleased(e);
 			}
 		});
 		larmKvitt.addMouseListener(new java.awt.event.MouseAdapter()
 		{
-			public void mousePressed(final MouseEvent e)
+			@Override
+      public void mousePressed(final MouseEvent e)
 			{
 				larmKvitt_mousePressed(e);
 			}
 
-			public void mouseReleased(final MouseEvent e)
+			@Override
+      public void mouseReleased(final MouseEvent e)
 			{
 				larmKvitt_mouseReleased(e);
 			}
@@ -324,7 +355,8 @@ public class BallTrackView
 		menuBar.add(menuFile);
 		menuFileClose.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(final ActionEvent e)
+			@Override
+      public void actionPerformed(final ActionEvent e)
 			{
 				close();
 			}
@@ -378,15 +410,17 @@ public class BallTrackView
 	 * to avoid blinking
 	 * @param g the graphics pen
 	 */
-	public void update(final Graphics g)
+	@Override
+  public void update(final Graphics g)
 	{
 		paint(g);
 	}
 
 	/**Paint paints all balls and the background
-	 * @param g the graphics pen
+	 * @param gr the graphics pen
 	 */
-	public void paint(final Graphics gr)
+	@Override
+  public void paint(final Graphics gr)
 	{
 		final Image im = createImage(500, 458);
 		final Graphics g = im.getGraphics();
@@ -463,10 +497,6 @@ public class BallTrackView
 	//signal is not set
 	private int longLength;    //used when signal is set
 
-	/**paintPortVakt draws the PortVakt
-	 * @param g the graphics pen
-	 */
-
 	//Variables used when painting the PortVakt
 	// taken from background picture
 	//The menubar takes some space as well
@@ -479,6 +509,9 @@ public class BallTrackView
 	private final int portLenght = 10;    //Value taken to fit the balls
 	private final int portWidth = 2;
 
+    /**paintPortVakt draws the PortVakt
+     * @param g the graphics pen
+     */
 	private void paintPortVakt(final Graphics g)
 	{
 
@@ -500,10 +533,6 @@ public class BallTrackView
 		}
 	}
 
-	/**paintMatLyft draws the matlyft
-	 * @param g the graphics pen
-	 */
-
 	//Variables for use when painting the MatLyft
 	private int parts = 0;    //Steps in leg 2
 	private int vert = 0;    //vertical differance in leg 2
@@ -511,6 +540,9 @@ public class BallTrackView
 	private final int baseHeight = 10;    //Height allways visible
 	private boolean NotOnTop = true;    //True when the level is != 15
 
+    /**paintMatLyft draws the matlyft
+     * @param g the graphics pen
+     */
 	private void paintMatLyft(final Graphics g)
 	{
 		centerX = 285;
@@ -592,13 +624,12 @@ public class BallTrackView
 		}
 	}
 
-	/**paintHiss draws the right lift called Hiss
-	 *@param g the Graphics pen
-	 */
-
 	//Variables for use when painting the Hiss
 	private final int lengthVisible = 23;
 
+    /**paintHiss draws the right lift called Hiss
+     *@param g the Graphics pen
+     */
 	private void paintHiss(final Graphics g)
 	{
 		level = rController.hissLevel();
@@ -697,10 +728,6 @@ public class BallTrackView
 		}
 	}
 
-	/**paintArm draws the Arm on left hand side
-	 *@param g the Graphics pen
-	 */
-
 	//Variables for use in painting the Arm
 	private int angel = 0;    //Angel of the arm horisontal
 	private final int xLeftPos = 40;    //Start possition to the right for Arm
@@ -710,6 +737,9 @@ public class BallTrackView
 	private final int proppHeight = 10;
 	private final int proppDepth = 2;
 
+    /**paintArm draws the Arm on left hand side
+     *@param g the Graphics pen
+     */
 	private void paintArm(final Graphics g)
 	{
 		lowerY = 151;

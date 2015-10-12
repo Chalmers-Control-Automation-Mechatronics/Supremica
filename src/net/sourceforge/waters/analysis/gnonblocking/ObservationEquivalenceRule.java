@@ -87,7 +87,7 @@ class ObservationEquivalenceRule extends TRSimplifierAbstractionRule
   /**
    * Sets the mode which redundant transitions are to be removed.
    *
-   * @see ObservationEquivalenceTRSimplifier.TransitionRemoval
+   * @see net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier.TransitionRemoval
    */
   public void setTransitionRemovalMode
     (final ObservationEquivalenceTRSimplifier.TransitionRemoval mode)
@@ -98,7 +98,7 @@ class ObservationEquivalenceRule extends TRSimplifierAbstractionRule
   /**
    * Gets the mode which redundant transitions are to be removed.
    *
-   * @see ObservationEquivalenceTRSimplifier.TransitionRemoval
+   * @see net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier.TransitionRemoval
    */
   public ObservationEquivalenceTRSimplifier.TransitionRemoval
     getTransitionRemovalMode()
@@ -125,8 +125,7 @@ class ObservationEquivalenceRule extends TRSimplifierAbstractionRule
 
   /**
    * Gets the transition limit.
-   *
-   * @see {@link #setTransitionLimit(int) setTransitionLimit()}
+   * @see #setTransitionLimit(int) setTransitionLimit()
    */
   public int getTransitionLimit()
   {

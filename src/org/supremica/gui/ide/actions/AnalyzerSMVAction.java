@@ -96,6 +96,7 @@ public class AnalyzerSMVAction extends IDEAction {
         }
     }
 
+    @Override
     public void actionPerformed(final ActionEvent e) {
         doAction();
     }
@@ -133,14 +134,11 @@ public class AnalyzerSMVAction extends IDEAction {
     }
 
     /**
-     * main loop
-     * stop if process is terminated and there is nothing to read
-     * if process is terminated and there is something to read - read it
-     * if process is not terminated and there is somethign to read - read it
-     * if process is not terminated and there is nothing to read - wait (retry)
-
-     * @param r
-     * @param p
+     * Main loop.
+     * Stop if process is terminated and there is nothing to read.
+     * If process is terminated and there is something to read - read it.
+     * If process is not terminated and there is something to read - read it.
+     * If process is not terminated and there is nothing to read - wait (retry).
      */
     private void runMainOutputLoop(final BufferedReader br, final Process p) throws IOException{
         boolean term = false;

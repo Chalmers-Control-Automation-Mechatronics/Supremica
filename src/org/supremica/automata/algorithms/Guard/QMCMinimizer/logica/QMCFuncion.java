@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.supremica.automata.algorithms.Guard.QMCMinimizer.logica;
 
@@ -16,22 +16,22 @@ import java.util.Vector;
  *
  */
 public class QMCFuncion {
-	
-	
+
+
     int numVariables;
     private char forma;
-    
+
     private String [] variables;
     private String [] terminos;
     private String [] indiferencias;
-        
+
     private ArrayList<QMCBinarioBean> listaTerminos;
     private ArrayList<QMCBinarioBean> listaBinarios;
     private ArrayList<QMCBinarioBean> listaBinariosInteractivos;
     private boolean tieneTerminos;
-    
-      
-   
+
+
+
 
     /**
      * Devuelve la forma canónica de la función
@@ -40,15 +40,15 @@ public class QMCFuncion {
 	public char getForma() {
 		return forma;
 	}
-	
+
 	/**
 	 * establece la forma.
 	 * @param forma puede ser 's' o 'p'
 	 */
-	public void setForma(char forma) {
+	public void setForma(final char forma) {
 		this.forma = forma;
 	}
-	
+
 	/**
 	 * Devuelve el numero de variables de la funcion
 	 * @return  numVariables.
@@ -58,12 +58,12 @@ public class QMCFuncion {
 	}
 	/**
 	 * Devuelve el numero de variables a introducir.
-	 * @param numVariables 
+	 * @param numVariables
 	 */
-	public void setNumVariables(int numVariables) {
+	public void setNumVariables(final int numVariables) {
 		this.numVariables = numVariables;
 	}
-   
+
     /**
      * Devuelve array de variables
      * @return variables
@@ -71,9 +71,9 @@ public class QMCFuncion {
     public String [] getVariables()
     {
         return variables;
-        
+
     }
-    
+
     /**
      * Devuelve array de terminos
      * @return terminos
@@ -82,7 +82,7 @@ public class QMCFuncion {
     {
         return terminos;
     }
-    
+
     /**
      * Devuelve array de indiferencias
      * @return indiferencias
@@ -91,41 +91,41 @@ public class QMCFuncion {
     {
         return indiferencias;
     }
-    
+
     /**
      * Primera forma del método que establece las variables en caso de tabla nueva
      * @param numVariables
      */
-    public void setVariables(int numVariables)
+    public void setVariables(final int numVariables)
     {
-                  
+
         char variable = 97;
         variables = new String[numVariables];
         this.numVariables = numVariables;
-        
+
         // Creo los valores de la cabecera
         for(int i=0; i<numVariables; i++)
         {
             // Si la variable es f se la salta
             if(variable==102)
-            {                
+            {
                 variable+=1;
             }
             variables[i] = String.valueOf(variable);
             variable +=1;
         }
-              
+
     }
-    
+
     /**
      * Segunda forma del método que establece las variables, en caso de función nueva
      * @param cadenaVariables
      */
-    public void setVariables (String cadenaVariables)
+    public void setVariables (final String cadenaVariables)
     {
         StringTokenizer stVariables;
         int i;
-        
+
         stVariables = new StringTokenizer(cadenaVariables,",");
         numVariables = stVariables.countTokens();
         variables = new String[numVariables];
@@ -135,18 +135,18 @@ public class QMCFuncion {
             variables[i]=stVariables.nextToken();
             i++;
         }
-                     
+
     }
     /**
      * Método que introduce los términos en un array simple
      * @param cadenaTerminos
      */
-    public void setTerminos (String cadenaTerminos)
+    public void setTerminos (final String cadenaTerminos)
     {
-        
+
         StringTokenizer stTerminos;
         int i;
-        
+
         stTerminos = new StringTokenizer(cadenaTerminos,",");
         terminos = new String[stTerminos.countTokens()];
         i=0;
@@ -155,18 +155,18 @@ public class QMCFuncion {
             terminos[i]=stTerminos.nextToken();
             i++;
         }
-        
-        
+
+
     }
     /**
      * Método que introduce las indiferencias en la función.
      * @param cadenaIndiferencias
      */
-    public void setIndiferencias (String cadenaIndiferencias)
+    public void setIndiferencias (final String cadenaIndiferencias)
     {
         StringTokenizer stIndiferencias;
         int i;
-        
+
         stIndiferencias = new StringTokenizer(cadenaIndiferencias,",");
         indiferencias = new String[stIndiferencias.countTokens()];
         i=0;
@@ -176,8 +176,8 @@ public class QMCFuncion {
             i++;
         }
     }
-          
-    
+
+
     /**
      * Devuelve  la lista de binarios terminos
      * @return listaTerminos
@@ -185,18 +185,17 @@ public class QMCFuncion {
     public ArrayList<QMCBinarioBean> getListaTerminos() {
         return listaTerminos;
     }
-    
+
     /**
      * Genera la lista de los datos binarios de la funcion
-     * @param listaBinarios  arrayList de binarios
      */
-    public void setListaBinarios(Vector<?> datosTabla) 
+    public void setListaBinarios(final Vector<?> datosTabla)
     {
         Vector<?> fila;
         String valorTermino, valorDec, valorBin;
-        QMCBinarioBean binarioBean, termino; 
+        QMCBinarioBean binarioBean, termino;
         int indice, posicion, contadorIndiferencias;
-                        
+
         // forma SOP
         if (forma=='s')
         {
@@ -207,21 +206,21 @@ public class QMCFuncion {
         {
             valorTermino = "0";
         }
-                      
+
         tieneTerminos = false;
         posicion = 0;
         contadorIndiferencias = 0;
-        
+
         // Inicializa las listas
         listaBinarios = new ArrayList<QMCBinarioBean>();
         listaTerminos = new ArrayList<QMCBinarioBean>();
-        
+
         for (int i=0; i<datosTabla.size(); i++)
         {
             fila = (Vector<?>)datosTabla.elementAt(i);
-            // Genera los objetos binario a partir de la tabla de verdad 
-            binarioBean = new QMCBinarioBean();      
-            // Valor decimal 
+            // Genera los objetos binario a partir de la tabla de verdad
+            binarioBean = new QMCBinarioBean();
+            // Valor decimal
             valorDec = String.valueOf(i);;
             binarioBean.setValorDec(valorDec);
             indice = 0;
@@ -234,14 +233,14 @@ public class QMCFuncion {
                 if (fila.elementAt(j).toString().equals("1"))
                 {
                     indice++;
-                }                   
+                }
              }
              // Introduce los datos en el bean y lo añade a la lista
              binarioBean.setValorBin(valorBin);
-             binarioBean.setIndice(indice); 
+             binarioBean.setIndice(indice);
              if(fila.elementAt(numVariables).equals(valorTermino))
              {
-                 binarioBean.setTermino(true); 
+                 binarioBean.setTermino(true);
                  binarioBean.setPosicion(String.valueOf(posicion));
                  listaTerminos.add(binarioBean);
                  posicion++;
@@ -253,12 +252,12 @@ public class QMCFuncion {
                  listaTerminos.add(binarioBean);
                  posicion++;
                  contadorIndiferencias++;
-             }                 
-             listaBinarios.add(binarioBean);              
+             }
+             listaBinarios.add(binarioBean);
         }
         // Genera la lista sencilla de terminos excluyendo los terminos indiferencia
-        int i,j,z;        
-        terminos = new String[listaTerminos.size()-contadorIndiferencias];  
+        int i,j,z;
+        terminos = new String[listaTerminos.size()-contadorIndiferencias];
         indiferencias = new String[contadorIndiferencias];
         i = 0;
         j = 0;
@@ -276,27 +275,26 @@ public class QMCFuncion {
             	indiferencias[z] = termino.getValorDec();
             	z++;
             }
-            i++;            
-        }        
+            i++;
+        }
         if(listaTerminos.size()!=0)
         {
             tieneTerminos = true;
-        }        
+        }
     }
-    
+
     /**
      * Genera un ArrayList de binarios vacios (modo interactivo)
-     * @param listaBinariosInteractivos  
      */
-    public void setListaBinariosInteractivos(int numVariables)
+    public void setListaBinariosInteractivos(final int numVariables)
     {
         QMCBinarioBean binarioInteractivo;
         int numBinarios;
-        
-        numBinarios = (int)Math.pow(2,numVariables);       
-        
+
+        numBinarios = (int)Math.pow(2,numVariables);
+
         // Inicializa la lista de terminos
-        listaBinariosInteractivos = new ArrayList<QMCBinarioBean>();      
+        listaBinariosInteractivos = new ArrayList<QMCBinarioBean>();
         for (int i=0; i<numBinarios; i++)
         {
             binarioInteractivo = new QMCBinarioBean();
@@ -304,11 +302,11 @@ public class QMCFuncion {
             binarioInteractivo.setTermino(false);
             listaBinariosInteractivos.add(binarioInteractivo);
         }
-    }    
+    }
     /**
     * Comprueba si la funcion tiene terminos
     * @return tieneTerminos
-    */ 
+    */
     public boolean isTieneTerminos()
     {
         return tieneTerminos;
@@ -336,12 +334,12 @@ public class QMCFuncion {
         }
         return listaBinariosInteractivos;
     }
-   
-    
-  
-    
-    
-	
+
+
+
+
+
+
 
 
 

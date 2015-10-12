@@ -1,10 +1,10 @@
 package org.supremica.softplc.CompILer.CodeGen.Datatypes;
 
-import java.util.*;
+import java.util.StringTokenizer;
 
-/**HelpMethods provides users of this package for IEC 6-1131-3 dataypes
- * with general methods, e.g. parsing
- * @see "Chapter 2.3 Datatypes in Programming industrial control
+/**HelpMethods provides users of this package for IEC 6-1131-3 datatypes
+ * with general methods, e.g. parsing.
+ * See "Chapter 2.3 Datatypes in Programming industrial control
  *       systems using IEC 1131-3 by R. W. Lewis. ISBN: 0 85296 827 2"
  * @author Anders Röding
  * @author Thomas Isaksson
@@ -16,10 +16,10 @@ public class HelpMethods
 	 * @param s string to parse
 	 * @return boolean value wrapped into a TypeBOOL
 	 */
-	public static TypeBOOL parseBOOL(String s)
+	public static TypeBOOL parseBOOL(final String s)
 	{
-		StringTokenizer tokens = new StringTokenizer(s, "#", false);
-		int TokenCount = tokens.countTokens();
+		final StringTokenizer tokens = new StringTokenizer(s, "#", false);
+		final int TokenCount = tokens.countTokens();
 		String st1 = tokens.nextToken();
 
 		if (TokenCount > 2)
@@ -51,7 +51,7 @@ public class HelpMethods
 	 * @param s string to parse
 	 * @return a type constant
 	 */
-	public static TypeConstant parseTypeConstants(String s)
+	public static TypeConstant parseTypeConstants(final String s)
 	{
 		if (s.equals("BOOL"))
 		{
@@ -149,11 +149,11 @@ public class HelpMethods
 	 * @param s string to parse
 	 * @return an object representing the parsed value
 	 */
-	public static TypeANY_NUM parseANY_NUM(String s)
+	public static TypeANY_NUM parseANY_NUM(final String s)
 	{
-		StringTokenizer tokens = new StringTokenizer(s, "#", false);
-		int TokenCount = tokens.countTokens();
-		String st1 = tokens.nextToken();
+		final StringTokenizer tokens = new StringTokenizer(s, "#", false);
+		final int TokenCount = tokens.countTokens();
+		final String st1 = tokens.nextToken();
 
 		switch (TokenCount)
 		{
@@ -221,7 +221,7 @@ public class HelpMethods
 				return null;
 			}    // new TypeLREAL(removeDashes(tokens.nextToken()));}
 		case 3 :
-			int radix = Integer.parseInt(tokens.nextToken());
+			final int radix = Integer.parseInt(tokens.nextToken());
 
 			if (st1.equals("SINT"))
 			{
@@ -264,9 +264,9 @@ public class HelpMethods
 	 * a string
 	 * @param s the string dashes should be removed from
 	 * @return s without dashes */
-	private static String removeDashes(String s)
+	private static String removeDashes(final String s)
 	{
-		StringTokenizer tokens = new StringTokenizer(s, "_", false);
+		final StringTokenizer tokens = new StringTokenizer(s, "_", false);
 		String outString = new String();
 
 		for (; tokens.countTokens() > 0; )

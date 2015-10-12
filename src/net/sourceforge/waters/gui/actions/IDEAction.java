@@ -65,7 +65,7 @@ import org.supremica.gui.ide.ModuleContainer;
  *
  * <DT>Invocation.</DT> <DD>All actions implement the {@link
  * java.awt.event.ActionListener} interface. The {@link
- * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionListener)
+ * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
  * actionPerformed()} method is automatically called when the user invokes
  * the action.</DD>
  *
@@ -74,7 +74,7 @@ import org.supremica.gui.ide.ModuleContainer;
  * {@link WatersActionManager}. They should check their enablement conditions
  * in the {@link Observer#update(EditorChangedEvent) update()} method, and
  * enable or disable the action accordingly using the {@link
- * javax.swing.Action@setEnabled(boolean) setEnabled()} method. At the same
+ * javax.swing.Action#setEnabled(boolean) setEnabled()} method. At the same
  * time, other attributes such as the description can also be changed.</DD>
  *
  * <DT>Access to the IDE.</DT> <DD>All actions store a reference to the

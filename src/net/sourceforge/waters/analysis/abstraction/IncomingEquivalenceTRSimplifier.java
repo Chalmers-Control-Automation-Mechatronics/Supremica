@@ -33,15 +33,6 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.iterator.TIntIntIterator;
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TIntIntHashMap;
-import gnu.trove.procedure.TIntProcedure;
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
-import gnu.trove.stack.TIntStack;
-import gnu.trove.stack.array.TIntArrayStack;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
@@ -59,6 +50,15 @@ import net.sourceforge.waters.analysis.tr.TransitionListBuffer;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
+
+import gnu.trove.iterator.TIntIntIterator;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.procedure.TIntProcedure;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
 
 
 /**
@@ -872,7 +872,7 @@ public class IncomingEquivalenceTRSimplifier
    * removed as nothing can be merged within this class.</P>
    *
    * <P>All candidate equivalence classes are recorded in the array {@link
-   * IncomingEquivalenceTRSimplifier#StateToClass mStateToClass}, which
+   * IncomingEquivalenceTRSimplifier#mStateToClass mStateToClass}, which
    * maintains a map from state codes (of merged classes) to their
    * candidate classes. Classes consisting of a single state are represented
    * by a <CODE>null</CODE> entry in the array.</P>

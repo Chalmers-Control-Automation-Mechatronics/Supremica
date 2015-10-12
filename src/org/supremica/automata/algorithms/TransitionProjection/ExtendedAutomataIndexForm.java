@@ -6,12 +6,18 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
+
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.module.*;
+import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
+
 import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.log.Logger;
@@ -25,7 +31,7 @@ import org.supremica.log.LoggerFactory;
  */
 
 public class ExtendedAutomataIndexForm {
-    
+
     // <automaton> x <event> -> <true|false>
     private boolean[][] alphabetEventsTable;
 
@@ -55,7 +61,7 @@ public class ExtendedAutomataIndexForm {
 
     // <event> -> <true|false>
     private boolean[] uncontrollableEventsTable;
-    
+
     // <event> -> <true|false>
     private boolean[] epsilonEventsTable;
 
@@ -76,27 +82,27 @@ public class ExtendedAutomataIndexForm {
 
     // <automaton> -> <max state index in current automaton>
     private int[] automatonStateMaxIndex;
-    
+
     // <automaton> x <state> x <event> -> <Guard[]>
     private int[][][][] guardStateEventTable;
-    
+
     // <automaton> x <state> x <event> -> <Action[]>
     private int[][][][] actionStateEventTable;
-    
+
     // <automaton> x <event> -> <Guard[]>
     private int[][][] eventGuradTable;
-    
+
     // <automaton> x <event> -> <Action[]>
     private int[][][] eventActionTable;
-    
-    // Max value 
-    private final int MAX_VALUE = Integer.MAX_VALUE;    
-    
+
+    // Max value
+    private final int MAX_VALUE = Integer.MAX_VALUE;
+
     private final Logger logger = LoggerFactory.createLogger(ExtendedAutomataIndexFormHelper.class);
     private final ExtendedAutomataIndexMap indexMap;
     private final int nbrAutomaton;
     private final int nbrUnionEvents;
-    
+
     public ExtendedAutomataIndexForm(final ExtendedAutomata exAutomata){
         indexMap = new ExtendedAutomataIndexMap(exAutomata);
         nbrAutomaton = exAutomata.size();
@@ -116,7 +122,7 @@ public class ExtendedAutomataIndexForm {
             logger.debug(ex.getStackTrace());
         }
     }
-    
+
     /**
      * Give each automaton a unique index Remember that this index
      * must be consistent with getAutomatonAt(int) in Automata
@@ -137,7 +143,7 @@ public class ExtendedAutomataIndexForm {
             automataSize[i] = currExAutomaton.getNodes().size();
         }
     }
-    
+
     private void generateEventIndices(final ExtendedAutomata exAutomata)
     {
         final List<EventDeclProxy> theAlphabet = exAutomata.getUnionAlphabet();
@@ -207,7 +213,7 @@ public class ExtendedAutomataIndexForm {
             }
             automatonStateMaxIndex[currAutomatonIndex] = maxIndex;
         }
-    }    
+    }
 
     /**
      * For each state in the automaton precompute an array
@@ -217,10 +223,6 @@ public class ExtendedAutomataIndexForm {
      * done in the states, since they do not know about the alphabet.
      *
      * Insert into enableEventsTable all states that enables a specific event.
-     *
-     * @param  theAutomata Description of the Parameter
-     * @param  theAutomaton Description of the Parameter
-     * @exception  Exception Description of the Exception
      */
     private void generateNextStateTransitionIndices(final ExtendedAutomata theAutomata)
     throws Exception
@@ -231,7 +233,7 @@ public class ExtendedAutomataIndexForm {
         final int nbrOfAutomaton = theAutomata.size();
         final TreeSet<Integer> sortedEventIndices = new TreeSet<Integer>();
         final int alphabetSize = theAlphabet.size();
-        
+
         nextStateTable = new int[nbrOfAutomaton][][];
         nextStatesTable = new int[nbrOfAutomaton][][][];
         outgoingEventsTable = new int[nbrOfAutomaton][][];
@@ -246,17 +248,17 @@ public class ExtendedAutomataIndexForm {
                 eventActionTable[i][j] = new int[]{MAX_VALUE};
             }
         }
-                        
+
         for(final ExtendedAutomaton currAutomaton:theAutomata){
             final int automatonIndex = indexMap.getExtendedAutomatonIndex(currAutomaton);
             final int nbrNodes = currAutomaton.getNodes().size();
             final int nbrEvents = theAlphabet.size();
             guardStateEventTable[automatonIndex] = new int[nbrNodes][nbrEvents][];
             actionStateEventTable[automatonIndex] = new int[nbrNodes][nbrEvents][];
-                        
+
             for(final EdgeProxy tran : currAutomaton.getTransitions()){
                 final int indexSource = indexMap.getLocationIndex(automatonIndex, tran.getSource());
-                for(Iterator<Proxy> itr=tran.getLabelBlock().getEventIdentifierList().iterator();itr.hasNext();){
+                for(final Iterator<Proxy> itr=tran.getLabelBlock().getEventIdentifierList().iterator();itr.hasNext();){
                     final EventDeclProxy currEvent = currAutomaton.getEvent(((SimpleIdentifierSubject)itr.next()).getName());
                     final int indexEvent = indexMap.getEventIndex(currEvent);
                     try{
@@ -268,9 +270,9 @@ public class ExtendedAutomataIndexForm {
                             eventGuradTable[automatonIndex][indexEvent] = ExtendedAutomataIndexFormHelper.addToBeginningOfArray(guardIndex, guardTable);
                             guardStateEventTable[automatonIndex][indexSource][indexEvent] = ExtendedAutomataIndexFormHelper.addToBeginningOfArray(guardIndex, guardStateTable);
                         }
-                        guardStateEventTable[automatonIndex][indexSource][indexEvent] = ExtendedAutomataIndexFormHelper.addToEndOfArray(MAX_VALUE, 
+                        guardStateEventTable[automatonIndex][indexSource][indexEvent] = ExtendedAutomataIndexFormHelper.addToEndOfArray(MAX_VALUE,
                                                                                                      guardStateEventTable[automatonIndex][indexSource][indexEvent]);
-                    } catch(Exception ex){}
+                    } catch(final Exception ex){}
                     try{
                         final List<BinaryExpressionProxy> actions = tran.getGuardActionBlock().getActions();
                         for(final BinaryExpressionProxy action : actions){
@@ -280,14 +282,14 @@ public class ExtendedAutomataIndexForm {
                             eventActionTable[automatonIndex][indexEvent] = ExtendedAutomataIndexFormHelper.addToBeginningOfArray(actionIndex, actionTable);
                             actionStateEventTable[automatonIndex][indexSource][indexEvent] = ExtendedAutomataIndexFormHelper.addToBeginningOfArray(actionIndex, actionStateTable);
                         }
-                        actionStateEventTable[automatonIndex][indexSource][indexEvent] = ExtendedAutomataIndexFormHelper.addToEndOfArray(MAX_VALUE, 
+                        actionStateEventTable[automatonIndex][indexSource][indexEvent] = ExtendedAutomataIndexFormHelper.addToEndOfArray(MAX_VALUE,
                                                                                                      actionStateEventTable[automatonIndex][indexSource][indexEvent]);
-                        
-                    } catch(Exception ex){}
+
+                    } catch(final Exception ex){}
                 }
             }
         }
-            
+
         for(final ExtendedAutomaton currAutomaton:theAutomata)
         {
             final int currAutomatonIndex = indexMap.getExtendedAutomatonIndex(currAutomaton);
@@ -297,7 +299,7 @@ public class ExtendedAutomataIndexForm {
             nextStateTable[currAutomatonIndex] = new int[currAutomatonNbrOfStates][];
             nextStatesTable[currAutomatonIndex] = new int[currAutomatonNbrOfStates][][];
             outgoingEventsTable[currAutomatonIndex] = new int[currAutomatonNbrOfStates][];
-            
+
             // The "worst" case is that all states enables each event
             enableEventsTable[currAutomatonIndex] = new int[alphabetSize][];
             for (int i = 0; i < alphabetSize; i++)
@@ -313,7 +315,7 @@ public class ExtendedAutomataIndexForm {
 
                 nextStateTable[currAutomatonIndex][currStateIndex] = new int[nbrOfEvents];
                 nextStatesTable[currAutomatonIndex][currStateIndex] = new int[nbrOfEvents][];
-                
+
                 // Insert all event indices in a tree (sorted), here it is cleared, below it is filed
                 sortedEventIndices.clear();
 
@@ -330,8 +332,8 @@ public class ExtendedAutomataIndexForm {
                 // Iterate over outgoing arcs
                 for(final EdgeProxy currArc : currAutomaton.getLocationToOutgoingEdgesMap().get(currState))
                 {
-                    
-                    for(Iterator<Proxy> itrEvent = currArc.getLabelBlock().getEventIdentifierList().iterator();itrEvent.hasNext();){
+
+                    for(final Iterator<Proxy> itrEvent = currArc.getLabelBlock().getEventIdentifierList().iterator();itrEvent.hasNext();){
                         // Get the event from the automaton
                         final EventDeclProxy currEvent = currAutomaton.getEvent(((SimpleIdentifierSubject)itrEvent.next()).getName());
 //                        EventDeclProxy currEvent = theAutomata.eventIdToProxy(((SimpleIdentifierSubject)e).getName());
@@ -452,7 +454,7 @@ public class ExtendedAutomataIndexForm {
                 final ArrayList<EdgeSubject> incommingArcs = currAutomaton.getLocationToIngoingEdgesMap().get(currState);
                 for(final EdgeProxy currArc : incommingArcs)
                 {
-                    for(Iterator<Proxy> itr=currArc.getLabelBlock().getEventIdentifierList().iterator();itr.hasNext();){
+                    for(final Iterator<Proxy> itr=currArc.getLabelBlock().getEventIdentifierList().iterator();itr.hasNext();){
                         // Get the event from the automaton
                         final EventDeclProxy currEvent = theAutomata.eventIdToProxy(((SimpleIdentifierSubject)itr.next()).getName());
                         final int currEventIndex = indexMap.getEventIndex(currEvent);
@@ -473,7 +475,7 @@ public class ExtendedAutomataIndexForm {
                 for(final Integer sortedEventIndicesIt : sortedEventIndices) {
                     incomingEventsTable[currAutomatonIndex][currStateIndex][i++] = sortedEventIndicesIt.intValue();
                 }
-                
+
                 incomingEventsTable[currAutomatonIndex][currStateIndex][i] = MAX_VALUE;
             }
         }
@@ -604,7 +606,7 @@ public class ExtendedAutomataIndexForm {
 
     public int[][] getEventToAutomatonTable()
     {
-        return eventToAutomatonTable; 
+        return eventToAutomatonTable;
     }
 
     public NodeProxy getState(final int automatonIndex, final int stateIndex)
@@ -622,7 +624,7 @@ public class ExtendedAutomataIndexForm {
     {
         return indexMap;
     }
-    
+
     public int getNbrAutomaton(){
         return nbrAutomaton;
     }
@@ -630,7 +632,7 @@ public class ExtendedAutomataIndexForm {
     public int getNbrUnionEvents(){
         return nbrUnionEvents;
     }
-    
+
     public int[][][][] getGuardStateEventTable(){
         return guardStateEventTable;
     }
@@ -646,5 +648,5 @@ public class ExtendedAutomataIndexForm {
     public int[][][] getEventActionTable(){
         return eventActionTable;
     }
-    
+
 }

@@ -57,7 +57,8 @@ import org.supremica.gui.ide.ImportDialog;
  * dialog enables the user to import and convert external files containing a
  * hierarchy of modules, as opposed to a single module.
  *
- * @see ImportDialog, OpenAction
+ * @see ImportDialog
+ * @see OpenAction
  * @author Robi Malik
  */
 

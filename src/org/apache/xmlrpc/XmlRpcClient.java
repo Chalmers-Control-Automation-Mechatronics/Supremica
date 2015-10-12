@@ -65,6 +65,7 @@ import java.util.EmptyStackException;
 import java.util.Hashtable;
 import java.util.Stack;
 import java.util.Vector;
+
 import org.xml.sax.AttributeList;
 import org.xml.sax.SAXException;
 
@@ -157,7 +158,8 @@ public class XmlRpcClient
 	 * @exception IOException: If the call could not be made because of lower
 	 *          level problems.
 	 */
-	public Object execute(final String method, final Vector<Comparable<?>> params)
+	@Override
+  public Object execute(final String method, final Vector<Comparable<?>> params)
 		throws XmlRpcException, IOException
 	{
 		final Worker worker = getWorker(false);
@@ -208,12 +210,6 @@ public class XmlRpcClient
 		}
 	}
 
-	/**
-	 *
-	 * @param async
-	 * @return
-	 * @throws IOException
-	 */
 	synchronized Worker getWorker(final boolean async)
 		throws IOException
 	{
@@ -297,10 +293,6 @@ public class XmlRpcClient
 		}
 	}
 
-	/**
-	 *
-	 * @return
-	 */
 	synchronized CallData dequeue()
 	{
 		if (first == null)
@@ -322,9 +314,6 @@ public class XmlRpcClient
 		return call;
 	}
 
-	/**
-	 *
-	 */
 	class Worker
 		extends XmlRpc
 		implements Runnable
@@ -364,7 +353,8 @@ public class XmlRpcClient
 		/**
 		 *
 		 */
-		public void run()
+		@Override
+    public void run()
 		{
 			while (call != null)
 			{
@@ -509,7 +499,8 @@ public class XmlRpcClient
 		/**
 		 * Called when the return value has been parsed.
 		 */
-		protected void objectParsed(final Object what)
+		@Override
+    protected void objectParsed(final Object what)
 		{
 			result = what;
 		}
@@ -542,7 +533,8 @@ public class XmlRpcClient
 		/**
 		 * Overrides method in XmlRpc to handle fault repsonses.
 		 */
-		public void startElement(final String name, final AttributeList atts)
+		@Override
+    public void startElement(final String name, final AttributeList atts)
 			throws SAXException
 		{
 			if ("fault".equals(name))

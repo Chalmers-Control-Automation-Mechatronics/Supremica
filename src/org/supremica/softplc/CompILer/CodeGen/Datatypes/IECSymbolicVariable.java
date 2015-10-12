@@ -1,15 +1,15 @@
 package org.supremica.softplc.CompILer.CodeGen.Datatypes;
 
 /**This class is used to represent Direct variables
- * @see "Chapter 2.3 Datatypes in Programming industrial control
+ * See "Chapter 2.3 Datatypes in Programming industrial control
  *       systems using IEC 1131-3 by R. W. Lewis. ISBN: 0 85296 827 2"
  * @author Anders Röding
  */
 public class IECSymbolicVariable
 	implements IECVariable
 {
-	private TypeConstant type;
-	private String name;
+	private final TypeConstant type;
+	private final String name;
 	/* For function block variables eg. LD A.B */
 	private String typeName;
 	private TypeConstant fieldType;
@@ -19,7 +19,7 @@ public class IECSymbolicVariable
 	/**
 	 * constructs a new IECSymbolic variable
 	 */
-	public IECSymbolicVariable(String s, TypeConstant t)
+	public IECSymbolicVariable(final String s, final TypeConstant t)
 	{
 		name = s;
 		type = t;
@@ -31,7 +31,7 @@ public class IECSymbolicVariable
 	 * @param fieldSelector the selector name (eg. B in LD A.B)
 	 * @param fieldType the selector type
 	 */
-	public IECSymbolicVariable(String name, TypeConstant varType, String typeName, String fieldSelector, TypeConstant fieldType, String fieldSelectorTypeName)
+	public IECSymbolicVariable(final String name, final TypeConstant varType, final String typeName, final String fieldSelector, final TypeConstant fieldType, final String fieldSelectorTypeName)
 	{
 		this.name = name;
 		this.type = varType;
@@ -44,7 +44,8 @@ public class IECSymbolicVariable
 	/**
 	 * @return variable type
 	 */
-	public TypeConstant getType()
+	@Override
+  public TypeConstant getType()
 	{
 		return type;
 	}

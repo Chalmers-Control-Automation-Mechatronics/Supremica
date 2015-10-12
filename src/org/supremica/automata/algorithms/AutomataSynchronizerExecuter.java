@@ -183,7 +183,8 @@ public final class AutomataSynchronizerExecuter
     public AutomataSynchronizerExecuter(final AutomataSynchronizerHelper synchronizerHelper)
     {
         setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
-			public void uncaughtException(final Thread thread, final Throwable cause) {
+			@Override
+      public void uncaughtException(final Thread thread, final Throwable cause) {
 				cause.printStackTrace();
 				causeOfInterrupt = cause;
 				getThreadToBeInterruptedUponException().interrupt();
@@ -278,7 +279,7 @@ public final class AutomataSynchronizerExecuter
 
         for (int i = 0; i < automataToBeSelected.size(); i++)
         {
-            automataIndices[i] =  indexForm.getAutomataIndexMap().getAutomatonIndex(((Automaton) automataToBeSelected.get(i)));
+            automataIndices[i] =  indexForm.getAutomataIndexMap().getAutomatonIndex((automataToBeSelected.get(i)));
         }
 
         helper.selectAutomata(automataIndices);
@@ -659,6 +660,7 @@ public final class AutomataSynchronizerExecuter
     /**
      * Performs the synchronization.
      */
+    @Override
     public void run()
     {
         initialize();
@@ -918,8 +920,7 @@ public final class AutomataSynchronizerExecuter
      * Builds automaton using either concatenated state names or new,
      * short, unique names as new state names.
      *
-     *@return  true if build successful, false if build is stopped with requestStop().
-     *@exception  Exception Description of the Exception
+     * @return true if build successful, false if build is stopped with requestStop().
      */
     public boolean buildAutomaton()
     {

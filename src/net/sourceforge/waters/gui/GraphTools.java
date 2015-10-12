@@ -254,7 +254,7 @@ public class GraphTools {
   /**
    * Determines a new name for a simple node in the given graph.
    * @param  graph    The graph to receive the new node.
-   * @param  alsUsed  A set of names to be considered as taken already.
+   * @param  alsoUsed A set of names to be considered as taken already.
    */
   public static String findNewSimpleNodeName(final GraphSubject graph,
                                              final Set<String> alsoUsed)
@@ -265,7 +265,7 @@ public class GraphTools {
   /**
    * Determines a new name for a group node in the given graph.
    * @param  graph    The graph to receive the new group node.
-   * @param  alsUsed  A set of names to be considered as taken already,
+   * @param  alsoUsed A set of names to be considered as taken already,
    *                  or <CODE>null</CODE>.
    */
   public static String findNewGroupNodeName(final GraphSubject graph,

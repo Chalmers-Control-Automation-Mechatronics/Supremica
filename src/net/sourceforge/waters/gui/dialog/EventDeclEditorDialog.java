@@ -188,7 +188,7 @@ public class EventDeclEditorDialog
    * event editor dialog are triggered when the user commits the dialog,
    * after the event declaration has been created and added
    * to the module. Therefore, they can query the value of {@link
-   * #getEventDecl()} to determine which subject was created. The
+   * #getEditedItem()} to determine which subject was created. The
    * {@link ActionEvent} passed to the listener is the event that caused
    * the dialog to be committed.
    */

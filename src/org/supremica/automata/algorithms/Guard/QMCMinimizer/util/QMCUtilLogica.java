@@ -21,7 +21,6 @@ public class QMCUtilLogica {
 
     /**
      * Motodo que calcula si un nomero es potencia de dos o no
-     * @param valorDec
      */
     public static boolean esPotencia2(final int diferencia)
     {
@@ -32,17 +31,17 @@ public class QMCUtilLogica {
 
         if (diferencia <=0) return false;
 
-        double mitadDouble = (double) diferencia;
-        long mitadLong = (long) diferencia;
+        double mitadDouble = diferencia;
+        long mitadLong = diferencia;
 
         while (true){
 
             if (mitadLong == 1) break;
 
-            mitadDouble = ( (double) mitadDouble ) / 2.0;
-            mitadLong = ( (long) mitadLong ) / 2l;
+            mitadDouble = ( mitadDouble ) / 2.0;
+            mitadLong = ( mitadLong ) / 2l;
 
-            if ( mitadDouble != (double) mitadLong ) {
+            if ( mitadDouble != mitadLong ) {
                 potenciaDe2 = false;
                 break;
             }
@@ -58,13 +57,13 @@ public class QMCUtilLogica {
     public static int log2(final int valorDec) {
 
 
-        double mitadDouble = (double) valorDec;
-        long mitadLong = (long) valorDec;
+        double mitadDouble = valorDec;
+        long mitadLong = valorDec;
         int i = 0;
         while (true){
             if (mitadLong == 1) break;
-            mitadDouble = ( (double) mitadDouble ) / 2.0;
-            mitadLong = ( (long) mitadLong ) / 2l;
+            mitadDouble = ( mitadDouble ) / 2.0;
+            mitadLong = ( mitadLong ) / 2l;
             i++;
         }
         return i;
@@ -278,7 +277,6 @@ public class QMCUtilLogica {
      * Multiplica dos cadenas de forma booleana
      * @param cadena1 producto de variables
      * @param cadena2 producto de variables
-     * @return
      */
     public static String multiplicaProductosBooleanos(String cadena1, final String cadena2)
     {
@@ -294,9 +292,6 @@ public class QMCUtilLogica {
 
     /**
      * Metodo que extrae un implicante de la lista dado su nombre
-     * @param implicantes
-     * @param nombre
-     * @return implicante
      */
     public static QMCImplicanteBean buscaImplicante
       (final ArrayList<QMCImplicanteBean> implicantes, final char nombre)
@@ -340,8 +335,6 @@ public class QMCUtilLogica {
 
     /**
      * Comprueba si todos los terminos estan cubiertos
-     * @param terminosLista
-     * @return
      */
     public static boolean compruebaTerminosCubiertos
       (final ArrayList<QMCBinarioBean> terminosLista)
@@ -484,9 +477,6 @@ public class QMCUtilLogica {
 
     /**
      * Comprueba si la cadena de implicantes dada existe como parte de la solucion
-     * @param listaCadenasImplicantes
-     * @param cadenaImplicantesElegidos
-     * @return
      */
     public static String compruebaImplicantesNoEsenciales
       (final ArrayList<String> listaCadenasImplicantes, String cadenaImplicantesElegidos)

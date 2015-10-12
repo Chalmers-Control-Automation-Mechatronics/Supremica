@@ -33,12 +33,6 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
-import gnu.trove.set.hash.TLongHashSet;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayDeque;
@@ -59,6 +53,12 @@ import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
+
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.set.hash.TLongHashSet;
 
 
 /**
@@ -1175,8 +1175,8 @@ public class SynthesisObservationEquivalenceTRSimplifier
     }
 
     /**
-     * Initialises the cache used by the
-     * {@link #getUniqueSuccessor(int,EquivalenceClass) getUniqueSuccessor()}
+     * Initialises the cache used by the {@link
+     * #getUniqueSuccessorClass(int, EquivalenceClass) getUniqueSuccessorClass()}
      * method if not yet initialised. This method is called automatically.
      */
     private void initCache()
@@ -1255,8 +1255,8 @@ public class SynthesisObservationEquivalenceTRSimplifier
     }
 
     /**
-     * Clears the cache used by the
-     * {@link #getUniqueSuccessor(int,EquivalenceClass) getUniqueSuccessor()}
+     * Clears the cache used by the {@link
+     * #getUniqueSuccessorClass(int,EquivalenceClass) getUniqueSuccessorClass()}
      * method. The cache needs to be cleared when starting to split on a
      * new end class.
      */

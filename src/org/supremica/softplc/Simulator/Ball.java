@@ -1,6 +1,7 @@
 package org.supremica.softplc.Simulator;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
 
 /**Class Ball is used to model balls
  *
@@ -25,7 +26,7 @@ public class Ball
 	/**Constructor Ball initialises a new ball
 	 * @param size Small ball (1, default) or Big ball (2)
 	 */
-	public Ball(int size)
+	public Ball(final int size)
 	{
 		switch (size)
 		{
@@ -59,7 +60,7 @@ public class Ball
 	 * @param toPos endposition for new subtrack
 	 * @param speed speed of ball
 	 */
-	public void moveInit(int[] fromPos, int[] toPos, float[] speed)
+	public void moveInit(final int[] fromPos, final int[] toPos, final float[] speed)
 	{
 		lower[0] = fromPos[0];
 		lower[1] = fromPos[1];
@@ -90,7 +91,7 @@ public class Ball
 	 * method makes it possible to allow the ball go in different
 	 * directions
 	 */
-	public void setCoord(int x, int y)
+	public void setCoord(final int x, final int y)
 	{
 		lower[0] = x;
 		lower[1] = y;
@@ -101,11 +102,11 @@ public class Ball
 	 *  @param b the ball that we might run into
 	 *  @return returns true if we might collide
 	 */
-	public boolean collisionRisk(Ball b)
+	public boolean collisionRisk(final Ball b)
 	{
-		float[] np = { lower[0] + sp[0], lower[1] + sp[1] };
-		double d1 = distance(lower, b.getFloatPosition());
-		double d2 = distance(np, b.getFloatPosition());
+		final float[] np = { lower[0] + sp[0], lower[1] + sp[1] };
+		final double d1 = distance(lower, b.getFloatPosition());
+		final double d2 = distance(np, b.getFloatPosition());
 
 		return ((d1 <= (radius + b.getRadius())) && (d2 < d1));
 	}
@@ -115,10 +116,10 @@ public class Ball
 	 * @param p2 a point/position
 	 * @return the distance between the two points
 	 */
-	private double distance(float[] p1, float[] p2)
+	private double distance(final float[] p1, final float[] p2)
 	{
-		float pp1 = p1[0] - p2[0];
-		float pp2 = p1[1] - p2[1];
+		final float pp1 = p1[0] - p2[0];
+		final float pp2 = p1[1] - p2[1];
 
 		return Math.sqrt(pp1 * pp1 + pp2 * pp2);
 	}
@@ -128,7 +129,7 @@ public class Ball
 	 */
 	public int[] getPosition()
 	{
-		int[] r = new int[]{ Math.round(lower[0]), Math.round(lower[1]) };
+		final int[] r = new int[]{ Math.round(lower[0]), Math.round(lower[1]) };
 
 		return r;
 	}
@@ -156,10 +157,10 @@ public class Ball
 		return atEndPos;
 	}
 
-	/**setVisible sets a flag to say whether it should be painted or not
-	 * @param
+	/**
+	 * setVisible sets a flag to say whether it should be painted or not
 	 */
-	public void setVisible(boolean v)
+	public void setVisible(final boolean v)
 	{
 		ballVisible = v;
 	}
@@ -167,7 +168,7 @@ public class Ball
 	/**allowMove is used to model the physical behaviour of balls, so that
 	 * they do not run over each other.
 	 */
-	public void allowMove(boolean a)
+	public void allowMove(final boolean a)
 	{
 		allowMove = a;
 	}
@@ -175,7 +176,7 @@ public class Ball
 	/**allowMove2 Gives false when a ball gets from leg7 to the arm.
 	 * Then when the arm moves back (left) the value again is true.
 	 */
-	public void allowMove2(boolean a)
+	public void allowMove2(final boolean a)
 	{
 		allowMove2 = a;
 	}
@@ -183,7 +184,7 @@ public class Ball
 	/**paint paints the ball
 	 * @param g the graphics pen
 	 */
-	public void paint(Graphics g)
+	public void paint(final Graphics g)
 	{
 		if (ballVisible)
 		{

@@ -113,7 +113,9 @@ import net.sourceforge.waters.xsd.module.SplineKind;
  * the double-up graph, and this command is registered with the undo
  * manager for execution on the main model.</P>
  *
- * @see GraphEditorPanel, Command
+ * @see GraphEditorPanel
+ * @see Command
+ *
  * @author Simon Ware, Robi Malik
  */
 

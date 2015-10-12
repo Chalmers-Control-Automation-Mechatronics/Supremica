@@ -182,20 +182,14 @@ public class EFASynchronizer {
 	}
 
 	/**
-	 * Returns the components
-	 * <p>
-	 *
-	 * @return
+	 * Returns the components.
 	 */
 	public List<SimpleEFAComponent> getComponents() {
 		return mComponents;
 	}
 
 	/**
-	 * Returns the synchronized EFA
-	 * <p>
-	 *
-	 * @return A synchronize EFA
+	 * Returns the synchronized EFA.
 	 */
 	public SimpleEFAComponent getSynchronizedEFA() {
 		return getSynchronizedEFA(null, null);
@@ -206,13 +200,7 @@ public class EFASynchronizer {
 	}
 
 	/**
-	 * Returns the synchronized EFA
-	 * <p>
-	 *
-	 * @param name
-	 * @param kind
-	 *            <p>
-	 * @return
+	 * Returns the synchronized EFA.
 	 */
 	public SimpleEFAComponent getSynchronizedEFA(final String name, final ComponentKind kind) {
 		if (name != null && !name.isEmpty()) {

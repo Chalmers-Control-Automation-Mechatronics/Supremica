@@ -46,10 +46,10 @@ import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
@@ -75,6 +75,7 @@ public abstract class AbstractConflictCheckerTest extends
 
   // #########################################################################
   // # Simple Access
+  @Override
   protected ConflictChecker getModelVerifier()
   {
     return (ConflictChecker) super.getModelVerifier();
@@ -83,6 +84,7 @@ public abstract class AbstractConflictCheckerTest extends
   // #########################################################################
   // # Overrides for abstract base class
   // # net.sourceforge.waters.analysis.AbstractAnalysisTest
+  @Override
   protected void configure(final ModuleCompiler compiler)
   {
 
@@ -105,6 +107,7 @@ public abstract class AbstractConflictCheckerTest extends
    * @see AbstractModelVerifierTest#checkCounterExample(ProductDESProxy,TraceProxy)
    * @see #createLanguageInclusionChecker(ProductDESProxy,ProductDESProxyFactory)
    */
+  @Override
   protected void checkCounterExample(final ProductDESProxy des,
                                      final TraceProxy trace) throws Exception
   {
@@ -148,7 +151,7 @@ public abstract class AbstractConflictCheckerTest extends
    * Depending on the size of the model, this language inclusion check may be a
    * difficult problem on its own. This default implementation returns a
    * {@link NativeLanguageInclusionChecker} if available, otherwise resorts to a
-   * {@link MonolithicLanguageInclusionChecker.} This should be enough for the
+   * {@link MonolithicLanguageInclusionChecker}. This should be enough for the
    * test cases contained in this class. Subclasses that involve more advanced
    * conflict checkers with larger tests may have to override this method.
    * </P>

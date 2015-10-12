@@ -36,6 +36,7 @@ package net.sourceforge.waters.gui.actions;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+
 import javax.swing.Action;
 
 import net.sourceforge.waters.gui.GraphEditorPanel;
@@ -52,10 +53,7 @@ import org.supremica.gui.ide.IDE;
 
 
 /**
- * The action to create a new simple component for a module.
- * This action merely popups the component creation dialog
- * ({@link BlockedEventListEditorDialog});
- * the actual component creation is done when the dialog is committed.
+ * The action to create a blocked events list in an automaton.
  *
  * @author Robi Malik
  */
@@ -94,6 +92,7 @@ public class InsertBlockedEventListAction
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent event)
   {
     final GraphEditorPanel surface = getActiveGraphEditorPanel();
@@ -109,6 +108,7 @@ public class InsertBlockedEventListAction
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.observer.Observer
+  @Override
   public void update(final EditorChangedEvent event)
   {
     switch (event.getKind()) {
@@ -125,6 +125,7 @@ public class InsertBlockedEventListAction
 
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.ModelObserver
+  @Override
   public void modelChanged(final ModelChangeEvent event)
   {
     if (event.getKind() == ModelChangeEvent.STATE_CHANGED &&
@@ -133,6 +134,7 @@ public class InsertBlockedEventListAction
     }
   }
 
+  @Override
   public int getModelObserverPriority()
   {
     return ModelObserver.DEFAULT_PRIORITY;

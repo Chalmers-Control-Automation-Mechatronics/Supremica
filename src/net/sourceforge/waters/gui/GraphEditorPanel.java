@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.gui;
 
-import gnu.trove.set.hash.THashSet;
-
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
@@ -168,6 +166,8 @@ import net.sourceforge.waters.xsd.module.SplineKind;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 import org.supremica.properties.Config;
+
+import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -1475,7 +1475,7 @@ public class GraphEditorPanel
   /**
    * Finds the handle clicked by a mouse event.
    * @param  item   The item under the cursor.
-   * @param  event  The mouse event being processed.
+   * @param  point  The position of the mouse click.
    * @return The handle clicked, or <CODE>null</CODE>
    */
   private Handle getClickedHandle(final ProxySubject item, final Point point)

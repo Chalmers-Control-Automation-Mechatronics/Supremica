@@ -269,10 +269,11 @@ public class EnabledEventsSilentContinuationTRSimplifier
     }
 
     //#######################################################################
-    //# Interface net.sourceforge.waters.analysis.abstraction.WatersIntHashingStrategy
+    //# Interface
+    //# net.sourceforge.waters.analysis.abstraction.WatersIntHashingStrategy
     /**
      * Computes a hash code for the given state based on incoming equivalence.
-     * @param  state   State number of the state for which a hash code is
+     * @param  root    State number of the state for which a hash code is
      *                 to be computed.
      */
     @Override

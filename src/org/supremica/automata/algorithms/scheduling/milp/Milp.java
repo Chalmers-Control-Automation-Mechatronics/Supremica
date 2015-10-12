@@ -1948,13 +1948,11 @@ public class Milp
     }
 
     /**
-     *  Calls {@link #findNearestPathSplits(Automaton, State, ArrayList<int[]>, LabeledEvent)}, thus
-     *  initiating search for the path splits on all transitions leading to state.
-     *
-     *
+     * Calls {@link #findNearestPathSplits(Automaton, State, ArrayList, LabeledEvent)},
+     * thus initiating search for the path splits on all transitions leading to state.
      * @param auto the automaton in which path splits may appear.
      * @param state the state above which path splits are searched for.
-     * @param altPathVariables the  ArrayList containing the indices of
+     * @param altPathsVariables the  ArrayList containing the indices of
      *           path split state pairs. The search is always ended by adding
      *           NO_PATH_SPLIT_INDEX to the list.
      */
@@ -1964,22 +1962,21 @@ public class Milp
     }
 
     /**
-     *  Finds all pairs of states {startState, endState} following the supplied
-     *  event upwards from the supplied state, such that there is a
-     *  path split in the supplied automaton at startState, leading in one
-     *  transition to endState. If the event is null, all upstreams path-split
-     *  states are found. Their inidices, as provided by {@link #AutomataIndexMap}, are
-     *  stored in the supplied ArrayList.
+     * Finds all pairs of states {startState, endState} following the supplied
+     * event upwards from the supplied state, such that there is a
+     * path split in the supplied automaton at startState, leading in one
+     * transition to endState. If the event is null, all upstream path-split
+     * states are found. Their indices, as provided by {@link AutomataIndexMap}, are
+     * stored in the supplied ArrayList.
      *
-     *
-     * @param auto, the automaton in which path splits may appear.
-     * @param altPathVariables, the ArrayList containing the indices of
+     * @param auto the automaton in which path splits may appear.
+     * @param state the state above which path splits are searched for.
+     * @param altPathsVariables the ArrayList containing the indices of
      *           path split state pairs. The search is always ended by adding
      *           NO_PATH_SPLIT_INDEX to the list.
-     * @param event, the event above (and including) which the search for
+     * @param event the event above (and including) which the search for
      *           path splits is started. If null, all transition leading to the
      *           state are considered.
-     * @parem state, the state above which path splits are searched for.
      */
     private void findNearestPathSplits(final Automaton auto, final State state, final ArrayList<int[]> altPathsVariables, final LabeledEvent event)
     {
@@ -3256,8 +3253,8 @@ public class Milp
     /**
      * This method creates all permutation of indices in an array of length n.
      *
-     * @param   the length of each permutation.
-     * @return  a list of all permutations of length  n.
+     * @param   n the length of each permutation.
+     * @return  a list of all permutations of length n.
      */
     private ArrayList<int[]> getIndexPermutations(final int n)
     {
@@ -3551,14 +3548,15 @@ public class Milp
     }
 
     /**
-     * This method returns the nearest variables upstreams from a given
+     * This method returns the nearest variables upstream from a given
      * [plantIndex stateIndex]-pair. If there is also an eventIndex supplied,
-     * the upstreams variables are only returned if there is no path split in the
-     * stateIndex-state. Otherwise, the alt. path variable representing that
+     * the upstream variables are only returned if there is no path split in the
+     * stateIndex-state. Otherwise, the alt path variable representing that
      * split is returned.
      *
-     * @param   [plantIndex stateIndex eventIndex] (the last entry is optional)
-     * @return  the collection of alt. path variables that correspond to the event
+     * @param   plantStateEvent array containing [plantIndex stateIndex eventIndex]
+     *          (the last entry is optional)
+     * @return  the collection of alt path variables that correspond to the event
      *          actually occurring in stateIndex-state.
      */
     public Collection<int[]> getActiveAltPathVars(final int[] plantStateEvent)

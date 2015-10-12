@@ -63,11 +63,8 @@ import org.supremica.gui.ide.IDE;
  * <P>This action copies all selected items from the panel that currently
  * owns the focus to the system clipboard. To support this action,
  * components including editable items must implement the {@link
- * SelectionOwner#getCurrentSelection() getCurrentSelection()}, {@link
- * SelectionOwner#canCopy(List<? extends Proxy>) canCopy()}, and {@link
- * SelectionOwner#createTransferable(List<? extends Proxy>)
- * createTransferable()} methods of the {@link SelectionOwner}
- * interface.</P>
+ * SelectionOwner#getCurrentSelection() getCurrentSelection()} method of the
+ * {@link SelectionOwner} interface.</P>
  *
  * @author Robi Malik
  */

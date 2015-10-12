@@ -58,8 +58,8 @@ class EnabledEventsLimitedCertainConflictsStep extends AbstractionStep
   //# Constructor
   /**
    * Creates a new abstraction step record.
-   * @param  simplifier        The certain conflicts simplifier that
-   *                           produced this abstraction.
+   * @param  analyzer          The conflict checker that requests this
+   *                           abstraction.
    * @param  resultAut         The automaton resulting from abstraction.
    * @param  originalAut       The automaton before abstraction.
    * @param  tau               The event representing silent transitions,

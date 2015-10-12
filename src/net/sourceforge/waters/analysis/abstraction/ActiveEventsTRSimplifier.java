@@ -33,12 +33,6 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TIntIntHashMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -55,6 +49,12 @@ import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 
 /**
@@ -558,7 +558,7 @@ public class ActiveEventsTRSimplifier
    * removed as nothing can be merged within this class.</P>
    *
    * <P>All candidate equivalence classes are recorded in the array {@link
-   * ActiveEventsTRSimplifier#StateToClass mStateToClass}, which
+   * ActiveEventsTRSimplifier#mStateToClass mStateToClass}, which
    * maintains a map from state codes (of merged classes) to their
    * candidate classes. Classes consisting of a single state are represented
    * by a <CODE>null</CODE> entry in the array.</P>
@@ -927,7 +927,7 @@ public class ActiveEventsTRSimplifier
     /**
      * The list of states constituting this candidate equivalence class,
      * represented as list identifier in {@link
-     * ActiveEvents'TRSimplifier#mListBuffer}.
+     * ActiveEventsTRSimplifier#mListBuffer}.
      */
     private int mList;
     /**
@@ -937,7 +937,7 @@ public class ActiveEventsTRSimplifier
     /**
      * A list of states to be split off from this class,
      * represented as list identifier in {@link
-     * ActiveEvents'TRSimplifier#mListBuffer}.
+     * ActiveEventsTRSimplifier#mListBuffer}.
      */
     private int mSplitList;
     /**

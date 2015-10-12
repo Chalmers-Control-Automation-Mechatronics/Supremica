@@ -336,8 +336,6 @@ public class ExtendedAutomaton {
 
     /**
      * Deprecated method.
-     * @param expr
-     * @return
      * @deprecated Use extractVariablesFromExpr method in ExtendedAutomata instead
      * @see ExtendedAutomata
      */

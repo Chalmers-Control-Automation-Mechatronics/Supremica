@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.model.compiler.efa;
 
-import gnu.trove.set.hash.THashSet;
-
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.AbstractList;
@@ -95,6 +93,8 @@ import net.sourceforge.waters.model.printer.ProxyPrinter;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
+
+import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -467,7 +467,7 @@ public class EFANormaliser extends AbortableCompiler
   /**
    * The visitor implementing the second pass of EFA unification. <p> For
    * each automaton, it collects all the information about events and their
-   * relevant updates and stores it in the map {@link EFAUnifier#mEventMap}.
+   * relevant updates and stores it in the map {@link EFANormaliser#mEventMap}.
    */
   private class Pass2Visitor extends DefaultModuleProxyVisitor
   {
@@ -1006,8 +1006,8 @@ public class EFANormaliser extends AbortableCompiler
      * Records a blocked events list entry.
      * <P>
      * This method is to be called after all regular transitions have been
-     * added using {@link #addUpdate(SimpleComponentProxy, ConstraintList)
-     * addUpdate()}.
+     * added using {@link #addUpdate(SimpleComponentProxy, ConstraintList,
+     * GuardActionBlockProxy) addUpdate()}.
      * <P>
      * If this method is called with another update already recorded for
      * the given automaton, it has no effect. Otherwise, the effect of
@@ -1844,7 +1844,7 @@ public class EFANormaliser extends AbortableCompiler
 
   /**
    * A map from a primitive event identifier ({@link IdentifierProxy}) to
-   * an {@link EFAEventinfo}, which is a more sophisticated data structure
+   * an {@link EFAEventInfo}, which is a more sophisticated data structure
    * containing information about an event.
    */
   private ProxyAccessorMap<IdentifierProxy,EFAEventInfo> mEventMap;

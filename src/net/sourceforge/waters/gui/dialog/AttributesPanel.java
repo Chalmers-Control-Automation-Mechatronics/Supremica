@@ -82,10 +82,10 @@ import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.util.NonTypingTable;
 import net.sourceforge.waters.model.base.AttributeFactory;
 import net.sourceforge.waters.model.base.Proxy;
+
 import org.supremica.automata.BDD.EFA.ForcibleEventAttributeFactory;
 import org.supremica.automata.BDD.EFA.TimeInvariantAttributeFactory;
 import org.supremica.gui.ide.DefaultAttributeFactory;
-
 import org.supremica.properties.Config;
 
 
@@ -98,7 +98,7 @@ import org.supremica.properties.Config;
  * @author Carly Hona, Robi Malik
  */
 
-class AttributesPanel extends JPanel
+public class AttributesPanel extends JPanel
 {
 
   //#########################################################################
@@ -132,12 +132,14 @@ class AttributesPanel extends JPanel
     mTable.setDefaultEditor(String.class, mEditor);
     final ListSelectionModel selmodel = mTable.getSelectionModel();
     selmodel.addListSelectionListener(new ListSelectionListener() {
+      @Override
       public void valueChanged(final ListSelectionEvent event)
       {
         updateListControlEnabled();
       }
     });
     mTable.addMouseListener(new MouseAdapter() {
+      @Override
       public void mouseClicked(final MouseEvent event)
       {
         handleAttributesTableClick(event);
@@ -321,6 +323,7 @@ class AttributesPanel extends JPanel
       if (editor.stopCellEditing()) {
         // Must wait for focus change events to be processed ...
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run()
             {
               addAttribute();
@@ -391,6 +394,7 @@ class AttributesPanel extends JPanel
 
     //#######################################################################
     //# Interface java.awt.event.ActionListener
+    @Override
     public void actionPerformed(final ActionEvent event)
     {
       addAttribute();
@@ -422,6 +426,7 @@ class AttributesPanel extends JPanel
 
     //#######################################################################
     //# Interface java.awt.event.ActionListener
+    @Override
     public void actionPerformed(final ActionEvent event)
     {
       removeAttributes();
@@ -451,6 +456,7 @@ class AttributesPanel extends JPanel
 
     //#######################################################################
     //# Overrides for base class javax.swing.DefaultCellEditor
+    @Override
     public JComboBox<String> getTableCellEditorComponent
       (final JTable table, final Object value, final boolean isSelected,
        final int row, final int column)
@@ -486,6 +492,7 @@ class AttributesPanel extends JPanel
       return combo;
     }
 
+    @Override
     public Object getCellEditorValue()
     {
       final JTextField textfield = getTextField();

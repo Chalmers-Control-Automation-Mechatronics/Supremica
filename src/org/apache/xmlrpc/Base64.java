@@ -136,21 +136,21 @@ public final class Base64
 		lookUpBase64Alphabet[63] = (byte) '/';
 	}
 
-	public static boolean isBase64(String isValidString)
+	public static boolean isBase64(final String isValidString)
 	{
 		return isArrayByteBase64(isValidString.getBytes());
 	}
 
-	public static boolean isBase64(byte octect)
+	public static boolean isBase64(final byte octect)
 	{
 
 		//shall we ignore white space? JEFF??
 		return ((octect == PAD) || (base64Alphabet[octect] != -1));
 	}
 
-	public static boolean isArrayByteBase64(byte[] arrayOctect)
+	public static boolean isArrayByteBase64(final byte[] arrayOctect)
 	{
-		int length = arrayOctect.length;
+		final int length = arrayOctect.length;
 
 		if (length == 0)
 		{
@@ -177,11 +177,11 @@ public final class Base64
 	 * @param binaryData Array containing binary data to encode.
 	 * @return Base64-encoded data.
 	 */
-	public static byte[] encode(byte[] binaryData)
+	public static byte[] encode(final byte[] binaryData)
 	{
-		int lengthDataBits = binaryData.length * EIGHTBIT;
-		int fewerThan24bits = lengthDataBits % TWENTYFOURBITGROUP;
-		int numberTriplets = lengthDataBits / TWENTYFOURBITGROUP;
+		final int lengthDataBits = binaryData.length * EIGHTBIT;
+		final int fewerThan24bits = lengthDataBits % TWENTYFOURBITGROUP;
+		final int numberTriplets = lengthDataBits / TWENTYFOURBITGROUP;
 		byte encodedData[] = null;
 		int encodedDataLength = 0;
 
@@ -199,7 +199,7 @@ public final class Base64
 		}
 
 		// allow extra length for the separator
-		int nbrChunks = ((CHUNK_SEPARATOR.length == 0)
+		final int nbrChunks = ((CHUNK_SEPARATOR.length == 0)
 						 ? 0
 						 : (int) Math.ceil((float) encodedDataLength / CHUNK_SIZE));
 
@@ -225,13 +225,13 @@ public final class Base64
 			l = (byte) (b2 & 0x0f);
 			k = (byte) (b1 & 0x03);
 
-			byte val1 = ((b1 & SIGN) == 0)
+			final byte val1 = ((b1 & SIGN) == 0)
 						? (byte) (b1 >> 2)
 						: (byte) ((b1) >> 2 ^ 0xc0);
-			byte val2 = ((b2 & SIGN) == 0)
+			final byte val2 = ((b2 & SIGN) == 0)
 						? (byte) (b2 >> 4)
 						: (byte) ((b2) >> 4 ^ 0xf0);
-			byte val3 = ((b3 & SIGN) == 0)
+			final byte val3 = ((b3 & SIGN) == 0)
 						? (byte) (b3 >> 6)
 						: (byte) ((b3) >> 6 ^ 0xfc);
 
@@ -267,7 +267,7 @@ public final class Base64
 
 			//log.debug("b1=" + b1);
 			//log.debug("b1<<2 = " + (b1>>2) );
-			byte val1 = ((b1 & SIGN) == 0)
+			final byte val1 = ((b1 & SIGN) == 0)
 						? (byte) (b1 >> 2)
 						: (byte) ((b1) >> 2 ^ 0xc0);
 
@@ -283,10 +283,10 @@ public final class Base64
 			l = (byte) (b2 & 0x0f);
 			k = (byte) (b1 & 0x03);
 
-			byte val1 = ((b1 & SIGN) == 0)
+			final byte val1 = ((b1 & SIGN) == 0)
 						? (byte) (b1 >> 2)
 						: (byte) ((b1) >> 2 ^ 0xc0);
-			byte val2 = ((b2 & SIGN) == 0)
+			final byte val2 = ((b2 & SIGN) == 0)
 						? (byte) (b2 >> 4)
 						: (byte) ((b2) >> 4 ^ 0xf0);
 
@@ -308,7 +308,7 @@ public final class Base64
 	/**
 	 * Decodes Base64 data into octects
 	 *
-	 * @param binaryData Byte array containing Base64 data
+	 * @param base64Data Byte array containing Base64 data
 	 * @return Array containing decoded data.
 	 */
 	public static byte[] decode(byte[] base64Data)
@@ -324,7 +324,7 @@ public final class Base64
 			return new byte[0];
 		}
 
-		int numberQuadruple = base64Data.length / FOURBYTE;
+		final int numberQuadruple = base64Data.length / FOURBYTE;
 		byte decodedData[] = null;
 		byte b1 = 0, b2 = 0, b3 = 0, b4 = 0, marker0 = 0, marker1 = 0;
 
@@ -400,9 +400,9 @@ public final class Base64
 	 * from.
 	 * @return The data, less whitespace (see RFC 2045).
 	 */
-	static byte[] discardWhitespace(byte[] data)
+	static byte[] discardWhitespace(final byte[] data)
 	{
-		byte groomedData[] = new byte[data.length];
+		final byte groomedData[] = new byte[data.length];
 		int bytesCopied = 0;
 
 		for (int i = 0; i < data.length; i++)
@@ -430,7 +430,7 @@ public final class Base64
 			}
 		}
 
-		byte packedData[] = new byte[bytesCopied];
+		final byte packedData[] = new byte[bytesCopied];
 
 		System.arraycopy(groomedData, 0, packedData, 0, bytesCopied);
 

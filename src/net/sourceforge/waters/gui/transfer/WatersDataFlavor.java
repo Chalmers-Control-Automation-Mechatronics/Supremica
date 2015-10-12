@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.gui.transfer;
 
-import gnu.trove.set.hash.THashSet;
-
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.util.ArrayList;
@@ -57,6 +55,8 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.SubjectTools;
+
+import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -136,7 +136,7 @@ public abstract class WatersDataFlavor extends DataFlavor
    *                The data will be duplicated and copies will be stored
    *                in the transferable.
    * @return An instance of {@link ProxyTransferable} containing the data.
-   * @throws {@link IllegalArgumentException} to indicate that no suitable
+   * @throws IllegalArgumentException to indicate that no suitable
    *         data flavour could be identified for the given data.
    * @see WatersDataFlavor
    */
@@ -160,7 +160,7 @@ public abstract class WatersDataFlavor extends DataFlavor
    *                support this flavor, but it can be suppressed by setting
    *                this parameter to <CODE>false</CODE>.
    * @return An instance of {@link ProxyTransferable} containing the data.
-   * @throws {@link IllegalArgumentException} to indicate that no suitable
+   * @throws IllegalArgumentException to indicate that no suitable
    *         data flavour could be identified for the given data.
    * @see WatersDataFlavor
    */
@@ -318,10 +318,10 @@ public abstract class WatersDataFlavor extends DataFlavor
    * The data flavour for a list of module components, as contained in the
    * components list tree-view. It is implemented as a {@link
    * ProxyTransferable} and contains a list of objects of type {@link
-   * net.sourceforge.waters.model.SimpleComponentProxy}, {@link
-   * net.sourceforge.waters.model.VariableComponentProxy}, {@link
-   * net.sourceforge.waters.model.InstanceProxy}, or {@link
-   * net.sourceforge.waters.model.ForeachProxy}.
+   * net.sourceforge.waters.model.module.SimpleComponentProxy}, {@link
+   * net.sourceforge.waters.model.module.VariableComponentProxy}, {@link
+   * net.sourceforge.waters.model.module.InstanceProxy}, or {@link
+   * net.sourceforge.waters.model.module.ForeachProxy}.
    */
   public static final WatersDataFlavor COMPONENT =
     new ModuleDataFlavor(ComponentProxy.class);
@@ -344,7 +344,7 @@ public abstract class WatersDataFlavor extends DataFlavor
    * The data flavour for a list of event aliases, as contained in the event
    * aliases tree-view. It is implemented as a {@link ProxyTransferable} and
    * contains a list of objects of type {@link EventAliasProxy} or
-   * {@link net.sourceforge.waters.model.ForeachProxy}.
+   * {@link net.sourceforge.waters.model.module.ForeachProxy}.
    */
   public static final WatersDataFlavor EVENT_ALIAS =
     new ModuleDataFlavor(EventAliasProxy.class);
@@ -376,15 +376,16 @@ public abstract class WatersDataFlavor extends DataFlavor
    * The data flavour for a list of event labels, as found on an edge of a
    * graph. It is implemented as a {@link ProxyTransferable} and contains a
    * list of objects of type {@link IdentifierProxy} or {@link
-   * net.sourceforge.waters.model.ForeachProxy}
+   * net.sourceforge.waters.model.module.ForeachProxy}
    */
   public static final WatersDataFlavor IDENTIFIER =
     new IdentifierDataFlavor();
 
   /**
    * The data flavour for a node labels. Node labels are represented in a
-   * graph using {@link LabelGeometryProxy} objects, which are converted to
-   * {@link net.sourceforge.waters.model.module.SimpleIdentifierProxy
+   * graph using {@link net.sourceforge.waters.model.module.LabelGeometryProxy}
+   * objects, which are converted to {@link
+   * net.sourceforge.waters.model.module.SimpleIdentifierProxy
    * SimpleIdentifierProxy} objects in the transferable.
    */
   public static final WatersDataFlavor LABEL_GEOMETRY =

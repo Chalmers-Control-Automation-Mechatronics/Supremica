@@ -36,6 +36,8 @@ package net.sourceforge.waters.gui.simulator;
 import java.util.EventObject;
 
 import net.sourceforge.waters.gui.observer.Subject;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
+import net.sourceforge.waters.subject.base.ModelObserver;
 
 
 /**
@@ -99,6 +101,7 @@ public class SimulationChangeEvent extends EventObject
   /**
    * Gets the source of this event.
    */
+  @Override
   public Simulation getSource()
   {
     return (Simulation) super.getSource();
@@ -107,8 +110,8 @@ public class SimulationChangeEvent extends EventObject
   /**
    * Gets the specific kind of notification. There are two possible values
    * <UL>
-   * <LI>{@link #MODEL_CHANGED)</LI>
-   * <LI>{@link #STATE_CHANGED)</LI>
+   * <LI>{@link #MODEL_CHANGED}</LI>
+   * <LI>{@link #STATE_CHANGED}</LI>
    * </UL>
    */
   public int getKind()

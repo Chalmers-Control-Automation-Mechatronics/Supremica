@@ -60,13 +60,11 @@ import org.supremica.gui.ide.IDE;
  * <P>This action deletes all selected items in the panel that currently
  * owns the focus. To support this action, components including editable
  * items must implement the {@link SelectionOwner#getCurrentSelection()
- * getCurrentSelection()}, {@link SelectionOwner#canDelete(List<? extends
- * Proxy>) canDelete()}, {@link SelectionOwner#getDeletionVictims(List<?
- * extends Proxy>) getDeletionVictims()}, {@link
- * SelectionOwner#deleteItems(List<net.sourceforge.waters.gui.transfer.InsertInfo>)
- * deleteItems()} and {@link
- * SelectionOwner#insertItems(List<net.sourceforge.waters.gui.transfer.InsertInfo>)
- * insertItems()} methods of the {@link SelectionOwner} interface.</P>
+ * getCurrentSelection()}, {@link SelectionOwner#canDelete(List) canDelete()},
+ * {@link SelectionOwner#getDeletionVictims(List) getDeletionVictims()},
+ * {@link SelectionOwner#deleteItems(List) deleteItems()} and {@link
+ * SelectionOwner#insertItems(List) insertItems()} methods of the
+ * {@link SelectionOwner} interface.</P>
  *
  * @author Robi Malik
  */

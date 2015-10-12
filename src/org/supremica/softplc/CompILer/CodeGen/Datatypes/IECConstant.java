@@ -10,7 +10,7 @@ public interface IECConstant
 {
 
 	/**getType returns the type of the constant
-	 * @see {@link TypeConstant}
+	 * @see TypeConstant
 	 * @return the type
 	 */
 	TypeConstant getType();

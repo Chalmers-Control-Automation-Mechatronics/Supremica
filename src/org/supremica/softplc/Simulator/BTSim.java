@@ -7,18 +7,18 @@ package org.supremica.softplc.Simulator;
 public class BTSim
 	implements org.supremica.softplc.RunTime.DigitalIODriver
 {
-	private short nrOfSignalsIn = 32;
-	private short nrOfSignalsOut = 32;
+	private final short nrOfSignalsIn = 32;
+	private final short nrOfSignalsOut = 32;
 
 	// inputs to simulator [18]
-	private boolean[] inSignals = new boolean[]{ false, false, false, false,
+	private final boolean[] inSignals = new boolean[]{ false, false, false, false,
 												 false, false, false, false,
 												 false, false, false, false,
 												 false, false, false, false,
 												 false, false };
 
 	// outputs from simulator [27]
-	private boolean[] outSignals = { false, true, false, false, false, false,
+	private final boolean[] outSignals = { false, true, false, false, false, false,
 									 false, true, false, false, false, false,
 									 false, false, false, false, false, true,
 									 false, false, false, false, false, true,
@@ -28,8 +28,8 @@ public class BTSim
 	{
 
 		// Start a RouteController thread
-		RouteController p = new RouteController(outSignals, this);
-		Thread pThread = new Thread(p);
+		final RouteController p = new RouteController(outSignals, this);
+		final Thread pThread = new Thread(p);
 
 		pThread.start();
 	}
@@ -37,16 +37,18 @@ public class BTSim
 	/** setSignalArray sets all signals
 	 *  @param values new value for port
 	 */
-	public synchronized void setSignalArray(boolean[] values)
+	@Override
+  public synchronized void setSignalArray(final boolean[] values)
 		throws Exception
 	{
 		System.arraycopy(values, 0, inSignals, 0, inSignals.length);
 	}
 
-	/** getSignalArray gets all signals
-	 *  @return all the values for the signals
-		 */
-	public void getSignalArray(boolean[] values)
+	/**
+	 * getSignalArray gets all signals.
+	 */
+	@Override
+  public void getSignalArray(final boolean[] values)
 		throws Exception
 	{
 		System.arraycopy(outSignals, 0, values, 0, outSignals.length);
@@ -59,7 +61,7 @@ public class BTSim
 	/**setOutSignals is used by RouteController
 	 * @param values the output signals to be set
 	 */
-	public synchronized void setOutSignals(boolean[] values)
+	public synchronized void setOutSignals(final boolean[] values)
 	{
 		System.arraycopy(values, 0, outSignals, 0, outSignals.length);
 	}
@@ -71,29 +73,34 @@ public class BTSim
 		return inSignals;
 	}
 
-	public short getNrOfSignalsIn()
+	@Override
+  public short getNrOfSignalsIn()
 	{
 		return nrOfSignalsIn;
 	}
 
-	public short getNrOfSignalsOut()
+	@Override
+  public short getNrOfSignalsOut()
 	{
 		return nrOfSignalsOut;
 	}
 
-	public boolean hasInputDescriptions()
+	@Override
+  public boolean hasInputDescriptions()
 	{
 		return true;
 	}
 
-	public boolean hasOutputDescriptions()
+	@Override
+  public boolean hasOutputDescriptions()
 	{
 		return true;
 	}
 
-	public String[] getInputDescriptions()
+	@Override
+  public String[] getInputDescriptions()
 	{
-		String[] temp = new String[nrOfSignalsIn];
+		final String[] temp = new String[nrOfSignalsIn];
 
 		//Define the names for the signal being used
 		temp[0] = new String("0 - KulaPortvakt");
@@ -133,9 +140,10 @@ public class BTSim
 		return temp;
 	}
 
-	public String[] getOutputDescriptions()
+	@Override
+  public String[] getOutputDescriptions()
 	{
-		String[] temp = new String[nrOfSignalsOut];
+		final String[] temp = new String[nrOfSignalsOut];
 
 		//Define the names for the signals being used
 		temp[0] = new String("0 - InPortvakt");

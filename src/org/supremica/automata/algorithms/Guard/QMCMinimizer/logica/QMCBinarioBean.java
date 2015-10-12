@@ -1,27 +1,27 @@
 /**
- * 
+ *
  */
 package org.supremica.automata.algorithms.Guard.QMCMinimizer.logica;
 
 /**
- * Clase tipo bean que encapsula los datos de las adyacencias 
+ * Clase tipo bean que encapsula los datos de las adyacencias
  * @author Pedro Sanz
- *  Fecha 17/03/2006 
+ *  Fecha 17/03/2006
  *
  */
 public class QMCBinarioBean implements Cloneable
 {
     String valorDec;
     String coordenadasVacuas;
-    String valorBin;    
+    String valorBin;
     int indice;
-    
+
     String posicion;
     boolean usada;
     boolean cubierta;
     boolean indiferencia;
     boolean termino;
-    
+
     /**
      * Devuelve true si es termino
      * @return termino
@@ -33,7 +33,7 @@ public class QMCBinarioBean implements Cloneable
      * Establece si el binario es termino.
      * @param termino
      */
-    public void setTermino(boolean termino) {
+    public void setTermino(final boolean termino) {
         this.termino = termino;
     }
     /**
@@ -45,12 +45,11 @@ public class QMCBinarioBean implements Cloneable
     }
     /**
      * Establece si se ha usado el termino o adyacencia que representa durante el proceso de minimización
-     * @param usado 
      */
-    public void setUsado(boolean usada) {
+    public void setUsado(final boolean usada) {
         this.usada = usada;
     }
-    
+
     /**
      * Devuelve true si el termino o adyacencia esta cubierta por algun implicante
      * @return Devuelve variable cubierta.
@@ -60,9 +59,9 @@ public class QMCBinarioBean implements Cloneable
     }
     /**
      * Establece si el binario esta cubierto por algun implicante
-     * @param cubierta 
+     * @param cubierta
      */
-    public void setCubierta(boolean cubierta) {
+    public void setCubierta(final boolean cubierta) {
         this.cubierta = cubierta;
     }
     /**
@@ -76,7 +75,7 @@ public class QMCBinarioBean implements Cloneable
      * Introduce el valor binario
      * @param valorBin
      */
-    public void setValorBin(String valorBin) {
+    public void setValorBin(final String valorBin) {
         this.valorBin = valorBin;
     }
     /**
@@ -88,9 +87,9 @@ public class QMCBinarioBean implements Cloneable
     }
     /**
      * Introduce las coordenadas vacuas
-     * @param coordenadasVacuas 
+     * @param coordenadasVacuas
      */
-    public void setCoordenadasVacuas(String coordenadasVacuas) {
+    public void setCoordenadasVacuas(final String coordenadasVacuas) {
         this.coordenadasVacuas = coordenadasVacuas;
     }
     /**
@@ -102,9 +101,9 @@ public class QMCBinarioBean implements Cloneable
     }
     /**
      * Introduce el valor decimal
-     * @param valorDec 
+     * @param valorDec
      */
-    public void setValorDec(String valorDec) {
+    public void setValorDec(final String valorDec) {
         this.valorDec = valorDec;
     }
     /**
@@ -118,33 +117,35 @@ public class QMCBinarioBean implements Cloneable
      * Introduce el indice (numero de unos)
      * @param indice
      */
-    public void setIndice(int indice) {
+    public void setIndice(final int indice) {
         this.indice = indice;
-    }   
-    
+    }
+
     /**
      * Implementación del método toString
      */
+    @Override
     public String toString()
     {
         return valorDec;
     }
     /**
      * Implementacion del metodo clone
-     * 
+     *
      * @return  una copia de la instancia de tipo QMCAdyacenciaBean
      */
+    @Override
     public Object clone()
     {
         try
         {
-            return super.clone();        
+            return super.clone();
         }
-        catch (CloneNotSupportedException e)
+        catch (final CloneNotSupportedException e)
         {
             // No deberia suceder ya que implementa la interfaz cloneable
             throw new InternalError();
-        }        
+        }
     }
     /**
      * Devuelve true si es indiferencia
@@ -157,7 +158,7 @@ public class QMCBinarioBean implements Cloneable
      * Establece si es indiferencia
      * @param indiferencia
      */
-    public void setIndiferencia(boolean indiferencia) {
+    public void setIndiferencia(final boolean indiferencia) {
         this.indiferencia = indiferencia;
     }
     /**
@@ -171,8 +172,8 @@ public class QMCBinarioBean implements Cloneable
      * Introduce la posicion de la adyacencia que representa en la lista de adyacencias
      * @param posicion variable posicion a introducir.
      */
-    public void setPosicion(String posicion) {
+    public void setPosicion(final String posicion) {
         this.posicion = posicion;
     }
-   
+
 }

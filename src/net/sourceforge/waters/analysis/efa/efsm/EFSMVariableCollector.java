@@ -65,7 +65,7 @@ class EFSMVariableCollector
   //# Invocation
   /**
    * Collects all variables in the given event encoding.
-   * @param  update   The event encoding to be searched.
+   * @param  encoding The event encoding to be searched.
    * @param  vars     All variables will be added to this collection.
    */
   void collectAllVariables(final EFSMEventEncoding encoding,
@@ -76,7 +76,7 @@ class EFSMVariableCollector
 
   /**
    * Collects all variables in the given event encoding.
-   * @param  update   The event encoding to be searched.
+   * @param  encoding The event encoding to be searched.
    * @param  unprimed Unprimed variables will be added to this collection.
    *                  This may be <CODE>null</CODE> to suppress collecting
    *                  unprimed variables.

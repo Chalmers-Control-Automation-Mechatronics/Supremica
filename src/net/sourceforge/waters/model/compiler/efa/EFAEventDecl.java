@@ -55,7 +55,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * event, creating individual events of type {@link EFAEvent} for different
  * value combinations of EFA variable components.</P>
  *
- * @see {@link EFACompiler}.
+ * @see EFACompiler
  * @author Robi Malik
  */
 
@@ -75,6 +75,7 @@ class EFAEventDecl {
 
   //#########################################################################
   //# Overrides for java.lang.Object
+  @Override
   public String toString()
   {
     return mEventDecl.getName();
@@ -181,7 +182,7 @@ class EFAEventDecl {
    * whose value may change when this event occurs. This set contains
    * only the EFA variable objects for the current state of the
    * concerned variables.
-   * @see {@link EFACompiler}.
+   * @see EFACompiler
    */
   private final Set<EFAVariable> mVariables;
   /**

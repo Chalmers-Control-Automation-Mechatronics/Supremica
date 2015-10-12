@@ -1526,9 +1526,6 @@ public class CompositionalGeneralisedConflictChecker
     /**
      * Counts the number of events which are shared by all automata of this
      * candidate, excluding tau.
-     *
-     * @param candidate
-     * @return
      */
     protected int countCandidatesSharedEvents(final Candidate candidate)
     {
@@ -1549,9 +1546,6 @@ public class CompositionalGeneralisedConflictChecker
 
     /**
      * Gets the number of local events for this candidate, excluding tau.
-     *
-     * @param candidate
-     * @return
      */
     protected int countCandidatesLocalEvents(final Candidate candidate)
     {
@@ -2319,8 +2313,7 @@ public class CompositionalGeneralisedConflictChecker
      * Finds any extra required steps between the given step and its successor
      * step. Converts all step information to be valid for the original
      * automaton.
-     *
-     * @param traceSteps
+     * @param traceStep
      *          The trace step of the given conflict trace to be converted.
      * @param originalAutSource
      *          The state of the original automaton to search from.
@@ -2480,7 +2473,7 @@ public class CompositionalGeneralisedConflictChecker
      *          State number of the source state in the original automaton.
      * @param event
      *          Integer code of the event to be included in the trace.
-     * @param targetClass
+     * @param resultAutTarget
      *          State number of the state in the simplified automaton (code of
      *          state class).
      * @return List of search records describing the trace from source to

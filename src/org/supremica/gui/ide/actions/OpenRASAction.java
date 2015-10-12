@@ -53,7 +53,7 @@ import org.supremica.gui.ide.IDE;
 /**
  * Create a EFA model for a Resource Allocation System (RAS)
  *
- * @ author Sajed, Zhennan
+ * @author Sajed, Zhennan
  */
 
 public class OpenRASAction extends net.sourceforge.waters.gui.actions.IDEAction {

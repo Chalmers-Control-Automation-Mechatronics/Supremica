@@ -1,6 +1,7 @@
 package org.supremica.external.avocades.common;
 
 import java.util.LinkedList;
+
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 
@@ -34,7 +35,8 @@ public class EFA extends ExtendedAutomaton{
 	   events = new LinkedList<String>();
    }
 
-   public void addTransition(final String from, final String to,
+   @Override
+  public void addTransition(final String from, final String to,
 		   String event, final String guard, String action ){
 
 	   this.addEvent(event);
@@ -52,7 +54,8 @@ public class EFA extends ExtendedAutomaton{
 	   super.addTransition(from,to,event,guard,action);
    }
 
-   public NodeProxy addState(final String name){
+   @Override
+  public NodeProxy addState(final String name){
 	   return this.addState(name, false, false);
    }
 
@@ -117,7 +120,8 @@ public class EFA extends ExtendedAutomaton{
        }
    }
 
-   public EventDeclProxy addEvent(final String event, final String kind){
+   @Override
+  public EventDeclProxy addEvent(final String event, final String kind){
 
        //check in data
        if(event == null ){
@@ -183,8 +187,6 @@ public class EFA extends ExtendedAutomaton{
 
    /**
     * return true if event already in list of events
-    * @param event
-    * @return
     */
    public boolean eventExist(final String event){
        return events.contains(event);

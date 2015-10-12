@@ -1,22 +1,22 @@
 package org.supremica.automata.algorithms.Guard.QMCMinimizer.util;
 /*
  * Copyright (c) 2003 Sun Microsystems, Inc. All  Rights Reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 
+ *
  * -Redistributions of source code must retain the above copyright
  *  notice, this list of conditions and the following disclaimer.
- * 
+ *
  * -Redistribution in binary form must reproduct the above copyright
  *  notice, this list of conditions and the following disclaimer in
  *  the documentation and/or other materials provided with the distribution.
- * 
+ *
  * Neither the name of Sun Microsystems, Inc. or the names of contributors
  * may be used to endorse or promote products derived from this software
  * without specific prior written permission.
- * 
+ *
  * This software is provided "AS IS," without a warranty of any kind. ALL
  * EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND WARRANTIES, INCLUDING
  * ANY IMPLIED WARRANTY OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@ package org.supremica.automata.algorithms.Guard.QMCMinimizer.util;
  * INCIDENTAL OR PUNITIVE DAMAGES, HOWEVER CAUSED AND REGARDLESS OF THE THEORY
  * OF LIABILITY, ARISING OUT OF THE USE OF OR INABILITY TO USE SOFTWARE, EVEN
  * IF SUN HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
- * 
+ *
  * You acknowledge that Software is not designed, licensed or intended for
  * use in the design, construction, operation or maintenance of any nuclear
  * facility.
@@ -40,10 +40,10 @@ package org.supremica.automata.algorithms.Guard.QMCMinimizer.util;
 
 
 import java.io.File;
-import java.util.Hashtable;
 import java.util.Enumeration;
+import java.util.Hashtable;
 
-import javax.swing.filechooser.*;
+import javax.swing.filechooser.FileFilter;
 
 /**
  * A convenience implementation of FileFilter that filters out
@@ -92,7 +92,7 @@ public class QMCFiltradorExtensionesArchivos extends FileFilter {
      *
      * @see #addExtension
      */
-    public QMCFiltradorExtensionesArchivos(String extension) {
+    public QMCFiltradorExtensionesArchivos(final String extension) {
 	this(extension,null);
     }
 
@@ -105,7 +105,7 @@ public class QMCFiltradorExtensionesArchivos extends FileFilter {
      *
      * @see #addExtension
      */
-    public QMCFiltradorExtensionesArchivos(String extension, String description) {
+    public QMCFiltradorExtensionesArchivos(final String extension, final String description) {
 	this();
 	if(extension!=null) addExtension(extension);
  	if(description!=null) setDescription(description);
@@ -120,7 +120,7 @@ public class QMCFiltradorExtensionesArchivos extends FileFilter {
      *
      * @see #addExtension
      */
-    public QMCFiltradorExtensionesArchivos(String[] filters) {
+    public QMCFiltradorExtensionesArchivos(final String[] filters) {
 	this(filters, null);
     }
 
@@ -132,7 +132,7 @@ public class QMCFiltradorExtensionesArchivos extends FileFilter {
      *
      * @see #addExtension
      */
-    public QMCFiltradorExtensionesArchivos(String[] filters, String description) {
+    public QMCFiltradorExtensionesArchivos(final String[] filters, final String description) {
 	this();
 	for (int i = 0; i < filters.length; i++) {
 	    // add filters one by one
@@ -148,14 +148,15 @@ public class QMCFiltradorExtensionesArchivos extends FileFilter {
      * Files that begin with "." are ignored.
      *
      * @see #getExtension
-     * @see FileFilter#accepts
+     * @see FileFilter#accept(File)
      */
-    public boolean accept(File f) {
+    @Override
+    public boolean accept(final File f) {
 	if(f != null) {
 	    if(f.isDirectory()) {
 		return true;
 	    }
-	    String extension = getExtension(f);
+	    final String extension = getExtension(f);
 	    if(extension != null && filters.get(getExtension(f)) != null) {
 		return true;
 	    };
@@ -169,10 +170,10 @@ public class QMCFiltradorExtensionesArchivos extends FileFilter {
      * @see #getExtension
      * @see FileFilter#accept
      */
-     public String getExtension(File f) {
+     public String getExtension(final File f) {
 	if(f != null) {
-	    String filename = f.getName();
-	    int i = filename.lastIndexOf('.');
+	    final String filename = f.getName();
+	    final int i = filename.lastIndexOf('.');
 	    if(i>0 && i<filename.length()-1) {
 		return filename.substring(i+1).toLowerCase();
 	    };
@@ -192,7 +193,7 @@ public class QMCFiltradorExtensionesArchivos extends FileFilter {
      *
      * Note that the "." before the extension is not needed and will be ignored.
      */
-    public void addExtension(String extension) {
+    public void addExtension(final String extension) {
 	if(filters == null) {
 	    filters = new Hashtable<String, QMCFiltradorExtensionesArchivos>(5);
 	}
@@ -205,17 +206,18 @@ public class QMCFiltradorExtensionesArchivos extends FileFilter {
      * Returns the human readable description of this filter. For
      * example: "JPEG and GIF Image Files (*.jpg, *.gif)"
      *
-     * @see setDescription
-     * @see setExtensionListInDescription
-     * @see isExtensionListInDescription
+     * @see #setDescription(String)
+     * @see #setExtensionListInDescription(boolean)
+     * @see #isExtensionListInDescription()
      * @see FileFilter#getDescription
      */
+    @Override
     public String getDescription() {
 	if(fullDescription == null) {
 	    if(description == null || isExtensionListInDescription()) {
  		fullDescription = description==null ? "(" : description + " (";
 		// build the description from the extension list
-		Enumeration<String> extensions = filters.keys();
+		final Enumeration<String> extensions = filters.keys();
 		if(extensions != null) {
 		    fullDescription += "." + extensions.nextElement();
 		    while (extensions.hasMoreElements()) {
@@ -234,11 +236,11 @@ public class QMCFiltradorExtensionesArchivos extends FileFilter {
      * Sets the human readable description of this filter. For
      * example: filter.setDescription("Gif and JPG Images");
      *
-     * @see setDescription
-     * @see setExtensionListInDescription
-     * @see isExtensionListInDescription
+     * @see #getDescription()
+     * @see #setExtensionListInDescription(boolean)
+     * @see #isExtensionListInDescription()
      */
-    public void setDescription(String description) {
+    public void setDescription(final String description) {
 	this.description = description;
 	fullDescription = null;
     }
@@ -250,11 +252,11 @@ public class QMCFiltradorExtensionesArchivos extends FileFilter {
      * Only relevent if a description was provided in the constructor
      * or using setDescription();
      *
-     * @see getDescription
-     * @see setDescription
-     * @see isExtensionListInDescription
+     * @see #getDescription()
+     * @see #setDescription(String)
+     * @see #isExtensionListInDescription()
      */
-    public void setExtensionListInDescription(boolean b) {
+    public void setExtensionListInDescription(final boolean b) {
 	useExtensionsInDescription = b;
 	fullDescription = null;
     }
@@ -266,9 +268,9 @@ public class QMCFiltradorExtensionesArchivos extends FileFilter {
      * Only relevent if a description was provided in the constructor
      * or using setDescription();
      *
-     * @see getDescription
-     * @see setDescription
-     * @see setExtensionListInDescription
+     * @see #getDescription()
+     * @see #setDescription(String)
+     * @see #setExtensionListInDescription(boolean)
      */
     public boolean isExtensionListInDescription() {
 	return useExtensionsInDescription;

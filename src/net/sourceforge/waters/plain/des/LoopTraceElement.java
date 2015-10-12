@@ -37,13 +37,14 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.List;
 
+import net.sourceforge.waters.model.base.ItemNotFoundException;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.LoopTraceProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
-import net.sourceforge.waters.model.des.LoopTraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 
 
@@ -124,6 +125,7 @@ public final class LoopTraceElement
   /**
    * Returns a copy of this product DES.
    */
+  @Override
   public LoopTraceElement clone()
   {
     return (LoopTraceElement) super.clone();
@@ -132,6 +134,7 @@ public final class LoopTraceElement
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.base.Proxy
+  @Override
   public Object acceptVisitor(final ProxyVisitor visitor)
     throws VisitorException
   {
@@ -142,6 +145,7 @@ public final class LoopTraceElement
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.des.LoopTraceProxy
+  @Override
   public int getLoopIndex()
   {
     return mLoopIndex;
@@ -150,6 +154,7 @@ public final class LoopTraceElement
 
   //#########################################################################
   //# Equals and Hashcode
+  @Override
   public Class<LoopTraceProxy> getProxyInterface()
   {
     return LoopTraceProxy.class;

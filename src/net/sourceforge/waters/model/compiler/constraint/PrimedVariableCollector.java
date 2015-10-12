@@ -86,7 +86,7 @@ class PrimedVariableCollector
 
   /**
    * Collects all primed variables in the given expressions.
-   * @param  expr        A collection of expressions to be searched.
+   * @param  exprs       A collection of expressions to be searched.
    * @param  vars        Found variables will be added in their primed form
    *                     to this set.
    */

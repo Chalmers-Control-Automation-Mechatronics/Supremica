@@ -251,7 +251,7 @@ extends JDialog
     /**
      * Gets the label used to describe the property in the dialog.
      * Not really relevant here, but makes things immensely more easy
-     * for {@link #SearchAction}.
+     * for {@link PropertiesControllerPanel.SearchAction}.
      */
     public String getLabel();
   }
@@ -748,7 +748,7 @@ extends JPanel
     }
   }
 
-  private class SearchAction
+  class SearchAction
   extends AbstractAction
   {
     JTextField text_field;

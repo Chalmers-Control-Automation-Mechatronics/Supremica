@@ -57,9 +57,8 @@ import org.supremica.gui.ide.IDE;
  * items must implement the {@link SelectionOwner#canSelectMore()
  * canSelectMore()}, {@link SelectionOwner#getAllSelectableItems()
  * getAllSelectableItems()}, {@link SelectionOwner#canSelectMore()
- * canSelectMore()}, {@link SelectionOwner#replaceSelection(List<?
- * extends Proxy>) replaceSelection()} methods of the {@link SelectionOwner}
- * interface.</P>
+ * canSelectMore()}, {@link SelectionOwner#replaceSelection(List)
+ * replaceSelection()} methods of the {@link SelectionOwner} interface.</P>
  *
  * @author Robi Malik
  */
@@ -84,6 +83,7 @@ public class IDESelectAllAction
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent event)
   {
     final FocusTracker tracker = getFocusTracker();
@@ -102,6 +102,7 @@ public class IDESelectAllAction
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.observer.Observer
+  @Override
   public void update(final EditorChangedEvent event)
   {
     if (event.getKind() == EditorChangedEvent.Kind.SELECTION_CHANGED) {

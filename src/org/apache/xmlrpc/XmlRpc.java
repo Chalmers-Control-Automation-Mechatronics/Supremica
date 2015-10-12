@@ -61,15 +61,17 @@ import java.io.InputStream;
 import java.util.Hashtable;
 import java.util.Stack;
 import java.util.Vector;
-import org.xml.sax.AttributeList;
-import org.xml.sax.HandlerBase;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
 // ARASH:
 // import uk.co.wilson.xml.MinML;
 // ARASH:
-import javax.xml.parsers.*;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.xml.sax.AttributeList;
+import org.xml.sax.HandlerBase;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 /**
  * This abstract base class provides basic capabilities for XML-RPC,
@@ -190,7 +192,7 @@ static
 	 * <code>ISO8859_1</code>.
 	 */
 	static String encoding = XmlWriter.ISO8859_1;
-	private TypeFactory typeFactory;
+	private final TypeFactory typeFactory;
 
 	/**
 	 * Creates a new instance with the {@link
@@ -210,7 +212,7 @@ static
 	 *
 	 * @param typeFactory The implementation to use.
 	 */
-	protected XmlRpc(String typeFactory)
+	protected XmlRpc(final String typeFactory)
 	{
 		Class<?> c = null;
 
@@ -220,7 +222,7 @@ static
 			{
 				c = Class.forName(typeFactory);
 			}
-			catch (ClassNotFoundException e)
+			catch (final ClassNotFoundException e)
 			{
 				System.err.println("Error loading TypeFactory specified by " + "the " + TypeFactory.class.getName() + " property, using default instead: " + e.getMessage());
 			}
@@ -236,7 +238,7 @@ static
 	 * @param typeFactory The implementation to use.
 	 * @return The new type mapping.
 	 */
-	private TypeFactory createTypeFactory(Class<?> typeFactory)
+	private TypeFactory createTypeFactory(final Class<?> typeFactory)
 	{
 
 		// If we're using the default, serve it up immediately.
@@ -249,7 +251,7 @@ static
 		{
 			return (TypeFactory) typeFactory.newInstance();
 		}
-		catch (Exception e)
+		catch (final Exception e)
 		{
 			System.err.println("Unable to create configured TypeFactory '" + typeFactory.getName() + "': " + e.getMessage() + ": Using default");
 
@@ -269,7 +271,7 @@ static
 	 * consulted. If that is not defined the driver defaults to
 	 * OpenXML.
 	 */
-	public static void setDriver(String driver)
+	public static void setDriver(final String driver)
 		throws ClassNotFoundException
 	{
 
@@ -299,7 +301,7 @@ catch (ClassNotFoundException x)
 	/**
 	 * Set the SAX Parser to be used by directly passing the Class object.
 	 */
-	public static void setDriver(Class<?> driver)
+	public static void setDriver(final Class<?> driver)
 	{
 
 		// ARASH
@@ -311,7 +313,7 @@ catch (ClassNotFoundException x)
 	 *
 	 * @param enc The Java name of the encoding.
 	 */
-	public static void setEncoding(String enc)
+	public static void setEncoding(final String enc)
 	{
 		encoding = enc;
 	}
@@ -338,7 +340,7 @@ catch (ClassNotFoundException x)
 	/**
 	 * Sets the maximum number of threads used at any given moment.
 	 */
-	public static void setMaxThreads(int maxThreads)
+	public static void setMaxThreads(final int maxThreads)
 	{
 		XmlRpc.maxThreads = maxThreads;
 	}
@@ -346,7 +348,7 @@ catch (ClassNotFoundException x)
 	/**
 	 * Switch debugging output on/off.
 	 */
-	public static void setDebug(boolean val)
+	public static void setDebug(final boolean val)
 	{
 		debug = val;
 	}
@@ -354,7 +356,7 @@ catch (ClassNotFoundException x)
 	/**
 	 * Switch HTTP keepalive on/off.
 	 */
-	public static void setKeepAlive(boolean val)
+	public static void setKeepAlive(final boolean val)
 	{
 		keepalive = val;
 	}
@@ -371,7 +373,7 @@ catch (ClassNotFoundException x)
 	 * Parse the input stream. For each root level object, method
 	 * <code>objectParsed</code> is called.
 	 */
-	synchronized void parse(InputStream is)
+	synchronized void parse(final InputStream is)
 		throws Exception
 	{
 
@@ -392,7 +394,7 @@ catch (ClassNotFoundException x)
 		readCdata = false;
 		currentValue = null;
 
-		long now = System.currentTimeMillis();
+		final long now = System.currentTimeMillis();
 
 		// ARASH
 
@@ -428,8 +430,8 @@ catch (NoSuchMethodError nsm)
 parser.setDocumentHandler(this);
 parser.setErrorHandler(this);
 */
-		SAXParserFactory parserFactory = SAXParserFactory.newInstance();
-		SAXParser parser = parserFactory.newSAXParser();
+		final SAXParserFactory parserFactory = SAXParserFactory.newInstance();
+		final SAXParser parser = parserFactory.newSAXParser();
 
 		if (debug)
 		{
@@ -476,7 +478,8 @@ parser.setErrorHandler(this);
 	/**
 	 * Method called by SAX driver.
 	 */
-	public void characters(char ch[], int start, int length)
+	@Override
+  public void characters(final char ch[], final int start, final int length)
 		throws SAXException
 	{
 		if (readCdata)
@@ -488,7 +491,8 @@ parser.setErrorHandler(this);
 	/**
 	 * Method called by SAX driver.
 	 */
-	public void endElement(String name)
+	@Override
+  public void endElement(final String name)
 		throws SAXException
 	{
 		if (debug)
@@ -511,11 +515,11 @@ parser.setErrorHandler(this);
 			// Only handle top level objects or objects contained in
 			// arrays here.  For objects contained in structs, wait
 			// for </member> (see code below).
-			int depth = values.size();
+			final int depth = values.size();
 
 			if ((depth < 2) || (values.elementAt(depth - 2).hashCode() != STRUCT))
 			{
-				Value v = currentValue;
+				final Value v = currentValue;
 
 				values.pop();
 
@@ -542,7 +546,7 @@ parser.setErrorHandler(this);
 		// Handle objects contained in structs.
 		if ("member".equals(name))
 		{
-			Value v = currentValue;
+			final Value v = currentValue;
 
 			values.pop();
 
@@ -563,7 +567,8 @@ parser.setErrorHandler(this);
 	/**
 	 * Method called by SAX driver.
 	 */
-	public void startElement(String name, AttributeList atts)
+	@Override
+  public void startElement(final String name, final AttributeList atts)
 		throws SAXException
 	{
 		if (debug)
@@ -573,7 +578,7 @@ parser.setErrorHandler(this);
 
 		if ("value".equals(name))
 		{
-			Value v = new Value();
+			final Value v = new Value();
 
 			values.push(v);
 
@@ -654,7 +659,8 @@ parser.setErrorHandler(this);
 	 * @param e
 	 * @throws SAXException
 	 */
-	public void error(SAXParseException e)
+	@Override
+  public void error(final SAXParseException e)
 		throws SAXException
 	{
 		System.err.println("Error parsing XML: " + e);
@@ -668,7 +674,8 @@ parser.setErrorHandler(this);
 	 * @param e
 	 * @throws SAXException
 	 */
-	public void fatalError(SAXParseException e)
+	@Override
+  public void fatalError(final SAXParseException e)
 		throws SAXException
 	{
 		System.err.println("Fatal error parsing XML: " + e);
@@ -701,7 +708,7 @@ parser.setErrorHandler(this);
 		/**
 		 * Notification that a new child element has been parsed.
 		 */
-		public void endElement(Value child)
+		public void endElement(final Value child)
 		{
 			switch (type)
 			{
@@ -719,7 +726,7 @@ parser.setErrorHandler(this);
 		 * Set the type of this value. If it's a container, create the
 		 * corresponding java container.
 		 */
-		public void setType(int type)
+		public void setType(final int type)
 		{
 
 			//System.out.println ("setting type to "+types[type]);
@@ -742,7 +749,7 @@ parser.setErrorHandler(this);
 		 * Set the character data for the element and interpret it
 		 * according to the element type.
 		 */
-		public void characterData(String cdata)
+		public void characterData(final String cdata)
 		{
 			switch (type)
 			{
@@ -785,16 +792,14 @@ parser.setErrorHandler(this);
 		 * method hashCode, but it doesn't matter since Value objects
 		 * are never used as keys in Hashtables.
 		 */
-		public int hashCode()
+		@Override
+    public int hashCode()
 		{
 			return type;
 		}
 
-		/**
-		 *
-		 * @return
-		 */
-		public String toString()
+		@Override
+    public String toString()
 		{
 			return (types[type] + " element " + value);
 		}

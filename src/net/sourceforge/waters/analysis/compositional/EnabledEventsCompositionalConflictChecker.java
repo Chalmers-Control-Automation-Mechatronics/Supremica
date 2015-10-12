@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.set.hash.THashSet;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -61,6 +59,8 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
+
+import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -787,9 +787,7 @@ public class EnabledEventsCompositionalConflictChecker extends
     }
 
     /**
-     * Returns true if this automaton considers this event as always enabled
-     * @param aut
-     * @return
+     * Returns true if this automaton considers this event as always enabled.
      */
     boolean isAlwaysEnabledAutomaton(final AutomatonProxy aut)
     {

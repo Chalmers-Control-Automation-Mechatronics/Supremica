@@ -38,6 +38,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.Action;
 
 import net.sourceforge.waters.gui.ModuleContext;
+import net.sourceforge.waters.gui.simulator.AutomatonStatus;
 import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
 import net.sourceforge.waters.gui.util.IconLoader;

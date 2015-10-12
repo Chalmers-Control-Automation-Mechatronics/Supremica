@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import gnu.trove.set.hash.THashSet;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -61,6 +59,8 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
+
+import gnu.trove.set.hash.THashSet;
 
 /**
  * <P>A monolithic implementation of a control-loop checker.</P>
@@ -858,9 +858,8 @@ public class MonolithicSCCControlLoopChecker
   }
 
   /**
-   * Looks for loop events that connect to that state within its SCC
-   * @param state A state
-   * @return All events that connect all the states in the strongly connected component
+   * Looks for loop events that connect to that state within its SCC.
+   * @param state A state.
    */
   private void getLoopEvents(final EncodedStateTuple state)
   {

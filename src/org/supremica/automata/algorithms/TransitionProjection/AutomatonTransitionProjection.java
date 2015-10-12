@@ -1,15 +1,6 @@
 
 package org.supremica.automata.algorithms.TransitionProjection;
 
-import gnu.trove.iterator.TIntIterator;
-import gnu.trove.iterator.TIntObjectIterator;
-import gnu.trove.map.hash.TIntIntHashMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
-import gnu.trove.stack.TIntStack;
-import gnu.trove.stack.array.TIntArrayStack;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Stack;
@@ -23,6 +14,15 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
+
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.iterator.TIntObjectIterator;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
 
 /**
  * AutomatonTransitionProjection class to project the given EFA/DFA.
@@ -506,7 +506,7 @@ public class AutomatonTransitionProjection {
      * Method to find the observation-equivalent states for the given <B>state</B>. The set of states in the coset are connected
      * to the <B>state</B> via unobservable or local transitions. Note that by default all transitions are observable.
      * @param state An state in the automaton
-     * @param direction The direction of the breadth-first search. <CODE>true</CODE> for downstream and <CODE>false</CODE> for upstream
+     * @param downstream The direction of the breadth-first search. <CODE>true</CODE> for downstream and <CODE>false</CODE> for upstream
      * @return The set of the equivalent states or empty set if <B>state</B> is not a state in the given automaton
      */
     private TIntHashSet findEquivalentStates(final int state, final boolean downstream){
@@ -559,7 +559,7 @@ public class AutomatonTransitionProjection {
      * Method to find the coset of observation-equivalent states for the input set of <B>states</B>. The set of states in the coset are connected
      * to each state in the set <B>states</B> via unobservable transitions. Note that by default all transitions are observable.
      * @param states Set of state in the automaton
-     * @param direction The direction of the breadth-first search. <CODE>true</CODE> for downstream and <CODE>false</CODE> for upstream
+     * @param downstream The direction of the breadth-first search. <CODE>true</CODE> for downstream and <CODE>false</CODE> for upstream
      * @return The set of the equivalent states
      */
     private TIntHashSet findEquivalentStates(final TIntHashSet states, final boolean downstream){

@@ -1049,7 +1049,6 @@ public class CompositionalConflictChecker
    * abstraction step and represents the current state of the model. It may
    * contain abstractions of only part of the original model, if event
    * disjoint subsystems are found.
-   * @see #mPostponedSubsystems
    */
   private Map<AutomatonProxy,AutomatonInfo> mAutomatonInfoMap;
 
