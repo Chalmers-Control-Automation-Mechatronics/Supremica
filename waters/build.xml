@@ -86,7 +86,7 @@
     <taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
       <classpath>
         <path refid="jaxb.classpath"/>
-        <pathelement location="${jaxb-xjc.jar}"/>
+          <pathelement location="${jaxb-xjc.jar}"/>
       </classpath>
     </taskdef>
     <delete dir="${tmp}" quiet="true"/>
