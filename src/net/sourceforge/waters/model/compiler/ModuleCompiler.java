@@ -40,6 +40,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.bind.JAXBException;
+
 import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.context.CompilationInfo;
@@ -53,19 +55,114 @@ import net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.expr.MultiEvalException;
+import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
+import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
+import net.sourceforge.waters.model.module.ConstantAliasProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
+import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
+import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.xsd.base.EventKind;
+
+import org.xml.sax.SAXException;
 
 
+/**
+ * <P>The main tool to translate module structures into plain finite-state
+ * machines.</P>
+ *
+ * <P>The module compiler takes as input a {@link ModuleProxy} object,
+ * which may contain guards and instantiation, and converts it into a
+ * {@link ProductDESProxy} object, which is a collection of traditional
+ * DES automata. Compilation is a necessary first step to pass module
+ * structures to many analysis algorithms that take as input a {@link
+ * ProductDESProxy}.</P>
+ *
+ * <P>To use a module compiler, the user first creates an instance of this
+ * class, and configures it as needed. Then compilation is started
+ * using the {@link #compile()} or {@link #compile(List)} method, which
+ * returns the resultant product DES. The following code is used to
+ * compile a given <CODE>module</CODE>.</P>
+ *
+ * <P>
+ * <CODE>try {</CODE><BR>
+ * <CODE>&nbsp;&nbsp;{@link ModuleProxyFactory} modFactory =
+ *   {@link ModuleElementFactory}.{@link ModuleElementFactory#getInstance()
+ *   getInstance}();</CODE><BR>
+ * <CODE>&nbsp;&nbsp;{@link OperatorTable} optable =
+ *   {@link CompilerOperatorTable}.{@link CompilerOperatorTable#getInstance()
+ *   getInstance}();</CODE><BR>
+ * <CODE>&nbsp;&nbsp;{@link ProxyUnmarshaller}&lt;{@link ModuleProxy}&gt; unmarshaller =
+ *   new {@link JAXBModuleMarshaller#JAXBModuleMarshaller(ModuleProxyFactory,OperatorTable)
+ *   JAXBModuleMarshaller}(modFactory, optable);</CODE><BR>
+ * <CODE>&nbsp;&nbsp;{@link DocumentManager} manager =
+ *   new {@link DocumentManager#DocumentManager() DocumentManager}();</CODE><BR>
+ * <CODE>&nbsp;&nbsp;manager.{@link DocumentManager#registerUnmarshaller(ProxyUnmarshaller)
+ *   registerUnmarshaller}(unmarshaller);</CODE><BR>
+ * <CODE>&nbsp;&nbsp;{@link ProductDESProxyFactory} desFactory =
+ *   {@link ProductDESElementFactory}.{@link ProductDESElementFactory#getInstance()
+ *   getInstance}();</CODE><BR>
+ * <CODE>&nbsp;&nbsp;{@link ModuleCompiler} compiler =
+ *   new {@link ModuleCompiler#ModuleCompiler(DocumentManager, ProductDESProxyFactory,
+ *   ModuleProxy) ModuleCompiler}(manager, desFactory, module);</CODE><BR>
+ * <CODE>&nbsp;&nbsp;// </CODE>configure compiler here if needed ...<BR>
+ * <CODE>&nbsp;&nbsp;{@link ProductDESProxy} des =
+ *   compiler.{@link #compile()};</CODE><BR>
+ * <CODE>&nbsp;&nbsp;// </CODE>compilation successful, result in
+ *   <CODE>des</CODE> ...<BR>
+ * <CODE>} catch ({@link EvalException} exception) {</CODE><BR>
+ * <CODE>&nbsp;&nbsp;// </CODE>module has errors ...<BR>
+ * <CODE>} catch ({@link JAXBException} | {@link SAXException} exception) {</CODE><BR>
+ * <CODE>&nbsp;&nbsp;// </CODE>error setting up XML parsers - should not happen ...<BR>
+ * <CODE>}</CODE></P>
+ *
+ * <P><STRONG>Algorithm:</STRONG></P>
+ * <P>The input module is transformed to a product DES in the following five
+ * steps.</P>
+ * <DL>
+ * <DT>{@link ModuleInstanceCompiler}</DT>
+ * <DD>Expands parameters bindings and foreach blocks, and loads and
+ * instantiates referenced modules.</DD>
+ * <DT>{@link GroupNodeCompiler}</DT>
+ * <DD>Expands transitions linked to group nodes into separate transitions.</DD>
+ * <DT>{@link EFANormaliser}</DT>
+ * <DD>Combines and renames events from different EFSMs, ensures that each
+ * event has a unique guard/action block throughout the module. (Only used
+ * if variables and guard/action blocks are present, and normalisation
+ * semantics is enabled by the {@link #setNormalizationEnabled(boolean)}
+ * method.)</DD>
+ * <DT>{@link EFACompiler}</DT>
+ * <DD>Creates variable automata and expands guard/action blocks into
+ * separate events. (Only used if variables and guard/action blocks are
+ * present.)</DD>
+ * <DT>{@link ModuleGraphCompiler}</DT>
+ * <DD>Replaces the objects in the module hierarchy by the corresponding
+ * {@link ProductDESProxy} structure.</DD>
+ * </DL>
+ *
+ * @author Robi Malik
+ */
 public class ModuleCompiler extends AbortableCompiler
 {
-  //##########################################################################
+
+  //#########################################################################
   //# Constructor
+  /**
+   * Creates a new module compiler for the given module.
+   * @param manager  The document manager used to load additional modules
+   *                 referred to by the module being being compiled.
+   * @param factory  The factory used to create the output product DES.
+   * @param module   The module to be compiled. This module is passed by
+   *                 reference into the compiler.
+   */
   public ModuleCompiler(final DocumentManager manager,
                         final ProductDESProxyFactory factory,
                         final ModuleProxy module)
@@ -78,13 +175,30 @@ public class ModuleCompiler extends AbortableCompiler
   }
 
 
-  //##########################################################################
+  //#########################################################################
   //# Simple Access
+  /**
+   * Gets the module to be compiled by this compiler.
+   */
   public ModuleProxy getInputModule()
   {
     return mInputModule;
   }
 
+  /**
+   * Sets a new input module for the compiler. This method replaces the
+   * current input module and invalidates information from a previous
+   * compilation.
+   * @param module  The module to be compiled.
+   * @param clone   Whether the input module is passed by reference or needs
+   *                cloning. If <CODE>true</CODE>, the compiler creates a copy
+   *                of the given module in order to compile the copy, enabling
+   *                the caller to make changes to the original while the copy
+   *                is being compiler. If <CODE>false</CODE> the given module
+   *                reference is compiled directly, and it is the caller's
+   *                responsibility to ensure that it remains unchanged while
+   *                being compiled.
+   */
   public void setInputModule(final ModuleProxy module, final boolean clone)
   {
     if (clone) {
@@ -103,7 +217,7 @@ public class ModuleCompiler extends AbortableCompiler
   }
 
 
-  //##########################################################################
+  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
   public void requestAbort()
@@ -136,14 +250,44 @@ public class ModuleCompiler extends AbortableCompiler
   }
 
 
-  //##########################################################################
+  //#########################################################################
   //# Invocation
+  /**
+   * Compiles the input module using default values for all parameter
+   * bindings.
+   * @return The product DES resulting from compilation.
+   * @throws EvalException to indicate any syntactical or semantical
+   *         errors encountered during compilation.
+   *         Using the {@link #setMultiExceptionsEnabled(boolean)
+   *         setMultiExceptionsEnabled()} method, the compiler may be
+   *         configured to collect multiple error messages in a single
+   *         exception ({@link MultiEvalException}), or to stop with an
+   *         exception when the first error is encountered.
+   */
   public ProductDESProxy compile()
     throws EvalException
   {
     return compile(null);
   }
 
+  /**
+   * Compiles the input module using the given parameter bindings.
+   * @param  bindings  List of parameter bindings to supply values for
+   *                   parameters specified in the module. A module's
+   *                   event declarations ({@link EventDeclProxy}) and
+   *                   constant alias declarations ({@link ConstantAliasProxy})
+   *                   may be declared as parameters, in which case the
+   *                   bindings can be used to supply values to replace these
+   *                   parameters.
+   * @return The product DES resulting from compilation.
+   * @throws EvalException to indicate any syntactical or semantical
+   *         errors encountered during compilation.
+   *         Using the {@link #setMultiExceptionsEnabled(boolean)
+   *         setMultiExceptionsEnabled()} method, the compiler may be
+   *         configured to collect multiple error messages in a single
+   *         exception ({@link MultiEvalException}), or to stop with an
+   *         exception when the first error is encountered.
+   */
   public ProductDESProxy compile(final List<ParameterBindingProxy> bindings)
     throws EvalException
   {
@@ -175,11 +319,10 @@ public class ModuleCompiler extends AbortableCompiler
       mGroupNodeCompiler = null;
       checkAbort();
 
-      if (efa && mIsExpandingEFATransitions)
-      {
-        if (mIsNormalizationEnabled)
-        { // Perform normalisation.
-          mEFANormaliser = new EFANormaliser(modfactory, mCompilationInfo, intermediate);
+      if (efa && mIsExpandingEFATransitions) {
+        if (mIsNormalizationEnabled) { // Perform normalisation.
+          mEFANormaliser =
+            new EFANormaliser(modfactory, mCompilationInfo, intermediate);
           mEFANormaliser.setUsesEventNameBuilder(true);
           mEFANormaliser.setCreatesGuardAutomaton(true);
           mEFANormaliser.setUsesEventAlphabet(mIsUsingEventAlphabet);
@@ -189,7 +332,7 @@ public class ModuleCompiler extends AbortableCompiler
 
         // Create variable automata.
         mEFACompiler =
-                  new EFACompiler(modfactory, mCompilationInfo, intermediate);
+          new EFACompiler(modfactory, mCompilationInfo, intermediate);
         checkAbort();
         intermediate = mEFACompiler.compile();
         mEFACompiler = null;
@@ -215,13 +358,23 @@ public class ModuleCompiler extends AbortableCompiler
     }
   }
 
+  /**
+   * Gets the source information resulting from the last compilation run.
+   * @return  A map that assigns to objects in the output {@link
+   *          ProductDESProxy} a source information record containing the
+   *          object in the input {@link ModuleProxy} from which it was
+   *          created, plus information about variable bindings.
+   *          The generation of source information may be disabled by calling
+   *          the {@link #setSourceInfoEnabled(boolean) setSourceInfoEnabled()}
+   *          method, in which case this method returns <CODE>null</CODE>.
+   */
   public Map<Object,SourceInfo> getSourceInfoMap()
   {
     return mCompilationInfo.getResultMap();
   }
 
 
-  //##########################################################################
+  //#########################################################################
   //# Static Invocation
   /**
    * Creates a name for a compiled module with its parameters appended
@@ -256,85 +409,215 @@ public class ModuleCompiler extends AbortableCompiler
   }
 
 
-  //##########################################################################
+  //#########################################################################
   //# Configuration
+  /**
+   * Returns whether compiler optimisation is enabled.
+   * @see #setOptimizationEnabled(boolean)
+   */
   public boolean isOptimizationEnabled()
   {
     return mIsOptimizationEnabled;
   }
 
+  /**
+   * Enables or disabled compiler optimisation.
+   * If enabled, the compiler may perform several optimisation steps to
+   * remove selfloops and unused events or automata from the output.
+   * This option is enabled by default.
+   */
   public void setOptimizationEnabled(final boolean enable)
   {
     mIsOptimizationEnabled = enable;
   }
 
-  public boolean isNormalizationEnabled()
-  {
-    return mIsNormalizationEnabled;
-  }
-
-  public void setNormalizationEnabled(final boolean enable)
-  {
-    mIsNormalizationEnabled = enable;
-  }
-
+  /**
+   * Returns whether guard/action blocks are compiled.
+   * @see #setExpandingEFATransitions(boolean)
+   */
   public boolean isExpandingEFATransitions()
   {
     return mIsExpandingEFATransitions;
   }
 
+  /**
+   * Sets whether guard/action blocks are compiled.
+   * If enabled, the compiler will compile guards and updates by replacing
+   * them with events. If disabled, guard/action blocks will be ignored
+   * (the {@link EFACompiler} will not be called).
+   * This option is enabled by default.
+   */
   public void setExpandingEFATransitions(final boolean expanding)
   {
     mIsExpandingEFATransitions = expanding;
   }
 
+  /**
+   * Returns whether normalisation semantics is used.
+   * @see #setNormalizationEnabled(boolean)
+   */
+  public boolean isNormalizationEnabled()
+  {
+    return mIsNormalizationEnabled;
+  }
+
+  /**
+   * <P>Sets whether normalisation semantics is used.</P>
+   *
+   * <P>If enabled, the compiler implements the semantics of a <I>normalised</I>
+   * EFSM system, using a first step to ensure that each event has a unique
+   * update associated with it.
+   * With this semantics the set of variables changed by a transition is
+   * determined after synchronous composition: variables that do not appear
+   * next-state variable in a guard/action remain unchanged unless composed
+   * with a transition in another EFSM that changes it.</P>
+   *
+   * <P>If disabled, an older semantics is used, where the set of variables
+   * changed by a transition is determined from EFSM containing it. The
+   * precise rules for this are further configured using the {@link
+   * #setUsingEventAlphabet(boolean) setUsingEventAlphabet()} method.</P>
+   *
+   * <P>This option is disabled by default.</P>
+   *
+   * <P><I>Reference:</I><BR>
+   * Sahar Mohajerani, Robi Malik, Martin Fabian. A framework for
+   * compositional nonblocking verification of extended finite-state machines.
+   * Discrete Event Dynamic Systems. September 2015.
+   * DOI:&nbsp;<A HREF="http://link.springer.com/article/10.1007/s10626-015-0217-y">10.1007/s10626-015-0217-y</A></P>
+   */
+  public void setNormalizationEnabled(final boolean enable)
+  {
+    mIsNormalizationEnabled = enable;
+  }
+
+  /**
+   * Gets whether unchanged variables are determined per-event when using
+   * old EFSM semantics.
+   * @see #setUsingEventAlphabet(boolean)
+   */
   public boolean isUsingEventAlphabet()
   {
     return mIsUsingEventAlphabet;
   }
 
+  /**
+   * <P>Sets whether unchanged variables are determined per-event when using
+   * old EFSM semantics.</P>
+   *
+   * <P>With old EFSM semantics, the user has to specify explicitly that
+   * variables remains unchanged (by writing an update such as
+   * <CODE>x&nbsp;=&nbsp;x</CODE>) if they do not appear on a transition.
+   * This option controls which variables are affected by this.</P>
+   *
+   * <P>If enabled, the compiler collects for each event in a EFSM all the
+   * variables that appear as next-state variable on one of its updates. All
+   * these variables will be allowed to assume a new value when the EFSM
+   * performs a transition with the event.</P>
+   *
+   * <P>If disabled, the set of changed variables is determined on a per-EFSM
+   * basis. All variables that appear as next-state variable in an EFSM may
+   * change on every transition of that EFSM.</P>
+   *
+   * <P>This option is enabled by default.
+   * It has no effect when normalisation is enabled.</P>
+   *
+   * @see #setNormalizationEnabled(boolean)
+   */
   public void setUsingEventAlphabet(final boolean using)
   {
     mIsUsingEventAlphabet = using;
   }
 
+  /**
+   * Returns whether the compiler generates source information.
+   * @see #setSourceInfoEnabled(boolean)
+   */
   public boolean isSourceInfoEnabled()
   {
     return mIsSourceInfoEnabled;
   }
 
+  /**
+   * <P>Sets whether the compiler generates source information.</P>
+   *
+   * <P>The source information records for each object in the output {@link
+   * ProductDESProxy} the object in the input {@link ModuleProxy} from which
+   * it was created, plus any variable bindings. It is used by the IDE to
+   * display error locations, and to highlight states and transitions during
+   * simulation.</P>
+   *
+   * <P>This option is disabled by default.</P>
+   *
+   * @see #getSourceInfoMap()
+   */
   public void setSourceInfoEnabled(final boolean enable)
   {
     mIsSourceInfoEnabled = enable;
     mCompilationInfo.setSourceInfoEnabled(enable);
   }
 
+  /**
+   * Returns whether the compiler collects multiple error messages.
+   * @see #setMultiExceptionsEnabled(boolean)
+   */
   public boolean isMultiExceptionsEnabled()
   {
     return mIsMultiExceptionsEnabled;
   }
 
+  /**
+   * Sets whether the compiler collects multiple error messages.
+   * If enabled, the compiler may continue after encountering an error.
+   * All errors encountered are collected in a {@link MultiEvalException}
+   * that is thrown at the end of compilation.
+   * If disabled, the compiler stops with a single {@link EvalException}
+   * on encountering the first error.
+   * This option is disabled by default.
+   */
   public void setMultiExceptionsEnabled(final boolean enable)
   {
     mIsMultiExceptionsEnabled = enable;
     mCompilationInfo.setMultiExceptionsEnabled(enable);
   }
 
+  /**
+   * Gets the set of enabled property names.
+   * @see #setEnabledPropertyNames(Collection)
+   */
   public Collection<String> getEnabledPropertyNames()
   {
     return mEnabledPropertyNames;
   }
 
+  /**
+   * Sets the set of enabled property names.
+   * If non-null, the compiler will check all property components to be
+   * generated (automata of type {@link ComponentKind#PROPERTY}) against
+   * the names in this collection, and suppress any that are not listed.
+   * The default for this option is <CODE>null</CODE>, which means to
+   * include all properties in the output.
+   */
   public void setEnabledPropertyNames(final Collection<String> names)
   {
     mEnabledPropertyNames = names;
   }
 
+  /**
+   * Gets the set of enabled proposition names.
+   * @see #setEnabledPropositionNames(Collection)
+   */
   public Collection<String> getEnabledPropositionNames()
   {
     return mEnabledPropositionNames;
   }
 
+  /**
+   * If non-null, the compiler will check all proposition events to be
+   * generated (events of type {@link EventKind#PROPOSITION}) against
+   * the names in this collection, and suppress any that are not listed.
+   * The default for this option is <CODE>null</CODE>, which means to
+   * include all propositions in the output.
+   */
   public void setEnabledPropositionNames(final Collection<String> names)
   {
     mEnabledPropositionNames = names;
@@ -342,7 +625,7 @@ public class ModuleCompiler extends AbortableCompiler
 
   /**
    * Gets the current setting for partial compilation of HISC subsystems.
-   * @see HISCCompileMode
+   * @see #setHISCCompileMode(HISCCompileMode)
    */
   public HISCCompileMode getHISCCompileMode()
   {
@@ -351,6 +634,9 @@ public class ModuleCompiler extends AbortableCompiler
 
   /**
    * Configures the compiler for partial compilation of HISC subsystems.
+   * The default for this option is {@link HISCCompileMode#NOT_HISC},
+   * which means that all components of a module hierarchy are compiled as a
+   * standard flat discrete event system.
    * @see HISCCompileMode
    */
   public void setHISCCompileMode(final HISCCompileMode mode)
@@ -359,7 +645,7 @@ public class ModuleCompiler extends AbortableCompiler
   }
 
 
-  //##########################################################################
+  //#########################################################################
   //# Auxiliary Methods
   private void tearDown()
   {
@@ -385,7 +671,7 @@ public class ModuleCompiler extends AbortableCompiler
   }
 
 
-  //##########################################################################
+  //#########################################################################
   //# Data Members
   private final DocumentManager mDocumentManager;
   private final ProductDESProxyFactory mFactory;
@@ -401,8 +687,8 @@ public class ModuleCompiler extends AbortableCompiler
   private ModuleGraphCompiler mGraphCompiler;
 
   private boolean mIsOptimizationEnabled = true;
-  private boolean mIsNormalizationEnabled = false;
   private boolean mIsExpandingEFATransitions = true;
+  private boolean mIsNormalizationEnabled = false;
   private boolean mIsUsingEventAlphabet = true;
   private boolean mIsSourceInfoEnabled = false;
   private boolean mIsMultiExceptionsEnabled = false;
