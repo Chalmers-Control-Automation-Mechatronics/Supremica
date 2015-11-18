@@ -33,11 +33,24 @@
 
 package net.sourceforge.waters.analysis.hisc;
 
+import net.sourceforge.waters.model.compiler.ModuleCompiler;
+
 /**
- * An enumeration to store different compiler settings to compile a
- * module hierarchy while supporting HISC.
+ * <P>An enumeration to store different compiler settings to compile a
+ * module hierarchy while supporting HISC.</P>
  *
- * @see net.sourceforge.waters.model.compiler.ModuleCompiler ModuleCompiler
+ * <P>Hierarchical Interface-Based Supervisory Control (HISC) structures a
+ * system into a hierarchy of components interacting via dedicated interface
+ * automata. This structure is emulated in Waters by the module hierarchy.
+ * With the HISC compile mode, the {@link ModuleCompiler} can be instructed
+ * to compile only a part of a module hierarchy, replacing other modules
+ * by their interfaces.</P>
+ *
+ * <P><I>Reference:</I><BR>
+ * Ryan J. Leduc, Bertil A. Brandin, Mark Lawford, and W. M. Wonham.
+ * Hierarchical Interface-Based Supervisory Control - Part&nbsp;I:
+ * Serial Case. IEEE Transitions on Automatic Control,
+ * <STRONG>50</STRONG>&nbsp;(9), September 2005, 1322-1335.</P>
  *
  * @author Robi Malik
  */

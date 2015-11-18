@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/waters/src/net/sourceforge/waters/gui/renderer/EPSGenerator.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.ui.favoriteGroups">
+<listEntry value="org.eclipse.debug.ui.launchGroup.debug"/>
+<listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
+</listAttribute>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="net.sourceforge.waters.gui.renderer.EPSGenerator"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-p /Scratch/svn/waikato/trunk/tac2014_extension/Models/TAC_Extension.supremica -o /Scratch/svn/waikato/trunk/tac2014_extension/Models/IMG /Scratch/svn/waikato/trunk/tac2014_extension/Models/Models/TAC_Extension.wmod"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="waters"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx512m&#13;&#10;-ea"/>
+</launchConfiguration>

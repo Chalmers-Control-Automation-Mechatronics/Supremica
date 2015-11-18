@@ -46,6 +46,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import javax.xml.bind.JAXBException;
+
 import net.sourceforge.waters.analysis.hisc.HISCAttributeFactory;
 import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
 import net.sourceforge.waters.model.analysis.Abortable;
@@ -55,6 +57,7 @@ import net.sourceforge.waters.model.base.ProxyAccessorSet;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.EvalAbortException;
+import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
@@ -64,11 +67,15 @@ import net.sourceforge.waters.model.compiler.context.SingleBindingContext;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.compiler.context.SourceInfoCloner;
 import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.MultiEvalException;
+import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.expr.TypeMismatchException;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
@@ -102,23 +109,27 @@ import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
+import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
 
+import org.xml.sax.SAXException;
+
 
 /**
- * The first pass of the compiler.
- * <P>
- * This compiler accepts a module ({@link ModuleProxy}) as input and
- * produces another module as output. It expands all aliases, foreach
+ * <P>A compiler tool to expand bindings, foreach blocks, and instantiations
+ * in a module.</P>
+ *
+ * <P>The instance compiler accepts a module ({@link ModuleProxy}) as input
+ * and produces another module as output. It expands all aliases, foreach
  * constructs, and instantiations. Event arrays as well as component and
  * variable arrays are enumerated explicitly. Variable components are
- * preserved in the output, but all guards and actions are simplified by
- * substituting values obtained from aliasing or instantiation.
- * <P>
- * It is ensured that the resultant module only contains
- * objects of the following types:
+ * preserved in the output, with all guards and actions simplified by
+ * substituting values obtained from aliasing or instantiation.</P>
+ *
+ * <P>It is ensured that the resultant module only contains
+ * objects of the following types:</P>
  * <UL>
  * <LI>{@link EventDeclProxy}, where only simple events are defined,
  *     i.e., the list of ranges is guaranteed to be empty;</LI>
@@ -126,14 +137,82 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
  * <LI>{@link VariableComponentProxy}.</LI>
  * </UL>
  *
+ * <P>The instance compiler is used as the first stage of the {@link
+ * ModuleCompiler} to translate a {@link ModuleProxy} into a {@link
+ * ProductDESProxy}, but it can also be used as a stand-alone component
+ * to remove foreach blocks and instantiation from a module. To do so,
+ * the user first creates an instance of this class and configures it as
+ * needed. Then compilation is started using the {@link #compile()} or
+ * {@link #compile(List)} method, which returns the instantiated module.
+ * The following code can be used to instantiate a given <CODE>module</CODE>.</P>
+ *
+ * <P>
+ * <CODE>try {</CODE><BR>
+ * <CODE>&nbsp;&nbsp;{@link ModuleProxyFactory} factory =
+ *   {@link ModuleElementFactory}.{@link ModuleElementFactory#getInstance()
+ *   getInstance}();</CODE><BR>
+ * <CODE>&nbsp;&nbsp;{@link OperatorTable} optable =
+ *   {@link CompilerOperatorTable}.{@link CompilerOperatorTable#getInstance()
+ *   getInstance}();</CODE><BR>
+ * <CODE>&nbsp;&nbsp;{@link ProxyUnmarshaller}&lt;{@link ModuleProxy}&gt; unmarshaller =
+ *   new {@link JAXBModuleMarshaller#JAXBModuleMarshaller(ModuleProxyFactory,OperatorTable)
+ *   JAXBModuleMarshaller}(factory, optable);</CODE><BR>
+ * <CODE>&nbsp;&nbsp;{@link DocumentManager} manager =
+ *   new {@link DocumentManager#DocumentManager() DocumentManager}();</CODE><BR>
+ * <CODE>&nbsp;&nbsp;manager.{@link DocumentManager#registerUnmarshaller(ProxyUnmarshaller)
+ *   registerUnmarshaller}(unmarshaller);</CODE><BR>
+ * <CODE>&nbsp;&nbsp;{@link ModuleInstanceCompiler} compiler =
+ *   new {@link ModuleInstanceCompiler#ModuleInstanceCompiler(DocumentManager,
+ *   ModuleProxyFactory, ModuleProxy) ModuleInstanceCompiler}(manager, factory,
+ *   module);</CODE><BR>
+ * <CODE>&nbsp;&nbsp;// </CODE>configure compiler here if needed ...<BR>
+ * <CODE>&nbsp;&nbsp;{@link ModuleProxy} instantiatedModule =
+ *   compiler.{@link #compile()};</CODE><BR>
+ * <CODE>&nbsp;&nbsp;// </CODE>instantiation successful, result in
+ *   <CODE>instantiatedModule</CODE> ...<BR>
+ * <CODE>} catch ({@link EvalException} exception) {</CODE><BR>
+ * <CODE>&nbsp;&nbsp;// </CODE>module has errors ...<BR>
+ * <CODE>} catch ({@link JAXBException} | {@link SAXException} exception) {</CODE><BR>
+ * <CODE>&nbsp;&nbsp;// </CODE>error setting up XML parsers - should not happen ...<BR>
+ * <CODE>}</CODE></P>
+ *
  * @author Robi Malik, Roger Su
  */
 
 public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
                                     implements Abortable
 {
+
   //#########################################################################
   //# Constructor
+  /**
+   * Creates a new module instance compiler for the given module.
+   * @param manager  The document manager used to load additional modules
+   *                 referred to by the module being being compiled.
+   * @param factory  The factory used to create the output module.
+   * @param module   The module to be compiled. This module is passed by
+   *                 reference into the compiler.
+   */
+  public ModuleInstanceCompiler(final DocumentManager manager,
+                                final ModuleProxyFactory factory,
+                                final ModuleProxy module)
+  {
+    this(manager, factory, new CompilationInfo(), module);
+  }
+
+  /**
+   * Creates a new module instance compiler for the given module.
+   * @param manager  The document manager used to load additional modules
+   *                 referred to by the module being being compiled.
+   * @param factory  The factory used to create the output module.
+   * @param compilationInfo  Information structure used to track error
+   *                 locations and to record how components in the output
+   *                 module are linked to the input module. This is passed
+   *                 in by the {@link ModuleCompiler} to track associations
+   *                 across several stages of compilations.
+   * @param module   The module to be compiled. This module is passed by
+   *                 reference into the compiler.
+   */
   public ModuleInstanceCompiler(final DocumentManager manager,
                                 final ModuleProxyFactory factory,
                                 final CompilationInfo compilationInfo,
@@ -179,11 +258,36 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
 
   //#########################################################################
   //# Invocation
+  /**
+   * Instantiates the input module using default values for all parameter
+   * bindings.
+   * @return The instantiated module.
+   * @throws EvalException to indicate any syntactical or semantical
+   *         errors encountered during compilation.
+   */
+  public ModuleProxy compile()
+    throws EvalException
+  {
+    return compile(null);
+  }
+
+  /**
+   * Instantiates the input module using the given parameter bindings.
+   * @param  bindings  List of parameter bindings to supply values for
+   *                   parameters specified in the module. A module's
+   *                   event declarations ({@link EventDeclProxy}) and
+   *                   constant alias declarations ({@link ConstantAliasProxy})
+   *                   may be declared as parameters, in which case the
+   *                   bindings can be used to supply values to replace these
+   *                   parameters.
+   * @return The instantiated module.
+   * @throws EvalException to indicate any syntactical or semantical
+   *         errors encountered during compilation.
+   */
   public ModuleProxy compile(final List<ParameterBindingProxy> bindings)
     throws EvalException
   {
-    try
-    {
+    try {
       mHasEFAElements = false;
       mContext = new ModuleBindingContext(mInputModule);
       mNameSpace = new CompiledNameSpace();
@@ -197,20 +301,16 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       final String name = mInputModule.getName();
       final String comment = mInputModule.getComment();
       return mFactory.createModuleProxy(name, comment, null, null,
-                                  mCompiledEvents, null, mCompiledComponents);
-    }
-
-    catch (final VisitorException exception)
-    {
+                                        mCompiledEvents, null,
+                                        mCompiledComponents);
+    } catch (final VisitorException exception) {
       final Throwable cause = exception.getCause();
-      if (cause instanceof EvalException)
+      if (cause instanceof EvalException) {
         throw (EvalException) cause;
-      else
+      } else {
         throw exception.getRuntimeException();
-    }
-
-    finally
-    {
+      }
+    } finally {
       mContext = null;
       mNameSpace = null;
       mCompiledEvents = null;
@@ -219,6 +319,10 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     }
   }
 
+  /**
+   * Returns whether the last instantiation run has found any variables or
+   * guard/action blocks in the input module.
+   */
   public boolean getHasEFAElements()
   {
     return mHasEFAElements;
@@ -227,41 +331,85 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
 
   //##########################################################################
   //# Configuration
+  /**
+   * Returns whether compiler optimisation is enabled.
+   * @see #setOptimizationEnabled(boolean)
+   */
   public boolean isOptimizationEnabled()
   {
     return mIsOptimizationEnabled;
   }
 
+  /**
+   * Enables or disabled compiler optimisation.
+   * If enabled, the compiler may perform several optimisation steps to
+   * remove selfloops and unused events or automata from the output.
+   * This option is enabled by default.
+   */
   public void setOptimizationEnabled(final boolean enable)
   {
     mIsOptimizationEnabled = enable;
   }
 
+  /**
+   * Gets the set of enabled property names.
+   * @see #setEnabledPropertyNames(Collection)
+   */
   public Collection<String> getEnabledPropertyNames()
   {
     return mEnabledPropertyNames;
   }
 
+  /**
+   * Sets the set of enabled property names.
+   * If non-null, the compiler will check all property components to be
+   * generated (automata of type {@link ComponentKind#PROPERTY}) against
+   * the names in this collection, and suppress any that are not listed.
+   * The default for this option is <CODE>null</CODE>, which means to
+   * include all properties in the output.
+   */
   public void setEnabledPropertyNames(final Collection<String> names)
   {
     mEnabledPropertyNames = names;
   }
 
+  /**
+   * Gets the set of enabled proposition names.
+   * @see #setEnabledPropositionNames(Collection)
+   */
   public Collection<String> getEnabledPropositionNames()
   {
     return mEnabledPropositionNames;
   }
 
+  /**
+   * If non-null, the compiler will check all proposition events to be
+   * generated (events of type {@link EventKind#PROPOSITION}) against
+   * the names in this collection, and suppress any that are not listed.
+   * The default for this option is <CODE>null</CODE>, which means to
+   * include all propositions in the output.
+   */
   public void setEnabledPropositionNames(final Collection<String> names)
   {
     mEnabledPropositionNames = names;
   }
 
+  /**
+   * Gets the current setting for partial compilation of HISC subsystems.
+   * @see #setHISCCompileMode(HISCCompileMode)
+   */
   public HISCCompileMode getHISCCompileMode()
   {
     return mHISCCompileMode;
   }
 
+  /**
+   * Configures the compiler for partial compilation of HISC subsystems.
+   * The default for this option is {@link HISCCompileMode#NOT_HISC},
+   * which means that all components of a module hierarchy are compiled as a
+   * standard flat discrete event system.
+   * @see HISCCompileMode
+   */
   public void setHISCCompileMode(final HISCCompileMode mode)
   {
     mHISCCompileMode = mode;
