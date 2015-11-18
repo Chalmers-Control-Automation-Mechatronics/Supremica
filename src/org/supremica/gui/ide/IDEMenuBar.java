@@ -86,6 +86,7 @@ import net.sourceforge.waters.gui.actions.InsertInstanceAction;
 import net.sourceforge.waters.gui.actions.InsertParameterBindingAction;
 import net.sourceforge.waters.gui.actions.InsertSimpleComponentAction;
 import net.sourceforge.waters.gui.actions.InsertVariableAction;
+import net.sourceforge.waters.gui.actions.InstantiateModuleAction;
 import net.sourceforge.waters.gui.actions.RecompileAction;
 import net.sourceforge.waters.gui.actions.ShowGraphAction;
 import net.sourceforge.waters.gui.actions.ShowModuleCommentAction;
@@ -334,6 +335,9 @@ public class IDEMenuBar extends JMenuBar
       // Embedder should probably go to 'Tools' menu?
       final Action layout = actions.getAction(GraphLayoutAction.class);
       mEditMenu.add(layout);
+      final Action instantiation =
+        actions.getAction(InstantiateModuleAction.class);
+      mEditMenu.add(instantiation);
     }
 
     final Component panel = getActivePanel();

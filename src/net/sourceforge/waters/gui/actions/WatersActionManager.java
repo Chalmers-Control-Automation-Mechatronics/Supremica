@@ -103,6 +103,7 @@ public abstract class WatersActionManager implements Observer
     addAction(new InsertVariableAction(ide));
     addAction(new RecompileAction(ide));
     addAction(new ShowGraphAction(ide));
+    addAction(new InstantiateModuleAction(ide));
     addAction(new ShowModuleCommentAction(ide));
     addAction(new SimulationBackToStartAction(ide));
     addAction(new SimulationCascadeAction(ide));
