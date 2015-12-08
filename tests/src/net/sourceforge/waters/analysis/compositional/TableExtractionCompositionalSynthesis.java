@@ -69,18 +69,55 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
   //# Main
   public static void main(final String[] args)
   {
+    if (args.length == 0) {
+      usage();
+    }
+    int index = 0;
+    int verbosity = VERBOSITY_NORMAL;
+    final String arg0 = args[0];
+    if (arg0.startsWith("-")) {
+      if (arg0.equals("-brief")) {
+        verbosity = VERBOSITY_BRIEF;
+      } else if (arg0.equals("-normal")) {
+        verbosity = VERBOSITY_NORMAL;
+      } else {
+        usage();
+      }
+      index++;
+    }
+    if (args.length == index) {
+      usage();
+    }
+    final File overviewFile = new File(args[index++]);
+    File chartFile = null;
+    if (index < args.length) {
+      chartFile = new File(args[index++]);
+    }
+    File compareFile = null;
+    if (index < args.length) {
+      compareFile = new File(args[index++]);
+    }
+    if (index < args.length) {
+      usage();
+    }
     final TableExtractionCompositionalSynthesis extractor =
-      new TableExtractionCompositionalSynthesis();
-    final File heuristicFile = new File(args[0]);
-    final File compareFile = new File(args[1]);
-    final File chartFile = new File(args[2]);
-    extractor.extract(heuristicFile, compareFile, chartFile);
+      new TableExtractionCompositionalSynthesis(verbosity);
+    extractor.extract(overviewFile, chartFile, compareFile);
+  }
+
+  private static void usage()
+  {
+    System.err.println("USAGE: java " +
+                       ProxyTools.getShortClassName
+                         (TableExtractionCompositionalSynthesis.class) +
+                       " [-brief|-normal]" +
+                       " <overview-file> [<chart-file>] [<compare-file>]");
   }
 
 
   //#########################################################################
   //# Constructor
-  private TableExtractionCompositionalSynthesis()
+  private TableExtractionCompositionalSynthesis(final int verbosity)
   {
     final Map<String, Result> automataMap = new TreeMap<String, Result>();
     mResults.add(automataMap);
@@ -104,10 +141,14 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
     createModelInfo("6linki", "6linki", false,true,"2.7 \\cdot 10^{14}");
     createModelInfo("6linkp", "6linkp", false,true,"4.2 \\cdot 10^{14}");
     createModelInfo("6linkre", "6linkre", false,true,"6.2 \\cdot 10^{14}");
+    mVerbosity = verbosity;
   }
 
-  private void createModelInfo(final String fullName, final String shortName,
-            final boolean nonblocking, final boolean controllable,  final String size)
+  private void createModelInfo(final String fullName,
+                               final String shortName,
+                               final boolean nonblocking,
+                               final boolean controllable,
+                               final String size)
   {
     final ModelInfo info = new ModelInfo(fullName, shortName, controllable, nonblocking, size);
     mModelInfoMap.put(fullName, info);
@@ -116,7 +157,9 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
 
   //#########################################################################
   //# Table Extraction
-  private void extract(final File heuristicFile, final File compareFile, final File chartFile)
+  private void extract(final File overviewFile,
+                       final File chartFile,
+                       final File compareFile)
   {
     try {
       final ProductDESProxyFactory factory =
@@ -163,7 +206,7 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
           }
         }
       }
-      printHeuristicTable(heuristicFile);
+      printOverviewTable(overviewFile);
       for (final Map<String, Result> map: mResults) {
         map.clear();
       }
@@ -173,8 +216,12 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
                     compareSelectingMethod, mapIndex, config);
         mapIndex++;
       }
-      printChart(chartFile);
-      printStateComparisonTable(compareFile);
+      if (chartFile != null) {
+        printChart(chartFile);
+      }
+      if (compareFile != null) {
+        printStateComparisonTable(compareFile);
+      }
     } catch (final Throwable exception) {
       System.err.println("FATAL ERROR");
       exception.printStackTrace(System.err);
@@ -198,7 +245,10 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
     readCsvFile(csvFile, mapIndex, heuristics);
   }
 
-  private void readCsvFile(final File fileName, final int mapIndex, final String heuristics) throws IOException
+  private void readCsvFile(final File fileName,
+                           final int mapIndex,
+                           final String heuristics)
+    throws IOException
   {
     if (fileName.exists()) {
       final int nameColumn = 0;
@@ -207,6 +257,7 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
       int totalStatesColumn = 0;
       int memColumn = 0;
       int resultColumn = 0;
+      final Map<String,Result> map = mResults.get(mapIndex);
       final BufferedReader br = new BufferedReader(new FileReader(fileName));
       for (String line = br.readLine(); line != null; line = br.readLine()) {
         final String sep = line.indexOf(',') >= 0 ? "," : ";";
@@ -233,11 +284,10 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
               final int totTrans = Integer.parseInt(words[totalTrColumn]);
               final int totStates = Integer.parseInt(words[totalStatesColumn]);
               final int supMem = Integer.parseInt(words[memColumn]);
-              final Map<String,Result> map = mResults.get(mapIndex);
               final Result oldResult = map.get(name);
               if (oldResult == null || oldResult.getMemory() > supMem) {
-                final Result newResult =new Result(name, time, totStates,
-                                                   totTrans, supMem, heuristics);
+                final Result newResult = new Result(name, time, totStates,
+                                                    totTrans, supMem, heuristics);
                 map.put(name, newResult);
               }
             }
@@ -245,37 +295,48 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
         }
       }
       br.close();
+    } else {
+      System.err.println(fileName + " not found.");
     }
   }
 
-  private void printHeuristicTable(final File outputFile) throws IOException
+  private void printOverviewTable(final File outputFile) throws IOException
   {
     final OutputStream stream = new FileOutputStream(outputFile);
     final PrintWriter writer = new PrintWriter(stream);
     for (final Map.Entry<String,ModelInfo> entry : mModelInfoMap.entrySet()) {
       final String name = entry.getKey();
       final ModelInfo info = entry.getValue();
-      String text = info.getTableText();
-      System.out.print(text);
+      String text = info.getTableText(mVerbosity);
       writer.print(text);
-      for (int mapIndex = 0; mapIndex <mResults.size(); mapIndex++) {
+      for (int mapIndex = 0; mapIndex < mResults.size(); mapIndex++) {
         final Map<String, Result> map = mResults.get(mapIndex);
         final Result result = map.get(name);
         if (result == null) {
-          writer.print(" & & &");
-          System.out.print(" & & &" );
+          if (mVerbosity >= VERBOSITY_NORMAL) {
+            writer.print(" & & &");
+          } else {
+            writer.print(" & &");
+          }
         } else {
+          writer.print(" & ");
           final double time = result.getTime();
-          final int memory = result.getMemory();
-          final String heuristics = result.getHeuristics();
-          text = " & " + String.format((Locale) null, "%.2f\\,s", time)
-            + " & " + memory  + " & " + heuristics;
-          System.out.print(text);
+          text = String.format((Locale) null, "%.2f\\,s", time);
           writer.print(text);
+          writer.print(" & ");
+          final int memory = result.getMemory();
+          writer.print(memory);
+          writer.print(" & ");
+          if (mVerbosity >= VERBOSITY_NORMAL) {
+            final String heuristics = result.getHeuristics();
+            writer.print(heuristics);
+          } else {
+            final int trans = result.getTotalTransitions();
+            writer.print(trans);
+          }
         }
       }
       writer.println(" \\\\");
-      System.out.println(" \\\\");
     }
     writer.close();
   }
@@ -288,31 +349,26 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
     for (final Map.Entry<String,ModelInfo> entry : mModelInfoMap.entrySet()) {
       final String name = entry.getKey();
       final ModelInfo info = entry.getValue();
-      String text = info.getTableText();
-      System.out.print(text);
+      String text = info.getTableText(VERBOSITY_NORMAL);
       writer.print(text);
       for (int mapIndex = 0; mapIndex <mResults.size(); mapIndex++) {
         final Map<String, Result> map = mResults.get(mapIndex);
         final Result result = map.get(name);
         if (result == null) {
           writer.print(" & & & &");
-          System.out.print(" & & & &" );
         } else {
           final int totStates = result.getTotalStates();
-          final int totTrans = result.getTotalTransition();
+          final int totTrans = result.getTotalTransitions();
           final double time = result.getTime();
           final int memory = result.getMemory();
           text = " & " + totStates + " & " + totTrans + " & " +
                  String.format((Locale) null, "%.2f\\,s", time) + " & " +
                  memory;
-          System.out.print(text);
           writer.print(text);
         }
       }
       writer.println(" \\\\");
-      System.out.println(" \\\\");
     }
-
     writer.close();
   }
 
@@ -329,7 +385,7 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
         final Map<String, Result> map = mResults.get(mapIndex);
         final Result result = map.get(name);
         if (result != null) {
-          final int totTrans = result.getTotalTransition();
+          final int totTrans = result.getTotalTransitions();
           if (totTrans > maxTransition) {
             maxTransition = totTrans;
           }
@@ -349,7 +405,7 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
           final String pos = mapIndex == 0 ? "lb" : "rb";
           writer.format("\\rput[%s]{90}(%.2f,7){\\tiny Out of memory}", pos, x);
         } else {
-          final int totTrans = result.getTotalTransition();
+          final int totTrans = result.getTotalTransitions();
           final double barHeight = (double)totTrans/ maxTransition * BAR_HEIGHT;
           final double x1 = barStartX;
           final double x2 = x1 + BAR_WIDTH;
@@ -438,9 +494,11 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
   {
     //#######################################################################
     //# Constructor
-    ModelInfo(final String fullName, final String shortName,
+    ModelInfo(final String fullName,
+              final String shortName,
               final boolean controllable,
-              final boolean nonblocking, final String size)
+              final boolean nonblocking,
+              final String size)
     {
       mFullName = fullName;
       mShortName = shortName;
@@ -451,11 +509,20 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
 
     //#######################################################################
     //# Simple Access
-    private String getTableText()
+    private String getTableText(final int verbosity)
     {
-      return mShortName + " & " + mControllable + " & " + mNonblocking +
-             " & " + mSize;
+      final StringBuilder builder = new StringBuilder(mShortName);
+      if (verbosity >= VERBOSITY_NORMAL) {
+        builder.append(" & ");
+        builder.append(mControllable);
+        builder.append(" & ");
+        builder.append(mNonblocking);
+      }
+      builder.append(" & ");
+      builder.append(mSize);
+      return builder.toString();
     }
+
     private String getShortName()
     {
       return mShortName;
@@ -496,7 +563,7 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
       return mTime;
     }
 
-    public int getTotalTransition()
+    public int getTotalTransitions()
     {
       return mTotTrans;
     }
@@ -535,6 +602,16 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
     @Override
     public int compare(final String s1, final String s2)
     {
+      if (s1.length() == 0) {
+        return s2.length() == 0 ? 0 : -1;
+      } else if (s2.length() == 0) {
+        return 1;
+      }
+      final boolean digit1 = Character.isDigit(s1.charAt(0));
+      final boolean digit2 = Character.isDigit(s2.charAt(0));
+      if (digit1 != digit2) {
+        return digit1 ? 1 : -1;
+      }
       return s1.compareToIgnoreCase(s2);
     }
   }
@@ -546,10 +623,15 @@ public class TableExtractionCompositionalSynthesis extends AbstractAnalysisTest
     new TreeMap<String, ModelInfo>(new LowerCaseComparator());
   private final List<Map<String,Result>> mResults =
     new ArrayList<Map<String,Result>>(2);
+  private final int mVerbosity;
+
   private static final int GROUP_WIDTH = 42;
   private static final int BAR_WIDTH = 16;
   private static final double OFFSET_IN_GROUP = 0.5*GROUP_WIDTH - BAR_WIDTH;
   private static final int BAR_HEIGHT = 300;
   private static final String[] BAR_COLOUR = {"fillstyle=solid,fillcolor=lightgray",
                                               "fillstyle=solid,fillcolor=gray"};
+
+  private static final int VERBOSITY_BRIEF = 0;
+  private static final int VERBOSITY_NORMAL = 1;
 }
