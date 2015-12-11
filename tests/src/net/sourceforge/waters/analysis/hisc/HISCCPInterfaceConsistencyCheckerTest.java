@@ -36,9 +36,6 @@ package net.sourceforge.waters.analysis.hisc;
 import java.util.Collections;
 import java.util.List;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierTest;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
@@ -46,6 +43,9 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 
 /**
@@ -405,6 +405,20 @@ public class HISCCPInterfaceConsistencyCheckerTest
   }
 
 
+  // AIP
+  public void testHISCCP_aip1sub1ld()
+  throws Exception
+  {
+    runModelVerifier("tests", "hisc", "aip1sub1ld.wmod", false);
+  }
+
+  public void testHISCCP_aip1sub1ld_failsic5()
+  throws Exception
+  {
+    runModelVerifier("tests", "hisc", "aip1sub1ld_failsic5.wmod", false);
+  }
+
+
   // song_aip
   public void testHISCCP_aip3syn_as1() throws Exception
   {
@@ -474,20 +488,6 @@ public class HISCCPInterfaceConsistencyCheckerTest
   throws Exception
   {
     runModelVerifier("despot", "tbed_hisc", "switch8sup.wmod", true);
-  }
-
-  // rhone_subsystem1
-  public void testHISCCP_rhone_subsystem1_ld()
-  throws Exception
-  {
-    runModelVerifier("tests", "hisc", "rhone_subsystem1_ld.wmod", false);
-  }
-
-  public void testHISCCP_rhone_subsystem1_ld_failsic5()
-  throws Exception
-  {
-    runModelVerifier("tests", "hisc",
-                     "rhone_subsystem1_ld_failsic5.wmod", false);
   }
 
 }

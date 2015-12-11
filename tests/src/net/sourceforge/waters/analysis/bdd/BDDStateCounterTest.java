@@ -37,9 +37,6 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
@@ -47,6 +44,9 @@ import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 
 public class BDDStateCounterTest
@@ -112,7 +112,7 @@ public class BDDStateCounterTest
   {
     final String group = "tests";
     final String dir = "hisc";
-    final String name = "rhone_subsystem1_patch0.wmod";
+    final String name = "aip0sub1p0.wmod";
     countStates(group, dir, name);
   }
 
@@ -120,7 +120,7 @@ public class BDDStateCounterTest
   {
     final String group = "tests";
     final String dir = "hisc";
-    final String name = "rhone_subsystem1_patch1.wmod";
+    final String name = "aip0sub1p1.wmod";
     countStates(group, dir, name);
   }
 
@@ -128,7 +128,7 @@ public class BDDStateCounterTest
   {
     final String group = "tests";
     final String dir = "hisc";
-    final String name = "rhone_subsystem1_patch2.wmod";
+    final String name = "aip0sub1p2.wmod";
     countStates(group, dir, name);
   }
 

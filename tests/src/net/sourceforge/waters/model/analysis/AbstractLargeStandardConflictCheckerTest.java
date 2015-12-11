@@ -89,7 +89,7 @@ public abstract class AbstractLargeStandardConflictCheckerTest extends
   {
     final String group = "tests";
     final String dir = "incremental_suite";
-    final String name = "rhone_alps.wmod";
+    final String name = "aip0alps.wmod";
     runModelVerifier(group, dir, name, false);
   }
 
@@ -97,7 +97,7 @@ public abstract class AbstractLargeStandardConflictCheckerTest extends
   {
     final String group = "tests";
     final String dir = "incremental_suite";
-    final String name = "rhone_tough.wmod";
+    final String name = "aip0tough.wmod";
     runModelVerifier(group, dir, name, false); // not sure about result ...
   }
 
@@ -159,6 +159,7 @@ public abstract class AbstractLargeStandardConflictCheckerTest extends
 
   // #########################################################################
   // # Test Cases --- profisafe
+  @Override
   public void testProfisafeI3HostEFA() throws Exception
   {
     final String group = "tests";

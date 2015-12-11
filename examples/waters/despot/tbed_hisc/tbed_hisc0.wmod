@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="tbed_hisc0" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>HISC version of Ryan Leduc's train testbed system. This model was is a re-implementation of the original model [1] developed in 2011 using Hierarchical Interface-Based Supervisory Control (HISC). This is the original model with supervisors. It is controllable and nonblocking. It has 5991593916308 reachable states and a diameter of 561.
-A synthesis version of this model is obtained by omotting the supervisors in the switch modules. It has 
+<Module Name="tbed_hisc0" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
+    <ns2:Comment>HISC version of Ryan Leduc's train testbed system. This model is a re-implementation of the original model [1] developed in 2011 using Hierarchical Interface-Based Supervisory Control (HISC). This is the original model with supervisors. It is controllable and nonblocking. It has 5991593916308 reachable states and a diameter of 561.
+A synthesis version of this model is obtained by omitting the supervisors in the switch modules. It has 
 287257200875274240 reachable states.
 
 Reference:

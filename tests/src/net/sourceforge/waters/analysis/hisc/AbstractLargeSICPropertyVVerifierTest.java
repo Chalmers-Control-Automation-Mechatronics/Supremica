@@ -43,13 +43,13 @@ public abstract class AbstractLargeSICPropertyVVerifierTest extends
   public void testSICPropertyVVerifier_rhone_subsystem1_ld_failsic5()
       throws Exception
   {
-    runModelVerifier("tests", "hisc", "rhone_subsystem1_ld_failsic5.wmod",
+    runModelVerifier("tests", "hisc", "aip1sub1ld_failsic5.wmod",
                      false);
   }
 
   public void testSICPropertyVVerifier_rhone_subsystem1_ld() throws Exception
   {
-    runModelVerifier("tests", "hisc", "rhone_subsystem1_ld.wmod", true);
+    runModelVerifier("tests", "hisc", "aip1sub1ld.wmod", true);
   }
 
   public void testSICPropertyVVerifier_maip3_syn_as1() throws Exception

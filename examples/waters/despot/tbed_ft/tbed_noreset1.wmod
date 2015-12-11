@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="tbed_reset" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="tbed_noreset1" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <ns2:Comment>Fault-tolent train testbed.
 Received and imported from DESpot 2014-06-05.
+
 All fault definitions are from the paper of Simon Radel, Aos Mulahuwaish and Ryan Leduc, Fault Tolerant Controllability, manuscript, 2014.
 
-TestbedFlat_resetable.desp has 16 resetable fault tolerant plants. 
-Each plant is for the same fault classes as given below and will be used to verify controllalbility and nonblocking if the faults in the model can be reset.
+TestbedFlat_non_repeatable.desp has 16 non-repeatable fault tolerant plants, one for each of the classes given below, for each train these classes are seperate.
+These are used to check if the model is controllable and nonblocking for a non-repeatable tolerant system.
 
 Fault classes are:
 sensor 0,1,2,4
@@ -18,7 +19,7 @@ sensor 23,24
 sensor 25,26
 
 The model is controllable and nonblocking.
-It has 664128 reachable states and the diameter is 496.</ns2:Comment>
+It has 14637946752 reachable states and the diameter is 622.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Scope="OPTIONAL_PARAMETER" Name=":accepting"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="cplL_3"/>
@@ -7707,6 +7708,9 @@ It has 664128 reachable states and the diameter is 496.</ns2:Comment>
                     <SimpleIdentifier Name="cplTurnf_6"/>
                     <SimpleIdentifier Name="cplTurnf_5"/>
                     <SimpleIdentifier Name="cplTurnf_7"/>
+                    <LabelGeometry Anchor="NW">
+                        <Point X="24" Y="36"/>
+                    </LabelGeometry>
                 </LabelBlock>
                 <NodeList>
                     <SimpleNode Initial="true" Name="0">
@@ -18030,7 +18034,7 @@ It has 664128 reachable states and the diameter is 496.</ns2:Comment>
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="Plant_resetable_t1_cl1">
+        <SimpleComponent Kind="PLANT" Name="Plant_non_repeatable_t1_cl1">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="0">
@@ -18068,33 +18072,10 @@ It has 664128 reachable states and the diameter is 496.</ns2:Comment>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Source="0" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="t1_at6"/>
-                            <SimpleIdentifier Name="t1_at7"/>
-                            <SimpleIdentifier Name="t1_at27"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="159" Y="101"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="1" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="t1_at6"/>
-                            <SimpleIdentifier Name="t1_at7"/>
-                            <SimpleIdentifier Name="t1_at27"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-22" Y="-67"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="278" Y="115"/>
-                        </SplineGeometry>
-                    </Edge>
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="Plant_resetable_t1_cl2">
+        <SimpleComponent Kind="PLANT" Name="Plant_non_repeatable_t1_cl2">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="0">
@@ -18127,40 +18108,16 @@ It has 664128 reachable states and the diameter is 496.</ns2:Comment>
                             <SimpleIdentifier Name="t1f_at5"/>
                             <SimpleIdentifier Name="t1f_at6"/>
                             <SimpleIdentifier Name="t1f_at7"/>
+                            <SimpleIdentifier Name="t1f_at8"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-13" Y="0"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Source="0" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="t1_at0"/>
-                            <SimpleIdentifier Name="t1_at1"/>
-                            <SimpleIdentifier Name="t1_at19"/>
-                            <SimpleIdentifier Name="t1_at20"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="160" Y="101"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="1" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="t1_at0"/>
-                            <SimpleIdentifier Name="t1_at1"/>
-                            <SimpleIdentifier Name="t1_at19"/>
-                            <SimpleIdentifier Name="t1_at20"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-23" Y="-78"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="239" Y="120"/>
-                        </SplineGeometry>
-                    </Edge>
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="Plant_resetable_t1_cl3">
+        <SimpleComponent Kind="PLANT" Name="Plant_non_repeatable_t1_cl3">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="0">
@@ -18192,37 +18149,17 @@ It has 664128 reachable states and the diameter is 496.</ns2:Comment>
                             <SimpleIdentifier Name="t1f_at10"/>
                             <SimpleIdentifier Name="t1f_at11"/>
                             <SimpleIdentifier Name="t1f_at13"/>
+                            <SimpleIdentifier Name="t1f_at27"/>
                             <SimpleIdentifier Name="t1f_at9"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-29" Y="4"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Source="0" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="t1_at15"/>
-                            <SimpleIdentifier Name="t1_at16"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="160" Y="101"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="1" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="t1_at15"/>
-                            <SimpleIdentifier Name="t1_at16"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-28" Y="-53"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="241" Y="113"/>
-                        </SplineGeometry>
-                    </Edge>
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="Plant_resetable_t1_cl4">
+        <SimpleComponent Kind="PLANT" Name="Plant_non_repeatable_t1_cl4">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="0">
@@ -18258,33 +18195,10 @@ It has 664128 reachable states and the diameter is 496.</ns2:Comment>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Source="0" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="t1_at8"/>
-                            <SimpleIdentifier Name="t1_at10"/>
-                            <SimpleIdentifier Name="t1_at9"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="160" Y="101"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="1" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="t1_at8"/>
-                            <SimpleIdentifier Name="t1_at10"/>
-                            <SimpleIdentifier Name="t1_at9"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-22" Y="-54"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="235" Y="115"/>
-                        </SplineGeometry>
-                    </Edge>
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="Plant_resetable_t1_cl5">
+        <SimpleComponent Kind="PLANT" Name="Plant_non_repeatable_t1_cl5">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="0">
@@ -18320,31 +18234,10 @@ It has 664128 reachable states and the diameter is 496.</ns2:Comment>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Source="0" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="t1_at12"/>
-                            <SimpleIdentifier Name="t1_at14"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="160" Y="101"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="1" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="t1_at12"/>
-                            <SimpleIdentifier Name="t1_at14"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-27" Y="-48"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="239" Y="122"/>
-                        </SplineGeometry>
-                    </Edge>
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="Plant_resetable_t1_cl6">
+        <SimpleComponent Kind="PLANT" Name="Plant_non_repeatable_t1_cl6">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="0">
@@ -18382,31 +18275,10 @@ It has 664128 reachable states and the diameter is 496.</ns2:Comment>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Source="0" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="t1_at23"/>
-                            <SimpleIdentifier Name="t1_at24"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="160" Y="101"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="1" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="t1_at23"/>
-                            <SimpleIdentifier Name="t1_at24"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-30" Y="-44"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="236" Y="110"/>
-                        </SplineGeometry>
-                    </Edge>
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="Plant_resetable_t1_cl7">
+        <SimpleComponent Kind="PLANT" Name="Plant_non_repeatable_t1_cl7">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="0">
@@ -18442,31 +18314,10 @@ It has 664128 reachable states and the diameter is 496.</ns2:Comment>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Source="0" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="t1_at25"/>
-                            <SimpleIdentifier Name="t1_at26"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="160" Y="101"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="1" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="t1_at25"/>
-                            <SimpleIdentifier Name="t1_at26"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-25" Y="-47"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="232" Y="116"/>
-                        </SplineGeometry>
-                    </Edge>
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="Plant_resetable_t1_cl8">
+        <SimpleComponent Kind="PLANT" Name="Plant_non_repeatable_t1_cl8">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="0">
@@ -18502,31 +18353,10 @@ It has 664128 reachable states and the diameter is 496.</ns2:Comment>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Source="0" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="t1_at12"/>
-                            <SimpleIdentifier Name="t1_at14"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="160" Y="101"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="1" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="t1_at12"/>
-                            <SimpleIdentifier Name="t1_at14"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-25" Y="-43"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="236" Y="122"/>
-                        </SplineGeometry>
-                    </Edge>
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="Plant_resetable_t2_cl1">
+        <SimpleComponent Kind="PLANT" Name="Plant_non_repeatable_t2_cl1">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="0">
@@ -18545,7 +18375,7 @@ It has 664128 reachable states and the diameter is 496.</ns2:Comment>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point X="348" Y="161"/>
+                            <Point X="320" Y="160"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="20" Y="20"/>
@@ -18560,37 +18390,14 @@ It has 664128 reachable states and the diameter is 496.</ns2:Comment>
                             <SimpleIdentifier Name="t2f_at2"/>
                             <SimpleIdentifier Name="t2f_at4"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-35" Y="-1"/>
+                                <Point X="-21" Y="0"/>
                             </LabelGeometry>
                         </LabelBlock>
-                    </Edge>
-                    <Edge Source="0" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="t2_at6"/>
-                            <SimpleIdentifier Name="t2_at7"/>
-                            <SimpleIdentifier Name="t2_at27"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="160" Y="101"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="1" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="t2_at6"/>
-                            <SimpleIdentifier Name="t2_at7"/>
-                            <SimpleIdentifier Name="t2_at27"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-23" Y="-55"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="257" Y="122"/>
-                        </SplineGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="Plant_resetable_t2_cl2">
+        <SimpleComponent Kind="PLANT" Name="Plant_non_repeatable_t2_cl2">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="0">
@@ -18623,40 +18430,16 @@ It has 664128 reachable states and the diameter is 496.</ns2:Comment>
                             <SimpleIdentifier Name="t2f_at5"/>
                             <SimpleIdentifier Name="t2f_at6"/>
                             <SimpleIdentifier Name="t2f_at7"/>
+                            <SimpleIdentifier Name="t2f_at8"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-17" Y="1"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Source="0" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="t2_at0"/>
-                            <SimpleIdentifier Name="t2_at1"/>
-                            <SimpleIdentifier Name="t2_at19"/>
-                            <SimpleIdentifier Name="t2_at20"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="160" Y="101"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="1" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="t2_at0"/>
-                            <SimpleIdentifier Name="t2_at1"/>
-                            <SimpleIdentifier Name="t2_at19"/>
-                            <SimpleIdentifier Name="t2_at20"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-23" Y="-77"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="240" Y="118"/>
-                        </SplineGeometry>
-                    </Edge>
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="Plant_resetable_t2_cl3">
+        <SimpleComponent Kind="PLANT" Name="Plant_non_repeatable_t2_cl3">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="0">
@@ -18689,36 +18472,16 @@ It has 664128 reachable states and the diameter is 496.</ns2:Comment>
                             <SimpleIdentifier Name="t2f_at10"/>
                             <SimpleIdentifier Name="t2f_at11"/>
                             <SimpleIdentifier Name="t2f_at13"/>
+                            <SimpleIdentifier Name="t2f_at27"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-35" Y="0"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Source="0" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="t2_at15"/>
-                            <SimpleIdentifier Name="t2_at16"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="160" Y="101"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="1" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="t2_at15"/>
-                            <SimpleIdentifier Name="t2_at16"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-25" Y="-47"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="243" Y="115"/>
-                        </SplineGeometry>
-                    </Edge>
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="Plant_resetable_t2_cl4">
+        <SimpleComponent Kind="PLANT" Name="Plant_non_repeatable_t2_cl4">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="0">
@@ -18729,7 +18492,7 @@ It has 664128 reachable states and the diameter is 496.</ns2:Comment>
                             <Point X="160" Y="160"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="20" Y="20"/>
+                            <Point X="8" Y="7"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="1">
@@ -18740,7 +18503,7 @@ It has 664128 reachable states and the diameter is 496.</ns2:Comment>
                             <Point X="320" Y="160"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="20" Y="20"/>
+                            <Point X="12" Y="7"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -18750,37 +18513,14 @@ It has 664128 reachable states and the diameter is 496.</ns2:Comment>
                             <SimpleIdentifier Name="t2f_at12"/>
                             <SimpleIdentifier Name="t2f_at14"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-37" Y="5"/>
+                                <Point X="-28" Y="7"/>
                             </LabelGeometry>
                         </LabelBlock>
-                    </Edge>
-                    <Edge Source="0" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="t2_at9"/>
-                            <SimpleIdentifier Name="t2_at10"/>
-                            <SimpleIdentifier Name="t2_at8"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="160" Y="101"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="1" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="t2_at9"/>
-                            <SimpleIdentifier Name="t2_at10"/>
-                            <SimpleIdentifier Name="t2_at8"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-26" Y="-57"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="236" Y="120"/>
-                        </SplineGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="Plant_resetable_t2_cl5">
+        <SimpleComponent Kind="PLANT" Name="Plant_non_repeatable_t2_cl5">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="0">
@@ -18812,35 +18552,14 @@ It has 664128 reachable states and the diameter is 496.</ns2:Comment>
                             <SimpleIdentifier Name="t2f_at15"/>
                             <SimpleIdentifier Name="t2f_at16"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-6" Y="1"/>
+                                <Point X="-32" Y="-37"/>
                             </LabelGeometry>
                         </LabelBlock>
-                    </Edge>
-                    <Edge Source="0" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="t2_at12"/>
-                            <SimpleIdentifier Name="t2_at14"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="160" Y="101"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="1" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="t2_at12"/>
-                            <SimpleIdentifier Name="t2_at14"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-25" Y="-34"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="238" Y="106"/>
-                        </SplineGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="Plant_resetable_t2_cl6">
+        <SimpleComponent Kind="PLANT" Name="Plant_non_repeatable_t2_cl6">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="0">
@@ -18878,31 +18597,10 @@ It has 664128 reachable states and the diameter is 496.</ns2:Comment>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Source="0" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="t2_at23"/>
-                            <SimpleIdentifier Name="t2_at24"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="160" Y="101"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="1" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="t2_at23"/>
-                            <SimpleIdentifier Name="t2_at24"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-17" Y="-44"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="238" Y="123"/>
-                        </SplineGeometry>
-                    </Edge>
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="Plant_resetable_t2_cl7">
+        <SimpleComponent Kind="PLANT" Name="Plant_non_repeatable_t2_cl7">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="0">
@@ -18938,31 +18636,10 @@ It has 664128 reachable states and the diameter is 496.</ns2:Comment>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Source="0" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="t2_at25"/>
-                            <SimpleIdentifier Name="t2_at26"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="160" Y="101"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="1" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="t2_at25"/>
-                            <SimpleIdentifier Name="t2_at26"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-26" Y="-48"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="237" Y="121"/>
-                        </SplineGeometry>
-                    </Edge>
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="Plant_resetable_t2_cl8">
+        <SimpleComponent Kind="PLANT" Name="Plant_non_repeatable_t2_cl8">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="0">
@@ -18981,7 +18658,7 @@ It has 664128 reachable states and the diameter is 496.</ns2:Comment>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point X="351" Y="158"/>
+                            <Point X="320" Y="160"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="20" Y="20"/>
@@ -18994,30 +18671,9 @@ It has 664128 reachable states and the diameter is 496.</ns2:Comment>
                             <SimpleIdentifier Name="t2f_at25"/>
                             <SimpleIdentifier Name="t2f_at26"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-41" Y="1"/>
+                                <Point X="-25" Y="0"/>
                             </LabelGeometry>
                         </LabelBlock>
-                    </Edge>
-                    <Edge Source="0" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="t2_at12"/>
-                            <SimpleIdentifier Name="t2_at14"/>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="160" Y="101"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="1" Target="0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="t2_at12"/>
-                            <SimpleIdentifier Name="t2_at14"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-26" Y="-43"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="255" Y="109"/>
-                        </SplineGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>

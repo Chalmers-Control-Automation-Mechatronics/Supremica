@@ -289,11 +289,11 @@ public abstract class AbstractSICProperty6VerifierTest extends
     runModelVerifier("despot", "tbed_hisc", "switch8sup.wmod", true);
   }
 
-  // rhone_subsystem1_ld
-  public void testSICProperty6Verifier_rhone_subsystem1_ld()
+  // AIP
+  public void testSICProperty6Verifier_aip1sub1ld()
   throws Exception
   {
-    runModelVerifier("tests", "hisc", "rhone_subsystem1_ld.wmod", true);
+    runModelVerifier("tests", "hisc", "aip1sub1ld.wmod", true);
   }
 
 

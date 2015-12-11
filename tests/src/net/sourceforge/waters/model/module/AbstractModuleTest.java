@@ -60,7 +60,13 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
 {
 
   //#########################################################################
-  //# Marshaling Test Cases
+  //# Marshalling Test Cases
+  public void testMarshal_aip1sub1ld()
+    throws Exception
+  {
+    testMarshal("tests", "hisc", "aip1sub1ld");
+  }
+
   public void testMarshal_buffer_sf1()
     throws Exception
   {
@@ -119,12 +125,6 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     throws Exception
   {
     testMarshal("tests", "hisc", "parManEg_I_mfb_lowlevel");
-  }
-
-  public void testMarshal_rhone_subsystem1_ld()
-    throws Exception
-  {
-    testMarshal("tests", "hisc", "rhone_subsystem1_ld");
   }
 
   public void testMarshal_small_factory_2()
@@ -301,6 +301,12 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
 
   //#########################################################################
   //# Cross-Cloning Test Cases (subject->plain and vice versa)
+  public void testCrossClone_aip1sub1ld()
+    throws Exception
+  {
+    testCrossClone("tests", "hisc", "aip1sub1ld");
+  }
+
   public void testCrossClone_buffer_sf1()
     throws Exception
   {
@@ -341,12 +347,6 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     throws Exception
   {
     testCrossClone("tests", "hisc", "parManEg_I_mfb_lowlevel");
-  }
-
-  public void testCrossClone_rhone_subsystem1_ld()
-    throws Exception
-  {
-    testCrossClone("tests", "hisc", "rhone_subsystem1_ld");
   }
 
   public void testCrossClone_small_factory_2()

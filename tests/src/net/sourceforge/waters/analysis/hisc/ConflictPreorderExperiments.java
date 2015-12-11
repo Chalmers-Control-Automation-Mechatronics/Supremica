@@ -168,11 +168,11 @@ public class ConflictPreorderExperiments
     mCurrentGroup = hisccp;
     testHISCCP_SimpleManufHISCCP1();
     testHISCCP_SimpleManufHISCCP1bad();
+    testHISCCP_aip1sub1ld();
     testHISCCP_aip3el12();
     testHISCCP_aip3el12b();
     testHISCCP_aip3el3();
     testHISCCP_aip3el4();
-    testHISCCP_rhone_subsystem1_ld();
     groups.add(hisccp);
 
     final FileOutputStream latexStream = new FileOutputStream(mLaTeXName);
@@ -214,6 +214,17 @@ public class ConflictPreorderExperiments
   }
 
 
+  // aip1sub1ld
+  private void testHISCCP_aip1sub1ld()
+    throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "hisc", "aip1sub1ld.wmod");
+    runHISCCP("aip1sub1", des, false, false);
+    runHISCCP("", des, true, false);
+  }
+
+
   // aip3_hisccp
   private void testHISCCP_aip3el12()
     throws Exception
@@ -249,17 +260,6 @@ public class ConflictPreorderExperiments
       getCompiledDES("hisccp", "aip3_hisccp", "el4.wmod");
     runHISCCP("aip3el4", des, false, true);
     runHISCCP("", des, true, true);
-  }
-
-
-  // rhone_subsystem1
-  private void testHISCCP_rhone_subsystem1_ld()
-    throws Exception
-  {
-    final ProductDESProxy des =
-      getCompiledDES("tests", "hisc", "rhone_subsystem1_ld.wmod");
-    runHISCCP("aip1sub1", des, false, false);
-    runHISCCP("", des, true, false);
   }
 
 

@@ -195,8 +195,8 @@ public class MonolithicSynthesizerExperiments
     synthesisTransferline(2);
     synthesisTransferline(3);
     synthesiseIPC();
-    synthesissRhoneSubPatch0();
-    synthesissRhoneSubPatch1();
+    synthesiseAIP0Sub0Patch0();
+    synthesiseAIP0Sub0Patch1();
     synthesisPhilosophers(8);
     synthesisPhilosophers(9);
     //synthesisPhilosophers(10);
@@ -304,14 +304,14 @@ public class MonolithicSynthesizerExperiments
     runModel("tests", "synthesis", "IPC.wmod");
   }
 
-  private void synthesissRhoneSubPatch0() throws Exception
+  private void synthesiseAIP0Sub0Patch0() throws Exception
   {
-    runModel("tests", "hisc", "rhone_subsystem1_patch0.wmod");
+    runModel("tests", "hisc", "aip0sub0p0.wmod");
   }
 
-  private void synthesissRhoneSubPatch1() throws Exception
+  private void synthesiseAIP0Sub0Patch1() throws Exception
   {
-    runModel("tests", "hisc", "rhone_subsystem1_patch1.wmod");
+    runModel("tests", "hisc", "aip0sub0p1.wmod");
   }
 
   @SuppressWarnings("unused")

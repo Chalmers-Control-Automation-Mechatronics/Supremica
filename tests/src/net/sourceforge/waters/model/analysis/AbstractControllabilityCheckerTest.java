@@ -143,27 +143,27 @@ public abstract class AbstractControllabilityCheckerTest
 
   //#########################################################################
   //# Test Cases --- hisc
-  public void testHISCRhoneSubsystem1Patch0() throws Exception
+  public void testHISCAIP0Sub1Patch0() throws Exception
   {
     final String group = "tests";
     final String dir = "hisc";
-    final String name = "rhone_subsystem1_patch0.wmod";
+    final String name = "aip0sub1p0.wmod";
     runModelVerifier(group, dir, name, true);
   }
 
-  public void testHISCRhoneSubsystem1Patch1() throws Exception
+  public void testHISCAIP0Sub1Patch1() throws Exception
   {
     final String group = "tests";
     final String dir = "hisc";
-    final String name = "rhone_subsystem1_patch1.wmod";
+    final String name = "aip0sub1p1.wmod";
     runModelVerifier(group, dir, name, true);
   }
 
-  public void testHISCRhoneSubsystem1Patch2() throws Exception
+  public void testHISCAIP0Sub1Patch2() throws Exception
   {
     final String group = "tests";
     final String dir = "hisc";
-    final String name = "rhone_subsystem1_patch2.wmod";
+    final String name = "aip0sub1p2.wmod";
     runModelVerifier(group, dir, name, true);
   }
 

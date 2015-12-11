@@ -296,18 +296,17 @@ public abstract class AbstractSICProperty5VerifierTest
     runModelVerifier("despot", "tbed_hisc", "switch8sup.wmod", true);
   }
 
-  // rhone_subsystem1
-  public void testSICProperty5Verifier_rhone_subsystem1_ld()
+  // AIP
+  public void testSICProperty5Verifier_aip1sub1ld()
   throws Exception
   {
-    runModelVerifier("tests", "hisc", "rhone_subsystem1_ld.wmod", true);
+    runModelVerifier("tests", "hisc", "aip1sub1ld.wmod", true);
   }
 
-  public void testSICProperty5Verifier_rhone_subsystem1_ld_failsic5()
+  public void testSICProperty5Verifier_aip1sub1ld_failsic5()
   throws Exception
   {
-    runModelVerifier("tests", "hisc",
-                     "rhone_subsystem1_ld_failsic5.wmod", false);
+    runModelVerifier("tests", "hisc", "aip1sub1ld_failsic5.wmod", false);
   }
 
   /**

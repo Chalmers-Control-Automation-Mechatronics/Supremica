@@ -326,11 +326,11 @@ public abstract class AbstractControlLoopCheckerTest
     runModelVerifier(group, dir, name, false);
   }
 
-  public void testHISCRhoneSubsystem1Patch2() throws Exception
+  public void testHISCAIP0Sub1Patch2() throws Exception
   {
     final String group = "tests";
     final String dir = "hisc";
-    final String name = "rhone_subsystem1_patch2.wmod";
+    final String name = "aip0sub1p2.wmod";
     runModelVerifier(group, dir, name, false);
   }
 

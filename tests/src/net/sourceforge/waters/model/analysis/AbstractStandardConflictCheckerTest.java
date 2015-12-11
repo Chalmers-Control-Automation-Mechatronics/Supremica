@@ -235,24 +235,24 @@ public abstract class AbstractStandardConflictCheckerTest
 
   //#########################################################################
   //# Test Cases --- hisc
-  public void testHISCRhoneSubsystem1Patch0() throws Exception
+  public void testHISCAIP0Sub1Patch0() throws Exception
   {
     final ProductDESProxy des =
-      getCompiledDES("tests", "hisc", "rhone_subsystem1_patch0.wmod");
+      getCompiledDES("tests", "hisc", "aip0sub1p0.wmod");
     runModelVerifier(des, false);
   }
 
-  public void testHISCRhoneSubsystem1Patch1() throws Exception
+  public void testHISCAIP0Sub1Patch1() throws Exception
   {
     final ProductDESProxy des =
-      getCompiledDES("tests", "hisc", "rhone_subsystem1_patch1.wmod");
+      getCompiledDES("tests", "hisc", "aip0sub1p1.wmod");
     runModelVerifier(des, false);
   }
 
-  public void testHISCRhoneSubsystem1Patch2() throws Exception
+  public void testHISCAIP0Sub1Patch2() throws Exception
   {
     final ProductDESProxy des =
-      getCompiledDES("tests", "hisc", "rhone_subsystem1_patch2.wmod");
+      getCompiledDES("tests", "hisc", "aip0sub1p2.wmod");
     runModelVerifier(des, true);
   }
 

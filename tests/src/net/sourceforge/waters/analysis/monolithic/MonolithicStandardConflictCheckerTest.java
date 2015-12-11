@@ -33,13 +33,13 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import net.sourceforge.waters.model.analysis.AbstractStandardConflictCheckerTest;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 
 public class MonolithicStandardConflictCheckerTest extends
@@ -77,30 +77,30 @@ public class MonolithicStandardConflictCheckerTest extends
   //#########################################################################
   //# Overridden Test Cases
   @Override
-  public void testHISCRhoneSubsystem1Patch0() throws Exception
+  public void testHISCAIP0Sub1Patch0() throws Exception
   {
     try {
-      super.testHISCRhoneSubsystem1Patch0();
+      super.testHISCAIP0Sub1Patch0();
     } catch (final OverflowException exception) {
       // Overflow in encoding --- never mind
     }
   }
 
   @Override
-  public void testHISCRhoneSubsystem1Patch1() throws Exception
+  public void testHISCAIP0Sub1Patch1() throws Exception
   {
     try {
-      super.testHISCRhoneSubsystem1Patch1();
+      super.testHISCAIP0Sub1Patch1();
     } catch (final OverflowException exception) {
       // Overflow in encoding --- never mind
     }
   }
 
   @Override
-  public void testHISCRhoneSubsystem1Patch2() throws Exception
+  public void testHISCAIP0Sub1Patch2() throws Exception
   {
     try {
-      super.testHISCRhoneSubsystem1Patch2();
+      super.testHISCAIP0Sub1Patch2();
     } catch (final OverflowException exception) {
       // Overflow in encoding --- never mind
     }

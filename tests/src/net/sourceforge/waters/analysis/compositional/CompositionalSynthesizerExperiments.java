@@ -396,12 +396,6 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
     runModel("tests", "synthesis", "IPC.wmod");
   }
 
-  @SuppressWarnings("unused")
-  private void synthesissRhoneSubPatch0() throws Exception
-  {
-    runModel("tests", "hisc", "rhone_subsystem1_patch0.wmod");
-  }
-
   private void synthesisFms2003() throws Exception
   {
     runModel("tests", "fms2003", "fms2003.wmod");

@@ -38,7 +38,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
 
-import net.sourceforge.waters.analysis.hisc.SICPropertyBuilder;
 import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -190,14 +189,14 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
                   "parManEg_I_mfb_lowlevel_multiAnswers_noInterface");
   }
 
-  public void testIntegrity_rhone_subsystem1_ld_failsic5() throws Exception
+  public void testIntegrity_aip1sub1ld_failsic5() throws Exception
   {
-    testIntegrity("tests", "hisc", "rhone_subsystem1_ld_failsic5");
+    testIntegrity("tests", "hisc", "aip1sub1ld_failsic5");
   }
 
-  public void testIntegrity_rhone_subsystem1_ld() throws Exception
+  public void testIntegrity_aip1sub1ld() throws Exception
   {
-    testIntegrity("tests", "hisc", "rhone_subsystem1_ld");
+    testIntegrity("tests", "hisc", "aip1sub1ld");
   }
 
   public void testIntegrity_as1() throws Exception
@@ -367,6 +366,7 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
 
   // #########################################################################
   // # Overrides for junit.framework.TestCase
+  @Override
   protected void setUp() throws Exception
   {
     super.setUp();
@@ -386,6 +386,7 @@ public class SICPropertyVBuilderTest extends AbstractWatersTest
     mBuilder = new SICPropertyBuilder(mProductDESFactory);
   }
 
+  @Override
   protected void tearDown() throws Exception
   {
     mInputDirectory = null;

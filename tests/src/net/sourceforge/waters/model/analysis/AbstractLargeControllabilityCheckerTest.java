@@ -127,7 +127,7 @@ public abstract class AbstractLargeControllabilityCheckerTest
   {
     final String group = "tests";
     final String dir = "incremental_suite";
-    final String name = "rhone_alps.wmod";
+    final String name = "aip0alps.wmod";
     runModelVerifier(group, dir, name, true);
   }
 
@@ -135,7 +135,7 @@ public abstract class AbstractLargeControllabilityCheckerTest
   {
     final String group = "tests";
     final String dir = "incremental_suite";
-    final String name = "rhone_tough.wmod";
+    final String name = "aip0tough.wmod";
     runModelVerifier(group, dir, name, false);
   }
 

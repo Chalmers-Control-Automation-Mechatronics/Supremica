@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="rhone_subsystem1_ld" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>Low level of AIP example modified using low data events.</ns2:Comment>
+<Module Name="aip1sub1ld_failsic5" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
+    <ns2:Comment>Low level of AIP example modified using low data events.
+This version has been modified to fail SIC property 5, with respect to event ZNoTrnsfCL[AS1].</ns2:Comment>
     <ConstantAliasList>
         <ConstantAlias Name="enTU1">
             <ConstantAliasExpression>
@@ -346,7 +347,7 @@
                 </EnumSetExpression>
             </RangeList>
             <ns2:AttributeMap>
-                <ns2:Attribute Name="HISC:EventType" Value="LOWDATA"/>
+                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
             </ns2:AttributeMap>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="DelayTrnsfCplToCL">
@@ -4256,7 +4257,7 @@
                                         <SimpleIdentifier Name="i"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point X="-134" Y="-83"/>
+                                        <Point X="-135" Y="-26"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <SplineGeometry>

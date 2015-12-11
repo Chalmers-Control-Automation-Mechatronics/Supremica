@@ -33,15 +33,14 @@
 
 package net.sourceforge.waters.analysis.hisc;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
-import net.sourceforge.waters.analysis.hisc.SICProperty5Verifier;
 import net.sourceforge.waters.analysis.monolithic.MonolithicConflictChecker;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 
 public class MonolithicSICProperty5VerifierTest extends
@@ -66,6 +65,7 @@ public class MonolithicSICProperty5VerifierTest extends
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  @Override
   protected ModelVerifier createModelVerifier(
                                               final ProductDESProxyFactory factory)
   {
@@ -76,21 +76,23 @@ public class MonolithicSICProperty5VerifierTest extends
 
   //#########################################################################
   //# Test Cases
-  public void testSICProperty5Verifier_rhone_subsystem1_ld()
+  @Override
+  public void testSICProperty5Verifier_aip1sub1ld()
     throws Exception
   {
     try {
-      super.testSICProperty5Verifier_rhone_subsystem1_ld();
+      super.testSICProperty5Verifier_aip1sub1ld();
     } catch (final OverflowException exception) {
       // MonolithicConflictChecker fails because of state encoding size :-(
     }
   }
 
-  public void testSICProperty5Verifier_rhone_subsystem1_ld_failsic5()
+  @Override
+  public void testSICProperty5Verifier_aip1sub1ld_failsic5()
     throws Exception
   {
     try {
-      super.testSICProperty5Verifier_rhone_subsystem1_ld_failsic5();
+      super.testSICProperty5Verifier_aip1sub1ld_failsic5();
     } catch (final OverflowException exception) {
       // MonolithicConflictChecker fails because of state encoding size :-(
     }
