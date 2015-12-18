@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="tbed_reset2" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
-    <ns2:Comment>Fault-tolent train testbed.
+    <ns2:Comment>Fault-tolerant train testbed.
 Received and imported from DESpot model TestbedFlat_resetable.desp, 2015-12-11.
 All fault definitions are from the paper of Simon Radel, Aos Mulahuwaish and Ryan Leduc, Fault Tolerant Controllability, manuscript, 2014.
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="tbed_noreset2" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
-    <ns2:Comment>Fault-tolent train testbed.
+    <ns2:Comment>Fault-tolerant train testbed.
 Received and imported from DESpot model TestbedFlat_non_repeatable.desp, 2015-12-11.
 
 All fault definitions are from the paper of Simon Radel, Aos Mulahuwaish and Ryan Leduc, Fault Tolerant Controllability, manuscript, 2014.
@@ -7599,6 +7599,9 @@ It has 12755607040 reachable states and the diameter is 596.</ns2:Comment>
                     <SimpleIdentifier Name="t2f_at21"/>
                     <SimpleIdentifier Name="t1f_at13"/>
                     <SimpleIdentifier Name="t2f_at13"/>
+                    <LabelGeometry Anchor="NW">
+                        <Point X="5" Y="5"/>
+                    </LabelGeometry>
                 </LabelBlock>
                 <NodeList>
                     <SimpleNode Initial="true" Name="0">
