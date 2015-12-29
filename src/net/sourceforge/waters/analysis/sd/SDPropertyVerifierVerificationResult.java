@@ -39,6 +39,7 @@ import java.util.List;
 
 import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
 import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 
 
 /**
@@ -53,18 +54,30 @@ import net.sourceforge.waters.model.analysis.VerificationResult;
 public class SDPropertyVerifierVerificationResult
   extends DefaultVerificationResult
 {
-  // #########################################################################
-  // # Constructors
+  //#########################################################################
+  //# Constructors
   /**
    * Creates a verification result representing an incomplete run.
+   * @param  verifier The model analyser creating this result.
    */
-  public SDPropertyVerifierVerificationResult()
+  public SDPropertyVerifierVerificationResult(final ModelVerifier verifier)
   {
+    this(verifier.getClass());
+  }
+
+  /**
+   * Creates a verification result representing an incomplete run.
+   * @param  clazz    The class of the model verifier creating this result.
+   */
+  public SDPropertyVerifierVerificationResult(final Class<?> clazz)
+  {
+    super(clazz);
     mCheckerStats = new ArrayList<VerificationResult>();
   }
 
-  // #########################################################################
-  // # Simple Access Methods
+
+  //#########################################################################
+  //# Simple Access Methods
   /**
    * Get all results from Modular Language Inclusion checker runs (one result for each
    * prohibitable event).
@@ -73,6 +86,7 @@ public class SDPropertyVerifierVerificationResult
   {
     return mCheckerStats;
   }
+
 
   //#########################################################################
   //# Providing Statistics

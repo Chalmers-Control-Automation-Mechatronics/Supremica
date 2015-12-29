@@ -63,6 +63,7 @@ public class CompositionalGeneralisedConflictCheckerVerificationResult
    */
   public CompositionalGeneralisedConflictCheckerVerificationResult()
   {
+    super(CompositionalGeneralisedConflictChecker.class);
     mUnsuccessfulCompositionCount = 0;
     mSuccessfulCompositionCount = 0;
     mComposedModelNumberOfStates = 0;

@@ -33,13 +33,13 @@
 
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.list.array.TIntArrayList;
-
 import java.io.PrintWriter;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.DefaultAnalysisResult;
+
+import gnu.trove.list.array.TIntArrayList;
 
 
 /**
@@ -60,6 +60,7 @@ public class ConflictPreorderResult
    */
   ConflictPreorderResult()
   {
+    super(TRConflictPreorderChecker.class);
     mFirstAutomatonStates = mSecondAutomatonStates = -1;
     mTotalLCPairs = 0;
     mLevelSizes = new TIntArrayList();

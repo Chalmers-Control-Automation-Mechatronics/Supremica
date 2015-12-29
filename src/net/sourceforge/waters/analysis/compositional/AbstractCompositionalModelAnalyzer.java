@@ -822,7 +822,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   @Override
   public AnalysisResult createAnalysisResult()
   {
-    return new CompositionalAnalysisResult();
+    return new CompositionalAnalysisResult(this);
   }
 
   @Override

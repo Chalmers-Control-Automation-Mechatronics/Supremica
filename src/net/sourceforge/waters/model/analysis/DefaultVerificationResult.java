@@ -35,6 +35,9 @@ package net.sourceforge.waters.model.analysis;
 
 import java.io.PrintWriter;
 
+import net.sourceforge.waters.model.analysis.des.ConflictChecker;
+import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 
 
@@ -55,9 +58,20 @@ public class DefaultVerificationResult
   //# Constructors
   /**
    * Creates a new verification result representing an incomplete run.
+   * @param  verifier The model verifier creating this result.
    */
-  public DefaultVerificationResult()
+  public DefaultVerificationResult(final ModelVerifier verifier)
   {
+    this(verifier.getClass());
+  }
+
+  /**
+   * Creates a new verification result representing an incomplete run.
+   * @param  clazz    The class of the model verifier creating this result.
+   */
+  public DefaultVerificationResult(final Class<?> clazz)
+  {
+    super(clazz);
   }
 
 
@@ -144,6 +158,16 @@ public class DefaultVerificationResult
       final int len = mCounterExample.getEvents().size();
       writer.print(len);
     }
+    if (ConflictChecker.class.isAssignableFrom(getAnalyzerClass())) {
+      writer.print(',');
+      if (mCounterExample == null) {
+        writer.print("NONCONFLICTING");
+      } else if (mCounterExample instanceof ConflictTraceProxy) {
+        final ConflictTraceProxy conflictTrace =
+          (ConflictTraceProxy) mCounterExample;
+        writer.print(conflictTrace.getKind());
+      }
+    }
   }
 
   @Override
@@ -151,6 +175,9 @@ public class DefaultVerificationResult
   {
     super.printCSVHorizontalHeadings(writer);
     writer.print(",CounterLength");
+    if (ConflictChecker.class.isAssignableFrom(getAnalyzerClass())) {
+      writer.print(",ConflictKind");
+    }
   }
 
 

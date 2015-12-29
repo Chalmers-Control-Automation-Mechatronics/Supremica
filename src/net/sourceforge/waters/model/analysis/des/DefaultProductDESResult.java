@@ -57,20 +57,33 @@ public class DefaultProductDESResult
   //#########################################################################
   //# Constructors
   /**
-   * Creates an automaton result representing an incomplete run.
+   * Creates a product DES result representing an incomplete run.
+   * @param  analyzer The model analyser creating this result.
    */
-  public DefaultProductDESResult()
+  public DefaultProductDESResult(final ModelAnalyzer analyzer)
   {
+    this(analyzer.getClass());
+  }
+
+  /**
+   * Creates a product DES result representing an incomplete run.
+   * @param  clazz    The class of the model analyser creating this result.
+   */
+  public DefaultProductDESResult(final Class<?> clazz)
+  {
+    super(clazz);
   }
 
 
   //#########################################################################
   //# Simple Access Methods
+  @Override
   public ProductDESProxy getComputedProductDES()
   {
     return getComputedProxy();
   }
 
+  @Override
   public Collection<AutomatonProxy> getComputedAutomata()
   {
     final ProductDESProxy des = getComputedProductDES();
@@ -81,6 +94,7 @@ public class DefaultProductDESResult
     }
   }
 
+  @Override
   public void setComputedProductDES(final ProductDESProxy des)
   {
     setComputedProxy(des);

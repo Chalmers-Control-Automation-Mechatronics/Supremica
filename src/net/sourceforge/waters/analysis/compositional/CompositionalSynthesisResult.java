@@ -36,6 +36,7 @@ package net.sourceforge.waters.analysis.compositional;
 import java.io.PrintWriter;
 
 import net.sourceforge.waters.model.analysis.AnalysisResult;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 
@@ -59,8 +60,9 @@ public abstract class CompositionalSynthesisResult
   /**
    * Creates a new synthesis result representing an incomplete run.
    */
-  public CompositionalSynthesisResult()
+  public CompositionalSynthesisResult(final ModelAnalyzer analyzer)
   {
+    super(analyzer);
     mSynchStates = -1;
     mSynchTransitions = -1;
   }

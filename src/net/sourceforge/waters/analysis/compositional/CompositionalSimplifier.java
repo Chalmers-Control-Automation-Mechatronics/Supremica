@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.set.hash.THashSet;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -49,6 +47,8 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
+
+import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -152,7 +152,7 @@ public class CompositionalSimplifier
   @Override
   public CompositionalSimplificationResult createAnalysisResult()
   {
-    return new CompositionalSimplificationResult();
+    return new CompositionalSimplificationResult(this);
   }
 
   @Override

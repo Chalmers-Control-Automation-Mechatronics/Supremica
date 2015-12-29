@@ -120,7 +120,7 @@ public abstract class AbstractModelVerifier
   @Override
   public VerificationResult createAnalysisResult()
   {
-    return new DefaultVerificationResult();
+    return new DefaultVerificationResult(this);
   }
 
 

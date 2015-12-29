@@ -39,6 +39,7 @@ import net.sourceforge.waters.analysis.annotation.ConflictPreorderResult;
 import net.sourceforge.waters.analysis.compositional.CompositionalSimplificationResult;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
+import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 
 
 /**
@@ -53,11 +54,17 @@ class HISCCPVerificationResult
 
   //#########################################################################
   //# Constructors
+  public HISCCPVerificationResult(final ModelVerifier verifier)
+  {
+    this(verifier.getClass());
+  }
+
   /**
    * Creates a new verification result representing an incomplete run.
    */
-  public HISCCPVerificationResult()
+  public HISCCPVerificationResult(final Class<?> clazz)
   {
+    super(clazz);
     mSimplificationResult = null;
     mConflictPreorderResult = null;
   }

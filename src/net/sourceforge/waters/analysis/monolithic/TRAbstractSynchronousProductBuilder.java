@@ -33,10 +33,6 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -73,6 +69,10 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.apache.log4j.Logger;
+
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 
 /**
@@ -321,7 +321,7 @@ public abstract class TRAbstractSynchronousProductBuilder
   @Override
   public TRSynchronousProductResult createAnalysisResult()
   {
-    return new TRSynchronousProductResult();
+    return new TRSynchronousProductResult(this);
   }
 
   @Override

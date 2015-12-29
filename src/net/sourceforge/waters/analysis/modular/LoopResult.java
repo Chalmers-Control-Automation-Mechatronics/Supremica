@@ -36,14 +36,20 @@ package net.sourceforge.waters.analysis.modular;
 import java.io.PrintWriter;
 
 import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 
 
 public class LoopResult extends DefaultVerificationResult
 {
 
-  LoopResult()
+  LoopResult(final ModelAnalyzer analyzer)
   {
-    super();
+    this(analyzer.getClass());
+  }
+
+  LoopResult(final Class<?> clazz)
+  {
+    super(clazz);
     mPeakNumberOfAutomata = -1;
     mNumberOfCompositions = -1;
   }
@@ -81,6 +87,7 @@ public class LoopResult extends DefaultVerificationResult
    * Specifies a value for both the peak number of automata and the total
    * number of automata constructed by the analysis.
    */
+  @Override
   public void setNumberOfAutomata(final int numaut)
   {
     setTotalNumberOfAutomata(numaut);

@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.analysis.trcomp;
 
-import gnu.trove.set.hash.THashSet;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -87,6 +85,8 @@ import net.sourceforge.waters.model.marshaller.MarshallingTools;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 import org.apache.log4j.Logger;
+
+import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -185,7 +185,7 @@ public abstract class AbstractTRCompositionalAnalyzer
   @Override
   public CompositionalVerificationResult createAnalysisResult()
   {
-    return new CompositionalVerificationResult();
+    return new CompositionalVerificationResult(getClass());
   }
 
 

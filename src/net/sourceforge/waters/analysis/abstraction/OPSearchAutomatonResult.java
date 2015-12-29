@@ -58,6 +58,7 @@ public class OPSearchAutomatonResult
    */
   public OPSearchAutomatonResult()
   {
+    super(OPSearchAutomatonSimplifier.class);
     mPeakComponents = -1;
     mPeakVerifierPairs = -1;
     mNumberOfIterations = -1;

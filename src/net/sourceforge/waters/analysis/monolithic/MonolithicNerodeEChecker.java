@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import gnu.trove.set.hash.THashSet;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -61,6 +59,8 @@ import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
+
+import gnu.trove.set.hash.THashSet;
 
 /**
  * <P>A monolithic implementation of Nerode Equivalence checker.</P>
@@ -444,7 +444,7 @@ public class MonolithicNerodeEChecker
   @Override
   public NerodeEquVerificationResult createAnalysisResult()
   {
-    return new NerodeEquVerificationResult();
+    return new NerodeEquVerificationResult(this);
   }
 
   @Override

@@ -65,6 +65,11 @@ public interface AnalysisResult
   //#########################################################################
   //# Read Access
   /**
+   * Gets the class of the model analyser that has created this result.
+   */
+  public Class<?> getAnalyzerClass();
+
+  /**
    * Gets the termination status of this analysis result. An analysis result may
    * be created while an analysis operation is in progress.
    * @return <CODE>true</CODE> to confirm that the result represents a completed

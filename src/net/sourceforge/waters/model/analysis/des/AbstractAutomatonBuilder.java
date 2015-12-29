@@ -123,7 +123,7 @@ public abstract class AbstractAutomatonBuilder
   @Override
   public AutomatonResult createAnalysisResult()
   {
-    return new DefaultAutomatonResult();
+    return new DefaultAutomatonResult(this);
   }
 
 

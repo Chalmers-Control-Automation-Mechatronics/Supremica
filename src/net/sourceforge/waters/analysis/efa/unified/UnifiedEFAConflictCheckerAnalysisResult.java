@@ -63,6 +63,7 @@ public class UnifiedEFAConflictCheckerAnalysisResult
    */
   public UnifiedEFAConflictCheckerAnalysisResult()
   {
+    super(UnifiedEFAConflictChecker.class);
     mTotalVariables = -1;
     mMaxDomain = -1;
     mTotalCompositionsCount = 0;

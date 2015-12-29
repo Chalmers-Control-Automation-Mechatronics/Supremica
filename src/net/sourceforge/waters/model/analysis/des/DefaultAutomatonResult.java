@@ -54,19 +54,32 @@ public class DefaultAutomatonResult
   //# Constructors
   /**
    * Creates an automaton result representing an incomplete run.
+   * @param  analyzer The model analyser creating this result.
    */
-  public DefaultAutomatonResult()
+  public DefaultAutomatonResult(final ModelAnalyzer analyzer)
   {
+    this(analyzer.getClass());
+  }
+
+  /**
+   * Creates an automaton result representing an incomplete run.
+   * @param  clazz    The class of the model analyser creating this result.
+   */
+  public DefaultAutomatonResult(final Class<?> clazz)
+  {
+    super(clazz);
   }
 
 
   //#########################################################################
   //# Simple Access Methods
+  @Override
   public AutomatonProxy getComputedAutomaton()
   {
     return getComputedProxy();
   }
 
+  @Override
   public void setComputedAutomaton(final AutomatonProxy aut)
   {
     setComputedProxy(aut);

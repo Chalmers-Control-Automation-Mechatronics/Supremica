@@ -60,8 +60,9 @@ public class PartitionedAutomatonResult
   /**
    * Creates a result representing an incomplete analysis run.
    */
-  public PartitionedAutomatonResult()
+  public PartitionedAutomatonResult(final Class<?> clazz)
   {
+    super(clazz);
     mInputEncoding = mOutputEncoding = null;
     mPartition = null;
   }

@@ -35,6 +35,7 @@ package net.sourceforge.waters.analysis.compositional;
 
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.des.TraceProxy;
 
 
@@ -53,10 +54,21 @@ public class CompositionalVerificationResult
   //#########################################################################
   //# Constructors
   /**
-   * Creates a new verification result representing an incomplete run.
+   * Creates a verification result representing an incomplete run.
+   * @param  verifier The model analyser creating this result.
    */
-  public CompositionalVerificationResult()
+  public CompositionalVerificationResult(final ModelVerifier verifier)
   {
+    this(verifier.getClass());
+  }
+
+  /**
+   * Creates a verification result representing an incomplete run.
+   * @param  clazz    The class of the model verifier creating this result.
+   */
+  public CompositionalVerificationResult(final Class<?> clazz)
+  {
+    super(clazz);
   }
 
 

@@ -74,7 +74,7 @@ public abstract class NativeModelVerifier
   @Override
   public NativeVerificationResult createAnalysisResult()
   {
-    return new NativeVerificationResult();
+    return new NativeVerificationResult(this);
   }
 
   @Override

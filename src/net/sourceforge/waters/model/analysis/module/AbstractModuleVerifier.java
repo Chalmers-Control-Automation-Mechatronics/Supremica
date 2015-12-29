@@ -108,7 +108,7 @@ public abstract class AbstractModuleVerifier
   @Override
   protected VerificationResult createAnalysisResult()
   {
-    return new DefaultVerificationResult();
+    return new DefaultVerificationResult(getClass());
   }
 
 

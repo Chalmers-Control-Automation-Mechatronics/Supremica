@@ -39,6 +39,7 @@ import java.util.Collection;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
 import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 
 
@@ -59,11 +60,18 @@ public class ModularVerificationResult
 
   //#########################################################################
   //# Constructors
+  public ModularVerificationResult(final ModelVerifier verifier)
+  {
+    super(verifier.getClass());
+    mFailedSpecs = null;
+  }
+
   /**
    * Creates a verification result representing an incomplete verification run.
    */
-  public ModularVerificationResult()
+  public ModularVerificationResult(final Class<?> clazz)
   {
+    super(clazz);
     mFailedSpecs = null;
   }
 

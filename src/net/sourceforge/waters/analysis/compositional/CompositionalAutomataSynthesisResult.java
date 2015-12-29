@@ -41,6 +41,7 @@ import java.util.List;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -65,8 +66,9 @@ public class CompositionalAutomataSynthesisResult
   /**
    * Creates a new synthesis result representing an incomplete run.
    */
-  public CompositionalAutomataSynthesisResult()
+  public CompositionalAutomataSynthesisResult(final ModelAnalyzer analyzer)
   {
+    super(analyzer);
     mNumberOfSupervisors = 0;
     mSupervisors = new ArrayList<>();
     mMaxUnrenamedSupervisorStates = -1;

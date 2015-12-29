@@ -262,7 +262,8 @@ public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
       }
 
       // If there is an interface, we must check the conflict preorder ...
-      final HISCCPVerificationResult hiscResult = new HISCCPVerificationResult();
+      final HISCCPVerificationResult hiscResult =
+        new HISCCPVerificationResult(this);
       setAnalysisResult(hiscResult);
       final ProductDESProxyFactory factory = getFactory();
       final String name = des.getName();

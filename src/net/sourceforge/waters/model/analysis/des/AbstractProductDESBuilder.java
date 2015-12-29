@@ -34,10 +34,10 @@
 package net.sourceforge.waters.model.analysis.des;
 
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.AutomatonProxy;
 
 
 /**
@@ -91,6 +91,7 @@ public abstract class AbstractProductDESBuilder
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.AutomatonBuilder
+  @Override
   public ProductDESProxy getComputedProductDES()
   {
     return getComputedProxy();
@@ -108,7 +109,7 @@ public abstract class AbstractProductDESBuilder
   @Override
   public ProductDESResult createAnalysisResult()
   {
-    return new DefaultProductDESResult();
+    return new DefaultProductDESResult(this);
   }
 
 

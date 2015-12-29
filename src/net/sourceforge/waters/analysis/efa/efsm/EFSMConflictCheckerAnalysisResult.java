@@ -69,6 +69,7 @@ public class EFSMConflictCheckerAnalysisResult
    */
   public EFSMConflictCheckerAnalysisResult()
   {
+    super(EFSMConflictChecker.class);
     mTotalCompositionsCount = 0;
     mUnsuccessfulCompositionsCount = 0;
     mNumberOfSplitAttempts = 0;

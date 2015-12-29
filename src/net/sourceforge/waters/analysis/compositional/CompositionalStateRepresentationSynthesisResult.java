@@ -62,8 +62,10 @@ public class CompositionalStateRepresentationSynthesisResult
   /**
    * Creates a new synthesis result representing an incomplete run.
    */
-  public CompositionalStateRepresentationSynthesisResult()
+  public CompositionalStateRepresentationSynthesisResult
+    (final AbstractCompositionalModelAnalyzer analyzer)
   {
+    super(analyzer);
     mSupervisors = new ArrayList<SynthesisStateSpace>();
   }
 

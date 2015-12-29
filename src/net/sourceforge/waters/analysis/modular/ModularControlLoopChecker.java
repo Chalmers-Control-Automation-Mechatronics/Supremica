@@ -33,12 +33,11 @@
 
 package net.sourceforge.waters.analysis.modular;
 
-import gnu.trove.set.hash.THashSet;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+
 import net.sourceforge.waters.analysis.monolithic.MonolithicSCCControlLoopChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
@@ -54,6 +53,8 @@ import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
+
+import gnu.trove.set.hash.THashSet;
 
 public class ModularControlLoopChecker
   extends AbstractModelVerifier
@@ -86,6 +87,7 @@ public class ModularControlLoopChecker
   }
 
 
+  @Override
   public boolean run() throws AnalysisException
   {
     try {
@@ -169,6 +171,7 @@ public class ModularControlLoopChecker
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @Override
   public boolean supportsNondeterminism()
   {
     return false;
@@ -324,6 +327,7 @@ public class ModularControlLoopChecker
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ControlLoopChecker
+  @Override
   public Collection<EventProxy> getNonLoopEvents()
   {
     throw new UnsupportedOperationException
@@ -366,11 +370,13 @@ public class ModularControlLoopChecker
       mFauxUncontrollable.addAll(event);
     }
 
+    @Override
     public ComponentKind getComponentKind(final AutomatonProxy aut)
     {
       return mBase.getComponentKind(aut);
     }
 
+    @Override
     public EventKind getEventKind(final EventProxy event)
     {
       if (mFauxUncontrollable.contains(event))
@@ -388,7 +394,7 @@ public class ModularControlLoopChecker
   @Override
   public LoopResult createAnalysisResult()
   {
-    return new LoopResult();
+    return new LoopResult(this);
   }
 
   @Override

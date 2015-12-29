@@ -63,8 +63,10 @@ public class CompositionalSimplificationResult
   /**
    * Creates a new simplification result representing an incomplete run.
    */
-  public CompositionalSimplificationResult()
+  public CompositionalSimplificationResult
+    (final AbstractCompositionalModelAnalyzer analyzer)
   {
+    super(analyzer);
     mSimplifiedAutomata = new LinkedList<AutomatonProxy>();
   }
 

@@ -38,6 +38,7 @@ import java.util.Formatter;
 
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
+import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 
 
 /**
@@ -53,10 +54,21 @@ public class NativeVerificationResult
   //#########################################################################
   //# Constructors
   /**
-   * Creates a verification result representing an incomplete verification run.
+   * Creates a verification result representing an incomplete run.
+   * @param  verifier The model analyser creating this result.
    */
-  public NativeVerificationResult()
+  public NativeVerificationResult(final ModelVerifier verifier)
   {
+    this(verifier.getClass());
+  }
+
+  /**
+   * Creates a verification result representing an incomplete run.
+   * @param  clazz    The class of the model verifier creating this result.
+   */
+  public NativeVerificationResult(final Class<?> clazz)
+  {
+    super(clazz);
     mEncodingSize = -1;
     mNumExploredTransitions = -1;
     mTarjanComponentCount = -1;

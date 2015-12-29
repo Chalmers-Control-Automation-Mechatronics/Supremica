@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.analysis.modular;
 
-import gnu.trove.set.hash.THashSet;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -65,6 +63,8 @@ import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
+
+import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -283,7 +283,7 @@ public class ModularControllabilityChecker
   @Override
   public ModularVerificationResult createAnalysisResult()
   {
-    return new ModularVerificationResult();
+    return new ModularVerificationResult(this);
   }
 
 

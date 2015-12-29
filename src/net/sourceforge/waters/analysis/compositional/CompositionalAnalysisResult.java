@@ -44,6 +44,7 @@ import net.sourceforge.waters.analysis.abstraction.TRSimplifierStatistics;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.DefaultAnalysisResult;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
 
 
@@ -65,10 +66,21 @@ public class CompositionalAnalysisResult
   //#########################################################################
   //# Constructors
   /**
-   * Creates a verification result representing an incomplete verification run.
+   * Creates an analysis result representing an incomplete run.
+   * @param  analyzer The model analyser creating this result.
    */
-  public CompositionalAnalysisResult()
+  public CompositionalAnalysisResult(final ModelAnalyzer analyzer)
   {
+    this(analyzer.getClass());
+  }
+
+  /**
+   * Creates an analysis result representing an incomplete run.
+   * @param  clazz    The class of the model analyser creating this result.
+   */
+  public CompositionalAnalysisResult(final Class<?> clazz)
+  {
+    super(clazz);
     mTotalCompositionsCount = 0;
     mUnsuccessfulCompositionsCount = 0;
     mBlockedEventsCount = mFailingEventsCount =

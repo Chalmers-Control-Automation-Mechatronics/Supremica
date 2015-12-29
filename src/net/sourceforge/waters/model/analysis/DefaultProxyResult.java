@@ -53,9 +53,11 @@ public class DefaultProxyResult<P extends Proxy>
   //# Constructors
   /**
    * Creates a proxy result representing an incomplete run.
+   * @param  clazz    The class of the model analyser creating this result.
    */
-  public DefaultProxyResult()
+  public DefaultProxyResult(final Class<?> clazz)
   {
+    super(clazz);
   }
 
 

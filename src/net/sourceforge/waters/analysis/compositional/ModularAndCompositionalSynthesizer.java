@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.set.hash.THashSet;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
@@ -62,6 +60,8 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.apache.log4j.Logger;
+
+import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -306,7 +306,7 @@ public class ModularAndCompositionalSynthesizer
   public CompositionalAutomataSynthesisResult createAnalysisResult()
   {
     final CompositionalAutomataSynthesisResult result =
-      new CompositionalAutomataSynthesisResult();
+      new CompositionalAutomataSynthesisResult(this);
     final AbstractionProcedureCreator creator =
       mCompositionalSynthesizer.getAbstractionProcedureCreator();
     final AutomataSynthesisAbstractionProcedure proc =

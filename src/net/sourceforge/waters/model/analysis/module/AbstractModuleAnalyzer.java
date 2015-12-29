@@ -238,7 +238,7 @@ public abstract class AbstractModuleAnalyzer implements ModuleAnalyzer
    */
   protected AnalysisResult createAnalysisResult()
   {
-    return new DefaultAnalysisResult();
+    return new DefaultAnalysisResult(getClass());
   }
 
   /**

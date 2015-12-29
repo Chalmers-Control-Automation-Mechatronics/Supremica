@@ -38,6 +38,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Formatter;
 
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersException;
 
@@ -56,8 +57,22 @@ public class DefaultAnalysisResult
 
   //#########################################################################
   //# Constructors
-  public DefaultAnalysisResult()
+  /**
+   * Creates an analysis result representing an incomplete run.
+   * @param  analyzer The model analyser creating this result.
+   */
+  public DefaultAnalysisResult(final ModelAnalyzer analyzer)
   {
+    this(analyzer.getClass());
+  }
+
+  /**
+   * Creates an analysis result representing an incomplete run.
+   * @param  clazz    The class of the model analyser creating this result.
+   */
+  public DefaultAnalysisResult(final Class<?> clazz)
+  {
+    mAnalyzerClass = clazz;
     mFinished = false;
     mRunTime = -1;
     mCompileTime = -1;
@@ -75,6 +90,12 @@ public class DefaultAnalysisResult
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.AnalysisResult
+  @Override
+  public Class<?> getAnalyzerClass()
+  {
+    return mAnalyzerClass;
+  }
+
   @Override
   public boolean isFinished()
   {
@@ -515,6 +536,7 @@ public class DefaultAnalysisResult
 
   //#########################################################################
   //# Data Members
+  private final Class<?> mAnalyzerClass;
   private boolean mFinished;
   private boolean mSatisfied;
   private long mRunTime;

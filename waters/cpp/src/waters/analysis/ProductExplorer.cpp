@@ -825,8 +825,6 @@ closeNonblockingTarjanState(uint32_t source, uint32_t* sourceTuple)
     return true; // continue checking states - results in critical component
   } else if (getAutomatonEncoding().isMarkedStateTuple(sourceTuple)) {
     return false; // stop checking states
-  } else if (isLocalDumpState(sourceTuple)) {
-    return true;
   } else {
     return expandForwardAgain
       (source, sourceTuple, sourcePacked,

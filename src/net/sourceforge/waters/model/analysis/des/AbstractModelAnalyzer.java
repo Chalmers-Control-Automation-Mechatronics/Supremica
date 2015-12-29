@@ -274,7 +274,7 @@ public abstract class AbstractModelAnalyzer
    */
   public AnalysisResult createAnalysisResult()
   {
-    return new DefaultAnalysisResult();
+    return new DefaultAnalysisResult(this);
   }
 
   /**

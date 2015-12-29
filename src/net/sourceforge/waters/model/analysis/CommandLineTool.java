@@ -272,7 +272,7 @@ public class CommandLineTool
             final long stop = System.currentTimeMillis();
             compileTime = stop - start;
             showSupportedException(exception);
-            final AnalysisResult result = new DefaultAnalysisResult();
+            final AnalysisResult result = new DefaultAnalysisResult(wrapper);
             result.setCompileTime(compileTime);
             result.setException(exception);
             writeCSV(csv, fullName, result, first);

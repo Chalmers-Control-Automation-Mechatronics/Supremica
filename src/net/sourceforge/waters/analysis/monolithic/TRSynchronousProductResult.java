@@ -39,6 +39,7 @@ import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.TRSynchronousProductStateMap;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.des.DefaultSynchronousProductResult;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 
 
 /**
@@ -57,9 +58,20 @@ public class TRSynchronousProductResult
   //# Constructors
   /**
    * Creates a synchronous product result representing an incomplete run.
+   * @param  analyzer The model analyser creating this result.
    */
-  public TRSynchronousProductResult()
+  public TRSynchronousProductResult(final ModelAnalyzer analyzer)
   {
+    this(analyzer.getClass());
+  }
+
+  /**
+   * Creates a synchronous product result representing an incomplete run.
+   * @param  clazz    The class of the model analyser creating this result.
+   */
+  public TRSynchronousProductResult(final Class<?> clazz)
+  {
+    super(clazz);
     mReducedDiamondsCount = -1;
   }
 

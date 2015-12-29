@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import gnu.trove.set.hash.THashSet;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -59,6 +57,8 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+
+import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -298,7 +298,7 @@ public abstract class AbstractCompositionalModelVerifier
   @Override
   public CompositionalVerificationResult createAnalysisResult()
   {
-    return new CompositionalVerificationResult();
+    return new CompositionalVerificationResult(this);
   }
 
 

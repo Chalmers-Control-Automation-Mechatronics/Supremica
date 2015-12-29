@@ -35,6 +35,7 @@ package net.sourceforge.waters.analysis.sd;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicNerodeEChecker;
 import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
+import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
 
 
@@ -51,9 +52,20 @@ public class NerodeEquVerificationResult extends DefaultVerificationResult
   // # Constructors
   /**
    * Creates a verification result representing an incomplete run.
+   * @param  verifier The model analyser creating this result.
    */
-  public NerodeEquVerificationResult()
+  public NerodeEquVerificationResult(final ModelVerifier verifier)
   {
+    this(verifier.getClass());
+  }
+
+  /**
+   * Creates a verification result representing an incomplete run.
+   * @param  clazz    The class of the model verifier creating this result.
+   */
+  public NerodeEquVerificationResult(final Class<?> clazz)
+  {
+    super(clazz);
     mCounterExample2 = null;
   }
 

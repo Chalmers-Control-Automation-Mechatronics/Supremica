@@ -302,7 +302,7 @@ public class CompositionalStateRepresentationSynthesizer extends
   @Override
   public CompositionalStateRepresentationSynthesisResult createAnalysisResult()
   {
-    return new CompositionalStateRepresentationSynthesisResult();
+    return new CompositionalStateRepresentationSynthesisResult(this);
   }
 
   @Override
