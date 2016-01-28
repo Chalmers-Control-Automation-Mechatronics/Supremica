@@ -211,6 +211,7 @@ public class SynthesizerDialog implements ActionListener
     private final SynthesisSelector typeSelector;
     private final AlgorithmSelector algorithmSelector;
     private final JCheckBox purgeBox;
+	private final JCheckBox renameBox;
     private final JCheckBox removeUnecessarySupBox;
     private final NonblockNote nbNote;
 
@@ -247,6 +248,9 @@ public class SynthesizerDialog implements ActionListener
       purgeBox = new JCheckBox("Purge result");
       purgeBox.setToolTipText("Remove all forbidden states");
 
+	  renameBox = new JCheckBox("Rename states");
+	  renameBox.setToolTipText("Give states generic names (q0, q1, q2,...)");
+	  
       removeUnecessarySupBox =
         new JCheckBox("Remove unnecessary supervisors");
       removeUnecessarySupBox
@@ -280,6 +284,7 @@ public class SynthesizerDialog implements ActionListener
       box = Box.createHorizontalBox();
       box.add(purgeBox);
       box.add(removeUnecessarySupBox);
+	  box.add(renameBox);
       panel.add(box);
       mainBox.add(panel);
 
@@ -300,6 +305,7 @@ public class SynthesizerDialog implements ActionListener
       algorithmSelector.setAlgorithm(synthesizerOptions
         .getSynthesisAlgorithm());
       purgeBox.setSelected(synthesizerOptions.doPurge());
+	  renameBox.setSelected(synthesizerOptions.doRename());
       removeUnecessarySupBox.setSelected(synthesizerOptions
         .getRemoveUnecessarySupervisors());
 
@@ -375,6 +381,7 @@ public class SynthesizerDialog implements ActionListener
       synthesizerOptions.setSynthesisAlgorithm(algorithmSelector
         .getAlgorithm());
       synthesizerOptions.setPurge(purgeBox.isSelected());
+	  synthesizerOptions.setRename(renameBox.isSelected());
       synthesizerOptions
         .setRemoveUnecessarySupervisors(removeUnecessarySupBox.isSelected());
     }
@@ -387,23 +394,37 @@ public class SynthesizerDialog implements ActionListener
       // Default
       purgeBox.setVisible(true); //X
       removeUnecessarySupBox.setVisible(true); //X
+	  renameBox.setVisible(true);
       nbNote.setVisible(false);
 
-      if (algorithmSelector.getAlgorithm() == SynthesisAlgorithm.MONOLITHIC) {
+      if (algorithmSelector.getAlgorithm() == SynthesisAlgorithm.MONOLITHIC) 
+	  {
         removeUnecessarySupBox.setVisible(false); //X
-      } else if (algorithmSelector.getAlgorithm() == SynthesisAlgorithm.COMPOSITIONAL) {
+      }
+	  else if (algorithmSelector.getAlgorithm() == SynthesisAlgorithm.COMPOSITIONAL) 
+	  {
         removeUnecessarySupBox.setVisible(false); //X
         purgeBox.setVisible(true); //X
-      } else if (algorithmSelector.getAlgorithm() == SynthesisAlgorithm.MODULAR) {
-        if ((typeSelector.getType() == SynthesisType.NONBLOCKING)
-            || (typeSelector.getType() == SynthesisType.NONBLOCKINGCONTROLLABLE)) {
+		renameBox.setVisible(false);
+      } 
+	  else if (algorithmSelector.getAlgorithm() == SynthesisAlgorithm.MODULAR) 
+	  {
+ 		renameBox.setVisible(false);
+		
+		if ((typeSelector.getType() == SynthesisType.NONBLOCKING)
+            || (typeSelector.getType() == SynthesisType.NONBLOCKINGCONTROLLABLE)) 
+		{
           purgeBox.setVisible(false); //X
+
           removeUnecessarySupBox.setVisible(false); //X
           nbNote.setVisible(true);
         }
-      } else if (algorithmSelector.getAlgorithm() == SynthesisAlgorithm.COMPOSITIONAL_WATERS) {
+      } 
+	  else if (algorithmSelector.getAlgorithm() == SynthesisAlgorithm.COMPOSITIONAL_WATERS) 
+	  {
         removeUnecessarySupBox.setVisible(false); //X
         purgeBox.setVisible(false); //X
+		renameBox.setVisible(false);
       }
       updatePanel();
     }

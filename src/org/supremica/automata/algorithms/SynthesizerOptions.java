@@ -61,6 +61,7 @@ public final class SynthesizerOptions
     private SynthesisType synthesisType;
     private SynthesisAlgorithm synthesisAlgorithm;
     private boolean purge;
+	private boolean rename;
     private boolean removeUnnecessarySupervisors;
     private boolean maximallyPermissive;
     private boolean maximallyPermissiveIncremental;
@@ -83,6 +84,7 @@ public final class SynthesizerOptions
         this(Config.SYNTHESIS_SYNTHESIS_TYPE.get(),
             Config.SYNTHESIS_ALGORITHM_TYPE.get(),
             Config.SYNTHESIS_PURGE.get(),
+			Config.SYNTHESIS_RENAME.get(),
             Config.SYNTHESIS_OPTIMIZE.get(),
             Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.get(),
             Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.get(),
@@ -99,13 +101,14 @@ public final class SynthesizerOptions
      * also more practical when adding new options.
      */
     private SynthesizerOptions(final SynthesisType synthesisType, final SynthesisAlgorithm synthesisAlgorithm,
-    		final boolean purge, final boolean removeUnnecessarySupervisors, final boolean maximallyPermissive,
+    		final boolean purge, final boolean rename, final boolean removeUnnecessarySupervisors, final boolean maximallyPermissive,
     		final boolean maximallyPermissiveIncremental, final boolean reduceSupervisors,
     		final boolean localizeSupervisors, final boolean supervisorsAsPlants, final boolean bddExtractSupervisor)
     {
         this.synthesisType = synthesisType;
         this.synthesisAlgorithm = synthesisAlgorithm;
         this.purge = purge;
+		this.rename = rename;
         this.removeUnnecessarySupervisors = removeUnnecessarySupervisors;
         this.maximallyPermissive = maximallyPermissive;
         this.maximallyPermissiveIncremental = maximallyPermissiveIncremental;
@@ -189,12 +192,19 @@ public final class SynthesizerOptions
     {
         purge = bool;
     }
-
     public boolean doPurge()
     {
         return purge;
     }
-
+	public void setRename(final boolean bool)
+	{
+		rename = bool;
+	}
+	public boolean doRename()
+	{
+		return rename;
+	}
+	
     public void setRememberDisabledUncontrollableEvents(final boolean remember)
     {
         rememberDisabledUncontrollableEvents = remember;
@@ -278,6 +288,7 @@ public final class SynthesizerOptions
         Config.SYNTHESIS_SYNTHESIS_TYPE.setValue(synthesisType);
         Config.SYNTHESIS_ALGORITHM_TYPE.setValue(synthesisAlgorithm);
         Config.SYNTHESIS_PURGE.set(purge);
+		Config.SYNTHESIS_RENAME.set(rename);
         Config.SYNTHESIS_OPTIMIZE.set(removeUnnecessarySupervisors);
         Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.set(maximallyPermissive);
         Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.set(maximallyPermissiveIncremental);
@@ -292,8 +303,17 @@ public final class SynthesizerOptions
      */
     public static SynthesizerOptions getDefaultSynthesizerOptions()
     {
-        return new SynthesizerOptions(SynthesisType.CONTROLLABLE, SynthesisAlgorithm.MODULAR,
-                                      true, true, true, true, true, true, false, false);
+        return new SynthesizerOptions(SynthesisType.CONTROLLABLE, 
+									  SynthesisAlgorithm.MODULAR,
+                                      true,		// SYNTHESIS_PURGE
+									  false,	// SYNTHESIS_RENAME
+									  true,		// SYNTHESIS_OPTIMIZE		
+									  true,		// SYNTHESIS_MAXIMALLY_PERMISSIVE
+									  true,		// SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL 
+									  true,		// SYNTHESIS_REDUCE_SUPERVISORS
+									  true,		// SYNTHESIS_LOCALIZE_SUPERVISORS
+									  false,	// SYNTHESIS_SUP_AS_PLANT
+									  false);	// BDD_SYNTHESIS_EXTRACT_AUTOMATON
     }
 
 //    public static SynthesizerOptions getDefaultSynthesizerOptionsS()

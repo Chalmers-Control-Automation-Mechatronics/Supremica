@@ -85,8 +85,8 @@ public class AnalyzerSynthesizerAction
         // Get the current options and allow the user to change them...
         SynthesizerOptions options = new SynthesizerOptions();
 
-        SynthesizerDialog synthesizerDialog = new SynthesizerDialog
-	  (ide.getFrame(), selectedAutomata.size(), options);
+        SynthesizerDialog synthesizerDialog = 
+			new SynthesizerDialog(ide.getFrame(), selectedAutomata.size(), options);
         synthesizerDialog.show();
         if (!options.getDialogOK())
         {

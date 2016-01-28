@@ -163,8 +163,14 @@ public class AutomataSynthesizer
 					executionDialog, helperStatistics, false);
 			if (mAbortRequested) return new Automata();
 			result.addAutomaton(retval.automaton);
+			
+			logger.debug("AutomataSynthesizer.execute::Monolithic with rename set to " + this.synthesizerOptions.doRename());
+			if(this.synthesizerOptions.doRename())
+			{
+				final EnumerateStates enumerator = new EnumerateStates(result, "q");
+				enumerator.execute();
+			}
         }
-
         else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.MODULAR)
         {
             // MODULAR (controllability) synthesis

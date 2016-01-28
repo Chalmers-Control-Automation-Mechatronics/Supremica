@@ -55,13 +55,14 @@ public class StateEnumerator
         putValue(SHORT_DESCRIPTION, "Rename states with q0, q1, etc");
     }
 
+	@Override
     public void actionPerformed(ActionEvent event)
     {
         // Get the selected automata
-        Automata automata = ActionMan.getGui().getSelectedAutomata();
+        final Automata automata = ActionMan.getGui().getSelectedAutomata();
 
         // No dialog just yet, prefix is always 'q'
-        EnumerateStates enumer = new EnumerateStates(automata, "q");
+        final EnumerateStates enumer = new EnumerateStates(automata, "q");
 
         enumer.execute();
     }

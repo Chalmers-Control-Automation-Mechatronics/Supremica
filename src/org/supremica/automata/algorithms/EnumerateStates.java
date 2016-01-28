@@ -1,6 +1,5 @@
 
 /************************ EnumerateStates.java ***************/
-
 // Walks the state set and renames the states as <prfx><num>
 // where <prfx> is given and <num> is calculated. Initial state
 // is always numbered 0
@@ -14,26 +13,26 @@ import org.supremica.automata.Automaton;
 
 public class EnumerateStates
 {
-    Automata automata = null;
-    StringBuilder prefix = null;
-    int prefixlen = 0;
+    final Automata automata;
+    final StringBuilder prefix;
+    final int prefixlen;
     
     /**
      * Creates enumerator for the supplied automata.
      */
-    public EnumerateStates(Automata automata, String prefix)
+    public EnumerateStates(Automata automata, final String prefix)
     {
         this.automata = automata;
         this.prefix = new StringBuilder(prefix);
         this.prefixlen = prefix.length();
     }
-    
+
     /**
      * Makes sure the enumeration is made.
      */
     public void execute()
     {
-        Iterator<Automaton> autit = automata.iterator();
+        final Iterator<Automaton> autit = automata.iterator();
         
         while (autit.hasNext())
         {
@@ -44,12 +43,12 @@ public class EnumerateStates
     /**
      * Enumerates the states in automaton.
      */
-    private void enumerate(Automaton automaton)
+    private void enumerate(final Automaton automaton)
     {
         automaton.beginTransaction();
         prefix.append("0");
         
-        State init = automaton.getInitialState();
+        final State init = automaton.getInitialState();
         
         if (init != null)
         {
@@ -59,10 +58,10 @@ public class EnumerateStates
         prefix.setLength(prefixlen);
         
         int num = 1;
-        Iterator<State> stateit = automaton.stateIterator();
+        final Iterator<State> stateit = automaton.stateIterator();
         while (stateit.hasNext())
         {
-            State state = stateit.next();
+            final State state = stateit.next();
             
             if (!state.isInitial())
             {
