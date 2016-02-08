@@ -125,6 +125,7 @@ public class InstantiateModuleAction extends WatersAction
     for (final EventDeclProxy e : moduleElement.getEventDeclList()) {
       if (e.getKind() != EventKind.PROPOSITION) {
         eventToKindMap.put(e.getName(), e.getKind().name());
+        exAutomata.addEvent(e.getName(), e.getKind().name());
       } else {
         prosToKindMap.put(e.getName(), e.getKind().name());
       }
