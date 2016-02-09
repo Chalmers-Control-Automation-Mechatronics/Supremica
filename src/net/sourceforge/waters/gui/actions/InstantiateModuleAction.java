@@ -134,8 +134,13 @@ public class InstantiateModuleAction extends WatersAction
       if (p instanceof SimpleComponentProxy) {
         // create an extended automaton ...
         final SimpleComponentProxy s = (SimpleComponentProxy) p;
+        String exAutName = s.getName();
+        if (exAutName.contains("[")) {
+          exAutName = exAutName.replace('[', '_')
+            .substring(0, s.getName().length() - 1);
+        }
         final ExtendedAutomaton exAut =
-          new ExtendedAutomaton(s.getName(), s.getKind());
+          new ExtendedAutomaton(exAutName, s.getKind());
         // add blocked events ...
         final GraphProxy graph = s.getGraph();
         final LabelBlockProxy blockEvents = graph.getBlockedEvents();
