@@ -172,7 +172,7 @@ public class Actions extends WatersActionManager
     public IDEAction analyzerDeleteAllAction = new AnalyzerDeleteAllAutomataAction(mIDEActions);
     public IDEAction analyzerMinimizeAction = new AnalyzerMinimizeAction(mIDEActions);
     public IDEAction analyzerPurgeAction = new AnalyzerPurgeAction(mIDEActions);
-	public IDEAction analyzerEnumerateAction = new AnalyzerEnumerateAction(mIDEActions);
+	//public IDEAction analyzerEnumerateAction = new AnalyzerEnumerateAction(mIDEActions);
     public IDEAction analyzerEventHiderAction = new AnalyzerEventHiderAction(mIDEActions);
     public IDEAction analyzerRenameAction = new AnalyzerRenameAction(mIDEActions);
     public IDEAction analyzerExportAction = new AnalyzerExportAction(mIDEActions);
