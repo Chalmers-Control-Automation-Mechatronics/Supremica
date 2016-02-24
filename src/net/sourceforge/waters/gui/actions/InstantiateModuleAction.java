@@ -34,6 +34,7 @@
 package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -80,8 +81,9 @@ public class InstantiateModuleAction extends WatersAction
   protected InstantiateModuleAction(final IDE ide)
   {
     super(ide);
-    putValue(Action.NAME, "Instantiate ...");
+    putValue(Action.NAME, "Instantiate");
     putValue(Action.SHORT_DESCRIPTION, "Instantiate the current module");
+    putValue(Action.MNEMONIC_KEY, KeyEvent.VK_I);
     setEnabled(false);
   }
 

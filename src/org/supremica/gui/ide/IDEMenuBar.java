@@ -332,7 +332,8 @@ public class IDEMenuBar extends JMenuBar
       final Action showcomment =
           actions.getAction(ShowModuleCommentAction.class);
       mEditMenu.add(showcomment);
-      // Embedder should probably go to 'Tools' menu?
+      // Embedder & Instantiate should probably go to 'Tools' menu?
+      mEditMenu.addSeparator();
       final Action layout = actions.getAction(GraphLayoutAction.class);
       mEditMenu.add(layout);
       final Action instantiation =
