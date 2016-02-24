@@ -126,6 +126,8 @@ isSkippable(CheckType mode)
     return false;
   } else if (mode == CHECK_TYPE_SAFETY) {
     return isControllable() ? true : !mIsDisabledInSpec;
+  } else if (mode == CHECK_TYPE_LOOP) {
+    return !isControllable();
   } else {
     return true;
   }

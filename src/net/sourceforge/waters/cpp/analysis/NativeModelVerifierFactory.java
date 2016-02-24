@@ -99,6 +99,13 @@ public class NativeModelVerifierFactory
   }
 
   @Override
+  public NativeControlLoopChecker createControlLoopChecker
+    (final ProductDESProxyFactory factory)
+  {
+    return new NativeControlLoopChecker(factory);
+  }
+
+  @Override
   public NativeLanguageInclusionChecker createLanguageInclusionChecker
     (final ProductDESProxyFactory factory)
   {
@@ -167,6 +174,8 @@ public class NativeModelVerifierFactory
       if (verifier instanceof NativeConflictChecker) {
         final NativeConflictChecker checker = (NativeConflictChecker) verifier;
         checker.setConflictCheckMode(ConflictCheckMode.NO_BACKWARDS_TRANSITIONS);
+      } else if (verifier instanceof NativeControlLoopChecker) {
+        // ignore
       } else {
         fail("Command line option " + getName() +
              " is only supported for conflict check!");

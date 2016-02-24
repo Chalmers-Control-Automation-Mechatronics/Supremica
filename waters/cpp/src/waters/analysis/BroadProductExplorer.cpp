@@ -79,7 +79,7 @@ namespace waters {
 
 BroadExpandHandler::
 BroadExpandHandler(BroadProductExplorer& explorer,
-                  TransitionCallBack callBack) :
+                   TransitionCallBack callBack) :
   mExplorer(explorer),
   mTransitionCallBack(callBack),
   mNumberOfWords(explorer.getAutomatonEncoding().getEncodingSize()),
@@ -262,18 +262,36 @@ void BroadProductExplorer::
 setup()
 {
   ProductExplorer::setup();
+
+  // Establish initial event map ...
+  jni::ClassCache* cache = getCache();
+  const jni::SetGlue events = getModel().getEventsGlue(cache);
+  const int numevents = events.size();
+  const EventRecordHashAccessor* eventaccessor =
+    BroadEventRecord::getHashAccessor();
+  PtrHashTable<const jni::EventGlue*,BroadEventRecord*>
+    eventMap(eventaccessor, numevents);
+  setupEventMap(eventMap);
+
+  // Collect transitions ...
   if (!isTrivial()) {
     switch (getCheckType()) {
     case CHECK_TYPE_SAFETY:
-      setupSafety();
+      setupSafety(eventMap);
       break;
     case CHECK_TYPE_NONBLOCKING:
-      setupNonblocking();
+      setupNonblocking(eventMap);
+      break;
+    case CHECK_TYPE_LOOP:
+      setupLoop(eventMap);
       break;
     default:
       break;
     }
   }
+
+  // Establish compact event list ...
+  setupCompactEventList(eventMap);
 }
 
 void BroadProductExplorer::
@@ -470,6 +488,49 @@ expandForwardAgain(uint32_t source,
 {
   BroadVisitHandler handler(*this, callBack);
   return expandForward(source, sourceTuple, sourcePacked, handler);
+}
+
+
+//----------------------------------------------------------------------------
+// hasControllableSelfloop()
+
+class BroadExpandLoopAgainHandler : public BroadExpandHandler
+{
+public:
+  //##########################################################################
+  //# Constructors & Destructors
+  explicit BroadExpandLoopAgainHandler(BroadProductExplorer& explorer) :
+    BroadExpandHandler(explorer, 0)
+  {}
+
+  //##########################################################################
+  //# Callbacks
+  virtual bool handleState(uint32_t source,
+			   const uint32_t* sourceTuple,
+			   const uint32_t* sourcePacked,
+			   BroadEventRecord* event)
+  {
+    // Return false (stop expansion) on controllable selfloop
+    getExplorer().incNumberOfTransitionsExplored();
+    if (!event->isControllable()) {
+      return true;
+    } else {
+      StateSpace& stateSpace = getExplorer().getStateSpace();
+      uint32_t target = stateSpace.find();
+      return source != target;
+    }
+  }
+};
+
+bool BroadProductExplorer::
+hasControllableSelfloop(uint32_t source, uint32_t* sourceTuple)
+{
+  uint32_t* sourcePacked = getStateSpace().get(source);
+  getAutomatonEncoding().decode(sourcePacked, sourceTuple);
+  BroadExpandLoopAgainHandler handler(*this);
+  return !expandForward(source, sourceTuple, sourcePacked, handler);
+  // expandForwardAgain() returns false when stopping early,
+  // i.e., when a controllable selfloop is found.
 }
 
 
@@ -701,19 +762,11 @@ storeNondeterministicTargets(const uint32_t* sourcetuple,
 //# BroadProductExplorer: Private Auxiliary Methods
 
 void BroadProductExplorer::
-setupSafety()
+setupSafety
+  (const PtrHashTable<const jni::EventGlue*,BroadEventRecord*>& eventMap)
 {
-  // Establish initial event map ...
   jni::ClassCache* cache = getCache();
-  const jni::SetGlue events = getModel().getEventsGlue(cache);
-  const int numevents = events.size();
-  const EventRecordHashAccessor* eventaccessor =
-    BroadEventRecord::getHashAccessor();
-  PtrHashTable<const jni::EventGlue*,BroadEventRecord*>
-    eventmap(eventaccessor, numevents);
-  setupEventMap(eventmap);
 
-  // Collect transitions ...
   const int numaut = getNumberOfAutomata();
   for (int a = 0; a < numaut; a++) {
     AutomatonRecord* aut = getAutomatonEncoding().getRecord(a);
@@ -724,7 +777,7 @@ setupSafety()
         setTraceEvent(0, aut);
       }
     }
-    setupTransitions(aut, autglue, eventmap);
+    setupTransitions(aut, autglue, eventMap);
     const jni::SetGlue& events = autglue.getEventsGlue(cache);
     const jni::IteratorGlue& eventiter = events.iteratorGlue(cache);
     while (eventiter.hasNext()) {
@@ -734,29 +787,19 @@ setupSafety()
         getKindTranslator().getEventKindGlue(&event, cache);
       if (kind == jni::EventKind_UNCONTROLLABLE ||
           kind == jni::EventKind_CONTROLLABLE) {
-        BroadEventRecord* eventrecord = eventmap.get(&event);
+        BroadEventRecord* eventrecord = eventMap.get(&event);
         eventrecord->normalize(aut);
       }
     }
   }
-
-  // Establish compact event list ...
-  setupCompactEventList(eventmap);
 }
 
 
 void BroadProductExplorer::
-setupNonblocking()
+setupNonblocking
+  (const PtrHashTable<const jni::EventGlue*,BroadEventRecord*>& eventMap)
 {
-  // Establish initial event map ...
   jni::ClassCache* cache = getCache();
-  const jni::SetGlue events = getModel().getEventsGlue(cache);
-  const int numevents = events.size();
-  const EventRecordHashAccessor* eventaccessor =
-    BroadEventRecord::getHashAccessor();
-  PtrHashTable<const jni::EventGlue*,BroadEventRecord*>
-    eventmap(eventaccessor, numevents);
-  setupEventMap(eventmap);
 
   // Collect transitions ...
   const int numaut = getNumberOfAutomata();
@@ -768,7 +811,7 @@ setupNonblocking()
       setTrivial();
       return;
     }
-    setupTransitions(aut, autglue, eventmap);
+    setupTransitions(aut, autglue, eventMap);
     const jni::SetGlue& events = autglue.getEventsGlue(cache);
     const jni::IteratorGlue& eventiter = events.iteratorGlue(cache);
     while (eventiter.hasNext()) {
@@ -778,7 +821,7 @@ setupNonblocking()
       case jni::EventKind_UNCONTROLLABLE:
       case jni::EventKind_CONTROLLABLE:
         {
-          BroadEventRecord* eventrecord = eventmap.get(&event);
+          BroadEventRecord* eventrecord = eventMap.get(&event);
           eventrecord->normalize(aut);
           break;
         }
@@ -802,9 +845,51 @@ setupNonblocking()
     }
     mDumpStates[d] = UINT32_MAX;
   }
+}
 
-  // Establish compact event list ...
-  setupCompactEventList(eventmap);
+void BroadProductExplorer::
+setupLoop(const PtrHashTable<const jni::EventGlue*,BroadEventRecord*>& eventMap)
+{
+  jni::ClassCache* cache = getCache();
+
+  const int numaut = getNumberOfAutomata();
+  bool hasControllableTransition = false;
+  for (int a = 0; a < numaut; a++) {
+    AutomatonRecord* aut = getAutomatonEncoding().getRecord(a);
+    const jni::AutomatonGlue& autglue = aut->getJavaAutomaton();
+    if (aut->getNumberOfInitialStates() == 0) {
+      setTrivial();
+    }
+    setupTransitions(aut, autglue, eventMap);
+    const jni::SetGlue& events = autglue.getEventsGlue(cache);
+    const jni::IteratorGlue& eventiter = events.iteratorGlue(cache);
+    while (eventiter.hasNext()) {
+      jobject javaobject = eventiter.next();
+      jni::EventGlue event(javaobject, cache);
+      jni::EventKind kind =
+        getKindTranslator().getEventKindGlue(&event, cache);
+      switch (kind) {
+      case jni::EventKind_CONTROLLABLE:
+        {
+          BroadEventRecord* eventRecord = eventMap.get(&event);
+          eventRecord->normalize(aut);
+          hasControllableTransition |= !eventRecord->isGloballyDisabled();
+        }
+        break;
+      case jni::EventKind_UNCONTROLLABLE:
+        {
+          BroadEventRecord* eventRecord = eventMap.get(&event);
+          eventRecord->normalize(aut);
+        }
+        break;
+      default:
+        break;
+      }
+    }
+  }
+  if (!hasControllableTransition) {
+    setTrivial();
+  }
 }
 
 

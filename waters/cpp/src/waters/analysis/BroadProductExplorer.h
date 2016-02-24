@@ -152,6 +152,7 @@ protected:
   virtual bool expandForwardAgain
     (uint32_t source, const uint32_t* sourceTuple,
      const uint32_t* sourcePacked, TransitionCallBack callBack = 0);
+  virtual bool hasControllableSelfloop(uint32_t source, uint32_t* sourceTuple);
   virtual bool expandReverse
     (uint32_t source, const uint32_t* sourceTuple,
      const uint32_t* sourcePacked, BroadExpandHandler& handler);
@@ -173,10 +174,14 @@ protected:
 private:
   //##########################################################################
   //# Private Auxiliary Methods
-  void setupSafety();
-  void setupNonblocking();
+  void setupSafety
+    (const PtrHashTable<const jni::EventGlue*,BroadEventRecord*>& eventMap);
+  void setupNonblocking
+    (const PtrHashTable<const jni::EventGlue*,BroadEventRecord*>& eventMap);
+  void setupLoop
+    (const PtrHashTable<const jni::EventGlue*,BroadEventRecord*>& eventMap);
   void setupEventMap
-    (PtrHashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap);
+    (PtrHashTable<const jni::EventGlue*,BroadEventRecord*>& eventMap);
   void setupTransitions
     (AutomatonRecord* aut,
      const jni::AutomatonGlue& autglue,

@@ -59,7 +59,9 @@
 #include "jni/glue/Glue.h"
 #include "jni/glue/HashMapGlue.h"
 #include "jni/glue/LinkedListGlue.h"
+#include "jni/glue/LoopTraceGlue.h"
 #include "jni/glue/NativeConflictCheckerGlue.h"
+#include "jni/glue/NativeControlLoopCheckerGlue.h"
 #include "jni/glue/NativeSafetyVerifierGlue.h"
 #include "jni/glue/NativeVerificationResultGlue.h"
 #include "jni/glue/OverflowExceptionGlue.h"
@@ -100,17 +102,69 @@ public:
 
   //##########################################################################
   //# Interface TarjanCallBack
-  virtual bool addStateToComponent(uint32_t state)
+  virtual bool isCriticalComponent(uint32_t start, uint32_t end)
   {
     TarjanStateSpace& tarjan = getTarjan();
-    if (tarjan.getNumberOfComponents() == 0) {
-      // Only check markings for the first component ...
-      const AutomatonEncoding& enc = mExplorer.getAutomatonEncoding();
-      const uint32_t* tuplePacked = tarjan.get(state);
-      return !enc.isMarkedStateTuplePacked(tuplePacked);
+    bool first = (tarjan.getNumberOfComponents() == 0);
+    for (uint32_t pos = start; pos < end; pos++) {
+      uint32_t state = tarjan.getStateOnComponentStack(pos);
+      if (first) {
+        // Only check markings for the first component ...
+        const AutomatonEncoding& enc = mExplorer.getAutomatonEncoding();
+        const uint32_t* tuplePacked = tarjan.get(state);
+        if (enc.isMarkedStateTuplePacked(tuplePacked)) {
+          return false;
+        }
+      } else {
+        if (!mExplorer.closeNonblockingTarjanState(state, mTupleBuffer)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+private:
+  //##########################################################################
+  //# Data Members
+  ProductExplorer& mExplorer;
+  uint32_t* mTupleBuffer;
+};
+
+
+//############################################################################
+//# Class ControlLoopTarjanCallBack
+//############################################################################
+
+class ControlLoopTarjanCallBack : public TarjanCallBack
+{
+public:
+  //##########################################################################
+  //# Constructors & Destructors
+  explicit ControlLoopTarjanCallBack
+    (TarjanStateSpace* tarjan, ProductExplorer* explorer) :
+    TarjanCallBack(tarjan),
+    mExplorer(*explorer)
+  {
+    int numAutomata = explorer->getNumberOfAutomata();
+    mTupleBuffer = new uint32_t[numAutomata];
+  }
+
+  virtual ~ControlLoopTarjanCallBack()
+  {
+    delete [] mTupleBuffer;
+  }
+
+  //##########################################################################
+  //# Interface TarjanCallBack
+  virtual bool isCriticalComponent(uint32_t start, uint32_t end)
+  {
+    TarjanStateSpace& tarjan = getTarjan();
+    if (end - start == 1) {
+      uint32_t state = tarjan.getStateOnComponentStack(start);
+      return mExplorer.hasControllableSelfloop(state, mTupleBuffer);
     } else {
-      // For all other components also check transitions ...
-      return mExplorer.closeNonblockingTarjanState(state, mTupleBuffer);
+      return true;
     }
   }
 
@@ -298,6 +352,39 @@ runNonblockingCheck()
   }
 }
 
+bool ProductExplorer::
+runLoopCheck()
+{
+  try {
+    // const jni::JavaString name(mCache->getEnvironment(), mModel.getName());
+    // std::cerr << (const char*) name << std::endl;
+    mStartTime = clock();
+    bool result = true;
+    mCheckType = CHECK_TYPE_LOOP;
+    setup();
+    if (!mIsTrivial || mTraceState != UINT32_MAX) {
+      if (mIsTrivial) {
+        result = false;
+      } else {
+        storeInitialStates(false);
+        result = doControlLoopTarjanSearch();
+      }
+      if (!result) {
+        mTraceStartTime = clock();
+        mTraceList = new jni::LinkedListGlue(mCache);
+        // computeTarjanCounterExample(*mTraceList);
+      }
+    }
+    teardown();
+    mStopTime = clock();
+    return result;
+  } catch (...) {
+    teardown();
+    throw;
+  }
+}
+
+
 jni::SafetyTraceGlue ProductExplorer::
 getSafetyCounterExample(const jni::NativeSafetyVerifierGlue& gchecker)
   const
@@ -439,6 +526,10 @@ setup()
         break;
       }
     }
+    break;
+  case CHECK_TYPE_LOOP:
+    mStateSpace = new TarjanStateSpace(mEncoding, mStateLimit);
+    mDepthMap = new ArrayList<uint32_t>(2); // for number of init states
     break;
   default:
     throw jni::PreAnalysisConfigurationException(mCheckType);
@@ -791,7 +882,7 @@ doNonblockingTarjanSearch(uint32_t root)
         mEncoding->decode(sourcePacked, sourceTuple);
         if (!isLocalDumpState(sourceTuple)) {
           expandForward(source, sourceTuple, sourcePacked,
-                        &ProductExplorer::processTarjanTransition);
+                        &ProductExplorer::processNonblockingTarjanTransition);
         }
         // The above calls tarjan->processTransition(source, target) ...
         tarjan->endStateExpansion();
@@ -806,9 +897,9 @@ doNonblockingTarjanSearch(uint32_t root)
 }
 
 bool ProductExplorer::
-processTarjanTransition(uint32_t source,
-                        const EventRecord* event,
-                        uint32_t target)
+processNonblockingTarjanTransition(uint32_t source,
+                                   const EventRecord* event,
+                                   uint32_t target)
 {
   // std::cerr << "  " << source << "->" << target << std::endl;
   TarjanStateSpace* tarjan = (TarjanStateSpace*) mStateSpace;
@@ -829,6 +920,7 @@ closeNonblockingTarjanState(uint32_t source, uint32_t* sourceTuple)
     return expandForwardAgain
       (source, sourceTuple, sourcePacked,
        &ProductExplorer::closeNonblockingTarjanTransition);
+    // expandForwardAgain() returns false when stopping early
   }
 }
 
@@ -840,6 +932,76 @@ closeNonblockingTarjanTransition(uint32_t source,
   TarjanStateSpace* tarjan = (TarjanStateSpace*) mStateSpace;
   return !tarjan->isClosedState(target);
   // false return value means to stop checking
+}
+
+
+//----------------------------------------------------------------------------
+// doNonblockingTarjanSearch()
+
+bool ProductExplorer::
+doControlLoopTarjanSearch()
+{
+  for (uint32_t root = 0; root < mNumStates; root++) {
+    if (!doControlLoopTarjanSearch(root)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+
+bool ProductExplorer::
+doControlLoopTarjanSearch(uint32_t root)
+{
+  TarjanStateSpace* tarjan = (TarjanStateSpace*) mStateSpace;
+  if (!tarjan->isOpenState(root)) {
+    return true;
+  }
+
+  ControlLoopTarjanCallBack callBack(tarjan, this);
+  uint32_t* sourceTuple = new uint32_t[mNumAutomata];
+  try {
+    tarjan->pushRootControlState(root);
+    do {
+      checkAbort();
+      // tarjan->dumpControlStack();
+      if (tarjan->isTopControlStateClosing()) {
+        // std::cerr << "c" << tarjan->getTopControlState() << std::endl;
+        tarjan->mayBeCloseComponent(&callBack);
+        tarjan->popControlState();
+        if (tarjan->getCriticalComponentSize() > 0) {
+          return false;
+        }
+      } else {
+        // std::cerr << "e" << tarjan->getTopControlState() << std::endl;
+        uint32_t source = tarjan->beginStateExpansion();
+        uint32_t* sourcePacked = mStateSpace->get(source);
+        mEncoding->decode(sourcePacked, sourceTuple);
+        expandForward(source, sourceTuple, sourcePacked,
+                      &ProductExplorer::processControlLoopTarjanTransition);
+        // The above calls tarjan->processTransition(source, target) ...
+        tarjan->endStateExpansion();
+        // std::cerr << "n=" << mStateSpace->size() << std::endl;
+      }
+    } while (!tarjan->isControlStackEmpty());
+    return true;
+  } catch (...) {
+    delete[] sourceTuple;
+    throw;
+  }
+}
+
+bool ProductExplorer::
+processControlLoopTarjanTransition(uint32_t source,
+                                   const EventRecord* event,
+                                   uint32_t target)
+{
+  if (event->isControllable()) {
+    // std::cerr << "  " << source << "->" << target << std::endl;
+    TarjanStateSpace* tarjan = (TarjanStateSpace*) mStateSpace;
+    tarjan->processTransition(source, target);
+  }
+  return true;
 }
 
 
@@ -1275,6 +1437,53 @@ Java_net_sourceforge_waters_cpp_analysis_NativeConflictChecker_runNativeAlgorith
       jni::ConflictTraceGlue trace =
         checker->getConflictCounterExample(gchecker);
       vresult.setCounterExample(&trace);
+      checker->addStatistics(vresult);
+      return vresult.returnJavaObject();
+    }
+  } catch (const std::bad_alloc& error) {
+    finalizer.finalize();
+    jni::OverflowExceptionGlue glue(jni::OverflowKind_MEMORY, &cache);
+    cache.throwJavaException(glue);
+    return 0;
+  } catch (const jni::PreJavaException& pre) {
+    finalizer.finalize();
+    pre.throwJavaException(cache);
+    return 0;
+  } catch (const jni::ExceptionGlue& glue) {
+    finalizer.finalize();
+    cache.throwJavaException(glue);
+    return 0;
+  } catch (const jthrowable& throwable) {
+    env->ExceptionClear();
+    finalizer.finalize();
+    env->Throw(throwable);
+    return 0;
+  }
+}
+
+
+JNIEXPORT jobject JNICALL
+Java_net_sourceforge_waters_cpp_analysis_NativeControlLoopChecker_runNativeAlgorithm
+  (JNIEnv* env, jobject jchecker)
+{
+  jni::ClassCache cache(env);
+  jni::NativeControlLoopCheckerGlue gchecker(jchecker, &cache);
+  waters::ProductExplorerFinalizer finalizer(gchecker);
+  try {
+    jni::EventGlue nomarking(0, &cache);
+    waters::ProductExplorer* checker =
+      finalizer.createProductExplorer(nomarking, nomarking, cache);
+    bool result = checker->runLoopCheck();
+    jni::NativeVerificationResultGlue vresult =
+      gchecker.createAnalysisResultGlue(&cache);
+    if (result) {
+      vresult.setSatisfied(true);
+      checker->addStatistics(vresult);
+      return vresult.returnJavaObject();
+    } else {
+      // jni::LoopTraceGlue trace = checker->getLoopCounterExample(gchecker);
+      // vresult.setCounterExample(&trace);
+      vresult.setSatisfied(false);
       checker->addStatistics(vresult);
       return vresult.returnJavaObject();
     }

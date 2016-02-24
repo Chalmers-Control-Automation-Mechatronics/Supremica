@@ -51,7 +51,8 @@ namespace waters {
 
 enum CheckType {
   CHECK_TYPE_SAFETY,
-  CHECK_TYPE_NONBLOCKING
+  CHECK_TYPE_NONBLOCKING,
+  CHECK_TYPE_LOOP
 };
 
 }   /* namespace waters */

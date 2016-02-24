@@ -134,6 +134,7 @@ public:
   //# Invocation
   virtual bool runSafetyCheck();
   virtual bool runNonblockingCheck();
+  virtual bool runLoopCheck();
   virtual jni::SafetyTraceGlue getSafetyCounterExample
     (const jni::NativeSafetyVerifierGlue& gchecker) const;
   virtual jni::ConflictTraceGlue getConflictCounterExample
@@ -207,11 +208,18 @@ protected:
 
   virtual bool doNonblockingTarjanSearch();
   virtual bool doNonblockingTarjanSearch(uint32_t root);
-  bool processTarjanTransition
+  bool processNonblockingTarjanTransition
     (uint32_t source, const EventRecord* event, uint32_t target);
-  bool closeNonblockingTarjanState(uint32_t state, uint32_t* tupleBuffer);
+  bool closeNonblockingTarjanState(uint32_t source, uint32_t* sourceTuple);
   bool closeNonblockingTarjanTransition
     (uint32_t source, const EventRecord* event, uint32_t target);
+
+  virtual bool doControlLoopTarjanSearch();
+  virtual bool doControlLoopTarjanSearch(uint32_t root);
+  bool processControlLoopTarjanTransition
+    (uint32_t source, const EventRecord* event, uint32_t target);
+  virtual bool hasControllableSelfloop
+    (uint32_t source, uint32_t* sourceTuple) = 0;
 
   virtual void computeBFSCounterExample
     (const jni::ListGlue& list, uint32_t level);
@@ -318,6 +326,7 @@ private:
   //##########################################################################
   //# Friends
   friend class NonblockingTarjanCallBack;
+  friend class ControlLoopTarjanCallBack;
 };
 
 }   /* namespace waters */

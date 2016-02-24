@@ -215,6 +215,7 @@
       </classpath>
       <class name="net.sourceforge.waters.cpp.analysis.NativeBitSet"/>
       <class name="net.sourceforge.waters.cpp.analysis.NativeConflictChecker"/>
+      <class name="net.sourceforge.waters.cpp.analysis.NativeControlLoopChecker"/>
       <class name="net.sourceforge.waters.cpp.analysis.NativeHashSet"/>
       <class name="net.sourceforge.waters.cpp.analysis.NativeModelAnalyzer"/>
       <class name="net.sourceforge.waters.cpp.analysis.NativeSafetyVerifier"/>

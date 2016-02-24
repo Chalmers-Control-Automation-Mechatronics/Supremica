@@ -177,6 +177,11 @@ public:
   void popControlState();
 
   //##########################################################################
+  //# Component Stack
+  inline uint32_t getStateOnComponentStack(uint32_t pos) const
+    {return mComponentStack.get(pos);}
+
+  //##########################################################################
   //# Algorithm
   uint32_t beginStateExpansion();
   void processTransition(uint32_t source, uint32_t target);
@@ -252,7 +257,7 @@ public:
 
   //##########################################################################
   //# Interface TarjanCallBack
-  virtual bool addStateToComponent(uint32_t state) = 0;
+  virtual bool isCriticalComponent(uint32_t start, uint32_t end) = 0;
 
 private:
   //##########################################################################

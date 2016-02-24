@@ -352,22 +352,11 @@ mayBeCloseComponent(TarjanCallBack *callBack)
   uint32_t state = mComponentStack.get(compIndex);
   uint32_t lowLink = getLowLink(state);
   if (compIndex == lowLink) {
-    bool critical = false;
     uint32_t end = mComponentStack.size();
-    if (callBack != 0) {
-      critical = true;
-      for (uint32_t pos = compIndex; pos < end; pos++) {
-        uint32_t s = mComponentStack.get(pos);
-        if (!callBack->addStateToComponent(s)) {
-          critical = false;
-          break;
-        }
-      }
-      if (critical) {
-        mCriticalComponentStart = compIndex;
-      }
+    if (callBack != 0 && callBack->isCriticalComponent(compIndex, end)) {
+      mCriticalComponentStart = compIndex;
     }
-    if (!critical) {
+    if (mCriticalComponentStart == UINT32_MAX) {
       for (uint32_t pos = compIndex; pos < end; pos++) {
         uint32_t s = mComponentStack.get(pos);
         setLowLink(s, LL_CLOSED);

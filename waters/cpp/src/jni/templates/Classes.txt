@@ -175,6 +175,9 @@ glue class SafetyTraceProxy extends TraceProxy {
 glue class ConflictTraceProxy extends TraceProxy {
 }
 
+glue class LoopTraceProxy extends TraceProxy {
+}
+
 glue class ProductDESProxyFactory {
   glue AutomatonProxy createAutomatonProxy(String name,
                                            glue ComponentKind kind,
@@ -192,6 +195,10 @@ glue class ProductDESProxyFactory {
                                                    glue Collection automata,
                                                    glue List steps,
                                                    glue ConflictKind kind);
+  glue LoopTraceProxy createLoopTraceProxy(String name,
+					   ProductDESProxy des,
+					   glue List events,
+					   int index);
   glue EventProxy createEventProxy(String name, glue EventKind kind);
   glue ProductDESProxy createProductDESProxy(String name,
                                              glue Collection events,
@@ -310,4 +317,7 @@ glue class NativeConflictChecker extends NativeModelVerifier {
   glue EventProxy getConfiguredPreconditionMarking();
   glue ConflictCheckMode getConflictCheckMode();
   boolean isDumpStateAware();
+}
+
+glue class NativeControlLoopChecker extends NativeModelVerifier {
 }
