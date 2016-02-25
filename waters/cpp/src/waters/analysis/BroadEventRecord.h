@@ -81,6 +81,8 @@ public:
   bool isSkippable(CheckType mode) const;
   inline bool isDeterministic() const
     {return mNumNondeterministicRecords == 0;}
+  inline bool hasSearchRecord() const
+    {return mUsedSearchRecords != 0 || mUnusedSearchRecords != 0;}
   inline int getNumberOfUpdates() const {return mNumberOfUpdates;}
   inline int getNumberOfNondeterministicUpdates() const
     {return mNumNondeterministicRecords;}

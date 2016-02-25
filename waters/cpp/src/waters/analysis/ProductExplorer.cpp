@@ -227,7 +227,8 @@ ProductExplorer(const jni::ProductDESProxyFactoryGlue& factory,
     mJavaTraceEvent(0, cache),
     mJavaTraceAutomaton(0, cache),
     mJavaTraceState(0, cache),
-    mConflictKind(jni::ConflictKind_CONFLICT)
+    mConflictKind(jni::ConflictKind_CONFLICT),
+    mLoopIndex(-1)
 {
 }
 
@@ -362,13 +363,24 @@ runLoopCheck()
     bool result = true;
     mCheckType = CHECK_TYPE_LOOP;
     setup();
-    if (!mIsTrivial || mTraceState != UINT32_MAX) {
-      if (mIsTrivial) {
-        result = false;
+    if (mIsTrivial) {
+      if (mTraceEvent == 0) {
+        result = true;
       } else {
-        storeInitialStates(false);
-        result = doControlLoopTarjanSearch();
+        storeInitialStates(false, false);
+        mTraceList = new jni::LinkedListGlue(mCache);
+        jni::TraceStepGlue step0 = mFactory.createTraceStepProxyGlue(0, mCache);
+        mTraceList->add(&step0);
+        mJavaTraceEvent = mTraceEvent->getJavaEvent();
+        jni::TraceStepGlue step1 =
+          mFactory.createTraceStepProxyGlue(&mJavaTraceEvent, mCache);
+        mTraceList->add(&step1);
+        mLoopIndex = 0;
+        result = false;
       }
+    } else {
+      storeInitialStates(false);
+      result = doControlLoopTarjanSearch();
       if (!result) {
         mTraceStartTime = clock();
         mTraceList = new jni::LinkedListGlue(mCache);
@@ -412,6 +424,17 @@ getConflictCounterExample(const jni::NativeConflictCheckerGlue& gchecker)
   const jni::ConflictKindGlue kind(mConflictKind, mCache);
   return mFactory.createConflictTraceProxyGlue
     (name, 0, 0, &mModel, &automata, mTraceList, &kind, mCache);
+}
+
+
+jni::LoopTraceGlue ProductExplorer::
+getLoopCounterExample(const jni::NativeControlLoopCheckerGlue& gchecker)
+  const
+{
+  jstring name = gchecker.getTraceName();
+  const jni::SetGlue automata = mModel.getAutomataGlue(mCache);
+  return mFactory.createLoopTraceProxyGlue
+    (name, 0, 0, &mModel, &automata, mTraceList, mLoopIndex, mCache);
 }
 
 
@@ -1481,8 +1504,8 @@ Java_net_sourceforge_waters_cpp_analysis_NativeControlLoopChecker_runNativeAlgor
       checker->addStatistics(vresult);
       return vresult.returnJavaObject();
     } else {
-      // jni::LoopTraceGlue trace = checker->getLoopCounterExample(gchecker);
-      // vresult.setCounterExample(&trace);
+      jni::LoopTraceGlue trace = checker->getLoopCounterExample(gchecker);
+      vresult.setCounterExample(&trace);
       vresult.setSatisfied(false);
       checker->addStatistics(vresult);
       return vresult.returnJavaObject();

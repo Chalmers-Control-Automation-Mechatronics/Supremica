@@ -291,7 +291,9 @@ setup()
   }
 
   // Establish compact event list ...
-  setupCompactEventList(eventMap);
+  if (!isTrivial()) {
+    setupCompactEventList(eventMap);
+  }
 }
 
 void BroadProductExplorer::
@@ -868,27 +870,36 @@ setupLoop(const PtrHashTable<const jni::EventGlue*,BroadEventRecord*>& eventMap)
       jni::EventGlue event(javaobject, cache);
       jni::EventKind kind =
         getKindTranslator().getEventKindGlue(&event, cache);
-      switch (kind) {
-      case jni::EventKind_CONTROLLABLE:
-        {
-          BroadEventRecord* eventRecord = eventMap.get(&event);
-          eventRecord->normalize(aut);
-          hasControllableTransition |= !eventRecord->isGloballyDisabled();
-        }
-        break;
-      case jni::EventKind_UNCONTROLLABLE:
-        {
-          BroadEventRecord* eventRecord = eventMap.get(&event);
-          eventRecord->normalize(aut);
-        }
-        break;
-      default:
-        break;
+      if (kind == jni::EventKind_CONTROLLABLE ||
+          kind == jni::EventKind_UNCONTROLLABLE) {
+        BroadEventRecord* eventRecord = eventMap.get(&event);
+        eventRecord->normalize(aut);
       }
     }
   }
-  if (!hasControllableTransition) {
-    setTrivial();
+  if (!isTrivial()) {
+    // Is there a controllable event not used in any automaton?
+    // If yes: control loop!
+    HashTableIterator iter = eventMap.iterator();
+    while (eventMap.hasNext(iter)) {
+      const BroadEventRecord* event = eventMap.next(iter);
+      if (event->isControllable()) {
+        if (event->isGloballyDisabled()) {
+          // skip
+        } else if (event->hasSearchRecord()) {
+          hasControllableTransition = true;
+        } else {
+          setTrivial();
+          setTraceEvent(event);
+          return;
+        }
+      }
+    }
+    // OK, all controllable events are used.
+    // Are there controllable transitions? If no: control-loop free!
+    if (!hasControllableTransition) {
+      setTrivial();
+    }
   }
 }
 

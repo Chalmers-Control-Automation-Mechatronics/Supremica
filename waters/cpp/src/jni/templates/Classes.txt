@@ -196,8 +196,11 @@ glue class ProductDESProxyFactory {
                                                    glue List steps,
                                                    glue ConflictKind kind);
   glue LoopTraceProxy createLoopTraceProxy(String name,
-					   ProductDESProxy des,
-					   glue List events,
+					   String comment,
+					   URI location,
+					   glue ProductDESProxy des,
+					   glue Collection automata,
+					   glue List steps,
 					   int index);
   glue EventProxy createEventProxy(String name, glue EventKind kind);
   glue ProductDESProxy createProductDESProxy(String name,
