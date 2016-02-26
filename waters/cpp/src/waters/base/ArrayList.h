@@ -164,6 +164,11 @@ public:
     return mArray[--mNumElements];
   }
 
+  void removeLast(int count)
+  {
+    mNumElements -= count;
+  }
+
   void sort(int (*comparator)(const void*,const void*))
   {
     qsort(mArray, mNumElements, sizeof(Value), comparator);

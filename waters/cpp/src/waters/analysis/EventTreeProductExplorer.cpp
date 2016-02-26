@@ -107,6 +107,23 @@ setupReverseTransitionRelations()
 
 
 //----------------------------------------------------------------------------
+// removeUncontrollableEvents()
+
+void EventTreeProductExplorer::
+removeUncontrollableEvents()
+{
+  mForwardEventTree.clear();
+  BroadProductExplorer::removeUncontrollableEvents();
+  EventTreeGenerator generator(getAutomatonEncoding(),
+                               getForwardEventRecords(),
+                               mForwardEventTree,
+                               getCheckType() == CHECK_TYPE_SAFETY);
+  generator.execute();
+  //generator.dump();
+}
+
+
+//----------------------------------------------------------------------------
 // expandForward()
 
 #define EXPAND(source, sourceTuple, sourcePacked,                       \

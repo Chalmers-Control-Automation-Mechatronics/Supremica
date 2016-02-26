@@ -192,6 +192,7 @@ public:
   //##########################################################################
   //# Trace Search
   void setUpTraceSearch(uint32_t numInit);
+  void setUpLoopClosingSearch(uint32_t entryState);
   uint32_t getTraceStatus(uint32_t state) const {return getLowLink(state);}
   uint32_t& getTraceStatusRef(uint32_t state) {return getLowLinkRef(state);}
 

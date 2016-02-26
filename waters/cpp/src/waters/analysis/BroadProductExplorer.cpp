@@ -251,7 +251,7 @@ addStatistics(const jni::NativeVerificationResultGlue& vresult)
   const
 {
   ProductExplorer::addStatistics(vresult);
-  vresult.setTotalNumberOfEvents(mEventRecords.size());
+  vresult.setTotalNumberOfEvents(mTotalNumberOfEvents);
 }
 
 
@@ -294,6 +294,8 @@ setup()
   if (!isTrivial()) {
     setupCompactEventList(eventMap);
   }
+  // Remember event count for stats - before it gets changed by optimisation
+  mTotalNumberOfEvents = mEventRecords.size();
 }
 
 void BroadProductExplorer::
@@ -303,7 +305,10 @@ teardown()
     delete mReversedEventRecords.get(i);
   }
   mReversedEventRecords.clear();
-  // Keeping mEventRecords - for stats
+  for (uint32_t i = 0; i < mEventRecords.size(); i++) {
+    delete mEventRecords.get(i);
+  }
+  mEventRecords.clear();
   delete [] mNondeterministicTransitionIterators;
   mNondeterministicTransitionIterators = 0;
   delete [] mDumpStates;
@@ -364,6 +369,29 @@ setupReverseTransitionRelations()
         new NondeterministicTransitionIterator[mMaxNondeterministicUpdates];
     }
   }
+}
+
+
+//----------------------------------------------------------------------------
+// removeUncontrollableEvents()
+
+void BroadProductExplorer::
+removeUncontrollableEvents()
+{
+  uint32_t w = 0;
+  uint32_t r = 0;
+  for (r = 0; r < mEventRecords.size(); r++) {
+    BroadEventRecord* event = mEventRecords.get(r);
+    if (event->isControllable()) {
+      if (w != r) {
+        mEventRecords.set(w, event);
+      }
+      w++;
+    } else {
+      delete event;
+    }
+  }
+  mEventRecords.removeLast(r - w);
 }
 
 
@@ -494,15 +522,16 @@ expandForwardAgain(uint32_t source,
 
 
 //----------------------------------------------------------------------------
-// hasControllableSelfloop()
+// expandForwardAgainIncludingSelfloops()
 
-class BroadExpandLoopAgainHandler : public BroadExpandHandler
+class BroadExpandHandlerIncludingSelfloops : public BroadExpandHandler
 {
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit BroadExpandLoopAgainHandler(BroadProductExplorer& explorer) :
-    BroadExpandHandler(explorer, 0)
+  explicit BroadExpandHandlerIncludingSelfloops(BroadProductExplorer& explorer,
+                                                TransitionCallBack callBack) :
+    BroadExpandHandler(explorer, callBack)
   {}
 
   //##########################################################################
@@ -512,27 +541,22 @@ public:
 			   const uint32_t* sourcePacked,
 			   BroadEventRecord* event)
   {
-    // Return false (stop expansion) on controllable selfloop
     getExplorer().incNumberOfTransitionsExplored();
-    if (!event->isControllable()) {
-      return true;
-    } else {
-      StateSpace& stateSpace = getExplorer().getStateSpace();
-      uint32_t target = stateSpace.find();
-      return source != target;
-    }
+    StateSpace& stateSpace = getExplorer().getStateSpace();
+    uint32_t target = stateSpace.find();
+    return handleTransition(source, event, target);
   }
 };
 
 bool BroadProductExplorer::
-hasControllableSelfloop(uint32_t source, uint32_t* sourceTuple)
+expandForwardAgainIncludingSelfloops(uint32_t source,
+                                     uint32_t* sourceTuple,
+                                     TransitionCallBack callBack)
 {
   uint32_t* sourcePacked = getStateSpace().get(source);
   getAutomatonEncoding().decode(sourcePacked, sourceTuple);
-  BroadExpandLoopAgainHandler handler(*this);
-  return !expandForward(source, sourceTuple, sourcePacked, handler);
-  // expandForwardAgain() returns false when stopping early,
-  // i.e., when a controllable selfloop is found.
+  BroadExpandHandlerIncludingSelfloops handler(*this, callBack);
+  return expandForward(source, sourceTuple, sourcePacked, handler);
 }
 
 

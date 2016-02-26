@@ -71,6 +71,7 @@ public:
 
   //#########################################################################
   //# Simple Access
+  void clear();
   inline bool isEmpty() const {return mCode.isEmpty();}
   inline uint32_t getCodeSize() const {return mCode.size();}
   inline uint32_t get(uint32_t index) const {return mCode.get(index);}

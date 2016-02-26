@@ -76,6 +76,7 @@ glue class Collection {
 
 glue class List extends Collection {
   boolean add(glue Object element);
+  boolean addAll(glue Collection elements);
   void add(int index, glue Object element);
 }
 

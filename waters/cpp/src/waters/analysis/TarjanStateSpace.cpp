@@ -400,9 +400,25 @@ setUpTraceSearch(uint32_t numInit)
   uint32_t end = mComponentStack.size();
   for (uint32_t pos = mCriticalComponentStart; pos < end; pos++) {
     uint32_t s = mComponentStack.get(pos);
-    setLowLink(s, TR_CRITICAL);
+    setLowLink(s, TR_CRITICAL); // TraceStatus and LowLink are the same
   }
   mComponentStack.clear();
+}
+
+void TarjanStateSpace::
+setUpLoopClosingSearch(uint32_t entryState)
+{
+  uint32_t numStates = size();
+  for (uint32_t s = 0; s < numStates; s++) {
+    uint32_t& ref = getTraceStatusRef(s);
+    if (s == entryState) {
+      ref = TR_CRITICAL;
+    } else if (ref == TR_CRITICAL) {
+      ref = TR_OPEN;
+    } else {
+      ref = TR_INIT;
+    }
+  }
 }
 
 

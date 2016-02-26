@@ -72,6 +72,7 @@ protected:
   //# Overrides for ProductExplorer
   virtual void setup();
   virtual void setupReverseTransitionRelations();
+  virtual void removeUncontrollableEvents();
   virtual bool expandForward
     (uint32_t source, const uint32_t* sourceTuple,
      const uint32_t* sourcePacked, BroadExpandHandler& handler);

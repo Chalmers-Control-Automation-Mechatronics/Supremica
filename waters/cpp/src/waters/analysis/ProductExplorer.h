@@ -222,14 +222,19 @@ protected:
   virtual bool doControlLoopTarjanSearch(uint32_t root);
   bool processControlLoopTarjanTransition
     (uint32_t source, const EventRecord* event, uint32_t target);
-  virtual bool hasControllableSelfloop
-    (uint32_t source, uint32_t* sourceTuple) = 0;
+  bool checkControlLoopTarjanTransitionForSelfloop
+    (uint32_t source, const EventRecord* event, uint32_t target);
+  virtual bool expandForwardAgainIncludingSelfloops
+    (uint32_t source, uint32_t* sourceTuple,
+     TransitionCallBack callBack = 0) = 0;
 
   virtual void computeBFSCounterExample
     (const jni::ListGlue& list, uint32_t level);
 
-  virtual void computeTarjanCounterExample(const jni::ListGlue& list);
-  void expandTarjanTraceState
+  virtual void computeNonblockingTarjanCounterExample
+    (const jni::ListGlue& list);
+  virtual void computeLoopCounterExample(const jni::ListGlue& list);
+  void expandNonblockingTarjanTraceState
     (uint32_t source, const uint32_t* sourceTuple,
      const uint32_t* sourcePacked, BlockedArrayList<uint32_t>* successors);
   bool processTarjanTraceTransition
@@ -244,6 +249,7 @@ protected:
   virtual void storeInitialStates(bool initzero, bool donondet = true);
   virtual bool isLocalDumpState(const uint32_t* tuple) const;
   virtual void setupReverseTransitionRelations() = 0;
+  virtual void removeUncontrollableEvents() = 0;
   virtual bool expandForwardSafety
     (uint32_t source, const uint32_t* sourceTuple,
      const uint32_t* sourcePacked, TransitionCallBack callBack = 0) = 0;
@@ -269,15 +275,19 @@ protected:
   //##########################################################################
   //# Simple Access
   inline jni::ClassCache* getCache() {return mCache;}
+  inline jni::ProductDESProxyFactoryGlue& getFactory() {return mFactory;}
   inline jni::ProductDESGlue& getModel() {return mModel;}
   inline jni::KindTranslatorGlue& getKindTranslator() {return mKindTranslator;}
   inline jni::EventGlue& getMarking() {return mMarking;}
   inline AutomatonEncoding& getAutomatonEncoding() {return *mEncoding;}
   inline bool isTrivial() const {return mIsTrivial;}
   inline void setTrivial() {mIsTrivial = true;}
+  inline uint32_t getTraceState() const {return mTraceState;}
   inline void setTraceState(uint32_t state) {mTraceState = state;}
   inline jni::ConflictKind getConflictKind() const {return mConflictKind;}
   inline void setConflictKind(jni::ConflictKind kind) {mConflictKind = kind;}
+  inline void setTarjanTraceSuccessors(BlockedArrayList<uint32_t>* successors)
+    {mTarjanTraceSuccessors = successors;}
 
 private:
   //##########################################################################
@@ -332,7 +342,12 @@ private:
   //# Friends
   friend class NonblockingTarjanCallBack;
   friend class ControlLoopTarjanCallBack;
+  friend class TarjanTraceFinder;
+  friend class NonblockingTarjanTraceFinder;
+  friend class LoopEntryTraceFinder;
+  friend class LoopClosingTraceFinder;
 };
+
 
 }   /* namespace waters */
 

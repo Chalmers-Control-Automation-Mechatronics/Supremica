@@ -55,6 +55,17 @@ namespace waters {
 
 
 //############################################################################
+//# EventTree: Simple Access
+
+void EventTree::
+clear()
+{
+  mCode.clear();
+  mEligibilityRecords.clear();
+}
+
+
+//############################################################################
 //# EventTree: Code Generation
 
 void EventTree::

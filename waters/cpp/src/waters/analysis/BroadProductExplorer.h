@@ -140,6 +140,7 @@ protected:
   //# State Expansion Procedures
   virtual bool isLocalDumpState(const uint32_t* tuple) const;
   virtual void setupReverseTransitionRelations();
+  virtual void removeUncontrollableEvents();
   virtual bool expandForward
     (uint32_t source, const uint32_t* sourceTuple,
      const uint32_t* sourcePacked, BroadExpandHandler& handler);
@@ -152,7 +153,9 @@ protected:
   virtual bool expandForwardAgain
     (uint32_t source, const uint32_t* sourceTuple,
      const uint32_t* sourcePacked, TransitionCallBack callBack = 0);
-  virtual bool hasControllableSelfloop(uint32_t source, uint32_t* sourceTuple);
+  virtual bool expandForwardAgainIncludingSelfloops
+    (uint32_t source, uint32_t* sourceTuple,
+     TransitionCallBack callBack = 0);
   virtual bool expandReverse
     (uint32_t source, const uint32_t* sourceTuple,
      const uint32_t* sourcePacked, BroadExpandHandler& handler);
@@ -191,9 +194,9 @@ private:
 
   //##########################################################################
   //# Data Members
-  int mNumEventRecords;
   ArrayList<BroadEventRecord*> mEventRecords;
   ArrayList<BroadEventRecord*> mReversedEventRecords;
+  uint32_t mTotalNumberOfEvents;
   int mMaxNondeterministicUpdates;
   NondeterministicTransitionIterator* mNondeterministicTransitionIterators;
   // List of pairs (automaton number, state number), terminated by UINT32_MAX;
