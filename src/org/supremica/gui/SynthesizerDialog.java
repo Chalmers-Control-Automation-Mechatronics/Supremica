@@ -38,11 +38,11 @@ package org.supremica.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Vector;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -73,34 +73,24 @@ abstract class SynthesizerPanel extends JPanel
 }
 
 
-public class SynthesizerDialog implements ActionListener
+public class SynthesizerDialog
+  extends JDialog
+  implements ActionListener
 {
-  private final JButton okButton;
-  private final JButton cancelButton;
-  private final SynthesizerOptions synthesizerOptions;
-  SynthesizerDialogStandardPanel standardPanel;
-  SynthesizerDialogAdvancedPanel advancedPanel;
-
-  MinimizationOptions mMinimizationOptions;
-  SynthesizerDialogHeuristicPanel mHeuristicPanel;
-  JTabbedPane mTabbedPane;
-  private final JDialog dialog;
-  private final Frame parentFrame;
 
   /**
-   * Creates modal dialog box for input of synthesizer options.
+   * Creates modal dialog box for input of synthesis options.
    */
-  public SynthesizerDialog(final Frame parentFrame, final int numSelected,
+  public SynthesizerDialog(final Frame parentFrame,
+                           final int numSelected,
                            final SynthesizerOptions synthesizerOptions)
   {
-    dialog = new JDialog(parentFrame, true); // modal
-    this.parentFrame = parentFrame;
+    super(parentFrame, true); // modal
     this.synthesizerOptions = synthesizerOptions;
 
-    dialog.setTitle("Synthesizer options");
-    dialog.setSize(new Dimension(400, 300));
+    setTitle("Synthesizer options");
 
-    final Container contentPane = dialog.getContentPane();
+    final Container contentPane = getContentPane();
 
     standardPanel = new SynthesizerDialogStandardPanel(numSelected);
     advancedPanel = new SynthesizerDialogAdvancedPanel();
@@ -110,11 +100,11 @@ public class SynthesizerDialog implements ActionListener
     mMinimizationOptions = new MinimizationOptions();
 
     mTabbedPane.addTab("Standard options", null, standardPanel,
-                      "Standard options");
+                       "Standard options");
     mTabbedPane.addTab("Advanced options", null, advancedPanel,
-                      "Advanced options");
-    mTabbedPane.addTab("Heuristic options", null, mHeuristicPanel, "Heuristic options");
-    //        tabbedPane.addTab("Guard options", null, guardPanel, "Guard options");
+                       "Advanced options");
+    mTabbedPane.addTab("Heuristic options", null, mHeuristicPanel,
+                       "Heuristic options");
 
     // buttonPanel
     final JPanel buttonPanel = new JPanel();
@@ -124,21 +114,12 @@ public class SynthesizerDialog implements ActionListener
 
     contentPane.add("Center", mTabbedPane);
     contentPane.add("South", buttonPanel);
-    Utility.setDefaultButton(dialog, okButton);
+    Utility.setDefaultButton(this, okButton);
 
-    // ** MF ** Fix to get the frigging thing centered
-    final Dimension dim = dialog.getMinimumSize();
-
-    dialog.setLocation(Utility.getPosForCenter(dim));
-    dialog.setResizable(false);
+    setResizable(true);
+    pack();
+    setLocationRelativeTo(parentFrame);
     update();
-  }
-
-  public SynthesizerDialog(final Frame parentFrame, final int numSelected,
-                           final SynthesizerOptions synthesizerOptions,
-                           final Vector<?> controllableEvents)
-  {
-    this(parentFrame, numSelected, synthesizerOptions);
   }
 
   /**
@@ -164,11 +145,6 @@ public class SynthesizerDialog implements ActionListener
     return button;
   }
 
-  public void show()
-  {
-    dialog.setVisible(true);
-  }
-
   @Override
   public void actionPerformed(final ActionEvent event)
   {
@@ -184,21 +160,18 @@ public class SynthesizerDialog implements ActionListener
         mMinimizationOptions.saveOptions();
         synthesizerOptions.setDialogOK(true);
 
-        dialog.setVisible(false);
-        dialog.dispose();
+        setVisible(false);
+        dispose();
       } else {
         JOptionPane
-          .showMessageDialog(parentFrame,
+          .showMessageDialog(getOwner(),
                              "Invalid combination of type and algorithm",
                              "Alert", JOptionPane.ERROR_MESSAGE);
       }
-      //////////////
-
-      //////////////
     } else if (source == cancelButton) {
       synthesizerOptions.setDialogOK(false); // Already done...
-      dialog.setVisible(false);
-      dialog.dispose();
+      setVisible(false);
+      dispose();
     }
   }
 
@@ -250,7 +223,7 @@ public class SynthesizerDialog implements ActionListener
 
 	  renameBox = new JCheckBox("Rename states");
 	  renameBox.setToolTipText("Give states generic names (q0, q1, q2,...)");
-	  
+
       removeUnecessarySupBox =
         new JCheckBox("Remove unnecessary supervisors");
       removeUnecessarySupBox
@@ -264,38 +237,30 @@ public class SynthesizerDialog implements ActionListener
       }
 
       // Create layout!
-      final Box mainBox = Box.createVerticalBox();
-
-      JPanel panel = new JPanel();
-      Box box = Box.createHorizontalBox();
-      box.add(new JLabel("Property:"));
-      box.add(typeSelector);
-      panel.add(box);
-      mainBox.add(panel);
-
-      panel = new JPanel();
-      box = Box.createHorizontalBox();
-      box.add(new JLabel("Algorithm: "));
-      box.add(algorithmSelector);
-      panel.add(box);
-      mainBox.add(panel);
-
-      panel = new JPanel();
-      box = Box.createHorizontalBox();
-      box.add(purgeBox);
-      box.add(removeUnecessarySupBox);
-	  box.add(renameBox);
-      panel.add(box);
-      mainBox.add(panel);
-
-      panel = new JPanel();
-      panel.add(nbNote);
-      mainBox.add(panel);
-
-      // Add components
-      this.add(mainBox);
-
-//      updatePanel();
+      setLayout(new GridBagLayout());
+      final GridBagConstraints constraints = new GridBagConstraints();
+      constraints.insets.top = 4;
+      constraints.insets.bottom = 4;
+      constraints.gridy = 0;
+      constraints.weightx = 1.0;
+      constraints.anchor = GridBagConstraints.EAST;
+      add(new JLabel("Property: "), constraints);
+      constraints.anchor = GridBagConstraints.WEST;
+      add(typeSelector, constraints);
+      constraints.gridy++;
+      constraints.anchor = GridBagConstraints.EAST;
+      add(new JLabel("Algorithm: "), constraints);
+      constraints.anchor = GridBagConstraints.WEST;
+      add(algorithmSelector, constraints);
+      constraints.gridy++;
+      constraints.gridwidth = 2;
+      constraints.anchor = GridBagConstraints.CENTER;
+      add(purgeBox, constraints);
+      constraints.insets.top = 0;
+      constraints.gridy++;
+      add(removeUnecessarySupBox, constraints);
+      constraints.gridy++;
+      add(renameBox, constraints);
     }
 
     @Override
@@ -331,42 +296,38 @@ public class SynthesizerDialog implements ActionListener
       algorithmSelector.removeAllItems();
       // Which type of verification?
       if (typeSelector.getType() == SynthesisType.CONTROLLABLE) {
-        algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHIC);
-        algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHIC_WATERS);
-        algorithmSelector.addItem(SynthesisAlgorithm.MODULAR);
-        algorithmSelector.addItem(SynthesisAlgorithm.COMPOSITIONAL);
-        algorithmSelector.addItem(SynthesisAlgorithm.BDD);
-//        algorithmSelector.addItem(SynthesisAlgorithm.SYNTHESISA);
-        algorithmSelector.addItem(SynthesisAlgorithm.COMPOSITIONAL_WATERS);
+        algorithmSelector.addSelectable(SynthesisAlgorithm.MONOLITHIC);
+        algorithmSelector.addSelectable(SynthesisAlgorithm.MONOLITHIC_WATERS);
+        algorithmSelector.addSelectable(SynthesisAlgorithm.MODULAR);
+        algorithmSelector.addSelectable(SynthesisAlgorithm.COMPOSITIONAL);
+        algorithmSelector.addSelectable(SynthesisAlgorithm.BDD);
+        algorithmSelector.addSelectable(SynthesisAlgorithm.COMPOSITIONAL_WATERS);
       } else if (typeSelector.getType() == SynthesisType.NONBLOCKING) {
-        algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHIC);
-        algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHIC_WATERS);
-        algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHICBDD);
-        algorithmSelector.addItem(SynthesisAlgorithm.COMPOSITIONAL);
-        algorithmSelector.addItem(SynthesisAlgorithm.BDD);
-//        algorithmSelector.addItem(SynthesisAlgorithm.SYNTHESISA);
-        algorithmSelector.addItem(SynthesisAlgorithm.COMPOSITIONAL_WATERS);
+        algorithmSelector.addSelectable(SynthesisAlgorithm.MONOLITHIC);
+        algorithmSelector.addSelectable(SynthesisAlgorithm.MONOLITHIC_WATERS);
+        algorithmSelector.addSelectable(SynthesisAlgorithm.MONOLITHICBDD);
+        algorithmSelector.addSelectable(SynthesisAlgorithm.COMPOSITIONAL);
+        algorithmSelector.addSelectable(SynthesisAlgorithm.BDD);
+        algorithmSelector.addSelectable(SynthesisAlgorithm.COMPOSITIONAL_WATERS);
       } else if (typeSelector.getType() == SynthesisType.NONBLOCKINGCONTROLLABLE) {
-        algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHIC);
-        algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHIC_WATERS);
-        algorithmSelector.addItem(SynthesisAlgorithm.COMPOSITIONAL);
-        algorithmSelector.addItem(SynthesisAlgorithm.BDD);
-//        algorithmSelector.addItem(SynthesisAlgorithm.SYNTHESISA);
-        algorithmSelector.addItem(SynthesisAlgorithm.COMPOSITIONAL_WATERS);
-      } else if (typeSelector.getType() == SynthesisType.NONBLOCKINGCONTROLLABLEOBSERVABLE) {
-        algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHIC);
+        algorithmSelector.addSelectable(SynthesisAlgorithm.MONOLITHIC);
+        algorithmSelector.addSelectable(SynthesisAlgorithm.MONOLITHIC_WATERS);
+        algorithmSelector.addSelectable(SynthesisAlgorithm.COMPOSITIONAL);
+        algorithmSelector.addSelectable(SynthesisAlgorithm.BDD);
+        algorithmSelector.addSelectable(SynthesisAlgorithm.COMPOSITIONAL_WATERS);
       }
-      // Default selection
-      algorithmSelector.setSelectedIndex(0);
-      // Reselect previously selected item if possible
-      algorithmSelector.setAlgorithm(selected);
+      if (algorithmSelector.getItemCount() > 0) {
+        // Default selection
+        algorithmSelector.setSelectedIndex(0);
+        // Reselect previously selected item if possible
+        algorithmSelector.setAlgorithm(selected);
+      }
       if (advancedPanel != null) {
         if (selected == SynthesisAlgorithm.MONOLITHIC_WATERS) {
           advancedPanel.setLocalizeBoxEnabled(true);
         } else {
           advancedPanel.setLocalizeBoxEnabled(false);
         }
-
         final boolean watersSelected =
           algorithmSelector.getAlgorithm() == SynthesisAlgorithm.MONOLITHIC_WATERS;
         final boolean reduceSelected = advancedPanel.isReduceBoxSelected();
@@ -397,30 +358,30 @@ public class SynthesizerDialog implements ActionListener
 	  renameBox.setVisible(true);
       nbNote.setVisible(false);
 
-      if (algorithmSelector.getAlgorithm() == SynthesisAlgorithm.MONOLITHIC) 
+      if (algorithmSelector.getAlgorithm() == SynthesisAlgorithm.MONOLITHIC)
 	  {
         removeUnecessarySupBox.setVisible(false); //X
       }
-	  else if (algorithmSelector.getAlgorithm() == SynthesisAlgorithm.COMPOSITIONAL) 
+	  else if (algorithmSelector.getAlgorithm() == SynthesisAlgorithm.COMPOSITIONAL)
 	  {
         removeUnecessarySupBox.setVisible(false); //X
         purgeBox.setVisible(true); //X
 		renameBox.setVisible(false);
-      } 
-	  else if (algorithmSelector.getAlgorithm() == SynthesisAlgorithm.MODULAR) 
+      }
+	  else if (algorithmSelector.getAlgorithm() == SynthesisAlgorithm.MODULAR)
 	  {
  		renameBox.setVisible(false);
-		
+
 		if ((typeSelector.getType() == SynthesisType.NONBLOCKING)
-            || (typeSelector.getType() == SynthesisType.NONBLOCKINGCONTROLLABLE)) 
+            || (typeSelector.getType() == SynthesisType.NONBLOCKINGCONTROLLABLE))
 		{
           purgeBox.setVisible(false); //X
 
           removeUnecessarySupBox.setVisible(false); //X
           nbNote.setVisible(true);
         }
-      } 
-	  else if (algorithmSelector.getAlgorithm() == SynthesisAlgorithm.COMPOSITIONAL_WATERS) 
+      }
+	  else if (algorithmSelector.getAlgorithm() == SynthesisAlgorithm.COMPOSITIONAL_WATERS)
 	  {
         removeUnecessarySupBox.setVisible(false); //X
         purgeBox.setVisible(false); //X
@@ -659,6 +620,13 @@ public class SynthesizerDialog implements ActionListener
       setSelectedItem(algo);
     }
 
+    private void addSelectable(final SynthesisAlgorithm algo)
+    {
+      if (algo.isLoadable()) {
+        addItem(algo);
+      }
+    }
+
     public static AlgorithmSelector create(final int num)
     {
       if (num == 1) {
@@ -705,5 +673,23 @@ public class SynthesizerDialog implements ActionListener
       return new SynthesisSelector();
     }
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private final JButton okButton;
+  private final JButton cancelButton;
+  private final SynthesizerOptions synthesizerOptions;
+  private final SynthesizerDialogStandardPanel standardPanel;
+  private final SynthesizerDialogAdvancedPanel advancedPanel;
+
+  private final MinimizationOptions mMinimizationOptions;
+  private final SynthesizerDialogHeuristicPanel mHeuristicPanel;
+  private final JTabbedPane mTabbedPane;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 2867105691568327887L;
 
 }

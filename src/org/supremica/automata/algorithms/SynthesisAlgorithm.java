@@ -49,62 +49,99 @@
  */
 package org.supremica.automata.algorithms;
 
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
+
 public enum SynthesisAlgorithm
 {
-    MONOLITHIC("Monolithic (explicit)", false),
-    MONOLITHIC_WATERS("Monolithic (Waters)", false),
-    MONOLITHICBDD("Monolithic (symbolic)", false),
 
-    PARTITIONBDD("Partitioning (symbolic)", false),
-    CLOCKPARTITION("Clock partitioning", false),
-    MINIMALITY_C("Minimality approach (classic)", false),
-    MINIMALITY_M("Minimality approach (monolithic)", false),
-    MINIMALITY_P("Minimality approach (partition)", false),
+  //#########################################################################
+  //# Enumeration Constants
+  MONOLITHIC("Monolithic (explicit)", false),
+  MONOLITHIC_WATERS("Monolithic (Waters)", false,
+                    ModelAnalyzerFactoryLoader.Monolithic),
+  MONOLITHICBDD("Monolithic (symbolic)", false),
 
-    MODULAR("Modular"),
-    COMPOSITIONAL("Compositional"),
-//    SYNTHESISA("Compositional (SynthesisA)"),
-    COMPOSITIONAL_WATERS("Compositional (Waters)"),
-    //IDD("IDD"),
-    //MonolithicSingleFixpoint("MONOLITHIC (single fixpoint)", false),    // works, but is very slow [due to lame implementation :s ]
-    BDD("BDD");    // works, but we cant handle the results yet
+  PARTITIONBDD("Partitioning (symbolic)", false),
+  CLOCKPARTITION("Clock partitioning", false),
+  MINIMALITY_C("Minimality approach (classic)", false),
+  MINIMALITY_M("Minimality approach (monolithic)", false),
+  MINIMALITY_P("Minimality approach (partition)", false),
 
-    /** Textual description. */
-    private final String description;
-    /** True if this algo prefers working on modular systems. */
-    private final boolean preferModular;
+  MODULAR("Modular"),
+  COMPOSITIONAL("Compositional"),
+  //    SYNTHESISA("Compositional (SynthesisA)"),
+  COMPOSITIONAL_WATERS("Compositional (Waters)", true,
+                       ModelAnalyzerFactoryLoader.Compositional),
+  //IDD("IDD"),
+  //MonolithicSingleFixpoint("MONOLITHIC (single fixpoint)", false),    // works, but is very slow [due to lame implementation :s ]
+  BDD("BDD"); // works, but we can't handle the results yet
 
-    private SynthesisAlgorithm(final String description)
-    {
-        this(description, true);
+
+  //#########################################################################
+  //# Constructors
+  private SynthesisAlgorithm(final String description)
+  {
+    this(description, true);
+  }
+
+  private SynthesisAlgorithm(final String description,
+                             final boolean preferModular)
+  {
+    this(description, preferModular, null);
+  }
+
+  private SynthesisAlgorithm(final String description,
+                             final boolean preferModular,
+                             final ModelAnalyzerFactoryLoader loader)
+  {
+    mDescription = description;
+    mPrefersModular = preferModular;
+    mLoader = loader;
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  @Override
+  public String toString()
+  {
+    return mDescription;
+  }
+
+  public boolean prefersModular()
+  {
+    return mPrefersModular;
+  }
+
+  public boolean isLoadable()
+  {
+    return mLoader == null || mLoader.isLoadable();
+  }
+
+  public static SynthesisAlgorithm fromDescription(final String description)
+  {
+    for (final SynthesisAlgorithm value : values()) {
+      if (value.mDescription.equals(description)) {
+        return value;
+      }
     }
+    return null;
+  }
 
-    private SynthesisAlgorithm(final String description, final boolean preferModular)
-    {
-        this.description = description;
-        this.preferModular = preferModular;
-    }
 
-    @Override
-    public String toString()
-    {
-        return description;
-    }
-
-    public boolean prefersModular()
-    {
-        return preferModular;
-    }
-
-    public static SynthesisAlgorithm fromDescription(final String description)
-    {
-        for (final SynthesisAlgorithm value: values())
-        {
-            if (value.description.equals(description))
-            {
-                return value;
-            }
-        }
-        return null;
-    }
+  //#########################################################################
+  //# Instance Variables
+  /**
+   * Textual description.
+   */
+  private final String mDescription;
+  /**
+   * True if this algorithm prefers working on modular systems.
+   */
+  private final boolean mPrefersModular;
+  /**
+   * Factory loader used for Waters algorithms,
+   * <CODE>null</CODE> for Supremica.
+   */
+  private ModelAnalyzerFactoryLoader mLoader;
 }

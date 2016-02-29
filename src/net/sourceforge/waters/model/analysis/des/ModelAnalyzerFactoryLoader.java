@@ -69,7 +69,7 @@ public enum ModelAnalyzerFactoryLoader
 
 
   //#########################################################################
-  //# Constructor
+  //# Invocation
   public ModelAnalyzerFactory getModelAnalyzerFactory()
     throws ClassNotFoundException
   {
@@ -90,6 +90,16 @@ public enum ModelAnalyzerFactoryLoader
       throw wrap(exception);
     } catch (final UnsatisfiedLinkError exception) {
       throw wrap(exception);
+    }
+  }
+
+  public boolean isLoadable()
+  {
+    try {
+      getModelAnalyzerFactory();
+      return true;
+    } catch (final ClassNotFoundException exception) {
+      return false;
     }
   }
 
