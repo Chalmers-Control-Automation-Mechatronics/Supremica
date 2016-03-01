@@ -105,10 +105,10 @@ class ExtPhilosPanel extends JPanel implements TestCase, ActionListener {
 		// super(new GridLayout(2, 1, 10, 10));
 		super();
 
-		JPanel cont = new JPanel();
+		final JPanel cont = new JPanel();
 		cont.setBorder(BorderFactory.createTitledBorder("Controllability"));
 		cont.setLayout(new GridLayout(2, 1));
-		JPanel ext_control = new JPanel();
+		final JPanel ext_control = new JPanel();
 		ext_control.add(i_l_take, BorderLayout.NORTH);
 
 		i_l_take.setSelected(true);
@@ -118,7 +118,7 @@ class ExtPhilosPanel extends JPanel implements TestCase, ActionListener {
 		l_put.setEnabled(false);
 		r_put.setEnabled(false);
 
-		JPanel normal_control = new JPanel();
+		final JPanel normal_control = new JPanel();
 		normal_control.add(l_take, BorderLayout.SOUTH);
 		normal_control.add(r_take, BorderLayout.SOUTH);
 		normal_control.add(l_put, BorderLayout.SOUTH);
@@ -126,17 +126,17 @@ class ExtPhilosPanel extends JPanel implements TestCase, ActionListener {
 		cont.add(ext_control);
 		cont.add(normal_control);
 
-		JPanel num_users = new JPanel();
+		final JPanel num_users = new JPanel();
 		num_users.add(new JLabel("Number of philosophers and forks: "),
 				BorderLayout.NORTH);
 		num_users.add(int_num, BorderLayout.NORTH);
 
-		JPanel num_intermStates = new JPanel();
+		final JPanel num_intermStates = new JPanel();
 		num_intermStates.add(new JLabel("Number of intermediate states: "),
 				BorderLayout.NORTH);
 		num_intermStates.add(int_interm_num, BorderLayout.NORTH);
 
-		JPanel animationPanel = new JPanel();
+		final JPanel animationPanel = new JPanel();
 		animationPanel.add(animation);
 		animationPanel.add(memory);
 		animationPanel.add(multiple);
@@ -145,13 +145,13 @@ class ExtPhilosPanel extends JPanel implements TestCase, ActionListener {
 		multiple.addActionListener(this);
 		i_l_take.addActionListener(this);
 
-		JPanel numberOfInstances = new JPanel();
+		final JPanel numberOfInstances = new JPanel();
 		numberOfInstances.add(new JLabel("Number of instances: "),
 				BorderLayout.NORTH);
 		numberOfInstances.add(int_numberOfInstances, BorderLayout.SOUTH);
 		int_numberOfInstances.setEnabled(false);
 
-		JPanel step_phils = new JPanel();
+		final JPanel step_phils = new JPanel();
 		step_phils
 				.add(
 						new JLabel(
@@ -160,7 +160,7 @@ class ExtPhilosPanel extends JPanel implements TestCase, ActionListener {
 		step_phils.add(int_step_phils, BorderLayout.SOUTH);
 		int_step_phils.setEnabled(false);
 
-		JPanel step_intermStates = new JPanel();
+		final JPanel step_intermStates = new JPanel();
 		step_intermStates
 				.add(
 						new JLabel(
@@ -171,7 +171,7 @@ class ExtPhilosPanel extends JPanel implements TestCase, ActionListener {
 
 		all_cases.addActionListener(this);
 
-		JPanel NK = new JPanel();
+		final JPanel NK = new JPanel();
 		NK.add(new JLabel("N: "), BorderLayout.SOUTH);
 		NK.add(int_N, BorderLayout.SOUTH);
 		NK.add(new JLabel("K: "), BorderLayout.SOUTH);
@@ -184,10 +184,10 @@ class ExtPhilosPanel extends JPanel implements TestCase, ActionListener {
 
 		traversing_algorithms = new JPanel();
 
-		Border border = BorderFactory
+		final Border border = BorderFactory
 				.createTitledBorder("Traversing order of the test cases for the N*K plane");
 		traversing_algorithms.setBorder(border);
-		ButtonGroup group = new ButtonGroup();
+		final ButtonGroup group = new ButtonGroup();
 		group.add(zigzagButton);
 		group.add(verticalButton);
 
@@ -197,7 +197,7 @@ class ExtPhilosPanel extends JPanel implements TestCase, ActionListener {
 		zigzagButton.setEnabled(false);
 		verticalButton.setEnabled(false);
 
-		Box theBox = Box.createVerticalBox();
+		final Box theBox = Box.createVerticalBox();
 		theBox.add(cont);
 		theBox.add(num_users);
 		theBox.add(num_intermStates);
@@ -211,7 +211,8 @@ class ExtPhilosPanel extends JPanel implements TestCase, ActionListener {
 		add(theBox, BorderLayout.NORTH);
 	}
 
-	public void actionPerformed(ActionEvent e) {
+	@Override
+  public void actionPerformed(final ActionEvent e) {
 		if (multiple.isSelected()) {
 			int_step_phils.setEnabled(true);
 			int_step_intermStates.setEnabled(true);
@@ -249,8 +250,9 @@ class ExtPhilosPanel extends JPanel implements TestCase, ActionListener {
 
 	}
 
-	public Project generateAutomata() throws Exception {
-		ExtDiningPhilosophers dp = new ExtDiningPhilosophers(i_l_take
+	@Override
+  public Project generateAutomata() throws Exception {
+		final ExtDiningPhilosophers dp = new ExtDiningPhilosophers(i_l_take
 				.isSelected(), int_num.get(), int_interm_num.get(), l_take
 				.isSelected(), r_take.isSelected(), l_put.isSelected(), r_put
 				.isSelected(), animation.isSelected(), memory.isSelected());
@@ -258,22 +260,23 @@ class ExtPhilosPanel extends JPanel implements TestCase, ActionListener {
 		return dp.getProject();
 	}
 
-	public void synthesizeSupervisor(IDE ide) throws Exception {
+	@Override
+  public void synthesizeSupervisor(final IDE ide) throws Exception {
 		int number_of_phils = int_num.get();
 		int number_of_interm_states = int_interm_num.get();
-		int number_of_instances = int_numberOfInstances.get();
+		final int number_of_instances = int_numberOfInstances.get();
 
-		TextArea result = new TextArea("");
+		final TextArea result = new TextArea("");
 
 		String result_text = "n \t k \t t \t m \t s \n \n";
 
 		BufferedWriter[] out_back;
 
-		SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
+		final SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
 		if (synth_algorithm.isSelected()) {
-			SynthesizerDialog synthesizerDialog = new SynthesizerDialog(ide
+			final SynthesizerDialog synthesizerDialog = new SynthesizerDialog(ide
 					.getFrame(), 2 * number_of_phils, synthesizerOptions);
-			synthesizerDialog.show();
+			synthesizerDialog.setVisible(true);
 		} else {
 			synthesizerOptions
 					.setSynthesisType(SynthesisType.NONBLOCKINGCONTROLLABLE);
@@ -314,7 +317,7 @@ class ExtPhilosPanel extends JPanel implements TestCase, ActionListener {
 			try {
 				out_back[i] = new BufferedWriter(new FileWriter(
 						"Results/DP/results_diningPhil" + i + ".txt"));
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				logger.error(e);
 			}
 
@@ -350,7 +353,7 @@ class ExtPhilosPanel extends JPanel implements TestCase, ActionListener {
 				result_text += " " + asw.getTimeSeconds() + "\t";
 				result_text += " \t ";
 
-				Automaton supervisor = asw.getSupervisor();
+				final Automaton supervisor = asw.getSupervisor();
 				result_text += " " + supervisor.nbrOfStates();
 			} else {
 				synthesizer = new AutomataSynthesizer(dp.getAutomata(),
@@ -360,24 +363,24 @@ class ExtPhilosPanel extends JPanel implements TestCase, ActionListener {
 				if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.BDD) {
 					synthesizer.execute();
 
-					BigDecimal time = synthesizer.getTimeSeconds();
+					final BigDecimal time = synthesizer.getTimeSeconds();
 					result_text += " " + time + "\t";
 					result_text += " \t";
 
-					long nbrOfStates = synthesizer.getNbrOfStatesBDD();
+					final long nbrOfStates = synthesizer.getNbrOfStatesBDD();
 					result_text += " " + nbrOfStates + "\t";
 
-					long nbrOfNodes = synthesizer.getNbrOfNodesBDD();
+					final long nbrOfNodes = synthesizer.getNbrOfNodesBDD();
 					result_text += " " + nbrOfNodes;
 				} else {
-					Automaton supervisor = synthesizer.execute()
+					final Automaton supervisor = synthesizer.execute()
 							.getFirstAutomaton();
 
-					BigDecimal time = synthesizer.getTimeSeconds();
+					final BigDecimal time = synthesizer.getTimeSeconds();
 					result_text += " " + time + "\t";
 					result_text += " \t";
 
-					int nbrOfStates = supervisor.getStateSet().size();
+					final int nbrOfStates = supervisor.getStateSet().size();
 					result_text += " " + nbrOfStates;
 				}
 			}

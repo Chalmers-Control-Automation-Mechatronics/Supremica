@@ -35,26 +35,29 @@
 
 package org.supremica.gui.ide.actions;
 
-import javax.swing.Action;
-import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import org.supremica.gui.ide.IDE;
-import org.supremica.gui.SynthesizerDialog;
-import org.supremica.gui.AutomataSynthesisWorker;
 import java.util.List;
-import org.supremica.automata.*;
-import org.supremica.automata.algorithms.*;
-import org.supremica.log.*;
+
+import javax.swing.Action;
+import javax.swing.ImageIcon;
+
+import org.supremica.automata.Automata;
+import org.supremica.automata.algorithms.SynthesizerOptions;
+import org.supremica.gui.AutomataSynthesisWorker;
+import org.supremica.gui.SynthesizerDialog;
+import org.supremica.gui.ide.IDE;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 
 public class AnalyzerSynthesizerAction
     extends IDEAction
 {
     private static final long serialVersionUID = 1L;
     @SuppressWarnings("unused")
-	private Logger logger = LoggerFactory.createLogger(IDE.class);
+	private final Logger logger = LoggerFactory.createLogger(IDE.class);
 
-    public AnalyzerSynthesizerAction(List<IDEAction> actionList)
+    public AnalyzerSynthesizerAction(final List<IDEAction> actionList)
     {
         super(actionList);
 
@@ -67,27 +70,29 @@ public class AnalyzerSynthesizerAction
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/synthesize16.gif")));
     }
 
-    public void actionPerformed(ActionEvent e)
+    @Override
+    public void actionPerformed(final ActionEvent e)
     {
         doAction();
     }
 
 
+    @Override
     public void doAction()
     {
         // Retrieve the selected automata and make a sanity check
-        Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 1, true, true, true, true))
         {
             return;
         }
 
         // Get the current options and allow the user to change them...
-        SynthesizerOptions options = new SynthesizerOptions();
+        final SynthesizerOptions options = new SynthesizerOptions();
 
-        SynthesizerDialog synthesizerDialog = 
+        final SynthesizerDialog synthesizerDialog =
 			new SynthesizerDialog(ide.getFrame(), selectedAutomata.size(), options);
-        synthesizerDialog.show();
+        synthesizerDialog.setVisible(true);
         if (!options.getDialogOK())
         {
             return;

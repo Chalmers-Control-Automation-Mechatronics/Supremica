@@ -57,20 +57,20 @@ public enum SynthesisType
     UNSAFETY("unsafety (for RAS models)"),
     NONBLOCKINGCONTROLLABLEOBSERVABLE("nonblocking, controllable and observable");
 
-    
+
     /** Textual description. */
     private final String description;
-    
-    private SynthesisType(String description)
+
+    private SynthesisType(final String description)
     {
         this.description = description;
     }
 
     public static SynthesisType[] editorValues()
     {
-        SynthesisType[] vals = new SynthesisType[4];
+        final SynthesisType[] vals = new SynthesisType[4];
         int i = 0;
-        for(SynthesisType v:SynthesisType.values())
+        for(final SynthesisType v:SynthesisType.values())
         {
             if(i < 4)
             {
@@ -84,28 +84,22 @@ public enum SynthesisType
 
     public static SynthesisType[] analyzerValues()
     {
-        SynthesisType[] vals = new SynthesisType[4];
-        int i = 0;
-        for(SynthesisType v:SynthesisType.values())
-        {
-            if(i < 4)
-            {
-                vals[i] = v;
-            }
-            i++;
-        }
-
+        final SynthesisType[] vals = new SynthesisType[3];
+        vals[0] = CONTROLLABLE;
+        vals[1] = NONBLOCKING;
+        vals[2] = NONBLOCKINGCONTROLLABLE;
         return vals;
     }
-    
+
+    @Override
     public String toString()
     {
         return description;
     }
-    
-    public static SynthesisType fromDescription(String description)
+
+    public static SynthesisType fromDescription(final String description)
     {
-        for (SynthesisType value: values())
+        for (final SynthesisType value: values())
         {
             if (value.description.equals(description))
             {

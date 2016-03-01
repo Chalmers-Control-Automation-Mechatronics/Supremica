@@ -342,8 +342,10 @@ class UsersPanel
         add(BorderLayout.SOUTH, num_users);
     }
 
+    @Override
     public void compute(final IDE ide){}
 
+    @Override
     public Project doIt()
     throws Exception
     {
@@ -364,8 +366,10 @@ class OperationPanel
         super();//(new GridLayout(2, 1, 10, 10));
     }
 
+    @Override
     public void compute(final IDE ide){}
 
+    @Override
     public Project doIt()
     throws Exception
     {
@@ -419,8 +423,10 @@ class PhilosPanel
         add(theBox, BorderLayout.NORTH);
     }
 
+    @Override
     public void compute(final IDE ide){}
 
+    @Override
     public Project doIt()
     throws Exception
     {
@@ -571,6 +577,7 @@ class ExtPhilosPanel
         add(theBox, BorderLayout.NORTH);
     }
 
+    @Override
     public void actionPerformed(final ActionEvent e) {
         if (multiple.isSelected()) {
             int_step_phils.setEnabled(true);
@@ -612,6 +619,7 @@ class ExtPhilosPanel
 
     }
 
+    @Override
     public Project doIt()
     throws Exception
     {
@@ -620,6 +628,7 @@ class ExtPhilosPanel
         return dp.getProject();
     }
 
+    @Override
     public void compute (final IDE ide)
     throws Exception
     {
@@ -637,7 +646,7 @@ class ExtPhilosPanel
         if(synth_algorithm.isSelected())
         {
             final SynthesizerDialog synthesizerDialog = new SynthesizerDialog(ide.getFrame(), 2*number_of_phils, synthesizerOptions);
-            synthesizerDialog.show();
+            synthesizerDialog.setVisible(true);
         }
         else
         {
@@ -806,8 +815,10 @@ class CatMousePanel
         add(theBox, BorderLayout.NORTH);
     }
 
+    @Override
     public void compute(final IDE ide)throws Exception{}
 
+    @Override
     public void actionPerformed(final ActionEvent e)
     {
         if (multiple.isSelected()) {
@@ -821,6 +832,7 @@ class CatMousePanel
         }
     }
 
+    @Override
     public Project doIt()
     throws Exception
     {
@@ -896,6 +908,7 @@ class ExtCatMousePanel
 
     }
 
+    @Override
     public void actionPerformed(final ActionEvent e)
     {
         if (multiple.isSelected()) {
@@ -927,6 +940,7 @@ class ExtCatMousePanel
     }
 
     //This function will be called when "Syntheisize" button is pressed
+    @Override
     public void compute(final IDE ide) throws Exception
     {
         int number_of_cats = int_num.get();
@@ -945,7 +959,7 @@ class ExtCatMousePanel
         {
             //Manually select the synthesis algorithm
             final SynthesizerDialog synthesizerDialog = new SynthesizerDialog(ide.getFrame(), 2*number_of_cats+5*number_of_levels, synthesizerOptions);
-            synthesizerDialog.show();
+            synthesizerDialog.setVisible(true);
         }
         else
         {
@@ -1073,6 +1087,7 @@ class ExtCatMousePanel
     }
 
 
+    @Override
     public Project doIt()
     throws Exception
     {
@@ -1101,8 +1116,10 @@ class BricksPanel
         panel.add(num_cols);
     }
 
+    @Override
     public void compute(final IDE ide){}
 
+    @Override
     public Project doIt()
     throws Exception
     {
@@ -1137,6 +1154,7 @@ class WarehousePanel
 
         selectOperatorEventsButton.addActionListener(new ActionListener()
         {
+            @Override
             public void actionPerformed(final ActionEvent e)
             {
                 if (selectOperatorEventsWindow == null)
@@ -1157,6 +1175,7 @@ class WarehousePanel
 
         selectUnobservableEventsButton.addActionListener(new ActionListener()
         {
+            @Override
             public void actionPerformed(final ActionEvent e)
             {
                 if (selectUnobservableEventsWindow == null)
@@ -1172,8 +1191,10 @@ class WarehousePanel
         panel.add(selectUnobservableEventsButton);
     }
 
+    @Override
     public void compute(final IDE ide){}
 
+    @Override
     public Project doIt()
     throws Exception
     {
@@ -1204,8 +1225,10 @@ class StickGamePanel
         panel.add(num_sticks);
     }
 
+    @Override
     public void compute(final IDE ide){}
 
+    @Override
     public Project doIt()
     throws Exception
     {
@@ -1240,8 +1263,10 @@ class AllocationBatchPanel
         add(new JLabel("Experimental serialized allocation batch"), BorderLayout.NORTH);
     }
 
+    @Override
     public void compute(final IDE ide){}
 
+    @Override
     public Project doIt()
     throws Exception
     {
@@ -1257,6 +1282,7 @@ class AllocationBatchPanel
         throw new SupremicaException("you must choose a filename");
     }
 
+    @Override
     public void actionPerformed(final ActionEvent e)
     {
         final Object src = e.getSource();
@@ -1296,8 +1322,10 @@ class CountersPanel
         panel.add(int_size = new IntegerField("8", 6));
     }
 
+    @Override
     public void compute(final IDE ide){}
 
+    @Override
     public Project doIt()
     throws Exception
     {
@@ -1332,8 +1360,10 @@ class RandomPanel
         panel.add(dbl_dens = new DoubleField("0.75", 6));
     }
 
+    @Override
     public void compute(final IDE ide){}
 
+    @Override
     public Project doIt()
     throws Exception
     {
@@ -1373,8 +1403,10 @@ class TransferLinePanel
         panel.add(int_cap2 = new IntegerField("1", 5));
     }
 
+    @Override
     public void compute(final IDE ide){}
 
+    @Override
     public Project doIt()
     throws Exception
     {
@@ -1420,8 +1452,10 @@ class PigeonHolePanel
         theBox.add(panel);
     }
 
+    @Override
     public void compute(final IDE ide){}
 
+    @Override
     public Project doIt()
     throws Exception
     {
@@ -1462,8 +1496,10 @@ class SanchezPanel
         panel.add(choice = new JComboBox<String>(choice_items));
     }
 
+    @Override
     public void compute(final IDE ide){}
 
+    @Override
     public Project doIt()
     throws Exception
     {
@@ -1500,8 +1536,10 @@ class RoundRobinPanel
         theBox.add(panel);
     }
 
+    @Override
     public void compute(final IDE ide){}
 
+    @Override
     public Project doIt()
     throws Exception
     {
@@ -1538,8 +1576,10 @@ class ArbiterPanel
         theBox.add(synchronizePanel);
     }
 
+    @Override
     public void compute(final IDE ide){}
 
+    @Override
     public Project doIt()
     throws Exception
     {
@@ -1605,6 +1645,7 @@ public class TestCasesDialog
             setToolTipText("Run the example for multiple instances");
             addActionListener(new ActionListener()
             {
+                @Override
                 public void actionPerformed(final ActionEvent e)
 
                 // throws Exception // cannot do this - what the f**k!
@@ -1642,6 +1683,7 @@ public class TestCasesDialog
             setToolTipText("Go ahead and do it");
             addActionListener(new ActionListener()
             {
+                @Override
                 public void actionPerformed(final ActionEvent e)
 
                 // throws Exception // cannot do this - what the f**k!
@@ -1674,6 +1716,7 @@ public class TestCasesDialog
             setToolTipText("Enough of this");
             addActionListener(new ActionListener()
             {
+                @Override
                 public void actionPerformed(final ActionEvent e)
                 {
                     action();
@@ -1699,6 +1742,7 @@ public class TestCasesDialog
             setToolTipText("Want some help?");
             addActionListener(new ActionListener()
             {
+                @Override
                 public void actionPerformed(final ActionEvent e)
                 {
                     action();
