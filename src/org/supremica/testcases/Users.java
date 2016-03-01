@@ -2,26 +2,26 @@
 /** Users.java *********************** */
 package org.supremica.testcases;
 
-import org.supremica.automata.AutomatonType;
+import org.supremica.automata.Arc;
 import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonType;
+import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.Project;
 import org.supremica.automata.State;
-import org.supremica.automata.Arc;
-import org.supremica.automata.LabeledEvent;
 
 class User
 	extends Automaton
 {
     final static String SEPARATOR = ":";    // This was once ".", but then someone broke the possibility to use the dot in event/state-names
 
-	User(int id, int num_resources, boolean a, boolean b, boolean c)
+	User(final int id, final int num_resources, final boolean a, final boolean b, final boolean c)
 		throws Exception
 	{
-		super("User " + id);
+		super("User_" + id);
 
 		setType(AutomatonType.PLANT);
 
-		State init = new State("I");    // initial state - only one
+		final State init = new State("I");    // initial state - only one
 
 		init.setInitial(true);
 		init.setAccepting(true);
@@ -31,9 +31,9 @@ class User
 		// Do the following for each resource
 		for (int r = 1; r <= num_resources; ++r)
 		{
-			LabeledEvent ai = new LabeledEvent("a" + id + SEPARATOR + r);
-			LabeledEvent bi = new LabeledEvent("b" + id + SEPARATOR + r);
-			LabeledEvent ci = new LabeledEvent("c" + id + SEPARATOR + r);
+			final LabeledEvent ai = new LabeledEvent("a" + id + SEPARATOR + r);
+			final LabeledEvent bi = new LabeledEvent("b" + id + SEPARATOR + r);
+			final LabeledEvent ci = new LabeledEvent("c" + id + SEPARATOR + r);
 
 			ai.setControllable(a);
 			bi.setControllable(b);
@@ -43,8 +43,8 @@ class User
 			getAlphabet().addEvent(ci);
 
 			// add states
-			State requ = new State("R" + r);
-			State usin = new State("U" + r);
+			final State requ = new State("R" + r);
+			final State usin = new State("U" + r);
 
 			addState(requ);
 			addState(usin);
@@ -64,17 +64,17 @@ class Fifo
 {
         final static String SEPARATOR = ":";    // This was once ".", but then someone broke the possibility to use the dot in event/state-names
 
-	Fifo(int id1, int id2, int resrc, boolean a, boolean b, boolean c)
+	Fifo(final int id1, final int id2, final int resrc, final boolean a, final boolean b, final boolean c)
 		throws Exception
 	{
-		super("Fifo " + resrc + ":" + id1 + "x" + id2);
+		super("Fifo_" + resrc + ":" + id1 + "x" + id2);
 
 		setType(AutomatonType.SPECIFICATION);
 
-		LabeledEvent a1 = new LabeledEvent("a" + id1 + SEPARATOR + resrc);
-		LabeledEvent a2 = new LabeledEvent("a" + id2 + SEPARATOR + resrc);
-		LabeledEvent b1 = new LabeledEvent("b" + id1 + SEPARATOR + resrc);
-		LabeledEvent b2 = new LabeledEvent("b" + id2 + SEPARATOR + resrc);
+		final LabeledEvent a1 = new LabeledEvent("a" + id1 + SEPARATOR + resrc);
+		final LabeledEvent a2 = new LabeledEvent("a" + id2 + SEPARATOR + resrc);
+		final LabeledEvent b1 = new LabeledEvent("b" + id1 + SEPARATOR + resrc);
+		final LabeledEvent b2 = new LabeledEvent("b" + id2 + SEPARATOR + resrc);
 
 		a1.setControllable(a);
 		a2.setControllable(a);
@@ -86,11 +86,11 @@ class Fifo
 		getAlphabet().addEvent(b2);
 
 		// add states
-		State q0 = new State("q0");
-		State q1 = new State("q1");
-		State q2 = new State("q2");
-		State q3 = new State("q3");
-		State q4 = new State("q4");
+		final State q0 = new State("q0");
+		final State q1 = new State("q1");
+		final State q2 = new State("q2");
+		final State q3 = new State("q3");
+		final State q4 = new State("q4");
 
 		q0.setInitial(true);
 		q0.setAccepting(true);
@@ -117,17 +117,17 @@ class Mutex
 {
 	    final static String SEPARATOR = ":";    // This was once ".", but then someone broke the possibility to use the dot in event/state-names
 
-	Mutex(int id1, int id2, int resrc, boolean a, boolean b, boolean c)
+	Mutex(final int id1, final int id2, final int resrc, final boolean a, final boolean b, final boolean c)
 		throws Exception
 	{
-		super("Mutex " + resrc + ":" + id1 + "x" + id2);
+		super("Mutex_" + resrc + ":" + id1 + "x" + id2);
 
 		setType(AutomatonType.SPECIFICATION);
 
-		LabeledEvent b1 = new LabeledEvent("b" + id1 + SEPARATOR + resrc);
-		LabeledEvent b2 = new LabeledEvent("b" + id2 + SEPARATOR + resrc);
-		LabeledEvent c1 = new LabeledEvent("c" + id1 + SEPARATOR + resrc);
-		LabeledEvent c2 = new LabeledEvent("c" + id2 + SEPARATOR + resrc);
+		final LabeledEvent b1 = new LabeledEvent("b" + id1 + SEPARATOR + resrc);
+		final LabeledEvent b2 = new LabeledEvent("b" + id2 + SEPARATOR + resrc);
+		final LabeledEvent c1 = new LabeledEvent("c" + id1 + SEPARATOR + resrc);
+		final LabeledEvent c2 = new LabeledEvent("c" + id2 + SEPARATOR + resrc);
 
 		b1.setControllable(b);
 		b2.setControllable(b);
@@ -139,9 +139,9 @@ class Mutex
 		getAlphabet().addEvent(c2);
 
 		// add states
-		State x = new State("X");
-		State y = new State("Y");
-		State z = new State("Z");
+		final State x = new State("X");
+		final State y = new State("Y");
+		final State z = new State("Z");
 
 		x.setInitial(true);
 		x.setAccepting(true);
@@ -161,7 +161,7 @@ public class Users
 {
 	Project project = new Project();
 
-	public Users(int num_users, int num_resources, boolean a, boolean b, boolean c)
+	public Users(final int num_users, final int num_resources, final boolean a, final boolean b, final boolean c)
 		throws Exception
 	{
 		project.setComment("Users competing for mutual resources. Each user can request any of the resources. The 'Fifo' specifications specifies that the users get access to the resources in the order they request them and the 'Mutex' specifications specifies that each resource is accessed by at most one user at a time. The specifications apply pairwise between users.");
