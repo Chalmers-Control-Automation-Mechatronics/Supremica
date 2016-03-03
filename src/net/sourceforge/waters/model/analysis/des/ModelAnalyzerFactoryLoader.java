@@ -50,7 +50,6 @@ public enum ModelAnalyzerFactoryLoader
 {
   BDD("net.sourceforge.waters.analysis.bdd.BDDModelVerifierFactory"),
   Compositional("net.sourceforge.waters.analysis.compositional.CompositionalModelAnalyzerFactory"),
-  EnabledEvents("net.sourceforge.waters.analysis.compositional.EnabledEventsCompositionalModelVerifierFactory"),
   GNB("net.sourceforge.waters.analysis.gnonblocking.GNBModelVerifierFactory"),
   Modular("net.sourceforge.waters.analysis.modular.ModularModelVerifierFactory"),
   Monolithic("net.sourceforge.waters.analysis.monolithic.MonolithicModelAnalyzerFactory"),

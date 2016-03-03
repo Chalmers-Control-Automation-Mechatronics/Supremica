@@ -71,7 +71,6 @@ public class ConflictAbstractionProcedureFactory
   protected ConflictAbstractionProcedureFactory()
   {
     register(CC);
-    register(EENB);
     register(GNB);
     register(NB);
     register(NBA);
@@ -106,26 +105,6 @@ public class ConflictAbstractionProcedureFactory
         createNBAbstractionProcedure
           (analyzer, ObservationEquivalenceTRSimplifier.Equivalence.
            OBSERVATION_EQUIVALENCE, false, true);
-    }
-  };
-
-  /**
-   * <P>Minimisation considers events that are known to be always-enabled or
-   * only-selfloop outside of the automaton being simplified. This is the
-   * same abstraction sequence as {@link #NB}, with special events enabled
-   * and additional steps in the chain to measure performance.</P>
-   */
-  public static final AbstractionProcedureCreator EENB =
-    new AbstractionProcedureCreator("EENB")
-  {
-    @Override
-    public AbstractionProcedure createAbstractionProcedure
-      (final AbstractCompositionalModelAnalyzer analyzer)
-    {
-      return EnabledEventsThreeStepConflictEquivalenceAbstractionProcedure.
-        createThreeStepConflictEquivalenceAbstractionProcedure
-          (analyzer, ObservationEquivalenceTRSimplifier.Equivalence.
-           WEAK_OBSERVATION_EQUIVALENCE, true, true);
     }
   };
 

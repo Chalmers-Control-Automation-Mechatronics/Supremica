@@ -14,9 +14,6 @@ MAIN_FACTORY=
 
 for F in "$@"; do
     case $F in
-    -aecomp)
-        FACTORY="EnabledEvents"
-        ;;
     -bdd)
         FACTORY="BDD"
         ;;
