@@ -96,7 +96,7 @@ public class EFASynchronizer {
 	}
 
 	/**
-	 * Run the synchronizer
+	 * Run the synchronizer and construct the synchronized model.
 	 * <p>
 	 *
 	 * @return true if the synchronization is successfully finished, false
@@ -117,6 +117,15 @@ public class EFASynchronizer {
 		return true;
 	}
 
+	/**
+	 * Run the synchronizer but does not construct the synchronized model.
+	 * <p>
+	 *
+	 * @return true if the synchronization is successfully finished, false
+	 *         otherwise.
+	 *         <p>
+	 * @throws AnalysisException
+	 */
 	public boolean lowSynch() throws AnalysisException {
 		mSize = mComponents.size();
 		if (mSize < 1) {
@@ -292,6 +301,7 @@ public class EFASynchronizer {
 		}
 	}
 
+	// Synchronization of transitions with controllable events
 	private Object[] cStep(final TIntArrayList source, final int event) throws AnalysisException {
 		final TIntArrayList target = new TIntArrayList(source);
 		final List<SimpleExpressionProxy> constraints = new ArrayList<>();
@@ -305,9 +315,10 @@ public class EFASynchronizer {
 				for (final int lb : lbs.toArray()) {
 					iter.reset(source.get(id), lb);
 					/**
-					 * It is assumed that given EFAs are deterministic, i.e.,
+					 * It is assumed that given EFAs are 'structurally' deterministic, i.e.,
 					 * there are no two transitions with the same source and
-					 * event but two different target locations
+					 * event but two different target locations even if the conjunction of
+					 * the guards are logically false.
 					 */
 					if (iter.advance()) {
 						fired++;
@@ -340,6 +351,7 @@ public class EFASynchronizer {
 		return new Object[] { source, target, event, constraints, null };
 	}
 
+	// Synchronization of transitions with uncontrollable events
 	private Object[] uStep(final TIntArrayList source, final int event) throws AnalysisException {
 		final TIntArrayList target = new TIntArrayList(source);
 		final int nbp = mEventPlant.get(event);
@@ -392,7 +404,7 @@ public class EFASynchronizer {
 		}
 		// It is assumed that all components have the same uncontrollable
 		// events!
-		// If either it is disbled by plant or no one fired this event
+		// Either it is disabled by plant or no one fired this event
 		if (firedByPlant < nbp || firedByPlant + firedBySpec == 0) {
 			return null;
 		}

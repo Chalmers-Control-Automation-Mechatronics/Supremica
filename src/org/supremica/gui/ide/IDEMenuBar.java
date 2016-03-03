@@ -455,7 +455,15 @@ public class IDEMenuBar extends JMenuBar
         mEdAnalyzeMenu = new JMenu("Analyze");
         mEdAnalyzeMenu.setMnemonic(KeyEvent.VK_Z);
         mEdAnalyzeMenu.add(actions.editorSynthesizerAction.getMenuItem());
-//        mEdAnalyzeMenu.add(actions.editorTransitionProjectionAction.getMenuItem());
+        if (Config.INCLUDE_EXPERIMENTAL_ALGORITHMS.get())
+        {
+        	//IISC Algorithms
+        	mEdAnalyzeMenu.addSeparator();
+	        mEdAnalyzeMenu.add(actions.editorEFASynch.getMenuItem());
+	        mEdAnalyzeMenu.add(actions.editorEFASynchEval.getMenuItem());
+	        mEdAnalyzeMenu.add(actions.editorEFAPE.getMenuItem());
+	        mEdAnalyzeMenu.add(actions.editorIISC.getMenuItem());
+        }
       }
 
       // Simulate

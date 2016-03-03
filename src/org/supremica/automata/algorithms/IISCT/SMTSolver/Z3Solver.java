@@ -84,7 +84,8 @@ public class Z3Solver extends AbstractSolver {
 			throw new SolverException(SOLVER_NAME,
 					"Cannot find 'libz3.dll' and/or 'libz3java.dll' files in ./dist folder. "
 							+ "Please add these files in the folder and try again. "
-							+ "You can find these files from the compiled Z3 project on GitHub.");
+							+ "You can find these files from the compiled Z3 project on GitHub."
+							+ "/n Note that, Z3 DLLs depend on Microsoft Visual C++ 2010 Redistributable Package libraries.");
 		}
 	}
 
