@@ -32,10 +32,7 @@ import gnu.trove.set.hash.THashSet;
  * Editor class of the Transition Projection method.
  * <p/>
  * @author Mohammad Reza Shoaei (shoaei@chalmers.se)
- * @version %I%, %G%
- * @since 1.0
  */
-@SuppressWarnings("deprecation")
 public class EditorEFASynchAction
  extends IDEAction
 {

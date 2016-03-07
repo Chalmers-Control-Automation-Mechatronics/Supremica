@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.logging.Level;
 
 import javax.swing.Action;
 
@@ -20,14 +19,13 @@ import net.sourceforge.waters.analysis.efa.simple.SimpleEFAVariableContext;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
+import org.apache.log4j.Logger;
 import org.supremica.automata.algorithms.IISCT.EFAPartialEvaluator;
-import org.supremica.gui.ide.IDE;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 
 import gnu.trove.set.hash.THashSet;
 
@@ -121,18 +119,17 @@ public class EditorEFAPEAction
       mHelper.importToIDE(root, system, module);
       System.err.println("Finish importing ...");
     } catch (AnalysisException | EvalException | IOException |
-     UnsupportedFlavorException ex) {
-      java.util.logging.Logger.getLogger(EditorTransitionProjectionAction.class
-       .getName()).
-       log(Level.SEVERE, null, ex);
+             UnsupportedFlavorException ex) {
+      final Logger logger = Logger.getLogger(getClass());
+      final String msg = ex.getMessage() == null ? "" : ex.getMessage();
+      logger.error(ProxyTools.getShortClassName(ex) + " caught in " +
+                   ProxyTools.getShortClassName(this) + ": " + msg);
     }
   }
 
   //#########################################################################
   //# Class Constants
-  @SuppressWarnings("unused")
-  private static final Logger logger = LoggerFactory.createLogger(IDE.class);
-  private static final long serialVersionUID = 1008047793917621873L;
   private SimpleEFAHelper mHelper;
+  private static final long serialVersionUID = 1008047793917621873L;
 
 }

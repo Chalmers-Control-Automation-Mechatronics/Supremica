@@ -648,7 +648,8 @@ public class IISynthesizer {
 
 	// ************************* Helper Methods ********************************
 
-	private HashMap<Integer, String> getStateSpecInfo(final int stateId) {
+	@SuppressWarnings("unused")
+  private HashMap<Integer, String> getStateSpecInfo(final int stateId) {
 		final HashMap<Integer, String> map = new HashMap<>();
 		final String sLabel = mStEnc.getAttribute(stateId, SimpleEFAHelper.DEFAULT_SPEC_KEY);
 		if (sLabel == null || sLabel.isEmpty()) {
@@ -900,7 +901,8 @@ public class IISynthesizer {
 		// Set of inductive invariant predicates
 		public List<BoolExpr> R = new ArrayList<>();
 		// Domain
-		public BoolExpr D;
+		@SuppressWarnings("unused")
+    public BoolExpr D;
 		// Status of IC3PathBlocking
 		public int status = INT_UNKNOWN;
 
@@ -908,7 +910,8 @@ public class IISynthesizer {
 			return coveredBy != INT_UNKNOWN;
 		}
 
-		public boolean isSupervisable() {
+		@SuppressWarnings("unused")
+    public boolean isSupervisable() {
 			return status == STATUS_SUPERVISED && isControllable;
 		}
 
@@ -1049,6 +1052,7 @@ public class IISynthesizer {
 			leafs.push(v);
 		}
 
+	    @SuppressWarnings("unused")
 		public void addLeaf(final TreeNode v) {
 			leafs.add(v);
 		}
@@ -1106,12 +1110,15 @@ public class IISynthesizer {
 	private static final int INT_NA = -2;
 	private static final int INITIAL_LABEL_ID = Short.MAX_VALUE;
 	private static final int STATUS_CTI = 0;
-	private static final int STATUS_BLOCKED_INIT = 1;
+	@SuppressWarnings("unused")
+  private static final int STATUS_BLOCKED_INIT = 1;
 	private static final int STATUS_BLOCKED_NODE = 2;
 	private static final int STATUS_NOTREACHABLE = 3;
 	private static final int STATUS_SUPERVISED = 4;
 	private static final int GENERAL_ZID = 0;
+    @SuppressWarnings("unused")
 	private static final int STRENGTHEN_BY_PARENT = 0;
+    @SuppressWarnings("unused")
 	private static final int STRENGTHEN_BY_BIOPARENT = 1;
 	private final Collection<SimpleEFAVariable> mVarCtx;
 	private final ListBufferTransitionRelation mTR;
@@ -1120,7 +1127,9 @@ public class IISynthesizer {
 	private final TransitionIterator mIter;
 	private final Tree mTree;
 	private Z3Solver zSolver;
+    @SuppressWarnings("unused")
 	private final boolean overapproximate = false;
+    @SuppressWarnings("unused")
 	private final boolean underapproximate = false;
 	private final HashMap<Integer, SimpleExpressionProxy> mLbToSpec;
 	// private final TIntObjectHashMap<BoolExpr> zLbToTranExpr;
