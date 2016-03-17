@@ -145,10 +145,15 @@ public class AutomataVerificationWorker
           //theAutomata = workbench.getAllAutomata(); // They are sent through the options instead
           break;
         case OP:
-          // OP-verifier ...
-          successMessage = "The observer property is satisfied.";
-          failureMessage = "The observer property is NOT satisfied.";
-          break;
+            // OP-verifier ...
+            successMessage = "The observer property is satisfied.";
+            failureMessage = "The observer property is NOT satisfied.";
+            break;
+        case DIAGNOSABILITY:
+            // Diagnosability verification ...
+            successMessage = "The system is diagnosable.";
+            failureMessage = "The system is NOT diagnosable.";
+            break;
         default:
           // Error... this can't happen!
           requestAbort();

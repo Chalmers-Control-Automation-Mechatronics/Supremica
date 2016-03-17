@@ -52,12 +52,10 @@ package org.supremica.automata.algorithms;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
+import net.sourceforge.waters.analysis.abstraction.BBSDAbstraction;
+import net.sourceforge.waters.analysis.abstraction.BBSDDiagnosabilityVerification;
 import net.sourceforge.waters.analysis.abstraction.OPSearchAutomatonSimplifier;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.Abortable;
@@ -65,10 +63,7 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.*;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 import org.supremica.automata.Alphabet;
@@ -87,10 +82,7 @@ import org.supremica.automata.algorithms.minimization.MinimizationHelper;
 import org.supremica.automata.algorithms.minimization.MinimizationHeuristic;
 import org.supremica.automata.algorithms.minimization.MinimizationOptions;
 import org.supremica.automata.algorithms.minimization.MinimizationStrategy;
-import org.supremica.gui.ActionMan;
-import org.supremica.gui.AutomataVerificationWorker;
-import org.supremica.gui.ExecutionDialog;
-import org.supremica.gui.ExecutionDialogMode;
+import org.supremica.gui.*;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
@@ -321,7 +313,16 @@ public class AutomataVerifier
             throw new UnsupportedOperationException("The selected algorithm is not implemented");
           }
         case OP:
-          return observerPropertyVerification();
+            return observerPropertyVerification();
+        case DIAGNOSABILITY:
+            if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.BBSD)
+        {
+            return BBSDDiagnosabilityVerification();
+        }
+        else
+        {
+            throw new UnsupportedOperationException("The selected algorithm is not implemented");
+        }
         default:
           throw new UnsupportedOperationException
             ("The selected type of verification is not implemented!");
@@ -1825,56 +1826,74 @@ public class AutomataVerifier
      * Checks observer property using OP-search algorithm from Waters.
      */
     private boolean observerPropertyVerification()
-      throws AnalysisException
+            throws AnalysisException
     {
-      final ProductDESProxyFactory factory =
-        ProductDESElementFactory.getInstance();
-      final AutomataToWaters importer = new AutomataToWaters(factory);
-      final AutomatonProxy aut;
-      switch (theAutomata.size()) {
-      case 0:
-        throw new IllegalStateException("No automata for OP check!");
-      case 1:
-        final Automaton first = theAutomata.iterator().next();
-        aut = importer.convertAutomaton(first);
-        break;
-      default:
-        final ProductDESProxy des = importer.convertAutomata(theAutomata);
-        final SynchronousProductBuilder sync =
-          new MonolithicSynchronousProductBuilder(des, factory);
-        final int limit = verificationOptions.getReachabilityStateLimit();
-        sync.setNodeLimit(limit);
-        sync.run();
-        aut = sync.getComputedAutomaton();
-        break;
-      }
-      final Collection<EventProxy> hidden = new ArrayList<EventProxy>(2);
-      final String tau = Config.MINIMIZATION_SILENT_EVENT_NAME.getAsString();
-      final String tau_c =
-        Config.MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME.getAsString();
-      final String tau_u =
-        Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.getAsString();
-      for (final EventProxy event : aut.getEvents()) {
-        final String name = event.getName();
-        if (name.equals(tau) || name.equals(tau_c) || name.equals(tau_u)) {
-          hidden.add(event);
+        final ProductDESProxyFactory factory =
+                ProductDESElementFactory.getInstance();
+        final AutomataToWaters importer = new AutomataToWaters(factory);
+        final AutomatonProxy aut;
+        switch (theAutomata.size()) {
+            case 0:
+                throw new IllegalStateException("No automata for OP check!");
+            case 1:
+                final Automaton first = theAutomata.iterator().next();
+                aut = importer.convertAutomaton(first);
+                break;
+            default:
+                final ProductDESProxy des = importer.convertAutomata(theAutomata);
+                final SynchronousProductBuilder sync =
+                        new MonolithicSynchronousProductBuilder(des, factory);
+                final int limit = verificationOptions.getReachabilityStateLimit();
+                sync.setNodeLimit(limit);
+                sync.run();
+                aut = sync.getComputedAutomaton();
+                break;
         }
-      }
-      final KindTranslator translator = IdenticalKindTranslator.getInstance();
-      final OPSearchAutomatonSimplifier simp =
-        new OPSearchAutomatonSimplifier(aut, hidden, factory, translator);
-      simp.setOperationMode(OPSearchAutomatonSimplifier.Mode.VERIFY);
-      if (Config.VERBOSE_MODE.isTrue()) {
-        try {
-          final File wmod = theAutomata.getFileLocation();
-          final File dir = wmod.getParentFile();
-          final File log = new File(dir, "op.log");
-          simp.setLogFile(log);
-        } catch (final MalformedURLException exception) {
-          // No file - no logging
+        final Collection<EventProxy> hidden = new ArrayList<EventProxy>(2);
+        final String tau = Config.MINIMIZATION_SILENT_EVENT_NAME.getAsString();
+        final String tau_c =
+                Config.MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME.getAsString();
+        final String tau_u =
+                Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.getAsString();
+        for (final EventProxy event : aut.getEvents()) {
+            final String name = event.getName();
+            if (name.equals(tau) || name.equals(tau_c) || name.equals(tau_u)) {
+                hidden.add(event);
+            }
         }
-      }
-      return simp.run();
+        final KindTranslator translator = IdenticalKindTranslator.getInstance();
+        final OPSearchAutomatonSimplifier simp =
+                new OPSearchAutomatonSimplifier(aut, hidden, factory, translator);
+        simp.setOperationMode(OPSearchAutomatonSimplifier.Mode.VERIFY);
+        if (Config.VERBOSE_MODE.isTrue()) {
+            try {
+                final File wmod = theAutomata.getFileLocation();
+                final File dir = wmod.getParentFile();
+                final File log = new File(dir, "op.log");
+                simp.setLogFile(log);
+            } catch (final MalformedURLException exception) {
+                // No file - no logging
+            }
+        }
+        return simp.run();
+    }
+
+    /**
+     * Examines diagnosability, by using BBSD abstraction.
+     *
+     *@return True if diagnosable, false if not
+     *@exception  Exception Description of the Exception
+     */
+    private boolean BBSDDiagnosabilityVerification()
+            throws Exception
+    {
+
+        if (theAutomata.size() == 0)
+            throw new IllegalStateException("No automaton selected for verification!");
+
+        BBSDDiagnosabilityVerification bbsd = new BBSDDiagnosabilityVerification(theAutomata);
+
+        return true;
     }
 
     /**
