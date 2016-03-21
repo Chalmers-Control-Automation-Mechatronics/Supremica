@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.gui.comp552;
 
-import gnu.trove.set.hash.THashSet;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -46,6 +44,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -57,8 +56,8 @@ import java.util.regex.Pattern;
 
 import javax.xml.bind.JAXBException;
 
-import net.sourceforge.waters.analysis.monolithic.MonolithicControlLoopChecker;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
+import net.sourceforge.waters.cpp.analysis.NativeControlLoopChecker;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.gui.ModuleContext;
@@ -81,6 +80,7 @@ import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.LoopTraceProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
@@ -105,6 +105,8 @@ import net.sourceforge.waters.xsd.base.EventKind;
 import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
 import org.xml.sax.SAXException;
+
+import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -215,6 +217,7 @@ public class ModelAssess
           mOutput.println("{\\bf\\itshape Nothing submitted!}");
           mOutput.println();
         } else {
+          Arrays.sort(submitted);
           for (final File file : submitted) {
             final String name = file.getName();
             if (name.endsWith(extension)) {
@@ -732,12 +735,24 @@ public class ModelAssess
       mModule = module;
       if (module == null) {
         mEventDeclNames = Collections.emptySet();
+        mPlantNames = Collections.emptySet();
       } else {
         final Collection<EventDeclProxy> decls = module.getEventDeclList();
         mEventDeclNames = new THashSet<String>(decls.size());
         for (final EventDeclProxy decl : decls) {
           final String name = decl.getName();
           mEventDeclNames.add(name);
+        }
+        final Collection<Proxy> comps = module.getComponentList();
+        mPlantNames = new THashSet<String>(comps.size());
+        for (final Proxy proxy : comps) {
+          if (proxy instanceof SimpleComponentProxy) {
+            final SimpleComponentProxy comp = (SimpleComponentProxy) proxy;
+            if (comp.getKind() == ComponentKind.PLANT) {
+              final String name = comp.getName();
+              mPlantNames.add(name);
+            }
+          }
         }
       }
       mTests = new LinkedList<AbstractTest>();
@@ -863,12 +878,29 @@ public class ModelAssess
           }
         }
       }
+      final Collection<Proxy> comps = attempt.getComponentList();
+      for (final Proxy proxy : comps) {
+        if (proxy instanceof SimpleComponentProxy) {
+          final SimpleComponentProxy comp = (SimpleComponentProxy) proxy;
+          if (comp.getKind() == ComponentKind.PLANT) {
+            final String name = comp.getName();
+            if (hasPlant(name)) {
+              matches++;
+            }
+          }
+        }
+      }
       return matches;
     }
 
     private boolean hasEventDecl(final String name)
     {
       return mEventDeclNames.contains(name);
+    }
+
+    private boolean hasPlant(final String name)
+    {
+      return mPlantNames.contains(name);
     }
 
     //#######################################################################
@@ -1145,6 +1177,7 @@ public class ModelAssess
 
     private ProductDESProxy mProductDES;
     private final Collection<String> mEventDeclNames;
+    private Collection<String> mPlantNames;
     private Map<String,EventProxy> mEventMap;
     private Map<String,AutomatonProxy> mPlantMap;
 
@@ -1370,11 +1403,19 @@ public class ModelAssess
         } else {
           final Pattern pattern = Pattern.compile("^exp[0-9]*_");
           boolean first = true;
+          int step = 0;
           for (final EventProxy event : events) {
             if (first) {
               first = false;
             } else {
               mOutput.print(", ");
+            }
+            if (trace instanceof LoopTraceProxy) {
+              final LoopTraceProxy loop = (LoopTraceProxy) trace;
+              if (step == loop.getLoopIndex()) {
+                mOutput.print("$\\langle$loop begins here$\\rangle$ ");
+              }
+              step++;
             }
             final String name = event.getName();
             final Matcher matcher = pattern.matcher(name);
@@ -1478,7 +1519,7 @@ public class ModelAssess
     LoopTest(final Solution sol, final float marks)
     {
       super(sol, "Loop check", marks,
-            new MonolithicControlLoopChecker(mProductDESFactory));
+            new NativeControlLoopChecker(mProductDESFactory));
     }
 
   }
