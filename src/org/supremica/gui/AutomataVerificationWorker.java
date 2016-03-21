@@ -40,15 +40,15 @@ import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
+import net.sourceforge.waters.analysis.abstraction.BBSDDiagnosabilityVerification;
 import net.sourceforge.waters.model.analysis.Abortable;
 
 import org.supremica.automata.Automata;
-import org.supremica.automata.algorithms.AutomataVerifier;
-import org.supremica.automata.algorithms.SynchronizationOptions;
-import org.supremica.automata.algorithms.VerificationOptions;
-import org.supremica.automata.algorithms.VerificationType;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.algorithms.*;
 import org.supremica.automata.algorithms.minimization.MinimizationOptions;
 import org.supremica.gui.ide.IDEReportInterface;
+import org.supremica.gui.ide.actions.IDEActionInterface;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.util.ActionTimer;
@@ -198,6 +198,15 @@ public class AutomataVerificationWorker
         timer.start();
         verificationSuccess = automataVerifier.verify();
         timer.stop();
+
+        // Add test result from Diagnosability verification
+        if (vtype == VerificationType.DIAGNOSABILITY &&
+            verificationOptions.getAlgorithmType() == VerificationAlgorithm.BBSD) {
+            Automata result = BBSDDiagnosabilityVerification.getResult();
+            if (result != null)
+                ((IDEActionInterface)workbench).getActiveDocumentContainer().getAnalyzerPanel().addAutomata(result);
+        }
+
 
         threadsToStop.clear();
 

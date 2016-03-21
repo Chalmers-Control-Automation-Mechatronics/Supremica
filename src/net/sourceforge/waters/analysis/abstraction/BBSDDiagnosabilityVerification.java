@@ -15,29 +15,32 @@ public class BBSDDiagnosabilityVerification {
 
     private BBSDAbstraction bbsd = new BBSDAbstraction();
 
+    private static Automaton result;
+
     public BBSDDiagnosabilityVerification(Automata theAutomata){
 
-        Automaton result = new Automaton("BBSDDiagnosabilityVerification");
         final HashSet<LabeledEvent> local_events = new HashSet<LabeledEvent>();
         final Hashtable<State,Integer> state_labels = new Hashtable<State, Integer>();
-
 
         if (theAutomata.size() == 1) {
             javax.swing.JOptionPane.showMessageDialog(null, "Since you only selected ONE automaton, you have entered a debugging mode. If this was not intended, please select 2+ automatons and try again.");
 
-            Automaton aut = theAutomata.getFirstAutomaton();
+            Automaton aut = new Automaton(theAutomata.getFirstAutomaton());
             local_events.clear();
             for (LabeledEvent e : aut.iterableEvents())
-                if (e.getLabel().equals("tau"))
+                if (e.isUnobservable() || e.getLabel().equals("tau"))
                     local_events.add(e);
             for (State s : aut.iterableStates())
                 state_labels.put(s, ((s.isForbidden()) ? 2 : 1));
+
+            result = new Automaton("BBSDDiagnosabilityVerification");
             result = bbsd.calculateAbstraction(aut, local_events, state_labels);
         }
         else {
-
             final Automata remaining = new Automata(theAutomata);
             Automata current;
+
+            result = new Automaton("BBSDDiagnosabilityVerification");
 
             AutomataSynchronizer theSynchronizer;
             try
@@ -63,8 +66,8 @@ public class BBSDDiagnosabilityVerification {
 
                     local_events.clear();
                     for (LabeledEvent e : currentGv.iterableEvents())
-                        if (!remaining.getUnionAlphabet().contains(e) && !result.getAlphabet().contains(e))
-                            local_events.add(e);
+                        if (e.isUnobservable() || (!remaining.getUnionAlphabet().contains(e) && !result.getAlphabet().contains(e)))
+                                local_events.add(e);
                     state_labels.clear();
                     for (State s : currentGv.iterableStates())
                         state_labels.put(s, ((s.isForbidden()) ? 2 : 1));
@@ -84,7 +87,7 @@ public class BBSDDiagnosabilityVerification {
                     // Make a last abstraction of G_v
                     local_events.clear();
                     for (LabeledEvent e : result.iterableEvents())
-                        if (!remaining.getUnionAlphabet().contains(e))
+                        if (e.isUnobservable() || !remaining.getUnionAlphabet().contains(e))
                             local_events.add(e);
                     for (State s : result.iterableStates())
                         state_labels.put(s, ((s.isForbidden()) ? 2 : 1));
@@ -275,6 +278,10 @@ public class BBSDDiagnosabilityVerification {
 
     private boolean isFailureEvent(LabeledEvent e) {
         return e.getName().toLowerCase().startsWith("f");
+    }
+
+    public static Automata getResult() {
+        return new Automata(result);
     }
 
 }
