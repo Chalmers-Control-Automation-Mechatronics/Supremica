@@ -1,4 +1,4 @@
-package net.sourceforge.waters.analysis.abstraction;
+package org.supremica.automata.algorithms.bbsd;
 
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.AutomataSynchronizer;
