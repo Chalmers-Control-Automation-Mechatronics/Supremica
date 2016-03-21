@@ -68,7 +68,8 @@ public enum VerificationType
   //MUTUALLYNONBLOCKING("Mutually nonblocking"),
   LANGUAGEINCLUSION("Language inclusion"),
   /** Observer property (OP-verifier) */
-  OP("Observer property", Config.GUI_ANALYZER_INCLUDE_OP);
+  OP("Observer property", Config.GUI_ANALYZER_INCLUDE_OP),
+  DIAGNOSABILITY("Diagnosability", Config.INCLUDE_EXPERIMENTAL_ALGORITHMS);
 
 
   //#########################################################################

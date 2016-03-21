@@ -52,7 +52,7 @@ public class AnalyzerSynchronizerAction
     extends IDEAction
 {
     private static final long serialVersionUID = 1L;
-    private Logger logger = LoggerFactory.createLogger(IDE.class);
+    private final Logger logger = LoggerFactory.createLogger(IDE.class);
 
     public AnalyzerSynchronizerAction(List<IDEAction> actionList)
     {
@@ -63,16 +63,18 @@ public class AnalyzerSynchronizerAction
 
         putValue(Action.NAME, "Synchronize...");
         putValue(Action.SHORT_DESCRIPTION, "Synchronize the selected automata");
-        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_S));
+        putValue(Action.MNEMONIC_KEY, KeyEvent.VK_S);
         //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/synchronize16.gif")));
     }
 
+	@Override
     public void actionPerformed(ActionEvent e)
     {
         doAction();
     }
 
+	@Override
     public void doAction()
     {
         // Retrieve the selected automata and make a sanity check
@@ -108,6 +110,7 @@ public class AnalyzerSynchronizerAction
         }
 
         // Start worker thread - perform the task.
-        new AutomataSynchronizerWorker(ide.getIDE(), selectedAutomata, "", synchronizationOptions);
+        final AutomataSynchronizerWorker asw = new AutomataSynchronizerWorker(ide.getIDE(), selectedAutomata, "", synchronizationOptions);
+		asw.start();	// Start this thread and let it run free
     }
 }

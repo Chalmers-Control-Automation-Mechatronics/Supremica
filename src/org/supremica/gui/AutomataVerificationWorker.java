@@ -40,6 +40,7 @@ import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
+import net.sourceforge.waters.analysis.abstraction.BBSDDiagnosabilityVerification;
 import net.sourceforge.waters.model.analysis.Abortable;
 
 import org.supremica.automata.Automata;
@@ -49,6 +50,7 @@ import org.supremica.automata.algorithms.VerificationOptions;
 import org.supremica.automata.algorithms.VerificationType;
 import org.supremica.automata.algorithms.minimization.MinimizationOptions;
 import org.supremica.gui.ide.IDEReportInterface;
+import org.supremica.gui.ide.actions.IDEActionInterface;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.util.ActionTimer;
@@ -63,7 +65,7 @@ public class AutomataVerificationWorker
     extends Thread
     implements Abortable
 {
-    private static Logger logger = LoggerFactory.createLogger(AutomataVerificationWorker.class);
+    private static final Logger logger = LoggerFactory.createLogger(AutomataVerificationWorker.class);
 
     private IDEReportInterface workbench = null;
     private Automata theAutomata = null;
@@ -119,6 +121,7 @@ public class AutomataVerificationWorker
         final VerificationType vtype =
           verificationOptions.getVerificationType();
         switch (vtype) {
+		{
         case CONTROLLABILITY:
         case INVERSECONTROLLABILITY:
           // Controllability verification...
@@ -145,10 +148,15 @@ public class AutomataVerificationWorker
           //theAutomata = workbench.getAllAutomata(); // They are sent through the options instead
           break;
         case OP:
-          // OP-verifier ...
-          successMessage = "The observer property is satisfied.";
-          failureMessage = "The observer property is NOT satisfied.";
-          break;
+            // OP-verifier ...
+            successMessage = "The observer property is satisfied.";
+            failureMessage = "The observer property is NOT satisfied.";
+            break;
+        case DIAGNOSABILITY:
+            // Diagnosability verification ...
+            successMessage = "The system is diagnosable.";
+            failureMessage = "The system is NOT diagnosable.";
+            break;
         default:
           // Error... this can't happen!
           requestAbort();
@@ -193,6 +201,15 @@ public class AutomataVerificationWorker
         timer.start();
         verificationSuccess = automataVerifier.verify();
         timer.stop();
+
+        // Add test result from Diagnosability verification
+        if (vtype == VerificationType.DIAGNOSABILITY &&
+            verificationOptions.getAlgorithmType() == VerificationAlgorithm.BBSD) {
+            Automata result = BBSDDiagnosabilityVerification.getResult();
+            if (result != null)
+                ((IDEActionInterface)workbench).getActiveDocumentContainer().getAnalyzerPanel().addAutomata(result);
+        }
+
 
         threadsToStop.clear();
 

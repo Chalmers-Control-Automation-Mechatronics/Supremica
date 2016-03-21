@@ -348,21 +348,22 @@ public class AutomataMinimizer
 //
 
                 // Compose and minimize!
-                 if(AutomataSynthesizer.renameBack()){
-                     final Automata selectClone=selection.clone();
-                     final String name= "HalfWaySynthesisResult("+selection.getFirstAutomaton().getName()+")";
-                      Automaton aut=new Automaton(name );
+                 if(AutomataSynthesizer.renameBack())
+				 {
+                     final Automata selectClone = selection.clone();
+                     final String name = "HalfWaySynthesisResult(" + selection.getFirstAutomaton().getName() + ")";
+                     // Automaton aut=new Automaton(name );
 //                        logger.info(selection);
-                        // Synch
-                        final SynchronizationOptions synchOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
-                        synchOptions.setUseShortStateNames(useShortStateNames);
-                        aut = AutomataSynchronizer.synchronizeAutomata(selectClone, synchOptions, false);
-                        aut.setName(name);
-                        aut.hide(hideThese, preserveControllability);
-                        AutomatonMinimizer.halfWaySynthesis(aut);
-                        AutomatonMinimizer.renameBackToOriginalEvents(aut);
-                        aut.setType(AutomatonType.SUPERVISOR);
-                        setOfHalf.addAutomaton(aut);
+					// Synch
+					final SynchronizationOptions synchOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
+					synchOptions.setUseShortStateNames(useShortStateNames);
+					final Automaton aut = AutomataSynchronizer.synchronizeAutomata(selectClone, synchOptions, false);
+					aut.setName(name);
+					aut.hide(hideThese, preserveControllability);
+					AutomatonMinimizer.halfWaySynthesis(aut);
+					AutomatonMinimizer.renameBackToOriginalEvents(aut);
+					aut.setType(AutomatonType.SUPERVISOR);
+					setOfHalf.addAutomaton(aut);
                }
 
                  min = monolithicMinimization(selection, hideThese);
@@ -504,7 +505,7 @@ public class AutomataMinimizer
      * minimization. Which automata should be composed and which
      * events can be hidden.
      */
-    private class MinimizationTask
+    private static class MinimizationTask
     {
         private final Automata automata;
         private final Alphabet eventsToHide;

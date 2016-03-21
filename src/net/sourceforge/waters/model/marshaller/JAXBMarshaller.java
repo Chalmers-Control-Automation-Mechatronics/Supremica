@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -99,6 +100,8 @@ public abstract class JAXBMarshaller
     mJAXBUnmarshaller = context.createUnmarshaller();
     mJAXBUnmarshaller.setSchema(schema);
     mJAXBMarshaller = context.createMarshaller();
+    mJAXBMarshaller.setProperty
+      (Marshaller.JAXB_ENCODING, Charset.defaultCharset().toString());
     mJAXBMarshaller.setProperty
       (Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
   }
