@@ -68,8 +68,9 @@ public class AutomataSynchronizerWorker
         this.theAutomata = theAutomata;
         this.syncOptions = syncOptions;
 
-        // Order this thread to begin execution; the Jvm calls the run method of this thread.
-        this.start();
+        //// Order this thread to begin execution; the Jvm calls the run method of this thread.
+        // this.start();	// This is bad practice, probably works in this case, but if someone sub-classes AutomataSynchronizerWorker all hell breaks loose
+							// The proper way is that the caller starts (see AnalyzerSynchronizerAction.java)
     }
 
     @Override

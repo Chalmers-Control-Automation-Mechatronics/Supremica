@@ -65,7 +65,7 @@ public class MonolithicSupervisor
      *
      * @param supervisor is an Automaton modeling the supervisor.
      */
-    public MonolithicSupervisor(Automaton supervisor)
+    public MonolithicSupervisor(final Automaton supervisor)
     throws SupremicaException
     {
         super(new Automata(supervisor));

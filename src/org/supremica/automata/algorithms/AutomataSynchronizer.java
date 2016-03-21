@@ -145,7 +145,7 @@ public class AutomataSynchronizer
     /**
      * Initializes the AutomataSynchronizerExecuter:s based on the AutomataSynchronizerHelper.
      */
-    public void initialize()
+    private void initialize()
     {
         // Allocate and initialize the synchronizationExecuters
         final int nbrOfExecuters = syncOptions.getNbrOfExecuters();
@@ -357,7 +357,7 @@ public class AutomataSynchronizer
     }
 
     @SuppressWarnings("unchecked")
-    public Automata removeGuardsActionsFromEFAs(final List<? extends Proxy> components)
+    public final Automata removeGuardsActionsFromEFAs(final List<? extends Proxy> components)
     {
         final Automata automata = new Automata();
         final HashSet<SimpleComponentSubject> autComps = new HashSet<SimpleComponentSubject>();

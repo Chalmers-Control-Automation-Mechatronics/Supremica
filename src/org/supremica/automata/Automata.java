@@ -304,6 +304,7 @@ public class Automata
     }
 
 
+	@Override
     public Iterator<Automaton> iterator()
     {
         return theAutomata.iterator();
@@ -330,7 +331,7 @@ public class Automata
 
     public Iterator<Automaton> plantIterator()
     {
-        return new AutomatonTypeIterator(AutomatonType.PLANT);
+        return new AutomatonTypeIterator(AutomatonType.PLANT, iterator());
     }
 
     /**
@@ -354,7 +355,7 @@ public class Automata
 
     public Iterator<Automaton> specificationIterator()
     {
-        return new AutomatonTypeIterator(AutomatonType.SPECIFICATION);
+        return new AutomatonTypeIterator(AutomatonType.SPECIFICATION, iterator());
     }
 
     /**
@@ -378,7 +379,7 @@ public class Automata
 
     public Iterator<Automaton> supervisorIterator()
     {
-        return new AutomatonTypeIterator(AutomatonType.SUPERVISOR);
+        return new AutomatonTypeIterator(AutomatonType.SUPERVISOR, iterator());
     }
 
     /**
@@ -1187,26 +1188,28 @@ public class Automata
         }
     }
 
-    class AutomatonTypeIterator
+    static class AutomatonTypeIterator
         implements Iterator<Automaton>
     {
         private final Iterator<Automaton> autIt;
         private final AutomatonType theType;
         private Automaton theAutomaton = null;
 
-        public AutomatonTypeIterator(final AutomatonType theType)
+        public AutomatonTypeIterator(final AutomatonType theType, final Iterator<Automaton> it)
         {
-            this.autIt = theAutomata.iterator();
+            this.autIt = it;	// was theAutomata.iterator()
             this.theType = theType;
 
             findNext();
         }
 
+		@Override
         public boolean hasNext()
         {
             return theAutomaton != null;
         }
 
+		@Override
         public Automaton next()
         {
             final Automaton returnAutomaton = theAutomaton;
@@ -1216,6 +1219,7 @@ public class Automata
             return returnAutomaton;
         }
 
+		@Override
         public void remove()
         {
             throw new UnsupportedOperationException();

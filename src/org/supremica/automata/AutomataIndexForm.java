@@ -427,8 +427,7 @@ public final class AutomataIndexForm
             }
 
             @SuppressWarnings("unused")
-            final
-			Alphabet currAlphabet = currAutomaton.getAlphabet();
+            final Alphabet currAlphabet = currAutomaton.getAlphabet();
             final Iterator<?> stateIt = currAutomaton.stateIterator();
 
             while (stateIt.hasNext())

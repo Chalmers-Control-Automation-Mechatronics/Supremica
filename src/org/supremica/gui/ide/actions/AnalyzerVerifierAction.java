@@ -116,7 +116,7 @@ public class AnalyzerVerifierAction
       final SynchronizationOptions sOptions =
         SynchronizationOptions.getDefaultVerificationOptions();
       // Work!
-      new AutomataVerificationWorker(ide, selectedAutomata,
+      new AutomataVerificationWorker(ide.getIDE(), selectedAutomata,
                                      vOptions, sOptions, mOptions);
     }
 }
