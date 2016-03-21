@@ -61,7 +61,8 @@ public enum VerificationAlgorithm
     SAT("Satisfiability"),
     COMPOSITIONAL("Compositional"),
     COMBINED("Compositional + BDD"),
-    BDD("BDD");
+    BDD("BDD"),
+    BBSD("BBSD");
     //IDD("IDD");
 
     /** Textual description. */

@@ -291,6 +291,9 @@ public class VerificationDialog
             case OP:
               algorithmSelector.addItem(VerificationAlgorithm.MONOLITHIC);
               break;
+            case DIAGNOSABILITY:
+                algorithmSelector.addItem(VerificationAlgorithm.BBSD);
+                break;
             default:
               throw new IllegalStateException("Unknown verification type: " +
                                               vtype + "!");
@@ -369,6 +372,17 @@ public class VerificationDialog
                          "by P. Pena et.al. (2009).");
             note.setVisible(true);
             break;
+          case DIAGNOSABILITY:
+              if (algorithmSelector.getSelectedItem() ==
+                      VerificationAlgorithm.BBSD) {
+                  note.setText("Note:\n" +
+                          "This algorithm uses BBSD to verify\n" +
+                          "if selected automata are diagnosable.\n");
+                  note.setVisible(true);
+              } else {
+                  note.setVisible(false);
+              }
+              break;
           default:
             note.setVisible(false);
             break;
