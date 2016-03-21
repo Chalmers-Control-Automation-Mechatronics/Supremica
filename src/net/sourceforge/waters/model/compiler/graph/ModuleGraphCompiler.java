@@ -360,7 +360,9 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
           mMaxInitialStates = 0;
           break;
         case 0:
-          throw new NondeterministicModuleException(mCurrentComponent, node);
+          final Proxy location = mCompilationInfo.getErrorLocation(node);
+          throw new NondeterministicModuleException
+                      (mCurrentComponent, node, location);
         default:
           break;
         }
@@ -571,29 +573,22 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
       throws NondeterministicModuleException
     {
       List<CompiledTransition> transitions = mmOutTransitions.get(event);
-
-      if (transitions == null)
-      {
+      if (transitions == null) {
         transitions = new LinkedList<CompiledTransition>();
         mmOutTransitions.put(event, transitions);
-      }
-
-      else
-      {
-        for (final CompiledTransition trans : transitions)
-        {
-          if (trans.getTarget() == target)
+      } else {
+        for (final CompiledTransition trans : transitions) {
+          if (trans.getTarget() == target) {
             return;
-          else if (mCurrentComponentIsDetermistic)
-          {
+          } else if (mCurrentComponentIsDetermistic) {
+            final Proxy location = mCompilationInfo.getErrorLocation(mmNode);
             throw new NondeterministicModuleException
-                                          (mCurrentComponent, mmNode, event);
+                        (mCurrentComponent, mmNode, event, location);
           }
         }
       }
-
       final CompiledTransition trans =
-                     new CompiledTransition(this, event, target, cause, orig);
+        new CompiledTransition(this, event, target, cause, orig);
       transitions.add(trans);
       mLocalTransitionsList.add(trans);
     }

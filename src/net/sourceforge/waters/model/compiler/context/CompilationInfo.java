@@ -33,12 +33,15 @@
 
 package net.sourceforge.waters.model.compiler.context;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.EvalAbortException;
 import net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler;
@@ -55,26 +58,38 @@ import net.sourceforge.waters.model.module.InstanceProxy;
  */
 public class CompilationInfo
 {
+
   //#########################################################################
   //# Constructor
   public CompilationInfo()
   {
     mExceptions = new MultiEvalException();
-    mInstanceStack = new LinkedList<InstanceProxy>();
     mResultMap = new HashMap<Object,SourceInfo>();
+    mParentSourceInfo = null;
   }
 
   public CompilationInfo(final boolean sourceInfoEnabled,
                          final boolean multiExceptionEnabled)
   {
     mExceptions = multiExceptionEnabled ? new MultiEvalException() : null;
-    mInstanceStack = sourceInfoEnabled ? new LinkedList<InstanceProxy>() : null;
     mResultMap = sourceInfoEnabled? new HashMap<Object,SourceInfo>() : null;
+    mParentSourceInfo = null;
   }
 
 
   //#########################################################################
-  //# Configuation
+  //# Overrides for java.lang.Object
+  @Override
+  public String toString()
+  {
+    final StringBuilder builder = new StringBuilder();
+    dump(builder);
+    return builder.toString();
+  }
+
+
+  //#########################################################################
+  //# Configuration
   public boolean isSourceInfoEnabled()
   {
     return mResultMap != null;
@@ -108,38 +123,87 @@ public class CompilationInfo
 
   //#########################################################################
   //# Access
-  public void add(final Object target, final Proxy source)
+  /**
+   * Records source information without bindings for the given target.
+   * @param  target  The output object to receive source information.
+   * @param  source  The input object to be associated with the target.
+   *                 If the compilation info contains source information for
+   *                 the source, then the source's source object will
+   *                 be associated with the target.
+   * @return The created source information record, or <CODE>null</CODE>
+   *         if source information is disabled.
+   */
+  public SourceInfo add(final Object target, final Proxy source)
   {
-    if (isSourceInfoEnabled())
-    {
-      if (!stackIsEmpty()) {
-        add(target, getStackBase(), null);
-      } else {
-        add(target, source, null);
-      }
+    return add(target, source, null);
+  }
+
+  /**
+   * Records source information with bindings for the given target.
+   * @param  target  The output object to receive source information.
+   * @param  source  The input object to be associated with the target.
+   *                 If the compilation info contains source information for
+   *                 the source, then the source's source object will
+   *                 be associated with the target.
+   * @param  context The binding context with the values of any foreach-block
+   *                 variables at the time this output is created.
+   * @return The created source information record, or <CODE>null</CODE>
+   *         if source information is disabled.
+   */
+  public SourceInfo add(final Object target,
+                        final Proxy source,
+                        final BindingContext context)
+  {
+    if (isSourceInfoEnabled()) {
+      final SourceInfo info = createSourceInfo(source, context);
+      add(target, info);
+      return info;
+    } else {
+      return null;
     }
   }
 
-  private void add(final Object target, final Proxy source,
-                   final BindingContext context)
+  /**
+   * Creates or retrieves a source information record without recording it.
+   * If the given source has associated source information, the source's
+   * source information is returned, otherwise a new source information
+   * record is created. The created source information uses the correct parent
+   * and can be filed later using {@link #add(Object, SourceInfo)}.
+   * @param  source  The input object to be associated with the target.
+   *                 If the compilation info contains source information for
+   *                 the source, then the source's source object will
+   *                 be used in the created source information.
+   * @param  context The binding context with the values of any foreach-block
+   *                 variables at the time this output is created.
+   * @return A source information record, even if source information
+   *         is disabled.
+   */
+  public SourceInfo createSourceInfo(Proxy source,
+                                     BindingContext context)
   {
-    if (isSourceInfoEnabled())
-    {
-      SourceInfo info = getSourceInfo(source);
-      if (info == null) {
-        info = new SourceInfo(source, context);
-      } else {
-        if (context != null)
-          info = new SourceInfo(info.getSourceObject(), context);
-      }
-      add(target, info);
+    final SourceInfo info = getSourceInfo(source);
+    if (info == null) {
+      return new SourceInfo(source, context, mParentSourceInfo);
+    } else if ((mParentSourceInfo == null || mParentSourceInfo == info.getParent()) &&
+               (context == null) || context == info.getBindingContext()) {
+      return info;
+    } else {
+      assert info.getParent() == null || mParentSourceInfo == null :
+        "Parent merging not implemented!";
+      assert info.getBindingContext() == null || context == null :
+        "Context merging not implemented!";
+      source = info.getSourceObject();
+      context = context == null ? info.getBindingContext() : context;
+      final SourceInfo parent = mParentSourceInfo == null ? info.getParent() : mParentSourceInfo;
+      return new SourceInfo(source, context, parent);
     }
   }
 
   public void add(final Object target, final SourceInfo info)
   {
-    if (isSourceInfoEnabled())
+    if (isSourceInfoEnabled()) {
       mResultMap.put(target, info);
+    }
   }
 
   public Map<Object,SourceInfo> getResultMap()
@@ -149,62 +213,58 @@ public class CompilationInfo
 
   public SourceInfo getSourceInfo(final Object target)
   {
-    if (mResultMap != null && mResultMap.containsKey(target))
+    if (mResultMap != null && mResultMap.containsKey(target)) {
       return mResultMap.get(target);
-    else
+    } else {
       return null;
+    }
+  }
+
+  /**
+   * Returns the location of an error message to be associated with the
+   * given output object. This method finds a root source object, i.e.,
+   * and object within the originally compiled module that can be flagged
+   * with an error in the editor.
+   * @param  culprit  The object that caused the error.
+   * @return The object in the original input module that can be flagged;
+   *         or the argument if source information is disabled or could
+   *         not be found for the argument.
+   */
+  public Proxy getErrorLocation(final Proxy culprit)
+  {
+    final SourceInfo info = getSourceInfo(culprit);
+    return info == null ? culprit : info.getRoot().getSourceObject();
   }
 
 
   //#########################################################################
   //# Source Information Handling of Instantiations
   /**
-   * Adds the instance pointer to the stack.
-   *
-   * @param inst The instance pointer
-   * @see #mInstanceStack
+   * Records the source information of the given instance object as the new
+   * parent. The parent source information refers to an instance object
+   * ({@link InstanceProxy}) that triggered compilation of a child module.
+   * It will be added as the parent of every source information created
+   * while compiling the child module.
+   * @param  instance  Instance referring to a child being compiled.
+   * @param  context   Binding context for variable in the instance.
+   * @return The source information record used as the parent.
+   * @see ModuleInstanceCompiler
    */
-  public void addCurrentInstance(final InstanceProxy inst)
+  public SourceInfo pushParentSourceInfo(final InstanceProxy instance,
+                                         final BindingContext context)
   {
-    if (mInstanceStack != null)
-      mInstanceStack.add(inst);
+    mParentSourceInfo = new SourceInfo(instance, context, mParentSourceInfo);
+    return mParentSourceInfo;
   }
 
   /**
-   * Removes the last item from the stack.
-   *
-   * @see #mInstanceStack
+   * Removes the current parent source information record.
+   * This method assigns the parent of the current parent as the new parent.
+   * @see #pushParentSourceInfo(InstanceProxy,BindingContext) pushParentSourceInfo()
    */
-  public void removeCurrentInstance()
+  public void popParentSourceInfo()
   {
-    if (mInstanceStack != null && mInstanceStack.size() > 0)
-      mInstanceStack.remove(mInstanceStack.size()-1);
-  }
-
-  /**
-   * Returns the base item of the stack, which is the base module.
-   *
-   * @return The base module
-   */
-  public InstanceProxy getStackBase()
-  {
-    return mInstanceStack.get(0);
-  }
-
-  /**
-   * Tests whether the stack is empty.
-   * <p>
-   * In other words, this tests whether the module of interest is an
-   * instantiation or not.
-   *
-   * @return <CODE>true</CODE> if the stack is empty, which means that the
-   *                           module is not an instantiation;<br>
-   *        <CODE>false</CODE> if the stack is not empty, which means that
-   *                           the module is an instantiation.
-   */
-  public boolean stackIsEmpty()
-  {
-    return mInstanceStack.isEmpty();
+    mParentSourceInfo = mParentSourceInfo.getParent();
   }
 
 
@@ -297,16 +357,44 @@ public class CompilationInfo
 
   /**
    * Adjusts the location of a given {@link EvalException} according to the
-   * information in {@link #mResultMap}.
-   *
-   * @param ex The exception to be modified
+   * information in {@link #mResultMap}. The exception's location is replaced
+   * by the error location obtained from {@link #getErrorLocation(Proxy)
+   * getErrorLocation()}.
+   * @param exception The exception to be modified.
    */
-  private void adjustLocation(final EvalException ex)
+  private void adjustLocation(final EvalException exception)
   {
-    final Proxy location = ex.getLocation();
-    final SourceInfo info = getSourceInfo(location);
-    if (info != null)
-      ex.replaceLocation(info.getSourceObject());
+    final Proxy location = exception.getLocation();
+    final Proxy adjusted = getErrorLocation(location);
+    if (adjusted != location) {
+      exception.replaceLocation(adjusted);
+    }
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  public void dump(final StringBuilder builder)
+  {
+    if (mResultMap.isEmpty()) {
+      builder.append("<empty compilation info>");
+    } else {
+      final List<String> lines = new ArrayList<>(mResultMap.size());
+      for (final Entry<Object,SourceInfo> entry : mResultMap.entrySet()) {
+        final StringBuilder line = new StringBuilder();
+        final Object key = entry.getKey();
+        ProxyTools.appendContainerName(key, line);
+        line.append(" -> ");
+        final SourceInfo info = entry.getValue();
+        info.dump(line);
+        lines.add(line.toString());
+      }
+      Collections.sort(lines);
+      for (final String line : lines) {
+        builder.append(line);
+        builder.append("\n");
+      }
+    }
   }
 
 
@@ -318,16 +406,15 @@ public class CompilationInfo
   private MultiEvalException mExceptions;
 
   /**
-   * Used by the {@link ModuleInstanceCompiler}, this list keeps track of
-   * nested instances.
-   * <p>
-   * The first item of this list is the actual module, while the rest of the
-   * existing items are the nested instances.
-   */
-  private final List<InstanceProxy> mInstanceStack;
-
-  /**
    * A map from target objects to their sources.
    */
   private Map<Object,SourceInfo> mResultMap;
+
+  /**
+   * The parent source information record, used by the {@link
+   * ModuleInstanceCompiler} when compiling instances.
+   * @see #pushParentSourceInfo(InstanceProxy,BindingContext) pushParentSourceInfo()
+   */
+  private SourceInfo mParentSourceInfo;
+
 }

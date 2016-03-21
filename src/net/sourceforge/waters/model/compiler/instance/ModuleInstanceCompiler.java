@@ -513,7 +513,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       final LabelBlockProxy labels1 = createLabelBlock(events);
       final EdgeProxy compiled = mFactory.createEdgeProxy
         (source1, target1, labels1, ga1, null, null, null);
-      addSourceInfo(compiled, edge);
+      mCompilationInfo.add(compiled, edge);
       mCurrentEdges.add(compiled);
       return compiled;
     } catch (final EvalException exception) {
@@ -573,7 +573,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
         event = entry.getCompiledEvent();
         if (!mIsOptimizationEnabled) {
           final Iterable<SingleEventOutput> outputs =
-            new EventOutputIterable(event);
+            new EventOutputIterable(event, mCompilationInfo);
           for (final SingleEventOutput output : outputs) {
             final CompiledSingleEvent single = output.getEvent();
             createEventDecl(single);
@@ -701,7 +701,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
         createLabelBlock(mCurrentBlockedEvents);
       final GraphProxy compiled = mFactory.createGraphProxy
         (deterministic, blocked1, mCurrentNodes, mCurrentEdges);
-      addSourceInfo(compiled, graph);
+      mCompilationInfo.add(compiled, graph);
       return compiled;
     } finally {
       mCurrentNodes = null;
@@ -737,7 +737,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       mFactory.createGroupNodeProxy(name, props1, attribs1, children1, null);
     mNodeMap.put(group, compiled);
     mCurrentNodes.add(compiled);
-    addSourceInfo(compiled, group);
+    mCompilationInfo.add(compiled, group);
     return compiled;
   }
 
@@ -765,7 +765,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
            */
           final SimpleExpressionProxy newguard =
                           (SimpleExpressionProxy) mCloner.getClone(oldguard);
-          addSourceInfo(newguard, oldguard);
+          mCompilationInfo.add(newguard, oldguard);
           newguards.add(newguard);
         }
 
@@ -811,7 +811,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
 
       final GuardActionBlockProxy newga =
           mFactory.createGuardActionBlockProxy(newguards, newactions, null);
-      addSourceInfo(newga, ga);
+      mCompilationInfo.add(newga, ga);
       return newga;
     } catch (final EvalException exception) {
       throw wrap(exception);
@@ -845,7 +845,8 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       }
       final SourceInfo info = mCompilationInfo.getSourceInfo(ident);
       final Proxy source = (info == null) ? ident : info.getSourceObject();
-      final SourceInfo einfo = new SourceInfo(source, mContext);
+      final SourceInfo einfo =
+        mCompilationInfo.createSourceInfo(source, mContext);
       final CompiledEvent occ = new CompiledEventOccurrence(event, einfo);
       if (mCurrentEventList != null) {
         mCurrentEventList.addEvent(occ);
@@ -865,80 +866,80 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     throws VisitorException
   {
     // Instance components are only processed in the second pass.
-    if (m1stPass) return null;
-
+    if (m1stPass) {
+      return null;
+    }
     checkAbort();
     final BindingContext oldContext = mContext;
     final CompiledNameSpace oldNameSpace = mNameSpace;
     final MultiEvalException oldExceptions = mCompilationInfo.getExceptions();
-
-    switch (mHISCCompileMode)
-    {
-      case HISC_LOW:
-        return null;
-
-      case HISC_HIGH:
-        mHISCCompileMode = HISCCompileMode.HISC_LOW;
-        break;
-
-      default:
-        break;
+    switch (mHISCCompileMode) {
+    case HISC_LOW:
+      return null;
+    case HISC_HIGH:
+      mHISCCompileMode = HISCCompileMode.HISC_LOW;
+      break;
+    default:
+      break;
     }
 
-    final IdentifierProxy ident = inst.getIdentifier();
-    final IdentifierProxy suffix = mNameCompiler.compileName(ident);
-    final IdentifierProxy fullname = mNameSpace.getPrefixedIdentifier(suffix, mFactory);
-    addSourceInfo(fullname, ident);
+    SourceInfo info = null;
+    try {
+      info = mCompilationInfo.pushParentSourceInfo(inst, mContext);
+      final IdentifierProxy ident = inst.getIdentifier();
+      final IdentifierProxy suffix = mNameCompiler.compileName(ident);
+      final IdentifierProxy fullname =
+        mNameSpace.getPrefixedIdentifier(suffix, mFactory);
+      mCompilationInfo.add(fullname, ident);
+      final List<ParameterBindingProxy> bindings = inst.getBindingList();
+      mParameterMap = new TreeMap<String,CompiledParameterBinding>();
+      visitCollection(bindings);
 
-    final List<ParameterBindingProxy> bindings = inst.getBindingList();
-    mParameterMap = new TreeMap<String,CompiledParameterBinding>();
-    visitCollection(bindings);
+      try {
+        final ModuleBindingContext root = mContext.getModuleBindingContext();
+        final URI uri = root.getModule().getLocation();
+        final String filename = inst.getModuleName();
+        final ModuleProxy module =
+          mDocumentManager.load(uri, filename, ModuleProxy.class);
+        mContext = new ModuleBindingContext(module, fullname, info);
+        mNameSpace = new CompiledNameSpace(suffix, mNameSpace);
+        mCompilationInfo.setExceptions(new MultiEvalException());
+        return visitModuleProxy(module);
 
-    try
-    {
-      final ModuleBindingContext root = mContext.getModuleBindingContext();
-      final URI uri = root.getModule().getLocation();
-      final String filename = inst.getModuleName();
-      final ModuleProxy module = mDocumentManager.load(uri, filename, ModuleProxy.class);
-      final SourceInfo info = new SourceInfo(inst, mContext);
-      mContext = new ModuleBindingContext(module, fullname, info);
-      mNameSpace = new CompiledNameSpace(suffix, mNameSpace);
-      mCompilationInfo.setExceptions(new MultiEvalException());
-      mCompilationInfo.addCurrentInstance(inst);
-      return visitModuleProxy(module);
-    }
-
-    catch (final VisitorException exception)
-    {
-      final Throwable cause = exception.getCause();
-      if (cause instanceof EvalException && !(cause instanceof EvalAbortException))
-      {
-        mCompilationInfo.setExceptions(oldExceptions);
-        final EvalException evalCause = (EvalException) cause;
-        for (final EvalException ex : evalCause.getAll()) {
-          final InstantiationException next = new InstantiationException(ex, inst);
-          mCompilationInfo.raiseInVisitor(next);
+      } catch (final VisitorException exception) {
+        final Throwable cause = exception.getCause();
+        if (cause instanceof EvalException &&
+          !(cause instanceof EvalAbortException)) {
+          mCompilationInfo.setExceptions(oldExceptions);
+          final EvalException evalCause = (EvalException) cause;
+          for (final EvalException ex : evalCause.getAll()) {
+            final InstantiationException next =
+              new InstantiationException(ex, inst);
+            mCompilationInfo.raiseInVisitor(next);
+          }
+          throw wrap(mCompilationInfo.getExceptions());
+        } else {
+          throw exception;
         }
-        throw wrap(mCompilationInfo.getExceptions());
+
+      } catch (final IOException | WatersUnmarshalException exception) {
+        final InstantiationException next =
+          new InstantiationException(exception, inst);
+        throw wrap(next);
+
+      } finally {
+        mContext = oldContext;
+        mNameSpace = oldNameSpace;
+        mCompilationInfo.setExceptions(oldExceptions);
+        mParameterMap = null;
+        if (mHISCCompileMode == HISCCompileMode.HISC_LOW) {
+          mHISCCompileMode = HISCCompileMode.HISC_HIGH;
+        }
       }
-      else throw exception;
-    }
-
-    catch (final IOException | WatersUnmarshalException exception)
-    {
-      final InstantiationException next = new InstantiationException(exception, inst);
-      throw wrap(next);
-    }
-
-    finally
-    {
-      mContext = oldContext;
-      mNameSpace = oldNameSpace;
-      mCompilationInfo.setExceptions(oldExceptions);
-      mCompilationInfo.removeCurrentInstance();
-      mParameterMap = null;
-      if (mHISCCompileMode == HISCCompileMode.HISC_LOW)
-        mHISCCompileMode = HISCCompileMode.HISC_HIGH;
+    } finally {
+      if (info != null) {
+        mCompilationInfo.popParentSourceInfo();
+      }
     }
   }
 
@@ -1063,12 +1064,13 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       }
       final GraphProxy graph = comp.getGraph();
       final GraphProxy newgraph = visitGraphProxy(graph);
-      final SimpleComponentProxy newcomp =
+      final SimpleComponentProxy newComp =
         mFactory.createSimpleComponentProxy(fullname, kind, newgraph, attribs);
-      mNameSpace.addComponent(suffix, newcomp);
-      mCompiledComponents.add(newcomp);
-      addSourceInfo(newcomp, comp);
-      return newcomp;
+      mNameSpace.addComponent(suffix, newComp);
+      mCompiledComponents.add(newComp);
+      // TODO Fixing bug: add missing context
+      mCompilationInfo.add(newComp, comp, mContext);
+      return newComp;
     } catch (final EvalException exception) {
       exception.provideLocation(comp);
       throw wrap(exception);
@@ -1107,7 +1109,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
                                      initial, null, null, null);
     mNodeMap.put(node, compiled);
     mCurrentNodes.add(compiled);
-    addSourceInfo(compiled, node);
+    mCompilationInfo.add(compiled, node);
     return compiled;
   }
 
@@ -1129,7 +1131,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       final IdentifierProxy suffix = mNameCompiler.compileName(ident);
       final IdentifierProxy fullname =
         mNameSpace.getPrefixedIdentifier(suffix, mFactory);
-      addSourceInfo(fullname, ident);
+      mCompilationInfo.add(fullname, ident);
       final BindingContext context = new SinglePrefixingContext(suffix);
       final SimpleExpressionProxy expr = var.getType();
       final SimpleExpressionProxy value =
@@ -1149,7 +1151,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
         final SimpleExpressionProxy newpred =
           mSimpleExpressionCompiler.simplify(oldpred, context);
         final Iterable<SingleEventOutput> outputs =
-          new EventOutputIterable(events);
+          new EventOutputIterable(events, mCompilationInfo);
         for (final SingleEventOutput output : outputs) {
           final CompiledSingleEvent event = output.getEvent();
           if (event.getKind() != EventKind.PROPOSITION) {
@@ -1170,7 +1172,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
                                               newinit, newmarkings);
       mNameSpace.addComponent(suffix, newvar);
       mCompiledComponents.add(newvar);
-      addSourceInfo(newvar, var);
+      mCompilationInfo.add(newvar, var);
       return newvar;
     } catch (final EvalException exception) {
       exception.provideLocation(var);
@@ -1235,7 +1237,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
                                final List<IdentifierProxy> elist)
   {
     final Iterable<SingleEventOutput> outputs =
-      new EventOutputIterable(events);
+      new EventOutputIterable(events, mCompilationInfo);
     for (final SingleEventOutput output : outputs) {
       final IdentifierProxy ident = createSingleEvent(output);
       elist.add(ident);
@@ -1265,7 +1267,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     final CompiledNameSpace namespace = cdecl.getNameSpace();
     final IdentifierProxy ident =
       namespace.getPrefixedIdentifier(suffix, mFactory);
-    addSourceInfo(ident, base);
+    mCompilationInfo.add(ident, base);
     final EventKind kind = edecl.getKind();
     final boolean observable = edecl.isObservable();
     Map<String,String> attribs = edecl.getAttributes();
@@ -1279,7 +1281,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     final EventDeclProxy decl = mFactory.createEventDeclProxy
       (ident, kind, observable, ScopeKind.LOCAL, null, null, attribs);
     mCompiledEvents.add(decl);
-    addSourceInfo(decl, edecl);
+    mCompilationInfo.add(decl, edecl);
     event.setIdentifier(ident);
     return decl;
   }
@@ -1291,11 +1293,6 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       mCurrentBlockedEvents = new CompiledEventList();
     }
     mCurrentBlockedEvents.addEvent(event);
-  }
-
-  private void addSourceInfo(final Proxy object, final Proxy source)
-  {
-    mCompilationInfo.add(object, source);
   }
 
   private boolean isDisabledProposition(final CompiledEvent event)
@@ -1436,7 +1433,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
         if (cloning) {
           final IndexedIdentifierProxy copy =
             mFactory.createIndexedIdentifierProxy(name, values);
-          addSourceInfo(copy, ident);
+          mCompilationInfo.add(copy, ident);
           return copy;
         } else {
           return ident;
@@ -1463,7 +1460,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
           !mEquality.equals(comp0, comp1)) {
         final QualifiedIdentifierProxy copy =
           mFactory.createQualifiedIdentifierProxy(base1, comp1);
-        addSourceInfo(copy, ident);
+        mCompilationInfo.add(copy, ident);
         return copy;
       } else {
         return ident;

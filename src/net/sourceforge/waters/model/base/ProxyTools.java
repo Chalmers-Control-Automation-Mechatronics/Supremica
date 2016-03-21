@@ -97,16 +97,34 @@ public class ProxyTools
 
   //#########################################################################
   //# Class Names
+  public static String getContainerName(final Object container)
+  {
+    final StringBuilder builder = new StringBuilder();
+    appendContainerName(container, builder);
+    return builder.toString();
+  }
+
+  public static void appendContainerName(final Object container,
+                                         final StringBuilder builder)
+  {
+    if (container instanceof Proxy) {
+      final Proxy proxy = (Proxy) container;
+      appendContainerName(proxy, builder);
+    } else {
+      builder.append(getShortClassName(container));
+    }
+  }
+
   public static void appendContainerName(final Proxy container,
-                                         final StringBuilder buffer)
+                                         final StringBuilder builder)
   {
     final String clsname = getShortProxyInterfaceName(container);
-    buffer.append(clsname);
+    builder.append(clsname);
     if (container instanceof NamedProxy) {
       final NamedProxy named = (NamedProxy) container;
-      buffer.append(" '");
-      buffer.append(named.getName());
-      buffer.append('\'');
+      builder.append(" '");
+      builder.append(named.getName());
+      builder.append('\'');
     }
   }
 
