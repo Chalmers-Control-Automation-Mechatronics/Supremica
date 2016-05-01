@@ -36,8 +36,6 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import org.supremica.automata.algorithms.IISCT.SMTSolver.SolverException;
 import org.supremica.automata.algorithms.IISCT.SMTSolver.Z3Solver;
 
-import gnu.trove.map.hash.TLongObjectHashMap;
-
 /**
  *
  * @author Mohammad Reza Shoaei
@@ -56,8 +54,6 @@ public class IISynthesizer {
 		mStEnc = stateEncoding;
 		mLbToSpec = labelToSpec;
 		mTree = new Tree();
-		zSupExpr = new TLongObjectHashMap<>(25, 0.8f, -1);
-		// zLbToTranExpr = new TIntObjectHashMap<BoolExpr>(50, 0.6f, -1);
 		zSolver = new Z3Solver(variableContext);
 		ZFALSE = zSolver.mkFalse();
 		ZTRUE = zSolver.mkTrue();
@@ -418,13 +414,6 @@ public class IISynthesizer {
 			}
 			// TF = T[j-1] & F[j-1]
 			TF = zSolver.mkAnd(T[j - 1], zSolver.mkAnd(F[j - 1]));
-			// If TF is False then the forbidden node is not reachable
-//			if (zSolver.entails(TF, ZFALSE)) {
-//				for (int i = j; i < F.length; i++) {
-//					F[i].add(ZFALSE);
-//				}
-//				return new Object[] { STATUS_NOTREACHABLE, F };
-//			}
 			// If TF is syntacticly True then push the cube and continue
 			if (zSolver.isTrueSyntactic(TF)) {
 				stack.push(new Object[] { c, j - 1 });
@@ -520,31 +509,6 @@ public class IISynthesizer {
 				.map(node -> getZTran(node)).reduce(ZTRUE, zSolver::mkAnd);
 	}
 
-	/*
-	 * private Boolean under_approximate(final List<BoolExpr> vR, final BoolExpr
-	 * zpvR, final BoolExpr... assumption) { loop: for (final BoolExpr cube :
-	 * vR) { final BoolExpr solved_cube = zSolver.simplify(cube); final
-	 * List<BoolExpr> split = zSolver.split(solved_cube); for (final BoolExpr
-	 * exp : split) { if (zSolver.entails(exp, zpvR, assumption)) { continue
-	 * loop; } } return false; } return true; }
-	 *
-	 * private BoolExpr getDomain(final TreeNode v, final TreeNode pv) { if
-	 * (v.data.zid == pv.data.zid) { return getDomain(v); } else { return
-	 * zSolver.mkAnd(getDomain(v), getDomain(pv)); }
-	 *
-	 * }
-	 *
-	 * private BoolExpr getDomain(final TreeNode v) { if (v.data.D == null) { if
-	 * (!v.isRoot() && v.data.zid == v.parent.data.zid && v.parent.data.D !=
-	 * null) { v.data.D = v.parent.data.D; } else { v.data.D =
-	 * zSolver.getZDomain(v.data.zid); } } return v.data.D; }
-	 *
-	 * private BoolExpr getDomain(final int index) { return
-	 * zSolver.getZDomain(index); }
-	 *
-	 * private BoolExpr getDomain(final int index1, final int index2) { return
-	 * zSolver.mkAnd(zSolver.getZDomain(index1), zSolver.getZDomain(index2)); }
-	 */
 	private void uncover(final TreeNode v) {
 		// If node is covering nodes
 		if (v.data.isCoveringNode && !isDeadlock(v)) {
@@ -586,12 +550,15 @@ public class IISynthesizer {
 			final List<BoolExpr> C = new ArrayList<>();
 			for (int i = path.size() - 1; i > 0; i--) {
 				final TreeNode v = path.get(i - 1);
-				final BoolExpr e = eval.get(i - 1);
 				// Updating this node ind. inv.
-				BoolExpr guard = zSolver.simplify(zSolver.mkNot(zSolver.mkAnd(F[i - 1])));
-				if (zSolver.isUNSAT(guard,e)){
+				final BoolExpr guard = zSolver.simplify(zSolver.mkNot(zSolver.mkAnd(F[i - 1])));
+				// Explicitly check the transition with supervision guard
+				// This part is commented so the actual supervision guard is displayed
+				/*
+				if (zSolver.isUNSAT(guard,eval.get(i - 1))){
 					guard = ZFALSE;
 				}
+				*/
 				if (!found){
 					updateIndInv(v, Arrays.asList(guard));
 				}
@@ -607,11 +574,8 @@ public class IISynthesizer {
 					}
 				}
 			}
-			final long u = sNode.data.getUniqueHash();
-			BoolExpr c = zSupExpr.get(u);
 			final BoolExpr guard = zSolver.simplify(zSolver.mkOr(C));
-			c = (c == null) ? guard : (BoolExpr) zSolver.mkAnd(c, guard).simplify();
-			zSupExpr.put(u, c);
+			sNode.data.zS = (BoolExpr) zSolver.mkAnd(sNode.data.zS, guard).simplify();
 			return true;
 
 		} else {
@@ -623,10 +587,6 @@ public class IISynthesizer {
 
 	private BoolExpr getZGeneralizedExpr(final BoolExpr exp, final int index) {
 		return zSolver.substitute(exp, index, GENERAL_ZID);
-	}
-
-	private BoolExpr getZSpecificExpr(final BoolExpr exp, final int index) {
-		return zSolver.substitute(exp, GENERAL_ZID, index);
 	}
 
 	private void updateIndInv(final List<TreeNode> path, final ListExpr F[])
@@ -712,12 +672,7 @@ public class IISynthesizer {
 		if (v.data.zT == null) {
 			v.data.zT = mkBoolExpr(mkIndex(v.parent.data.zid, v.data.zid), v.data.sT);
 		}
-		return (BoolExpr) zSolver.mkAnd(v.data.zT, getZSup(v)).simplify();
-	}
-
-	private BoolExpr getZSup(final TreeNode v) {
-		final BoolExpr C = zSupExpr.get(v.data.getUniqueHash());
-		return C == null ? ZTRUE : getZSpecificExpr(C, v.data.zid);
+		return (BoolExpr) zSolver.mkAnd(v.data.zT, v.data.zS).simplify();
 	}
 
 	private int[] mkIndex(final int val1, final int val2) {
@@ -745,13 +700,6 @@ public class IISynthesizer {
 				.map((exp) -> "(" + exp.toString() + ")&").reduce("", String::concat);
 		return andStr.substring(0, andStr.length() - 1);
 	}
-
-	/*
-	 * private String mkOr(final String str1, final String str2) { if
-	 * (isTrueStr(str1) || isTrueStr(str2)) { return STR_TRUE; } if
-	 * (isFalseStr(str1)) { return str2; } if (isFalseStr(str2)) { return str1;
-	 * } return "(" + str1 + ")|(" + str2 + ")"; }
-	 */
 
 	private String mkNot(final String str) {
 		if (isTrueStr(str)) {
@@ -821,43 +769,22 @@ public class IISynthesizer {
 		System.err.println("********* IISCT *********");
 		final List<TreeNode> sups = mTree.getNodes().stream()
 				.filter(node -> node.data.hasSupGuards()).collect(Collectors.toList());
-		for (final TreeNode v : sups) {
-			final BoolExpr img = zSolver.getPreImage2(getZTran(v), v.data.zid);
-			final BoolExpr sub = zSolver.substitute(img, v.parent.data.zid, -1);
-			System.err.println(mStEnc.getSimpleState(v.parent.data.L).getName() + " > "
-					+ mLbEnc.getEventDeclByLabelId(v.data.Lb).getName() + " : " + sub);
-		}
-		/*for (final TreeNode v : sups) {
-			final List<TreeNode> path = new ArrayList<>(v.getPathToRoot());
-			final List<BoolExpr> eval = evaluate(path.subList(0, path.size() - 1));
-			//eval.add(ZFALSE);
-			final List<TreeNode> nodes = path.stream()
-					.filter(node -> node.data.L == v.data.L && node.id < v.id).sorted()
-					.collect(Collectors.toList());
-			BoolExpr sub = ZFALSE;
-			BoolExpr C = null;
-			for (int i = nodes.size() - 1; i >= 0; i--) {
-				final TreeNode node = nodes.get(i);
-				final BoolExpr e = eval.get(path.indexOf(node));
-				C = zSolver.substitute(getZSup(v), v.data.zid, node.data.zid);
-				final BoolExpr img = zSolver.getPreImage2(zSolver.mkAnd(getZTran(node), C),
-						node.data.zid, e);
-				if (!zSolver.isFalseSyntactic(img)) {
-					if (node.data.zid == node.parent.data.zid) {
-						sub = zSolver.substitute(C, node.parent.data.zid, -1);
-					} else {
-						sub = zSolver.substitute(img, node.parent.data.zid, -1);
-					}
-					break;
+		if (!sups.isEmpty()){
+			for (final TreeNode v : sups) {
+				BoolExpr img = v.data.zS;
+				if (!zSolver.isTrueSyntactic(v.data.zT)){
+					img = zSolver.getPreImage2(getZTran(v), v.data.zid);
 				}
+				final BoolExpr sub = zSolver.substitute(img, v.parent.data.zid, -1);
+				System.err.println(mStEnc.getSimpleState(v.parent.data.L).getName() + " > "
+						+ mLbEnc.getEventDeclByLabelId(v.data.Lb).getName() + " : " + sub);
 			}
-			System.err.println(mStEnc.getSimpleState(v.parent.data.L).getName() + " > "
-					+ mLbEnc.getEventDeclByLabelId(v.data.Lb).getName() + " : " + sub);
-		}*/
+		} else {
+			System.err.println("The system is safe.");
+		}
 		System.err.println("***********************");
 		System.err.println("System: " + mTR.getName());
 		System.err.println("Nr Nodes: " + mTree.size());
-		System.err.println(zSupExpr.valueCollection());
 		System.err.println("***********************");
 	}
 
@@ -900,9 +827,8 @@ public class IISynthesizer {
 		public int bPV = INT_UNKNOWN;
 		// Set of inductive invariant predicates
 		public List<BoolExpr> R = new ArrayList<>();
-		// Domain
-		@SuppressWarnings("unused")
-    public BoolExpr D;
+		// Supervision guard
+		public BoolExpr zS = ZTRUE;
 		// Status of IC3PathBlocking
 		public int status = INT_UNKNOWN;
 
@@ -911,19 +837,12 @@ public class IISynthesizer {
 		}
 
 		@SuppressWarnings("unused")
-    public boolean isSupervisable() {
+		public boolean isSupervisable() {
 			return status == STATUS_SUPERVISED && isControllable;
 		}
 
 		public boolean hasSupGuards() {
 			return status == STATUS_SUPERVISED;
-		}
-
-		// Cantor pairing function: Pairing two integers into a unique integer
-		public long getUniqueHash() {
-			final long A = 2 * (long) L;
-			final long B = 2 * (long) Lb;
-			return (A >= B ? A * A + A + B : A + B * B) / 2;
 		}
 
 		@Override
@@ -965,11 +884,6 @@ public class IISynthesizer {
 					.collect(Collectors.toList());
 			return list.isEmpty() ? null : list.get(list.size() - 1);
 		}
-
-		// public Stream<TreeNode> getPathFromNode(final TreeNode fromNode) {
-		// return this.getPathToRoot().stream()
-		// .filter(node -> node.id >= fromNode.id).sorted();
-		// }
 
 		@Override
 		public int compareTo(final TreeNode node) {
@@ -1111,7 +1025,7 @@ public class IISynthesizer {
 	private static final int INITIAL_LABEL_ID = Short.MAX_VALUE;
 	private static final int STATUS_CTI = 0;
 	@SuppressWarnings("unused")
-  private static final int STATUS_BLOCKED_INIT = 1;
+	private static final int STATUS_BLOCKED_INIT = 1;
 	private static final int STATUS_BLOCKED_NODE = 2;
 	private static final int STATUS_NOTREACHABLE = 3;
 	private static final int STATUS_SUPERVISED = 4;
@@ -1132,8 +1046,6 @@ public class IISynthesizer {
     @SuppressWarnings("unused")
 	private final boolean underapproximate = false;
 	private final HashMap<Integer, SimpleExpressionProxy> mLbToSpec;
-	// private final TIntObjectHashMap<BoolExpr> zLbToTranExpr;
-	private final TLongObjectHashMap<BoolExpr> zSupExpr;
 	private final BoolExpr ZFALSE;
 	private final BoolExpr ZTRUE;
 }
