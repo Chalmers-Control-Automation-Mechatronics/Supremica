@@ -1068,7 +1068,6 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
         mFactory.createSimpleComponentProxy(fullname, kind, newgraph, attribs);
       mNameSpace.addComponent(suffix, newComp);
       mCompiledComponents.add(newComp);
-      // TODO Fixing bug: add missing context
       mCompilationInfo.add(newComp, comp, mContext);
       return newComp;
     } catch (final EvalException exception) {

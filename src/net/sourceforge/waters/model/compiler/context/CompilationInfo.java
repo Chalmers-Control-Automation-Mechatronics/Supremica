@@ -167,14 +167,19 @@ public class CompilationInfo
    * Creates or retrieves a source information record without recording it.
    * If the given source has associated source information, the source's
    * source information is returned, otherwise a new source information
-   * record is created. The created source information uses the correct parent
+   * record is created. The parent and context information are combined from
+   * the source's source information, the argument, and the currently set
+   * parent ({@link #mParentSourceInfo}), but presently at least one of the
+   * combined values must be <CODE>null</CODE>. The created source information
    * and can be filed later using {@link #add(Object, SourceInfo)}.
    * @param  source  The input object to be associated with the target.
    *                 If the compilation info contains source information for
    *                 the source, then the source's source object will
    *                 be used in the created source information.
    * @param  context The binding context with the values of any foreach-block
-   *                 variables at the time this output is created.
+   *                 variables at the time this output is created, or
+   *                 <CODE>null</CODE> to use the context of the source's
+   *                 source.
    * @return A source information record, even if source information
    *         is disabled.
    */
