@@ -163,7 +163,13 @@ public class AboutPanel
     } else {
       builder.append("Dynamic libraries compiled for ");
       builder.append(osType);
-      if (!version.checkOSType()) {
+      if (version.checkOSType()) {
+        try {
+          System.loadLibrary("waters");
+        } catch (final UnsatisfiedLinkError error) {
+          builder.append(" - <span style=\"color: red;\">failed to load</span>");
+        }
+      } else {
         builder.append(" - <span style=\"color: red;\">incompatible</span>");
       }
       builder.append("<BR>");
