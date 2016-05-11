@@ -205,7 +205,7 @@ public class AutomataVerificationWorker
         // Add test result from Diagnosability verification
         if (vtype == VerificationType.DIAGNOSABILITY &&
             verificationOptions.getAlgorithmType() == VerificationAlgorithm.BBSD) {
-            final Automata result = BBSDDiagnosabilityVerification.getResult();
+            final Automata result = BBSDDiagnosabilityVerification.getFinalAutomata();
             if (result != null)
                 ((IDEActionInterface)workbench).getActiveDocumentContainer().getAnalyzerPanel().addAutomata(result);
         }

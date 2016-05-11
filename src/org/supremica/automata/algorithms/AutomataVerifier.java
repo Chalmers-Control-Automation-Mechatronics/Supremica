@@ -1902,12 +1902,7 @@ public class AutomataVerifier
 
         @SuppressWarnings("unused")
         final BBSDDiagnosabilityVerification bbsd = new BBSDDiagnosabilityVerification(theAutomata);
-
-        // Try to return the resulting automaton to the gui
-        // Automaton result = new Automaton(bbsd.getResult());
-        // ActionMan.getGui().addAutomata(new Automata(result));
-
-        return true;
+        return bbsd.getResult();
     }
 
     /**

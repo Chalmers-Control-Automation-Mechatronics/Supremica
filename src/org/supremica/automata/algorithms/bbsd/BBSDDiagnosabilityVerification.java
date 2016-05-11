@@ -6,6 +6,7 @@ import org.supremica.automata.algorithms.SynchronizationOptions;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
+// import org.supremica.util.ActionTimer;
 
 import java.util.*;
 
@@ -17,12 +18,27 @@ public class BBSDDiagnosabilityVerification {
 
     private static Automaton result;
 
-    public BBSDDiagnosabilityVerification(Automata theAutomata){
+    /*private final ActionTimer timer1 = new ActionTimer(); // TOTAL
+    private final ActionTimer timer2 = new ActionTimer(); // SEPARATION INTO Gv_N and Gv_F
+    private final ActionTimer timer3 = new ActionTimer(); // CALCULATE GV
+    private final ActionTimer timer4 = new ActionTimer(); // SYNCHRONISATION
+    private final ActionTimer timer5 = new ActionTimer();*/
+
+    public BBSDDiagnosabilityVerification(Automata theAutomata) {
+
+        /*timer1.reset();
+        timer2.reset();
+        timer3.reset();
+        timer4.reset();
+        timer5.reset();
+        BBSDAbstraction.timer.reset();*/
+
+        //timer1.start();
 
         final HashSet<LabeledEvent> local_events = new HashSet<LabeledEvent>();
-        final Hashtable<State,Integer> state_labels = new Hashtable<State, Integer>();
+        final Hashtable<State, Integer> state_labels = new Hashtable<State, Integer>();
 
-        if (theAutomata.size() == 1) {
+        if (theAutomata.size() == 1 && !theAutomata.getFirstAutomaton().getAlphabet().contains("f")) {
             javax.swing.JOptionPane.showMessageDialog(null, "Since you only selected ONE automaton, you have entered a debugging mode. If this was not intended, please select 2+ automatons and try again.");
 
             Automaton aut = new Automaton(theAutomata.getFirstAutomaton());
@@ -35,16 +51,14 @@ public class BBSDDiagnosabilityVerification {
 
             result = new Automaton("BBSDDiagnosabilityVerification");
             result = bbsd.calculateAbstraction(aut, local_events, state_labels);
-        }
-        else {
+        } else {
             final Automata remaining = new Automata(theAutomata);
             Automata current;
 
             result = new Automaton("BBSDDiagnosabilityVerification");
 
             AutomataSynchronizer theSynchronizer;
-            try
-            {
+            try {
                 for (Automaton aut : theAutomata) {
                     remaining.removeAutomaton(aut.getName());
 
@@ -58,16 +72,18 @@ public class BBSDDiagnosabilityVerification {
                 logger.info(" && " + str.toString());*/
 
                     // Calculate (G_N'||G_F')
+
+                    // timer3.start();
                     Automaton currentGv = calculateGv(aut);
+                    // timer3.stop();
 
                     /*
                      * Calculate G_v_prime
                      */
-
                     local_events.clear();
                     for (LabeledEvent e : currentGv.iterableEvents())
                         if (e.isUnobservable() || (!remaining.getUnionAlphabet().contains(e) && !result.getAlphabet().contains(e)))
-                                local_events.add(e);
+                            local_events.add(e);
                     state_labels.clear();
                     for (State s : currentGv.iterableStates())
                         state_labels.put(s, ((s.isForbidden()) ? 2 : 1));
@@ -77,11 +93,12 @@ public class BBSDDiagnosabilityVerification {
                         current = new Automata();
                         current.addAutomaton(result);
                         current.addAutomaton(currentGv);
+                        // timer4.start();
                         theSynchronizer = new AutomataSynchronizer(current, new SynchronizationOptions(), Config.SYNTHESIS_SUP_AS_PLANT.get());
                         theSynchronizer.execute();
+                        // timer4.stop();
                         result = theSynchronizer.getAutomaton();
-                    }
-                    else
+                    } else
                         result = currentGv;
 
                     // Make a last abstraction of G_v
@@ -92,11 +109,8 @@ public class BBSDDiagnosabilityVerification {
                     for (State s : result.iterableStates())
                         state_labels.put(s, ((s.isForbidden()) ? 2 : 1));
                     result = bbsd.calculateAbstraction(result, local_events, state_labels);
-
                 }
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 logger.error("Error in BBSDDiagnosabilityVerification.java: " + e);
             }
         }
@@ -104,27 +118,34 @@ public class BBSDDiagnosabilityVerification {
         // Create a tau event that can be used instead of local events
         LabeledEvent localEvent = new LabeledEvent("tau");
         boolean addTau = false;
-        for (Arc t : result.iterableArcs())
-            if (t.getEvent().getLabel().startsWith("tau"))
+        for (Arc t : result.iterableArcs()) {
+            if (t.getEvent().getLabel().startsWith("tau")) {
                 t.setEvent(localEvent);
-        for (LabeledEvent e : result.iterableEvents())
-            if (e.getLabel().startsWith("tau")) {
-                result.getAlphabet().removeEvent(e);
                 addTau = true;
             }
+        }
+        for (LabeledEvent e : result.iterableEvents())
+            if (e.getLabel().startsWith("tau"))
+                result.getAlphabet().removeEvent(e);
         if (addTau) result.getAlphabet().addEvent(localEvent);
 
         // Print debug data for abstraction
-        for (State s : result.iterableStates())
+        /*for (State s : result.iterableStates())
             logger.info("Name: " + s.getName() + ", forbidden: " + s.isForbidden() + ", accepting: " + s.isAccepting() + ", initial: " + s.isInitial());
         logger.info("- - - -");
         for (Arc t : result.iterableArcs())
             logger.info(t.getFromState() + "," + t.getLabel() + "," + t.getToState());
         logger.info("- - - -");
         for (LabeledEvent e : result.iterableEvents())
-            logger.info(e.getLabel());
+            logger.info(e.getLabel());*/
         // The correct value, the number of states in the synchronization
-
+        // timer1.stop();
+        /*logger.info("TOT: \t" + timer1.toString());
+        logger.info("ABS: \t" + BBSDAbstraction.timer.toString());
+        logger.info("SEP: \t" + timer2.toString());
+        logger.info("3: \t" + timer3.toString());
+        logger.info("4: \t" + timer4.toString());
+        //logger.info("5: \t" + timer5.toString());*/
     }
 
     private Automaton calculateGv(Automaton aut) {
@@ -142,7 +163,9 @@ public class BBSDDiagnosabilityVerification {
         /*
          * Separate the automaton into G_F and G_N
          */
+        // timer2.start();
         Automata temp = separateNormalAndFailure(aut);
+        // timer2.stop();
         Automaton autN = temp.getAutomaton("G_N");
         Automaton autF = temp.getAutomaton("G_F");
         autN.setName(aut.getName()+"_N");
@@ -168,7 +191,7 @@ public class BBSDDiagnosabilityVerification {
         for (State s : autF.iterableStates())
             state_labels.put(s, ((s.isForbidden()) ? 2 : 1));
 
-        // Perform abstraction
+        // Perform abstraction on autF
         autF = bbsd.calculateAbstraction(autF, local_events, state_labels);
 
 
@@ -183,8 +206,12 @@ public class BBSDDiagnosabilityVerification {
         if (autN.nbrOfStates() > 0) {
             AutomataSynchronizer theSynchronizer;
             try {
+                // timer3.stop();
+                // timer4.start();
                 theSynchronizer = new AutomataSynchronizer(automata, new SynchronizationOptions(), Config.SYNTHESIS_SUP_AS_PLANT.get());
                 theSynchronizer.execute();
+                // timer4.stop();
+                // timer3.start();
                 G_v = theSynchronizer.getAutomaton();
             } catch (Exception e) {
                 logger.error("Error in BBSDDiagnosabilityVerification.java calculateGv(): " + e);
@@ -280,8 +307,11 @@ public class BBSDDiagnosabilityVerification {
         return e.getName().toLowerCase().startsWith("f");
     }
 
-    public static Automata getResult() {
+    public static Automata getFinalAutomata() {
         return new Automata(result);
+    }
+    public static boolean getResult() {
+        return !result.getComment().equals("not");
     }
 
 }

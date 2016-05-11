@@ -1,46 +1,43 @@
 package org.supremica.automata.algorithms.bbsd;
 
-import java.util.ArrayDeque;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 
-import org.supremica.automata.Arc;
-import org.supremica.automata.Automaton;
-import org.supremica.automata.LabeledEvent;
-import org.supremica.automata.State;
+import org.supremica.automata.*;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
+// import org.supremica.util.ActionTimer;
 
 public class BBSDAbstraction {
 
     @SuppressWarnings("unused")
     private static Logger logger = LoggerFactory.createLogger(BBSDAbstraction.class);
+    //public static ActionTimer timer = new ActionTimer();
+
+    // Create a dummy state that is used for local loops
+    final State dummy = new State("SelfLoopDummyState");
 
     public BBSDAbstraction() {}
 
     public Automaton calculateAbstraction(final Automaton aut, final HashSet<LabeledEvent> local_events) {
-        final Hashtable<State,Integer> state_labels = new Hashtable<State,Integer>();
+        final Map<State,Integer> state_labels = new Hashtable<>();
         for (final State s : aut.iterableStates()) state_labels.put(s,1);
-        return calculateAbstraction(aut, local_events, state_labels);
+        return calculateAbstraction(aut, local_events, (Hashtable<State,Integer>)state_labels);
     }
 
     public Automaton calculateAbstraction(final Automaton aut, final HashSet<LabeledEvent> local_events, final Hashtable<State,Integer> state_labels) {
 
-
+        //timer.start();
+        //logger.info(" - - -");
+        //logger.info("States: " + aut.nbrOfStates() + ", Events: " + aut.nbrOfEvents() + ", Transitions: " + aut.nbrOfTransitions() + ",\t(name: " + aut.getName() + ")");
         /*StringBuilder str = new StringBuilder();
         for (LabeledEvent e : local_events)
             str.append(e.getLabel());
         logger.info(" && " + str.toString());*/
 
-
-
         int blocks;
 
-        Map<State, Integer> pi = new Hashtable<State, Integer>(state_labels); // pi_template for new test
-        final Map<State, Integer> pi_zeros = new Hashtable<State, Integer>();
+        Map<State, Integer> pi = new Hashtable<>(state_labels); // pi_template for new test
+        final Map<State, Integer> pi_zeros = new Hashtable<>();
         Map<State, Integer> pi_temp;
         for (final State s : aut.iterableStates()) pi_zeros.put(s, 0);
 
@@ -50,19 +47,10 @@ public class BBSDAbstraction {
         }
         logger.info("- - - -");*/
 
-        final Set<State> reach_states = new HashSet<State>();
-        final Map<State, HashSet<BlockTransition>> blockTransitions = new Hashtable<State, HashSet<BlockTransition>>();
-
-
-
-        /*
-         *
-         * INSERT TRANSITIONS TO DUMMY STATE FROM EACH STATE IN A LOCAL LOOP
-         *
-         */
+        final Map<State, HashSet<BlockTransition>> blockTransitions = new Hashtable<>();
 
         // Create a tau event that can be used instead of local events
-        final LabeledEvent localEvent = new LabeledEvent("tau_" + aut.getName());
+        LabeledEvent localEvent = new LabeledEvent("tau_" + aut.getName());
         if (local_events.size() > 0) {
             aut.getAlphabet().addEvent(localEvent);
             for (final Arc t : aut.iterableArcs())
@@ -72,40 +60,74 @@ public class BBSDAbstraction {
                 aut.getAlphabet().removeEvent(e);
         }
 
+        final Map<State, HashSet<State>> coreachable = new Hashtable<>();
+
         // Loop until pi = pi'
         while (true) {
+            // logger.info("1: " + timer.toString());
 
             // Calculate local transitions
-            final Set<Arc> LB_trans = new HashSet<Arc>();
+            Set<Arc> LB_trans = new HashSet<>();
             for (final Arc t : aut.iterableArcs())
-                if (t.getEvent().equals(localEvent) && pi.get(t.getFromState()).equals(pi.get(t.getToState())))
+                if (t.getEvent().equals(localEvent) && !t.getToState().equals(dummy) && pi.get(t.getFromState()).equals(pi.get(t.getToState())))
                     LB_trans.add(t);
 
-            for (final State s : aut.iterableStates()) {
-                reach_states.clear();
-                blockTransitions.put(s, new HashSet<BlockTransition>());
 
-                // Calculate reachability for each state
-                final Queue<State> q = new ArrayDeque<State>();
-                State s2;
-                q.add(s);
-                while (!q.isEmpty()) {
-                    s2 = q.poll();
-                    for (final Arc t : s2.getOutgoingArcs())
-                        if (LB_trans.contains(t) && !reach_states.contains(t.getToState())) {
-                            reach_states.add(t.getToState());
-                            q.add(t.getToState());
+            // logger.info("2: " + timer.toString());
+
+            for (final State s : aut.iterableStates()) {
+                blockTransitions.put(s, new HashSet<>());
+                coreachable.put(s, new HashSet<>());
+            }
+            boolean coreachability_finished = false;
+            while(!coreachability_finished) {
+                coreachability_finished = true;
+                for (final Arc t : LB_trans) {
+                    int pi1 = pi.get(t.getToState());
+                    for (final State s : aut.iterableStates()) {
+                        if (pi1 == pi.get(s)) {
+                            final Set<State> ss = coreachable.get(s);
+                            if (t.getToState() == s || ss.contains(t.getToState())) {
+                                if (t.getFromState() == s) {
+                                    aut.addArc(new Arc(s, dummy, localEvent));
+                                }
+                                if (!ss.contains(t.getFromState())) {
+                                    coreachable.get(s).add(t.getFromState());
+                                    coreachability_finished = false;
+                                }
+                            }
                         }
+                    }
                 }
 
-                // Calculate block transitions of each state
-                for (final Arc t : aut.iterableArcs())
-                    if (!LB_trans.contains(t) && (t.getFromState() == s || reach_states.contains(t.getFromState())))
-                        blockTransitions.get(s).add(new BlockTransition(pi.get(t.getFromState()), t.getEvent(), pi.get(t.getToState())));
+                /*for (final State s1 : aut.iterableStates()) {
+                    StringBuilder str = new StringBuilder();
+                    str.append(s1.getName()+ ": ");
+                    for (final State s2 : coreachable.get(s1)) {
+                        str.append(s2.getName() + ", ");
+                    }
+                    logger.info(" && " + str.toString());
+                }*/
+
             }
 
+            // logger.info("3: " + timer.toString());
+
+
+            for (final Arc t : aut.iterableArcs()) {
+                if (!LB_trans.contains(t)) {
+                    State s1 = t.getFromState();
+                    BlockTransition bt = new BlockTransition(pi.get(s1), t.getEvent(), ((t.getToState().equals(dummy)) ? 0 : pi.get(t.getToState())));
+                    blockTransitions.get(s1).add(bt);
+                    for (State s2 : coreachable.get(s1))
+                        blockTransitions.get(s2).add(bt);
+                }
+            }
+
+            // logger.info("4: " + timer.toString());
+
             // Update pi to create new partitioning
-            pi_temp = new Hashtable<State, Integer>(pi_zeros);
+            pi_temp = new Hashtable<>(pi_zeros);
             int k = 1;
             for (final State s : aut.iterableStates()) {
                 if (pi_temp.get(s) == 0) {
@@ -117,12 +139,14 @@ public class BBSDAbstraction {
                 }
             }
 
+            // logger.info("5: " + timer.toString());
+
             // Debug info - Output block transitions for each state
             /*StringBuilder sb;
             for (State s : aut.iterableStates()) {
                 sb = new StringBuilder("&& " + s.getName() + "(" + pi.get(s) + "," + pi_temp.get(s) + ") : ");
                 for (BlockTransition t : blockTransitions.get(s))
-                    sb.append("(" + t.getLabel() + "," + t.getTargetBlock() + ") ");
+                    sb.append("(" + t.getSourceBlock() + "," + t.getLabel() + "," + t.getTargetBlock() + ") ");
                 logger.info(sb.toString());
             }*/
 
@@ -145,27 +169,32 @@ public class BBSDAbstraction {
 
         // Create the base for the result
         final Automaton result = new Automaton("("+aut.getName()+")_prime");
+        result.setType(AutomatonType.PLANT);
         result.getAlphabet().addEvents(aut.getAlphabet());
 
         // Add one state for each block
+        // logger.info("6: " + timer.toString());
+
+        boolean[] initial = new boolean[blocks];
+        boolean[] forbidden = new boolean[blocks];
+        boolean[] notAccepting = new boolean[blocks];
+
+        for (final State s2 : aut.iterableStates()) {
+            if (s2.isInitial())
+                initial[pi.get(s2)-1] = true;
+            if (s2.isForbidden())
+                forbidden[pi.get(s2)-1] = true;
+            else if (!s2.isAccepting())
+                notAccepting[pi.get(s2)-1] = true;
+        }
+
+        // logger.info("7: " + timer.toString());
+
         for (int i = 1; i <= blocks; ++i) {
             final State newState = new State("B" + i);
-            boolean initial = false;
-            boolean forbidden = false;
-            boolean accepting = true;
-            for (final State s2 : aut.iterableStates()) {
-                if (pi.get(s2) == i) {
-                    if (s2.isInitial())
-                        initial = true;
-                    if (s2.isForbidden())
-                        forbidden = true;
-                    else if (!s2.isAccepting())
-                        accepting = false;
-                }
-            }
-            newState.setInitial(initial);
-            newState.setForbidden(forbidden);
-            newState.setAccepting(accepting && !forbidden);
+            newState.setInitial(initial[i-1]);
+            newState.setForbidden(forbidden[i-1]);
+            newState.setAccepting(!notAccepting[i-1] && !forbidden[i-1]);
             result.addState(newState);
         }
 
@@ -173,22 +202,33 @@ public class BBSDAbstraction {
         // Add all transitions that go between blocks
         int pi1, pi2;
         for (final Arc t : aut.iterableArcs()) {
+            Arc t2 = null;
             pi1 = pi.get(t.getFromState());
-            pi2 = pi.get(t.getToState());
-            if (pi1 != pi2 || !t.getEvent().equals(localEvent)) {
-                final Arc t2 = new Arc(result.getStateWithName("B" + pi1), result.getStateWithName("B" + pi2), t.getEvent());
-                if (!result.getStateWithName("B" + pi1).containsOutgoingArc(t2)) result.addArc(t2);
+            final State s1 = result.getStateWithName("B" + pi1);
+            if (t.getToState().equals(dummy)) {
+                t2 = new Arc(s1, s1, t.getEvent());
+                if (s1.isForbidden())
+                    result.setComment("not");
             }
+            else {
+                pi2 = pi.get(t.getToState());
+                final State s2 = result.getStateWithName("B" + pi2);
+                if (pi1 != pi2 || !t.getEvent().equals(localEvent))
+                    t2 = new Arc(s1, s2, t.getEvent());
+            }
+            if (t2 != null && !s1.containsOutgoingArc(t2)) result.addArc(t2);
         }
+        // logger.info("8: " + timer.toString());
 
-        /*
-         *
-         * REPLACE TRANSITIONS TO DUMMY STATE WITH SELFLOOPS
-         *
-         */
+        // timer.stop();
+
+        //logger.info("States: " + result.nbrOfStates() + ", Events: " + result.nbrOfEvents() + ", Transitions: " + result.nbrOfTransitions() + ",\t(name: " + result.getName() + ")");
+        //logger.info(" - - -");
+        //timer.stop();
 
         return result;
     }
+
 
     /*
      * CONTAINER CLASS FOR TRANSITIONS BETWEEN BLOCKS
