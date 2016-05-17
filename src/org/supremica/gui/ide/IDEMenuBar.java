@@ -256,6 +256,7 @@ public class IDEMenuBar extends JMenuBar
     Config.INCLUDE_EXTERNALTOOLS.addPropertyChangeListener(toolsListener);
     Config.INCLUDE_SOCEDITOR.addPropertyChangeListener(toolsListener);
     Config.INCLUDE_ANIMATOR.addPropertyChangeListener(toolsListener);
+    Config.INCLUDE_FLEXFACT.addPropertyChangeListener(toolsListener);
     Config.INCLUDE_RAS_SUPPORT.addPropertyChangeListener(fileListener);
     Config.INCLUDE_WATERS_SIMULATOR.addPropertyChangeListener(analyzeListener);
     Config.GUI_ANALYZER_INCLUDE_HISC.addPropertyChangeListener(analyzeListener);
@@ -548,6 +549,14 @@ public class IDEMenuBar extends JMenuBar
         mToolsMenu.add(actions.simulatorLaunchAnimatorAction);
         mToolsMenu.add(actions.simulatorLaunchSimulatorAction);
         mToolsMenu.add(actions.simulatorClearSimulationData);
+      }
+      if (Config.INCLUDE_FLEXFACT.isTrue()) {
+        if (mToolsMenu == null) {
+          mToolsMenu = new JMenu("Tools");
+        } else {
+          mToolsMenu.addSeparator();
+        }
+        mToolsMenu.add(actions.toolsFlexfact);
       }
       if (mToolsMenu != null) {
         mToolsMenu.setMnemonic(KeyEvent.VK_T);
