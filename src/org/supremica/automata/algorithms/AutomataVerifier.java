@@ -1902,7 +1902,7 @@ public class AutomataVerifier
 
         @SuppressWarnings("unused")
         final BBSDDiagnosabilityVerification bbsd = new BBSDDiagnosabilityVerification(theAutomata);
-        return bbsd.getResult();
+        return BBSDDiagnosabilityVerification.getResult();
     }
 
     /**
