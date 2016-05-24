@@ -99,6 +99,7 @@ import net.sourceforge.waters.gui.actions.SimulationResetAction;
 import net.sourceforge.waters.gui.actions.SimulationShowAllAction;
 import net.sourceforge.waters.gui.actions.SimulationStepAction;
 import net.sourceforge.waters.gui.actions.SimulationStepBackAction;
+import net.sourceforge.waters.gui.actions.ToolsFlexfactAction;
 import net.sourceforge.waters.gui.actions.WatersRedoAction;
 import net.sourceforge.waters.gui.actions.WatersUndoAction;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
@@ -556,7 +557,7 @@ public class IDEMenuBar extends JMenuBar
         } else {
           mToolsMenu.addSeparator();
         }
-        mToolsMenu.add(actions.toolsFlexfact);
+        mToolsMenu.add(actions.getAction(ToolsFlexfactAction.class));
       }
       if (mToolsMenu != null) {
         mToolsMenu.setMnemonic(KeyEvent.VK_T);

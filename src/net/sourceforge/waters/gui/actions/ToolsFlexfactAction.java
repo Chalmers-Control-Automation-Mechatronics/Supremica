@@ -33,18 +33,19 @@
 //# carries forward this exception.
 //###########################################################################
 
-package org.supremica.gui.ide.actions;
+package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.util.List;
 
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 
 import net.sourceforge.waters.gui.flexfact.Flexfact;
 import net.sourceforge.waters.gui.flexfact.Local;
+import net.sourceforge.waters.gui.simulator.Simulation;
 
 import org.supremica.gui.ide.IDE;
+import org.supremica.gui.ide.ModuleContainer;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 
@@ -62,9 +63,9 @@ public class ToolsFlexfactAction
     /**
      * Constructor.
      */
-    public ToolsFlexfactAction(final List<IDEAction> actionList)
+    public ToolsFlexfactAction(final IDE ide)
     {
-        super(actionList);
+        super(ide);
 
         putValue(Action.NAME, "Connect to Flexfact");
         putValue(Action.SHORT_DESCRIPTION, "Establish connection with the Flexfact simulator");
@@ -76,18 +77,14 @@ public class ToolsFlexfactAction
     @Override
     public void actionPerformed(final ActionEvent e)
     {
-        doAction();
-    }
+      final ModuleContainer container = getActiveModuleContainer();
+      @SuppressWarnings("unused")
+      final Simulation sim = container.getSimulatorPanel().getSimulation();
 
-    /**
-     * The code that is run when the action is invoked.
-     */
-    @Override
-    public void doAction()
-    {
       final Thread flexfact = new Thread(new Flexfact());
       final Thread local = new Thread(new Local());
       flexfact.start();
       local.start();
     }
+
 }
