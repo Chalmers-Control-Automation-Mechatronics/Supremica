@@ -7,22 +7,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import net.sourceforge.waters.gui.simulator.Simulation;
+
 public class Flexfact implements Runnable {
 	static List<String> events = new ArrayList<String>();
 	static String subscribeStr = "";
-	public Flexfact() {};
+	final Simulation sim;
+	public Flexfact(final Simulation _sim) {
+	  sim = _sim;
+	};
 	@Override
   public void run(){
 
 		try (
 			Scanner sc = new Scanner(System.in); // Read in commands from the console
-			Socket flexFactSocket = new Socket(InetAddress.getLocalHost(), 40000); // This is for receiving commands
+			Socket flexFactSocket = new Socket(InetAddress.getLocalHost(), 40000); // For receiving commands
 			PrintWriter flexFactOut = new PrintWriter(flexFactSocket.getOutputStream(), true); // For sending out Subscribe
 		) {
-			//START FLEXFACT SIMULATION FIRST
 
 			//Start reading what Flexfact has to say locally and on the Flexfact socket.
-			final Thread sendingThread = new Thread(new Read(flexFactSocket, false));
+			final Thread sendingThread = new Thread(new Read(flexFactSocket, false, sim));
 			sendingThread.start();
 
 			System.out.println("This is a Flexfact exec");

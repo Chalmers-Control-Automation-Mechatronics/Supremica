@@ -5,6 +5,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+
+import net.sourceforge.waters.gui.simulator.Simulation;
+import net.sourceforge.waters.gui.simulator.SimulatorStep;
 
 /**
  * Thread to read what comes in from Flexfact
@@ -14,15 +19,17 @@ public class Read implements Runnable{
 
 	Socket client;
 	BufferedReader in;
+	Simulation sim;
 	boolean isLocal;
 
 	/**
 	 * Constructor to read from the input stream
 	 * @param _client - The socket to read from
 	 */
-	public Read(final Socket _client, final boolean _isLocal) {
+	public Read(final Socket _client, final boolean _isLocal, final Simulation _sim) {
 		client = _client;
 		isLocal = _isLocal;
+		sim = _sim;
 		try {
 			in = new BufferedReader(
 			        new InputStreamReader(client.getInputStream()));
@@ -51,6 +58,22 @@ public class Read implements Runnable{
 					line = line.replaceAll("</?Subscribe>", "");
 					// Fill the list with commands
 					Local.events = Arrays.asList(line.split(" +"));
+				}
+				else if(line.startsWith("<Notify>")){
+				  line = line.replaceAll(" *</?Notify> *", "");
+
+				  final List<SimulatorStep> steps = sim.getEnabledSteps();
+				  final Iterator<SimulatorStep> i = steps.iterator();
+				  SimulatorStep e = null;
+				  while(i.hasNext()){
+				    final SimulatorStep eventProxy = i.next();
+				    if(eventProxy.getEvent().getName().equals(line)){
+				      e = eventProxy;
+				    }
+				  }
+				  assert e != null;
+
+				  sim.step(e);
 				}
 			}
 		}catch (final Exception e){

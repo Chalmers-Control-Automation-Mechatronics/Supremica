@@ -78,10 +78,9 @@ public class ToolsFlexfactAction
     public void actionPerformed(final ActionEvent e)
     {
       final ModuleContainer container = getActiveModuleContainer();
-      @SuppressWarnings("unused")
       final Simulation sim = container.getSimulatorPanel().getSimulation();
 
-      final Thread flexfact = new Thread(new Flexfact());
+      final Thread flexfact = new Thread(new Flexfact(sim));
       final Thread local = new Thread(new Local());
       flexfact.start();
       local.start();

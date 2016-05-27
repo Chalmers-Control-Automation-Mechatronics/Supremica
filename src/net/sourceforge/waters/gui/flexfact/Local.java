@@ -22,7 +22,7 @@ public class Local implements Runnable {
 			//START FLEXFACT SIMULATION FIRST
 
 			//Start reading what Flexfact has to say locally and on the Flexfact socket.
-			final Thread localThread = new Thread(new Read(localSocket, true));
+			final Thread localThread = new Thread(new Read(localSocket, true, null));
 			localThread.start();
 
 			// Is notify the only tag we need?
