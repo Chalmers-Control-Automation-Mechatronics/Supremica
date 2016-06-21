@@ -54,7 +54,6 @@ public class Read implements Runnable{
 				// If it gives a list of events able to be sent
 				// add them to the list of capable commands.
 				if(line.startsWith("<Subscribe>")){
-					Flexfact.subscribeStr = line; // Unnecessary?
 					line = line.replaceAll("</?Subscribe>", "");
 					// Fill the list with commands
 					Local.events = Arrays.asList(line.split(" +"));

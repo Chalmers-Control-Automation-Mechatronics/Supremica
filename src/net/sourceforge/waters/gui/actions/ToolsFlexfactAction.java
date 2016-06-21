@@ -57,6 +57,10 @@ public class ToolsFlexfactAction
 {
     @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.createLogger(IDE.class);
+    boolean alreadyRunning = false;
+    Thread flexfact = null;
+    Thread local = null;
+    Process proc = null;
 
     private static final long serialVersionUID = 1L;
 
@@ -80,10 +84,38 @@ public class ToolsFlexfactAction
       final ModuleContainer container = getActiveModuleContainer();
       final Simulation sim = container.getSimulatorPanel().getSimulation();
 
-      final Thread flexfact = new Thread(new Flexfact(sim));
-      final Thread local = new Thread(new Local());
-      flexfact.start();
-      local.start();
+
+
+
+//      if (flexfact != null)
+//      {
+//        if(flexfact.isAlive()){
+//          flexfact.interrupt();
+//          local.interrupt();
+//          //Flexfact.KillThread();
+//          //Local.KillThread();
+//        }
+//      }
+
+      try {
+        if(proc != null){
+          final String[] args1 = new String[] {"/bin/bash", "-c", "pkill -f flexfact"};
+          proc = new ProcessBuilder(args1).start();
+        }
+        Thread.sleep(600);
+        final String[] args = new String[] {"/bin/bash", "-c", "~/COMP520/flexfact_sources/build/bin/flexfact"};
+        proc = new ProcessBuilder(args).start();
+        Thread.sleep(600);
+      } catch (final Exception ex) {
+        ex.printStackTrace();
+      }
+
+        flexfact = new Thread(new Flexfact(sim));
+        local = new Thread(new Local());
+        flexfact.start();
+        local.start();
+
+      alreadyRunning = true;
     }
 
 }

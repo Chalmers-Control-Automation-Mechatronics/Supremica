@@ -1,70 +1,54 @@
 package net.sourceforge.waters.gui.flexfact;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 import net.sourceforge.waters.gui.simulator.Simulation;
 
 public class Flexfact implements Runnable {
 	static List<String> events = new ArrayList<String>();
-	static String subscribeStr = "";
 	final Simulation sim;
+	static Socket flexFactSocket;
+	static PrintWriter flexFactOut;
+
 	public Flexfact(final Simulation _sim) {
 	  sim = _sim;
 	};
-	@Override
-  public void run(){
 
-		try (
-			Scanner sc = new Scanner(System.in); // Read in commands from the console
-			Socket flexFactSocket = new Socket(InetAddress.getLocalHost(), 40000); // For receiving commands
-			PrintWriter flexFactOut = new PrintWriter(flexFactSocket.getOutputStream(), true); // For sending out Subscribe
-		) {
+	@Override
+    public void run(){
+
+		try{
+		    flexFactSocket = new Socket(InetAddress.getLocalHost(), 40000);
+            flexFactOut = new PrintWriter(flexFactSocket.getOutputStream(), true); // For sending out Subscribe
+
+            final Thread sendingThread = new Thread(new Read(flexFactSocket, false, sim));
+            sendingThread.start();
 
 			//Start reading what Flexfact has to say locally and on the Flexfact socket.
-			final Thread sendingThread = new Thread(new Read(flexFactSocket, false, sim));
-			sendingThread.start();
-
 			System.out.println("This is a Flexfact exec");
-			// Send the subscribe message only
-			// when the line has been read
-			flexFactOut.println("<Subscribe> </Subscribe>");
-//			while(subscribeStr.equals(""))
-//			{
-//			}
-//			System.out.println(subscribeStr);
-//			flexFactOut.println(subscribeStr);
+			SendMessage();
 
-			// Is notify the only tag we need?
-			//TODO: If multiple commands on a line, check each in list and send ones that match.
-			while (sc.hasNext()){
-				final String input = sc.nextLine();
-				//System.out.println("you wrote: " + input);
-				flexFactOut.println(input);
 
-				if(input.toLowerCase().equals("exit"))
-					break;
-//				else if(events.contains(input)){
-//					// Debugging
-//					System.out.println("Command sent.");
-//					out.println("<Notify> " + input + " </Notify>");
-//
-//				}
-//				else
-//					System.out.println("Invalid command.");
 
-			}
-			System.out.println("\nClosing...\n");
-			//out.close();
-			//clientSocket.close();
-			//serverSocket.close();
 		}
-		catch(final Exception e) {
-			e.printStackTrace();
+		catch(final IOException e) {
+		  System.out.println("Closing...");
+          flexFactOut.close();
+          try {
+            flexFactSocket.close();
+          } catch (final IOException exception) {
+            // TODO Auto-generated catch block
+            exception.printStackTrace();
+          }
 		}
+	}
+
+	public static void SendMessage(){
+	  flexFactOut.println("<Subscribe> </Subscribe>");
 	}
 }
