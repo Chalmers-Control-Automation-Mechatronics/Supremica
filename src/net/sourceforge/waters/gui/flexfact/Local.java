@@ -13,6 +13,7 @@ public class Local implements Runnable {
 	static PrintWriter localOut;
 	static ServerSocket awaitingSocket;
 	static Socket localSocket;
+	Thread localThread;
 	@Override
   public void run(){
 
@@ -20,12 +21,12 @@ public class Local implements Runnable {
 		  awaitingSocket = new ServerSocket(40001);   // Server Socket to grab Flexfact's waiting connection
 		  getComms();
 
-          final Thread localThread = new Thread(new Read(localSocket, true, null));
+          localThread = new Thread(new Read(localSocket, true, null));
           localThread.start();
 
 		}
 		catch(final Exception e) {
-		  System.out.println("Closing...");
+		  System.out.println("Closing Local...");
           try {
             awaitingSocket.close();
             localSocket.close();

@@ -14,6 +14,7 @@ public class Flexfact implements Runnable {
 	final Simulation sim;
 	static Socket flexFactSocket;
 	static PrintWriter flexFactOut;
+	Thread sendingThread;
 
 	public Flexfact(final Simulation _sim) {
 	  sim = _sim;
@@ -26,21 +27,20 @@ public class Flexfact implements Runnable {
 		    flexFactSocket = new Socket(InetAddress.getLocalHost(), 40000);
             flexFactOut = new PrintWriter(flexFactSocket.getOutputStream(), true); // For sending out Subscribe
 
-            final Thread sendingThread = new Thread(new Read(flexFactSocket, false, sim));
+            sendingThread = new Thread(new Read(flexFactSocket, false, sim));
             sendingThread.start();
 
 			//Start reading what Flexfact has to say locally and on the Flexfact socket.
 			System.out.println("This is a Flexfact exec");
 			SendMessage();
 
-
-
 		}
 		catch(final IOException e) {
-		  System.out.println("Closing...");
+		  System.out.println("Closing Flexfact...");
           flexFactOut.close();
           try {
             flexFactSocket.close();
+
           } catch (final IOException exception) {
             // TODO Auto-generated catch block
             exception.printStackTrace();

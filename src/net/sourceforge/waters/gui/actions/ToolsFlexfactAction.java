@@ -42,6 +42,7 @@ import javax.swing.ImageIcon;
 
 import net.sourceforge.waters.gui.flexfact.Flexfact;
 import net.sourceforge.waters.gui.flexfact.Local;
+import net.sourceforge.waters.gui.flexfact.UDPListener;
 import net.sourceforge.waters.gui.simulator.Simulation;
 
 import org.supremica.gui.ide.IDE;
@@ -57,9 +58,9 @@ public class ToolsFlexfactAction
 {
     @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.createLogger(IDE.class);
-    boolean alreadyRunning = false;
     Thread flexfact = null;
     Thread local = null;
+    Thread udpListener = null;
     Process proc = null;
 
     private static final long serialVersionUID = 1L;
@@ -84,19 +85,6 @@ public class ToolsFlexfactAction
       final ModuleContainer container = getActiveModuleContainer();
       final Simulation sim = container.getSimulatorPanel().getSimulation();
 
-
-
-
-//      if (flexfact != null)
-//      {
-//        if(flexfact.isAlive()){
-//          flexfact.interrupt();
-//          local.interrupt();
-//          //Flexfact.KillThread();
-//          //Local.KillThread();
-//        }
-//      }
-
       try {
         if(proc != null){
           final String[] args1 = new String[] {"/bin/bash", "-c", "pkill -f flexfact"};
@@ -110,12 +98,14 @@ public class ToolsFlexfactAction
         ex.printStackTrace();
       }
 
+        if (udpListener == null){
+          udpListener = new Thread(new UDPListener(sim));
+          udpListener.start();
+        }
         flexfact = new Thread(new Flexfact(sim));
         local = new Thread(new Local());
         flexfact.start();
         local.start();
-
-      alreadyRunning = true;
     }
 
 }

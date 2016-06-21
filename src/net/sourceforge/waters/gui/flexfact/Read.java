@@ -75,11 +75,20 @@ public class Read implements Runnable{
 				  sim.step(e);
 				}
 			}
+		}catch (final IOException exception){
+		  exception.printStackTrace();
 		}catch (final Exception e){
-			e.printStackTrace();
+		  try {
+            client.close();
+            in.close();
+          } catch (final IOException exception2) {
+            exception2.printStackTrace();
+          }
 		}finally {
+
 			try{
 			in.close();
+			client.close();
 			}
 			catch (final IOException e){
 				e.printStackTrace();
