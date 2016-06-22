@@ -560,8 +560,13 @@ public class ConflictAssess
   private synchronized void printMalformedCounterExample
     (final TraceProxy trace, final String msg)
   {
-    mReportPrinter.println("BAD (" + msg + "):");
-    printCounterExample(trace);
+    mReportPrinter.print("BAD (" + msg + ")");
+    if (trace != null) {
+      mReportPrinter.println(":");
+      printCounterExample(trace);
+    } else {
+      mReportPrinter.println();
+    }
   }
 
   private synchronized void printGoodCounterExample
@@ -582,7 +587,7 @@ public class ConflictAssess
   }
 
   private void printCounterExample
-    (final TraceProxy trace)
+  (final TraceProxy trace)
   {
     final List<EventProxy> traceevents = trace.getEvents();
     if (traceevents.isEmpty()) {
