@@ -87,7 +87,7 @@ public class BDDExtendedSynthesizer {
             nbrOfStates = bddAutomata.nbrOfNonblockingStates;
             synthesisTimer.stop();
         }
-        else if(options.getSynthesisType().equals(SynthesisType.NONBLOCKINGCONTROLLABLE))
+        else if(options.getSynthesisType().equals(SynthesisType.NONBLOCKING_CONTROLLABLE))
         {
             synthesisTimer.start();
             statesAfterSynthesis =  bddAutomata.getNonblockingControllableStates(options.getReachability());

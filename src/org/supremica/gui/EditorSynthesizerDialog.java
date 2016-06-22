@@ -436,7 +436,7 @@ class EditorSynthesizerDialogStandardPanel
             algorithmSelector.addItem(SynthesisAlgorithm.BDD);
 */
         }
-        else if (typeSelector.getType() == SynthesisType.NONBLOCKINGCONTROLLABLE)
+        else if (typeSelector.getType() == SynthesisType.NONBLOCKING_CONTROLLABLE)
         {
             algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHICBDD);
             algorithmSelector.addItem(SynthesisAlgorithm.PARTITIONBDD);

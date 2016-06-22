@@ -59,11 +59,13 @@ import net.sourceforge.waters.analysis.compositional.AutomataSynthesisAbstractio
 import net.sourceforge.waters.analysis.compositional.CompositionalAutomataSynthesizer;
 import net.sourceforge.waters.analysis.compositional.CompositionalSelectionHeuristicFactory;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
+import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizerNormality;
 import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;
+import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -163,7 +165,7 @@ public class AutomataSynthesizer
 					executionDialog, helperStatistics, false);
 			if (mAbortRequested) return new Automata();
 			result.addAutomaton(retval.automaton);
-			
+
 			logger.debug("AutomataSynthesizer.execute::Monolithic with rename set to " + this.synthesizerOptions.doRename());
 			if(this.synthesizerOptions.doRename())
 			{
@@ -211,7 +213,7 @@ public class AutomataSynthesizer
                 // Plantify specs
                 MinimizationHelper.plantify(theAutomata);
             }
-            else if (type == SynthesisType.NONBLOCKINGCONTROLLABLE)
+            else if (type == SynthesisType.NONBLOCKING_CONTROLLABLE)
             {
 
                 // NONBLOCKING and controllable. Plantify the specifications and supervisors!
@@ -250,109 +252,6 @@ public class AutomataSynthesizer
         }
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
-        // Compositional synthesis by using synthesis abstraction (DCDS 2011).
-
-//         else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.SYNTHESISA)
-//        {
-//
-//            // Use synthesis Abstraction minimization!
-//
-//            // Prepare for synthesis
-//            // Make a copy
-//
-//            theAutomata = new Automata(theAutomata);
-//            // Make preparations based on synthesis type
-//            final SynthesisType type = synthesizerOptions.getSynthesisType();
-//
-//            if (type == SynthesisType.NONBLOCKING)
-//            {
-//                // Only nonblocking? Then everything should be considered controllable!
-//                for (final Automaton automaton : theAutomata)
-//                {
-//                    for (final LabeledEvent event : automaton.getAlphabet())
-//                    {
-//                        event.setControllable(true);
-//                    }
-//                }
-//            }
-//            else if (type == SynthesisType.CONTROLLABLE)
-//            {
-//
-//                // Only controllable? Then everything should be considered marked...
-//                // and AFTER that, the specs must be plantified!
-//                for (final Automaton automaton : theAutomata)
-//                {
-//                    automaton.setAllStatesAccepting();
-//                }
-//                // Plantify specs
-//                MinimizationHelper.plantify(theAutomata);
-//            }
-//
-//            else if (type == SynthesisType.NONBLOCKINGCONTROLLABLE)
-//            {
-//
-//
-//                // NONBLOCKING and controllable. Plantify the specifications and supervisors!
-//            	// if no plants in model, just set everything to type 'plant'
-//                if (theAutomata.plantIterator().hasNext()) MinimizationHelper.plantify(theAutomata);
-//                else {
-//                	for (final Automaton a : theAutomata) {
-//                		a.setComment("plant(" + a.getName() + ")");
-//                        a.setType(AutomatonType.PLANT);
-//                	}
-//                }
-//            }
-//
-//            // Do the stuff!
-//            final AutomataMinimizer minimizer = new AutomataMinimizer(theAutomata);
-//            minimizer.setExecutionDialog(executionDialog);
-//            synthesis=true;
-//
-//            final MinimizationOptions options = MinimizationOptions.getDefaultSynthesisOptionsSynthesisA();
-//
-////          //Abstract the automata by using synthesis Abstraction
-//            final Automata min = minimizer.getCompositionalMinimization(options, synthesis);
-//
-//            // get the halfwaysynthesis automata.
-//            final Automata halfwaySynthesisResult = new Automata();
-//            for(final Automaton aut:min){
-//                if(aut.getName().contains("HalfWaySynthesisResult")){
-//                    halfwaySynthesisResult.addAutomaton(aut);
-//                }
-//            }
-//            // remove the halfway synthesis result from min.
-//            if(halfwaySynthesisResult.size()>0){
-//                min.removeAutomata(halfwaySynthesisResult);
-//            }
-//
-////            Automaton cloneAutomaton=min.getFirstAutomaton();
-////
-//            //rename back the tau events to the original events.
-//
-//            AutomatonMinimizer.renameBackToOriginalEvents(min);
-//
-////            min.addAutomaton(cloneAutomaton);
-//
-////
-//            // Applying monolithic synthesis on the abstract automaton.
-//            final MonolithicAutomataSynthesizer synthesizer = new MonolithicAutomataSynthesizer();
-//            mThreadToAbort = synthesizer;
-//            final MonolithicReturnValue retval = synthesizer.synthesizeSupervisor(min, synthesizerOptions, synchronizationOptions, executionDialog, helperStatistics, false);
-//
-//            if (mAbortRequested)
-//                return new Automata();
-//            retval.automaton.setName("sup(Untitled)");
-//            result.addAutomaton(retval.automaton);
-//
-//            // add the result of halfway synthesis to the final synthesis result.
-//            if(halfwaySynthesisResult.size()>0){
-//                result.addAutomata(halfwaySynthesisResult);
-//            }
-////
-//
-//        }
-      //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-
          else if (synthesizerOptions.getSynthesisAlgorithm() ==
                   SynthesisAlgorithm.MONOLITHIC_WATERS)
          {
@@ -361,7 +260,9 @@ public class AutomataSynthesizer
              ProductDESElementFactory.getInstance();
            final KindTranslator translator;
            final EventProxy marking;
-           switch (synthesizerOptions.getSynthesisType()) {
+           final SynthesisType synthesisType =
+             synthesizerOptions.getSynthesisType();
+           switch (synthesisType) {
            case NONBLOCKING:
              translator = ControllableSynthesisKindTranslator.getInstance();
              marking = null;
@@ -372,22 +273,27 @@ public class AutomataSynthesizer
              marking =
                factory.createEventProxy(":none", EventKind.PROPOSITION);
              break;
-           case NONBLOCKINGCONTROLLABLE:
+           case NONBLOCKING_CONTROLLABLE:
+           case NONBLOCKING_CONTROLLABLE_NORMAL:
              theAutomata = new Automata(theAutomata);
              translator = IdenticalKindTranslator.getInstance();
              marking = null;
              break;
            default:
              throw new IllegalStateException
-               ("Unknown synthesis type " +
+               ("Unsupported synthesis type " +
                 synthesizerOptions.getSynthesisType() + "!");
            }
-
            final AutomataToWaters exporter = new AutomataToWaters(factory);
            final ProductDESProxy des = exporter.convertAutomata(theAutomata);
-
-           final MonolithicSynthesizer synthesizer =
-             new MonolithicSynthesizer(des, factory, translator);
+           final SupervisorSynthesizer synthesizer;
+           if (synthesisType == SynthesisType.NONBLOCKING_CONTROLLABLE_NORMAL) {
+             synthesizer =
+               new MonolithicSynthesizerNormality(des, factory, translator);
+           } else {
+             synthesizer =
+               new MonolithicSynthesizer(des, factory, translator);
+           }
            mThreadToAbort = synthesizer;
            synthesizer.setConfiguredDefaultMarking(marking);
            final boolean supervisorReduction =
@@ -437,7 +343,7 @@ public class AutomataSynthesizer
             marking =
               factory.createEventProxy(":none", EventKind.PROPOSITION);
             break;
-          case NONBLOCKINGCONTROLLABLE:
+          case NONBLOCKING_CONTROLLABLE:
             theAutomata = new Automata(theAutomata);
             MinimizationHelper.plantify(theAutomata);
             translator = IdenticalKindTranslator.getInstance();
@@ -445,7 +351,7 @@ public class AutomataSynthesizer
             break;
           default:
             throw new IllegalStateException
-              ("Unknown synthesis type " +
+              ("Unsupported synthesis type " +
                synthesizerOptions.getSynthesisType() + "!");
           }
 
@@ -527,8 +433,8 @@ public class AutomataSynthesizer
         {
             // BDD synthesis
             final SynthesisType type = synthesizerOptions.getSynthesisType();
-            final boolean doControllabilitySynth = (type == SynthesisType.NONBLOCKINGCONTROLLABLE) | (type == SynthesisType.CONTROLLABLE);
-            final boolean doNonblockingSynth = (type == SynthesisType.NONBLOCKINGCONTROLLABLE) | (type == SynthesisType.NONBLOCKING);
+            final boolean doControllabilitySynth = (type == SynthesisType.NONBLOCKING_CONTROLLABLE) | (type == SynthesisType.CONTROLLABLE);
+            final boolean doNonblockingSynth = (type == SynthesisType.NONBLOCKING_CONTROLLABLE) | (type == SynthesisType.NONBLOCKING);
 
             final Automata newAutomata = new Automata(theAutomata);
             final AutomataBDDSynthesizer bddSynthesizer = new AutomataBDDSynthesizer(newAutomata,
@@ -920,7 +826,7 @@ public class AutomataSynthesizer
         }
 
         // NONBLOCKING synthesis is not implemented...
-        if ((synthesizerOptions.getSynthesisType() == SynthesisType.NONBLOCKING) || (synthesizerOptions.getSynthesisType() == SynthesisType.NONBLOCKINGCONTROLLABLE))
+        if ((synthesizerOptions.getSynthesisType() == SynthesisType.NONBLOCKING) || (synthesizerOptions.getSynthesisType() == SynthesisType.NONBLOCKING_CONTROLLABLE))
         {
             logger.warn("Currently global nonblocking is NOT guaranteed. The only guarantee " +
                 "is that each supervisor is individually nonblocking with respect to the " +

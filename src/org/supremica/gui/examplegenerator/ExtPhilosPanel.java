@@ -279,7 +279,7 @@ class ExtPhilosPanel extends JPanel implements TestCase, ActionListener {
 			synthesizerDialog.setVisible(true);
 		} else {
 			synthesizerOptions
-					.setSynthesisType(SynthesisType.NONBLOCKINGCONTROLLABLE);
+					.setSynthesisType(SynthesisType.NONBLOCKING_CONTROLLABLE);
 			synthesizerOptions.setSynthesisAlgorithm(SynthesisAlgorithm.BDD);
 			synthesizerOptions.setPurge(true);
 			synthesizerOptions.setMaximallyPermissive(true);

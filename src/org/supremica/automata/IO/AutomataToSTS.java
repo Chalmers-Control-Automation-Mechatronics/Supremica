@@ -207,7 +207,7 @@ public class AutomataToSTS
     public void createSpec(final PrintWriter pw)
     {
         final SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
-        synthesizerOptions.setSynthesisType(SynthesisType.NONBLOCKINGCONTROLLABLE);
+        synthesizerOptions.setSynthesisType(SynthesisType.NONBLOCKING_CONTROLLABLE);
         synthesizerOptions.setSynthesisAlgorithm(SynthesisAlgorithm.MONOLITHIC);
         synthesizerOptions.setPurge(false);
         synthesizerOptions.setMaximallyPermissive(true);

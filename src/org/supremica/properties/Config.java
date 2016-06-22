@@ -296,7 +296,7 @@ public final class Config
     public static final BooleanProperty VERIFY_SHOW_BAD_TRACE = new BooleanProperty(PropertyType.ALGORITHMS_VERIFICATION, "showBadTrace", false, "Show trace to bad state");
 
     // ALGORITHMS_SYNTHESIS
-    public static final ObjectProperty<SynthesisType> SYNTHESIS_SYNTHESIS_TYPE = new ObjectProperty<SynthesisType>(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisSynthesisType", SynthesisType.NONBLOCKINGCONTROLLABLE, "Default synthesis type", SynthesisType.values());
+    public static final ObjectProperty<SynthesisType> SYNTHESIS_SYNTHESIS_TYPE = new ObjectProperty<SynthesisType>(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisSynthesisType", SynthesisType.NONBLOCKING_CONTROLLABLE, "Default synthesis type", SynthesisType.values());
     public static final ObjectProperty<SynthesisAlgorithm> SYNTHESIS_ALGORITHM_TYPE  = new ObjectProperty<SynthesisAlgorithm>(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisAlgorithmType", SynthesisAlgorithm.MONOLITHIC, "Default synthesis algorithm", SynthesisAlgorithm.values());
     public static final BooleanProperty SYNTHESIS_PURGE = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisPurge", true, "Remove forbidden states after synthesis"); // MF changed to true here
 	public static final BooleanProperty SYNTHESIS_RENAME = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisRename", false, "Rename states to generic names (q0, q1, ...)");	// MF

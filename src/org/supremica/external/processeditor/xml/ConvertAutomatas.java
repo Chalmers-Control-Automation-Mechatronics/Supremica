@@ -602,7 +602,7 @@ public class ConvertAutomatas {
 	    final Project theProject = builder.build(file);
 
 	    final SynthesizerOptions syntOptions = new SynthesizerOptions();
-	    syntOptions.setSynthesisType(SynthesisType.NONBLOCKINGCONTROLLABLE);
+	    syntOptions.setSynthesisType(SynthesisType.NONBLOCKING_CONTROLLABLE);
 	    syntOptions.setSynthesisAlgorithm(SynthesisAlgorithm.MONOLITHIC);
 	    syntOptions.setPurge(true);
 	    syntOptions.setMaximallyPermissive(true);

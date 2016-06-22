@@ -309,12 +309,14 @@ public class SynthesizerDialog
         algorithmSelector.addSelectable(SynthesisAlgorithm.COMPOSITIONAL);
         algorithmSelector.addSelectable(SynthesisAlgorithm.BDD);
         algorithmSelector.addSelectable(SynthesisAlgorithm.COMPOSITIONAL_WATERS);
-      } else if (typeSelector.getType() == SynthesisType.NONBLOCKINGCONTROLLABLE) {
+      } else if (typeSelector.getType() == SynthesisType.NONBLOCKING_CONTROLLABLE) {
         algorithmSelector.addSelectable(SynthesisAlgorithm.MONOLITHIC);
         algorithmSelector.addSelectable(SynthesisAlgorithm.MONOLITHIC_WATERS);
         algorithmSelector.addSelectable(SynthesisAlgorithm.COMPOSITIONAL);
         algorithmSelector.addSelectable(SynthesisAlgorithm.BDD);
         algorithmSelector.addSelectable(SynthesisAlgorithm.COMPOSITIONAL_WATERS);
+      } else if (typeSelector.getType() == SynthesisType.NONBLOCKING_CONTROLLABLE_NORMAL) {
+        algorithmSelector.addSelectable(SynthesisAlgorithm.MONOLITHIC_WATERS);
       }
       if (algorithmSelector.getItemCount() > 0) {
         // Default selection
@@ -373,7 +375,7 @@ public class SynthesizerDialog
  		renameBox.setVisible(false);
 
 		if ((typeSelector.getType() == SynthesisType.NONBLOCKING)
-            || (typeSelector.getType() == SynthesisType.NONBLOCKINGCONTROLLABLE))
+            || (typeSelector.getType() == SynthesisType.NONBLOCKING_CONTROLLABLE))
 		{
           purgeBox.setVisible(false); //X
 

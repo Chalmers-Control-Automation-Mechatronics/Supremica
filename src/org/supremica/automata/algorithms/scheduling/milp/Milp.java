@@ -796,7 +796,7 @@ public class Milp
                 // If there are several automata with similar names (one is a plant the other are
                 // restricting specification), then perform a synthesis
                 final SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
-                synthesizerOptions.setSynthesisType(SynthesisType.NONBLOCKINGCONTROLLABLE);
+                synthesizerOptions.setSynthesisType(SynthesisType.NONBLOCKING_CONTROLLABLE);
                 synthesizerOptions.setSynthesisAlgorithm(SynthesisAlgorithm.MONOLITHIC);
                 synthesizerOptions.setPurge(true);
                 synthesizerOptions.setMaximallyPermissive(true);
