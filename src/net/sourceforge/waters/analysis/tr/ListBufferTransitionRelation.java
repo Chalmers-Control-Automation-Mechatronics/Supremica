@@ -69,40 +69,50 @@ import gnu.trove.stack.array.TIntArrayStack;
 
 
 /**
- * A more convenient means to store and retrieve transitions of an automaton.
- * <p>
- * The list buffer transition relation is created from an automaton to index
+ * <P>A more convenient means to store and retrieve transitions of an
+ * automaton.</P>
+ *
+ * <P>The list buffer transition relation is created from an automaton to index
  * its transitions, making it easier to associate states with transitions, and
- * to modify the transition structure.
- * <p>
- * Transitions are stored in a {@link TransitionListBuffer} in bit-packed form
- * in blocked linked lists. The user may choose to create a buffer for
+ * to modify the transition structure.</P>
+ *
+ * <P>Transitions are stored in a {@link TransitionListBuffer} in bit-packed
+ * form in blocked linked lists. The user may choose to create a buffer for
  * outgoing transitions, which enables quick access to transitions given their
  * source state, or a buffer for incoming transitions, which enables quick
  * access to transitions given their target state, or both.
- * <p>
  * Reconfiguration of the buffer selection is possible, but time-consuming.
  * Some methods require the presence or absence of the incoming or outgoing
- * buffer, see details with each method.
- * <p>
- * The encoding of states and events is defined by the user upon creation of
- * the transition relation, using a {@link StateEncoding} and an
- * {@link EventEncoding}. After construction, the encoding can no longer be
- * changed, except that events can be removed (marked as unused) and states
- * can be marked as unreachable. These removals will be respected when
- * creating an automaton from the transition relation.
- * <p>
- * The transition buffers recognise the silent event code
+ * buffer, see details with each method.</P>
+ *
+ * <P>Access to the transitions is possible through transition iterators
+ * ({@link TransitionIterator}), which are obtained using methods such as
+ * {@link #createSuccessorsReadOnlyIterator()}. Depending on the buffer
+ * configuration, it is possible to iterate over all transitions, or all
+ * transitions with a given source or target state, or all transitions with a
+ * given source or target state and event, etc.</P>
+ *
+ * <P>The encoding of states and events is defined by the user upon creation
+ * of the transition relation, using a {@link StateEncoding} and an
+ * {@link EventEncoding}. After construction, the encodings can no longer be
+ * changed, except that the status of events changed, events can be removed
+ * (by setting their status to be unused), and states can be marked as
+ * unreachable.</P>
+ *
+ * <P>The transition buffers recognise the silent event code
  * {@link EventEncoding#TAU} and automatically suppress all selfloops using
- * this event.
- * <p>
- * The transition relation also associates with each state its initial status
- * and its propositions in a bit set, using an {@link IntStateBuffer}.
+ * this event.</P>
+ *
+ * <P>The transition relation associates with each state its initial
+ * status, and its propositions in a bit set, using an {@link IntStateBuffer}.
+ * There also is special support for a <I>dump state</I>, which is a unique
+ * non-accepting state without outgoing transitions.</P>
  *
  * @see StateEncoding
  * @see EventEncoding
  * @see IntStateBuffer
  * @see TransitionListBuffer
+ * @see TransitionIterator
  *
  * @author Robi Malik
  */
@@ -1006,7 +1016,7 @@ public class ListBufferTransitionRelation implements EventStatusProvider
    * transitions. The iterator returned is not initialised, so one of the
    * methods {@link TransitionIterator#resetState(int)} or
    * {@link TransitionIterator#reset(int, int)} must be called before it can
-   * be used. Being a read-only iterator, the iterator return by this method
+   * be used. Being a read-only iterator, the iterator returned by this method
    * does not implement the {@link TransitionIterator#remove()} method.
    */
   public TransitionIterator createSuccessorsReadOnlyIterator()

@@ -302,7 +302,6 @@ public class AutomataSynthesizer
            final boolean supervisorLocalization =
              synthesizerOptions.getLocalizeSupervisors();
            synthesizer.setSupervisorLocalizationEnabled(supervisorLocalization);
-           // set options & marking
            synthesizer.run();
            final ProductDESResult watersResult =
              synthesizer.getAnalysisResult();
@@ -315,7 +314,7 @@ public class AutomataSynthesizer
                result.addAutomaton(aut);
              }
            } else {
-             final Automaton aut = new Automaton("sup(Untitled)");
+             final Automaton aut = new Automaton("empty_supervisor");
              aut.setType(AutomatonType.SUPERVISOR);
              result.addAutomaton(aut);
            }
@@ -333,7 +332,7 @@ public class AutomataSynthesizer
           final EventProxy marking;
           switch (synthesizerOptions.getSynthesisType()) {
           case NONBLOCKING:
-            translator = ConflictKindTranslator.getInstanceUncontrollable();
+            translator = ConflictKindTranslator.getInstanceControllable();
             marking = null;
             break;
           case CONTROLLABLE:
@@ -419,7 +418,7 @@ public class AutomataSynthesizer
               result.addAutomaton(aut);
             }
           } else {
-            final Automaton aut = new Automaton("sup(Untitled)");
+            final Automaton aut = new Automaton("empty_supervisor");
             aut.setType(AutomatonType.SUPERVISOR);
             result.addAutomaton(aut);
           }
