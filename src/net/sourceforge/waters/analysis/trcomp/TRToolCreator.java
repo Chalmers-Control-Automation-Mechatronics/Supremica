@@ -44,9 +44,9 @@ import net.sourceforge.waters.model.analysis.ListedEnumFactory;
  *
  * <P>The tool creator has a type argument that represents the type of tool
  * it creates, e.g., {@link TransitionRelationSimplifier}.
- * Its {@link #create(AbstractTRCompositionalAnalyzer) create()} is invoked
- * during initialisation of the model analyser to create the tool in the
- * correct context. In addition, the tool creator has a name, so it can
+ * Its {@link #create(AbstractTRCompositionalAnalyzer) create()} method is
+ * invoked during initialisation of the model analyser to create the tool in
+ * the correct context. In addition, the tool creator has a name, so it can
  * be added to a {@link ListedEnumFactory} to implement command line
  * options.</P>
  *
