@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.gui.simulator;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -50,7 +52,8 @@ import javax.swing.JLabel;
 
 import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.ModuleContext;
-import net.sourceforge.waters.gui.flexfact.Local;
+import net.sourceforge.waters.gui.flexfact.LocalServer;
+import net.sourceforge.waters.gui.flexfact.LocalSocket;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.util.PropositionIcon;
@@ -80,8 +83,6 @@ import net.sourceforge.waters.xsd.base.EventKind;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 import org.supremica.properties.Config;
-
-import gnu.trove.set.hash.THashSet;
 
 
 public class Simulation implements ModelObserver, Observer
@@ -315,9 +316,9 @@ public class Simulation implements ModelObserver, Observer
         if(ind >= 0) {
           event = new StringBuilder(event).replace(ind, ind+5, "-").toString();
         }
-        if(Local.events.contains(event))
+        if(LocalServer.events.contains(event))
         {
-          Local.SendEvent(event);
+          LocalSocket.SendEvent(event);
         }
       }
     }

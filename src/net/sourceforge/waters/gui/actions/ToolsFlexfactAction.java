@@ -40,9 +40,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 
-import net.sourceforge.waters.gui.flexfact.Flexfact;
-import net.sourceforge.waters.gui.flexfact.Local;
-import net.sourceforge.waters.gui.flexfact.UDPListener;
+import net.sourceforge.waters.gui.flexfact.LocalServer;
 import net.sourceforge.waters.gui.simulator.Simulation;
 
 import org.supremica.gui.ide.IDE;
@@ -58,9 +56,8 @@ public class ToolsFlexfactAction
 {
     @SuppressWarnings("unused")
     private final Logger logger = LoggerFactory.createLogger(IDE.class);
-    Thread flexfact = null;
+
     Thread local = null;
-    Thread udpListener = null;
     Process proc = null;
 
     private static final long serialVersionUID = 1L;
@@ -91,20 +88,13 @@ public class ToolsFlexfactAction
           proc = new ProcessBuilder(args1).start();
         }
         Thread.sleep(600);
-        final String[] args = new String[] {"/bin/bash", "-c", "~/COMP520/flexfact_sources/build/bin/flexfact"};
+        final String[] args = new String[] {"/bin/bash", "-c", "flexfact"};
         proc = new ProcessBuilder(args).start();
         Thread.sleep(600);
       } catch (final Exception ex) {
         ex.printStackTrace();
       }
-
-        if (udpListener == null){
-          udpListener = new Thread(new UDPListener(sim));
-          udpListener.start();
-        }
-        flexfact = new Thread(new Flexfact(sim));
-        local = new Thread(new Local());
-        flexfact.start();
+        local = new Thread(new LocalServer(sim));
         local.start();
     }
 

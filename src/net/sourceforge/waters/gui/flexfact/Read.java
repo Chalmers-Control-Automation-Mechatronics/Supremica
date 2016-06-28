@@ -56,7 +56,7 @@ public class Read implements Runnable{
 				if(line.startsWith("<Subscribe>")){
 					line = line.replaceAll("</?Subscribe>", "");
 					// Fill the list with commands
-					Local.events = Arrays.asList(line.split(" +"));
+					LocalServer.events = Arrays.asList(line.split(" +"));
 				}
 				else if(line.startsWith("<Notify>")){
 				  line = line.replaceAll(" *</?Notify> *", "");
