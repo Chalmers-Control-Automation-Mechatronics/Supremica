@@ -33,9 +33,6 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.set.hash.TIntHashSet;
-
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntSetBuffer;
@@ -48,6 +45,9 @@ import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
+
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
 
 
 /**
@@ -116,6 +116,30 @@ public class SubsetConstructionTRSimplifier
   public int getTransitionLimit()
   {
     return mTransitionLimit;
+  }
+
+  /**
+   * Sets whether dump states are pruned during subset construction.
+   * @see #isDumpStateAware()
+   */
+  public void setDumpStateAware(final boolean aware)
+  {
+    mDumpStateAware = aware;
+  }
+
+  /**
+   * <P>Gets whether dump states are pruned during subset construction.</P>
+   *
+   * <P>If set to <CODE>true</CODE>, and state set encountered during subset
+   * construction, which includes the dump state of the input transition
+   * relation, will be replaced by a dump state in the output transition
+   * relation, and no exploration will happen beyond these states.</P>
+   *
+   * <P>The default of this setting is <CODE>false</CODE>.</P>
+   */
+  public boolean isDumpStateAware()
+  {
+    return mDumpStateAware;
   }
 
   /**
@@ -255,6 +279,7 @@ public class SubsetConstructionTRSimplifier
       }
 
       // 2. Expand subset states.
+      final int dumpIndex = mDumpStateAware ? rel.getDumpStateIndex() : -1;
       final int numEvents = rel.getNumberOfProperEvents();
       final IntSetBuffer.IntSetIterator iter = mStateSetBuffer.iterator();
       final TIntArrayList current = new TIntArrayList();
@@ -274,11 +299,7 @@ public class SubsetConstructionTRSimplifier
                 if (mFailingEventsAsSelfloops) {
                   mTransitionBuffer.addTransition(source, e, source);
                 } else {
-                  if (mDumpStateIndex < 0) {
-                    mDumpStateIndex = mSetOffsets.size();
-                    final int offset = mStateSetBuffer.add(current); // empty set
-                    mSetOffsets.add(offset);
-                  }
+                  createDumpState();
                   mTransitionBuffer.addTransition(source, e, mDumpStateIndex);
                 }
                 if (EventStatus.isAlwaysEnabledEvent(status)) {
@@ -294,6 +315,12 @@ public class SubsetConstructionTRSimplifier
               mEventIterator.resume(state);
               while (mEventIterator.advance()) {
                 final int target = mEventIterator.getCurrentTargetState();
+                if (target == dumpIndex) {
+                  createDumpState();
+                  mTransitionBuffer.addTransition(source, e, mDumpStateIndex);
+                  current.clear();
+                  break;
+                }
                 current.add(target);
               }
             }
@@ -393,6 +420,16 @@ public class SubsetConstructionTRSimplifier
 
   //#########################################################################
   //# Auxiliary Methods
+  private void createDumpState()
+  {
+    if (mDumpStateIndex < 0) {
+      final int[] empty = new int[0];
+      mDumpStateIndex = mSetOffsets.size();
+      final int offset = mStateSetBuffer.add(empty);
+      mSetOffsets.add(offset);
+    }
+  }
+
   private boolean isSelfloopEventExceptInFailingStates
     (final int e,
      final TransitionIterator eventIter,
@@ -429,6 +466,7 @@ public class SubsetConstructionTRSimplifier
   //# Data Members
   private int mStateLimit = Integer.MAX_VALUE;
   private int mTransitionLimit = Integer.MAX_VALUE;
+  private boolean mDumpStateAware = false;
   private boolean mFailingEventsAsSelfloops = false;
 
   private boolean mIsDeterministic;
