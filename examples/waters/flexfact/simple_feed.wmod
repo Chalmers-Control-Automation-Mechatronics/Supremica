@@ -441,5 +441,122 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="cb_spec1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="S0">
+                        <PointGeometry>
+                            <Point X="128" Y="144"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point X="-1" Y="-16"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S1">
+                        <PointGeometry>
+                            <Point X="224" Y="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S2">
+                        <PointGeometry>
+                            <Point X="224" Y="224"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S3">
+                        <PointGeometry>
+                            <Point X="128" Y="224"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S4">
+                        <PointGeometry>
+                            <Point X="304" Y="224"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="S0" Target="S1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="sf_wplv"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-28" Y="-21"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S1" Target="S2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="cb_bm_east"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="1" Y="-16"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S2" Target="S4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="sf_wplv"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-22" Y="-15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="264" Y="208"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S4" Target="S2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="xs_wpar"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-23" Y="6"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="264" Y="240"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S2" Target="S3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="xs_wpar"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-20" Y="9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S3" Target="S0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="cb_boff"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-52" Y="-6"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S0" Target="S0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="cb_boff"/>
+                            <SimpleIdentifier Name="cb_bm_west"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-37" Y="-48"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="77" Y="142"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
     </ComponentList>
 </Module>
