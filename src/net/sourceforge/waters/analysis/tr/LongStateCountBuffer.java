@@ -65,7 +65,7 @@ import net.sourceforge.waters.model.des.StateProxy;
  * @author Robi Malik
  */
 
-public class IntStateBuffer extends AbstractStateBuffer
+public class LongStateCountBuffer extends AbstractStateBuffer
 {
 
   //#########################################################################
@@ -81,7 +81,7 @@ public class IntStateBuffer extends AbstractStateBuffer
    * @param  stateEnc        State encoding that defines the assignment of
    *                         state codes for the states in the buffer.
    */
-  public IntStateBuffer(final EventEncoding eventEnc,
+  public LongStateCountBuffer(final EventEncoding eventEnc,
                         final StateEncoding stateEnc)
   {
     this(eventEnc, stateEnc, null);
@@ -99,24 +99,24 @@ public class IntStateBuffer extends AbstractStateBuffer
    *                         otherwise an additional unreachable dump state
    *                         is added to the end of the state space.
    */
-  public IntStateBuffer(final EventEncoding eventEnc,
-                        final StateEncoding stateEnc,
-                        final StateProxy dumpState)
+  public LongStateCountBuffer(final EventEncoding eventEnc,
+                              final StateEncoding stateEnc,
+                              final StateProxy dumpState)
   {
     super(stateEnc, dumpState);
 
     mPropositionStatus = eventEnc;
     final int numStates = stateEnc.getNumberOfStates();
     if (getDumpStateIndex() >= 0) {
-      mStateInfo = new int[numStates];
+      mStateInfo = new long[numStates];
     } else {
       setDumpStateIndex(numStates);
-      mStateInfo = new int[numStates + 1];
+      mStateInfo = new long[numStates + 1];
     }
     for (int s = 0; s < numStates; s++) {
       final StateProxy state = stateEnc.getState(s);
       if (state != null) {
-        int info = TAG_REACHABLE;
+        long info = TAG_REACHABLE;
         if (state.isInitial()) {
           info |= TAG_INITIAL;
         }
@@ -142,7 +142,7 @@ public class IntStateBuffer extends AbstractStateBuffer
    * @param  propStatus Event status provider to determine the number of
    *                    propositions and which propositions are used.
    */
-  public IntStateBuffer(final int size,
+  public LongStateCountBuffer(final int size,
                         final EventStatusProvider propStatus)
   {
     this(size + 1, size, propStatus);
@@ -164,13 +164,13 @@ public class IntStateBuffer extends AbstractStateBuffer
    * @param  propStatus Event status provider to determine the number of
    *                    propositions and which propositions are used.
    */
-  public IntStateBuffer(final int size,
+  public LongStateCountBuffer(final int size,
                         final int dumpIndex,
                         final EventStatusProvider propStatus)
   {
     mPropositionStatus = propStatus;
     setDumpStateIndex(dumpIndex);
-    mStateInfo = new int[size];
+    mStateInfo = new long[size];
     Arrays.fill(mStateInfo, TAG_REACHABLE);
   }
 
@@ -182,19 +182,13 @@ public class IntStateBuffer extends AbstractStateBuffer
    * @param  propStatus Event status provider to determine the number of
    *                    propositions and which propositions are used.
   */
-  public IntStateBuffer(final AbstractStateBuffer buffer,
+  public LongStateCountBuffer(final LongStateCountBuffer buffer,
                         final EventStatusProvider propStatus)
   {
     mPropositionStatus = propStatus;
     setDumpStateIndex(buffer.getDumpStateIndex());
     final int size = buffer.getNumberOfStates();
-
-    if (buffer instanceof IntStateBuffer) {
-      final IntStateBuffer buffer2 = (IntStateBuffer) buffer;
-      mStateInfo = Arrays.copyOf(buffer2.mStateInfo, size);
-    } else {
-      mStateInfo = null;
-    }
+    mStateInfo = Arrays.copyOf(buffer.mStateInfo, size);
   }
 
 
@@ -269,12 +263,7 @@ public class IntStateBuffer extends AbstractStateBuffer
   @Override
   public boolean isMarked(final int state, final int prop)
   {
-    if (mPropositionStatus.isPropositionUsed(prop)) {
-      final int pattern = 1 << prop;
-      return (mStateInfo[state] & pattern) != 0;
-    } else {
-      return true;
-    }
+    return false;
   }
 
   /**
@@ -289,12 +278,7 @@ public class IntStateBuffer extends AbstractStateBuffer
   @Override
   public int getNumberOfMarkings(final boolean countUnused)
   {
-    final int numProps = mPropositionStatus.getNumberOfPropositions();
-    int result = 0;
-    for (int prop = 0; prop < numProps; prop++) {
-      result += getNumberOfMarkings(prop, countUnused);
-    }
-    return result;
+    return 0;
   }
 
   /**
@@ -309,19 +293,7 @@ public class IntStateBuffer extends AbstractStateBuffer
   @Override
   public int getNumberOfMarkings(final int prop, final boolean countUnused)
   {
-    if (mPropositionStatus.isPropositionUsed(prop)) {
-      int result = 0;
-      for (int state = 0; state < getNumberOfStates(); state++) {
-        if (isReachable(state) && isMarked(state, prop)) {
-          result++;
-        }
-      }
-      return result;
-    } else if (countUnused) {
-      return getNumberOfStates();
-    } else {
-      return 0;
-    }
+    return 0;
   }
 
   /**
@@ -338,7 +310,7 @@ public class IntStateBuffer extends AbstractStateBuffer
   @Override
   public long getAllMarkings(final int state)
   {
-    return mStateInfo[state] & ~TAG_ALL;
+    return 0;
   }
 
   /**
@@ -351,18 +323,7 @@ public class IntStateBuffer extends AbstractStateBuffer
   @Override
   public void setMarked(final int state, final int prop, final boolean value)
   {
-    final int pattern = 1 << prop;
-    if (value) {
-      mStateInfo[state] |= pattern;
-    } else {
-      if (!mPropositionStatus.isPropositionUsed(prop)) {
-        mPropositionStatus.setPropositionUsed(prop, true);
-        for (int s = 0; s < mStateInfo.length; s++) {
-          mStateInfo[s] |= pattern;
-        }
-      }
-      mStateInfo[state] &= ~pattern;
-    }
+
   }
 
   /**
@@ -377,7 +338,7 @@ public class IntStateBuffer extends AbstractStateBuffer
   @Override
   public void setAllMarkings(final int state, final long markings)
   {
-    mStateInfo[state] = (mStateInfo[state] & TAG_ALL) | (int) markings;
+
   }
 
   /**
@@ -432,7 +393,7 @@ public class IntStateBuffer extends AbstractStateBuffer
   @Override
   public void clearMarkings(final int state)
   {
-    mStateInfo[state] &= TAG_ALL;
+
   }
 
   /**
@@ -444,7 +405,7 @@ public class IntStateBuffer extends AbstractStateBuffer
   @Override
   public void copyMarkings(final int source, final int dest)
   {
-    mStateInfo[dest] |= (mStateInfo[source] & ~TAG_ALL);
+
   }
 
   /**
@@ -465,11 +426,7 @@ public class IntStateBuffer extends AbstractStateBuffer
   @Override
   public long createMarkings(final TIntArrayList props)
   {
-    int result = 0;
-    for (int p = 0; p < props.size(); p++) {
-      result |= 1 << props.get(p);
-    }
-    return result;
+    return 0;
   }
 
   /**
@@ -484,7 +441,7 @@ public class IntStateBuffer extends AbstractStateBuffer
   @Override
   public long addMarking(final long markings, final int prop)
   {
-    return markings | (1L << prop);
+    return 0;
   }
 
   /**
@@ -497,7 +454,7 @@ public class IntStateBuffer extends AbstractStateBuffer
   @Override
   public boolean isMarked(final long markings, final int prop)
   {
-    return (markings & (1L << prop)) != 0;
+    return false;
   }
 
   /**
@@ -510,7 +467,7 @@ public class IntStateBuffer extends AbstractStateBuffer
   @Override
   public long mergeMarkings(final long markings1, final long markings2)
   {
-    return markings1 | markings2;
+    return 0;
   }
 
   /**
@@ -522,22 +479,7 @@ public class IntStateBuffer extends AbstractStateBuffer
   @Override
   public boolean addRedundantPropositions()
   {
-    final int numProps = mPropositionStatus.getNumberOfPropositions();
-    int pattern = 0;
-    for (int p = 0; p < numProps; p++) {
-      if (!mPropositionStatus.isPropositionUsed(p)) {
-        mPropositionStatus.setPropositionUsed(p, true);
-        pattern |= (1 << p);
-      }
-    }
-    if (pattern == 0) {
-      return false;
-    } else {
-      for (int state = 0; state < mStateInfo.length; state++) {
-        mStateInfo[state] |= pattern;
-      }
-      return true;
-    }
+    return false;
   }
 
   /**
@@ -549,25 +491,7 @@ public class IntStateBuffer extends AbstractStateBuffer
   @Override
   public boolean removeRedundantPropositions()
   {
-    final int numProps = mPropositionStatus.getNumberOfPropositions();
-    boolean removed = false;
-    for (int p = 0; p < numProps; p++) {
-      if (mPropositionStatus.isPropositionUsed(p)) {
-        final int pattern = (1 << p) | TAG_REACHABLE;
-        boolean redundant = true;
-        for (int state = 0; state < mStateInfo.length; state++) {
-          if ((mStateInfo[state] & pattern) == TAG_REACHABLE) {
-            redundant = false;
-            break;
-          }
-        }
-        if (redundant) {
-          mPropositionStatus.setPropositionUsed(p, false);
-          removed = true;
-        }
-      }
-    }
-    return removed;
+    return false;
   }
 
 
@@ -581,7 +505,7 @@ public class IntStateBuffer extends AbstractStateBuffer
   @Override
   public boolean isEmpty()
   {
-    for (final int tags : mStateInfo) {
+    for (final long tags : mStateInfo) {
       if ((tags & TAG_REACHABLE) != 0) {
         return false;
       }
@@ -597,7 +521,7 @@ public class IntStateBuffer extends AbstractStateBuffer
   public int getNumberOfReachableStates()
   {
     int count = 0;
-    for (final int tags : mStateInfo) {
+    for (final long tags : mStateInfo) {
       if ((tags & TAG_REACHABLE) != 0) {
         count++;
       }
@@ -646,7 +570,6 @@ public class IntStateBuffer extends AbstractStateBuffer
     return new StateEncoding(states);
   }
 
-
   //#########################################################################
   //# Debugging
   @Override
@@ -658,14 +581,12 @@ public class IntStateBuffer extends AbstractStateBuffer
     return writer.toString();
   }
 
-  @Override
   public void dump(final PrintWriter printer)
   {
-    final int used = mPropositionStatus.getUsedPropositions();
     printer.print('{');
     int last = -1;
     for (int s = 0; s < mStateInfo.length; s++) {
-      final int info = mStateInfo[s] &~ TAG_REACHABLE;
+      final long info = mStateInfo[s] & ~TAG_REACHABLE;
       if (info != 0) {
         if (last >= 0) {
           printer.print(", ");
@@ -675,26 +596,8 @@ public class IntStateBuffer extends AbstractStateBuffer
           printer.print("->");
         }
         printer.print(s);
-        if ((info & used) != 0) {
-          final int numProps = mPropositionStatus.getNumberOfPropositions();
-          if (numProps == 1) {
-            printer.print('*');
-          } else {
-            printer.print('<');
-            boolean first = true;
-            for (int p = 0; p < numProps; p++) {
-              if ((info & (1 << p) & used) != 0) {
-                if (first) {
-                  first = false;
-                } else {
-                  printer.print(",");
-                }
-                printer.print(p);
-              }
-            }
-            printer.print('>');
-          }
-        }
+        final long count = info & ~TAG_ALL;
+        printer.print(count);
       }
     }
     if (last < mStateInfo.length - 1) {
@@ -711,13 +614,13 @@ public class IntStateBuffer extends AbstractStateBuffer
   //#########################################################################
   //# Data Members
   private final EventStatusProvider mPropositionStatus;
-  private final int[] mStateInfo;
+  private final long[] mStateInfo;
 
 
   //#########################################################################
   //# Class Constants
-  private static final int TAG_INITIAL = 0x80000000;
-  private static final int TAG_REACHABLE = 0x40000000;
-  private static final int TAG_ALL = TAG_INITIAL | TAG_REACHABLE;
+  private static final long TAG_INITIAL = 0x8000000000000000L;
+  private static final long TAG_REACHABLE = 0x4000000000000000L;
+  private static final long TAG_ALL = TAG_INITIAL | TAG_REACHABLE;
 
 }

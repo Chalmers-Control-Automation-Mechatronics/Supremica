@@ -33,6 +33,13 @@
 
 package net.sourceforge.waters.analysis.tr;
 
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TLongObjectHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -59,13 +66,6 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.apache.log4j.Logger;
-
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TLongObjectHashMap;
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
-import gnu.trove.stack.TIntStack;
-import gnu.trove.stack.array.TIntArrayStack;
 
 
 /**
@@ -223,7 +223,11 @@ public class ListBufferTransitionRelation implements EventStatusProvider
     final List<TransitionProxy> list = new ArrayList<>(transitions);
     final int numStates = stateEnc.getNumberOfStates() + 1;
     final int numTrans = aut.getTransitions().size();
-    mStateBuffer = new IntStateBuffer(eventEnc, stateEnc, dumpState);
+    if (mStateCount) {
+      mStateBuffer = new LongStateCountBuffer(eventEnc, stateEnc, dumpState);
+    } else {
+      mStateBuffer = new IntStateBuffer(eventEnc, stateEnc, dumpState);
+    }
     mEventStatus = eventEnc;
     if ((config & CONFIG_SUCCESSORS) != 0) {
       mSuccessorBuffer =
@@ -315,7 +319,11 @@ public class ListBufferTransitionRelation implements EventStatusProvider
     checkConfig(config);
     mName = name;
     mKind = kind;
-    mStateBuffer = new IntStateBuffer(numStates, dumpIndex, eventEnc);
+    if (mStateCount) {
+      mStateBuffer = new LongStateCountBuffer(numStates, dumpIndex, eventEnc);
+    } else {
+      mStateBuffer = new IntStateBuffer(numStates, dumpIndex, eventEnc);
+    }
     mEventStatus = eventEnc;
     if ((config & CONFIG_SUCCESSORS) != 0) {
       mSuccessorBuffer =
@@ -420,7 +428,11 @@ public class ListBufferTransitionRelation implements EventStatusProvider
       new DefaultEventStatusProvider(numProperEvents, numPropositions);
     mEventStatus.setProperEventStatus(EventEncoding.TAU,
                                       EventStatus.STATUS_FULLY_LOCAL);
-    mStateBuffer = new IntStateBuffer(numStates, dumpIndex, mEventStatus);
+    if (mStateCount) {
+      mStateBuffer = new LongStateCountBuffer(numStates, dumpIndex, mEventStatus);
+    } else {
+      mStateBuffer = new IntStateBuffer(numStates, dumpIndex, mEventStatus);
+    }
     if ((config & CONFIG_SUCCESSORS) != 0) {
       mSuccessorBuffer =
         new OutgoingTransitionListBuffer(numStates ,mEventStatus, 0);
@@ -1700,7 +1712,7 @@ public class ListBufferTransitionRelation implements EventStatusProvider
 
   //#########################################################################
   //# Direct Access to State and Transition Buffers
-  public IntStateBuffer getStateBuffer()
+  public AbstractStateBuffer getStateBuffer()
   {
     return mStateBuffer;
   }
@@ -2411,7 +2423,11 @@ public class ListBufferTransitionRelation implements EventStatusProvider
                     final int config)
     throws OverflowException
   {
-    mStateBuffer = new IntStateBuffer(numStates, dumpIndex, mEventStatus);
+    if (mStateCount) {
+      mStateBuffer = new LongStateCountBuffer(numStates, dumpIndex, mEventStatus);
+    } else {
+      mStateBuffer = new IntStateBuffer(numStates, dumpIndex, mEventStatus);
+    }
     reset(numTrans, config);
   }
 
@@ -2434,7 +2450,11 @@ public class ListBufferTransitionRelation implements EventStatusProvider
                     final int config)
     throws OverflowException
   {
-    mStateBuffer = new IntStateBuffer(numStates, mEventStatus);
+    if (mStateCount) {
+      mStateBuffer = new LongStateCountBuffer(numStates, mEventStatus);
+    } else {
+      mStateBuffer = new IntStateBuffer(numStates, mEventStatus);
+    }
     reset(numTrans, config);
   }
 
@@ -2709,13 +2729,21 @@ public class ListBufferTransitionRelation implements EventStatusProvider
         dumpClass = partition.getUnusedClass();
       }
       final int newSize = partition.getNumberOfClasses();
-      final IntStateBuffer newStateBuffer;
+      final AbstractStateBuffer newStateBuffer;
       final int extraStates;
       if (dumpClass >= 0) {
-        newStateBuffer = new IntStateBuffer(newSize, dumpClass, mEventStatus);
+        if (mStateCount) {
+          newStateBuffer = new LongStateCountBuffer(newSize, dumpClass, mEventStatus);
+        } else {
+          newStateBuffer = new IntStateBuffer(newSize, dumpClass, mEventStatus);
+        }
         extraStates = 0;
       } else {
-        newStateBuffer = new IntStateBuffer(newSize, mEventStatus);
+        if (mStateCount) {
+          newStateBuffer = new LongStateCountBuffer(newSize, mEventStatus);
+        } else {
+          newStateBuffer = new IntStateBuffer(newSize, mEventStatus);
+        }
         extraStates = 1;
       }
       if (mSuccessorBuffer != null) {
@@ -3123,9 +3151,11 @@ public class ListBufferTransitionRelation implements EventStatusProvider
   private ComponentKind mKind;
 
   private final EventStatusProvider mEventStatus;
-  private IntStateBuffer mStateBuffer;
+  private AbstractStateBuffer mStateBuffer;
   private OutgoingTransitionListBuffer mSuccessorBuffer;
   private IncomingTransitionListBuffer mPredecessorBuffer;
+
+  private final boolean mStateCount = false;
 
 
   //#########################################################################
@@ -3140,6 +3170,12 @@ public class ListBufferTransitionRelation implements EventStatusProvider
    * an incoming transition buffer.
    */
   public static final int CONFIG_PREDECESSORS = 0x02;
+  /**
+   * Configuration setting specifying that the transition relation is to use
+   * a {@link LongStateCountBuffer}, which ignores the markings and
+   * propositions, whilst retaining the state count.
+   */
+  public static final int CONFIG_COUNT = 0x03;
   /**
    * Configuration setting specifying that the transition relation is to use
    * both an outgoing and an incoming transition buffer.
