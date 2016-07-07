@@ -33,6 +33,9 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
+
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntSetBuffer;
@@ -45,9 +48,6 @@ import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
-
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.set.hash.TIntHashSet;
 
 
 /**
@@ -357,7 +357,7 @@ public class SubsetConstructionTRSimplifier
   {
     if (mSetOffsets != null) {
       final ListBufferTransitionRelation rel = getTransitionRelation();
-      final IntStateBuffer oldStateBuffer = rel.getStateBuffer();
+      final IntStateBuffer oldStateBuffer = (IntStateBuffer) rel.getStateBuffer();
       final int numDetStates = mSetOffsets.size();
       final int numEvents = rel.getNumberOfProperEvents();
       final int numTrans = mTransitionBuffer.size();
