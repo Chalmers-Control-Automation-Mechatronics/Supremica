@@ -75,7 +75,7 @@ public class BDDStateCounterTest
     super.setUp();
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mMonolithicChecker = new NativeControllabilityChecker(factory);
-    mBDDChecker = new BDDControllabilityChecker(factory);
+    mBDDChecker = new BDDStateCounter(factory);
     mBDDChecker.setReorderingEnabled(true);
   }
 
@@ -615,6 +615,6 @@ public class BDDStateCounterTest
   //#########################################################################
   //# Data Members
   private ControllabilityChecker mMonolithicChecker;
-  private BDDControllabilityChecker mBDDChecker;
+  private BDDStateCounter mBDDChecker;
 
 }

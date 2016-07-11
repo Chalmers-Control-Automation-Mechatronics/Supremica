@@ -88,6 +88,13 @@ public interface ModelAnalyzerFactory
     (ProductDESProxyFactory factory)
     throws AnalysisConfigurationException;
 
+  /**
+   * Creates a state counter.
+   */
+  public StateCounter createStateCounter
+    (ProductDESProxyFactory factory)
+    throws AnalysisConfigurationException;
+
 
   //#########################################################################
   //# Command Line Arguments
