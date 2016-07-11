@@ -33,11 +33,11 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.list.array.TIntArrayList;
-
 import java.io.PrintWriter;
 
 import net.sourceforge.waters.model.des.StateProxy;
+
+import gnu.trove.list.array.TIntArrayList;
 
 
 /**
@@ -75,8 +75,6 @@ public abstract class AbstractStateBuffer
    * a <CODE>null</CODE> state, it is used as a reachable dump state,
    * otherwise an additional unreachable dump state is added to the end of
    * the state space.
-   * @param  eventEnc        Event encoding that defines event codes for
-   *                         proposition events used as markings of the states.
    * @param  stateEnc        State encoding that defines the assignment of
    *                         state codes for the states in the buffer.
    */
@@ -87,8 +85,6 @@ public abstract class AbstractStateBuffer
 
   /**
    * Creates a new state buffer.
-   * @param  eventEnc        Event encoding that defines event codes for
-   *                         proposition events used as markings of the states.
    * @param  stateEnc        State encoding that defines the assignment of
    *                         state codes for the states in the buffer.
    * @param  dumpState       Dump state to be used, or <CODE>null</CODE>.

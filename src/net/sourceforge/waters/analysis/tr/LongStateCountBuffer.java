@@ -33,9 +33,6 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TLongObjectHashMap;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -44,6 +41,9 @@ import java.util.Collection;
 
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
+
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TLongObjectHashMap;
 
 
 /**
@@ -104,8 +104,6 @@ public class LongStateCountBuffer extends AbstractStateBuffer
                               final StateProxy dumpState)
   {
     super(stateEnc, dumpState);
-
-    mPropositionStatus = eventEnc;
     final int numStates = stateEnc.getNumberOfStates();
     if (getDumpStateIndex() >= 0) {
       mStateInfo = new long[numStates];
@@ -168,7 +166,6 @@ public class LongStateCountBuffer extends AbstractStateBuffer
                         final int dumpIndex,
                         final EventStatusProvider propStatus)
   {
-    mPropositionStatus = propStatus;
     setDumpStateIndex(dumpIndex);
     mStateInfo = new long[size];
     Arrays.fill(mStateInfo, TAG_REACHABLE);
@@ -185,7 +182,6 @@ public class LongStateCountBuffer extends AbstractStateBuffer
   public LongStateCountBuffer(final LongStateCountBuffer buffer,
                         final EventStatusProvider propStatus)
   {
-    mPropositionStatus = propStatus;
     setDumpStateIndex(buffer.getDumpStateIndex());
     final int size = buffer.getNumberOfStates();
     mStateInfo = Arrays.copyOf(buffer.mStateInfo, size);
@@ -581,6 +577,7 @@ public class LongStateCountBuffer extends AbstractStateBuffer
     return writer.toString();
   }
 
+  @Override
   public void dump(final PrintWriter printer)
   {
     printer.print('{');
@@ -613,7 +610,6 @@ public class LongStateCountBuffer extends AbstractStateBuffer
 
   //#########################################################################
   //# Data Members
-  private final EventStatusProvider mPropositionStatus;
   private final long[] mStateInfo;
 
 
