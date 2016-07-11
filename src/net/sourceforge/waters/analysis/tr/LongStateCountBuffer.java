@@ -33,6 +33,9 @@
 
 package net.sourceforge.waters.analysis.tr;
 
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TLongObjectHashMap;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -41,9 +44,6 @@ import java.util.Collection;
 
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
-
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TLongObjectHashMap;
 
 
 /**
@@ -82,7 +82,7 @@ public class LongStateCountBuffer extends AbstractStateBuffer
    *                         state codes for the states in the buffer.
    */
   public LongStateCountBuffer(final EventEncoding eventEnc,
-                        final StateEncoding stateEnc)
+                              final StateEncoding stateEnc)
   {
     this(eventEnc, stateEnc, null);
   }
@@ -137,13 +137,10 @@ public class LongStateCountBuffer extends AbstractStateBuffer
    * <CODE>false</CODE>. An additional unreachable dump state is added
    * at the end.
    * @param  size       The number of states in the new buffer.
-   * @param  propStatus Event status provider to determine the number of
-   *                    propositions and which propositions are used.
    */
-  public LongStateCountBuffer(final int size,
-                        final EventStatusProvider propStatus)
+  public LongStateCountBuffer(final int size)
   {
-    this(size + 1, size, propStatus);
+    this(size + 1, size);
     mStateInfo[getDumpStateIndex()] = 0;
   }
 
@@ -159,12 +156,9 @@ public class LongStateCountBuffer extends AbstractStateBuffer
    *                    outgoing transitions. It must be specified for
    *                    every state buffer to provide for algorithms that
    *                    redirect transitions to such a state.
-   * @param  propStatus Event status provider to determine the number of
-   *                    propositions and which propositions are used.
    */
   public LongStateCountBuffer(final int size,
-                        final int dumpIndex,
-                        final EventStatusProvider propStatus)
+                        final int dumpIndex)
   {
     setDumpStateIndex(dumpIndex);
     mStateInfo = new long[size];
@@ -176,11 +170,8 @@ public class LongStateCountBuffer extends AbstractStateBuffer
    * state buffer. This copy constructor constructs a deep copy that does
    * not share any data structures with the given state buffer.
    * @param  buffer     The state buffer to be copied from.
-   * @param  propStatus Event status provider to determine the number of
-   *                    propositions and which propositions are used.
   */
-  public LongStateCountBuffer(final LongStateCountBuffer buffer,
-                        final EventStatusProvider propStatus)
+  public LongStateCountBuffer(final LongStateCountBuffer buffer)
   {
     setDumpStateIndex(buffer.getDumpStateIndex());
     final int size = buffer.getNumberOfStates();
@@ -190,6 +181,12 @@ public class LongStateCountBuffer extends AbstractStateBuffer
 
   //#########################################################################
   //# Simple Access
+  @Override
+  public LongStateCountBuffer clone(final EventStatusProvider propStatus)
+  {
+    return new LongStateCountBuffer(this);
+  }
+
   /**
    * Gets the number of states in the buffer.
    */

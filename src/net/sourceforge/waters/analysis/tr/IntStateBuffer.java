@@ -182,24 +182,25 @@ public class IntStateBuffer extends AbstractStateBuffer
    * @param  propStatus Event status provider to determine the number of
    *                    propositions and which propositions are used.
   */
-  public IntStateBuffer(final AbstractStateBuffer buffer,
+  public IntStateBuffer(final IntStateBuffer buffer,
                         final EventStatusProvider propStatus)
   {
     mPropositionStatus = propStatus;
     setDumpStateIndex(buffer.getDumpStateIndex());
     final int size = buffer.getNumberOfStates();
-
-    if (buffer instanceof IntStateBuffer) {
-      final IntStateBuffer buffer2 = (IntStateBuffer) buffer;
-      mStateInfo = Arrays.copyOf(buffer2.mStateInfo, size);
-    } else {
-      mStateInfo = null;
-    }
+    final IntStateBuffer buffer2 = buffer;
+    mStateInfo = Arrays.copyOf(buffer2.mStateInfo, size);
   }
 
 
   //#########################################################################
   //# Simple Access
+  @Override
+  public IntStateBuffer clone(final EventStatusProvider propStatus)
+  {
+    return new IntStateBuffer(this, propStatus);
+  }
+
   /**
    * Gets the number of states in the buffer.
    */

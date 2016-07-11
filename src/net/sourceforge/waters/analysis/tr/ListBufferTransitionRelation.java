@@ -320,7 +320,7 @@ public class ListBufferTransitionRelation implements EventStatusProvider
     mName = name;
     mKind = kind;
     if (mStateCount) {
-      mStateBuffer = new LongStateCountBuffer(numStates, dumpIndex, eventEnc);
+      mStateBuffer = new LongStateCountBuffer(numStates, dumpIndex);
     } else {
       mStateBuffer = new IntStateBuffer(numStates, dumpIndex, eventEnc);
     }
@@ -429,7 +429,7 @@ public class ListBufferTransitionRelation implements EventStatusProvider
     mEventStatus.setProperEventStatus(EventEncoding.TAU,
                                       EventStatus.STATUS_FULLY_LOCAL);
     if (mStateCount) {
-      mStateBuffer = new LongStateCountBuffer(numStates, dumpIndex, mEventStatus);
+      mStateBuffer = new LongStateCountBuffer(numStates, dumpIndex);
     } else {
       mStateBuffer = new IntStateBuffer(numStates, dumpIndex, mEventStatus);
     }
@@ -486,7 +486,7 @@ public class ListBufferTransitionRelation implements EventStatusProvider
   {
     this(rel,
          eventStatus,
-         new IntStateBuffer(rel.mStateBuffer, eventStatus),
+         rel.mStateBuffer.clone(eventStatus),
          config);
   }
 
@@ -515,7 +515,7 @@ public class ListBufferTransitionRelation implements EventStatusProvider
    */
   public ListBufferTransitionRelation(final ListBufferTransitionRelation rel,
                                       final EventStatusProvider eventStatus,
-                                      final IntStateBuffer stateBuffer,
+                                      final AbstractStateBuffer stateBuffer,
                                       final int config)
   {
     checkConfig(config);
@@ -2424,7 +2424,7 @@ public class ListBufferTransitionRelation implements EventStatusProvider
     throws OverflowException
   {
     if (mStateCount) {
-      mStateBuffer = new LongStateCountBuffer(numStates, dumpIndex, mEventStatus);
+      mStateBuffer = new LongStateCountBuffer(numStates, dumpIndex);
     } else {
       mStateBuffer = new IntStateBuffer(numStates, dumpIndex, mEventStatus);
     }
@@ -2451,7 +2451,7 @@ public class ListBufferTransitionRelation implements EventStatusProvider
     throws OverflowException
   {
     if (mStateCount) {
-      mStateBuffer = new LongStateCountBuffer(numStates, mEventStatus);
+      mStateBuffer = new LongStateCountBuffer(numStates);
     } else {
       mStateBuffer = new IntStateBuffer(numStates, mEventStatus);
     }
@@ -2733,14 +2733,14 @@ public class ListBufferTransitionRelation implements EventStatusProvider
       final int extraStates;
       if (dumpClass >= 0) {
         if (mStateCount) {
-          newStateBuffer = new LongStateCountBuffer(newSize, dumpClass, mEventStatus);
+          newStateBuffer = new LongStateCountBuffer(newSize, dumpClass);
         } else {
           newStateBuffer = new IntStateBuffer(newSize, dumpClass, mEventStatus);
         }
         extraStates = 0;
       } else {
         if (mStateCount) {
-          newStateBuffer = new LongStateCountBuffer(newSize, mEventStatus);
+          newStateBuffer = new LongStateCountBuffer(newSize);
         } else {
           newStateBuffer = new IntStateBuffer(newSize, mEventStatus);
         }

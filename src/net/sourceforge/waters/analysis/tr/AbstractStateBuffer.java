@@ -33,11 +33,11 @@
 
 package net.sourceforge.waters.analysis.tr;
 
+import gnu.trove.list.array.TIntArrayList;
+
 import java.io.PrintWriter;
 
 import net.sourceforge.waters.model.des.StateProxy;
-
-import gnu.trove.list.array.TIntArrayList;
 
 
 /**
@@ -187,6 +187,9 @@ public abstract class AbstractStateBuffer
 
   //#########################################################################
   //# Simple Access
+  @SuppressWarnings("javadoc")
+  public abstract AbstractStateBuffer clone(EventStatusProvider propStatus);
+
   /**
    * Gets the number of states in the buffer.
    */
