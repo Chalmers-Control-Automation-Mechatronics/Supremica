@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.map.hash.TObjectIntHashMap;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -43,6 +41,8 @@ import net.sourceforge.waters.analysis.monolithic.StateTupleEncoding;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.StateProxy;
+
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 
 /**
@@ -109,6 +109,10 @@ public class TRSynchronousProductStateMap
     mStateTupleEncoding.decode(mEncodedTuple, decodedTuple);
   }
 
+  public int getComposedState(final int[] decodedTuple)
+  {
+    return mStateSpace.get(decodedTuple);
+  }
 
   //#########################################################################
   //# Auxiliary Methods
