@@ -68,6 +68,7 @@ public class SimulationResetAction
     if (panel != null) {
       final Simulation sim = panel.getSimulation();
       sim.resetState(false);
+      SimulationAutoStepAction.toggle = false;
     }
   }
 

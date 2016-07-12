@@ -37,7 +37,6 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.Action;
 
-import net.sourceforge.waters.gui.flexfact.AutoStep;
 import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
 import net.sourceforge.waters.gui.util.IconLoader;
@@ -49,7 +48,7 @@ public class SimulationAutoStepAction
   extends WatersSimulationAction
 {
 
-  static boolean toggle = false;
+  public static boolean toggle = false;
 
   //#########################################################################
   //# Constructor
@@ -70,17 +69,8 @@ public class SimulationAutoStepAction
   {
     toggle = !toggle;
 
-    // If in auto mode
-    if(toggle == true){
-      final SimulatorPanel panel = getObservedSimulatorPanel();
-      if (panel != null) {
-        final Thread autostep = new Thread(new AutoStep(panel));
-        autostep.start();
-      }
-    }
-    else{
-      // Auto step interrupt
-    }
+    // Starts stepping through controllable events if there are any
+    getObservedSimulatorPanel().getSimulation().autoStep();
   }
 
 

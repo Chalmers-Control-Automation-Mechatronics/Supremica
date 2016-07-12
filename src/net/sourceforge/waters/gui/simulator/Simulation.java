@@ -44,14 +44,17 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 
 import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.ModuleContext;
+import net.sourceforge.waters.gui.actions.SimulationAutoStepAction;
 import net.sourceforge.waters.gui.flexfact.LocalServer;
 import net.sourceforge.waters.gui.flexfact.LocalSocket;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
@@ -329,6 +332,49 @@ public class Simulation implements ModelObserver, Observer
     final SimulationChangeEvent simEvent = new SimulationChangeEvent
       (this, SimulationChangeEvent.STATE_CHANGED);
     fireSimulationChangeEvent(simEvent);
+
+    // If the Autostep was turned on.
+    if(SimulationAutoStepAction.toggle){
+      autoStep();
+    }
+  }
+
+  /**
+   * Automatically steps through controllable events if there are any enabled.
+   */
+  public void autoStep()
+  {
+    final int numEvents = getEnabledSteps().size();
+
+    // Get controllable events from current possible events.
+    final List<SimulatorStep> possibleControllableEvents = new ArrayList<SimulatorStep>();
+    for(final SimulatorStep s : getEnabledSteps()){
+      if(s.getEvent().getKind() == EventKind.CONTROLLABLE)
+        possibleControllableEvents.add(s);
+    }
+    // If there's at least one controllable event
+    if (!possibleControllableEvents.isEmpty()){
+      final Random rand = new Random();
+
+      //Get random controllable event. If list is size of 1, get the first element.
+      final SimulatorStep c = possibleControllableEvents.get(possibleControllableEvents.size() == 1 ? 0 : rand.nextInt(possibleControllableEvents.size()));
+      if(Config.INCLUDE_FLEXFACT.isTrue()){
+        SwingUtilities.invokeLater(new Runnable() {
+          @Override
+          public void run()
+          {
+            try {
+              Thread.sleep(1000);
+            } catch (final InterruptedException exception) {
+              exception.printStackTrace();
+            }
+            if(getEnabledSteps().size() == numEvents && getEnabledSteps().contains(c)){
+             step(c);
+            }
+          }
+        });
+      }
+    }
   }
 
   /**
