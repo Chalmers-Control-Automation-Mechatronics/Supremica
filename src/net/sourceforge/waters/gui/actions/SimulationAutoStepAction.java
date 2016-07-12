@@ -34,14 +34,12 @@
 package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.util.List;
-import java.util.Random;
 
 import javax.swing.Action;
 
+import net.sourceforge.waters.gui.flexfact.AutoStep;
 import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
-import net.sourceforge.waters.gui.simulator.SimulatorStep;
 import net.sourceforge.waters.gui.util.IconLoader;
 
 import org.supremica.gui.ide.IDE;
@@ -50,6 +48,8 @@ import org.supremica.gui.ide.IDE;
 public class SimulationAutoStepAction
   extends WatersSimulationAction
 {
+
+  static boolean toggle = false;
 
   //#########################################################################
   //# Constructor
@@ -68,29 +68,18 @@ public class SimulationAutoStepAction
   @Override
   public void actionPerformed(final ActionEvent event)
   {
-    SimulatorPanel panel = getObservedSimulatorPanel();
-    if (panel != null) {
-      Simulation sim = panel.getSimulation();
-      List<SimulatorStep> possibleEvents = sim.getEnabledSteps();
-      while(!possibleEvents.isEmpty())
-      {
-        final Random rand = new Random();
-        rand.nextInt(possibleEvents.size());
-        try {
-          Thread.sleep(1000);
-        } catch (final InterruptedException exception) {
-          exception.printStackTrace();
-        }
-        sim.step(possibleEvents.get(rand.nextInt(possibleEvents.size())));
+    toggle = !toggle;
 
-        panel = getObservedSimulatorPanel();
-        if (panel != null) {
-          sim = panel.getSimulation();
-          possibleEvents = sim.getEnabledSteps();
-        }
-        else
-          break;
+    // If in auto mode
+    if(toggle == true){
+      final SimulatorPanel panel = getObservedSimulatorPanel();
+      if (panel != null) {
+        final Thread autostep = new Thread(new AutoStep(panel));
+        autostep.start();
       }
+    }
+    else{
+      // Auto step interrupt
     }
   }
 
