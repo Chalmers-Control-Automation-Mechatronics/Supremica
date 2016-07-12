@@ -74,7 +74,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mTraceMarshaller = new JAXBTraceMarshaller(factory);
     mModelVerifier = createModelVerifier(factory);
-    setNodeLimit();
+    setNodeLimit(mModelVerifier);
   }
 
 
@@ -413,6 +413,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     mModelVerifier.setModel(des);
   }
 
+
   //#########################################################################
   //# Auxiliary Methods
   protected void runModelVerifierWithBindings(final ProductDESProxy des,
@@ -449,17 +450,6 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
       }
     }
     getLogger().info("Done " + des.getName());
-  }
-
-  private void setNodeLimit()
-  {
-    if (mModelVerifier.getNodeLimit() == Integer.MAX_VALUE) {
-      final String prop = System.getProperty("waters.analysis.statelimit");
-      if (prop != null) {
-        final int limit = Integer.parseInt(prop);
-        mModelVerifier.setNodeLimit(limit);
-      }
-    }
   }
 
 
