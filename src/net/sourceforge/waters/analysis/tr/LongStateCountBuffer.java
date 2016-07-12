@@ -76,21 +76,16 @@ public class LongStateCountBuffer extends AbstractStateBuffer
    * a <CODE>null</CODE> state, it is used as a reachable dump state,
    * otherwise an additional unreachable dump state is added to the end of
    * the state space.
-   * @param  eventEnc        Event encoding that defines event codes for
-   *                         proposition events used as markings of the states.
    * @param  stateEnc        State encoding that defines the assignment of
    *                         state codes for the states in the buffer.
    */
-  public LongStateCountBuffer(final EventEncoding eventEnc,
-                              final StateEncoding stateEnc)
+  public LongStateCountBuffer(final StateEncoding stateEnc)
   {
-    this(eventEnc, stateEnc, null);
+    this(stateEnc, null);
   }
 
   /**
    * Creates a new state buffer.
-   * @param  eventEnc        Event encoding that defines event codes for
-   *                         proposition events used as markings of the states.
    * @param  stateEnc        State encoding that defines the assignment of
    *                         state codes for the states in the buffer.
    * @param  dumpState       Dump state to be used, or <CODE>null</CODE>.
@@ -99,8 +94,7 @@ public class LongStateCountBuffer extends AbstractStateBuffer
    *                         otherwise an additional unreachable dump state
    *                         is added to the end of the state space.
    */
-  public LongStateCountBuffer(final EventEncoding eventEnc,
-                              final StateEncoding stateEnc,
+  public LongStateCountBuffer(final StateEncoding stateEnc,
                               final StateProxy dumpState)
   {
     super(stateEnc, dumpState);
@@ -117,12 +111,6 @@ public class LongStateCountBuffer extends AbstractStateBuffer
         long info = TAG_REACHABLE;
         if (state.isInitial()) {
           info |= TAG_INITIAL;
-        }
-        for (final EventProxy prop : state.getPropositions()) {
-          final int p = eventEnc.getEventCode(prop);
-          if (p >= 0 && eventEnc.isPropositionUsed(p)) {
-            info |= (1 << p);
-          }
         }
         mStateInfo[s] = info;
       }
@@ -158,7 +146,7 @@ public class LongStateCountBuffer extends AbstractStateBuffer
    *                    redirect transitions to such a state.
    */
   public LongStateCountBuffer(final int size,
-                        final int dumpIndex)
+                              final int dumpIndex)
   {
     setDumpStateIndex(dumpIndex);
     mStateInfo = new long[size];
@@ -256,7 +244,7 @@ public class LongStateCountBuffer extends AbstractStateBuffer
   @Override
   public boolean isMarked(final int state, final int prop)
   {
-    return false;
+    return true;
   }
 
   /**
@@ -398,69 +386,7 @@ public class LongStateCountBuffer extends AbstractStateBuffer
   @Override
   public void copyMarkings(final int source, final int dest)
   {
-
-  }
-
-  /**
-   * Creates markings pattern representing an empty set of propositions.
-   */
-  @Override
-  public long createMarkings()
-  {
-    return 0;
-  }
-
-  /**
-   * Creates markings pattern for the given propositions.
-   * @param  props    Collection of proposition IDs defining a state marking.
-   * @return A number identifying the given combination of propositions.
-   * @see #setAllMarkings(int,long) setAllMarkings()
-   */
-  @Override
-  public long createMarkings(final TIntArrayList props)
-  {
-    return 0;
-  }
-
-  /**
-   * Adds a marking to a given marking pattern.
-   * @param  markings  Marking pattern to be augmented.
-   * @param  prop      Code of proposition to be added to pattern.
-   * @return A number identifying a marking consisting of all propositions
-   *         contained in the given markings, plus the the additional marking.
-   * @see #mergeMarkings(long, long)
-   * @see #setAllMarkings(int,long) setAllMarkings()
-   */
-  @Override
-  public long addMarking(final long markings, final int prop)
-  {
-    return 0;
-  }
-
-  /**
-   * Checks whether the given marking pattern contains the given proposition.
-   * @param  markings  Marking pattern to be examined.
-   * @param  prop      Code of proposition to be tested.
-   * @return <CODE>true</CODE> if the marking pattern includes the given
-   *         proposition, <CODE>false</CODE> otherwise.
-   */
-  @Override
-  public boolean isMarked(final long markings, final int prop)
-  {
-    return false;
-  }
-
-  /**
-   * Combines two marking patterns.
-   * @return A number identifying a marking consisting of all propositions
-   *         contained in one of the two input marking patterns.
-   * @see #addMarking(long, int)
-   * @see #setAllMarkings(int,long) setAllMarkings()
-   */
-  @Override
-  public long mergeMarkings(final long markings1, final long markings2)
-  {
-    return 0;
+    mStateInfo[dest] |= (mStateInfo[source] & ~TAG_ALL);
   }
 
   /**

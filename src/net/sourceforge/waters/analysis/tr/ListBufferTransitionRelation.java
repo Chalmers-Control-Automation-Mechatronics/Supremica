@@ -213,7 +213,7 @@ public class ListBufferTransitionRelation implements EventStatusProvider
     checkConfig(config);
     mName = aut.getName();
     mKind = aut.getKind();
-    // TODO put events in eventEnc
+    // Put events in eventEnc
     final Set<EventProxy> events = new THashSet<>(aut.getEvents());
     if (stateEnc == null) {
       stateEnc = new StateEncoding(aut);
@@ -224,7 +224,7 @@ public class ListBufferTransitionRelation implements EventStatusProvider
     final int numStates = stateEnc.getNumberOfStates() + 1;
     final int numTrans = aut.getTransitions().size();
     if (mStateCount) {
-      mStateBuffer = new LongStateCountBuffer(eventEnc, stateEnc, dumpState);
+      mStateBuffer = new LongStateCountBuffer(stateEnc, dumpState);
     } else {
       mStateBuffer = new IntStateBuffer(eventEnc, stateEnc, dumpState);
     }
@@ -3155,6 +3155,10 @@ public class ListBufferTransitionRelation implements EventStatusProvider
   private OutgoingTransitionListBuffer mSuccessorBuffer;
   private IncomingTransitionListBuffer mPredecessorBuffer;
 
+  /**
+   * If set to true, use {@link LongStateCountBuffer};
+   * if set of false, use {@link IntStateBuffer}.
+   */
   private final boolean mStateCount = false;
 
 

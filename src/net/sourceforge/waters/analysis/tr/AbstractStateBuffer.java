@@ -104,28 +104,6 @@ public abstract class AbstractStateBuffer
         break;
       }
     }
-    /*if (mDumpStateIndex >= 0) {
-      mStateInfo = new int[numStates];
-    } else {
-      mDumpStateIndex = numStates;
-      mStateInfo = new int[numStates + 1];
-    }
-    for (int s = 0; s < numStates; s++) {
-      final StateProxy state = stateEnc.getState(s);
-      if (state != null) {
-        int info = TAG_REACHABLE;
-        if (state.isInitial()) {
-          info |= TAG_INITIAL;
-        }
-        for (final EventProxy prop : state.getPropositions()) {
-          final int p = eventEnc.getEventCode(prop);
-          if (p >= 0 && eventEnc.isPropositionUsed(p)) {
-            info |= (1 << p);
-          }
-        }
-        mStateInfo[s] = info;
-      }
-    }*/
   }
 
   /**
@@ -140,7 +118,7 @@ public abstract class AbstractStateBuffer
    *                    propositions and which propositions are used.
    */
   public AbstractStateBuffer(final int size,
-                        final EventStatusProvider propStatus)
+                             final EventStatusProvider propStatus)
   {
 
   }
@@ -167,27 +145,9 @@ public abstract class AbstractStateBuffer
 
   }
 
-  /**
-   * Creates a new state buffer that is an identical copy of the given
-   * state buffer. This copy constructor constructs a deep copy that does
-   * not share any data structures with the given state buffer.
-   * @param  buffer     The state buffer to be copied from.
-   * @param  propStatus Event status provider to determine the number of
-   *                    propositions and which propositions are used.
-  */
-  /*public AbstractStateBuffer(final AbstractStateBuffer buffer,
-                        final EventStatusProvider propStatus)
-  {
-    mPropositionStatus = propStatus;
-    mDumpStateIndex = buffer.mDumpStateIndex;
-    final int size = buffer.getNumberOfStates();
-    mStateInfo = Arrays.copyOf(buffer.mStateInfo, size);
-  }*/
-
 
   //#########################################################################
   //# Simple Access
-  @SuppressWarnings("javadoc")
   public abstract AbstractStateBuffer clone(EventStatusProvider propStatus);
 
   /**
@@ -247,6 +207,18 @@ public abstract class AbstractStateBuffer
   public abstract boolean isMarked(final int state, final int prop);
 
   /**
+   * Checks whether the given marking pattern contains the given proposition.
+   * @param  markings  Marking pattern to be examined.
+   * @param  prop      Code of proposition to be tested.
+   * @return <CODE>true</CODE> if the marking pattern includes the given
+   *         proposition, <CODE>false</CODE> otherwise.
+   */
+  public boolean isMarked(final long markings, final int prop)
+  {
+    return (markings & (1L << prop)) != 0;
+  }
+
+  /**
    * Gets the total number of markings in this state buffer.
    * Each instance of a proposition marking a reachable state counts
    * as marking.
@@ -280,6 +252,20 @@ public abstract class AbstractStateBuffer
    * @see #setAllMarkings(int,long) setAllMarkings()
    */
   public abstract long getAllMarkings(final int state);
+
+  /**
+   * Adds a marking to a given marking pattern.
+   * @param  markings  Marking pattern to be augmented.
+   * @param  prop      Code of proposition to be added to pattern.
+   * @return A number identifying a marking consisting of all propositions
+   *         contained in the given markings, plus the the additional marking.
+   * @see #mergeMarkings(long, long)
+   * @see #setAllMarkings(int,long) setAllMarkings()
+   */
+  public long addMarking(final long markings, final int prop)
+  {
+    return markings | (1L << prop);
+  }
 
   /**
    * Sets the marking of a state.
@@ -345,7 +331,10 @@ public abstract class AbstractStateBuffer
   /**
    * Creates markings pattern representing an empty set of propositions.
    */
-  public abstract long createMarkings();
+  public long createMarkings()
+  {
+    return 0;
+  }
 
   /**
    * Creates markings pattern for the given propositions.
@@ -353,27 +342,14 @@ public abstract class AbstractStateBuffer
    * @return A number identifying the given combination of propositions.
    * @see #setAllMarkings(int,long) setAllMarkings()
    */
-  public abstract long createMarkings(final TIntArrayList props);
-
-  /**
-   * Adds a marking to a given marking pattern.
-   * @param  markings  Marking pattern to be augmented.
-   * @param  prop      Code of proposition to be added to pattern.
-   * @return A number identifying a marking consisting of all propositions
-   *         contained in the given markings, plus the the additional marking.
-   * @see #mergeMarkings(long, long)
-   * @see #setAllMarkings(int,long) setAllMarkings()
-   */
-  public abstract long addMarking(final long markings, final int prop);
-
-  /**
-   * Checks whether the given marking pattern contains the given proposition.
-   * @param  markings  Marking pattern to be examined.
-   * @param  prop      Code of proposition to be tested.
-   * @return <CODE>true</CODE> if the marking pattern includes the given
-   *         proposition, <CODE>false</CODE> otherwise.
-   */
-  public abstract boolean isMarked(final long markings, final int prop);
+  public long createMarkings(final TIntArrayList props)
+  {
+    int result = 0;
+    for (int p = 0; p < props.size(); p++) {
+      result |= 1 << props.get(p);
+    }
+    return result;
+  }
 
   /**
    * Combines two marking patterns.
@@ -382,7 +358,10 @@ public abstract class AbstractStateBuffer
    * @see #addMarking(long, int)
    * @see #setAllMarkings(int,long) setAllMarkings()
    */
-  public abstract long mergeMarkings(final long markings1, final long markings2);
+  public long mergeMarkings(final long markings1, final long markings2)
+  {
+    return markings1 | markings2;
+  }
 
   /**
    * Ensures all propositions are marked as used. All propositions marked

@@ -196,7 +196,7 @@ public class IntStateBuffer extends AbstractStateBuffer
   //#########################################################################
   //# Simple Access
   @Override
-  public IntStateBuffer clone(final EventStatusProvider propStatus)
+  public AbstractStateBuffer clone(final EventStatusProvider propStatus)
   {
     return new IntStateBuffer(this, propStatus);
   }
@@ -446,72 +446,6 @@ public class IntStateBuffer extends AbstractStateBuffer
   public void copyMarkings(final int source, final int dest)
   {
     mStateInfo[dest] |= (mStateInfo[source] & ~TAG_ALL);
-  }
-
-  /**
-   * Creates markings pattern representing an empty set of propositions.
-   */
-  @Override
-  public long createMarkings()
-  {
-    return 0;
-  }
-
-  /**
-   * Creates markings pattern for the given propositions.
-   * @param  props    Collection of proposition IDs defining a state marking.
-   * @return A number identifying the given combination of propositions.
-   * @see #setAllMarkings(int,long) setAllMarkings()
-   */
-  @Override
-  public long createMarkings(final TIntArrayList props)
-  {
-    int result = 0;
-    for (int p = 0; p < props.size(); p++) {
-      result |= 1 << props.get(p);
-    }
-    return result;
-  }
-
-  /**
-   * Adds a marking to a given marking pattern.
-   * @param  markings  Marking pattern to be augmented.
-   * @param  prop      Code of proposition to be added to pattern.
-   * @return A number identifying a marking consisting of all propositions
-   *         contained in the given markings, plus the the additional marking.
-   * @see #mergeMarkings(long, long)
-   * @see #setAllMarkings(int,long) setAllMarkings()
-   */
-  @Override
-  public long addMarking(final long markings, final int prop)
-  {
-    return markings | (1L << prop);
-  }
-
-  /**
-   * Checks whether the given marking pattern contains the given proposition.
-   * @param  markings  Marking pattern to be examined.
-   * @param  prop      Code of proposition to be tested.
-   * @return <CODE>true</CODE> if the marking pattern includes the given
-   *         proposition, <CODE>false</CODE> otherwise.
-   */
-  @Override
-  public boolean isMarked(final long markings, final int prop)
-  {
-    return (markings & (1L << prop)) != 0;
-  }
-
-  /**
-   * Combines two marking patterns.
-   * @return A number identifying a marking consisting of all propositions
-   *         contained in one of the two input marking patterns.
-   * @see #addMarking(long, int)
-   * @see #setAllMarkings(int,long) setAllMarkings()
-   */
-  @Override
-  public long mergeMarkings(final long markings1, final long markings2)
-  {
-    return markings1 | markings2;
   }
 
   /**
