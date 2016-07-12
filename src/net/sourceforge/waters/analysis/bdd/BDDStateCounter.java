@@ -33,178 +33,90 @@
 
 package net.sourceforge.waters.analysis.bdd;
 
-import gnu.trove.map.hash.TObjectDoubleHashMap;
-import java.util.ArrayList;
-import java.util.List;
-
 import net.sf.javabdd.BDD;
-import net.sf.javabdd.BDDFactory;
-
+import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.AnalysisResult;
+import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.des.StateCounter;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 /**
- * A utility class to determine the number of synchronous product states
- * from a state set given as a {@link BDD}.
+ * <P>A BDD implementation of a state counter.</P>
+ *
+ * <P>This model verifier constructs the synchronous composition of its
+ * input under all circumstances and returns the total number of reachable
+ * states in the analysis result
+ * (retrieved by {@link AnalysisResult#getTotalNumberOfStates()}).</P>
  *
  * @author Robi Malik
  */
 
-class BDDStateCounter
+public class BDDStateCounter
+  extends BDDModelVerifier
+  implements StateCounter
 {
 
   //#########################################################################
   //# Constructors
-  BDDStateCounter(final BDDFactory factory,
-                  final AutomatonBDD[] autBDDbyVarIndex)
+  /**
+   * Creates a new BDD-based state counter.
+   * @param  factory     The factory used for trace construction
+   *                     (not needed for state counting).
+   */
+  public BDDStateCounter(final ProductDESProxyFactory factory)
   {
-    mBDDFactory = factory;
-    mAutomatonBDDbyVarIndex = autBDDbyVarIndex;
-    final int numvars = mBDDFactory.varNum();
-    mOrderedAutomatonBDDs = new ArrayList<AutomatonBDD>(numvars);
-    AutomatonBDD prev = null;
-    for (int l = 0; l < numvars; l++) {
-      final int varindex = mBDDFactory.level2Var(l);
-      final AutomatonBDD autBDD = mAutomatonBDDbyVarIndex[varindex];
-      if (autBDD != prev) {
-        mOrderedAutomatonBDDs.add(autBDD);
-        prev = autBDD;
-      }
-    }
-    mCache = new TObjectDoubleHashMap<BDD>();
+    this(null, factory);
+  }
+
+  /**
+   * Creates a new BDD-based state counter for a particular model.
+   * @param  model       The model to be analysed by this state counter.
+   * @param  factory     The factory used for trace construction
+   *                     (not needed for state counting).
+   */
+  public BDDStateCounter(final ProductDESProxy model,
+                         final ProductDESProxyFactory factory)
+  {
+    super(model, IdenticalKindTranslator.getInstance(), factory);
   }
 
 
   //#########################################################################
   //# Invocation
-  public double count(final BDD bdd)
+  @Override
+  public boolean run()
+    throws AnalysisException
   {
-    if (mOrderedAutomatonBDDs.isEmpty()) {
-      return 1.0;
-    } else {
-      return getOpenCount(bdd, 0);
-    }
-  }
-
-
-  //#########################################################################
-  //# Algorithm
-  private double getOpenCount(final BDD bdd, int autindex)
-  {
-    if (bdd.isZero()) {
-      return 0.0;
-    } else if (bdd.isOne()) {
-      return getStateProduct(autindex);
-    }
-    final int varindex = bdd.var();
-    AutomatonBDD autBDD = mOrderedAutomatonBDDs.get(autindex);
-    double factor = 1.0;
-    while (mAutomatonBDDbyVarIndex[varindex] != autBDD) {
-      factor *= autBDD.getNumberOfEncodedStates();
-      autindex++;
-      autBDD = mOrderedAutomatonBDDs.get(autindex);
-    }
-    double result = mCache.get(bdd);
-    if (result == 0.0) {
-      final int numbits = autBDD.getNumberOfStateBits();
-      result = getOpenCount(bdd, autindex, 0, 0, numbits);
-      mCache.put(bdd, result);
-    }
-    return factor * result;
-  }
-
-  private double getOpenCount(final BDD bdd,
-                              final int autindex,
-                              final int falsemask,
-                              final int truemask,
-                              int openbits)
-  {
-    if (bdd.isZero()) {
-      return 0.0;
-    }
-    final AutomatonBDD autBDD = mOrderedAutomatonBDDs.get(autindex);
-    final int firstuse2 = autBDD.getFirstUse2();
-    if (truemask >= firstuse2) { // truemask is the lowest possible value.
-      if ((truemask & 1) != 0) {
-        return 0.0;
-      } else if ((falsemask & 1) == 0) {
-        openbits--;
+    getLogger().debug("BDDSafetyVerifier.run(): " +
+                      getModel().getName() + " ...");
+    try {
+      setUp();
+      createAutomatonBDDs();
+      createEventBDDs();
+      final BDD reachable = computeReachability();
+      reachable.free();
+      return setSatisfiedResult();
+    } catch (final AnalysisException exception) {
+      throw setExceptionResult(exception);
+    } catch (final OutOfMemoryError error) {
+      System.gc();
+      final OverflowException overflow = new OverflowException(error);
+      throw setExceptionResult(overflow);
+    } catch (final WatersRuntimeException exception) {
+      if (exception.getCause() instanceof AnalysisException) {
+        final AnalysisException cause = (AnalysisException) exception.getCause();
+        throw setExceptionResult(cause);
+      } else {
+        throw exception;
       }
-      return getClosedCount(bdd, autindex, openbits);
+    } finally {
+      tearDown();
+      getLogger().debug("BDDStateCounter.run(): " +
+                        getModel().getName() + " done.");
     }
-    final int numbits = autBDD.getNumberOfStateBits();
-    final int mask = (1 << numbits) - 1;
-    final int maxcode = mask & ~falsemask;
-    if (maxcode < firstuse2) {
-      return getClosedCount(bdd, autindex, openbits);
-    }
-    final int varindex;
-    final boolean newvar;
-    if (bdd.isOne()) {
-      varindex = -1;
-      newvar = true;
-    } else {
-      varindex = bdd.var();
-      newvar = (mAutomatonBDDbyVarIndex[varindex] != autBDD);
-    }
-    if (newvar) {
-      final int bothmask = falsemask | truemask;
-      int bit = numbits - 1;
-      int bitmask = 1 << bit;
-      while ((bitmask & bothmask) != 0) {
-        bit--;
-        bitmask = 1 << bit;
-      }
-      openbits--;
-      return
-        getOpenCount(bdd, autindex, falsemask | bitmask, truemask, openbits) +
-        getOpenCount(bdd, autindex, falsemask, truemask | bitmask, openbits);
-    }
-    final BDD low = bdd.low();
-    final BDD high = bdd.high();
-    final int bitindex = autBDD.getBitIndex(varindex);
-    final int bitmask = 1 << bitindex;
-    openbits--;
-    return
-      getOpenCount(low, autindex, falsemask | bitmask, truemask, openbits) +
-      getOpenCount(high, autindex, falsemask, truemask | bitmask, openbits);
   }
-
-  private double getClosedCount(final BDD bdd,
-                                final int autindex,
-                                int openbits)
-  {
-    if (bdd.isZero()) {
-      return 0.0;
-    } else if (bdd.isOne()) {
-      return (1 << openbits) * getStateProduct(autindex + 1);
-    }
-    final int varindex = bdd.var();
-    final AutomatonBDD autBDD = mOrderedAutomatonBDDs.get(autindex);
-    if (mAutomatonBDDbyVarIndex[varindex] != autBDD) {
-      return (1 << openbits) * getOpenCount(bdd, autindex + 1);
-    }
-    final BDD low = bdd.low();
-    final BDD high = bdd.high();
-    openbits--;
-    return getClosedCount(low, autindex, openbits) +
-           getClosedCount(high, autindex, openbits);
-  }
-
-  private double getStateProduct(final int autindex)
-  {
-    double result = 1.0;
-    for (int a = autindex; a < mOrderedAutomatonBDDs.size(); a++) {
-      final AutomatonBDD autBDD = mOrderedAutomatonBDDs.get(a);
-      result *= autBDD.getNumberOfEncodedStates();
-    }
-    return result;
-  }
-
-
-  //#########################################################################
-  //# Data Members
-  private final BDDFactory mBDDFactory;
-  private final AutomatonBDD[] mAutomatonBDDbyVarIndex;
-  private final List<AutomatonBDD> mOrderedAutomatonBDDs;
-  private final TObjectDoubleHashMap<BDD> mCache;
 
 }

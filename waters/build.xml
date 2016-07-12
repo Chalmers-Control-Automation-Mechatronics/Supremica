@@ -219,6 +219,7 @@
       <class name="net.sourceforge.waters.cpp.analysis.NativeHashSet"/>
       <class name="net.sourceforge.waters.cpp.analysis.NativeModelAnalyzer"/>
       <class name="net.sourceforge.waters.cpp.analysis.NativeSafetyVerifier"/>
+      <class name="net.sourceforge.waters.cpp.analysis.NativeStateCounter"/>
       <class name="net.sourceforge.waters.cpp.analysis.NativeWordSizeTest"/>
     </javah>
   </target>

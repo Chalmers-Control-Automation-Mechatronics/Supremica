@@ -36,6 +36,7 @@ package net.sourceforge.waters.cpp.analysis;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentBoolean;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
+import net.sourceforge.waters.model.analysis.des.StateCounter;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -110,6 +111,13 @@ public class NativeModelVerifierFactory
     (final ProductDESProxyFactory factory)
   {
     return new NativeLanguageInclusionChecker(factory);
+  }
+
+  @Override
+  public StateCounter createStateCounter
+    (final ProductDESProxyFactory factory)
+  {
+    return new NativeStateCounter(factory);
   }
 
 

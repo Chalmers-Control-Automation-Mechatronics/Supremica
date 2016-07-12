@@ -34,90 +34,41 @@
 package net.sourceforge.waters.cpp.analysis;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.VerificationResult;
-import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.analysis.AnalysisResult;
+import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
+import net.sourceforge.waters.model.analysis.des.StateCounter;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.TraceProxy;
 
 
 /**
+ * <P>A monolithic state counter implementation, written in C++.</P>
+ *
  * @author Robi Malik
  */
 
-public abstract class NativeModelVerifier
+public class NativeStateCounter
   extends NativeModelAnalyzer
-  implements ModelVerifier
+  implements StateCounter
 {
 
   //#########################################################################
   //# Constructors
-  public NativeModelVerifier(final ProductDESProxyFactory factory,
-                             final KindTranslator translator)
+  public NativeStateCounter(final ProductDESProxyFactory factory)
   {
-    this(null, factory, translator);
+    this(null, factory);
   }
 
-  public NativeModelVerifier(final ProductDESProxy model,
-                             final ProductDESProxyFactory factory,
-                             final KindTranslator translator)
+  public NativeStateCounter(final ProductDESProxy model,
+                            final ProductDESProxyFactory factory)
   {
-    super(model, factory, translator);
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelVerifier
-  @Override
-  public void setCounterExampleEnabled(final boolean enable)
-  {
-    setDetailedOutputEnabled(enable);
-  }
-
-  @Override
-  public boolean isCounterExampleEnabled()
-  {
-    return isDetailedOutputEnabled();
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelVerifier
-  @Override
-  public boolean isSatisfied()
-  {
-    final VerificationResult result = getAnalysisResult();
-    if (result != null) {
-      return result.isSatisfied();
-    } else {
-      throw new IllegalStateException("Call run() first!");
-    }
-  }
-
-  @Override
-  public TraceProxy getCounterExample()
-  {
-    if (isSatisfied()) {
-      throw new IllegalStateException("No trace for satisfied property!");
-    } else {
-      final VerificationResult result = getAnalysisResult();
-      return result.getCounterExample();
-    }
-  }
-
-  @Override
-  public VerificationResult getAnalysisResult()
-  {
-    return (VerificationResult) super.getAnalysisResult();
+    super(model, factory, ConflictKindTranslator.getInstanceUncontrollable());
   }
 
 
   //#########################################################################
   //# Native Methods
   @Override
-  abstract VerificationResult runNativeAlgorithm() throws AnalysisException;
-
-  public abstract String getTraceName();
+  native AnalysisResult runNativeAlgorithm() throws AnalysisException;
 
 }

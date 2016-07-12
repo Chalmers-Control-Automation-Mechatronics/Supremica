@@ -137,6 +137,7 @@ public:
   virtual bool runSafetyCheck();
   virtual bool runNonblockingCheck();
   virtual bool runLoopCheck();
+  virtual void runStateCount();
   virtual jni::SafetyTraceGlue getSafetyCounterExample
     (const jni::NativeSafetyVerifierGlue& gchecker) const;
   virtual jni::ConflictTraceGlue getConflictCounterExample

@@ -60,11 +60,21 @@ public class ConflictKindTranslator
 
   //#########################################################################
   //# Singleton Pattern
+  /**
+   * Returns a kind translator that remaps all plants and specifications as
+   * plants, and all controllable and uncontrollable events as the same
+   * controllable.
+   */
   public static ConflictKindTranslator getInstanceControllable()
   {
     return SingletonHolderControllable.theInstance;
   }
 
+  /**
+   * Returns a kind translator that remaps all plants and specifications as
+   * plants, and all controllable and uncontrollable events as the same
+   * uncontrollable.
+   */
   public static ConflictKindTranslator getInstanceUncontrollable()
   {
     return SingletonHolderUncontrollable.theInstance;

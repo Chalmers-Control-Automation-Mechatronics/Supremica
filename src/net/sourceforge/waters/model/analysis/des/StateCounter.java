@@ -31,41 +31,21 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.bdd;
+package net.sourceforge.waters.model.analysis.des;
 
-import net.sourceforge.waters.model.analysis.AbstractStateCounterTest;
-import net.sourceforge.waters.model.analysis.des.StateCounter;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.analysis.AnalysisResult;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+/**
+ * <P>A model analyser used for gathering statistics.</P>
+ *
+ * <P>A state counter does not necessarily perform any analysis or verification
+ * task, and returns a true verification result for all inputs. It typically
+ * provides some information in its {@link AnalysisResult}, such as the number
+ * of reachable states.</P>
+ *
+ * @author Robi Malik
+ */
 
-
-public class BDDStateCounterTest
-  extends AbstractStateCounterTest
+public interface StateCounter extends ModelAnalyzer
 {
-
-  //#########################################################################
-  //# Entry points in junit.framework.TestCase
-  public static Test suite()
-  {
-    final TestSuite testSuite = new TestSuite(BDDStateCounterTest.class);
-    return testSuite;
-  }
-
-  public static void main(final String[] args)
-  {
-    junit.textui.TestRunner.run(suite());
-  }
-
-
-  //#########################################################################
-  //# Overrides for base class
-  //# net.sourceforge.waters.model.analysis.AbstractStateCounterTest
-  @Override
-  protected StateCounter createStateCounter(final ProductDESProxyFactory factory)
-  {
-    return new BDDStateCounter(factory);
-  }
-
 }

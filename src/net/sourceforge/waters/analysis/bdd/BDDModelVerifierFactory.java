@@ -109,6 +109,13 @@ public class BDDModelVerifierFactory
     return new BDDLanguageInclusionChecker(factory);
   }
 
+  @Override
+  public BDDStateCounter createStateCounter
+    (final ProductDESProxyFactory factory)
+  {
+    return new BDDStateCounter(factory);
+  }
+
 
   //#########################################################################
   //# Inner Class CommandLineArgumentPack

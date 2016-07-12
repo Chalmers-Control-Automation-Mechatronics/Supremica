@@ -276,6 +276,7 @@ setup()
   // Collect transitions ...
   if (!isTrivial()) {
     switch (getCheckType()) {
+    case CHECK_TYPE_COUNT:
     case CHECK_TYPE_SAFETY:
       setupSafety(eventMap);
       break;

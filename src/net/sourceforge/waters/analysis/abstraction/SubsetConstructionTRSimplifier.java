@@ -33,10 +33,10 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import net.sourceforge.waters.analysis.tr.AbstractStateBuffer;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntSetBuffer;
-import net.sourceforge.waters.analysis.tr.IntStateBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.OneEventCachingTransitionIterator;
 import net.sourceforge.waters.analysis.tr.PreTransitionBuffer;
@@ -357,7 +357,7 @@ public class SubsetConstructionTRSimplifier
   {
     if (mSetOffsets != null) {
       final ListBufferTransitionRelation rel = getTransitionRelation();
-      final IntStateBuffer oldStateBuffer = rel.getStateBuffer();
+      final AbstractStateBuffer oldStateBuffer = rel.getStateBuffer();
       final int numDetStates = mSetOffsets.size();
       final int numEvents = rel.getNumberOfProperEvents();
       final int numTrans = mTransitionBuffer.size();

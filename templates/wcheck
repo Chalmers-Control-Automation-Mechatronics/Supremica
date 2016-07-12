@@ -50,6 +50,9 @@ for F in "$@"; do
     -cont)
         CHECK="ControllabilityChecker"
         ;;
+    -count)
+        CHECK="StateCounter"
+        ;;
     -lang)
         CHECK="LanguageInclusionChecker"
         ;;
