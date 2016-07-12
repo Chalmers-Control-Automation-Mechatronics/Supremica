@@ -65,6 +65,7 @@
 #include "jni/glue/NativeConflictCheckerGlue.h"
 #include "jni/glue/NativeControlLoopCheckerGlue.h"
 #include "jni/glue/NativeSafetyVerifierGlue.h"
+#include "jni/glue/NativeStateCounterGlue.h"
 #include "jni/glue/NativeVerificationResultGlue.h"
 #include "jni/glue/OverflowExceptionGlue.h"
 #include "jni/glue/SafetyTraceGlue.h"
@@ -405,6 +406,23 @@ runLoopCheck()
   }
 }
 
+void ProductExplorer::
+runStateCount()
+{
+  try {
+    mStartTime = clock();
+    mCheckType = CHECK_TYPE_COUNT;
+    setup();
+    storeInitialStates(true);
+    doSafetySearch();
+    teardown();
+    mStopTime = clock();
+  } catch (...) {
+    teardown();
+    throw;
+  }
+}
+
 
 jni::SafetyTraceGlue ProductExplorer::
 getSafetyCounterExample(const jni::NativeSafetyVerifierGlue& gchecker)
@@ -562,6 +580,10 @@ setup()
   case CHECK_TYPE_LOOP:
     mStateSpace = new TarjanStateSpace(mEncoding, mStateLimit);
     mDepthMap = new ArrayList<uint32_t>(2); // for number of init states
+    break;
+  case CHECK_TYPE_COUNT:
+    mStateSpace = new StateSpace(mEncoding, mStateLimit);
+    mDepthMap = new ArrayList<uint32_t>(128);
     break;
   default:
     throw jni::PreAnalysisConfigurationException(mCheckType);
@@ -1523,8 +1545,8 @@ class ProductExplorerFinalizer {
 public:
   //##########################################################################
   //# Constructor & Destructor
-  ProductExplorerFinalizer(const jni::NativeModelVerifierGlue& gchecker) :
-    mNativeModelVerifier(gchecker), mProductExplorer(0)
+  ProductExplorerFinalizer(const jni::NativeModelAnalyzerGlue& gchecker) :
+    mNativeModelAnalyzer(gchecker), mProductExplorer(0)
   {
   }
 
@@ -1541,29 +1563,29 @@ public:
      jni::ClassCache& cache)
   {
     jni::ProductDESProxyFactoryGlue factory =
-      mNativeModelVerifier.getFactoryGlue(&cache);
-    jni::ProductDESGlue des = mNativeModelVerifier.getModelGlue(&cache);
+      mNativeModelAnalyzer.getFactoryGlue(&cache);
+    jni::ProductDESGlue des = mNativeModelAnalyzer.getModelGlue(&cache);
     jni::KindTranslatorGlue translator =
-      mNativeModelVerifier.getKindTranslatorGlue(&cache);
-    if (mNativeModelVerifier.isEventTreeEnabled()) {
+      mNativeModelAnalyzer.getKindTranslatorGlue(&cache);
+    if (mNativeModelAnalyzer.isEventTreeEnabled()) {
       mProductExplorer = new EventTreeProductExplorer
         (factory, des, translator, premarking, marking, &cache);
     } else {
       mProductExplorer = new BroadProductExplorer
         (factory, des, translator, premarking, marking, &cache);
     }
-    const int limit = mNativeModelVerifier.getNodeLimit();
+    const int limit = mNativeModelAnalyzer.getNodeLimit();
     if (limit >= 0) {
       mProductExplorer->setStateLimit(limit);
     }
-    const int tlimit = mNativeModelVerifier.getTransitionLimit();
+    const int tlimit = mNativeModelAnalyzer.getTransitionLimit();
     if (tlimit >= 0) {
       mProductExplorer->setTransitionLimit(tlimit);
     }
     JNIEnv* env = cache.getEnvironment();
     jobject bbuffer =
       env->NewDirectByteBuffer(mProductExplorer, sizeof(*mProductExplorer));
-    mNativeModelVerifier.setNativeModelAnalyzer(bbuffer);
+    mNativeModelAnalyzer.setNativeModelAnalyzer(bbuffer);
     return mProductExplorer;
   }
 
@@ -1572,7 +1594,7 @@ public:
   void finalize()
   {
     if (mProductExplorer != 0) {
-      mNativeModelVerifier.setNativeModelAnalyzer(0);
+      mNativeModelAnalyzer.setNativeModelAnalyzer(0);
       delete mProductExplorer;
       mProductExplorer = 0;
     }
@@ -1581,7 +1603,7 @@ public:
 private:
   //##########################################################################
   //# Data Members
-  jni::NativeModelVerifierGlue mNativeModelVerifier;
+  jni::NativeModelAnalyzerGlue mNativeModelAnalyzer;
   ProductExplorer* mProductExplorer;
 
 };
@@ -1719,6 +1741,45 @@ Java_net_sourceforge_waters_cpp_analysis_NativeControlLoopChecker_runNativeAlgor
       checker->addStatistics(vresult);
       return vresult.returnJavaObject();
     }
+  } catch (const std::bad_alloc& error) {
+    finalizer.finalize();
+    jni::OverflowExceptionGlue glue(jni::OverflowKind_MEMORY, &cache);
+    cache.throwJavaException(glue);
+    return 0;
+  } catch (const jni::PreJavaException& pre) {
+    finalizer.finalize();
+    pre.throwJavaException(cache);
+    return 0;
+  } catch (const jni::ExceptionGlue& glue) {
+    finalizer.finalize();
+    cache.throwJavaException(glue);
+    return 0;
+  } catch (const jthrowable& throwable) {
+    env->ExceptionClear();
+    finalizer.finalize();
+    env->Throw(throwable);
+    return 0;
+  }
+}
+
+
+JNIEXPORT jobject JNICALL
+Java_net_sourceforge_waters_cpp_analysis_NativeStateCounter_runNativeAlgorithm
+  (JNIEnv* env, jobject jchecker)
+{
+  jni::ClassCache cache(env);
+  jni::NativeStateCounterGlue gchecker(jchecker, &cache);
+  waters::ProductExplorerFinalizer finalizer(gchecker);
+  try {
+    jni::EventGlue nomarking(0, &cache);
+    waters::ProductExplorer* checker =
+      finalizer.createProductExplorer(nomarking, nomarking, cache);
+    checker->runStateCount();
+    jni::NativeVerificationResultGlue result =
+      gchecker.createAnalysisResultGlue(&cache);
+    result.setSatisfied(true);
+    checker->addStatistics(result);
+    return result.returnJavaObject();
   } catch (const std::bad_alloc& error) {
     finalizer.finalize();
     jni::OverflowExceptionGlue glue(jni::OverflowKind_MEMORY, &cache);

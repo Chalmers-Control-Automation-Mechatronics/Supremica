@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2016 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,91 +33,39 @@
 
 package net.sourceforge.waters.cpp.analysis;
 
-import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.VerificationResult;
-import net.sourceforge.waters.model.analysis.des.ModelVerifier;
-import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.analysis.AbstractStateCounterTest;
+import net.sourceforge.waters.model.analysis.des.StateCounter;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.TraceProxy;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 
-/**
- * @author Robi Malik
- */
-
-public abstract class NativeModelVerifier
-  extends NativeModelAnalyzer
-  implements ModelVerifier
+public class NativeStateCounterTest
+  extends AbstractStateCounterTest
 {
 
   //#########################################################################
-  //# Constructors
-  public NativeModelVerifier(final ProductDESProxyFactory factory,
-                             final KindTranslator translator)
+  //# Entry points in junit.framework.TestCase
+  public static Test suite()
   {
-    this(null, factory, translator);
+    final TestSuite testSuite = new TestSuite(NativeStateCounterTest.class);
+    return testSuite;
   }
 
-  public NativeModelVerifier(final ProductDESProxy model,
-                             final ProductDESProxyFactory factory,
-                             final KindTranslator translator)
+  public static void main(final String[] args)
   {
-    super(model, factory, translator);
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelVerifier
-  @Override
-  public void setCounterExampleEnabled(final boolean enable)
-  {
-    setDetailedOutputEnabled(enable);
-  }
-
-  @Override
-  public boolean isCounterExampleEnabled()
-  {
-    return isDetailedOutputEnabled();
+    junit.textui.TestRunner.run(suite());
   }
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelVerifier
+  //# Overrides for base class
+  //# net.sourceforge.waters.model.analysis.AbstractStateCounterTest
   @Override
-  public boolean isSatisfied()
+  protected StateCounter createStateCounter(final ProductDESProxyFactory factory)
   {
-    final VerificationResult result = getAnalysisResult();
-    if (result != null) {
-      return result.isSatisfied();
-    } else {
-      throw new IllegalStateException("Call run() first!");
-    }
+    return new NativeStateCounter(factory);
   }
-
-  @Override
-  public TraceProxy getCounterExample()
-  {
-    if (isSatisfied()) {
-      throw new IllegalStateException("No trace for satisfied property!");
-    } else {
-      final VerificationResult result = getAnalysisResult();
-      return result.getCounterExample();
-    }
-  }
-
-  @Override
-  public VerificationResult getAnalysisResult()
-  {
-    return (VerificationResult) super.getAnalysisResult();
-  }
-
-
-  //#########################################################################
-  //# Native Methods
-  @Override
-  abstract VerificationResult runNativeAlgorithm() throws AnalysisException;
-
-  public abstract String getTraceName();
 
 }

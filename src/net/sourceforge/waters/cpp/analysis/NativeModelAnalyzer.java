@@ -35,6 +35,9 @@ package net.sourceforge.waters.cpp.analysis;
 
 import java.nio.ByteBuffer;
 
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
+import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzer;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -96,6 +99,12 @@ public abstract class NativeModelAnalyzer
     return true;
   }
 
+  @Override
+  public NativeVerificationResult createAnalysisResult()
+  {
+    return new NativeVerificationResult(this);
+  }
+
 
   //#########################################################################
   //# Configuration
@@ -111,7 +120,38 @@ public abstract class NativeModelAnalyzer
 
 
   //#########################################################################
+  //# Invocation
+  @Override
+  public boolean run()
+    throws AnalysisException
+  {
+    if (getModel() == null) {
+      throw new AnalysisConfigurationException("Input model is NULL!");
+    } else {
+      clearAnalysisResult();
+      final long start = System.currentTimeMillis();
+      try {
+        final AnalysisResult result = runNativeAlgorithm();
+        final long stop = System.currentTimeMillis();
+        result.setRuntime(stop - start);
+        setAnalysisResult(result);
+        return result.isSatisfied();
+      } catch (final AnalysisException exception) {
+        final long stop = System.currentTimeMillis();
+        final AnalysisResult result = createAnalysisResult();
+        result.setException(exception);
+        result.setRuntime(stop - start);
+        setAnalysisResult(result);
+        throw exception;
+      }
+    }
+  }
+
+
+  //#########################################################################
   //# Native Methods
+  abstract AnalysisResult runNativeAlgorithm() throws AnalysisException;
+
   @Override
   public native void requestAbort();
 
