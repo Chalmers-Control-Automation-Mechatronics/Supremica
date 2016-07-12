@@ -44,6 +44,7 @@ import java.util.Map;
 
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.junit.AbstractWatersTest;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.NameNotFoundException;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -414,6 +415,18 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
   protected boolean isProductDESDeterministic()
   {
     return mProductDESIsDeterministic;
+  }
+
+
+  void setNodeLimit(final ModelAnalyzer analyzer)
+  {
+    if (analyzer.getNodeLimit() == Integer.MAX_VALUE) {
+      final String prop = System.getProperty("waters.analysis.statelimit");
+      if (prop != null) {
+        final int limit = Integer.parseInt(prop);
+        analyzer.setNodeLimit(limit);
+      }
+    }
   }
 
 
