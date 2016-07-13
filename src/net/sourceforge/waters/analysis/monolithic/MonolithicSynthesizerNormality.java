@@ -68,7 +68,6 @@ import net.sourceforge.waters.model.analysis.des.AbstractProductDESBuilder;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -514,6 +513,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @SuppressWarnings("unused")
   @Override
   public boolean run() throws AnalysisException
   {
@@ -1106,12 +1106,6 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
     return mUsedMarking;
   }
 
-  private int getUsedDefaultMarkingID() throws EventNotFoundException
-  {
-    final EventProxy marking = getUsedDefaultMarking();
-    return mEventEncoding.getEventCode(marking);
-  }
-
   private boolean isMarkedState(final int[] tuple)
   {
     for (int a = 0; a < mNumAutomata; a++) {
@@ -1145,28 +1139,6 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
       mStateTuples.add(encodedTuple);
       return code;
     }
-  }
-
-  private void removeDumpStateTransitions(final ListBufferTransitionRelation rel,
-                                          final int dump)
-  {
-    final TransitionIterator iter =
-      rel.createAllTransitionsModifyingIterator();
-    while (iter.advance()) {
-      if (iter.getCurrentTargetState() == dump) {
-        iter.remove();
-      }
-    }
-    rel.setReachable(dump, false);
-  }
-
-  private ProductDESProxy createDESProxy(final ListBufferTransitionRelation rel)
-    throws EventNotFoundException
-  {
-    rel.setName(mOutputName);
-    final AutomatonProxy aut =
-      rel.createAutomaton(getFactory(), mEventEncoding);
-    return AutomatonTools.createProductDESProxy(aut, getFactory());
   }
 
   private int[] createReducedTuple(final int[] tuple, final int removeIndex)
@@ -1589,31 +1561,6 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
     }
   }
 
-
-  //#########################################################################
-  //# Debugging
-  @SuppressWarnings("unused")
-  private int[] showTuple(final int[] encodedTuple)
-  {
-    final int[] tuple = new int[mNumAutomata];
-    mSTEncoding.decode(encodedTuple, tuple);
-    return tuple;
-  }
-
-  @SuppressWarnings("unused")
-  private String showStateTuple(final int[] tuple)
-  {
-    String msg = "";
-    for (int i = 0; i < tuple.length; i++) {
-      final AutomatonProxy aut = mAutomata.get(i);
-      final ComponentKind kind = getKindTranslator().getComponentKind(aut);
-      final StateProxy state = mOriginalStates[i][tuple[i]];
-      msg +=
-        kind.toString() + " " + aut.getName() + " : [" + tuple[i] + "] "
-          + state.getName() + "\n";
-    }
-    return msg;
-  }
 
   //#########################################################################
   //# Data Members
