@@ -83,6 +83,7 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.marshaller.MarshallingTools;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.apache.log4j.Logger;
 
@@ -1275,7 +1276,11 @@ public abstract class AbstractTRCompositionalAnalyzer
     throws AnalysisException
   {
     final KindTranslator translator = getKindTranslator();
-    switch (translator.getComponentKind(aut)) {
+    final ComponentKind kind = translator.getComponentKind(aut);
+    if (kind == null) {
+      return null;
+    }
+    switch (kind) {
     case PLANT:
     case SPEC:
       final TRAbstractionStepInput step;

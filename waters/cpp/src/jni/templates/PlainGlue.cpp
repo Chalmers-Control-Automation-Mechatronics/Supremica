@@ -69,6 +69,9 @@ $IF-ENUM
 $CLASSNAME$ $CPPCLASSNAME::
 toEnum(jobject javaobject, ClassCache* cache)
 {
+  if (javaobject == NULL) {
+    return $CLASSNAME_null;
+  }
   ClassGlue* cls = cache->getClass(CLASS_$CLASSNAME);
   JNIEnv* env = cls->getEnvironment();
   jmethodID mid = cls->getMethodID(METHOD_Object_equals_0);
@@ -88,9 +91,13 @@ toEnum(jobject javaobject, ClassCache* cache)
 jobject $CPPCLASSNAME::
 toJavaObject($CLASSNAME$ item, ClassCache* cache)
 {
-  uint32_t fieldcode = (uint32_t) item;
-  ClassGlue* cls = cache->getClass(CLASS_$CLASSNAME);
-  return cls->getStaticFinalField(fieldcode);
+  int32_t fieldcode = (int32_t) item;
+  if (fieldcode < 0) {
+    return NULL;
+  } else {
+    ClassGlue* cls = cache->getClass(CLASS_$CLASSNAME);
+    return cls->getStaticFinalField(fieldcode);
+  }
 }
 
 

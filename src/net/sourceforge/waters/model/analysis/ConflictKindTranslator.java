@@ -102,7 +102,7 @@ public class ConflictKindTranslator
    * Returns the component kind of the given automaton in a conflict
    * check.
    * @return {@link ComponentKind#PLANT}, if the given automaton is
-   *         a plant, spec, or supervisor.
+   *         a plant, spec, or supervisor; <CODE>null</CODE> otherwise.
    */
   @Override
   public ComponentKind getComponentKind(final AutomatonProxy aut)
@@ -114,7 +114,7 @@ public class ConflictKindTranslator
     case SUPERVISOR:
       return ComponentKind.PLANT;
     default:
-      return kind;
+      return null;
     }
   }
 
@@ -122,7 +122,8 @@ public class ConflictKindTranslator
    * Returns the event kind of the given event in a conflict check.
    * @return Either {@link EventKind#CONTROLLABLE} or
    *         {@link EventKind#UNCONTROLLABLE}, depending on which
-   *         version of the conflict kind translator is used.
+   *         version of the conflict kind translator is used;
+   *         or {@link EventKind#PROPOSITION}.
    */
   @Override
   public EventKind getEventKind(final EventProxy event)
@@ -145,6 +146,6 @@ public class ConflictKindTranslator
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = -5515028385922953990L;
 
 }

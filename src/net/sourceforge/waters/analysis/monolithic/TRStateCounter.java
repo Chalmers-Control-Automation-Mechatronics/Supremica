@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2016 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,83 +33,73 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
+import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.StateCounter;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+
+import org.apache.log4j.Logger;
 
 
 /**
- * A factory interface for all types of model verifiers.
+ * A Java implementation of the {@link StateCounter} interface.
+ * The implementation is based on a monolithic synchronous product algorithm,
+ * using {@link ListBufferTransitionRelation} as automaton representation.
  *
  * @author Robi Malik
  */
 
-public class MonolithicModelAnalyzerFactory
-  extends AbstractModelAnalyzerFactory
+public class TRStateCounter
+  extends TRAbstractModelAnalyzer
+  implements StateCounter
 {
 
   //#########################################################################
-  //# Singleton Pattern
-  public static MonolithicModelAnalyzerFactory getInstance()
-  {
-    return SingletonHolder.INSTANCE;
-  }
-
-  private static class SingletonHolder {
-    private static final MonolithicModelAnalyzerFactory INSTANCE =
-      new MonolithicModelAnalyzerFactory();
-  }
-
-
-  //#########################################################################
   //# Constructors
-  private MonolithicModelAnalyzerFactory()
+  public TRStateCounter()
   {
+    this(null);
+  }
+
+  public TRStateCounter(final ProductDESProxy model)
+  {
+    this(model, ConflictKindTranslator.getInstanceUncontrollable());
+  }
+
+  public TRStateCounter(final ProductDESProxy model,
+                        final KindTranslator translator)
+  {
+    super(model, translator);
   }
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelVerifierFactory
+  //# Invocation
   @Override
-  public MonolithicConflictChecker createConflictChecker
-    (final ProductDESProxyFactory factory)
+  public boolean run()
+    throws AnalysisException
   {
-    return new MonolithicConflictChecker(factory);
-  }
-
-  @Override
-  public MonolithicControllabilityChecker createControllabilityChecker
-    (final ProductDESProxyFactory factory)
-  {
-    return new MonolithicControllabilityChecker(factory);
-  }
-
-  @Override
-  public MonolithicControlLoopChecker createControlLoopChecker
-    (final ProductDESProxyFactory factory)
-  {
-    return new MonolithicControlLoopChecker(factory);
-  }
-
-  @Override
-  public MonolithicLanguageInclusionChecker createLanguageInclusionChecker
-    (final ProductDESProxyFactory factory)
-  {
-    return new MonolithicLanguageInclusionChecker(factory);
-  }
-
-  @Override
-  public StateCounter createStateCounter
-    (final ProductDESProxyFactory factory)
-  {
-    return new TRStateCounter();
-  }
-
-  @Override
-  public MonolithicSynthesizer createSupervisorSynthesizer
-    (final ProductDESProxyFactory factory)
-  {
-    return new MonolithicSynthesizer(factory);
+    try {
+      setUp();
+      exploreStateSpace();
+      return setBooleanResult(true);
+    } catch (final AnalysisException exception) {
+      throw setExceptionResult(exception);
+    } catch (final OutOfMemoryError error) {
+      tearDown();
+      final Logger logger = getLogger();
+      logger.debug("<out of memory>");
+      final OverflowException exception = new OverflowException(error);
+      throw setExceptionResult(exception);
+    } catch (final StackOverflowError error) {
+      final OverflowException exception = new OverflowException(error);
+      throw setExceptionResult(exception);
+    } finally {
+      tearDown();
+    }
   }
 
 }

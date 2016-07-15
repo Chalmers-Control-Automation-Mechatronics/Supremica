@@ -346,6 +346,13 @@ public abstract class AbstractStateCounterTest
     countStates(des, 12960.0);
   }
 
+  public void testJustProperty() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "just_property.wmod");
+    countStates(des, 1.0);
+  }
+
   public void testRelease_and_blow() throws Exception
   {
     final ProductDESProxy des =

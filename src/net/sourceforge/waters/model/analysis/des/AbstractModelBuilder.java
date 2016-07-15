@@ -154,21 +154,30 @@ public abstract class AbstractModelBuilder<P extends Proxy>
     if (mOutputName != null) {
       return mOutputName;
     } else {
-      final StringBuilder buffer = new StringBuilder("{");
-      final ProductDESProxy model = getModel();
-      final Collection<AutomatonProxy> automata = model.getAutomata();
-      boolean first = true;
-      for (final AutomatonProxy aut : automata) {
-        if (first) {
-          first = false;
-        } else {
-          buffer.append(',');
-        }
-        buffer.append(aut.getName());
-      }
-      buffer.append('}');
-      return buffer.toString();
+      final ProductDESProxy des = getModel();
+      return computeOutputName(des);
     }
+  }
+
+  /**
+   * Computes a default name for an output object by combining all the
+   * automata names in the given model.
+   */
+  public static String computeOutputName(final ProductDESProxy des)
+  {
+    final StringBuilder buffer = new StringBuilder("{");
+    final Collection<AutomatonProxy> automata = des.getAutomata();
+    boolean first = true;
+    for (final AutomatonProxy aut : automata) {
+      if (first) {
+        first = false;
+      } else {
+        buffer.append(',');
+      }
+      buffer.append(aut.getName());
+    }
+    buffer.append('}');
+    return buffer.toString();
   }
 
 

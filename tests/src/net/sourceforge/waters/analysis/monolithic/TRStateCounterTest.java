@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2016 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,83 +33,39 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
+import net.sourceforge.waters.model.analysis.AbstractStateCounterTest;
 import net.sourceforge.waters.model.analysis.des.StateCounter;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
-/**
- * A factory interface for all types of model verifiers.
- *
- * @author Robi Malik
- */
 
-public class MonolithicModelAnalyzerFactory
-  extends AbstractModelAnalyzerFactory
+public class TRStateCounterTest
+  extends AbstractStateCounterTest
 {
 
   //#########################################################################
-  //# Singleton Pattern
-  public static MonolithicModelAnalyzerFactory getInstance()
+  //# Entry points in junit.framework.TestCase
+  public static Test suite()
   {
-    return SingletonHolder.INSTANCE;
+    final TestSuite testSuite = new TestSuite(TRStateCounterTest.class);
+    return testSuite;
   }
 
-  private static class SingletonHolder {
-    private static final MonolithicModelAnalyzerFactory INSTANCE =
-      new MonolithicModelAnalyzerFactory();
+  public static void main(final String[] args)
+  {
+    junit.textui.TestRunner.run(suite());
   }
 
 
   //#########################################################################
-  //# Constructors
-  private MonolithicModelAnalyzerFactory()
-  {
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelVerifierFactory
+  //# Overrides for base class
+  //# net.sourceforge.waters.model.analysis.AbstractStateCounterTest
   @Override
-  public MonolithicConflictChecker createConflictChecker
-    (final ProductDESProxyFactory factory)
-  {
-    return new MonolithicConflictChecker(factory);
-  }
-
-  @Override
-  public MonolithicControllabilityChecker createControllabilityChecker
-    (final ProductDESProxyFactory factory)
-  {
-    return new MonolithicControllabilityChecker(factory);
-  }
-
-  @Override
-  public MonolithicControlLoopChecker createControlLoopChecker
-    (final ProductDESProxyFactory factory)
-  {
-    return new MonolithicControlLoopChecker(factory);
-  }
-
-  @Override
-  public MonolithicLanguageInclusionChecker createLanguageInclusionChecker
-    (final ProductDESProxyFactory factory)
-  {
-    return new MonolithicLanguageInclusionChecker(factory);
-  }
-
-  @Override
-  public StateCounter createStateCounter
-    (final ProductDESProxyFactory factory)
+  protected StateCounter createStateCounter(final ProductDESProxyFactory factory)
   {
     return new TRStateCounter();
-  }
-
-  @Override
-  public MonolithicSynthesizer createSupervisorSynthesizer
-    (final ProductDESProxyFactory factory)
-  {
-    return new MonolithicSynthesizer(factory);
   }
 
 }
