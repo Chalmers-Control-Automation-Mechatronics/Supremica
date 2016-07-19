@@ -722,31 +722,43 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
       while(numDeletions > 0){
         numDeletions = 0;
         //Observability step
+        //Declare read only transition iterator
         //Loop through each state in sync product
         for(int source=0; source < mTransitionRelation.getNumberOfStates(); source++){
           //Get the controllable outgoing transitions for given state
           final TransitionIterator iter = mTransitionRelation.createSuccessorsReadOnlyIteratorByStatus(EventStatus.STATUS_CONTROLLABLE);
           iter.resetState(source);
           while(iter.advance()){
-             if(iter.getCurrentTargetState() == dumpStateIndex){
+            if(iter.getCurrentTargetState() == dumpStateIndex){
               final int event = iter.getCurrentEvent();
-              final int sourceState = iter.getCurrentSourceState();
-              final int[] sourceSet = new int [mSTEncoding.getNumberOfAutomata()];
-              resultMap.getOriginalState(source, sourceSet);
-              final int stateTupleNum = resultMap.getComposedState(sourceSet);
-
+              final int[] sourceTuple = new int[2]; //0 = source set, 1 = source state?
+              resultMap.getOriginalState(source, sourceTuple);
+              //Get sourceSet from pair
+              final int[] sourceSet = subsetSimplifier.getSourceSet(sourceTuple[0]);
               for(final int s : sourceSet){
-                if(s != sourceState){
-                  //TODO: continue here
+                if(s != sourceTuple[1]){
+                  final int[] sourceTupleDash = new int[2];
+                  sourceTupleDash[0] = sourceTuple[0];
+                  sourceTupleDash[1] = s;
+                  final int newState = resultMap.getComposedState(sourceTupleDash);
+                  final TransitionIterator succIterSameEvent = mTransitionRelation.createSuccessorsModifyingIterator();
+                  succIterSameEvent.resetState(newState);
+                  succIterSameEvent.setCurrentToState(dumpStateIndex);
+                  while(succIterSameEvent.advance()){
+                    succIterSameEvent.remove();
+                  }
                 }
               }
-             }
+            }
           }
         }
 
         //TODO:Nonblocking step
 
+
+
         //Controllability step
+        final int markingProp = getUsedDefaultMarkingID();
         for(int e=EventEncoding.NONTAU; e<mNumProperEvents; e++){
           final byte status = mEventEncoding.getProperEventStatus(e);
           if(!EventStatus.isControllableEvent(status)){
@@ -754,113 +766,37 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
             while(iter.advance()){
               if(iter.getCurrentTargetState() == dumpStateIndex){
                 final int source = iter.getCurrentSourceState();
-
-                //TODO:Delete the current state
-                numDeletions++;
-
+                //If source is initial state, stop and return empty set/no result
+                if(mTransitionRelation.isInitial(source)){
+                  return setBooleanResult(false);
+                }
                 //Change all transitions pointing to this state, to point to dump
-                //TODO:Is it safe to declare the below externally and keep re-using it?
+                //TODO:Is it safe to declare the below out of the loop and keep re-using it?
+                //TODO:Is it necessary to manually point these transitions to dump as setReachable() already removes them
                 final TransitionIterator predIter = mTransitionRelation.createPredecessorsModifyingIterator();
                 predIter.resetState(source);
                 while(iter.advance()){
                   iter.setCurrentToState(dumpStateIndex);
                 }
+                //Set the state as unreachable (will be removed later)
+                mTransitionRelation.setReachable(source, false);
+                numDeletions++;
               }
             }
           }
         }
       }
 
+      //Extract supervisor
 
-
-      return true;
-      /*if (isDetailedOutputEnabled()) {
-        final int marking = getUsedDefaultMarkingID();
-        ProductDESProxy des = null;
-        if (mSupervisorReductionEnabled) {
-          // Supervisor Reduction Enabled
-          final ChainTRSimplifier chain = new ChainTRSimplifier();
-          final ObservationEquivalenceTRSimplifier bisimulator =
-            new ObservationEquivalenceTRSimplifier();
-          bisimulator.setEquivalence
-            (ObservationEquivalenceTRSimplifier.Equivalence.
-             DETERMINISTIC_MINSTATE);
-          bisimulator.setTransitionLimit(getTransitionLimit());
-          chain.add(bisimulator);
-
-          mSupervisorSimplifier.setRestrictedEvent(-1);
-
-          chain.add(mSupervisorSimplifier);
-          chain.setTransitionRelation(mTransitionRelation);
-          chain.setDefaultMarkingID(marking);
-          chain.run();
-
-          mTransitionRelation = mSupervisorSimplifier.getTransitionRelation();
-          if (!mSupervisorLocalizationEnabled) {
-            mTransitionRelation.removeDeadlockStateTransitions(marking);
-            mTransitionRelation.setName("supervisor");
-            des = createDESProxy(mTransitionRelation);
-          } else {
-            // (Reduction &) Localization Enabled
-            final TIntArrayList enabDisabEvents = new TIntArrayList();
-            final TIntArrayList disabEvents = new TIntArrayList();
-            final List<AutomatonProxy> autList =
-              new ArrayList<AutomatonProxy>();
-            final boolean simplified =
-              localizeSupervisor(marking, autList, enabDisabEvents,
-                                 disabEvents);
-            if (simplified) {
-              final IsomorphismChecker checker =
-                new IsomorphismChecker(getFactory(), false, false);
-              final THashSet<AutomatonProxy> removeSet =
-                new THashSet<AutomatonProxy>();
-              for (int autom = 0; autom < autList.size() - 1; autom++) {
-                for (int auto = autom + 1; auto < autList.size(); auto++) {
-                  if (checker.checkBisimulation(autList.get(autom),
-                                                autList.get(auto))) {
-                    removeSet.add(autList.get(auto));
-                  }
-                }
-              }
-              for (int a = autList.size() - 1; a >= 0; a--) {
-                if (removeSet.contains(autList.get(a))) {
-                  removeSet.remove(autList.get(a));
-                  autList.remove(a);
-                }
-              }
-            }
-            des =
-              AutomatonTools.createProductDESProxy("localised_sup", autList,
-                                                   getFactory());
-          }
-        } else if (mSupervisorLocalizationEnabled) {
-
-          // localization only ...
-          mSupervisorSimplifier.setDefaultMarkingID(marking);
-          mSupervisorSimplifier.setTransitionRelation(mTransitionRelation);
-          mTransitionRelation = mSupervisorSimplifier.getTransitionRelation();
-          final TIntArrayList enabDisabEvents = new TIntArrayList();
-          final TIntArrayList disabEvents = new TIntArrayList();
-          final List<AutomatonProxy> autList =
-            new ArrayList<AutomatonProxy>();
-          mSupervisorSimplifier.setExperimentalMode(true);
-          localizeSupervisor(marking, autList, enabDisabEvents, disabEvents);
-          mSupervisorSimplifier.setExperimentalMode(false);
-          des =
-            AutomatonTools.createProductDESProxy("localised_sup", autList,
-                                                 getFactory());
-
-        } else {
-          // Both Reduction & Localization Disabled
-          removeDumpStateTransitions(mTransitionRelation, mNumGoodStates);
-          mTransitionRelation.removeProperSelfLoopEvents();
-          mTransitionRelation.removeRedundantPropositions();
-          des = createDESProxy(mTransitionRelation);
-        }
-        return setProxyResult(des);
-      } else {
+      if(isDetailedOutputEnabled()){
+        //Return result
+        final ProductDESProxy result = createDESProxy(mTransitionRelation);
+        setProxyResult(result);
+      }
+      else {
         return true;
-      }*/
+      }
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
     } catch (final OutOfMemoryError error) {
