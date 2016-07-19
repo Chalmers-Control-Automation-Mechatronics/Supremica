@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 
@@ -487,6 +488,32 @@ public class LongStateCountBuffer extends AbstractStateBuffer
       }
     }
     return new StateEncoding(states);
+  }
+
+  /**
+   * Get the state count of a state in this buffer.
+   *
+   * @param state ID of the state.
+   * @return the count of the specified state.
+   */
+  @Override
+  public long getStateCount(final int state)
+  {
+    return mStateInfo[state] & ~TAG_ALL;
+  }
+
+  public void setStateCount(final int state, final long count)
+    throws OverflowException
+  {
+    if ((count & TAG_ALL) == 0) {
+      // Remove the old data.
+      mStateInfo[state] &= TAG_ALL;
+      // Add the new data.
+      mStateInfo[state] |= count;
+    } else {
+      // Potential problem: the given count may be too large.
+      throw new OverflowException();
+    }
   }
 
   //#########################################################################

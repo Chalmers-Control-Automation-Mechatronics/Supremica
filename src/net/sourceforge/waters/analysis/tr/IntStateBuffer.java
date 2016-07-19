@@ -581,6 +581,20 @@ public class IntStateBuffer extends AbstractStateBuffer
     return new StateEncoding(states);
   }
 
+  /**
+   * Get the state count of a state in this buffer.
+   * <p>
+   * In this class, this method always returns 1.
+   *
+   * @param state ID of the state.
+   * @return the count of the specified state.
+   */
+  @Override
+  public long getStateCount(final int state)
+  {
+    return 1L;
+  }
+
 
   //#########################################################################
   //# Debugging

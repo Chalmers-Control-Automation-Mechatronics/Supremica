@@ -195,6 +195,9 @@ public abstract class AbstractStateBuffer
    */
   public abstract void setReachable(final int state, final boolean value);
 
+
+  //#########################################################################
+  //# Simple Access: Markings
   /**
    * Checks whether a state is marked.
    * This method reports a state as marked if the indicated proposition is
@@ -378,6 +381,17 @@ public abstract class AbstractStateBuffer
    *         <CODE>false</CODE> otherwise.
    */
   public abstract boolean removeRedundantPropositions();
+
+
+  //#########################################################################
+  //# Simple Access: State Count
+  /**
+   * Get the state count of a state in this buffer.
+   *
+   * @param state ID of the state.
+   * @return the count of the specified state.
+   */
+  public abstract long getStateCount(int state);
 
 
   //#########################################################################
