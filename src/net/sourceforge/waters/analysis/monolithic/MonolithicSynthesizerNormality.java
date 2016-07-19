@@ -68,6 +68,7 @@ import net.sourceforge.waters.model.analysis.des.AbstractProductDESBuilder;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -1096,6 +1097,15 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
       mStateTuples.add(encodedTuple);
       return code;
     }
+  }
+
+  private ProductDESProxy createDESProxy(final ListBufferTransitionRelation rel)
+    throws EventNotFoundException
+  {
+    rel.setName(mOutputName);
+    final AutomatonProxy aut =
+      rel.createAutomaton(getFactory(), mEventEncoding);
+    return AutomatonTools.createProductDESProxy(aut, getFactory());
   }
 
   private int[] createReducedTuple(final int[] tuple, final int removeIndex)
