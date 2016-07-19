@@ -682,6 +682,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
       ListBufferTransitionRelation powersetRel;
       eventsHiddenRel = new ListBufferTransitionRelation
         (mTransitionRelation, ListBufferTransitionRelation.CONFIG_ALL); //deep copy of all objects
+      eventsHiddenRel.setName("events_hidden");
 
       //Event hiding
       final SpecialEventsTRSimplifier eventSimplifier =
@@ -690,6 +691,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
 
       powersetRel = new ListBufferTransitionRelation
         (eventsHiddenRel, ListBufferTransitionRelation.CONFIG_ALL);
+      powersetRel.setName("powerset_events_hidden");
 
       //Powerset construction
       final SubsetConstructionTRSimplifier subsetSimplifier =
@@ -709,9 +711,6 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
       final TRSynchronousProductBuilder builder = new TRSynchronousProductBuilder(autToSync);
       builder.run();
 
-      //Free up memory
-      eventsHiddenRel = powersetRel = null;
-
       //Synthesis step
       final TRAutomatonProxy syncModel = builder.getComputedAutomaton(); //Probably don't need
       mTransitionRelation = syncModel.getTransitionRelation();
@@ -722,7 +721,6 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
       while(numDeletions > 0){
         numDeletions = 0;
         //Observability step
-        //Declare read only transition iterator
         //Loop through each state in sync product
         for(int source=0; source < mTransitionRelation.getNumberOfStates(); source++){
           //Get the controllable outgoing transitions for given state
@@ -758,7 +756,6 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
 
 
         //Controllability step
-        final int markingProp = getUsedDefaultMarkingID();
         for(int e=EventEncoding.NONTAU; e<mNumProperEvents; e++){
           final byte status = mEventEncoding.getProperEventStatus(e);
           if(!EventStatus.isControllableEvent(status)){
@@ -788,15 +785,39 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
       }
 
       //Extract supervisor
+      final TransitionIterator iter = powersetRel.createAllTransitionsModifyingIteratorByStatus(EventStatus.STATUS_CONTROLLABLE);
+      final int psDumpIndex = powersetRel.getDumpStateIndex();
+      while(iter.advance()){
+        if(iter.getCurrentTargetState() != psDumpIndex){
+          final int event = iter.getCurrentEvent();
+          final TransitionIterator spIter = mTransitionRelation.createAllTransitionsReadOnlyIterator(event);
+          final int spDumpIndex = mTransitionRelation.getDumpStateIndex();
+          while(spIter.advance()){
+            if(spIter.getCurrentTargetState() == spDumpIndex){
+              final int source = spIter.getCurrentSourceState();
+              final int[] sourceTuple = new int[2]; //0 = source set, 1 = source state?
+              resultMap.getOriginalState(source, sourceTuple);
+              //Get sourceSet from pair
+              final int[] synthesisSourceSet = subsetSimplifier.getSourceSet(sourceTuple[0]);
+              //TODO: Check this is how I get the set of states from state id for the powersetRel
+              final int[] powersetSourceSet = subsetSimplifier.getSourceSet(iter.getCurrentSourceState());
+              if(Arrays.equals(synthesisSourceSet, powersetSourceSet)){
+                //Add new transition with same event pointing to dump
+                powersetRel.addTransition(iter.getCurrentSourceState(), event, psDumpIndex);
+                //Remove original transition from powerset
+                iter.remove();
+              }
+            }
+          }
+        }
+      }
 
       if(isDetailedOutputEnabled()){
         //Return result
         final ProductDESProxy result = createDESProxy(mTransitionRelation);
         setProxyResult(result);
       }
-      else {
-        return true;
-      }
+      return true;
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
     } catch (final OutOfMemoryError error) {
