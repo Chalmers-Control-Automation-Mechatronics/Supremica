@@ -1199,20 +1199,23 @@ public abstract class AbstractCompositionalModelAnalyzer
     mEventInfoMap = new HashMap<>(numEvents);
     mDirtyAutomata = new LinkedList<>();
     for (AutomatonProxy aut : automata) {
-      switch (translator.getComponentKind(aut)) {
-      case SPEC:
-        aut = plantify(aut);
-        if (aut == null) {
+      final ComponentKind kind = translator.getComponentKind(aut);
+      if (kind != null) {
+        switch (kind) {
+        case SPEC:
+          aut = plantify(aut);
+          if (aut == null) {
+            break;
+          }
+          // fall through ...
+        case PLANT:
+          mCurrentAutomata.add(aut);
+          addEventsToAutomata(aut);
+          mDirtyAutomata.add(aut);
+          break;
+        default:
           break;
         }
-        // fall through ...
-      case PLANT:
-        mCurrentAutomata.add(aut);
-        addEventsToAutomata(aut);
-        mDirtyAutomata.add(aut);
-        break;
-      default:
-        break;
       }
     }
     final AnalysisResult result = getAnalysisResult();

@@ -239,6 +239,7 @@ public class ListBufferTransitionRelation implements EventStatusProvider
         new IncomingTransitionListBuffer(numStates, mEventStatus,  numTrans);
       mPredecessorBuffer.setUpTransitions(events, list, eventEnc, stateEnc);
     }
+    mStateCount = ((config & CONFIG_COUNT) != 0);
   }
 
   /**
@@ -333,6 +334,7 @@ public class ListBufferTransitionRelation implements EventStatusProvider
       mPredecessorBuffer =
         new IncomingTransitionListBuffer(numStates, eventEnc, 0);
     }
+    mStateCount = ((config & CONFIG_COUNT) != 0);
   }
 
   /**
@@ -441,6 +443,7 @@ public class ListBufferTransitionRelation implements EventStatusProvider
       mPredecessorBuffer =
         new IncomingTransitionListBuffer(numStates, mEventStatus, 0);
     }
+    mStateCount = ((config & CONFIG_COUNT) != 0);
   }
 
   /**
@@ -543,6 +546,7 @@ public class ListBufferTransitionRelation implements EventStatusProvider
           mPredecessorBuffer.setUpTransitions(rel.mSuccessorBuffer);
         }
       }
+      mStateCount = ((config & CONFIG_COUNT) != 0);
     } catch (final OverflowException exception) {
       // Can't have overflow because states and events have already been
       // encoded successfully in rel.
@@ -562,6 +566,9 @@ public class ListBufferTransitionRelation implements EventStatusProvider
     }
     if (mPredecessorBuffer != null) {
       config |= CONFIG_PREDECESSORS;
+    }
+    if (mStateCount) {
+      config |= CONFIG_COUNT;
     }
     return new ListBufferTransitionRelation(this, config);
   }
@@ -3159,7 +3166,7 @@ public class ListBufferTransitionRelation implements EventStatusProvider
    * If set to true, use {@link LongStateCountBuffer};
    * if set of false, use {@link IntStateBuffer}.
    */
-  private final boolean mStateCount = false;
+  private boolean mStateCount;
 
 
   //#########################################################################
@@ -3179,11 +3186,11 @@ public class ListBufferTransitionRelation implements EventStatusProvider
    * a {@link LongStateCountBuffer}, which ignores the markings and
    * propositions, whilst retaining the state count.
    */
-  public static final int CONFIG_COUNT = 0x03;
+  public static final int CONFIG_COUNT = 0x04;
   /**
-   * Configuration setting specifying that the transition relation is to use
-   * both an outgoing and an incoming transition buffer.
+   * Configuration setting specifying that all the flags are set.
    */
   public static final int CONFIG_ALL = CONFIG_SUCCESSORS
-                                       | CONFIG_PREDECESSORS;
+                                     | CONFIG_PREDECESSORS
+                                     | CONFIG_COUNT;
 }

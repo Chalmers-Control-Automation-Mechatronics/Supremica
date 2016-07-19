@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.list.array.TIntArrayList;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -42,6 +40,8 @@ import java.util.List;
 
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
+
+import gnu.trove.list.array.TIntArrayList;
 
 
 /**
@@ -111,7 +111,7 @@ public class IntArrayBuffer implements WatersIntHashingStrategy
                         final int defaultHashSetValue)
   {
     mArraySize = arraySize;
-    mBlockSize = arraySize * BLOCK_SIZE;
+    mBlockSize = arraySize < 1 ? 1 : arraySize * BLOCK_SIZE;
     mSizeLimit = limit;
     mDefaultHashValue = defaultHashSetValue;
     mBlocks = new ArrayList<int[]>();
@@ -237,7 +237,7 @@ public class IntArrayBuffer implements WatersIntHashingStrategy
     final int[] block = mBlocks.get(blockno);
     int offset = mArraySize * (array & BLOCK_MASK);
     int result = block[offset];
-    for (int j = 0; j < mArraySize; j++) {
+    for (int j = 1; j < mArraySize; j++) {
       result = 5 * result + block[offset++];
     }
     return result;
