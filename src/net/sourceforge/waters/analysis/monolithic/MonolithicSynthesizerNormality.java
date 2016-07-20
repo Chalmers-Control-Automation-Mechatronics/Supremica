@@ -68,6 +68,7 @@ import net.sourceforge.waters.model.analysis.des.AbstractProductDESBuilder;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -682,6 +683,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
       ListBufferTransitionRelation powersetRel;
       eventsHiddenRel = new ListBufferTransitionRelation
         (mTransitionRelation, ListBufferTransitionRelation.CONFIG_ALL); //deep copy of all objects
+      eventsHiddenRel.setName("events_hidden");
 
       //Event hiding
       final SpecialEventsTRSimplifier eventSimplifier =
@@ -690,6 +692,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
 
       powersetRel = new ListBufferTransitionRelation
         (eventsHiddenRel, ListBufferTransitionRelation.CONFIG_ALL);
+      powersetRel.setName("powerset_events_hidden");
 
       //Powerset construction
       final SubsetConstructionTRSimplifier subsetSimplifier =
@@ -709,9 +712,6 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
       final TRSynchronousProductBuilder builder = new TRSynchronousProductBuilder(autToSync);
       builder.run();
 
-      //Free up memory
-      eventsHiddenRel = powersetRel = null;
-
       //Synthesis step
       final TRAutomatonProxy syncModel = builder.getComputedAutomaton(); //Probably don't need
       mTransitionRelation = syncModel.getTransitionRelation();
@@ -728,23 +728,33 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
           final TransitionIterator iter = mTransitionRelation.createSuccessorsReadOnlyIteratorByStatus(EventStatus.STATUS_CONTROLLABLE);
           iter.resetState(source);
           while(iter.advance()){
-             if(iter.getCurrentTargetState() == dumpStateIndex){
+            if(iter.getCurrentTargetState() == dumpStateIndex){
               final int event = iter.getCurrentEvent();
-              final int sourceState = iter.getCurrentSourceState();
-              final int[] sourceSet = new int [mSTEncoding.getNumberOfAutomata()];
-              resultMap.getOriginalState(source, sourceSet);
-              final int stateTupleNum = resultMap.getComposedState(sourceSet);
-
+              final int[] sourceTuple = new int[2]; //0 = source set, 1 = source state?
+              resultMap.getOriginalState(source, sourceTuple);
+              //Get sourceSet from pair
+              final int[] sourceSet = subsetSimplifier.getSourceSet(sourceTuple[0]);
               for(final int s : sourceSet){
-                if(s != sourceState){
-                  //TODO: continue here
+                if(s != sourceTuple[1]){
+                  final int[] sourceTupleDash = new int[2];
+                  sourceTupleDash[0] = sourceTuple[0];
+                  sourceTupleDash[1] = s;
+                  final int newState = resultMap.getComposedState(sourceTupleDash);
+                  final TransitionIterator succIterSameEvent = mTransitionRelation.createSuccessorsModifyingIterator();
+                  succIterSameEvent.resetState(newState);
+                  succIterSameEvent.setCurrentToState(dumpStateIndex);
+                  while(succIterSameEvent.advance()){
+                    succIterSameEvent.remove();
+                  }
                 }
               }
-             }
+            }
           }
         }
 
         //TODO:Nonblocking step
+
+
 
         //Controllability step
         for(int e=EventEncoding.NONTAU; e<mNumProperEvents; e++){
@@ -754,113 +764,61 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
             while(iter.advance()){
               if(iter.getCurrentTargetState() == dumpStateIndex){
                 final int source = iter.getCurrentSourceState();
-
-                //TODO:Delete the current state
-                numDeletions++;
-
+                //If source is initial state, stop and return empty set/no result
+                if(mTransitionRelation.isInitial(source)){
+                  return setBooleanResult(false);
+                }
                 //Change all transitions pointing to this state, to point to dump
-                //TODO:Is it safe to declare the below externally and keep re-using it?
+                //TODO:Is it safe to declare the below out of the loop and keep re-using it?
+                //TODO:Is it necessary to manually point these transitions to dump as setReachable() already removes them
                 final TransitionIterator predIter = mTransitionRelation.createPredecessorsModifyingIterator();
                 predIter.resetState(source);
                 while(iter.advance()){
                   iter.setCurrentToState(dumpStateIndex);
                 }
+                //Set the state as unreachable (will be removed later)
+                mTransitionRelation.setReachable(source, false);
+                numDeletions++;
               }
             }
           }
         }
       }
 
-
-
-      return true;
-      /*if (isDetailedOutputEnabled()) {
-        final int marking = getUsedDefaultMarkingID();
-        ProductDESProxy des = null;
-        if (mSupervisorReductionEnabled) {
-          // Supervisor Reduction Enabled
-          final ChainTRSimplifier chain = new ChainTRSimplifier();
-          final ObservationEquivalenceTRSimplifier bisimulator =
-            new ObservationEquivalenceTRSimplifier();
-          bisimulator.setEquivalence
-            (ObservationEquivalenceTRSimplifier.Equivalence.
-             DETERMINISTIC_MINSTATE);
-          bisimulator.setTransitionLimit(getTransitionLimit());
-          chain.add(bisimulator);
-
-          mSupervisorSimplifier.setRestrictedEvent(-1);
-
-          chain.add(mSupervisorSimplifier);
-          chain.setTransitionRelation(mTransitionRelation);
-          chain.setDefaultMarkingID(marking);
-          chain.run();
-
-          mTransitionRelation = mSupervisorSimplifier.getTransitionRelation();
-          if (!mSupervisorLocalizationEnabled) {
-            mTransitionRelation.removeDeadlockStateTransitions(marking);
-            mTransitionRelation.setName("supervisor");
-            des = createDESProxy(mTransitionRelation);
-          } else {
-            // (Reduction &) Localization Enabled
-            final TIntArrayList enabDisabEvents = new TIntArrayList();
-            final TIntArrayList disabEvents = new TIntArrayList();
-            final List<AutomatonProxy> autList =
-              new ArrayList<AutomatonProxy>();
-            final boolean simplified =
-              localizeSupervisor(marking, autList, enabDisabEvents,
-                                 disabEvents);
-            if (simplified) {
-              final IsomorphismChecker checker =
-                new IsomorphismChecker(getFactory(), false, false);
-              final THashSet<AutomatonProxy> removeSet =
-                new THashSet<AutomatonProxy>();
-              for (int autom = 0; autom < autList.size() - 1; autom++) {
-                for (int auto = autom + 1; auto < autList.size(); auto++) {
-                  if (checker.checkBisimulation(autList.get(autom),
-                                                autList.get(auto))) {
-                    removeSet.add(autList.get(auto));
-                  }
-                }
-              }
-              for (int a = autList.size() - 1; a >= 0; a--) {
-                if (removeSet.contains(autList.get(a))) {
-                  removeSet.remove(autList.get(a));
-                  autList.remove(a);
-                }
+      //Extract supervisor
+      final TransitionIterator iter = powersetRel.createAllTransitionsModifyingIteratorByStatus(EventStatus.STATUS_CONTROLLABLE);
+      final int psDumpIndex = powersetRel.getDumpStateIndex();
+      while(iter.advance()){
+        if(iter.getCurrentTargetState() != psDumpIndex){
+          final int event = iter.getCurrentEvent();
+          final TransitionIterator spIter = mTransitionRelation.createAllTransitionsReadOnlyIterator(event);
+          final int spDumpIndex = mTransitionRelation.getDumpStateIndex();
+          while(spIter.advance()){
+            if(spIter.getCurrentTargetState() == spDumpIndex){
+              final int source = spIter.getCurrentSourceState();
+              final int[] sourceTuple = new int[2]; //0 = source set, 1 = source state?
+              resultMap.getOriginalState(source, sourceTuple);
+              //Get sourceSet from pair
+              final int[] synthesisSourceSet = subsetSimplifier.getSourceSet(sourceTuple[0]);
+              //TODO: Check this is how I get the set of states from state id for the powersetRel
+              final int[] powersetSourceSet = subsetSimplifier.getSourceSet(iter.getCurrentSourceState());
+              if(Arrays.equals(synthesisSourceSet, powersetSourceSet)){
+                //Add new transition with same event pointing to dump
+                powersetRel.addTransition(iter.getCurrentSourceState(), event, psDumpIndex);
+                //Remove original transition from powerset
+                iter.remove();
               }
             }
-            des =
-              AutomatonTools.createProductDESProxy("localised_sup", autList,
-                                                   getFactory());
           }
-        } else if (mSupervisorLocalizationEnabled) {
-
-          // localization only ...
-          mSupervisorSimplifier.setDefaultMarkingID(marking);
-          mSupervisorSimplifier.setTransitionRelation(mTransitionRelation);
-          mTransitionRelation = mSupervisorSimplifier.getTransitionRelation();
-          final TIntArrayList enabDisabEvents = new TIntArrayList();
-          final TIntArrayList disabEvents = new TIntArrayList();
-          final List<AutomatonProxy> autList =
-            new ArrayList<AutomatonProxy>();
-          mSupervisorSimplifier.setExperimentalMode(true);
-          localizeSupervisor(marking, autList, enabDisabEvents, disabEvents);
-          mSupervisorSimplifier.setExperimentalMode(false);
-          des =
-            AutomatonTools.createProductDESProxy("localised_sup", autList,
-                                                 getFactory());
-
-        } else {
-          // Both Reduction & Localization Disabled
-          removeDumpStateTransitions(mTransitionRelation, mNumGoodStates);
-          mTransitionRelation.removeProperSelfLoopEvents();
-          mTransitionRelation.removeRedundantPropositions();
-          des = createDESProxy(mTransitionRelation);
         }
-        return setProxyResult(des);
-      } else {
-        return true;
-      }*/
+      }
+
+      if(isDetailedOutputEnabled()){
+        //Return result
+        final ProductDESProxy result = createDESProxy(mTransitionRelation);
+        setProxyResult(result);
+      }
+      return true;
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
     } catch (final OutOfMemoryError error) {
@@ -1139,6 +1097,15 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
       mStateTuples.add(encodedTuple);
       return code;
     }
+  }
+
+  private ProductDESProxy createDESProxy(final ListBufferTransitionRelation rel)
+    throws EventNotFoundException
+  {
+    rel.setName(mOutputName);
+    final AutomatonProxy aut =
+      rel.createAutomaton(getFactory(), mEventEncoding);
+    return AutomatonTools.createProductDESProxy(aut, getFactory());
   }
 
   private int[] createReducedTuple(final int[] tuple, final int removeIndex)

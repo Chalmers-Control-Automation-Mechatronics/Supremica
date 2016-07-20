@@ -381,8 +381,8 @@ public class SubsetConstructionTRSimplifier
         rel.setAllMarkings(detstate, markings);
       }
       rel.removeRedundantPropositions();
-      mSetOffsets = null;
-      mStateSetBuffer = null;
+      //mSetOffsets = null;
+      //mStateSetBuffer = null;
       rel.removeEvent(EventEncoding.TAU);
       mTransitionBuffer.addOutgoingTransitions(rel);
       mTransitionBuffer = null;
@@ -461,6 +461,12 @@ public class SubsetConstructionTRSimplifier
     }
   }
 
+  //#########################################################################
+  //# Simple Access Methods
+  public int[] getSourceSet(final int stateIndex)
+  {
+    return mStateSetBuffer.getSetContents(mSetOffsets.get(stateIndex));
+  }
 
   //#########################################################################
   //# Data Members
