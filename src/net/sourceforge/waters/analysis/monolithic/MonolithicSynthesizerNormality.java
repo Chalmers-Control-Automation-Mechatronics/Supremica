@@ -84,6 +84,9 @@ import gnu.trove.map.custom_hash.TObjectByteCustomHashMap;
 import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
 
 
 /**
@@ -678,39 +681,40 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
       mSafeStates = null;
       mReachableStates = null;
 
-      //Controllable and Non-Blocking supervisor is created by this stage
-      ListBufferTransitionRelation eventsHiddenRel;
-      ListBufferTransitionRelation powersetRel;
-      eventsHiddenRel = new ListBufferTransitionRelation
-        (mTransitionRelation, ListBufferTransitionRelation.CONFIG_ALL); //deep copy of all objects
-      eventsHiddenRel.setName("events_hidden");
-
       //Event hiding
-      final SpecialEventsTRSimplifier eventSimplifier =
-        new SpecialEventsTRSimplifier(eventsHiddenRel);
+      SpecialEventsTRSimplifier eventSimplifier =
+        new SpecialEventsTRSimplifier(mTransitionRelation);
       eventSimplifier.run();
-
-      powersetRel = new ListBufferTransitionRelation
-        (eventsHiddenRel, ListBufferTransitionRelation.CONFIG_ALL);
-      powersetRel.setName("powerset_events_hidden");
+      final AutomatonProxy eventsHiddenAut =
+        mTransitionRelation.createAutomaton(getFactory(), mEventEncoding);
+      eventSimplifier = null;
 
       //Powerset construction
       final SubsetConstructionTRSimplifier subsetSimplifier =
-        new SubsetConstructionTRSimplifier(powersetRel);
+        new SubsetConstructionTRSimplifier();
+      final ListBufferTransitionRelation powersetRel =
+        new ListBufferTransitionRelation(mTransitionRelation,
+                  subsetSimplifier.getPreferredInputConfiguration());
+      powersetRel.setName("powerset_events_hidden");
+      subsetSimplifier.setTransitionRelation(powersetRel);
       subsetSimplifier.run();
+      final AutomatonProxy powerSetAut =
+        powersetRel.createAutomaton(getFactory(), mEventEncoding);
 
       //Synchronous composition
-      final Collection<AutomatonProxy> auts = new ArrayList<AutomatonProxy>(2);
-      final AutomatonProxy aut1 = eventsHiddenRel.createAutomaton(getFactory(), mEventEncoding);
-      final AutomatonProxy aut2 = powersetRel.createAutomaton(getFactory(), mEventEncoding);
-      auts.add(aut1);
-      auts.add(aut2);
-      final Set<EventProxy> events = new THashSet<EventProxy>();
-      events.addAll(aut1.getEvents());
-      events.addAll(aut2.getEvents());
-      final ProductDESProxy autToSync = getFactory().createProductDESProxy("synchronous_comp",events,auts);
-      final TRSynchronousProductBuilder builder = new TRSynchronousProductBuilder(autToSync);
+      Collection<AutomatonProxy> automata = new ArrayList<AutomatonProxy>(2);
+      automata.add(eventsHiddenAut);
+      automata.add(powerSetAut);
+      Set<EventProxy> events = new THashSet<EventProxy>();
+      events.addAll(eventsHiddenAut.getEvents());
+      events.addAll(powerSetAut.getEvents());
+      final ProductDESProxy autToSync =
+        getFactory().createProductDESProxy("synchronous_comp",events,automata);
+      final TRSynchronousProductBuilder builder =
+        new TRSynchronousProductBuilder(autToSync);
       builder.run();
+      events = null;
+      automata = null; //TODO: Check null-ing these is okay
 
       //Synthesis step
       final TRAutomatonProxy syncModel = builder.getComputedAutomaton(); //Probably don't need
@@ -719,6 +723,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
 
       int numDeletions = 1;
       final int dumpStateIndex = mTransitionRelation.getDumpStateIndex();
+      final int markedStateCode = mEventEncoding.getEventCode(mUsedMarking);
       while(numDeletions > 0){
         numDeletions = 0;
         //Observability step
@@ -740,6 +745,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
                   sourceTupleDash[0] = sourceTuple[0];
                   sourceTupleDash[1] = s;
                   final int newState = resultMap.getComposedState(sourceTupleDash);
+                  //Successor modifying iterator, buffers will flip here. linear op. can I eliminate this?
                   final TransitionIterator succIterSameEvent = mTransitionRelation.createSuccessorsModifyingIterator();
                   succIterSameEvent.resetState(newState);
                   succIterSameEvent.setCurrentToState(dumpStateIndex);
@@ -752,9 +758,44 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
           }
         }
 
-        //TODO:Nonblocking step
+        //Nonblocking step
+        //Check and set state reachability
+        mTransitionRelation.checkReachability();
 
+        //Create a backwards transition iterator
+        final TransitionIterator pred1Iter = mTransitionRelation.createPredecessorsReadOnlyIterator();
 
+        //A set of coreachable states
+        final TIntHashSet coreachableStates = new TIntHashSet(mTransitionRelation.getNumberOfStates());
+        final TIntStack open = new TIntArrayStack();
+
+        //Add all reachable states to the stack
+        for(int sourceID=0; sourceID<mTransitionRelation.getNumberOfStates(); sourceID++){
+          if(mTransitionRelation.isMarked(sourceID, markedStateCode)){
+            coreachableStates.add(sourceID);
+            open.push(sourceID);
+          }
+        }
+
+        //Add all states that can reach a coreachable state to the set
+        while(open.size() != 0){
+          final int state = open.pop();
+          pred1Iter.resetState(state);
+          while(pred1Iter.advance()){
+            open.push(pred1Iter.getCurrentSourceState());
+            coreachableStates.add(pred1Iter.getCurrentSourceState());
+          }
+        }
+
+        //If any state is not coreachable, change all incoming transitions to dump state
+        for(int stateID=0; stateID<mTransitionRelation.getNumberOfStates(); stateID++){
+          if(!coreachableStates.contains(stateID)){
+            pred1Iter.resetState(stateID);
+            while(pred1Iter.advance()){
+              pred1Iter.setCurrentToState(mTransitionRelation.getDumpStateIndex());
+            }
+          }
+        }
 
         //Controllability step
         for(int e=EventEncoding.NONTAU; e<mNumProperEvents; e++){
@@ -1166,7 +1207,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
       } else if (info.mAut < mNumPlants && info.mProbability == 1.0f) {
         return -1;
       } else if ((this.getAutomaton() < mNumPlants && info.mAut < mNumPlants)
-                 || (this.getAutomaton() >= mNumPlants && info.mAut >= mNumPlants)) {
+          || (this.getAutomaton() >= mNumPlants && info.mAut >= mNumPlants)) {
         return (this.getProbability() < info.mProbability) ? -1 : 1;
       } else {
         return (this.getAutomaton() < mNumPlants) ? -1 : 1;
