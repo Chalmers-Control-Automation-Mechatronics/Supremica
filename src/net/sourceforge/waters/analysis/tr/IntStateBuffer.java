@@ -47,22 +47,22 @@ import net.sourceforge.waters.model.des.StateProxy;
 
 
 /**
- * A data structure that stores status information for states in a transition
- * relation in a compact way.
- *
+ * A data structure that compactly stores the status information of the states
+ * in a transition relation.
+ * <p>
  * The state buffer considers a state space represented consisting of integer
  * state code ranging from&nbsp;0 up to the number of states minus&nbsp;1.
  * For each state code, it stores the following status information.
  * Each state can be designated as <I>initial</I> and/or <I>reachable</I>,
  * and can be <I>marked</I> with zero or more propositions.
- *
+ * <p>
  * The information is stored packed into the bits of a single integer for
  * each state. This allows for the encoding of up to 30 distinct marking
  * propositions.
  *
  * @see StateEncoding
  *
- * @author Robi Malik
+ * @author Robi Malik, Roger Su
  */
 
 public class IntStateBuffer extends AbstractStateBuffer

@@ -114,7 +114,7 @@ import org.apache.log4j.Logger;
  * @see TransitionListBuffer
  * @see TransitionIterator
  *
- * @author Robi Malik
+ * @author Robi Malik, Roger Su
  */
 public class ListBufferTransitionRelation implements EventStatusProvider
 {
@@ -3200,9 +3200,9 @@ public class ListBufferTransitionRelation implements EventStatusProvider
    */
   public static final int CONFIG_COUNT = 0x04;
   /**
-   * Configuration setting specifying that all the flags are set.
+   * Configuration setting specifying that the transition relation is to use
+   * both outgoing and incoming transition buffers.
    */
   public static final int CONFIG_ALL = CONFIG_SUCCESSORS
-                                     | CONFIG_PREDECESSORS
-                                     | CONFIG_COUNT;
+                                     | CONFIG_PREDECESSORS;
 }

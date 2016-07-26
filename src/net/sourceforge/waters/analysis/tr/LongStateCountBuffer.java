@@ -48,8 +48,8 @@ import net.sourceforge.waters.model.des.StateProxy;
 
 
 /**
- * A data structure that stores status information for states in a transition
- * relation in a compact way.
+ * A data structure that compactly stores the status information of the states
+ * in a transition relation.
  * <p>
  * The state buffer considers a state space represented consisting of integer
  * state code ranging from&nbsp;0 up to the number of states minus&nbsp;1.
