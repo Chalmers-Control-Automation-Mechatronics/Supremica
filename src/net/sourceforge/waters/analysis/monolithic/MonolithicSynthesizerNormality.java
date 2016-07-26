@@ -706,7 +706,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
       automata.add(eventsHiddenAut);
       automata.add(powerSetAut);
       Set<EventProxy> events = new THashSet<EventProxy>();
-      events.addAll(eventsHiddenAut.getEvents());
+      events.addAll(eventsHiddenAut.getEvents()); //Possibly missing the unobservable events
       events.addAll(powerSetAut.getEvents());
       final ProductDESProxy autToSync =
         getFactory().createProductDESProxy("synchronous_comp",events,automata);
@@ -714,10 +714,10 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
         new TRSynchronousProductBuilder(autToSync);
       builder.run();
       events = null;
-      automata = null; //TODO: Check null-ing these is okay
+      automata = null;
 
       //Synthesis step
-      final TRAutomatonProxy syncModel = builder.getComputedAutomaton(); //Probably don't need
+      final TRAutomatonProxy syncModel = builder.getComputedAutomaton();
       mTransitionRelation = syncModel.getTransitionRelation();
       final TRSynchronousProductStateMap resultMap = builder.getAnalysisResult().getStateMap();
 
@@ -727,14 +727,15 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
       while(numDeletions > 0){
         numDeletions = 0;
         //Observability step
+        final TransitionIterator successorReadOnlyIter =
+          mTransitionRelation.createSuccessorsReadOnlyIteratorByStatus(EventStatus.STATUS_CONTROLLABLE);
         //Loop through each state in sync product
         for(int source=0; source < mTransitionRelation.getNumberOfStates(); source++){
           //Get the controllable outgoing transitions for given state
-          final TransitionIterator iter = mTransitionRelation.createSuccessorsReadOnlyIteratorByStatus(EventStatus.STATUS_CONTROLLABLE);
-          iter.resetState(source);
-          while(iter.advance()){
-            if(iter.getCurrentTargetState() == dumpStateIndex){
-              final int event = iter.getCurrentEvent();
+          successorReadOnlyIter.resetState(source);
+          while(successorReadOnlyIter.advance()){
+            if(successorReadOnlyIter.getCurrentTargetState() == dumpStateIndex){
+              final int event = successorReadOnlyIter.getCurrentEvent();
               final int[] sourceTuple = new int[2]; //0 = source set, 1 = source state?
               resultMap.getOriginalState(source, sourceTuple);
               //Get sourceSet from pair
@@ -745,8 +746,8 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
                   sourceTupleDash[0] = sourceTuple[0];
                   sourceTupleDash[1] = s;
                   final int newState = resultMap.getComposedState(sourceTupleDash);
-                  //Successor modifying iterator, buffers will flip here. linear op. can I eliminate this?
-                  final TransitionIterator succIterSameEvent = mTransitionRelation.createSuccessorsModifyingIterator();
+                  final TransitionIterator succIterSameEvent =
+                    mTransitionRelation.createSuccessorsModifyingIterator();
                   succIterSameEvent.resetState(newState);
                   succIterSameEvent.setCurrentToState(dumpStateIndex);
                   while(succIterSameEvent.advance()){
@@ -763,7 +764,8 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
         mTransitionRelation.checkReachability();
 
         //Create a backwards transition iterator
-        final TransitionIterator pred1Iter = mTransitionRelation.createPredecessorsReadOnlyIterator();
+        mTransitionRelation.reconfigure(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+        final TransitionIterator predecessorIterator = mTransitionRelation.createPredecessorsReadOnlyIterator();
 
         //A set of coreachable states
         final TIntHashSet coreachableStates = new TIntHashSet(mTransitionRelation.getNumberOfStates());
@@ -780,20 +782,21 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
         //Add all states that can reach a coreachable state to the set
         while(open.size() != 0){
           final int state = open.pop();
-          pred1Iter.resetState(state);
-          while(pred1Iter.advance()){
-            open.push(pred1Iter.getCurrentSourceState());
-            coreachableStates.add(pred1Iter.getCurrentSourceState());
+          predecessorIterator.resetState(state);
+          while(predecessorIterator.advance()){
+            open.push(predecessorIterator.getCurrentSourceState());
+            coreachableStates.add(predecessorIterator.getCurrentSourceState());
           }
         }
 
         //If any state is not coreachable, change all incoming transitions to dump state
         for(int stateID=0; stateID<mTransitionRelation.getNumberOfStates(); stateID++){
           if(!coreachableStates.contains(stateID)){
-            pred1Iter.resetState(stateID);
-            while(pred1Iter.advance()){
-              pred1Iter.setCurrentToState(mTransitionRelation.getDumpStateIndex());
+            predecessorIterator.resetState(stateID);
+            while(predecessorIterator.advance()){
+              predecessorIterator.setCurrentToState(mTransitionRelation.getDumpStateIndex());
             }
+            numDeletions++;
           }
         }
 
