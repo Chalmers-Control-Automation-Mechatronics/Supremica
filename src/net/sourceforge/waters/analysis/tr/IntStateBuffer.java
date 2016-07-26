@@ -176,8 +176,11 @@ public class IntStateBuffer extends AbstractStateBuffer
 
   /**
    * Creates a new state buffer that is an identical copy of the given
-   * state buffer. This copy constructor constructs a deep copy that does
+   * state buffer.
+   * <p>
+   * This copy constructor constructs a deep copy that does
    * not share any data structures with the given state buffer.
+   *
    * @param  buffer     The state buffer to be copied from.
    * @param  propStatus Event status provider to determine the number of
    *                    propositions and which propositions are used.
@@ -192,6 +195,34 @@ public class IntStateBuffer extends AbstractStateBuffer
     mStateInfo = Arrays.copyOf(buffer2.mStateInfo, size);
   }
 
+  /**
+   * Creates a new ordinary state buffer corresponding to a given
+   * state-count buffer.
+   * <p>
+   * Since the new state buffer is copied from a state-count buffer,
+   * it would not contain markings.
+   *
+   * @param buffer     The state-count buffer to be copied from.
+   * @param propStatus Event status provider to determine the number of
+   *                   propositions and which propositions are used.
+   */
+  public IntStateBuffer(final LongStateCountBuffer buffer,
+                        final EventStatusProvider propStatus)
+  {
+    mPropositionStatus = propStatus;
+    setDumpStateIndex(buffer.getDumpStateIndex());
+    final int size = buffer.getNumberOfStates();
+    mStateInfo = new int[size];
+    for (int i = 0; i < size; i++) {
+      if (buffer.isInitial(i)) {
+        mStateInfo[i] |= TAG_INITIAL;
+      }
+      if (buffer.isReachable(i)) {
+        mStateInfo[i] |= TAG_REACHABLE;
+      }
+    }
+  }
+
 
   //#########################################################################
   //# Simple Access
@@ -199,6 +230,20 @@ public class IntStateBuffer extends AbstractStateBuffer
   public AbstractStateBuffer clone(final EventStatusProvider propStatus)
   {
     return new IntStateBuffer(this, propStatus);
+  }
+
+  @Override
+  public AbstractStateBuffer clone(final int size,
+                                   final EventStatusProvider propStatus)
+  {
+    return new IntStateBuffer(size, propStatus);
+  }
+
+  @Override
+  public AbstractStateBuffer clone(final int size, final int dumpIndex,
+                                   final EventStatusProvider propStatus)
+  {
+    return new IntStateBuffer(size, dumpIndex, propStatus);
   }
 
   /**
@@ -581,18 +626,32 @@ public class IntStateBuffer extends AbstractStateBuffer
     return new StateEncoding(states);
   }
 
+  //#########################################################################
+  //# Simple Access: State Count
   /**
-   * Get the state count of a state in this buffer.
-   * <p>
-   * In this class, this method always returns 1.
+   * Gets the state count of a state in this buffer.
    *
    * @param state ID of the state.
-   * @return the count of the specified state.
+   *
+   * @return the count of the specified state, which is always 1 for
+   *         this particular type of buffer. Note that the count of 1
+   *         is implicitly represented by the number 0.
    */
   @Override
   public long getStateCount(final int state)
   {
-    return 1L;
+    return 0;
+  }
+
+  /**
+   * Sets the state count of a state in this buffer.
+   * <p>
+   * In this class, this method simply does nothing.
+   */
+  @Override
+  public void setStateCount(final int state, final long count)
+  {
+
   }
 
 

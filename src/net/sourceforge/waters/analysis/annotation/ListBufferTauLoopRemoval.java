@@ -44,6 +44,7 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 
 
 public class ListBufferTauLoopRemoval
@@ -117,7 +118,7 @@ public class ListBufferTauLoopRemoval
     }
   }
 
-  public void run()
+  public void run() throws OverflowException
   {
     TIME -= System.currentTimeMillis();
     mTransitionRelation.removeTauSelfLoops();

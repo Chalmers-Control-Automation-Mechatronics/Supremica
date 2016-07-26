@@ -50,20 +50,21 @@ import net.sourceforge.waters.model.des.StateProxy;
 /**
  * A data structure that stores status information for states in a transition
  * relation in a compact way.
- *
+ * <p>
  * The state buffer considers a state space represented consisting of integer
  * state code ranging from&nbsp;0 up to the number of states minus&nbsp;1.
  * For each state code, it stores the following status information.
  * Each state can be designated as <I>initial</I> and/or <I>reachable</I>,
- * and can be <I>marked</I> with zero or more propositions.
- *
- * The information is stored packed into the bits of a single integer for
- * each state. This allows for the encoding of up to 30 distinct marking
- * propositions.
+ * and can have a state-count value from 1 to 2^63.
+ * <p>
+ * The information is stored packed into the bits of a single long for each
+ * state. Since each state has a minimum count of one, an encoding of 0
+ * shall mean a state-count of 1. Hence, the value of the 62 bits (excluding
+ * the most significant two) represents the state-count minus 1.
  *
  * @see StateEncoding
  *
- * @author Robi Malik
+ * @author Robi Malik, Roger Su
  */
 
 public class LongStateCountBuffer extends AbstractStateBuffer
@@ -138,6 +139,22 @@ public class LongStateCountBuffer extends AbstractStateBuffer
    * This constructor allocates a new state buffer with the given number
    * of states. States are initially marked as reachable, while all other
    * attributes and markings of the states are initialised to be
+   * <CODE>false</CODE>. An additional unreachable dump state is added
+   * at the end.
+   * @param  size       The number of states in the new buffer.
+   * @param eventStatus Event status provider to determine the number of
+   *                    propositions and which propositions are used.
+   */
+  public LongStateCountBuffer(final int size, final EventStatusProvider eventStatus)
+  {
+    this(size);
+  }
+
+  /**
+   * Creates a new empty state buffer.
+   * This constructor allocates a new state buffer with the given number
+   * of states. States are initially marked as reachable, while all other
+   * attributes and markings of the states are initialised to be
    * <CODE>false</CODE>.
    * @param  size       The number of states in the new buffer.
    * @param  dumpIndex  The index of the dump state in the new buffer.
@@ -146,12 +163,32 @@ public class LongStateCountBuffer extends AbstractStateBuffer
    *                    every state buffer to provide for algorithms that
    *                    redirect transitions to such a state.
    */
-  public LongStateCountBuffer(final int size,
-                              final int dumpIndex)
+  public LongStateCountBuffer(final int size, final int dumpIndex)
   {
     setDumpStateIndex(dumpIndex);
     mStateInfo = new long[size];
     Arrays.fill(mStateInfo, TAG_REACHABLE);
+  }
+
+  /**
+   * Creates a new empty state buffer.
+   * This constructor allocates a new state buffer with the given number
+   * of states. States are initially marked as reachable, while all other
+   * attributes and markings of the states are initialised to be
+   * <CODE>false</CODE>.
+   * @param  size       The number of states in the new buffer.
+   * @param  dumpIndex  The index of the dump state in the new buffer.
+   *                    The dump state signifies a unmarked state without
+   *                    outgoing transitions. It must be specified for
+   *                    every state buffer to provide for algorithms that
+   *                    redirect transitions to such a state.
+   * @param eventStatus Event status provider to determine the number of
+   *                    propositions and which propositions are used.
+   */
+  public LongStateCountBuffer(final int size, final int dumpIndex,
+                              final EventStatusProvider eventStatus)
+  {
+    this(size, dumpIndex);
   }
 
   /**
@@ -167,13 +204,55 @@ public class LongStateCountBuffer extends AbstractStateBuffer
     mStateInfo = Arrays.copyOf(buffer.mStateInfo, size);
   }
 
+  /**
+   * Creates a new state-count buffer corresponding to a given normal
+   * state buffer.
+   * <p>
+   * Since the new state buffer is a state-count buffer and contains no
+   * markings, the markings of the original normal state buffer will be
+   * discarded.
+   *
+   * @param buffer     The state buffer to be copied from.
+   * @param propStatus Event status provider to determine the number of
+   *                   propositions and which propositions are used.
+   */
+  public LongStateCountBuffer(final IntStateBuffer buffer,
+                              final EventStatusProvider propStatus)
+  {
+    setDumpStateIndex(buffer.getDumpStateIndex());
+    final int size = buffer.getNumberOfStates();
+    mStateInfo = new long[size];
+    for (int i = 0; i < size; i++) {
+      if (buffer.isInitial(i)) {
+        mStateInfo[i] |= TAG_INITIAL;
+      }
+      if (buffer.isReachable(i)) {
+        mStateInfo[i] |= TAG_REACHABLE;
+      }
+    }
+  }
+
 
   //#########################################################################
   //# Simple Access
   @Override
-  public LongStateCountBuffer clone(final EventStatusProvider propStatus)
+  public AbstractStateBuffer clone(final EventStatusProvider propStatus)
   {
     return new LongStateCountBuffer(this);
+  }
+
+  @Override
+  public AbstractStateBuffer clone(final int size,
+                                   final EventStatusProvider propStatus)
+  {
+    return new LongStateCountBuffer(size);
+  }
+
+  @Override
+  public AbstractStateBuffer clone(final int size, final int dumpIndex,
+                                   final EventStatusProvider propStatus)
+  {
+    return new LongStateCountBuffer(size, dumpIndex);
   }
 
   /**
@@ -490,8 +569,10 @@ public class LongStateCountBuffer extends AbstractStateBuffer
     return new StateEncoding(states);
   }
 
+  //#########################################################################
+  //# Simple Access: State Count
   /**
-   * Get the state count of a state in this buffer.
+   * Gets the state count of a state in this buffer.
    *
    * @param state ID of the state.
    * @return the count of the specified state.
@@ -502,6 +583,13 @@ public class LongStateCountBuffer extends AbstractStateBuffer
     return mStateInfo[state] & ~TAG_ALL;
   }
 
+  /**
+   * Sets the state count of a state in this buffer.
+   *
+   * @param state ID of the state.
+   * @param count the count of the specified state.
+   */
+  @Override
   public void setStateCount(final int state, final long count)
     throws OverflowException
   {

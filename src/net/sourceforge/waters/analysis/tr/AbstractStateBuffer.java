@@ -37,6 +37,7 @@ import gnu.trove.list.array.TIntArrayList;
 
 import java.io.PrintWriter;
 
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.StateProxy;
 
 
@@ -149,6 +150,13 @@ public abstract class AbstractStateBuffer
   //#########################################################################
   //# Simple Access
   public abstract AbstractStateBuffer clone(EventStatusProvider propStatus);
+
+  public abstract AbstractStateBuffer clone(final int size,
+                                            EventStatusProvider propStatus);
+
+  public abstract AbstractStateBuffer clone(final int size,
+                                            final int dumpIndex,
+                                            EventStatusProvider propStatus);
 
   /**
    * Gets the number of states in the buffer.
@@ -386,12 +394,21 @@ public abstract class AbstractStateBuffer
   //#########################################################################
   //# Simple Access: State Count
   /**
-   * Get the state count of a state in this buffer.
+   * Gets the state count of a particular state in this buffer.
    *
-   * @param state ID of the state.
+   * @param state ID of the particular state.
    * @return the count of the specified state.
    */
-  public abstract long getStateCount(int state);
+  public abstract long getStateCount(final int state);
+
+  /**
+   * Sets the state count of a particular state in this buffer.
+   *
+   * @param state ID of the particular state.
+   * @param count the count of the specified state.
+   */
+  public abstract void setStateCount(final int state, final long count)
+    throws OverflowException;
 
 
   //#########################################################################

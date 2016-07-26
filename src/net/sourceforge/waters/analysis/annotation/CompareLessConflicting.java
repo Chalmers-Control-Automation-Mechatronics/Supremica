@@ -55,6 +55,7 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
@@ -544,8 +545,9 @@ public class CompareLessConflicting
     }
   }
 
-  public static ListBufferTransitionRelation
-    mergeConflictEquivalent(final ListBufferTransitionRelation aut, final int marking)
+  public static ListBufferTransitionRelation mergeConflictEquivalent
+    (final ListBufferTransitionRelation aut, final int marking)
+      throws OverflowException
   {
     final CompareLessConflicting clc = new CompareLessConflicting(aut, aut, marking);
     final TIntObjectHashMap<TIntArrayList> statetogroup = new TIntObjectHashMap<TIntArrayList>();

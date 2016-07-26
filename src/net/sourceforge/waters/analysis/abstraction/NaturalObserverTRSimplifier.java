@@ -33,6 +33,12 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
+
 import java.util.ArrayList;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -42,12 +48,6 @@ import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
-
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.set.hash.TIntHashSet;
-import gnu.trove.stack.TIntStack;
-import gnu.trove.stack.array.TIntArrayStack;
 
 /**
  * <P>An implementation of the natural observer algorithm.</P>
@@ -256,7 +256,7 @@ public class NaturalObserverTRSimplifier
 
   //#########################################################################
   //# Auxiliary Methods
-  private boolean extendEvent()
+  private boolean extendEvent() throws OverflowException
   {
     boolean modified = false;
     final ListBufferTransitionRelation rel = getTransitionRelation();
