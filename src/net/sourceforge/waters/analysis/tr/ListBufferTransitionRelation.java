@@ -114,7 +114,7 @@ import org.apache.log4j.Logger;
  * @see TransitionListBuffer
  * @see TransitionIterator
  *
- * @author Robi Malik
+ * @author Robi Malik, Roger Su
  */
 public class ListBufferTransitionRelation implements EventStatusProvider
 {
