@@ -59,6 +59,7 @@ public class ToolsFlexfactAction
 
     Thread local = null;
     Process proc = null;
+    LocalServer localServer = null;
 
     private static final long serialVersionUID = 1L;
 
@@ -85,16 +86,18 @@ public class ToolsFlexfactAction
       try {
         if(proc != null){
           final String[] args1 = new String[] {"/bin/bash", "-c", "pkill -f flexfact"};
+          localServer.KillThreads();
           proc = new ProcessBuilder(args1).start();
         }
-        Thread.sleep(600);
+        Thread.sleep(400);
         final String[] args = new String[] {"/bin/bash", "-c", "flexfact"};
         proc = new ProcessBuilder(args).start();
         Thread.sleep(600);
       } catch (final Exception ex) {
         ex.printStackTrace();
       }
-        local = new Thread(new LocalServer(sim));
+      localServer = new LocalServer(sim);
+        local = new Thread(localServer);
         local.start();
     }
 

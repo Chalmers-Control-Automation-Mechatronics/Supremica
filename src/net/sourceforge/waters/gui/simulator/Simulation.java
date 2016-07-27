@@ -319,6 +319,14 @@ public class Simulation implements ModelObserver, Observer
         if(ind >= 0) {
           event = new StringBuilder(event).replace(ind, ind+5, "-").toString();
         }
+        ind = event.lastIndexOf("_down");
+        if(ind >= 0) {
+          event = new StringBuilder(event).replace(ind, ind+5, "+").toString();
+        }
+        ind = event.lastIndexOf("_up");
+        if(ind >= 0) {
+          event = new StringBuilder(event).replace(ind, ind+3, "-").toString();
+        }
         if(LocalServer.events.contains(event))
         {
           LocalSocket.SendEvent(event);
@@ -359,6 +367,16 @@ public class Simulation implements ModelObserver, Observer
       //Get random controllable event. If list is size of 1, get the first element.
       final SimulatorStep c = possibleControllableEvents.get(possibleControllableEvents.size() == 1 ? 0 : rand.nextInt(possibleControllableEvents.size()));
       if(Config.INCLUDE_FLEXFACT.isTrue()){
+        SwingUtilities.invokeLater(new Runnable() {
+          @Override
+          public void run()
+          {
+            if(getEnabledSteps().size() == numEvents && getEnabledSteps().contains(c))
+             step(c);
+          }
+        });
+      }
+      else{
         SwingUtilities.invokeLater(new Runnable() {
           @Override
           public void run()

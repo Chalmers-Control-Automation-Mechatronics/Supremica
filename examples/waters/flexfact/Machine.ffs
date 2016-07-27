@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlexFactConfiguration>
+<SimulationParameters>
+<OperatorPanel cnt="0"/>
+<FaultMonitor val="0"/>
+</SimulationParameters>
+<PlantComponents>
+<StackFeeder id="SF1">
+<Position x="1" y="2" phi="std"/>
+</StackFeeder>
+<Machine id="PM1">
+<Position x="2" y="2" phi="std"/>
+<FaultConfig enabled="no" id="Process Breakdown">
+<Stochastic t_f="0" enabled="no" t_r="0"/>
+</FaultConfig>
+<Parameters proc="A"/>
+</Machine>
+<ExitSlide id="XS1">
+<Position x="4" y="2" phi="std"/>
+</ExitSlide>
+</PlantComponents>
+</FlexFactConfiguration>

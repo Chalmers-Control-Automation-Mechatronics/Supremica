@@ -1,19 +1,28 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
-<Module Name="simple_feed" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
+<Module Name="Machine" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <EventDeclList>
         <EventDecl Kind="UNCONTROLLABLE" Name="sf_wpar"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="sf_wplv"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="sf_fdhome"/>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
         <EventDecl Kind="CONTROLLABLE" Name="sf_fdon"/>
-        <EventDecl Kind="CONTROLLABLE" Name="cb_bm_west"/>
-        <EventDecl Kind="CONTROLLABLE" Name="cb_bm_east"/>
-        <EventDecl Kind="CONTROLLABLE" Name="cb_boff"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="cb_wpar"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="cb_wplv"/>
+        <EventDecl Kind="CONTROLLABLE" Name="pm1_bm_west"/>
+        <EventDecl Kind="CONTROLLABLE" Name="pm1_bm_east"/>
+        <EventDecl Kind="CONTROLLABLE" Name="pm1_boff"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="pm1_wpar"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="pm1_wplv"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="xs_wpar"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="xs_wplv"/>
         <EventDecl Kind="CONTROLLABLE" Name="sf_fdoff"/>
+        <EventDecl Kind="CONTROLLABLE" Name="pm1_mon"/>
+        <EventDecl Kind="CONTROLLABLE" Name="pm1_moff"/>
+        <EventDecl Kind="CONTROLLABLE" Name="pm1_pm_down"/>
+        <EventDecl Kind="CONTROLLABLE" Name="pm1_pm_up"/>
+        <EventDecl Kind="CONTROLLABLE" Name="pm1_poff"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="pm1_ps_down"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="pm1_ps_up"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="pm1_mrqu"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="pm1_mack"/>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="PLANT" Name="sf_wp">
@@ -285,7 +294,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="cb_bm">
+        <SimpleComponent Kind="PLANT" Name="pm1_bm">
             <Graph>
                 <NodeList>
                     <SimpleNode Name="west">
@@ -322,7 +331,7 @@
                 <EdgeList>
                     <Edge Source="off" Target="west">
                         <LabelBlock>
-                            <SimpleIdentifier Name="cb_bm_west"/>
+                            <SimpleIdentifier Name="pm1_bm_west"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-39" Y="3"/>
                             </LabelGeometry>
@@ -333,7 +342,7 @@
                     </Edge>
                     <Edge Source="west" Target="off">
                         <LabelBlock>
-                            <SimpleIdentifier Name="cb_boff"/>
+                            <SimpleIdentifier Name="pm1_boff"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-25" Y="-20"/>
                             </LabelGeometry>
@@ -344,7 +353,7 @@
                     </Edge>
                     <Edge Source="east" Target="off">
                         <LabelBlock>
-                            <SimpleIdentifier Name="cb_boff"/>
+                            <SimpleIdentifier Name="pm1_boff"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-23" Y="-19"/>
                             </LabelGeometry>
@@ -355,7 +364,7 @@
                     </Edge>
                     <Edge Source="off" Target="east">
                         <LabelBlock>
-                            <SimpleIdentifier Name="cb_bm_east"/>
+                            <SimpleIdentifier Name="pm1_bm_east"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-34" Y="2"/>
                             </LabelGeometry>
@@ -366,8 +375,8 @@
                     </Edge>
                     <Edge Source="west" Target="west">
                         <LabelBlock>
-                            <SimpleIdentifier Name="cb_wpar"/>
-                            <SimpleIdentifier Name="cb_wplv"/>
+                            <SimpleIdentifier Name="pm1_wpar"/>
+                            <SimpleIdentifier Name="pm1_wplv"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-19" Y="-48"/>
                             </LabelGeometry>
@@ -378,8 +387,8 @@
                     </Edge>
                     <Edge Source="east" Target="east">
                         <LabelBlock>
-                            <SimpleIdentifier Name="cb_wpar"/>
-                            <SimpleIdentifier Name="cb_wplv"/>
+                            <SimpleIdentifier Name="pm1_wpar"/>
+                            <SimpleIdentifier Name="pm1_wplv"/>
                             <SimpleIdentifier Name="xs_wpar"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-30" Y="-64"/>
@@ -441,10 +450,10 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC" Name="cb_spec1">
+        <SimpleComponent Kind="SPEC" Name="pm1_spec1">
             <Graph>
                 <LabelBlock>
-                    <SimpleIdentifier Name="cb_bm_west"/>
+                    <SimpleIdentifier Name="pm1_bm_west"/>
                     <LabelGeometry Anchor="NW">
                         <Point X="272" Y="304"/>
                     </LabelGeometry>
@@ -505,7 +514,7 @@
                     </Edge>
                     <Edge Source="S1" Target="S2">
                         <LabelBlock>
-                            <SimpleIdentifier Name="cb_bm_east"/>
+                            <SimpleIdentifier Name="pm1_bm_east"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="1" Y="-16"/>
                             </LabelGeometry>
@@ -543,7 +552,7 @@
                     </Edge>
                     <Edge Source="S3" Target="S0">
                         <LabelBlock>
-                            <SimpleIdentifier Name="cb_boff"/>
+                            <SimpleIdentifier Name="pm1_boff"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-52" Y="-6"/>
                             </LabelGeometry>
@@ -551,7 +560,7 @@
                     </Edge>
                     <Edge Source="S0" Target="S0">
                         <LabelBlock>
-                            <SimpleIdentifier Name="cb_boff"/>
+                            <SimpleIdentifier Name="pm1_boff"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-42" Y="-29"/>
                             </LabelGeometry>

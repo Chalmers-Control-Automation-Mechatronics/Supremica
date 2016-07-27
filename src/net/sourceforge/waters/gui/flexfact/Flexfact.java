@@ -29,9 +29,6 @@ public class Flexfact implements Runnable {
 
             sendingThread = new Thread(new Read(flexFactSocket, false, sim));
             sendingThread.start();
-
-			//Start reading what Flexfact has to say locally and on the Flexfact socket.
-			System.out.println("This is a Flexfact exec");
 			SendMessage();
 
 		}
@@ -42,8 +39,7 @@ public class Flexfact implements Runnable {
             flexFactSocket.close();
 
           } catch (final IOException exception) {
-            // TODO Auto-generated catch block
-            exception.printStackTrace();
+            System.err.println("Error at Flexfact");
           }
 		}
 	}

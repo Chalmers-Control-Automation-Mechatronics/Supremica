@@ -42,10 +42,19 @@ public class LocalServer implements Runnable {
               awaitingSocket.close();
               localSocket.close();
             } catch (final IOException exception) {
-              exception.printStackTrace();
+              System.err.println("Error at LocalServer");
             }
   		}
   	}
 
+	public void KillThreads(){
+	  System.out.println("Killing...");
+      try {
+        awaitingSocket.close();
+        localSocket.close();
+      } catch (final IOException exception) {
+        System.err.println("Error at Killing");
+      }
+	}
 }
 

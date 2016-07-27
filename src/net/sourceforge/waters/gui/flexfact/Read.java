@@ -46,9 +46,9 @@ public class Read implements Runnable{
 		try{
 			// Forever reading in lines
 			while ((line = in.readLine()) != null){
-				if(isLocal)
+				if(isLocal && !line.startsWith("%"))
 					System.out.println("local: " + line);
-				else
+				else if (!line.startsWith("%"))
 					System.out.println("Flexfact: " + line);
 
 				// If it gives a list of events able to be sent
@@ -75,25 +75,14 @@ public class Read implements Runnable{
 				  sim.step(e);
 				}
 			}
-		}catch (final IOException exception){
-		  exception.printStackTrace();
-		}catch (final Exception e){
+		}catch (final Exception exception){
 		  try {
             client.close();
             in.close();
           } catch (final IOException exception2) {
+            System.err.println("Error at Read");
             exception2.printStackTrace();
           }
-		}finally {
-
-			try{
-			in.close();
-			client.close();
-			}
-			catch (final IOException e){
-				e.printStackTrace();
-			}
 		}
 	}
-
 }

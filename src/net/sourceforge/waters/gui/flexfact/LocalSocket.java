@@ -26,7 +26,7 @@ public class LocalSocket implements Runnable {
           try {
             LocalServer.localSocket.close();
           } catch (final IOException exception) {
-            exception.printStackTrace();
+            System.err.println("Error at LocalSocket");
           }
           localOut.close();
         }
