@@ -765,7 +765,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
 
         //Create a backwards transition iterator
         mTransitionRelation.reconfigure(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
-        final TransitionIterator predecessorIterator = mTransitionRelation.createPredecessorsReadOnlyIterator();
+        final TransitionIterator predecessorIterator = mTransitionRelation.createPredecessorsModifyingIterator();
 
         //A set of coreachable states
         final TIntHashSet coreachableStates = new TIntHashSet(mTransitionRelation.getNumberOfStates());
@@ -813,12 +813,10 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
                   return setBooleanResult(false);
                 }
                 //Change all transitions pointing to this state, to point to dump
-                //TODO:Is it safe to declare the below out of the loop and keep re-using it?
                 //TODO:Is it necessary to manually point these transitions to dump as setReachable() already removes them
-                final TransitionIterator predIter = mTransitionRelation.createPredecessorsModifyingIterator();
-                predIter.resetState(source);
-                while(iter.advance()){
-                  iter.setCurrentToState(dumpStateIndex);
+                predecessorIterator.resetState(source);
+                while(predecessorIterator.advance()){
+                  predecessorIterator.setCurrentToState(dumpStateIndex);
                 }
                 //Set the state as unreachable (will be removed later)
                 mTransitionRelation.setReachable(source, false);
