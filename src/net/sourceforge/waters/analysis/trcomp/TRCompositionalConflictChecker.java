@@ -118,7 +118,7 @@ import org.apache.log4j.Logger;
  * @author Robi Malik
  */
 public class TRCompositionalConflictChecker
-  extends AbstractTRCompositionalAnalyzer
+  extends AbstractTRCompositionalVerifier
   implements ConflictChecker
 {
 

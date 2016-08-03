@@ -39,10 +39,9 @@ import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.EnumFactory;
 import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.StateCounter;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.TraceProxy;
 
 /**
  * A compositional state counter based on {@link TRAutomatonProxy} that
@@ -69,10 +68,11 @@ public class TRCompositionalStateCounter
 
   public TRCompositionalStateCounter(final ProductDESProxy model,
                                      final KindTranslator translator,
-                                     final ModelVerifier mono)
+                                     final ModelAnalyzer mono)
   {
     super(model, translator, mono);
   }
+
 
   //#########################################################################
   /**
@@ -92,20 +92,6 @@ public class TRCompositionalStateCounter
     return builder;
   }*/
 
-  /**
-   * Inherited from the superclass {@link AbstractTRCompositionalAnalyzer}.
-   * <p>
-   * Because counterexamples are irrelevant in the computation of the state
-   * count, this method always returns <code>null</code>.
-   */
-  @Override
-  public TraceProxy getCounterExample()
-  {
-    return null;
-  }
-
-
-
   @Override
   public EnumFactory<TRToolCreator<TransitionRelationSimplifier>> getTRSimplifierFactory()
   {
@@ -120,18 +106,13 @@ public class TRCompositionalStateCounter
     return false;
   }
 
-  @Override
-  protected TRTraceProxy createEmptyTrace(final ProductDESProxy des)
-  {
-    return null;
-  }
-
   protected TransitionRelationSimplifier createStateCountEquivalentChain
     (final Equivalence reverseObservationEquivalence,
      final boolean b, final boolean c, final boolean d)
   {
     return null;
   }
+
 
   //#########################################################################
   //# Abstraction Chains
@@ -154,6 +135,7 @@ public class TRCompositionalStateCounter
          true, true, true);
     }
   };*/
+
 
   //#########################################################################
   //# Data Members
