@@ -771,7 +771,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
         final TIntHashSet coreachableStates = new TIntHashSet(mTransitionRelation.getNumberOfStates());
         final TIntStack open = new TIntArrayStack();
 
-        //Add all reachable states to the stack
+        //Add all accepting states to the stack
         for(int sourceID=0; sourceID<mTransitionRelation.getNumberOfStates(); sourceID++){
           if(mTransitionRelation.isMarked(sourceID, markedStateCode)){
             coreachableStates.add(sourceID);
@@ -781,11 +781,14 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
 
         //Add all states that can reach a coreachable state to the set
         while(open.size() != 0){
-          final int state = open.pop();
-          predecessorIterator.resetState(state);
+          final int targetState = open.pop();
+          predecessorIterator.resetState(targetState);
           while(predecessorIterator.advance()){
-            open.push(predecessorIterator.getCurrentSourceState());
-            coreachableStates.add(predecessorIterator.getCurrentSourceState());
+            final int sourceState = predecessorIterator.getCurrentSourceState();
+            if(!coreachableStates.contains(sourceState)){
+              open.push(predecessorIterator.getCurrentSourceState());
+              coreachableStates.add(predecessorIterator.getCurrentSourceState());
+            }
           }
         }
 
