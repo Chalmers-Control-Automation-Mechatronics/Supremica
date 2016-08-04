@@ -33,6 +33,15 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.custom_hash.TObjectByteCustomHashMap;
+import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,15 +87,6 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.apache.log4j.Logger;
-
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.custom_hash.TObjectByteCustomHashMap;
-import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
-import gnu.trove.stack.TIntStack;
-import gnu.trove.stack.array.TIntArrayStack;
 
 
 /**
@@ -705,15 +705,15 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
       Collection<AutomatonProxy> automata = new ArrayList<AutomatonProxy>(2);
       automata.add(eventsHiddenAut);
       automata.add(powerSetAut);
-      Set<EventProxy> events = new THashSet<EventProxy>();
-      events.addAll(eventsHiddenAut.getEvents()); //Possibly missing the unobservable events
-      events.addAll(powerSetAut.getEvents());
+      //Set<EventProxy> events = new THashSet<EventProxy>();
+      //events.addAll(eventsHiddenAut.getEvents()); //Possibly missing the unobservable events
+      //events.addAll(powerSetAut.getEvents());
       final ProductDESProxy autToSync =
-        getFactory().createProductDESProxy("synchronous_comp",events,automata);
+        getFactory().createProductDESProxy("synchronous_comp",mEventEncoding.getUsedEvents(),automata);
       final TRSynchronousProductBuilder builder =
         new TRSynchronousProductBuilder(autToSync);
       builder.run();
-      events = null;
+      //events = null;
       automata = null;
 
       //Synthesis step
@@ -727,7 +727,8 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
       while(numDeletions > 0){
         numDeletions = 0;
         //Observability step
-        final TransitionIterator successorReadOnlyIter =
+        mTransitionRelation.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+        /*final TransitionIterator successorReadOnlyIter =
           mTransitionRelation.createSuccessorsReadOnlyIteratorByStatus(EventStatus.STATUS_CONTROLLABLE);
         //Loop through each state in sync product
         for(int source=0; source < mTransitionRelation.getNumberOfStates(); source++){
@@ -757,11 +758,11 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
               }
             }
           }
-        }
+        }*/
 
         //Nonblocking step
         //Check and set state reachability
-        mTransitionRelation.checkReachability();
+        //mTransitionRelation.checkReachability();
 
         //Create a backwards transition iterator
         mTransitionRelation.reconfigure(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
@@ -771,11 +772,12 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
         final TIntHashSet coreachableStates = new TIntHashSet(mTransitionRelation.getNumberOfStates());
         final TIntStack open = new TIntArrayStack();
 
-        //Add all accepting states to the stack
-        for(int sourceID=0; sourceID<mTransitionRelation.getNumberOfStates(); sourceID++){
-          if(mTransitionRelation.isMarked(sourceID, markedStateCode)){
-            coreachableStates.add(sourceID);
-            open.push(sourceID);
+        //For each state
+        for(int state=0; state<mTransitionRelation.getNumberOfStates(); state++){
+          //If it is reachable and accepting, add it to open
+          if(mTransitionRelation.isReachable(state) && mTransitionRelation.isMarked(state, markedStateCode)){
+            open.push(state);
+            coreachableStates.add(state);
           }
         }
 
@@ -793,12 +795,21 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
         }
 
         //If any state is not coreachable, change all incoming transitions to dump state
-        for(int stateID=0; stateID<mTransitionRelation.getNumberOfStates(); stateID++){
-          if(!coreachableStates.contains(stateID)){
-            predecessorIterator.resetState(stateID);
-            while(predecessorIterator.advance()){
-              predecessorIterator.setCurrentToState(mTransitionRelation.getDumpStateIndex());
+        for(int state=0; state<mTransitionRelation.getNumberOfStates(); state++){
+          //TODO: not sure if reachability check here is correct
+          if(mTransitionRelation.isReachable(state) && !coreachableStates.contains(state)){
+            //TODO: This can be pulled out into a method as it is reused
+            //If source is initial state, stop and return empty set/no result
+            if(mTransitionRelation.isInitial(state)){
+              return setBooleanResult(false);
             }
+            //Change all transitions pointing to this state, to point to dump
+            predecessorIterator.resetState(state);
+            while(predecessorIterator.advance()){
+              predecessorIterator.setCurrentToState(dumpStateIndex);
+            }
+            //Set the state as unreachable (will be removed later)
+            mTransitionRelation.setReachable(state, false);
             numDeletions++;
           }
         }
@@ -811,12 +822,12 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
             while(iter.advance()){
               if(iter.getCurrentTargetState() == dumpStateIndex){
                 final int source = iter.getCurrentSourceState();
+                //TODO: This can be pulled out into a method as it is reused
                 //If source is initial state, stop and return empty set/no result
                 if(mTransitionRelation.isInitial(source)){
                   return setBooleanResult(false);
                 }
                 //Change all transitions pointing to this state, to point to dump
-                //TODO:Is it necessary to manually point these transitions to dump as setReachable() already removes them
                 predecessorIterator.resetState(source);
                 while(predecessorIterator.advance()){
                   predecessorIterator.setCurrentToState(dumpStateIndex);
