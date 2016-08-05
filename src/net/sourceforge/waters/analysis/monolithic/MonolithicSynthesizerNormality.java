@@ -517,7 +517,6 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
-  @SuppressWarnings("unused")
   @Override
   public boolean run() throws AnalysisException
   {
@@ -705,15 +704,12 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
       Collection<AutomatonProxy> automata = new ArrayList<AutomatonProxy>(2);
       automata.add(eventsHiddenAut);
       automata.add(powerSetAut);
-      //Set<EventProxy> events = new THashSet<EventProxy>();
-      //events.addAll(eventsHiddenAut.getEvents()); //Possibly missing the unobservable events
-      //events.addAll(powerSetAut.getEvents());
       final ProductDESProxy autToSync =
         getFactory().createProductDESProxy("synchronous_comp",mEventEncoding.getUsedEvents(),automata);
       final TRSynchronousProductBuilder builder =
         new TRSynchronousProductBuilder(autToSync);
+      builder.setEventEncoding(mEventEncoding);
       builder.run();
-      //events = null;
       automata = null;
 
       //Synthesis step
@@ -871,6 +867,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
 
       if(isDetailedOutputEnabled()){
         //Return result
+        mTransitionRelation.removeRedundantPropositions();
         final ProductDESProxy result = createDESProxy(mTransitionRelation);
         setProxyResult(result);
       }
