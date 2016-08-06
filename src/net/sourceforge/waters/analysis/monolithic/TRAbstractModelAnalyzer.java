@@ -979,7 +979,7 @@ public abstract class TRAbstractModelAnalyzer
     @Override
     public boolean isMarkedStateEncoded(final int[] encoded)
     {
-      final int state = mStateSpace.get(encoded);
+      final int state = mStateSpace.getIndex(encoded);
       return isMarkedState(state);
     }
 

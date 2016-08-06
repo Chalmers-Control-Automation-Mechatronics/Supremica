@@ -112,6 +112,30 @@ public abstract class TRAbstractSynchronousProductBuilder
     return mRemovingSelfloops;
   }
 
+  /**
+   * Sets whether the synchronous product builder is used for state
+   * counting.
+   * <p>
+   * If enabled, each state tuple of the synchronous product would contain
+   * a state count, and the state count of the tuple&nbsp;
+   * x = (q<sub>1</sub>,<sub>q2</sub>,...,q<sub>n</sub>)
+   * would be #(x) = #(q<sub>1</sub>)*#(q<sub>2</sub>)*...*#(q<sub>n</sub>).
+   */
+  public void setCountingStates(final boolean counting)
+  {
+    mCountingStates = counting;
+  }
+
+  /**
+   * Returns whether the synchronous product builder is used for state
+   * counting.
+   * @see #setCountingStates(boolean) setCountingStates()
+   */
+  public boolean getCountingStates()
+  {
+    return mCountingStates;
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelBuilder
@@ -311,27 +335,52 @@ public abstract class TRAbstractSynchronousProductBuilder
       final IntArrayBuffer stateSpace = getStateSpace();
       final int deadlockState = getDeadlockState();
       final ListBufferTransitionRelation rel;
+      // Create a transition relation of the appropriate type.
       if (deadlockState >= 0) {
-        rel = new ListBufferTransitionRelation(computeOutputName(),
-                                               computeOutputKind(),
-                                               outputEnc,
-                                               stateSpace.size(),
-                                               deadlockState,
-                                               ListBufferTransitionRelation.
-                                               CONFIG_SUCCESSORS);
+        if (mCountingStates) {
+          // Deadlock & State Count
+          rel = new ListBufferTransitionRelation(computeOutputName(),
+                                                 computeOutputKind(),
+                                                 outputEnc,
+                                                 stateSpace.size(),
+                                                 deadlockState,
+                                                 ListBufferTransitionRelation.
+                                                 CONFIG_S_C);
+        } else {
+          // Deadlock & No State Count
+          rel = new ListBufferTransitionRelation(computeOutputName(),
+                                                 computeOutputKind(),
+                                                 outputEnc,
+                                                 stateSpace.size(),
+                                                 deadlockState,
+                                                 ListBufferTransitionRelation.
+                                                 CONFIG_SUCCESSORS);
+        }
       } else {
-        rel = new ListBufferTransitionRelation(computeOutputName(),
-                                               computeOutputKind(),
-                                               outputEnc,
-                                               stateSpace.size(),
-                                               ListBufferTransitionRelation.
-                                               CONFIG_SUCCESSORS);
-
+        if (mCountingStates) {
+          // Not Deadlock & State Count
+          rel = new ListBufferTransitionRelation(computeOutputName(),
+                                                 computeOutputKind(),
+                                                 outputEnc,
+                                                 stateSpace.size(),
+                                                 ListBufferTransitionRelation.
+                                                 CONFIG_S_C);
+        } else {
+          // Not Deadlock & No State Count
+          rel = new ListBufferTransitionRelation(computeOutputName(),
+                                                 computeOutputKind(),
+                                                 outputEnc,
+                                                 stateSpace.size(),
+                                                 ListBufferTransitionRelation.
+                                                 CONFIG_SUCCESSORS);
+        }
       }
+      // Prepare the initial states.
       final int numInit = getNumberOfInitialStates();
       for (int s = 0; s < numInit; s++) {
         rel.setInitial(s, true);
       }
+      // Handle the propositions.
       final int numProps = outputEnc.getNumberOfPropositions();
       boolean hasProps = false;
       for (int p = 0; p < numProps; p++) {
@@ -342,6 +391,7 @@ public abstract class TRAbstractSynchronousProductBuilder
         }
       }
       mPreTransitionBuffer.addOutgoingTransitions(rel);
+      // Handle the self loops.
       if (getRemovingSelfloops()) {
         rel.removeTauSelfLoops();
         if (getPruningDeadlocks() && hasProps) {
@@ -350,12 +400,37 @@ public abstract class TRAbstractSynchronousProductBuilder
           rel.removeProperSelfLoopEvents();
         }
       }
+      // Handle the state count.
+      final StateTupleEncoding tupleEnc = getStateTupleEncoding();
+      if (mCountingStates) {
+        final int numComponents = stateSpace.getArraySize();
+        final TRAutomatonProxy[] components = getInputAutomata();
+        // For each state tuple in the synchronous product,
+        for (int tupleI = 0; tupleI < stateSpace.size(); tupleI++) {
+          final int[] encoded = new int[numComponents];
+          final int[] decoded = new int[numComponents];
+          // Load an encoded tuple.
+          stateSpace.getContents(tupleI, encoded);
+          // Decode the state tuple.
+          tupleEnc.decode(encoded, decoded);
+          // For each component automaton, multiply its state count with
+          // the total state count. Note that the number representing the
+          // state count is one less than the actual state count.
+          long totalCount = 1L;
+          for (int componentI = 0; componentI < numComponents; componentI++) {
+            totalCount *= components[componentI].getTransitionRelation().
+              getStateBuffer().getStateCount(decoded[componentI]) + 1;
+          }
+          totalCount -= 1;
+          // Now, store this state count to its correct location.
+          rel.getStateBuffer().setStateCount(decoded[tupleI], totalCount);
+        }
+      }
+      // Build the final product.
       final TRAutomatonProxy aut = new TRAutomatonProxy(outputEnc, rel);
       final TRSynchronousProductResult result = getAnalysisResult();
       result.setComputedAutomaton(aut);
-      final ProductDESProxy model = getModel();
-      final Collection<AutomatonProxy> automata = model.getAutomata();
-      final StateTupleEncoding tupleEnc = getStateTupleEncoding();
+      final Collection<AutomatonProxy> automata = getModel().getAutomata();
       final TRSynchronousProductStateMap stateMap =
         new TRSynchronousProductStateMap(automata, tupleEnc, stateSpace);
       result.setStateMap(stateMap);
@@ -476,6 +551,7 @@ public abstract class TRAbstractSynchronousProductBuilder
   private String mOutputName;
   private ComponentKind mOutputKind = ComponentKind.PLANT;
   private boolean mRemovingSelfloops = true;
+  private boolean mCountingStates;
 
   private PreTransitionBuffer mPreTransitionBuffer;
   private int mPreviousSource;
