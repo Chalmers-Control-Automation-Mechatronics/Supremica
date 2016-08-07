@@ -335,45 +335,25 @@ public abstract class TRAbstractSynchronousProductBuilder
       final IntArrayBuffer stateSpace = getStateSpace();
       final int deadlockState = getDeadlockState();
       final ListBufferTransitionRelation rel;
+      final int config = mCountingStates ?
+        ListBufferTransitionRelation.CONFIG_S_C :
+        ListBufferTransitionRelation.CONFIG_SUCCESSORS;
       // Create a transition relation of the appropriate type.
       if (deadlockState >= 0) {
-        if (mCountingStates) {
-          // Deadlock & State Count
-          rel = new ListBufferTransitionRelation(computeOutputName(),
-                                                 computeOutputKind(),
-                                                 outputEnc,
-                                                 stateSpace.size(),
-                                                 deadlockState,
-                                                 ListBufferTransitionRelation.
-                                                 CONFIG_S_C);
-        } else {
-          // Deadlock & No State Count
-          rel = new ListBufferTransitionRelation(computeOutputName(),
-                                                 computeOutputKind(),
-                                                 outputEnc,
-                                                 stateSpace.size(),
-                                                 deadlockState,
-                                                 ListBufferTransitionRelation.
-                                                 CONFIG_SUCCESSORS);
-        }
+        // Deadlock & State Count
+        rel = new ListBufferTransitionRelation(computeOutputName(),
+                                               computeOutputKind(),
+                                               outputEnc,
+                                               stateSpace.size(),
+                                               deadlockState,
+                                               config);
       } else {
-        if (mCountingStates) {
-          // Not Deadlock & State Count
-          rel = new ListBufferTransitionRelation(computeOutputName(),
-                                                 computeOutputKind(),
-                                                 outputEnc,
-                                                 stateSpace.size(),
-                                                 ListBufferTransitionRelation.
-                                                 CONFIG_S_C);
-        } else {
-          // Not Deadlock & No State Count
-          rel = new ListBufferTransitionRelation(computeOutputName(),
-                                                 computeOutputKind(),
-                                                 outputEnc,
-                                                 stateSpace.size(),
-                                                 ListBufferTransitionRelation.
-                                                 CONFIG_SUCCESSORS);
-        }
+        // Not Deadlock & State Count
+        rel = new ListBufferTransitionRelation(computeOutputName(),
+                                               computeOutputKind(),
+                                               outputEnc,
+                                               stateSpace.size(),
+                                               config);
       }
       // Prepare the initial states.
       final int numInit = getNumberOfInitialStates();
@@ -404,11 +384,11 @@ public abstract class TRAbstractSynchronousProductBuilder
       final StateTupleEncoding tupleEnc = getStateTupleEncoding();
       if (mCountingStates) {
         final int numComponents = stateSpace.getArraySize();
+        final int[] encoded = new int[numComponents];
+        final int[] decoded = new int[numComponents];
         final TRAutomatonProxy[] components = getInputAutomata();
         // For each state tuple in the synchronous product,
         for (int tupleI = 0; tupleI < stateSpace.size(); tupleI++) {
-          final int[] encoded = new int[numComponents];
-          final int[] decoded = new int[numComponents];
           // Load an encoded tuple.
           stateSpace.getContents(tupleI, encoded);
           // Decode the state tuple.
