@@ -33,15 +33,6 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.custom_hash.TObjectByteCustomHashMap;
-import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
-import gnu.trove.stack.TIntStack;
-import gnu.trove.stack.array.TIntArrayStack;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -87,6 +78,15 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.apache.log4j.Logger;
+
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.custom_hash.TObjectByteCustomHashMap;
+import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
 
 
 /**
@@ -245,6 +245,9 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
     mEventEncoding =
       new EventEncoding(events, translator, filter,
                         EventEncoding.FILTER_PROPOSITIONS);
+    final EventProxy tau =
+      getFactory().createEventProxy(":tau", EventKind.UNCONTROLLABLE, false);
+    mEventEncoding.addSilentEvent(tau);
     mEventEncoding.sortProperEvents(EventStatus.STATUS_CONTROLLABLE);
     mNumProperEvents = mEventEncoding.getNumberOfProperEvents();
 
@@ -517,7 +520,6 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
-  @SuppressWarnings("unused")
   @Override
   public boolean run() throws AnalysisException
   {
@@ -705,15 +707,12 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
       Collection<AutomatonProxy> automata = new ArrayList<AutomatonProxy>(2);
       automata.add(eventsHiddenAut);
       automata.add(powerSetAut);
-      //Set<EventProxy> events = new THashSet<EventProxy>();
-      //events.addAll(eventsHiddenAut.getEvents()); //Possibly missing the unobservable events
-      //events.addAll(powerSetAut.getEvents());
       final ProductDESProxy autToSync =
         getFactory().createProductDESProxy("synchronous_comp",mEventEncoding.getUsedEvents(),automata);
       final TRSynchronousProductBuilder builder =
         new TRSynchronousProductBuilder(autToSync);
+      builder.setEventEncoding(mEventEncoding);
       builder.run();
-      //events = null;
       automata = null;
 
       //Synthesis step
@@ -871,6 +870,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
 
       if(isDetailedOutputEnabled()){
         //Return result
+        mTransitionRelation.removeRedundantPropositions();
         final ProductDESProxy result = createDESProxy(mTransitionRelation);
         setProxyResult(result);
       }

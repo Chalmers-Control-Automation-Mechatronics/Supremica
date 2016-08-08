@@ -100,7 +100,7 @@ public class IntArrayBuffer implements WatersIntHashingStrategy
    *                     in an {@link OverflowException} being thrown.
    * @param  initialSize The estimated initial capacity of the hash table.
    * @param  defaultHashSetValue
-   *                     The value to be returned by the {@link #get(int[])
+   *                     The value to be returned by the {@link #getIndex(int[])
    *                     get()} method if an entry is not found. The default
    *                     return value is&nbsp;-1, but it can be overridden by
    *                     this constructor.
@@ -184,7 +184,7 @@ public class IntArrayBuffer implements WatersIntHashingStrategy
    *         contents in this buffer, or the configured default value
    *         (usually&nbsp;-1) if not found.
    */
-  public int get(final int[] data)
+  public int getIndex(final int[] data)
   {
     ensureCapacity(mArraySize);
     final int blockno = mNextFreeIndex >>> BLOCK_SHIFT;
@@ -212,6 +212,14 @@ public class IntArrayBuffer implements WatersIntHashingStrategy
     for (int i = 0, j = offset; i < mArraySize; i++, j++) {
       data[i] = block[j];
     }
+  }
+
+  /**
+   * Gets the size of the arrays.
+   */
+  public int getArraySize()
+  {
+    return mArraySize;
   }
 
   /**

@@ -51,16 +51,11 @@ import net.sourceforge.waters.model.des.StateProxy;
  * A data structure that compactly stores the status information of the states
  * in a transition relation.
  * <p>
- * The state buffer considers a state space represented consisting of integer
+ * The state buffer considers a state space represented by <code>long</code>
  * state code ranging from&nbsp;0 up to the number of states minus&nbsp;1.
  * For each state code, it stores the following status information.
  * Each state can be designated as <I>initial</I> and/or <I>reachable</I>,
- * and can have a state-count value from 1 to 2^63.
- * <p>
- * The information is stored packed into the bits of a single long for each
- * state. Since each state has a minimum count of one, an encoding of 0
- * shall mean a state-count of 1. Hence, the value of the 62 bits (excluding
- * the most significant two) represents the state-count minus 1.
+ * and can have a state-count value from 1 to 2<sup>63</sup>-1.
  *
  * @see StateEncoding
  *
@@ -101,12 +96,15 @@ public class LongStateCountBuffer extends AbstractStateBuffer
   {
     super(stateEnc, dumpState);
     final int numStates = stateEnc.getNumberOfStates();
+    // Initialise the array of states.
     if (getDumpStateIndex() >= 0) {
       mStateInfo = new long[numStates];
     } else {
       setDumpStateIndex(numStates);
       mStateInfo = new long[numStates + 1];
     }
+    // Handle the initial and reachable flags, and ensure that
+    // the state counts should all be 1 instead of the default 0.
     for (int s = 0; s < numStates; s++) {
       final StateProxy state = stateEnc.getState(s);
       if (state != null) {
@@ -116,6 +114,7 @@ public class LongStateCountBuffer extends AbstractStateBuffer
         }
         mStateInfo[s] = info;
       }
+      mStateInfo[s] += 1; // Default state count
     }
   }
 
@@ -223,12 +222,16 @@ public class LongStateCountBuffer extends AbstractStateBuffer
     final int size = buffer.getNumberOfStates();
     mStateInfo = new long[size];
     for (int i = 0; i < size; i++) {
+      // Initial flags
       if (buffer.isInitial(i)) {
         mStateInfo[i] |= TAG_INITIAL;
       }
+      // Reachable flags
       if (buffer.isReachable(i)) {
         mStateInfo[i] |= TAG_REACHABLE;
       }
+      // Default state count
+      mStateInfo[i] += 1;
     }
   }
 

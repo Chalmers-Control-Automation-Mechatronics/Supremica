@@ -111,7 +111,7 @@ public class TRSynchronousProductStateMap
 
   public int getComposedState(final int[] decodedTuple)
   {
-    return mStateSpace.get(decodedTuple);
+    return mStateSpace.getIndex(decodedTuple);
   }
 
   //#########################################################################

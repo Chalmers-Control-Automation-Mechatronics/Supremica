@@ -33,13 +33,6 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TLongObjectHashMap;
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
-import gnu.trove.stack.TIntStack;
-import gnu.trove.stack.array.TIntArrayStack;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -66,6 +59,13 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.apache.log4j.Logger;
+
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TLongObjectHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
 
 
 /**
@@ -664,7 +664,6 @@ public class ListBufferTransitionRelation implements EventStatusProvider
   {
     mKind = kind;
   }
-
 
   //#########################################################################
   //# State Access
@@ -3205,4 +3204,9 @@ public class ListBufferTransitionRelation implements EventStatusProvider
    */
   public static final int CONFIG_ALL = CONFIG_SUCCESSORS
                                      | CONFIG_PREDECESSORS;
+  /**
+   * Configuration setting specifying that the transition relation is to use
+   * an outgoing transition buffers, and is to count the states.
+   */
+  public static final int CONFIG_S_C = CONFIG_SUCCESSORS | CONFIG_COUNT;
 }
