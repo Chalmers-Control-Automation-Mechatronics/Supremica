@@ -54,6 +54,7 @@ import org.supremica.automata.IO.AutomataToXML;
 import org.supremica.automata.IO.AutomatonToDot;
 import org.supremica.automata.IO.AutomatonToDsx;
 import org.supremica.automata.IO.AutomatonToFSM;
+import org.supremica.automata.IO.AutomatonToSMC;
 import org.supremica.automata.IO.FileFormats;
 import org.supremica.automata.algorithms.minimization.MinimizationHelper;
 import org.supremica.gui.ExportDialog;
@@ -175,6 +176,25 @@ public class AnalyzerExportAction
             return;
         }
 */
+		if(exportMode == ExportFormat.SMC_DEBUG)
+		{
+			for(Iterator<Automaton> autIt = selectedAutomata.iterator(); autIt.hasNext(); )
+			{
+				final Automaton currAutomaton = (Automaton) autIt.next();
+				final AutomatonToSMC smcExporter = new AutomatonToSMC(currAutomaton);
+				final TextFrame textFrame = new TextFrame("SMC debug output");
+				
+				try
+				{
+					smcExporter.serialize(textFrame.getPrintWriter());
+				}
+				catch(Exception ex)
+				{
+					logger.debug(ex.getStackTrace());
+				}
+			}
+		}
+		
         if (exportMode == ExportFormat.DOT_DEBUG)
         {
             for (Iterator<Automaton> autIt = selectedAutomata.iterator(); autIt.hasNext(); )
@@ -311,7 +331,10 @@ public class AnalyzerExportAction
                                                 return;
                                                 }
                  */
-        if ((exportMode == ExportFormat.DOT) || (exportMode == ExportFormat.DSX) || (exportMode == ExportFormat.FSM) || (exportMode == ExportFormat.PCG))
+        if ((exportMode == ExportFormat.DOT) || (exportMode == ExportFormat.DSX) || 
+				(exportMode == ExportFormat.FSM) || (exportMode == ExportFormat.PCG) ||
+				(exportMode == ExportFormat.SMC)
+				)
         {
             for (Iterator<Automaton> autIt = selectedAutomata.iterator(); autIt.hasNext(); )
             {
@@ -345,7 +368,7 @@ public class AnalyzerExportAction
                 return;
             }
 
-            fileExporter.setDialogTitle("Save Project as ...");
+            fileExporter.setDialogTitle("Export Project as ...");
 
             if (fileExporter.showSaveDialog(ide.getIDE()) == JFileChooser.APPROVE_OPTION)
             {
@@ -437,6 +460,10 @@ public class AnalyzerExportAction
         {
             fileExporter = FileDialogs.getExportFileChooser(FileFormats.STS);
         }
+		else if(exportMode == ExportFormat.SMC)
+		{
+			fileExporter = FileDialogs.getExportFileChooser(FileFormats.SMC);
+		}
 /*        
         else if (exportMode == ExportFormat.SP)
         {
@@ -478,6 +505,11 @@ public class AnalyzerExportAction
                             final AutomatonToDsx exporter = new AutomatonToDsx(currAutomaton);
                             exporter.serialize(currFile.getAbsolutePath());
                         }
+						else if(exportMode == ExportFormat.SMC)
+						{
+							final AutomatonToSMC exporter = new AutomatonToSMC(currAutomaton);
+							exporter.serialize(currFile.getAbsolutePath());
+						}
                         else if (exportMode == ExportFormat.FSM)
                         {
                             final AutomatonToFSM exporter = new AutomatonToFSM(currAutomaton);

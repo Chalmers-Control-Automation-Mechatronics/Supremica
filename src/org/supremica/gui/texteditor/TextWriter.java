@@ -40,22 +40,24 @@ import java.io.*;
 class TextWriter
 	extends Writer
 {
-	TextPanel panel = null;
+	final TextPanel panel;
 	boolean open = true;    // instantiating implicitly opens the writer
 
-	TextWriter(TextPanel panel)
+	TextWriter(final TextPanel panel)
 	{
 		this.panel = panel;
 	}
 
+	@Override
 	public void write(char[] cbuf, int off, int len)
 		throws IOException
 	{
-		String str = new String(cbuf, off, len);
+		final String str = new String(cbuf, off, len);
 
 		panel.append(str);
 	}
 
+	@Override
 	public void flush()
 		throws IOException
 	{
@@ -65,6 +67,7 @@ class TextWriter
 		}
 	}
 
+	@Override
 	public void close()
 		throws IOException
 	{

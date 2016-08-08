@@ -59,13 +59,14 @@ import org.supremica.automata.LabeledEvent;
 public class AutomatonToDsx
 	implements AutomataSerializer
 {
-	private Automaton aut;
+	private final Automaton aut;
 
 	public AutomatonToDsx(Automaton aut)
 	{
 		this.aut = aut;
 	}
 
+	@Override
 	public void serialize(PrintWriter pw)
 		throws Exception
 	{
@@ -166,6 +167,7 @@ public class AutomatonToDsx
 		pw.close();
 	}
 
+	@Override
 	public void serialize(String fileName)
 		throws Exception
 	{
