@@ -383,10 +383,10 @@ public abstract class TRAbstractSynchronousProductBuilder
       // Handle the state count.
       final StateTupleEncoding tupleEnc = getStateTupleEncoding();
       if (mCountingStates) {
-        final int numComponents = stateSpace.getArraySize();
-        final int[] encoded = new int[numComponents];
-        final int[] decoded = new int[numComponents];
         final TRAutomatonProxy[] components = getInputAutomata();
+        final int numComponents = components.length;
+        final int[] encoded = new int[stateSpace.getArraySize()];
+        final int[] decoded = new int[numComponents];
         // For each state tuple in the synchronous product,
         for (int tupleI = 0; tupleI < stateSpace.size(); tupleI++) {
           // Load an encoded tuple.
@@ -396,12 +396,13 @@ public abstract class TRAbstractSynchronousProductBuilder
           // For each component automaton, multiply its state count with
           // the total state count.
           long totalCount = 1L;
-          for (int componentI = 0; componentI < numComponents; componentI++) {
-            totalCount *= components[componentI].getTransitionRelation().
-              getStateBuffer().getStateCount(decoded[componentI]);
+          for (int autI = 0; autI < numComponents; autI++) {
+            totalCount *= components[autI].getTransitionRelation().
+              getStateBuffer().getStateCount(decoded[autI]);
           }
-          // Now, store this state count to its correct location.
-          rel.getStateBuffer().setStateCount(decoded[tupleI], totalCount);
+          // Now, store this state count to the location of its
+          // corresponding tuple.
+          rel.getStateBuffer().setStateCount(tupleI, totalCount);
         }
       }
       // Build the final product.
