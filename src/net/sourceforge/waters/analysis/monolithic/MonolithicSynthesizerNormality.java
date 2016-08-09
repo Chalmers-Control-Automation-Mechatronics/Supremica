@@ -33,6 +33,15 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.custom_hash.TObjectByteCustomHashMap;
+import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,15 +87,6 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.apache.log4j.Logger;
-
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.custom_hash.TObjectByteCustomHashMap;
-import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
-import gnu.trove.stack.TIntStack;
-import gnu.trove.stack.array.TIntArrayStack;
 
 
 /**
@@ -727,7 +727,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
         numDeletions = 0;
         //Observability step
         mTransitionRelation.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-        /*final TransitionIterator successorReadOnlyIter =
+        final TransitionIterator successorReadOnlyIter =
           mTransitionRelation.createSuccessorsReadOnlyIteratorByStatus(EventStatus.STATUS_CONTROLLABLE);
         //Loop through each state in sync product
         for(int source=0; source < mTransitionRelation.getNumberOfStates(); source++){
@@ -735,6 +735,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
           successorReadOnlyIter.resetState(source);
           while(successorReadOnlyIter.advance()){
             if(successorReadOnlyIter.getCurrentTargetState() == dumpStateIndex){
+              @SuppressWarnings("unused")
               final int event = successorReadOnlyIter.getCurrentEvent();
               final int[] sourceTuple = new int[2]; //0 = source set, 1 = source state?
               resultMap.getOriginalState(source, sourceTuple);
@@ -757,7 +758,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
               }
             }
           }
-        }*/
+        }
 
         //Nonblocking step
         //Check and set state reachability

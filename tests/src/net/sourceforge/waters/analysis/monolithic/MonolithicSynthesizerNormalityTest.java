@@ -34,16 +34,18 @@
 package net.sourceforge.waters.analysis.monolithic;
 
 import java.util.Collection;
+import java.util.Set;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 import net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 
 public class MonolithicSynthesizerNormalityTest
@@ -90,11 +92,17 @@ public class MonolithicSynthesizerNormalityTest
   {
     super.checkResult(des, result, expect);
     if (result.isSatisfied()) {
-      // Check whether any of the supervisors uses an unobservable event
-      // (using assertXXX)
-      @SuppressWarnings("unused")
       final Collection<? extends AutomatonProxy> computedSupervisors =
         result.getComputedAutomata();
+      // Check whether any of the supervisors uses an unobservable event
+      final AutomatonProxy computedSupervisor = computedSupervisors.iterator().next();
+      final Set<EventProxy> events = computedSupervisor.getEvents();
+      boolean unobservableEvent = false;
+      for(final EventProxy e : events){
+        if(!e.isObservable())
+          unobservableEvent = true;
+      }
+      assertEquals("An unobservable event was used in the supervisor!", false, unobservableEvent);
      }
   }
 
