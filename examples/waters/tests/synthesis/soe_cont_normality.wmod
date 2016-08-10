@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="soe_cont" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
+<Module Name="soe_cont_normality" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <ns2:Comment>A test for compositional synthesis. This test checks specifically whether the event c is passed as a controllable event to the synthesis observation equivalence simplifier. If c is considered as an uncontrollable event, then states S0, S1, and S2 will be incorrectly merged when simplifying G, leading to an incorrect synthesis result.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="c"/>
         <EventDecl Kind="CONTROLLABLE" Name="d"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="u"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="v"/>
+        <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="tau_u"/>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
     </EventDeclList>
     <ComponentList>
@@ -59,7 +59,7 @@
                 <EdgeList>
                     <Edge Source="S0" Target="S1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="v"/>
+                            <SimpleIdentifier Name="tau_u"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-20" Y="-19"/>
                             </LabelGeometry>
@@ -70,7 +70,7 @@
                     </Edge>
                     <Edge Source="S1" Target="S0">
                         <LabelBlock>
-                            <SimpleIdentifier Name="v"/>
+                            <SimpleIdentifier Name="tau_u"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-15" Y="-18"/>
                             </LabelGeometry>
@@ -114,7 +114,7 @@
                     <Edge Source="S3" Target="S4">
                         <LabelBlock>
                             <SimpleIdentifier Name="u"/>
-                            <SimpleIdentifier Name="v"/>
+                            <SimpleIdentifier Name="tau_u"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-19" Y="0"/>
                             </LabelGeometry>
@@ -177,6 +177,7 @@
         <SimpleComponent Kind="SUPERVISOR" Name="sup">
             <Graph>
                 <LabelBlock>
+                    <SimpleIdentifier Name="c"/>
                     <SimpleIdentifier Name="d"/>
                     <LabelGeometry Anchor="NW">
                         <Point X="18" Y="28"/>
@@ -191,53 +192,7 @@
                             <Point X="-25" Y="-4"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="S1">
-                        <PointGeometry>
-                            <Point X="176" Y="48"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="8" Y="-9"/>
-                        </LabelGeometry>
-                    </SimpleNode>
                 </NodeList>
-                <EdgeList>
-                    <Edge Source="S0" Target="S1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="v"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-20" Y="-19"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="145" Y="38"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="S1" Target="S0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="v"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-15" Y="-18"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="142" Y="57"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="S1" Target="S1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="c"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="5" Y="-11"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="219" Y="47"/>
-                        </SplineGeometry>
-                        <EndPointGeometry>
-                            <Point X="176" Y="48"/>
-                        </EndPointGeometry>
-                    </Edge>
-                </EdgeList>
             </Graph>
         </SimpleComponent>
     </ComponentList>
