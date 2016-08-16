@@ -33,15 +33,6 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.custom_hash.TObjectByteCustomHashMap;
-import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
-import gnu.trove.stack.TIntStack;
-import gnu.trove.stack.array.TIntArrayStack;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -87,6 +78,15 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.apache.log4j.Logger;
+
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.custom_hash.TObjectByteCustomHashMap;
+import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
 
 
 /**
@@ -687,21 +687,20 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
       SpecialEventsTRSimplifier eventSimplifier =
         new SpecialEventsTRSimplifier(mTransitionRelation);
       eventSimplifier.run();
-      final AutomatonProxy eventsHiddenAut =
-        mTransitionRelation.createAutomaton(getFactory(), mEventEncoding);
+      final TRAutomatonProxy eventsHiddenAut =
+        new TRAutomatonProxy(mEventEncoding, mTransitionRelation);
       eventSimplifier = null;
 
       //Powerset construction
       final SubsetConstructionTRSimplifier subsetSimplifier =
         new SubsetConstructionTRSimplifier();
       final ListBufferTransitionRelation powersetRel =
-        new ListBufferTransitionRelation(mTransitionRelation,
-                  subsetSimplifier.getPreferredInputConfiguration());
+        new ListBufferTransitionRelation(mTransitionRelation, mEventEncoding,
+                                         subsetSimplifier.getPreferredInputConfiguration());
       powersetRel.setName("powerset_events_hidden");
       subsetSimplifier.setTransitionRelation(powersetRel);
       subsetSimplifier.run();
-      final AutomatonProxy powerSetAut =
-        powersetRel.createAutomaton(getFactory(), mEventEncoding);
+      final TRAutomatonProxy powerSetAut = new TRAutomatonProxy(mEventEncoding, powersetRel);
 
       //Synchronous composition
       Collection<AutomatonProxy> automata = new ArrayList<AutomatonProxy>(2);
