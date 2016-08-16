@@ -33,20 +33,31 @@
 
 package net.sourceforge.waters.analysis.trcomp;
 
-import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier.Equivalence;
+import java.util.List;
+
+import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
+import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult;
+import net.sourceforge.waters.analysis.monolithic.TRAbstractSynchronousProductBuilder;
+import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.EnumFactory;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.ListedEnumFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.StateCounter;
+import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 /**
- * A compositional state counter based on {@link TRAutomatonProxy} that
- * can be configured to use different abstraction sequences for its
- * simplification steps.
+ * A compositional state counter based on {@link TRAutomatonProxy}, which
+ * uses <I>reverse observation equivalence</I> as its main abstraction
+ * rule, in addition to <I>hiding</I> and <I>tau-loop removal</I>.
  *
  * @author Roger Su
  */
@@ -71,55 +82,69 @@ public class TRCompositionalStateCounter
                                      final ModelAnalyzer mono)
   {
     super(model, translator, mono);
+    setDoNotDropTrivialAutomata(true);
   }
 
 
   //#########################################################################
-  /**
-   * Override this method?
-   */
-  /*@Override
+  @Override
   protected TRAbstractSynchronousProductBuilder createSynchronousProductBuilder()
   {
     final KindTranslator translator = getKindTranslator();
-    final TRAbstractSynchronousProductBuilder builder =
-      new TRSynchronousProductBuilder();
-    builder.setDetailedOutputEnabled(true);
+    final TRAbstractSynchronousProductBuilder builder = new TRSynchronousProductBuilder();
+    builder.setCountingStates(true);
+    builder.setDetailedOutputEnabled(false);
     builder.setKindTranslator(translator);
     builder.setRemovingSelfloops(true);
     builder.setNodeLimit(mInternalStateLimit);
     builder.setTransitionLimit(mInternalTransitionLimit);
     return builder;
-  }*/
+  }
 
   @Override
   public EnumFactory<TRToolCreator<TransitionRelationSimplifier>> getTRSimplifierFactory()
   {
-    // TODO Auto-generated method stub
-    return null;
+    return
+      new ListedEnumFactory<TRToolCreator<TransitionRelationSimplifier>>() {
+      {
+        register(ROEQ);
+      }
+    };
   }
 
   @Override
   protected boolean analyseSubsystemMonolithically(final TRSubsystemInfo subsys)
     throws AnalysisException
   {
-    return false;
-  }
-
-  protected TransitionRelationSimplifier createStateCountEquivalentChain
-    (final Equivalence reverseObservationEquivalence,
-     final boolean b, final boolean c, final boolean d)
-  {
-    return null;
+    if (subsys == null | subsys.getNumberOfAutomata() == 0) {
+      // Do nothing.
+    } else {
+      // Construct the synchronous composition.
+      final ProductDESProxyFactory factory = getFactory();
+      final List<TRAutomatonProxy> automata = subsys.getAutomata();
+      final ProductDESProxy des =
+        AutomatonTools.createProductDESProxy("StateCount", automata, factory);
+      final TRSynchronousProductBuilder syncBuilder =
+        new TRSynchronousProductBuilder(des);
+      syncBuilder.setCountingStates(true);
+      syncBuilder.run();
+      // Retrieve the state count.
+      final TRAutomatonProxy syncProduct = syncBuilder.getComputedProxy();
+      final long totalCount = syncProduct.getTransitionRelation().getTotalStateCount();
+      final CompositionalAnalysisResult analysisResult = getAnalysisResult();
+      analysisResult.setTotalNumberOfStates(totalCount);
+    }
+    return true;
   }
 
 
   //#########################################################################
   //# Abstraction Chains
   /**
-   * Reverse Observation Equivalence
+   * Reverse Observation Equivalence (but currently only has inherited
+   * 'hiding' and 'tau-loop removal').
    */
-  /*public static final TRToolCreator<TransitionRelationSimplifier> ROEQ =
+  public static final TRToolCreator<TransitionRelationSimplifier> ROEQ =
     new TRToolCreator<TransitionRelationSimplifier>("ROEQ")
   {
     @Override
@@ -127,20 +152,21 @@ public class TRCompositionalStateCounter
       (final AbstractTRCompositionalAnalyzer analyzer)
         throws AnalysisConfigurationException
     {
-      final TRCompositionalStateCounter checker =
-        (TRCompositionalStateCounter) analyzer;
-      return checker.createStateCountEquivalentChain
-        (ObservationEquivalenceTRSimplifier.
-         Equivalence.OBSERVATION_EQUIVALENCE,
-         true, true, true);
+      final ChainTRSimplifier chain = analyzer.startAbstractionChain();
+      final TransitionRelationSimplifier loopRemover =
+        new TauLoopRemovalTRSimplifier();
+      chain.add(loopRemover);
+      chain.setPreferredOutputConfiguration
+        (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      return chain;
     }
-  };*/
+  };
 
 
   //#########################################################################
   //# Data Members
   // Configuration
-  //private final int mInternalStateLimit = Integer.MAX_VALUE;
-  //private final int mInternalTransitionLimit = Integer.MAX_VALUE;
+  private final int mInternalStateLimit = Integer.MAX_VALUE;
+  private final int mInternalTransitionLimit = Integer.MAX_VALUE;
 
 }

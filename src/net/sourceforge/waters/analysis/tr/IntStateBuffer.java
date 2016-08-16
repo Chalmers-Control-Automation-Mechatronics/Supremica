@@ -634,13 +634,12 @@ public class IntStateBuffer extends AbstractStateBuffer
    * @param state ID of the state.
    *
    * @return the count of the specified state, which is always 1 for
-   *         this particular type of buffer. Note that the count of 1
-   *         is implicitly represented by the number 0.
+   *         this particular type of buffer.
    */
   @Override
   public long getStateCount(final int state)
   {
-    return 0;
+    return 1;
   }
 
   /**

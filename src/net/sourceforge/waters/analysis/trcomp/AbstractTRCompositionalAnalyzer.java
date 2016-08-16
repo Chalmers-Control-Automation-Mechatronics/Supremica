@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.analysis.trcomp;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -81,8 +83,6 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.apache.log4j.Logger;
-
-import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -483,6 +483,12 @@ public abstract class AbstractTRCompositionalAnalyzer
   public String getMonolithicDumpFileName()
   {
     return mMonolithicDumpFileName;
+  }
+
+  // TODO
+  public void setDoNotDropTrivialAutomata(final boolean flag)
+  {
+    mDoNotDropTrivialAutomata = flag;
   }
 
 
@@ -914,10 +920,10 @@ public abstract class AbstractTRCompositionalAnalyzer
     }
     countSpecialEvents(enc);
     try {
-      // Set up trace computation ...
+      // Set up trace computation.
       mIntermediateAbstractionSequence =
         new IntermediateAbstractionSequence(aut);
-      // Simplify ...
+      // Simplify.
       final int oldNumStates = rel.getNumberOfStates();
       mSpecialEventsListener.setEnabled(true);
       mTRSimplifier.setTransitionRelation(rel);
@@ -928,7 +934,7 @@ public abstract class AbstractTRCompositionalAnalyzer
           aut.resetStateNames();
         }
       }
-      // Record steps and update event status ...
+      // Record steps and update event status.
       mIntermediateAbstractionSequence.commit();
       mNeedsSimplification.setSuppressed(aut);
       if (simplified || !mAlwaysEnabledDetectedInitially) {
@@ -936,7 +942,8 @@ public abstract class AbstractTRCompositionalAnalyzer
           mIntermediateAbstractionSequence.getInputEventEncoding();
         updateEventStatus(aut, oldEncoding);
       }
-      if (simplified && isTrivialAutomaton(aut)) {
+      // Drop trivial automata if necessary.
+      if (simplified && isTrivialAutomaton(aut) && mDoNotDropTrivialAutomata) {
         logger.debug("Dropping trivial automaton " + aut.getName());
         dropTrivialAutomaton(aut);
         mCurrentSubsystem.removeAutomaton(aut, mNeedsSimplification);
@@ -1710,6 +1717,7 @@ public abstract class AbstractTRCompositionalAnalyzer
   private boolean mSelfloopOnlyEventsEnabled = false;
   private boolean mAlwaysEnabledEventsEnabled = false;
   private boolean mPreservingEncodings = false;
+  private boolean mDoNotDropTrivialAutomata = false;
   private String mMonolithicDumpFileName = null;
 
   // Tools

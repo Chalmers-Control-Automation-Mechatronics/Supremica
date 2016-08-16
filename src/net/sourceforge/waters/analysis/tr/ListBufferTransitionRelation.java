@@ -33,6 +33,13 @@
 
 package net.sourceforge.waters.analysis.tr;
 
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TLongObjectHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -59,13 +66,6 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.apache.log4j.Logger;
-
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TLongObjectHashMap;
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
-import gnu.trove.stack.TIntStack;
-import gnu.trove.stack.array.TIntArrayStack;
 
 
 /**
@@ -665,17 +665,9 @@ public class ListBufferTransitionRelation implements EventStatusProvider
     mKind = kind;
   }
 
+
   //#########################################################################
   //# State Access
-  /**
-   * Gets the number of states in the transition relation, including any
-   * states set to be unreachable.
-   */
-  public int getNumberOfStates()
-  {
-    return mStateBuffer.getNumberOfStates();
-  }
-
   /**
    * Returns whether this transition relation is empty.
    * @return <CODE>true</CODE> if all states are marked as unreachable,
@@ -687,12 +679,34 @@ public class ListBufferTransitionRelation implements EventStatusProvider
   }
 
   /**
+   * Gets the number of states in the transition relation, including any
+   * states set to be unreachable.
+   */
+  public int getNumberOfStates()
+  {
+    return mStateBuffer.getNumberOfStates();
+  }
+
+  /**
    * Gets the number of reachable states in the transition relation. A state
    * is considered reachable if its reachability flag is set.
    */
   public int getNumberOfReachableStates()
   {
     return mStateBuffer.getNumberOfReachableStates();
+  }
+
+  /**
+   * Gets the total state count of this transition relation. The total
+   * state count is the sum of state counts of each individual state.
+   */
+  public long getTotalStateCount()
+  {
+    long total = 0;
+    for (int i = 0; i < mStateBuffer.getNumberOfReachableStates(); i++) {
+      total += mStateBuffer.getStateCount(i);
+    }
+    return total;
   }
 
   /**

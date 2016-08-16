@@ -114,7 +114,7 @@ public class LongStateCountBuffer extends AbstractStateBuffer
         }
         mStateInfo[s] = info;
       }
-      mStateInfo[s] += 1; // Default state count
+      mStateInfo[s] += 1; // Initial state count is one.
     }
   }
 
