@@ -109,6 +109,20 @@ public class MonolithicSynthesizerNormalityTest
 
   //#########################################################################
   //# Test cases with unobservable events
+  public void testNormality01() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "normality_01.wmod");
+    runSynthesizer(des, true);
+  }
+
+  public void testParrowNormality() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "parrow_normality.wmod");
+    runSynthesizer(des, true);
+  }
+
   public void testSoeContNormality() throws Exception
   {
     final ProductDESProxy des =

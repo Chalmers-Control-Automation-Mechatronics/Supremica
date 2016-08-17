@@ -198,7 +198,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SUPERVISOR" Name="supervisor">
+        <SimpleComponent Kind="SUPERVISOR" Name="sup">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="q0.m0.r0.s0">
