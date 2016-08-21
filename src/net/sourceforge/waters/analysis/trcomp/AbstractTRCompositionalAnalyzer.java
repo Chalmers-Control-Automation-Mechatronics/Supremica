@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.analysis.trcomp;
 
-import gnu.trove.set.hash.THashSet;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -83,6 +81,8 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.apache.log4j.Logger;
+
+import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -483,12 +483,6 @@ public abstract class AbstractTRCompositionalAnalyzer
   public String getMonolithicDumpFileName()
   {
     return mMonolithicDumpFileName;
-  }
-
-  // TODO
-  public void setDoNotDropTrivialAutomata(final boolean flag)
-  {
-    mDoNotDropTrivialAutomata = flag;
   }
 
 
@@ -943,11 +937,9 @@ public abstract class AbstractTRCompositionalAnalyzer
         updateEventStatus(aut, oldEncoding);
       }
       // Drop trivial automata if necessary.
-      if (simplified && isTrivialAutomaton(aut) && mDoNotDropTrivialAutomata) {
-        logger.debug("Dropping trivial automaton " + aut.getName());
-        dropTrivialAutomaton(aut);
-        mCurrentSubsystem.removeAutomaton(aut, mNeedsSimplification);
-      }
+      logger.debug("Dropping trivial automaton " + aut.getName());
+      dropTrivialAutomaton(aut);
+      mCurrentSubsystem.removeAutomaton(aut, mNeedsSimplification);
       return simplified;
     } catch (final OverflowException exception) {
       recordUnsuccessfulComposition(exception);
@@ -1717,7 +1709,6 @@ public abstract class AbstractTRCompositionalAnalyzer
   private boolean mSelfloopOnlyEventsEnabled = false;
   private boolean mAlwaysEnabledEventsEnabled = false;
   private boolean mPreservingEncodings = false;
-  private boolean mDoNotDropTrivialAutomata = false;
   private String mMonolithicDumpFileName = null;
 
   // Tools

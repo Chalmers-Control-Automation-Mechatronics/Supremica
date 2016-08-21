@@ -82,36 +82,10 @@ public class TRCompositionalStateCounter
                                      final ModelAnalyzer mono)
   {
     super(model, translator, mono);
-    setDoNotDropTrivialAutomata(true);
   }
-
 
   //#########################################################################
-  @Override
-  protected TRAbstractSynchronousProductBuilder createSynchronousProductBuilder()
-  {
-    final KindTranslator translator = getKindTranslator();
-    final TRAbstractSynchronousProductBuilder builder = new TRSynchronousProductBuilder();
-    builder.setCountingStates(true);
-    builder.setDetailedOutputEnabled(false);
-    builder.setKindTranslator(translator);
-    builder.setRemovingSelfloops(true);
-    builder.setNodeLimit(mInternalStateLimit);
-    builder.setTransitionLimit(mInternalTransitionLimit);
-    return builder;
-  }
-
-  @Override
-  public EnumFactory<TRToolCreator<TransitionRelationSimplifier>> getTRSimplifierFactory()
-  {
-    return
-      new ListedEnumFactory<TRToolCreator<TransitionRelationSimplifier>>() {
-      {
-        register(ROEQ);
-      }
-    };
-  }
-
+  // Overriding Methods
   @Override
   protected boolean analyseSubsystemMonolithically(final TRSubsystemInfo subsys)
     throws AnalysisException
@@ -130,16 +104,48 @@ public class TRCompositionalStateCounter
       syncBuilder.run();
       // Retrieve the state count.
       final TRAutomatonProxy syncProduct = syncBuilder.getComputedProxy();
-      final long totalCount = syncProduct.getTransitionRelation().getTotalStateCount();
+      final long trStateCount = syncProduct.getTransitionRelation().getTotalStateCount();
       final CompositionalAnalysisResult analysisResult = getAnalysisResult();
-      analysisResult.setTotalNumberOfStates(totalCount);
+      analysisResult.setTotalNumberOfStates(trStateCount * mDroppedCount);
     }
     return true;
+  }
+
+  @Override
+  protected TRAbstractSynchronousProductBuilder createSynchronousProductBuilder()
+  {
+    final KindTranslator translator = getKindTranslator();
+    final TRAbstractSynchronousProductBuilder builder = new TRSynchronousProductBuilder();
+    builder.setCountingStates(true);
+    builder.setDetailedOutputEnabled(false);
+    builder.setKindTranslator(translator);
+    builder.setRemovingSelfloops(true);
+    builder.setNodeLimit(mInternalStateLimit);
+    builder.setTransitionLimit(mInternalTransitionLimit);
+    return builder;
+  }
+
+  @Override
+  protected void dropTrivialAutomaton(final TRAutomatonProxy aut)
+  {
+    mDroppedCount *= aut.getTransitionRelation().getTotalStateCount();
+    super.dropTrivialAutomaton(aut);
   }
 
 
   //#########################################################################
   //# Abstraction Chains
+  @Override
+  public EnumFactory<TRToolCreator<TransitionRelationSimplifier>> getTRSimplifierFactory()
+  {
+    return
+      new ListedEnumFactory<TRToolCreator<TransitionRelationSimplifier>>() {
+      {
+        register(ROEQ);
+      }
+    };
+  }
+
   /**
    * Reverse Observation Equivalence (but currently only has inherited
    * 'hiding' and 'tau-loop removal').
@@ -165,8 +171,7 @@ public class TRCompositionalStateCounter
 
   //#########################################################################
   //# Data Members
-  // Configuration
   private final int mInternalStateLimit = Integer.MAX_VALUE;
   private final int mInternalTransitionLimit = Integer.MAX_VALUE;
-
+  private long mDroppedCount = 1;
 }
