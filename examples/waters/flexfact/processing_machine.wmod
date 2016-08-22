@@ -1420,17 +1420,6 @@ It has 208 reachable states.</ns2:Comment>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Source="E1" Target="E2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="sf1_wplv"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-29" Y="-22"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="200" Y="120"/>
-                        </SplineGeometry>
-                    </Edge>
                     <Edge Source="E2" Target="E1">
                         <LabelBlock>
                             <SimpleIdentifier Name="xs1_wpar"/>
@@ -1541,6 +1530,7 @@ It has 208 reachable states.</ns2:Comment>
                     <Edge Source="S0" Target="E1">
                         <LabelBlock>
                             <SimpleIdentifier Name="pm1_bm_east"/>
+                            <SimpleIdentifier Name="pm1_wpar"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-94" Y="-31"/>
                             </LabelGeometry>
@@ -1563,6 +1553,7 @@ It has 208 reachable states.</ns2:Comment>
                     <Edge Source="S1" Target="E2">
                         <LabelBlock>
                             <SimpleIdentifier Name="pm1_bm_east"/>
+                            <SimpleIdentifier Name="pm1_wpar"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-38" Y="-30"/>
                             </LabelGeometry>
@@ -1585,6 +1576,7 @@ It has 208 reachable states.</ns2:Comment>
                     <Edge Source="S2" Target="E3">
                         <LabelBlock>
                             <SimpleIdentifier Name="pm1_bm_east"/>
+                            <SimpleIdentifier Name="pm1_wpar"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-28" Y="-30"/>
                             </LabelGeometry>
@@ -1607,6 +1599,7 @@ It has 208 reachable states.</ns2:Comment>
                     <Edge Source="S3" Target="E4">
                         <LabelBlock>
                             <SimpleIdentifier Name="pm1_bm_east"/>
+                            <SimpleIdentifier Name="pm1_wpar"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-40" Y="-13"/>
                             </LabelGeometry>
@@ -1629,6 +1622,7 @@ It has 208 reachable states.</ns2:Comment>
                     <Edge Source="S4" Target="E5">
                         <LabelBlock>
                             <SimpleIdentifier Name="pm1_bm_east"/>
+                            <SimpleIdentifier Name="pm1_wpar"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-26" Y="-30"/>
                             </LabelGeometry>
@@ -1817,6 +1811,17 @@ It has 208 reachable states.</ns2:Comment>
                         </LabelBlock>
                         <SplineGeometry>
                             <Point X="120" Y="240"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="E1" Target="E2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="sf1_wplv"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-29" Y="-22"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="200" Y="120"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>

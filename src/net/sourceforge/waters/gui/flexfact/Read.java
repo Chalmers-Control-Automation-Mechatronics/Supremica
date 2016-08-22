@@ -8,9 +8,10 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import net.sourceforge.waters.gui.LoggerErrorDisplay;
 import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.simulator.SimulatorStep;
+
+import org.supremica.gui.ide.IDE;
 
 /**
  * Thread to read what comes in from Flexfact
@@ -80,8 +81,8 @@ public class Read implements Runnable{
 				  if(e != null)
 				    sim.step(e);
 				  else{
-				    final LoggerErrorDisplay le = new LoggerErrorDisplay();
-				    le.displayError("Event " + line + " is not enabled.");
+				    final IDE ide = sim.getModuleContainer().getIDE();
+				    ide.error("Event " + line + " is not enabled.");
 				  }
 
 
