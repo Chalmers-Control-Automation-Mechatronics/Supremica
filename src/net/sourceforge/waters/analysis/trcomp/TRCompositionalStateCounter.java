@@ -46,6 +46,7 @@ import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.EnumFactory;
+import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.ListedEnumFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
@@ -74,7 +75,7 @@ public class TRCompositionalStateCounter
 
   public TRCompositionalStateCounter(final ProductDESProxy model)
   {
-    this (model, null, null);
+    this (model, IdenticalKindTranslator.getInstance(), null);
   }
 
   public TRCompositionalStateCounter(final ProductDESProxy model,
