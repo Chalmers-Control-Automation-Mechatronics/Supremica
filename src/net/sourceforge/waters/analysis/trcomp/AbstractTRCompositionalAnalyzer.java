@@ -608,9 +608,11 @@ public abstract class AbstractTRCompositionalAnalyzer
     mSynchronousProductBuilder.setDetailedOutputEnabled(true);
 
     final ModelAnalyzer mono = getMonolithicAnalyzer();
-    mono.setKindTranslator(translator);
-    mono.setNodeLimit(getMonolithicStateLimit());
-    mono.setTransitionLimit(getMonolithicTransitionLimit());
+    if (mono != null) {
+      mono.setKindTranslator(translator);
+      mono.setNodeLimit(getMonolithicStateLimit());
+      mono.setTransitionLimit(getMonolithicTransitionLimit());
+    }
 
     mSubsystemQueue = new PriorityQueue<>();
     mNeedsSimplification = new SimplificationQueue(trs);
