@@ -3,6 +3,7 @@
 <SimulationParameters>
 <OperatorPanel cnt="0"/>
 <FaultMonitor val="0"/>
+<Device type="Simplenet (local)"/>
 </SimulationParameters>
 <PlantComponents>
 <StackFeeder id="SF1">

@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import net.sourceforge.waters.gui.LoggerErrorDisplay;
 import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.simulator.SimulatorStep;
 
@@ -60,6 +61,12 @@ public class Read implements Runnable{
 				}
 				else if(line.startsWith("<Notify>")){
 				  line = line.replaceAll(" *</?Notify> *", "");
+				  //TODO: Subject to change
+				  if(line.contains("+"))
+				    line = line.replaceAll("\\+", "_south");
+				  if(line.contains("-"))
+				    line = line.replaceAll("-", "_north");
+
 
 				  final List<SimulatorStep> steps = sim.getEnabledSteps();
 				  final Iterator<SimulatorStep> i = steps.iterator();
@@ -70,9 +77,14 @@ public class Read implements Runnable{
 				      e = eventProxy;
 				    }
 				  }
-				  assert e != null;
+				  if(e != null)
+				    sim.step(e);
+				  else{
+				    final LoggerErrorDisplay le = new LoggerErrorDisplay();
+				    le.displayError("Event " + line + " is not enabled.");
+				  }
 
-				  sim.step(e);
+
 				}
 			}
 		}catch (final Exception exception){
