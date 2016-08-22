@@ -37,6 +37,7 @@ package org.supremica.gui.ide.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 
 import javax.swing.Action;
 import javax.swing.KeyStroke;
@@ -45,6 +46,7 @@ import net.sourceforge.waters.gui.util.IconLoader;
 
 import org.supremica.gui.ide.DocumentContainerManager;
 import org.supremica.gui.ide.IDE;
+import org.supremica.properties.Config;
 
 
 public class ExitAction
@@ -75,6 +77,14 @@ public class ExitAction
             ide.getDocumentContainerManager();
         if (manager.closeAllContainers())
         {
+          if(Config.INCLUDE_FLEXFACT.isTrue()){
+            final String[] args1 = new String[] {"/bin/bash", "-c", "pkill -f flexfact"};
+            try {
+              new ProcessBuilder(args1).start();
+            } catch (final IOException exception) {
+              exception.printStackTrace();
+            }
+          }
             System.exit(0);
         }
     }
