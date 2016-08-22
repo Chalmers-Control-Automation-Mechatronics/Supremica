@@ -84,6 +84,7 @@ public class TRCompositionalStateCounter
     super(model, translator, mono);
   }
 
+
   //#########################################################################
   // Overriding Methods
   @Override
@@ -105,8 +106,7 @@ public class TRCompositionalStateCounter
       // Retrieve the state count.
       final TRAutomatonProxy syncProduct = syncBuilder.getComputedProxy();
       final long trStateCount = syncProduct.getTransitionRelation().getTotalStateCount();
-      final CompositionalAnalysisResult analysisResult = getAnalysisResult();
-      analysisResult.setTotalNumberOfStates(trStateCount * mDroppedCount);
+      mTotalStateCount *= trStateCount;
     }
     return true;
   }
@@ -128,13 +128,27 @@ public class TRCompositionalStateCounter
   @Override
   protected void dropTrivialAutomaton(final TRAutomatonProxy aut)
   {
-    mDroppedCount *= aut.getTransitionRelation().getTotalStateCount();
+    mTotalStateCount *= aut.getTransitionRelation().getTotalStateCount();
     super.dropTrivialAutomaton(aut);
+  }
+
+  @Override
+  public boolean run() throws AnalysisException
+  {
+    // Carry out the normal 'run' method.
+    super.run();
+
+    // Overwrite the state count in AnalysisResult.
+    final CompositionalAnalysisResult result = getAnalysisResult();
+    result.setTotalNumberOfStates(mTotalStateCount);
+
+    // State counting always returns true.
+    return true;
   }
 
 
   //#########################################################################
-  //# Abstraction Chains
+  //# Abstraction Chain
   @Override
   public EnumFactory<TRToolCreator<TransitionRelationSimplifier>> getTRSimplifierFactory()
   {
@@ -173,5 +187,5 @@ public class TRCompositionalStateCounter
   //# Data Members
   private final int mInternalStateLimit = Integer.MAX_VALUE;
   private final int mInternalTransitionLimit = Integer.MAX_VALUE;
-  private long mDroppedCount = 1;
+  private long mTotalStateCount = 1;
 }
