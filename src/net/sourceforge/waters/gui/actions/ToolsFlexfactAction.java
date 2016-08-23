@@ -84,15 +84,26 @@ public class ToolsFlexfactAction
       final Simulation sim = container.getSimulatorPanel().getSimulation();
 
       try {
-        if(proc != null){
-          final String[] args1 = new String[] {"/bin/bash", "-c", "pkill -f flexfact"};
-          localServer.KillThreads();
-          proc = new ProcessBuilder(args1).start();
+        if(System.getProperty("os.name").toLowerCase().contains("linux")){
+          if(proc != null){
+            final String[] args1 = new String[] {"/bin/bash", "-c", "pkill -f flexfact"};
+            localServer.KillThreads();
+            proc = new ProcessBuilder(args1).start();
+          }
+          Thread.sleep(400);
+          final String[] args = new String[] {"/bin/bash", "-c", "flexfact"};
+          proc = new ProcessBuilder(args).start();
+          Thread.sleep(600);
         }
-        Thread.sleep(400);
-        final String[] args = new String[] {"/bin/bash", "-c", "flexfact"};
-        proc = new ProcessBuilder(args).start();
-        Thread.sleep(600);
+       if(System.getProperty("os.name").toLowerCase().contains("windows")){
+         if(proc != null){
+           proc.destroy();
+           localServer.KillThreads();
+         }
+         Thread.sleep(400);
+         proc = new ProcessBuilder("C:\\FAUDES\\Applications\\FlexFact.exe").start();
+         Thread.sleep(600);
+       }
       } catch (final Exception ex) {
         ex.printStackTrace();
       }
@@ -102,3 +113,5 @@ public class ToolsFlexfactAction
     }
 
 }
+
+
