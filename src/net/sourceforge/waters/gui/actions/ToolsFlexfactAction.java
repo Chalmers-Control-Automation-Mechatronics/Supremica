@@ -58,7 +58,7 @@ public class ToolsFlexfactAction
     private final Logger logger = LoggerFactory.createLogger(IDE.class);
 
     Thread local = null;
-    Process proc = null;
+    public static Process proc = null;
     LocalServer localServer = null;
 
     private static final long serialVersionUID = 1L;

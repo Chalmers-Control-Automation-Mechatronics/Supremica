@@ -42,6 +42,7 @@ import java.io.IOException;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 
+import net.sourceforge.waters.gui.actions.ToolsFlexfactAction;
 import net.sourceforge.waters.gui.util.IconLoader;
 
 import org.supremica.gui.ide.DocumentContainerManager;
@@ -78,11 +79,17 @@ public class ExitAction
         if (manager.closeAllContainers())
         {
           if(Config.INCLUDE_FLEXFACT.isTrue()){
+            if(System.getProperty("os.name").toLowerCase().contains("linux")){
             final String[] args1 = new String[] {"/bin/bash", "-c", "pkill -f flexfact"};
             try {
               new ProcessBuilder(args1).start();
             } catch (final IOException exception) {
               exception.printStackTrace();
+            }
+            }
+            if(System.getProperty("os.name").toLowerCase().contains("windows")){
+              if(ToolsFlexfactAction.proc != null)
+              ToolsFlexfactAction.proc.destroy();
             }
           }
             System.exit(0);
