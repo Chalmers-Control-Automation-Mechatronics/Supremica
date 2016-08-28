@@ -92,7 +92,7 @@ public class TRCompositionalStateCounter
   protected boolean analyseSubsystemMonolithically(final TRSubsystemInfo subsys)
     throws AnalysisException
   {
-    if (subsys == null | subsys.getNumberOfAutomata() == 0) {
+    if (subsys == null || subsys.getNumberOfAutomata() == 0) {
       // Do nothing.
     } else {
       // Construct the synchronous composition.
