@@ -763,25 +763,20 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
         }
 
         //Nonblocking step
-        //Check and set state reachability
-        //mTransitionRelation.checkReachability();
-
-        //Create a backwards transition iterator
-        mTransitionRelation.reconfigure(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
-        final TransitionIterator predecessorIterator = mTransitionRelation.createPredecessorsModifyingIterator();
-
-        //A set of coreachable states
         final TIntHashSet coreachableStates = new TIntHashSet(mTransitionRelation.getNumberOfStates());
         final TIntStack open = new TIntArrayStack();
 
-        //For each state
+        //For each state: If it is reachable and accepting, add it to open
         for(int state=0; state<mTransitionRelation.getNumberOfStates(); state++){
-          //If it is reachable and accepting, add it to open
           if(mTransitionRelation.isReachable(state) && mTransitionRelation.isMarked(state, markedStateCode)){
             open.push(state);
             coreachableStates.add(state);
           }
         }
+
+        //Create a backwards transition iterator
+        mTransitionRelation.reconfigure(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+        final TransitionIterator predecessorIterator = mTransitionRelation.createPredecessorsModifyingIterator();
 
         //Add all states that can reach a coreachable state to the set
         while(open.size() != 0){
@@ -796,28 +791,39 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
           }
         }
 
-        //If any state is not coreachable, change all incoming transitions to dump state
-        for(int state=0; state<mTransitionRelation.getNumberOfStates(); state++){
-          //TODO: not sure if reachability check here is correct
-          if(mTransitionRelation.isReachable(state) && !coreachableStates.contains(state)){
-            //TODO: This can be pulled out into a method as it is reused
-            //If source is initial state, stop and return empty set/no result
-            if(mTransitionRelation.isInitial(state)){
-              return setBooleanResult(false);
-            }
-            //Change all transitions pointing to this state, to point to dump
-            predecessorIterator.resetState(state);
-            while(predecessorIterator.advance()){
-              predecessorIterator.setCurrentToState(dumpStateIndex);
-            }
-            //Set the state as unreachable (will be removed later)
-            mTransitionRelation.setReachable(state, false);
-            numDeletions++;
+        mTransitionRelation.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+        final TransitionIterator allTransIter = mTransitionRelation
+          .createAllTransitionsModifyingIterator();
+        while(allTransIter.advance()){
+          final int targetState = allTransIter.getCurrentTargetState();
+          if(!coreachableStates.contains(targetState) && targetState != dumpStateIndex){
+            allTransIter.setCurrentToState(dumpStateIndex);
           }
         }
 
         //Controllability step
-        for(int e=EventEncoding.NONTAU; e<mNumProperEvents; e++){
+        final TransitionIterator successorIterator = mTransitionRelation.createSuccessorsModifyingIterator();
+        for(int state=0; state<mTransitionRelation.getNumberOfStates(); state++){
+          successorIterator.resetState(state);
+          while(successorIterator.advance()){
+           if(successorIterator.getCurrentTargetState() == dumpStateIndex){
+             final int event = successorIterator.getCurrentEvent();
+             final byte status = mEventEncoding.getProperEventStatus(event);
+             if(!EventStatus.isControllableEvent(status)){
+               //Remove all out-going transitions
+               final TransitionIterator poo = mTransitionRelation.createSuccessorsModifyingIterator();
+               poo.resetState(state);
+               while(poo.advance()){
+                 poo.remove();
+               }
+               //Remove marking
+               mTransitionRelation.removeMarkings(state, markedStateCode);
+             }
+           }
+          }
+        }
+
+        /*for(int e=EventEncoding.NONTAU; e<mNumProperEvents; e++){
           final byte status = mEventEncoding.getProperEventStatus(e);
           if(!EventStatus.isControllableEvent(status)){
             final TransitionIterator iter = mTransitionRelation.createAllTransitionsReadOnlyIterator(e);
@@ -840,7 +846,9 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
               }
             }
           }
-        }
+        }*/
+        //Check and set state reachability
+        mTransitionRelation.checkReachability();
       }
 
       //Extract supervisor
