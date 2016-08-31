@@ -694,23 +694,25 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
       //Powerset construction
       final SubsetConstructionTRSimplifier subsetSimplifier =
         new SubsetConstructionTRSimplifier();
+      final EventEncoding copy = new EventEncoding(mEventEncoding);
       final ListBufferTransitionRelation powersetRel =
-        new ListBufferTransitionRelation(mTransitionRelation, mEventEncoding,
+        new ListBufferTransitionRelation(mTransitionRelation, copy,
                                          subsetSimplifier.getPreferredInputConfiguration());
       powersetRel.setName("powerset_events_hidden");
       subsetSimplifier.setTransitionRelation(powersetRel);
       subsetSimplifier.run();
-      final TRAutomatonProxy powerSetAut = new TRAutomatonProxy(mEventEncoding, powersetRel);
+      final TRAutomatonProxy powerSetAut = new TRAutomatonProxy(copy, powersetRel);
 
       //Synchronous composition
       Collection<AutomatonProxy> automata = new ArrayList<AutomatonProxy>(2);
-      automata.add(eventsHiddenAut);
       automata.add(powerSetAut);
+      automata.add(eventsHiddenAut);
       final ProductDESProxy autToSync =
         getFactory().createProductDESProxy("synchronous_comp",mEventEncoding.getUsedEvents(),automata);
       final TRSynchronousProductBuilder builder =
         new TRSynchronousProductBuilder(autToSync);
       builder.setEventEncoding(mEventEncoding);
+      builder.setPruningDeadlocks(true);
       builder.run();
       automata = null;
 
@@ -734,7 +736,6 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
           successorReadOnlyIter.resetState(source);
           while(successorReadOnlyIter.advance()){
             if(successorReadOnlyIter.getCurrentTargetState() == dumpStateIndex){
-              @SuppressWarnings("unused")
               final int event = successorReadOnlyIter.getCurrentEvent();
               final int[] sourceTuple = new int[2]; //0 = source set, 1 = source state?
               resultMap.getOriginalState(source, sourceTuple);
@@ -748,10 +749,12 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
                   final int newState = resultMap.getComposedState(sourceTupleDash);
                   final TransitionIterator succIterSameEvent =
                     mTransitionRelation.createSuccessorsModifyingIterator();
-                  succIterSameEvent.resetState(newState);
-                  succIterSameEvent.setCurrentToState(dumpStateIndex);
-                  while(succIterSameEvent.advance()){
-                    succIterSameEvent.remove();
+                  succIterSameEvent.reset(newState, event);
+                  if (succIterSameEvent.advance()) {
+                    succIterSameEvent.setCurrentToState(dumpStateIndex);
+                    while(succIterSameEvent.advance()){
+                      succIterSameEvent.remove();
+                    }
                   }
                 }
               }
@@ -871,7 +874,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
       if(isDetailedOutputEnabled()){
         //Return result
         mTransitionRelation.removeRedundantPropositions();
-        final ProductDESProxy result = createDESProxy(mTransitionRelation);
+        final ProductDESProxy result = createDESProxy(powersetRel, copy);
         setProxyResult(result);
       }
       return true;
@@ -1155,12 +1158,13 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
     }
   }
 
-  private ProductDESProxy createDESProxy(final ListBufferTransitionRelation rel)
+  private ProductDESProxy createDESProxy(final ListBufferTransitionRelation rel,
+                                         final EventEncoding encoding)
     throws EventNotFoundException
   {
     rel.setName(mOutputName);
     final AutomatonProxy aut =
-      rel.createAutomaton(getFactory(), mEventEncoding);
+      rel.createAutomaton(getFactory(), encoding);
     return AutomatonTools.createProductDESProxy(aut, getFactory());
   }
 

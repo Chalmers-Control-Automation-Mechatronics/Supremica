@@ -127,6 +127,6 @@ public class MonolithicSynthesizerNormalityTest
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "synthesis", "soe_cont_normality.wmod");
-    runSynthesizer(des, true);
+    runSynthesizer(des, false);
   }
 }
