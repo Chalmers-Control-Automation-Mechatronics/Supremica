@@ -823,30 +823,6 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
           }
         }
 
-        /*for(int e=EventEncoding.NONTAU; e<mNumProperEvents; e++){
-          final byte status = mEventEncoding.getProperEventStatus(e);
-          if(!EventStatus.isControllableEvent(status)){
-            final TransitionIterator iter = mTransitionRelation.createAllTransitionsReadOnlyIterator(e);
-            while(iter.advance()){
-              if(iter.getCurrentTargetState() == dumpStateIndex){
-                final int source = iter.getCurrentSourceState();
-                //TODO: This can be pulled out into a method as it is reused
-                //If source is initial state, stop and return empty set/no result
-                if(mTransitionRelation.isInitial(source)){
-                  return setBooleanResult(false);
-                }
-                //Change all transitions pointing to this state, to point to dump
-                predecessorIterator.resetState(source);
-                while(predecessorIterator.advance()){
-                  predecessorIterator.setCurrentToState(dumpStateIndex);
-                }
-                //Set the state as unreachable (will be removed later)
-                mTransitionRelation.setReachable(source, false);
-                numDeletions++;
-              }
-            }
-          }
-        }*/
         //Check and set state reachability
         mTransitionRelation.checkReachability();
       }
