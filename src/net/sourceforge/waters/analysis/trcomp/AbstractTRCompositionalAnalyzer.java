@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.analysis.trcomp;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -81,8 +83,6 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.apache.log4j.Logger;
-
-import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -939,9 +939,11 @@ public abstract class AbstractTRCompositionalAnalyzer
         updateEventStatus(aut, oldEncoding);
       }
       // Drop trivial automata if necessary.
-      logger.debug("Dropping trivial automaton " + aut.getName());
-      dropTrivialAutomaton(aut);
-      mCurrentSubsystem.removeAutomaton(aut, mNeedsSimplification);
+      if (simplified && isTrivialAutomaton(aut)) {
+        logger.debug("Dropping trivial automaton " + aut.getName());
+        dropTrivialAutomaton(aut);
+        mCurrentSubsystem.removeAutomaton(aut, mNeedsSimplification);
+      }
       return simplified;
     } catch (final OverflowException exception) {
       recordUnsuccessfulComposition(exception);
