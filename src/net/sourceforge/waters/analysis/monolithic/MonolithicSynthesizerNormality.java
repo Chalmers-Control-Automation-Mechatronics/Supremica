@@ -802,7 +802,8 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
         }
 
         //Controllability step
-        final TransitionIterator successorIterator = mTransitionRelation.createSuccessorsModifyingIterator();
+        final TransitionIterator successorIterator =
+          mTransitionRelation.createSuccessorsModifyingIterator();
         for(int state=0; state<mTransitionRelation.getNumberOfStates(); state++){
           successorIterator.resetState(state);
           while(successorIterator.advance()){
@@ -810,11 +811,16 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
              final int event = successorIterator.getCurrentEvent();
              final byte status = mEventEncoding.getProperEventStatus(event);
              if(!EventStatus.isControllableEvent(status)){
+               //If an initial state is removed, synthesis has failed. Return false.
+               if (mTransitionRelation.isInitial(state)){
+                 return setBooleanResult(false);
+               }
                //Remove all out-going transitions
-               final TransitionIterator poo = mTransitionRelation.createSuccessorsModifyingIterator();
-               poo.resetState(state);
-               while(poo.advance()){
-                 poo.remove();
+               final TransitionIterator stateSuccessorIterator =
+                 mTransitionRelation.createSuccessorsModifyingIterator();
+               stateSuccessorIterator.resetState(state);
+               while(stateSuccessorIterator.advance()){
+                 stateSuccessorIterator.remove();
                }
                //Remove marking
                mTransitionRelation.removeMarkings(state, markedStateCode);
@@ -849,6 +855,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
                 powersetRel.addTransition(iter.getCurrentSourceState(), event, psDumpIndex);
                 //Remove original transition from powerset
                 iter.remove();
+                break;
               }
             }
           }
