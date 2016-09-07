@@ -33,6 +33,10 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -64,10 +68,6 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.EventKind;
-
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
 
 
 /**
@@ -249,6 +249,11 @@ public abstract class TRAbstractModelAnalyzer
     return mStateCallback;
   }
 
+  public int getDefaultConfig()
+  {
+    return ListBufferTransitionRelation.CONFIG_SUCCESSORS;
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
@@ -284,8 +289,9 @@ public abstract class TRAbstractModelAnalyzer
     boolean gotDump = false;
     for (final AutomatonProxy aut : automata) {
       if (translator.getComponentKind(aut) != null) {
+        final int config = getDefaultConfig();
         final TRAutomatonProxy tr = TRAutomatonProxy.createTRAutomatonProxy
-          (aut, translator, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+          (aut, translator, config);
         mInputAutomata[a] = tr;
         final ListBufferTransitionRelation rel = tr.getTransitionRelation();
         int numStates = getLastReachableState(rel) + 1;

@@ -136,6 +136,16 @@ public abstract class TRAbstractSynchronousProductBuilder
     return mCountingStates;
   }
 
+  @Override
+  public int getDefaultConfig()
+  {
+    int config = super.getDefaultConfig();
+    if (mCountingStates) {
+      config |= ListBufferTransitionRelation.CONFIG_COUNT;
+    }
+    return config;
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelBuilder
@@ -399,7 +409,7 @@ public abstract class TRAbstractSynchronousProductBuilder
           for (int autI = 0; autI < numComponents; autI++) {
             totalCount *= components[autI].getTransitionRelation().
               getStateBuffer().getStateCount(decoded[autI]);
-          }
+          } //TODO: The multiplication may not be carried out correctly
           // Now, store this state count to the location of its
           // corresponding tuple.
           rel.getStateBuffer().setStateCount(tupleI, totalCount);
