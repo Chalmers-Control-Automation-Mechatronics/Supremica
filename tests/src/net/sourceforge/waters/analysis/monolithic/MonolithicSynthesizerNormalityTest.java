@@ -88,22 +88,23 @@ public class MonolithicSynthesizerNormalityTest
   protected void checkResult(final ProductDESProxy des,
                              final ProductDESResult result,
                              final boolean expect)
-    throws Exception
+                               throws Exception
   {
     super.checkResult(des, result, expect);
     if (result.isSatisfied()) {
       final Collection<? extends AutomatonProxy> computedSupervisors =
         result.getComputedAutomata();
       // Check whether any of the supervisors uses an unobservable event
-      final AutomatonProxy computedSupervisor = computedSupervisors.iterator().next();
-      final Set<EventProxy> events = computedSupervisor.getEvents();
-      boolean unobservableEvent = false;
-      for(final EventProxy e : events){
-        if(!e.isObservable())
-          unobservableEvent = true;
+      for (final AutomatonProxy sup : computedSupervisors) {
+        final Set<EventProxy> events = sup.getEvents();
+        for (final EventProxy event : events){
+          if (!event.isObservable()) {
+            fail("The supervisor '" + sup.getName() +
+                 "' uses the unobservable event '" + event.getName() + "'!");
+          }
+        }
       }
-      assertEquals("An unobservable event was used in the supervisor!", false, unobservableEvent);
-     }
+    }
   }
 
 
@@ -114,6 +115,13 @@ public class MonolithicSynthesizerNormalityTest
     final ProductDESProxy des =
       getCompiledDES("tests", "synthesis", "normality_01.wmod");
     runSynthesizer(des, true);
+  }
+
+  public void testNormality02() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "normality_02.wmod");
+    runSynthesizer(des, false);
   }
 
   public void testParrowNormality() throws Exception

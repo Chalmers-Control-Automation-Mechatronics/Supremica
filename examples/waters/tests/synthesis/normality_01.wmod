@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="normality_01" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
+    <ns2:Comment>A basic tests for synthesis with unobservable events.
+This tests involves controllability only.
+If (and only if) tau is unobservable, event d must be disabled in the plant' state S3.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="tau"/>
         <EventDecl Kind="CONTROLLABLE" Name="c"/>
