@@ -152,6 +152,9 @@ public class TRCompositionalStateCounter
   @Override
   protected void setUp() throws AnalysisException
   {
+    // Reset
+    mTotalStateCount = 1;
+
     // Carry out the normal 'setUp' method.
     super.setUp();
 
