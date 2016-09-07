@@ -147,6 +147,22 @@ public class TRCompositionalStateCounter
     return true;
   }
 
+  @Override
+  protected void setUp() throws AnalysisException
+  {
+    // Carry out the normal 'setUp' method.
+    super.setUp();
+
+    // Ensures that the transition relations do state counting.
+    final TRSubsystemInfo subsystem = getCurrentSubsystem();
+    final List<TRAutomatonProxy> automata = subsystem.getAutomata();
+    for (final TRAutomatonProxy aut : automata) {
+      int config = aut.getTransitionRelation().getConfiguration();
+      config |= ListBufferTransitionRelation.CONFIG_COUNT;
+      aut.getTransitionRelation().reconfigure(config);
+    }
+  }
+
 
   //#########################################################################
   //# Abstraction Chain
