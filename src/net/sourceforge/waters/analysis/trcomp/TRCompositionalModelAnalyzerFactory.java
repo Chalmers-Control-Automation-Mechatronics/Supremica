@@ -48,6 +48,7 @@ import net.sourceforge.waters.model.analysis.CommandLineArgumentString;
 import net.sourceforge.waters.model.analysis.EnumFactory;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.analysis.des.StateCounter;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -121,6 +122,13 @@ public class TRCompositionalModelAnalyzerFactory
     (final ProductDESProxyFactory factory)
   {
     return new TRCompositionalLanguageInclusionChecker();
+  }
+
+  @Override
+  public StateCounter createStateCounter
+    (final ProductDESProxyFactory factory)
+  {
+    return new TRCompositionalStateCounter();
   }
 
 
