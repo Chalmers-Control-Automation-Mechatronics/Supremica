@@ -68,7 +68,9 @@ public class LongStateCountBuffer extends AbstractStateBuffer
   //#########################################################################
   //# Constructors
   /**
-   * Creates a new state buffer. This constructor creates a new state buffer
+   * Creates a new state buffer.
+   * <p>
+   * This constructor creates a new state buffer
    * with the states in the given encoding. If the state encoding contains
    * a <CODE>null</CODE> state, it is used as a reachable dump state,
    * otherwise an additional unreachable dump state is added to the end of
@@ -120,6 +122,7 @@ public class LongStateCountBuffer extends AbstractStateBuffer
 
   /**
    * Creates a new empty state buffer.
+   * <p>
    * This constructor allocates a new state buffer with the given number
    * of states. States are initially marked as reachable, while all other
    * attributes and markings of the states are initialised to be
@@ -135,6 +138,7 @@ public class LongStateCountBuffer extends AbstractStateBuffer
 
   /**
    * Creates a new empty state buffer.
+   * <p>
    * This constructor allocates a new state buffer with the given number
    * of states. States are initially marked as reachable, while all other
    * attributes and markings of the states are initialised to be
@@ -151,10 +155,11 @@ public class LongStateCountBuffer extends AbstractStateBuffer
 
   /**
    * Creates a new empty state buffer.
+   * <p>
    * This constructor allocates a new state buffer with the given number
    * of states. States are initially marked as reachable, while all other
-   * attributes and markings of the states are initialised to be
-   * <CODE>false</CODE>.
+   * attributes and markings of the states are initialised to
+   * <CODE>false</CODE>. Also, the count of each state is initialised to 1.
    * @param  size       The number of states in the new buffer.
    * @param  dumpIndex  The index of the dump state in the new buffer.
    *                    The dump state signifies a unmarked state without
@@ -166,7 +171,7 @@ public class LongStateCountBuffer extends AbstractStateBuffer
   {
     setDumpStateIndex(dumpIndex);
     mStateInfo = new long[size];
-    Arrays.fill(mStateInfo, TAG_REACHABLE);
+    Arrays.fill(mStateInfo, TAG_REACHABLE | 1L);
   }
 
   /**

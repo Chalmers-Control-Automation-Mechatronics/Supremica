@@ -102,6 +102,8 @@ public class TRCompositionalStateCounter
         AutomatonTools.createProductDESProxy("StateCount", automata, factory);
       final TRSynchronousProductBuilder syncBuilder =
         new TRSynchronousProductBuilder(des);
+      syncBuilder.setNodeLimit(getMonolithicStateLimit());
+      syncBuilder.setTransitionLimit(this.getMonolithicTransitionLimit());
       syncBuilder.setCountingStates(true);
       syncBuilder.run();
       // Retrieve the state count.
@@ -116,14 +118,14 @@ public class TRCompositionalStateCounter
   protected TRAbstractSynchronousProductBuilder createSynchronousProductBuilder()
   {
     final KindTranslator translator = getKindTranslator();
-    final TRAbstractSynchronousProductBuilder builder = new TRSynchronousProductBuilder();
-    builder.setCountingStates(true);
-    builder.setDetailedOutputEnabled(false);
-    builder.setKindTranslator(translator);
-    builder.setRemovingSelfloops(true);
-    builder.setNodeLimit(mInternalStateLimit);
-    builder.setTransitionLimit(mInternalTransitionLimit);
-    return builder;
+    final TRAbstractSynchronousProductBuilder syncBuilder = new TRSynchronousProductBuilder();
+    syncBuilder.setCountingStates(true);
+    syncBuilder.setDetailedOutputEnabled(false);
+    syncBuilder.setKindTranslator(translator);
+    syncBuilder.setRemovingSelfloops(true);
+    syncBuilder.setNodeLimit(getInternalStateLimit());
+    syncBuilder.setTransitionLimit(getInternalTransitionLimit());
+    return syncBuilder;
   }
 
   @Override
@@ -145,6 +147,25 @@ public class TRCompositionalStateCounter
 
     // State counting always returns true.
     return true;
+  }
+
+  @Override
+  protected void setUp() throws AnalysisException
+  {
+    // Reset
+    mTotalStateCount = 1;
+
+    // Carry out the normal 'setUp' method.
+    super.setUp();
+
+    // Ensures that the transition relations do state counting.
+    final TRSubsystemInfo subsystem = getCurrentSubsystem();
+    final List<TRAutomatonProxy> automata = subsystem.getAutomata();
+    for (final TRAutomatonProxy aut : automata) {
+      int config = aut.getTransitionRelation().getConfiguration();
+      config |= ListBufferTransitionRelation.CONFIG_COUNT;
+      aut.getTransitionRelation().reconfigure(config);
+    }
   }
 
 
@@ -186,7 +207,5 @@ public class TRCompositionalStateCounter
 
   //#########################################################################
   //# Data Members
-  private final int mInternalStateLimit = Integer.MAX_VALUE;
-  private final int mInternalTransitionLimit = Integer.MAX_VALUE;
   private long mTotalStateCount = 1;
 }
