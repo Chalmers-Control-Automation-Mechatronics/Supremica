@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import gnu.trove.set.hash.TIntHashSet;
-
 import java.util.Collection;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -57,6 +55,8 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.apache.log4j.Logger;
+
+import gnu.trove.set.hash.TIntHashSet;
 
 
 /**
@@ -409,7 +409,7 @@ public abstract class TRAbstractSynchronousProductBuilder
           for (int autI = 0; autI < numComponents; autI++) {
             totalCount *= components[autI].getTransitionRelation().
               getStateBuffer().getStateCount(decoded[autI]);
-          } //TODO: The multiplication may not be carried out correctly
+          }
           // Now, store this state count to the location of its
           // corresponding tuple.
           rel.getStateBuffer().setStateCount(tupleI, totalCount);
