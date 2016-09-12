@@ -36,6 +36,8 @@ package net.sourceforge.waters.analysis.trcomp;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.ReverseObservationEquivalenceTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.TRSimplificationListener;
 import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult;
@@ -183,8 +185,12 @@ public class TRCompositionalStateCounter
   }
 
   /**
-   * Reverse Observation Equivalence (but currently only has inherited
-   * 'hiding' and 'tau-loop removal').
+   * Abstraction chain for compositional state counting:
+   * <OL>
+   * <LI>Hiding</LI>
+   * <LI>Tau-loop removal</LI>
+   * <LI>Reverse observation equivalence</LI>
+   * </OL>
    */
   public static final TRToolCreator<TransitionRelationSimplifier> ROEQ =
     new TRToolCreator<TransitionRelationSimplifier>("ROEQ")
@@ -194,10 +200,28 @@ public class TRCompositionalStateCounter
       (final AbstractTRCompositionalAnalyzer analyzer)
         throws AnalysisConfigurationException
     {
+      // Configuration
+      final int transitionLimit = analyzer.getInternalTransitionLimit();
+      final TRSimplificationListener listener =
+        analyzer.new PartitioningListener();
+
+      // The initial abstraction chain
       final ChainTRSimplifier chain = analyzer.startAbstractionChain();
+
+      // Tau-loop removal
       final TransitionRelationSimplifier loopRemover =
         new TauLoopRemovalTRSimplifier();
+      loopRemover.setSimplificationListener(listener);
       chain.add(loopRemover);
+
+      // Reverse observation equivalence
+      final ReverseObservationEquivalenceTRSimplifier simplifier =
+        new ReverseObservationEquivalenceTRSimplifier();
+      simplifier.setTransitionLimit(transitionLimit);
+      simplifier.setSimplificationListener(listener);
+      //chain.add(simplifier);
+
+      // Finialise
       chain.setPreferredOutputConfiguration
         (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
       return chain;
@@ -207,5 +231,5 @@ public class TRCompositionalStateCounter
 
   //#########################################################################
   //# Data Members
-  private long mTotalStateCount = 1;
+  private long mTotalStateCount;
 }
