@@ -475,7 +475,7 @@ public class TRCompositionalLanguageInclusionChecker
         ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION :
         ObservationEquivalenceTRSimplifier.Equivalence.DETERMINISTIC_MINSTATE;
       bisimulator.setEquivalence(eq);
-      bisimulator.setTransitionLimit(stateLimit);
+      bisimulator.setTransitionLimit(transitionLimit);
       bisimulator.setSimplificationListener(listener);
       chain.add(bisimulator);
       chain.setPreferredOutputConfiguration
