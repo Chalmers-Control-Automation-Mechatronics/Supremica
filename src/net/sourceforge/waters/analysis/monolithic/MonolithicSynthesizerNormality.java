@@ -754,6 +754,8 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
                     succIterSameEvent.setCurrentToState(dumpStateIndex);
                     while(succIterSameEvent.advance()){
                       succIterSameEvent.remove();
+                      //Increment removed state/transition counter
+                      numDeletions++;
                     }
                   }
                 }
@@ -791,6 +793,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
           }
         }
 
+        //Change any transition that points to a non-coreachable state to dump
         mTransitionRelation.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
         final TransitionIterator allTransIter = mTransitionRelation
           .createAllTransitionsModifyingIterator();
@@ -798,6 +801,8 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
           final int targetState = allTransIter.getCurrentTargetState();
           if(!coreachableStates.contains(targetState) && targetState != dumpStateIndex){
             allTransIter.setCurrentToState(dumpStateIndex);
+            //Increment removed state/transition counter
+            numDeletions++;
           }
         }
 
@@ -805,13 +810,18 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
         final TransitionIterator successorIterator =
           mTransitionRelation.createSuccessorsModifyingIterator();
         for(int state=0; state<mTransitionRelation.getNumberOfStates(); state++){
+          //If a state is initial and not coreachable, return failed result
+          //This is part of the non-blocking check above but is more efficient here
+          if (mTransitionRelation.isInitial(state) && !coreachableStates.contains(state)){
+            return setBooleanResult(false);
+          }
           successorIterator.resetState(state);
           while(successorIterator.advance()){
            if(successorIterator.getCurrentTargetState() == dumpStateIndex){
              final int event = successorIterator.getCurrentEvent();
              final byte status = mEventEncoding.getProperEventStatus(event);
              if(!EventStatus.isControllableEvent(status)){
-               //If an initial state is removed, synthesis has failed. Return false.
+               //If an initial state is removed as not controllable, synthesis has failed.
                if (mTransitionRelation.isInitial(state)){
                  return setBooleanResult(false);
                }
@@ -824,6 +834,8 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
                }
                //Remove marking
                mTransitionRelation.removeMarkings(state, markedStateCode);
+               //Increment removed state/transition counter
+               numDeletions++;
              }
            }
           }
@@ -848,7 +860,6 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
               resultMap.getOriginalState(source, sourceTuple);
               //Get sourceSet from pair
               final int[] synthesisSourceSet = subsetSimplifier.getSourceSet(sourceTuple[0]);
-              //TODO: Check this is how I get the set of states from state id for the powersetRel
               final int[] powersetSourceSet = subsetSimplifier.getSourceSet(iter.getCurrentSourceState());
               if(Arrays.equals(synthesisSourceSet, powersetSourceSet)){
                 //Add new transition with same event pointing to dump
@@ -862,10 +873,13 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
         }
       }
 
+      mTransitionRelation = powersetRel;
+      mEventEncoding = copy;
+
       if(isDetailedOutputEnabled()){
         //Return result
         mTransitionRelation.removeRedundantPropositions();
-        final ProductDESProxy result = createDESProxy(powersetRel, copy);
+        final ProductDESProxy result = createDESProxy(mTransitionRelation, mEventEncoding);
         setProxyResult(result);
       }
       return true;
