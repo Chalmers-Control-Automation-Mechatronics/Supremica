@@ -219,11 +219,11 @@ public class TRCompositionalStateCounter
         new ReverseObservationEquivalenceTRSimplifier();
       simplifier.setTransitionLimit(transitionLimit);
       simplifier.setSimplificationListener(listener);
-      //chain.add(simplifier);
+      chain.add(simplifier);
 
       // Finialise
       chain.setPreferredOutputConfiguration
-        (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+        (ListBufferTransitionRelation.CONFIG_S_C);
       return chain;
     }
   };
