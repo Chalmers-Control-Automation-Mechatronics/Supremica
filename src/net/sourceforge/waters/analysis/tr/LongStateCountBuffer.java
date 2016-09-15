@@ -33,9 +33,6 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TLongObjectHashMap;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -45,6 +42,9 @@ import java.util.Collection;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
+
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TLongObjectHashMap;
 
 
 /**
@@ -220,7 +220,7 @@ public class LongStateCountBuffer extends AbstractStateBuffer
    * @param propStatus Event status provider to determine the number of
    *                   propositions and which propositions are used.
    */
-  public LongStateCountBuffer(final IntStateBuffer buffer,
+  public LongStateCountBuffer(final AbstractStateBuffer buffer,
                               final EventStatusProvider propStatus)
   {
     setDumpStateIndex(buffer.getDumpStateIndex());

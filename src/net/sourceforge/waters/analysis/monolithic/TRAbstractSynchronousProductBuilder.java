@@ -141,7 +141,7 @@ public abstract class TRAbstractSynchronousProductBuilder
   {
     int config = super.getDefaultConfig();
     if (mCountingStates) {
-      config |= ListBufferTransitionRelation.CONFIG_COUNT;
+      config |= ListBufferTransitionRelation.CONFIG_COUNT_LONG;
     }
     return config;
   }

@@ -100,8 +100,10 @@ public class TRCompositionalStateCounter
       // Construct the synchronous composition.
       final ProductDESProxyFactory factory = getFactory();
       final List<TRAutomatonProxy> automata = subsys.getAutomata();
+      final String name = AutomatonTools.getCompositionName(automata);
       final ProductDESProxy des =
-        AutomatonTools.createProductDESProxy("StateCount", automata, factory);
+        AutomatonTools.createProductDESProxy(name, automata, factory);
+      recordMonolithicAttempt(des);
       final TRSynchronousProductBuilder syncBuilder =
         new TRSynchronousProductBuilder(des);
       syncBuilder.setNodeLimit(getMonolithicStateLimit());
@@ -165,7 +167,7 @@ public class TRCompositionalStateCounter
     final List<TRAutomatonProxy> automata = subsystem.getAutomata();
     for (final TRAutomatonProxy aut : automata) {
       int config = aut.getTransitionRelation().getConfiguration();
-      config |= ListBufferTransitionRelation.CONFIG_COUNT;
+      config |= ListBufferTransitionRelation.CONFIG_COUNT_LONG;
       aut.getTransitionRelation().reconfigure(config);
     }
   }

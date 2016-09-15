@@ -33,14 +33,14 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.list.array.TIntArrayList;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+
+import gnu.trove.list.array.TIntArrayList;
 
 
 /**
@@ -155,7 +155,7 @@ public class ReverseObservationEquivalenceTRSimplifier
   @Override
   public int getPreferredInputConfiguration()
   {
-    return ListBufferTransitionRelation.CONFIG_S_C;
+    return ListBufferTransitionRelation.CONFIG_SUCCESSORS;
   }
 
   @Override

@@ -272,7 +272,7 @@ public abstract class AbstractTRSimplifier
     mResultPartition = null;
     final int config = getPreferredInputConfiguration();
     if (config != 0) {
-      mTransitionRelation.reconfigure(config | ListBufferTransitionRelation.CONFIG_COUNT);
+      mTransitionRelation.reconfigure(config);
     }
   }
 
