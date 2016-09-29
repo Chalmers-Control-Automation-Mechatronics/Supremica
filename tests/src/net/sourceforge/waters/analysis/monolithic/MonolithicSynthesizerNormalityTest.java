@@ -137,4 +137,11 @@ public class MonolithicSynthesizerNormalityTest
       getCompiledDES("tests", "synthesis", "soe_cont_normality.wmod");
     runSynthesizer(des, false);
   }
+
+  public void testTrafficLights() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "traffic_lights.wmod");
+    runSynthesizer(des, true);
+  }
 }
