@@ -34,6 +34,7 @@
 package net.sourceforge.waters.gui.simulator;
 
 import java.util.List;
+
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
@@ -56,7 +57,7 @@ public class SimulatorStep
 
   //#########################################################################
   //# Constructor
-  SimulatorStep(final SimulatorState next, final List<AutomatonProxy> nondet)
+  public SimulatorStep(final SimulatorState next, final List<AutomatonProxy> nondet)
   {
     mNextSimulatorState = next;
     mNonDeterministicAutomata = nondet;
@@ -70,7 +71,7 @@ public class SimulatorStep
     return mNextSimulatorState;
   }
 
-  EventProxy getEvent()
+  public EventProxy getEvent()
   {
     return mNextSimulatorState.getEvent();
   }
@@ -83,6 +84,7 @@ public class SimulatorStep
 
   //#########################################################################
   //# Overrides for java.lang.Object
+  @Override
   public String toString()
   {
     final String name = getEvent().getName();

@@ -34,6 +34,7 @@
 package net.sourceforge.waters.model.compiler.context;
 
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 
 
 /**
@@ -78,10 +79,29 @@ public class SourceInfo
 
   //#########################################################################
   //# Constructor
-  public SourceInfo(final Proxy proxy, final BindingContext context)
+  SourceInfo(final Proxy proxy, final BindingContext context)
+  {
+    this(proxy, context, null);
+  }
+
+  SourceInfo(final Proxy proxy,
+             final BindingContext context,
+             final SourceInfo parent)
   {
     mSourceObject = proxy;
     mBindingContext = context;
+    mParent = parent;
+  }
+
+
+  //#########################################################################
+  //# Overrides for java.lang.Object
+  @Override
+  public String toString()
+  {
+    final StringBuilder builder = new StringBuilder();
+    dump(builder);
+    return builder.toString();
   }
 
 
@@ -103,6 +123,37 @@ public class SourceInfo
   public BindingContext getBindingContext()
   {
     return mBindingContext;
+  }
+
+  /**
+   * Gets the parent of this source information record.
+   * If a compiled module contains instances ({@link
+   * net.sourceforge.waters.model.module.InstanceProxy InstanceProxy}) that
+   * refer to a child module, then the child module is compiled with source
+   * information referencing to the elements of the child module. In
+   * addition, all these source information records contain a parent source
+   * information that references the instance in the parent module.
+   */
+  public SourceInfo getParent()
+  {
+    return mParent;
+  }
+
+  /**
+   * Gets the root parent of this source information record.
+   * This method returns the uppermost parent of this source information,
+   * which is either the source information itself (if the compiled module
+   * has no instances) or a source information referencing an instance in
+   * the original module that triggered compilation.
+   * @see #getParent()
+   */
+  public SourceInfo getRoot()
+  {
+    SourceInfo root = this;
+    while (root.mParent != null) {
+      root = root.mParent;
+    }
+    return root;
   }
 
 
@@ -137,10 +188,37 @@ public class SourceInfo
   public Proxy getGraphSourceObject()
   {
     final SourceInfo info = getGraphSourceInfo();
-    if (info == this)
-      return this.getSourceObject();
-    else
+    if (info == this) {
+      return getSourceObject();
+    } else {
       return info.getGraphSourceObject();
+    }
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  public void dump(final StringBuilder builder)
+  {
+    dump(builder, 0);
+  }
+
+  private void dump(final StringBuilder builder, final int indent)
+  {
+    for (int i = 0; i < indent; i++) {
+      builder.append(' ');
+    }
+    ProxyTools.appendContainerName(mSourceObject, builder);
+    if (mBindingContext != null) {
+      builder.append(" [");
+      // TODO dump bindings ...
+      builder.append("...");
+      builder.append("]");
+    }
+    if (mParent != null) {
+      builder.append("\n");
+      mParent.dump(builder, indent + 2);
+    }
   }
 
 
@@ -148,5 +226,6 @@ public class SourceInfo
   //# Data Members
   private final Proxy mSourceObject;
   private final BindingContext mBindingContext;
+  private final SourceInfo mParent;
 
 }

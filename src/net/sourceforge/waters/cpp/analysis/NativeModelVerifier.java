@@ -33,9 +33,7 @@
 
 package net.sourceforge.waters.cpp.analysis;
 
-import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
@@ -72,12 +70,6 @@ public abstract class NativeModelVerifier
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelVerifier
   @Override
-  public NativeVerificationResult createAnalysisResult()
-  {
-    return new NativeVerificationResult(this);
-  }
-
-  @Override
   public void setCounterExampleEnabled(final boolean enable)
   {
     setDetailedOutputEnabled(enable);
@@ -87,35 +79,6 @@ public abstract class NativeModelVerifier
   public boolean isCounterExampleEnabled()
   {
     return isDetailedOutputEnabled();
-  }
-
-
-  //#########################################################################
-  //# Invocation
-  @Override
-  public boolean run()
-    throws AnalysisException
-  {
-    if (getModel() == null) {
-      throw new AnalysisConfigurationException("Input model is NULL!");
-    } else {
-      clearAnalysisResult();
-      final long start = System.currentTimeMillis();
-      try {
-        final AnalysisResult result = runNativeAlgorithm();
-        final long stop = System.currentTimeMillis();
-        result.setRuntime(stop - start);
-        setAnalysisResult(result);
-        return result.isSatisfied();
-      } catch (final AnalysisException exception) {
-        final long stop = System.currentTimeMillis();
-        final AnalysisResult result = createAnalysisResult();
-        result.setException(exception);
-        result.setRuntime(stop - start);
-        setAnalysisResult(result);
-        throw exception;
-      }
-    }
   }
 
 
@@ -152,6 +115,7 @@ public abstract class NativeModelVerifier
 
   //#########################################################################
   //# Native Methods
+  @Override
   abstract VerificationResult runNativeAlgorithm() throws AnalysisException;
 
   public abstract String getTraceName();

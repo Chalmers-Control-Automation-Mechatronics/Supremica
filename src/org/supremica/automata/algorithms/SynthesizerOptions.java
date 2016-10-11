@@ -140,7 +140,7 @@ public final class SynthesizerOptions
 
         if (synthesisAlgorithm == SynthesisAlgorithm.BDD)
         {
-            if ((synthesisType != SynthesisType.NONBLOCKINGCONTROLLABLE) &&
+            if ((synthesisType != SynthesisType.NONBLOCKING_CONTROLLABLE) &&
                 (synthesisType != SynthesisType.CONTROLLABLE) &&
                 (synthesisType != SynthesisType.NONBLOCKING))
             {
@@ -328,7 +328,7 @@ public final class SynthesizerOptions
     public static SynthesizerOptions getDefaultMonolithicCNBSynthesizerOptions()
     {
         final SynthesizerOptions options = getDefaultSynthesizerOptions();
-		options.synthesisType = SynthesisType.NONBLOCKINGCONTROLLABLE;
+		options.synthesisType = SynthesisType.NONBLOCKING_CONTROLLABLE;
         options.synthesisAlgorithm = SynthesisAlgorithm.MONOLITHIC;
         options.removeUnnecessarySupervisors = true;
         options.reduceSupervisors = true;

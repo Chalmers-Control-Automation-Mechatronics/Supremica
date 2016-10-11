@@ -464,7 +464,7 @@ public final class EditorSynthesizerOptions
     public static EditorSynthesizerOptions getDefaultMonolithicCNBSynthesizerOptions()
     {
         final EditorSynthesizerOptions options = getDefaultSynthesizerOptions();
-		options.synthesisType = SynthesisType.NONBLOCKINGCONTROLLABLE;
+		options.synthesisType = SynthesisType.NONBLOCKING_CONTROLLABLE;
         options.synthesisAlgorithm = SynthesisAlgorithm.BDD;
         options.removeUnnecessarySupervisors = false;
         options.reduceSupervisors = false;

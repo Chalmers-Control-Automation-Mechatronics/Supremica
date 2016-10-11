@@ -173,6 +173,7 @@ public class IconLoader
   private static final String NAME_SIMULATOR_REPLAY = "simulator_replay";
   private static final String NAME_SIMULATOR_RESET = "simulator_reset";
   private static final String NAME_SIMULATOR_STEP = "simulator_step";
+  private static final String NAME_SIMULATOR_AUTOSTEP = "simulator_autostep";
   private static final String NAME_SIMULATOR_TO_END = "simulator_to_end";
   private static final String NAME_SIMULATOR_TO_START = "simulator_to_start";
   private static final String NAME_SPEC = "specification";
@@ -293,6 +294,8 @@ public class IconLoader
     getWatersIcon(NAME_SIMULATOR_RESET);
   public static final ImageIcon ICON_SIMULATOR_STEP =
     getWatersIcon(NAME_SIMULATOR_STEP);
+  public static final ImageIcon ICON_SIMULATOR_AUTOSTEP =
+    getWatersIcon(NAME_SIMULATOR_AUTOSTEP);
   public static final ImageIcon ICON_SIMULATOR_TO_END =
     getWatersIcon(NAME_SIMULATOR_TO_END);
   public static final ImageIcon ICON_SIMULATOR_TO_START =

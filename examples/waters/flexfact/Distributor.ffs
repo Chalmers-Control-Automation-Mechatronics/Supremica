@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlexFactConfiguration>
+<SimulationParameters>
+<OperatorPanel cnt="0"/>
+<FaultMonitor val="0"/>
+<Device type="Simplenet (local)"/>
+</SimulationParameters>
+<PlantComponents>
+<StackFeeder id="SF1">
+<Position x="2" y="2" phi="std"/>
+</StackFeeder>
+<Distributor id="DS1">
+<Position x="3" y="2" phi="std"/>
+<Parameters len="1"/>
+</Distributor>
+<ExitSlide id="XS1">
+<Position x="5" y="2" phi="std"/>
+</ExitSlide>
+<ExitSlide id="XS2">
+<Position x="3" y="4" phi="+90"/>
+</ExitSlide>
+</PlantComponents>
+</FlexFactConfiguration>

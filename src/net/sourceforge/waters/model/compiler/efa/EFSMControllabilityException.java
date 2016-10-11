@@ -33,8 +33,8 @@
 
 package net.sourceforge.waters.model.compiler.efa;
 
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -48,7 +48,6 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 
 public class EFSMControllabilityException extends EvalException
 {
-  private static final long serialVersionUID = 5983937125200118084L;
 
   //#########################################################################
   //# Constructors
@@ -73,23 +72,31 @@ public class EFSMControllabilityException extends EvalException
   public EFSMControllabilityException(final SimpleComponentProxy component,
                                       final EFAVariable variable,
                                       final IdentifierProxy event,
-                                      final BinaryExpressionProxy location)
+                                      final Proxy location)
   {
     super(component.getKind().toString() + " '" + component.getName() +
           "' attempts to modify the variable '" +
           variable.getVariableName().toString() + "' on the " +
           isUncontrollable(component.getKind()) + "event '" +
           event.toString() + "'!",
-          location); // The location is the action of the guard action block.
+          location);
   }
+
 
   //#########################################################################
   //# Auxiliary Method
   private static String isUncontrollable(final ComponentKind kind)
   {
-    if (kind.equals(ComponentKind.PROPERTY))
+    if (kind == ComponentKind.PROPERTY) {
       return "";
-    else
+    } else {
       return "uncontrollable ";
+    }
   }
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 5983937125200118084L;
+
 }

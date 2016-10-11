@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="parrow_normality" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
+    <ns2:Comment>Parrow's protocol, an ideal protocol for data transmission, however not physically viable since the 'acknowledgement' signals also have to travel in an unreliable medium. The Sender, Receiver and Medium should together show the Desired behaviour. A physically viable protocol is the alternating bit protocol.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="PROPOSITION" Name=":forbidden"/>
+        <EventDecl Kind="CONTROLLABLE" Name="acknowledge"/>
+        <EventDecl Kind="CONTROLLABLE" Name="in"/>
+        <EventDecl Kind="CONTROLLABLE" Name="out"/>
+        <EventDecl Kind="CONTROLLABLE" Name="receive"/>
+        <EventDecl Kind="CONTROLLABLE" Name="send"/>
+        <EventDecl Kind="CONTROLLABLE" Observable="false" Name="tau_lost"/>
+        <EventDecl Kind="CONTROLLABLE" Observable="false" Name="tau_ok"/>
+        <EventDecl Kind="CONTROLLABLE" Name="timeout"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="Medium">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="m0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="95" Y="92"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="m1">
+                        <PointGeometry>
+                            <Point X="152" Y="150"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="m2">
+                        <PointGeometry>
+                            <Point X="57" Y="186"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="m3">
+                        <PointGeometry>
+                            <Point X="189" Y="55"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="m0" Target="m1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="in"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="m1" Target="m2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_ok"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="104" Y="178"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="m1" Target="m3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tau_lost"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="181" Y="103"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="m2" Target="m0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="out"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="65" Y="138"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="m3" Target="m0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="timeout"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="142" Y="63"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="Desired behaviour">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="q0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="q1"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="q0" Target="q1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="send"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="q1" Target="q0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="receive"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Sender">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="s1"/>
+                    <SimpleNode Name="s2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="s0" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="send"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s1" Target="s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="in"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s2" Target="s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="acknowledge"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="s2" Target="s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="timeout"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="Receiver">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="r0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="r1"/>
+                    <SimpleNode Name="r2"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="r0" Target="r1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="out"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="r1" Target="r2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="receive"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="r2" Target="r0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="acknowledge"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="sup">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="q0.m0.r0.s0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="96" Y="80"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q0.m0.r2.s2">
+                        <PointGeometry>
+                            <Point X="51" Y="175"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q1.m0.r0.s1">
+                        <PointGeometry>
+                            <Point X="215" Y="60"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q1.m0.r1.s2">
+                        <PointGeometry>
+                            <Point X="111" Y="256"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="q1.m1.r0.s2">
+                        <PointGeometry>
+                            <Point X="269" Y="134"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="q0.m0.r0.s0" Target="q1.m0.r0.s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="send"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="152" Y="62"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q0.m0.r2.s2" Target="q0.m0.r0.s0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="acknowledge"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="65" Y="124"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q1.m0.r0.s1" Target="q1.m1.r0.s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="in"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="4" Y="-7"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="244" Y="94"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q1.m0.r1.s2" Target="q0.m0.r2.s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="receive"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="74" Y="221"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="q1.m1.r0.s2" Target="q1.m0.r1.s2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="out"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point X="269" Y="134"/>
+                        </StartPointGeometry>
+                    </Edge>
+                    <Edge Source="q1.m1.r0.s2" Target="q1.m0.r0.s1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="timeout"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-27" Y="12"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point X="269" Y="134"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point X="226" Y="104"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

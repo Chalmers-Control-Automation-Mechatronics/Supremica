@@ -36,6 +36,7 @@ package net.sourceforge.waters.model.compiler;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -44,9 +45,12 @@ import java.util.List;
 import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersException;
+import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierException;
+import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.compiler.efa.ActionSyntaxException;
 import net.sourceforge.waters.model.compiler.graph.NondeterministicModuleException;
@@ -69,6 +73,7 @@ import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.DescendingModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
@@ -95,7 +100,7 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
       (name, null, null, null, null, null, null);
     final ProductDESProxy des = compile(module);
     assertTrue("Unexpected name!", des.getName().equals(name));
-    assertTrue("Unexpected location!", des.getLocation() == null);
+    assertNull("Unexpected location!", des.getLocation());
     assertTrue("Unexpected event!", des.getEvents().isEmpty());
     assertTrue("Unexpected automata!", des.getAutomata().isEmpty());
   }
@@ -127,14 +132,16 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   public void testCompile_array()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "compiler/instance", "array");
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "instance", "array");
     testCompile(module);
   }
 
   public void testCompile_array2d()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "compiler/instance", "array2d");
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "instance", "array2d");
     testCompile(module);
   }
 
@@ -155,14 +162,16 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   public void testCompile_colours()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "compiler/graph", "colours");
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "graph", "colours");
     testCompile(module);
   }
 
   public void testCompile_empty_intrange() throws IOException,
     WatersException
   {
-    final ModuleProxy module = loadModule("tests", "compiler/instance", "empty_intrange");
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "instance", "empty_intrange");
     testCompile(module);
   }
 
@@ -190,7 +199,8 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   public void testCompile_instantiate_order()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "compiler/instance", "instantiate_order");
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "instance", "instantiate_order");
     testCompile(module);
   }
 
@@ -210,41 +220,47 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   public void testCompile_markus2()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "compiler/graph", "markus2");
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "graph", "markus2");
     testCompile(module);
   }
 
   public void testCompile_nested_groups() throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "compiler/groupnode", "nested_groups");
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "groupnode", "nested_groups");
     testCompile(module);
   }
 
   public void testCompile_nodegroup1()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "compiler/groupnode", "nodegroup1");
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "groupnode", "nodegroup1");
     testCompile(module);
   }
 
   public void testCompile_nodegroup2()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "compiler/groupnode", "nodegroup2");
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "groupnode", "nodegroup2");
     testCompile(module);
   }
 
   public void testCompile_nodegroup4()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "compiler/groupnode", "nodegroup4");
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "groupnode", "nodegroup4");
     testCompile(module);
   }
 
   public void testCompile_order()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "compiler/instance", "order");
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "instance", "order");
     testCompile(module);
   }
 
@@ -279,7 +295,8 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   public void testCompile_spaces()
   throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests","compiler/instance", "spaces");
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "instance", "spaces");
     testCompile(module);
   }
 
@@ -1172,12 +1189,12 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   private static class DescendantCheckVisitor
     extends DescendingModuleProxyVisitor
   {
-
     //#######################################################################
     //# Invocation
     private boolean isDescendant(final Proxy child, final Proxy parent)
     {
       mChild = child;
+      mForeachBlocks.clear();
       try {
         parent.acceptVisitor(this);
       } catch (final VisitorException exception) {
@@ -1190,8 +1207,13 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
       return false;
     }
 
+    private List<ForeachProxy> getForeachBlocks()
+    {
+      return mForeachBlocks;
+    }
+
     //#######################################################################
-    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    //# Interface net.sourceforge.waters.model.base.ProxyVisitor
     @Override
     public Object visitProxy(final Proxy proxy)
       throws VisitorException
@@ -1203,20 +1225,34 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     }
 
     //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
+    public Object visitForeachProxy(final ForeachProxy foreach)
+      throws VisitorException
+    {
+      mForeachBlocks.add(foreach);
+      final Object result = super.visitForeachProxy(foreach);
+      // The following code will not be executed in case of exception,
+      // particularly when the child is found and SUCCESS is thrown.
+      final int pos = mForeachBlocks.size() - 1;
+      mForeachBlocks.remove(pos);
+      return result;
+    }
+
+    //#######################################################################
     //# Data Members
     private Proxy mChild;
+    private final List<ForeachProxy> mForeachBlocks = new ArrayList<>();
 
     //#######################################################################
     //# Class Constants
     private static final VisitorException SUCCESS = new VisitorException();
-
   }
 
 
   //#########################################################################
   //# Inner Class: SourceInfoCheckVisitor
-  private static class SourceInfoCheckVisitor
-    extends DescendingModuleProxyVisitor
+  private class SourceInfoCheckVisitor
   {
     //#######################################################################
     //# Constructor
@@ -1234,132 +1270,127 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     //# Invocation
     private void checkSourceInfo()
     {
-      try {
-        for (final EventProxy event : mOutputDES.getEvents())
-          visitEventProxy(event);
-        for (final AutomatonProxy automaton : mOutputDES.getAutomata())
-          visitAutomatonProxy(automaton);
-      } catch(final WatersException ex) { }
+      for (final EventProxy event : mOutputDES.getEvents()) {
+        visitEventProxy(event);
+      }
+      for (final AutomatonProxy automaton : mOutputDES.getAutomata()) {
+        visitAutomatonProxy(automaton);
+      }
     }
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     public Object visitEventProxy(final EventProxy event)
-      throws WatersException
     {
-      final Proxy source = mCompiler.getSourceInfoMap().get(event).getSourceObject();
-      final boolean inModule = mDescendantChecker.isDescendant(source, mInputModule);
-      final boolean correctType = (source instanceof EventDeclProxy) ||
-                                  (source instanceof InstanceProxy);
-      String errorMessage = null;
-
-      if (!inModule && !correctType)
-        errorMessage = "The source of the EventProxy '" + event.getName() +
-                   "' is not in the module, and is not of the correct type!";
-
-      else if (!inModule && correctType)
-        errorMessage = "The source of the EventProxy '" + event.getName() +
-                       "' is of the correct type, but is not in the module!";
-
-      else if (inModule && !correctType)
-        errorMessage = "The source of the EventProxy '" + event.getName() +
-                       "' is in the module, but is not of the correct type!";
-
-      if (errorMessage != null)
-        assertTrue(errorMessage, false);
-
+      final SourceInfo info = mCompiler.getSourceInfoMap().get(event);
+      checkInModule(event, info);
+      checkExpectedType(event, info, EventDeclProxy.class);
       return null;
     }
 
-    public Object visitAutomatonProxy(final AutomatonProxy automaton)
-      throws WatersException
+    public Object visitAutomatonProxy(final AutomatonProxy aut)
     {
-      final Proxy source = mCompiler.getSourceInfoMap().get(automaton).getSourceObject();
-      final boolean inModule = mDescendantChecker.isDescendant(source, mInputModule);
-      boolean correctType = true;
-      String errorMessage = null;
-
+      final SourceInfo info = mCompiler.getSourceInfoMap().get(aut);
+      checkInModule(aut, info);
+      // Check foreach blocks first, they will get overwritten when
+      // descendant checker is called again.
+      final List<ForeachProxy> foreachBlocks =
+        mDescendantChecker.getForeachBlocks();
+      for (final ForeachProxy foreach : foreachBlocks) {
+        final SourceInfo root = info.getRoot();
+        final BindingContext context = root.getBindingContext();
+        final String name = foreach.getName();
+        final SimpleIdentifierProxy ident =
+          mModuleFactory.createSimpleIdentifierProxy(name);
+        if (context == null || context.getBoundExpression(ident) == null) {
+          final Proxy rootSource = root.getSourceObject();
+          fail("The root source info for the " +
+               ProxyTools.getContainerName(aut) + " (" +
+               ProxyTools.getContainerName(rootSource) +
+               ") is lacking a binding for the foreach-block variable '" +
+               name + "'!");
+        }
+      }
+      final Proxy source = info.getSourceObject();
       if (source instanceof SimpleComponentProxy) {
-        correctType = true;
-        mCurrentComponent= (SimpleComponentProxy) source;
-        for (final StateProxy state : automaton.getStates())
+        mCurrentComponent = (SimpleComponentProxy) source;
+        for (final StateProxy state : aut.getStates()) {
           visitStateProxy(state);
-        for (final TransitionProxy transition : automaton.getTransitions())
+        }
+        for (final TransitionProxy transition : aut.getTransitions()) {
           visitTransitionProxy(transition);
-      } else if (!((source instanceof InstanceProxy) ||
-                   (source instanceof VariableComponentProxy)))
-        correctType = false;
-
-      if (!inModule && !correctType)
-        errorMessage = "The source of the AutomatonProxy '" + automaton.getName()
-                 + "' is not in the module, and is not of the correct type!";
-
-      else if (!inModule && correctType)
-        errorMessage = "The source of the AutomatonProxy '" + automaton.getName()
-                     + "' is of the correct type, but is not in the module!";
-
-      else if (inModule && !correctType)
-        errorMessage = "The source of the AutomatonProxy '" + automaton.getName()
-                     + "' is in the module, but is not of the correct type!";
-
-      if (errorMessage != null)
-        assertTrue(errorMessage, false);
-
+        }
+      } else if (source instanceof VariableComponentProxy) {
+        // ok
+      } else {
+        fail("The source object of the AutomatonProxy '" + aut.getName() +
+             "' is of type " + ProxyTools.getShortClassName(source) +
+             ", but should be SimpleComponentProxy or VariableComponentProxy!");
+      }
       return null;
     }
 
     public Object visitStateProxy(final StateProxy state)
-      throws WatersException
     {
-      final Proxy source = mCompiler.getSourceInfoMap().get(state).getSourceObject();
-      final boolean inModule = mDescendantChecker.isDescendant(source, mCurrentComponent);
-      final boolean correctType = (source instanceof SimpleNodeProxy) ||
-                                  (source instanceof InstanceProxy);
-      String errorMessage = null;
-
-      if (!inModule && !correctType)
-        errorMessage = "The source of the StateProxy '" + state.getName() +
-                    "' is not in the module, and is not of the correct type!";
-
-      else if (!inModule && correctType)
-        errorMessage = "The source of the StateProxy '" + state.getName() +
-                       "' is of the correct type, but is not in the module!";
-
-      else if (inModule && !correctType)
-        errorMessage = "The source of the StateProxy '" + state.getName() +
-                       "' is in the module, but is not of the correct type!";
-
-      if (errorMessage != null)
-        assertTrue(errorMessage, false);
-
+      final SourceInfo info = mCompiler.getSourceInfoMap().get(state);
+      checkInModule(state, info);
+      checkExpectedType(state, info, SimpleNodeProxy.class);
+      final Proxy source = info.getSourceObject();
+      if (!mDescendantChecker.isDescendant(source, mCurrentComponent)) {
+        fail("The source object of the " +
+             ProxyTools.getContainerName(state) + " (" +
+             ProxyTools.getContainerName(source) +
+             ") is not in the current component " +
+             ProxyTools.getContainerName(mCurrentComponent) + "!");
+      }
       return null;
     }
 
-    public Object visitTransitionProxy(final TransitionProxy transition)
-      throws WatersException
+    public Object visitTransitionProxy(final TransitionProxy trans)
     {
-      final Proxy source = mCompiler.getSourceInfoMap().get(transition).getSourceObject();
-      final boolean inModule = mDescendantChecker.isDescendant(source, mCurrentComponent);
-      final boolean correctType = (source instanceof IdentifierProxy) ||
-                                  (source instanceof InstanceProxy);
-      String errorMessage = null;
-
-      if (!inModule && !correctType)
-        errorMessage = "The source of the TransitionProxy '" + transition.getEvent().getName() +
-                    "' is not in the module, and is not of the correct type!";
-
-      else if (!inModule && correctType)
-        errorMessage = "The source of the TransitionProxy '" + transition.getEvent().getName() +
-                       "' is of the correct type, but is not in the module!";
-
-      else if (inModule && !correctType)
-        errorMessage = "The source of the TransitionProxy '" + transition.getEvent().getName() +
-                       "' is in the module, but is not of the correct type!";
-
-      if (errorMessage != null)
-        assertTrue(errorMessage, false);
-
+      final SourceInfo info = mCompiler.getSourceInfoMap().get(trans);
+      checkInModule(trans, info);
+      checkExpectedType(trans, info, IdentifierProxy.class);
       return null;
+    }
+
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private void checkInModule(final Proxy proxy, final SourceInfo info)
+    {
+      final SourceInfo root = info.getRoot();
+      final Proxy rootSource = root.getSourceObject();
+      if (!mDescendantChecker.isDescendant(rootSource, mInputModule)) {
+        fail("The root source object of the " +
+             ProxyTools.getContainerName(proxy) + " (" +
+             ProxyTools.getContainerName(rootSource) +
+             ") is not in the input module!");
+      }
+      for (SourceInfo parent = info.getParent();
+           parent != null; parent = parent.getParent()) {
+        final Proxy parentSource = parent.getSourceObject();
+        if (!(parentSource instanceof InstanceProxy)) {
+          fail("The source object of the " +
+               ProxyTools.getContainerName(proxy) +
+               "' refers to the parent " +
+               ProxyTools.getContainerName(parentSource) +
+               ", which is not of type InstanceProxy as expected!");
+        }
+      }
+    }
+
+    private void checkExpectedType(final Proxy proxy,
+                                   final SourceInfo info,
+                                   final Class<? extends Proxy> type)
+    {
+      final Proxy source = info.getSourceObject();
+      if (!type.isAssignableFrom(source.getClass())) {
+        fail("The source object of the " +
+             ProxyTools.getContainerName(proxy) +
+             " is not of type " + ProxyTools.getShortClassName(type) +
+             " as expected!");
+      }
     }
 
     //#######################################################################

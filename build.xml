@@ -59,7 +59,7 @@
 
     <!-- JAXB -->
     <property name="jaxb-api.jar" location="${lib}/jaxb-api.jar"/>
-    <property name="jaxb-core.jar" location="${lib}/jaxb-api.jar"/>
+    <property name="jaxb-core.jar" location="${lib}/jaxb-core.jar"/>
     <property name="jaxb-impl.jar" location="${lib}/jaxb-impl.jar"/>
     
     <path id="jaxb.classpath">

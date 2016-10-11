@@ -650,7 +650,7 @@ class ExtPhilosPanel
         }
         else
         {
-            synthesizerOptions.setSynthesisType(SynthesisType.NONBLOCKINGCONTROLLABLE);
+            synthesizerOptions.setSynthesisType(SynthesisType.NONBLOCKING_CONTROLLABLE);
             synthesizerOptions.setSynthesisAlgorithm(SynthesisAlgorithm.BDD);
             synthesizerOptions.setPurge(true);
             synthesizerOptions.setMaximallyPermissive(true);
@@ -964,7 +964,7 @@ class ExtCatMousePanel
         else
         {
             //Default is BDD
-            synthesizerOptions.setSynthesisType(SynthesisType.NONBLOCKINGCONTROLLABLE);
+            synthesizerOptions.setSynthesisType(SynthesisType.NONBLOCKING_CONTROLLABLE);
             synthesizerOptions.setSynthesisAlgorithm(SynthesisAlgorithm.BDD);
             synthesizerOptions.setPurge(true);
             synthesizerOptions.setMaximallyPermissive(true);

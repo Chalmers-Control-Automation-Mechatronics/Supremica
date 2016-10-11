@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="caseStudy-original" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment></ns2:Comment>
+<Module Name="caseStudy-original" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
+    <ns2:Comment>The model is blocking (deadlock).
+It has 26750 reachable states.
+The diameter is 164.
+</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="type1BookR1"/>
         <EventDecl Kind="CONTROLLABLE" Name="type1BookR6ReleaseR1"/>

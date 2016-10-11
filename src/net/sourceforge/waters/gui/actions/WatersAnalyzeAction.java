@@ -293,6 +293,7 @@ public abstract class WatersAnalyzeAction
         mInformationLabel.setText("ERROR: Out of Memory");
       } else {
         mInformationLabel.setText("ERROR: " + exception.getMessage());
+        pack();
       }
       mExitButton.setText("OK");
       mExitButton.removeActionListener(mExitButton.getActionListeners()[0]);
@@ -331,7 +332,9 @@ public abstract class WatersAnalyzeAction
         } catch (final AnalysisAbortException exception) {
           // Do nothing: Aborted
           return;
-        } catch (final AnalysisException exception) {
+        } catch (final AnalysisException |
+                       NoClassDefFoundError |
+                       UnsatisfiedLinkError exception) {
           SwingUtilities.invokeLater
             (new Runnable() {@Override
             public void run() {error(exception);}});

@@ -183,7 +183,7 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 		} else {
 			// Default is BDD
 			synthesizerOptions
-					.setSynthesisType(SynthesisType.NONBLOCKINGCONTROLLABLE);
+					.setSynthesisType(SynthesisType.NONBLOCKING_CONTROLLABLE);
 			synthesizerOptions.setSynthesisAlgorithm(SynthesisAlgorithm.BDD);
 			synthesizerOptions.setPurge(true);
 			synthesizerOptions.setMaximallyPermissive(true);

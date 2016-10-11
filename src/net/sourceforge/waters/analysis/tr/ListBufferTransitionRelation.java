@@ -69,42 +69,52 @@ import gnu.trove.stack.array.TIntArrayStack;
 
 
 /**
- * A more convenient means to store and retrieve transitions of an automaton.
- * <p>
- * The list buffer transition relation is created from an automaton to index
+ * <P>A more convenient means to store and retrieve transitions of an
+ * automaton.</P>
+ *
+ * <P>The list buffer transition relation is created from an automaton to index
  * its transitions, making it easier to associate states with transitions, and
- * to modify the transition structure.
- * <p>
- * Transitions are stored in a {@link TransitionListBuffer} in bit-packed form
- * in blocked linked lists. The user may choose to create a buffer for
+ * to modify the transition structure.</P>
+ *
+ * <P>Transitions are stored in a {@link TransitionListBuffer} in bit-packed
+ * form in blocked linked lists. The user may choose to create a buffer for
  * outgoing transitions, which enables quick access to transitions given their
  * source state, or a buffer for incoming transitions, which enables quick
  * access to transitions given their target state, or both.
- * <p>
  * Reconfiguration of the buffer selection is possible, but time-consuming.
  * Some methods require the presence or absence of the incoming or outgoing
- * buffer, see details with each method.
- * <p>
- * The encoding of states and events is defined by the user upon creation of
- * the transition relation, using a {@link StateEncoding} and an
- * {@link EventEncoding}. After construction, the encoding can no longer be
- * changed, except that events can be removed (marked as unused) and states
- * can be marked as unreachable. These removals will be respected when
- * creating an automaton from the transition relation.
- * <p>
- * The transition buffers recognise the silent event code
+ * buffer, see details with each method.</P>
+ *
+ * <P>Access to the transitions is possible through transition iterators
+ * ({@link TransitionIterator}), which are obtained using methods such as
+ * {@link #createSuccessorsReadOnlyIterator()}. Depending on the buffer
+ * configuration, it is possible to iterate over all transitions, or all
+ * transitions with a given source or target state, or all transitions with a
+ * given source or target state and event, etc.</P>
+ *
+ * <P>The encoding of states and events is defined by the user upon creation
+ * of the transition relation, using a {@link StateEncoding} and an
+ * {@link EventEncoding}. After construction, the encodings can no longer be
+ * changed, except that the status of events changed, events can be removed
+ * (by setting their status to be unused), and states can be marked as
+ * unreachable.</P>
+ *
+ * <P>The transition buffers recognise the silent event code
  * {@link EventEncoding#TAU} and automatically suppress all selfloops using
- * this event.
- * <p>
- * The transition relation also associates with each state its initial status
- * and its propositions in a bit set, using an {@link IntStateBuffer}.
+ * this event.</P>
+ *
+ * <P>The transition relation associates with each state its initial
+ * status, and its propositions in a bit set, using an {@link IntStateBuffer}.
+ * There also is special support for a <I>dump state</I>, which is a unique
+ * non-accepting state without outgoing transitions.</P>
  *
  * @see StateEncoding
  * @see EventEncoding
  * @see IntStateBuffer
  * @see TransitionListBuffer
+ * @see TransitionIterator
  *
- * @author Robi Malik
+ * @author Robi Malik, Roger Su
  */
 public class ListBufferTransitionRelation implements EventStatusProvider
 {
@@ -203,7 +213,7 @@ public class ListBufferTransitionRelation implements EventStatusProvider
     checkConfig(config);
     mName = aut.getName();
     mKind = aut.getKind();
-    // TODO put events in eventEnc
+    // Put events in eventEnc
     final Set<EventProxy> events = new THashSet<>(aut.getEvents());
     if (stateEnc == null) {
       stateEnc = new StateEncoding(aut);
@@ -213,7 +223,11 @@ public class ListBufferTransitionRelation implements EventStatusProvider
     final List<TransitionProxy> list = new ArrayList<>(transitions);
     final int numStates = stateEnc.getNumberOfStates() + 1;
     final int numTrans = aut.getTransitions().size();
-    mStateBuffer = new IntStateBuffer(eventEnc, stateEnc, dumpState);
+    if ((config & CONFIG_COUNT_LONG) != 0) {
+      mStateBuffer = new LongStateCountBuffer(stateEnc, dumpState);
+    } else {
+      mStateBuffer = new IntStateBuffer(eventEnc, stateEnc, dumpState);
+    }
     mEventStatus = eventEnc;
     if ((config & CONFIG_SUCCESSORS) != 0) {
       mSuccessorBuffer =
@@ -305,7 +319,11 @@ public class ListBufferTransitionRelation implements EventStatusProvider
     checkConfig(config);
     mName = name;
     mKind = kind;
-    mStateBuffer = new IntStateBuffer(numStates, dumpIndex, eventEnc);
+    if ((config & CONFIG_COUNT_LONG) != 0) {
+      mStateBuffer = new LongStateCountBuffer(numStates, dumpIndex);
+    } else {
+      mStateBuffer = new IntStateBuffer(numStates, dumpIndex, eventEnc);
+    }
     mEventStatus = eventEnc;
     if ((config & CONFIG_SUCCESSORS) != 0) {
       mSuccessorBuffer =
@@ -410,7 +428,11 @@ public class ListBufferTransitionRelation implements EventStatusProvider
       new DefaultEventStatusProvider(numProperEvents, numPropositions);
     mEventStatus.setProperEventStatus(EventEncoding.TAU,
                                       EventStatus.STATUS_FULLY_LOCAL);
-    mStateBuffer = new IntStateBuffer(numStates, dumpIndex, mEventStatus);
+    if ((config & CONFIG_COUNT_LONG) != 0) {
+      mStateBuffer = new LongStateCountBuffer(numStates, dumpIndex);
+    } else {
+      mStateBuffer = new IntStateBuffer(numStates, dumpIndex, mEventStatus);
+    }
     if ((config & CONFIG_SUCCESSORS) != 0) {
       mSuccessorBuffer =
         new OutgoingTransitionListBuffer(numStates ,mEventStatus, 0);
@@ -464,7 +486,7 @@ public class ListBufferTransitionRelation implements EventStatusProvider
   {
     this(rel,
          eventStatus,
-         new IntStateBuffer(rel.mStateBuffer, eventStatus),
+         rel.mStateBuffer.clone(eventStatus),
          config);
   }
 
@@ -493,7 +515,7 @@ public class ListBufferTransitionRelation implements EventStatusProvider
    */
   public ListBufferTransitionRelation(final ListBufferTransitionRelation rel,
                                       final EventStatusProvider eventStatus,
-                                      final IntStateBuffer stateBuffer,
+                                      final AbstractStateBuffer stateBuffer,
                                       final int config)
   {
     checkConfig(config);
@@ -540,6 +562,9 @@ public class ListBufferTransitionRelation implements EventStatusProvider
     }
     if (mPredecessorBuffer != null) {
       config |= CONFIG_PREDECESSORS;
+    }
+    if ((config & CONFIG_COUNT_LONG) != 0) {
+      config |= CONFIG_COUNT_LONG;
     }
     return new ListBufferTransitionRelation(this, config);
   }
@@ -644,15 +669,6 @@ public class ListBufferTransitionRelation implements EventStatusProvider
   //#########################################################################
   //# State Access
   /**
-   * Gets the number of states in the transition relation, including any
-   * states set to be unreachable.
-   */
-  public int getNumberOfStates()
-  {
-    return mStateBuffer.getNumberOfStates();
-  }
-
-  /**
    * Returns whether this transition relation is empty.
    * @return <CODE>true</CODE> if all states are marked as unreachable,
    *         <CODE>false</CODE> otherwise.
@@ -663,12 +679,34 @@ public class ListBufferTransitionRelation implements EventStatusProvider
   }
 
   /**
+   * Gets the number of states in the transition relation, including any
+   * states set to be unreachable.
+   */
+  public int getNumberOfStates()
+  {
+    return mStateBuffer.getNumberOfStates();
+  }
+
+  /**
    * Gets the number of reachable states in the transition relation. A state
    * is considered reachable if its reachability flag is set.
    */
   public int getNumberOfReachableStates()
   {
     return mStateBuffer.getNumberOfReachableStates();
+  }
+
+  /**
+   * Gets the total state count of this transition relation. The total
+   * state count is the sum of state counts of each individual state.
+   */
+  public long getTotalStateCount()
+  {
+    long total = 0;
+    for (int i = 0; i < mStateBuffer.getNumberOfReachableStates(); i++) {
+      total += mStateBuffer.getStateCount(i);
+    }
+    return total;
   }
 
   /**
@@ -1006,7 +1044,7 @@ public class ListBufferTransitionRelation implements EventStatusProvider
    * transitions. The iterator returned is not initialised, so one of the
    * methods {@link TransitionIterator#resetState(int)} or
    * {@link TransitionIterator#reset(int, int)} must be called before it can
-   * be used. Being a read-only iterator, the iterator return by this method
+   * be used. Being a read-only iterator, the iterator returned by this method
    * does not implement the {@link TransitionIterator#remove()} method.
    */
   public TransitionIterator createSuccessorsReadOnlyIterator()
@@ -1690,7 +1728,7 @@ public class ListBufferTransitionRelation implements EventStatusProvider
 
   //#########################################################################
   //# Direct Access to State and Transition Buffers
-  public IntStateBuffer getStateBuffer()
+  public AbstractStateBuffer getStateBuffer()
   {
     return mStateBuffer;
   }
@@ -2317,45 +2355,70 @@ public class ListBufferTransitionRelation implements EventStatusProvider
   }
 
   /**
-   * Reconfigures the current set of transition buffers.
-   *
+   * Reconfigures the current set of state and transition buffers.
    * @param config
    *          Configuration flags defining which transition buffers are to be
-   *          used from now on. Should be one of {@link #CONFIG_SUCCESSORS},
-   *          {@link #CONFIG_PREDECESSORS}, or {@link #CONFIG_ALL}.
+   *          used from now on. Should be a combination of the flags
+   *          {@link #CONFIG_SUCCESSORS}, {@link #CONFIG_PREDECESSORS},
+   *          {@link #CONFIG_COUNT_LONG}, and {@link #CONFIG_COUNT_OFF}.
+   *          If neither of the bits {@link #CONFIG_SUCCESSORS} or
+   *          {@link #CONFIG_PREDECESSORS} is set, the transition buffer
+   *          configuration is unchanged, otherwise it is changed precisely
+   *          to the indicated combination.
+   *          If neither of the bits {@link #CONFIG_COUNT_LONG} or
+   *          {@link #CONFIG_COUNT_OFF} is set, the state buffer is unchanged,
+   *          otherwise it is changed to the indicated type. It is an error
+   *          of both {@link #CONFIG_COUNT_LONG} and {@link #CONFIG_COUNT_OFF}
+   *          are set.
    */
   public void reconfigure(final int config)
   {
-    checkConfig(config);
     final int numStates = getNumberOfStates();
-    try {
-      if (mSuccessorBuffer == null && (config & CONFIG_SUCCESSORS) != 0) {
-        if (mPredecessorBuffer != null) {
-          mSuccessorBuffer =
-            new OutgoingTransitionListBuffer(numStates, mEventStatus);
-          mSuccessorBuffer.setUpTransitions(mPredecessorBuffer);
-        } else {
-          throw createNoBufferException(CONFIG_PREDECESSORS);
+
+    // Change transition buffers
+    if ((config & CONFIG_ALL) != 0) {
+      try {
+        if (mSuccessorBuffer == null && (config & CONFIG_SUCCESSORS) != 0) {
+          if (mPredecessorBuffer != null) {
+            mSuccessorBuffer =
+              new OutgoingTransitionListBuffer(numStates, mEventStatus);
+            mSuccessorBuffer.setUpTransitions(mPredecessorBuffer);
+          } else {
+            throw createNoBufferException(CONFIG_PREDECESSORS);
+          }
         }
-      }
-      if (mPredecessorBuffer == null && (config & CONFIG_PREDECESSORS) != 0) {
-        if (mSuccessorBuffer != null) {
-          mPredecessorBuffer =
-            new IncomingTransitionListBuffer(numStates, mEventStatus);
-          mPredecessorBuffer.setUpTransitions(mSuccessorBuffer);
-        } else {
-          throw createNoBufferException(CONFIG_SUCCESSORS);
+        if (mPredecessorBuffer == null && (config & CONFIG_PREDECESSORS) != 0) {
+          if (mSuccessorBuffer != null) {
+            mPredecessorBuffer =
+              new IncomingTransitionListBuffer(numStates, mEventStatus);
+            mPredecessorBuffer.setUpTransitions(mSuccessorBuffer);
+          } else {
+            throw createNoBufferException(CONFIG_SUCCESSORS);
+          }
         }
+      } catch (final OverflowException exception) {
+        // Can't have overflow because states and events have already been
+        // encoded successfully.
+        throw new WatersRuntimeException(exception);
       }
-    } catch (final OverflowException exception) {
-      // Can't have overflow because states and events have already been
-      // encoded successfully.
-      throw new WatersRuntimeException(exception);
+      if ((config & CONFIG_SUCCESSORS) == 0) {
+        mSuccessorBuffer = null;
+      } else if ((config & CONFIG_PREDECESSORS) == 0) {
+        mPredecessorBuffer = null;
+      }
     }
-    if ((config & CONFIG_SUCCESSORS) == 0) {
-      mSuccessorBuffer = null;
-    } else if ((config & CONFIG_PREDECESSORS) == 0) {
-      mPredecessorBuffer = null;
+
+    // Change the type of the state buffer, if necessary.
+    if ((config & CONFIG_COUNT_LONG) != 0) {
+      if (!(mStateBuffer instanceof LongStateCountBuffer)) {
+        // Normal buffer -> State-count buffer.
+        mStateBuffer = new LongStateCountBuffer(mStateBuffer, mEventStatus);
+      }
+    } else if ((config & CONFIG_COUNT_OFF) != 0) {
+      if (!(mStateBuffer instanceof IntStateBuffer)) {
+        // State-count buffer -> Normal buffer.
+        mStateBuffer = new IntStateBuffer(mStateBuffer, mEventStatus);
+      }
     }
   }
 
@@ -2401,7 +2464,11 @@ public class ListBufferTransitionRelation implements EventStatusProvider
                     final int config)
     throws OverflowException
   {
-    mStateBuffer = new IntStateBuffer(numStates, dumpIndex, mEventStatus);
+    if ((config & CONFIG_COUNT_LONG) != 0) {
+      mStateBuffer = new LongStateCountBuffer(numStates, dumpIndex);
+    } else {
+      mStateBuffer = new IntStateBuffer(numStates, dumpIndex, mEventStatus);
+    }
     reset(numTrans, config);
   }
 
@@ -2424,7 +2491,11 @@ public class ListBufferTransitionRelation implements EventStatusProvider
                     final int config)
     throws OverflowException
   {
-    mStateBuffer = new IntStateBuffer(numStates, mEventStatus);
+    if ((config & CONFIG_COUNT_LONG) != 0) {
+      mStateBuffer = new LongStateCountBuffer(numStates);
+    } else {
+      mStateBuffer = new IntStateBuffer(numStates, mEventStatus);
+    }
     reset(numTrans, config);
   }
 
@@ -2684,14 +2755,18 @@ public class ListBufferTransitionRelation implements EventStatusProvider
   }
 
   /**
-   * Repartitions the states of this transition relation. This method
-   * implements state merging by automaton quotient. It is used to merge
-   * states after a partition has been obtained through a
+   * Repartitions the states of this transition relation.
+   * <p>
+   * This method implements state merging by automaton quotient. It is used
+   * to merge states after a partition has been obtained through a
    * {@link TransitionRelationSimplifier}.
-   * @param partition
-   *          The partition to be imposed, or <CODE>null</CODE>.
+   *
+   * @param partition The partition to be imposed, or <CODE>null</CODE>.
+   *
+   * @throws OverflowException when the available space to store the state
+   *                           count becomes insufficient.
    */
-  public void merge(final TRPartition partition)
+  public void merge(final TRPartition partition) throws OverflowException
   {
     if (partition != null) {
       int dumpClass = partition.getClassCode(getDumpStateIndex());
@@ -2699,36 +2774,52 @@ public class ListBufferTransitionRelation implements EventStatusProvider
         dumpClass = partition.getUnusedClass();
       }
       final int newSize = partition.getNumberOfClasses();
-      final IntStateBuffer newStateBuffer;
+      final AbstractStateBuffer newStateBuffer;
       final int extraStates;
+      // Make a new state buffer, same as the original type.
       if (dumpClass >= 0) {
-        newStateBuffer = new IntStateBuffer(newSize, dumpClass, mEventStatus);
+        newStateBuffer = mStateBuffer.clone(newSize, dumpClass, mEventStatus);
         extraStates = 0;
       } else {
-        newStateBuffer = new IntStateBuffer(newSize, mEventStatus);
+        newStateBuffer = mStateBuffer.clone(newSize, mEventStatus);
         extraStates = 1;
       }
+      // Make new transition list buffers.
       if (mSuccessorBuffer != null) {
         mSuccessorBuffer.merge(partition, extraStates);
       }
       if (mPredecessorBuffer != null) {
         mPredecessorBuffer.merge(partition,  extraStates);
       }
-      int c = 0;
+      // Merge
+      int stateID = 0;
       for (final int[] clazz : partition.getClasses()) {
         if (clazz == null) {
-          newStateBuffer.setReachable(c, false);
+          newStateBuffer.setReachable(stateID, false);
         } else {
-          boolean init = false;
+          boolean initial = false;
           long markings = 0;
+          long count = 0;
+          /*
+           * Initial  --- Applicable to both buffer types.
+           * Markings --- Only for normal state buffer.
+           * Count    --- Only for state-count buffer.
+           *
+           * Since all type-specific methods are made compatible --- for
+           * example, all the marking methods for state-count buffer does
+           * nothing, and similarly for normal state buffers --- there is
+           * no need to test which type of buffer it is.
+           */
           for (final int state : clazz) {
-            init |= mStateBuffer.isInitial(state);
+            initial |= mStateBuffer.isInitial(state);
             markings |= mStateBuffer.getAllMarkings(state);
+            count += mStateBuffer.getStateCount(state);
           }
-          newStateBuffer.setInitial(c, init);
-          newStateBuffer.setAllMarkings(c, markings);
+          newStateBuffer.setInitial(stateID, initial);
+          newStateBuffer.setAllMarkings(stateID, markings);
+          newStateBuffer.setStateCount(stateID, count);
         }
-        c++;
+        stateID++;
       }
       mStateBuffer = newStateBuffer;
     }
@@ -3113,7 +3204,7 @@ public class ListBufferTransitionRelation implements EventStatusProvider
   private ComponentKind mKind;
 
   private final EventStatusProvider mEventStatus;
-  private IntStateBuffer mStateBuffer;
+  private AbstractStateBuffer mStateBuffer;
   private OutgoingTransitionListBuffer mSuccessorBuffer;
   private IncomingTransitionListBuffer mPredecessorBuffer;
 
@@ -3132,8 +3223,25 @@ public class ListBufferTransitionRelation implements EventStatusProvider
   public static final int CONFIG_PREDECESSORS = 0x02;
   /**
    * Configuration setting specifying that the transition relation is to use
-   * both an outgoing and an incoming transition buffer.
+   * a {@link IntStateBuffer}, which supports marking but not state counts.
+   * This is the default when creating a new transition relation.
+   */
+  public static final int CONFIG_COUNT_OFF = 0x04;
+  /**
+   * Configuration setting specifying that the transition relation is to use
+   * a {@link LongStateCountBuffer}, which ignores the markings and
+   * propositions, whilst retaining the state count.
+   */
+  public static final int CONFIG_COUNT_LONG = 0x08;
+  /**
+   * Configuration setting specifying that the transition relation is to use
+   * both outgoing and incoming transition buffers.
    */
   public static final int CONFIG_ALL = CONFIG_SUCCESSORS
-                                       | CONFIG_PREDECESSORS;
+                                     | CONFIG_PREDECESSORS;
+  /**
+   * Configuration setting specifying that the transition relation is to use
+   * an outgoing transition buffer, and is to count the states.
+   */
+  public static final int CONFIG_S_C = CONFIG_SUCCESSORS | CONFIG_COUNT_LONG;
 }

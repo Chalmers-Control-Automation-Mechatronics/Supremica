@@ -33,13 +33,14 @@
 
 package net.sourceforge.waters.analysis.trcomp;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -52,7 +53,6 @@ import net.sourceforge.waters.analysis.abstraction.TRSimplificationListener;
 import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult;
-import net.sourceforge.waters.analysis.compositional.CompositionalVerificationResult;
 import net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.analysis.monolithic.TRAbstractSynchronousProductBuilder;
@@ -70,23 +70,19 @@ import net.sourceforge.waters.model.analysis.EnumFactory;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.ListedEnumFactory;
 import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
-import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.marshaller.MarshallingTools;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.apache.log4j.Logger;
-
-import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -118,14 +114,14 @@ import gnu.trove.set.hash.THashSet;
 
 public abstract class AbstractTRCompositionalAnalyzer
   extends AbstractModelAnalyzer
-  implements ModelVerifier
+  implements ModelAnalyzer
 {
 
   //#########################################################################
   //# Constructors
   public AbstractTRCompositionalAnalyzer(final ProductDESProxy model,
                                          final KindTranslator translator,
-                                         final ModelVerifier mono)
+                                         final ModelAnalyzer mono)
   {
     super(model, ProductDESElementFactory.getInstance(), translator);
     mTRSimplifierCreator = getTRSimplifierFactory().getDefaultValue();
@@ -177,37 +173,15 @@ public abstract class AbstractTRCompositionalAnalyzer
   }
 
   @Override
-  public CompositionalVerificationResult getAnalysisResult()
+  public CompositionalAnalysisResult getAnalysisResult()
   {
-    return (CompositionalVerificationResult) super.getAnalysisResult();
+    return (CompositionalAnalysisResult) super.getAnalysisResult();
   }
 
   @Override
-  public CompositionalVerificationResult createAnalysisResult()
+  public CompositionalAnalysisResult createAnalysisResult()
   {
-    return new CompositionalVerificationResult(getClass());
-  }
-
-
-  //#########################################################################
-  //# Interface for net.sourceforge.waters.model.analysis.des.ModelVerifier
-  @Override
-  public void setCounterExampleEnabled(final boolean enable)
-  {
-    setDetailedOutputEnabled(enable);
-  }
-
-  @Override
-  public boolean isCounterExampleEnabled()
-  {
-    return isDetailedOutputEnabled();
-  }
-
-  @Override
-  public boolean isSatisfied()
-  {
-    final AnalysisResult result = getAnalysisResult();
-    return result.isSatisfied();
+    return new CompositionalAnalysisResult(getClass());
   }
 
 
@@ -341,11 +315,6 @@ public abstract class AbstractTRCompositionalAnalyzer
     return mMonolithicAnalyzer;
   }
 
-  public ModelVerifier getMonolithicVerifier()
-  {
-    return (ModelVerifier) getMonolithicAnalyzer();
-  }
-
 
   public int getInternalStateLimit()
   {
@@ -475,27 +444,6 @@ public abstract class AbstractTRCompositionalAnalyzer
   }
 
   /**
-   * Sets whether counterexample checking is enabled.
-   * If enabled, the generated counterexample is checked for correctness
-   * after each step during counterexample. This is a very slow process,
-   * and only recommend for testing and debugging.
-   * This setting is disabled by default.
-   */
-  public void setTraceCheckingEnabled(final boolean checking)
-  {
-    mTraceCheckingEnabled = checking;
-  }
-
-  /**
-   * Returns whether counterexample checking is enabled.
-   * @see #setTraceCheckingEnabled(boolean) setTraceCheckingEnabled()
-   */
-  public boolean isTraceCheckingEnabled()
-  {
-    return mTraceCheckingEnabled;
-  }
-
-  /**
    * Sets state and event encodings are to be preserved when copying
    * input automata of type {@link TRAutomatonProxy}. If set, the input
    * automata will be used with the exact same encoding, which has to be
@@ -511,7 +459,7 @@ public abstract class AbstractTRCompositionalAnalyzer
   /**
    * Returns whether state and event encodings are to be preserved when
    * copying input automata of type {@link TRAutomatonProxy}.
-   * @see #setTraceCheckingEnabled(boolean) setTraceCheckingEnabled()
+   * @see #setPreservingEncodings(boolean) setPreservingEncodings()
    */
   public boolean getPreservingEncodings()
   {
@@ -624,7 +572,7 @@ public abstract class AbstractTRCompositionalAnalyzer
     final Collection<AutomatonProxy> automata = model.getAutomata();
     final int numAutomata = automata.size();
     final int numEvents = model.getEvents().size();
-    if (isCounterExampleEnabled()) {
+    if (isDetailedOutputEnabled()) {
       mAbstractionSequence = new ArrayList<>(4 * numAutomata);
       mCurrentAutomataMap = new HashMap<>(numAutomata);
     }
@@ -659,11 +607,12 @@ public abstract class AbstractTRCompositionalAnalyzer
     mSynchronousProductBuilder = createSynchronousProductBuilder();
     mSynchronousProductBuilder.setDetailedOutputEnabled(true);
 
-    final ModelVerifier mono = getMonolithicVerifier();
-    mono.setKindTranslator(translator);
-    mono.setNodeLimit(getMonolithicStateLimit());
-    mono.setTransitionLimit(getMonolithicTransitionLimit());
-    mono.setCounterExampleEnabled(isCounterExampleEnabled());
+    final ModelAnalyzer mono = getMonolithicAnalyzer();
+    if (mono != null) {
+      mono.setKindTranslator(translator);
+      mono.setNodeLimit(getMonolithicStateLimit());
+      mono.setTransitionLimit(getMonolithicTransitionLimit());
+    }
 
     mSubsystemQueue = new PriorityQueue<>();
     mNeedsSimplification = new SimplificationQueue(trs);
@@ -837,6 +786,11 @@ public abstract class AbstractTRCompositionalAnalyzer
     return mSpecialEventsFinder;
   }
 
+  protected PartitioningListener getSpecialEventsListener()
+  {
+    return mSpecialEventsListener;
+  }
+
   protected TRSubsystemInfo getCurrentSubsystem()
   {
     return mCurrentSubsystem;
@@ -845,6 +799,11 @@ public abstract class AbstractTRCompositionalAnalyzer
   protected Collection<TRSubsystemInfo> getPendingSubsystems()
   {
     return mSubsystemQueue;
+  }
+
+  protected List<TRAbstractionStep> getAbstractionSequence()
+  {
+    return mAbstractionSequence;
   }
 
   protected IntermediateAbstractionSequence getIntermediateAbstractionSequence()
@@ -957,10 +916,10 @@ public abstract class AbstractTRCompositionalAnalyzer
     }
     countSpecialEvents(enc);
     try {
-      // Set up trace computation ...
+      // Set up trace computation.
       mIntermediateAbstractionSequence =
         new IntermediateAbstractionSequence(aut);
-      // Simplify ...
+      // Simplify.
       final int oldNumStates = rel.getNumberOfStates();
       mSpecialEventsListener.setEnabled(true);
       mTRSimplifier.setTransitionRelation(rel);
@@ -971,7 +930,7 @@ public abstract class AbstractTRCompositionalAnalyzer
           aut.resetStateNames();
         }
       }
-      // Record steps and update event status ...
+      // Record steps and update event status.
       mIntermediateAbstractionSequence.commit();
       mNeedsSimplification.setSuppressed(aut);
       if (simplified || !mAlwaysEnabledDetectedInitially) {
@@ -979,6 +938,7 @@ public abstract class AbstractTRCompositionalAnalyzer
           mIntermediateAbstractionSequence.getInputEventEncoding();
         updateEventStatus(aut, oldEncoding);
       }
+      // Drop trivial automata if necessary.
       if (simplified && isTrivialAutomaton(aut)) {
         logger.debug("Dropping trivial automaton " + aut.getName());
         dropTrivialAutomaton(aut);
@@ -1030,7 +990,7 @@ public abstract class AbstractTRCompositionalAnalyzer
       mIntermediateAbstractionSequence =
         new IntermediateAbstractionSequence(sync);
       // Set up trace computation ...
-      if (isCounterExampleEnabled()) {
+      if (isDetailedOutputEnabled()) {
         final List<TRAutomatonProxy> automata = candidate.getAutomata();
         final List<TRAbstractionStep> preds = getAbstractionSteps(automata);
         final EventEncoding enc = candidate.getEventEncoding();
@@ -1045,7 +1005,7 @@ public abstract class AbstractTRCompositionalAnalyzer
       mTRSimplifier.setTransitionRelation(rel);
       mTRSimplifier.run();
       // Update trace information ...
-      if (isCounterExampleEnabled()) {
+      if (isDetailedOutputEnabled()) {
         for (final TRAutomatonProxy aut : candidate.getAutomata()) {
           mCurrentAutomataMap.remove(aut);
         }
@@ -1199,38 +1159,7 @@ public abstract class AbstractTRCompositionalAnalyzer
 
   protected TRTraceProxy computeCounterExample() throws AnalysisException
   {
-    final VerificationResult result = getAnalysisResult();
-    if (!result.isSatisfied() && isCounterExampleEnabled()) {
-      final Logger logger = getLogger();
-      logger.debug("Starting trace expansion ...");
-      mSpecialEventsListener.setEnabled(true);
-      final ProductDESProxy des = getModel();
-      final TRTraceProxy trace = createEmptyTrace(des);
-      final int end = mAbstractionSequence.size();
-      final ListIterator<TRAbstractionStep> iter =
-        mAbstractionSequence.listIterator(end);
-      while (iter.hasPrevious()) {
-        checkAbort();
-        final TRAbstractionStep step = iter.previous();
-        step.reportExpansion();
-        step.expandTrace(trace, this);
-        if (mTraceCheckingEnabled) {
-          checkIntermediateCounterExample(trace);
-        }
-        iter.remove();
-      }
-      result.setCounterExample(trace);
-      return trace;
-    } else {
-      return null;
-    }
-  }
-
-  protected abstract TRTraceProxy createEmptyTrace(ProductDESProxy des);
-
-  protected void checkIntermediateCounterExample(final TRTraceProxy trace)
-    throws AnalysisException
-  {
+    return null;
   }
 
 
@@ -1275,7 +1204,11 @@ public abstract class AbstractTRCompositionalAnalyzer
     throws AnalysisException
   {
     final KindTranslator translator = getKindTranslator();
-    switch (translator.getComponentKind(aut)) {
+    final ComponentKind kind = translator.getComponentKind(aut);
+    if (kind == null) {
+      return null;
+    }
+    switch (kind) {
     case PLANT:
     case SPEC:
       final TRAbstractionStepInput step;
@@ -1296,7 +1229,7 @@ public abstract class AbstractTRCompositionalAnalyzer
         setSatisfiedResult();
         return null;
       }
-      if (isCounterExampleEnabled()) {
+      if (isDetailedOutputEnabled()) {
         addAbstractionStep(step, created);
       }
       return created;
@@ -1337,7 +1270,7 @@ public abstract class AbstractTRCompositionalAnalyzer
 
   protected void dropSubsystem(final TRSubsystemInfo subsys)
   {
-    if (isCounterExampleEnabled()) {
+    if (isDetailedOutputEnabled()) {
       for (final TRAutomatonProxy aut : subsys.getAutomata()) {
         dropTrivialAutomaton(aut);
       }
@@ -1346,7 +1279,7 @@ public abstract class AbstractTRCompositionalAnalyzer
 
   protected void dropTrivialAutomaton(final TRAutomatonProxy aut)
   {
-    if (isCounterExampleEnabled()) {
+    if (isDetailedOutputEnabled()) {
       final TRAbstractionStep step = createDropStep(aut);
       addAbstractionStep(step);
     }
@@ -1355,7 +1288,7 @@ public abstract class AbstractTRCompositionalAnalyzer
   protected List<TRAbstractionStep> createDropSteps
     (final TRSubsystemInfo subsys)
   {
-    if (isCounterExampleEnabled()) {
+    if (isDetailedOutputEnabled()) {
       final List<TRAutomatonProxy> automata = subsys.getAutomata();
       final List<TRAbstractionStep> steps = new ArrayList<>(automata.size());
       for (final TRAutomatonProxy aut : subsys.getAutomata()) {
@@ -1404,19 +1337,6 @@ public abstract class AbstractTRCompositionalAnalyzer
   protected boolean setSatisfiedResult()
   {
     return setBooleanResult(true);
-  }
-
-  /**
-   * Stores a verification result indicating that the property checked
-   * is not satisfied and marks the run as completed.
-   * @param  counterexample The counterexample obtained by verification.
-   * @return <CODE>false</CODE>
-   */
-  protected boolean setFailedResult(final TraceProxy counterexample)
-  {
-    final VerificationResult result = getAnalysisResult();
-    result.setCounterExample(counterexample);
-    return setBooleanResult(false);
   }
 
 
@@ -1573,7 +1493,7 @@ public abstract class AbstractTRCompositionalAnalyzer
   {
     //#######################################################################
     //# Simple Access
-    private void setEnabled(final boolean enabled)
+    void setEnabled(final boolean enabled)
     {
       mEnabled = enabled;
     }
@@ -1592,7 +1512,7 @@ public abstract class AbstractTRCompositionalAnalyzer
     public void onSimplificationFinish
       (final TransitionRelationSimplifier simplifier, final boolean result)
     {
-      if (result && isCounterExampleEnabled() &&
+      if (result && isDetailedOutputEnabled() &&
           mIntermediateAbstractionSequence != null) {
         final TRAbstractionStep last =
           mIntermediateAbstractionSequence.getLastIntermediateStep();
@@ -1706,7 +1626,7 @@ public abstract class AbstractTRCompositionalAnalyzer
     private void commit()
     {
       final TRAbstractionStep last = mSteps.peekLast();
-      if (last != null && isCounterExampleEnabled()) {
+      if (last != null && isDetailedOutputEnabled()) {
         if (mPredecessor != null) {
           mPredecessor.clearOutputAutomaton();
         }
@@ -1792,7 +1712,6 @@ public abstract class AbstractTRCompositionalAnalyzer
   private boolean mFailingEventsEnabled = false;
   private boolean mSelfloopOnlyEventsEnabled = false;
   private boolean mAlwaysEnabledEventsEnabled = false;
-  private boolean mTraceCheckingEnabled = false;
   private boolean mPreservingEncodings = false;
   private String mMonolithicDumpFileName = null;
 

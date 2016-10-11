@@ -76,6 +76,7 @@ $IF-ENUM
 //############################################################################
 
 enum $CLASSNAME$ {
+  $CLASSNAME_null = -1,
 $FOREACH-FIELD
   $CLASSNAME_$FIELDNAME$ = $INDEX$COMMA$
 $ENDFOR

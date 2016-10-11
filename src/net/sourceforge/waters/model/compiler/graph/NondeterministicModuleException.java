@@ -67,12 +67,14 @@ public class NondeterministicModuleException extends EvalException {
    * one initial state.
    * @param comp     The simple component that causes the problem.
    * @param node     One of the initial states.
+   * @param location The error location to be associated with the exception.
    */
   public NondeterministicModuleException(final SimpleComponentProxy comp,
-                                         final SimpleNodeProxy node)
+                                         final SimpleNodeProxy node,
+                                         final Proxy location)
   {
     super("Automaton '" + comp.getName() +
-          "' has more than one initial state!", node);
+          "' has more than one initial state!", location);
   }
 
   /**
@@ -81,14 +83,16 @@ public class NondeterministicModuleException extends EvalException {
    * @param comp     The simple component that causes the problem.
    * @param node     The state with nondeterministic outgoing transitions.
    * @param event    The event that causes the trouble.
+   * @param location The error location to be associated with the exception.
    */
   public NondeterministicModuleException(final SimpleComponentProxy comp,
                                          final SimpleNodeProxy node,
-                                         final EventProxy event)
+                                         final EventProxy event,
+                                         final Proxy location)
   {
     super("Multiple transitions labelled '" + event.getName() +
           "' originating from state '" + node.getName() +
-          "' in automaton '" + comp.getName() + "'!", node);
+          "' in automaton '" + comp.getName() + "'!", location);
   }
 
 

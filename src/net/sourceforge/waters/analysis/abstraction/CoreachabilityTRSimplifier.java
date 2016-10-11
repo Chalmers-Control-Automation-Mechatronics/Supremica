@@ -91,7 +91,7 @@ public class CoreachabilityTRSimplifier
     final int alphaID = getPreconditionMarkingID();
     final int defaultID = getDefaultMarkingID();
     final int numStates = rel.getNumberOfStates();
-    final TIntHashSet reachableStates = new TIntHashSet(numStates);
+    final TIntHashSet coreachableStates = new TIntHashSet(numStates);
     final TIntStack unvisitedStates = new TIntArrayStack();
     // Creates a hash set of all states which can reach an omega marked or alpha
     // marked state.
@@ -99,7 +99,7 @@ public class CoreachabilityTRSimplifier
       if ((rel.isMarked(sourceID, defaultID) ||
            rel.isMarked(sourceID, alphaID)) &&
           rel.isReachable(sourceID) &&
-          reachableStates.add(sourceID) ) {
+          coreachableStates.add(sourceID) ) {
         checkAbort();
         unvisitedStates.push(sourceID);
         while (unvisitedStates.size() > 0) {
@@ -107,7 +107,7 @@ public class CoreachabilityTRSimplifier
           iter.resetState(newSource);
           while (iter.advance()) {
             final int predID = iter.getCurrentSourceState();
-            if (rel.isReachable(predID) && reachableStates.add(predID)) {
+            if (rel.isReachable(predID) && coreachableStates.add(predID)) {
               unvisitedStates.push(predID);
             }
           }
@@ -115,11 +115,11 @@ public class CoreachabilityTRSimplifier
       }
     }
     // Remove states which cannot reach a state marked alpha or omega.
-    final int numReachable = reachableStates.size();
+    final int numReachable = coreachableStates.size();
     if (numReachable < numStates) {
       boolean modified = false;
       for (int sourceID = 0; sourceID < numStates; sourceID++) {
-        if (rel.isReachable(sourceID) && !reachableStates.contains(sourceID)) {
+        if (rel.isReachable(sourceID) && !coreachableStates.contains(sourceID)) {
           rel.setReachable(sourceID, false);
           modified = true;
         }

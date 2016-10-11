@@ -57,7 +57,7 @@ public class MonolithicAutomataSynthesizer implements Abortable {
 		// permissive supervisor. See Introduction to Discrete Event
 		// Systems, Cassandras, Lafortune for a discussion about this
 		// problem.
-		if (synthesizerOptions.getSynthesisType() == SynthesisType.NONBLOCKINGCONTROLLABLEOBSERVABLE) {
+		if (synthesizerOptions.getSynthesisType() == SynthesisType.NONBLOCKING_CONTROLLABLE_NORMAL) {
 			final Alphabet unionAlphabet = AlphabetHelpers.getUnionAlphabet(automata);
 			final Alphabet problemEvents = new Alphabet();
 
@@ -112,7 +112,7 @@ public class MonolithicAutomataSynthesizer implements Abortable {
 
 		// We must keep track of all events that we have disabled
 		// This is used when checking for observability
-		if (synthesizerOptions.getSynthesisType() == SynthesisType.NONBLOCKINGCONTROLLABLEOBSERVABLE) {
+		if (synthesizerOptions.getSynthesisType() == SynthesisType.NONBLOCKING_CONTROLLABLE_NORMAL) {
 			synchronizationOptions.setRememberDisabledEvents(true);
 		}
 
@@ -157,7 +157,7 @@ public class MonolithicAutomataSynthesizer implements Abortable {
 		retval.automaton = syncher.getAutomaton();
 		retval.didSomething |= !syncher.getHelper().getAutomataIsControllable();
 
-		if (synthesizerOptions.getSynthesisType() == SynthesisType.NONBLOCKINGCONTROLLABLEOBSERVABLE) {
+		if (synthesizerOptions.getSynthesisType() == SynthesisType.NONBLOCKING_CONTROLLABLE_NORMAL) {
 			// Reset the synchronization type
 			synchronizationOptions
 					.setRememberDisabledEvents(orgRememberDisabledEvents);

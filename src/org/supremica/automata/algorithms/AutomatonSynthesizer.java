@@ -114,11 +114,11 @@ public class AutomatonSynthesizer
         {
             didSomething = synthesizeNonblocking();
         }
-        else if (synthesisType == SynthesisType.NONBLOCKINGCONTROLLABLE)
+        else if (synthesisType == SynthesisType.NONBLOCKING_CONTROLLABLE)
         {
             didSomething = synthesizeControllableNonblocking();
         }
-        else if (synthesisType == SynthesisType.NONBLOCKINGCONTROLLABLEOBSERVABLE)
+        else if (synthesisType == SynthesisType.NONBLOCKING_CONTROLLABLE_NORMAL)
         {
             didSomething = synthesizeControllableNonblockingObservable();
         }

@@ -86,6 +86,8 @@ public class CloseAction
             final DocumentContainer container = manager.getActiveContainer();
             final boolean enabled = container != null;
             setEnabled(enabled);
+
+
             break;
         default:
             break;

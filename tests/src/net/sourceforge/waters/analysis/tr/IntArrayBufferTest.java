@@ -179,7 +179,7 @@ public class IntArrayBufferTest extends AbstractWatersTest
     final int offset = buffer.add(data);
     final int[] fetch = new int[data.length];
     assertEquals("Unexpected offset of added data!",
-                 offset, buffer.get(data));
+                 offset, buffer.getIndex(data));
     buffer.getContents(offset, fetch);
     for (int i = 0; i < data.length; i++) {
       assertEquals("Unexpected data fetched!", data[i], fetch[i]);
@@ -196,7 +196,7 @@ public class IntArrayBufferTest extends AbstractWatersTest
     final int offset = buffer.add(list);
     final int[] fetch = new int[data.length];
     assertEquals("Unexpected offset of added data!",
-                 offset, buffer.get(data));
+                 offset, buffer.getIndex(data));
     buffer.getContents(offset, fetch);
     for (int i = 0; i < data.length; i++) {
       assertEquals("Unexpected data fetched!", data[i], fetch[i]);

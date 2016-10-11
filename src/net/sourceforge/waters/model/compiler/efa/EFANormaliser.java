@@ -1604,8 +1604,9 @@ public class EFANormaliser extends AbortableCompiler
             // Not controllable: Create an exception.
             for (final EFAVariable var : primeVariables) {
               for (final BinaryExpressionProxy action : gaBlock.getActions()) {
+                final Proxy location = mCompilationInfo.getErrorLocation(action);
                 final EFSMControllabilityException exception =
-                  new EFSMControllabilityException(mComponent, var, ident, action);
+                  new EFSMControllabilityException(mComponent, var, ident, location);
                 mCompilationInfo.raise(exception);
               }
             }

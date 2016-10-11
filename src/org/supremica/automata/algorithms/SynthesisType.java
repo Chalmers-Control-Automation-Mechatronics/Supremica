@@ -53,9 +53,9 @@ public enum SynthesisType
 {
     CONTROLLABLE("controllable"),
     NONBLOCKING("nonblocking"),
-    NONBLOCKINGCONTROLLABLE("nonblocking and controllable"),
-    UNSAFETY("unsafety (for RAS models)"),
-    NONBLOCKINGCONTROLLABLEOBSERVABLE("nonblocking, controllable and observable");
+    NONBLOCKING_CONTROLLABLE("nonblocking and controllable"),
+    NONBLOCKING_CONTROLLABLE_NORMAL("nonblocking, controllable, and normal"),
+    UNSAFETY("unsafety (for RAS models)");
 
 
     /** Textual description. */
@@ -84,10 +84,11 @@ public enum SynthesisType
 
     public static SynthesisType[] analyzerValues()
     {
-        final SynthesisType[] vals = new SynthesisType[3];
+        final SynthesisType[] vals = new SynthesisType[4];
         vals[0] = CONTROLLABLE;
         vals[1] = NONBLOCKING;
-        vals[2] = NONBLOCKINGCONTROLLABLE;
+        vals[2] = NONBLOCKING_CONTROLLABLE;
+        vals[3] = NONBLOCKING_CONTROLLABLE_NORMAL;
         return vals;
     }
 

@@ -52,10 +52,12 @@ package org.supremica.automata.algorithms;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
 
-import net.sourceforge.waters.analysis.abstraction.BBSDAbstraction;
-import net.sourceforge.waters.analysis.abstraction.BBSDDiagnosabilityVerification;
 import net.sourceforge.waters.analysis.abstraction.OPSearchAutomatonSimplifier;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.Abortable;
@@ -63,7 +65,10 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
-import net.sourceforge.waters.model.des.*;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 import org.supremica.automata.Alphabet;
@@ -77,12 +82,16 @@ import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.State;
 import org.supremica.automata.BDD.BDDVerifier;
 import org.supremica.automata.IO.AutomataToWaters;
+import org.supremica.automata.algorithms.bbsd.BBSDDiagnosabilityVerification;
 import org.supremica.automata.algorithms.minimization.AutomataMinimizer;
 import org.supremica.automata.algorithms.minimization.MinimizationHelper;
 import org.supremica.automata.algorithms.minimization.MinimizationHeuristic;
 import org.supremica.automata.algorithms.minimization.MinimizationOptions;
 import org.supremica.automata.algorithms.minimization.MinimizationStrategy;
-import org.supremica.gui.*;
+import org.supremica.gui.ActionMan;
+import org.supremica.gui.AutomataVerificationWorker;
+import org.supremica.gui.ExecutionDialog;
+import org.supremica.gui.ExecutionDialogMode;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
@@ -987,7 +996,7 @@ public class AutomataVerifier
     throws Exception
     {
         final AutomataIndexMap indexMap = synchHelper.getIndexMap();
-        StringBuilder addedAutomata = new StringBuilder();
+        final StringBuilder addedAutomata = new StringBuilder();
         final int start = selectedAutomata.size() - automataIndices.length;
 
         if (attempt == 1)
@@ -1891,13 +1900,9 @@ public class AutomataVerifier
         if (theAutomata.size() == 0)
             throw new IllegalStateException("No automaton selected for verification!");
 
-        BBSDDiagnosabilityVerification bbsd = new BBSDDiagnosabilityVerification(theAutomata);
-
-        // Try to return the resulting automaton to the gui
-        // Automaton result = new Automaton(bbsd.getResult());
-        // ActionMan.getGui().addAutomata(new Automata(result));
-
-        return true;
+        @SuppressWarnings("unused")
+        final BBSDDiagnosabilityVerification bbsd = new BBSDDiagnosabilityVerification(theAutomata);
+        return BBSDDiagnosabilityVerification.getResult();
     }
 
     /**

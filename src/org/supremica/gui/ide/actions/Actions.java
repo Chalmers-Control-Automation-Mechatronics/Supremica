@@ -186,6 +186,7 @@ public class Actions extends WatersActionManager
     public IDEAction simulatorLaunchSimulatorAction = new SimulatorLaunchSimulatorAction(mIDEActions);
     public IDEAction simulatorClearSimulationData = new SimulatorClearSimulationData(mIDEActions);
 
+
     // Analyzer experimental
     public IDEAction analyzerExperimentAction = new AnalyzerExperimentAction(mIDEActions);
     public IDEAction analyzerPredictSizeAction = new AnalyzerPredictSizeAction(mIDEActions);

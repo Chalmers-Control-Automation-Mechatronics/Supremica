@@ -227,6 +227,8 @@ class TeachingSecurityManager extends SecurityManager
       }
     } else if (perm instanceof ReflectPermission) {
       // allow :-(
+    } else if (perm instanceof RuntimePermission) {
+      // needed for Java 1.8 lambda expressions?
     } else if (mEnabled) {
       super.checkPermission(perm);
     }

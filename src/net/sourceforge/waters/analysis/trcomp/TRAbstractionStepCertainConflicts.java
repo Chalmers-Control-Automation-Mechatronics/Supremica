@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.abstraction.LimitedCertainConflictsTRSimplifier;
+import net.sourceforge.waters.analysis.tr.AbstractStateBuffer;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntStateBuffer;
@@ -462,7 +463,7 @@ class TRAbstractionStepCertainConflicts
       final ListBufferTransitionRelation inputRel =
         inputAut.getTransitionRelation();
       final int numStates = inputRel.getNumberOfStates();
-      final IntStateBuffer langStateBuffer =
+      final AbstractStateBuffer langStateBuffer =
         new IntStateBuffer(numStates, langEnc); // Making new dump state!
       final ListBufferTransitionRelation langRel =
         new ListBufferTransitionRelation(inputRel, langEnc,

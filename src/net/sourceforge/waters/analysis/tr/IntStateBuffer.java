@@ -33,9 +33,6 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TLongObjectHashMap;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -45,27 +42,30 @@ import java.util.Collection;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TLongObjectHashMap;
+
 
 /**
- * A data structure that stores status information for states in a transition
- * relation in a compact way.
- *
+ * A data structure that compactly stores the status information of the states
+ * in a transition relation.
+ * <p>
  * The state buffer considers a state space represented consisting of integer
  * state code ranging from&nbsp;0 up to the number of states minus&nbsp;1.
  * For each state code, it stores the following status information.
  * Each state can be designated as <I>initial</I> and/or <I>reachable</I>,
  * and can be <I>marked</I> with zero or more propositions.
- *
+ * <p>
  * The information is stored packed into the bits of a single integer for
  * each state. This allows for the encoding of up to 30 distinct marking
  * propositions.
  *
  * @see StateEncoding
  *
- * @author Robi Malik
+ * @author Robi Malik, Roger Su
  */
 
-public class IntStateBuffer
+public class IntStateBuffer extends AbstractStateBuffer
 {
 
   //#########################################################################
@@ -103,19 +103,14 @@ public class IntStateBuffer
                         final StateEncoding stateEnc,
                         final StateProxy dumpState)
   {
+    super(stateEnc, dumpState);
+
     mPropositionStatus = eventEnc;
     final int numStates = stateEnc.getNumberOfStates();
-    mDumpStateIndex = -1;
-    for (int s = 0; s < numStates; s++) {
-      if (stateEnc.getState(s) == dumpState) {
-        mDumpStateIndex = s;
-        break;
-      }
-    }
-    if (mDumpStateIndex >= 0) {
+    if (getDumpStateIndex() >= 0) {
       mStateInfo = new int[numStates];
     } else {
-      mDumpStateIndex = numStates;
+      setDumpStateIndex(numStates);
       mStateInfo = new int[numStates + 1];
     }
     for (int s = 0; s < numStates; s++) {
@@ -151,7 +146,7 @@ public class IntStateBuffer
                         final EventStatusProvider propStatus)
   {
     this(size + 1, size, propStatus);
-    mStateInfo[mDumpStateIndex] = 0;
+    mStateInfo[getDumpStateIndex()] = 0;
   }
 
   /**
@@ -174,15 +169,18 @@ public class IntStateBuffer
                         final EventStatusProvider propStatus)
   {
     mPropositionStatus = propStatus;
-    mDumpStateIndex = dumpIndex;
+    setDumpStateIndex(dumpIndex);
     mStateInfo = new int[size];
     Arrays.fill(mStateInfo, TAG_REACHABLE);
   }
 
   /**
    * Creates a new state buffer that is an identical copy of the given
-   * state buffer. This copy constructor constructs a deep copy that does
+   * state buffer.
+   * <p>
+   * This copy constructor constructs a deep copy that does
    * not share any data structures with the given state buffer.
+   *
    * @param  buffer     The state buffer to be copied from.
    * @param  propStatus Event status provider to determine the number of
    *                    propositions and which propositions are used.
@@ -191,36 +189,76 @@ public class IntStateBuffer
                         final EventStatusProvider propStatus)
   {
     mPropositionStatus = propStatus;
-    mDumpStateIndex = buffer.mDumpStateIndex;
+    setDumpStateIndex(buffer.getDumpStateIndex());
     final int size = buffer.getNumberOfStates();
     mStateInfo = Arrays.copyOf(buffer.mStateInfo, size);
+  }
+
+  /**
+   * Creates a new ordinary state buffer corresponding to a given
+   * by copying from another buffer.
+   * @param buffer     The state-count buffer to be copied from.
+   * @param propStatus Event status provider to determine the number of
+   *                   propositions and which propositions are used.
+   */
+  public IntStateBuffer(final AbstractStateBuffer buffer,
+                        final EventStatusProvider propStatus)
+  {
+    mPropositionStatus = propStatus;
+    setDumpStateIndex(buffer.getDumpStateIndex());
+    final int size = buffer.getNumberOfStates();
+    if (buffer instanceof IntStateBuffer) {
+      final IntStateBuffer intBuffer = (IntStateBuffer) buffer;
+      mStateInfo = Arrays.copyOf(intBuffer.mStateInfo, size);
+    } else {
+      mStateInfo = new int[size];
+      for (int i = 0; i < size; i++) {
+        if (buffer.isInitial(i)) {
+          mStateInfo[i] |= TAG_INITIAL;
+        }
+        if (buffer.isReachable(i)) {
+          mStateInfo[i] |= TAG_REACHABLE;
+        }
+      }
+    }
   }
 
 
   //#########################################################################
   //# Simple Access
+  @Override
+  public AbstractStateBuffer clone(final EventStatusProvider propStatus)
+  {
+    return new IntStateBuffer(this, propStatus);
+  }
+
+  @Override
+  public AbstractStateBuffer clone(final int size,
+                                   final EventStatusProvider propStatus)
+  {
+    return new IntStateBuffer(size, propStatus);
+  }
+
+  @Override
+  public AbstractStateBuffer clone(final int size, final int dumpIndex,
+                                   final EventStatusProvider propStatus)
+  {
+    return new IntStateBuffer(size, dumpIndex, propStatus);
+  }
+
   /**
    * Gets the number of states in the buffer.
    */
+  @Override
   public int getNumberOfStates()
   {
     return mStateInfo.length;
   }
 
   /**
-   * Gets the index of the dump state in this state buffer. The dump state
-   * signifies a unmarked state without outgoing transitions. It is set
-   * for every state buffer to provide for algorithms that redirect
-   * transitions to such a state.
-   */
-  public int getDumpStateIndex()
-  {
-    return mDumpStateIndex;
-  }
-
-  /**
    * Determines whether the given state is initial.
    */
+  @Override
   public boolean isInitial(final int state)
   {
     return (mStateInfo[state] & TAG_INITIAL) != 0;
@@ -229,6 +267,7 @@ public class IntStateBuffer
   /**
    * Sets the initial status of the given state.
    */
+  @Override
   public void setInitial(final int state, final boolean value)
   {
     if (value) {
@@ -243,6 +282,7 @@ public class IntStateBuffer
    * Reachability is merely handled as a flag by this class,
    * to be interpreted by the users.
    */
+  @Override
   public boolean isReachable(final int state)
   {
     return (mStateInfo[state] & TAG_REACHABLE) != 0;
@@ -253,6 +293,7 @@ public class IntStateBuffer
    * Reachability is merely handled as a flag by this class,
    * to be interpreted by the users.
    */
+  @Override
   public void setReachable(final int state, final boolean value)
   {
     if (value) {
@@ -271,6 +312,7 @@ public class IntStateBuffer
    * @param  state   ID of the state to be tested.
    * @param  prop    ID of the marking proposition to be tested.
    */
+  @Override
   public boolean isMarked(final int state, final int prop)
   {
     if (mPropositionStatus.isPropositionUsed(prop)) {
@@ -290,6 +332,7 @@ public class IntStateBuffer
    *                      as marked in all states; if <CODE>false</CODE>,
    *                      unused propositions are not counted.
    */
+  @Override
   public int getNumberOfMarkings(final boolean countUnused)
   {
     final int numProps = mPropositionStatus.getNumberOfPropositions();
@@ -309,6 +352,7 @@ public class IntStateBuffer
    *                      as marked in all states; if <CODE>false</CODE>,
    *                      unused propositions considered as not marked.
    */
+  @Override
   public int getNumberOfMarkings(final int prop, final boolean countUnused)
   {
     if (mPropositionStatus.isPropositionUsed(prop)) {
@@ -337,6 +381,7 @@ public class IntStateBuffer
    *         patterns. Only propositions marked as used are considered.
    * @see #setAllMarkings(int,long) setAllMarkings()
    */
+  @Override
   public long getAllMarkings(final int state)
   {
     return mStateInfo[state] & ~TAG_ALL;
@@ -349,6 +394,7 @@ public class IntStateBuffer
    * @param  value    <CODE>true</CODE> if the state is to be marked,
    *                  <CODE>false</CODE> if it is to be unmarked.
    */
+  @Override
   public void setMarked(final int state, final int prop, final boolean value)
   {
     final int pattern = 1 << prop;
@@ -374,6 +420,7 @@ public class IntStateBuffer
    *                  {@link #createMarkings(TIntArrayList) createMarkings()},
    *                  or {@link #mergeMarkings(long,long) mergeMarkings()}.
    */
+  @Override
   public void setAllMarkings(final int state, final long markings)
   {
     mStateInfo[state] = (mStateInfo[state] & TAG_ALL) | (int) markings;
@@ -391,6 +438,7 @@ public class IntStateBuffer
    *         i.e., if the pattern contained a marking not already present
    *         on the state.
    */
+  @Override
   public boolean addMarkings(final int state, final long markings)
   {
     if ((mStateInfo[state] & markings) != markings) {
@@ -413,6 +461,7 @@ public class IntStateBuffer
    *         i.e., if the pattern contained a marking actually present
    *         on the state.
    */
+  @Override
   public boolean removeMarkings(final int state, final long markings)
   {
     if ((mStateInfo[state] & markings) != 0) {
@@ -426,6 +475,7 @@ public class IntStateBuffer
   /**
    * Removes all markings from the given state.
    */
+  @Override
   public void clearMarkings(final int state)
   {
     mStateInfo[state] &= TAG_ALL;
@@ -437,70 +487,10 @@ public class IntStateBuffer
    * The markings of the source state will not be changed, and the destination
    * state retains any markings it previously had in addition to the new ones.
    */
+  @Override
   public void copyMarkings(final int source, final int dest)
   {
     mStateInfo[dest] |= (mStateInfo[source] & ~TAG_ALL);
-  }
-
-  /**
-   * Creates markings pattern representing an empty set of propositions.
-   */
-  public long createMarkings()
-  {
-    return 0;
-  }
-
-  /**
-   * Creates markings pattern for the given propositions.
-   * @param  props    Collection of proposition IDs defining a state marking.
-   * @return A number identifying the given combination of propositions.
-   * @see #setAllMarkings(int,long) setAllMarkings()
-   */
-  public long createMarkings(final TIntArrayList props)
-  {
-    int result = 0;
-    for (int p = 0; p < props.size(); p++) {
-      result |= 1 << props.get(p);
-    }
-    return result;
-  }
-
-  /**
-   * Adds a marking to a given marking pattern.
-   * @param  markings  Marking pattern to be augmented.
-   * @param  prop      Code of proposition to be added to pattern.
-   * @return A number identifying a marking consisting of all propositions
-   *         contained in the given markings, plus the the additional marking.
-   * @see #mergeMarkings(long, long)
-   * @see #setAllMarkings(int,long) setAllMarkings()
-   */
-  public long addMarking(final long markings, final int prop)
-  {
-    return markings | (1L << prop);
-  }
-
-  /**
-   * Checks whether the given marking pattern contains the given proposition.
-   * @param  markings  Marking pattern to be examined.
-   * @param  prop      Code of proposition to be tested.
-   * @return <CODE>true</CODE> if the marking pattern includes the given
-   *         proposition, <CODE>false</CODE> otherwise.
-   */
-  public boolean isMarked(final long markings, final int prop)
-  {
-    return (markings & (1L << prop)) != 0;
-  }
-
-  /**
-   * Combines two marking patterns.
-   * @return A number identifying a marking consisting of all propositions
-   *         contained in one of the two input marking patterns.
-   * @see #addMarking(long, int)
-   * @see #setAllMarkings(int,long) setAllMarkings()
-   */
-  public long mergeMarkings(final long markings1, final long markings2)
-  {
-    return markings1 | markings2;
   }
 
   /**
@@ -509,6 +499,7 @@ public class IntStateBuffer
    * @return <CODE>true</CODE> if at least one proposition was changed,
    *         <CODE>false</CODE> otherwise.
    */
+  @Override
   public boolean addRedundantPropositions()
   {
     final int numProps = mPropositionStatus.getNumberOfPropositions();
@@ -535,6 +526,7 @@ public class IntStateBuffer
    * @return <CODE>true</CODE> if at least one proposition was removed,
    *         <CODE>false</CODE> otherwise.
    */
+  @Override
   public boolean removeRedundantPropositions()
   {
     final int numProps = mPropositionStatus.getNumberOfPropositions();
@@ -566,6 +558,7 @@ public class IntStateBuffer
    * @return <CODE>true</CODE> if all states in the buffer are marked
    *         as unreachable, <CODE>false</CODE> otherwise.
    */
+  @Override
   public boolean isEmpty()
   {
     for (final int tags : mStateInfo) {
@@ -580,6 +573,7 @@ public class IntStateBuffer
    * Gets the number of states currently marked as reachable in this state
    * buffer.
    */
+  @Override
   public int getNumberOfReachableStates()
   {
     int count = 0;
@@ -599,6 +593,7 @@ public class IntStateBuffer
    *          Event encoding defining what propositions are to be used to
    *          encode markings.
    */
+  @Override
   public StateEncoding createStateEncoding(final EventEncoding eventEnc)
   {
     final int numProps = eventEnc.getNumberOfPropositions();
@@ -631,6 +626,33 @@ public class IntStateBuffer
     return new StateEncoding(states);
   }
 
+  //#########################################################################
+  //# Simple Access: State Count
+  /**
+   * Gets the state count of a state in this buffer.
+   *
+   * @param state ID of the state.
+   *
+   * @return the count of the specified state, which is always 1 for
+   *         this particular type of buffer.
+   */
+  @Override
+  public long getStateCount(final int state)
+  {
+    return 1;
+  }
+
+  /**
+   * Sets the state count of a state in this buffer.
+   * <p>
+   * In this class, this method simply does nothing.
+   */
+  @Override
+  public void setStateCount(final int state, final long count)
+  {
+
+  }
+
 
   //#########################################################################
   //# Debugging
@@ -643,6 +665,7 @@ public class IntStateBuffer
     return writer.toString();
   }
 
+  @Override
   public void dump(final PrintWriter printer)
   {
     final int used = mPropositionStatus.getUsedPropositions();
@@ -696,7 +719,6 @@ public class IntStateBuffer
   //# Data Members
   private final EventStatusProvider mPropositionStatus;
   private final int[] mStateInfo;
-  private int mDumpStateIndex;
 
 
   //#########################################################################

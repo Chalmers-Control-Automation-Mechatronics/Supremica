@@ -81,7 +81,7 @@ import org.apache.log4j.Logger;
  */
 
 public class TRCompositionalLanguageInclusionChecker
-  extends AbstractTRCompositionalAnalyzer
+  extends AbstractTRCompositionalVerifier
   implements LanguageInclusionChecker
 {
 
@@ -430,14 +430,20 @@ public class TRCompositionalLanguageInclusionChecker
   //#########################################################################
   //# Abstraction Chains
   /**
-   * <P>The abstraction sequence that consists of only observation
-   * equivalence. This tool creator produces a transition relation simplifier
-   * consisting of:</P>
-   * <UL>
-   * <LI>Special events removal {@link SpecialEventsTRSimplifier}</LI>
-   * <LI>Tau-loop removal {@link TauLoopRemovalTRSimplifier}</LI>
-   * <LI>Observation equivalence {@link ObservationEquivalenceTRSimplifier}</LI>
-   * </UL>.
+   * <P>The projection abstraction sequence. This transition relation
+   * simplifier chain calculates a minimal deterministic recogniser of the
+   * language of its input transition relation, after hiding local events.
+   * It is implemented in the following steps.</P>
+   * <OL>
+   * <LI>{@link SpecialEventsTRSimplifier} to hide local events.</LI>
+   * <LI>{@link TauLoopRemovalTRSimplifier} to remove loops of only local
+   *     events. This is for performance improvement of the following steps.</LI>
+   * <LI>{@link SubsetConstructionTRSimplifier} to perform powerset construction
+   *     and obtain a deterministic recogniser without tau transitions that
+   *     accepts the same language.</LI>
+   * <LI>{@link ObservationEquivalenceTRSimplifier} to get the minimal
+   *     language-equivalent deterministic automaton.</LI>
+   * </OL>
    */
   public static final TRToolCreator<TransitionRelationSimplifier> PROJ =
     new TRToolCreator<TransitionRelationSimplifier>("PROJ")
@@ -447,6 +453,7 @@ public class TRCompositionalLanguageInclusionChecker
       (final AbstractTRCompositionalAnalyzer analyzer)
     {
       final ChainTRSimplifier chain = analyzer.startAbstractionChain();
+      // startAbstractionChain() adds a SpecialEventsTRSimplifier.
       final int stateLimit = analyzer.getInternalStateLimit();
       final int transitionLimit = analyzer.getInternalTransitionLimit();
       final TRSimplificationListener listener =
@@ -468,7 +475,7 @@ public class TRCompositionalLanguageInclusionChecker
         ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION :
         ObservationEquivalenceTRSimplifier.Equivalence.DETERMINISTIC_MINSTATE;
       bisimulator.setEquivalence(eq);
-      bisimulator.setTransitionLimit(stateLimit);
+      bisimulator.setTransitionLimit(transitionLimit);
       bisimulator.setSimplificationListener(listener);
       chain.add(bisimulator);
       chain.setPreferredOutputConfiguration

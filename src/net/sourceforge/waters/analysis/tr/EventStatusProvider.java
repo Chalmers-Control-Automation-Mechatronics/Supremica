@@ -70,6 +70,7 @@ public interface EventStatusProvider
    *                Must be in the range of events in the encoding.
    * @return A combination of the bits
    *         {@link EventStatus#STATUS_CONTROLLABLE},
+   *         {@link EventStatus#STATUS_LOCAL},
    *         {@link EventStatus#STATUS_ALWAYS_ENABLED},
    *         {@link EventStatus#STATUS_SELFLOOP_ONLY},
    *         {@link EventStatus#STATUS_BLOCKED},
@@ -84,6 +85,7 @@ public interface EventStatusProvider
    *                Must be in the range of events in the encoding.
    * @param  status A combination of the bits
    *                {@link EventStatus#STATUS_CONTROLLABLE},
+   *                {@link EventStatus#STATUS_LOCAL},
    *                {@link EventStatus#STATUS_ALWAYS_ENABLED},
    *                {@link EventStatus#STATUS_SELFLOOP_ONLY},
    *                {@link EventStatus#STATUS_BLOCKED},

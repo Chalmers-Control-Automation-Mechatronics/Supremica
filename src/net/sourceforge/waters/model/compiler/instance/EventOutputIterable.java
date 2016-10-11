@@ -39,6 +39,7 @@ import java.util.NoSuchElementException;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.context.AliasBindingContext;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
+import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 
 
@@ -57,12 +58,20 @@ class EventOutputIterable implements Iterable<SingleEventOutput>
   //# Constructor
   EventOutputIterable(final CompiledEvent event)
   {
+    this(event, null);
+  }
+
+  EventOutputIterable(final CompiledEvent event,
+                      final CompilationInfo info)
+  {
     mEvent = event;
+    mCompilationInfo = info;
   }
 
 
   //#########################################################################
   //# Interface java.lang.Iterable
+  @Override
   public Iterator<SingleEventOutput> iterator()
   {
     return createEventOutputIterator(mEvent);
@@ -71,26 +80,29 @@ class EventOutputIterable implements Iterable<SingleEventOutput>
 
   //#########################################################################
   //# Auxiliary Methods
-  private static Iterator<SingleEventOutput> createEventOutputIterator
+  private Iterator<SingleEventOutput> createEventOutputIterator
     (final CompiledEvent event)
   {
     return createEventOutputIterator(event, null);
   }
 
-  private static Iterator<SingleEventOutput> createEventOutputIterator
-    (final CompiledEvent event, SourceInfo outerinfo)
+  private Iterator<SingleEventOutput> createEventOutputIterator
+    (final CompiledEvent event, final SourceInfo outerInfo)
   {
-    final SourceInfo localinfo = event.getSourceInfo();
+    final SourceInfo localInfo = event.getSourceInfo();
     final SourceInfo info;
-    if (localinfo == null) {
-      info = outerinfo;
-    } else if (outerinfo == null) {
-      info = localinfo;
+    if (mCompilationInfo == null) {
+      info = null;
+    } else if (localInfo == null) {
+      info = outerInfo;
+    } else if (outerInfo == null) {
+      info = localInfo;
     } else {
-      final Proxy source = localinfo.getSourceObject();
-      final BindingContext context = localinfo.getBindingContext();
-      final BindingContext alias = new AliasBindingContext(outerinfo, context);
-      info = new SourceInfo(source, alias);
+      final Proxy source = localInfo.getSourceObject();
+      final BindingContext context = localInfo.getBindingContext();
+      final BindingContext alias =
+        new AliasBindingContext(outerInfo, context);
+      info = mCompilationInfo.createSourceInfo(source, alias);
     }
     if (event instanceof CompiledSingleEvent) {
       final CompiledSingleEvent single = (CompiledSingleEvent) event;
@@ -117,27 +129,30 @@ class EventOutputIterable implements Iterable<SingleEventOutput>
 
     //#######################################################################
     //# Interface java.util.Iterator
+    @Override
     public boolean hasNext()
     {
       return mOutput != null;
     }
 
+    @Override
     public SingleEventOutput next()
     {
       if (mOutput != null) {
         final SingleEventOutput output = mOutput;
         mOutput = null;
-	return output;
+        return output;
       } else {
-	throw new NoSuchElementException
-	  ("No more events in single event output iteration!");
+        throw new NoSuchElementException
+          ("No more events in single event output iteration!");
       }
     }
-	
+
+    @Override
     public void remove()
     {
       throw new UnsupportedOperationException
-	("Can't remove from single event output iteration!");
+        ("Can't remove from single event output iteration!");
     }
 
     //#######################################################################
@@ -148,7 +163,7 @@ class EventOutputIterable implements Iterable<SingleEventOutput>
 
   //#########################################################################
   //# Local Class NestedEventOutputIterator
-  private static class NestedEventOutputIterator
+  private class NestedEventOutputIterator
     implements Iterator<SingleEventOutput>
   {
 
@@ -165,27 +180,30 @@ class EventOutputIterable implements Iterable<SingleEventOutput>
 
     //#######################################################################
     //# Interface java.util.Iterator
+    @Override
     public boolean hasNext()
     {
       return mOuterIterator != null;
     }
 
+    @Override
     public SingleEventOutput next()
     {
       if (mOuterIterator != null) {
-	final SingleEventOutput output = mInnerIterator.next();
-	advance();
-	return output;
+        final SingleEventOutput output = mInnerIterator.next();
+        advance();
+        return output;
       } else {
-	throw new NoSuchElementException
-	  ("No more events in nested event output iteration!");
+        throw new NoSuchElementException
+          ("No more events in nested event output iteration!");
       }
     }
-	
+
+    @Override
     public void remove()
     {
       throw new UnsupportedOperationException
-	("Can't remove from nested event output iteration!");
+        ("Can't remove from nested event output iteration!");
     }
 
     //#######################################################################
@@ -193,14 +211,14 @@ class EventOutputIterable implements Iterable<SingleEventOutput>
     private void advance()
     {
       while (mInnerIterator == null || !mInnerIterator.hasNext()) {
-	if (mOuterIterator.hasNext()) {
-	  final CompiledEvent event = mOuterIterator.next();
-	  mInnerIterator = createEventOutputIterator(event, mSourceInfo);
-	} else {
-	  mOuterIterator = null;
-	  mInnerIterator = null;
-	  return;
-	}
+        if (mOuterIterator.hasNext()) {
+          final CompiledEvent event = mOuterIterator.next();
+          mInnerIterator = createEventOutputIterator(event, mSourceInfo);
+        } else {
+          mOuterIterator = null;
+          mInnerIterator = null;
+          return;
+        }
       }
     }
 
@@ -216,5 +234,6 @@ class EventOutputIterable implements Iterable<SingleEventOutput>
   //#########################################################################
   //# Data Members
   private final CompiledEvent mEvent;
+  private final CompilationInfo mCompilationInfo;
 
 }

@@ -113,11 +113,13 @@ public abstract class WatersActionManager implements Observer
     addAction(new SimulationResetAction(ide));
     addAction(new SimulationShowAllAction(ide));
     addAction(new SimulationStepAction(ide));
+    addAction(new SimulationAutoStepAction(ide));
     addAction(new SimulationStepBackAction(ide));
     addAction(new ToolEdgeAction(ide));
     addAction(new ToolGroupNodeAction(ide));
     addAction(new ToolNodeAction(ide));
     addAction(new ToolSelectAction(ide));
+    addAction(new ToolsFlexfactAction(ide));
     addAction(new WatersRedoAction(ide));
     addAction(new WatersUndoAction(ide));
     ide.attach(this);

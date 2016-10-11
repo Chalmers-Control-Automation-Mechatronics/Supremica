@@ -227,15 +227,18 @@ glue class ProductDESProxyFactory {
 package net.sourceforge.waters.model.analysis;
 //###########################################################################
 
-glue class VerificationResult {
+glue class AnalysisResult {
   void setSatisfied(boolean satisfied);
-  void setCounterExample(glue TraceProxy trace);
   void updatePeakMemoryUsage(long usage);
   void setNumberOfAutomata(int numaut);
   void setNumberOfStates(double numstates);
   void setNumberOfTransitions(double numtrans);
   void setPeakNumberOfNodes(int numnodes);
   void setTotalNumberOfEvents(int numEvents);
+}
+
+glue class VerificationResult extends AnalysisResult {
+  void setCounterExample(glue TraceProxy trace);
 }
 
 glue class KindTranslator {
@@ -300,13 +303,13 @@ glue class NativeModelAnalyzer {
   int getNodeLimit();
   int getTransitionLimit();
   boolean isEventTreeEnabled();
+  glue NativeVerificationResult createAnalysisResult();
   ByteBuffer getNativeModelAnalyzer();
   void setNativeModelAnalyzer(ByteBuffer buffer);
 }
 
 glue class NativeModelVerifier extends NativeModelAnalyzer {
   String getTraceName();
-  glue NativeVerificationResult createAnalysisResult();
 }
 
 glue class NativeSafetyVerifier extends NativeModelVerifier {
@@ -324,4 +327,7 @@ glue class NativeConflictChecker extends NativeModelVerifier {
 }
 
 glue class NativeControlLoopChecker extends NativeModelVerifier {
+}
+
+glue class NativeStateCounter extends NativeModelAnalyzer {
 }

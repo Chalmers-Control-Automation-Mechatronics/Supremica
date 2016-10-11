@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="dynamic_prime_sieve" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="dynamic_prime_sieve" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <ns2:Comment>Distributed prime number sieve, dymanic version.
 
 Source generates numbers from 2 to N and sends them to the first sieve process sieve[1].
@@ -10,7 +10,7 @@ If it is, x is discarded, otherwise x is sent to the next sieve process.
 Any numbers passing through all sieves are primes, and sent to the sink for printing.
 
 The model is parametrised by the number S of sieve processes and the maximum number N tested.
-The largest working value for N is p(S)^2-1 where p(S) is the Nth prime.
+The largest working value for N is p(S)^2-1 where p(S) is the S-th prime.
 
 source :
 

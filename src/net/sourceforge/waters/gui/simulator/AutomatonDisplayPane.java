@@ -130,10 +130,10 @@ public class AutomatonDisplayPane
     mTransform = mInverseTransform = null;
     final ModuleSubject module = container.getModule();
     final RenderingContext context = new SimulatorRenderingContext();
-    final Map<Object,SourceInfo> infomap = mContainer.getSourceInfoMap();
-    final SourceInfo sInfo = infomap.get(aut);
+    final Map<Object,SourceInfo> infoMap = mContainer.getSourceInfoMap();
+    final SourceInfo info = infoMap.get(aut);
     final SimpleExpressionCompiler compiler = sim.getSimpleExpressionCompiler();
-    final BindingContext bindings = sInfo.getBindingContext();
+    final BindingContext bindings = info.getBindingContext();
     final ProxyShapeProducer producer =
       new SubjectShapeProducer(graph, module, context, compiler, bindings);
     mPopupFactory = new DisplayPanePopupFactory(sim, this);

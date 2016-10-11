@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="parrow" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="parrow" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <ns2:Comment>Parrow's protocol, an ideal protocol for data transmission, however not physically viable since the 'acknowledgement' signals also have to travel in an unreliable medium. The Sender, Receiver and Medium should together show the Desired behaviour. A physically viable protocol is the alternating bit protocol.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
@@ -9,8 +9,8 @@
         <EventDecl Kind="CONTROLLABLE" Name="out"/>
         <EventDecl Kind="CONTROLLABLE" Name="receive"/>
         <EventDecl Kind="CONTROLLABLE" Name="send"/>
-        <EventDecl Observable="false" Kind="CONTROLLABLE" Name="tau_lost"/>
-        <EventDecl Observable="false" Kind="CONTROLLABLE" Name="tau_ok"/>
+        <EventDecl Kind="CONTROLLABLE" Name="tau_lost"/>
+        <EventDecl Kind="CONTROLLABLE" Name="tau_ok"/>
         <EventDecl Kind="CONTROLLABLE" Name="timeout"/>
     </EventDeclList>
     <ComponentList>
@@ -27,27 +27,27 @@
                     <SimpleNode Name="m3"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="m1" Source="m0">
+                    <Edge Source="m0" Target="m1">
                         <LabelBlock>
                             <SimpleIdentifier Name="in"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="m2" Source="m1">
+                    <Edge Source="m1" Target="m2">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau_ok"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="m3" Source="m1">
+                    <Edge Source="m1" Target="m3">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau_lost"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="m0" Source="m2">
+                    <Edge Source="m2" Target="m0">
                         <LabelBlock>
                             <SimpleIdentifier Name="out"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="m0" Source="m3">
+                    <Edge Source="m3" Target="m0">
                         <LabelBlock>
                             <SimpleIdentifier Name="timeout"/>
                         </LabelBlock>
@@ -66,12 +66,12 @@
                     <SimpleNode Name="q1"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="q1" Source="q0">
+                    <Edge Source="q0" Target="q1">
                         <LabelBlock>
                             <SimpleIdentifier Name="send"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="q0" Source="q1">
+                    <Edge Source="q1" Target="q0">
                         <LabelBlock>
                             <SimpleIdentifier Name="receive"/>
                         </LabelBlock>
@@ -91,22 +91,22 @@
                     <SimpleNode Name="s2"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="send"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="in"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s2">
+                    <Edge Source="s2" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="acknowledge"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s2">
+                    <Edge Source="s2" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="timeout"/>
                         </LabelBlock>
@@ -126,17 +126,17 @@
                     <SimpleNode Name="r2"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="r1" Source="r0">
+                    <Edge Source="r0" Target="r1">
                         <LabelBlock>
                             <SimpleIdentifier Name="out"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="r2" Source="r1">
+                    <Edge Source="r1" Target="r2">
                         <LabelBlock>
                             <SimpleIdentifier Name="receive"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="r0" Source="r2">
+                    <Edge Source="r2" Target="r0">
                         <LabelBlock>
                             <SimpleIdentifier Name="acknowledge"/>
                         </LabelBlock>
@@ -160,42 +160,42 @@
                     <SimpleNode Name="q1.m3.r0.s2"/>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="q1.m0.r0.s1" Source="q0.m0.r0.s0">
+                    <Edge Source="q0.m0.r0.s0" Target="q1.m0.r0.s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="send"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="q0.m0.r0.s0" Source="q0.m0.r2.s2">
+                    <Edge Source="q0.m0.r2.s2" Target="q0.m0.r0.s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="acknowledge"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="q1.m1.r0.s2" Source="q1.m0.r0.s1">
+                    <Edge Source="q1.m0.r0.s1" Target="q1.m1.r0.s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="in"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="q0.m0.r2.s2" Source="q1.m0.r1.s2">
+                    <Edge Source="q1.m0.r1.s2" Target="q0.m0.r2.s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="receive"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="q1.m2.r0.s2" Source="q1.m1.r0.s2">
+                    <Edge Source="q1.m1.r0.s2" Target="q1.m2.r0.s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau_ok"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="q1.m3.r0.s2" Source="q1.m1.r0.s2">
+                    <Edge Source="q1.m1.r0.s2" Target="q1.m3.r0.s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="tau_lost"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="q1.m0.r1.s2" Source="q1.m2.r0.s2">
+                    <Edge Source="q1.m2.r0.s2" Target="q1.m0.r1.s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="out"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="q1.m0.r0.s1" Source="q1.m3.r0.s2">
+                    <Edge Source="q1.m3.r0.s2" Target="q1.m0.r0.s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="timeout"/>
                         </LabelBlock>

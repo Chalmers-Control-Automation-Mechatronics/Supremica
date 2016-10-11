@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.list.array.TIntArrayList;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -42,6 +40,8 @@ import java.util.List;
 
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
+
+import gnu.trove.list.array.TIntArrayList;
 
 
 /**
@@ -100,7 +100,7 @@ public class IntArrayBuffer implements WatersIntHashingStrategy
    *                     in an {@link OverflowException} being thrown.
    * @param  initialSize The estimated initial capacity of the hash table.
    * @param  defaultHashSetValue
-   *                     The value to be returned by the {@link #get(int[])
+   *                     The value to be returned by the {@link #getIndex(int[])
    *                     get()} method if an entry is not found. The default
    *                     return value is&nbsp;-1, but it can be overridden by
    *                     this constructor.
@@ -111,7 +111,7 @@ public class IntArrayBuffer implements WatersIntHashingStrategy
                         final int defaultHashSetValue)
   {
     mArraySize = arraySize;
-    mBlockSize = arraySize * BLOCK_SIZE;
+    mBlockSize = arraySize < 1 ? 1 : arraySize * BLOCK_SIZE;
     mSizeLimit = limit;
     mDefaultHashValue = defaultHashSetValue;
     mBlocks = new ArrayList<int[]>();
@@ -184,7 +184,7 @@ public class IntArrayBuffer implements WatersIntHashingStrategy
    *         contents in this buffer, or the configured default value
    *         (usually&nbsp;-1) if not found.
    */
-  public int get(final int[] data)
+  public int getIndex(final int[] data)
   {
     ensureCapacity(mArraySize);
     final int blockno = mNextFreeIndex >>> BLOCK_SHIFT;
@@ -215,6 +215,14 @@ public class IntArrayBuffer implements WatersIntHashingStrategy
   }
 
   /**
+   * Gets the size of the arrays.
+   */
+  public int getArraySize()
+  {
+    return mArraySize;
+  }
+
+  /**
    * Gets the number of arrays currently stored in this integer set buffer.
    */
   public int size()
@@ -237,7 +245,7 @@ public class IntArrayBuffer implements WatersIntHashingStrategy
     final int[] block = mBlocks.get(blockno);
     int offset = mArraySize * (array & BLOCK_MASK);
     int result = block[offset];
-    for (int j = 0; j < mArraySize; j++) {
+    for (int j = 1; j < mArraySize; j++) {
       result = 5 * result + block[offset++];
     }
     return result;
