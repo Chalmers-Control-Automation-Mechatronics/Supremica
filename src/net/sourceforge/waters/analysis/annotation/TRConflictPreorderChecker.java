@@ -62,9 +62,9 @@ import gnu.trove.set.hash.TIntHashSet;
  * <P>An implementation of the conflict preorder algorithm.</P>
  *
  * <P><I>Reference:</I><BR>
- * Simon Ware, Robi Malik. A State-Based Characterisation of the Conflict
- * Preorder. Proc. 10th Workshop on the Foundations of Coordination Languages
- * and Software Architecture, FOCLASA 2011, 34-48, Aachen, Germany, 2011.</P>
+ * Simon Ware, Robi Malik. An Algorithm to Test the Conflict Preorder.
+ * Science of Computer Programming, <STRONG>89</STRONG>&nbsp;(A), 23-40,
+ * 2014.</P>
  *
  * @author Simon Ware, Robi Malik
  */
