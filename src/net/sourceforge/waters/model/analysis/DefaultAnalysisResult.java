@@ -374,7 +374,7 @@ public class DefaultAnalysisResult
     if (mCompileTime >= 0) {
       formatter.format("Compile time: %.3fs\n", 0.001f * mCompileTime);
     }
-    writer.println("Memory usage: " + (mPeakMemoryUsage >> 10) + " kB");
+    writer.println("Memory usage: " + (mPeakMemoryUsage >> 10) + " KiB");
     if (mTotalNumberOfEvents >= 0) {
       writer.println("Total number of events: " + mTotalNumberOfEvents);
     }

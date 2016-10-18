@@ -114,7 +114,7 @@ done
 OK=1
 if [ "" = "$CHECK" ]; then
     echo "No check specified!"
-    echo "Available options are: -conf -cont -lang -loop -synth"
+    echo "Available options are: -conf -cont -count -lang -loop -synth"
     OK=0
 fi
 
