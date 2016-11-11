@@ -33,12 +33,6 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.custom_hash.TObjectByteCustomHashMap;
-import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
-import gnu.trove.set.hash.THashSet;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -81,6 +75,12 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.apache.log4j.Logger;
+
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.custom_hash.TObjectByteCustomHashMap;
+import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -621,6 +621,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           return setBooleanResult(false);
         }
       }
+      setBooleanResult(true);
 
       // re-encode states (make only one bad state)
       final int markingID = 0;

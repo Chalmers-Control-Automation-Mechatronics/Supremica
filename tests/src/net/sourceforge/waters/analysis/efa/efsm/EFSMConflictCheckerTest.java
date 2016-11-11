@@ -38,9 +38,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.WatersException;
@@ -49,6 +46,9 @@ import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 
 /**
@@ -374,7 +374,7 @@ public class EFSMConflictCheckerTest
   public void testPslBig()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "psl", "pslBig");
+    final ModuleProxy module = loadModule("tests", "psl", "psl_big");
     checkConflict(module, false);
   }
 
@@ -395,8 +395,7 @@ public class EFSMConflictCheckerTest
   public void testPslBigWithManyRestartTrans()
     throws IOException, WatersException
   {
-    final ModuleProxy module =
-      loadModule("tests", "psl", "pslBigWithManyRestartTrans");
+    final ModuleProxy module = loadModule("tests", "psl", "psl_restart");
     checkConflict(module, false);
   }
 

@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.model.analysis;
 
-import gnu.trove.set.hash.THashSet;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -63,6 +61,8 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
+
+import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -261,6 +261,13 @@ public abstract class AbstractSupervisorSynthesizerTest
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "synthesis", "coffee_machine.wmod");
+    runSynthesizer(des, true);
+  }
+
+  public void testCT3() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "CT3.wmod");
     runSynthesizer(des, true);
   }
 
