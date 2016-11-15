@@ -86,6 +86,12 @@ public:
   bool equals(const BitSet& bitSet) const;
   uint64_t hash() const;
 
+  //##########################################################################
+  //# Debugging
+#ifdef DEBUG
+  void dump() const;
+#endif /* DEBUG */
+
 private:
   //##########################################################################
   //# Auxiliary Methods
