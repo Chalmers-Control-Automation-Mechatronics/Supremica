@@ -621,7 +621,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           return setBooleanResult(false);
         }
       }
-      setBooleanResult(true);
 
       // re-encode states (make only one bad state)
       final int markingID = 0;
@@ -750,7 +749,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
         }
         return setProxyResult(des);
       } else {
-        return true;
+        return setBooleanResult(true);
       }
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
@@ -803,8 +802,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           List<AutomatonProxy> originalAutomata = new ArrayList<>(mAutomata);
           StateTupleEncoding stEncodingCopy = mSTEncoding;
           final ListBufferTransitionRelation transitionRelationCopy =
-            new ListBufferTransitionRelation(
-                                             mTransitionRelation,
+            new ListBufferTransitionRelation(mTransitionRelation,
                                              ListBufferTransitionRelation.CONFIG_SUCCESSORS);
           automata:
           for (int a = mAutomata.size() - 1; a >= 0; a--) {

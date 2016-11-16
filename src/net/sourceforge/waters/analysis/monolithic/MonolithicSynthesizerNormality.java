@@ -724,7 +724,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
       int numDeletions = 1;
       final int dumpStateIndex = mTransitionRelation.getDumpStateIndex();
       final int markedStateCode = mEventEncoding.getEventCode(mUsedMarking);
-      while(numDeletions > 0){
+      while (numDeletions > 0) {
         numDeletions = 0;
         //Observability step
         mTransitionRelation.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
@@ -872,17 +872,20 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
           }
         }
       }
-
       mTransitionRelation = powersetRel;
       mEventEncoding = copy;
 
-      if(isDetailedOutputEnabled()){
-        //Return result
+      // Return result
+      if (isDetailedOutputEnabled()) {
+        mTransitionRelation.removeDeadlockStateTransitions(markedStateCode);
+        mTransitionRelation.checkReachability();
         mTransitionRelation.removeRedundantPropositions();
-        final ProductDESProxy result = createDESProxy(mTransitionRelation, mEventEncoding);
-        setProxyResult(result);
+        final ProductDESProxy result =
+          createDESProxy(mTransitionRelation, mEventEncoding);
+        return setProxyResult(result);
+      } else {
+        return setBooleanResult(true);
       }
-      return true;
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
     } catch (final OutOfMemoryError error) {
@@ -934,8 +937,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
           List<AutomatonProxy> originalAutomata = new ArrayList<>(mAutomata);
           StateTupleEncoding stEncodingCopy = mSTEncoding;
           final ListBufferTransitionRelation transitionRelationCopy =
-            new ListBufferTransitionRelation(
-                                             mTransitionRelation,
+            new ListBufferTransitionRelation(mTransitionRelation,
                                              ListBufferTransitionRelation.CONFIG_SUCCESSORS);
           automata:
           for (int a = mAutomata.size() - 1; a >= 0; a--) {
@@ -1025,11 +1027,9 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
                     merging = true;
                     break;
                   default:
-                    throw new IllegalStateException(
-                                                    "Unsupport state status "
-                                                      + mStatusMap
-                                                        .get(newTupEncoded)
-                                                      + "!");
+                    throw new IllegalStateException
+                      ("Unsupported state status " +
+                       mStatusMap.get(newTupEncoded) + "!");
                   }
                 }
               } else {
@@ -1056,8 +1056,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
         }
 
         ListBufferTransitionRelation copy =
-          new ListBufferTransitionRelation(
-                                           mTransitionRelation,
+          new ListBufferTransitionRelation(mTransitionRelation,
                                            ListBufferTransitionRelation.CONFIG_SUCCESSORS);
 
         final ChainTRSimplifier chain = new ChainTRSimplifier();
