@@ -207,6 +207,7 @@ public class CompositionalAutomataSynthesizer
   {
     super(model, factory, translator, abstractionCreator,
           preselectingMethodFactory);
+    setSelectionHeuristic(CompositionalSelectionHeuristicFactory.MinSync);
   }
 
 
@@ -228,6 +229,7 @@ public class CompositionalAutomataSynthesizer
   {
     return mSupervisorNamePrefix;
   }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable

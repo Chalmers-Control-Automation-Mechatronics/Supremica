@@ -37,9 +37,7 @@ import java.io.PrintStream;
 
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.compositional.ChainSelectionHeuristic;
-import net.sourceforge.waters.analysis.compositional.CompositionalConflictChecker;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
-import net.sourceforge.waters.analysis.compositional.SelectionHeuristicCreator;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentBoolean;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentChain;
@@ -394,14 +392,12 @@ public class TRCompositionalModelAnalyzerFactory
     @Override
     public void dump(final PrintStream stream, final Object analyzer)
     {
-      if (analyzer instanceof CompositionalConflictChecker) {
-        super.dump(stream, analyzer);
-        final CompositionalConflictChecker composer =
-          (CompositionalConflictChecker) analyzer;
-        final EnumFactory<SelectionHeuristicCreator> factory =
-          composer.getSelectionHeuristicFactory();
-        factory.dumpEnumeration(stream, INDENT);
-      }
+      super.dump(stream, analyzer);
+      final AbstractTRCompositionalAnalyzer composer =
+        (AbstractTRCompositionalAnalyzer) analyzer;
+      final EnumFactory<SelectionHeuristic<TRCandidate>> factory =
+        composer.getSelectionHeuristicFactory();
+      factory.dumpEnumeration(stream, INDENT);
     }
   }
 
@@ -611,10 +607,10 @@ public class TRCompositionalModelAnalyzerFactory
   {
     //#######################################################################
     //# Constructors
-    protected DumpFileArgument()
+    private DumpFileArgument()
     {
       super("-dump",
-            "Save abstracted model in given file before monolithic verification");
+            "Save abstracted model in given file before monolithic\nanalysis");
     }
 
     //#######################################################################

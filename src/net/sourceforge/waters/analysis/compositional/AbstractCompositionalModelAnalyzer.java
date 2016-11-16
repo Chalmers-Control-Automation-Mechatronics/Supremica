@@ -198,8 +198,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     mSelectionHeuristic =
       CompositionalSelectionHeuristicFactory.MinS.createChainHeuristic();
     mSubsumptionEnabled = false;
-    mLowerInternalStateLimit = mUpperInternalStateLimit =
-      super.getNodeLimit();
+    mLowerInternalStateLimit = mUpperInternalStateLimit = 100000;
     mInternalTransitionLimit = super.getTransitionLimit();
     mSynchronousProductBuilder =
       new MonolithicSynchronousProductBuilder(factory);

@@ -140,8 +140,8 @@ public abstract class BDDModelVerifier
     mVariableOrdering = VariableOrdering.FORCE;
     mIsReorderingEnabled = true;
     mInitialSize = 50000;
-    mPartitioningStrategy = TransitionPartitioningStrategy.GREEDY;
-    mPartitioningSizeLimit = Integer.MAX_VALUE;
+    mPartitioningStrategy = TransitionPartitioningStrategy.AUTOMATA;
+    mPartitioningSizeLimit = 10000;
   }
 
 

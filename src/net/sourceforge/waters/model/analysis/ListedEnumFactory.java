@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import java.io.PrintStream;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,7 +41,8 @@ import java.util.List;
 
 /**
  * An extensible implementation of the {@link EnumFactory} interface.
- * This enumeration factory simply maintains a list of registered values.
+ * This enumeration factory simply maintains a list of registered values,
+ * one of which can be designated as default.
  *
  * @author Robi Malik
  */
@@ -58,22 +60,58 @@ public class ListedEnumFactory<E> extends EnumFactory<E>
 
   //#########################################################################
   //# Initialisation
+  protected void register(final E item, final boolean isDefault)
+  {
+    register(item);
+    if (isDefault) {
+      mDefaultValue = item;
+    }
+  }
+
   protected void register(final E item)
   {
     mRegisteredElements.add(item);
   }
 
+  public void setDefaultValue(final E item)
+  {
+    mDefaultValue = item;
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.EnumFactory
+  @Override
   public List<E> getEnumConstants()
   {
     return Collections.unmodifiableList(mRegisteredElements);
+  }
+
+  @Override
+  public E getDefaultValue()
+  {
+    if (mDefaultValue == null) {
+      return super.getDefaultValue();
+    } else {
+      return mDefaultValue;
+    }
+  }
+
+  @Override
+  public void dumpEnumeration(final PrintStream stream, final int indent)
+  {
+    super.dumpEnumeration(stream, indent);
+    if (mDefaultValue != null) {
+      CommandLineArgument.doIndent(stream, indent);
+      stream.print("Default is: ");
+      stream.println(mDefaultValue);
+    }
   }
 
 
   //#########################################################################
   //# Data Members
   private final List<E> mRegisteredElements;
+  private E mDefaultValue;
 
 }

@@ -134,6 +134,9 @@ public class TRCompositionalConflictChecker
     super(model,
           ConflictKindTranslator.getInstanceControllable(),
           new NativeConflictChecker(ProductDESElementFactory.getInstance()));
+    setFailingEventsEnabled(true);
+    setSelfloopOnlyEventsEnabled(true);
+    setAlwaysEnabledEventsEnabled(true);
   }
 
 
@@ -205,7 +208,7 @@ public class TRCompositionalConflictChecker
         register(NB1);
         register(NB1w);
         register(NB2);
-        register(NB2w);
+        register(NB2w, true);
         register(NB3);
         register(NB3w);
         register(GNB);

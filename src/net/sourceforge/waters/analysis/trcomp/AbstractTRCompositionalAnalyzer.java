@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.analysis.trcomp;
 
-import gnu.trove.set.hash.THashSet;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -83,6 +81,8 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.apache.log4j.Logger;
+
+import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -228,7 +228,7 @@ public abstract class AbstractTRCompositionalAnalyzer
     return
       new ListedEnumFactory<TRPreselectionHeuristic>() {
       {
-        register(PRESEL_MustL);
+        register(PRESEL_MustL, true);
         register(PRESEL_MustSp);
         register(PRESEL_Pairs);
         register(PRESEL_MaxS);
@@ -274,7 +274,7 @@ public abstract class AbstractTRCompositionalAnalyzer
         register(SEL_MinSSp);
         register(SEL_MinS0);
         register(SEL_MinS0a);
-        register(SEL_MinSync);
+        register(SEL_MinSync, true);
         register(SEL_MinSyncA);
         register(SEL_MaxC);
         register(SEL_MaxL);
@@ -1706,7 +1706,7 @@ public abstract class AbstractTRCompositionalAnalyzer
   //#########################################################################
   //# Data Members
   // Configuration
-  private int mInternalStateLimit = Integer.MAX_VALUE;
+  private int mInternalStateLimit = 100000;
   private int mInternalTransitionLimit = Integer.MAX_VALUE;
   private boolean mBlockedEventsEnabled = true;
   private boolean mFailingEventsEnabled = false;
