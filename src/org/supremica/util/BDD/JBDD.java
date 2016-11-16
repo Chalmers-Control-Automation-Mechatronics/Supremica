@@ -17,9 +17,9 @@ package org.supremica.util.BDD;
 
 
 		This is a BDD Java interface for the two popular BDD
-		packages BuDDy and CUDD. This allows you to combain the
+		packages BuDDy and CUDD. This allows you to combine the
 		programmer-friend programming language of Java with the
-		efficient BDD packages writen in highly optimized C.
+		efficient BDD packages written in highly optimised C.
 
 
 		You can choose between BuDDy and CUDD at runtime.
@@ -55,19 +55,13 @@ class JBDD
 		}
 		catch (final UnsatisfiedLinkError ule)
 		{
-			System.err.println("DLL " + lib + " not in the path, trying user supplied directory");
-
 			try
 			{
 				final java.io.File f = new java.io.File(Options.extraLibPath, System.mapLibraryName(lib));
-
 				System.load(f.getAbsolutePath());
 			}
 			catch (final UnsatisfiedLinkError ule2)
 			{
-				System.err.println("Unable to load the DLL: " + ule2);
-				System.err.println("If you are using linux, this may be a GCC 3.x vs GCC 2.x issue :(");
-
 				throw ule2;
 			}
 		}
@@ -78,7 +72,7 @@ class JBDD
 	private static final int DEFAULT_VAR_COUNT = 64,
 							 DEFAULT_NODE_COUNT = 3 * 10000;    //
 
-	/** Supported dyanmic reorering method */
+	/** Supported dynamic reordering method */
 	public static final int REORDER_NONE = 0, REORDER_WIN2 = 1,
 							REORDER_WIN3 = 2, REORDER_SIFT = 3,
 							REORDER_RANDOM = 4;
