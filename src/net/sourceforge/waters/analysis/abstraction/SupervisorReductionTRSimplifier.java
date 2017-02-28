@@ -33,11 +33,6 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.iterator.TLongIterator;
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.set.hash.TIntHashSet;
-import gnu.trove.set.hash.TLongHashSet;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -57,15 +52,62 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
+import gnu.trove.iterator.TLongIterator;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.set.hash.TLongHashSet;
+
 
 /**
- * Transition relation simplifier that implements halfway synthesis.
+ * <P>A transition relation simplifier that implements the supervisor
+ * reduction algorithm.</P>
+ *
+ * <P>The supervisor reduction simplifier takes as input a transition
+ * relation representing a supervisor, and transforms it into a smaller
+ * supervisor that makes the same control decisions. Supervisor reduction
+ * is based on the observation that for each controllable event, there are
+ * states where it must be disabled and states where it must be enabled,
+ * while for other states it does not matter whether or not the supervisor
+ * enables the event because it is not possible in the plant.</P>
+ *
+ * <P>To distinguish these three possibilities, the supervisor reduction
+ * simplifier checks for each controllable event the states that
+ * have an outgoing transition with that event. If the transition's target
+ * state is the dump state, then the event must be enabled in the transition's
+ * source state; if the transition's target state is not the dump state,
+ * then the event must be enabled in the transition's source state. States
+ * without any transitions for a controllable event are assumed to be
+ * &quot;don't care&quot; and may be merged into enabling or disabling states
+ * during supervisor reduction.</P>
+ *
+ * <P>Supervisor reduction may be performed for all controllable events
+ * simultaneously, or for one controllable event only. The latter case
+ * is known as <I>supervisor localisation</I> and requires that that the
+ * supervisor reduction simplifier is invoked several times to create separate
+ * supervisors for each controllable event that needs to be disabled in at
+ * least one state.</P>
+ *
+ * <P>The result of this transition relation simplifier follows the same
+ * conventions as the input, i.e., disablement of a controllable event is
+ * indicated by the presence of a transition to the dump state. A pure
+ * supervisor automaton is obtained by deleting the dump state and
+ * associated transitions.</P>
+ *
+ * <P>
+ * <I>References.</I><BR>
+ * R. Su and W. Murray Wonham. Supervisor Reduction for Discrete-Event
+ * Systems. Discrete Event Dynamic Systems: Theory and Applications,
+ * <STRONG>14</STRONG>&nbsp;(1), 31-53, 2004.<BR>
+ * Kai Cai and W. M. Wonham. Supervisor Localization: A Top-Down Approach to
+ * Distributed Control of Discrete-Event Systems. IEEE Transactions on
+ * Automatic Control, <STRONG>55</STRONG>&nbsp;(3), 605-618, 2010.
+ * </P>
  *
  * @author Fangqian Qiu, Robi Malik
  */
 
-public class SupervisorReductionTRSimplifier extends
-  AbstractMarkingTRSimplifier
+public class SupervisorReductionTRSimplifier
+  extends AbstractMarkingTRSimplifier
 {
 
   //#########################################################################
@@ -78,6 +120,7 @@ public class SupervisorReductionTRSimplifier extends
   {
     super(rel);
   }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
@@ -93,14 +136,27 @@ public class SupervisorReductionTRSimplifier extends
     return false;
   }
 
+
   //#########################################################################
   //# Configuration
-  public void setRestrictedEvent(final int event)
+  /**
+   * Sets the controllable event to be enabled or disabled by the supervisor.
+   * If set, supervisor reduction will produce a localised supervisor
+   * controlling only this event. Otherwise all controllable events are
+   * subject to control.
+   * @param  event  The number of the controllable event to be enabled or
+   *                disabled by the supervisor; or -1 to control all events.
+   */
+  public void setSupervisedEvent(final int event)
   {
     mRestrictedEvent = event;
   }
 
-  public int getRestrictedEvent()
+  /**
+   * Gets the controllable event to be enabled or disabled by the supervisor.
+   * @see #setSupervisedEvent(int) setSupervisedEvent()
+   */
+  public int getSupervisedEvent()
   {
     return mRestrictedEvent;
   }
@@ -114,6 +170,7 @@ public class SupervisorReductionTRSimplifier extends
   {
     return mExperimentalMode;
   }
+
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
@@ -984,8 +1041,9 @@ public class SupervisorReductionTRSimplifier extends
     }
   }
 
+
   //#########################################################################
-  //# For Debugging
+  //# Debugging
   public int[] showClassList(final IntListBuffer classes, final int list)
   {
     final int[] array = classes.toArray(list);
@@ -999,6 +1057,7 @@ public class SupervisorReductionTRSimplifier extends
       System.out.println(mStateToClass[i]);
     }
   }
+
 
   //#########################################################################
   //# Data Members

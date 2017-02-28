@@ -649,7 +649,7 @@ public class CompositionalAutomataSynthesizer
         final int markingID = mTempEventEncoding.getEventCode(marking);
         mSupervisorSimplifier.setDefaultMarkingID(markingID);
         mSupervisorSimplifier.setTransitionRelation(rel);//set TR
-        mSupervisorSimplifier.setRestrictedEvent(-1);//set event
+        mSupervisorSimplifier.setSupervisedEvent(-1);//set event
         mSupervisorSimplifier.run();
         return mSupervisorSimplifier.getTransitionRelation();
       } catch (final OverflowException overflow) {

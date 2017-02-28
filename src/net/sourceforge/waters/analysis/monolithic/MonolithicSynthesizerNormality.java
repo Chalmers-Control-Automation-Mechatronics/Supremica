@@ -1068,7 +1068,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
         bisimulator.setTransitionLimit(getTransitionLimit());
         chain.add(bisimulator);
 
-        mSupervisorSimplifier.setRestrictedEvent(e);
+        mSupervisorSimplifier.setSupervisedEvent(e);
 
         chain.add(mSupervisorSimplifier);
         chain.setTransitionRelation(copy);

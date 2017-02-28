@@ -678,7 +678,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           bisimulator.setTransitionLimit(getTransitionLimit());
           chain.add(bisimulator);
 
-          mSupervisorSimplifier.setRestrictedEvent(-1);
+          mSupervisorSimplifier.setSupervisedEvent(-1);
 
           chain.add(mSupervisorSimplifier);
           chain.setTransitionRelation(mTransitionRelation);
@@ -936,7 +936,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
         bisimulator.setTransitionLimit(getTransitionLimit());
         chain.add(bisimulator);
 
-        mSupervisorSimplifier.setRestrictedEvent(e);
+        mSupervisorSimplifier.setSupervisedEvent(e);
 
         chain.add(mSupervisorSimplifier);
         chain.setTransitionRelation(copy);
