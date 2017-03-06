@@ -55,8 +55,7 @@ public class ChainTRSimplifier
 
   public ChainTRSimplifier(final List<TransitionRelationSimplifier> steps)
   {
-    mIsPartitioning = true;
-    mSteps = new LinkedList<TransitionRelationSimplifier>();
+    this();
     for (final TransitionRelationSimplifier step : steps) {
       add(step);
     }

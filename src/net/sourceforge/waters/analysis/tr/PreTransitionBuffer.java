@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.list.array.TIntArrayList;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -43,6 +41,8 @@ import java.util.List;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
 import net.sourceforge.waters.model.des.AutomatonTools;
+
+import gnu.trove.list.array.TIntArrayList;
 
 
 /**
@@ -128,37 +128,14 @@ public class PreTransitionBuffer
 
   //#########################################################################
   //# Storing Transitions
+  public void addIncomingTransitions(final ListBufferTransitionRelation rel)
+  {
+    addTransitions(rel, ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+  }
+
   public void addOutgoingTransitions(final ListBufferTransitionRelation rel)
   {
-    close();
-    final TIntArrayList states = new TIntArrayList(mMaxFanout);
-    final int size = (mBlocks.size() - 1) * BLOCK_SIZE + mCurrentOffset + 1;
-    int[] block = null;
-    int blockno = 0;
-    int offset = BLOCK_SIZE;
-    int pos = 0;
-    while (pos < size) {
-      if (offset >= BLOCK_SIZE) {
-        block = mBlocks.get(blockno++);
-        offset = 0;
-      }
-      final int key = block[offset++];
-      int state;
-      do {
-        if (offset >= BLOCK_SIZE) {
-          block = mBlocks.get(blockno++);
-          offset = 0;
-        }
-        state = block[offset++];
-        states.add(state & ~TAG_END);
-      } while ((state & TAG_END) == 0);
-      final int from = key >>> mStateShift;
-      final int event = key & mEventMask;
-      states.sort();
-      rel.addTransitions(from, event, states);
-      pos += 1 + states.size();
-      states.clear();
-    }
+    addTransitions(rel, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
   }
 
 
@@ -189,6 +166,43 @@ public class PreTransitionBuffer
     mCurrentState = -1;
   }
 
+  private void addTransitions(final ListBufferTransitionRelation rel,
+                              final int config)
+  {
+    close();
+    final TIntArrayList states = new TIntArrayList(mMaxFanout);
+    final int size = (mBlocks.size() - 1) * BLOCK_SIZE + mCurrentOffset + 1;
+    int[] block = null;
+    int blockno = 0;
+    int offset = BLOCK_SIZE;
+    int pos = 0;
+    while (pos < size) {
+      if (offset >= BLOCK_SIZE) {
+        block = mBlocks.get(blockno++);
+        offset = 0;
+      }
+      final int key = block[offset++];
+      int state;
+      do {
+        if (offset >= BLOCK_SIZE) {
+          block = mBlocks.get(blockno++);
+          offset = 0;
+        }
+        state = block[offset++];
+        states.add(state & ~TAG_END);
+      } while ((state & TAG_END) == 0);
+      final int from = key >>> mStateShift;
+      final int event = key & mEventMask;
+      states.sort();
+      if (config == ListBufferTransitionRelation.CONFIG_SUCCESSORS) {
+        rel.addTransitions(from, event, states);
+      } else {
+        rel.addTransitions(states, event, from);
+      }
+      pos += 1 + states.size();
+      states.clear();
+    }
+  }
 
   //#########################################################################
   //# Debugging

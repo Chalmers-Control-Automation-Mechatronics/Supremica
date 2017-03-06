@@ -41,6 +41,7 @@ import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -100,30 +101,23 @@ public abstract class AbstractTRSimplifierTest
   //#########################################################################
   //# Test Cases
   /**
-   * <P>
-   * Tests the model in file {supremica}/examples/waters/tests/abstraction/
-   * empty_1.wmod.
-   * </P>
+   * <P>Tests the model in file {supremica}/examples/waters/tests/abstraction/
+   * empty_1.wmod.</P>
    *
-   * <P>
-   * All test modules contain up to two automata, named "before" and "after".
+   * <P>All test modules contain up to two automata, named "before" and "after".
    * The automaton named "before" is required to be present, and defines the
    * input automaton for the abstraction rule. The automaton "after" defines the
    * expected result of abstraction. It may be missing, in which case the
    * abstraction should have no effect and return the unchanged input automaton
-   * (the test expects the same object, not an identical copy).
-   * </P>
+   * (the test expects the same object, not an identical copy).</P>
    *
-   * <P>
-   * The names of critical events are expected to be "tau", ":alpha", and
-   * ":accepting", respectively.
-   * </P>
+   * <P>The names of critical events are expected to be "tau", ":alpha", and
+   * ":accepting", respectively. In addition, a state called ":dump" is set
+   * to be the dump state of the input transition relation.</P>
    *
-   * <P>
-   * After running the test, any automaton created by the rule is saved in
+   * <P>After running the test, any automaton created by the rule is saved in
    * {supremica}/logs/results/analysis/op/{classname} as a .des file
-   * (for text viewing) and as a .wmod file (to load into the IDE).
-   * </P>
+   * (for text viewing) and as a .wmod file (to load into the IDE).</P>
    */
   public void test_empty_1() throws Exception
   {
@@ -370,7 +364,7 @@ public abstract class AbstractTRSimplifierTest
    * Creates an instance of the transition simplifier to be tested.
    */
   protected abstract TransitionRelationSimplifier
-    createTransitionRelationSimplifier();
+    createTransitionRelationSimplifier() throws AnalysisException;
 
   /**
    * Creates an event encoding for use with the given product DES and

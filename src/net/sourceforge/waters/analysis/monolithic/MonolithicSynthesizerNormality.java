@@ -48,7 +48,7 @@ import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SpecialEventsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SubsetConstructionTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.SupervisorReductionTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.SuWonhamSupervisorReductionTRSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntArrayHashingStrategy;
@@ -481,7 +481,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
     mFinalStateExplorer =
       new FinalStateExplorer(eventAutomata, transitions, ndTuple3,
                              EventEncoding.NONTAU, mNumProperEvents - 1);
-    mSupervisorSimplifier = new SupervisorReductionTRSimplifier();
+    mSupervisorSimplifier = new SuWonhamSupervisorReductionTRSimplifier();
     mDisabledEvents = new THashSet<>();
   }
 
@@ -1642,7 +1642,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
   private FinalStateExplorer mFinalStateExplorer;
   private ListBufferTransitionRelation mTransitionRelation;
 
-  private SupervisorReductionTRSimplifier mSupervisorSimplifier;
+  private SuWonhamSupervisorReductionTRSimplifier mSupervisorSimplifier;
 
   private int mNumGoodStates;
   private BitSet mGoodStates;

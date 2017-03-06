@@ -33,15 +33,14 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.set.hash.TIntHashSet;
-
 import java.util.Random;
 
+import net.sourceforge.waters.junit.AbstractWatersTest;
+
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
 import junit.framework.Test;
 import junit.framework.TestSuite;
-
-import net.sourceforge.waters.junit.AbstractWatersTest;
 
 
 /**
@@ -232,6 +231,24 @@ public class IntSetBufferTest extends AbstractWatersTest
       for (int i = 0; i < count; i++) {
         assertEquals("Unexpected data at position " + i + " in array!",
                      i + 1, gotten[i]);
+      }
+    }
+  }
+
+  public void testContains()
+  {
+    final int MAXCOUNT = 100;
+    final IntSetBuffer buffer = new IntSetBuffer(MAXCOUNT + 1);
+    final TIntArrayList list = new TIntArrayList(MAXCOUNT >> 2);
+    for (int size = 2; size <= MAXCOUNT; size <<= 1) {
+      list.clear();
+      for (int i = 1; i < size; i += 2) {
+        list.add(i);
+      }
+      final int set = buffer.add(list);
+      for (int i = 0; i <= size; i++) {
+        assertEquals("Unexpected result from containment test!",
+                     i % 2 != 0, buffer.contains(set, i));
       }
     }
   }

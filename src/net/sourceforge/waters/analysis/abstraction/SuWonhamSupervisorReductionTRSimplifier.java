@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -59,39 +59,14 @@ import gnu.trove.set.hash.TLongHashSet;
 
 
 /**
- * <P>A transition relation simplifier that implements the supervisor
- * reduction algorithm.</P>
+ * <P>A transition relation simplifier that implements the Su/Wonham
+ * supervisor reduction algorithm.</P>
  *
- * <P>The supervisor reduction simplifier takes as input a transition
- * relation representing a supervisor, and transforms it into a smaller
- * supervisor that makes the same control decisions. Supervisor reduction
- * is based on the observation that for each controllable event, there are
- * states where it must be disabled and states where it must be enabled,
- * while for other states it does not matter whether or not the supervisor
- * enables the event because it is not possible in the plant.</P>
- *
- * <P>To distinguish these three possibilities, the supervisor reduction
- * simplifier checks for each controllable event the states that
- * have an outgoing transition with that event. If the transition's target
- * state is the dump state, then the event must be enabled in the transition's
- * source state; if the transition's target state is not the dump state,
- * then the event must be enabled in the transition's source state. States
- * without any transitions for a controllable event are assumed to be
- * &quot;don't care&quot; and may be merged into enabling or disabling states
- * during supervisor reduction.</P>
- *
- * <P>Supervisor reduction may be performed for all controllable events
- * simultaneously, or for one controllable event only. The latter case
- * is known as <I>supervisor localisation</I> and requires that that the
- * supervisor reduction simplifier is invoked several times to create separate
- * supervisors for each controllable event that needs to be disabled in at
- * least one state.</P>
- *
- * <P>The result of this transition relation simplifier follows the same
- * conventions as the input, i.e., disablement of a controllable event is
- * indicated by the presence of a transition to the dump state. A pure
- * supervisor automaton is obtained by deleting the dump state and
- * associated transitions.</P>
+ * <P>This supervisor reduction simplifier supports the classical
+ * supervisor reduction algorithm by Su and Wonham (2004), as well as
+ * its localised version by Cai and Wonham (2010). The latter is obtained
+ * by configuring the supervised event and invoking supervisor reduction
+ * once for each controllable event.</P>
  *
  * <P>
  * <I>References.</I><BR>
@@ -106,17 +81,17 @@ import gnu.trove.set.hash.TLongHashSet;
  * @author Fangqian Qiu, Robi Malik
  */
 
-public class SupervisorReductionTRSimplifier
-  extends AbstractMarkingTRSimplifier
+public class SuWonhamSupervisorReductionTRSimplifier
+  extends AbstractSupervisorReductionTRSimplifier
 {
 
   //#########################################################################
   //# Constructors
-  public SupervisorReductionTRSimplifier() throws AnalysisException
+  public SuWonhamSupervisorReductionTRSimplifier() throws AnalysisException
   {
   }
 
-  public SupervisorReductionTRSimplifier(final ListBufferTransitionRelation rel)
+  public SuWonhamSupervisorReductionTRSimplifier(final ListBufferTransitionRelation rel)
   {
     super(rel);
   }
@@ -130,37 +105,9 @@ public class SupervisorReductionTRSimplifier
     return ListBufferTransitionRelation.CONFIG_ALL;
   }
 
-  @Override
-  public boolean isObservationEquivalentAbstraction()
-  {
-    return false;
-  }
-
 
   //#########################################################################
   //# Configuration
-  /**
-   * Sets the controllable event to be enabled or disabled by the supervisor.
-   * If set, supervisor reduction will produce a localised supervisor
-   * controlling only this event. Otherwise all controllable events are
-   * subject to control.
-   * @param  event  The number of the controllable event to be enabled or
-   *                disabled by the supervisor; or -1 to control all events.
-   */
-  public void setSupervisedEvent(final int event)
-  {
-    mRestrictedEvent = event;
-  }
-
-  /**
-   * Gets the controllable event to be enabled or disabled by the supervisor.
-   * @see #setSupervisedEvent(int) setSupervisedEvent()
-   */
-  public int getSupervisedEvent()
-  {
-    return mRestrictedEvent;
-  }
-
   public void setExperimentalMode(final boolean experimentalMode)
   {
     mExperimentalMode = experimentalMode;
@@ -191,7 +138,8 @@ public class SupervisorReductionTRSimplifier
       if (findBadStates()) {
         final TIntArrayList enabDisabEvents = new TIntArrayList();
         final TIntArrayList disabEvents = new TIntArrayList();
-        if (mRestrictedEvent < 0) {
+        final int supervisedEvent = getSupervisedEvent();
+        if (supervisedEvent < 0) {
           // monolithic supervisor reduction
           setUpClasses();
           setUpEventList(enabDisabEvents, disabEvents);
@@ -201,9 +149,9 @@ public class SupervisorReductionTRSimplifier
             partition = reduceSupervisor(enabDisabEvents);
           }
         } else {
-          // supervisor localization
+          // supervisor localisation
           final TIntArrayList singletonList = new TIntArrayList(1);
-          singletonList.add(mRestrictedEvent);
+          singletonList.add(supervisedEvent);
           if (mExperimentalMode) {
             final ListBufferTransitionRelation rel = getTransitionRelation();
             final int numStates = rel.getNumberOfStates();
@@ -1064,7 +1012,6 @@ public class SupervisorReductionTRSimplifier
   private int mNumProperEvents;
   private int mBadStateIndex;
   private int mNumBadStates;
-  private int mRestrictedEvent;
   private int[] mStateToClass;
   private IntListBuffer mClasses;
   private int[] mShadowStateToClass;

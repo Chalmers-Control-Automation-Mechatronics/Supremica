@@ -44,7 +44,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.abstraction.HalfWaySynthesisTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.SupervisorReductionTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.SuWonhamSupervisorReductionTRSimplifier;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
@@ -325,7 +325,7 @@ public class CompositionalAutomataSynthesizer
   {
     mDistinguisherInfoList = new LinkedList<DistinguisherInfo>();
     mBackRenaming = new HashMap<EventProxy,EventProxy>();
-    mSupervisorSimplifier = new SupervisorReductionTRSimplifier();
+    mSupervisorSimplifier = new SuWonhamSupervisorReductionTRSimplifier();
     mHalfwaySimplifier = new HalfWaySynthesisTRSimplifier();
     mHalfwaySimplifier.setOutputMode
       (HalfWaySynthesisTRSimplifier.OutputMode.PSEUDO_SUPERVISOR);
@@ -1192,7 +1192,7 @@ public class CompositionalAutomataSynthesizer
   private final boolean mReduceIncrementally = false;
   private String mSupervisorNamePrefix = "sup:";
 
-  private SupervisorReductionTRSimplifier mSupervisorSimplifier;
+  private SuWonhamSupervisorReductionTRSimplifier mSupervisorSimplifier;
   private HalfWaySynthesisTRSimplifier mHalfwaySimplifier;
   private List<DistinguisherInfo> mDistinguisherInfoList;
   /**
