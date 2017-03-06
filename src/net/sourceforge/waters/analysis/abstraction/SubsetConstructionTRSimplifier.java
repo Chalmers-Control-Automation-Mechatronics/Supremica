@@ -130,7 +130,7 @@ public class SubsetConstructionTRSimplifier
   /**
    * <P>Gets whether dump states are pruned during subset construction.</P>
    *
-   * <P>If set to <CODE>true</CODE>, and state set encountered during subset
+   * <P>If set to <CODE>true</CODE>, any state set encountered during subset
    * construction, which includes the dump state of the input transition
    * relation, will be replaced by a dump state in the output transition
    * relation, and no exploration will happen beyond these states.</P>
@@ -286,6 +286,7 @@ public class SubsetConstructionTRSimplifier
       states:
       for (int source = 0; source < mSetOffsets.size(); source++) {
         final int set = mSetOffsets.get(source);
+        events:
         for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
           checkAbort();
           iter.reset(set);
@@ -319,7 +320,7 @@ public class SubsetConstructionTRSimplifier
                   createDumpState();
                   mTransitionBuffer.addTransition(source, e, mDumpStateIndex);
                   current.clear();
-                  break;
+                  continue events;
                 }
                 current.add(target);
               }
