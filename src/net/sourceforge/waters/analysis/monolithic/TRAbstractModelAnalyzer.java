@@ -33,10 +33,6 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -69,10 +65,19 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.EventKind;
 
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+
 
 /**
- * A Java implementation of the monolithic synchronous product algorithm,
- * based on {@link ListBufferTransitionRelation} as automaton representation.
+ * <P>An abstract base class for monolithic model analysers that use
+ * {@link ListBufferTransitionRelation} as their automata representation.</P>
+ *
+ * <P>The base class supports the automatic conversion of general automata
+ * ({@link AutomatonProxy}) to transition-relation based ({@link
+ * TRAutomatonProxy}) objects when needed, and contains general support
+ * to store the synchronous product state space and expand state tuples.</P>
  *
  * @author Robi Malik
  */

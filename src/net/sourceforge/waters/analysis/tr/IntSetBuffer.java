@@ -350,6 +350,33 @@ public class IntSetBuffer implements WatersIntHashingStrategy
   }
 
   /**
+   * Determines whether two sets in this buffer have a non-empty intersection.
+   * @param  set1    The unique index of the first set to be compared.
+   * @param  set2    The unique index of the second set to be compared.
+   * @return <CODE>true</CODE> if the indicated sets have at least
+   *         one common element, <CODE>false</CODE> otherwise.
+   */
+  public boolean intersects(final int set1, final int set2)
+  {
+    final IntSetIterator iter1 = iterator(set1);
+    final IntSetIterator iter2 = iterator(set2);
+    boolean more1 = iter1.advance();
+    boolean more2 = iter2.advance();
+    while (more1 && more2) {
+      final int elem1 = iter1.getCurrentData();
+      final int elem2 = iter2.getCurrentData();
+      if (elem1 < elem2) {
+        more1 = iter1.advance();
+      } else if (elem2 < elem1) {
+        more2 = iter2.advance();
+      } else {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Returns an iterator that can be used to iterate over the individual
    * sets in this buffer. The iterator returned by this method is not
    * initialised, so its {@link IntSetIterator#reset(int) reset()} method

@@ -54,13 +54,12 @@ import gnu.trove.set.hash.TLongHashSet;
  */
 
 public class ReverseLanguageStep3TRSimplifier
-  extends AbstractSupervisorReductionTRSimplifier
+  extends AbstractMarkingTRSimplifier
 {
 
   //#########################################################################
   //# Constructors
   public ReverseLanguageStep3TRSimplifier()
-    throws AnalysisException
   {
   }
 
@@ -120,6 +119,7 @@ public class ReverseLanguageStep3TRSimplifier
   {
     return mStateLimit;
   }
+
 
   //#########################################################################
   //# Overrides for
@@ -207,21 +207,19 @@ public class ReverseLanguageStep3TRSimplifier
         advance2 = mTransitionIterator2.advance();
       } else if (e1 < e2) {
         final byte status2 = mOriginalSupervisor.getProperEventStatus(e1);
-        if (EventStatus.isUsedEvent(status2)) {
-          advance1 = mTransitionIterator1.advance();
-        } else {
+        if (!EventStatus.isUsedEvent(status2)) {
           final int t1 = mTransitionIterator1.getCurrentTargetState();
           createPair(t1, s2);
         }
+        advance1 = mTransitionIterator1.advance();
       } else {
         final byte status1 = rel.getProperEventStatus(e2);
-        if (EventStatus.isUsedEvent(status1)) {
-          advance2 = mTransitionIterator2.advance();
-        } else {
+        if (!EventStatus.isUsedEvent(status1)) {
           final int t2 = mTransitionIterator2.getCurrentTargetState();
           recordTransition(s1, e2);
           createPair(s1, t2);
         }
+        advance2 = mTransitionIterator2.advance();
       }
     }
   }

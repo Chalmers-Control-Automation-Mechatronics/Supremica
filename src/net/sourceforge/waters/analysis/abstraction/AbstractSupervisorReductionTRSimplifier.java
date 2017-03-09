@@ -34,7 +34,6 @@
 package net.sourceforge.waters.analysis.abstraction;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-import net.sourceforge.waters.model.analysis.AnalysisException;
 
 
 /**
@@ -81,7 +80,7 @@ public abstract class AbstractSupervisorReductionTRSimplifier
 
   //#########################################################################
   //# Constructors
-  public AbstractSupervisorReductionTRSimplifier() throws AnalysisException
+  public AbstractSupervisorReductionTRSimplifier()
   {
   }
 
@@ -122,6 +121,63 @@ public abstract class AbstractSupervisorReductionTRSimplifier
   public int getSupervisedEvent()
   {
     return mSupervisedEvent;
+  }
+
+  /**
+   * Sets the state limit. The states limit specifies the maximum
+   * number of states that will be created. The default for supervisor
+   * reduction is <STRONG>not</STRONG> to support state limits, but
+   * this behaviour may be overridden by subclasses.
+   * @param limit
+   *          The new state limit, or {@link Integer#MAX_VALUE} to allow
+   *          an unlimited number of states.
+   */
+  public void setStateLimit(final int limit)
+  {
+  }
+
+  /**
+   * Gets the state limit.
+   * @see #setStateLimit(int) setStateLimit()
+   */
+  public int getStateLimit()
+  {
+    return Integer.MAX_VALUE;
+  }
+
+  /**
+   * Sets the transition limit. The transition limit specifies the maximum
+   * number of transitions that will be created. The default for supervisor
+   * reduction is <STRONG>not</STRONG> to support transition limits, but
+   * this behaviour may be overridden by subclasses.
+   * @param limit
+   *          The new transition limit, or {@link Integer#MAX_VALUE} to allow
+   *          an unlimited number of transitions.
+   */
+  public void setTransitionLimit(final int limit)
+  {
+  }
+
+  /**
+   * Gets the transition limit.
+   * @see #setTransitionLimit(int) setTransitionLimit()
+   */
+  public int getTransitionLimit()
+  {
+    return Integer.MAX_VALUE;
+  }
+
+
+  //#########################################################################
+  //# Specific Access
+  public boolean isSupervisedEventRequired()
+  {
+    return false;
+  }
+
+  public boolean isMinimizationIncluded()
+  {
+    return false;
   }
 
 

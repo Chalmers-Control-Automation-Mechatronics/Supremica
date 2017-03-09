@@ -2733,6 +2733,29 @@ public class ListBufferTransitionRelation implements EventStatusProvider
   }
 
   /**
+   * Removes all transitions to the dump state.
+   * This method removes all transitions to the transition relation's
+   * designated dump state, and marks the dump state as unreachable.
+   * @return <CODE>true</CODE> if at least one transition was removed,
+   *         <CODE>false</CODE> otherwise.
+   * @see #getDumpStateIndex()
+   */
+  public boolean removeDumpStateTransitions()
+  {
+    final int dump = getDumpStateIndex();
+    final TransitionIterator iter = createAllTransitionsModifyingIterator();
+    boolean removed = false;
+    while (iter.advance()) {
+      if (iter.getCurrentTargetState() == dump) {
+        iter.remove();
+        removed = true;
+      }
+    }
+    setReachable(dump, false);
+    return removed;
+  }
+
+  /**
    * Ensures all propositions are marked as used. All propositions marked
    * as unused are marked as used and added to all states by this method.
    * @return <CODE>true</CODE> if at least one proposition was changed,

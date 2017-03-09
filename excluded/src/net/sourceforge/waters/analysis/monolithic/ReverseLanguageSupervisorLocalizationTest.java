@@ -33,36 +33,33 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
+import net.sourceforge.waters.analysis.abstraction.ReverseLanguageSupervisorReductionTRSimplifier;
 import net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
-public class MonolithicReductionPlusLocalizationTest extends
-  AbstractSupervisorSynthesizerTest
+
+public class ReverseLanguageSupervisorLocalizationTest
+  extends AbstractSupervisorSynthesizerTest
 {
 
   //#########################################################################
-  //# To be Provided by Subclasses
-  /**
-   * Creates an instance of the synthesiser under test. This method
-   * instantiates the class of the synthesiser tested by the particular
-   * subclass of this test, and configures it as needed.
-   * @param factory
-   *          The factory used by the synthesiser to create its output.
-   * @return An instance of the synthesiser.
-   */
+  //# Overrides for
+  //# net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest
   @Override
   protected SupervisorSynthesizer createSynthesizer
     (final ProductDESProxyFactory factory)
   {
     final MonolithicSynthesizer synthesizer =
       new MonolithicSynthesizer(factory);
-    synthesizer.setSupervisorReductionEnabled(true);
-    synthesizer.setSupervisorLocalizationEnabled(true);
+    final ReverseLanguageSupervisorReductionTRSimplifier simplifier =
+      new ReverseLanguageSupervisorReductionTRSimplifier();
+    simplifier.setStateLimit(25000);
+    simplifier.setEnablingSupervisor(false);
+    synthesizer.setSupervisorReductionSimplifier(simplifier);
     return synthesizer;
   }
 
@@ -72,7 +69,7 @@ public class MonolithicReductionPlusLocalizationTest extends
   public static Test suite()
   {
     final TestSuite testSuite =
-      new TestSuite(MonolithicReductionPlusLocalizationTest.class);
+      new TestSuite(ReverseLanguageSupervisorLocalizationTest.class);
     return testSuite;
   }
 

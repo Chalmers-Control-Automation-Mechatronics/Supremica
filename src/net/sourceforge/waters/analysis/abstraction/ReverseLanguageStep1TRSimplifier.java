@@ -42,12 +42,14 @@ import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.InvalidModelException;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.OverflowKind;
 import net.sourceforge.waters.model.analysis.des.NondeterministicDESException;
 import net.sourceforge.waters.model.base.ProxyTools;
 
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.list.array.TLongArrayList;
 import gnu.trove.map.hash.TLongIntHashMap;
+import gnu.trove.set.hash.TIntHashSet;
 
 
 /**
@@ -66,7 +68,6 @@ public class ReverseLanguageStep1TRSimplifier
   //#########################################################################
   //# Constructors
   public ReverseLanguageStep1TRSimplifier()
-    throws AnalysisException
   {
   }
 
@@ -111,6 +112,7 @@ public class ReverseLanguageStep1TRSimplifier
    *          The new state limit, or {@link Integer#MAX_VALUE} to allow
    *          an unlimited number of states.
    */
+  @Override
   public void setStateLimit(final int limit)
   {
     mStateLimit = limit;
@@ -120,6 +122,7 @@ public class ReverseLanguageStep1TRSimplifier
    * Gets the state limit.
    * @see #setStateLimit(int) setStateLimit()
    */
+  @Override
   public int getStateLimit()
   {
     return mStateLimit;
@@ -132,6 +135,7 @@ public class ReverseLanguageStep1TRSimplifier
    *          The new transition limit, or {@link Integer#MAX_VALUE} to allow
    *          an unlimited number of transitions.
    */
+  @Override
   public void setTransitionLimit(final int limit)
   {
     mTransitionLimit = limit;
@@ -141,9 +145,20 @@ public class ReverseLanguageStep1TRSimplifier
    * Gets the transition limit.
    * @see #setTransitionLimit(int) setTransitionLimit()
    */
+  @Override
   public int getTransitionLimit()
   {
     return mTransitionLimit;
+  }
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.analysis.abstraction.
+  //# AbstractSupervisorReductionTRSimplifier
+  @Override
+  public boolean isSupervisedEventRequired()
+  {
+    return true;
   }
 
 
@@ -188,6 +203,7 @@ public class ReverseLanguageStep1TRSimplifier
     mPairList = new TLongArrayList(numStates);
     mPairMap = new TLongIntHashMap(numStates, 0.5f, -1, -1);
     mPreTransitionBuffer = new PreTransitionBuffer(numEvents, mTransitionLimit);
+    mEnablingPairIndices = new TIntHashSet(numStates);
     mEnablingList = new TIntArrayList(numStates);
     mDisablingList = new TIntArrayList(numStates);
     mSetIterator = mSetBuffer.iterator();
@@ -204,6 +220,7 @@ public class ReverseLanguageStep1TRSimplifier
     }
     mFullSetIndex = mSetBuffer.add(mEnablingList);
     mEnablingList.clear();
+    mEnablingFakePair = mDisablingFakePair = -1;
   }
 
   @Override
@@ -233,7 +250,8 @@ public class ReverseLanguageStep1TRSimplifier
 
   //#########################################################################
   //# Algorithm
-  private int createInitialPair()
+  private void createInitialPair()
+    throws OverflowException
   {
     mEnablingList.clear();
     mDisablingList.clear();
@@ -250,8 +268,7 @@ public class ReverseLanguageStep1TRSimplifier
         mEnablingList.add(source);
       }
     }
-    mDecisivePair = createPair(mEnablingList, mDisablingList);
-    return mDecisivePair;
+    createPair(mEnablingList, mDisablingList);
   }
 
   private void expandPair(final int targetPairIndex)
@@ -264,10 +281,7 @@ public class ReverseLanguageStep1TRSimplifier
     final int disablingIndex = (int) (pair >> 32);
     if (mSetBuffer.size(enablingIndex) == 0 ||
         mSetBuffer.size(disablingIndex) == 0) {
-      checkAbort();
-      for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
-        mPreTransitionBuffer.addTransition(targetPairIndex, e, targetPairIndex);
-      }
+      addSelfloops(targetPairIndex);
     } else {
       for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
         checkAbort();
@@ -276,6 +290,9 @@ public class ReverseLanguageStep1TRSimplifier
         final int sourcePairIndex = createPair(mEnablingList, mDisablingList);
         if (sourcePairIndex >= 0) {
           mPreTransitionBuffer.addTransition(targetPairIndex, e, sourcePairIndex);
+          if (e == getSupervisedEvent()) {
+            mEnablingPairIndices.add(sourcePairIndex);
+          }
           mEnablingList.clear();
           mDisablingList.clear();
         }
@@ -301,6 +318,7 @@ public class ReverseLanguageStep1TRSimplifier
 
   private int createPair(final TIntArrayList enablingList,
                          final TIntArrayList disablingList)
+    throws OverflowException
   {
     final long enablingIndex, disablingIndex;
     if (enablingList.isEmpty()) {
@@ -329,45 +347,131 @@ public class ReverseLanguageStep1TRSimplifier
     final int next = mPairList.size();
     int index = mPairMap.putIfAbsent(pair, next);
     if (index < 0) {
-      index = next;
-      mPairList.add(pair);
+      if (next < mStateLimit) {
+        index = next;
+        mPairList.add(pair);
+      } else {
+        throw new OverflowException(OverflowKind.STATE, mStateLimit);
+      }
     }
     return index;
   }
 
   private void createPairsTR()
-    throws OverflowException
+    throws AnalysisException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    final int numStates = mPairList.size();
-    final int numTrans = mPreTransitionBuffer.size();
-    rel.reset(numStates, numTrans,
-              ListBufferTransitionRelation.CONFIG_PREDECESSORS);
     final int numProps = rel.getNumberOfPropositions();
-    final int defaultMarking = getDefaultMarkingID();
-    for (int p = 0; p < numProps; p++) {
-      rel.setPropositionUsed(p, p == defaultMarking);
-    }
-    final int dump = rel.getDumpStateIndex();
-    for (int s = 0; s < numStates; s++) {
-      final long pair = mPairList.get(s);
-      final int set;
-      if (mEnablingSupervisor) {
-        set = (int) (pair & 0xffffffffL);
-      } else {
-        set = (int) (pair >> 32);
+    final int numStates = mPairList.size();
+    if (numStates == 0) {
+      rel.reset(1, 0, ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+      rel.setInitial(1, true);
+      for (int p = 0; p < numProps; p++) {
+        rel.setPropositionUsed(p, false);
       }
-      if (set == mFullSetIndex || mSetBuffer.contains(set, mInitialState)) {
-        rel.setInitial(s, true);
+      final int numEvents = rel.getNumberOfProperEvents();
+      for (int e = 0; e < numEvents; e++) {
+        final byte status = rel.getProperEventStatus(e);
+        rel.setProperEventStatus(e, status | EventStatus.STATUS_UNUSED);
       }
-      if (s != dump) {
+    } else {
+      addSupervisedTransitions();
+      assert mDisablingFakePair > 0;
+      final int numTrans = mPreTransitionBuffer.size();
+      rel.reset(mDisablingFakePair + 1, mDisablingFakePair, numTrans,
+                ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+      final int defaultMarking = getDefaultMarkingID();
+      for (int p = 0; p < numProps; p++) {
+        rel.setPropositionUsed(p, p == defaultMarking);
+      }
+      for (int s = 0; s < numStates; s++) {
+        final long pair = mPairList.get(s);
+        final int set;
+        if (mEnablingSupervisor) {
+          set = (int) (pair & 0xffffffffL);
+        } else {
+          set = (int) (pair >>> 32);
+        }
+        if (set == mFullSetIndex || mSetBuffer.contains(set, mInitialState)) {
+          rel.setInitial(s, true);
+        }
         rel.setMarked(s, defaultMarking, true);
       }
+      if (mEnablingFakePair >= 0) {
+        rel.setMarked(mEnablingFakePair, defaultMarking, true);
+      }
+      mPreTransitionBuffer.addIncomingTransitions(rel);
     }
-    mPreTransitionBuffer.addIncomingTransitions(rel);
-    if (!mEnablingSupervisor) {
-      final int event = getSupervisedEvent();
-      rel.addTransition(mDecisivePair, event, dump);
+  }
+
+  private void addSupervisedTransitions()
+    throws AnalysisException
+  {
+    final int numPairs = mPairList.size();
+    final long criticalPair = mPairList.get(0);
+    if (mEnablingSupervisor) {
+      final int disablingSet = (int) (criticalPair >>> 32);
+      createEnablingTransition(0);
+      for (int p = 1; p < numPairs; p++) {
+        final long pair = mPairList.get(p);
+        final int set = (int) (pair & 0xffffffff);
+        if (set != mFullSetIndex && mSetBuffer.intersects(set, disablingSet)) {
+          createDisablingTransition(p);
+        }
+      }
+    } else {
+      final int enablingSet = (int) (criticalPair & 0xffffffff);
+      for (int p = 1; p < numPairs; p++) {
+        final long pair = mPairList.get(p);
+        final int set = (int) (pair >>> 32);
+        if (set != mFullSetIndex && mSetBuffer.intersects(set, enablingSet)) {
+          createEnablingTransition(p);
+        }
+      }
+      createDisablingTransition(0);
+    }
+  }
+
+  private void createDisablingTransition(final int p)
+    throws AnalysisException
+  {
+    checkAbort();
+    if (mDisablingFakePair < 0) {
+      if (mEnablingFakePair >= 0) {
+        mDisablingFakePair = mEnablingFakePair + 1;
+      } else {
+        mDisablingFakePair = mPairList.size();
+      }
+    }
+    final int e = getSupervisedEvent();
+    mPreTransitionBuffer.addTransition(mDisablingFakePair, e, p);
+  }
+
+  private void createEnablingTransition(final int p)
+    throws AnalysisException
+  {
+    if (!mEnablingPairIndices.contains(p)) {
+      if (mEnablingFakePair < 0) {
+        mEnablingFakePair = mPairList.size();
+        addSelfloops(mEnablingFakePair);
+      }
+      checkAbort();
+      final int e = getSupervisedEvent();
+      mPreTransitionBuffer.addTransition(mEnablingFakePair, e, p);
+    }
+  }
+
+  private void addSelfloops(final int p)
+    throws AnalysisException
+  {
+    checkAbort();
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final int numEvents = rel.getNumberOfProperEvents();
+    for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+      final byte status = rel.getProperEventStatus(e);
+      if (EventStatus.isUsedEvent(status)) {
+        mPreTransitionBuffer.addTransition(p, e, p);
+      }
     }
   }
 
@@ -382,13 +486,15 @@ public class ReverseLanguageStep1TRSimplifier
   private TLongArrayList mPairList;
   private TLongIntHashMap mPairMap;
   private PreTransitionBuffer mPreTransitionBuffer;
+  private TIntHashSet mEnablingPairIndices;
 
   private TIntArrayList mEnablingList;
   private TIntArrayList mDisablingList;
   private IntSetBuffer.IntSetIterator mSetIterator;
   private TransitionIterator mPredecessorsIterator;
-  private int mDecisivePair;
   private int mInitialState;
   private long mEmptySetIndex;
   private long mFullSetIndex;
+  private int mEnablingFakePair;
+  private int mDisablingFakePair;
 }

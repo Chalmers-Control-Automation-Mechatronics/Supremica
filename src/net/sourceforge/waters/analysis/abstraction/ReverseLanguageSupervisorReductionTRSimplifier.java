@@ -54,14 +54,12 @@ public class ReverseLanguageSupervisorReductionTRSimplifier
   //#########################################################################
   //# Constructors
   public ReverseLanguageSupervisorReductionTRSimplifier()
-    throws AnalysisException
   {
     this(null);
   }
 
   public ReverseLanguageSupervisorReductionTRSimplifier
     (final ListBufferTransitionRelation rel)
-    throws AnalysisException
   {
     super(rel);
     mReverseLanguageStep = new ReverseLanguageStep1TRSimplifier();
@@ -71,13 +69,15 @@ public class ReverseLanguageSupervisorReductionTRSimplifier
     mMinimizationStep = new ObservationEquivalenceTRSimplifier();
     mMinimizationStep.setEquivalence
       (ObservationEquivalenceTRSimplifier.Equivalence.DETERMINISTIC_MINSTATE);
-    final List<TransitionRelationSimplifier> chain = new ArrayList<>(5);
+    final List<TransitionRelationSimplifier> chain = new ArrayList<>(7);
     mSuWonhamStep = new SuWonhamSupervisorReductionTRSimplifier();
     chain.add(mReverseLanguageStep);
     chain.add(mSubsetConstructionStep);
     chain.add(mSynchronisationStep);
+    chain.add(new SelfloopSupervisorReductionTRSimplifier());
     chain.add(mMinimizationStep);
     chain.add(mSuWonhamStep);
+    chain.add(new SelfloopSupervisorReductionTRSimplifier());
     mChain = new ChainTRSimplifier(chain, rel);
     createStatistics();
   }
@@ -102,6 +102,7 @@ public class ReverseLanguageSupervisorReductionTRSimplifier
    *          The new state limit, or {@link Integer#MAX_VALUE} to allow
    *          an unlimited number of states.
    */
+  @Override
   public void setStateLimit(final int limit)
   {
     mReverseLanguageStep.setStateLimit(limit);
@@ -113,6 +114,7 @@ public class ReverseLanguageSupervisorReductionTRSimplifier
    * Gets the state limit.
    * @see #setStateLimit(int) setStateLimit()
    */
+  @Override
   public int getStateLimit()
   {
     return mReverseLanguageStep.getStateLimit();
@@ -125,6 +127,7 @@ public class ReverseLanguageSupervisorReductionTRSimplifier
    *          The new transition limit, or {@link Integer#MAX_VALUE} to allow
    *          an unlimited number of transitions.
    */
+  @Override
   public void setTransitionLimit(final int limit)
   {
     mReverseLanguageStep.setTransitionLimit(limit);
@@ -136,6 +139,7 @@ public class ReverseLanguageSupervisorReductionTRSimplifier
    * Gets the transition limit.
    * @see #setTransitionLimit(int) setTransitionLimit()
    */
+  @Override
   public int getTransitionLimit()
   {
     return mReverseLanguageStep.getStateLimit();
@@ -152,6 +156,19 @@ public class ReverseLanguageSupervisorReductionTRSimplifier
     mReverseLanguageStep.setSupervisedEvent(event);
     mSuWonhamStep.setSupervisedEvent(event);
   }
+
+  @Override
+  public boolean isSupervisedEventRequired()
+  {
+    return true;
+  }
+
+  @Override
+  public boolean isMinimizationIncluded()
+  {
+    return true;
+  }
+
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.abstraction.
@@ -172,12 +189,6 @@ public class ReverseLanguageSupervisorReductionTRSimplifier
   {
     super.setTransitionRelation(rel);
     mChain.setTransitionRelation(rel);
-  }
-
-  @Override
-  public int getPreferredInputConfiguration()
-  {
-    return mChain.getPreferredInputConfiguration();
   }
 
   @Override

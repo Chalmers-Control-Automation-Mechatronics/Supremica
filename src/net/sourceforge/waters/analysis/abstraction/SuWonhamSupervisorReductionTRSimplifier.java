@@ -87,7 +87,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
 
   //#########################################################################
   //# Constructors
-  public SuWonhamSupervisorReductionTRSimplifier() throws AnalysisException
+  public SuWonhamSupervisorReductionTRSimplifier()
   {
   }
 
@@ -98,7 +98,8 @@ public class SuWonhamSupervisorReductionTRSimplifier
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
+  //# Interface
+  //# net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
   @Override
   public int getPreferredInputConfiguration()
   {
@@ -108,6 +109,14 @@ public class SuWonhamSupervisorReductionTRSimplifier
 
   //#########################################################################
   //# Configuration
+  /**
+   * Enables or disables reordering of states based on distance to decision
+   * states. This experimental optimisation by Fanqian Qiu only works with
+   * supervisor localisation, i.e., when a supervised event is configured.
+   * Otherwise, the setting has no effect.
+   * @param experimentalMode <CODE>true</CODE> to enable reordering.
+   * @see #setSupervisedEvent(int) setSupervisedEvent()
+   */
   public void setExperimentalMode(final boolean experimentalMode)
   {
     mExperimentalMode = experimentalMode;
@@ -661,7 +670,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
       rel.createAllTransitionsReadOnlyIteratorByStatus
         (EventStatus.STATUS_CONTROLLABLE);
     while (iter.advance()) {
-      // for each controllable event ...
+      // for each controllable transition ...
       checkAbort();
       final int currentEvent = iter.getCurrentEvent();
       final int succ = iter.getCurrentTargetState();
@@ -744,7 +753,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
           badClass[nextBad++] = s;
         } else {
           int listID = mStateToClass[s];
-          if (mExperimentalMode) {
+          if (mInverseMap != null) { // experimental mode
             listID = mStateToClass[mInverseMap[s]];
           }
           if (mClasses.getFirst(listID) == s) {
