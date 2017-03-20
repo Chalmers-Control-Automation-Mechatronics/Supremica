@@ -112,7 +112,7 @@ import gnu.trove.set.hash.THashSet;
 /**
  * @author Robi Malik
  */
-public class ModelAssess
+public class ModelAssessor
 {
 
   //#########################################################################
@@ -132,9 +132,9 @@ public class ModelAssess
     try {
       final LoggerFactory loggerfactory = LoggerFactory.getInstance();
       loggerfactory.logToNull();
-      final ModelAssess assess =
-        new ModelAssess(config, classlist, inputdir, outputdir);
-      assess.run();
+      final ModelAssessor assessor =
+        new ModelAssessor(config, classlist, inputdir, outputdir);
+      assessor.run();
     } catch (final IOException exception) {
       System.err.println(ProxyTools.getShortClassName(exception) + " caught!");
       final String msg = exception.getMessage();
@@ -165,7 +165,7 @@ public class ModelAssess
 
   //#########################################################################
   //# Constructor
-  private ModelAssess(final String config,
+  private ModelAssessor(final String config,
                       final String classlist,
                       final String inputdir,
                       final String outputdir)
@@ -203,7 +203,6 @@ public class ModelAssess
   private void run()
     throws FileNotFoundException
   {
-    final String extension = mMarshaller.getDefaultExtension();
     final File outfile = new File(mOutputDirectory, "assess.tex");
     final OutputStream outstream = new FileOutputStream(outfile);
     mOutput = new PrintStream(outstream);
@@ -219,21 +218,35 @@ public class ModelAssess
         } else {
           Arrays.sort(submitted);
           for (final File file : submitted) {
-            final String name = file.getName();
-            if (name.endsWith(extension)) {
-              processModule(file);
-            } else if (name.endsWith("coversheet.rtf")) {
-              // ignore
-            } else {
-              mOutput.println
-              ("{\\bf\\itshape Unknown file type: {\\tt " + name + "}}!");
-              mOutput.println();
-            }
+            processFile(file);
           }
         }
       }
     } finally {
       mOutput.close();
+    }
+  }
+
+  private void processFile(final File file)
+  {
+    if (file.isDirectory()) {
+      final File[] children = file.listFiles();
+      Arrays.sort(children);
+      for (final File child : children) {
+        processFile(child);
+      }
+    } else {
+      final String name = file.getName();
+      final String extension = mMarshaller.getDefaultExtension();
+      if (name.endsWith(extension)) {
+        processModule(file);
+      } else if (name.endsWith("coversheet.rtf")) {
+        // ignore
+      } else {
+        mOutput.println
+        ("{\\bf\\itshape Unknown file type: {\\tt " + name + "}}!");
+        mOutput.println();
+      }
     }
   }
 
