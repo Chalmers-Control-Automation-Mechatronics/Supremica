@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="empty_spec" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="empty_spec" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <ns2:Comment>A test that involves an automaton without any states.
 Since automaton empty has no initial state, this model should have no reachable states, so it should be both controllable and nonblocking. Yet, it will be considered uncontrollable and blocking, if the automaton empty is ignored.</ns2:Comment>
     <EventDeclList>
@@ -16,27 +16,27 @@ Since automaton empty has no initial state, this model should have no reachable 
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="48" X="80"/>
+                            <Point X="80" Y="48"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-9" X="10"/>
+                            <Point X="10" Y="-9"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
                         <PointGeometry>
-                            <Point Y="112" X="80"/>
+                            <Point X="80" Y="112"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-8" X="9"/>
+                            <Point X="9" Y="-8"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="S1" Source="S0">
+                    <Edge Source="S0" Target="S1">
                         <LabelBlock>
                             <SimpleIdentifier Name="u"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-8" X="10"/>
+                                <Point X="10" Y="-8"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -48,27 +48,27 @@ Since automaton empty has no initial state, this model should have no reachable 
                 <LabelBlock>
                     <SimpleIdentifier Name="u"/>
                     <LabelGeometry Anchor="NW">
-                        <Point Y="37" X="113"/>
+                        <Point X="113" Y="37"/>
                     </LabelGeometry>
                 </LabelBlock>
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
                         <PointGeometry>
-                            <Point Y="48" X="80"/>
+                            <Point X="80" Y="48"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="8" X="3"/>
+                            <Point X="3" Y="8"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
             </Graph>
         </SimpleComponent>
         <SimpleComponent Kind="SPEC" Name="empty">
-            <Graph>
+            <Graph Deterministic="false">
                 <LabelBlock>
                     <SimpleIdentifier Name="c"/>
                     <LabelGeometry Anchor="NW">
-                        <Point Y="29" X="26"/>
+                        <Point X="26" Y="29"/>
                     </LabelGeometry>
                 </LabelBlock>
             </Graph>

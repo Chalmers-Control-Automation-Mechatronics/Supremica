@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="empty_prop" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="empty_prop" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <ns2:Comment>A test that involves a property without any states.
 This model should fail a language inclusion check, because the plant accepts the empty trace, but the property does not.</ns2:Comment>
     <EventDeclList>
@@ -15,27 +15,27 @@ This model should fail a language inclusion check, because the plant accepts the
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="48" X="80"/>
+                            <Point X="80" Y="48"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-9" X="10"/>
+                            <Point X="10" Y="-9"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
                         <PointGeometry>
-                            <Point Y="112" X="80"/>
+                            <Point X="80" Y="112"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-8" X="9"/>
+                            <Point X="9" Y="-8"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="S1" Source="S0">
+                    <Edge Source="S0" Target="S1">
                         <LabelBlock>
                             <SimpleIdentifier Name="u"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-8" X="10"/>
+                                <Point X="10" Y="-8"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -43,7 +43,7 @@ This model should fail a language inclusion check, because the plant accepts the
             </Graph>
         </SimpleComponent>
         <SimpleComponent Kind="PROPERTY" Name="empty">
-            <Graph/>
+            <Graph Deterministic="false"/>
         </SimpleComponent>
     </ComponentList>
 </Module>

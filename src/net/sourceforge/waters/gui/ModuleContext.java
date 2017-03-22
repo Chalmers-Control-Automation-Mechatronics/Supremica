@@ -52,6 +52,7 @@ import net.sourceforge.waters.gui.util.IconLoader;
 import net.sourceforge.waters.gui.util.PropositionIcon;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
 import net.sourceforge.waters.model.module.ComponentProxy;
@@ -667,19 +668,7 @@ public class ModuleContext
 
   public static String getComponentKindToolTip(final ComponentKind kind)
   {
-    switch (kind) {
-    case PLANT:
-      return "Plant";
-    case PROPERTY:
-      return "Property";
-    case SPEC:
-      return "Specification";
-    case SUPERVISOR:
-      return "Supervisor";
-    default:
-      throw new IllegalArgumentException("Unknown component kind: " + kind
-                                         + "!");
-    }
+    return AutomatonTools.getComponentKindStringCapitalised(kind);
   }
 
   public static String getEventKindToolTip(final EventKind kind,

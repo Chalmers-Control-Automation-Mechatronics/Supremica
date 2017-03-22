@@ -34,6 +34,7 @@
 package net.sourceforge.waters.model.compiler.graph;
 
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
@@ -63,6 +64,17 @@ public class NondeterministicModuleException extends EvalException {
   }
 
   /**
+   * Constructs a new exception indicating that an automaton has no initial
+   * state.
+   * @param comp     The simple component that causes the problem.
+   */
+  public NondeterministicModuleException(final SimpleComponentProxy comp)
+  {
+    super(AutomatonTools.getComponentKindStringCapitalised(comp.getKind()) +
+          " '" + comp.getName() + "' does not have any initial state!", comp);
+  }
+
+  /**
    * Constructs a new exception indicating that an automaton has more than
    * one initial state.
    * @param comp     The simple component that causes the problem.
@@ -73,8 +85,9 @@ public class NondeterministicModuleException extends EvalException {
                                          final SimpleNodeProxy node,
                                          final Proxy location)
   {
-    super("Automaton '" + comp.getName() +
-          "' has more than one initial state!", location);
+    super(AutomatonTools.getComponentKindStringCapitalised(comp.getKind()) +
+          " '" + comp.getName() + "' has more than one initial state!",
+          location);
   }
 
   /**
@@ -91,8 +104,9 @@ public class NondeterministicModuleException extends EvalException {
                                          final Proxy location)
   {
     super("Multiple transitions labelled '" + event.getName() +
-          "' originating from state '" + node.getName() +
-          "' in automaton '" + comp.getName() + "'!", location);
+          "' originating from state '" + node.getName() + "' in " +
+          AutomatonTools.getComponentKindStringLowerCase(comp.getKind()) +
+          " '" + comp.getName() + "'!", location);
   }
 
 

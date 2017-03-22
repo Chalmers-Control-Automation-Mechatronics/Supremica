@@ -138,7 +138,7 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
 
 
   //##########################################################################
-  //# Optimization Configuration
+  //# Optimisation Configuration
   public boolean isOptimizationEnabled()
   {
     return mIsOptimizationEnabled;
@@ -254,6 +254,9 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
       mLocalStateNames = new HashSet<String>(numNodes);
       mLocalTransitionsList = new LinkedList<CompiledTransition>();
       visitCollection(nodes);
+      if (mMaxInitialStates > 0) {
+        throw new NondeterministicModuleException(comp);
+      }
 
       // Pre-compile transitions
       final Collection<EdgeProxy> edges = graph.getEdges();
@@ -261,7 +264,7 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
       final Collection<EventProxy> keys = mLocalEventsMap.keySet();
       final List<EventProxy> alphabet = new ArrayList<EventProxy>(keys);
 
-      // Optimization
+      // Optimisation
       if (mIsOptimizationEnabled) {
         mNumReachableStates = 0;
         mNumReachableTransitions = 0;
@@ -328,10 +331,10 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
       addAutomaton(ident, aut);
       mCompilationInfo.add(aut, comp);
       return aut;
-    }
 
-    finally
-    {
+    } catch (final EvalException exception) {
+      throw wrap(exception);
+    } finally {
       mCurrentComponent = null;
       mLocalEventsMap = null;
       mPrecompiledNodesMap = null;
@@ -347,8 +350,7 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
   public CompiledNode visitSimpleNodeProxy(final SimpleNodeProxy node)
     throws VisitorException
   {
-    try
-    {
+    try {
       checkAbort();
       final String name = node.getName();
       if (!mLocalStateNames.add(name)) {
@@ -372,13 +374,9 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
       final PlainEventListProxy elist = node.getPropositions();
       visitPlainEventListProxy(elist);
       return mCurrentSource;
-    }
-
-    catch (final EvalException exception) {
+    } catch (final EvalException exception) {
       throw wrap(exception);
-    }
-
-    finally {
+    } finally {
       mCurrentSource = null;
     }
   }
@@ -485,7 +483,7 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
       final SelfloopInfo info = new SelfloopInfo();
       mLocalEventsMap.put(event, info);
       /* Special treatment of forbidden proposition:
-       * exclude this from compiler optimization.
+       * exclude this from compiler optimisation.
        */
       final String name = event.getName();
       if (name.equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {

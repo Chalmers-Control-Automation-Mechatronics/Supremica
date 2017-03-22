@@ -33,9 +33,6 @@
 
 package net.sourceforge.waters.model.des;
 
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.strategy.HashingStrategy;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -44,6 +41,9 @@ import java.util.Set;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.WatersHashSet;
 import net.sourceforge.waters.xsd.base.ComponentKind;
+
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.strategy.HashingStrategy;
 
 
 /**
@@ -306,6 +306,56 @@ public final class AutomatonTools
     return buffer.toString();
   }
 
+  /**
+   * Returns a string to describe the given component kind.
+   * This method returns a string of only lower-case characters.
+   * Possible return values are:
+   * <CODE>&quot;plant&quot;</CODE>,
+   * <CODE>&quot;property&quot;</CODE>,
+   * <CODE>&quot;specification&quot;</CODE>, and
+   * <CODE>&quot;supervisor&quot;</CODE>.
+   */
+  public static String getComponentKindStringLowerCase(final ComponentKind kind)
+  {
+    switch (kind) {
+    case PLANT:
+      return "plant";
+    case PROPERTY:
+      return "property";
+    case SPEC:
+      return "specification";
+    case SUPERVISOR:
+      return "supervisor";
+    default:
+      throw new IllegalArgumentException("Unknown component kind: " + kind
+                                         + "!");
+    }
+  }
+  /**
+   * Returns a string to describe the given component kind.
+   * This method returns a string with capitalised initial followed by
+   * lower-case characters. Possible return values are:
+   * <CODE>&quot;Plant&quot;</CODE>,
+   * <CODE>&quot;Property&quot;</CODE>,
+   * <CODE>&quot;Specification&quot;</CODE>, and
+   * <CODE>&quot;Supervisor&quot;</CODE>.
+   */
+  public static String getComponentKindStringCapitalised(final ComponentKind kind)
+  {
+    switch (kind) {
+    case PLANT:
+      return "Plant";
+    case PROPERTY:
+      return "Property";
+    case SPEC:
+      return "Specification";
+    case SUPERVISOR:
+      return "Supervisor";
+    default:
+      throw new IllegalArgumentException("Unknown component kind: " + kind
+                                         + "!");
+    }
+  }
 
   //#########################################################################
   //# Inner Class TransitionHashingStrategy
