@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -37,13 +37,12 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sf.javabdd.BDD;
-import net.sf.javabdd.BDDFactory;
-
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
@@ -51,6 +50,18 @@ import net.sourceforge.waters.model.des.SafetyTraceProxy;
  *
  * <P>The {@link #run()} method of this model checker does nothing,
  * and simply claims that every model is controllable.</P>
+ *
+ * <P>You are welcome to edit this file as much as you like,
+ * but please <STRONG>do not change</STRONG> the public interface.
+ * Do not change the signature of the two constructors,
+ * or of the {@link #run()} or {@link #getCounterExample()} methods.
+ * You should expect a single constructor call, followed by several calls
+ * to {@link #run()} and {@link #getCounterExample()}, so your code needs
+ * to be reentrant.</P>
+ *
+ * <P><STRONG>WARNING:</STRONG> If you do not comply with these rules, the
+ * automatic tester may fail to run your program, resulting in 0 marks for
+ * your assignment.</P>
  *
  * @see ModelChecker
  *
@@ -81,86 +92,72 @@ public class ControllabilityChecker extends ModelChecker
    * Runs this controllability checker.
    * This method starts the model checking process on the model given
    * as parameter to the constructor of this object. On termination,
-   * the result of checking the property is known and can be queried
-   * using the {@link #getResult()} and {@link #getCounterExample()}
-   * methods.
+   * if the result is false, a counterexample can be queried using the
+   * {@link #getCounterExample()} method.
    * Presently, this is a dummy implementation that does nothing but always
    * returns <CODE>true</CODE>.
    * @return <CODE>true</CODE> if the model is controllable, or
    *         <CODE>false</CODE> if it is not.
-   *         The same value can be queried using the {@link #getResult()}
-   *         method.
    */
+  @Override
   public boolean run()
   {
-    // Let us try to open a BDD factory. The "java" BDD factory is much
-    // easier to debug than the faster "buddy" factory, but let us try
-    // "buddy" first to see whether the native library can be loaded. 
-    // Another fast alternative is "cudd".
-    final BDDFactory bddFactory = BDDFactory.init("buddy", 10000, 5000);
+    // The following code determines and prints the number of uncontrollable
+    // events in each finite-state machine in the model.
+    // This is not very helpful for a controllability check,
+    // but it demonstrates the use of the interfaces.
 
-    try {
+    // Start new line (for tidier output with ControllabilityMain)
+    System.out.println();
 
-      // The following code demonstrates how to create some BDDs.
-      // It has nothing to do with controllability checking.
+    // First get the model
+    final ProductDESProxy model = getModel();
 
-      // Allocate five Boolean variables.
-      bddFactory.setVarNum(5);
+    // For each automaton ...
+    for (final AutomatonProxy aut : model.getAutomata()) {
 
-      // Get the first and second variable.
-      final BDD x0 = bddFactory.ithVar(0);
-      final BDD x1 = bddFactory.ithVar(1);
+      // Is it a plant or specification?
+      final String plantOrSpec;
+      switch (aut.getKind()) {
+      case PLANT:
+        plantOrSpec = "Plant";
+        break;
+      case SPEC:
+        plantOrSpec = "Spec";
+        break;
+      default:
+        // Don't bother if it is something else
+        continue;
+      }
 
-      // Calculate their logical AND ...
-      @SuppressWarnings("unused")
-      final BDD and01 = x0.and(x1);
+      // Reset counter for uncontrollable events
+      int count = 0;
+      // For each event in the automaton alphabet ...
+      for (final EventProxy event : aut.getEvents()) {
+        // Count uncontrollable events ...
+        if (event.getKind() == EventKind.UNCONTROLLABLE) {
+          count++;
+        }
+      }
 
-      // The BDD factory has its own memory management and garbage
-      // collection. If we do not want to use a BDD any longer, we
-      // should inform the factory that it can now be reclaimed.
-      x0.free();
-      x1.free();
-      // It causes an exception if we use x0 or x1 again from now on.
+      // Print what we have found
+      System.out.println(plantOrSpec + " " + aut.getName() + " has " +
+                         count + " uncontrollable events.");
+    }
 
-      // Since this is going to be done very often, there is a shorter
-      // alternative. The andWith() (and similar methods) automatically
-      // consume the two input BDDs.
-      final BDD x2 = bddFactory.ithVar(2);
-      final BDD x3 = bddFactory.ithVar(3);
-      x2.andWith(x3);
-      // Now variable x2 contains the conjunction x2 && x3.
-      // x3 has been freed and must not be accessed again.
+    // Try to compute a counterexample ...
+    // This is not yet implemented and should only be done of the model is
+    // not controllable, but never mind ...
+    mCounterExample = computeCounterExample();
 
-      // This all was no good at all as far as controllability of
-      // the input model is concerned. Let us just leave ...
-      return true;
-
-    } finally {
-
-      // Before we leave, we _must_ close the BDD factory, otherwise
-      // it cannot be used a second time. This is done in a finally
-      // block, to make sure it happens even in case of errors.
-      bddFactory.done();
-
-    }      
+    // This all was no good as far as controllability checking was concerned.
+    // Let us just leave.
+    return true;
   }
 
 
   //#########################################################################
   //# Simple Access Methods
-  /**
-   * Gets the result of controllability checking.
-   * @return <CODE>true</CODE> if the model was found to be controllable,
-   *         <CODE>false</CODE> otherwise.
-   * @throws IllegalStateException in all cases, because this method is
-   *         not yet implemented.
-   */
-  public boolean getResult()
-  {
-    throw new IllegalStateException
-      ("Controllability checking not yet implemented!");
-  }
-
   /**
    * Gets a counterexample if the model was found to be not controllable.
    * representing a controllability error trace. A controllability error
@@ -173,12 +170,27 @@ public class ControllabilityChecker extends ModelChecker
    *         The returned trace is constructed for the input product DES
    *         of this controllability checker and shares its automata and
    *         event objects.
-   * @throws IllegalStateException if this method is called before
-   *         model checking has completed, i.e., before {@link #run()}
-   *         has been called, or model checking has found that the
-   *         property is satisfied and there is no counterexample.
    */
+  @Override
   public SafetyTraceProxy getCounterExample()
+  {
+    // Just return a stored counterexample. This is the recommended way
+    // of doing this, because we may no longer be able to use the
+    // data structures used by the algorithm once the run() method has
+    // finished. The counterexample can be computed by a method similar to
+    // computeCounterExample() below or otherwise.
+    return mCounterExample;
+  }
+
+  /**
+   * Computes a counterexample.
+   * This method is to be called from {@link #run()} after the model was
+   * found to be not controllable, and while any data structures from
+   * the controllability check that may be needed to compute the
+   * counterexample are still available.
+   * @return The computed counterexample.
+   */
+  private SafetyTraceProxy computeCounterExample()
   {
     // The following creates a trace that consists of all the events in
     // the input model.
@@ -187,16 +199,24 @@ public class ControllabilityChecker extends ModelChecker
 
     final ProductDESProxyFactory desFactory = getFactory();
     final ProductDESProxy des = getModel();
-    final String desname = des.getName();
-    final String tracename = desname + ":uncontrollable";
+    final String desName = des.getName();
+    final String traceName = desName + ":uncontrollable";
     final Collection<EventProxy> events = des.getEvents();
-    final List<EventProxy> tracelist = new LinkedList<EventProxy>();
+    final List<EventProxy> traceList = new LinkedList<EventProxy>();
     for (final EventProxy event : events) {
-      tracelist.add(event);
+      traceList.add(event);
     }
     final SafetyTraceProxy trace =
-      desFactory.createSafetyTraceProxy(tracename, des, tracelist);
+      desFactory.createSafetyTraceProxy(traceName, des, traceList);
     return trace;
   }
+
+
+  //#########################################################################
+  //# Data Members
+  /**
+   * The computed counterexample or null if the model is controllable.
+   */
+  private SafetyTraceProxy mCounterExample;
 
 }
