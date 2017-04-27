@@ -53,7 +53,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  *
  * <P>You are welcome to edit this file as much as you like,
  * but please <STRONG>do not change</STRONG> the public interface.
- * Do not change the signature of the two constructors,
+ * Do not change the signature of the constructor,
  * or of the {@link #run()} or {@link #getCounterExample()} methods.
  * You should expect a single constructor call, followed by several calls
  * to {@link #run()} and {@link #getCounterExample()}, so your code needs
@@ -134,7 +134,7 @@ public class ControllabilityChecker extends ModelChecker
       int count = 0;
       // For each event in the automaton alphabet ...
       for (final EventProxy event : aut.getEvents()) {
-        // Count uncontrollable events ...
+        // count if uncontrollable
         if (event.getKind() == EventKind.UNCONTROLLABLE) {
           count++;
         }
@@ -150,7 +150,7 @@ public class ControllabilityChecker extends ModelChecker
     // not controllable, but never mind ...
     mCounterExample = computeCounterExample();
 
-    // This all was no good as far as controllability checking was concerned.
+    // This all was no good as far as controllability checking is concerned.
     // Let us just leave.
     return true;
   }

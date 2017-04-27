@@ -57,7 +57,7 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
  *
  * <P>This class provides a simple application that accepts a list
  * of file names on the command line, loads a model from each file,
- * passes it to a conflict checker, and prints the result.
+ * passes it to a controllability checker, and prints the result.
  * More precisely, this class can be run as follows.</P>
  *
  * <P><CODE>java ControllabilityMain
@@ -94,7 +94,7 @@ public class ControllabilityMain
   //# Main Method for Testing
   /**
    * Main method.
-   * This is a main method to check a set of files for control loop free.
+   * This is a main method to check a set of files for controllability.
    * Please refer to the class documentation ({@link ControllabilityMain})
    * for more detailed information.
    * @param  args    Array of file names from the command line.
