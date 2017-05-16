@@ -37,7 +37,7 @@ import net.sourceforge.waters.model.base.WatersException;
 
 
 /**
- * The superclass of al exceptions thrown by analysis algorithms.
+ * The superclass of all exceptions thrown by analysis algorithms.
  *
  * @author Robi Malik
  */

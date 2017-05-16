@@ -41,7 +41,6 @@ import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
@@ -52,9 +51,8 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * <P>A tool to check whether a controllability error trace is a correct
  * counterexample to show that a given product DES is not controllable.</P>
  *
- * <P>To use this class, it must be initialised with a
- * {@link ProductDESProxyFactory}. Afterwards, {@link
- * #checkCounterExample(ProductDESProxy,SafetyTraceProxy)
+ * <P>To use this class, an instance must be obtained from the constructor.
+ * Afterwards, {@link #checkCounterExample(ProductDESProxy,SafetyTraceProxy)
  * checkCounterExample()} can be called repeatedly. If a check fails,
  * {@link #getDiagnostics()} can be called to retrieve an explanation.</P>
  *

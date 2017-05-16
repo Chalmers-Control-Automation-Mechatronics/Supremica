@@ -419,12 +419,13 @@
     <copy todir="${javadoc552}/src">
       <fileset dir="${supremica.src}">
         <include
-          name="net/sourceforge/waters/analysis/comp552/ConflictChecker.java"/>
+          name="net/sourceforge/waters/model/analysis/AnalysisException.java"/>
+        <include name="net/sourceforge/waters/analysis/comp552/Conflict*.java"/>
         <include
-          name="net/sourceforge/waters/analysis/comp552/ConflictMain.java"/>
-        <include name="net/sourceforge/waters/analysis/comp552/ConflictCounterExampleChecker.java"/>
+          name="net/sourceforge/waters/analysis/comp552/Controllability*.java"/>
         <include
           name="net/sourceforge/waters/analysis/comp552/ModelChecker.java"/>
+        <exclude name="net/sourceforge/waters/analysis/comp552/*Assess.java"/>
       </fileset>
     </copy>
     <javadoc destdir="${javadoc552}"
