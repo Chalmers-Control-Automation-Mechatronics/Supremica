@@ -214,7 +214,7 @@ public class ConflictChecker extends ModelChecker
     final String modelname = model.getName();
     final String tracename = modelname + "-conflicting";
     final Collection<EventProxy> events = model.getEvents();
-    final List<EventProxy> tracelist = new LinkedList<EventProxy>();
+    final List<EventProxy> tracelist = new LinkedList<>();
     for (final EventProxy event : events) {
       tracelist.add(event);
     }

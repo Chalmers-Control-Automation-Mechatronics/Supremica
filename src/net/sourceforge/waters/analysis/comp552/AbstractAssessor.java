@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -48,6 +48,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.bind.JAXBException;
@@ -61,7 +62,6 @@ import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.OperatorTable;
@@ -85,29 +85,24 @@ import org.xml.sax.SAXException;
 
 
 /**
- * <P>A main class for testing the {@link BDDControllabilityChecker} class.
- * It provides a simple application that reads a test suite description,
+ * <P>An abstract base class for all assessors of the COMP552 programming
+ * assignments. The assessor reads a test suite description,
  * runs all tests contained, and prints a result with recommended grades.</P>
  *
  * @author Robi Malik
  */
 
-public class ControllabilityAssess
+abstract class AbstractAssessor
 {
 
   //#########################################################################
-  //# Constructors
-  private ControllabilityAssess(final File reportFile,
-                         final File progressFile,
-                         final int minutes,
-                         final long maxBytes,
-                         final TeachingSecurityManager secman)
+  //# Constructor
+  AbstractAssessor()
     throws JAXBException, SAXException, IOException
   {
-    mSecurityManager = secman;
+    mDESFactory = ProductDESElementFactory.getInstance();
     final ModuleProxyFactory moduleFactory =
       ModuleElementFactory.getInstance();
-    mDESFactory = ProductDESElementFactory.getInstance();
     final OperatorTable optable = CompilerOperatorTable.getInstance();
     final JAXBModuleMarshaller moduleMarshaller =
       new JAXBModuleMarshaller(moduleFactory, optable);
@@ -116,6 +111,77 @@ public class ControllabilityAssess
     mDocumentManager = new DocumentManager();
     mDocumentManager.registerUnmarshaller(desMarshaller);
     mDocumentManager.registerUnmarshaller(moduleMarshaller);
+    mFormatter = new DecimalFormat("0.000");
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  ProductDESProxyFactory getFactory()
+  {
+    return mDESFactory;
+  }
+
+
+  //#########################################################################
+  //# Set Up
+  static void setUpLogger()
+  {
+    final PrintWriter writer = new PrintWriter(System.err);
+    final PatternLayout layout = new PatternLayout("%-5p %m%n");
+    final Appender appender = new WriterAppender(layout, writer);
+    appender.setName("stderr");
+    final Logger root = Logger.getRootLogger();
+    root.setLevel(Level.ERROR);
+    root.addAppender(appender);
+  }
+
+  void processCommandLine(final String[] args)
+  {
+    try {
+      if (args.length < 3) {
+        System.err.println
+          ("USAGE: java " + ProxyTools.getShortClassName(this) +
+           " <input> <output> <marks> <minutes> <maxbytes> <readable-dir> ...");
+        System.exit(1);
+      }
+      final File inputfile = new File(args[0]);
+      final File outputfile = new File(args[1]);
+      final File marksfile = new File(args[2]);
+      final int minutes = Integer.parseInt(args[3]);
+      final long maxBytes = parseBytes(args[4]);
+      final TeachingSecurityManager secman = new TeachingSecurityManager();
+      secman.addReadWriteDirectory("");
+      for (int i = 5; i < args.length; i++) {
+        secman.addReadOnlyDirectory(args[i]);
+      }
+      secman.addLibrary("waters");
+      secman.addLibrary("buddy");
+      secman.addLibrary("cudd");
+      secman.close();
+      configure(outputfile, marksfile, minutes, maxBytes, secman);
+      runSuite(inputfile);
+      terminate();
+      System.exit(0);
+    } catch (final Throwable exception) {
+      System.err.println("FATAL ERROR !!!");
+      System.err.println(exception.getClass().getName() +
+                         " caught in main()!");
+      exception.printStackTrace(System.err);
+      System.exit(1);
+    } finally {
+      close();
+    }
+  }
+
+  void configure(final File reportFile,
+                 final File progressFile,
+                 final int minutes,
+                 final long maxBytes,
+                 final TeachingSecurityManager secman)
+    throws JAXBException, SAXException, IOException
+  {
+    mSecurityManager = secman;
 
     mTerminated = false;
     if (progressFile.exists()) {
@@ -172,7 +238,6 @@ public class ControllabilityAssess
       mReportPrinter = new PrintWriter(reportStream);
     }
 
-    mFormatter = new DecimalFormat("0.000");
     mStream = null;
     if (!mTerminated) {
       final Thread timoutWatchdog = new TimeoutWatchdog(minutes);
@@ -181,6 +246,19 @@ public class ControllabilityAssess
       memoryWatchdog.start();
     }
   }
+
+
+  //#########################################################################
+  //# Hooks
+  abstract ModelChecker createChecker(ProductDESProxy des);
+
+  abstract AbstractCounterExampleChecker createCounterExampleChecker();
+
+  abstract TraceProxy createAlternateTrace(String name,
+                                           ProductDESProxy des,
+                                           List<EventProxy> events);
+
+  abstract String getResultText(boolean result);
 
 
   //#########################################################################
@@ -320,12 +398,12 @@ public class ControllabilityAssess
       mProgressPrinter.flush();
     }
 
-    BDDControllabilityChecker checker;
+    ModelChecker checker;
     boolean result;
     double time;
     try {
       mSecurityManager.setEnabled(true);
-      checker = new BDDControllabilityChecker(des, mDESFactory);
+      checker = createChecker(des);
       final long starttime = System.currentTimeMillis();
       result = checker.run();
       final long stoptime = System.currentTimeMillis();
@@ -353,11 +431,8 @@ public class ControllabilityAssess
       if (mTerminated) {
         return;
       }
-      if (result) {
-        mReportPrinter.print("controllable");
-      } else {
-        mReportPrinter.print("not controllable");
-      }
+      final String text = getResultText(result);
+      mReportPrinter.print(text);
       if (result == expect) {
         mReportPrinter.print(" - ok");
       } else {
@@ -373,7 +448,7 @@ public class ControllabilityAssess
         mProgressPrinter.println("in " + index);
         mProgressPrinter.flush();
       }
-      SafetyTraceProxy trace;
+      TraceProxy trace;
       try {
         mSecurityManager.setEnabled(true);
         trace = checker.getCounterExample();
@@ -402,41 +477,76 @@ public class ControllabilityAssess
 
   //#########################################################################
   //# Counterexample Verification
-  private boolean checkCounterExample(final ProductDESProxy des,
-                                      final SafetyTraceProxy trace)
+  boolean checkCounterExample(final ProductDESProxy des,
+                              final TraceProxy trace)
     throws AnalysisException
   {
-    if (trace == null) {
-      printMalformedCounterExample(trace, "is NULL");
+    final AbstractCounterExampleChecker checker = createCounterExampleChecker();
+    if (checker.checkCounterExample(des, trace)) {
+      mNumCorrectTraces++;
+      printGoodCounterExample(trace);
+      return true;
+    }
+    final String diagnostics = checker.getDiagnostics();
+    if (trace != null && isHalfCorrectCounterExample(des, trace, checker)) {
+      mNumHalfCorrectTraces++;
       return false;
     }
-    final ControllabilityCounterExampleChecker checker =
-      new ControllabilityCounterExampleChecker(false);
-    if (checker.checkCounterExample(des, trace)) {
-      printGoodCounterExample(trace);
-      mNumCorrectTraces++;
+    printMalformedCounterExample(trace, diagnostics);
+    return false;
+  }
+
+  boolean isHalfCorrectCounterExample(final ProductDESProxy des,
+                                      final TraceProxy trace,
+                                      final AbstractCounterExampleChecker checker)
+    throws AnalysisException
+  {
+    final String name = trace.getName() + ":reversed";
+    final List<EventProxy> reversedList = new LinkedList<>();
+    for (final EventProxy event : trace.getEvents()) {
+      reversedList.add(0, event);
+    }
+    final TraceProxy reversedTrace =
+      createAlternateTrace(name, des, reversedList);
+    if (checker.checkCounterExample(des, reversedTrace)) {
+      printMalformedCounterExample(trace, "is in reversed order");
       return true;
     } else {
-      final String diag = checker.getDiagnostics();
-      printMalformedCounterExample(trace, diag);
       return false;
     }
   }
 
-  private synchronized void printMalformedCounterExample
+  synchronized void printMalformedCounterExample
     (final TraceProxy trace, final String msg)
   {
-    mReportPrinter.println("BAD (" + msg + "):");
-    printCounterExample(trace);
+    final String line1, line2;
+    final int splitPos = msg.indexOf('\n');
+    if (splitPos >= 0) {
+      line1 = msg.substring(0, splitPos);
+      line2 = msg.substring(splitPos + 1);
+    } else {
+      line1 = msg;
+      line2 = null;
+    }
+    mReportPrinter.print("BAD (" + line1 + ")");
+    if (trace != null) {
+      mReportPrinter.println(":");
+      printCounterExample(trace);
+      if (line2 != null) {
+        mReportPrinter.println(line2);
+      }
+    } else {
+      mReportPrinter.println();
+    }
   }
 
-  private synchronized void printGoodCounterExample
+  synchronized void printGoodCounterExample
     (final TraceProxy trace)
   {
     printGoodCounterExample(trace, null);
   }
 
-  private synchronized void printGoodCounterExample
+  synchronized void printGoodCounterExample
     (final TraceProxy trace, final String msg)
   {
     mReportPrinter.print("ok");
@@ -447,8 +557,7 @@ public class ControllabilityAssess
     printCounterExample(trace);
   }
 
-  private void printCounterExample
-    (final TraceProxy trace)
+  private void printCounterExample(final TraceProxy trace)
   {
     final List<EventProxy> traceevents = trace.getEvents();
     if (traceevents.isEmpty()) {
@@ -552,70 +661,9 @@ public class ControllabilityAssess
 
 
   //#########################################################################
-  //# Main Method for Testing
-  /**
-   * Main method.
-   * This is a main method to check a set of files for controllability.
-   * Please refer to the class documentation ({@link ControllabilityAssess})
-   * for more detailed information.
-   * @param  args    Array of file names from the command line.
-   */
-  public static void main(final String[] args)
-  {
-    final PrintWriter writer = new PrintWriter(System.err);
-    final PatternLayout layout = new PatternLayout("%-5p %m%n");
-    final Appender appender = new WriterAppender(layout, writer);
-    appender.setName("stderr");
-    final Logger root = Logger.getRootLogger();
-    root.setLevel(Level.ERROR);
-    root.addAppender(appender);
-
-    ControllabilityAssess assessor = null;
-    try {
-      if (args.length < 3) {
-        System.err.println
-          ("USAGE: java " + ControllabilityAssess.class.getName() +
-           " <input> <output> <marks> <minutes> <maxbytes> <readable-dir> ...");
-        System.exit(1);
-      }
-      final File inputfile = new File(args[0]);
-      final File outputfile = new File(args[1]);
-      final File marksfile = new File(args[2]);
-      final int minutes = Integer.parseInt(args[3]);
-      final long maxBytes = parseBytes(args[4]);
-      final TeachingSecurityManager secman = new TeachingSecurityManager();
-      secman.addReadWriteDirectory("");
-      for (int i = 5; i < args.length; i++) {
-        secman.addReadOnlyDirectory(args[i]);
-      }
-      secman.addLibrary("waters");
-      secman.addLibrary("buddy");
-      secman.addLibrary("cudd");
-      secman.close();
-      assessor =
-        new ControllabilityAssess(outputfile, marksfile, minutes, maxBytes, secman);
-      assessor.runSuite(inputfile);
-      assessor.terminate();
-      System.exit(0);
-    } catch (final Throwable exception) {
-      System.err.println("FATAL ERROR !!!");
-      System.err.println(exception.getClass().getName() +
-                         " caught in main()!");
-      exception.printStackTrace(System.err);
-      System.exit(1);
-    } finally {
-      if (assessor != null) {
-        assessor.close();
-      }
-    }
-  }
-
-
-  //#########################################################################
   //# Local Class TimeoutWatchdog
   private class TimeoutWatchdog extends Thread
   {
-
     //#######################################################################
     //# Constructor
     private TimeoutWatchdog(final int minutes)
@@ -645,7 +693,6 @@ public class ControllabilityAssess
     //#######################################################################
     //# Data Members
     private final int mMinutes;
-
   }
 
 
@@ -653,7 +700,6 @@ public class ControllabilityAssess
   //# Local Class MemoryWatchdog
   private class MemoryWatchdog extends Thread
   {
-
     //#######################################################################
     //# Constructor
     private MemoryWatchdog(final long maxBytes)
@@ -670,7 +716,7 @@ public class ControllabilityAssess
         do {
           Thread.sleep(5000);
         } while (NativeModelAnalyzer.getPeakMemoryUsage() <= mLimit);
-        synchronized (ControllabilityAssess.this) {
+        synchronized (AbstractAssessor.this) {
           mReportPrinter.println("OUT OF MEMORY");
           mProgressPrinter.println("abort");
         }
@@ -686,18 +732,17 @@ public class ControllabilityAssess
     //#######################################################################
     //# Data Members
     private final long mLimit;
-
   }
 
 
   //#########################################################################
   //# Data Members
-  private final TeachingSecurityManager mSecurityManager;
   private final ProductDESProxyFactory mDESFactory;
   private final DocumentManager mDocumentManager;
-  private final PrintWriter mReportPrinter;
-  private final PrintWriter mProgressPrinter;
   private final NumberFormat mFormatter;
+  private TeachingSecurityManager mSecurityManager;
+  private PrintWriter mReportPrinter;
+  private PrintWriter mProgressPrinter;
 
   private InputStream mStream;
   private long mStartTime;

@@ -202,7 +202,7 @@ public class ControllabilityChecker extends ModelChecker
     final String desName = des.getName();
     final String traceName = desName + ":uncontrollable";
     final Collection<EventProxy> events = des.getEvents();
-    final List<EventProxy> traceList = new LinkedList<EventProxy>();
+    final List<EventProxy> traceList = new LinkedList<>();
     for (final EventProxy event : events) {
       traceList.add(event);
     }
