@@ -1,0 +1,137 @@
+#!/bin/bash
+
+#############################################################################
+
+if [ "$1" = "552" ]
+then
+  WWW=$HOME/public_html/comp552-17a
+  INST_DIR=/home/comp452/lib
+else
+  WWW=$HOME/public_html/download_waters
+fi
+
+SUP_SRC=`dirname "$0"`/..
+SUP_SRC=`readlink -f "$SUP_SRC"`
+SUP_DIST=$SUP_SRC/dist
+W_IN=distrib_inputs
+W_DIST_TMP=waters
+ARCHIVE_PREFIX=waterside23
+
+#############################################################################
+
+echo Extracting JAR ...
+
+JAR_TMP=jartmp
+if [ -d $JAR_TMP ];
+then
+  rm -rf $JAR_TMP
+fi
+mkdir $JAR_TMP
+(cd $JAR_TMP ; jar xf $SUP_DIST/Supremica.jar)
+rm -rf $JAR_TMP/dummy
+rm -rf $JAR_TMP/META-INF
+rm -rf $JAR_TMP/Thumbs.db
+rm -rf $JAR_TMP/manifest.txt
+
+if [ "$1" = "552" ]
+then
+  rm -rf $JAR_TMP/includeInJarFile
+  rm -rf $JAR_TMP/net/sourceforge/waters/analysis/bdd
+  rm -rf $JAR_TMP/net/sourceforge/waters/analysis/comp552
+  rm -rf $JAR_TMP/net/sourceforge/waters/analysis/compositional
+# net/sourceforge/waters/analysis/hisc is needed by compiler.
+  rm -rf $JAR_TMP/net/sourceforge/waters/analysis/modular
+  rm -rf $JAR_TMP/net/sourceforge/waters/analysis/monolithic
+  rm -rf $JAR_TMP/net/sourceforge/waters/analysis/po
+  rm -rf $JAR_TMP/net/sourceforge/waters/analysis/trcomp
+fi
+
+VPROPS=$JAR_TMP/net/sourceforge/waters/config/Version.properties
+cp $VPROPS $W_IN
+
+#############################################################################
+
+for PLATFORM in linux.amd64 linux.x86 win32.amd64 win32.x86;
+do
+
+echo $PLATFORM ...
+
+OS=`echo $PLATFORM | sed -e 's/\..*$//'`
+ARCH=`echo $PLATFORM | sed -e 's/^.*\.//'`
+if [ "$ARCH" = "amd64" ];
+then
+    BITS=64
+else
+    BITS=32
+fi
+
+if [ -d $W_DIST_TMP ];
+then
+    rm -rf $W_DIST_TMP
+fi
+mkdir $W_DIST_TMP
+
+echo "  Repacking JAR ..."
+
+sed -e "s/^native\\.host\\.arch.*$/native.host.arch = $PLATFORM/" $W_IN/Version.properties > $VPROPS
+jar cfm Supremica.jar $W_IN/manifest.txt -C $JAR_TMP .
+
+#############################################################################
+
+echo "  Copying ..."
+
+sed -e s/NNN/$BITS/g $W_IN/README.$OS > $W_DIST_TMP/README.$OS
+chmod 644 $W_DIST_TMP/README.$OS
+install -m 644 $SUP_SRC/platform/$PLATFORM/lib/* $W_DIST_TMP
+install -m 644 Supremica.jar $W_DIST_TMP
+install -m 644 $SUP_DIST/SupremicaLib.jar $W_DIST_TMP
+install -m 644 $W_IN/waters.properties $W_DIST_TMP
+
+#############################################################################
+
+echo "  Setting up Download ..."
+mkdir -p $WWW
+if [ "$OS" = "linux" ];
+then
+    ARCHIVE=$WWW/$ARCHIVE_PREFIX.$PLATFORM.tar.gz
+    if [ -r $ARCHIVE ];
+    then
+        rm -f $ARCHIVE
+    fi
+    install -m 755 $W_IN/waters $W_DIST_TMP
+    tar czf $ARCHIVE $W_DIST_TMP 
+else
+    ARCHIVE=$WWW/$ARCHIVE_PREFIX.$PLATFORM.zip
+    if [ -r $ARCHIVE ];
+    then
+        rm -f $ARCHIVE
+    fi
+    cp $W_IN/waters.bat $W_DIST_TMP
+    cp $W_IN/waters.vbs $W_DIST_TMP
+    unix2dos $W_DIST_TMP/waters.bat $W_DIST_TMP/waters.vbs \
+        $W_DIST_TMP/README.$OS >& /dev/null
+    zip -r $ARCHIVE $W_DIST_TMP >& /dev/null
+fi
+
+done
+
+#############################################################################
+
+if [ "$1" = "552" ]
+then
+
+  echo Installing ...
+
+  if [ -d $INST_DIR ];
+  then
+    rm -rf $INST_DIR/waters
+  fi
+  (cd $INST_DIR ; tar zxf $WWW/$ARCHIVE_PREFIX.linux.amd64.tar.gz)
+  cat inputs/dot226.properties >> $INST_DIR/waters/waters.properties
+
+fi
+
+#############################################################################
+
+echo Cleaning up ...
+rm -rf $JAR_TMP $W_DIST_TMP Supremica.jar $W_IN/Version.properties

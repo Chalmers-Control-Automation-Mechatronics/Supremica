@@ -1,0 +1,22 @@
+Welcome to Waters/Supremica IDE
+
+To run the software, you need a Java 1.8 runtime environment.
+If you do not have it, please download and install it from
+http://www.oracle.com/technetwork/java/javase/downloads
+
+This version of Waters/Supremica IDE includes precompiled binaries
+for NNN-bit Windows. You will need a NNN-bit Java Virtual Machine
+(not necessarily NNN-bit Windows) to run this.
+
+For complete functionality of the analyser, you also need to
+install GraphViz 2.26, available from 
+  http://www.graphviz.org/pub/graphviz/stable/windows
+Just make sure the dot executable is in your search path.
+Higher versions than 2.26 unfortunately do not work.
+
+To run the IDE, please execute the script waters.bat or waters.vbs
+in this directory. These scripts cannot be copied to another place
+such as your desktop, but it is possible to create a shortcut and
+put that somewhere else.
+
+Have fun!
