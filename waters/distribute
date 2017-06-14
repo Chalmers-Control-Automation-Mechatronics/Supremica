@@ -80,8 +80,15 @@ jar cfm Supremica.jar $W_IN/manifest.txt -C $JAR_TMP .
 
 echo "  Copying ..."
 
-sed -e s/NNN/$BITS/g $W_IN/README.$OS > $W_DIST_TMP/README.$OS
-chmod 644 $W_DIST_TMP/README.$OS
+if [ "$OS" = "win32" ];
+then
+    RSUFFIX=windows
+else
+    RSUFFIX=$OS
+fi
+
+sed -e s/NNN/$BITS/g $W_IN/README.$RSUFFIX > $W_DIST_TMP/README.$RSUFFIX
+chmod 644 $W_DIST_TMP/README.$RSUFFIX
 install -m 644 $SUP_SRC/platform/$PLATFORM/lib/* $W_DIST_TMP
 install -m 644 Supremica.jar $W_DIST_TMP
 install -m 644 $SUP_DIST/SupremicaLib.jar $W_DIST_TMP

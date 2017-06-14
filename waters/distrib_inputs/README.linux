@@ -11,10 +11,10 @@ for NNN-bit Linux. You will need a NNN-bit Java Virtual Machine
 (not necessarily NNN-bit Linux) to run this.
 
 For complete functionality of the analyser, you also need to
-install GraphViz 2.26, available from
-  http://www.graphviz.org/pub/graphviz/stable
+install GraphViz 2.28, available from
+  http://www.graphviz.org/pub/graphviz/ARCHIVE
 Just make sure the dot executable is in your search path.
-Higher versions than 2.26 unfortunately do not work.
+Higher versions than 2.28 unfortunately do not work.
 
 To run the IDE, please execute the script waters in this directory.
 You may add the directory to your search path or create an alias
