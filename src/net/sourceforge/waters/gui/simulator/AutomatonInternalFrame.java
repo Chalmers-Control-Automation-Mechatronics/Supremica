@@ -185,7 +185,6 @@ public class AutomatonInternalFrame
     return mParent;
   }
 
-  static int i = 0;
   /**
    * Stores the current position of the window as a reference frame for
    * aspect-preserving resizing. Also calculates the size of the window
