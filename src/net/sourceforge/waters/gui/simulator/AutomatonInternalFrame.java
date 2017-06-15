@@ -34,10 +34,12 @@
 package net.sourceforge.waters.gui.simulator;
 
 
+import java.awt.AWTEvent;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.event.AWTEventListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
@@ -78,7 +80,6 @@ public class AutomatonInternalFrame
     mParent = parent;
     mDisplayPane = new AutomatonDisplayPane(aut, graph, container, sim, this);
     setContentPane(mDisplayPane);
-    addMouseListener(new InternalFrameMouseAdapter());
     addComponentListener(new PreserveAspectComponentListener());
     setVisible(true);
     pack();
@@ -274,34 +275,9 @@ public class AutomatonInternalFrame
 
 
   //#########################################################################
-  //# Inner class InternalFrameMouseAdapter
-  private class InternalFrameMouseAdapter extends MouseAdapter
-  {
-
-    //#######################################################################
-    //# Interface java.awt.event.MouseListener
-    /**
-     * Listener for mouse-release events.
-     * When mouse button 1 is released, a window-resize operation may
-     * have been completed, so we store the new location of the reference
-     * frame.
-     */
-    @Override
-    public void mouseReleased(final MouseEvent event)
-    {
-      if (event.getButton() == MouseEvent.BUTTON1) {
-        storeReferenceFrame();
-      }
-    }
-
-  }
-
-
-  //#########################################################################
   //# Inner Class PreserveAspectComponentListener
   private class PreserveAspectComponentListener extends ComponentAdapter
   {
-
     //#######################################################################
     //# Interface java.awt.event.ComponentListener
     /**
@@ -332,10 +308,66 @@ public class AutomatonInternalFrame
       if (mOldBounds != null && !mDisplayPane.isEmbedderRunning()) {
         final Rectangle bounds = getBounds();
         adjustSize(bounds, false);
+        mGlobalMouseListener.setFrame(AutomatonInternalFrame.this);
         // Don't set mOldBounds - this is done by mouse handler.
       }
     }
+  }
 
+
+  //#########################################################################
+  //# Inner class GlobalMouseListener
+  private static class GlobalMouseListener implements AWTEventListener
+  {
+    //#######################################################################
+    //# Interface java.awt.event.MouseListener
+    /**
+     * <P>Listener for mouse-release events.
+     * When the left mouse button is released, a window-resize operation may
+     * have been completed, so we store the new location of the reference
+     * frame.</P>
+     * <P>This is implemented as an {@link AWTEventListener}, because
+     * under Windows, an ordinary mouse listener does not receive
+     * mouse-released events that occur on the title bar of an internal
+     * frame.</P>
+     */
+    @Override
+    public void eventDispatched(final AWTEvent event)
+    {
+      final MouseEvent mouseEvent = (MouseEvent) event;
+      if (mouseEvent.getID() == MouseEvent.MOUSE_RELEASED &&
+          mouseEvent.getButton() == MouseEvent.BUTTON1) {
+        doAction();
+        Toolkit.getDefaultToolkit().removeAWTEventListener(this);
+      }
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private void setFrame(final AutomatonInternalFrame frame)
+    {
+      if (mFrame != frame) {
+        if (mFrame == null) {
+          Toolkit.getDefaultToolkit().addAWTEventListener
+            (this, AWTEvent.MOUSE_EVENT_MASK);
+        } else {
+          doAction();
+        }
+        mFrame = frame;
+      }
+    }
+
+    private void doAction()
+    {
+      if (mFrame != null) {
+        mFrame.storeReferenceFrame();
+        mFrame = null;
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private AutomatonInternalFrame mFrame = null;
   }
 
 
@@ -363,6 +395,13 @@ public class AutomatonInternalFrame
    * content pane.
    */
   private int mBorderHeight = 0;
+
+  /**
+   * A single instance of a global event listener, which is needed to
+   * detect the end of frame resizing operations by the user.
+   */
+  private final static GlobalMouseListener mGlobalMouseListener =
+    new GlobalMouseListener();
 
 
   //#########################################################################
